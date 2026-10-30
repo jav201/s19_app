@@ -1,0 +1,1384 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py -k verify_reread or non_os_error or failed_manifest or f2_ or mac_attach or differs_from_its_row or fresh_folder
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree; PRE-FIX sources (the reviewed diff), corrective-pass-1 test arms added)
+# source sha256 (16): app.py 2f6b446594652dbc · apply.py 9cb482d5e2876f00 · change_service.py 3623a42e6d1cd13e · project_gather_service.py a0dae1342b64bc14 · test_b100_save_image.py 559768f390ded771
+# PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# date: 2026-10-29T21:29:14Z
+# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\__init__.py
+FF.FFF....                                                               [100%]
+================================== FAILURES ===================================
+__________ test_tc_b100_17_verify_reread_failure_rolls_the_emit_back __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30038/test_tc_b100_17_verify_reread_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000244BD2D5290>
+
+    def test_tc_b100_17_verify_reread_failure_rolls_the_emit_back(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Review F1 / SEC-7 (LLR-167.4, LED .53): the emit LANDS, then the
+        verify re-read raises ``OSError`` (an AV or indexer lock on the
+        just-written file) → the status says not saved, and the emitted image
+        and the folder this save created are both gone. The emitted file must
+        join the rollback list the moment it lands — recording it only after
+        the emit returns leaves ``P1/firmware.s19`` and a folder ``list_projects``
+        treats as a project."""
+    
+        def _refuse_reread(path, image, kind):
+            assert Path(path).is_file(), "the emit has not landed yet"
+            raise PermissionError(13, "re-read refused", str(path))
+    
+        monkeypatch.setattr(
+            change_service_module, "verify_written_image", _refuse_reread
+        )
+        before: dict = {}
+    
+        async def scenario(app, pilot) -> None:
+            _add(app, PATCH_ADDRESS, PATCH_BYTES)
+            _apply(app)
+            before.update(_tree_digests(app.workarea))
+    
+        lines, project, _ = _save_session(tmp_path, scenario)
+        assert "Project NOT saved: could not save" in lines[-1], lines
+>       assert not project.exists(), sorted(project.rglob("*"))
+E       AssertionError: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30038/test_tc_b100_17_verify_reread_0/app/.s19tool/workarea/P1/firmware.s19')]
+E       assert not True
+E        +  where True = exists()
+E        +    where exists = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30038/test_tc_b100_17_verify_reread_0/app/.s19tool/workarea/P1').exists
+
+tests\test_b100_save_image.py:766: AssertionError
+____ test_tc_b100_17_non_os_error_after_the_emit_rolls_back_then_surfaces _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30038/test_tc_b100_17_non_os_error_a0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000244BFA41ED0>
+
+    def test_tc_b100_17_non_os_error_after_the_emit_rolls_back_then_surfaces(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Review F1 / SEC-7 (LLR-167.4): an error that is not an ``OSError``
+        after the emit landed still rolls the save back — no folder, no
+        image — and then surfaces (it is a defect, never swallowed)."""
+    
+        def _defect(path, image, kind):
+            raise ValueError("forced defect after the emit")
+    
+        monkeypatch.setattr(change_service_module, "verify_written_image", _defect)
+        src = _copy_case01(tmp_path) / "firmware.s19"
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            async with app.run_test(size=(220, 60)) as pilot:
+                await pilot.pause()
+                await _load_image(pilot, app, src)
+                _add(app, PATCH_ADDRESS, PATCH_BYTES)
+                _apply(app)
+                before = _tree_digests(app.workarea)
+                with pytest.raises(ValueError, match="forced defect"):
+                    app._handle_save_dialog(_payload(app, "P1"))
+                return before, _tree_digests(app.workarea), app.workarea / "P1"
+    
+        before, after, project = asyncio.run(_drive())
+>       assert not project.exists(), sorted(project.rglob("*"))
+E       AssertionError: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30038/test_tc_b100_17_non_os_error_a0/app/.s19tool/workarea/P1/firmware.s19')]
+E       assert not True
+E        +  where True = exists()
+E        +    where exists = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30038/test_tc_b100_17_non_os_error_a0/app/.s19tool/workarea/P1').exists
+
+tests\test_b100_save_image.py:796: AssertionError
+_____ test_f2_unreadable_source_refuses_and_the_app_keeps_running[image] ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30038/test_f2_unreadable_source_refu0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000244C0622990>
+locked = 'image'
+
+    @pytest.mark.parametrize("locked", ["image", "a2l"])
+    def test_f2_unreadable_source_refuses_and_the_app_keeps_running(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, locked: str
+    ) -> None:
+        """Review F2 (LLR-164.4): a source the plan must digest cannot be read
+        — the image on the copy branch, or the A2L while a patch is pending on
+        the emit branch → the status says not saved and names the file, no
+        folder exists, the app is still running, and the pending patch is
+        still in memory (base painted ``… Nothing written.`` and kept
+        running; the decide/plan block let ``PermissionError`` escape)."""
+        folder = _copy_case01(tmp_path, "firmware.s19", "firmware.a2l")
+        real_open = open
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            async with app.run_test(size=(220, 60)) as pilot:
+                await pilot.pause()
+                await _load_image(pilot, app, folder / "firmware.s19")
+                if locked == "a2l":
+                    app.load_a2l_from_path(folder / "firmware.a2l")
+                    await _wait_for(
+                        pilot, lambda: app.current_a2l_path is not None, "the A2L"
+                    )
+                    _add(app, PATCH_ADDRESS, PATCH_BYTES)
+                    _apply(app)
+                    target = app.current_a2l_path
+                else:
+                    target = app.current_file.path
+    
+                def _open(file, mode="r", *args, **kwargs):
+                    handle = real_open(file, mode, *args, **kwargs)
+                    if "b" in mode and Path(file) == Path(target):
+                        return _UnreadableHandle(handle)
+                    return handle
+    
+                monkeypatch.setattr(app_module, "open", _open, raising=False)
+                await _save_as_callback(pilot, app, "P1")
+                monkeypatch.undo()
+                status = _status_text(app)
+                alive = (app.is_running, app.return_code)
+                unsaved = app._change_service.differs_from_last_saved(
+                    app.current_file.mem_map
+                )
+                return status, alive, unsaved, target.name, app.workarea / "P1"
+    
+>       status, alive, unsaved, name, project = asyncio.run(_drive())
+                                                ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_save_image.py:904: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_save_image.py:874: in _drive
+    async with app.run_test(size=(220, 60)) as pilot:
+..\..\anaconda3\envs\s19env\Lib\contextlib.py:217: in __aexit__
+    await anext(self.gen)
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: in run_test
+    raise self._exception
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:702: in _flush_next_callbacks
+    await invoke(callback.callback)
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:56: in _invoke
+    result = callback(*params[:parameter_count])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\app.py:8862: in _handle_save_dialog
+    plan = self._plan_project_save(project_dir, cleaned, image_step)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\app.py:9371: in _plan_project_save
+    PlannedFile("image", loaded.path, loaded.path.name, *_file_digest(loaded.path))
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\app.py:1493: in _file_digest
+    for chunk in iter(lambda: handle.read(1 << 20), b""):
+s19_app\tui\app.py:1493: in <lambda>
+    for chunk in iter(lambda: handle.read(1 << 20), b""):
+                              ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <tests.test_b100_save_image._UnreadableHandle object at 0x00000244BF257F90>
+args = (1048576,)
+
+    def read(self, *args):
+>       raise PermissionError(13, "Permission denied")
+E       PermissionError: [Errno 13] Permission denied
+
+tests\test_b100_save_image.py:848: PermissionError
+---------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────
+│ C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\tui\app.py:8862 in           
+│ _handle_save_dialog                                                          
+│                                                                              
+│    8859 │   │   │   if self.current_file                                     
+│    8860 │   │   │   else _ProjectImageStep(emit=False)                       
+│    8861 │   │   )                                                            
+│ ❱  8862 │   │   plan = self._plan_project_save(project_dir, cleaned, image_s 
+│    8863 │   │   if plan.refusal is not None:                                 
+│    8864 │   │   │   self.set_status(plan.refusal)                            
+│    8865 │   │   │   self.notify(                                             
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │               cleaned = 'P1'                                             │ 
+│ │            image_step = _ProjectImageStep(                               │ 
+│ │                         │   emit=False,                                  │ 
+│ │                         │   derived=None,                                │ 
+│ │                         │   summary=None,                                │ 
+│ │                         │   payload=None,                                │ 
+│ │                         │   name='',                                     │ 
+│ │                         │   carried=0,                                   │ 
+│ │                         │   applied_by_save=0,                           │ 
+│ │                         │   refusal=None                                 │ 
+│ │                         )                                                │ 
+│ │                  item = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │       missing_sources = []                                               │ 
+│ │   open_project_folded = ''                                               │ 
+│ │       parent_resolved = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │               payload = SaveProjectPayload(                              │ 
+│ │                         │                                                │ 
+│ │                         parent_folder='C:\\Users\\jjgh8\\AppData\\Local… │ 
+│ │                         │   project_name='P1',                           │ 
+│ │                         │   batch=(),                                    │ 
+│ │                         │   assignments={}                               │ 
+│ │                         )                                                │ 
+│ │           project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │ project_file_suffixes = {                                                │ 
+│ │                         │   '.s19',                                      │ 
+│ │                         │   '.hex',                                      │ 
+│ │                         │   '.mac',                                      │ 
+│ │                         │   '.a2l',                                      │ 
+│ │                         │   '.srec',                                     │ 
+│ │                         │   '.ihex'                                      │ 
+│ │                         }                                                │ 
+│ │        raw_components = ['P1']                                           │ 
+│ │       reserved_folded = {                                                │ 
+│ │                         │   'temp',                                      │ 
+│ │                         │   'splits',                                    │ 
+│ │                         │   'logs',                                      │ 
+│ │                         │   'flowsets',                                  │ 
+│ │                         │   'templates',                                 │ 
+│ │                         │   'patches',                                   │ 
+│ │                         │   'reports',                                   │ 
+│ │                         │   'crc',                                       │ 
+│ │                         │   'flows'                                      │ 
+│ │                         }                                                │ 
+│ │                  self = S19TuiApp(                                       │ 
+│ │                         │   title='Hex Edit Tool',                       │ 
+│ │                         │   classes={'-dark-mode'},                      │ 
+│ │                         │   pseudo_classes={'focus', 'dark'}             │ 
+│ │                         )                                                │ 
+│ │            typed_name = 'P1'                                             │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\tui\app.py:9371 in           
+│ _plan_project_save                                                           
+│                                                                              
+│    9368 │   │   │   │   )                                                    
+│    9369 │   │   │   else:                                                    
+│    9370 │   │   │   │   files.append(                                        
+│ ❱  9371 │   │   │   │   │   PlannedFile("image", loaded.path, loaded.path.na 
+│    9372 │   │   │   │   )                                                    
+│    9373 │   │   │   │   image = f"{loaded.path.name} unchanged copy"         
+│    9374 │   │   │   if loaded.mac_path and loaded.mac_path != loaded.path:   
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │        files = []                                                        │ 
+│ │        image = ''                                                        │ 
+│ │   image_step = _ProjectImageStep(                                        │ 
+│ │                │   emit=False,                                           │ 
+│ │                │   derived=None,                                         │ 
+│ │                │   summary=None,                                         │ 
+│ │                │   payload=None,                                         │ 
+│ │                │   name='',                                              │ 
+│ │                │   carried=0,                                            │ 
+│ │                │   applied_by_save=0,                                    │ 
+│ │                │   refusal=None                                          │ 
+│ │                )                                                         │ 
+│ │       loaded = LoadedFile(                                               │ 
+│ │                │                                                         │ 
+│ │                path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pyte… │ 
+│ │                │   file_type='s19',                                      │ 
+│ │                │   mem_map={                                             │ 
+│ │                │   │   2147483648: 83,                                   │ 
+│ │                │   │   2147483649: 49,                                   │ 
+│ │                │   │   2147483650: 57,                                   │ 
+│ │                │   │   2147483651: 84,                                   │ 
+│ │                │   │   2147483652: 79,                                   │ 
+│ │                │   │   2147483653: 79,                                   │ 
+│ │                │   │   2147483654: 76,                                   │ 
+│ │                │   │   2147483655: 95,                                   │ 
+│ │                │   │   2147483656: 66,                                   │ 
+│ │                │   │   2147483657: 65,                                   │ 
+│ │                │   │   ... +87                                           │ 
+│ │                │   },                                                    │ 
+│ │                │   row_bases=[                                           │ 
+│ │                │   │   2147483648,                                       │ 
+│ │                │   │   2147483664,                                       │ 
+│ │                │   │   2147483680,                                       │ 
+│ │                │   │   2147483712,                                       │ 
+│ │                │   │   2147483728,                                       │ 
+│ │                │   │   2147483744,                                       │ 
+│ │                │   │   2147483760                                        │ 
+│ │                │   ],                                                    │ 
+│ │                │   ranges=[                                              │ 
+│ │                │   │   (2147483648, 2147483681),                         │ 
+│ │                │   │   (2147483712, 2147483776)                          │ 
+│ │                │   ],                                                    │ 
+│ │                │   range_validity=[True, True],                          │ 
+│ │                │   errors=[],                                            │ 
+│ │                │   a2l_path=None,                                        │ 
+│ │                │   a2l_data=None,                                        │ 
+│ │                │   mac_path=None,                                        │ 
+│ │                │   mac_records=[],                                       │ 
+│ │                │   mac_diagnostics=[],                                   │ 
+│ │                │   variant_id=None,                                      │ 
+│ │                │   source_s0_header=b'CASE01_BASIC',                     │ 
+│ │                │   entropy_windows=[                                     │ 
+│ │                │   │   EntropyWindow(                                    │ 
+│ │                │   │   │   start=2147483648,                             │ 
+│ │                │   │   │   end=2147483681,                               │ 
+│ │                │   │   │   sample_count=33,                              │ 
+│ │                │   │   │   entropy=4.68075775572209,                     │ 
+│ │                │   │   │   band='low',                                   │ 
+│ │                │   │   │   low_confidence=True                           │ 
+│ │                │   │   ),                                                │ 
+│ │                │   │   EntropyWindow(                                    │ 
+│ │                │   │   │   start=2147483712,                             │ 
+│ │                │   │   │   end=2147483776,                               │ 
+│ │                │   │   │   sample_count=64,                              │ 
+│ │                │   │   │   entropy=6.0,                                  │ 
+│ │                │   │   │   band='medium',                                │ 
+│ │                │   │   │   low_confidence=False                          │ 
+│ │                │   │   )                                                 │ 
+│ │                │   ],                                                    │ 
+│ │                │   out_of_order_count=0,                                 │ 
+│ │                │   entry_point=2147483648                                │ 
+│ │                )                                                         │ 
+│ │  project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of… │ 
+│ │ project_name = 'P1'                                                      │ 
+│ │         self = S19TuiApp(                                                │ 
+│ │                │   title='Hex Edit Tool',                                │ 
+│ │                │   classes={'-dark-mode'},                               │ 
+│ │                │   pseudo_classes={'focus', 'dark'}                      │ 
+│ │                )                                                         │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\tui\app.py:1493 in           
+│ _file_digest                                                                 
+│                                                                              
+│    1490 │   digest = hashlib.sha256()                                        
+│    1491 │   size = 0                                                         
+│    1492 │   with open(path, "rb") as handle:                                 
+│ ❱  1493 │   │   for chunk in iter(lambda: handle.read(1 << 20), b""):        
+│    1494 │   │   │   digest.update(chunk)                                     
+│    1495 │   │   │   size += len(chunk)                                       
+│    1496 │   return digest.hexdigest(), size                                  
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ digest = <sha256 _hashlib.HASH object @ 0x00000244BF5B9F70>              │ 
+│ │ handle = <tests.test_b100_save_image._UnreadableHandle object at         │ 
+│ │          0x00000244BF257F90>                                             │ 
+│ │   path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8… │ 
+│ │   size = 0                                                               │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\tui\app.py:1493 in <lambda>  
+│                                                                              
+│    1490 │   digest = hashlib.sha256()                                        
+│    1491 │   size = 0                                                         
+│    1492 │   with open(path, "rb") as handle:                                 
+│ ❱  1493 │   │   for chunk in iter(lambda: handle.read(1 << 20), b""):        
+│    1494 │   │   │   digest.update(chunk)                                     
+│    1495 │   │   │   size += len(chunk)                                       
+│    1496 │   return digest.hexdigest(), size                                  
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ handle = <tests.test_b100_save_image._UnreadableHandle object at         │ 
+│ │          0x00000244BF257F90>                                             │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app-b100-inc5\tests\test_b100_save_image.py:848 in 
+│ read                                                                         
+│                                                                              
+│    845 │   │   self._handle.close()                                          
+│    846 │                                                                     
+│    847 │   def read(self, *args):                                            
+│ ❱  848 │   │   raise PermissionError(13, "Permission denied")                
+│    849                                                                       
+│    850                                                                       
+│    851 async def _save_as_callback(pilot, app: S19TuiApp, name: str) -> None 
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ args = (1048576,)                                                        │ 
+│ │ self = <tests.test_b100_save_image._UnreadableHandle object at           │ 
+│ │        0x00000244BF257F90>                                               │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+╰──────────────────────────────────────────────────────────────────────────────
+PermissionError: [Errno 13] Permission denied
+______ test_f2_unreadable_source_refuses_and_the_app_keeps_running[a2l] _______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30038/test_f2_unreadable_source_refu1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000244BF6E97D0>
+locked = 'a2l'
+
+    @pytest.mark.parametrize("locked", ["image", "a2l"])
+    def test_f2_unreadable_source_refuses_and_the_app_keeps_running(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, locked: str
+    ) -> None:
+        """Review F2 (LLR-164.4): a source the plan must digest cannot be read
+        — the image on the copy branch, or the A2L while a patch is pending on
+        the emit branch → the status says not saved and names the file, no
+        folder exists, the app is still running, and the pending patch is
+        still in memory (base painted ``… Nothing written.`` and kept
+        running; the decide/plan block let ``PermissionError`` escape)."""
+        folder = _copy_case01(tmp_path, "firmware.s19", "firmware.a2l")
+        real_open = open
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            async with app.run_test(size=(220, 60)) as pilot:
+                await pilot.pause()
+                await _load_image(pilot, app, folder / "firmware.s19")
+                if locked == "a2l":
+                    app.load_a2l_from_path(folder / "firmware.a2l")
+                    await _wait_for(
+                        pilot, lambda: app.current_a2l_path is not None, "the A2L"
+                    )
+                    _add(app, PATCH_ADDRESS, PATCH_BYTES)
+                    _apply(app)
+                    target = app.current_a2l_path
+                else:
+                    target = app.current_file.path
+    
+                def _open(file, mode="r", *args, **kwargs):
+                    handle = real_open(file, mode, *args, **kwargs)
+                    if "b" in mode and Path(file) == Path(target):
+                        return _UnreadableHandle(handle)
+                    return handle
+    
+                monkeypatch.setattr(app_module, "open", _open, raising=False)
+                await _save_as_callback(pilot, app, "P1")
+                monkeypatch.undo()
+                status = _status_text(app)
+                alive = (app.is_running, app.return_code)
+                unsaved = app._change_service.differs_from_last_saved(
+                    app.current_file.mem_map
+                )
+                return status, alive, unsaved, target.name, app.workarea / "P1"
+    
+>       status, alive, unsaved, name, project = asyncio.run(_drive())
+                                                ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_save_image.py:904: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_save_image.py:874: in _drive
+    async with app.run_test(size=(220, 60)) as pilot:
+..\..\anaconda3\envs\s19env\Lib\contextlib.py:217: in __aexit__
+    await anext(self.gen)
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: in run_test
+    raise self._exception
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:702: in _flush_next_callbacks
+    await invoke(callback.callback)
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:56: in _invoke
+    result = callback(*params[:parameter_count])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\app.py:8862: in _handle_save_dialog
+    plan = self._plan_project_save(project_dir, cleaned, image_step)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\app.py:9385: in _plan_project_save
+    *_file_digest(self.current_a2l_path),
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\app.py:1493: in _file_digest
+    for chunk in iter(lambda: handle.read(1 << 20), b""):
+s19_app\tui\app.py:1493: in <lambda>
+    for chunk in iter(lambda: handle.read(1 << 20), b""):
+                              ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <tests.test_b100_save_image._UnreadableHandle object at 0x00000244BFAA69D0>
+args = (1048576,)
+
+    def read(self, *args):
+>       raise PermissionError(13, "Permission denied")
+E       PermissionError: [Errno 13] Permission denied
+
+tests\test_b100_save_image.py:848: PermissionError
+---------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────
+│ C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\tui\app.py:8862 in           
+│ _handle_save_dialog                                                          
+│                                                                              
+│    8859 │   │   │   if self.current_file                                     
+│    8860 │   │   │   else _ProjectImageStep(emit=False)                       
+│    8861 │   │   )                                                            
+│ ❱  8862 │   │   plan = self._plan_project_save(project_dir, cleaned, image_s 
+│    8863 │   │   if plan.refusal is not None:                                 
+│    8864 │   │   │   self.set_status(plan.refusal)                            
+│    8865 │   │   │   self.notify(                                             
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │               cleaned = 'P1'                                             │ 
+│ │            image_step = _ProjectImageStep(                               │ 
+│ │                         │   emit=True,                                   │ 
+│ │                         │   derived={                                    │ 
+│ │                         │   │   2147483648: 83,                          │ 
+│ │                         │   │   2147483649: 49,                          │ 
+│ │                         │   │   2147483650: 57,                          │ 
+│ │                         │   │   2147483651: 84,                          │ 
+│ │                         │   │   2147483652: 79,                          │ 
+│ │                         │   │   2147483653: 79,                          │ 
+│ │                         │   │   2147483654: 76,                          │ 
+│ │                         │   │   2147483655: 95,                          │ 
+│ │                         │   │   2147483656: 66,                          │ 
+│ │                         │   │   2147483657: 65,                          │ 
+│ │                         │   │   ... +87                                  │ 
+│ │                         │   },                                           │ 
+│ │                         │   summary=ChangeSummary(                       │ 
+│ │                         │   │   source_path=None,                        │ 
+│ │                         │   │   kind='change',                           │ 
+│ │                         │   │   encoding='utf-8',                        │ 
+│ │                         │   │   value_mode='text',                       │ 
+│ │                         │   │                                            │ 
+│ │                         timestamp_utc='2026-10-29T21:29:26.113362+00:00… │ 
+│ │                         │   │   variant_id=None,                         │ 
+│ │                         │   │   counts={                                 │ 
+│ │                         │   │   │   'applied': 1,                        │ 
+│ │                         │   │   │   'skipped-partial': 0,                │ 
+│ │                         │   │   │   'skipped-outside': 0,                │ 
+│ │                         │   │   │   'skipped-no-image': 0,               │ 
+│ │                         │   │   │   'blocked': 0                         │ 
+│ │                         │   │   },                                       │ 
+│ │                         │   │   entries=[                                │ 
+│ │                         │   │   │   ChangeSummaryEntry(                  │ 
+│ │                         │   │   │   │   entry_type='bytes',              │ 
+│ │                         │   │   │   │   address_start=2147483772,        │ 
+│ │                         │   │   │   │   address_end=2147483776,          │ 
+│ │                         │   │   │   │   before_bytes=(60, 61, 62, 63),   │ 
+│ │                         │   │   │   │   after_bytes=(                    │ 
+│ │                         │   │   │   │   │   222,                         │ 
+│ │                         │   │   │   │   │   173,                         │ 
+│ │                         │   │   │   │   │   190,                         │ 
+│ │                         │   │   │   │   │   239                          │ 
+│ │                         │   │   │   │   ),                               │ 
+│ │                         │   │   │   │   disposition='applied',           │ 
+│ │                         │   │   │   │   linkage='standalone',            │ 
+│ │                         │   │   │   │   linkage_symbol=None,             │ 
+│ │                         │   │   │   │   symbol=None                      │ 
+│ │                         │   │   │   )                                    │ 
+│ │                         │   │   ],                                       │ 
+│ │                         │   │   issues=[],                               │ 
+│ │                         │   │   saved_path=None,                         │ 
+│ │                         │   │   verify_result=None,                      │ 
+│ │                         │   │   source_image_path=None                   │ 
+│ │                         │   ),                                           │ 
+│ │                         │                                                │ 
+│ │                         payload=b'S00F00004341534530315F4241534943B2\r\… │ 
+│ │                         │   name='firmware.s19',                         │ 
+│ │                         │   carried=1,                                   │ 
+│ │                         │   applied_by_save=0,                           │ 
+│ │                         │   refusal=None                                 │ 
+│ │                         )                                                │ 
+│ │                  item = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │       missing_sources = []                                               │ 
+│ │   open_project_folded = ''                                               │ 
+│ │       parent_resolved = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │               payload = SaveProjectPayload(                              │ 
+│ │                         │                                                │ 
+│ │                         parent_folder='C:\\Users\\jjgh8\\AppData\\Local… │ 
+│ │                         │   project_name='P1',                           │ 
+│ │                         │   batch=(),                                    │ 
+│ │                         │   assignments={}                               │ 
+│ │                         )                                                │ 
+│ │           project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │ project_file_suffixes = {                                                │ 
+│ │                         │   '.s19',                                      │ 
+│ │                         │   '.hex',                                      │ 
+│ │                         │   '.mac',                                      │ 
+│ │                         │   '.a2l',                                      │ 
+│ │                         │   '.srec',                                     │ 
+│ │                         │   '.ihex'                                      │ 
+│ │                         }                                                │ 
+│ │        raw_components = ['P1']                                           │ 
+│ │       reserved_folded = {                                                │ 
+│ │                         │   'temp',                                      │ 
+│ │                         │   'splits',                                    │ 
+│ │                         │   'logs',                                      │ 
+│ │                         │   'flowsets',                                  │ 
+│ │                         │   'templates',                                 │ 
+│ │                         │   'patches',                                   │ 
+│ │                         │   'reports',                                   │ 
+│ │                         │   'crc',                                       │ 
+│ │                         │   'flows'                                      │ 
+│ │                         }                                                │ 
+│ │                  self = S19TuiApp(                                       │ 
+│ │                         │   title='Hex Edit Tool',                       │ 
+│ │                         │   classes={'-dark-mode'},                      │ 
+│ │                         │   pseudo_classes={'focus', 'dark'}             │ 
+│ │                         )                                                │ 
+│ │            typed_name = 'P1'                                             │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\tui\app.py:9385 in           
+│ _plan_project_save                                                           
+│                                                                              
+│    9382 │   │   │   files.append(                                            
+│    9383 │   │   │   │   PlannedFile(                                         
+│    9384 │   │   │   │   │   "a2l", self.current_a2l_path, self.current_a2l_p 
+│ ❱  9385 │   │   │   │   │   *_file_digest(self.current_a2l_path),            
+│    9386 │   │   │   │   )                                                    
+│    9387 │   │   │   )                                                        
+│    9388 │   │   if not os.path.lexists(project_dir):                         
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │        files = [                                                         │ 
+│ │                │   PlannedFile(                                          │ 
+│ │                │   │   role='image',                                     │ 
+│ │                │   │                                                     │ 
+│ │                source=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/py… │ 
+│ │                │   │   name='firmware.s19',                              │ 
+│ │                │   │                                                     │ 
+│ │                digest='d37fbacaed599993db6dd9af09cda31279616dcbbf7deb95… │ 
+│ │                │   │   size=310                                          │ 
+│ │                │   )                                                     │ 
+│ │                ]                                                         │ 
+│ │        image = 'firmware.s19 + 1 change entry, 0 applied by this save'   │ 
+│ │   image_step = _ProjectImageStep(                                        │ 
+│ │                │   emit=True,                                            │ 
+│ │                │   derived={                                             │ 
+│ │                │   │   2147483648: 83,                                   │ 
+│ │                │   │   2147483649: 49,                                   │ 
+│ │                │   │   2147483650: 57,                                   │ 
+│ │                │   │   2147483651: 84,                                   │ 
+│ │                │   │   2147483652: 79,                                   │ 
+│ │                │   │   2147483653: 79,                                   │ 
+│ │                │   │   2147483654: 76,                                   │ 
+│ │                │   │   2147483655: 95,                                   │ 
+│ │                │   │   2147483656: 66,                                   │ 
+│ │                │   │   2147483657: 65,                                   │ 
+│ │                │   │   ... +87                                           │ 
+│ │                │   },                                                    │ 
+│ │                │   summary=ChangeSummary(                                │ 
+│ │                │   │   source_path=None,                                 │ 
+│ │                │   │   kind='change',                                    │ 
+│ │                │   │   encoding='utf-8',                                 │ 
+│ │                │   │   value_mode='text',                                │ 
+│ │                │   │   timestamp_utc='2026-10-29T21:29:26.113362+00:00', │ 
+│ │                │   │   variant_id=None,                                  │ 
+│ │                │   │   counts={                                          │ 
+│ │                │   │   │   'applied': 1,                                 │ 
+│ │                │   │   │   'skipped-partial': 0,                         │ 
+│ │                │   │   │   'skipped-outside': 0,                         │ 
+│ │                │   │   │   'skipped-no-image': 0,                        │ 
+│ │                │   │   │   'blocked': 0                                  │ 
+│ │                │   │   },                                                │ 
+│ │                │   │   entries=[                                         │ 
+│ │                │   │   │   ChangeSummaryEntry(                           │ 
+│ │                │   │   │   │   entry_type='bytes',                       │ 
+│ │                │   │   │   │   address_start=2147483772,                 │ 
+│ │                │   │   │   │   address_end=2147483776,                   │ 
+│ │                │   │   │   │   before_bytes=(60, 61, 62, 63),            │ 
+│ │                │   │   │   │   after_bytes=(222, 173, 190, 239),         │ 
+│ │                │   │   │   │   disposition='applied',                    │ 
+│ │                │   │   │   │   linkage='standalone',                     │ 
+│ │                │   │   │   │   linkage_symbol=None,                      │ 
+│ │                │   │   │   │   symbol=None                               │ 
+│ │                │   │   │   )                                             │ 
+│ │                │   │   ],                                                │ 
+│ │                │   │   issues=[],                                        │ 
+│ │                │   │   saved_path=None,                                  │ 
+│ │                │   │   verify_result=None,                               │ 
+│ │                │   │   source_image_path=None                            │ 
+│ │                │   ),                                                    │ 
+│ │                │                                                         │ 
+│ │                payload=b'S00F00004341534530315F4241534943B2\r\nS3258000… │ 
+│ │                │   name='firmware.s19',                                  │ 
+│ │                │   carried=1,                                            │ 
+│ │                │   applied_by_save=0,                                    │ 
+│ │                │   refusal=None                                          │ 
+│ │                )                                                         │ 
+│ │       loaded = LoadedFile(                                               │ 
+│ │                │                                                         │ 
+│ │                path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pyte… │ 
+│ │                │   file_type='s19',                                      │ 
+│ │                │   mem_map={                                             │ 
+│ │                │   │   2147483648: 83,                                   │ 
+│ │                │   │   2147483649: 49,                                   │ 
+│ │                │   │   2147483650: 57,                                   │ 
+│ │                │   │   2147483651: 84,                                   │ 
+│ │                │   │   2147483652: 79,                                   │ 
+│ │                │   │   2147483653: 79,                                   │ 
+│ │                │   │   2147483654: 76,                                   │ 
+│ │                │   │   2147483655: 95,                                   │ 
+│ │                │   │   2147483656: 66,                                   │ 
+│ │                │   │   2147483657: 65,                                   │ 
+│ │                │   │   ... +87                                           │ 
+│ │                │   },                                                    │ 
+│ │                │   row_bases=[                                           │ 
+│ │                │   │   2147483648,                                       │ 
+│ │                │   │   2147483664,                                       │ 
+│ │                │   │   2147483680,                                       │ 
+│ │                │   │   2147483712,                                       │ 
+│ │                │   │   2147483728,                                       │ 
+│ │                │   │   2147483744,                                       │ 
+│ │                │   │   2147483760                                        │ 
+│ │                │   ],                                                    │ 
+│ │                │   ranges=[                                              │ 
+│ │                │   │   (2147483648, 2147483681),                         │ 
+│ │                │   │   (2147483712, 2147483776)                          │ 
+│ │                │   ],                                                    │ 
+│ │                │   range_validity=[True, True],                          │ 
+│ │                │   errors=[],                                            │ 
+│ │                │                                                         │ 
+│ │                a2l_path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │                │   a2l_data={                                            │ 
+│ │                │   │   'path':                                           │ 
+│ │                'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8… │ 
+│ │                │   │   'sections': [                                     │ 
+│ │                │   │   │   {                                             │ 
+│ │                │   │   │   │   'name': 'PROJECT',                        │ 
+│ │                │   │   │   │   'meta': 'CASE01 "Synthetic project for    │ 
+│ │                S19Tool stress testing"',                                 │ 
+│ │                │   │   │   │   'start_line': 1,                          │ 
+│ │                │   │   │   │   'lines': [''],                            │ 
+│ │                │   │   │   │   'children': [                             │ 
+│ │                │   │   │   │   │   {                                     │ 
+│ │                │   │   │   │   │   │   'name': 'HEADER',                 │ 
+│ │                │   │   │   │   │   │   'meta': '',                       │ 
+│ │                │   │   │   │   │   │   'start_line': 2,                  │ 
+│ │                │   │   │   │   │   │   'lines': [                        │ 
+│ │                │   │   │   │   │   │   │   '    VERSION "1.0"',          │ 
+│ │                │   │   │   │   │   │   │   '    PROJECT_NO 1'            │ 
+│ │                │   │   │   │   │   │   ],                                │ 
+│ │                │   │   │   │   │   │   'children': [],                   │ 
+│ │                │   │   │   │   │   │   'end_line': 5                     │ 
+│ │                │   │   │   │   │   },                                    │ 
+│ │                │   │   │   │   │   {                                     │ 
+│ │                │   │   │   │   │   │   'name': 'MODULE',                 │ 
+│ │                │   │   │   │   │   │   'meta': 'BASIC "Synthetic ECU     │ 
+│ │                module"',                                                 │ 
+│ │                │   │   │   │   │   │   'start_line': 7,                  │ 
+│ │                │   │   │   │   │   │   'lines': [                        │ 
+│ │                │   │   │   │   │   │   │   '',                           │ 
+│ │                │   │   │   │   │   │   │   '',                           │ 
+│ │                │   │   │   │   │   │   │   '',                           │ 
+│ │                │   │   │   │   │   │   │   '',                           │ 
+│ │                │   │   │   │   │   │   │   '',                           │ 
+│ │                │   │   │   │   │   │   │   ''                            │ 
+│ │                │   │   │   │   │   │   ],                                │ 
+│ │                │   │   │   │   │   │   'children': [                     │ 
+│ │                │   │   │   │   │   │   │   {                             │ 
+│ │                │   │   │   │   │   │   │   │   'name': 'MOD_COMMON',     │ 
+│ │                │   │   │   │   │   │   │   │   'meta': '""',             │ 
+│ │                │   │   │   │   │   │   │   │   'start_line': 8,          │ 
+│ │                │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │                │   │   │   │   │   │   │   │   │   '      BYTE_ORDER     │ 
+│ │                MSB_FIRST',                                               │ 
+│ │                │   │   │   │   │   │   │   │   │   '      ALIGNMENT_BYTE │ 
+│ │                1',                                                       │ 
+│ │                │   │   │   │   │   │   │   │   │   '      ALIGNMENT_WORD │ 
+│ │                2',                                                       │ 
+│ │                │   │   │   │   │   │   │   │   │   '      ALIGNMENT_LONG │ 
+│ │                4',                                                       │ 
+│ │                │   │   │   │   │   │   │   │   │   '                     │ 
+│ │                ALIGNMENT_FLOAT32_IEEE 4'                                 │ 
+│ │                │   │   │   │   │   │   │   │   ],                        │ 
+│ │                │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │                │   │   │   │   │   │   │   │   'end_line': 14            │ 
+│ │                │   │   │   │   │   │   │   },                            │ 
+│ │                │   │   │   │   │   │   │   {                             │ 
+│ │                │   │   │   │   │   │   │   │   'name': 'MOD_PAR',        │ 
+│ │                │   │   │   │   │   │   │   │   'meta': '""',             │ 
+│ │                │   │   │   │   │   │   │   │   'start_line': 16,         │ 
+│ │                │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │                │   │   │   │   │   │   │   │   │   '      EPK            │ 
+│ │                "S19TOOL_SYNTH"'                                          │ 
+│ │                │   │   │   │   │   │   │   │   ],                        │ 
+│ │                │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │                │   │   │   │   │   │   │   │   'end_line': 18            │ 
+│ │                │   │   │   │   │   │   │   },                            │ 
+│ │                │   │   │   │   │   │   │   {                             │ 
+│ │                │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT',  │ 
+│ │                │   │   │   │   │   │   │   │   'meta': 'RL_U8',          │ 
+│ │                │   │   │   │   │   │   │   │   'start_line': 20,         │ 
+│ │                │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │                │   │   │   │   │   │   │   │   │   '      FNC_VALUES 1   │ 
+│ │                UBYTE COLUMN_DIR DIRECT'                                  │ 
+│ │                │   │   │   │   │   │   │   │   ],                        │ 
+│ │                │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │                │   │   │   │   │   │   │   │   'end_line': 22            │ 
+│ │                │   │   │   │   │   │   │   },                            │ 
+│ │                │   │   │   │   │   │   │   {                             │ 
+│ │                │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT',  │ 
+│ │                │   │   │   │   │   │   │   │   'meta': 'RL_U16',         │ 
+│ │                │   │   │   │   │   │   │   │   'start_line': 24,         │ 
+│ │                │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │                │   │   │   │   │   │   │   │   │   '      FNC_VALUES 1   │ 
+│ │                UWORD COLUMN_DIR DIRECT'                                  │ 
+│ │                │   │   │   │   │   │   │   │   ],                        │ 
+│ │                │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │                │   │   │   │   │   │   │   │   'end_line': 26            │ 
+│ │                │   │   │   │   │   │   │   },                            │ 
+│ │                │   │   │   │   │   │   │   {                             │ 
+│ │                │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT',  │ 
+│ │                │   │   │   │   │   │   │   │   'meta': 'RL_U32',         │ 
+│ │                │   │   │   │   │   │   │   │   'start_line': 28,         │ 
+│ │                │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │                │   │   │   │   │   │   │   │   │   '      FNC_VALUES 1   │ 
+│ │                ULONG COLUMN_DIR DIRECT'                                  │ 
+│ │                │   │   │   │   │   │   │   │   ],                        │ 
+│ │                │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │                │   │   │   │   │   │   │   │   'end_line': 30            │ 
+│ │                │   │   │   │   │   │   │   },                            │ 
+│ │                │   │   │   │   │   │   │   {                             │ 
+│ │                │   │   │   │   │   │   │   │   'name': 'COMPU_METHOD',   │ 
+│ │                │   │   │   │   │   │   │   │   'meta': 'CM_IDENT "%6.2"  │ 
+│ │                IDENTICAL "%6.2" ""',                                     │ 
+│ │                │   │   │   │   │   │   │   │   'start_line': 32,         │ 
+│ │                │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │                │   │   │   │   │   │   │   │   │   '      COEFFS 0 1 0 0 │ 
+│ │                0 1'                                                      │ 
+│ │                │   │   │   │   │   │   │   │   ],                        │ 
+│ │                │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │                │   │   │   │   │   │   │   │   'end_line': 34            │ 
+│ │                │   │   │   │   │   │   │   },                            │ 
+│ │                │   │   │   │   │   │   │   {                             │ 
+│ │                │   │   │   │   │   │   │   │   'name': 'CHARACTERISTIC', │ 
+│ │                │   │   │   │   │   │   │   │   'meta': 'CAL_BLOCK_A      │ 
+│ │                "CAL_BLOCK_A synthetic characteristic"',                  │ 
+│ │                │   │   │   │   │   │   │   │   'start_line': 36,         │ 
+│ │                │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │                │   │   │   │   │   │   │   │   │   '  VALUE 0x80000010   │ 
+│ │                RL_U8 0 CM_IDENT 0 255'                                   │ 
+│ │                │   │   │   │   │   │   │   │   ],                        │ 
+│ │                │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │                │   │   │   │   │   │   │   │   'end_line': 38            │ 
+│ │                │   │   │   │   │   │   │   },                            │ 
+│ │                │   │   │   │   │   │   │   {                             │ 
+│ │                │   │   │   │   │   │   │   │   'name': 'CHARACTERISTIC', │ 
+│ │                │   │   │   │   │   │   │   │   'meta': 'CAL_BLOCK_B      │ 
+│ │                "CAL_BLOCK_B synthetic characteristic"',                  │ 
+│ │                │   │   │   │   │   │   │   │   'start_line': 39,         │ 
+│ │                │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │                │   │   │   │   │   │   │   │   │   '  VALUE 0x80000040   │ 
+│ │                RL_U8 0 CM_IDENT 0 255'                                   │ 
+│ │                │   │   │   │   │   │   │   │   ],                        │ 
+│ │                │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │                │   │   │   │   │   │   │   │   'end_line': 41            │ 
+│ │                │   │   │   │   │   │   │   },                            │ 
+│ │                │   │   │   │   │   │   │   {                             │ 
+│ │                │   │   │   │   │   │   │   │   'name': 'MEASUREMENT',    │ 
+│ │                │   │   │   │   │   │   │   │   'meta': 'MEAS_STATUS      │ 
+│ │                "MEAS_STATUS synthetic measurement"',                     │ 
+│ │                │   │   │   │   │   │   │   │   'start_line': 42,         │ 
+│ │                │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │                │   │   │   │   │   │   │   │   │   '  UBYTE CM_IDENT 0 0 │ 
+│ │                0 255',                                                   │ 
+│ │                │   │   │   │   │   │   │   │   │   '  ECU_ADDRESS        │ 
+│ │                0x80000000'                                               │ 
+│ │                │   │   │   │   │   │   │   │   ],                        │ 
+│ │                │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │                │   │   │   │   │   │   │   │   'end_line': 45            │ 
+│ │                │   │   │   │   │   │   │   },                            │ 
+│ │                │   │   │   │   │   │   │   {                             │ 
+│ │                │   │   │   │   │   │   │   │   'name': 'GROUP',          │ 
+│ │                │   │   │   │   │   │   │   │   'meta': 'GRP_BASIC        │ 
+│ │                "GRP_BASIC group"',                                       │ 
+│ │                │   │   │   │   │   │   │   │   'start_line': 46,         │ 
+│ │                │   │   │   │   │   │   │   │   'lines': [],              │ 
+│ │                │   │   │   │   │   │   │   │   'children': [             │ 
+│ │                │   │   │   │   │   │   │   │   │   {                     │ 
+│ │                │   │   │   │   │   │   │   │   │   │   'name':           │ 
+│ │                'REF_CHARACTERISTIC',                                     │ 
+│ │                │   │   │   │   │   │   │   │   │   │   'meta': '',       │ 
+│ │                │   │   │   │   │   │   │   │   │   │   'start_line': 47, │ 
+│ │                │   │   │   │   │   │   │   │   │   │   'lines': [        │ 
+│ │                │   │   │   │   │   │   │   │   │   │   │   '             │ 
+│ │                CAL_BLOCK_A',                                             │ 
+│ │                │   │   │   │   │   │   │   │   │   │   │   '             │ 
+│ │                CAL_BLOCK_B'                                              │ 
+│ │                │   │   │   │   │   │   │   │   │   │   ],                │ 
+│ │                │   │   │   │   │   │   │   │   │   │   'children': [],   │ 
+│ │                │   │   │   │   │   │   │   │   │   │   'end_line': 50    │ 
+│ │                │   │   │   │   │   │   │   │   │   }                     │ 
+│ │                │   │   │   │   │   │   │   │   ],                        │ 
+│ │                │   │   │   │   │   │   │   │   'end_line': 51            │ 
+│ │                │   │   │   │   │   │   │   }                             │ 
+│ │                │   │   │   │   │   │   ],                                │ 
+│ │                │   │   │   │   │   │   'end_line': 52                    │ 
+│ │                │   │   │   │   │   }                                     │ 
+│ │                │   │   │   │   ],                                        │ 
+│ │                │   │   │   │   'end_line': 53                            │ 
+│ │                │   │   │   }                                             │ 
+│ │                │   │   ],                                                │ 
+│ │                │   │   'errors': [],                                     │ 
+│ │                │   │   'tags': [                                         │ 
+│ │                │   │   │   {                                             │ 
+│ │                │   │   │   │   'section': 'CHARACTERISTIC',              │ 
+│ │                │   │   │   │   'name': 'CAL_BLOCK_A',                    │ 
+│ │                │   │   │   │   'description': 'CAL_BLOCK_A synthetic     │ 
+│ │                characteristic',                                          │ 
+│ │                │   │   │   │   'address': 2147483664,                    │ 
+│ │                │   │   │   │   'length': 1,                              │ 
+│ │                │   │   │   │   'source': 'formula',                      │ 
+│ │                │   │   │   │   'unit': None,                             │ 
+│ │                │   │   │   │   'lower_limit': '0',                       │ 
+│ │                │   │   │   │   'upper_limit': '255',                     │ 
+│ │                │   │   │   │   'bit_org': None,                          │ 
+│ │                │   │   │   │   ... +18                                   │ 
+│ │                │   │   │   },                                            │ 
+│ │                │   │   │   {                                             │ 
+│ │                │   │   │   │   'section': 'CHARACTERISTIC',              │ 
+│ │                │   │   │   │   'name': 'CAL_BLOCK_B',                    │ 
+│ │                │   │   │   │   'description': 'CAL_BLOCK_B synthetic     │ 
+│ │                characteristic',                                          │ 
+│ │                │   │   │   │   'address': 2147483712,                    │ 
+│ │                │   │   │   │   'length': 1,                              │ 
+│ │                │   │   │   │   'source': 'formula',                      │ 
+│ │                │   │   │   │   'unit': None,                             │ 
+│ │                │   │   │   │   'lower_limit': '0',                       │ 
+│ │                │   │   │   │   'upper_limit': '255',                     │ 
+│ │                │   │   │   │   'bit_org': None,                          │ 
+│ │                │   │   │   │   ... +18                                   │ 
+│ │                │   │   │   },                                            │ 
+│ │                │   │   │   {                                             │ 
+│ │                │   │   │   │   'section': 'MEASUREMENT',                 │ 
+│ │                │   │   │   │   'name': 'MEAS_STATUS',                    │ 
+│ │                │   │   │   │   'description': 'MEAS_STATUS synthetic     │ 
+│ │                measurement',                                             │ 
+│ │                │   │   │   │   'address': 2147483648,                    │ 
+│ │                │   │   │   │   'length': 1,                              │ 
+│ │                │   │   │   │   'source': 'formula',                      │ 
+│ │                │   │   │   │   'unit': None,                             │ 
+│ │                │   │   │   │   'lower_limit': '0',                       │ 
+│ │                │   │   │   │   'upper_limit': '255',                     │ 
+│ │                │   │   │   │   'bit_org': None,                          │ 
+│ │                │   │   │   │   ... +18                                   │ 
+│ │                │   │   │   }                                             │ 
+│ │                │   │   ],                                                │ 
+│ │                │   │   'record_layouts_by_name': {                       │ 
+│ │                │   │   │   'RL_U8': {                                    │ 
+│ │                │   │   │   │   'name': 'RL_U8',                          │ 
+│ │                │   │   │   │   'tokens': [                               │ 
+│ │                │   │   │   │   │   'FNC_VALUES',                         │ 
+│ │                │   │   │   │   │   '1',                                  │ 
+│ │                │   │   │   │   │   'UBYTE',                              │ 
+│ │                │   │   │   │   │   'COLUMN_DIR',                         │ 
+│ │                │   │   │   │   │   'DIRECT'                              │ 
+│ │                │   │   │   │   ],                                        │ 
+│ │                │   │   │   │   'lines': [                                │ 
+│ │                │   │   │   │   │   '      FNC_VALUES 1 UBYTE COLUMN_DIR  │ 
+│ │                DIRECT'                                                   │ 
+│ │                │   │   │   │   ],                                        │ 
+│ │                │   │   │   │   'byte_order': None                        │ 
+│ │                │   │   │   },                                            │ 
+│ │                │   │   │   'RL_U16': {                                   │ 
+│ │                │   │   │   │   'name': 'RL_U16',                         │ 
+│ │                │   │   │   │   'tokens': [                               │ 
+│ │                │   │   │   │   │   'FNC_VALUES',                         │ 
+│ │                │   │   │   │   │   '1',                                  │ 
+│ │                │   │   │   │   │   'UWORD',                              │ 
+│ │                │   │   │   │   │   'COLUMN_DIR',                         │ 
+│ │                │   │   │   │   │   'DIRECT'                              │ 
+│ │                │   │   │   │   ],                                        │ 
+│ │                │   │   │   │   'lines': [                                │ 
+│ │                │   │   │   │   │   '      FNC_VALUES 1 UWORD COLUMN_DIR  │ 
+│ │                DIRECT'                                                   │ 
+│ │                │   │   │   │   ],                                        │ 
+│ │                │   │   │   │   'byte_order': None                        │ 
+│ │                │   │   │   },                                            │ 
+│ │                │   │   │   'RL_U32': {                                   │ 
+│ │                │   │   │   │   'name': 'RL_U32',                         │ 
+│ │                │   │   │   │   'tokens': [                               │ 
+│ │                │   │   │   │   │   'FNC_VALUES',                         │ 
+│ │                │   │   │   │   │   '1',                                  │ 
+│ │                │   │   │   │   │   'ULONG',                              │ 
+│ │                │   │   │   │   │   'COLUMN_DIR',                         │ 
+│ │                │   │   │   │   │   'DIRECT'                              │ 
+│ │                │   │   │   │   ],                                        │ 
+│ │                │   │   │   │   'lines': [                                │ 
+│ │                │   │   │   │   │   '      FNC_VALUES 1 ULONG COLUMN_DIR  │ 
+│ │                DIRECT'                                                   │ 
+│ │                │   │   │   │   ],                                        │ 
+│ │                │   │   │   │   'byte_order': None                        │ 
+│ │                │   │   │   }                                             │ 
+│ │                │   │   },                                                │ 
+│ │                │   │   'compu_methods_by_name': {                        │ 
+│ │                │   │   │   'CM_IDENT': {                                 │ 
+│ │                │   │   │   │   'name': 'CM_IDENT',                       │ 
+│ │                │   │   │   │   'long_identifier': '%6.2',                │ 
+│ │                │   │   │   │   'conversion_type': 'IDENTICAL',           │ 
+│ │                │   │   │   │   'format': '%6.2',                         │ 
+│ │                │   │   │   │   'unit': '%6.2',                           │ 
+│ │                │   │   │   │   'coeffs_linear': None,                    │ 
+│ │                │   │   │   │   'coeffs': [                               │ 
+│ │                │   │   │   │   │   0.0,                                  │ 
+│ │                │   │   │   │   │   1.0,                                  │ 
+│ │                │   │   │   │   │   0.0,                                  │ 
+│ │                │   │   │   │   │   0.0,                                  │ 
+│ │                │   │   │   │   │   0.0,                                  │ 
+│ │                │   │   │   │   │   1.0                                   │ 
+│ │                │   │   │   │   ],                                        │ 
+│ │                │   │   │   │   'compu_tab_ref': None,                    │ 
+│ │                │   │   │   │   'formula': None,                          │ 
+│ │                │   │   │   │   'lines': ['      COEFFS 0 1 0 0 0 1']     │ 
+│ │                │   │   │   }                                             │ 
+│ │                │   │   },                                                │ 
+│ │                │   │   'compu_tabs_by_name': {}                          │ 
+│ │                │   },                                                    │ 
+│ │                │   mac_path=None,                                        │ 
+│ │                │   mac_records=[],                                       │ 
+│ │                │   mac_diagnostics=[],                                   │ 
+│ │                │   variant_id=None,                                      │ 
+│ │                │   source_s0_header=b'CASE01_BASIC',                     │ 
+│ │                │   entropy_windows=[                                     │ 
+│ │                │   │   EntropyWindow(                                    │ 
+│ │                │   │   │   start=2147483648,                             │ 
+│ │                │   │   │   end=2147483681,                               │ 
+│ │                │   │   │   sample_count=33,                              │ 
+│ │                │   │   │   entropy=4.68075775572209,                     │ 
+│ │                │   │   │   band='low',                                   │ 
+│ │                │   │   │   low_confidence=True                           │ 
+│ │                │   │   ),                                                │ 
+│ │                │   │   EntropyWindow(                                    │ 
+│ │                │   │   │   start=2147483712,                             │ 
+│ │                │   │   │   end=2147483776,                               │ 
+│ │                │   │   │   sample_count=64,                              │ 
+│ │                │   │   │   entropy=6.0,                                  │ 
+│ │                │   │   │   band='medium',                                │ 
+│ │                │   │   │   low_confidence=False                          │ 
+│ │                │   │   )                                                 │ 
+│ │                │   ],                                                    │ 
+│ │                │   out_of_order_count=0,                                 │ 
+│ │                │   entry_point=2147483648                                │ 
+│ │                )                                                         │ 
+│ │      payload = b'S00F00004341534530315F4241534943B2\r\nS325800000005331… │ 
+│ │  project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of… │ 
+│ │ project_name = 'P1'                                                      │ 
+│ │         self = S19TuiApp(                                                │ 
+│ │                │   title='Hex Edit Tool',                                │ 
+│ │                │   classes={'-dark-mode'},                               │ 
+│ │                │   pseudo_classes={'focus', 'dark'}                      │ 
+│ │                )                                                         │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\tui\app.py:1493 in           
+│ _file_digest                                                                 
+│                                                                              
+│    1490 │   digest = hashlib.sha256()                                        
+│    1491 │   size = 0                                                         
+│    1492 │   with open(path, "rb") as handle:                                 
+│ ❱  1493 │   │   for chunk in iter(lambda: handle.read(1 << 20), b""):        
+│    1494 │   │   │   digest.update(chunk)                                     
+│    1495 │   │   │   size += len(chunk)                                       
+│    1496 │   return digest.hexdigest(), size                                  
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ digest = <sha256 _hashlib.HASH object @ 0x00000244BD394F10>              │ 
+│ │ handle = <tests.test_b100_save_image._UnreadableHandle object at         │ 
+│ │          0x00000244BFAA69D0>                                             │ 
+│ │   path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8… │ 
+│ │   size = 0                                                               │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\tui\app.py:1493 in <lambda>  
+│                                                                              
+│    1490 │   digest = hashlib.sha256()                                        
+│    1491 │   size = 0                                                         
+│    1492 │   with open(path, "rb") as handle:                                 
+│ ❱  1493 │   │   for chunk in iter(lambda: handle.read(1 << 20), b""):        
+│    1494 │   │   │   digest.update(chunk)                                     
+│    1495 │   │   │   size += len(chunk)                                       
+│    1496 │   return digest.hexdigest(), size                                  
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ handle = <tests.test_b100_save_image._UnreadableHandle object at         │ 
+│ │          0x00000244BFAA69D0>                                             │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app-b100-inc5\tests\test_b100_save_image.py:848 in 
+│ read                                                                         
+│                                                                              
+│    845 │   │   self._handle.close()                                          
+│    846 │                                                                     
+│    847 │   def read(self, *args):                                            
+│ ❱  848 │   │   raise PermissionError(13, "Permission denied")                
+│    849                                                                       
+│    850                                                                       
+│    851 async def _save_as_callback(pilot, app: S19TuiApp, name: str) -> None 
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ args = (1048576,)                                                        │ 
+│ │ self = <tests.test_b100_save_image._UnreadableHandle object at           │ 
+│ │        0x00000244BFAA69D0>                                               │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+╰──────────────────────────────────────────────────────────────────────────────
+PermissionError: [Errno 13] Permission denied
+______ test_f2_byte_range_locked_image_refuses_and_the_app_keeps_running ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30038/test_f2_byte_range_locked_imag0')
+
+    @pytest.mark.skipif(sys.platform != "win32", reason="msvcrt byte-range lock")
+    def test_f2_byte_range_locked_image_refuses_and_the_app_keeps_running(
+        tmp_path: Path,
+    ) -> None:
+        """Review F2, probe P2b: the image byte-range-locked by another handle
+        (copy branch), Save project run as an app callback → the refusal is
+        painted, no folder exists and the session is still running."""
+        import msvcrt
+    
+        src = _copy_case01(tmp_path) / "firmware.s19"
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            async with app.run_test(size=(220, 60)) as pilot:
+                await pilot.pause()
+                await _load_image(pilot, app, src)
+                image = app.current_file.path
+                size = image.stat().st_size
+                with open(image, "r+b") as handle:
+                    msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, size)
+                    try:
+                        await _save_as_callback(pilot, app, "P1")
+                    finally:
+                        handle.seek(0)
+                        msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, size)
+                return (
+                    _status_text(app),
+                    (app.is_running, app.return_code),
+                    app.workarea / "P1",
+                )
+    
+>       status, alive, project = asyncio.run(_drive())
+                                 ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_save_image.py:943: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_save_image.py:925: in _drive
+    async with app.run_test(size=(220, 60)) as pilot:
+..\..\anaconda3\envs\s19env\Lib\contextlib.py:217: in __aexit__
+    await anext(self.gen)
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: in run_test
+    raise self._exception
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:702: in _flush_next_callbacks
+    await invoke(callback.callback)
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:56: in _invoke
+    result = callback(*params[:parameter_count])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\app.py:8862: in _handle_save_dialog
+    plan = self._plan_project_save(project_dir, cleaned, image_step)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\app.py:9371: in _plan_project_save
+    PlannedFile("image", loaded.path, loaded.path.name, *_file_digest(loaded.path))
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\app.py:1493: in _file_digest
+    for chunk in iter(lambda: handle.read(1 << 20), b""):
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+>   for chunk in iter(lambda: handle.read(1 << 20), b""):
+                              ^^^^^^^^^^^^^^^^^^^^
+E   PermissionError: [Errno 13] Permission denied
+
+s19_app\tui\app.py:1493: PermissionError
+---------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────
+│ C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\tui\app.py:8862 in           
+│ _handle_save_dialog                                                          
+│                                                                              
+│    8859 │   │   │   if self.current_file                                     
+│    8860 │   │   │   else _ProjectImageStep(emit=False)                       
+│    8861 │   │   )                                                            
+│ ❱  8862 │   │   plan = self._plan_project_save(project_dir, cleaned, image_s 
+│    8863 │   │   if plan.refusal is not None:                                 
+│    8864 │   │   │   self.set_status(plan.refusal)                            
+│    8865 │   │   │   self.notify(                                             
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │               cleaned = 'P1'                                             │ 
+│ │            image_step = _ProjectImageStep(                               │ 
+│ │                         │   emit=False,                                  │ 
+│ │                         │   derived=None,                                │ 
+│ │                         │   summary=None,                                │ 
+│ │                         │   payload=None,                                │ 
+│ │                         │   name='',                                     │ 
+│ │                         │   carried=0,                                   │ 
+│ │                         │   applied_by_save=0,                           │ 
+│ │                         │   refusal=None                                 │ 
+│ │                         )                                                │ 
+│ │                  item = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │       missing_sources = []                                               │ 
+│ │   open_project_folded = ''                                               │ 
+│ │       parent_resolved = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │               payload = SaveProjectPayload(                              │ 
+│ │                         │                                                │ 
+│ │                         parent_folder='C:\\Users\\jjgh8\\AppData\\Local… │ 
+│ │                         │   project_name='P1',                           │ 
+│ │                         │   batch=(),                                    │ 
+│ │                         │   assignments={}                               │ 
+│ │                         )                                                │ 
+│ │           project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │ project_file_suffixes = {                                                │ 
+│ │                         │   '.s19',                                      │ 
+│ │                         │   '.hex',                                      │ 
+│ │                         │   '.mac',                                      │ 
+│ │                         │   '.a2l',                                      │ 
+│ │                         │   '.srec',                                     │ 
+│ │                         │   '.ihex'                                      │ 
+│ │                         }                                                │ 
+│ │        raw_components = ['P1']                                           │ 
+│ │       reserved_folded = {                                                │ 
+│ │                         │   'temp',                                      │ 
+│ │                         │   'splits',                                    │ 
+│ │                         │   'logs',                                      │ 
+│ │                         │   'flowsets',                                  │ 
+│ │                         │   'templates',                                 │ 
+│ │                         │   'patches',                                   │ 
+│ │                         │   'reports',                                   │ 
+│ │                         │   'crc',                                       │ 
+│ │                         │   'flows'                                      │ 
+│ │                         }                                                │ 
+│ │                  self = S19TuiApp(                                       │ 
+│ │                         │   title='Hex Edit Tool',                       │ 
+│ │                         │   classes={'-dark-mode'},                      │ 
+│ │                         │   pseudo_classes={'focus', 'dark'}             │ 
+│ │                         )                                                │ 
+│ │            typed_name = 'P1'                                             │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\tui\app.py:9371 in           
+│ _plan_project_save                                                           
+│                                                                              
+│    9368 │   │   │   │   )                                                    
+│    9369 │   │   │   else:                                                    
+│    9370 │   │   │   │   files.append(                                        
+│ ❱  9371 │   │   │   │   │   PlannedFile("image", loaded.path, loaded.path.na 
+│    9372 │   │   │   │   )                                                    
+│    9373 │   │   │   │   image = f"{loaded.path.name} unchanged copy"         
+│    9374 │   │   │   if loaded.mac_path and loaded.mac_path != loaded.path:   
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │        files = []                                                        │ 
+│ │        image = ''                                                        │ 
+│ │   image_step = _ProjectImageStep(                                        │ 
+│ │                │   emit=False,                                           │ 
+│ │                │   derived=None,                                         │ 
+│ │                │   summary=None,                                         │ 
+│ │                │   payload=None,                                         │ 
+│ │                │   name='',                                              │ 
+│ │                │   carried=0,                                            │ 
+│ │                │   applied_by_save=0,                                    │ 
+│ │                │   refusal=None                                          │ 
+│ │                )                                                         │ 
+│ │       loaded = LoadedFile(                                               │ 
+│ │                │                                                         │ 
+│ │                path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pyte… │ 
+│ │                │   file_type='s19',                                      │ 
+│ │                │   mem_map={                                             │ 
+│ │                │   │   2147483648: 83,                                   │ 
+│ │                │   │   2147483649: 49,                                   │ 
+│ │                │   │   2147483650: 57,                                   │ 
+│ │                │   │   2147483651: 84,                                   │ 
+│ │                │   │   2147483652: 79,                                   │ 
+│ │                │   │   2147483653: 79,                                   │ 
+│ │                │   │   2147483654: 76,                                   │ 
+│ │                │   │   2147483655: 95,                                   │ 
+│ │                │   │   2147483656: 66,                                   │ 
+│ │                │   │   2147483657: 65,                                   │ 
+│ │                │   │   ... +87                                           │ 
+│ │                │   },                                                    │ 
+│ │                │   row_bases=[                                           │ 
+│ │                │   │   2147483648,                                       │ 
+│ │                │   │   2147483664,                                       │ 
+│ │                │   │   2147483680,                                       │ 
+│ │                │   │   2147483712,                                       │ 
+│ │                │   │   2147483728,                                       │ 
+│ │                │   │   2147483744,                                       │ 
+│ │                │   │   2147483760                                        │ 
+│ │                │   ],                                                    │ 
+│ │                │   ranges=[                                              │ 
+│ │                │   │   (2147483648, 2147483681),                         │ 
+│ │                │   │   (2147483712, 2147483776)                          │ 
+│ │                │   ],                                                    │ 
+│ │                │   range_validity=[True, True],                          │ 
+│ │                │   errors=[],                                            │ 
+│ │                │   a2l_path=None,                                        │ 
+│ │                │   a2l_data=None,                                        │ 
+│ │                │   mac_path=None,                                        │ 
+│ │                │   mac_records=[],                                       │ 
+│ │                │   mac_diagnostics=[],                                   │ 
+│ │                │   variant_id=None,                                      │ 
+│ │                │   source_s0_header=b'CASE01_BASIC',                     │ 
+│ │                │   entropy_windows=[                                     │ 
+│ │                │   │   EntropyWindow(                                    │ 
+│ │                │   │   │   start=2147483648,                             │ 
+│ │                │   │   │   end=2147483681,                               │ 
+│ │                │   │   │   sample_count=33,                              │ 
+│ │                │   │   │   entropy=4.68075775572209,                     │ 
+│ │                │   │   │   band='low',                                   │ 
+│ │                │   │   │   low_confidence=True                           │ 
+│ │                │   │   ),                                                │ 
+│ │                │   │   EntropyWindow(                                    │ 
+│ │                │   │   │   start=2147483712,                             │ 
+│ │                │   │   │   end=2147483776,                               │ 
+│ │                │   │   │   sample_count=64,                              │ 
+│ │                │   │   │   entropy=6.0,                                  │ 
+│ │                │   │   │   band='medium',                                │ 
+│ │                │   │   │   low_confidence=False                          │ 
+│ │                │   │   )                                                 │ 
+│ │                │   ],                                                    │ 
+│ │                │   out_of_order_count=0,                                 │ 
+│ │                │   entry_point=2147483648                                │ 
+│ │                )                                                         │ 
+│ │  project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of… │ 
+│ │ project_name = 'P1'                                                      │ 
+│ │         self = S19TuiApp(                                                │ 
+│ │                │   title='Hex Edit Tool',                                │ 
+│ │                │   classes={'-dark-mode'},                               │ 
+│ │                │   pseudo_classes={'focus', 'dark'}                      │ 
+│ │                )                                                         │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\tui\app.py:1493 in           
+│ _file_digest                                                                 
+│                                                                              
+│    1490 │   digest = hashlib.sha256()                                        
+│    1491 │   size = 0                                                         
+│    1492 │   with open(path, "rb") as handle:                                 
+│ ❱  1493 │   │   for chunk in iter(lambda: handle.read(1 << 20), b""):        
+│    1494 │   │   │   digest.update(chunk)                                     
+│    1495 │   │   │   size += len(chunk)                                       
+│    1496 │   return digest.hexdigest(), size                                  
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ digest = <sha256 _hashlib.HASH object @ 0x00000244C1216C10>              │ 
+│ │ handle = <_io.BufferedReader                                             │ 
+│ │          name='C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\… │ 
+│ │   path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8… │ 
+│ │   size = 0                                                               │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\tui\app.py:1493 in <lambda>  
+│                                                                              
+│    1490 │   digest = hashlib.sha256()                                        
+│    1491 │   size = 0                                                         
+│    1492 │   with open(path, "rb") as handle:                                 
+│ ❱  1493 │   │   for chunk in iter(lambda: handle.read(1 << 20), b""):        
+│    1494 │   │   │   digest.update(chunk)                                     
+│    1495 │   │   │   size += len(chunk)                                       
+│    1496 │   return digest.hexdigest(), size                                  
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ handle = <_io.BufferedReader                                             │ 
+│ │          name='C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\… │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+╰──────────────────────────────────────────────────────────────────────────────
+PermissionError: [Errno 13] Permission denied
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_image.py::test_tc_b100_17_verify_reread_failure_rolls_the_emit_back
+FAILED tests/test_b100_save_image.py::test_tc_b100_17_non_os_error_after_the_emit_rolls_back_then_surfaces
+FAILED tests/test_b100_save_image.py::test_f2_unreadable_source_refuses_and_the_app_keeps_running[image]
+FAILED tests/test_b100_save_image.py::test_f2_unreadable_source_refuses_and_the_app_keeps_running[a2l]
+FAILED tests/test_b100_save_image.py::test_f2_byte_range_locked_image_refuses_and_the_app_keeps_running
+5 failed, 5 passed, 38 deselected in 24.60s
+# exit: 1

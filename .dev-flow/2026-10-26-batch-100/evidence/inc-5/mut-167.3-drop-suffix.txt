@@ -1,0 +1,155 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation 167.3-drop-suffix
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# date: 2026-10-29T19:49:57+00:00
+# requirement: LLR-167.3
+# mutation: the success line drops the entry-count clause — file s19_app/tui/app.py
+# pre-mutation sha256: 2f6b446594652dbc34ea05dc1be9f206791bff5e871e166306873d36e12bdf32
+# mutant sha256: 182ba37cc96bcd897ae540472cbd419ebf4cc72b6427b8a507cd33f2768201b9
+# restored sha256: 2f6b446594652dbc34ea05dc1be9f206791bff5e871e166306873d36e12bdf32
+# RESTORE OK
+................FF....................F                                  [100%]
+================================== FAILURES ===================================
+______________________ test_tc_b100_16_one_applied_entry ______________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29958/test_tc_b100_16_one_applied_en0')
+
+    def test_tc_b100_16_one_applied_entry(tmp_path: Path) -> None:
+        """1 applied entry → the status carries 1 entry and 0 applied by this
+        save; the verify line names it through ``save_back_status_suffix``."""
+    
+        async def scenario(app, pilot) -> None:
+            _add(app, PATCH_ADDRESS, PATCH_BYTES)
+            _apply(app)
+    
+        lines, _, _ = _save_session(tmp_path, scenario)
+        final = lines[-1]
+        assert final.startswith("Saved project to"), lines
+>       assert "firmware.s19 + 1 change entry, 0 applied by this save" in final, final
+E       AssertionError: Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-29958\test_tc_b100_16_one_applied_en0\app\.s19tool\workarea\P1 (variant 'firmware')
+E       assert 'firmware.s19 + 1 change entry, 0 applied by this save' in "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-29958\\test_tc_b100_16_one_applied_en0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
+
+tests\test_b100_save_image.py:641: AssertionError
+_________________ test_tc_b100_16_entry_added_after_the_apply _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29958/test_tc_b100_16_entry_added_af0')
+
+    def test_tc_b100_16_entry_added_after_the_apply(tmp_path: Path) -> None:
+        """1 applied + 1 added after the apply → 2 entries, 1 applied by this
+        save."""
+    
+        async def scenario(app, pilot) -> None:
+            _add(app, PATCH_ADDRESS, PATCH_BYTES)
+            _apply(app)
+            _add(app, SECOND_ADDRESS, SECOND_BYTES)
+    
+        lines, project, _ = _save_session(tmp_path, scenario)
+        final = lines[-1]
+>       assert "firmware.s19 + 2 change entries, 1 applied by this save" in final, final
+E       AssertionError: Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-29958\test_tc_b100_16_entry_added_af0\app\.s19tool\workarea\P1 (variant 'firmware')
+E       assert 'firmware.s19 + 2 change entries, 1 applied by this save' in "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-29958\\test_tc_b100_16_entry_added_af0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
+
+tests\test_b100_save_image.py:658: AssertionError
+_________ test_at_b100_05_save_project_saves_the_patched_image[size1] _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29958/test_at_b100_05_save_project_s1')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_05_save_project_saves_the_patched_image(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-167's acceptance scene, by keys and clicks: load ``case_01``
+        ``firmware.s19`` through the Load file dialog, add and apply
+        ``0x8000007C DE AD BE EF`` in the Patch Editor (no save-back), Save
+        project P1 through the current dialog (``ctrl+s``), then open P1 in a
+        FRESH app through the Load project dialog (``p``). The project image,
+        read by the independent reader, equals source + patch (0 differing
+        addresses); the save status names 1 entry; the reopened Loaded panel
+        names ``firmware.s19``. Both reference sizes, notifications on.
+    
+        RED (executed on 1d677ba, P-1): ``project firmware.s19 == in-memory
+        patched image? False`` — the save copied the unpatched work copy."""
+        src = _copy_case01(tmp_path) / "firmware.s19"
+        base = tmp_path / "app"
+    
+        async def _save_scene() -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src)
+                await _add_entry_through_the_panel(pilot, app, "0x8000007C", "DE AD BE EF")
+                assert await pilot.click("#patch_doc_apply_button"), (
+                    "click missed #patch_doc_apply_button"
+                )
+                await _wait_for(
+                    pilot, lambda: "Apply:" in _status_text(app), "the painted apply line"
+                )
+                await pilot.press("ctrl+s")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, SaveProjectScreen),
+                    "the Save project dialog",
+                )
+                assert await pilot.click("#project_name"), "click missed #project_name"
+                await pilot.press(*"P1")
+                assert await pilot.click("#save_ok"), "click missed #save_ok"
+                await _wait_for(
+                    pilot,
+                    lambda: _status_text(app).startswith("Saved project to"),
+                    "the painted Save project success line",
+                )
+                return _painted_log(app)
+    
+        async def _reopen_scene() -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, "P1")
+                await _wait_for(
+                    pilot,
+                    lambda: "Loaded project 'P1'" in " ".join(
+                        str(app.query_one(f"#log_line_{i}", Label).render())
+                        for i in (1, 2, 3, 4)
+                    ),
+                    "the painted line naming the reopened project",
+                )
+                await _wait_for(
+                    pilot,
+                    lambda: "firmware.s19"
+                    in " ".join(
+                        str(static.render()) for static in app.query("#loaded_slots Static")
+                    ),
+                    "the Loaded panel naming firmware.s19",
+                )
+                return " ".join(
+                    str(static.render()) for static in app.query("#loaded_slots Static")
+                )
+    
+        painted = asyncio.run(_save_scene())
+        project_image = _workarea(base) / "P1" / "firmware.s19"
+        written = read_s19(project_image)
+        expected = _patched(_source_data(), PATCH_ADDRESS, PATCH_BYTES)
+        assert _differing(written.data, expected) == [], (
+            "project firmware.s19 == in-memory patched image? False"
+        )
+        # The save status names the entry at both sizes: the verify line
+        # (``save_back_status_suffix``) fits the narrow strip; the success
+        # line's own clause is clipped at 118 columns and checked at 220.
+        assert "1 entry applied before this save (0x8000007C)" in painted, painted
+        if size[0] >= 220:
+>           assert "1 change entry, 0 applied by this save" in painted, painted
+E           AssertionError: Apply: 1 applied, 0 skipped, 0 blocked
+E             Project saved + manifest verified
+E             Saved + verified: firmware.s19 — 1 entry applied before this save (0x8000007C)
+E             Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-29958\test_at_b100_05_save_project_s1\app\.s19tool\workarea\P1 (variant 'firmware')
+E           assert '1 change entry, 0 applied by this save' in "Apply: 1 applied, 0 skipped, 0 blocked\nProject saved + manifest verified\nSaved + verified: firmware.s19 — 1 entry a...Temp\\pytest-of-jjgh8\\pytest-29958\\test_at_b100_05_save_project_s1\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
+
+tests\test_b100_save_image.py:1408: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_image.py::test_tc_b100_16_one_applied_entry - Ass...
+FAILED tests/test_b100_save_image.py::test_tc_b100_16_entry_added_after_the_apply
+FAILED tests/test_b100_save_image.py::test_at_b100_05_save_project_saves_the_patched_image[size1]
+3 failed, 36 passed in 89.28s (0:01:29)
+
+# exit: 1

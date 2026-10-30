@@ -1,0 +1,4 @@
+# command: python -c "import s19_app; print(s19_app.__file__)"
+# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 ; PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset
+C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\__init__.py
+False

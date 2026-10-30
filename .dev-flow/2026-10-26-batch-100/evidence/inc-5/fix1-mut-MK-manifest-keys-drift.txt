@@ -1,0 +1,73 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree + corrective pass 1) with mutation MK-manifest-keys-drift
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# date: 2026-10-29T21:53:52+00:00
+# finding: review F8 (LED .45)
+# mutation: the plan's manifest keys drift from the keys project.json carries — file s19_app/tui/app.py
+# pre-mutation sha256: 8032dead73f7ee542aabe188794f816f897bba76f64268011b94cc708a831cd2
+# mutant sha256: 9c6c4437d8961aa95bf6b1735df76cfa2203aa99b439d8d802109bd6170f383a
+# restored sha256: 8032dead73f7ee542aabe188794f816f897bba76f64268011b94cc708a831cd2
+# RESTORE OK
+..............................F.................                         [100%]
+================================== FAILURES ===================================
+________________________ test_tc_b100_59_fresh_folder _________________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30048/test_tc_b100_59_fresh_folder0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000178078A2DD0>
+
+    def test_tc_b100_59_fresh_folder(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Fresh target, S19 + A2L loaded, nothing patched → image, A2L and
+        ``project.json`` rows, all ``new``; the tree equals the rows."""
+        plans = _capture_plans(monkeypatch)
+        folder = _copy_case01(tmp_path, "firmware.s19", "firmware.a2l")
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            async with app.run_test(size=(220, 60)) as pilot:
+                await pilot.pause()
+                await _load_image(pilot, app, folder / "firmware.s19")
+                app.load_a2l_from_path(folder / "firmware.a2l")
+                await _wait_for(
+                    pilot, lambda: app.current_a2l_path is not None, "the A2L load"
+                )
+                before = _tree_digests(app.workarea)
+                await _save(pilot, app, "P1")
+                await _wait_for(
+                    pilot,
+                    lambda: _status_text(app).startswith("Saved project to"),
+                    "the save",
+                )
+                after = _tree_digests(app.workarea)
+            return before, after, app.workarea / "P1"
+    
+        before, after, project = asyncio.run(_drive())
+        assert len(plans) == 1
+        plan = plans[0]
+        assert plan.target_kind == "new" and plan.refusal is None
+        assert [(row.role, row.landing.name, row.action) for row in plan.rows] == [
+            ("image", "firmware.s19", "new"),
+            ("a2l", "firmware.a2l", "new"),
+            ("manifest", "project.json", "new"),
+        ]
+        assert plan.image == "firmware.s19 unchanged copy"
+        assert plan.manifest_keys[:4] == (
+            "schema_version",
+            "active_variant",
+            "batch",
+            "assignments",
+        )
+        # Review F8: the plan's keys are the keys the written project.json
+        # carries (no gather ran, so ``gathered`` is rightly absent).
+        written = json.loads((project / "project.json").read_text(encoding="utf-8"))
+>       assert tuple(written) == plan.manifest_keys
+E       AssertionError: assert ('schema_vers...'assignments') == ('schema_vers...', 'gathered')
+E         
+E         Right contains one more item: 'gathered'
+E         Use -v to get more diff
+
+tests\test_b100_save_image.py:1165: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_fresh_folder - Assertio...
+1 failed, 47 passed in 118.99s (0:01:58)
+
+# exit: 1

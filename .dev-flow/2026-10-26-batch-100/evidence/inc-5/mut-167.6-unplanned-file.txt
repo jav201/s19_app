@@ -1,0 +1,623 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation 167.6-unplanned-file
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# date: 2026-10-29T19:55:54+00:00
+# requirement: LLR-167.6
+# mutation: the handler places a file the plan did not name (the source copy beside the emitted image) — file s19_app/tui/app.py
+# pre-mutation sha256: 2f6b446594652dbc34ea05dc1be9f206791bff5e871e166306873d36e12bdf32
+# mutant sha256: e2f15d7acd2d0530f2dc788366af863f27cea9220b99f9b7c8493bad43059ad8
+# restored sha256: 2f6b446594652dbc34ea05dc1be9f206791bff5e871e166306873d36e12bdf32
+# RESTORE OK
+........F..FFFFFFF.F.F..............FFF                                  [100%]
+================================== FAILURES ===================================
+___________________ test_tc_b100_15_patched_s19_is_emitted ____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_tc_b100_15_patched_s19_is0')
+
+    def test_tc_b100_15_patched_s19_is_emitted(tmp_path: Path) -> None:
+        """A patched S19 → the project image is source + document (0 differing
+        addresses), every data record ≤ 32 bytes, the S0 equal to the
+        source's; the landed image is the active variant."""
+    
+        async def scenario(app, pilot) -> None:
+            _add(app, PATCH_ADDRESS, PATCH_BYTES)
+            _apply(app)
+    
+        lines, project, variant = _save_session(tmp_path, scenario)
+        image = project / "firmware.s19"
+        written = read_s19(image)
+        assert written.errors == [], written.errors
+        expected = _patched(_source_data(), PATCH_ADDRESS, PATCH_BYTES)
+>       assert _differing(written.data, expected) == []
+E       assert [2147483772, ...4, 2147483775] == []
+E         
+E         Left contains 4 more items, first extra item: 2147483772
+E         Use -v to get more diff
+
+tests\test_b100_save_image.py:446: AssertionError
+_____________ test_tc_b100_15_entry_removed_after_apply_is_absent _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_tc_b100_15_entry_removed_0')
+
+    def test_tc_b100_15_entry_removed_after_apply_is_absent(tmp_path: Path) -> None:
+        """Two entries applied, one removed → the saved image holds only the
+        remaining one; the removed address holds the source byte."""
+    
+        async def scenario(app, pilot) -> None:
+            _add(app, PATCH_ADDRESS, PATCH_BYTES)
+            _add(app, SECOND_ADDRESS, SECOND_BYTES)
+            assert _apply(app).counts[DISPOSITION_APPLIED] == 2
+            app._change_service.remove_entry(f"0x{SECOND_ADDRESS:08X}")
+    
+        _, project, _ = _save_session(tmp_path, scenario)
+        written = read_s19(project / "firmware.s19").data
+        expected = _patched(_source_data(), PATCH_ADDRESS, PATCH_BYTES)
+>       assert _differing(written, expected) == []
+E       assert [2147483772, ...4, 2147483775] == []
+E         
+E         Left contains 4 more items, first extra item: 2147483772
+E         Use -v to get more diff
+
+tests\test_b100_save_image.py:503: AssertionError
+___________________ test_tc_b100_15_patched_hex_is_emitted ____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_tc_b100_15_patched_hex_is0')
+
+    def test_tc_b100_15_patched_hex_is_emitted(tmp_path: Path) -> None:
+        """A patched Intel HEX source → 0 differing addresses."""
+        src = tmp_path / "sources" / "image.hex"
+        src.parent.mkdir(parents=True)
+        source = {0x1000 + i: i for i in range(32)}
+        src.write_text(
+            "\n".join(
+                [
+                    _hex_line(0x1000, bytes(range(16))),
+                    _hex_line(0x1010, bytes(range(16, 32))),
+                    ":00000001FF",
+                ]
+            )
+            + "\n",
+            encoding="ascii",
+        )
+    
+        async def _drive() -> Path:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            async with app.run_test(size=(220, 60)) as pilot:
+                await pilot.pause()
+                await _load_image(pilot, app, src)
+                _add(app, 0x1004, (0xAA, 0xBB))
+                _apply(app)
+                await _save(pilot, app, "H1")
+                await _wait_for(
+                    pilot,
+                    lambda: _status_text(app).startswith("Saved project to"),
+                    "the HEX Save project",
+                )
+            return app.workarea / "H1"
+    
+>       project = asyncio.run(_drive())
+                  ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_save_image.py:543: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_save_image.py:536: in _drive
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_tc_b100_15_patched_hex_is_emitted.<locals>._drive.<locals>.<lambda> at 0x0000021F0CFBB7E0>
+description = 'the HEX Save project', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the HEX Save project
+
+tests\test_b100_save_image.py:149: AssertionError
+________________ test_tc_b100_15_mac_and_a2l_stay_byte_copies _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_tc_b100_15_mac_and_a2l_st0')
+
+    def test_tc_b100_15_mac_and_a2l_stay_byte_copies(tmp_path: Path) -> None:
+        """A project holding S19 + MAC + A2L, patched and saved as another
+        project → the image emitted, the MAC and the A2L byte-identical."""
+        base = tmp_path / "app"
+    
+        async def _drive() -> Path:
+            app = S19TuiApp(base_dir=base)
+            p1 = app.workarea / "P1"
+            p1.mkdir(parents=True)
+            for name in ("firmware.s19", "firmware.mac", "firmware.a2l"):
+                shutil.copy2(CASE01_DIR / name, p1 / name)
+            async with app.run_test(size=(220, 60)) as pilot:
+                await pilot.pause()
+                await _load_project(pilot, app, "P1")
+                assert app.current_file.mac_path is not None
+                assert app.current_a2l_path is not None
+                _add(app, PATCH_ADDRESS, PATCH_BYTES)
+                _apply(app)
+                await _save(pilot, app, "P2")
+                await _wait_for(
+                    pilot,
+                    lambda: _status_text(app).startswith("Saved project to"),
+                    "the P2 save",
+                )
+            return app.workarea / "P2"
+    
+>       p2 = asyncio.run(_drive())
+             ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_save_image.py:575: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_save_image.py:568: in _drive
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_tc_b100_15_mac_and_a2l_stay_byte_copies.<locals>._drive.<locals>.<lambda> at 0x0000021F0C298860>
+description = 'the P2 save', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the P2 save
+
+tests\test_b100_save_image.py:149: AssertionError
+_________ test_tc_b100_15_save_back_then_save_project_keeps_the_patch _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_tc_b100_15_save_back_then0')
+
+    def test_tc_b100_15_save_back_then_save_project_keeps_the_patch(
+        tmp_path: Path,
+    ) -> None:
+        """Save-back, then Save project → the patch is in the project image
+        (A-08: deciding on ``differs_from_last_saved`` would copy the
+        unpatched source here, because the save-back recorded the state)."""
+    
+        async def scenario(app, pilot) -> None:
+            _add(app, PATCH_ADDRESS, PATCH_BYTES)
+            _apply(app)
+            await _save_back(pilot, app, "firmware.s19")
+            assert not app._change_service.differs_from_last_saved(
+                app.current_file.mem_map
+            )
+    
+        _, project, _ = _save_session(tmp_path, scenario)
+        expected = _patched(_source_data(), PATCH_ADDRESS, PATCH_BYTES)
+>       assert _differing(read_s19(project / "firmware.s19").data, expected) == []
+E       assert [2147483772, ...4, 2147483775] == []
+E         
+E         Left contains 4 more items, first extra item: 2147483772
+E         Use -v to get more diff
+
+tests\test_b100_save_image.py:599: AssertionError
+___________ test_tc_b100_15_clashing_name_lands_as_the_next_variant ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_tc_b100_15_clashing_name_0')
+
+    def test_tc_b100_15_clashing_name_lands_as_the_next_variant(tmp_path: Path) -> None:
+        """The target already holds a DIFFERENT ``firmware.s19`` → the patched
+        image lands as ``firmware_1.s19`` and becomes the active variant; the
+        existing file is untouched."""
+        base = tmp_path / "app"
+        existing = CASE02_S19.read_bytes()
+    
+        async def scenario(app, pilot) -> None:
+            target = app.workarea / "P1"
+            target.mkdir(parents=True)
+            (target / "firmware.s19").write_bytes(existing)
+            _add(app, PATCH_ADDRESS, PATCH_BYTES)
+            _apply(app)
+    
+        _, project, variant = _save_session(tmp_path, scenario)
+        assert (project / "firmware.s19").read_bytes() == existing
+        expected = _patched(_source_data(), PATCH_ADDRESS, PATCH_BYTES)
+>       assert _differing(read_s19(project / "firmware_1.s19").data, expected) == []
+E       assert [2147483772, ...4, 2147483775] == []
+E         
+E         Left contains 4 more items, first extra item: 2147483772
+E         Use -v to get more diff
+
+tests\test_b100_save_image.py:619: AssertionError
+______________________ test_tc_b100_16_one_applied_entry ______________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_tc_b100_16_one_applied_en0')
+
+    def test_tc_b100_16_one_applied_entry(tmp_path: Path) -> None:
+        """1 applied entry → the status carries 1 entry and 0 applied by this
+        save; the verify line names it through ``save_back_status_suffix``."""
+    
+        async def scenario(app, pilot) -> None:
+            _add(app, PATCH_ADDRESS, PATCH_BYTES)
+            _apply(app)
+    
+        lines, _, _ = _save_session(tmp_path, scenario)
+        final = lines[-1]
+>       assert final.startswith("Saved project to"), lines
+E       AssertionError: ['Loaded firmware.s19 (S19 only)', 'Project NOT saved: the plan named C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-o..._one_applied_en0\\app\\.s19tool\\workarea\\P1\\firmware.s19 (new) but the file landed at C:\\Users\\jjgh8\\AppData\\L']
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x0000021F0C81F990>('Saved project to')
+E        +    where <built-in method startswith of str object at 0x0000021F0C81F990> = 'Project NOT saved: the plan named C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-29961\\test_tc_b100_16_one_applied_en0\\app\\.s19tool\\workarea\\P1\\firmware.s19 (new) but the file landed at C:\\Users\\jjgh8\\AppData\\L'.startswith
+
+tests\test_b100_save_image.py:640: AssertionError
+_________________ test_tc_b100_16_entry_added_after_the_apply _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_tc_b100_16_entry_added_af0')
+
+    def test_tc_b100_16_entry_added_after_the_apply(tmp_path: Path) -> None:
+        """1 applied + 1 added after the apply → 2 entries, 1 applied by this
+        save."""
+    
+        async def scenario(app, pilot) -> None:
+            _add(app, PATCH_ADDRESS, PATCH_BYTES)
+            _apply(app)
+            _add(app, SECOND_ADDRESS, SECOND_BYTES)
+    
+        lines, project, _ = _save_session(tmp_path, scenario)
+        final = lines[-1]
+>       assert "firmware.s19 + 2 change entries, 1 applied by this save" in final, final
+E       AssertionError: Project NOT saved: the plan named C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-29961\test_tc_b100_16_entry_added_af0\app\.s19tool\workarea\P1\firmware.s19 (new) but the file landed at C:\Users\jjgh8\AppData\L
+E       assert 'firmware.s19 + 2 change entries, 1 applied by this save' in 'Project NOT saved: the plan named C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-29961\\test_tc_b100_16_entry_added_af0\\app\\.s19tool\\workarea\\P1\\firmware.s19 (new) but the file landed at C:\\Users\\jjgh8\\AppData\\L'
+
+tests\test_b100_save_image.py:658: AssertionError
+_______________ test_tc_b100_17_emit_refusal_writes_no_manifest _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_tc_b100_17_emit_refusal_w0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000021F0EB55790>
+
+    def test_tc_b100_17_emit_refusal_writes_no_manifest(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """``save_patched`` / the emit returning ``ok=False`` → no file, no
+        manifest, the folder this save created removed."""
+    
+        def _refuse(*args, **kwargs):
+            return None, [
+                change_service_module.ValidationIssue(
+                    code="MF-WRITE-CONTAINMENT",
+                    message="forced emit refusal",
+                    severity=change_service_module.ValidationSeverity.WARNING,
+                    artifact="change",
+                )
+            ]
+    
+        monkeypatch.setattr(change_service_module, "save_patched_image", _refuse)
+    
+        async def scenario(app, pilot) -> None:
+            _add(app, PATCH_ADDRESS, PATCH_BYTES)
+            _apply(app)
+    
+        lines, project, _ = _save_session(tmp_path, scenario)
+        assert "the patched image was not written: forced emit refusal" in lines[-1], lines
+>       assert not project.exists(), sorted(project.rglob("*"))
+E       AssertionError: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_tc_b100_17_emit_refusal_w0/app/.s19tool/workarea/P1/firmware.s19')]
+E       assert not True
+E        +  where True = exists()
+E        +    where exists = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_tc_b100_17_emit_refusal_w0/app/.s19tool/workarea/P1').exists
+
+tests\test_b100_save_image.py:733: AssertionError
+____________ test_tc_b100_58_save_project_records_the_saved_state _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_tc_b100_58_save_project_r0')
+
+    def test_tc_b100_58_save_project_records_the_saved_state(tmp_path: Path) -> None:
+        """loaded → False; applied → True; applied → Save project → False."""
+    
+        async def scenario(app, pilot) -> None:
+            await _save(pilot, app, "P1")
+            await _wait_for(
+                pilot,
+                lambda: _status_text(app).startswith("Saved project to"),
+                "the Save project success line",
+            )
+    
+>       assert _predicate_after(tmp_path, scenario) == (False, True, False)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_save_image.py:818: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_save_image.py:804: in _predicate_after
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_save_image.py:798: in _drive
+    await scenario(app, pilot)
+tests\test_b100_save_image.py:812: in scenario
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_tc_b100_58_save_project_records_the_saved_state.<locals>.scenario.<locals>.<lambda> at 0x0000021F0CAE18A0>
+description = 'the Save project success line', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the Save project success line
+
+tests\test_b100_save_image.py:149: AssertionError
+______________ test_tc_b100_70_unwritten_document_keeps_the_flag ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_tc_b100_70_unwritten_docu0')
+
+    def test_tc_b100_70_unwritten_document_keeps_the_flag(tmp_path: Path) -> None:
+        """A Save project that emits the image but does NOT write the editor's
+        document into the project (an unsaved, typed document — the document
+        is written by Save project only from Inc 8a) keeps the flag set: the
+        entries exist only in the editor and the image, so nothing on disk
+        holds the document."""
+        dirty_before, dirty_after, status = _dirty_after_save(tmp_path, blocked=False)
+        assert dirty_before is True
+>       assert status.startswith("Saved project to"), status
+E       AssertionError: Project NOT saved: the plan named C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-29961\test_tc_b100_70_unwritten_docu0\app\.s19tool\workarea\P1\firmware.s19 (new) but the file landed at C:\Users\jjgh8\AppData\L
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x0000021F0D2A4030>('Saved project to')
+E        +    where <built-in method startswith of str object at 0x0000021F0D2A4030> = 'Project NOT saved: the plan named C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-29961\\test_tc_b100_70_unwritten_docu0\\app\\.s19tool\\workarea\\P1\\firmware.s19 (new) but the file landed at C:\\Users\\jjgh8\\AppData\\L'.startswith
+
+tests\test_b100_save_image.py:1275: AssertionError
+_________ test_at_b100_05_save_project_saves_the_patched_image[size0] _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_at_b100_05_save_project_s0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_05_save_project_saves_the_patched_image(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-167's acceptance scene, by keys and clicks: load ``case_01``
+        ``firmware.s19`` through the Load file dialog, add and apply
+        ``0x8000007C DE AD BE EF`` in the Patch Editor (no save-back), Save
+        project P1 through the current dialog (``ctrl+s``), then open P1 in a
+        FRESH app through the Load project dialog (``p``). The project image,
+        read by the independent reader, equals source + patch (0 differing
+        addresses); the save status names 1 entry; the reopened Loaded panel
+        names ``firmware.s19``. Both reference sizes, notifications on.
+    
+        RED (executed on 1d677ba, P-1): ``project firmware.s19 == in-memory
+        patched image? False`` — the save copied the unpatched work copy."""
+        src = _copy_case01(tmp_path) / "firmware.s19"
+        base = tmp_path / "app"
+    
+        async def _save_scene() -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src)
+                await _add_entry_through_the_panel(pilot, app, "0x8000007C", "DE AD BE EF")
+                assert await pilot.click("#patch_doc_apply_button"), (
+                    "click missed #patch_doc_apply_button"
+                )
+                await _wait_for(
+                    pilot, lambda: "Apply:" in _status_text(app), "the painted apply line"
+                )
+                await pilot.press("ctrl+s")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, SaveProjectScreen),
+                    "the Save project dialog",
+                )
+                assert await pilot.click("#project_name"), "click missed #project_name"
+                await pilot.press(*"P1")
+                assert await pilot.click("#save_ok"), "click missed #save_ok"
+                await _wait_for(
+                    pilot,
+                    lambda: _status_text(app).startswith("Saved project to"),
+                    "the painted Save project success line",
+                )
+                return _painted_log(app)
+    
+        async def _reopen_scene() -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, "P1")
+                await _wait_for(
+                    pilot,
+                    lambda: "Loaded project 'P1'" in " ".join(
+                        str(app.query_one(f"#log_line_{i}", Label).render())
+                        for i in (1, 2, 3, 4)
+                    ),
+                    "the painted line naming the reopened project",
+                )
+                await _wait_for(
+                    pilot,
+                    lambda: "firmware.s19"
+                    in " ".join(
+                        str(static.render()) for static in app.query("#loaded_slots Static")
+                    ),
+                    "the Loaded panel naming firmware.s19",
+                )
+                return " ".join(
+                    str(static.render()) for static in app.query("#loaded_slots Static")
+                )
+    
+>       painted = asyncio.run(_save_scene())
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_save_image.py:1396: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_save_image.py:1364: in _save_scene
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_at_b100_05_save_project_saves_the_patched_image.<locals>._save_scene.<locals>.<lambda> at 0x0000021F0D512700>
+description = 'the painted Save project success line', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the painted Save project success line
+
+tests\test_b100_save_image.py:149: AssertionError
+_________ test_at_b100_05_save_project_saves_the_patched_image[size1] _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_at_b100_05_save_project_s1')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_05_save_project_saves_the_patched_image(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-167's acceptance scene, by keys and clicks: load ``case_01``
+        ``firmware.s19`` through the Load file dialog, add and apply
+        ``0x8000007C DE AD BE EF`` in the Patch Editor (no save-back), Save
+        project P1 through the current dialog (``ctrl+s``), then open P1 in a
+        FRESH app through the Load project dialog (``p``). The project image,
+        read by the independent reader, equals source + patch (0 differing
+        addresses); the save status names 1 entry; the reopened Loaded panel
+        names ``firmware.s19``. Both reference sizes, notifications on.
+    
+        RED (executed on 1d677ba, P-1): ``project firmware.s19 == in-memory
+        patched image? False`` — the save copied the unpatched work copy."""
+        src = _copy_case01(tmp_path) / "firmware.s19"
+        base = tmp_path / "app"
+    
+        async def _save_scene() -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src)
+                await _add_entry_through_the_panel(pilot, app, "0x8000007C", "DE AD BE EF")
+                assert await pilot.click("#patch_doc_apply_button"), (
+                    "click missed #patch_doc_apply_button"
+                )
+                await _wait_for(
+                    pilot, lambda: "Apply:" in _status_text(app), "the painted apply line"
+                )
+                await pilot.press("ctrl+s")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, SaveProjectScreen),
+                    "the Save project dialog",
+                )
+                assert await pilot.click("#project_name"), "click missed #project_name"
+                await pilot.press(*"P1")
+                assert await pilot.click("#save_ok"), "click missed #save_ok"
+                await _wait_for(
+                    pilot,
+                    lambda: _status_text(app).startswith("Saved project to"),
+                    "the painted Save project success line",
+                )
+                return _painted_log(app)
+    
+        async def _reopen_scene() -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, "P1")
+                await _wait_for(
+                    pilot,
+                    lambda: "Loaded project 'P1'" in " ".join(
+                        str(app.query_one(f"#log_line_{i}", Label).render())
+                        for i in (1, 2, 3, 4)
+                    ),
+                    "the painted line naming the reopened project",
+                )
+                await _wait_for(
+                    pilot,
+                    lambda: "firmware.s19"
+                    in " ".join(
+                        str(static.render()) for static in app.query("#loaded_slots Static")
+                    ),
+                    "the Loaded panel naming firmware.s19",
+                )
+                return " ".join(
+                    str(static.render()) for static in app.query("#loaded_slots Static")
+                )
+    
+>       painted = asyncio.run(_save_scene())
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_save_image.py:1396: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_save_image.py:1364: in _save_scene
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_at_b100_05_save_project_saves_the_patched_image.<locals>._save_scene.<locals>.<lambda> at 0x0000021F0ED53560>
+description = 'the painted Save project success line', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the painted Save project success line
+
+tests\test_b100_save_image.py:149: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_image.py::test_tc_b100_15_patched_s19_is_emitted
+FAILED tests/test_b100_save_image.py::test_tc_b100_15_entry_removed_after_apply_is_absent
+FAILED tests/test_b100_save_image.py::test_tc_b100_15_patched_hex_is_emitted
+FAILED tests/test_b100_save_image.py::test_tc_b100_15_mac_and_a2l_stay_byte_copies
+FAILED tests/test_b100_save_image.py::test_tc_b100_15_save_back_then_save_project_keeps_the_patch
+FAILED tests/test_b100_save_image.py::test_tc_b100_15_clashing_name_lands_as_the_next_variant
+FAILED tests/test_b100_save_image.py::test_tc_b100_16_one_applied_entry - Ass...
+FAILED tests/test_b100_save_image.py::test_tc_b100_16_entry_added_after_the_apply
+FAILED tests/test_b100_save_image.py::test_tc_b100_17_emit_refusal_writes_no_manifest
+FAILED tests/test_b100_save_image.py::test_tc_b100_58_save_project_records_the_saved_state
+FAILED tests/test_b100_save_image.py::test_tc_b100_70_unwritten_document_keeps_the_flag
+FAILED tests/test_b100_save_image.py::test_at_b100_05_save_project_saves_the_patched_image[size0]
+FAILED tests/test_b100_save_image.py::test_at_b100_05_save_project_saves_the_patched_image[size1]
+13 failed, 26 passed in 162.48s (0:02:42)
+
+# exit: 1

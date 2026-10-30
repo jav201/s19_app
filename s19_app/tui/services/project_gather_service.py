@@ -64,6 +64,7 @@ seam for both changes.
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional, Sequence
@@ -73,8 +74,9 @@ from ..workspace import (
     WorkareaContainmentError,
     _guarded_destination,
     place_into_workarea,
+    predict_placement,
 )
-from .variant_execution_service import MANIFEST_ARTIFACT
+from .variant_execution_service import MANIFEST_ARTIFACT, PROJECT_MANIFEST_NAME
 
 #: The per-artifact project homes (change 1, folders.html §1 — the drawn
 #: tree names them ``patches\`` / ``checks\`` / ``templates\``).
@@ -680,3 +682,174 @@ def scoped_home_target(
     if project_dir is None:
         return common_home
     return project_dir / subdir
+
+
+# ---------------------------------------------------------------------------
+# The Save project plan (batch-100 B100-I17, LLR-167.6, R-PC)
+# ---------------------------------------------------------------------------
+
+#: Save-plan action words (LLR-167.6). Inc 5 produces ``new``, ``keep`` and
+#: ``rewrite``; ``replace`` and ``merge`` are added with the merge rows that
+#: produce them (Inc 8a).
+PLAN_ACTION_NEW = "new"
+PLAN_ACTION_KEEP = "keep"
+PLAN_ACTION_REWRITE = "rewrite"
+
+#: Save-plan target kinds (LLR-167.6): a folder this save creates, the open
+#: project, or another existing project the save merges into.
+PLAN_TARGET_NEW = "new"
+PLAN_TARGET_OPEN = "open project"
+PLAN_TARGET_MERGE = "merge"
+
+#: The row role of the ``project.json`` row.
+PLAN_ROLE_MANIFEST = "manifest"
+
+
+@dataclass(frozen=True)
+class PlannedFile:
+    """
+    Summary:
+        One top-level file a Save project will place — an input of
+        :func:`plan_project_save`. The digest and size are computed by the
+        app (once per dialog open), so the planner hashes no payload.
+
+    Args:
+        role (str): ``"image"``, ``"mac"`` or ``"a2l"``.
+        source (Path): The file the row derives from (for an emitted image,
+            the loaded source).
+        name (str): The requested landing name.
+        digest (str): The SHA-256 hex digest of the bytes that will land.
+        size (int): Their size, in bytes.
+    """
+
+    role: str
+    source: Path
+    name: str
+    digest: str
+    size: int
+
+
+@dataclass(frozen=True)
+class SavePlanRow:
+    """
+    Summary:
+        One row of the save plan, at plan granularity (LLR-167.6).
+
+    Args:
+        role (str): ``"image"``, ``"mac"``, ``"a2l"`` or ``"manifest"``.
+        source (Optional[Path]): The row's source (``None`` for
+            ``project.json``).
+        landing (Path): The predicted full landing path, in the resolved
+            form :func:`place_into_workarea` returns.
+        action (str): One of the ``PLAN_ACTION_*`` words.
+    """
+
+    role: str
+    source: Optional[Path]
+    landing: Path
+    action: str
+
+
+@dataclass(frozen=True)
+class SavePlan:
+    """
+    Summary:
+        The one Save project plan (B100-I17): what the save will write,
+        computed without writing. ``_handle_save_dialog`` executes exactly
+        these rows and the Save dialog paints them (R-PC). Frozen, so a
+        reader cannot change what the handler executes.
+
+    Args:
+        target (Path): The project folder, as the app names it.
+        target_kind (str): One of the ``PLAN_TARGET_*`` kinds.
+        rows (tuple[SavePlanRow, ...]): The file rows, then ``project.json``.
+        image (str): The image description — source + N change entries, K
+            applied by this save, or an unchanged copy.
+        manifest_keys (tuple[str, ...]): The ``project.json`` keys the app
+            writes (an input, LED .45).
+        refusal (Optional[str]): The refusal with its tokens; a refused plan
+            has no rows.
+    """
+
+    target: Path
+    target_kind: str
+    rows: tuple[SavePlanRow, ...]
+    image: str
+    manifest_keys: tuple[str, ...]
+    refusal: Optional[str] = None
+
+
+def plan_project_save(
+    target: Path,
+    *,
+    target_kind: str,
+    files: Sequence[PlannedFile],
+    image: str,
+    manifest_keys: Sequence[str],
+    refusal: Optional[str] = None,
+) -> SavePlan:
+    """
+    Summary:
+        Compute the Save project plan WITHOUT writing (B100-I17, LLR-167.6):
+        one row per top-level file, each landing name predicted by
+        :func:`predict_placement` — the placement's own rule — with its
+        action word, plus the ``project.json`` row. A pure function of its
+        inputs and the target's listing: no byte is written and no payload
+        is hashed (the digests are inputs).
+
+    Args:
+        target (Path): The project folder (it may not exist yet).
+        target_kind (str): One of the ``PLAN_TARGET_*`` kinds.
+        files (Sequence[PlannedFile]): The files the save places, in
+            placement order.
+        image (str): The image description the app composed.
+        manifest_keys (Sequence[str]): The keys the app writes into
+            ``project.json`` (LED .45: an input, so a new key changes no
+            signature here).
+        refusal (Optional[str]): A refusal the app found (a blocked
+            re-derive); the plan then has no rows.
+
+    Returns:
+        SavePlan: The frozen plan.
+
+    Data Flow:
+        - A refusal → a row-less plan carrying it.
+        - Each file → ``predict_placement(digest, size, target, name)``:
+          a reuse is ``keep``, a claimed name is ``new``.
+        - ``project.json`` → ``rewrite`` when the target holds one, else
+          ``new``.
+
+    Dependencies:
+        Uses:
+            - predict_placement (B100-I22)
+        Used by:
+            - s19_app.tui.app.S19TuiApp._handle_save_dialog
+    """
+    keys = tuple(manifest_keys)
+    if refusal is not None:
+        return SavePlan(target, target_kind, (), image, keys, refusal)
+    rows: list[SavePlanRow] = []
+    for planned in files:
+        predicted = predict_placement(
+            planned.digest, planned.size, target, planned.name
+        )
+        rows.append(
+            SavePlanRow(
+                planned.role,
+                planned.source,
+                predicted.path,
+                PLAN_ACTION_KEEP if predicted.reused else PLAN_ACTION_NEW,
+            )
+        )
+    manifest = Path(target).resolve() / PROJECT_MANIFEST_NAME
+    rows.append(
+        SavePlanRow(
+            PLAN_ROLE_MANIFEST,
+            None,
+            manifest,
+            PLAN_ACTION_REWRITE
+            if os.path.lexists(manifest)
+            else PLAN_ACTION_NEW,
+        )
+    )
+    return SavePlan(target, target_kind, tuple(rows), image, keys)

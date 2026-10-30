@@ -1,0 +1,79 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree + corrective pass 1) with mutation ME-adopt-before-folder
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# date: 2026-10-29T21:45:39+00:00
+# finding: review F4 (LLR-167.2, LLR-167.4)
+# mutation: the re-derived image is adopted before the project folder exists — file s19_app/tui/app.py
+# pre-mutation sha256: 8032dead73f7ee542aabe188794f816f897bba76f64268011b94cc708a831cd2
+# mutant sha256: 05fd3cfb725c578d2e0196a0e9f7efcbeae60faa94dc2a87b5153235964fe326
+# restored sha256: 8032dead73f7ee542aabe188794f816f897bba76f64268011b94cc708a831cd2
+# RESTORE OK
+.................F....F.........................                         [100%]
+================================== FAILURES ===================================
+_________________ test_tc_b100_16_entry_added_after_the_apply _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30044/test_tc_b100_16_entry_added_af0')
+
+    def test_tc_b100_16_entry_added_after_the_apply(tmp_path: Path) -> None:
+        """1 applied + 1 added after the apply → 2 entries, 1 applied by this
+        save."""
+    
+        async def scenario(app, pilot) -> None:
+            _add(app, PATCH_ADDRESS, PATCH_BYTES)
+            _apply(app)
+            _add(app, SECOND_ADDRESS, SECOND_BYTES)
+    
+        lines, project, _ = _save_session(tmp_path, scenario)
+        final = lines[-1]
+        assert "firmware.s19 + 2 change entries, 1 applied by this save" in final, final
+>       assert any(
+            "includes 1 entry not applied before this save (0x80000060)" in line
+            for line in lines
+        ), lines
+E       AssertionError: ['Loaded firmware.s19 (S19 only)', 'Project saved + manifest verified', 'Saved + verified: firmware.s19 — 2 entries ap...added_af0\\app\\.s19tool\\workarea\\P1 (variant 'firmware') — firmware.s19 + 2 change entries, 1 applied by this save"]
+E       assert False
+E        +  where False = any(<generator object test_tc_b100_16_entry_added_after_the_apply.<locals>.<genexpr> at 0x0000018A8BE92CF0>)
+
+tests\test_b100_save_image.py:662: AssertionError
+____________ test_tc_b100_17_failed_manifest_write_adopts_nothing _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30044/test_tc_b100_17_failed_manifes0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000018A8EA5E0D0>
+
+    def test_tc_b100_17_failed_manifest_write_adopts_nothing(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Review F4 (LLR-167.2, LLR-167.4): an UNAPPLIED entry makes the save
+        emit, then the manifest write fails → the save rolls back AND the
+        session view is not the re-derived image: the session map still holds
+        the source bytes at the entry and no summary carries a saved path.
+        Adopting before ``project.json`` is on disk would show the operator a
+        patched image that no file holds."""
+        monkeypatch.setattr(
+            S19TuiApp, "_write_and_verify_manifest", lambda self, *a, **k: False
+        )
+        seen: dict = {}
+    
+        async def scenario(app, pilot) -> None:
+            _add(app, PATCH_ADDRESS, PATCH_BYTES)
+            seen["map"] = app.current_file.mem_map
+            seen["service"] = app._change_service
+    
+        lines, project, _ = _save_session(tmp_path, scenario)
+        assert "project.json was not written" in lines[-1], lines
+        assert not project.exists(), sorted(project.rglob("*"))
+        source = _source_data()
+        span = range(PATCH_ADDRESS, PATCH_ADDRESS + len(PATCH_BYTES))
+>       assert [seen["map"][a] for a in span] == [source[a] for a in span]
+E       assert [222, 173, 190, 239] == [60, 61, 62, 63]
+E         
+E         At index 0 diff: 222 != 60
+E         Use -v to get more diff
+
+tests\test_b100_save_image.py:824: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_image.py::test_tc_b100_16_entry_added_after_the_apply
+FAILED tests/test_b100_save_image.py::test_tc_b100_17_failed_manifest_write_adopts_nothing
+2 failed, 46 passed in 119.66s (0:01:59)
+
+# exit: 1

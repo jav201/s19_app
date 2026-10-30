@@ -1,0 +1,10 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py tests/test_b99_staging.py tests/test_b100_reuse.py tests/test_b99_editor_image.py tests/test_id_registry.py
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree; corrective pass 1 applied)
+# source sha256 (16): app.py 8032dead73f7ee54 · apply.py 6d00f17fcefb704c · change_service.py 95da58bf3bcc27cd · project_gather_service.py 11697d6c85efb9e2 · test_b100_save_image.py 559768f390ded771
+# PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# date: 2026-10-29T21:33:16Z
+# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\__init__.py
+........................................................................ [ 52%]
+..................................................................       [100%]
+138 passed in 365.33s (0:06:05)
+# exit: 0

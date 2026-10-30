@@ -40,6 +40,7 @@ from .changes import STATUS_VERIFIED, VerifyResult
 from ..range_index import address_in_sorted_ranges, build_sorted_range_index
 from ..render.hexview import build_row_bases, find_string_in_mem, render_hex_view_text
 from ..utils import safe_text
+from .changes.apply import render_patched_image
 from .changes.check import run_check_document
 from .changes.io import (
     list_change_documents,
@@ -48,7 +49,13 @@ from .changes.io import (
     serialize_change_document,
     write_change_document,
 )
-from .changes.model import ChangeDocument, ChangeEntry
+from .changes.model import (
+    DISPOSITION_APPLIED,
+    DISPOSITION_BLOCKED,
+    ChangeDocument,
+    ChangeEntry,
+    ChangeSummary,
+)
 from .command_bar import CommandBar, PaletteEntry
 from .mac import parse_mac_file
 from .models import LoadedFile, ProjectVariantSet
@@ -154,13 +161,24 @@ from .services.report_service import (
 from .services.manifest_writer import (
     ManifestVerifyResult,
     MANIFEST_VERIFIED,
+    serialize_manifest,
     verify_written_manifest,
     write_project_manifest,
 )
 from .services.project_gather_service import (
+    PLAN_ACTION_KEEP,
+    PLAN_ACTION_NEW,
+    PLAN_ROLE_MANIFEST,
+    PLAN_TARGET_MERGE,
+    PLAN_TARGET_NEW,
+    PLAN_TARGET_OPEN,
     PROJECT_CHECKS_DIR,
     PROJECT_PATCHES_DIR,
+    PlannedFile,
+    SavePlan,
+    SavePlanRow,
     gather_project_artifacts,
+    plan_project_save,
     scoped_home,
 )
 from .services import folder_open_service
@@ -190,6 +208,7 @@ from .workspace import (
     PROJECT_DATA_EXTENSIONS,
     PROJECT_PRIMARY_DATA_EXTENSIONS,
     PROJECT_NAME_MAX_CHARS,
+    PlacementResult,
     RESERVED_WORKAREA_HOMES,
     S19_EXTENSIONS,
     SUPPORTED_EXTENSIONS,
@@ -1416,6 +1435,129 @@ _SAVE_REPORT_SUFFIX_CHARS = 53
 #: ``_MAX_FULL_PATH`` idiom): ``len(workarea) + 1 + len(name) + 53`` must
 #: stay at or under this bound.
 _SAVE_FULL_PATH_LIMIT = 259
+
+def _save_manifest_keys(
+    declared_regions: Sequence[DeclaredRegion],
+) -> tuple[str, ...]:
+    """
+    Summary:
+        The ``project.json`` keys a Save project writes, read off the
+        manifest writer itself (LED .45: the save plan takes them as an
+        input), so the plan never carries a hand-copied key list.
+
+    Args:
+        declared_regions (Sequence[DeclaredRegion]): The regions the save
+            writes; the writer adds ``declared_regions`` only when any exist.
+
+    Returns:
+        tuple[str, ...]: The keys, in the writer's order. ``gathered`` is
+            not among them: the gather decides it AFTER the plan and has no
+            plan rows until Inc 7 / 8a (LED .63).
+
+    Data Flow:
+        - Serialize an empty composition with these regions through
+          ``serialize_manifest`` (no file is touched).
+        - Parse the text back and keep its top-level key order.
+
+    Dependencies:
+        Uses:
+            - manifest_writer.serialize_manifest
+        Used by:
+            - S19TuiApp._plan_project_save
+    """
+    text, _issues = serialize_manifest(
+        ProjectVariantSet(project_name="", variants=(), active_id=None),
+        Path(),
+        declared_regions=declared_regions,
+    )
+    return tuple(json.loads(text))
+
+
+@dataclass(frozen=True)
+class _ProjectImageStep:
+    """
+    Summary:
+        Save project's image decision (LLR-167.1), made on data before
+        anything is created: emit the re-derived image, copy the source, or
+        refuse the whole save.
+
+    Args:
+        emit (bool): True when the re-derived data differs from the source.
+        derived (Optional[dict[int, int]]): The re-derived copy (emit only).
+        summary (Optional[ChangeSummary]): Its summary (emit only).
+        payload (Optional[bytes]): The exact bytes the emit writes.
+        name (str): The emitted image's requested name.
+        carried (int): Document entries the emitted image carries.
+        applied_by_save (int): Of those, the ones no apply wrote before.
+        refusal (Optional[str]): The blocked-entries refusal.
+    """
+
+    emit: bool
+    derived: Optional[dict[int, int]] = None
+    summary: Optional[ChangeSummary] = None
+    payload: Optional[bytes] = None
+    name: str = ""
+    carried: int = 0
+    applied_by_save: int = 0
+    refusal: Optional[str] = None
+
+
+def _file_digest(path: Path) -> Tuple[str, int]:
+    """
+    Summary:
+        The SHA-256 hex digest and size of one file a Save project copies —
+        the plan's input (LLR-167.6), computed by the app so the planner
+        hashes nothing.
+
+    Args:
+        path (Path): The file.
+
+    Returns:
+        Tuple[str, int]: ``(digest, size)``.
+
+    Raises:
+        OSError: The file cannot be read. A read error that names no file
+            (a byte-range lock fails the read, not the open) is given
+            ``path`` as its ``filename``, so the refusal can name it.
+    """
+    digest = hashlib.sha256()
+    size = 0
+    try:
+        with open(path, "rb") as handle:
+            for chunk in iter(lambda: handle.read(1 << 20), b""):
+                digest.update(chunk)
+                size += len(chunk)
+    except OSError as exc:
+        if exc.filename is None:
+            exc.filename = str(path)
+        raise
+    return digest.hexdigest(), size
+
+
+def _plan_row_mismatch(row: SavePlanRow, placed: PlacementResult) -> Optional[str]:
+    """
+    Summary:
+        Check one landed placement against its plan row (LLR-163.7,
+        LLR-167.6): a different path, or a reuse the plan did not predict
+        (or the reverse), is an error naming both paths — never silent.
+
+    Args:
+        row (SavePlanRow): The planned row.
+        placed (PlacementResult): Where the placement landed.
+
+    Returns:
+        Optional[str]: The refusal line, or ``None`` when they agree.
+    """
+    same_path = os.path.normcase(str(placed.path)) == os.path.normcase(
+        str(row.landing)
+    )
+    if same_path and placed.reused == (row.action == PLAN_ACTION_KEEP):
+        return None
+    landed_action = PLAN_ACTION_KEEP if placed.reused else PLAN_ACTION_NEW
+    return (
+        f"Project NOT saved: the plan named {row.landing} ({row.action}) "
+        f"but the file landed at {placed.path} ({landed_action}) — save again."
+    )
 
 
 #: The session-snapshot domain (HLR-165, LLR-165.2): every attribute name
@@ -3567,9 +3709,13 @@ class S19TuiApp(App):
             # classification identical to the apply routing's.
             mac_records=loaded.mac_records,
             a2l_tags=self._compute_a2l_enriched_tags() or None,
+            # SEC-4 (LED .56): the emit stages under THIS work area.
+            workarea_root=self.workarea,
         )
         self._report_change_result(result)
         if result.ok:
+            # LLR-167.5: a successful save-back records the saved image.
+            self._change_service.mark_saved(loaded.mem_map)
             self._surface_verify_result()
             # US-061 / LLR-061.1: reveal the PERSISTENT before/after-report
             # control (a durable widget, not a Toast) so the report stays
@@ -4105,7 +4251,8 @@ class S19TuiApp(App):
 
         Data Flow:
             - Read ``last_summary.verify_result`` (the §6.2 C-10 carrier
-              stamped by ``ChangeService.save_patched``); absent → no-op.
+              stamped by ``ChangeService.emit_and_verify`` for the save-back and
+              Save project); absent → no-op.
             - ``verified`` → one status line composed as ``Saved + verified:
               {name}`` + :func:`save_back_status_suffix` over
               ``ChangeService.last_save_applied`` /
@@ -4125,6 +4272,7 @@ class S19TuiApp(App):
                   ``last_save_applied`` / ``last_save_not_applied``)
             Used by:
                 - on_patch_editor_panel_save_back_decision
+                - _handle_save_dialog (Save project's emit, after commit)
         """
         summary = self._change_service.last_summary
         if summary is None or summary.verify_result is None:
@@ -8743,6 +8891,48 @@ class S19TuiApp(App):
                 "Save project refused: link/junction target: %s", project_dir
             )
             return
+        # HLR-167 / LLR-167.1 / LLR-167.6: decide the image on DATA and
+        # compute the save plan BEFORE anything is created — a blocked
+        # re-derive refuses the whole save and no folder is made.
+        # LLR-164.4 / review F2: the plan reads every source it digests; a
+        # source that cannot be read refuses here, before any folder
+        # exists, and the app keeps running.
+        try:
+            image_step = (
+                self._decide_project_image()
+                if self.current_file
+                else _ProjectImageStep(emit=False)
+            )
+            plan = self._plan_project_save(project_dir, cleaned, image_step)
+        except OSError as exc:
+            unreadable = (
+                Path(exc.filename).name if exc.filename else "a source file"
+            )
+            message = (
+                f"Project NOT saved: {unreadable} could not be read: "
+                f"{exc.strerror or exc}. Nothing written."
+            )
+            self.set_status(message)
+            self.notify(
+                message,
+                title="Project not saved",
+                severity="error",
+                timeout=10.0,
+                markup=False,
+            )
+            self.logger.warning("Save project refused: %s", exc)
+            return
+        if plan.refusal is not None:
+            self.set_status(plan.refusal)
+            self.notify(
+                plan.refusal,
+                title="Project not saved",
+                severity="error",
+                timeout=10.0,
+                markup=False,
+            )
+            self.logger.warning("Save project refused: %s", plan.refusal)
+            return
         # Review findings F6(a)/S-F5: remember whether THIS call creates the
         # folder, so a later failure can remove exactly what it created — a
         # pre-existing project folder is never touched. The ownership
@@ -8830,39 +9020,90 @@ class S19TuiApp(App):
                     manifest_restores,
                 )
                 return
-            # LED .53: each placement runs through ``place_into_workarea``
-            # so the reuse flag is known — a byte-identical file the
-            # placement REUSED is never recorded, so the rollback removes
-            # exactly what THIS save created.
-            if self.current_file:
-                placed_image = place_into_workarea(
-                    self.current_file.path, project_dir,
-                    workarea_root=self.workarea,
-                )
-                saved = placed_image.path
-                if not placed_image.reused:
-                    placed_files.append(placed_image.path)
-                self.logger.info("Project saved. name=%s file=%s", cleaned, saved)
-                if saved.suffix.lower() in PROJECT_PRIMARY_DATA_EXTENSIONS:
-                    saved_primary_name = saved.name
-                if self.current_file.mac_path and self.current_file.mac_path != self.current_file.path:
-                    placed_mac = place_into_workarea(
-                        self.current_file.mac_path, project_dir,
+            # LLR-167.2 / LLR-167.6 (R-PC): execute exactly the plan's file
+            # rows. LED .53: each placement reports its reuse flag — a
+            # byte-identical file the placement REUSED is never recorded,
+            # so the rollback removes exactly what THIS save created. Every
+            # landed placement is checked against its row.
+            for row in plan.rows:
+                if row.role == PLAN_ROLE_MANIFEST:
+                    continue
+                if row.role == "image" and image_step.emit:
+                    landed: list[PlacementResult] = []
+
+                    def _emit_landed(placed: PlacementResult) -> None:
+                        # SEC-7 / review F1: the emitted image joins the
+                        # rollback list the moment it lands — the verify
+                        # re-read that follows inside the emit can raise.
+                        landed.append(placed)
+                        if not placed.reused:
+                            placed_files.append(placed.path)
+
+                    # PDR-UX-C6: the emit's verify line names the entries
+                    # from this split — recorded where the emit runs, not
+                    # while deciding (review F7).
+                    self._change_service.record_save_entries()
+                    emit_result = self._change_service.emit_and_verify(
+                        image_step.derived,
+                        self.current_file.ranges,
+                        project_dir,
+                        row.landing.name,
+                        source_kind=self.current_file.file_type,
+                        bytes_per_line=32,
+                        s0_header=self.current_file.source_s0_header,
+                        source_image_path=self.current_file.path,
+                        summary=image_step.summary,
+                        workarea_root=self.workarea,
+                        on_placed=_emit_landed,
+                    )
+                    if not emit_result.ok or not landed:
+                        detail = "; ".join(
+                            issue.message for issue in emit_result.issues
+                        ) or emit_result.message
+                        message = (
+                            "Project NOT saved: could not save — the patched "
+                            f"image was not written: {detail}"
+                        )
+                        self.set_status(message)
+                        self.logger.warning("Project save emit failed: %s", detail)
+                        self._abort_save(
+                            project_dir,
+                            created_project_dir,
+                            placed_files,
+                            created_dirs,
+                            save_state,
+                            manifest_restores,
+                        )
+                        return
+                    placed = landed[0]
+                else:
+                    placed = place_into_workarea(
+                        row.source, project_dir,
                         workarea_root=self.workarea,
                     )
-                    saved_mac = placed_mac.path
-                    if not placed_mac.reused:
-                        placed_files.append(placed_mac.path)
-                    self.logger.info("Project saved MAC. name=%s file=%s", cleaned, saved_mac)
-            if self.current_a2l_path:
-                placed_a2l = place_into_workarea(
-                    self.current_a2l_path, project_dir,
-                    workarea_root=self.workarea,
+                    if not placed.reused:
+                        placed_files.append(placed.path)
+                mismatch = _plan_row_mismatch(row, placed)
+                if mismatch is not None:
+                    self.set_status(mismatch)
+                    self.logger.warning("Save project plan mismatch: %s", mismatch)
+                    self._abort_save(
+                        project_dir,
+                        created_project_dir,
+                        placed_files,
+                        created_dirs,
+                        save_state,
+                        manifest_restores,
+                    )
+                    return
+                self.logger.info(
+                    "Project saved %s. name=%s file=%s", row.role, cleaned, placed.path
                 )
-                saved_a2l = placed_a2l.path
-                if not placed_a2l.reused:
-                    placed_files.append(placed_a2l.path)
-                self.logger.info("Project saved A2L. name=%s file=%s", cleaned, saved_a2l)
+                if (
+                    row.role == "image"
+                    and placed.path.suffix.lower() in PROJECT_PRIMARY_DATA_EXTENSIONS
+                ):
+                    saved_primary_name = placed.path.name
             # F-09 (LLR-056.3): project CREATE/SAVE swaps the active project
             # without reloading a file (no ``_apply_prepared_load`` pass), so
             # the sticky report-filter selection resets here.
@@ -9024,19 +9265,52 @@ class S19TuiApp(App):
                 manifest_restores,
             )
             return
+        except Exception:
+            # SEC-7: any other error after the folder's creation is a
+            # defect — roll the failed save back first, then let it surface.
+            self.logger.exception("Project save failed with an unexpected error.")
+            self._abort_save(
+                project_dir,
+                created_project_dir,
+                placed_files,
+                created_dirs,
+                save_state,
+                manifest_restores,
+            )
+            raise
         # R2-3: the save is COMMITTED — the statements below run OUTSIDE
         # the rollback try: once ``project.json`` is on disk, an error
         # here must never roll the save back (the rollback would unlink
         # a variant the manifest now lists).
+        # LLR-167.2: the emitted image is now on disk — the session view
+        # takes the re-derived image in place, so it equals what was saved,
+        # and the verify outcome is painted (its line names the entries
+        # through ``save_back_status_suffix``).
+        mem_map = self.current_file.mem_map if self.current_file else None
+        if image_step.emit:
+            self._change_service.adopt_rederived(
+                mem_map, image_step.derived, image_step.summary
+            )
+            self._surface_verify_result()
+        # LLR-167.5: record the saved image state — only when the session
+        # image equals what was written (an emit, or a copy of a session
+        # that does not differ from its source).
+        if image_step.emit or not self._change_service.image_differs_from_source(
+            mem_map
+        ):
+            self._change_service.mark_saved(mem_map)
         # F1: the success line paints only after the manifest is on
         # disk — a save that is about to fail must not have said
-        # "Saved".
+        # "Saved". LLR-167.3: an emitting save names the entries the image
+        # carries and how many this save applied.
+        image_clause = f" — {plan.image}" if image_step.emit else ""
         if saved_variant_id:
             self.set_status(
                 f"Saved project to {project_dir} (variant '{saved_variant_id}')"
+                f"{image_clause}"
             )
         else:
-            self.set_status(f"Saved project to {project_dir}")
+            self.set_status(f"Saved project to {project_dir}{image_clause}")
         # R2-5: a manifest verify MISMATCH (LLR-004.2 — reported, not a
         # failure) stays the NEWEST status line: the drift report is
         # re-painted after the success line, never buried beneath it.
@@ -9050,6 +9324,209 @@ class S19TuiApp(App):
         self.current_project_dir = project_dir
         self.update_project_labels()
         self.refresh_files()
+
+    def _decide_project_image(self) -> _ProjectImageStep:
+        """
+        Summary:
+            Save project's emit decision on data (LLR-167.1): re-derive the
+            current CHANGE document onto a copy of the source image and emit
+            iff the result differs from the source's data. A check document
+            never counts. ``image_differs_from_source`` is only the fast
+            path that starts the re-derive; it never decides copy. A blocked
+            re-derive refuses the whole save (LLR-167.4).
+
+        Returns:
+            _ProjectImageStep: emit (with the re-derived copy, its summary,
+                the emitted bytes and the entry counts), copy, or refuse.
+                No image byte and no save record is written here (review
+                F7); the document's collision findings (``document.issues``)
+                are refreshed by the re-derive, as an apply does.
+
+        Data Flow:
+            - Fast path: a non-``change`` document, or one with no entry on
+              an image the journal shows unchanged, copies at once.
+            - Re-derive the document onto a copy of the session map; any
+              blocked entry refuses the save, naming the addresses.
+            - Compare the copy with the source's data over the document's
+              spans: equal → copy (an applied-then-undone entry, or bytes
+              the source already holds).
+            - Differs → render the exact emitted bytes (an unsupported
+              image kind refuses) and count the entries the image carries
+              and how many of those no apply wrote before this save.
+
+        Dependencies:
+            Uses:
+                - ChangeService.image_differs_from_source / rederive_for_save
+                  / rederived_differs_from_source / save_entry_split
+                - render_patched_image
+                - _compute_a2l_enriched_tags
+            Used by:
+                - _handle_save_dialog (before the project folder exists)
+        """
+        loaded = self.current_file
+        service = self._change_service
+        document = service.document
+        mem_map = loaded.mem_map
+        if document.kind != "change" or not (
+            service.image_differs_from_source(mem_map) or document.entries
+        ):
+            return _ProjectImageStep(emit=False)
+        derived, summary = service.rederive_for_save(
+            dict(mem_map),
+            ranges=loaded.ranges,
+            session_map=mem_map,
+            mac_records=loaded.mac_records,
+            a2l_tags=self._compute_a2l_enriched_tags() or None,
+        )
+        blocked = [
+            record.address_start
+            for record in summary.entries
+            if record.disposition == DISPOSITION_BLOCKED
+        ]
+        if blocked:
+            names = ", ".join(f"0x{address:08X}" for address in blocked)
+            return _ProjectImageStep(
+                emit=False,
+                refusal=(
+                    f"Project NOT saved: {len(blocked)} blocked "
+                    f"{'entry' if len(blocked) == 1 else 'entries'} ({names}) "
+                    "— fix them in the Patch Editor."
+                ),
+            )
+        if not service.rederived_differs_from_source(mem_map, derived):
+            return _ProjectImageStep(emit=False)
+        payload = render_patched_image(
+            derived,
+            loaded.ranges,
+            source_kind=loaded.file_type,
+            bytes_per_line=32,
+            s0_header=loaded.source_s0_header,
+        )
+        if payload is None:
+            return _ProjectImageStep(
+                emit=False,
+                refusal=(
+                    f"Project NOT saved: a patched {loaded.file_type} image "
+                    "cannot be written — only S19 and HEX images carry "
+                    "change entries."
+                ),
+            )
+        _applied, not_applied = service.save_entry_split()
+        carried = {
+            record.address_start
+            for record in summary.entries
+            if record.disposition == DISPOSITION_APPLIED
+        }
+        suffix = ".hex" if loaded.file_type == "hex" else ".s19"
+        name = (
+            loaded.path.name
+            if loaded.path.suffix.lower() == suffix
+            else loaded.path.stem + suffix
+        )
+        return _ProjectImageStep(
+            emit=True,
+            derived=derived,
+            summary=summary,
+            payload=payload,
+            name=name,
+            carried=len(carried),
+            applied_by_save=sum(1 for address in not_applied if address in carried),
+        )
+
+    def _plan_project_save(
+        self,
+        project_dir: Path,
+        project_name: str,
+        image_step: _ProjectImageStep,
+    ) -> SavePlan:
+        """
+        Summary:
+            Build the one save plan (LLR-167.6, R-PC) from what this save
+            will place: the image (the emitted bytes or the source), the MAC
+            and the A2L, each with the digest the app computes here so the
+            planner hashes nothing, plus the manifest keys (LED .45).
+
+        Args:
+            project_dir (Path): The UNRESOLVED target folder.
+            project_name (str): The target's on-disk name.
+            image_step (_ProjectImageStep): The image decision.
+
+        Returns:
+            SavePlan: The frozen plan the handler executes.
+
+        Raises:
+            OSError: A source the plan digests cannot be read (the caller
+                refuses the save before any folder exists).
+
+        Data Flow:
+            - The image row: the emitted bytes' digest (an emit) or the
+              source file's (a copy); then the MAC and the A2L, each
+              digested from its file. A refused decision plans no file.
+            - The target kind: ``new`` when nothing exists at the target,
+              ``open project`` for the open project's name, else ``merge``.
+            - The manifest keys come from the manifest writer
+              (``_save_manifest_keys``).
+
+        Dependencies:
+            Uses:
+                - _file_digest / _save_manifest_keys
+                - project_gather_service.plan_project_save
+            Used by:
+                - _handle_save_dialog (before the project folder exists)
+        """
+        loaded = self.current_file
+        files: list[PlannedFile] = []
+        image = ""
+        if loaded is not None and image_step.refusal is None:
+            if image_step.emit:
+                payload = image_step.payload
+                files.append(
+                    PlannedFile(
+                        "image",
+                        loaded.path,
+                        image_step.name,
+                        hashlib.sha256(payload).hexdigest(),
+                        len(payload),
+                    )
+                )
+                image = (
+                    f"{loaded.path.name} + {image_step.carried} change "
+                    f"{'entry' if image_step.carried == 1 else 'entries'}, "
+                    f"{image_step.applied_by_save} applied by this save"
+                )
+            else:
+                files.append(
+                    PlannedFile("image", loaded.path, loaded.path.name, *_file_digest(loaded.path))
+                )
+                image = f"{loaded.path.name} unchanged copy"
+            if loaded.mac_path and loaded.mac_path != loaded.path:
+                files.append(
+                    PlannedFile(
+                        "mac", loaded.mac_path, loaded.mac_path.name,
+                        *_file_digest(loaded.mac_path),
+                    )
+                )
+        if self.current_a2l_path and image_step.refusal is None:
+            files.append(
+                PlannedFile(
+                    "a2l", self.current_a2l_path, self.current_a2l_path.name,
+                    *_file_digest(self.current_a2l_path),
+                )
+            )
+        if not os.path.lexists(project_dir):
+            target_kind = PLAN_TARGET_NEW
+        elif (self.current_project or "").casefold() == project_name.casefold():
+            target_kind = PLAN_TARGET_OPEN
+        else:
+            target_kind = PLAN_TARGET_MERGE
+        return plan_project_save(
+            project_dir,
+            target_kind=target_kind,
+            files=files,
+            image=image,
+            manifest_keys=_save_manifest_keys(self._declared_regions),
+            refusal=image_step.refusal,
+        )
 
     def _write_and_verify_manifest(
         self,
@@ -12189,7 +12666,13 @@ class S19TuiApp(App):
                 for variant in self._variant_set.variants
             ):
                 self._variant_set.active_id = pending_variant
+        previous_map = self.current_file.mem_map if self.current_file else None
         self.current_file = loaded
+        # LLR-167.5 (B100-I18): a load records the saved-image state. Only a
+        # NEW image dict counts — a MAC/A2L attach keeps the live dict (and
+        # any unsaved patch in it), so recording there would hide that patch.
+        if loaded.mem_map is not previous_map:
+            self._change_service.mark_saved(loaded.mem_map)
         # batch-48 (LLR-077.2, the BL-4 arm): a NEW image is now installed, so
         # any completed check run describes a PREVIOUS one. Bump the monotonic
         # generation and push it into the change service, which compares it

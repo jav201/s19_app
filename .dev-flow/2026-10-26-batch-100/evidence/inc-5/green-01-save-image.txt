@@ -1,0 +1,62 @@
+# command: python -m pytest -q -p no:cacheprovider tests/test_b100_save_image.py tests/test_b99_staging.py::test_at_b99_05_save_project_after_same_name_save_back tests/test_id_registry.py -rA
+# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
+# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# date: 2026-10-29T19:40:21Z
+.....................................................                    [100%]
+=================================== PASSES ====================================
+=========================== short test summary info ===========================
+PASSED tests/test_b100_save_image.py::test_tc_b100_14_no_entry_copies
+PASSED tests/test_b100_save_image.py::test_tc_b100_14_new_bytes_emit
+PASSED tests/test_b100_save_image.py::test_tc_b100_14_same_bytes_copy
+PASSED tests/test_b100_save_image.py::test_tc_b100_14_check_document_copies
+PASSED tests/test_b100_save_image.py::test_tc_b100_14_applied_then_undone_copies
+PASSED tests/test_b100_save_image.py::test_tc_b100_14_unapplied_entry_emits
+PASSED tests/test_b100_save_image.py::test_tc_b100_14_save_back_then_emit
+PASSED tests/test_b100_save_image.py::test_tc_b100_14_deciding_writes_nothing
+PASSED tests/test_b100_save_image.py::test_tc_b100_15_patched_s19_is_emitted
+PASSED tests/test_b100_save_image.py::test_tc_b100_15_check_document_only_copies
+PASSED tests/test_b100_save_image.py::test_tc_b100_15_unchanged_document_copies
+PASSED tests/test_b100_save_image.py::test_tc_b100_15_entry_removed_after_apply_is_absent
+PASSED tests/test_b100_save_image.py::test_tc_b100_15_patched_hex_is_emitted
+PASSED tests/test_b100_save_image.py::test_tc_b100_15_mac_and_a2l_stay_byte_copies
+PASSED tests/test_b100_save_image.py::test_tc_b100_15_save_back_then_save_project_keeps_the_patch
+PASSED tests/test_b100_save_image.py::test_tc_b100_15_clashing_name_lands_as_the_next_variant
+PASSED tests/test_b100_save_image.py::test_tc_b100_16_one_applied_entry
+PASSED tests/test_b100_save_image.py::test_tc_b100_16_entry_added_after_the_apply
+PASSED tests/test_b100_save_image.py::test_tc_b100_17_blocked_entry_refuses_the_whole_save
+PASSED tests/test_b100_save_image.py::test_tc_b100_17_emit_refusal_writes_no_manifest
+PASSED tests/test_b100_save_image.py::test_tc_b100_58_predicate_sequence_unit
+PASSED tests/test_b100_save_image.py::test_tc_b100_58_save_project_records_the_saved_state
+PASSED tests/test_b100_save_image.py::test_tc_b100_58_save_back_records_the_saved_state
+PASSED tests/test_b100_save_image.py::test_tc_b100_59_fresh_folder
+PASSED tests/test_b100_save_image.py::test_tc_b100_59_open_project_unchanged
+PASSED tests/test_b100_save_image.py::test_tc_b100_59_pending_patch_in_the_open_project
+PASSED tests/test_b100_save_image.py::test_tc_b100_59_refused_plan_writes_nothing
+PASSED tests/test_b100_save_image.py::test_tc_b100_59_planning_writes_nothing_and_hashes_no_payload
+PASSED tests/test_b100_save_image.py::test_tc_b100_59_gather_service_imports_no_change_module
+PASSED tests/test_b100_save_image.py::test_tc_b100_69_rederive_writes_nothing_into_the_session_map
+PASSED tests/test_b100_save_image.py::test_tc_b100_69_save_patched_writes_the_pre_split_bytes[applied]
+PASSED tests/test_b100_save_image.py::test_tc_b100_69_save_patched_writes_the_pre_split_bytes[undone]
+PASSED tests/test_b100_save_image.py::test_tc_b100_69_save_patched_writes_the_pre_split_bytes[added_after_apply]
+PASSED tests/test_b100_save_image.py::test_tc_b100_69_save_patched_writes_the_pre_split_bytes[blocked]
+PASSED tests/test_b100_save_image.py::test_tc_b100_69_sec4_junction_save_back_stages_in_this_work_area
+PASSED tests/test_b100_save_image.py::test_tc_b100_70_refused_save_keeps_the_flag
+PASSED tests/test_b100_save_image.py::test_tc_b100_70_unwritten_document_keeps_the_flag
+PASSED tests/test_b100_save_image.py::test_at_b100_05_save_project_saves_the_patched_image[size0]
+PASSED tests/test_b100_save_image.py::test_at_b100_05_save_project_saves_the_patched_image[size1]
+PASSED tests/test_b99_staging.py::test_at_b99_05_save_project_after_same_name_save_back
+PASSED tests/test_id_registry.py::test_tc600_g1_every_named_node_id_is_registered
+PASSED tests/test_id_registry.py::test_tc601_g2_live_entries_name_existing_nodes
+PASSED tests/test_id_registry.py::test_tc602_g3_every_citation_is_registered
+PASSED tests/test_id_registry.py::test_tc603_g4_requirements_citations_are_live
+PASSED tests/test_id_registry.py::test_tc604_g5_grammar_holds_or_is_registered_legacy
+PASSED tests/test_id_registry.py::test_tc605_g6_normalized_keys_are_unique
+PASSED tests/test_id_registry.py::test_tc606_g7_no_stem_exceeds_the_high_water_mark
+PASSED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+PASSED tests/test_id_registry.py::test_tc608_tokenizer_and_normalizer_edge_cases
+PASSED tests/test_id_registry.py::test_tc609_registry_file_is_well_formed
+PASSED tests/test_id_registry.py::test_tc610_reservations_are_recorded_and_respected
+PASSED tests/test_id_registry.py::test_at280_registry_and_repository_agree_in_both_directions
+PASSED tests/test_id_registry.py::test_at281_every_guard_rule_can_fail
+53 passed in 125.40s (0:02:05)
+# exit: 0

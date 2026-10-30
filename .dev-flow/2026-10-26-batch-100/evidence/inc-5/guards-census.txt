@@ -1,0 +1,8 @@
+# command: python -m pytest -q -p no:cacheprovider -k census tests
+# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
+# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# date: 2026-10-29T21:05:00Z
+........................................................................ [ 82%]
+...............                                                          [100%]
+87 passed, 3856 deselected in 90.01s (0:01:30)
+# exit: 0

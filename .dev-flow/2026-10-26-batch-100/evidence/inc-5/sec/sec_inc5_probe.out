@@ -1,0 +1,148 @@
+s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\__init__.py
+python = 3.11.15
+
+== A: save_patched_image API (the Round-2 SEC-4 probe shape) ==
+ A1 junction dest, root=None: path=None issues=['MF-WRITE-CONTAINMENT']
+   staging dirs created: []
+   other-work-area diff: {'created': [], 'removed': [], 'changed': []}
+  CHECK A1 junction dest, root=None: refused: ok
+  CHECK A1 junction dest, root=None: no staging dir created: ok
+  CHECK A1 junction dest, root=None: 0 entries created in the other work area: ok
+ A2 junction dest, root=this work area: path=None issues=['MF-WRITE-CONTAINMENT']
+   staging dirs created: []
+   other-work-area diff: {'created': [], 'removed': [], 'changed': []}
+  CHECK A2 junction dest, root=this work area: refused: ok
+  CHECK A2 junction dest, root=this work area: no staging dir created: ok
+  CHECK A2 junction dest, root=this work area: 0 entries created in the other work area: ok
+ A3 PRE-RESOLVED junction dest, root=this work area: path=None issues=['MF-WRITE-CONTAINMENT']
+   staging dirs created: []
+   other-work-area diff: {'created': [], 'removed': [], 'changed': []}
+  CHECK A3 PRE-RESOLVED junction dest, root=this work area: refused: ok
+  CHECK A3 PRE-RESOLVED junction dest, root=this work area: no staging dir created: ok
+  CHECK A3 PRE-RESOLVED junction dest, root=this work area: 0 entries created in the other work area: ok
+ A4 junction dest, root=None, upper-cased spelling: path=None issues=['MF-WRITE-CONTAINMENT']
+   staging dirs created: []
+   other-work-area diff: {'created': [], 'removed': [], 'changed': []}
+  CHECK A4 junction dest, root=None, upper-cased spelling: refused: ok
+  CHECK A4 junction dest, root=None, upper-cased spelling: no staging dir created: ok
+  CHECK A4 junction dest, root=None, upper-cased spelling: 0 entries created in the other work area: ok
+ A5 PRE-RESOLVED junction dest, root=None (SEC-6 shape, not an app path today): path=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\sec-inc5\work\A\other\.s19tool\workarea\T\firmware_patched.s19
+   staging dirs created: ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\sec-inc5\\work\\A\\other\\.s19tool\\workarea\\temp\\.staging\\stage-1knlmo9z']
+   other-work-area diff: {'created': ['.s19tool\\workarea\\T\\firmware_patched.s19', '.s19tool\\workarea\\temp', '.s19tool\\workarea\\temp\\.staging'], 'removed': [], 'changed': []}
+ A6 control, real project dest with root: path=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\sec-inc5\work\A\app\.s19tool\workarea\P\firmware_patched.s19; staged under: ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\sec-inc5\\work\\A\\app\\.s19tool\\workarea\\temp\\.staging\\stage-lrc8it44']
+  CHECK A6 control accepted: ok
+  CHECK A6 staging under this work area: ok
+
+== B: app save-back with a junction project open ==
+  current_project_dir: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\sec-inc5\work\B\app\.s19tool\workarea\evil | equals its resolved form: False
+  status tail:  Loaded project 'evil' -> firmware.s19 | Patched image not saved - see issues | [MF-WRITE-CONTAINMENT] warning: the save-back destination is not inside this .s19tool/workarea/ tree — the patched image was not written: Refusing to place: destination traverses a symbolic link or reparse point: C:\User
+  whole-scratch diff: {'created': [], 'removed': [], 'changed': []}
+  entries created/changed OUTSIDE this work area: []
+  CHECK B save-back refused: ok
+  CHECK B 0 entries outside this work area: ok
+
+== C: Save project (emit path) with a junction project open ==
+ C1 name=evil (the junction itself)
+   status: Project NOT saved: 'evil' is a link or junction — choose another name.
+   exception escaped the handler: None
+   whole-scratch diff: {'created': [], 'removed': [], 'changed': ['app\\.s19tool\\logs\\s19tui.log']}
+   net entries OUTSIDE this work area: []
+  CHECK C1 name=evil (the junction itself): no exception: ok
+  CHECK C1 name=evil (the junction itself): net 0 entries outside this work area: ok
+ C2 parent=<wa>\evil (absolute, through the junction), name=X
+   status: Project NOT saved: could not save — the patched image was not written: the save-back destination is not inside this .s19tool/workarea/ tree — the patched image was not written: Refusing to place: destination traverses a 
+   exception escaped the handler: None
+   emit guard called with dest=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\sec-inc5\work\C\app\.s19tool\workarea\evil\X
+     other tree at that moment: ['.s19tool', '.s19tool\\workarea', '.s19tool\\workarea\\T', '.s19tool\\workarea\\T\\X', '.s19tool\\workarea\\T\\firmware.s19']
+     outside tree at that moment: []
+   whole-scratch diff: {'created': [], 'removed': [], 'changed': ['app\\.s19tool\\logs\\s19tui.log']}
+   net entries OUTSIDE this work area: []
+  CHECK C2 parent=<wa>\evil (absolute, through the junction), name=X: no exception: ok
+  CHECK C2 parent=<wa>\evil (absolute, through the junction), name=X: net 0 entries outside this work area: ok
+ C3 parent=relative '.s19tool/workarea/evil' (resolve_input_path resolves it), name=Y
+   status: Project NOT saved: could not save — the patched image was not written: the save-back destination is not inside this .s19tool/workarea/ tree — the patched image was not written: Refusing to place: destination is not conta
+   exception escaped the handler: None
+   emit guard called with dest=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\sec-inc5\work\C\other\.s19tool\workarea\T\Y
+     other tree at that moment: ['.s19tool', '.s19tool\\workarea', '.s19tool\\workarea\\T', '.s19tool\\workarea\\T\\Y', '.s19tool\\workarea\\T\\firmware.s19']
+     outside tree at that moment: []
+   whole-scratch diff: {'created': [], 'removed': [], 'changed': ['app\\.s19tool\\logs\\s19tui.log']}
+   net entries OUTSIDE this work area: []
+  CHECK C3 parent=relative '.s19tool/workarea/evil' (resolve_input_path resolves it), name=Y: no exception: ok
+  CHECK C3 parent=relative '.s19tool/workarea/evil' (resolve_input_path resolves it), name=Y: net 0 entries outside this work area: ok
+ C4 parent=<wa>\EVIL upper-cased, name=Z
+   status: Project NOT saved: could not save — the patched image was not written: the save-back destination is not inside this .s19tool/workarea/ tree — the patched image was not written: Refusing to place: destination traverses a 
+   exception escaped the handler: None
+   emit guard called with dest=C:\USERS\JJGH8\APPDATA\LOCAL\TEMP\CLAUDE\C--USERS-JJGH8-CLDE\A8FEAB43-C248-4CCB-86CF-122B894659B2\SCRATCHPAD\SEC-INC5\WORK\C\APP\.S19TOOL\WORKAREA\EVIL\Z
+     other tree at that moment: ['.s19tool', '.s19tool\\workarea', '.s19tool\\workarea\\T', '.s19tool\\workarea\\T\\Z', '.s19tool\\workarea\\T\\firmware.s19']
+     outside tree at that moment: []
+   whole-scratch diff: {'created': [], 'removed': [], 'changed': ['app\\.s19tool\\logs\\s19tui.log']}
+   net entries OUTSIDE this work area: []
+  CHECK C4 parent=<wa>\EVIL upper-cased, name=Z: no exception: ok
+  CHECK C4 parent=<wa>\EVIL upper-cased, name=Z: net 0 entries outside this work area: ok
+ C5 parent outside every work area, name=W
+   status: Project NOT saved: could not save — the patched image was not written: the save-back destination is not inside this .s19tool/workarea/ tree — the patched image was not written: Refusing to place: destination is not conta
+   exception escaped the handler: None
+   emit guard called with dest=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\sec-inc5\work\C\outside\W
+     other tree at that moment: ['.s19tool', '.s19tool\\workarea', '.s19tool\\workarea\\T', '.s19tool\\workarea\\T\\firmware.s19']
+     outside tree at that moment: ['W']
+   whole-scratch diff: {'created': [], 'removed': [], 'changed': ['app\\.s19tool\\logs\\s19tui.log']}
+   net entries OUTSIDE this work area: []
+  CHECK C5 parent outside every work area, name=W: no exception: ok
+  CHECK C5 parent outside every work area, name=W: net 0 entries outside this work area: ok
+ C6 control: parent=<wa>, new name P2
+   status: Saved project to C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\sec-inc5\work\C\app\.s19tool\workarea\P2 (variant 'firmware') — firmware.s19 + 1 change entry,
+   exception escaped the handler: None
+   emit guard called with dest=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\sec-inc5\work\C\app\.s19tool\workarea\P2
+     other tree at that moment: ['.s19tool', '.s19tool\\workarea', '.s19tool\\workarea\\T', '.s19tool\\workarea\\T\\firmware.s19']
+     outside tree at that moment: []
+   whole-scratch diff: {'created': ['app\\.s19tool\\workarea\\P2', 'app\\.s19tool\\workarea\\P2\\firmware.s19', 'app\\.s19tool\\workarea\\P2\\project.json', 'app\\.s19tool\\workarea\\temp\\.staging'], 'removed': [], 'changed': ['app\\.s19tool\\logs\\s19tui.log']}
+   net entries OUTSIDE this work area: []
+  CHECK C6 control: parent=<wa>, new name P2: no exception: ok
+  CHECK C6 control: parent=<wa>, new name P2: net 0 entries outside this work area: ok
+  CHECK C6 control saved: ok
+
+== D: Save project rollback — does it delete only what it created? ==
+ D1 reuse + manifest failure in the open project M
+   status: ["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\sec-inc5\\work\\D\\app\\.s19tool\\workarea\\M (variant 'firmware') — firmware.s19 + 1 change entry, ", 'Project NOT saved: could not save — project.json was not written. check the folder.']
+   exception: None
+   M diff: {'created': [], 'removed': [], 'changed': []} | every pre-existing file byte-identical after: True
+  CHECK D1 rollback removed nothing that pre-existed: ok
+ D2 concurrent writer at the planned landing (project C)
+   status: ['Project NOT saved: could not save — project.json was not written. check the folder.', 'Project NOT saved: the plan named C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\sec-inc5\\work\\D\\app\\.s19tool\\workarea\\C\\firmware.s19 (new) but the file lande']
+   exception escaped the handler: None
+   work-area diff: {'created': ['C', 'C\\firmware.s19'], 'removed': [], 'changed': []}
+   foreign file survives intact: [('C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\sec-inc5\\work\\D\\app\\.s19tool\\workarea\\C\\firmware.s19', True)]
+ D3 verify raises OSError after the emit placed (project V)
+   status: ['Project NOT saved: the plan named C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\sec-inc5\\work\\D\\app\\.s19tool\\workarea\\C\\firmware.s19 (new) but the file lande', 'Project NOT saved: could not save — [Errno 13] probe: verify re-read denied. check the folder.']
+   exception escaped the handler: None
+   work-area diff: {'created': ['V', 'V\\firmware.s19'], 'removed': [], 'changed': []}
+ D4 verify raises ValueError after the emit placed (project V2)
+   status: ['Project NOT saved: the plan named C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\sec-inc5\\work\\D\\app\\.s19tool\\workarea\\C\\firmware.s19 (new) but the file lande', 'Project NOT saved: could not save — [Errno 13] probe: verify re-read denied. check the folder.']
+   exception escaped the handler: ValueError('probe: verify re-read parse error')
+   work-area diff: {'created': ['V2', 'V2\\firmware.s19'], 'removed': [], 'changed': []}
+  CHECK D2 foreign file survives: ok
+  CHECK D2 the save's own dedup file removed: ok
+   D3 leftover entries after rollback: ['V', 'V\\firmware.s19']
+   D4 leftover entries: ['V2', 'V2\\firmware.s19']
+
+== E: TOCTOU — the target becomes a junction between plan and run ==
+ E1 junction planted at the target after the plan, before mkdir
+   status: ['Loaded firmware.s19 (S19 only)', 'Project NOT saved: could not save — the patched image was not written: the save-back destination is not inside this .s19tool/workarea/ tree — the patched image was not written: Refusing to place: destination traverses a ']
+   exception escaped the handler: None
+   whole-scratch diff: {'created': ['app\\.s19tool\\workarea\\Q'], 'removed': [], 'changed': ['app\\.s19tool\\logs\\s19tui.log']}
+   net entries OUTSIDE this work area: []
+   other work area T now: ['firmware.s19']
+  CHECK E1 0 entries outside this work area: ok
+  CHECK E1 other work area's file intact: ok
+ E2 the folder this save created swapped for a junction before the placement
+   status: ['Project NOT saved: could not save — the patched image was not written: the save-back destination is not inside this .s19tool/workarea/ tree — the patched image was not written: Refusing to place: destination traverses a ', 'Project NOT saved: could not save — the patched image was not written: the save-back destination is not inside this .s19tool/workarea/ tree — the patched image was not written: Refusing to place: destination traverses a ']
+   exception escaped the handler: None
+   whole-scratch diff: {'created': [], 'removed': [], 'changed': ['app\\.s19tool\\logs\\s19tui.log']}
+   net entries OUTSIDE this work area: []
+   other work area T now: ['firmware.s19']
+  CHECK E2 0 entries outside this work area: ok
+  CHECK E2 other work area's file intact: ok
+
+junctions still present after rmdir: []
+scratch folder removed: True
+FAILED CHECKS: []

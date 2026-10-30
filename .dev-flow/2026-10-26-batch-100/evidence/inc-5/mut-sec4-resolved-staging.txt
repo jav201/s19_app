@@ -1,0 +1,64 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation sec4-resolved-staging
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# date: 2026-10-29T20:00:49+00:00
+# requirement: LLR-167.7 (SEC-4, LED .56)
+# mutation: the staging root resolves dest_dir again (the pre-SEC-4 walk) — file s19_app/tui/changes/apply.py
+# pre-mutation sha256: 9cb482d5e2876f00e8f90fdaf39cdf34991b4c640b9a9b86255931da2ce07828
+# mutant sha256: 5c27743a09667d429db24a4764c0f83a23a3895b4eb60b39417ac3f88dbaafb4
+# restored sha256: 9cb482d5e2876f00e8f90fdaf39cdf34991b4c640b9a9b86255931da2ce07828
+# RESTORE OK
+..................................F....                                  [100%]
+================================== FAILURES ===================================
+______ test_tc_b100_69_sec4_junction_save_back_stages_in_this_work_area _______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29964/test_tc_b100_69_sec4_junction_0')
+
+    def test_tc_b100_69_sec4_junction_save_back_stages_in_this_work_area(
+        tmp_path: Path,
+    ) -> None:
+        """SEC-4 (LED .56): with a junction project open, a save-back leaves
+        0 entries in the other work area — no ``temp/`` or ``temp/.staging/``
+        is created there (the executed RED at base created both)."""
+        b100_links.require_junctions()
+        other_workarea = _workarea(tmp_path / "other")
+        other_project = other_workarea / "T"
+        other_project.mkdir(parents=True)
+        shutil.copy2(CASE01_DIR / "firmware.s19", other_project / "firmware.s19")
+        base = tmp_path / "app"
+        app = S19TuiApp(base_dir=base)
+        b100_links.create_junction(app.workarea / "J", other_project)
+        other_before = sorted(
+            str(p.relative_to(other_workarea)) for p in other_workarea.rglob("*")
+        )
+    
+        async def _drive() -> str:
+            async with app.run_test(size=(220, 60)) as pilot:
+                await pilot.pause()
+                await _load_project(pilot, app, "J")
+                _add(app, PATCH_ADDRESS, PATCH_BYTES)
+                _apply(app)
+                await _save_back(pilot, app, "patched.s19")
+                return _painted_log(app)
+    
+        status = asyncio.run(_drive())
+        other_after = sorted(
+            str(p.relative_to(other_workarea)) for p in other_workarea.rglob("*")
+        )
+        assert "Patched image not saved" in status, status
+>       assert other_after == other_before, (status, other_after)
+E       AssertionError: ("Loaded firmware.s19 (S19 only)
+E         Loaded project 'J' -> firmware.s19
+E         Patched image not saved - see issues
+E         [MF-WRITE-...on traverses a symbolic link or reparse point: C:\\Users\\jjgh8\\", ['T', 'T\\firmware.s19', 'temp', 'temp\\.staging'])
+E       assert ['T', 'T\\fir...mp\\.staging'] == ['T', 'T\\firmware.s19']
+E         
+E         Left contains 2 more items, first extra item: 'temp'
+E         Use -v to get more diff
+
+tests\test_b100_save_image.py:1189: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_image.py::test_tc_b100_69_sec4_junction_save_back_stages_in_this_work_area
+1 failed, 38 passed in 97.30s (0:01:37)
+
+# exit: 1
