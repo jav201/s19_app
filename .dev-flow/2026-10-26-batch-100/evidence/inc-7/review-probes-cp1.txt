@@ -1,0 +1,35 @@
+# command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc7 python -m pytest -p no:cacheprovider -q -s -rA --tb=line -p no:randomly --rootdir=. /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/cp7-1/rev/test_r7_probes.py
+# label: code-reviewer probes (evidence/inc-7/review/test_r7_probes.py, copied verbatim to scratch) on the cp1 tree
+# tree: C:/Users/jjgh8/Github/s19_app-b100-inc7 (cwd = tree)
+# PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc7 ; NO_COLOR unset
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# source sha256[:16]:
+#   s19_app/tui/services/manifest_writer.py ab36c9a2a6216de5
+#   s19_app/tui/services/variant_execution_service.py aae7d7fdde4d735e
+#   s19_app/tui/app.py 3b46619711652f9c
+#   s19_app/tui/screens.py 49d6efdc73e26b28
+# started: 2026-10-30T07:05:38-06:00
+s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+.plan.manifest_keys: ('schema_version', 'active_variant', 'batch', 'assignments', 'files', 'derived_from')
+written keys      : ('schema_version', 'active_variant', 'batch', 'assignments', 'files', 'derived_from')
+.statuses: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30340\\test_pr_restore_retry_lands_wh0\\app\\.s19tool\\workarea\\ab (variant 'firmware')", 'Project NOT saved: could not save — forced verify re-read failure. check the folder.']
+.issues: 101 last: 50 more recorded entries
+.announcement: LoadAnnouncement(project='P', opened=None, position=0, count=1, reason='next-valid', latest=False, others=('aaa.s19',), mac=None, a2l=None, problems=(LoadProblem(label='not readable', file='aaa.s19', detail='0 data bytes - replace the file, or Save project to drop it', rank=2),), relation=None, unreadable=('aaa.s19',), hidden=0)
+log: ["Loaded project 'P' -> (no image) - 1 variants, 1 problem - details: p"]
+.problems: (LoadProblem(label='not readable', file='firmware.a2l', detail='the file cannot be read - replace the file, or Save project to drop it', rank=2),)
+current_file: C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30340\test_pa_unreadable_a2l_is_not_0\app\.s19tool\workarea\P\firmware.s19
+log: ['Loaded firmware.s19 (S19 only)', "Loaded project 'P' -> firmware.s19 - variant 1 of 1, 1 problem - details: p"]
+.load [0.20135760004632175] s; panel painted 0.00 s; problem rows 103
+.
+=================================== PASSES ====================================
+=========================== short test summary info ===========================
+PASSED ::test_r7_import_proof
+PASSED ::test_p1_plan_keys_equal_written_keys_when_derived_from_is_carried
+PASSED ::test_pr_restore_retry_lands_when_the_holder_lets_go
+PASSED ::test_pf_skipped_entries_beyond_the_bound_are_counted
+PASSED ::test_pn_every_image_unreadable_no_mac
+PASSED ::test_pa_unreadable_a2l_is_not_blamed_on_the_image
+PASSED ::test_pb_files_records_at_the_cap_all_missing
+7 passed in 101.98s (0:01:41)
+# exit: 0
+# finished: 2026-10-30T07:07:21-06:00

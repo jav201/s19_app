@@ -1,0 +1,7 @@
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+[A1-nested-5x1000] bytes=975561 read=0.02s check=0.00s issues={'MANIFEST-PATH-ESCAPE': 100, 'MANIFEST-BAD-STRUCTURE': 1} kept_entries=0 problems=102
+[A2-deep-32x32600] bytes=1043572 read=0.01s check=0.00s issues={'MANIFEST-PATH-ESCAPE': 32} kept_entries=0 problems=33
+[A3-junction-loop-5x1000] bytes=280561 read=0.06s check=0.00s issues={'MANIFEST-PATH-ESCAPE': 100, 'MANIFEST-BAD-STRUCTURE': 1} kept_entries=0 problems=102
+[A4-through-junction-3x1000] bytes=581754 read=0.01s check=0.00s issues={'MANIFEST-PATH-ESCAPE': 100, 'MANIFEST-BAD-STRUCTURE': 1} kept_entries=0 problems=102
+exit=0

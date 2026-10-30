@@ -1,0 +1,19 @@
+# command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc7-impl/base python -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_session_reset.py::test_tc_b100_08_reset_runs_once_before_the_first_install tests/test_b99_staging.py::test_tc_b99_13_no_final_name_replace_outside_placement tests/test_tui_patch_variant.py::test_tc_035_4_routing_guards tests/test_tui_variants.py::test_no_new_parse_loaded_file_call_sites tests/test_address_census.py::test_at_b83_08_tree_holds_no_assembled_selectors
+# label: Isolation re-run on base 80052cb (new/edited Inc 7 tests copied in) of every non-known census / guard failure
+# tree: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc7-impl/base (git HEAD 80052cb; working changes: 10 paths)
+# PYTHONPATH=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc7-impl/base ; NO_COLOR unset
+# s19_app import: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc7-impl\base\s19_app\__init__.py
+# source sha256[:16]:
+#   s19_app/tui/services/manifest_writer.py c88152e6975e6c1b
+#   s19_app/tui/services/variant_execution_service.py 76b276077ded9717
+#   s19_app/tui/app.py 762d1a98c8a65903
+#   s19_app/tui/screens.py ea549ab4bd9d3ef4
+# started: 2026-10-30T05:36:05-06:00
+....F                                                                    [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc7-impl\base\tests\test_address_census.py:309: AssertionError: address arguments outside {literal, name, fstring} appeared: tests/test_b100_project_check.py:884 other:Attribute
+=========================== short test summary info ===========================
+FAILED tests/test_address_census.py::test_at_b83_08_tree_holds_no_assembled_selectors
+1 failed, 4 passed in 14.68s
+# exit: 1
+# finished: 2026-10-30T05:36:20-06:00

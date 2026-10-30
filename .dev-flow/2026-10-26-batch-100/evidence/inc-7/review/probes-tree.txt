@@ -1,0 +1,70 @@
+# cmd: python -m pytest -p no:cacheprovider -s -q probes/test_r7_probes.py (cwd = worktree)
+# tree: C:/Users/jjgh8/Github/s19_app-b100-inc7  PYTHONPATH=same  NO_COLOR unset
+# b3a8da7ae550bda5 s19_app/tui/services/manifest_writer.py
+# bd33c8be189d2c87 s19_app/tui/services/variant_execution_service.py
+# 0e29d80841fa3f38 s19_app/tui/app.py
+# e23ea8f72bc93153 s19_app/tui/screens.py
+s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+.plan.manifest_keys: ('schema_version', 'active_variant', 'batch', 'assignments', 'files')
+written keys      : ('schema_version', 'active_variant', 'batch', 'assignments', 'files', 'derived_from')
+Fstatuses: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30289\\test_pr_restore_retry_lands_wh0\\app\\.s19tool\\workarea\\ab (variant 'firmware')", 'Project NOT saved: could not save — forced verify re-read failure. check the folder.']
+.issues: 101 last: 50 more recorded entries
+.announcement: LoadAnnouncement(project='P', opened=None, position=0, count=1, reason='next-valid', latest=False, others=('aaa.s19',), mac=None, a2l=None, problems=(LoadProblem(label='not readable', file='aaa.s19', detail='0 data bytes - replace the file, or Save project to drop it', rank=2),), relation=None, unreadable=('aaa.s19',))
+log: ["Loaded project 'P' -> (no image) - 1 variants, 1 problem - details: p"]
+.
+================================== FAILURES ===================================
+______ test_p1_plan_keys_equal_written_keys_when_derived_from_is_carried ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30289/test_p1_plan_keys_equal_writte0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001B8AE791790>
+
+    def test_p1_plan_keys_equal_written_keys_when_derived_from_is_carried(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        plans = si._capture_plans(monkeypatch)
+    
+        async def _drive() -> Path:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            p1 = app.workarea / "P1"
+            p1.mkdir(parents=True)
+            for name in ("firmware.s19", "firmware.mac"):
+                shutil.copy2(si.CASE01_DIR / name, p1 / name)
+            (p1 / "project.json").write_text(
+                json.dumps(
+                    {
+                        "schema_version": 1,
+                        "active_variant": "firmware",
+                        "files": projects.file_records(p1),
+                        "derived_from": {
+                            "firmware.s19": {"base": "orig.s19", "sha256": "a" * 64, "differ": 3}
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+            async with app.run_test(size=(220, 60)) as pilot:
+                await pilot.pause()
+                await si._load_project(pilot, app, "P1")
+                await si._save(pilot, app, "P1")
+                await si._wait_for(
+                    pilot,
+                    lambda: si._status_text(app).startswith("Saved project to"),
+                    "the save into the open project",
+                )
+            return p1
+    
+        p1 = asyncio.run(_drive())
+        written = json.loads((p1 / "project.json").read_text(encoding="utf-8"))
+        plan = plans[-1]
+        print("plan.manifest_keys:", plan.manifest_keys)
+        print("written keys      :", tuple(written))
+>       assert tuple(written) == plan.manifest_keys
+E       AssertionError: assert ('schema_vers...derived_from') == ('schema_vers...nts', 'files')
+E         
+E         Left contains one more item: 'derived_from'
+E         Use -v to get more diff
+
+..\..\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r7\probes\test_r7_probes.py:81: AssertionError
+=========================== short test summary info ===========================
+FAILED ::test_p1_plan_keys_equal_written_keys_when_derived_from_is_carried - ...
+1 failed, 4 passed in 116.50s (0:01:56)

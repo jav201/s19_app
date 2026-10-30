@@ -1,0 +1,18 @@
+# r2: round-1 probes on cp1 tree
+ab36c9a2a6216de5 s19_app/tui/services/manifest_writer.py
+aae7d7fdde4d735e s19_app/tui/services/variant_execution_service.py
+3b46619711652f9c s19_app/tui/app.py
+49d6efdc73e26b28 s19_app/tui/screens.py
+s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+.plan.manifest_keys: ('schema_version', 'active_variant', 'batch', 'assignments', 'files', 'derived_from')
+written keys      : ('schema_version', 'active_variant', 'batch', 'assignments', 'files', 'derived_from')
+.statuses: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30344\\test_pr_restore_retry_lands_wh0\\app\\.s19tool\\workarea\\ab (variant 'firmware')", 'Project NOT saved: could not save — forced verify re-read failure. check the folder.']
+.issues: 101 last: 50 more recorded entries
+.announcement: LoadAnnouncement(project='P', opened=None, position=0, count=1, reason='next-valid', latest=False, others=('aaa.s19',), mac=None, a2l=None, problems=(LoadProblem(label='not readable', file='aaa.s19', detail='0 data bytes - replace the file, or Save project to drop it', rank=2),), relation=None, unreadable=('aaa.s19',), hidden=0)
+log: ["Loaded project 'P' -> (no image) - 1 variants, 1 problem - details: p"]
+.problems: (LoadProblem(label='not readable', file='firmware.a2l', detail='the file cannot be read - replace the file, or Save project to drop it', rank=2),)
+current_file: C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30344\test_pa_unreadable_a2l_is_not_0\app\.s19tool\workarea\P\firmware.s19
+log: ['Loaded firmware.s19 (S19 only)', "Loaded project 'P' -> firmware.s19 - variant 1 of 1, 1 problem - details: p"]
+.load [0.2127992999739945] s; panel painted 0.00 s; problem rows 103
+.
+7 passed in 105.20s (0:01:45)

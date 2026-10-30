@@ -1,0 +1,11 @@
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+[C1 held] listing: ['project.json', 'project.json.previous-20261030T115725Z']
+   copy bytes == previous: [True] | project.json unchanged: b'{"new": "bytes of th'
+   status: ['project.json could not be restored (PermissionError); its previous content is kept as project.json.previous-20261030T115725Z in C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s7\\runs\\C1_1793361444209\\app\\.s19tool\\workarea\\P - rename it to project.json'] 
+   log_line_4: project.json could not be restored (PermissionError); its previous content is kept as project.json.previous-20261030T1
+   staging left: []
+[C2 held 0.2 s] restored: True | listing: ['project.json'] | status: []
+[C3 all names taken] pre-existing untouched: True | new files: [] | status: ['project.json could not be restored (PermissionError) and its previous content could not be kept in C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s7\\runs\\C3_1793361447809\\app\\.s19tool\\workarea\\P']
+[C4 name is a junction] outside folder: ['keep.txt'] | P: ['project.json', 'project.json.previous-20261030T115729Z', 'project.json.previous-20261030T115730Z', 'project.json.previous-20261030T115731Z', 'project.json.previous-20261030T115733Z'] | status: ['project.json could not be restored (PermissionError) and its previous content could not be kept in C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s7\\runs\\C4_1793361449948\\app\\.s19tool\\workarea\\P']
+[C5 keep through a junction project folder] kept: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s7\runs\C5_1793361452024\app\.s19tool\workarea\P\project.json.previous-20261030T115732Z | outside now holds: ['project.json.previous-20261030T115732Z']

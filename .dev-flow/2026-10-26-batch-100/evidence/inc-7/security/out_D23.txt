@@ -1,0 +1,6 @@
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+[D2 Save project into P (unknown key, schema 2)] keys after: ['active_variant', 'assignments', 'batch', 'declared_regions', 'files', 'schema_version'] schema: 1
+   statuses: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s7\\runs\\D2_1793361515405\\app\\.s19tool\\workarea\\P (variant 'firmware')"]
+[D3 append, P swapped for a junction before the manifest write] other work area: {'created': [], 'removed': [], 'changed': []}
+   statuses: ['Copying into workarea temp...', 'Parsing firmware.s19...', 'Loaded firmware.s19', 'Manifest write failed']

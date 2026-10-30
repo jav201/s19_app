@@ -30,6 +30,29 @@ def require_junctions() -> None:
         pytest.skip("directory junctions are a Windows-only test arm (PDR C-QA-6)")
 
 
+def enable_case_sensitive(folder: Path) -> None:
+    """Make the empty ``folder`` case-sensitive (``fsutil file
+    setCaseSensitiveInfo``), so ``sub`` and ``SUB`` are two objects in it
+    (Inc 7 corrective pass 2, SEC7-R2-1). Skips the calling test with a
+    named reason when the flag cannot be set: off Windows, or where the
+    Windows feature is unavailable."""
+    if not junctions_available():
+        pytest.skip("case-sensitive folders are a Windows-only test arm (PDR C-QA-6)")
+    import subprocess
+
+    result = subprocess.run(
+        ["fsutil", "file", "setCaseSensitiveInfo", str(folder), "enable"],
+        capture_output=True,
+        text=True,
+        errors="replace",
+    )
+    if result.returncode != 0:
+        pytest.skip(
+            "fsutil setCaseSensitiveInfo is unavailable here: "
+            + (result.stdout.strip() or result.stderr.strip())
+        )
+
+
 def create_junction(link: Path, target: Path) -> Path:
     """Create a directory junction at ``link`` pointing at ``target``.
 

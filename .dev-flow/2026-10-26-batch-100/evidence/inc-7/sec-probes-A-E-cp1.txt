@@ -1,0 +1,20 @@
+# security probes A and E (security-increment-007 evidence/inc-7/security/probe_a_dos.py, probe_e_load.py, copied verbatim to scratch) re-run on the cp1 tree
+# command: PROBE_TREE=<worktree> env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python probe_a_dos.py ; python probe_e_load.py
+#   s19_app/tui/services/manifest_writer.py ab36c9a2a6216de5
+#   s19_app/tui/services/variant_execution_service.py aae7d7fdde4d735e
+#   s19_app/tui/app.py 3b46619711652f9c
+#   s19_app/tui/screens.py 49d6efdc73e26b28
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+[A1-nested-5x1000] bytes=975561 read=0.02s check=0.00s issues={'MANIFEST-PATH-ESCAPE': 100, 'MANIFEST-BAD-STRUCTURE': 1} kept_entries=0 problems=102
+[A2-deep-32x32600] bytes=1043572 read=0.01s check=0.00s issues={'MANIFEST-PATH-ESCAPE': 32} kept_entries=0 problems=33
+[A3-junction-loop-5x1000] bytes=280561 read=0.06s check=0.00s issues={'MANIFEST-PATH-ESCAPE': 100, 'MANIFEST-BAD-STRUCTURE': 1} kept_entries=0 problems=102
+[A4-through-junction-3x1000] bytes=581754 read=0.01s check=0.00s issues={'MANIFEST-PATH-ESCAPE': 100, 'MANIFEST-BAD-STRUCTURE': 1} kept_entries=0 problems=102
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+manifest bytes: 975589
+[E load] _handle_load_project=0.07s  click->panel painted=0.83s  rows=3
+   rows with an internal code: 0 | with an exception name: 0
+   first row:   ! manifest damaged:     sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/su…     a file p 
+   last row:   ! no digests saved: project.json  Save project records them
+[E append] load_from_path -> 'Added variant' = 0.40s; statuses: ["project.json in project 'P' holds entries that were skipped and was not rewritten - firmwa"]

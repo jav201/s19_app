@@ -1,0 +1,22 @@
+# command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc7 python -m pytest -p no:cacheprovider -q -s --tb=line tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling tests/test_b100_project_check.py::test_tc_b100_61_r2_2_legitimate_manifest_inside_every_cap_is_checked_whole tests/test_b100_project_check.py::test_tc_b100_61_sec7_r2_1_case_sensitive_folder_checks_each_spelling tests/test_b100_project_check.py::test_tc_b100_61_sec7_r2_2_one_serialize_checks_each_name_once tests/test_b100_project_check.py::test_tc_b100_62_swap_toast_and_status_paint_no_exception_class tests/test_b100_save_guards.py::test_tc_b100_07_save_project_refuses_when_no_previous_copy_can_be_kept tests/test_b100_save_guards.py::test_tc_b100_07_rollback_keeps_the_previous_copy_unless_restored tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second
+# label: GREEN: the cp2 arms (10 functions, 17 cases), cp2 tree
+# tree: C:/Users/jjgh8/Github/s19_app-b100-inc7 (cwd = tree)
+# PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc7 ; NO_COLOR unset
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# source sha256[:16]:
+#   s19_app/tui/services/manifest_writer.py 3711eba2c27f3691
+#   s19_app/tui/services/variant_execution_service.py 425f610345f263c6
+#   s19_app/tui/app.py 923de169c6c44bc8
+#   s19_app/tui/screens.py 49d6efdc73e26b28
+# started: 2026-10-30T13:15:46-06:00
+.SEC6-5 timings (s): {'read': 0.089, 'load': 0.122, 'painted': 0.0, 'appended': 0.682}
+.SEC6-5 timings (s): {'read': 0.221, 'load': 0.46, 'painted': 0.0, 'appended': 0.751}
+..........variant-append: trigger -> outcome 0.815 s; ['Project saved + manifest verified']
+.mac-sync: trigger -> outcome 0.758 s; ['Project saved + manifest verified']
+.a2l-sync: trigger -> outcome 0.435 s; ['Project saved + manifest verified']
+.save-back: trigger -> outcome 0.413 s; ['Project saved + manifest verified']
+.save-project: trigger -> outcome 0.694 s; ['Project saved + manifest verified']
+.
+17 passed in 43.20s
+# exit: 0
+# finished: 2026-10-30T13:16:30-06:00

@@ -1,0 +1,8 @@
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+file symlink: True
+[F1 project_file_records] keys: ['firmware.s19', 'hard.s19']
+[F2 reader] accepted: ['firmware.s19', 'hard.s19']
+   issues: [('MANIFEST-PATH-ESCAPE', 'link.s19'), ('MANIFEST-PATH-ESCAPE', 'jdir.s19'), ('MANIFEST-BAD-STRUCTURE', 'flows/secret.s19'), ('MANIFEST-BAD-STRUCTURE', 'sub/inner.s19')]
+[F3 check] problems: [('manifest damaged', 'link.s19'), ('manifest damaged', 'jdir.s19'), ('manifest damaged', 'flows/secret.s19'), ('manifest damaged', 'sub/inner.s19'), ('changed on disk', 'firmware.s19'), ('changed on disk', 'hard.s19')]
+exit=0

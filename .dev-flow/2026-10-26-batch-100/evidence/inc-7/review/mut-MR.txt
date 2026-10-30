@@ -1,0 +1,67 @@
+# mutant: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r7\mut\MR\s19_app\tui\app.py
+#   old: b'if attempts >= 5 or time.monotonic() >= deadline:'
+#   new: b'if attempts >= 1 or time.monotonic() >= deadline:'
+#   sha256[:16] before 0e29d80841fa3f38 after c6224f74e5e888d9
+# cmd: python -m pytest -p no:cacheprovider -q tests/test_b100_save_guards.py::test_tc_b100_07_failed_restore_keeps_the_previous_manifest tests/test_r7_probes.py::test_pr_restore_retry_lands_when_the_holder_lets_go
+# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r7/mut/MR  PYTHONPATH=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r7/mut/MR  NO_COLOR unset
+# s19_app import: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r7\mut\MR\s19_app\__init__.py
+..F                                                                      [100%]
+================================== FAILURES ===================================
+_____________ test_pr_restore_retry_lands_when_the_holder_lets_go _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30291/test_pr_restore_retry_lands_wh0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000027E07073B10>
+
+    def test_pr_restore_retry_lands_when_the_holder_lets_go(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        base = tmp_path / "app"
+        timers: list = []
+    
+        def _raise(project_dir, *args, **kwargs):
+            handle = open(project_dir / "project.json", "rb")
+            timer = threading.Timer(0.15, handle.close)
+            timer.start()
+            timers.append(timer)
+            raise OSError("forced verify re-read failure")
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            probe = sg._StatusProbe(app)
+            src = sg._copy_source(tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(src)
+                await sg._flush(pilot)
+                app._handle_save_dialog(sg._payload(app, "ab"))
+                await sg._flush(pilot)
+                project_dir = app.workarea / "ab"
+                before = (project_dir / "project.json").read_bytes()
+                src_b = tmp_path / "sources" / "b.s19"
+                src_b.write_text(sg._S19_B, encoding="ascii")
+                app.load_selected_file(src_b)
+                await sg._flush(pilot)
+                monkeypatch.setattr(app_module, "verify_written_manifest", _raise)
+                app._handle_save_dialog(sg._payload(app, "ab"))
+                await sg._flush(pilot)
+                for timer in timers:
+                    timer.join()
+                after = (project_dir / "project.json").read_bytes()
+                kept = sorted(project_dir.glob("project.json.previous-*"))
+            return probe.messages, before, after, kept
+    
+        messages, before, after, kept = asyncio.run(_drive())
+        print("statuses:", messages[-3:])
+>       assert kept == [], kept
+E       AssertionError: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30291/test_pr_restore_retry_lands_wh0/app/.s19tool/workarea/ab/project.json.previous-20261030T120209Z')]
+E       assert [WindowsPath(...030T120209Z')] == []
+E         
+E         Left contains one more item: WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30291/test_pr_restore_retry_lands_wh0/app/.s19tool/workarea/ab/project.json.previous-20261030T120209Z')
+E         Use -v to get more diff
+
+tests\test_r7_probes.py:133: AssertionError
+---------------------------- Captured stdout call -----------------------------
+statuses: ["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30291\\test_pr_restore_retry_lands_wh0\\app\\.s19tool\\workarea\\ab (variant 'firmware')", 'Project NOT saved: could not save — forced verify re-read failure. check the folder.', 'project.json could not be restored (PermissionError); its previous content is kept as project.json.previous-20261030T120209Z in C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30291\\test_pr_restore_retry_lands_wh0\\app\\.s19tool\\workarea\\ab - rename it to project.json']
+=========================== short test summary info ===========================
+FAILED tests/test_r7_probes.py::test_pr_restore_retry_lands_when_the_holder_lets_go
+1 failed, 2 passed in 18.10s

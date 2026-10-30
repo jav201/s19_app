@@ -1,0 +1,23 @@
+# r2 probes on /c/Users/jjgh8/Github/s19_app-b100-inc7
+s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+tui/services/manifest_writer.py ab36c9a2a6216de5
+tui/services/variant_execution_service.py aae7d7fdde4d735e
+tui/app.py 3b46619711652f9c
+tui/screens.py 49d6efdc73e26b28
+.messages: ['Project NOT saved: project.json holds keys this version does not know and its content could not be kept beside it in C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30345\\test_q1_sec7_3_no_copy_refuses0\\app\\.s19tool\\workarea\\P']
+listing: ['project.json']
+.files keys: ['FIRMWARE.S19']
+problems: [ProjectFileProblem(kind='not recorded', file='firmware.s19', reason='in the project, not in project.json', code=None)]
+Fread 0.13 s
+batch 1000 assignments 998 files 0
+issues: [('MANIFEST-BAD-STRUCTURE', {'entry': '3 more recorded entries', 'reason': 'skipped - more entries than one load checks'})]
+problems: [('manifest damaged', '3 more recorded entries', 'skipped - more entries than one load checks'), ('no digests saved', 'project.json', '')]
+rewrite refusal: holds entries that were skipped
+F
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r7b\rp\test_r2_probes.py:114: AssertionError: [ProjectFileProblem(kind='not recorded', file='firmware.s19', reason='in the project, not in project.json', code=None)]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r7b\rp\test_r2_probes.py:171: AssertionError: assert 998 == 1000
+=========================== short test summary info ===========================
+FAILED ::test_q2_files_key_case_differs_from_disk - AssertionError: [ProjectF...
+FAILED ::test_q3_ceiling_inside_the_caps - AssertionError: assert 998 == 1000
+2 failed, 2 passed in 95.96s (0:01:35)

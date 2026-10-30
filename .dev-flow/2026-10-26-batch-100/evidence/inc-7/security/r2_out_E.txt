@@ -1,0 +1,9 @@
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+manifest bytes: 975589
+[E load] _handle_load_project=0.07s  click->panel painted=0.71s  rows=3
+   rows with an internal code: 0 | with an exception name: 0
+   first row:   ! manifest damaged:     sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/su…     a file p 
+   last row:   ! no digests saved: project.json  Save project records them
+[E append] load_from_path -> 'Added variant' = 0.35s; statuses: ["project.json in project 'P' holds entries that were skipped and was not rewritten - firmwa"]
+exit=0

@@ -204,7 +204,11 @@ def test_tc_b100_08_reset_runs_once_before_the_first_install(tmp_path: Path) -> 
         _seed_project_p1(app.workarea)
         events: list[str] = []
         original_reset = getattr(app, "_reset_project_session", None)
-        original_load = app.load_selected_file
+        # Inc 7 re-pin (LLR-169.6): the project variant now installs through
+        # ``_install_project_image`` (parse first, then apply), the MAC
+        # through ``load_selected_file``; both apply through
+        # ``_apply_loaded_file``, so that is the install marker.
+        original_apply = app._apply_loaded_file
 
         def _recording_reset() -> int:
             events.append("reset")
@@ -212,12 +216,12 @@ def test_tc_b100_08_reset_runs_once_before_the_first_install(tmp_path: Path) -> 
                 return 0
             return original_reset()
 
-        def _recording_load(path, a2l_files=None) -> None:
+        def _recording_apply(loaded, path, load_started) -> None:
             events.append("install")
-            original_load(path, a2l_files)
+            original_apply(loaded, path, load_started)
 
         app._reset_project_session = _recording_reset
-        app.load_selected_file = _recording_load
+        app._apply_loaded_file = _recording_apply
         async with app.run_test() as pilot:
             await pilot.pause()
             app._handle_load_project(P1_NAME)

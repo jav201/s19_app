@@ -1,0 +1,3 @@
+normcase groups with >1 member: 973
+pairs NTFS keeps distinct but normcase merges: 0
+exit=0

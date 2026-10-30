@@ -40,8 +40,11 @@ path-safety implementation.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
+import shutil
+import stat
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Mapping, Optional, Sequence
@@ -50,16 +53,31 @@ from ...validation.model import ValidationIssue, ValidationSeverity
 from ..models import ProjectVariantSet
 from .report_addendum import DeclaredRegion
 from ..workspace import (
-    WORKAREA_TEMP,
     WorkareaContainmentError,
-    _find_workarea_root,
-    _path_traverses_reparse_point,
+    _guarded_destination,
+    _is_reparse_point,
+    _private_stage_dir,
     ensure_workarea,
 )
 from .variant_execution_service import (
+    ENTRY_MODE_MANIFEST_KEYS,
     MANIFEST_ARTIFACT,
+    PROBLEM_CHANGED,
+    PROBLEM_MISSING,
+    PROBLEM_NO_DIGESTS,
+    PROBLEM_NO_MANIFEST,
+    PROBLEM_NOT_READABLE,
+    PROBLEM_NOT_RECORDED,
     PROJECT_MANIFEST_NAME,
+    PROJECT_RECORDED_SUFFIXES,
+    DerivedFrom,
+    FileRecord,
+    ProjectFileProblem,
+    ProjectManifest,
+    _EntryWalk,
     _resolve_manifest_entry,
+    manifest_is_damaged,
+    manifest_problems,
     read_project_manifest,
 )
 
@@ -118,7 +136,9 @@ def _manifest_write_issue(
     )
 
 
-def _manifest_write_containment_issue(message: str) -> ValidationIssue:
+def _manifest_write_containment_issue(
+    message: str, details: Optional[dict[str, str]] = None
+) -> ValidationIssue:
     """
     Summary:
         Build one write-path ``ValidationIssue`` tagged
@@ -128,6 +148,8 @@ def _manifest_write_containment_issue(message: str) -> ValidationIssue:
 
     Args:
         message (str): Human-readable finding describing the failed write.
+        details (Optional[dict[str, str]]): ``{"exception": "<class>: <text>"}``
+            for the caller's log only, never painted (SEC7-R2-3).
 
     Returns:
         ValidationIssue: The finding.
@@ -147,6 +169,7 @@ def _manifest_write_containment_issue(message: str) -> ValidationIssue:
         severity=ValidationSeverity.WARNING,
         message=message,
         artifact=MANIFEST_ARTIFACT,
+        details=dict(details or {}),
     )
 
 
@@ -180,6 +203,7 @@ def _reject_unsafe_entry(
     project_root: Path,
     entry: str,
     context: str,
+    walk: _EntryWalk,
 ) -> Optional[ValidationIssue]:
     """
     Summary:
@@ -193,6 +217,8 @@ def _reject_unsafe_entry(
         entry (str): The project-relative path string to check.
         context (str): Display context for the finding (``"batch"`` or
             ``"assignments[<id>]"``).
+        walk (_EntryWalk): The one walk of this serialize, shared by every
+            entry (its cache and folder ceiling, SEC7-R2-2).
 
     Returns:
         Optional[ValidationIssue]: A ``MANIFEST-WRITE-ESCAPE`` finding when the
@@ -200,8 +226,9 @@ def _reject_unsafe_entry(
         project root.
 
     Data Flow:
-        - Delegate to ``_resolve_manifest_entry`` (the reader's predicate) with
-          a throwaway issue sink; a ``None`` return OR any appended reader
+        - Delegate to ``_resolve_manifest_entry`` (the reader's predicate) in
+          its manifest-keys mode (LLR-169.8, B100-I21) with a throwaway
+          issue sink; a ``None`` return OR any appended reader
           issue means the entry is unsafe — re-reported as one refusal finding
           naming the entry, so there is no second path-safety implementation.
 
@@ -213,7 +240,9 @@ def _reject_unsafe_entry(
             - serialize_manifest
     """
     probe: list[ValidationIssue] = []
-    resolved = _resolve_manifest_entry(project_root, entry, context, probe)
+    resolved = _resolve_manifest_entry(
+        project_root, entry, context, probe, ENTRY_MODE_MANIFEST_KEYS, walk
+    )
     if resolved is not None and not probe:
         return None
     return _manifest_write_issue(
@@ -230,6 +259,8 @@ def serialize_manifest(
     assignments: Optional[Mapping[str, Sequence[str]]] = None,
     declared_regions: Sequence[DeclaredRegion] = (),
     gathered: Optional[Mapping[str, Sequence[str]]] = None,
+    files: Optional[Mapping[str, FileRecord]] = None,
+    derived_from: Optional[Mapping[str, DerivedFrom]] = None,
     schema_version: int = DEFAULT_SCHEMA_VERSION,
 ) -> tuple[Optional[str], list[ValidationIssue]]:
     """
@@ -272,6 +303,14 @@ def serialize_manifest(
             key is omitted entirely when ``None`` / empty (back-compat —
             the reader ignores unknown keys, so a pre-change-1 reader
             round-trips a gathered manifest without findings).
+        files (Optional[Mapping[str, FileRecord]]): The B100-I1 ``files``
+            records (LLR-169.1): project-relative path -> size and file
+            digest. Each key goes through the refusal predicate; the key is
+            omitted when ``None`` / empty (byte-identical output).
+        derived_from (Optional[Mapping[str, DerivedFrom]]): The B100-I16
+            records (LLR-168.4): patched variant file -> ``{"base",
+            "sha256", "differ"}``. Each key and each ``base`` go through the
+            refusal predicate; omitted when ``None`` / empty.
         schema_version (int): The literal written for ``schema_version``;
             defaults to :data:`DEFAULT_SCHEMA_VERSION` (``1``).
 
@@ -311,24 +350,37 @@ def serialize_manifest(
     """
     assignments = assignments or {}
     findings: list[ValidationIssue] = []
+    # SEC7-R2-2: one walk for the whole serialize, so each distinct folder
+    # or file is checked once and the folder ceiling bounds the writer too.
+    walk = _EntryWalk(project_root)
 
     for entry in batch:
-        issue = _reject_unsafe_entry(project_root, entry, "batch")
+        issue = _reject_unsafe_entry(project_root, entry, "batch", walk)
         if issue is not None:
             findings.append(issue)
     for variant_id, entries in assignments.items():
         context = f"assignments[{variant_id!r}]"
         for entry in entries:
-            issue = _reject_unsafe_entry(project_root, entry, context)
+            issue = _reject_unsafe_entry(project_root, entry, context, walk)
             if issue is not None:
                 findings.append(issue)
     gathered = gathered or {}
     for home, entries in gathered.items():
         context = f"gathered[{home!r}]"
         for entry in entries:
-            issue = _reject_unsafe_entry(project_root, entry, context)
+            issue = _reject_unsafe_entry(project_root, entry, context, walk)
             if issue is not None:
                 findings.append(issue)
+    files = files or {}
+    derived_from = derived_from or {}
+    for context, entry in (
+        *(("files", key) for key in files),
+        *(("derived_from", key) for key in derived_from),
+        *(("derived_from base", record.base) for record in derived_from.values()),
+    ):
+        issue = _reject_unsafe_entry(project_root, entry, context, walk)
+        if issue is not None:
+            findings.append(issue)
 
     if findings:
         return None, findings
@@ -360,55 +412,60 @@ def serialize_manifest(
             home: _posix_entries(list(entries))
             for home, entries in gathered.items()
         }
+    # Optional, additive keys of the B100-I1 envelope (LLR-169.1,
+    # LLR-168.4): written ONLY when non-empty, so a manifest without them
+    # serializes byte-identically to before (same idiom as above).
+    if files:
+        envelope["files"] = {
+            key.replace("\\", "/"): {"size": record.size, "sha256": record.sha256}
+            for key, record in files.items()
+        }
+    if derived_from:
+        envelope["derived_from"] = {
+            key.replace("\\", "/"): {
+                "base": record.base,
+                "sha256": record.sha256,
+                "differ": record.differ,
+            }
+            for key, record in derived_from.items()
+        }
     return json.dumps(envelope, indent=2), []
 
 
-def _check_destination_contained(destination: Path) -> None:
+def _check_destination_contained(destination: Path, workarea_root: Path) -> None:
     """
     Summary:
-        Re-run ``copy_into_workarea``'s containment CHECKS against the manifest
-        destination ``project.json`` path: locate its ``.s19tool/workarea``
-        root, confirm the resolved path stays inside it, and confirm no parent
-        up to the workarea root traverses a symlink / NTFS junction (LLR-002.1).
-        This validates the FINAL target before the atomic replace, reusing the
-        reader-side checks rather than the copy-with-dedup body.
+        Validate the manifest destination before the atomic replace with the
+        ONE placement guard (SEC PDR-C1, SEC6-3, LLR-171.4): the project
+        folder is judged UNRESOLVED against THIS app's work area, so a
+        project folder swapped for a junction after placement can never
+        carry ``project.json`` into another work area.
 
     Args:
-        destination (Path): The intended ``project_dir / "project.json"`` path.
+        destination (Path): The intended ``project_dir / "project.json"``
+            path, as the caller named it (never resolved first).
+        workarea_root (Path): This app's ``.s19tool/workarea`` root.
 
     Returns:
         None: The destination is contained when the function returns normally.
 
     Raises:
-        WorkareaContainmentError: When the destination has no ``.s19tool/
-            workarea`` ancestor, escapes that root, or traverses a reparse
-            point — the same rejection conditions ``copy_into_workarea`` raises.
+        WorkareaContainmentError: When the project folder has no work-area
+            anchor, traverses a link or junction, or resolves outside this
+            work area (``_guarded_destination``).
 
     Data Flow:
-        - Resolve the destination, then apply ``_find_workarea_root`` +
-          ``is_relative_to(workarea_root)`` + ``_path_traverses_reparse_point``
-          (``workspace.py`` containment seam) — the exact checks
-          ``copy_into_workarea`` runs before placing a file.
+        - ``_guarded_destination(destination.parent, workarea_root)`` walks
+          the unresolved chain for reparse points, then requires
+          ``contained_in_workarea`` for the resolved pair.
 
     Dependencies:
         Uses:
-            - _find_workarea_root
-            - _path_traverses_reparse_point
+            - workspace._guarded_destination
         Used by:
             - write_project_manifest
     """
-    resolved = destination.resolve()
-    workarea_root = _find_workarea_root(resolved)
-    if workarea_root is None or not resolved.is_relative_to(workarea_root):
-        raise WorkareaContainmentError(
-            "Refusing to write manifest: destination is not contained inside a "
-            f".s19tool/workarea/ root: {resolved}"
-        )
-    if _path_traverses_reparse_point(resolved, stop_at=workarea_root.parent):
-        raise WorkareaContainmentError(
-            "Refusing to write manifest: destination traverses a symbolic link "
-            f"or reparse point: {resolved}"
-        )
+    _guarded_destination(destination.parent, workarea_root)
 
 
 def write_project_manifest(
@@ -420,17 +477,21 @@ def write_project_manifest(
     assignments: Optional[Mapping[str, Sequence[str]]] = None,
     declared_regions: Sequence[DeclaredRegion] = (),
     gathered: Optional[Mapping[str, Sequence[str]]] = None,
+    files: Optional[Mapping[str, FileRecord]] = None,
+    derived_from: Optional[Mapping[str, DerivedFrom]] = None,
     schema_version: int = DEFAULT_SCHEMA_VERSION,
 ) -> tuple[Optional[Path], list[ValidationIssue]]:
     """
     Summary:
         Serialize a project composition and WRITE it atomically to
         ``project_root / "project.json"`` inside the contained work area
-        (HLR-002 / LLR-002.1..002.3). The bytes are staged under
-        ``.s19tool/workarea/temp/``, the final destination is validated with
-        ``copy_into_workarea``'s containment CHECKS, and the staged file is then
-        moved onto the FIXED ``project.json`` name via an atomic ``os.replace``
-        (D-3 locked mechanism). A re-save overwrites the prior manifest in place
+        (HLR-002 / LLR-002.1..002.3). The bytes are staged in a PRIVATE
+        per-write directory (``_private_stage_dir``, LLR-169.7 / O-11 — never
+        the shared ``temp/project.json``), the project folder is validated
+        unresolved against this work area (``_guarded_destination``, SEC
+        PDR-C1), and the staged file is then moved onto the FIXED
+        ``project.json`` name via an atomic ``os.replace`` (D-3 locked
+        mechanism). A re-save overwrites the prior manifest in place
         — the writer never dedup-suffixes to ``project_1.json`` (LLR-002.2),
         which the reader (opening only ``project_dir / PROJECT_MANIFEST_NAME``)
         would never see.
@@ -455,6 +516,10 @@ def write_project_manifest(
             regions (LLR-026.1) — see :func:`serialize_manifest`.
         gathered (Optional[Mapping[str, Sequence[str]]]): The change-1
             gather rows (HLR-138) — see :func:`serialize_manifest`.
+        files (Optional[Mapping[str, FileRecord]]): The ``files`` records —
+            see :func:`serialize_manifest`.
+        derived_from (Optional[Mapping[str, DerivedFrom]]): The
+            ``derived_from`` records — see :func:`serialize_manifest`.
         schema_version (int): The literal written for ``schema_version``.
 
     Returns:
@@ -472,15 +537,22 @@ def write_project_manifest(
     Data Flow:
         - :func:`serialize_manifest` first; a ``None`` text short-circuits to
           ``(None, refusal_findings)`` — nothing is staged or written.
-        - ``ensure_workarea(base_dir)`` → stage the text under ``temp/`` →
-          :func:`_check_destination_contained` on ``project_root / "project.json"``
-          → atomic ``os.replace(staged, destination)``.
-        - The staged temp file is always removed in a ``finally``.
+        - ``ensure_workarea(base_dir)`` →
+          :func:`_check_destination_contained` on ``project_root /
+          "project.json"`` → stage the text in a private directory →
+          atomic ``os.replace(staged, destination)``. Concurrent writers
+          never share a staging path (the QA race probe: 12 cross-content
+          and 60 failed writes of 80 through the shared name).
+        - The private staging directory is always removed in a ``finally``.
+        - After the replace the destination is checked again (SEC7-2): a
+          project folder swapped for a link or junction inside the window
+          gives ``(None, [MANIFEST-WRITE-CONTAINMENT naming where the
+          bytes landed])``, never a written path.
 
     Dependencies:
         Uses:
             - serialize_manifest
-            - ensure_workarea
+            - ensure_workarea / workspace._private_stage_dir
             - _check_destination_contained
             - os.replace
         Used by:
@@ -499,21 +571,23 @@ def write_project_manifest(
         assignments=assignments,
         declared_regions=declared_regions,
         gathered=gathered,
+        files=files,
+        derived_from=derived_from,
         schema_version=schema_version,
     )
     if text is None:
         return None, findings
 
     destination = project_root / PROJECT_MANIFEST_NAME
-    workarea = ensure_workarea(base_dir)
-    staged = workarea / WORKAREA_TEMP / PROJECT_MANIFEST_NAME
+    stage_dir: Optional[Path] = None
     try:
-        _check_destination_contained(destination)
-        staged.parent.mkdir(parents=True, exist_ok=True)
+        workarea = ensure_workarea(base_dir)
+        _check_destination_contained(destination, workarea)
+        stage_dir = _private_stage_dir(workarea)
+        staged = stage_dir / PROJECT_MANIFEST_NAME
         staged.write_text(text, encoding="utf-8")
         destination.parent.mkdir(parents=True, exist_ok=True)
         os.replace(staged, destination)
-        return destination, []
     except (WorkareaContainmentError, OSError) as exc:
         return None, [
             _manifest_write_containment_issue(
@@ -522,10 +596,26 @@ def write_project_manifest(
             )
         ]
     finally:
-        try:
-            staged.unlink()
-        except OSError:
-            pass
+        if stage_dir is not None:
+            shutil.rmtree(stage_dir, ignore_errors=True)
+    # SEC7-2: the replace opens the project folder by name again; a folder
+    # swapped for a link or junction after the check carried the manifest
+    # elsewhere. Detect it, never report it as written.
+    try:
+        _check_destination_contained(destination, workarea)
+    except (WorkareaContainmentError, OSError) as exc:
+        landed = os.path.realpath(destination)
+        # SEC7-R2-3: the message is painted; the exception class rides in
+        # ``details`` for the caller's log only (this module stays headless,
+        # LLR-004.3).
+        return None, [
+            _manifest_write_containment_issue(
+                "the project folder changed during the manifest write - "
+                f"project.json landed outside this work area at {landed}",
+                details={"exception": f"{type(exc).__name__}: {exc}"},
+            )
+        ]
+    return destination, []
 
 
 #: Verify-on-write outcome — the re-read manifest equals intent with zero
@@ -611,22 +701,23 @@ def _resolve_intended_entries(
             the intended composition.
 
     Returns:
-        list[Path]: ``(project_root / entry).resolve()`` for each entry, in
-        input order — matching the reader-side idiom
-        ``test_variant_execution.py:163``.
+        list[Path]: The resolved project root joined with each entry, ``.``
+        and ``..`` applied to the text, in input order — the form the
+        reader's manifest-keys walk returns (SEC7-1), with no filesystem call
+        per entry (SEC7-R2-2).
 
     Data Flow:
         - Pure transform over already-safe entries (the serializer refused any
           escaping entry up front, LLR-001.5), so no containment re-check is
           needed here — this only mirrors the reader's relative→absolute
-          resolution for an apples-to-apples comparison.
+          form for an apples-to-apples comparison.
 
     Dependencies:
         Used by:
             - verify_written_manifest
     """
     root = project_root.resolve()
-    return [(root / entry).resolve() for entry in raw_entries]
+    return [Path(os.path.normpath(root / entry)) for entry in raw_entries]
 
 
 def verify_written_manifest(
@@ -636,6 +727,8 @@ def verify_written_manifest(
     *,
     batch: Sequence[str] = (),
     assignments: Optional[Mapping[str, Sequence[str]]] = None,
+    files: Optional[Mapping[str, FileRecord]] = None,
+    derived_from: Optional[Mapping[str, DerivedFrom]] = None,
 ) -> ManifestVerifyResult:
     """
     Summary:
@@ -661,11 +754,16 @@ def verify_written_manifest(
             project-relative strings passed to :func:`write_project_manifest`.
         assignments (Optional[Mapping[str, Sequence[str]]]): The intended
             per-variant entries, keyed by ``variant_id``. ``None`` → empty.
+        files (Optional[Mapping[str, FileRecord]]): The intended ``files``
+            records (LLR-169.3); ``None`` → empty.
+        derived_from (Optional[Mapping[str, DerivedFrom]]): The intended
+            ``derived_from`` records (LLR-169.3); ``None`` → empty.
 
     Returns:
         ManifestVerifyResult: ``status`` + ``drift`` + ``issues`` +
         ``written_path``. ``drift`` lists every field of
-        ``{"active_variant", "batch", "assignments"}`` that differs; ``issues``
+        ``{"active_variant", "batch", "assignments", "files",
+        "derived_from"}`` that differs (LLR-169.3); ``issues``
         carries any re-read reader findings (non-empty → MISMATCH, R-1).
 
     Raises:
@@ -702,7 +800,7 @@ def verify_written_manifest(
     if manifest is None:
         return ManifestVerifyResult(
             status=MANIFEST_MISMATCH,
-            drift=["active_variant", "batch", "assignments"],
+            drift=["active_variant", "batch", "assignments", "files", "derived_from"],
             issues=[],
             written_path=None,
         )
@@ -714,6 +812,14 @@ def verify_written_manifest(
         for variant_id, entries in assignments.items()
     }
 
+    root = project_root.resolve()
+    intended_files = {
+        (root / key).resolve(): record for key, record in (files or {}).items()
+    }
+    intended_derived = {
+        (root / key).resolve(): record for key, record in (derived_from or {}).items()
+    }
+
     drift: list[str] = []
     if manifest.active_variant != intended_active:
         drift.append("active_variant")
@@ -721,6 +827,10 @@ def verify_written_manifest(
         drift.append("batch")
     if manifest.assignments != intended_assignments:
         drift.append("assignments")
+    if manifest.files != intended_files:
+        drift.append("files")
+    if manifest.derived_from != intended_derived:
+        drift.append("derived_from")
 
     status = (
         MANIFEST_VERIFIED
@@ -733,3 +843,269 @@ def verify_written_manifest(
         issues=list(manifest.issues),
         written_path=canonical_path,
     )
+
+
+def file_record(path: Path) -> FileRecord:
+    """
+    Summary:
+        The size and streamed SHA-256 file digest of one project file
+        (LLR-169.1, B100-I3).
+
+    Args:
+        path (Path): The file.
+
+    Returns:
+        FileRecord: ``(size, sha256)``, the digest as 64 lowercase hex.
+
+    Raises:
+        OSError: The file cannot be read.
+
+    Data Flow:
+        - Read in 1 MiB chunks into ``hashlib.sha256``; never the whole
+          file at once.
+
+    Dependencies:
+        Used by:
+            - project_file_records / check_project_files / derive_record
+    """
+    digest = hashlib.sha256()
+    size = 0
+    with open(path, "rb") as handle:
+        for chunk in iter(lambda: handle.read(1 << 20), b""):
+            digest.update(chunk)
+            size += len(chunk)
+    return FileRecord(size, digest.hexdigest())
+
+
+def _top_level_project_files(project_dir: Path) -> list[Path]:
+    """
+    Summary:
+        The O-2 scope (LLR-169.2): the top-level regular files of
+        ``project_dir`` with a project data or A2L suffix, by name. No
+        sub-folder is walked, and no link or junction is followed.
+
+    Args:
+        project_dir (Path): The project folder.
+
+    Returns:
+        list[Path]: The files, sorted by name; empty when the folder cannot
+            be listed.
+
+    Dependencies:
+        Used by:
+            - project_file_records / check_project_files
+    """
+    found: list[Path] = []
+    try:
+        with os.scandir(project_dir) as entries:
+            for entry in entries:
+                if Path(entry.name).suffix.lower() not in PROJECT_RECORDED_SUFFIXES:
+                    continue
+                path = Path(entry.path)
+                if entry.is_file(follow_symlinks=False) and not _is_reparse_point(path):
+                    found.append(path)
+    except OSError:
+        return []
+    return sorted(found, key=lambda item: item.name)
+
+
+def project_file_records(project_dir: Path) -> dict[str, FileRecord]:
+    """
+    Summary:
+        The ``files`` map the manifest seam writes (LLR-169.2): one record
+        per top-level data or A2L file, computed from disk after every copy
+        has landed.
+
+    Args:
+        project_dir (Path): The project folder.
+
+    Returns:
+        dict[str, FileRecord]: File name -> record, sorted by name. A file
+            that cannot be read is left out (Load then reports it as
+            ``not recorded``) rather than failing the write.
+
+    Dependencies:
+        Uses:
+            - _top_level_project_files / file_record
+        Used by:
+            - s19_app.tui.app.S19TuiApp._write_and_verify_manifest
+    """
+    records: dict[str, FileRecord] = {}
+    for path in _top_level_project_files(project_dir):
+        try:
+            records[path.name] = file_record(path)
+        except OSError:
+            continue
+    return records
+
+
+def count_differing_bytes(base: Mapping[int, int], derived: Mapping[int, int]) -> int:
+    """
+    Summary:
+        How many addresses differ between two images (LLR-168.4): a
+        different byte, or an address present in only one of them.
+
+    Args:
+        base (Mapping[int, int]): The base image's address -> byte map.
+        derived (Mapping[int, int]): The patched image's map.
+
+    Returns:
+        int: The count.
+
+    Dependencies:
+        Used by:
+            - derive_record
+    """
+    return sum(
+        1
+        for address in base.keys() | derived.keys()
+        if base.get(address) != derived.get(address)
+    )
+
+
+def derive_record(
+    base_path: Path, base_map: Mapping[int, int], derived_map: Mapping[int, int]
+) -> DerivedFrom:
+    """
+    Summary:
+        The ``derived_from`` record of a patched variant (LLR-168.4,
+        B100-I16), computed at the write while both images are in hand.
+
+    Args:
+        base_path (Path): The base image file (it need not be in the
+            project).
+        base_map (Mapping[int, int]): The base image's data.
+        derived_map (Mapping[int, int]): The patched image's data.
+
+    Returns:
+        DerivedFrom: The base's file name and file digest and the number of
+            differing bytes.
+
+    Raises:
+        OSError: The base file cannot be read.
+
+    Dependencies:
+        Uses:
+            - file_record / count_differing_bytes
+        Used by:
+            - s19_app.tui.app.S19TuiApp (the save-back and Save project's
+              emit)
+    """
+    return DerivedFrom(
+        base_path.name,
+        file_record(base_path).sha256,
+        count_differing_bytes(base_map, derived_map),
+    )
+
+
+def _disk_problem(path: Path, record: FileRecord) -> Optional[ProjectFileProblem]:
+    """
+    Summary:
+        Compare one recorded file with disk (LLR-169.5): ``missing``,
+        ``not readable`` (not a regular file, or unreadable), ``changed on
+        disk`` (size, then digest), or ``None`` when it matches.
+
+    Args:
+        path (Path): The recorded file, resolved inside the project.
+        record (FileRecord): Its record.
+
+    Returns:
+        Optional[ProjectFileProblem]: The problem, or ``None``.
+
+    Data Flow:
+        - ``os.lstat``: absent → ``missing``; any other error → ``not
+          readable``.
+        - Only ``S_ISREG`` non-link files are hashed; a device, a folder or
+          a link is ``not readable``.
+        - A size difference needs no hash; an equal size is hashed.
+
+    Dependencies:
+        Uses:
+            - file_record
+        Used by:
+            - check_project_files
+    """
+    name = path.name
+    try:
+        info = os.lstat(path)
+    except FileNotFoundError:
+        return ProjectFileProblem(
+            PROBLEM_MISSING, name, "recorded in project.json, not on disk"
+        )
+    except (OSError, ValueError):
+        return ProjectFileProblem(PROBLEM_NOT_READABLE, name, "the file cannot be read")
+    if not stat.S_ISREG(info.st_mode) or _is_reparse_point(path):
+        return ProjectFileProblem(PROBLEM_NOT_READABLE, name, "not a regular file")
+    if info.st_size != record.size:
+        return ProjectFileProblem(
+            PROBLEM_CHANGED, name, f"saved {record.size} B, now {info.st_size} B"
+        )
+    try:
+        actual = file_record(path)
+    except OSError:
+        return ProjectFileProblem(PROBLEM_NOT_READABLE, name, "the file cannot be read")
+    if actual != record:
+        return ProjectFileProblem(
+            PROBLEM_CHANGED, name, f"same size ({record.size} B), different content"
+        )
+    return None
+
+
+def check_project_files(
+    project_dir: Path, manifest: Optional[ProjectManifest]
+) -> list[ProjectFileProblem]:
+    """
+    Summary:
+        The Load-side project check (LLR-169.5, B100-I3): the manifest's
+        problems and what changed on disk since the manifest was written.
+        It never raises and never parses an image; ``not readable`` from an
+        install is added by the load itself (LLR-169.9).
+
+    Args:
+        project_dir (Path): The project folder.
+        manifest (Optional[ProjectManifest]): Its read manifest; ``None``
+            when it has no ``project.json``.
+
+    Returns:
+        list[ProjectFileProblem]: Every problem found, possibly several per
+            file; the load keeps one per file by precedence.
+
+    Data Flow:
+        - No manifest → ``no project.json``.
+        - The manifest's own findings → ``manifest damaged`` (one per
+          skipped entry, or one for ``project.json``); a manifest damaged
+          as a whole stops here.
+        - No ``files`` records → ``no digests saved``.
+        - Each record → :func:`_disk_problem`.
+        - Each top-level data or A2L file without a record → ``not
+          recorded`` (three writers still place files without the seam,
+          P-36).
+
+    Dependencies:
+        Uses:
+            - manifest_problems / manifest_is_damaged / _disk_problem /
+              _top_level_project_files
+        Used by:
+            - s19_app.tui.app.S19TuiApp._handle_load_project
+    """
+    if manifest is None:
+        return [ProjectFileProblem(PROBLEM_NO_MANIFEST, PROJECT_MANIFEST_NAME)]
+    problems = manifest_problems(manifest)
+    if manifest_is_damaged(manifest):
+        return problems
+    if not manifest.files:
+        problems.append(ProjectFileProblem(PROBLEM_NO_DIGESTS, PROJECT_MANIFEST_NAME))
+        return problems
+    for path, record in manifest.files.items():
+        problem = _disk_problem(path, record)
+        if problem is not None:
+            problems.append(problem)
+    recorded = {path.name for path in manifest.files}
+    for path in _top_level_project_files(project_dir):
+        if path.name not in recorded:
+            problems.append(
+                ProjectFileProblem(
+                    PROBLEM_NOT_RECORDED, path.name, "in the project, not in project.json"
+                )
+            )
+    return problems

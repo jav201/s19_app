@@ -1,0 +1,8 @@
+# s19_app import: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp7-1\pre\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+[T2 load          ] {'bytes': 236860, 'longest path': 240, 'handler s': 7.59, 'click->panel s': 8.448, 'rows': 1, 'reads s': [7.536]}
+[T2 variant-append] {'bytes': 236860, 'longest path': 250, 'trigger->outcome s': 23.951, 'reads s': [7.621], 'outcome': 'Project saved + manifest verified'}
+[T2 mac-sync      ] {'bytes': 236860, 'longest path': 244, 'trigger->outcome s': 23.579, 'reads s': [7.474], 'outcome': 'Project saved + manifest verified'}
+[T2 a2l-sync      ] {'bytes': 236860, 'longest path': 244, 'trigger->outcome s': 22.579, 'reads s': [7.589], 'outcome': 'Project saved + manifest verified'}
+[T2 save-back     ] {'bytes': 236860, 'longest path': 245, 'trigger->outcome s': 19.589, 'reads s': [5.886], 'outcome': 'Project saved + manifest verified'}
+[T2 save-project  ] {'bytes': 236860, 'longest path': 248, 'trigger->outcome s': 5.973, 'reads s': [5.918], 'outcome': 'Project saved + manifest verified'}

@@ -1,0 +1,116 @@
+# security probes (security-increment-007 evidence/inc-7/security/*.py, copied verbatim to scratch) re-run on the cp2 tree
+# command: cd scratch/cp7-2/sec; PROBE_TREE=<worktree> env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=<worktree> python <probe> [args]
+#   s19_app/tui/services/manifest_writer.py 3711eba2c27f3691
+#   s19_app/tui/services/variant_execution_service.py 425f610345f263c6
+#   s19_app/tui/app.py 923de169c6c44bc8
+#   s19_app/tui/screens.py 49d6efdc73e26b28
+## probe_a_dos.py
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+[A1-nested-5x1000] bytes=975561 read=0.02s check=0.00s issues={'MANIFEST-PATH-ESCAPE': 100, 'MANIFEST-BAD-STRUCTURE': 1} kept_entries=0 problems=102
+[A2-deep-32x32600] bytes=1043572 read=0.01s check=0.00s issues={'MANIFEST-PATH-ESCAPE': 32} kept_entries=0 problems=33
+[A3-junction-loop-5x1000] bytes=280561 read=0.05s check=0.00s issues={'MANIFEST-PATH-ESCAPE': 100, 'MANIFEST-BAD-STRUCTURE': 1} kept_entries=0 problems=102
+[A4-through-junction-3x1000] bytes=581754 read=0.01s check=0.00s issues={'MANIFEST-PATH-ESCAPE': 100, 'MANIFEST-BAD-STRUCTURE': 1} kept_entries=0 problems=102
+## exit 0
+## probe_e_load.py
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+manifest bytes: 975589
+[E load] _handle_load_project=0.07s  click->panel painted=0.70s  rows=3
+   rows with an internal code: 0 | with an exception name: 0
+   first row:   ! manifest damaged:     sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/su…     a file p 
+   last row:   ! no digests saved: project.json  Save project records them
+[E append] load_from_path -> 'Added variant' = 0.36s; statuses: ["project.json in project 'P' holds entries that were skipped and was not rewritten - firmwa"]
+## exit 0
+## r2_probe_w.py
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+[W1 intermediate junction] issues: [('MANIFEST-PATH-ESCAPE', 'jdir/secret.json'), ('MANIFEST-PATH-ESCAPE', './jdir/secret.json'), ('MANIFEST-PATH-ESCAPE', 'real/../jdir/secret.json'), ('MANIFEST-PATH-ESCAPE', 'real\\..\\jdir\\secret.json'), ('MANIFEST-PATH-ESCAPE', 'JDIR/secret.json'), ('MANIFEST-PATH-ESCAPE', 'real/inner/secret.json'), ('MANIFEST-PATH-ESCAPE', 'real/./inner/secret.json'), ('MANIFEST-PATH-ESCAPE', 'jdir/secret.json'), ('MANIFEST-PATH-ESCAPE', 'real/inner/secret.json')]
+   accepted: 'real\\a.json'                     INSIDE exists=True
+   fsutil: 6758\app\.s19tool\workarea\P is enabled.
+   folder entries: ['SUB', 'project.json', 'sub']
+[W2a real-then-junction] issues: [('MANIFEST-PATH-ESCAPE', 'SUB/secret.json'), ('MANIFEST-PATH-ESCAPE', 'SUB/secret.json'), ('MANIFEST-PATH-ESCAPE', 'SUB/secret.json')]
+   accepted: 'sub\\a.json'                      INSIDE exists=True
+   accepted: 'sub\\a.json'                      INSIDE exists=True
+   accepted: 'sub\\a.json'                      INSIDE exists=True
+   rewrite refusal: holds entries that were skipped
+   fsutil: 6802\app\.s19tool\workarea\P is enabled.
+   folder entries: ['SUB', 'project.json', 'sub']
+[W2b junction-first] issues: [('MANIFEST-PATH-ESCAPE', 'SUB/secret.json'), ('MANIFEST-PATH-ESCAPE', 'SUB/secret.json'), ('MANIFEST-PATH-ESCAPE', 'SUB/secret.json')]
+   accepted: 'sub\\a.json'                      INSIDE exists=True
+   accepted: 'sub\\a.json'                      INSIDE exists=True
+   accepted: 'sub\\a.json'                      INSIDE exists=True
+   rewrite refusal: holds entries that were skipped
+   fsutil: 6909\app\.s19tool\workarea\P is enabled.
+   folder entries: ['SUB', 'project.json']
+[W2c missing-name-then-junction] issues: [('MANIFEST-PATH-ESCAPE', 'SUB/secret.json'), ('MANIFEST-PATH-ESCAPE', 'SUB/secret.json'), ('MANIFEST-PATH-ESCAPE', 'SUB/secret.json')]
+   accepted: 'sub\\missing.json'                INSIDE exists=False
+   accepted: 'sub\\missing.json'                INSIDE exists=False
+   accepted: 'sub\\missing.json'                INSIDE exists=False
+   rewrite refusal: holds entries that were skipped
+   fsutil: 6952\app\.s19tool\workarea\P is enabled.
+   folder entries: ['A.s19', 'a.s19', 'project.json']
+[W2d files key through a file symlink (case-sensitive)] issues: [('MANIFEST-PATH-ESCAPE', 'A.s19'), ('MANIFEST-PATH-ESCAPE', 'a.s19')]
+   accepted: 'a.s19'                            INSIDE exists=True
+   check_project_files problems: [('manifest damaged', 'A.s19'), ('manifest damaged', 'a.s19')]
+[W2e control: symlink key first] issues: [('MANIFEST-PATH-ESCAPE', 'A.s19')]
+   accepted: 'a.s19'                            INSIDE exists=True
+   8.3 name of the junction: A_LONG~1
+[W3 short name / ADS / dots / spaces] issues: [('MANIFEST-PATH-ESCAPE', 'f.s19:secret'), ('MANIFEST-PATH-ESCAPE', 'f.s19::$DATA'), ('MANIFEST-PATH-ESCAPE', 'a_long_junction_name_here./secret.json'), ('MANIFEST-PATH-ESCAPE', 'a_long_junction_name_here /secret.json'), ('MANIFEST-PATH-ESCAPE', 'A_LONG~1/secret.json'), ('MANIFEST-PATH-ESCAPE', 'a_long~1/secret.json')]
+   accepted: 'a_long_junction_name_here\u3000\\secret.json' INSIDE exists=False
+[W4 ceiling] lstat calls=2004 batch=1000 assignments={'firmware': 1000} gathered={'patches': ['keep.json']} files=['firmware.s19'] derived_from=['firmware.s19']
+   fold: []
+   any lstat of jdir: True | rewrite refusal: holds entries that were skipped | keep reason (Save project): None
+# links created: 8 | removed: 8
+## exit 0
+## r2_probe_w2x.py
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+fsutil rc: 0
+reader issues: [('MANIFEST-PATH-ESCAPE', 'SUB/secret.json')]
+  batch 'sub\\missing.json'    realpath=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp7-2\sec\runs\W2x_1793389087782\app\.s19tool\workarea\P\sub\missing.json
+      read_change_document opened it: False | codes: ['MF-PATH-UNRESOLVED'] | mentions marker: False
+# junction removed: True
+## exit 0
+## r2_probe_t.py T1 T2
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+[T1 load          ] {'bytes': 236860, 'longest path': 246, 'handler s': 0.181, 'click->panel s': 1.063, 'rows': 1, 'reads s': [0.145]}
+[T1 variant-append] {'bytes': 236860, 'longest path': 256, 'trigger->outcome s': 0.947, 'reads s': [0.132], 'outcome': 'Project saved + manifest verified'}
+[T1 mac-sync      ] {'bytes': 236860, 'longest path': 250, 'trigger->outcome s': 0.816, 'reads s': [0.134], 'outcome': 'Project saved + manifest verified'}
+[T1 a2l-sync      ] {'bytes': 236860, 'longest path': 250, 'trigger->outcome s': 0.533, 'reads s': [0.136], 'outcome': 'Project saved + manifest verified'}
+[T1 save-back     ] {'bytes': 236860, 'longest path': 251, 'trigger->outcome s': 0.5, 'reads s': [0.128], 'outcome': 'Project saved + manifest verified'}
+[T1 save-project  ] {'bytes': 236860, 'longest path': 254, 'trigger->outcome s': 0.189, 'reads s': [0.129], 'outcome': 'Project saved + manifest verified'}
+[T2 load          ] {'bytes': 236860, 'longest path': 246, 'handler s': 0.147, 'click->panel s': 1.143, 'rows': 1, 'reads s': [0.113]}
+[T2 variant-append] {'bytes': 236860, 'longest path': 256, 'trigger->outcome s': 0.889, 'reads s': [0.112], 'outcome': 'Project saved + manifest verified'}
+[T2 mac-sync      ] {'bytes': 236860, 'longest path': 250, 'trigger->outcome s': 0.875, 'reads s': [0.112], 'outcome': 'Project saved + manifest verified'}
+[T2 a2l-sync      ] {'bytes': 236860, 'longest path': 250, 'trigger->outcome s': 0.439, 'reads s': [0.108], 'outcome': 'Project saved + manifest verified'}
+[T2 save-back     ] {'bytes': 236860, 'longest path': 251, 'trigger->outcome s': 0.427, 'reads s': [0.107], 'outcome': 'Project saved + manifest verified'}
+[T2 save-project  ] {'bytes': 236860, 'longest path': 254, 'trigger->outcome s': 0.164, 'reads s': [0.108], 'outcome': 'Project saved + manifest verified'}
+## exit 0
+## r2_probe_t3.py
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+[T3 read] batch: 1000 | assignments: {'firmware': 1000} | fold: [] | keep reason: None
+[T3 after Save project] batch: 0 | assignments: {} | previous-* copies: []
+   statuses: ['Project saved + manifest verified', 'Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scrat']
+## exit 0
+## r2_probe_s.py S1 S2 S3 S4
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+[S1 SEC7-2 swap after the check] written: None codes: ['MANIFEST-WRITE-CONTAINMENT']
+   other work area: {'created': [], 'removed': [], 'changed': ['Q\\project.json']}
+   message (app.py notify()s it as the toast body): the project folder changed during the manifest write - project.json landed outside this work area at C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users ...
+   exception class names in it: [] | names the outside folder: True
+[S2 SEC7-6 keep through a junction project folder] kept: None | outside holds: []
+[S3a later names taken] keep calls: 2 | files holding the previous bytes: ['project.json.previous-20261030T193902Z']
+   previous-* copies left (not pre-claimed): ['project.json.previous-20261030T193902Z']
+   project.json == previous: False
+   statuses: ["Project NOT saved: could not save — [Errno 13] held by another program: 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-jjgh8-clde\\\\a8feab43", 'project.json could not be restored and its previous content could not be kept in C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43', 'project.json could not be restored; its previous content is kept as project.json.previous-20261030T193902Z in C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude']
+[S3b control] keep calls: 2 | files holding the previous bytes: ['project.json.previous-20261030T193909Z', 'project.json.previous-20261030T193909Z-1']
+   previous-* copies left (not pre-claimed): ['project.json.previous-20261030T193909Z', 'project.json.previous-20261030T193909Z-1']
+   project.json == previous: False
+   statuses: ["Project NOT saved: could not save — [Errno 13] held by another program: 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-jjgh8-clde\\\\a8feab43", 'project.json could not be restored; its previous content is kept as project.json.previous-20261030T193909Z-1 in C:\\Users\\jjgh8\\AppData\\Local\\Temp\\clau', 'project.json could not be restored; its previous content is kept as project.json.previous-20261030T193909Z in C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude']
+[S4 SEC7-3 no copy possible] project.json unchanged: True | pre-claimed names intact: True 60
+   statuses: ['Project NOT saved: project.json holds keys this version does not know and its content could not be kept beside it in C:\\Users\\jjgh8\\AppData\\']
+## exit 0

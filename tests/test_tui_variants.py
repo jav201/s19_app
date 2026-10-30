@@ -220,7 +220,14 @@ def test_no_new_parse_loaded_file_call_sites() -> None:
             _walk(child, scope)
 
     _walk(tree, "<module>")
-    assert sorted(call_sites) == ["_start_load_worker", "load_selected_file"], (
+    # batch-100 Inc 7 (LLR-169.6 / LLR-169.9): a project variant is parsed
+    # before it is applied, so an image that does not parse or holds no data
+    # is reported ``not readable`` and never reaches the views.
+    assert sorted(call_sites) == [
+        "_install_project_image",
+        "_start_load_worker",
+        "load_selected_file",
+    ], (
         f"unexpected _parse_loaded_file call sites: {sorted(call_sites)} "
         "(LLR-005.4 allows only the pre-existing worker + sync-path sites)"
     )

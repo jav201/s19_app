@@ -1,0 +1,32 @@
+Unexpected error while loading file: 'utf-8' codec can't decode byte 0x80 in position 128: invalid start byte
+Traceback (most recent call last):
+  File "C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\core.py", line 313, in _load
+    for line_number, line in enumerate(f, 1):
+  File "<frozen codecs>", line 322, in decode
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0x80 in position 128: invalid start byte
+Unexpected error while loading file: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+Traceback (most recent call last):
+  File "C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\core.py", line 313, in _load
+    for line_number, line in enumerate(f, 1):
+  File "<frozen codecs>", line 322, in decode
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+Unexpected error while loading file: [Errno 13] Permission denied: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s7b\\runs\\H_1793370359801\\dir.s19'
+Traceback (most recent call last):
+  File "C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\core.py", line 312, in _load
+    with open(self.path, 'r') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s7b\\runs\\H_1793370359801\\dir.s19'
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+garbage.s19  -> ok, 0 bytes
+binary.s19   -> caught class UnicodeDecodeError
+short.s19    -> ok, 0 bytes
+badlen.s19   -> ok, 0 bytes
+nonhex.s19   -> ok, 0 bytes
+utf16.s19    -> caught class UnicodeDecodeError
+empty.s19    -> ok, 0 bytes
+garbage.hex  -> ok, 0 bytes
+badlen.hex   -> ok, 0 bytes
+binary.hex   -> ok, 0 bytes
+dir.s19      -> caught class PermissionError
+exit=0

@@ -1,0 +1,16 @@
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+[S1 SEC7-2 swap after the check] written: None codes: ['MANIFEST-WRITE-CONTAINMENT']
+   other work area: {'created': [], 'removed': [], 'changed': ['Q\\project.json']}
+   message (app.py notify()s it as the toast body): the project folder changed during the manifest write - project.json landed outside this work area at C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users ...
+   exception class names in it: ['WorkareaContainmentError'] | names the outside folder: True
+[S2 SEC7-6 keep through a junction project folder] kept: None | outside holds: []
+[S3a later names taken] keep calls: 2 | files holding the previous bytes: []
+   previous-* copies left (not pre-claimed): []
+   project.json == previous: False
+   statuses: ["Project NOT saved: could not save — [Errno 13] held by another program: 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-jjgh8-clde\\\\a8feab43", 'project.json could not be restored and its previous content could not be kept in C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43']
+[S3b control] keep calls: 2 | files holding the previous bytes: ['project.json.previous-20261030T143041Z']
+   previous-* copies left (not pre-claimed): ['project.json.previous-20261030T143041Z']
+   project.json == previous: False
+   statuses: ["Project NOT saved: could not save — [Errno 13] held by another program: 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-jjgh8-clde\\\\a8feab43", 'project.json could not be restored; its previous content is kept as project.json.previous-20261030T143041Z in C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude']
+exit=0

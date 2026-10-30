@@ -1,0 +1,19 @@
+# r2 mutant R2-SEC7-3-refusal: app.py 'if kept is None:' -> 'if kept is None and False:' (sha256 3b46619711652f9c -> c44584eafe82a6e6)
+# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r7b/mut/sec73 (copy of the worktree with the one edit); NO_COLOR unset
+import C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r7b\mut\sec73\s19_app\__init__.py
+## shipped: tests/test_b100_save_guards.py tests/test_b100_save_image.py
+........................................................................ [ 67%]
+...................................                                      [100%]
+107 passed in 486.91s (0:08:06)
+## probe Q1
+ERROR: file or directory not found: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r7b/rp/test_r2_probes.py::test_q1_sec7_3_no_copy_refuses_and_rolls_back
+
+
+no tests ran in 0.00s
+## probe Q1 (re-run with a Windows path)
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r7b\mut\sec73\s19_app\tui\app.py:8894: AttributeError: 'NoneType' object has no attribute 'unlink'
+=========================== short test summary info ===========================
+FAILED ::test_q1_sec7_3_no_copy_refuses_and_rolls_back - AttributeError: 'Non...
+1 failed in 2.78s

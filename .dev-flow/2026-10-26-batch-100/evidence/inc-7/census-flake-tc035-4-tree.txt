@@ -1,0 +1,15 @@
+# command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc7 python -m pytest -p no:cacheprovider -q --tb=line tests/test_tui_patch_variant.py::test_tc_035_4_routing_guards tests/test_tui_patch_variant.py::test_tc_035_4_routing_guards tests/test_tui_patch_variant.py::test_tc_035_4_routing_guards
+# label: Flake check on the FINAL tree: tc_035_4 routing guards, 3 repeats in isolation
+# tree: C:/Users/jjgh8/Github/s19_app-b100-inc7 (git HEAD 80052cb; working changes: 19 paths)
+# PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc7 ; NO_COLOR unset
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# source sha256[:16]:
+#   s19_app/tui/services/manifest_writer.py b3a8da7ae550bda5
+#   s19_app/tui/services/variant_execution_service.py bd33c8be189d2c87
+#   s19_app/tui/app.py 0e29d80841fa3f38
+#   s19_app/tui/screens.py e23ea8f72bc93153
+# started: 2026-10-30T05:43:01-06:00
+.                                                                        [100%]
+1 passed in 1.96s
+# exit: 0
+# finished: 2026-10-30T05:43:04-06:00

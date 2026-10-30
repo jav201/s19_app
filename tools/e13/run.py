@@ -12,6 +12,12 @@ Scenarios:
   pe-saveback     Load project P after a save-back (firmware_1.s19 active)
   pe-problems     Load project P with 30 problems -> the panel lists all 30
   pe-damaged      Load project P whose project.json is not JSON
+  pe-patched      Load project P: firmware_1.s19 carries a derived_from record
+                  and every file a files record (the "patched, N bytes differ
+                  from <base>" line, Inc 7)
+  pe-unreadable   Load project P whose active variant broken.s19 holds no S19
+                  data (the red "not readable" mark; Load opens the next
+                  valid variant, Inc 7)
 
 ``--close`` dismisses the panel after it opens, so the capture shows the
 summary line and ``#status_text`` the load left behind.
@@ -23,6 +29,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import hashlib
 import json
 import os
 import shutil
@@ -31,7 +38,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 CASE01 = ROOT / "examples" / "case_01_basic_valid" / "firmware.s19"
 CASE02 = ROOT / "examples" / "case_02_gaps_and_patch_targets" / "firmware.s19"
-SCENARIOS = ("pe-clean", "pe-saveback", "pe-problems", "pe-damaged")
+SCENARIOS = ("pe-clean", "pe-saveback", "pe-problems", "pe-damaged", "pe-patched",
+             "pe-unreadable")
 
 
 def seed(workarea: Path, scenario: str) -> None:
@@ -40,11 +48,26 @@ def seed(workarea: Path, scenario: str) -> None:
     project.mkdir(parents=True)
     shutil.copy2(CASE01, project / "firmware.s19")
     manifest: object = {"schema_version": 1, "active_variant": "firmware"}
-    if scenario in ("pe-saveback", "pe-problems"):
+    if scenario in ("pe-saveback", "pe-problems", "pe-patched"):
         shutil.copy2(CASE02, project / "firmware_1.s19")
         manifest = {"schema_version": 1, "active_variant": "firmware_1"}
     if scenario == "pe-problems":
         manifest["batch"] = [f"../escape_{i:02d}.json" for i in range(30)]
+    if scenario == "pe-patched":
+        base_sha = hashlib.sha256((project / "firmware.s19").read_bytes()).hexdigest()
+        manifest["files"] = {
+            item.name: {
+                "size": item.stat().st_size,
+                "sha256": hashlib.sha256(item.read_bytes()).hexdigest(),
+            }
+            for item in sorted(project.glob("*.s19"))
+        }
+        manifest["derived_from"] = {
+            "firmware_1.s19": {"base": "firmware.s19", "sha256": base_sha, "differ": 4}
+        }
+    if scenario == "pe-unreadable":
+        (project / "broken.s19").write_text("not an s19 file\n", encoding="utf-8")
+        manifest["active_variant"] = "broken"
     text = json.dumps(manifest, indent=2)
     if scenario == "pe-damaged":
         text = '{"schema_version": 1, "active_variant": '

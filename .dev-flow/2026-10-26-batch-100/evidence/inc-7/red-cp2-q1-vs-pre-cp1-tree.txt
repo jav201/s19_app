@@ -1,0 +1,19 @@
+# command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/cp7-2/pre-cp1base python -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_save_guards.py::test_tc_b100_07_save_project_refuses_when_no_previous_copy_can_be_kept
+# label: RED: R2-1 arm (Q1) on the pre-cp1 tree (cp7-1/pre sources + cp2 tests)
+# tree: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/cp7-2/pre-cp1base (cwd = tree)
+# PYTHONPATH=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/cp7-2/pre-cp1base ; NO_COLOR unset
+# s19_app import: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp7-2\pre-cp1base\s19_app\__init__.py
+# source sha256[:16]:
+#   s19_app/tui/services/manifest_writer.py b3a8da7ae550bda5
+#   s19_app/tui/services/variant_execution_service.py bd33c8be189d2c87
+#   s19_app/tui/app.py 0e29d80841fa3f38
+#   s19_app/tui/screens.py e23ea8f72bc93153
+# started: 2026-10-30T13:09:14-06:00
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp7-2\pre-cp1base\tests\test_b100_save_guards.py:2035: assert '{\n  "schema...    }\n  }\n}' == '{"schema_ver...user_key": 7}'
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_save_project_refuses_when_no_previous_copy_can_be_kept
+1 failed in 3.93s
+# exit: 1
+# finished: 2026-10-30T13:09:19-06:00
