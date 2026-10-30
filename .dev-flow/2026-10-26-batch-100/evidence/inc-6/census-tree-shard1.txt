@@ -1,0 +1,690 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE --basetemp=C:/Users/jjgh8/AppData/Local/Temp/i6t1 tests/test_b100_focus.py tests/test_b100_session_reset.py tests/test_b97_flow_execution.py tests/test_b97_width.py tests/test_b99_load_project.py tests/test_flow_multi_image_ui.py tests/test_manifest_writer.py tests/test_tui_diff_screen.py tests/test_tui_report_filter_surface.py tests/test_variant_execution.py 
+# tree: C:/Users/jjgh8/Github/s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree incl. re-pins)
+# runner: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc6-impl/py.sh (sets PYTHONPATH to that tree; NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8)
+# date: 2026-10-30T01:48:43Z
+............................................F....FF..................... [ 18%]
+........................................................................ [ 37%]
+........................................................................ [ 56%]
+........................................................................ [ 75%]
+.............................................................F.......... [ 94%]
+.F...................                                                    [100%]
+================================== FAILURES ===================================
+___________ test_tc_b100_10_no_discard_notice_when_nothing_unsaved ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t1/test_tc_b100_10_no_discard_not0')
+
+    def test_tc_b100_10_no_discard_notice_when_nothing_unsaved(tmp_path: Path) -> None:
+        """A clean load-over (0 outgoing entries) paints no closed-document
+        line; the loaded-project line stays the freshest."""
+    
+        base = tmp_path / "app"
+        _seed_project_p1(_workarea(base))
+        _seed_project_p2(_workarea(base))
+    
+        async def _drive() -> list:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app._handle_load_project(P1_NAME)
+                await _flush(pilot)
+                app._handle_load_project(P2_NAME)
+                await _flush(pilot)
+                return list(app.log_lines)
+    
+        lines = asyncio.run(_drive())
+        assert not any("Closed the Patch Editor document" in line for line in lines)
+>       assert lines[-1] == "Loaded project 'P2' -> prg.s19", lines
+E       AssertionError: ['Loaded firmware.mac (S19+MAC)', "Loaded project 'P1' -> firmware.s19 + firmware.mac - variant 1 of 1, 1 problem -", 'Loaded prg.s19 (S19 only)', "Loaded project 'P2' -> prg.s19 - variant 1 of 1, 1 problem - details: p"]
+E       assert 'Loaded proje... - details: p' == "Loaded proje...2' -> prg.s19"
+E         
+E         - Loaded project 'P2' -> prg.s19
+E         + Loaded project 'P2' -> prg.s19 - variant 1 of 1, 1 problem - details: p
+
+tests\test_b100_session_reset.py:619: AssertionError
+_____ test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size0] _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t1/test_at_b100_03_project_load_o0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_03_project_load_over_unsaved_work_saves_only_p2(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-165's acceptance scene, by keys only: load P1 (S19 + MAC + A2L)
+        through the Load project dialog (``p``), add ONE Patch Editor entry
+        through the panel's own inputs, load P2 through the dialog (the
+        interim closed-document notice names the entry, LED .55(a)), Save
+        project as P2 — P2's folder holds ``prg.s19`` + ``project.json`` ONLY
+        (P-2's re-save at base also wrote P1's ``firmware.mac`` /
+        ``firmware.a2l``), the Loaded panel shows no MAC and no A2L. Both
+        reference sizes, notifications on. After the load-over the AT also
+        asserts the painted Patch Editor observables: the ledger is empty
+        (0 rows + the empty-state line) and the SCRIPT window subtitle shows
+        ``0 entries`` with no dirty ``●`` (LED .55(b)).
+    
+        RED (executed at base): ``P2 files after save: ['firmware.a2l',
+        'firmware.mac', 'prg.s19', 'project.json']`` — the p03/P-2 shape."""
+    
+        base = tmp_path / "app"
+        app = S19TuiApp(base_dir=base)
+        workarea = app.workarea
+        _seed_project_p1(workarea)
+        _seed_project_p2(workarea)
+    
+        async def _drive() -> tuple:
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, P1_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: f"Loaded project '{P1_NAME}'" in _status_text(app),
+                    "the painted line naming the opened project P1",
+                )
+                # One Patch Editor entry through the panel's own inputs.
+                await pilot.press("6")
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.query("#patch_entry_add_button")) > 0,
+                    "the Patch Editor panel",
+                )
+                assert await pilot.click("#patch_entry_address_input"), (
+                    "click missed #patch_entry_address_input"
+                )
+                await pilot.press(*"0x8000007C")
+                assert await pilot.click("#patch_entry_bytes_input"), (
+                    "click missed #patch_entry_bytes_input"
+                )
+                await pilot.press(*"DE AD BE EF")
+                assert await pilot.click("#patch_entry_add_button"), (
+                    "click missed #patch_entry_add_button"
+                )
+                await _wait_for(
+                    pilot,
+                    lambda: "Patch Editor: entry added." in _status_text(app),
+                    "the painted confirmation of the added entry",
+                )
+                # LED .55(b) vacuity guard: the entry went in through the
+                # panel's own inputs, so the dirty marker is painted BEFORE
+                # the load-over (without this the no-marker assertion below
+                # would pass even if the marker had never existed).
+                marked = (
+                    app.query_one("#patch_win_script", Container).border_subtitle
+                    or ""
+                )
+                assert "●" in marked, marked
+                # A P1 draft in the paste buffer, typed through the panel's
+                # own TextArea (writer w2 marks the panel dirty). The buffer
+                # lives in the panel's JSON view, so the JSON tab chip is
+                # clicked first — the shipped surface a user takes. LED
+                # .55(b) says the reset clears the buffer too: without the
+                # pre-load non-empty assertion the post-load empty assertion
+                # would pass even if the buffer had never held the draft.
+                assert await pilot.click("#patch_tab_json"), "click missed #patch_tab_json"
+                await _wait_for(
+                    pilot,
+                    lambda: app.query_one("#patch_paste_text", TextArea).region.width > 0,
+                    "the JSON view's paste buffer to become visible",
+                )
+                assert await pilot.click("#patch_paste_text"), (
+                    "click missed #patch_paste_text"
+                )
+                await pilot.press(*"P1 DRAFT")
+                paste_buffer = app.query_one("#patch_paste_text", TextArea)
+                assert "P1 DRAFT" in paste_buffer.text, repr(paste_buffer.text)
+                # Back to the Inspector tab: the TextArea holds the keyboard,
+                # and the load-over below starts with the rail key ``1``.
+                assert await pilot.click("#patch_tab_inspector"), (
+                    "click missed #patch_tab_inspector"
+                )
+                await pilot.pause()
+                # The load-over: P2 replaces P1. The closed-document notice is
+                # the freshest painted line (LED .55(a)); the loaded-project
+                # line stays in the log history and both are asserted on the
+                # captured log below.
+                await _open_project_through_dialog(pilot, app, P2_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: (
+                        "Closed the Patch Editor document (1 entries); "
+                        "unsaved changes were not kept" in _status_text(app)
+                    ),
+                    "the interim closed-document notice (LED .55(a)) as the freshest line",
+                )
+                # LED .55(b): the reset cleared the panel's paste buffer —
+                # P1's draft must not survive into P2's session.
+                await _wait_for(
+                    pilot,
+                    lambda: app.query_one("#patch_paste_text", TextArea).text == "",
+                    "the paste buffer cleared by the reset",
+                )
+                # LED .55(b): the reset cleared the panel's dirty marker — the
+                # SCRIPT window subtitle is painted "0 entries" with no ●. The
+                # marker repaint is deferred until after the buffer's change
+                # message, so it is polled, not read once.
+                await _wait_for(
+                    pilot,
+                    lambda: (
+                        "0 entries"
+                        in (
+                            app.query_one("#patch_win_script", Container).border_subtitle
+                            or ""
+                        )
+                        and "●"
+                        not in (
+                            app.query_one("#patch_win_script", Container).border_subtitle
+                            or ""
+                        )
+                    ),
+                    "the clean '0 entries' subtitle after the load-over",
+                )
+                # HLR-165's painted observable: the Patch Editor ledger is
+                # empty — 0 rows and the empty-state line. This pins HLR-165's
+                # observable, NOT LLR-165.1's repaint clause: deleting the
+                # seam's refresh_entries call is an EQUIVALENT mutant (the
+                # reviewer's R8b survives) because the install's deferred
+                # chain repaints the ledger anyway.
+                table = app.query_one("#patch_doc_entries_table", DataTable)
+                assert table.row_count == 0, table.row_count
+                empty_state = app.query_one("#patch_doc_empty_state", Static)
+                assert not empty_state.has_class("hidden")
+                assert str(empty_state.render()) == PatchEditorPanel.EMPTY_STATE_TEXT
+                # The Loaded panel: no MAC, no A2L in any slot.
+                loaded_text = " ".join(
+                    str(static.render())
+                    for static in app.query("#loaded_slots Static")
+                )
+                assert "firmware.mac" not in loaded_text, loaded_text
+                assert "firmware.a2l" not in loaded_text, loaded_text
+                # Save project as P2 (the open project).
+                await _save_project_as(pilot, app, P2_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: "Saved project" in _status_text(app),
+                    "the P2 save success line",
+                )
+                await _flush(pilot)
+            p2_files = sorted(item.name for item in (workarea / P2_NAME).iterdir())
+            return p2_files, list(app.log_lines)
+    
+>       p2_files, log_lines = asyncio.run(_drive())
+                              ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_session_reset.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_session_reset.py:805: in _drive
+    assert await pilot.click("#patch_entry_address_input"), (
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\pilot.py:238: in click
+    return await self._post_mouse_events(
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\pilot.py:429: in _post_mouse_events
+    target_widget = screen.query_one(widget)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = LoadResultScreen(), selector = '#patch_entry_address_input'
+expect_type = None
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#patch_entry_address_input' on LoadResultScreen()
+
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: NoMatches
+_____ test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size1] _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t1/test_at_b100_03_project_load_o1')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_03_project_load_over_unsaved_work_saves_only_p2(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-165's acceptance scene, by keys only: load P1 (S19 + MAC + A2L)
+        through the Load project dialog (``p``), add ONE Patch Editor entry
+        through the panel's own inputs, load P2 through the dialog (the
+        interim closed-document notice names the entry, LED .55(a)), Save
+        project as P2 — P2's folder holds ``prg.s19`` + ``project.json`` ONLY
+        (P-2's re-save at base also wrote P1's ``firmware.mac`` /
+        ``firmware.a2l``), the Loaded panel shows no MAC and no A2L. Both
+        reference sizes, notifications on. After the load-over the AT also
+        asserts the painted Patch Editor observables: the ledger is empty
+        (0 rows + the empty-state line) and the SCRIPT window subtitle shows
+        ``0 entries`` with no dirty ``●`` (LED .55(b)).
+    
+        RED (executed at base): ``P2 files after save: ['firmware.a2l',
+        'firmware.mac', 'prg.s19', 'project.json']`` — the p03/P-2 shape."""
+    
+        base = tmp_path / "app"
+        app = S19TuiApp(base_dir=base)
+        workarea = app.workarea
+        _seed_project_p1(workarea)
+        _seed_project_p2(workarea)
+    
+        async def _drive() -> tuple:
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, P1_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: f"Loaded project '{P1_NAME}'" in _status_text(app),
+                    "the painted line naming the opened project P1",
+                )
+                # One Patch Editor entry through the panel's own inputs.
+                await pilot.press("6")
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.query("#patch_entry_add_button")) > 0,
+                    "the Patch Editor panel",
+                )
+                assert await pilot.click("#patch_entry_address_input"), (
+                    "click missed #patch_entry_address_input"
+                )
+                await pilot.press(*"0x8000007C")
+                assert await pilot.click("#patch_entry_bytes_input"), (
+                    "click missed #patch_entry_bytes_input"
+                )
+                await pilot.press(*"DE AD BE EF")
+                assert await pilot.click("#patch_entry_add_button"), (
+                    "click missed #patch_entry_add_button"
+                )
+                await _wait_for(
+                    pilot,
+                    lambda: "Patch Editor: entry added." in _status_text(app),
+                    "the painted confirmation of the added entry",
+                )
+                # LED .55(b) vacuity guard: the entry went in through the
+                # panel's own inputs, so the dirty marker is painted BEFORE
+                # the load-over (without this the no-marker assertion below
+                # would pass even if the marker had never existed).
+                marked = (
+                    app.query_one("#patch_win_script", Container).border_subtitle
+                    or ""
+                )
+                assert "●" in marked, marked
+                # A P1 draft in the paste buffer, typed through the panel's
+                # own TextArea (writer w2 marks the panel dirty). The buffer
+                # lives in the panel's JSON view, so the JSON tab chip is
+                # clicked first — the shipped surface a user takes. LED
+                # .55(b) says the reset clears the buffer too: without the
+                # pre-load non-empty assertion the post-load empty assertion
+                # would pass even if the buffer had never held the draft.
+                assert await pilot.click("#patch_tab_json"), "click missed #patch_tab_json"
+                await _wait_for(
+                    pilot,
+                    lambda: app.query_one("#patch_paste_text", TextArea).region.width > 0,
+                    "the JSON view's paste buffer to become visible",
+                )
+                assert await pilot.click("#patch_paste_text"), (
+                    "click missed #patch_paste_text"
+                )
+                await pilot.press(*"P1 DRAFT")
+                paste_buffer = app.query_one("#patch_paste_text", TextArea)
+                assert "P1 DRAFT" in paste_buffer.text, repr(paste_buffer.text)
+                # Back to the Inspector tab: the TextArea holds the keyboard,
+                # and the load-over below starts with the rail key ``1``.
+                assert await pilot.click("#patch_tab_inspector"), (
+                    "click missed #patch_tab_inspector"
+                )
+                await pilot.pause()
+                # The load-over: P2 replaces P1. The closed-document notice is
+                # the freshest painted line (LED .55(a)); the loaded-project
+                # line stays in the log history and both are asserted on the
+                # captured log below.
+                await _open_project_through_dialog(pilot, app, P2_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: (
+                        "Closed the Patch Editor document (1 entries); "
+                        "unsaved changes were not kept" in _status_text(app)
+                    ),
+                    "the interim closed-document notice (LED .55(a)) as the freshest line",
+                )
+                # LED .55(b): the reset cleared the panel's paste buffer —
+                # P1's draft must not survive into P2's session.
+                await _wait_for(
+                    pilot,
+                    lambda: app.query_one("#patch_paste_text", TextArea).text == "",
+                    "the paste buffer cleared by the reset",
+                )
+                # LED .55(b): the reset cleared the panel's dirty marker — the
+                # SCRIPT window subtitle is painted "0 entries" with no ●. The
+                # marker repaint is deferred until after the buffer's change
+                # message, so it is polled, not read once.
+                await _wait_for(
+                    pilot,
+                    lambda: (
+                        "0 entries"
+                        in (
+                            app.query_one("#patch_win_script", Container).border_subtitle
+                            or ""
+                        )
+                        and "●"
+                        not in (
+                            app.query_one("#patch_win_script", Container).border_subtitle
+                            or ""
+                        )
+                    ),
+                    "the clean '0 entries' subtitle after the load-over",
+                )
+                # HLR-165's painted observable: the Patch Editor ledger is
+                # empty — 0 rows and the empty-state line. This pins HLR-165's
+                # observable, NOT LLR-165.1's repaint clause: deleting the
+                # seam's refresh_entries call is an EQUIVALENT mutant (the
+                # reviewer's R8b survives) because the install's deferred
+                # chain repaints the ledger anyway.
+                table = app.query_one("#patch_doc_entries_table", DataTable)
+                assert table.row_count == 0, table.row_count
+                empty_state = app.query_one("#patch_doc_empty_state", Static)
+                assert not empty_state.has_class("hidden")
+                assert str(empty_state.render()) == PatchEditorPanel.EMPTY_STATE_TEXT
+                # The Loaded panel: no MAC, no A2L in any slot.
+                loaded_text = " ".join(
+                    str(static.render())
+                    for static in app.query("#loaded_slots Static")
+                )
+                assert "firmware.mac" not in loaded_text, loaded_text
+                assert "firmware.a2l" not in loaded_text, loaded_text
+                # Save project as P2 (the open project).
+                await _save_project_as(pilot, app, P2_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: "Saved project" in _status_text(app),
+                    "the P2 save success line",
+                )
+                await _flush(pilot)
+            p2_files = sorted(item.name for item in (workarea / P2_NAME).iterdir())
+            return p2_files, list(app.log_lines)
+    
+>       p2_files, log_lines = asyncio.run(_drive())
+                              ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_session_reset.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_session_reset.py:805: in _drive
+    assert await pilot.click("#patch_entry_address_input"), (
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\pilot.py:238: in click
+    return await self._post_mouse_events(
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\pilot.py:429: in _post_mouse_events
+    target_widget = screen.query_one(widget)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = LoadResultScreen(), selector = '#patch_entry_address_input'
+expect_type = None
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#patch_entry_address_input' on LoadResultScreen()
+
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: NoMatches
+_______________ test_at_b78_32_app_bindings_block_is_untouched ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t1/test_at_b78_32_app_bindings_bl0')
+
+    def test_at_b78_32_app_bindings_block_is_untouched(tmp_path: Path) -> None:
+        """AT-B78-32 (PIN) -- Lane 1 does not disturb the App ``BINDINGS`` block.
+    
+        RE-AUTHORED at batch-79 Phase 0, and the reason is the point of the node.
+    
+        The batch-78 spec realizes this as *"a zero-line ``git diff`` over
+        ``app.py:1338-1375``"*. Executed against the tree, that range STOPS
+        MID-BLOCK: the cited end line falls on the ``crc_designer`` screen binding,
+        and **eight** entries sit BELOW it and outside the range --
+        ``plus`` / ``minus`` context paging, ``comma`` / ``period`` hex paging,
+        ``pagedown`` / ``pageup`` from batch-31 AC-3, and ``ctrl+z`` / ``ctrl+y``
+        from batch-40 S2. An entry added or removed among those eight leaves the
+        range-based predicate GREEN, so the guard would report "untouched" for a
+        block that was touched. It fails in the safe-looking direction.
+    
+        ⚠️ **That sentence said "the ``page_prev_context`` entry" and "six" until the
+        SIXTH merge gate measured it.** Both were wrong, and the second followed from
+        the first: ``page_prev_context`` is two lines LOWER than the cited boundary,
+        so believing the boundary sat there silently dropped ``plus``/``minus`` from
+        the inventory. The figure came in from Phase 0's premise table and was
+        carried through two rewrites of this very paragraph without being
+        re-executed -- including one whose stated purpose was removing false
+        references from it. *A figure inherited inside a sentence you are editing is
+        still an inherited figure.* The paragraph's THESIS is unaffected: the range
+        does stop mid-block, entries do escape the predicate, and the node's
+        assertions never depended on the count.
+    
+        It is not drift: at ``f6ff1d3`` the block ALREADY ran past the cited end and
+        batch-78 added zero ``Binding(`` lines. The range was wrong when it was
+        written and survived three Phase-2 rounds -- because a line range looks like
+        a measurement. A code comment in ``screens_directionb.py`` carried the
+        CORRECT extent, so the two artifacts disagreed and the code was right.
+    
+        **batch-79 Inc-11: this docstring cites no line number as a POINTER, and it
+        took three commits to get there.** Numbers still appear below, and they are
+        NARRATION -- the record of which ranges were claimed and how each was wrong.
+        Read none of them as an address. (Two earlier drafts got this wrong in
+        opposite directions: the first claimed "EVERY line number is now gone" while
+        five remained, and the fifth gate then noted that one of the survivors,
+        ``1339-1393``, happens to be the block's CURRENT extent -- accurate today,
+        which is exactly what makes narration read as a pointer. The wording above
+        is scoped to POINTERS for that reason.)
+        The first pass cited
+        ``screens_directionb.py:6712`` for that comment; the branch pushed it to
+        ``:6822``. The second pass removed that one and left the block's own range
+        ``1338-1392`` in place -- and the very next commit added an import at the
+        top of ``app.py`` and shifted the block to ``1339-1393``. The range that had
+        been "corrected" was **also wrong on arrival**.
+    
+        So the docstring arguing that a line range is "one insertion away from
+        failing the same silent way" demonstrated the claim three times on itself.
+        Everything is cited by FILE and DESCRIPTION now; a symbol reference that cannot
+        go stale is the whole point of the node below.
+    
+        A corrected range would not fix this, and this batch proved it twice: any
+        edit ABOVE the block shifts it, and both "corrected" ranges were invalidated
+        within days -- one of them wrong the moment it was written. This
+        resolves the block from the CLASS instead, which no line movement can blind,
+        and pins two independent projections of it.
+        """
+        rows = _b79_app_binding_rows()
+    
+        # The FULL row set, frozen. The node pinned only a count plus a key-only
+        # projection of the shown bindings until the independent review measured the
+        # blind spot: 24 of the 38 entries are `show=False`, so their key, action
+        # and description were certified by the count alone. Executed, all three of
+        # these stayed GREEN — a hidden binding's action rebound, a hidden binding's
+        # key changed, and one hidden removed while another was added. The shown
+        # projection kept only `key`, so **re-pointing `slash` or `g` to a different
+        # action — precisely what Lane 1 does at Inc-9 — was invisible too.**
+        #
+        # The spec's line-range predicate would have caught every one of those. The
+        # re-authoring is still right about range fragility, but it was not the
+        # strict improvement the Inc-6 record claimed: its counterfactual was an
+        # ADDITION, the one class a count can see. A frozen row set is a superset of
+        # both old projections and no line movement blinds it.
+>       assert rows == _B79_COMMITTED_APP_BINDING_ROWS, (
+            "the App BINDINGS block must be byte-for-byte the committed set. "
+            f"Added: {sorted(rows - _B79_COMMITTED_APP_BINDING_ROWS)!r}; "
+            f"removed: {sorted(_B79_COMMITTED_APP_BINDING_ROWS - rows)!r}"
+        )
+E       AssertionError: the App BINDINGS block must be byte-for-byte the committed set. Added: [('c', 'confirm_attention', 'Confirm', False), ('ctrl+l', 'load_file', 'Load file', True), ('ctrl+s', 'save_project', 'Save project', True), ('d', 'a2l_describe_tag', 'Describe tag', False)]; removed: [('ctrl+l', 'load_file', 'Load', True), ('ctrl+s', 'save_project', 'Save', True)]
+E       assert frozenset({('... False), ...}) == frozenset({('... False), ...})
+E         
+E         Extra items in the left set:
+E         ('c', 'confirm_attention', 'Confirm', False)
+E         ('ctrl+l', 'load_file', 'Load file', True)
+E         ('d', 'a2l_describe_tag', 'Describe tag', False)
+E         ('ctrl+s', 'save_project', 'Save project', True)
+E         Extra items in the right set:...
+E         
+E         ...Full output truncated (3 lines hidden), use '-vv' to show
+
+tests\test_tui_diff_screen.py:3912: AssertionError
+________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t1/test_at_056e_a2b_diff_report_b0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001D7CFB4F210>
+
+    def test_at_056e_a2b_diff_report_byte_identical_despite_selection(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """AT-056e / LLR-054.5 (HLR-054 scope guard, Q-5 black-box arm).
+    
+        Intent: with a filter SELECTED on the report selector, the A2B diff
+        report driven through ITS shipped surface (Compare then Report on the
+        diff screen) is byte-identical (canonical form) to a no-filter A2B
+        run under the same environment pin — the sticky selection observably
+        does NOT leak into the always-complete diff report.
+        """
+        _pin_report_clocks(monkeypatch)
+    
+        def _session(root: Path, select_filter: bool) -> Dict[str, bytes]:
+            project_dir = _make_project(
+                root, "proj", filters={"f.json": _valid_filter_body()}
+            )
+    
+            async def _drive() -> Dict[str, bytes]:
+                app = S19TuiApp(base_dir=root)
+                async with app.run_test(size=(120, 40)) as pilot:
+                    await pilot.pause()
+                    await _load_project(app, pilot, "proj")
+                    if select_filter:
+                        await _select_filter_via_dropdown(app, pilot, "f.json")
+                    app.action_show_screen("diff")
+                    await pilot.pause()
+                    app.query_one("#diff_path_a", Input).value = str(
+                        project_dir / "a.s19"
+                    )
+                    app.query_one("#diff_path_b", Input).value = str(
+                        project_dir / "b.s19"
+                    )
+                    app.query_one("#diff_compare_button", Button).press()
+                    await _flush(pilot)
+                    app.query_one("#diff_report_button", Button).press()
+                    await _flush(pilot)
+                return _reports(project_dir)
+    
+            return asyncio.run(_drive())
+    
+        base_root = tmp_path / "base"
+        sel_root = tmp_path / "sel"
+        base_root.mkdir()
+        sel_root.mkdir()
+        baseline = _session(base_root, select_filter=False)
+        selected = _session(sel_root, select_filter=True)
+    
+        expected = {_DIFF_MD_NAME, _DIFF_HTML_NAME}
+>       assert set(baseline) == expected, f"baseline wrote {sorted(baseline)}"
+E       AssertionError: baseline wrote []
+E       assert set() == {'20260710T12...ff-report.md'}
+E         
+E         Extra items in the right set:
+E         '20260710T120000Z-diff-report.md'
+E         '20260710T120000Z-diff-report.html'
+E         Use -v to get more diff
+
+tests\test_tui_report_filter_surface.py:773: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_session_reset.py::test_tc_b100_10_no_discard_notice_when_nothing_unsaved
+FAILED tests/test_b100_session_reset.py::test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size0]
+FAILED tests/test_b100_session_reset.py::test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size1]
+FAILED tests/test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+5 failed, 376 passed in 2222.01s (0:37:02)

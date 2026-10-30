@@ -50,6 +50,7 @@ from s19_app.tui.app import S19TuiApp
 from s19_app.tui.segment_split_view import SegRow
 from s19_app.tui.screens import LoadProjectScreen
 from tests.support.independent_reader import read_hex, read_s19
+from tests.support.b100_projects import dismiss_load_result_panel
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE00 = ROOT / "examples" / "case_00_public"
@@ -978,6 +979,9 @@ async def _load_project_pilot(app: S19TuiApp, pilot, name: str) -> None:
         "the project-load status line",
         attempts=200,
     )
+    # Inc 6 (HLR-178): the dialog route opens the Load-result panel;
+    # dismiss it first with its shown key ``esc``.
+    await dismiss_load_result_panel(pilot, app)
 
 
 def test_at_b99_11_sanitised_mac_only_second_export_takes_suffix(
@@ -1067,9 +1071,15 @@ def test_at_b99_11_sanitised_mac_only_second_export_takes_suffix(
             assert await pilot.click("#load_path"), "click missed #load_path"
             await pilot.press(*str(mac_src))
             assert await pilot.click("#load_ok"), "click missed #load_ok"
+            # Inc 6 (LLR-168.3): the MAC sync into the open project rewrites
+            # project.json, and the seam's verify line is painted after the
+            # load line, so the load line is read from the painted log.
             await _wait_for(
                 pilot,
-                lambda: "firmware.mac" in _status_text(app),
+                lambda: any(
+                    "firmware.mac" in str(app.query_one(f"#log_line_{i}").render())
+                    for i in (1, 2, 3, 4)
+                ),
                 "the MAC load status line",
                 attempts=200,
             )

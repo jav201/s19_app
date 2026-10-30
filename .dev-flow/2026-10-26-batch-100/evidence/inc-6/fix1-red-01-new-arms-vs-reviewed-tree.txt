@@ -1,0 +1,631 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE --basetemp=C:/Users/jjgh8/AppData/Local/Temp/f1red tests/test_b100_active_variant.py tests/test_b100_announce.py -k damaged_manifest_is_never or now_opens_only or control_bytes or thirty or warning_colour or ok_colour or hang_under
+# tree: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc6-fix1/pre (the reviewed Inc 6 tree d37ee857 rebuilt by reversing corrective pass 1 (hash-verified), with the corrective-pass-1 tests copied in), sources: d37ee857f64b202d *s19_app/tui/app.py;a957b576658777b0 *s19_app/tui/screens.py;8e2e8cf059eb48aa *s19_app/tui/services/variant_execution_service.py;781f04ed2cc30897 *s19_app/tui/styles.tcss;
+# PYTHONPATH=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc6-fix1/pre ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# date: 2026-10-30T03:36:33Z
+# s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc6-fix1\pre\s19_app\__init__.py
+FFFFFFFFFFFFFFFFFF                                                       [100%]
+================================== FAILURES ===================================
+___ test_tc_b100_20_damaged_manifest_is_never_rewritten[save-back-not-json] ___
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000294D3FA9950>
+writer = 'save-back', damage = 'not-json'
+
+    @pytest.mark.parametrize("damage", DAMAGE_KINDS)
+    @pytest.mark.parametrize("writer", WRITERS)
+    def test_tc_b100_20_damaged_manifest_is_never_rewritten(
+        tmp_path: Path, monkeypatch, writer: str, damage: str
+    ) -> None:
+        """Each in-project writer, with a ``project.json`` the reader cannot
+        read as a manifest: the damaged bytes are identical afterwards (the
+        user's records in them survive), the writer's file is placed, the status
+        says the manifest is damaged and was not rewritten, and nothing claims
+        a save, a verify or a new opening variant.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): every arm —
+        the writer replaced the file with an almost empty manifest and painted
+        ``Project saved + manifest verified``."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        damaged = _damage(project_dir, damage, monkeypatch)
+        statuses = _run_writer(tmp_path, base, writer)
+        placed = PLACED[writer]
+>       assert (project_dir / "project.json").read_bytes() == damaged, (
+            "the damaged project.json was rewritten"
+        )
+E       AssertionError: the damaged project.json was rewritten
+E       assert b'{\r\n  "sch...nts": {}\r\n}' == b'{"schema_ve...seed.json"]},'
+E         
+E         At index 1 diff: b'\r' != b'"'
+E         Use -v to get more diff
+
+tests\test_b100_active_variant.py:521: AssertionError
+_ test_tc_b100_20_damaged_manifest_is_never_rewritten[save-back-not-an-object] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000294D4DFA750>
+writer = 'save-back', damage = 'not-an-object'
+
+    @pytest.mark.parametrize("damage", DAMAGE_KINDS)
+    @pytest.mark.parametrize("writer", WRITERS)
+    def test_tc_b100_20_damaged_manifest_is_never_rewritten(
+        tmp_path: Path, monkeypatch, writer: str, damage: str
+    ) -> None:
+        """Each in-project writer, with a ``project.json`` the reader cannot
+        read as a manifest: the damaged bytes are identical afterwards (the
+        user's records in them survive), the writer's file is placed, the status
+        says the manifest is damaged and was not rewritten, and nothing claims
+        a save, a verify or a new opening variant.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): every arm —
+        the writer replaced the file with an almost empty manifest and painted
+        ``Project saved + manifest verified``."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        damaged = _damage(project_dir, damage, monkeypatch)
+        statuses = _run_writer(tmp_path, base, writer)
+        placed = PLACED[writer]
+>       assert (project_dir / "project.json").read_bytes() == damaged, (
+            "the damaged project.json was rewritten"
+        )
+E       AssertionError: the damaged project.json was rewritten
+E       assert b'{\r\n  "sch...nts": {}\r\n}' == b'["firmware"]'
+E         
+E         At index 0 diff: b'{' != b'['
+E         Use -v to get more diff
+
+tests\test_b100_active_variant.py:521: AssertionError
+___ test_tc_b100_20_damaged_manifest_is_never_rewritten[save-back-over-cap] ___
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000294D40705D0>
+writer = 'save-back', damage = 'over-cap'
+
+    @pytest.mark.parametrize("damage", DAMAGE_KINDS)
+    @pytest.mark.parametrize("writer", WRITERS)
+    def test_tc_b100_20_damaged_manifest_is_never_rewritten(
+        tmp_path: Path, monkeypatch, writer: str, damage: str
+    ) -> None:
+        """Each in-project writer, with a ``project.json`` the reader cannot
+        read as a manifest: the damaged bytes are identical afterwards (the
+        user's records in them survive), the writer's file is placed, the status
+        says the manifest is damaged and was not rewritten, and nothing claims
+        a save, a verify or a new opening variant.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): every arm —
+        the writer replaced the file with an almost empty manifest and painted
+        ``Project saved + manifest verified``."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        damaged = _damage(project_dir, damage, monkeypatch)
+        statuses = _run_writer(tmp_path, base, writer)
+        placed = PLACED[writer]
+>       assert (project_dir / "project.json").read_bytes() == damaged, (
+            "the damaged project.json was rewritten"
+        )
+E       AssertionError: the damaged project.json was rewritten
+E       assert b'{\r\n  "sch...nts": {}\r\n}' == b'{"schema_ve...seed.json"]}}'
+E         
+E         At index 1 diff: b'\r' != b'"'
+E         Use -v to get more diff
+
+tests\test_b100_active_variant.py:521: AssertionError
+_ test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-not-json] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000294D5900490>
+writer = 'variant-append', damage = 'not-json'
+
+    @pytest.mark.parametrize("damage", DAMAGE_KINDS)
+    @pytest.mark.parametrize("writer", WRITERS)
+    def test_tc_b100_20_damaged_manifest_is_never_rewritten(
+        tmp_path: Path, monkeypatch, writer: str, damage: str
+    ) -> None:
+        """Each in-project writer, with a ``project.json`` the reader cannot
+        read as a manifest: the damaged bytes are identical afterwards (the
+        user's records in them survive), the writer's file is placed, the status
+        says the manifest is damaged and was not rewritten, and nothing claims
+        a save, a verify or a new opening variant.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): every arm —
+        the writer replaced the file with an almost empty manifest and painted
+        ``Project saved + manifest verified``."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        damaged = _damage(project_dir, damage, monkeypatch)
+        statuses = _run_writer(tmp_path, base, writer)
+        placed = PLACED[writer]
+>       assert (project_dir / "project.json").read_bytes() == damaged, (
+            "the damaged project.json was rewritten"
+        )
+E       AssertionError: the damaged project.json was rewritten
+E       assert b'{\r\n  "sch...nts": {}\r\n}' == b'{"schema_ve...seed.json"]},'
+E         
+E         At index 1 diff: b'\r' != b'"'
+E         Use -v to get more diff
+
+tests\test_b100_active_variant.py:521: AssertionError
+_ test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-not-an-object] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000294D52E6CD0>
+writer = 'variant-append', damage = 'not-an-object'
+
+    @pytest.mark.parametrize("damage", DAMAGE_KINDS)
+    @pytest.mark.parametrize("writer", WRITERS)
+    def test_tc_b100_20_damaged_manifest_is_never_rewritten(
+        tmp_path: Path, monkeypatch, writer: str, damage: str
+    ) -> None:
+        """Each in-project writer, with a ``project.json`` the reader cannot
+        read as a manifest: the damaged bytes are identical afterwards (the
+        user's records in them survive), the writer's file is placed, the status
+        says the manifest is damaged and was not rewritten, and nothing claims
+        a save, a verify or a new opening variant.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): every arm —
+        the writer replaced the file with an almost empty manifest and painted
+        ``Project saved + manifest verified``."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        damaged = _damage(project_dir, damage, monkeypatch)
+        statuses = _run_writer(tmp_path, base, writer)
+        placed = PLACED[writer]
+>       assert (project_dir / "project.json").read_bytes() == damaged, (
+            "the damaged project.json was rewritten"
+        )
+E       AssertionError: the damaged project.json was rewritten
+E       assert b'{\r\n  "sch...nts": {}\r\n}' == b'["firmware"]'
+E         
+E         At index 0 diff: b'{' != b'['
+E         Use -v to get more diff
+
+tests\test_b100_active_variant.py:521: AssertionError
+_ test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-over-cap] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife5')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000294D4AF2AD0>
+writer = 'variant-append', damage = 'over-cap'
+
+    @pytest.mark.parametrize("damage", DAMAGE_KINDS)
+    @pytest.mark.parametrize("writer", WRITERS)
+    def test_tc_b100_20_damaged_manifest_is_never_rewritten(
+        tmp_path: Path, monkeypatch, writer: str, damage: str
+    ) -> None:
+        """Each in-project writer, with a ``project.json`` the reader cannot
+        read as a manifest: the damaged bytes are identical afterwards (the
+        user's records in them survive), the writer's file is placed, the status
+        says the manifest is damaged and was not rewritten, and nothing claims
+        a save, a verify or a new opening variant.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): every arm —
+        the writer replaced the file with an almost empty manifest and painted
+        ``Project saved + manifest verified``."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        damaged = _damage(project_dir, damage, monkeypatch)
+        statuses = _run_writer(tmp_path, base, writer)
+        placed = PLACED[writer]
+>       assert (project_dir / "project.json").read_bytes() == damaged, (
+            "the damaged project.json was rewritten"
+        )
+E       AssertionError: the damaged project.json was rewritten
+E       assert b'{\r\n  "sch...nts": {}\r\n}' == b'{"schema_ve...seed.json"]}}'
+E         
+E         At index 1 diff: b'\r' != b'"'
+E         Use -v to get more diff
+
+tests\test_b100_active_variant.py:521: AssertionError
+___ test_tc_b100_20_damaged_manifest_is_never_rewritten[mac-sync-not-json] ____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife6')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000294D515BED0>
+writer = 'mac-sync', damage = 'not-json'
+
+    @pytest.mark.parametrize("damage", DAMAGE_KINDS)
+    @pytest.mark.parametrize("writer", WRITERS)
+    def test_tc_b100_20_damaged_manifest_is_never_rewritten(
+        tmp_path: Path, monkeypatch, writer: str, damage: str
+    ) -> None:
+        """Each in-project writer, with a ``project.json`` the reader cannot
+        read as a manifest: the damaged bytes are identical afterwards (the
+        user's records in them survive), the writer's file is placed, the status
+        says the manifest is damaged and was not rewritten, and nothing claims
+        a save, a verify or a new opening variant.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): every arm —
+        the writer replaced the file with an almost empty manifest and painted
+        ``Project saved + manifest verified``."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        damaged = _damage(project_dir, damage, monkeypatch)
+        statuses = _run_writer(tmp_path, base, writer)
+        placed = PLACED[writer]
+>       assert (project_dir / "project.json").read_bytes() == damaged, (
+            "the damaged project.json was rewritten"
+        )
+E       AssertionError: the damaged project.json was rewritten
+E       assert b'{\r\n  "sch...nts": {}\r\n}' == b'{"schema_ve...seed.json"]},'
+E         
+E         At index 1 diff: b'\r' != b'"'
+E         Use -v to get more diff
+
+tests\test_b100_active_variant.py:521: AssertionError
+_ test_tc_b100_20_damaged_manifest_is_never_rewritten[mac-sync-not-an-object] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife7')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000294D4616990>
+writer = 'mac-sync', damage = 'not-an-object'
+
+    @pytest.mark.parametrize("damage", DAMAGE_KINDS)
+    @pytest.mark.parametrize("writer", WRITERS)
+    def test_tc_b100_20_damaged_manifest_is_never_rewritten(
+        tmp_path: Path, monkeypatch, writer: str, damage: str
+    ) -> None:
+        """Each in-project writer, with a ``project.json`` the reader cannot
+        read as a manifest: the damaged bytes are identical afterwards (the
+        user's records in them survive), the writer's file is placed, the status
+        says the manifest is damaged and was not rewritten, and nothing claims
+        a save, a verify or a new opening variant.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): every arm —
+        the writer replaced the file with an almost empty manifest and painted
+        ``Project saved + manifest verified``."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        damaged = _damage(project_dir, damage, monkeypatch)
+        statuses = _run_writer(tmp_path, base, writer)
+        placed = PLACED[writer]
+>       assert (project_dir / "project.json").read_bytes() == damaged, (
+            "the damaged project.json was rewritten"
+        )
+E       AssertionError: the damaged project.json was rewritten
+E       assert b'{\r\n  "sch...nts": {}\r\n}' == b'["firmware"]'
+E         
+E         At index 0 diff: b'{' != b'['
+E         Use -v to get more diff
+
+tests\test_b100_active_variant.py:521: AssertionError
+___ test_tc_b100_20_damaged_manifest_is_never_rewritten[mac-sync-over-cap] ____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife8')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000294D56DD3D0>
+writer = 'mac-sync', damage = 'over-cap'
+
+    @pytest.mark.parametrize("damage", DAMAGE_KINDS)
+    @pytest.mark.parametrize("writer", WRITERS)
+    def test_tc_b100_20_damaged_manifest_is_never_rewritten(
+        tmp_path: Path, monkeypatch, writer: str, damage: str
+    ) -> None:
+        """Each in-project writer, with a ``project.json`` the reader cannot
+        read as a manifest: the damaged bytes are identical afterwards (the
+        user's records in them survive), the writer's file is placed, the status
+        says the manifest is damaged and was not rewritten, and nothing claims
+        a save, a verify or a new opening variant.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): every arm —
+        the writer replaced the file with an almost empty manifest and painted
+        ``Project saved + manifest verified``."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        damaged = _damage(project_dir, damage, monkeypatch)
+        statuses = _run_writer(tmp_path, base, writer)
+        placed = PLACED[writer]
+>       assert (project_dir / "project.json").read_bytes() == damaged, (
+            "the damaged project.json was rewritten"
+        )
+E       AssertionError: the damaged project.json was rewritten
+E       assert b'{\r\n  "sch...nts": {}\r\n}' == b'{"schema_ve...seed.json"]}}'
+E         
+E         At index 1 diff: b'\r' != b'"'
+E         Use -v to get more diff
+
+tests\test_b100_active_variant.py:521: AssertionError
+___ test_tc_b100_20_damaged_manifest_is_never_rewritten[a2l-sync-not-json] ____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife9')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000294D500A110>
+writer = 'a2l-sync', damage = 'not-json'
+
+    @pytest.mark.parametrize("damage", DAMAGE_KINDS)
+    @pytest.mark.parametrize("writer", WRITERS)
+    def test_tc_b100_20_damaged_manifest_is_never_rewritten(
+        tmp_path: Path, monkeypatch, writer: str, damage: str
+    ) -> None:
+        """Each in-project writer, with a ``project.json`` the reader cannot
+        read as a manifest: the damaged bytes are identical afterwards (the
+        user's records in them survive), the writer's file is placed, the status
+        says the manifest is damaged and was not rewritten, and nothing claims
+        a save, a verify or a new opening variant.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): every arm —
+        the writer replaced the file with an almost empty manifest and painted
+        ``Project saved + manifest verified``."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        damaged = _damage(project_dir, damage, monkeypatch)
+        statuses = _run_writer(tmp_path, base, writer)
+        placed = PLACED[writer]
+>       assert (project_dir / "project.json").read_bytes() == damaged, (
+            "the damaged project.json was rewritten"
+        )
+E       AssertionError: the damaged project.json was rewritten
+E       assert b'{\r\n  "sch...nts": {}\r\n}' == b'{"schema_ve...seed.json"]},'
+E         
+E         At index 1 diff: b'\r' != b'"'
+E         Use -v to get more diff
+
+tests\test_b100_active_variant.py:521: AssertionError
+_ test_tc_b100_20_damaged_manifest_is_never_rewritten[a2l-sync-not-an-object] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife10')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000294D4DCAB50>
+writer = 'a2l-sync', damage = 'not-an-object'
+
+    @pytest.mark.parametrize("damage", DAMAGE_KINDS)
+    @pytest.mark.parametrize("writer", WRITERS)
+    def test_tc_b100_20_damaged_manifest_is_never_rewritten(
+        tmp_path: Path, monkeypatch, writer: str, damage: str
+    ) -> None:
+        """Each in-project writer, with a ``project.json`` the reader cannot
+        read as a manifest: the damaged bytes are identical afterwards (the
+        user's records in them survive), the writer's file is placed, the status
+        says the manifest is damaged and was not rewritten, and nothing claims
+        a save, a verify or a new opening variant.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): every arm —
+        the writer replaced the file with an almost empty manifest and painted
+        ``Project saved + manifest verified``."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        damaged = _damage(project_dir, damage, monkeypatch)
+        statuses = _run_writer(tmp_path, base, writer)
+        placed = PLACED[writer]
+>       assert (project_dir / "project.json").read_bytes() == damaged, (
+            "the damaged project.json was rewritten"
+        )
+E       AssertionError: the damaged project.json was rewritten
+E       assert b'{\r\n  "sch...nts": {}\r\n}' == b'["firmware"]'
+E         
+E         At index 0 diff: b'{' != b'['
+E         Use -v to get more diff
+
+tests\test_b100_active_variant.py:521: AssertionError
+___ test_tc_b100_20_damaged_manifest_is_never_rewritten[a2l-sync-over-cap] ____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife11')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000294D56376D0>
+writer = 'a2l-sync', damage = 'over-cap'
+
+    @pytest.mark.parametrize("damage", DAMAGE_KINDS)
+    @pytest.mark.parametrize("writer", WRITERS)
+    def test_tc_b100_20_damaged_manifest_is_never_rewritten(
+        tmp_path: Path, monkeypatch, writer: str, damage: str
+    ) -> None:
+        """Each in-project writer, with a ``project.json`` the reader cannot
+        read as a manifest: the damaged bytes are identical afterwards (the
+        user's records in them survive), the writer's file is placed, the status
+        says the manifest is damaged and was not rewritten, and nothing claims
+        a save, a verify or a new opening variant.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): every arm —
+        the writer replaced the file with an almost empty manifest and painted
+        ``Project saved + manifest verified``."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        damaged = _damage(project_dir, damage, monkeypatch)
+        statuses = _run_writer(tmp_path, base, writer)
+        placed = PLACED[writer]
+>       assert (project_dir / "project.json").read_bytes() == damaged, (
+            "the damaged project.json was rewritten"
+        )
+E       AssertionError: the damaged project.json was rewritten
+E       assert b'{\r\n  "sch...nts": {}\r\n}' == b'{"schema_ve...seed.json"]}}'
+E         
+E         At index 1 diff: b'\r' != b'"'
+E         Use -v to get more diff
+
+tests\test_b100_active_variant.py:521: AssertionError
+_________ test_tc_b100_20_append_says_now_opens_only_after_the_write __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_20_append_says_no0')
+
+    def test_tc_b100_20_append_says_now_opens_only_after_the_write(tmp_path: Path) -> None:
+        """A real write failure (``project.json`` read-only, review probe P2):
+        the append still adds the variant, the status says the manifest write
+        failed, and 0 lines claim that Load now opens the new file — on disk
+        ``active_variant`` is still the old one.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): ``'Manifest write
+        failed', "Project 'P' now opens firmware_1.s19"``."""
+        import os
+        import stat
+    
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        manifest_path = project_dir / "project.json"
+        before = manifest_path.read_bytes()
+        os.chmod(manifest_path, stat.S_IREAD)
+        try:
+            statuses = _run_writer(tmp_path, base, "variant-append")
+        finally:
+            os.chmod(manifest_path, stat.S_IREAD | stat.S_IWRITE)
+        assert manifest_path.read_bytes() == before
+        assert projects.read_manifest(project_dir)["active_variant"] == "firmware"
+        assert "Manifest write failed" in statuses, statuses
+>       assert not [s for s in statuses if "now opens" in s], statuses
+E       AssertionError: ['Copying into workarea temp...', 'Parsing firmware.s19...', 'Loaded firmware.s19', 'Manifest write failed', "Project 'P' now opens firmware_1.s19", "Added variant 'firmware_1' to project 'P'"]
+E       assert not ["Project 'P' now opens firmware_1.s19"]
+
+tests\test_b100_active_variant.py:557: AssertionError
+_______ test_tc_b100_56_recorded_variant_with_control_bytes_paints_none _______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_56_recorded_varia0')
+
+    def test_tc_b100_56_recorded_variant_with_control_bytes_paints_none(tmp_path: Path) -> None:
+        """A recorded ``active_variant`` is any JSON string: one holding an ESC
+        sequence and a BEL reaches the status log scrubbed — the line naming it
+        is painted, with 0 control bytes in any log line.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): the raw ESC and
+        BEL reached ``app.log_lines`` and ``#log_line_*`` (SEC6-6)."""
+        base = tmp_path / "app"
+        project_dir = _seed_two_variants(_workarea(base))
+        (project_dir / "project.json").write_text(
+            json.dumps({"schema_version": 1, "active_variant": "\x1b[31mZ[red]q\x07"}),
+            encoding="utf-8",
+        )
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=(118, 54)) as pilot:
+                await pilot.pause()
+                app._handle_load_project("P")
+                await _flush(pilot)
+                painted = [
+                    str(app.query_one(f"#log_line_{i}", Label).render()) for i in (1, 2, 3, 4)
+                ]
+                return list(app.log_lines), painted
+    
+        lines, painted = asyncio.run(_drive())
+        named = [line for line in lines if "not found - activating the first variant" in line]
+>       assert named == [
+            "Manifest active_variant '[31mZ[red]q' not found - activating the first variant."
+        ], lines
+E       AssertionError: ["Manifest active_variant '\x1b[31mZ[red]q\x07' not found - activating the first variant.", 'Loaded firmware.s19 (S19 only)', "Loaded project 'P' -> firmware.s19 - variant 1 of 2, 1 problem - details: p"]
+E       assert ['Manifest ac...rst variant.'] == ['Manifest ac...rst variant.']
+E         
+E         At index 0 diff: "Manifest active_variant '\x1b[31mZ[red]q\x07' not found - activating the first variant." != "Manifest active_variant '[31mZ[red]q' not found - activating the first variant."
+E         Use -v to get more diff
+
+tests\test_b100_announce.py:366: AssertionError
+______ test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_67_thirty_problem0')
+
+    def test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last(tmp_path: Path) -> None:
+        async def _scenario(pilot, app):
+            rows = list(app.screen.query("#result_body .result-problem"))
+            body = app.screen.query_one("#result_body")
+            before = body.region.contains_region(rows[-1].region)
+            await pilot.press("end")
+            await _flush(pilot)
+            after = body.region.contains_region(rows[-1].region)
+            painted = [projects.flat("\n".join(projects.painted_lines(row))) for row in rows]
+            return len(rows), before, after, _panel_text(app), painted
+    
+        count, before, after, text, painted = _run_panel(tmp_path, _scenario, problems=30)
+        assert count == 30, f"{30 - count} problems missing from the panel"
+>       assert len(set(painted)) == 30, "the 30 problem rows are not distinct"
+E       AssertionError: the 30 problem rows are not distinct
+E       assert 1 == 30
+E        +  where 1 = len({'! Manifest entry skipped: project.json a recorded entry points outside the project; Save project rewrites it'})
+E        +    where {'! Manifest entry skipped: project.json a recorded entry points outside the project; Save project rewrites it'} = set(['! Manifest entry skipped: project.json a recorded entry points outside the project; Save project rewrites it', '! Ma...', '! Manifest entry skipped: project.json a recorded entry points outside the project; Save project rewrites it', ...])
+
+tests\test_b100_announce.py:501: AssertionError
+______ test_tc_b100_67_fallback_and_problems_paint_in_the_warning_colour ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_67_fallback_and_p0')
+
+    def test_tc_b100_67_fallback_and_problems_paint_in_the_warning_colour(tmp_path: Path) -> None:
+        """UX-1 (the P-E verdict B prototype): with a damaged manifest the
+        fallback reason, the "Problems found" heading and the problem's mark and
+        label paint in the warning colour; the file the problem names does not.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): every row painted
+        in the default colour."""
+    
+        def _scenario(app):
+            summary = app.screen.query_one("#result_summary")
+            heading = app.screen.query_one(".result-heading")
+            row = app.screen.query("#result_body .result-problem").first()
+            return (
+                _colour_of(summary, "the first variant by name"),
+                _colour_of(heading, "Problems found"),
+                _colour_of(row, "! "),
+                _colour_of(row, "Manifest damaged: "),
+                _colour_of(row, "project.json"),
+            )
+    
+        reason, heading, mark, label, file_name = _run_damaged_panel(tmp_path, (118, 54), _scenario)
+>       assert (reason, heading, mark, label) == (YELLOW, YELLOW, YELLOW, YELLOW)
+E       AssertionError: assert ('#e9e9e9', '...9', '#e9e9e9') == ('#f6ff8f', '...f', '#f6ff8f')
+E         
+E         At index 0 diff: '#e9e9e9' != '#f6ff8f'
+E         Use -v to get more diff
+
+tests\test_b100_announce.py:565: AssertionError
+___________ test_tc_b100_67_recorded_reason_paints_in_the_ok_colour ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_67_recorded_reaso0')
+
+    def test_tc_b100_67_recorded_reason_paints_in_the_ok_colour(tmp_path: Path) -> None:
+        """UX-1: the recorded active variant's reason paints in the OK colour,
+        and "No problems found." too.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): default colour."""
+    
+        async def _scenario(pilot, app):
+            summary = app.screen.query_one("#result_summary")
+            heading = app.screen.query_one(".result-heading")
+            return (
+                _colour_of(summary, "recorded as the active variant"),
+                _colour_of(heading, "No problems found."),
+            )
+    
+>       assert _run_panel(tmp_path, _scenario) == (GREEN, GREEN)
+E       AssertionError: assert ('#e9e9e9', '#e9e9e9') == ('#54efae', '#54efae')
+E         
+E         At index 0 diff: '#e9e9e9' != '#54efae'
+E         Use -v to get more diff
+
+tests\test_b100_announce.py:583: AssertionError
+____________ test_tc_b100_67_wrapped_lines_hang_under_their_column ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_67_wrapped_lines_0')
+
+    def test_tc_b100_67_wrapped_lines_hang_under_their_column(tmp_path: Path) -> None:
+        """UX-2 / UX-3 at 99x54: the fallback reason wraps and its continuation
+        starts under the value column (10 cells), and the damaged-manifest
+        problem wraps and its continuation starts under the label (4 cells),
+        never at column 0 nor under the ``!``.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): both continuations
+        started at column 0."""
+    
+        def _scenario(app):
+            summary = projects.painted_lines(app.screen.query_one("#result_summary"))
+            row = projects.painted_lines(app.screen.query("#result_body .result-problem").first())
+            return summary, row
+    
+        summary, row = _run_damaged_panel(tmp_path, (99, 54), _scenario)
+        start = next(i for i, line in enumerate(summary) if "the first variant by name" in line)
+        reason = summary[start : summary.index(next(l for l in summary if l.startswith("Variants")))]
+        assert len(reason) >= 2, f"the reason did not wrap at 99x54: {summary}"
+        for line in reason:
+>           assert line.startswith(" " * 10) and line[10] != " ", summary
+E           AssertionError: ['Opened    firmware.s19', '          the first variant by name (the manifest could not', 'be read)', 'Variants  2 in the project', 'Others    firmware_1.s19', 'MAC       (none)', ...]
+E           assert (False)
+E            +  where False = <built-in method startswith of str object at 0x00000294D4FABF70>((' ' * 10))
+E            +    where <built-in method startswith of str object at 0x00000294D4FABF70> = 'be read)'.startswith
+
+tests\test_b100_announce.py:605: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[save-back-not-json]
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[save-back-not-an-object]
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[save-back-over-cap]
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-not-json]
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-not-an-object]
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-over-cap]
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[mac-sync-not-json]
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[mac-sync-not-an-object]
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[mac-sync-over-cap]
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[a2l-sync-not-json]
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[a2l-sync-not-an-object]
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[a2l-sync-over-cap]
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_append_says_now_opens_only_after_the_write
+FAILED tests/test_b100_announce.py::test_tc_b100_56_recorded_variant_with_control_bytes_paints_none
+FAILED tests/test_b100_announce.py::test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last
+FAILED tests/test_b100_announce.py::test_tc_b100_67_fallback_and_problems_paint_in_the_warning_colour
+FAILED tests/test_b100_announce.py::test_tc_b100_67_recorded_reason_paints_in_the_ok_colour
+FAILED tests/test_b100_announce.py::test_tc_b100_67_wrapped_lines_hang_under_their_column
+18 failed, 37 deselected in 79.54s (0:01:19)

@@ -56,6 +56,7 @@ from s19_app.tui.workspace import (
 )
 from tests.support import b100_links
 from tests.support.independent_reader import read_s19
+from tests.support.b100_projects import dismiss_load_result_panel
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE01 = ROOT / "examples" / "case_01_basic_valid" / "firmware.s19"
@@ -1268,6 +1269,9 @@ async def _open_project(pilot, app: S19TuiApp, name: str) -> None:
         lambda: f"Loaded project '{name}'" in _status_text(app),
         f"the status naming the loaded project {name}",
     )
+    # Inc 6 (HLR-178): the dialog route opens the Load-result panel;
+    # dismiss it first with its shown key ``esc``.
+    await dismiss_load_result_panel(pilot, app)
 
 
 async def _load_file_through_dialog(pilot, app: S19TuiApp, src: Path) -> None:

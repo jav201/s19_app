@@ -1,0 +1,52 @@
+# mutation: UX1-label-uncoloured — UX-1 (LLR-178.3): the problem label loses the warning colour
+# file: s19_app/tui/screens.py (sha256 before ea549ab4bd9d3ef4)
+# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=C:\Users\jjgh8\AppData\Local\Temp\f1mut-UX1-label-uncoloured tests/test_b100_announce.py -k colour
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (corrective pass 1, mutated in place, then restored)
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\__init__.py
+# date: 2026-10-30T03:35:25Z
+# --- old
+#           text.append_text(safe_text(f"{problem.label}: ", YELLOW))
+# --- new
+#           text.append_text(safe_text(f"{problem.label}: "))
+F.                                                                       [100%]
+================================== FAILURES ===================================
+______ test_tc_b100_67_fallback_and_problems_paint_in_the_warning_colour ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-UX1-label-uncoloured/test_tc_b100_67_fallback_and_p0')
+
+    def test_tc_b100_67_fallback_and_problems_paint_in_the_warning_colour(tmp_path: Path) -> None:
+        """UX-1 (the P-E verdict B prototype): with a damaged manifest the
+        fallback reason, the "Problems found" heading and the problem's mark and
+        label paint in the warning colour; the file the problem names does not.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): every row painted
+        in the default colour."""
+    
+        def _scenario(app):
+            summary = app.screen.query_one("#result_summary")
+            heading = app.screen.query_one(".result-heading")
+            row = app.screen.query("#result_body .result-problem").first()
+            return (
+                _colour_of(summary, "the first variant by name"),
+                _colour_of(heading, "Problems found"),
+                _colour_of(row, "! "),
+                _colour_of(row, "Manifest damaged: "),
+                _colour_of(row, "project.json"),
+            )
+    
+        reason, heading, mark, label, file_name = _run_damaged_panel(tmp_path, (118, 54), _scenario)
+>       assert (reason, heading, mark, label) == (YELLOW, YELLOW, YELLOW, YELLOW)
+E       AssertionError: assert ('#f6ff8f', '...f', '#e9e9e9') == ('#f6ff8f', '...f', '#f6ff8f')
+E         
+E         At index 3 diff: '#e9e9e9' != '#f6ff8f'
+E         Use -v to get more diff
+
+tests\test_b100_announce.py:565: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_announce.py::test_tc_b100_67_fallback_and_problems_paint_in_the_warning_colour
+1 failed, 1 passed, 22 deselected in 8.07s
+
+
+VERDICT: KILLED (pytest exit 1)
+RESTORE OK (sha256 ea549ab4bd9d3ef4)

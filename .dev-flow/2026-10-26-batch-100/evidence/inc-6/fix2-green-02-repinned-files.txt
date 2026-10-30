@@ -1,0 +1,8 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE --basetemp=C:/Users/jjgh8/AppData/Local/Temp/pytest-f2g2 tests/test_b99_crc_region.py tests/test_b99_staging.py tests/test_b100_reuse.py tests/test_b99_patch_truth.py tests/test_b99_truncation.py tests/test_b99_export.py
+# tree: C:/Users/jjgh8/Github/s19_app-b100-inc6 (corrective pass 2 final), sources: 762d1a98c8a65903 *s19_app/tui/app.py;ea549ab4bd9d3ef4 *s19_app/tui/screens.py;e494c50cd7266bff *s19_app/tui/services/variant_execution_service.py;781f04ed2cc30897 *s19_app/tui/styles.tcss;
+# PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# date: 2026-10-30T04:41:10Z
+# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\__init__.py
+........................................................................ [ 50%]
+........................................................................ [100%]
+144 passed in 321.44s (0:05:21)

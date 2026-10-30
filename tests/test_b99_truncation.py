@@ -67,6 +67,7 @@ from s19_app.tui.services.flow_model import (
 )
 from s19_app.tui.services.load_service import build_loaded_s19
 from tests.support.independent_reader import read_hex, read_s19
+from tests.support.b100_projects import dismiss_load_result_panel
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests" / "fixtures" / "synth"
@@ -596,6 +597,9 @@ def test_at_b99_03_status_leads_defect_flow_source_fails(tmp_path):
             await pilot.click(row)
             await pilot.pause()
             assert await pilot.click("#project_ok"), "click missed #project_ok"
+            # Inc 6 (HLR-178): the dialog route opens the Load-result panel;
+            # dismiss it first with its shown key ``esc``.
+            await dismiss_load_result_panel(pilot, app)
             # ``#status_context`` carries the project name durably; the rolling
             # ``#status_text`` line can be overwritten by the file-load worker.
             await _wait_for(

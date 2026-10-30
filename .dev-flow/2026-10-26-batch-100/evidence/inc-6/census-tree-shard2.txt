@@ -1,0 +1,510 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE --basetemp=C:/Users/jjgh8/AppData/Local/Temp/i6t2 tests/test_b100_reuse.py tests/test_b97_check_editor.py tests/test_b97_key_bar.py tests/test_b99_bytes_field.py tests/test_b99_patch_truth.py tests/test_id_registry.py tests/test_project_gather.py tests/test_tui_directionb.py tests/test_tui_report_seam.py tests/test_workspace_variants.py 
+# tree: C:/Users/jjgh8/Github/s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree incl. re-pins)
+# runner: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc6-impl/py.sh (sets PYTHONPATH to that tree; NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8)
+# date: 2026-10-30T01:48:43Z
+....................................FF.................................. [ 18%]
+..........................................................F..FF......... [ 37%]
+........................................................................ [ 55%]
+........................................................................ [ 74%]
+........................................................................ [ 93%]
+...........................                                              [100%]
+================================== FAILURES ===================================
+____ test_at_b100_01_repeated_loads_reuse_and_name_existing_variant[size0] ____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t2/test_at_b100_01_repeated_loads0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_01_repeated_loads_reuse_and_name_existing_variant(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """Five loads through the shipped surface — case_01, case_02, then each
+        again: the work area holds two image files, the project folder holds two
+        data files, and every repeated load's painted status names the existing
+        variant instead of reporting an add."""
+        base = tmp_path / "app"
+        source_copies = tmp_path / "sources"
+        # The variant id is the file's stem, so both sources keep the
+        # ``firmware.s19`` name (in separate folders — they differ in bytes).
+        src01 = source_copies / "case01" / "firmware.s19"
+        src01.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(CASE01, src01)
+        src02 = source_copies / "case02" / "firmware.s19"
+        src02.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(CASE02, src02)
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            project_dir = app.workarea / "P"
+            project_dir.mkdir(parents=True, exist_ok=True)
+            # A project needs at least one data file to load; the MAC seeds it
+            # without colliding with the two firmware images under test.
+            shutil.copy2(
+                ROOT / "examples" / "case_01_basic_valid" / "firmware.mac",
+                project_dir / "firmware.mac",
+            )
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project(pilot, app, "P")
+                await _load_file_through_dialog(pilot, app, src01)
+                await _wait_for(
+                    pilot,
+                    lambda: "Added variant 'firmware' to project 'P'" in _status_text(app),
+                    "the first load's added-variant status",
+                )
+                await _load_file_through_dialog(pilot, app, src02)
+                await _wait_for(
+                    pilot,
+                    lambda: "Added variant 'firmware_1' to project 'P'" in _status_text(app),
+                    "the second load's added-variant status",
+                )
+                # The repeated loads: the painted status names the existing
+                # variant and never reports an add.
+                await _load_file_through_dialog(pilot, app, src01)
+                await _wait_for(
+                    pilot,
+                    lambda: "Variant 'firmware' already in project 'P'" in _status_text(app),
+                    "the repeated case_01 load naming the existing variant",
+                )
+                repeated_01 = _status_text(app)
+                assert "Added variant" not in repeated_01, repeated_01
+                await _load_file_through_dialog(pilot, app, src02)
+                await _wait_for(
+                    pilot,
+                    lambda: "Variant 'firmware_1' already in project 'P'" in _status_text(app),
+                    "the repeated case_02 load naming the existing variant",
+                )
+                repeated_02 = _status_text(app)
+                assert "Added variant" not in repeated_02, repeated_02
+                temp_files = sorted(
+                    p.name for p in (app.workarea / "temp").iterdir() if p.is_file()
+                )
+                project_files = sorted(p.name for p in project_dir.glob("*.s19"))
+                return temp_files, project_files
+    
+>       temp_files, project_files = asyncio.run(_drive())
+                                    ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_reuse.py:1368: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_reuse.py:1332: in _drive
+    await _load_file_through_dialog(pilot, app, src01)
+tests\test_b100_reuse.py:1282: in _load_file_through_dialog
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function _load_file_through_dialog.<locals>.<lambda> at 0x000001B7E61F0FE0>
+description = 'the Load file dialog', attempts = 150
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 150) -> None:
+        for _ in range(attempts):
+            await pilot.pause()
+            if predicate():
+                return
+>       raise AssertionError(f"did not settle: {description}")
+E       AssertionError: did not settle: the Load file dialog
+
+tests\test_b100_reuse.py:104: AssertionError
+____ test_at_b100_01_repeated_loads_reuse_and_name_existing_variant[size1] ____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t2/test_at_b100_01_repeated_loads1')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_01_repeated_loads_reuse_and_name_existing_variant(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """Five loads through the shipped surface — case_01, case_02, then each
+        again: the work area holds two image files, the project folder holds two
+        data files, and every repeated load's painted status names the existing
+        variant instead of reporting an add."""
+        base = tmp_path / "app"
+        source_copies = tmp_path / "sources"
+        # The variant id is the file's stem, so both sources keep the
+        # ``firmware.s19`` name (in separate folders — they differ in bytes).
+        src01 = source_copies / "case01" / "firmware.s19"
+        src01.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(CASE01, src01)
+        src02 = source_copies / "case02" / "firmware.s19"
+        src02.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(CASE02, src02)
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            project_dir = app.workarea / "P"
+            project_dir.mkdir(parents=True, exist_ok=True)
+            # A project needs at least one data file to load; the MAC seeds it
+            # without colliding with the two firmware images under test.
+            shutil.copy2(
+                ROOT / "examples" / "case_01_basic_valid" / "firmware.mac",
+                project_dir / "firmware.mac",
+            )
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project(pilot, app, "P")
+                await _load_file_through_dialog(pilot, app, src01)
+                await _wait_for(
+                    pilot,
+                    lambda: "Added variant 'firmware' to project 'P'" in _status_text(app),
+                    "the first load's added-variant status",
+                )
+                await _load_file_through_dialog(pilot, app, src02)
+                await _wait_for(
+                    pilot,
+                    lambda: "Added variant 'firmware_1' to project 'P'" in _status_text(app),
+                    "the second load's added-variant status",
+                )
+                # The repeated loads: the painted status names the existing
+                # variant and never reports an add.
+                await _load_file_through_dialog(pilot, app, src01)
+                await _wait_for(
+                    pilot,
+                    lambda: "Variant 'firmware' already in project 'P'" in _status_text(app),
+                    "the repeated case_01 load naming the existing variant",
+                )
+                repeated_01 = _status_text(app)
+                assert "Added variant" not in repeated_01, repeated_01
+                await _load_file_through_dialog(pilot, app, src02)
+                await _wait_for(
+                    pilot,
+                    lambda: "Variant 'firmware_1' already in project 'P'" in _status_text(app),
+                    "the repeated case_02 load naming the existing variant",
+                )
+                repeated_02 = _status_text(app)
+                assert "Added variant" not in repeated_02, repeated_02
+                temp_files = sorted(
+                    p.name for p in (app.workarea / "temp").iterdir() if p.is_file()
+                )
+                project_files = sorted(p.name for p in project_dir.glob("*.s19"))
+                return temp_files, project_files
+    
+>       temp_files, project_files = asyncio.run(_drive())
+                                    ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_reuse.py:1368: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_reuse.py:1332: in _drive
+    await _load_file_through_dialog(pilot, app, src01)
+tests\test_b100_reuse.py:1282: in _load_file_through_dialog
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function _load_file_through_dialog.<locals>.<lambda> at 0x000001B7E6CC6520>
+description = 'the Load file dialog', attempts = 150
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 150) -> None:
+        for _ in range(attempts):
+            await pilot.pause()
+            if predicate():
+                return
+>       raise AssertionError(f"did not settle: {description}")
+E       AssertionError: did not settle: the Load file dialog
+
+tests\test_b100_reuse.py:104: AssertionError
+____________ test_tc_b99_18_lane_line_carries_patch_and_crc_riders ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t2/test_tc_b99_18_lane_line_carri0')
+
+    def test_tc_b99_18_lane_line_carries_patch_and_crc_riders(tmp_path: Path) -> None:
+        """TC-B99-18 (DDR finding F-2, Phase-4 coverage gap): a lane whose PATCH
+        ends ``notices`` (one entry applied, one ``skipped-outside``) and whose
+        CRC step ends ``notices`` (a legacy region straddling the 0xFA2E-0xFCB0
+        gap) paints BOTH separately-clipped riders on its terminal log line —
+        the UX-C1 ``PATCH: … not applied (0x… skipped-outside)`` note AND the
+        UX-C2 ``CRC: … of … region bytes absent`` note (absent count computed
+        independently from the reader's map) — followed by the ``wrote …``
+        segment, and still writes the file. The app appends the riders and never
+        overwrites; no other test drove a lane carrying both."""
+        docs = {
+            "mix.json": _doc(_MIX_ENTRIES),
+            "partial_crc.json": json.dumps(
+                {
+                    "polynomial": "0x04C11DB7",
+                    "init": "0xFFFFFFFF",
+                    "reverse": True,
+                    "final_xor": "0xFFFFFFFF",
+                    "regions": [
+                        {
+                            "start": "0x0000FA00",
+                            "end": "0x0000FC00",
+                            "output_address": "0x0000FC00",
+                        }
+                    ],
+                }
+            ),
+        }
+        flows = {
+            "b99_r": [
+                SourceBlock("prg.s19"),
+                PatchBlock("mix.json"),
+                CrcBlock("partial_crc.json"),
+                WriteOutBlock("o.s19"),
+            ],
+        }
+        project_dir = _stage_project(tmp_path, "proj1", docs, flows)
+        oracle = read_s19(_PRG_S19)
+        absent = sum(1 for addr in range(0xFA00, 0xFC00) if addr not in oracle.data)
+    
+        async def body(app, pilot):
+            await _load_project_dialog(app, pilot, "proj1")
+            panel = await _open_flow_execution_key(app, pilot)
+            await _import_flow_picker(app, pilot, "b99_r", 0)
+            await _run_until_heads(app, pilot, {0: "◇"})
+            return "\n".join(painted_rows(app, panel.query_one("#fx_log")))
+    
+        # Wider than ``_run_fx``'s 220: both clipped riders plus the ``wrote …``
+        # segment push the terminal line past 220 cells (the F-2 gap itself).
+        async def drive():
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(280, 60)) as pilot:
+                await settle(pilot)
+                return await body(app, pilot)
+    
+>       log = asyncio.run(drive())
+              ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b99_patch_truth.py:528: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b99_patch_truth.py:526: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests\test_b99_patch_truth.py:515: in body
+    panel = await _open_flow_execution_key(app, pilot)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def _open_flow_execution_key(app, pilot) -> object:
+        """Open Flow Execution by its rail key (``]``) and wait until the panel
+        paints (any non-empty painted row)."""
+        await pilot.press("right_square_bracket")
+        panel = app.query_one("#fx_panel")
+        for _ in range(100):
+            await pilot.pause()
+            if any(r.strip() for r in painted_rows(app, panel)):
+                return panel
+>       raise AssertionError("Flow Execution never painted")
+E       AssertionError: Flow Execution never painted
+
+tests\test_b99_patch_truth.py:755: AssertionError
+__________________ test_at_b99_06_flow_execution_patch_truth __________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t2/test_at_b99_06_flow_execution_0')
+
+    def test_at_b99_06_flow_execution_patch_truth(tmp_path: Path) -> None:
+        """AT-B99-06 (HLR-156, black box): three lanes over `#fx_run` — all-outside
+        → the PATCH cell is the error glyph, no file is written, the painted log
+        names the cause and the flow report names the address and
+        ``skipped-outside``; partial → notices (the PATCH card paints ``notices``,
+        PDR-ux row 97), the written file holds only the applied entry
+        (independent reader), the log names ``1 of 2 entries not applied``;
+        malformed → error, the report names ``MF-JSON-PARSE``. No report says
+        ``CLEAN``. The project loads through the Load project dialog, Flow
+        Execution opens by its rail key and Run is clicked (review fix F2)."""
+        docs = {
+            "outside.json": _doc([_bytes_entry(0x20000, "01 02 03 04")]),
+            "mix.json": _doc(_MIX_ENTRIES),
+            "bad.json": "{nope",
+        }
+        flows = {
+            "b99_outside": [
+                SourceBlock("prg.s19"),
+                PatchBlock("outside.json"),
+                WriteOutBlock("out_outside.s19"),
+                ReportBlock(),
+            ],
+            "b99_mix": [
+                SourceBlock("prg.s19"),
+                PatchBlock("mix.json"),
+                WriteOutBlock("out_mix.s19"),
+                ReportBlock(),
+            ],
+            "b99_bad": [
+                SourceBlock("prg.s19"),
+                PatchBlock("bad.json"),
+                WriteOutBlock("out_bad.s19"),
+                ReportBlock(),
+            ],
+        }
+        project_dir = _stage_project(tmp_path, "proj1", docs, flows)
+    
+        async def body(app, pilot):
+            await _load_project_dialog(app, pilot, "proj1")
+            panel = await _open_flow_execution_key(app, pilot)
+            for lane, stem in enumerate(flows):
+                await _import_flow_picker(app, pilot, stem, lane)
+            await _run_until_heads(app, pilot, {0: "✗", 1: "◇", 2: "✗"})
+            log = "\n".join(painted_rows(app, panel.query_one("#fx_log")))
+            head = panel.query_one("#fx_lane_0_head").render().plain
+            patch_cell = panel.query_one("#fx_card_0_1 .fx-card-status").render().plain
+            mix_patch_cell = panel.query_one("#fx_card_1_1 .fx-card-status").render().plain
+            return log, head, patch_cell, mix_patch_cell
+    
+>       log, head, patch_cell, mix_patch_cell = _run_fx(tmp_path, body)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b99_patch_truth.py:868: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b99_patch_truth.py:816: in _run_fx
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b99_patch_truth.py:814: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests\test_b99_patch_truth.py:858: in body
+    panel = await _open_flow_execution_key(app, pilot)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def _open_flow_execution_key(app, pilot) -> object:
+        """Open Flow Execution by its rail key (``]``) and wait until the panel
+        paints (any non-empty painted row)."""
+        await pilot.press("right_square_bracket")
+        panel = app.query_one("#fx_panel")
+        for _ in range(100):
+            await pilot.pause()
+            if any(r.strip() for r in painted_rows(app, panel)):
+                return panel
+>       raise AssertionError("Flow Execution never painted")
+E       AssertionError: Flow Execution never painted
+
+tests\test_b99_patch_truth.py:755: AssertionError
+____________ test_at_b99_07_hostile_symbol_name_renders_literally _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t2/test_at_b99_07_hostile_symbol_0')
+
+    def test_at_b99_07_hostile_symbol_name_renders_literally(tmp_path: Path) -> None:
+        """AT-B99-07 (HLR-156, UX-C10/PQ-7): a change document whose unresolved
+        symbol carries Rich-active markup and control bytes is refused, and every
+        surface it reaches — the painted lane log and cells, the flow report —
+        renders it literally: 0 markup spans, 0 control characters on the painted
+        strip, the raw payload absent from the report file (``md_safe`` escaped).
+        The project loads through the Load project dialog, Flow Execution opens
+        by its rail key and Run is clicked (review fix F2)."""
+        hostile_doc = json.dumps(
+            {
+                "format": "s19app-changeset",
+                "version": "2.0",
+                "kind": "change",
+                "encoding": "utf-8",
+                "value_mode": "text",
+                "entries": [
+                    _bytes_entry(0xEB10, "DE AD"),
+                    _bytes_entry(0xEC00, "FF", symbol=_HOSTILE_SYMBOL),
+                ],
+            }
+        )
+        docs = {"hostile.json": hostile_doc}
+        flows = {
+            "b99_hostile": [
+                SourceBlock("prg.s19"),
+                PatchBlock("hostile.json"),
+                WriteOutBlock("out_hostile.s19"),
+                ReportBlock(),
+            ],
+        }
+        project_dir = _stage_project(tmp_path, "proj1", docs, flows)
+    
+        async def body(app, pilot):
+            await _load_project_dialog(app, pilot, "proj1")
+            panel = await _open_flow_execution_key(app, pilot)
+            await _import_flow_picker(app, pilot, "b99_hostile", 0)
+            await _run_until_heads(app, pilot, {0: "✗"})
+            log = "\n".join(painted_rows(app, panel.query_one("#fx_log")))
+            painted = "\n".join(painted_rows(app, panel))
+            widgets = [panel.query_one("#fx_log"), panel.query_one("#fx_lane_0_head")]
+            widgets += list(panel.query(".fx-card-body")) + list(panel.query(".fx-card-status"))
+            spans = [s for w in widgets for s in _payload_spans(w.render())]
+            return log, painted, spans
+    
+>       log, painted, spans = _run_fx(tmp_path, body)
+                              ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b99_patch_truth.py:942: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b99_patch_truth.py:816: in _run_fx
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b99_patch_truth.py:814: in _drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests\test_b99_patch_truth.py:932: in body
+    panel = await _open_flow_execution_key(app, pilot)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def _open_flow_execution_key(app, pilot) -> object:
+        """Open Flow Execution by its rail key (``]``) and wait until the panel
+        paints (any non-empty painted row)."""
+        await pilot.press("right_square_bracket")
+        panel = app.query_one("#fx_panel")
+        for _ in range(100):
+            await pilot.pause()
+            if any(r.strip() for r in painted_rows(app, panel)):
+                return panel
+>       raise AssertionError("Flow Execution never painted")
+E       AssertionError: Flow Execution never painted
+
+tests\test_b99_patch_truth.py:755: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_reuse.py::test_at_b100_01_repeated_loads_reuse_and_name_existing_variant[size0]
+FAILED tests/test_b100_reuse.py::test_at_b100_01_repeated_loads_reuse_and_name_existing_variant[size1]
+FAILED tests/test_b99_patch_truth.py::test_tc_b99_18_lane_line_carries_patch_and_crc_riders
+FAILED tests/test_b99_patch_truth.py::test_at_b99_06_flow_execution_patch_truth
+FAILED tests/test_b99_patch_truth.py::test_at_b99_07_hostile_symbol_name_renders_literally
+5 failed, 382 passed in 1282.50s (0:21:22)

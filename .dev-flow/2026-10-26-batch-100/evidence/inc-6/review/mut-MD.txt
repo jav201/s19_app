@@ -1,0 +1,218 @@
+# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/mut/MD
+# command: python -m pytest -q -p no:cacheprovider -rfE --basetemp=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MD tests/test_b100_announce.py tests/test_b100_focus.py tests/test_b100_session_reset.py tests/test_b100_active_variant.py -k tc_b100_67 or tc_b100_56 or at_b100_19 or tc_b100_12_panel or at_b100_04 or at_b100_03 or at_b100_20 or at_b100_06
+# date: 2026-10-30T03:02:57Z
+# s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r6\mut\MD\s19_app\__init__.py
+# python 3.11.15
+...........FF..........                                                  [100%]
+================================== FAILURES ===================================
+___ test_at_b100_04_focus_lands_and_single_keys_reach_their_screens[size0] ____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MD/test_at_b100_04_focus_lands_an0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_04_focus_lands_and_single_keys_reach_their_screens(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-166 black-box: after a project load and after a file load the
+        focused widget is a named, visible, non-text widget (observed through
+        the painted region — never a private attribute), and the single-key
+        bindings reach their actions: ``p`` opens the Load project dialog,
+        ``k`` opens the Legend, ``t`` opens the report viewer. Base RED (P-16):
+        the hidden Split / Join table holds the focus and ``p`` stays on
+        Screen."""
+        base = tmp_path / "app"
+        # A distinct image for the second load (a different byte content under
+        # the same stem would collide with the project's variant id).
+        src02 = tmp_path / "sources" / "case02" / "firmware.s19"
+        src02.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(CASE02_DIR / "firmware.s19", src02)
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=base)
+            _seed_project_p1(app.workarea)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                # The P-16 shape, built through the shipped surface: the
+                # palette-first Split / Join / Export window opens and takes the
+                # focus onto its table; a rail key hides the window and the
+                # table keeps the focus.
+                await _open_split_join_via_palette(pilot, app)
+                await pilot.press("1")
+                await _flush(pilot)
+    
+                # Route 1 — Load project through its dialog.
+                await _load_project_through_dialog(pilot, app, P1_NAME)
+                await _wait_for_focus_on_target(pilot, app, "files_list")
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+                # The other single-key surfaces reach their screens too.
+                await pilot.press("k")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, LegendScreen),
+                    "the Legend screen (the `k` binding reached its action)",
+                )
+                await pilot.press("escape")
+                await _wait_for(
+                    pilot,
+                    lambda: not isinstance(app.screen, LegendScreen),
+                    "the Legend screen closed",
+                )
+                await pilot.press("t")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, ReportViewerScreen),
+                    "the report viewer (the `t` binding reached its action)",
+                )
+                assert await pilot.click("#report_close"), "click missed #report_close"
+                await _wait_for(
+                    pilot,
+                    lambda: not isinstance(app.screen, ReportViewerScreen),
+                    "the report viewer closed",
+                )
+    
+                # Route 2 — Load file through its dialog: the same focus landing.
+                await _load_file_through_dialog(pilot, app, src02)
+                await _wait_for_focus_on_target(pilot, app, "files_list")
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:1210: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_focus.py:1181: in _drive
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_at_b100_04_focus_lands_and_single_keys_reach_their_screens.<locals>._drive.<locals>.<lambda> at 0x000002021925F9C0>
+description = 'the Legend screen (the `k` binding reached its action)'
+attempts = 150
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 150) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the Legend screen (the `k` binding reached its action)
+
+tests\test_b100_focus.py:78: AssertionError
+___ test_at_b100_04_focus_lands_and_single_keys_reach_their_screens[size1] ____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MD/test_at_b100_04_focus_lands_an1')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_04_focus_lands_and_single_keys_reach_their_screens(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-166 black-box: after a project load and after a file load the
+        focused widget is a named, visible, non-text widget (observed through
+        the painted region — never a private attribute), and the single-key
+        bindings reach their actions: ``p`` opens the Load project dialog,
+        ``k`` opens the Legend, ``t`` opens the report viewer. Base RED (P-16):
+        the hidden Split / Join table holds the focus and ``p`` stays on
+        Screen."""
+        base = tmp_path / "app"
+        # A distinct image for the second load (a different byte content under
+        # the same stem would collide with the project's variant id).
+        src02 = tmp_path / "sources" / "case02" / "firmware.s19"
+        src02.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(CASE02_DIR / "firmware.s19", src02)
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=base)
+            _seed_project_p1(app.workarea)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                # The P-16 shape, built through the shipped surface: the
+                # palette-first Split / Join / Export window opens and takes the
+                # focus onto its table; a rail key hides the window and the
+                # table keeps the focus.
+                await _open_split_join_via_palette(pilot, app)
+                await pilot.press("1")
+                await _flush(pilot)
+    
+                # Route 1 — Load project through its dialog.
+                await _load_project_through_dialog(pilot, app, P1_NAME)
+                await _wait_for_focus_on_target(pilot, app, "files_list")
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+                # The other single-key surfaces reach their screens too.
+                await pilot.press("k")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, LegendScreen),
+                    "the Legend screen (the `k` binding reached its action)",
+                )
+                await pilot.press("escape")
+                await _wait_for(
+                    pilot,
+                    lambda: not isinstance(app.screen, LegendScreen),
+                    "the Legend screen closed",
+                )
+                await pilot.press("t")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, ReportViewerScreen),
+                    "the report viewer (the `t` binding reached its action)",
+                )
+                assert await pilot.click("#report_close"), "click missed #report_close"
+                await _wait_for(
+                    pilot,
+                    lambda: not isinstance(app.screen, ReportViewerScreen),
+                    "the report viewer closed",
+                )
+    
+                # Route 2 — Load file through its dialog: the same focus landing.
+                await _load_file_through_dialog(pilot, app, src02)
+                await _wait_for_focus_on_target(pilot, app, "files_list")
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:1210: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_focus.py:1181: in _drive
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_at_b100_04_focus_lands_and_single_keys_reach_their_screens.<locals>._drive.<locals>.<lambda> at 0x000002021811A520>
+description = 'the Legend screen (the `k` binding reached its action)'
+attempts = 150
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 150) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the Legend screen (the `k` binding reached its action)
+
+tests\test_b100_focus.py:78: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_focus.py::test_at_b100_04_focus_lands_and_single_keys_reach_their_screens[size0]
+FAILED tests/test_b100_focus.py::test_at_b100_04_focus_lands_and_single_keys_reach_their_screens[size1]
+2 failed, 21 passed, 67 deselected in 332.91s (0:05:32)
+# exit: 1

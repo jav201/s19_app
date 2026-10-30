@@ -6,10 +6,12 @@ from pathlib import Path
 from typing import TYPE_CHECKING, List, Mapping, Optional, Sequence, Tuple
 
 from rich.markup import escape as escape_markup
+from rich.table import Table
+from rich.text import Text
 from textual import events, work
 from textual.app import ComposeResult
 from textual.binding import Binding
-from textual.containers import Container, Horizontal, ScrollableContainer
+from textual.containers import Container, Horizontal, ScrollableContainer, VerticalScroll
 from textual.message import Message
 from textual.screen import ModalScreen
 from textual.widget import Widget
@@ -32,6 +34,8 @@ from .capped_text_area import CappedTextArea
 from .changes.verify import STATUS_VERIFIED
 from .color_policy import css_class_for_severity
 from ..render.hexview import MAX_HEX_ROWS, render_hex_view_text
+from ..utils import safe_text
+from .insight_style import DGRAY, GREEN, YELLOW
 from .open_folder_chip import OpenFolderChip, titled_header
 from .window_help import WindowHelpChip, open_window_help
 from .os_clipboard_input import OsClipboardInput
@@ -69,6 +73,7 @@ from .services.report_service import (
 
 if TYPE_CHECKING:
     from .operations.crc_config import CrcConfig
+    from .services.variant_execution_service import LoadAnnouncement, LoadProblem
     from .operations.model import Operation
 
 logger = logging.getLogger("s19tui")
@@ -1014,6 +1019,151 @@ class SelectVariantScreen(ModalScreen[Optional[str]]):
             variant_id = self.options[index][0]
             logger.info("SelectVariantScreen dismissing with variant_id=%s", variant_id)
             self.dismiss(variant_id)
+
+
+#: The value the Load-result panel dismisses with when the operator asks for
+#: the variant selector (``v`` or ``#result_variant``, LLR-178.3).
+LOAD_RESULT_SELECT_VARIANT = "select_variant"
+
+#: The Load-result panel's label column (P-E verdict B): a value that wraps
+#: hangs under its value column, never under the label.
+_RESULT_KEY_WIDTH = 10
+#: The problem mark column (``"  ! "``): a problem that wraps hangs under
+#: its label, never under the mark.
+_RESULT_MARK_WIDTH = 4
+
+
+class LoadResultScreen(ModalScreen[Optional[str]]):
+    """The Load-result panel (HLR-178 / LLR-178.3, P-E verdict B).
+
+    Summary:
+        Opened after a project load from the Load project dialog: which
+        variant opened and why, how many the project holds, the other
+        variants, the MAC and A2L that loaded, and every problem in a
+        scrolling list with no truncation. Every name read from disk
+        renders through ``safe_text``. The focus starts on the list
+        (``#result_body``: up, down, PgUp, PgDn, Home, End scroll it);
+        ``tab`` moves to ``#result_ok`` ("Close (esc)"); ``escape``
+        dismisses from anywhere and ``enter`` only on ``#result_ok``; ``v``
+        (or ``#result_variant``) dismisses with
+        :data:`LOAD_RESULT_SELECT_VARIANT` so the app opens its variant
+        selector. ``#result_variant`` is reached by its key, not by
+        ``tab``, so ``tab`` from the list lands on Close. Severity colours
+        follow the prototype (``insight_style``): the fallback reason, the
+        problem heading and each problem's mark and label in the warning
+        colour, the recorded reason in the OK colour, labels and details
+        dim; every colour is a ``Text`` style, never markup.
+
+    Args:
+        announcement (LoadAnnouncement): The composed announcement
+            (``compose_load_announcement``).
+
+    Data Flow:
+        - ``compose`` builds the summary grid (label column, value column),
+          the problem heading and one ``Static`` row per problem (mark
+          column, text column) inside ``#result_body``.
+        - ``on_mount`` focuses ``#result_body``.
+        - The bindings and ``on_button_pressed`` dismiss with ``None`` or
+          :data:`LOAD_RESULT_SELECT_VARIANT`.
+
+    Dependencies:
+        Uses:
+            - ``safe_text`` / the shared ``.modal-dialog`` classes
+        Used by:
+            - ``S19TuiApp._route_load_project``
+    """
+
+    BINDINGS = [
+        Binding("escape", "close_result", "Close", show=False),
+        Binding("v", "select_variant", "Select variant", show=False),
+    ]
+
+    def __init__(self, announcement: "LoadAnnouncement") -> None:
+        super().__init__()
+        self.announcement = announcement
+
+    def compose(self) -> ComposeResult:
+        announcement = self.announcement
+        count = len(announcement.problems)
+        title = f"Project {announcement.project} opened" + (
+            f" with {count} problem{'' if count == 1 else 's'}" if count else ""
+        )
+        heading = (
+            Text("Problems found (the rest loaded)", style=f"bold {YELLOW}")
+            if count
+            else Text("No problems found.", style=GREEN)
+        )
+        variant_button = Button(
+            "Select variant (v)", id="result_variant"
+        )
+        variant_button.can_focus = False
+        yield Container(
+            Label(safe_text(title), classes="modal-title"),
+            VerticalScroll(
+                Static(self._summary(), id="result_summary"),
+                Label(heading, classes="result-heading"),
+                *[
+                    Static(self._problem_row(problem), classes="result-problem")
+                    for problem in announcement.problems
+                ],
+                id="result_body",
+            ),
+            Container(
+                variant_button,
+                Button("Close (esc)", id="result_ok", classes="modal-confirm"),
+                id="result_buttons",
+                classes="modal-buttons",
+            ),
+            id="load_result_dialog",
+            classes="modal-dialog",
+        )
+
+    def _summary(self) -> Table:
+        announcement = self.announcement
+        grid = Table.grid()
+        grid.add_column(width=_RESULT_KEY_WIDTH, no_wrap=True, style=DGRAY)
+        grid.add_column()
+        grid.add_row("Opened", safe_text(announcement.opened or "(no image)", "bold"))
+        grid.add_row(
+            "",
+            Text(
+                announcement.reason_text,
+                style=GREEN if announcement.latest else YELLOW,
+            ),
+        )
+        grid.add_row("Variants", Text(f"{announcement.count} in the project"))
+        for index, name in enumerate(announcement.others):
+            grid.add_row("Others" if index == 0 else "", safe_text(name))
+        for key, name in (("MAC", announcement.mac), ("A2L", announcement.a2l)):
+            grid.add_row(key, safe_text(name) if name else Text("(none)", style=DGRAY))
+        return grid
+
+    @staticmethod
+    def _problem_row(problem: "LoadProblem") -> Table:
+        text = Text()
+        text.append_text(safe_text(f"{problem.label}: ", YELLOW))
+        text.append_text(safe_text(problem.file))
+        text.append_text(safe_text(f"  {problem.detail}", DGRAY))
+        grid = Table.grid()
+        grid.add_column(width=_RESULT_MARK_WIDTH, no_wrap=True)
+        grid.add_column()
+        grid.add_row(Text("  ! ", style=YELLOW), text)
+        return grid
+
+    def on_mount(self) -> None:
+        self.query_one("#result_body", VerticalScroll).focus()
+
+    def action_close_result(self) -> None:
+        self.dismiss(None)
+
+    def action_select_variant(self) -> None:
+        self.dismiss(LOAD_RESULT_SELECT_VARIANT)
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "result_ok":
+            self.dismiss(None)
+        elif event.button.id == "result_variant":
+            self.dismiss(LOAD_RESULT_SELECT_VARIANT)
 
 
 #: N8 — map a :class:`~s19_app.tui.legend.LegendLine` role to its card CSS class

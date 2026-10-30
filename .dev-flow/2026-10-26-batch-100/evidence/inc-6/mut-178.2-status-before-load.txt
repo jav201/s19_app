@@ -1,0 +1,39 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_announce.py -k tc_b100_56
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree) with mutation 178.2-status-before-load
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# date: 2026-10-30T01:47:25+00:00
+# requirement: LLR-178.2
+# mutation: the project + file line is written BEFORE the loads (not the final writer) — file s19_app/tui/app.py
+# pre-mutation sha256: d37ee857f64b202deb9eb2d14c9ed63e6205930ef7b4378138aaebd56e776b29
+# mutant sha256: 3a1e107e48808802a6ec3f6a707b3887b8ddacaf8b4d82b26f6b80e95a8bbd16
+# restored sha256: d37ee857f64b202deb9eb2d14c9ed63e6205930ef7b4378138aaebd56e776b29
+# RESTORE OK
+F..                                                                      [100%]
+================================== FAILURES ===================================
+_________ test_tc_b100_56_one_summary_line_and_the_final_status_text __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30153/test_tc_b100_56_one_summary_li0')
+
+    def test_tc_b100_56_one_summary_line_and_the_final_status_text(tmp_path: Path) -> None:
+        base = tmp_path / "app"
+        _seed_two_variants(_workarea(base))
+        lines, log4, status, panel = _load_directly(base)
+        summaries = [line for line in lines if line.endswith("details: p")]
+        assert len(summaries) == 1, lines
+        assert str(log4) == summaries[0]
+        assert str(log4) == (
+            "Loaded project 'P' -> firmware_1.s19 - variant 2 of 2, 0 problems - details: p"
+        )
+        assert len(str(log4)) <= 118
+>       assert str(status) == "Loaded project 'P' -> firmware_1.s19"
+E       AssertionError: assert 'Loaded firmw...19 (S19 only)' == 'Loaded proje...irmware_1.s19'
+E         
+E         - Loaded project 'P' -> firmware_1.s19
+E         + Loaded firmware_1.s19 (S19 only)
+
+tests\test_b100_announce.py:307: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_announce.py::test_tc_b100_56_one_summary_line_and_the_final_status_text
+1 failed, 2 passed, 17 deselected in 6.71s
+
+# exit: 1

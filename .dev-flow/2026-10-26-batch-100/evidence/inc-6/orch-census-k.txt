@@ -1,0 +1,7 @@
+# command: python -m pytest -q -p no:cacheprovider tests -k census
+# tree: /c/Users/jjgh8/Github/s19_app-b100-inc6 (base 093a7c0 + Inc 6, fix3) | sources: 762d1a98c8a65903 *s19_app/tui/app.py;ea549ab4bd9d3ef4 *s19_app/tui/screens.py;76b276077ded9717 *s19_app/tui/services/variant_execution_service.py;781f04ed2cc30897 *s19_app/tui/styles.tcss;
+# PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc6 | NO_COLOR unset | 2026-10-30T01:17:58-06:00
+s19_app: C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\__init__.py
+........................................................................ [ 82%]
+...............                                                          [100%]
+87 passed, 3931 deselected in 88.55s (0:01:28)

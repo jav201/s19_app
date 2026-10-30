@@ -1,0 +1,21 @@
+# Orchestrator isolation re-run of the 4 non-known census failures (2026-10-30)
+# tree: /c/Users/jjgh8/Github/s19_app-b100-inc6  app.py sha256[:16]=762d1a98c8a65903 vxs=76b276077ded9717
+# base: main checkout at 093a7c0 (source clean; only records modified)
+## TREE run 1
+PASSED tests/test_before_after_report.py::test_tc330_before_after_row_reveal_hide_state_machine
+PASSED tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop
+PASSED tests/test_tui_patch_editor_v2.py::test_tc344_undo_redo_disabled_for_file_backed_document
+FAILED tests/test_tui_patch_editor_v2.py::test_at057b_regroup_wiring_and_binding_regression
+1 failed, 3 passed in 8.89s
+## TREE run 2
+PASSED tests/test_before_after_report.py::test_tc330_before_after_row_reveal_hide_state_machine
+PASSED tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop
+PASSED tests/test_tui_patch_editor_v2.py::test_tc344_undo_redo_disabled_for_file_backed_document
+PASSED tests/test_tui_patch_editor_v2.py::test_at057b_regroup_wiring_and_binding_regression
+4 passed in 8.74s
+## BASE run 1 (at057b only)
+PASSED tests/test_tui_patch_editor_v2.py::test_at057b_regroup_wiring_and_binding_regression
+1 passed in 2.28s
+## BASE run 2 (at057b only)
+FAILED tests/test_tui_patch_editor_v2.py::test_at057b_regroup_wiring_and_binding_regression
+1 failed in 2.42s

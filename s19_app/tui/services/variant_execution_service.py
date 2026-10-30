@@ -105,6 +105,19 @@ MANIFEST_BAD_STRUCTURE = "MANIFEST-BAD-STRUCTURE"
 #: (F-S-03) — the entry is skipped.
 MANIFEST_PATH_ESCAPE = "MANIFEST-PATH-ESCAPE"
 
+#: ``ValidationIssue.details`` marks of a manifest finding (LLR-178.1): the
+#: ``"entry"`` a skipped entry recorded, so the Load-result panel names it,
+#: and ``"scope": "manifest"`` on the one structure finding that voids the
+#: whole manifest (a top level that is not an object), so the finding is
+#: recognised by a mark, never by its message text.
+_ISSUE_ENTRY = "entry"
+_ISSUE_SCOPE = "scope"
+_SCOPE_MANIFEST = "manifest"
+#: The longest recorded entry a finding keeps (characters, ellipsis
+#: included): a manifest entry is any JSON value, so the panel row naming it
+#: stays one readable row (SEC6-7).
+_ENTRY_CLIP = 120
+
 #: The three execution scopes of the E6 TUI trigger (LLR-006.6).
 SCOPE_ACTIVE = "active"
 SCOPE_ALL = "all"
@@ -129,6 +142,7 @@ def _manifest_issue(
     code: str,
     message: str,
     severity: ValidationSeverity = ValidationSeverity.ERROR,
+    details: Optional[dict[str, str]] = None,
 ) -> ValidationIssue:
     """
     Summary:
@@ -140,6 +154,8 @@ def _manifest_issue(
         message (str): Human-readable finding — names paths and counts only.
         severity (ValidationSeverity): Defaults to ERROR (every manifest
             read rule is an ERROR per F-S-03).
+        details (Optional[dict[str, str]]): The finding's marks
+            (``_ISSUE_ENTRY`` / ``_ISSUE_SCOPE``); ``None`` -> none.
 
     Returns:
         ValidationIssue: The finding.
@@ -153,6 +169,7 @@ def _manifest_issue(
         severity=severity,
         message=message,
         artifact=MANIFEST_ARTIFACT,
+        details=dict(details or {}),
     )
 
 
@@ -176,6 +193,12 @@ class ProjectManifest:
         assignments (dict[str, list[Path]]): Per-variant resolved file paths
             in manifest order (LLR-006.2 inner order, second half), keyed by
             ``variant_id``.
+        declared_regions (Tuple[DeclaredRegion, ...]): The operator-declared
+            memory regions (LLR-026.1).
+        gathered (dict[str, list[Path]]): The change-1 gather rows (HLR-138)
+            — project home -> resolved paths in manifest order (LLR-168.1,
+            B100-I2), so a writer can rewrite the manifest with them
+            carried.
         issues (list[ValidationIssue]): Every collected size / parse /
             structure / containment finding (collect-don't-abort).
 
@@ -199,7 +222,14 @@ class ProjectManifest:
     batch: list[Path] = field(default_factory=list)
     assignments: dict[str, list[Path]] = field(default_factory=dict)
     declared_regions: Tuple[DeclaredRegion, ...] = ()
+    gathered: dict[str, list[Path]] = field(default_factory=dict)
     issues: list[ValidationIssue] = field(default_factory=list)
+
+
+def _entry_mark(entry: str) -> dict[str, str]:
+    """The ``details`` mark naming a skipped entry, clipped to
+    ``_ENTRY_CLIP`` characters with an ellipsis (SEC6-7)."""
+    return {_ISSUE_ENTRY: _clip(entry, _ENTRY_CLIP)}
 
 
 def _resolve_manifest_entry(
@@ -243,6 +273,12 @@ def _resolve_manifest_entry(
           the project root → one ``MANIFEST-PATH-ESCAPE``
           (``workspace._path_traverses_reparse_point``, security finding
           S-N01 reuse).
+        - ``resolve()`` or the reparse walk raising ``OSError`` /
+          ``ValueError`` / ``RuntimeError`` (a path the OS cannot take, e.g.
+          over ~32 760 characters on Windows, or a symlink / junction loop)
+          → one ``MANIFEST-PATH-ESCAPE``, never an exception (SEC6-7).
+        - Every finding marks the recorded entry, clipped to
+          ``_ENTRY_CLIP`` characters (:func:`_entry_mark`).
         - Existence is NOT checked here: a missing file surfaces later as
           the per-file ``MF-PATH-UNRESOLVED`` finding of the shared reader.
 
@@ -259,6 +295,7 @@ def _resolve_manifest_entry(
                 MANIFEST_BAD_STRUCTURE,
                 f"manifest {context} entry is not a path string - entry "
                 "skipped",
+                details=_entry_mark(json.dumps(raw_entry)),
             )
         )
         return None
@@ -269,6 +306,7 @@ def _resolve_manifest_entry(
                 MANIFEST_PATH_ESCAPE,
                 f"manifest {context} entry carries a NUL character - not a "
                 f"path; entry skipped: {text!r}",
+                details=_entry_mark(text),
             )
         )
         return None
@@ -279,25 +317,46 @@ def _resolve_manifest_entry(
                 f"manifest {context} entry is an absolute path - entries "
                 f"resolve against the project directory only; entry "
                 f"skipped: {text!r}",
+                details=_entry_mark(text),
             )
         )
         return None
-    resolved = (project_root / text).resolve()
-    if not resolved.is_relative_to(project_root):
+    try:
+        resolved = (project_root / text).resolve()
+        escapes = not resolved.is_relative_to(project_root)
+        traverses = not escapes and _path_traverses_reparse_point(
+            resolved, stop_at=project_root
+        )
+    except (OSError, ValueError, RuntimeError) as exc:
+        # SEC6-7: an entry the OS cannot resolve (on Windows a path over
+        # ~32 760 characters raises ValueError; a junction that points to
+        # itself raises RuntimeError) is skipped, never raised.
+        issues.append(
+            _manifest_issue(
+                MANIFEST_PATH_ESCAPE,
+                f"manifest {context} entry is not a usable path "
+                f"({type(exc).__name__}) - entry skipped",
+                details=_entry_mark(text),
+            )
+        )
+        return None
+    if escapes:
         issues.append(
             _manifest_issue(
                 MANIFEST_PATH_ESCAPE,
                 f"manifest {context} entry escapes the project directory - "
                 f"entry skipped: {text!r}",
+                details=_entry_mark(text),
             )
         )
         return None
-    if _path_traverses_reparse_point(resolved, stop_at=project_root):
+    if traverses:
         issues.append(
             _manifest_issue(
                 MANIFEST_PATH_ESCAPE,
                 f"manifest {context} entry traverses a symbolic link or "
                 f"reparse point - entry skipped: {text!r}",
+                details=_entry_mark(text),
             )
         )
         return None
@@ -406,11 +465,15 @@ def read_project_manifest(
           ``MANIFEST-SIZE-CAP``, empty manifest).
         - Parse catching ``JSONDecodeError`` / ``RecursionError`` /
           ``UnicodeDecodeError`` / ``OSError`` → one
-          ``MANIFEST-JSON-PARSE``.
+          ``MANIFEST-JSON-PARSE``; a plain ``ValueError`` (an integer over
+          Python's digit limit, SEC6-8) is caught the same way, so the
+          manifest reads as damaged.
         - Non-object top level → one ``MANIFEST-BAD-STRUCTURE``.
-        - ``batch`` (array) and ``assignments`` (object of arrays) entries
-          each resolve through :func:`_resolve_manifest_entry`; unsafe
-          entries are skipped with one ERROR each.
+        - ``batch`` (array), ``assignments`` and ``gathered`` (objects of
+          arrays) entries each resolve through
+          :func:`_resolve_manifest_entry`; unsafe entries are skipped with
+          one ERROR each, a malformed ``gathered`` value with one
+          ``MANIFEST-BAD-STRUCTURE`` (LLR-168.1).
 
     Dependencies:
         Uses:
@@ -452,6 +515,7 @@ def read_project_manifest(
             payload = json.load(handle)
     except (
         json.JSONDecodeError,
+        ValueError,
         RecursionError,
         UnicodeDecodeError,
         OSError,
@@ -470,6 +534,7 @@ def read_project_manifest(
                 MANIFEST_BAD_STRUCTURE,
                 "the project manifest top level is not a JSON object - "
                 "ignored",
+                details={_ISSUE_SCOPE: _SCOPE_MANIFEST},
             )
         )
         return empty
@@ -543,6 +608,40 @@ def read_project_manifest(
                     resolved_entries.append(resolved)
             assignments[str(variant_id)] = resolved_entries
 
+    # LLR-168.1 (B100-I2): the gather rows, read like ``assignments`` so a
+    # writer can carry them through a rewrite.
+    gathered: dict[str, list[Path]] = {}
+    gathered_raw = payload.get("gathered", {})
+    if not isinstance(gathered_raw, dict):
+        issues.append(
+            _manifest_issue(
+                MANIFEST_BAD_STRUCTURE,
+                "manifest gathered is not an object - ignored",
+            )
+        )
+    else:
+        for home, entries in gathered_raw.items():
+            if not isinstance(entries, list):
+                issues.append(
+                    _manifest_issue(
+                        MANIFEST_BAD_STRUCTURE,
+                        f"manifest gathered[{home!r}] is not an array - "
+                        "ignored",
+                    )
+                )
+                continue
+            resolved_entries = []
+            for entry in entries:
+                resolved = _resolve_manifest_entry(
+                    project_root,
+                    entry,
+                    f"gathered[{home!r}]",
+                    issues,
+                )
+                if resolved is not None:
+                    resolved_entries.append(resolved)
+            gathered[str(home)] = resolved_entries
+
     return ProjectManifest(
         schema_version=schema_version,
         active_variant=active_variant,
@@ -551,7 +650,360 @@ def read_project_manifest(
         declared_regions=_parse_manifest_declared_regions(
             payload.get("declared_regions", []), issues
         ),
+        gathered=gathered,
         issues=issues,
+    )
+
+
+#: Why a project load opened the variant it did (LLR-178.1). The ids are
+#: internal; the panel and the status line show :data:`LOAD_REASON_TEXT`.
+LOAD_REASON_RECORDED = "recorded"
+LOAD_REASON_NONE_RECORDED = "none-recorded"
+LOAD_REASON_MANIFEST_DAMAGED = "manifest-damaged"
+LOAD_REASON_NO_MANIFEST = "no-manifest"
+LOAD_REASON_NEXT_VALID = "next-valid"
+
+#: The user-term wording of each reason. "latest" is reserved for the
+#: variant the app's last recorded write made active (HLR-178), which is
+#: what the manifest's ``active_variant`` records.
+LOAD_REASON_TEXT: dict[str, str] = {
+    LOAD_REASON_RECORDED: "recorded as the active variant (the latest saved)",
+    LOAD_REASON_NONE_RECORDED: (
+        "the first variant by name (the manifest records no active variant)"
+    ),
+    LOAD_REASON_MANIFEST_DAMAGED: (
+        "the first variant by name (the manifest could not be read)"
+    ),
+    LOAD_REASON_NO_MANIFEST: (
+        "the first variant by name (the project has no project.json)"
+    ),
+    LOAD_REASON_NEXT_VALID: (
+        "the next valid variant (the recorded one is missing or not readable)"
+    ),
+}
+
+#: Problem precedence (HLR-169): a damaged or absent manifest outranks a
+#: missing file. Inc 7 adds the remaining kinds below these two.
+_PROBLEM_RANK_MANIFEST = 0
+_PROBLEM_RANK_MISSING = 1
+
+#: Manifest finding code -> (problem label, what happened and the next
+#: step), in user terms; the code itself goes to the log only (HLR-169).
+_MANIFEST_PROBLEM_TEXT: dict[str, tuple[str, str]] = {
+    MANIFEST_SIZE_CAP: (
+        "Manifest damaged",
+        "too large to read - defaults used; Save project rewrites it",
+    ),
+    MANIFEST_JSON_PARSE: (
+        "Manifest damaged",
+        "not valid JSON - defaults used; Save project rewrites it",
+    ),
+    MANIFEST_BAD_STRUCTURE: (
+        "Manifest entry skipped",
+        "a recorded entry has the wrong shape; Save project rewrites it",
+    ),
+    MANIFEST_PATH_ESCAPE: (
+        "Manifest entry skipped",
+        "a recorded entry points outside the project; Save project rewrites it",
+    ),
+}
+
+#: The reference width the status summary line is composed for (the
+#: 118-column reference terminal); names are clipped so "details: p" stays
+#: on screen.
+LOAD_SUMMARY_WIDTH = 118
+
+
+@dataclass(frozen=True)
+class LoadProblem:
+    """
+    Summary:
+        One problem a project load found, in user terms (HLR-169 /
+        LLR-178.1): its label, the file it concerns, and what happened with
+        the next step.
+
+    Args:
+        label (str): The problem kind as the user reads it.
+        file (str): The file (or recorded variant) concerned.
+        detail (str): What happened and what to do next.
+        rank (int): Precedence; lower sorts first.
+    """
+
+    label: str
+    file: str
+    detail: str
+    rank: int
+
+
+@dataclass(frozen=True)
+class LoadAnnouncement:
+    """
+    Summary:
+        What a project load opened and why (LLR-178.1) — the input of the
+        status summary line, the final file-state line and the Load-result
+        panel.
+
+    Args:
+        project (str): The project name.
+        opened (Optional[str]): The opened variant's file name, or ``None``
+            when the project holds no openable image.
+        position (int): The opened variant's 1-based position among the
+            project's variants (``0`` when nothing opened).
+        count (int): How many variants the project holds.
+        reason (str): One of the ``LOAD_REASON_*`` ids.
+        latest (bool): True only when the opened variant is the one the
+            app's last recorded write made active.
+        others (Tuple[str, ...]): The other variants' file names.
+        mac (Optional[str]): The MAC file that loaded, if any.
+        a2l (Optional[str]): The A2L file that loaded, if any.
+        problems (Tuple[LoadProblem, ...]): Every problem, in precedence
+            order.
+    """
+
+    project: str
+    opened: Optional[str]
+    position: int
+    count: int
+    reason: str
+    latest: bool
+    others: Tuple[str, ...] = ()
+    mac: Optional[str] = None
+    a2l: Optional[str] = None
+    problems: Tuple[LoadProblem, ...] = ()
+
+    @property
+    def reason_text(self) -> str:
+        """The reason in user terms (:data:`LOAD_REASON_TEXT`)."""
+        return LOAD_REASON_TEXT[self.reason]
+
+    @property
+    def target(self) -> str:
+        """The opened image and the MAC that loaded with it, as one name."""
+        names = [name for name in (self.opened, self.mac) if name]
+        return " + ".join(names) if names else "(no image)"
+
+    def status_line(self) -> str:
+        """The final file-state line: the project and the opened file."""
+        return f"Loaded project '{self.project}' -> {self.target}"
+
+    def summary_line(self, width: int = LOAD_SUMMARY_WIDTH) -> str:
+        """
+        Summary:
+            The one status-log summary line (LLR-178.2): the project and the
+            opened file, ``variant k of n``, the problem count, then
+            ``details: p`` — composed to fit ``width`` by clipping the
+            names, never the counts.
+
+        Args:
+            width (int): The column budget (the 118-column reference).
+
+        Returns:
+            str: The line.
+
+        Dependencies:
+            Uses:
+                - ``target`` / ``_clip``
+            Used by:
+                - s19_app.tui.app.S19TuiApp._handle_load_project
+        """
+        problems = len(self.problems)
+        counts = (
+            f"variant {self.position} of {self.count}"
+            if self.opened
+            else f"{self.count} variants"
+        )
+        tail = (
+            f" - {counts}, {problems} problem{'' if problems == 1 else 's'}"
+            " - details: p"
+        )
+        project, target = self.project, self.target
+        overflow = len(f"Loaded project '{project}' -> {target}{tail}") - width
+        if overflow > 0:
+            target = _clip(target, max(8, len(target) - overflow))
+            overflow = len(f"Loaded project '{project}' -> {target}{tail}") - width
+        if overflow > 0:
+            project = _clip(project, max(8, len(project) - overflow))
+        return f"Loaded project '{project}' -> {target}{tail}"
+
+
+def _clip(text: str, limit: int) -> str:
+    """``text`` cut to ``limit`` characters, ending in an ellipsis."""
+    return text if len(text) <= limit else text[: limit - 1] + "…"
+
+
+def _manifest_problems(manifest: ProjectManifest) -> list[LoadProblem]:
+    """
+    Summary:
+        One user-term problem per manifest finding (HLR-169 wording,
+        LLR-178.1): the label and the next step come from the finding's
+        code; the code and the finding message (which can name an exception
+        class) never reach a problem.
+
+    Args:
+        manifest (ProjectManifest): The read manifest.
+
+    Returns:
+        list[LoadProblem]: One problem per finding, in finding order, all at
+            the manifest rank.
+
+    Data Flow:
+        - A skipped entry names the entry it recorded (the
+          ``_ISSUE_ENTRY`` mark), so thirty skipped entries are thirty
+          distinct rows; any other finding names ``project.json``.
+        - The finding marked ``_SCOPE_MANIFEST`` (a top level that is not an
+          object) is a damaged manifest, not a skipped entry, although its
+          code is ``MANIFEST-BAD-STRUCTURE``.
+
+    Dependencies:
+        Uses:
+            - ``_MANIFEST_PROBLEM_TEXT``
+        Used by:
+            - compose_load_announcement
+    """
+    problems: list[LoadProblem] = []
+    for issue in manifest.issues:
+        label, detail = _MANIFEST_PROBLEM_TEXT.get(
+            issue.code, ("Manifest entry skipped", "Save project rewrites it")
+        )
+        if issue.details.get(_ISSUE_SCOPE) == _SCOPE_MANIFEST:
+            label, detail = (
+                "Manifest damaged",
+                "not a manifest object - defaults used; Save project rewrites it",
+            )
+        problems.append(
+            LoadProblem(
+                label,
+                issue.details.get(_ISSUE_ENTRY, PROJECT_MANIFEST_NAME),
+                detail,
+                _PROBLEM_RANK_MANIFEST,
+            )
+        )
+    return problems
+
+
+def manifest_is_damaged(manifest: ProjectManifest) -> bool:
+    """
+    Summary:
+        True when ``project.json`` exists but could not be read as a
+        manifest at all: over the size cap, not well-formed JSON (an
+        ``OSError`` on open included), or a top level that is not an object
+        (LLR-178.1, and the OQ-1 ruling (b) for the in-project writers).
+
+    Args:
+        manifest (ProjectManifest): The read manifest.
+
+    Returns:
+        bool: True for those three whole-file cases; a manifest with only
+            skipped entries is readable and returns False.
+
+    Dependencies:
+        Used by:
+            - compose_load_announcement (the ``manifest-damaged`` reason)
+            - s19_app.tui.app.S19TuiApp._rewrite_project_manifest (a damaged
+              manifest is never rewritten)
+    """
+    return any(
+        issue.code in (MANIFEST_SIZE_CAP, MANIFEST_JSON_PARSE)
+        or issue.details.get(_ISSUE_SCOPE) == _SCOPE_MANIFEST
+        for issue in manifest.issues
+    )
+
+
+def compose_load_announcement(
+    project_name: str,
+    variant_set: ProjectVariantSet,
+    manifest: Optional[ProjectManifest],
+    *,
+    mac_name: Optional[str] = None,
+    a2l_name: Optional[str] = None,
+) -> LoadAnnouncement:
+    """
+    Summary:
+        Compose what a project load announces (LLR-178.1): the variant it
+        opened, the variant count, why that one opened, whether it is the
+        latest saved, the other variants, the MAC and A2L that loaded, and
+        every problem in precedence order. Pure: reads no file and no clock
+        — "latest" comes from the recorded ``active_variant``, never from
+        file times.
+
+    Args:
+        project_name (str): The project name.
+        variant_set (ProjectVariantSet): The project's variants with the
+            ``active_id`` the load opened.
+        manifest (Optional[ProjectManifest]): The read manifest; ``None``
+            when the project has no ``project.json``.
+        mac_name (Optional[str]): The MAC file that loaded, if any.
+        a2l_name (Optional[str]): The A2L file that loaded, if any.
+
+    Returns:
+        LoadAnnouncement: The announcement.
+
+    Data Flow:
+        - Reason: no manifest -> ``no-manifest``; a manifest that could not
+          be read -> ``manifest-damaged``; no ``active_variant`` recorded ->
+          ``none-recorded``; the recorded id is the opened one ->
+          ``recorded``; otherwise ``next-valid`` with a missing-variant
+          problem.
+        - Problems: one per manifest finding (user terms), then the
+          missing recorded variant; sorted by precedence, stable.
+
+    Dependencies:
+        Uses:
+            - LOAD_REASON_TEXT / _manifest_problems / manifest_is_damaged
+        Used by:
+            - s19_app.tui.app.S19TuiApp._handle_load_project
+            - s19_app.tui.screens.LoadResultScreen (renders it)
+    """
+    variants = variant_set.variants
+    opened_variant = next(
+        (v for v in variants if v.variant_id == variant_set.active_id), None
+    )
+    problems: list[LoadProblem] = []
+    if manifest is None:
+        reason = LOAD_REASON_NO_MANIFEST
+        problems.append(
+            LoadProblem(
+                "No manifest",
+                PROJECT_MANIFEST_NAME,
+                "not found - the first variant opened; Save project records one",
+                _PROBLEM_RANK_MANIFEST,
+            )
+        )
+    else:
+        problems.extend(_manifest_problems(manifest))
+        recorded = manifest.active_variant
+        if manifest_is_damaged(manifest):
+            reason = LOAD_REASON_MANIFEST_DAMAGED
+        elif recorded is None:
+            reason = LOAD_REASON_NONE_RECORDED
+        elif opened_variant is not None and recorded == opened_variant.variant_id:
+            reason = LOAD_REASON_RECORDED
+        else:
+            reason = LOAD_REASON_NEXT_VALID
+            problems.append(
+                LoadProblem(
+                    "Missing variant",
+                    recorded,
+                    "recorded as active but not in the project - the next "
+                    "valid variant opened",
+                    _PROBLEM_RANK_MISSING,
+                )
+            )
+    problems.sort(key=lambda problem: problem.rank)
+    position = (
+        variants.index(opened_variant) + 1 if opened_variant is not None else 0
+    )
+    return LoadAnnouncement(
+        project=project_name,
+        opened=opened_variant.path.name if opened_variant is not None else None,
+        position=position,
+        count=len(variants),
+        reason=reason,
+        latest=reason == LOAD_REASON_RECORDED,
+        others=tuple(v.path.name for v in variants if v is not opened_variant),
+        mac=mac_name,
+        a2l=a2l_name,
+        problems=tuple(problems),
     )
 
 

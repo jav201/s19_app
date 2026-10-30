@@ -71,6 +71,7 @@ from s19_app.tui.workspace import WORKAREA_SUBDIR
 
 from tests import b97_fixtures
 from tests.support import b100_links
+from tests.support import b100_projects
 from tests.support.independent_reader import read_hex
 from tests.support.independent_reader import read_s19
 
@@ -1706,6 +1707,21 @@ def test_at_b100_05_save_project_saves_the_patched_image(
                 ),
                 "the painted line naming the reopened project",
             )
+            # Inc 6 (HLR-178): the dialog route opens the Load-result
+            # panel; it is the oracle of what opened and why, then its
+            # shown key ``esc`` closes it.
+            await _wait_for(
+                pilot,
+                lambda: len(app.screen.query("#result_ok")) > 0,
+                "the Load-result panel",
+            )
+            panel = await b100_projects.read_load_result_panel(pilot, app)
+            await pilot.press("escape")
+            await _wait_for(
+                pilot,
+                lambda: len(app.screen.query("#result_ok")) == 0,
+                "the Load-result panel closed",
+            )
             await _wait_for(
                 pilot,
                 lambda: "firmware.s19"
@@ -1714,6 +1730,7 @@ def test_at_b100_05_save_project_saves_the_patched_image(
                 ),
                 "the Loaded panel naming firmware.s19",
             )
+            reopened_panels.append(panel)
             return " ".join(
                 str(static.render()) for static in app.query("#loaded_slots Static")
             )
@@ -1733,5 +1750,8 @@ def test_at_b100_05_save_project_saves_the_patched_image(
     assert "1 entry applied before this save (0x8000007C)" in painted, painted
     success = next((m for m in statuses if m.startswith("Saved project to")), "")
     assert "1 change entry, 0 applied by this save" in success, statuses
+    reopened_panels: list = []
     loaded_panel = asyncio.run(_reopen_scene())
     assert "firmware.s19" in loaded_panel, loaded_panel
+    assert "Opened    firmware.s19" in reopened_panels[0], reopened_panels
+    assert "recorded as the active variant" in reopened_panels[0], reopened_panels

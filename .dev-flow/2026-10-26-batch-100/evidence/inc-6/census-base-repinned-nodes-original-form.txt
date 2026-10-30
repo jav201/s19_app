@@ -1,0 +1,18 @@
+# command: python -m pytest -q -p no:cacheprovider -rA tests/test_b99_crc_region.py::test_at_b99_10_flow_crc_region_pilot tests/test_b99_staging.py::test_at_b99_04_duplicate_refused_distinct_parallel_markers tests/test_b100_reuse.py::test_at_b100_01_repeated_loads_reuse_and_name_existing_variant tests/test_b99_patch_truth.py::test_tc_b99_18_lane_line_carries_patch_and_crc_riders tests/test_b99_patch_truth.py::test_at_b99_06_flow_execution_patch_truth tests/test_b99_patch_truth.py::test_at_b99_07_hostile_symbol_name_renders_literally tests/test_b99_export.py::test_at_b99_11_sanitised_mac_only_second_export_takes_suffix tests/test_b99_export.py::test_tc_b99_29_junctioned_project_home_shows_refusal tests/test_b99_truncation.py::test_at_b99_03_status_leads_defect_flow_source_fails
+# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/i6b (093a7c0 base, these test files UNMODIFIED = the pre-re-pin form)
+# PYTHONPATH=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/i6b ; NO_COLOR=unset
+# date: 2026-10-30T02:24:29Z
+..........                                                               [100%]
+=================================== PASSES ====================================
+=========================== short test summary info ===========================
+PASSED tests/test_b99_crc_region.py::test_at_b99_10_flow_crc_region_pilot
+PASSED tests/test_b99_staging.py::test_at_b99_04_duplicate_refused_distinct_parallel_markers
+PASSED tests/test_b100_reuse.py::test_at_b100_01_repeated_loads_reuse_and_name_existing_variant[size0]
+PASSED tests/test_b100_reuse.py::test_at_b100_01_repeated_loads_reuse_and_name_existing_variant[size1]
+PASSED tests/test_b99_patch_truth.py::test_tc_b99_18_lane_line_carries_patch_and_crc_riders
+PASSED tests/test_b99_patch_truth.py::test_at_b99_06_flow_execution_patch_truth
+PASSED tests/test_b99_patch_truth.py::test_at_b99_07_hostile_symbol_name_renders_literally
+PASSED tests/test_b99_export.py::test_at_b99_11_sanitised_mac_only_second_export_takes_suffix
+PASSED tests/test_b99_export.py::test_tc_b99_29_junctioned_project_home_shows_refusal
+PASSED tests/test_b99_truncation.py::test_at_b99_03_status_leads_defect_flow_source_fails
+10 passed in 168.45s (0:02:48)

@@ -1,0 +1,69 @@
+# mutation: SEC6-6-raw-active-variant — SEC6-6 (LLR-178.2): the recorded active_variant reaches the status log unscrubbed
+# file: s19_app/tui/app.py (sha256 before 762d1a98c8a65903)
+# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=C:\Users\jjgh8\AppData\Local\Temp\f1mut-SEC6-6-raw-active-variant tests/test_b100_announce.py -k control_bytes
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (corrective pass 1, mutated in place, then restored)
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\__init__.py
+# date: 2026-10-30T03:35:08Z
+# --- old
+#                   self.set_status(
+#                       safe_text(
+#                           f"Manifest active_variant '{manifest.active_variant}' "
+#                           "not found - activating the first variant."
+#                       ).plain
+#                   )
+# --- new
+#                   self.set_status(
+#                       f"Manifest active_variant '{manifest.active_variant}' "
+#                       "not found - activating the first variant."
+#                   )
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______ test_tc_b100_56_recorded_variant_with_control_bytes_paints_none _______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-SEC6-6-raw-active-variant/test_tc_b100_56_recorded_varia0')
+
+    def test_tc_b100_56_recorded_variant_with_control_bytes_paints_none(tmp_path: Path) -> None:
+        """A recorded ``active_variant`` is any JSON string: one holding an ESC
+        sequence and a BEL reaches the status log scrubbed â€” the line naming it
+        is painted, with 0 control bytes in any log line.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): the raw ESC and
+        BEL reached ``app.log_lines`` and ``#log_line_*`` (SEC6-6)."""
+        base = tmp_path / "app"
+        project_dir = _seed_two_variants(_workarea(base))
+        (project_dir / "project.json").write_text(
+            json.dumps({"schema_version": 1, "active_variant": "\x1b[31mZ[red]q\x07"}),
+            encoding="utf-8",
+        )
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=(118, 54)) as pilot:
+                await pilot.pause()
+                app._handle_load_project("P")
+                await _flush(pilot)
+                painted = [
+                    str(app.query_one(f"#log_line_{i}", Label).render()) for i in (1, 2, 3, 4)
+                ]
+                return list(app.log_lines), painted
+    
+        lines, painted = asyncio.run(_drive())
+        named = [line for line in lines if "not found - activating the first variant" in line]
+>       assert named == [
+            "Manifest active_variant '[31mZ[red]q' not found - activating the first variant."
+        ], lines
+E       AssertionError: ["Manifest active_variant '\x1b[31mZ[red]q\x07' not found - activating the first variant.", 'Loaded firmware.s19 (S19 only)', "Loaded project 'P' -> firmware.s19 - variant 1 of 2, 1 problem - details: p"]
+E       assert ['Manifest ac...rst variant.'] == ['Manifest ac...rst variant.']
+E         
+E         At index 0 diff: "Manifest active_variant '\x1b[31mZ[red]q\x07' not found - activating the first variant." != "Manifest active_variant '[31mZ[red]q' not found - activating the first variant."
+E         Use -v to get more diff
+
+tests\test_b100_announce.py:366: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_announce.py::test_tc_b100_56_recorded_variant_with_control_bytes_paints_none
+1 failed, 23 deselected in 4.81s
+
+
+VERDICT: KILLED (pytest exit 1)
+RESTORE OK (sha256 762d1a98c8a65903)

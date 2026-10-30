@@ -1,0 +1,7 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE --basetemp=C:/Users/jjgh8/AppData/Local/Temp/i6g1 tests/test_b100_active_variant.py tests/test_b100_announce.py tests/test_b100_focus.py tests/test_b100_save_image.py tests/test_b100_session_reset.py
+# tree: C:/Users/jjgh8/Github/s19_app-b100-inc6 final (base 093a7c0 + Inc 6), sources: d37ee857f64b202d *s19_app/tui/app.py;a957b576658777b0 *s19_app/tui/screens.py;8e2e8cf059eb48aa *s19_app/tui/services/variant_execution_service.py;781f04ed2cc30897 *s19_app/tui/styles.tcss;
+# PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# date: 2026-10-30T02:30:29Z
+........................................................................ [ 52%]
+..................................................................       [100%]
+138 passed in 738.80s (0:12:18)

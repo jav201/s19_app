@@ -1,0 +1,7 @@
+# command: python -m pytest -q -p no:cacheprovider -k census tests
+# tree: same as guards.txt, sources: d37ee857f64b202d *s19_app/tui/app.py;a957b576658777b0 *s19_app/tui/screens.py;8e2e8cf059eb48aa *s19_app/tui/services/variant_execution_service.py;781f04ed2cc30897 *s19_app/tui/styles.tcss;
+# PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc6 ; NO_COLOR=unset
+# date: 2026-10-30T02:48:21Z
+........................................................................ [ 82%]
+...............                                                          [100%]
+87 passed, 3905 deselected in 103.25s (0:01:43)

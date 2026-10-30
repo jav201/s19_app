@@ -67,9 +67,11 @@ from .screens import (
     ConfirmDiscardScreen,
     EntryJsonScreen,
     LegendScreen,
+    LOAD_RESULT_SELECT_VARIANT,
     LoadFileScreen,
     LoadFlowScreen,
     LoadProjectScreen,
+    LoadResultScreen,
     OperationsScreen,
     ReportViewerScreen,
     SaveFlowScreen,
@@ -195,8 +197,12 @@ from .services.variant_execution_service import (
     EXECUTION_SCOPES,
     PROJECT_MANIFEST_NAME,
     SCOPE_ACTIVE,
+    LoadAnnouncement,
+    ProjectManifest,
     VariantExecutionResult,
+    compose_load_announcement,
     execute_project_variants,
+    manifest_is_damaged,
     read_project_manifest,
 )
 from .workspace import (
@@ -1601,6 +1607,7 @@ _SESSION_SNAPSHOT_NAMES: Tuple[str, ...] = (
     "_image_generation",
     "_last_execution",
     "_last_flow_run",
+    "_last_load_announcement",
     "_last_manifest_verify_result",
     "_last_template_path",
     "_mac_first_visible_address",
@@ -1900,6 +1907,9 @@ class S19TuiApp(App):
         #: parse worker signature stays untouched and the worker never reads
         #: this field (LLR-005.4 thread contract). Cleared on load failure.
         self._pending_variant_id: Optional[str] = None
+        #: The announcement of the last project load (LLR-178.1): what the
+        #: Load-result panel shows, kept for the session.
+        self._last_load_announcement: Optional[LoadAnnouncement] = None
         #: Most recent ``execute_scope`` outcome retained for "generate
         #: report from last execution" (E8 / LLR-008.5):
         #: ``(project_dir, scope, assignment_source, results)``. The
@@ -3669,12 +3679,20 @@ class S19TuiApp(App):
               successful save, after the verify outcome surfaces, an
               information notify offers the before/after report action
               (key ``b`` — LLR-038.3).
+            - A save into the open project makes the written file the
+              project's active variant (``_activate_project_file``) and
+              rewrites ``project.json`` through
+              ``_rewrite_project_manifest`` with every key the save-back
+              does not own carried (LLR-168.2 / LLR-168.3); a damaged
+              ``project.json`` is left as it is; ``current_file.path``
+              stays on the loaded image.
 
         Dependencies:
             Uses:
                 - ``ChangeService.save_patched``
                 - ``_active_project_dir``
                 - ``_synth_s0_header_from_filename``
+                - ``_activate_project_file`` / ``_rewrite_project_manifest``
             Used by:
                 - Textual message dispatch for ``PatchEditorPanel``
         """
@@ -3716,6 +3734,15 @@ class S19TuiApp(App):
         if result.ok:
             # LLR-167.5: a successful save-back records the saved image.
             self._change_service.mark_saved(loaded.mem_map)
+            # LLR-168.2: a save-back into the open project becomes its
+            # active variant, in the session and in project.json; the
+            # loaded image keeps its own path.
+            project_dir = self._active_project_dir()
+            summary = self._change_service.last_summary
+            saved = summary.saved_path if summary is not None else None
+            if project_dir is not None and saved is not None:
+                if self._activate_project_file(project_dir, saved) is not None:
+                    self._rewrite_project_manifest(project_dir, saved)
             self._surface_verify_result()
             # US-061 / LLR-061.1: reveal the PERSISTENT before/after-report
             # control (a durable widget, not a Toast) so the report stays
@@ -6958,7 +6985,67 @@ class S19TuiApp(App):
             self.logger.info("No projects found in workarea.")
             return
         self.logger.info("Load project action triggered. projects=%s", projects)
-        self.push_screen(LoadProjectScreen(projects), self._handle_load_project)
+        self.push_screen(LoadProjectScreen(projects), self._route_load_project)
+
+    def _route_load_project(self, name: Optional[str]) -> None:
+        """
+        Summary:
+            The Load project dialog's router (LLR-178.3): run the project
+            load, then open the Load-result panel when this load composed
+            an announcement. A direct ``_handle_load_project`` call (tests,
+            fixtures) meets no modal.
+
+        Args:
+            name (Optional[str]): The picked project, or ``None`` on cancel.
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``_handle_load_project`` stores the load's announcement in
+              ``_last_load_announcement``.
+            - The panel opens only when that field now holds a NEW object
+              (identity, not equality): a cancel, or a load that stopped
+              before composing, leaves the previous announcement in place,
+              and re-opening its panel would swallow the next key.
+
+        Dependencies:
+            Uses:
+                - ``_handle_load_project`` / ``LoadResultScreen``
+            Used by:
+                - ``action_load_project`` (the dialog's dismiss callback)
+        """
+        before = self._last_load_announcement
+        self._handle_load_project(name)
+        announcement = self._last_load_announcement
+        if announcement is None or announcement is before:
+            return
+        self.push_screen(LoadResultScreen(announcement), self._handle_load_result)
+
+    def _handle_load_result(self, choice: Optional[str]) -> None:
+        """
+        Summary:
+            Close the Load-result panel (LLR-178.3); ``v`` /
+            ``#result_variant`` then opens the existing variant selector.
+            The focus needs no move here (LLR-166.1): the load tail
+            re-homes the main screen's focus behind the panel, and closing
+            the panel restores that focus.
+
+        Args:
+            choice (Optional[str]): ``LOAD_RESULT_SELECT_VARIANT`` or
+                ``None``.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - ``action_select_variant``
+            Used by:
+                - ``_route_load_project`` (the panel's dismiss callback)
+        """
+        if choice == LOAD_RESULT_SELECT_VARIANT:
+            self.action_select_variant()
 
     def action_select_variant(self) -> None:
         """
@@ -9615,6 +9702,9 @@ class S19TuiApp(App):
                 - _surface_manifest_verify_result
             Used by:
                 - _handle_save_dialog
+                - on_patch_editor_panel_save_back_decision, the variant
+                  append and the MAC / A2L syncs (LLR-168.3, through
+                  ``_rewrite_project_manifest``)
         """
         variant_set = self._variant_set
         # R2-5: the verify outcome is handed to the caller on this
@@ -10060,9 +10150,12 @@ class S19TuiApp(App):
             if manifest.active_variant in known_ids:
                 variant_set.active_id = manifest.active_variant
             else:
+                # SEC6-6: the recorded id is any JSON string; scrub it.
                 self.set_status(
-                    f"Manifest active_variant '{manifest.active_variant}' "
-                    "not found - activating the first variant."
+                    safe_text(
+                        f"Manifest active_variant '{manifest.active_variant}' "
+                        "not found - activating the first variant."
+                    ).plain
                 )
                 self.logger.warning(
                     "Manifest active_variant unknown: %s (known: %s)",
@@ -10097,8 +10190,26 @@ class S19TuiApp(App):
         self.load_selected_file(selected_file, a2l_files)
         if primary_file and mac_file:
             self.load_selected_file(mac_file, a2l_files)
-        status_target = f"{selected_file.name} + {mac_file.name}" if primary_file and mac_file else selected_file.name
-        self.set_status(f"Loaded project '{name}' -> {status_target}")
+        loaded = self.current_file
+        announcement = compose_load_announcement(
+            name,
+            variant_set,
+            manifest,
+            mac_name=(
+                loaded.mac_path.name
+                if loaded is not None and loaded.mac_path is not None
+                else None
+            ),
+            a2l_name=(
+                self.current_a2l_path.name if self.current_a2l_path else None
+            ),
+        )
+        self._last_load_announcement = announcement
+        # LLR-178.2: one summary line (opened file, k of n, problem count,
+        # "details: p") and the project + opened-file line as the last
+        # writer of #status_text; names render through safe_text.
+        self.set_status(safe_text(announcement.summary_line()).plain)
+        self.set_file_status(safe_text(announcement.status_line()))
         if discarded_unsaved:
             # LED-2026-10-26-batch-100.55(a): until Inc 10 lands the load
             # question (LLR-174.x), the closed Patch Editor document is
@@ -10122,6 +10233,171 @@ class S19TuiApp(App):
                 projects.append(item.name)
         return projects
 
+    def _manifest_carry(
+        self, project_dir: Path, manifest: Optional[ProjectManifest]
+    ) -> dict:
+        """
+        Summary:
+            The ``project.json`` keys an in-project writer does not own
+            (B100-I7, LLR-168.3), read back from disk and converted from the
+            reader's absolute paths to project-relative POSIX strings — the
+            only form ``serialize_manifest`` accepts (it refuses the whole
+            manifest on one absolute entry, A-03).
+
+        Args:
+            project_dir (Path): The open project's folder.
+            manifest (Optional[ProjectManifest]): That folder's manifest,
+                read once by the caller; ``None`` when it has no
+                ``project.json``.
+
+        Returns:
+            dict: ``batch``, ``assignments``, ``declared_regions`` and
+                ``gathered`` keyword arguments for
+                ``_write_and_verify_manifest``; empty when the project has
+                no ``project.json``.
+
+        Data Flow:
+            - ``read_project_manifest`` resolves every entry against the
+              resolved project folder; each is made relative to that same
+              root. Entries the reader skipped (unsafe or malformed) are
+              not carried — the serializer would refuse them.
+
+        Dependencies:
+            Used by:
+                - ``_rewrite_project_manifest``
+        """
+        if manifest is None:
+            return {}
+        root = project_dir.resolve()
+
+        def _relative(paths: Sequence[Path]) -> list[str]:
+            return [path.relative_to(root).as_posix() for path in paths]
+
+        return {
+            "batch": _relative(manifest.batch),
+            "assignments": {
+                variant_id: _relative(paths)
+                for variant_id, paths in manifest.assignments.items()
+            },
+            "declared_regions": manifest.declared_regions,
+            "gathered": {
+                home: _relative(paths) for home, paths in manifest.gathered.items()
+            },
+        }
+
+    def _rewrite_project_manifest(self, project_dir: Path, placed: Path) -> bool:
+        """
+        Summary:
+            The one ``project.json`` rewrite of the in-project writers
+            (LLR-168.3, the OQ-1 ruling): a readable manifest is rewritten
+            through the seam with every key the writer does not own
+            carried; a damaged one is never rewritten.
+
+        Args:
+            project_dir (Path): The open project's folder.
+            placed (Path): The file the writer just placed or saved there.
+
+        Returns:
+            bool: True when ``project.json`` now records the session's
+                state (written and verified); False when it was damaged and
+                left as it is, the write failed, or the verify reported a
+                mismatch.
+
+        Data Flow:
+            - The manifest is read once; the carry is built from that read.
+            - No ``project.json`` -> one is written (OQ-1 (a)).
+            - ``manifest_is_damaged`` (over the size cap, not JSON, a top
+              level that is not an object) -> no write: the placed file
+              stays and one status line names the project and the file;
+              the user's Save project stays the recovery (OQ-1 (b)).
+            - Entries the reader skipped (unsafe or malformed) are not
+              carried: reported and skipped, never trusted (HLR-169).
+
+        Dependencies:
+            Uses:
+                - read_project_manifest / manifest_is_damaged
+                - _manifest_carry / _write_and_verify_manifest
+            Used by:
+                - on_patch_editor_panel_save_back_decision
+                - _sync_loaded_file_to_project (variant append, MAC sync)
+                - _sync_loaded_a2l_to_project
+        """
+        manifest = read_project_manifest(project_dir)
+        if manifest is not None and manifest_is_damaged(manifest):
+            project_name = self.current_project or project_dir.name
+            self.set_status(
+                safe_text(
+                    f"{PROJECT_MANIFEST_NAME} in project '{project_name}' is "
+                    f"damaged and was not rewritten - {placed.name} stays in "
+                    "the project; Save project rewrites it"
+                ).plain
+            )
+            self.logger.warning(
+                "Damaged manifest not rewritten: %s (placed %s)", project_dir, placed
+            )
+            return False
+        if not self._write_and_verify_manifest(
+            project_dir, **self._manifest_carry(project_dir, manifest)
+        ):
+            return False
+        result = self._last_manifest_verify_result
+        return result is not None and result.status == MANIFEST_VERIFIED
+
+    def _activate_project_file(self, project_dir: Path, landed: Path) -> Optional[str]:
+        """
+        Summary:
+            Make a file that just landed in the open project its active
+            variant in the session (LLR-168.2 / LLR-168.3): rebuild the
+            variant set from the folder, activate the landed file's variant
+            and stamp it on the loaded image.
+
+        Args:
+            project_dir (Path): The open project's folder.
+            landed (Path): The file the placement or the save landed on.
+
+        Returns:
+            Optional[str]: The activated variant id, or ``None`` when the
+                folder does not validate (the variant set is left as it
+                was).
+
+        Data Flow:
+            - The variant set is rebuilt from the folder, then the id is
+              found by FILE NAME after the build: a stem collision makes the
+              id the full file name (the E6 duplicate-id rule), so the stem
+              is only the fallback.
+            - The id becomes ``active_id`` and ``current_file.variant_id``;
+              the project labels repaint. ``project.json`` is not touched
+              here (the caller rewrites it).
+
+        Dependencies:
+            Uses:
+                - ``validate_project_files`` / ``build_variant_set``
+            Used by:
+                - ``_sync_loaded_file_to_project`` (the variant append)
+                - ``on_patch_editor_panel_save_back_decision``
+        """
+        data_files, _a2l_files, error = validate_project_files(project_dir)
+        if error is not None:
+            self.logger.warning("Variant set not rebuilt during sync: %s", error)
+            return None
+        project_name = self.current_project or project_dir.name
+        # Resolve the id AFTER the build by filename match — a stem
+        # collision makes the id the full filename (E6 duplicate-id rule).
+        self._variant_set = build_variant_set(project_name, data_files)
+        variant_id = next(
+            (
+                variant.variant_id
+                for variant in self._variant_set.variants
+                if variant.path.name == landed.name
+            ),
+            landed.stem,
+        )
+        self._variant_set.active_id = variant_id
+        if self.current_file is not None:
+            self.current_file.variant_id = variant_id
+        self.update_project_labels()
+        return variant_id
+
     def _sync_loaded_file_to_project(self) -> None:
         """
         Summary:
@@ -10141,11 +10417,14 @@ class S19TuiApp(App):
               already names a variant in ``_variant_set`` (a variant
               activation reload); otherwise place the file in through
               ``place_into_workarea``, rebuild the variant set with the new
-              file active, stamp ``current_file.variant_id``, and report
-              the outcome in the status line — an added variant is reported
-              as added; a reused file (identical bytes) names the existing
-              variant instead (LLR-163.5).
-            - MAC loads keep the pre-batch single-MAC sync rules.
+              file active, stamp ``current_file.variant_id``, rewrite
+              ``project.json`` through the seam with every key the append
+              does not own carried, name the file Load now opens
+              (LLR-168.3), and report the outcome in the status line — an
+              added variant is reported as added; a reused file (identical
+              bytes) names the existing variant instead (LLR-163.5).
+            - MAC loads keep the pre-batch single-MAC sync rules; a MAC
+              that lands rewrites ``project.json`` the same way (LLR-168.3).
 
         Dependencies:
             Uses:
@@ -10170,6 +10449,7 @@ class S19TuiApp(App):
             existing_suffixes = {item.suffix.lower() for item in data_files}
         else:
             existing_suffixes = set()
+        mac_placed: Optional[Path] = None
         try:
             if self.current_file.path.suffix.lower() in PROJECT_PRIMARY_DATA_EXTENSIONS:
                 known_variant_ids = (
@@ -10200,27 +10480,17 @@ class S19TuiApp(App):
                     saved = placement.path
                     project_name = self.current_project or project_dir.name
                     appended_id = saved.stem
-                    synced_files, _synced_a2l, sync_error = validate_project_files(project_dir)
-                    if sync_error is None:
-                        # Resolve the id AFTER the build by filename match —
-                        # a stem collision makes the id the full filename
-                        # (E6 duplicate-id rule).
-                        self._variant_set = build_variant_set(project_name, synced_files)
-                        appended_id = next(
-                            (
-                                variant.variant_id
-                                for variant in self._variant_set.variants
-                                if variant.path.name == saved.name
-                            ),
-                            saved.stem,
-                        )
-                        self._variant_set.active_id = appended_id
-                        self.current_file.variant_id = appended_id
-                        self.update_project_labels()
-                    else:
-                        self.logger.warning(
-                            "Variant set not rebuilt during sync: %s", sync_error
-                        )
+                    activated = self._activate_project_file(project_dir, saved)
+                    if activated is not None:
+                        appended_id = activated
+                        # LLR-168.3: the appended file is the project's
+                        # active variant on disk too; the status says which
+                        # file Load now opens only once project.json
+                        # records it (F2 / SEC6-4).
+                        if self._rewrite_project_manifest(project_dir, saved):
+                            self.set_status(
+                                f"Project '{project_name}' now opens {saved.name}"
+                            )
                     if placement.reused:
                         self.set_status(
                             f"Variant '{appended_id}' already in project "
@@ -10242,10 +10512,10 @@ class S19TuiApp(App):
                             project_dir,
                         )
             elif self.current_file.path.suffix.lower() in MAC_EXTENSIONS and ".mac" not in existing_suffixes:
-                copy_into_workarea(
+                mac_placed = place_into_workarea(
                     self.current_file.path, project_dir,
                     workarea_root=self.workarea,
-                )
+                ).path
                 self.logger.info("Synced MAC data file into project: %s", project_dir)
             if (
                 self.current_file.mac_path
@@ -10253,17 +10523,26 @@ class S19TuiApp(App):
                 and self.current_file.mac_path.suffix.lower() in MAC_EXTENSIONS
                 and ".mac" not in existing_suffixes
             ):
-                copy_into_workarea(
+                mac_placed = place_into_workarea(
                     self.current_file.mac_path, project_dir,
                     workarea_root=self.workarea,
-                )
+                ).path
                 self.logger.info("Synced attached MAC file into project: %s", project_dir)
+            if mac_placed is not None:
+                # LLR-168.3: the MAC sync rewrites project.json, carrying
+                # every key it does not own.
+                self._rewrite_project_manifest(project_dir, mac_placed)
         except WorkareaContainmentError as exc:
             self.set_status(f"Project sync rejected: {exc}")
             self.logger.warning("Project sync rejected by workarea guard: %s", exc)
 
     def _sync_loaded_a2l_to_project(self) -> None:
-        """Copy loaded A2L file into active project if allowed."""
+        """Copy loaded A2L file into active project if allowed.
+
+        The copy places through ``place_into_workarea`` and then rewrites
+        ``project.json`` through ``_rewrite_project_manifest``, carrying
+        every key the sync does not own (LLR-168.3).
+        """
         if not self.current_a2l_path:
             return
         project_dir = self._active_project_dir()
@@ -10278,8 +10557,11 @@ class S19TuiApp(App):
             self.logger.info("Project already has A2L file, skipping sync: %s", project_dir)
             return
         try:
-            copy_into_workarea(self.current_a2l_path, project_dir, workarea_root=self.workarea)
+            placed = place_into_workarea(
+                self.current_a2l_path, project_dir, workarea_root=self.workarea
+            ).path
             self.logger.info("Synced A2L file into project: %s", project_dir)
+            self._rewrite_project_manifest(project_dir, placed)
         except WorkareaContainmentError as exc:
             self.set_status(f"A2L sync rejected: {exc}")
             self.logger.warning("A2L sync rejected by workarea guard: %s", exc)

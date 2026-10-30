@@ -1,0 +1,639 @@
+# mutation: SEC6-8-plain-valueerror-not-caught — SEC6-8 (LLR-178.1, SEC6-1 skip path): the manifest parse no longer catches a plain ValueError (an integer over the digit limit)
+# file: s19_app/tui/services/variant_execution_service.py (sha256 before 76b276077ded9717)
+# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=C:\Users\jjgh8\AppData\Local\Temp\f3mut-SEC6-8-plain-valueerror-not-caught tests/test_b100_announce.py tests/test_b100_active_variant.py -k digit_limit or int-over-digit-limit
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (corrective pass 3, mutated in place, then restored)
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\__init__.py
+# date: 2026-10-30T05:15:27Z
+# --- old
+#           json.JSONDecodeError,
+#           ValueError,
+#           RecursionError,
+# --- new
+#           json.JSONDecodeError,
+#           RecursionError,
+FFFFF                                                                    [100%]
+================================== FAILURES ===================================
+________ test_tc_b100_67_integer_over_the_digit_limit_reads_as_damaged ________
+
+    async def _drive():
+        app = S19TuiApp(base_dir=base)
+        async with app.run_test(size=(118, 54), notifications=True) as pilot:
+            await pilot.pause()
+>           await _open_panel(pilot, app)
+
+tests\test_b100_announce.py:715: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_announce.py:424: in _open_panel
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _open_panel.<locals>.<lambda> at 0x000001BE88F6B4C0>
+description = 'the Load-result panel holding a focus', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the Load-result panel holding a focus
+
+tests\test_b100_announce.py:96: AssertionError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-8-plain-valueerror-not-caught/test_tc_b100_67_integer_over_t0')
+
+    def test_tc_b100_67_integer_over_the_digit_limit_reads_as_damaged(tmp_path: Path) -> None:
+        """SEC6-8: ``project.json`` holds a 5 000-digit integer (``json.load``
+        raises a plain ``ValueError``) — the project opens through the Load
+        project dialog and the panel says the manifest is damaged.
+    
+        RED (executed on the corrective-pass-2 tree, e494c50c): ``ValueError``
+        out of ``json.load``; the app exited."""
+        base = tmp_path / "app"
+        project_dir = _seed_two_variants(_workarea(base))
+        (project_dir / "project.json").write_text(projects.OVERLONG_INT_MANIFEST, encoding="utf-8")
+    
+        async def _drive():
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=(118, 54), notifications=True) as pilot:
+                await pilot.pause()
+                await _open_panel(pilot, app)
+                return _panel_text(app)
+    
+>       text = asyncio.run(_drive())
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_announce.py:718: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_announce.py:713: in _drive
+    async with app.run_test(size=(118, 54), notifications=True) as pilot:
+..\..\anaconda3\envs\s19env\Lib\contextlib.py:231: in __aexit__
+    await self.gen.athrow(typ, value, traceback)
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: in run_test
+    raise self._exception
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:702: in _flush_next_callbacks
+    await invoke(callback.callback)
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:56: in _invoke
+    result = callback(*params[:parameter_count])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\app.py:7019: in _route_load_project
+    self._handle_load_project(name)
+s19_app\tui\app.py:10141: in _handle_load_project
+    manifest = read_project_manifest(project_dir)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\services\variant_execution_service.py:515: in read_project_manifest
+    payload = json.load(handle)
+              ^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\json\__init__.py:293: in load
+    return loads(fp.read(),
+..\..\anaconda3\envs\s19env\Lib\json\__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\json\decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <json.decoder.JSONDecoder object at 0x000001BE82E0B6D0>
+s = '{"schema_version": 1, "pad": 9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999...999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999}'
+idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+>           obj, end = self.scan_once(s, idx)
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E           ValueError: Exceeds the limit (4300 digits) for integer string conversion: value has 5000 digits; use sys.set_int_max_str_digits() to increase the limit
+
+..\..\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
+---------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────
+│ C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\tui\app.py:7019 in           
+│ _route_load_project                                                          
+│                                                                              
+│    7016 │   │   │   │   - ``action_load_project`` (the dialog's dismiss call 
+│    7017 │   │   """                                                          
+│    7018 │   │   before = self._last_load_announcement                        
+│ ❱  7019 │   │   self._handle_load_project(name)                              
+│    7020 │   │   announcement = self._last_load_announcement                  
+│    7021 │   │   if announcement is None or announcement is before:           
+│    7022 │   │   │   return                                                   
+│                                                                              
+│ ╭─────────────────── locals ────────────────────╮                            
+│ │ before = None                                 │                            
+│ │   name = 'P'                                  │                            
+│ │   self = S19TuiApp(                           │                            
+│ │          │   title='Hex Edit Tool',           │                            
+│ │          │   classes={'-dark-mode'},          │                            
+│ │          │   pseudo_classes={                 │                            
+│ │          │   │   'focus',                     │                            
+│ │          │   │   'dark'                       │                            
+│ │          │   }                                │                            
+│ │          )                                    │                            
+│ ╰───────────────────────────────────────────────╯                            
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\tui\app.py:10141 in          
+│ _handle_load_project                                                         
+│                                                                              
+│   10138 │   │   # order of ``build_variant_set`` (with a status warning when 
+│   10139 │   │   # manifest names an unknown variant).                        
+│   10140 │   │   variant_set = build_variant_set(name, data_files)            
+│ ❱ 10141 │   │   manifest = read_project_manifest(project_dir)                
+│   10142 │   │   # LLR-028.1 — adopt the manifest's declared regions as app s 
+│   10143 │   │   # next Reports dialog seeds from them (HLR-028 capture); res 
+│   10144 │   │   # for a legacy/no-key project so a prior project's regions d 
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │         a2l_files = []                                                   │ 
+│ │        data_files = [                                                    │ 
+│ │                     │                                                    │ 
+│ │                     WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mu… │ 
+│ │                     │                                                    │ 
+│ │                     WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mu… │ 
+│ │                     ]                                                    │ 
+│ │ discarded_unsaved = 0                                                    │ 
+│ │             error = None                                                 │ 
+│ │              name = 'P'                                                  │ 
+│ │       project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mu… │ 
+│ │              self = S19TuiApp(                                           │ 
+│ │                     │   title='Hex Edit Tool',                           │ 
+│ │                     │   classes={'-dark-mode'},                          │ 
+│ │                     │   pseudo_classes={'focus', 'dark'}                 │ 
+│ │                     )                                                    │ 
+│ │       variant_set = ProjectVariantSet(                                   │ 
+│ │                     │   project_name='P',                                │ 
+│ │                     │   variants=(                                       │ 
+│ │                     │   │   VariantDescriptor(                           │ 
+│ │                     │   │   │   variant_id='firmware',                   │ 
+│ │                     │   │   │                                            │ 
+│ │                     path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp… │ 
+│ │                     │   │   │   file_type='s19'                          │ 
+│ │                     │   │   ),                                           │ 
+│ │                     │   │   VariantDescriptor(                           │ 
+│ │                     │   │   │   variant_id='firmware_1',                 │ 
+│ │                     │   │   │                                            │ 
+│ │                     path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp… │ 
+│ │                     │   │   │   file_type='s19'                          │ 
+│ │                     │   │   )                                            │ 
+│ │                     │   ),                                               │ 
+│ │                     │   active_id='firmware'                             │ 
+│ │                     )                                                    │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\tui\services\variant_executi 
+│ on_service.py:515 in read_project_manifest                                   
+│                                                                              
+│    512 │   │   return empty                                                  
+│    513 │   try:                                                              
+│    514 │   │   with manifest_path.open("rb") as handle:                      
+│ ❱  515 │   │   │   payload = json.load(handle)                               
+│    516 │   except (                                                          
+│    517 │   │   json.JSONDecodeError,                                         
+│    518 │   │   RecursionError,                                               
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │         empty = ProjectManifest(                                         │ 
+│ │                 │   schema_version=None,                                 │ 
+│ │                 │   active_variant=None,                                 │ 
+│ │                 │   batch=[],                                            │ 
+│ │                 │   assignments={},                                      │ 
+│ │                 │   declared_regions=(),                                 │ 
+│ │                 │   gathered={},                                         │ 
+│ │                 │   issues=[]                                            │ 
+│ │                 )                                                        │ 
+│ │        handle = <_io.BufferedReader                                      │ 
+│ │                 name='C:\\Users\\jjgh8\\AppData\\Local\\Temp\\f3mut-SEC… │ 
+│ │        issues = []                                                       │ 
+│ │ manifest_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SE… │ 
+│ │   project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SE… │ 
+│ │    size_bytes = 5030                                                     │ 
+│ │    size_probe = None                                                     │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\__init__.py:293 in load        
+│                                                                              
+│   290 │   To use a custom ``JSONDecoder`` subclass, specify it with the ``cl 
+│   291 │   kwarg; otherwise ``JSONDecoder`` is used.                          
+│   292 │   """                                                                
+│ ❱ 293 │   return loads(fp.read(),                                            
+│   294 │   │   cls=cls, object_hook=object_hook,                              
+│   295 │   │   parse_float=parse_float, parse_int=parse_int,                  
+│   296 │   │   parse_constant=parse_constant, object_pairs_hook=object_pairs_ 
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │               cls = None                                                 │ 
+│ │                fp = <_io.BufferedReader                                  │ 
+│ │                     name='C:\\Users\\jjgh8\\AppData\\Local\\Temp\\f3mut… │ 
+│ │                kw = {}                                                   │ 
+│ │       object_hook = None                                                 │ 
+│ │ object_pairs_hook = None                                                 │ 
+│ │    parse_constant = None                                                 │ 
+│ │       parse_float = None                                                 │ 
+│ │         parse_int = None                                                 │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\__init__.py:346 in loads       
+│                                                                              
+│   343 │   if (cls is None and object_hook is None and                        
+│   344 │   │   │   parse_int is None and parse_float is None and              
+│   345 │   │   │   parse_constant is None and object_pairs_hook is None and n 
+│ ❱ 346 │   │   return _default_decoder.decode(s)                              
+│   347 │   if cls is None:                                                    
+│   348 │   │   cls = JSONDecoder                                              
+│   349 │   if object_hook is not None:                                        
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │               cls = None                                                 │ 
+│ │                kw = {}                                                   │ 
+│ │       object_hook = None                                                 │ 
+│ │ object_pairs_hook = None                                                 │ 
+│ │    parse_constant = None                                                 │ 
+│ │       parse_float = None                                                 │ 
+│ │         parse_int = None                                                 │ 
+│ │                 s = '{"schema_version": 1, "pad":                        │ 
+│ │                     999999999999999999999999999999999999999999999999999… │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:337 in decode       
+│                                                                              
+│   334 │   │   containing a JSON document).                                   
+│   335 │   │                                                                  
+│   336 │   │   """                                                            
+│ ❱ 337 │   │   obj, end = self.raw_decode(s, idx=_w(s, 0).end())              
+│   338 │   │   end = _w(s, end).end()                                         
+│   339 │   │   if end != len(s):                                              
+│   340 │   │   │   raise JSONDecodeError("Extra data", s, end)                
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │   _w = <built-in method match of re.Pattern object at                    │ 
+│ │        0x000001BE82D9B920>                                               │ 
+│ │    s = '{"schema_version": 1, "pad":                                     │ 
+│ │        999999999999999999999999999999999999999999999999999'+4950         │ 
+│ │ self = <json.decoder.JSONDecoder object at 0x000001BE82E0B6D0>           │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:353 in raw_decode   
+│                                                                              
+│   350 │   │                                                                  
+│   351 │   │   """                                                            
+│   352 │   │   try:                                                           
+│ ❱ 353 │   │   │   obj, end = self.scan_once(s, idx)                          
+│   354 │   │   except StopIteration as err:                                   
+│   355 │   │   │   raise JSONDecodeError("Expecting value", s, err.value) fro 
+│   356 │   │   return obj, end                                                
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │  idx = 0                                                                 │ 
+│ │    s = '{"schema_version": 1, "pad":                                     │ 
+│ │        999999999999999999999999999999999999999999999999999'+4950         │ 
+│ │ self = <json.decoder.JSONDecoder object at 0x000001BE82E0B6D0>           │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+╰──────────────────────────────────────────────────────────────────────────────
+ValueError: Exceeds the limit (4300 digits) for integer string conversion: valu
+has 5000 digits; use sys.set_int_max_str_digits() to increase the limit
+_ test_tc_b100_20_damaged_manifest_is_never_rewritten[save-back-int-over-digit-limit] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-8-plain-valueerror-not-caught/test_tc_b100_20_damaged_manife0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001BE8A070650>
+writer = 'save-back', damage = 'int-over-digit-limit'
+
+    @pytest.mark.parametrize("damage", DAMAGE_KINDS)
+    @pytest.mark.parametrize("writer", WRITERS)
+    def test_tc_b100_20_damaged_manifest_is_never_rewritten(
+        tmp_path: Path, monkeypatch, writer: str, damage: str
+    ) -> None:
+        """Each in-project writer, with a ``project.json`` the reader cannot
+        read as a manifest: the damaged bytes are identical afterwards (the
+        user's records in them survive), the writer's file is placed, the status
+        says the manifest is damaged and was not rewritten, and nothing claims
+        a save, a verify or a new opening variant.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): every arm —
+        the writer replaced the file with an almost empty manifest and painted
+        ``Project saved + manifest verified``."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        damaged = _damage(project_dir, damage, monkeypatch)
+>       statuses = _run_writer(tmp_path, base, writer)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_active_variant.py:528: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_active_variant.py:507: in _run_writer
+    asyncio.run(_drive())
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_active_variant.py:482: in _drive
+    await _open_seeded_project(pilot, app)
+tests\test_b100_active_variant.py:300: in _open_seeded_project
+    app._handle_load_project(name)
+s19_app\tui\app.py:10141: in _handle_load_project
+    manifest = read_project_manifest(project_dir)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\services\variant_execution_service.py:515: in read_project_manifest
+    payload = json.load(handle)
+              ^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\json\__init__.py:293: in load
+    return loads(fp.read(),
+..\..\anaconda3\envs\s19env\Lib\json\__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\json\decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <json.decoder.JSONDecoder object at 0x000001BE82E0B6D0>
+s = '{"schema_version": 1, "pad": 9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999...999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999}'
+idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+>           obj, end = self.scan_once(s, idx)
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E           ValueError: Exceeds the limit (4300 digits) for integer string conversion: value has 5000 digits; use sys.set_int_max_str_digits() to increase the limit
+
+..\..\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
+_ test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-int-over-digit-limit] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-8-plain-valueerror-not-caught/test_tc_b100_20_damaged_manife1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001BE88B74050>
+writer = 'variant-append', damage = 'int-over-digit-limit'
+
+    @pytest.mark.parametrize("damage", DAMAGE_KINDS)
+    @pytest.mark.parametrize("writer", WRITERS)
+    def test_tc_b100_20_damaged_manifest_is_never_rewritten(
+        tmp_path: Path, monkeypatch, writer: str, damage: str
+    ) -> None:
+        """Each in-project writer, with a ``project.json`` the reader cannot
+        read as a manifest: the damaged bytes are identical afterwards (the
+        user's records in them survive), the writer's file is placed, the status
+        says the manifest is damaged and was not rewritten, and nothing claims
+        a save, a verify or a new opening variant.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): every arm —
+        the writer replaced the file with an almost empty manifest and painted
+        ``Project saved + manifest verified``."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        damaged = _damage(project_dir, damage, monkeypatch)
+>       statuses = _run_writer(tmp_path, base, writer)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_active_variant.py:528: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_active_variant.py:507: in _run_writer
+    asyncio.run(_drive())
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_active_variant.py:482: in _drive
+    await _open_seeded_project(pilot, app)
+tests\test_b100_active_variant.py:300: in _open_seeded_project
+    app._handle_load_project(name)
+s19_app\tui\app.py:10141: in _handle_load_project
+    manifest = read_project_manifest(project_dir)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\services\variant_execution_service.py:515: in read_project_manifest
+    payload = json.load(handle)
+              ^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\json\__init__.py:293: in load
+    return loads(fp.read(),
+..\..\anaconda3\envs\s19env\Lib\json\__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\json\decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <json.decoder.JSONDecoder object at 0x000001BE82E0B6D0>
+s = '{"schema_version": 1, "pad": 9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999...999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999}'
+idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+>           obj, end = self.scan_once(s, idx)
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E           ValueError: Exceeds the limit (4300 digits) for integer string conversion: value has 5000 digits; use sys.set_int_max_str_digits() to increase the limit
+
+..\..\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
+_ test_tc_b100_20_damaged_manifest_is_never_rewritten[mac-sync-int-over-digit-limit] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-8-plain-valueerror-not-caught/test_tc_b100_20_damaged_manife2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001BE8962BE10>
+writer = 'mac-sync', damage = 'int-over-digit-limit'
+
+    @pytest.mark.parametrize("damage", DAMAGE_KINDS)
+    @pytest.mark.parametrize("writer", WRITERS)
+    def test_tc_b100_20_damaged_manifest_is_never_rewritten(
+        tmp_path: Path, monkeypatch, writer: str, damage: str
+    ) -> None:
+        """Each in-project writer, with a ``project.json`` the reader cannot
+        read as a manifest: the damaged bytes are identical afterwards (the
+        user's records in them survive), the writer's file is placed, the status
+        says the manifest is damaged and was not rewritten, and nothing claims
+        a save, a verify or a new opening variant.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): every arm —
+        the writer replaced the file with an almost empty manifest and painted
+        ``Project saved + manifest verified``."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        damaged = _damage(project_dir, damage, monkeypatch)
+>       statuses = _run_writer(tmp_path, base, writer)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_active_variant.py:528: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_active_variant.py:507: in _run_writer
+    asyncio.run(_drive())
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_active_variant.py:482: in _drive
+    await _open_seeded_project(pilot, app)
+tests\test_b100_active_variant.py:300: in _open_seeded_project
+    app._handle_load_project(name)
+s19_app\tui\app.py:10141: in _handle_load_project
+    manifest = read_project_manifest(project_dir)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\services\variant_execution_service.py:515: in read_project_manifest
+    payload = json.load(handle)
+              ^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\json\__init__.py:293: in load
+    return loads(fp.read(),
+..\..\anaconda3\envs\s19env\Lib\json\__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\json\decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <json.decoder.JSONDecoder object at 0x000001BE82E0B6D0>
+s = '{"schema_version": 1, "pad": 9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999...999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999}'
+idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+>           obj, end = self.scan_once(s, idx)
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E           ValueError: Exceeds the limit (4300 digits) for integer string conversion: value has 5000 digits; use sys.set_int_max_str_digits() to increase the limit
+
+..\..\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
+_ test_tc_b100_20_damaged_manifest_is_never_rewritten[a2l-sync-int-over-digit-limit] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-8-plain-valueerror-not-caught/test_tc_b100_20_damaged_manife3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001BE88940950>
+writer = 'a2l-sync', damage = 'int-over-digit-limit'
+
+    @pytest.mark.parametrize("damage", DAMAGE_KINDS)
+    @pytest.mark.parametrize("writer", WRITERS)
+    def test_tc_b100_20_damaged_manifest_is_never_rewritten(
+        tmp_path: Path, monkeypatch, writer: str, damage: str
+    ) -> None:
+        """Each in-project writer, with a ``project.json`` the reader cannot
+        read as a manifest: the damaged bytes are identical afterwards (the
+        user's records in them survive), the writer's file is placed, the status
+        says the manifest is damaged and was not rewritten, and nothing claims
+        a save, a verify or a new opening variant.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): every arm —
+        the writer replaced the file with an almost empty manifest and painted
+        ``Project saved + manifest verified``."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        damaged = _damage(project_dir, damage, monkeypatch)
+>       statuses = _run_writer(tmp_path, base, writer)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_active_variant.py:528: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_active_variant.py:507: in _run_writer
+    asyncio.run(_drive())
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_active_variant.py:482: in _drive
+    await _open_seeded_project(pilot, app)
+tests\test_b100_active_variant.py:300: in _open_seeded_project
+    app._handle_load_project(name)
+s19_app\tui\app.py:10141: in _handle_load_project
+    manifest = read_project_manifest(project_dir)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\services\variant_execution_service.py:515: in read_project_manifest
+    payload = json.load(handle)
+              ^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\json\__init__.py:293: in load
+    return loads(fp.read(),
+..\..\anaconda3\envs\s19env\Lib\json\__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\json\decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <json.decoder.JSONDecoder object at 0x000001BE82E0B6D0>
+s = '{"schema_version": 1, "pad": 9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999...999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999}'
+idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+>           obj, end = self.scan_once(s, idx)
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E           ValueError: Exceeds the limit (4300 digits) for integer string conversion: value has 5000 digits; use sys.set_int_max_str_digits() to increase the limit
+
+..\..\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_announce.py::test_tc_b100_67_integer_over_the_digit_limit_reads_as_damaged
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[save-back-int-over-digit-limit]
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-int-over-digit-limit]
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[mac-sync-int-over-digit-limit]
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[a2l-sync-int-over-digit-limit]
+5 failed, 59 deselected in 24.55s
+
+
+VERDICT: KILLED (pytest exit 1)
+RESTORE OK (sha256 76b276077ded9717)

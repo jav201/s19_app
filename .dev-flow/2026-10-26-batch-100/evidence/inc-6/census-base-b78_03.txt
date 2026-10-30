@@ -1,0 +1,93 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/i6b (093a7c0 base, the test file unmodified)
+# PYTHONPATH=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/i6b ; NO_COLOR=unset
+# date: 2026-10-30T02:24:14Z
+F                                                                        [100%]
+================================== FAILURES ===================================
+______ test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30164/test_at_b78_03_the_palette_act0')
+
+    def test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact(
+        tmp_path: Path,
+    ) -> None:
+        """AT-B78-03 (GATE) -- the action set equals the Inc-0 ARTIFACT, not the producer.
+    
+        ⚠️ **This node was provably INERT before Inc-0 froze the artifact, and the
+        reason is worth carrying.** `CommandBar` is constructed as
+        `CommandBar(self._build_palette_entries())`, so an implementation comparing
+        the rendered palette against `_build_palette_entries()` compares a producer
+        with ITSELF: executed, the predicate stayed GREEN at `36 == 36` with a whole
+        `Binding` removed from `S19TuiApp.BINDINGS`.
+    
+        What breaks the circularity is the TEMPORAL FREEZE -- a set captured before
+        the change and read back from disk. So this reads
+        `tests/goldens/batch78/at-b78-03-palette-actions.json` and **never
+        regenerates it**; a run that rebuilds it has restored the tautology.
+        """
+        import json
+    
+        from s19_app.tui.command_bar import CommandBar
+    
+        frozen = json.loads(
+            Path("tests/goldens/batch78/at-b78-03-palette-actions.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        expected = frozen if isinstance(frozen, list) else frozen.get("actions", frozen)
+    
+        async def _drive():
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                bar = app.query_one(CommandBar)
+                await pilot.press("ctrl+k")
+                await pilot.pause()
+                rows = list(bar.query_one("#palette_list").children)
+                return [item.data for item in rows]
+    
+        observed = asyncio.run(_drive())
+    
+        # Union of both lanes' amendments to the frozen artifact (RC-1 rebase #4):
+        # batch-95 change 4 (LLR-135.6, ruling Q6/7a) hand-appended ONE action —
+        # "open_split_join_export", the palette-first Split / Join / Export screen
+        # entry — so the freeze now carries the 37 Inc-0 rows plus that one
+        # reviewed amendment (a REGENERATION would restore the tautology this
+        # node exists to break). batch-94's two non-digit rail bindings are NOT
+        # in the freeze — each is pinned as a named live-only delta below
+        # (Inc-001's Check Editor `=`; Inc-003's Flow Execution `]`, US-007).
+        assert len(expected) == 38, (
+            f"the frozen artifact must still carry the 37 Inc-0 actions plus the "
+            f"one batch-95 amendment; it has {len(expected)} -- if this fails "
+            f"the artifact was REGENERATED, which restores the tautology"
+        )
+        live_deltas = ["show_screen('check_editor')", "show_screen('flow_execution')"]
+        for added in live_deltas:
+            assert added in observed, (
+                f"a non-digit rail binding must add exactly one palette action "
+                f"({added!r}); observed={observed!r}"
+            )
+        observed_pre_change = [
+            a for a in observed if a not in live_deltas
+        ]
+        assert len(observed_pre_change) == len(observed) - len(live_deltas), (
+            "each live-only delta must appear exactly once (no duplicates)"
+        )
+>       assert observed_pre_change == list(expected), (
+            f"the pre-change palette action set must equal the Inc-0 freeze.\n"
+            f"missing: {sorted(set(expected) - set(observed_pre_change))}\n"
+            f"unexpected: {sorted(set(observed_pre_change) - set(expected))}"
+        )
+E       AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+E         missing: []
+E         unexpected: ['a2l_describe_tag', 'confirm_attention']
+E       assert ['focus_palet...us_goto', ...] == ['focus_palet...us_goto', ...]
+E         
+E         At index 13 diff: 'a2l_describe_tag' != 'view_reports'
+E         Left contains 2 more items, first extra item: 'open_settings_menu'
+E         Use -v to get more diff
+
+tests\test_tui_commandbar.py:2704: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+1 failed in 2.88s

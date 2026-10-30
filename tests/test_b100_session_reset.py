@@ -616,7 +616,10 @@ def test_tc_b100_10_no_discard_notice_when_nothing_unsaved(tmp_path: Path) -> No
 
     lines = asyncio.run(_drive())
     assert not any("Closed the Patch Editor document" in line for line in lines)
-    assert lines[-1] == "Loaded project 'P2' -> prg.s19", lines
+    # Inc 6 (LLR-178.2): the loaded-project line is the load's summary line.
+    assert lines[-1] == (
+        "Loaded project 'P2' -> prg.s19 - variant 1 of 1, 1 problem - details: p"
+    ), lines
 
 
 def test_tc_b100_10_notice_names_every_discarded_entry(tmp_path: Path) -> None:
@@ -739,6 +742,15 @@ async def _open_project_through_dialog(pilot, app: S19TuiApp, name: str) -> None
         pilot,
         lambda: not isinstance(app.screen, LoadProjectScreen),
         f"the Load project dialog to close after loading {name}",
+    )
+    # Inc 6 (HLR-178): the dialog route opens the Load-result panel;
+    # dismiss it first with its shown key ``esc``.
+    await _wait_for(
+        pilot, lambda: len(app.screen.query("#result_ok")) > 0, "the Load-result panel"
+    )
+    await pilot.press("escape")
+    await _wait_for(
+        pilot, lambda: len(app.screen.query("#result_ok")) == 0, "the panel closed"
     )
 
 

@@ -1,0 +1,59 @@
+# command: python -m pytest -q -p no:cacheprovider tests/test_import_census.py tests/test_tui_snapshot.py tests/test_id_registry.py tests/test_batch91_registry_hygiene.py tests/test_address_census.py tests/test_engine_unchanged.py
+# tree: C:/Users/jjgh8/Github/s19_app-b100-inc6 final, sources: d37ee857f64b202d *s19_app/tui/app.py;a957b576658777b0 *s19_app/tui/screens.py;8e2e8cf059eb48aa *s19_app/tui/services/variant_execution_service.py;781f04ed2cc30897 *s19_app/tui/styles.tcss;
+# PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# date: 2026-10-30T02:43:03Z
+F....................................................................... [ 96%]
+...                                                                      [100%]
+================================== FAILURES ===================================
+_____________________ test_tc653_safe_text_import_census ______________________
+
+    def test_tc653_safe_text_import_census() -> None:
+        """TC-653 — live-tree AST census over the safe_text move (LLR-003.1/003.3)."""
+        # LLR-003.1: exactly one definition site per symbol in the product tree,
+        # and it is s19_app/utils.py.
+        def_sites: dict = {}
+        scrub_sites: dict = {}
+        for path in sorted(PRODUCT_ROOT.rglob("*.py")):
+            if "__pycache__" in path.parts:
+                continue
+            module = _product_module_of(path)
+            tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+            for node in ast.walk(tree):
+                if (
+                    isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+                    and node.name == "safe_text"
+                ):
+                    def_sites.setdefault(module, []).append(node.lineno)
+                if isinstance(node, ast.Assign):
+                    for target in node.targets:
+                        if isinstance(target, ast.Name) and target.id == "_CONTROL_SCRUB":
+                            scrub_sites.setdefault(module, []).append(node.lineno)
+        assert sorted(def_sites) == [UTILS_MODULE], (
+            f"safe_text must be defined only at {UTILS_MODULE}, found: {def_sites}"
+        )
+        assert sorted(scrub_sites) == [UTILS_MODULE], (
+            f"_CONTROL_SCRUB must be defined only at {UTILS_MODULE}, found: {scrub_sites}"
+        )
+    
+        # LLR-003.3: the measured consumer set imports the NAME safe_text from
+        # s19_app.utils — set-equality, drift in either direction fails.
+        names = _census_names(PRODUCT_ROOT, _product_package_of, _product_module_of)
+        importers = names.get((UTILS_MODULE, "safe_text"), set())
+>       assert importers == MEASURED_SAFE_TEXT_CONSUMERS, (
+            f"safe_text importer set drifted from the measured set: "
+            f"extra={sorted(importers - MEASURED_SAFE_TEXT_CONSUMERS)} "
+            f"missing={sorted(MEASURED_SAFE_TEXT_CONSUMERS - importers)}"
+        )
+E       AssertionError: safe_text importer set drifted from the measured set: extra=['s19_app.tui.screens'] missing=[]
+E       assert {'s19_app.tui...ectionb', ...} == {'s19_app.tui...t_split_view'}
+E         
+E         Extra items in the left set:
+E         's19_app.tui.screens'
+E         Use -v to get more diff
+
+tests\test_import_census.py:231: AssertionError
+--------------------------- snapshot report summary ---------------------------
+29 snapshots passed.
+=========================== short test summary info ===========================
+FAILED tests/test_import_census.py::test_tc653_safe_text_import_census - Asse...
+1 failed, 74 passed in 147.82s (0:02:27)

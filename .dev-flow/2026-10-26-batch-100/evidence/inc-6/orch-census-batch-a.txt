@@ -1,0 +1,44 @@
+# command: python -m pytest -q -p no:cacheprovider tests/test_b100_active_variant.py tests/test_b100_announce.py tests/test_b100_focus.py tests/test_b100_reuse.py tests/test_b100_save_guards.py tests/test_b100_save_image.py tests/test_b100_session_reset.py tests/test_b97_check_editor.py tests/test_b97_chips_help.py tests/test_b97_flow_builder.py tests/test_b97_flow_execution.py tests/test_b97_key_bar.py tests/test_b97_load_project_dialog.py tests/test_b97_patch_editor.py tests/test_b97_width.py tests/test_b99_bytes_field.py tests/test_b99_crc_region.py tests/test_b99_editor_image.py tests/test_b99_export.py tests/test_b99_load_project.py tests/test_b99_patch_truth.py tests/test_b99_s0.py tests/test_b99_staging.py tests/test_b99_truncation.py tests/test_before_after_report.py tests/test_change_service.py tests/test_changes_apply.py tests/test_flow_execution.py -rfE
+# tree: /c/Users/jjgh8/Github/s19_app-b100-inc6 (base 093a7c0 + Inc 6, fix3) | sources: 762d1a98c8a65903 *s19_app/tui/app.py;ea549ab4bd9d3ef4 *s19_app/tui/screens.py;76b276077ded9717 *s19_app/tui/services/variant_execution_service.py;781f04ed2cc30897 *s19_app/tui/styles.tcss;
+# PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc6 | NO_COLOR unset | 2026-10-29T23:35:42-06:00
+s19_app: C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\__init__.py
+│ │           apply a change document'+34                                    │ 
+│ │    self = S19TuiApp(                                                     │ 
+│ │           │   title='Hex Edit Tool',                                     │ 
+│ │           │   classes={'-dark-mode'},                                    │ 
+│ │           │   pseudo_classes={'dark', 'focus'}                           │ 
+│ │           )                                                              │ 
+│ │ trimmed = 'Before/after report refused: No applied change summary -      │ 
+│ │           apply a change document'+34                                    │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\tui\app.py:15541 in          
+│ _render_log_lines                                                            
+│                                                                              
+│   15538 │   │   lines = list(self.log_lines)                                 
+│   15539 │   │   while len(lines) < 4:                                        
+│   15540 │   │   │   lines.insert(0, "")                                      
+│ ❱ 15541 │   │   self.query_one("#log_line_1", Label).update(lines[-4])       
+│   15542 │   │   self.query_one("#log_line_2", Label).update(lines[-3])       
+│   15543 │   │   self.query_one("#log_line_3", Label).update(lines[-2])       
+│   15544 │   │   self.query_one("#log_line_4", Label).update(lines[-1])       
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ lines = [                                                                │ 
+│ │         │   '',                                                          │ 
+│ │         │   '',                                                          │ 
+│ │         │   '',                                                          │ 
+│ │         │   'Before/after report refused: No applied change summary -    │ 
+│ │         apply a change document'+34                                      │ 
+│ │         ]                                                                │ 
+│ │  self = S19TuiApp(                                                       │ 
+│ │         │   title='Hex Edit Tool',                                       │ 
+│ │         │   classes={'-dark-mode'},                                      │ 
+│ │         │   pseudo_classes={'dark', 'focus'}                             │ 
+│ │         )                                                                │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+╰──────────────────────────────────────────────────────────────────────────────
+NoMatches: No nodes match '#log_line_1' on Screen(id='_default')
+=========================== short test summary info ===========================
+FAILED tests/test_before_after_report.py::test_tc330_before_after_row_reveal_hide_state_machine
+1 failed, 936 passed in 4009.51s (1:06:49)

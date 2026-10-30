@@ -1,0 +1,1580 @@
+# command: python -m pytest -q -p no:cacheprovider -rA tests/test_b100_announce.py tests/test_b100_active_variant.py::test_at_b100_20_every_writer_carries_the_keys_it_does_not_own tests/test_b100_focus.py::test_tc_b100_12_panel_close_lands_on_the_windows_target tests/test_b100_focus.py::test_at_b100_04_focus_lands_and_single_keys_reach_their_screens tests/test_b100_save_image.py::test_at_b100_05_save_project_saves_the_patched_image
+# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/i6b (093a7c0 base; the Inc 6 test files copied in: test_b100_announce.py, test_b100_active_variant.py, support/b100_projects.py, and the re-pinned test_b100_focus.py / test_b100_save_image.py; 0 source paths modified)
+# PYTHONPATH=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/i6b ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# date: 2026-10-30T01:38:11Z
+FFFFFFFFFF.FFFFFFFFFFFFFFFFF                                             [100%]
+================================== FAILURES ===================================
+_______________________ test_tc_b100_55_recorded_active _______________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_tc_b100_55_recorded_activ0')
+
+    def test_tc_b100_55_recorded_active(tmp_path: Path) -> None:
+        service = _reasons()
+        vs = _variants("firmware.s19", "firmware_1.s19", active="firmware_1")
+>       announcement = _compose(
+            "P", vs, ProjectManifest(schema_version=1, active_variant="firmware_1")
+        )
+
+tests\test_b100_announce.py:135: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = ('P', ProjectVariantSet(project_name='P', variants=(VariantDescriptor(variant_id='firmware', path=WindowsPath('firmwar...ojectManifest(schema_version=1, active_variant='firmware_1', batch=[], assignments={}, declared_regions=(), issues=[]))
+kwargs = {}
+
+    def _compose(*args, **kwargs):
+>       from s19_app.tui.services.variant_execution_service import compose_load_announcement
+E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
+
+tests\test_b100_announce.py:121: ImportError
+_________________ test_tc_b100_55_first_by_name_none_recorded _________________
+
+    def test_tc_b100_55_first_by_name_none_recorded() -> None:
+        service = _reasons()
+        vs = _variants("firmware.s19", "firmware_1.s19", active="firmware")
+>       announcement = _compose("P", vs, ProjectManifest(schema_version=1, active_variant=None))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_announce.py:150: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = ('P', ProjectVariantSet(project_name='P', variants=(VariantDescriptor(variant_id='firmware', path=WindowsPath('firmwar...re'), ProjectManifest(schema_version=1, active_variant=None, batch=[], assignments={}, declared_regions=(), issues=[]))
+kwargs = {}
+
+    def _compose(*args, **kwargs):
+>       from s19_app.tui.services.variant_execution_service import compose_load_announcement
+E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
+
+tests\test_b100_announce.py:121: ImportError
+_______________ test_tc_b100_55_first_by_name_manifest_damaged ________________
+
+    def test_tc_b100_55_first_by_name_manifest_damaged() -> None:
+        service = _reasons()
+        vs = _variants("firmware.s19", "firmware_1.s19", active="firmware")
+        manifest = ProjectManifest(
+            schema_version=None,
+            active_variant=None,
+            issues=[_issue(MANIFEST_JSON_PARSE, "not JSON - ignored: JSONDecodeError")],
+        )
+>       announcement = _compose("P", vs, manifest)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_announce.py:164: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = ('P', ProjectVariantSet(project_name='P', variants=(VariantDescriptor(variant_id='firmware', path=WindowsPath('firmwar...SONDecodeError', artifact='manifest', symbol=None, address=None, line_number=None, related_artifacts=[], details={})]))
+kwargs = {}
+
+    def _compose(*args, **kwargs):
+>       from s19_app.tui.services.variant_execution_service import compose_load_announcement
+E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
+
+tests\test_b100_announce.py:121: ImportError
+________________ test_tc_b100_55_first_by_name_no_project_json ________________
+
+    def test_tc_b100_55_first_by_name_no_project_json() -> None:
+        service = _reasons()
+        vs = _variants("firmware.s19", "firmware_1.s19", active="firmware")
+>       announcement = _compose("P", vs, None)
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_announce.py:173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = ('P', ProjectVariantSet(project_name='P', variants=(VariantDescriptor(variant_id='firmware', path=WindowsPath('firmwar...Descriptor(variant_id='firmware_1', path=WindowsPath('firmware_1.s19'), file_type='s19')), active_id='firmware'), None)
+kwargs = {}
+
+    def _compose(*args, **kwargs):
+>       from s19_app.tui.services.variant_execution_service import compose_load_announcement
+E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
+
+tests\test_b100_announce.py:121: ImportError
+_________ test_tc_b100_55_next_valid_when_the_recorded_one_is_missing _________
+
+    def test_tc_b100_55_next_valid_when_the_recorded_one_is_missing() -> None:
+        """The recorded ``firmware-patched`` is gone: the app opened
+        ``firmware``; the announcement says why and is never "recorded"."""
+        service = _reasons()
+        vs = _variants("firmware.s19", "firmware_1.s19", active="firmware")
+>       announcement = _compose(
+            "P", vs, ProjectManifest(schema_version=1, active_variant="firmware-patched")
+        )
+
+tests\test_b100_announce.py:186: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = ('P', ProjectVariantSet(project_name='P', variants=(VariantDescriptor(variant_id='firmware', path=WindowsPath('firmwar...anifest(schema_version=1, active_variant='firmware-patched', batch=[], assignments={}, declared_regions=(), issues=[]))
+kwargs = {}
+
+    def _compose(*args, **kwargs):
+>       from s19_app.tui.services.variant_execution_service import compose_load_announcement
+E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
+
+tests\test_b100_announce.py:121: ImportError
+____________ test_tc_b100_55_five_reasons_have_distinct_user_text _____________
+
+    def test_tc_b100_55_five_reasons_have_distinct_user_text() -> None:
+        service = _reasons()
+        ids = [
+>           service.LOAD_REASON_RECORDED,
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            service.LOAD_REASON_NONE_RECORDED,
+            service.LOAD_REASON_MANIFEST_DAMAGED,
+            service.LOAD_REASON_NO_MANIFEST,
+            service.LOAD_REASON_NEXT_VALID,
+        ]
+E       AttributeError: module 's19_app.tui.services.variant_execution_service' has no attribute 'LOAD_REASON_RECORDED'
+
+tests\test_b100_announce.py:199: AttributeError
+_____________ test_tc_b100_55_three_problems_in_precedence_order ______________
+
+    def test_tc_b100_55_three_problems_in_precedence_order() -> None:
+        """Two skipped manifest entries rank before the missing variant."""
+        vs = _variants("firmware.s19", active="firmware")
+        manifest = ProjectManifest(
+            schema_version=1,
+            active_variant="gone",
+            issues=[_issue(MANIFEST_PATH_ESCAPE), _issue(MANIFEST_BAD_STRUCTURE)],
+        )
+>       announcement = _compose("P", vs, manifest)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_announce.py:219: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = ('P', ProjectVariantSet(project_name='P', variants=(VariantDescriptor(variant_id='firmware', path=WindowsPath('firmwar...'>, message='x', artifact='manifest', symbol=None, address=None, line_number=None, related_artifacts=[], details={})]))
+kwargs = {}
+
+    def _compose(*args, **kwargs):
+>       from s19_app.tui.services.variant_execution_service import compose_load_announcement
+E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
+
+tests\test_b100_announce.py:121: ImportError
+_____________ test_tc_b100_55_latest_never_comes_from_file_times ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_tc_b100_55_latest_never_c0')
+
+    def test_tc_b100_55_latest_never_comes_from_file_times(tmp_path: Path) -> None:
+        """A touched (newer) file is never called latest: only the variant the
+        manifest records is; a fallback open is not latest either."""
+        service = _reasons()
+        folder = tmp_path / "P"
+        folder.mkdir()
+        for name in ("firmware.s19", "firmware_1.s19"):
+            (folder / name).write_text("S0030000FC\n", encoding="ascii")
+        future = time.time() + 3600
+        os.utime(folder / "firmware.s19", (future, future))
+        recorded = build_variant_set("P", sorted(folder.iterdir()))
+        recorded.active_id = "firmware_1"
+>       first = _compose("P", recorded, ProjectManifest(schema_version=1, active_variant="firmware_1"))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_announce.py:239: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = ('P', ProjectVariantSet(project_name='P', variants=(VariantDescriptor(variant_id='firmware', path=WindowsPath('C:/User...ojectManifest(schema_version=1, active_variant='firmware_1', batch=[], assignments={}, declared_regions=(), issues=[]))
+kwargs = {}
+
+    def _compose(*args, **kwargs):
+>       from s19_app.tui.services.variant_execution_service import compose_load_announcement
+E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
+
+tests\test_b100_announce.py:121: ImportError
+_____________ test_tc_b100_55_boundaries_one_variant_and_no_image _____________
+
+    def test_tc_b100_55_boundaries_one_variant_and_no_image() -> None:
+>       one = _compose(
+            "P", _variants("firmware.s19", active="firmware"),
+            ProjectManifest(schema_version=1, active_variant="firmware"),
+        )
+
+tests\test_b100_announce.py:250: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = ('P', ProjectVariantSet(project_name='P', variants=(VariantDescriptor(variant_id='firmware', path=WindowsPath('firmwar...ProjectManifest(schema_version=1, active_variant='firmware', batch=[], assignments={}, declared_regions=(), issues=[]))
+kwargs = {}
+
+    def _compose(*args, **kwargs):
+>       from s19_app.tui.services.variant_execution_service import compose_load_announcement
+E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
+
+tests\test_b100_announce.py:121: ImportError
+_________ test_tc_b100_56_one_summary_line_and_the_final_status_text __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_tc_b100_56_one_summary_li0')
+
+    def test_tc_b100_56_one_summary_line_and_the_final_status_text(tmp_path: Path) -> None:
+        base = tmp_path / "app"
+        _seed_two_variants(_workarea(base))
+        lines, log4, status, panel = _load_directly(base)
+        summaries = [line for line in lines if line.endswith("details: p")]
+>       assert len(summaries) == 1, lines
+E       AssertionError: ['Loaded firmware_1.s19 (S19 only)', "Loaded project 'P' -> firmware_1.s19"]
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_b100_announce.py:301: AssertionError
+_____ test_tc_b100_56_long_names_keep_the_details_key_inside_118_columns ______
+
+    def test_tc_b100_56_long_names_keep_the_details_key_inside_118_columns() -> None:
+        long_set = _variants("f" * 90 + ".s19", active="f" * 90)
+>       from s19_app.tui.services.variant_execution_service import compose_load_announcement
+E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
+
+tests\test_b100_announce.py:321: ImportError
+______ test_tc_b100_67_focus_starts_on_the_list_and_enter_keeps_it_open _______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_tc_b100_67_focus_starts_o0')
+
+    def test_tc_b100_67_focus_starts_on_the_list_and_enter_keeps_it_open(tmp_path: Path) -> None:
+        async def _scenario(pilot, app):
+            focused = app.focused.id if app.focused else None
+            await pilot.press("enter")
+            await _flush(pilot)
+            return focused, _panel_open(app)
+    
+>       focused, still_open = _run_panel(tmp_path, _scenario, problems=3)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_announce.py:393: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_announce.py:383: in _run_panel
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_announce.py:380: in _drive
+    await _open_panel(pilot, app)
+tests\test_b100_announce.py:364: in _open_panel
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _open_panel.<locals>.<lambda> at 0x000001D4C19C7600>
+description = 'the Load-result panel holding a focus', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the Load-result panel holding a focus
+
+tests\test_b100_announce.py:80: AssertionError
+_________________ test_tc_b100_67_the_shown_esc_key_closes_it _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_tc_b100_67_the_shown_esc_0')
+
+    def test_tc_b100_67_the_shown_esc_key_closes_it(tmp_path: Path) -> None:
+        async def _scenario(pilot, app):
+            label = str(app.screen.query_one("#result_ok").label)
+            await pilot.press("escape")
+            await _wait_for(pilot, lambda: not _panel_open(app), "the panel closed by esc")
+            return label
+    
+>       label = _run_panel(tmp_path, _scenario)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_announce.py:405: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_announce.py:383: in _run_panel
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_announce.py:380: in _drive
+    await _open_panel(pilot, app)
+tests\test_b100_announce.py:364: in _open_panel
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _open_panel.<locals>.<lambda> at 0x000001D4C3042F20>
+description = 'the Load-result panel holding a focus', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the Load-result panel holding a focus
+
+tests\test_b100_announce.py:80: AssertionError
+_____________ test_tc_b100_67_tab_reaches_close_and_enter_closes ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_tc_b100_67_tab_reaches_cl0')
+
+    def test_tc_b100_67_tab_reaches_close_and_enter_closes(tmp_path: Path) -> None:
+        async def _scenario(pilot, app):
+            await pilot.press("tab")
+            await _flush(pilot, 4)
+            after_tab = app.focused.id if app.focused else None
+            await pilot.press("enter")
+            await _wait_for(pilot, lambda: not _panel_open(app), "the panel closed by enter")
+            return after_tab
+    
+>       assert _run_panel(tmp_path, _scenario, problems=2) == "result_ok"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_announce.py:418: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_announce.py:383: in _run_panel
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_announce.py:380: in _drive
+    await _open_panel(pilot, app)
+tests\test_b100_announce.py:364: in _open_panel
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _open_panel.<locals>.<lambda> at 0x000001D4C2664A40>
+description = 'the Load-result panel holding a focus', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the Load-result panel holding a focus
+
+tests\test_b100_announce.py:80: AssertionError
+________________ test_tc_b100_67_v_opens_the_variant_selector _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_tc_b100_67_v_opens_the_va0')
+
+    def test_tc_b100_67_v_opens_the_variant_selector(tmp_path: Path) -> None:
+        async def _scenario(pilot, app):
+            await pilot.press("v")
+            await _wait_for(
+                pilot,
+                lambda: isinstance(app.screen, SelectVariantScreen),
+                "the variant selector",
+            )
+            return _panel_open(app)
+    
+>       assert _run_panel(tmp_path, _scenario) is False
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_announce.py:431: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_announce.py:383: in _run_panel
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_announce.py:380: in _drive
+    await _open_panel(pilot, app)
+tests\test_b100_announce.py:364: in _open_panel
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _open_panel.<locals>.<lambda> at 0x000001D4C48EF4C0>
+description = 'the Load-result panel holding a focus', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the Load-result panel holding a focus
+
+tests\test_b100_announce.py:80: AssertionError
+______ test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_tc_b100_67_thirty_problem0')
+
+    def test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last(tmp_path: Path) -> None:
+        async def _scenario(pilot, app):
+            rows = list(app.screen.query("#result_body .result-problem"))
+            body = app.screen.query_one("#result_body")
+            before = body.region.contains_region(rows[-1].region)
+            await pilot.press("end")
+            await _flush(pilot)
+            after = body.region.contains_region(rows[-1].region)
+            return len(rows), before, after, _panel_text(app)
+    
+>       count, before, after, text = _run_panel(tmp_path, _scenario, problems=30)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_announce.py:444: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_announce.py:383: in _run_panel
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_announce.py:380: in _drive
+    await _open_panel(pilot, app)
+tests\test_b100_announce.py:364: in _open_panel
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _open_panel.<locals>.<lambda> at 0x000001D4C5024A40>
+description = 'the Load-result panel holding a focus', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the Load-result panel holding a focus
+
+tests\test_b100_announce.py:80: AssertionError
+___________ test_tc_b100_67_damaged_manifest_paints_user_terms_only ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_tc_b100_67_damaged_manife0')
+
+    def test_tc_b100_67_damaged_manifest_paints_user_terms_only(tmp_path: Path) -> None:
+        base = tmp_path / "app"
+        project_dir = _seed_two_variants(_workarea(base))
+        (project_dir / "project.json").write_text("{not json", encoding="utf-8")
+    
+        async def _drive():
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=(118, 54), notifications=True) as pilot:
+                await pilot.pause()
+                await _open_panel(pilot, app)
+                return _panel_text(app)
+    
+>       text = asyncio.run(_drive())
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_announce.py:464: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_announce.py:461: in _drive
+    await _open_panel(pilot, app)
+tests\test_b100_announce.py:364: in _open_panel
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _open_panel.<locals>.<lambda> at 0x000001D4C37F3C40>
+description = 'the Load-result panel holding a focus', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the Load-result panel holding a focus
+
+tests\test_b100_announce.py:80: AssertionError
+______ test_at_b100_19_the_panel_names_the_opened_variant_and_why[size0] ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_at_b100_19_the_panel_name0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", SIZES)
+    def test_at_b100_19_the_panel_names_the_opened_variant_and_why(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-178's acceptance scene by keys and clicks: Load file, Save
+        project P, apply a patch and save back with the default name; reopen P
+        in a fresh app through the Load project dialog — the panel names
+        ``firmware-patched.s19`` as opened, recorded as active, among P's 2
+        variants; ``tab`` then ``enter`` closes it. Delete that file and reopen:
+        the panel names ``firmware.s19`` as the next valid variant and lists the
+        missing one; ``end`` reaches the last problem; the shown ``esc`` closes.
+    
+        RED (executed on 1d677ba, P-3): the reload status is ``Loaded project
+        'P' -> firmware.s19`` with no panel, no count and no reason."""
+        src = projects.copy_sources(tmp_path / "src", projects.CASE01_DIR, "firmware.s19")
+        base = tmp_path / "app"
+    
+        async def _save_scene() -> None:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src / "firmware.s19")
+                await _save_project_through_dialog(pilot, app, "P")
+                await _add_and_apply_through_the_panel(pilot, app)
+                await _save_back_through_the_prompt(pilot, app, None)
+    
+        async def _reopen(close_with: str) -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                text = await _open_project_and_read_the_panel(pilot, app)
+                if close_with == "tab-enter":
+                    await pilot.press("tab")
+                    await _wait_for(
+                        pilot,
+                        lambda: app.focused is not None and app.focused.id == "result_ok",
+                        "tab on Close",
+                    )
+                    await pilot.press("enter")
+                else:
+                    await pilot.press("end")
+                    await _flush(pilot, 4)
+                    rows = list(app.screen.query("#result_body .result-problem"))
+                    body = app.screen.query_one("#result_body")
+                    assert rows and body.region.contains_region(rows[-1].region), (
+                        "end must show the last problem"
+                    )
+                    await pilot.press("escape")
+                await _wait_for(pilot, lambda: not _panel_open(app), "the panel closed")
+                return text
+    
+        asyncio.run(_save_scene())
+>       first = asyncio.run(_reopen("tab-enter"))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_announce.py:535: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_announce.py:513: in _reopen
+    text = await _open_project_and_read_the_panel(pilot, app)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_b100_announce.py:479: in _open_project_and_read_the_panel
+    await _open_panel(pilot, app)
+tests\test_b100_announce.py:364: in _open_panel
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _open_panel.<locals>.<lambda> at 0x000001D4C4C632E0>
+description = 'the Load-result panel holding a focus', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the Load-result panel holding a focus
+
+tests\test_b100_announce.py:80: AssertionError
+______ test_at_b100_19_the_panel_names_the_opened_variant_and_why[size1] ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_at_b100_19_the_panel_name1')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", SIZES)
+    def test_at_b100_19_the_panel_names_the_opened_variant_and_why(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-178's acceptance scene by keys and clicks: Load file, Save
+        project P, apply a patch and save back with the default name; reopen P
+        in a fresh app through the Load project dialog — the panel names
+        ``firmware-patched.s19`` as opened, recorded as active, among P's 2
+        variants; ``tab`` then ``enter`` closes it. Delete that file and reopen:
+        the panel names ``firmware.s19`` as the next valid variant and lists the
+        missing one; ``end`` reaches the last problem; the shown ``esc`` closes.
+    
+        RED (executed on 1d677ba, P-3): the reload status is ``Loaded project
+        'P' -> firmware.s19`` with no panel, no count and no reason."""
+        src = projects.copy_sources(tmp_path / "src", projects.CASE01_DIR, "firmware.s19")
+        base = tmp_path / "app"
+    
+        async def _save_scene() -> None:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src / "firmware.s19")
+                await _save_project_through_dialog(pilot, app, "P")
+                await _add_and_apply_through_the_panel(pilot, app)
+                await _save_back_through_the_prompt(pilot, app, None)
+    
+        async def _reopen(close_with: str) -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                text = await _open_project_and_read_the_panel(pilot, app)
+                if close_with == "tab-enter":
+                    await pilot.press("tab")
+                    await _wait_for(
+                        pilot,
+                        lambda: app.focused is not None and app.focused.id == "result_ok",
+                        "tab on Close",
+                    )
+                    await pilot.press("enter")
+                else:
+                    await pilot.press("end")
+                    await _flush(pilot, 4)
+                    rows = list(app.screen.query("#result_body .result-problem"))
+                    body = app.screen.query_one("#result_body")
+                    assert rows and body.region.contains_region(rows[-1].region), (
+                        "end must show the last problem"
+                    )
+                    await pilot.press("escape")
+                await _wait_for(pilot, lambda: not _panel_open(app), "the panel closed")
+                return text
+    
+        asyncio.run(_save_scene())
+>       first = asyncio.run(_reopen("tab-enter"))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_announce.py:535: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_announce.py:513: in _reopen
+    text = await _open_project_and_read_the_panel(pilot, app)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_b100_announce.py:479: in _open_project_and_read_the_panel
+    await _open_panel(pilot, app)
+tests\test_b100_announce.py:364: in _open_panel
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _open_panel.<locals>.<lambda> at 0x000001D4C4F6E8E0>
+description = 'the Load-result panel holding a focus', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the Load-result panel holding a focus
+
+tests\test_b100_announce.py:80: AssertionError
+____ test_at_b100_20_every_writer_carries_the_keys_it_does_not_own[size0] _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_at_b100_20_every_writer_c0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", SIZES)
+    def test_at_b100_20_every_writer_carries_the_keys_it_does_not_own(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-168's carry scene by keys and clicks: P records ``batch``,
+        ``assignments``, ``declared_regions`` and ``gathered``. With P open, the
+        engineer loads (1) a new S19, (2) a MAC and (3) an A2L through Load;
+        after each, ``project.json`` on disk was rewritten, keeps those keys
+        equal (JSON compare) with 0 absolute paths, and after (1) names the new
+        variant as active. A fresh app opening P names it in the Load-result
+        panel.
+    
+        RED (A-03 / P-3 shape): at the base no writer rewrites the manifest, so
+        after (1) ``project.json`` is unchanged and still names ``firmware``."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        s19 = projects.copy_sources(tmp_path / "s19", projects.CASE02_DIR, "firmware.s19")
+        side = projects.copy_sources(
+            tmp_path / "side", projects.CASE01_DIR, "firmware.mac", "firmware.a2l"
+        )
+        manifest_path = project_dir / "project.json"
+        snapshots: list = []
+    
+        def _stamp() -> tuple:
+            # The write replaces the file (staged, then moved in): a new file
+            # identity or time stamp proves a rewrite even when a step leaves
+            # the bytes identical (the MAC and A2L steps change no key).
+            stat = manifest_path.stat()
+            return (stat.st_ino, stat.st_mtime_ns)
+    
+        async def _writers() -> None:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_and_close_the_panel(pilot, app, "P")
+                for src, landed in (
+                    (s19 / "firmware.s19", "firmware_1.s19"),
+                    (side / "firmware.mac", "firmware.mac"),
+                    (side / "firmware.a2l", "firmware.a2l"),
+                ):
+                    previous = _stamp()
+                    await _load_through_dialog_until(
+                        pilot,
+                        app,
+                        src,
+                        lambda: (project_dir / landed).is_file() and _stamp() != previous,
+                        f"{landed} placed and project.json rewritten",
+                    )
+                    snapshots.append(json.loads(manifest_path.read_bytes()))
+    
+        async def _reopen() -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                return await _open_and_close_the_panel(pilot, app, "P")
+    
+>       asyncio.run(_writers())
+
+tests\test_b100_active_variant.py:657: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_active_variant.py:635: in _writers
+    await _open_and_close_the_panel(pilot, app, "P")
+tests\test_b100_active_variant.py:590: in _open_and_close_the_panel
+    await _wait_for(pilot, lambda: len(app.screen.query("#result_ok")) > 0, "the Load-result panel")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _open_and_close_the_panel.<locals>.<lambda> at 0x000001D4C3F33920>
+description = 'the Load-result panel', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the Load-result panel
+
+tests\test_b100_active_variant.py:75: AssertionError
+____ test_at_b100_20_every_writer_carries_the_keys_it_does_not_own[size1] _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_at_b100_20_every_writer_c1')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", SIZES)
+    def test_at_b100_20_every_writer_carries_the_keys_it_does_not_own(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-168's carry scene by keys and clicks: P records ``batch``,
+        ``assignments``, ``declared_regions`` and ``gathered``. With P open, the
+        engineer loads (1) a new S19, (2) a MAC and (3) an A2L through Load;
+        after each, ``project.json`` on disk was rewritten, keeps those keys
+        equal (JSON compare) with 0 absolute paths, and after (1) names the new
+        variant as active. A fresh app opening P names it in the Load-result
+        panel.
+    
+        RED (A-03 / P-3 shape): at the base no writer rewrites the manifest, so
+        after (1) ``project.json`` is unchanged and still names ``firmware``."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        s19 = projects.copy_sources(tmp_path / "s19", projects.CASE02_DIR, "firmware.s19")
+        side = projects.copy_sources(
+            tmp_path / "side", projects.CASE01_DIR, "firmware.mac", "firmware.a2l"
+        )
+        manifest_path = project_dir / "project.json"
+        snapshots: list = []
+    
+        def _stamp() -> tuple:
+            # The write replaces the file (staged, then moved in): a new file
+            # identity or time stamp proves a rewrite even when a step leaves
+            # the bytes identical (the MAC and A2L steps change no key).
+            stat = manifest_path.stat()
+            return (stat.st_ino, stat.st_mtime_ns)
+    
+        async def _writers() -> None:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_and_close_the_panel(pilot, app, "P")
+                for src, landed in (
+                    (s19 / "firmware.s19", "firmware_1.s19"),
+                    (side / "firmware.mac", "firmware.mac"),
+                    (side / "firmware.a2l", "firmware.a2l"),
+                ):
+                    previous = _stamp()
+                    await _load_through_dialog_until(
+                        pilot,
+                        app,
+                        src,
+                        lambda: (project_dir / landed).is_file() and _stamp() != previous,
+                        f"{landed} placed and project.json rewritten",
+                    )
+                    snapshots.append(json.loads(manifest_path.read_bytes()))
+    
+        async def _reopen() -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                return await _open_and_close_the_panel(pilot, app, "P")
+    
+>       asyncio.run(_writers())
+
+tests\test_b100_active_variant.py:657: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_active_variant.py:635: in _writers
+    await _open_and_close_the_panel(pilot, app, "P")
+tests\test_b100_active_variant.py:590: in _open_and_close_the_panel
+    await _wait_for(pilot, lambda: len(app.screen.query("#result_ok")) > 0, "the Load-result panel")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _open_and_close_the_panel.<locals>.<lambda> at 0x000001D4C12D6700>
+description = 'the Load-result panel', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the Load-result panel
+
+tests\test_b100_active_variant.py:75: AssertionError
+________ test_tc_b100_12_panel_close_lands_on_the_windows_target[esc] _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_tc_b100_12_panel_close_la0')
+close_keys = ('escape',)
+
+    @pytest.mark.parametrize(
+        "close_keys", [("escape",), ("tab", "enter")], ids=["esc", "tab_enter"]
+    )
+    def test_tc_b100_12_panel_close_lands_on_the_windows_target(
+        tmp_path: Path, close_keys: tuple
+    ) -> None:
+        """LLR-166.1, Inc 6 arms: the Load-result panel's two closes — its shown
+        key ``esc`` from the list, and ``tab`` to Close then ``enter`` — each
+        leave the focus on the displayed window's declared target, starting
+        from the P-16 shape (the hidden Split / Join table held the focus
+        before the load)."""
+        base = tmp_path / "app"
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=base)
+            _seed_project_p1(app.workarea)
+            async with app.run_test(size=(118, 54), notifications=True) as pilot:
+                await pilot.pause()
+                await _open_split_join_via_palette(pilot, app)
+                await pilot.press("1")
+                await _flush(pilot)
+                await _open_project_and_wait_for_the_panel(pilot, app, P1_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: app.focused is not None and app.focused.id == "result_body",
+                    "the panel's focus on its list",
+                )
+                for key in close_keys:
+                    await pilot.press(key)
+                    await pilot.pause()
+                await _wait_for(
+                    pilot, lambda: not _result_panel_open(app), "the panel closed"
+                )
+                await _wait_for_focus_on_target(pilot, app, "files_list")
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:1248: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_focus.py:1234: in _drive
+    await _open_project_and_wait_for_the_panel(pilot, app, P1_NAME)
+tests\test_b100_focus.py:1101: in _open_project_and_wait_for_the_panel
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _open_project_and_wait_for_the_panel.<locals>.<lambda> at 0x000001D4C42B8CC0>
+description = 'the status naming the loaded project P1 and the Load-result panel'
+attempts = 150
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 150) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the status naming the loaded project P1 and the Load-result panel
+
+tests\test_b100_focus.py:78: AssertionError
+_____ test_tc_b100_12_panel_close_lands_on_the_windows_target[tab_enter] ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_tc_b100_12_panel_close_la1')
+close_keys = ('tab', 'enter')
+
+    @pytest.mark.parametrize(
+        "close_keys", [("escape",), ("tab", "enter")], ids=["esc", "tab_enter"]
+    )
+    def test_tc_b100_12_panel_close_lands_on_the_windows_target(
+        tmp_path: Path, close_keys: tuple
+    ) -> None:
+        """LLR-166.1, Inc 6 arms: the Load-result panel's two closes — its shown
+        key ``esc`` from the list, and ``tab`` to Close then ``enter`` — each
+        leave the focus on the displayed window's declared target, starting
+        from the P-16 shape (the hidden Split / Join table held the focus
+        before the load)."""
+        base = tmp_path / "app"
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=base)
+            _seed_project_p1(app.workarea)
+            async with app.run_test(size=(118, 54), notifications=True) as pilot:
+                await pilot.pause()
+                await _open_split_join_via_palette(pilot, app)
+                await pilot.press("1")
+                await _flush(pilot)
+                await _open_project_and_wait_for_the_panel(pilot, app, P1_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: app.focused is not None and app.focused.id == "result_body",
+                    "the panel's focus on its list",
+                )
+                for key in close_keys:
+                    await pilot.press(key)
+                    await pilot.pause()
+                await _wait_for(
+                    pilot, lambda: not _result_panel_open(app), "the panel closed"
+                )
+                await _wait_for_focus_on_target(pilot, app, "files_list")
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:1248: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_focus.py:1234: in _drive
+    await _open_project_and_wait_for_the_panel(pilot, app, P1_NAME)
+tests\test_b100_focus.py:1101: in _open_project_and_wait_for_the_panel
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _open_project_and_wait_for_the_panel.<locals>.<lambda> at 0x000001D4C4CEE160>
+description = 'the status naming the loaded project P1 and the Load-result panel'
+attempts = 150
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 150) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the status naming the loaded project P1 and the Load-result panel
+
+tests\test_b100_focus.py:78: AssertionError
+___ test_at_b100_04_focus_lands_and_single_keys_reach_their_screens[size0] ____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_at_b100_04_focus_lands_an0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_04_focus_lands_and_single_keys_reach_their_screens(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-166 black-box: after a project load and after a file load the
+        focused widget is a named, visible, non-text widget (observed through
+        the painted region — never a private attribute), and the single-key
+        bindings reach their actions: ``p`` opens the Load project dialog,
+        ``k`` opens the Legend, ``t`` opens the report viewer. Base RED (P-16):
+        the hidden Split / Join table holds the focus and ``p`` stays on
+        Screen."""
+        base = tmp_path / "app"
+        # A distinct image for the second load (a different byte content under
+        # the same stem would collide with the project's variant id).
+        src02 = tmp_path / "sources" / "case02" / "firmware.s19"
+        src02.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(CASE02_DIR / "firmware.s19", src02)
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=base)
+            _seed_project_p1(app.workarea)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                # The P-16 shape, built through the shipped surface: the
+                # palette-first Split / Join / Export window opens and takes the
+                # focus onto its table; a rail key hides the window and the
+                # table keeps the focus.
+                await _open_split_join_via_palette(pilot, app)
+                await pilot.press("1")
+                await _flush(pilot)
+    
+                # Route 1 — Load project through its dialog.
+                await _load_project_through_dialog(pilot, app, P1_NAME)
+                await _wait_for_focus_on_target(pilot, app, "files_list")
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+                # The other single-key surfaces reach their screens too.
+                await pilot.press("k")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, LegendScreen),
+                    "the Legend screen (the `k` binding reached its action)",
+                )
+                await pilot.press("escape")
+                await _wait_for(
+                    pilot,
+                    lambda: not isinstance(app.screen, LegendScreen),
+                    "the Legend screen closed",
+                )
+                await pilot.press("t")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, ReportViewerScreen),
+                    "the report viewer (the `t` binding reached its action)",
+                )
+                assert await pilot.click("#report_close"), "click missed #report_close"
+                await _wait_for(
+                    pilot,
+                    lambda: not isinstance(app.screen, ReportViewerScreen),
+                    "the report viewer closed",
+                )
+    
+                # Route 2 — Load file through its dialog: the same focus landing.
+                await _load_file_through_dialog(pilot, app, src02)
+                await _wait_for_focus_on_target(pilot, app, "files_list")
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:1210: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_focus.py:1175: in _drive
+    await _load_project_through_dialog(pilot, app, P1_NAME)
+tests\test_b100_focus.py:1113: in _load_project_through_dialog
+    await _open_project_and_wait_for_the_panel(pilot, app, name)
+tests\test_b100_focus.py:1101: in _open_project_and_wait_for_the_panel
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _open_project_and_wait_for_the_panel.<locals>.<lambda> at 0x000001D4C2761C60>
+description = 'the status naming the loaded project P1 and the Load-result panel'
+attempts = 150
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 150) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the status naming the loaded project P1 and the Load-result panel
+
+tests\test_b100_focus.py:78: AssertionError
+___ test_at_b100_04_focus_lands_and_single_keys_reach_their_screens[size1] ____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_at_b100_04_focus_lands_an1')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_04_focus_lands_and_single_keys_reach_their_screens(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-166 black-box: after a project load and after a file load the
+        focused widget is a named, visible, non-text widget (observed through
+        the painted region — never a private attribute), and the single-key
+        bindings reach their actions: ``p`` opens the Load project dialog,
+        ``k`` opens the Legend, ``t`` opens the report viewer. Base RED (P-16):
+        the hidden Split / Join table holds the focus and ``p`` stays on
+        Screen."""
+        base = tmp_path / "app"
+        # A distinct image for the second load (a different byte content under
+        # the same stem would collide with the project's variant id).
+        src02 = tmp_path / "sources" / "case02" / "firmware.s19"
+        src02.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(CASE02_DIR / "firmware.s19", src02)
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=base)
+            _seed_project_p1(app.workarea)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                # The P-16 shape, built through the shipped surface: the
+                # palette-first Split / Join / Export window opens and takes the
+                # focus onto its table; a rail key hides the window and the
+                # table keeps the focus.
+                await _open_split_join_via_palette(pilot, app)
+                await pilot.press("1")
+                await _flush(pilot)
+    
+                # Route 1 — Load project through its dialog.
+                await _load_project_through_dialog(pilot, app, P1_NAME)
+                await _wait_for_focus_on_target(pilot, app, "files_list")
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+                # The other single-key surfaces reach their screens too.
+                await pilot.press("k")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, LegendScreen),
+                    "the Legend screen (the `k` binding reached its action)",
+                )
+                await pilot.press("escape")
+                await _wait_for(
+                    pilot,
+                    lambda: not isinstance(app.screen, LegendScreen),
+                    "the Legend screen closed",
+                )
+                await pilot.press("t")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, ReportViewerScreen),
+                    "the report viewer (the `t` binding reached its action)",
+                )
+                assert await pilot.click("#report_close"), "click missed #report_close"
+                await _wait_for(
+                    pilot,
+                    lambda: not isinstance(app.screen, ReportViewerScreen),
+                    "the report viewer closed",
+                )
+    
+                # Route 2 — Load file through its dialog: the same focus landing.
+                await _load_file_through_dialog(pilot, app, src02)
+                await _wait_for_focus_on_target(pilot, app, "files_list")
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:1210: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_focus.py:1175: in _drive
+    await _load_project_through_dialog(pilot, app, P1_NAME)
+tests\test_b100_focus.py:1113: in _load_project_through_dialog
+    await _open_project_and_wait_for_the_panel(pilot, app, name)
+tests\test_b100_focus.py:1101: in _open_project_and_wait_for_the_panel
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _open_project_and_wait_for_the_panel.<locals>.<lambda> at 0x000001D4C1863420>
+description = 'the status naming the loaded project P1 and the Load-result panel'
+attempts = 150
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 150) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the status naming the loaded project P1 and the Load-result panel
+
+tests\test_b100_focus.py:78: AssertionError
+_________ test_at_b100_05_save_project_saves_the_patched_image[size0] _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_at_b100_05_save_project_s0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_05_save_project_saves_the_patched_image(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-167's acceptance scene, by keys and clicks: load ``case_01``
+        ``firmware.s19`` through the Load file dialog, add and apply
+        ``0x8000007C DE AD BE EF`` in the Patch Editor (no save-back), Save
+        project P1 through the current dialog (``ctrl+s``), then open P1 in a
+        FRESH app through the Load project dialog (``p``). The project image,
+        read by the independent reader, equals source + patch (0 differing
+        addresses); the save status names 1 entry; the reopened Loaded panel
+        names ``firmware.s19``. Both reference sizes, notifications on.
+    
+        RED (executed on 1d677ba, P-1): ``project firmware.s19 == in-memory
+        patched image? False`` — the save copied the unpatched work copy."""
+        src = _copy_case01(tmp_path) / "firmware.s19"
+        base = tmp_path / "app"
+    
+        statuses: list = []
+    
+        async def _save_scene() -> str:
+            app = S19TuiApp(base_dir=base)
+            real_set_status = app.set_status
+    
+            def _capture(message, *args, **kwargs):
+                statuses.append(str(message))
+                return real_set_status(message, *args, **kwargs)
+    
+            app.set_status = _capture
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src)
+                await _add_entry_through_the_panel(pilot, app, "0x8000007C", "DE AD BE EF")
+                assert await pilot.click("#patch_doc_apply_button"), (
+                    "click missed #patch_doc_apply_button"
+                )
+                await _wait_for(
+                    pilot, lambda: "Apply:" in _status_text(app), "the painted apply line"
+                )
+                await pilot.press("ctrl+s")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, SaveProjectScreen),
+                    "the Save project dialog",
+                )
+                assert await pilot.click("#project_name"), "click missed #project_name"
+                await pilot.press(*"P1")
+                assert await pilot.click("#save_ok"), "click missed #save_ok"
+                await _wait_for(
+                    pilot,
+                    lambda: _status_text(app).startswith("Saved project to"),
+                    "the painted Save project success line",
+                )
+                return _painted_log(app)
+    
+        async def _reopen_scene() -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, "P1")
+                await _wait_for(
+                    pilot,
+                    lambda: "Loaded project 'P1'" in " ".join(
+                        str(app.query_one(f"#log_line_{i}", Label).render())
+                        for i in (1, 2, 3, 4)
+                    ),
+                    "the painted line naming the reopened project",
+                )
+                # Inc 6 (HLR-178): the dialog route opens the Load-result
+                # panel; it is the oracle of what opened and why, then its
+                # shown key ``esc`` closes it.
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.screen.query("#result_ok")) > 0,
+                    "the Load-result panel",
+                )
+                panel = "\n".join(
+                    str(widget.render())
+                    for widget in app.screen.query("#result_body Static")
+                )
+                await pilot.press("escape")
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.screen.query("#result_ok")) == 0,
+                    "the Load-result panel closed",
+                )
+                await _wait_for(
+                    pilot,
+                    lambda: "firmware.s19"
+                    in " ".join(
+                        str(static.render()) for static in app.query("#loaded_slots Static")
+                    ),
+                    "the Loaded panel naming firmware.s19",
+                )
+                reopened_panels.append(panel)
+                return " ".join(
+                    str(static.render()) for static in app.query("#loaded_slots Static")
+                )
+    
+        painted = asyncio.run(_save_scene())
+        project_image = _workarea(base) / "P1" / "firmware.s19"
+        written = read_s19(project_image)
+        expected = _patched(_source_data(), PATCH_ADDRESS, PATCH_BYTES)
+        assert _differing(written.data, expected) == [], (
+            "project firmware.s19 == in-memory patched image? False"
+        )
+        # The save status names the entry at both sizes: the verify line
+        # (``save_back_status_suffix``) is checked as painted. The success
+        # line's own clause is capped at the terminal width by the log, and
+        # follows the project path, so it is checked on the full message the
+        # app passed to ``set_status`` (independent of the temp-path depth).
+        assert "1 entry applied before this save (0x8000007C)" in painted, painted
+        success = next((m for m in statuses if m.startswith("Saved project to")), "")
+        assert "1 change entry, 0 applied by this save" in success, statuses
+        reopened_panels: list = []
+>       loaded_panel = asyncio.run(_reopen_scene())
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_save_image.py:1756: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_save_image.py:1712: in _reopen_scene
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_at_b100_05_save_project_saves_the_patched_image.<locals>._reopen_scene.<locals>.<lambda> at 0x000001D4C42E0B80>
+description = 'the Load-result panel', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the Load-result panel
+
+tests\test_b100_save_image.py:152: AssertionError
+_________ test_at_b100_05_save_project_saves_the_patched_image[size1] _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_at_b100_05_save_project_s1')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_05_save_project_saves_the_patched_image(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-167's acceptance scene, by keys and clicks: load ``case_01``
+        ``firmware.s19`` through the Load file dialog, add and apply
+        ``0x8000007C DE AD BE EF`` in the Patch Editor (no save-back), Save
+        project P1 through the current dialog (``ctrl+s``), then open P1 in a
+        FRESH app through the Load project dialog (``p``). The project image,
+        read by the independent reader, equals source + patch (0 differing
+        addresses); the save status names 1 entry; the reopened Loaded panel
+        names ``firmware.s19``. Both reference sizes, notifications on.
+    
+        RED (executed on 1d677ba, P-1): ``project firmware.s19 == in-memory
+        patched image? False`` — the save copied the unpatched work copy."""
+        src = _copy_case01(tmp_path) / "firmware.s19"
+        base = tmp_path / "app"
+    
+        statuses: list = []
+    
+        async def _save_scene() -> str:
+            app = S19TuiApp(base_dir=base)
+            real_set_status = app.set_status
+    
+            def _capture(message, *args, **kwargs):
+                statuses.append(str(message))
+                return real_set_status(message, *args, **kwargs)
+    
+            app.set_status = _capture
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src)
+                await _add_entry_through_the_panel(pilot, app, "0x8000007C", "DE AD BE EF")
+                assert await pilot.click("#patch_doc_apply_button"), (
+                    "click missed #patch_doc_apply_button"
+                )
+                await _wait_for(
+                    pilot, lambda: "Apply:" in _status_text(app), "the painted apply line"
+                )
+                await pilot.press("ctrl+s")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, SaveProjectScreen),
+                    "the Save project dialog",
+                )
+                assert await pilot.click("#project_name"), "click missed #project_name"
+                await pilot.press(*"P1")
+                assert await pilot.click("#save_ok"), "click missed #save_ok"
+                await _wait_for(
+                    pilot,
+                    lambda: _status_text(app).startswith("Saved project to"),
+                    "the painted Save project success line",
+                )
+                return _painted_log(app)
+    
+        async def _reopen_scene() -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, "P1")
+                await _wait_for(
+                    pilot,
+                    lambda: "Loaded project 'P1'" in " ".join(
+                        str(app.query_one(f"#log_line_{i}", Label).render())
+                        for i in (1, 2, 3, 4)
+                    ),
+                    "the painted line naming the reopened project",
+                )
+                # Inc 6 (HLR-178): the dialog route opens the Load-result
+                # panel; it is the oracle of what opened and why, then its
+                # shown key ``esc`` closes it.
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.screen.query("#result_ok")) > 0,
+                    "the Load-result panel",
+                )
+                panel = "\n".join(
+                    str(widget.render())
+                    for widget in app.screen.query("#result_body Static")
+                )
+                await pilot.press("escape")
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.screen.query("#result_ok")) == 0,
+                    "the Load-result panel closed",
+                )
+                await _wait_for(
+                    pilot,
+                    lambda: "firmware.s19"
+                    in " ".join(
+                        str(static.render()) for static in app.query("#loaded_slots Static")
+                    ),
+                    "the Loaded panel naming firmware.s19",
+                )
+                reopened_panels.append(panel)
+                return " ".join(
+                    str(static.render()) for static in app.query("#loaded_slots Static")
+                )
+    
+        painted = asyncio.run(_save_scene())
+        project_image = _workarea(base) / "P1" / "firmware.s19"
+        written = read_s19(project_image)
+        expected = _patched(_source_data(), PATCH_ADDRESS, PATCH_BYTES)
+        assert _differing(written.data, expected) == [], (
+            "project firmware.s19 == in-memory patched image? False"
+        )
+        # The save status names the entry at both sizes: the verify line
+        # (``save_back_status_suffix``) is checked as painted. The success
+        # line's own clause is capped at the terminal width by the log, and
+        # follows the project path, so it is checked on the full message the
+        # app passed to ``set_status`` (independent of the temp-path depth).
+        assert "1 entry applied before this save (0x8000007C)" in painted, painted
+        success = next((m for m in statuses if m.startswith("Saved project to")), "")
+        assert "1 change entry, 0 applied by this save" in success, statuses
+        reopened_panels: list = []
+>       loaded_panel = asyncio.run(_reopen_scene())
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_save_image.py:1756: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_save_image.py:1712: in _reopen_scene
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_at_b100_05_save_project_saves_the_patched_image.<locals>._reopen_scene.<locals>.<lambda> at 0x000001D4C1B86D40>
+description = 'the Load-result panel', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the Load-result panel
+
+tests\test_b100_save_image.py:152: AssertionError
+=================================== PASSES ====================================
+=========================== short test summary info ===========================
+PASSED tests/test_b100_announce.py::test_tc_b100_56_hostile_variant_name_paints_no_markup
+FAILED tests/test_b100_announce.py::test_tc_b100_55_recorded_active - ImportE...
+FAILED tests/test_b100_announce.py::test_tc_b100_55_first_by_name_none_recorded
+FAILED tests/test_b100_announce.py::test_tc_b100_55_first_by_name_manifest_damaged
+FAILED tests/test_b100_announce.py::test_tc_b100_55_first_by_name_no_project_json
+FAILED tests/test_b100_announce.py::test_tc_b100_55_next_valid_when_the_recorded_one_is_missing
+FAILED tests/test_b100_announce.py::test_tc_b100_55_five_reasons_have_distinct_user_text
+FAILED tests/test_b100_announce.py::test_tc_b100_55_three_problems_in_precedence_order
+FAILED tests/test_b100_announce.py::test_tc_b100_55_latest_never_comes_from_file_times
+FAILED tests/test_b100_announce.py::test_tc_b100_55_boundaries_one_variant_and_no_image
+FAILED tests/test_b100_announce.py::test_tc_b100_56_one_summary_line_and_the_final_status_text
+FAILED tests/test_b100_announce.py::test_tc_b100_56_long_names_keep_the_details_key_inside_118_columns
+FAILED tests/test_b100_announce.py::test_tc_b100_67_focus_starts_on_the_list_and_enter_keeps_it_open
+FAILED tests/test_b100_announce.py::test_tc_b100_67_the_shown_esc_key_closes_it
+FAILED tests/test_b100_announce.py::test_tc_b100_67_tab_reaches_close_and_enter_closes
+FAILED tests/test_b100_announce.py::test_tc_b100_67_v_opens_the_variant_selector
+FAILED tests/test_b100_announce.py::test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last
+FAILED tests/test_b100_announce.py::test_tc_b100_67_damaged_manifest_paints_user_terms_only
+FAILED tests/test_b100_announce.py::test_at_b100_19_the_panel_names_the_opened_variant_and_why[size0]
+FAILED tests/test_b100_announce.py::test_at_b100_19_the_panel_names_the_opened_variant_and_why[size1]
+FAILED tests/test_b100_active_variant.py::test_at_b100_20_every_writer_carries_the_keys_it_does_not_own[size0]
+FAILED tests/test_b100_active_variant.py::test_at_b100_20_every_writer_carries_the_keys_it_does_not_own[size1]
+FAILED tests/test_b100_focus.py::test_tc_b100_12_panel_close_lands_on_the_windows_target[esc]
+FAILED tests/test_b100_focus.py::test_tc_b100_12_panel_close_lands_on_the_windows_target[tab_enter]
+FAILED tests/test_b100_focus.py::test_at_b100_04_focus_lands_and_single_keys_reach_their_screens[size0]
+FAILED tests/test_b100_focus.py::test_at_b100_04_focus_lands_and_single_keys_reach_their_screens[size1]
+FAILED tests/test_b100_save_image.py::test_at_b100_05_save_project_saves_the_patched_image[size0]
+FAILED tests/test_b100_save_image.py::test_at_b100_05_save_project_saves_the_patched_image[size1]
+27 failed, 1 passed in 350.33s (0:05:50)

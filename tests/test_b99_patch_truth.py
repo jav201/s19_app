@@ -60,6 +60,7 @@ from s19_app.tui.services.markdown_safety import md_safe
 from tests.b97_fixtures import write_flow
 from tests.b97_probes import painted_rows, settle
 from tests.support.independent_reader import read_s19
+from tests.support.b100_projects import dismiss_load_result_panel
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 #: The public example image (no S0 record) the rw-p0x probes ran against —
@@ -739,6 +740,9 @@ async def _load_project_dialog(app, pilot, name: str) -> None:
     for _ in range(100):
         await pilot.pause()
         if f"Loaded project '{name}'" in _status_text(app):
+            # Inc 6 (HLR-178): the dialog route opens the Load-result panel;
+            # dismiss it first with its shown key ``esc``.
+            await dismiss_load_result_panel(pilot, app)
             return
     raise AssertionError(f"project {name} did not load")
 
