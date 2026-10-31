@@ -1,0 +1,12 @@
+mutant: M19
+requirement: LLR-172.1d (Q1)
+target file: s19_app/tui/app.py
+edit: '        if not contained_in_workarea(normalized, self.workarea):\n            if not record_recent_source(normalized):\n                self.logger.warning("Recent sources not updated: %r", str(normalized))\n        self.set_progress(50, f"Parsing {copied.name}...")' -> '        self._pending_recent_source = normalized\n        self.set_progress(50, f"Parsing {copied.name}...")'
+edit: '        loaded = prepared.loaded\n        # Variant stamping happens HERE, at apply time on the main UI thread:' -> '        loaded = prepared.loaded\n        source = getattr(self, "_pending_recent_source", None)\n        self._pending_recent_source = None\n        if source is not None and not contained_in_workarea(source, self.workarea):\n            if not record_recent_source(source):\n                self.logger.warning("Recent sources not updated: %r", str(source))\n        # Variant stamping happens HERE, at apply time on the main UI thread:'
+sha256 before: 62232011882325626771cb015ccfce4b34c15945e90b8432fd628c61fcf22d80
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a
+command: pytest -q --tb=line tests/test_b100_recents.py::test_tc_b100_34_source_that_copies_then_fails_to_parse_is_recorded
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a\s19_app\__init__.py
+pytest summary: 1 passed in 6.05s
+verdict: SURVIVED
+restored = True

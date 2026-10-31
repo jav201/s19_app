@@ -1,0 +1,22 @@
+# mut-int-08 (integration sanity mutant, expected RED; run in a COPY of the worktree at scratchpad/int9a/mutwt, never in the worktree): s19_app/tui/app.py: C5 / LLR-172.6a: item.data holds the painted label | applied 08 d928a869c4cb861f | the copy's file is restored from a byte copy after the run and its sha256 verified
+# date: 2026-10-31T04:43:29-06:00
+fatal: not a git repository (or any of the parent directories): .git
+# cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int9a/mutwt  branch:  base: 4fef292 (uncommitted worktree)
+# interpreter: C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+# env: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<worktree>
+# sha256[:16] workspace.py=a3342ed048ebe157 app.py=d928a869c4cb861f
+# s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int9a\mutwt\s19_app\__init__.py
+# command: python -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_recents.py::test_tc_b100_39_picked_row_loads_the_file_as_named -rfE
+
+.FFF                                                                     [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int9a\mutwt\tests\test_b100_recents.py:2471: AssertionError: ('None', "'a\\x9bb.s19'")
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int9a\mutwt\tests\test_b100_recents.py:2471: AssertionError: ('None', "'x\\u202egpj.s19'")
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int9a\mutwt\tests\test_b100_recents.py:2471: AssertionError: ('None', "'nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.s19'")
+=========================== short test summary info ===========================
+FAILED tests/test_b100_recents.py::test_tc_b100_39_picked_row_loads_the_file_as_named[C1 control U+009B]
+FAILED tests/test_b100_recents.py::test_tc_b100_39_picked_row_loads_the_file_as_named[bidi override U+202E]
+FAILED tests/test_b100_recents.py::test_tc_b100_39_picked_row_loads_the_file_as_named[130 characters]
+3 failed, 1 passed in 70.37s (0:01:10)
+# exit: 1
+# restore: restored OK sha256[:16]=6223201188232562

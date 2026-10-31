@@ -1,0 +1,11 @@
+mutant: M50
+requirement: LLR-172.2i
+target file: s19_app/tui/workspace.py
+edit: '    if not isinstance(raw, dict):\n        return None\n    path = raw.get("path")\n    kind = raw.get("kind")' -> '    path = raw["path"]\n    kind = raw["kind"]'
+sha256 before: a3342ed048ebe157423bd68446455b556604d05a3d7bbe3349800aaca3a4cc04
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a
+command: pytest -q --tb=line tests/test_b100_recents.py::test_tc_b100_35_malformed_entry_is_dropped
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a\s19_app\__init__.py
+pytest summary: 1 failed in 0.34s
+verdict: KILLED
+restored = True

@@ -2045,11 +2045,17 @@ _FINAL_NAME_ALLOWLIST = {
     # claim/fill live there now; copy_into_workarea is its one-line wrapper
     # and no longer writes (review finding F10), so only the placement is
     # allow-listed.
+    # batch-100 Inc 9a (LLR-172.1h / LLR-172.1i): record_recent_source
+    # replaces the per-user recent-sources store under %LOCALAPPDATA% —
+    # outside every work area, so outside LLR-155.3's invariant — through a
+    # unique staging file and os.replace, and unlinks only its own staging
+    # file when the write fails.
     "s19_app/tui/workspace.py": frozenset(
         {
             "_private_stage_dir",
             "place_group_into_workarea",
             "place_into_workarea",
+            "record_recent_source",
         }
     ),
     # batch-100 Inc 2 fix pass 1 + the LED .53 redesign (review finding

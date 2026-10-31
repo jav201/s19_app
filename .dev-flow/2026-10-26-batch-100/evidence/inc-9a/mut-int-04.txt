@@ -1,0 +1,18 @@
+# mut-int-04 (integration sanity mutant, expected RED; run in a COPY of the worktree at scratchpad/int9a/mutwt, never in the worktree): s19_app/tui/app.py: S2 / LLR-172.1e: load_from_path drops the inside-the-work-area test | applied 04 e14f7640cfe409e2 | the copy's file is restored from a byte copy after the run and its sha256 verified
+# date: 2026-10-31T04:42:27-06:00
+fatal: not a git repository (or any of the parent directories): .git
+# cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int9a/mutwt  branch:  base: 4fef292 (uncommitted worktree)
+# interpreter: C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+# env: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<worktree>
+# sha256[:16] workspace.py=a3342ed048ebe157 app.py=e14f7640cfe409e2
+# s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int9a\mutwt\s19_app\__init__.py
+# command: python -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_recents.py::test_tc_b100_34_source_inside_the_work_area_is_not_recorded -rfE
+
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int9a\mutwt\tests\test_b100_recents.py:928: AssertionError: {'a2l work copy pick': 2, 'control: outside': 3, 'typed inside file': 2, 'variant switch': 1}
+=========================== short test summary info ===========================
+FAILED tests/test_b100_recents.py::test_tc_b100_34_source_inside_the_work_area_is_not_recorded
+1 failed in 8.96s
+# exit: 1
+# restore: restored OK sha256[:16]=6223201188232562

@@ -1,0 +1,24 @@
+# green-04-targeted (final): the new or changed arms outside test_b100_recents.py — tc_b100_33 (CI skip of [upper case] off Windows, E5), tc_b99_13 (E4 allow-list re-pin), test_id_registry tc607 (scanned-file bound 227->228, E4) and tc600-tc603 (id/citation registration, reached by the E5 test names and requirement edits). Touched-module run deferred to the batch-end battery by operator override (2026-10-31).
+# date: 2026-10-31T07:44:48-06:00
+# cwd: C:/Users/jjgh8/Github/s19_app-b100-inc9a
+# sha256[:16] workspace.py=0af4b92489233ff2 app.py=bbf04117fbf0d3f5
+# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc9a\s19_app\__init__.py
+# env: env -u NO_COLOR LOCALAPPDATA=<scratchpad>/e5fix/lad/<run id> PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=.
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rA tests/test_b100_project_homes.py::test_tc_b100_33_work_area_under_another_spelling_saves_there tests/test_b99_staging.py::test_tc_b99_13_no_final_name_replace_outside_placement tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound tests/test_id_registry.py::test_tc600_g1_every_named_node_id_is_registered tests/test_id_registry.py::test_tc601_g2_live_entries_name_existing_nodes tests/test_id_registry.py::test_tc602_g3_every_citation_is_registered tests/test_id_registry.py::test_tc603_g4_requirements_citations_are_live
+
+..........                                                               [100%]
+=================================== PASSES ====================================
+=========================== short test summary info ===========================
+PASSED tests/test_b100_project_homes.py::test_tc_b100_33_work_area_under_another_spelling_saves_there[trailing separator]
+PASSED tests/test_b100_project_homes.py::test_tc_b100_33_work_area_under_another_spelling_saves_there[upper case]
+PASSED tests/test_b100_project_homes.py::test_tc_b100_33_work_area_under_another_spelling_saves_there[dot-dot segment]
+PASSED tests/test_b100_project_homes.py::test_tc_b100_33_work_area_under_another_spelling_saves_there[junction alias]
+PASSED tests/test_b99_staging.py::test_tc_b99_13_no_final_name_replace_outside_placement
+PASSED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+PASSED tests/test_id_registry.py::test_tc600_g1_every_named_node_id_is_registered
+PASSED tests/test_id_registry.py::test_tc601_g2_live_entries_name_existing_nodes
+PASSED tests/test_id_registry.py::test_tc602_g3_every_citation_is_registered
+PASSED tests/test_id_registry.py::test_tc603_g4_requirements_citations_are_live
+10 passed in 14.11s
+# exit: 0
+# sha256[:16] after: workspace.py=0af4b92489233ff2 app.py=bbf04117fbf0d3f5

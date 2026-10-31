@@ -13,6 +13,8 @@ Dependencies:
 
 from __future__ import annotations
 
+import hashlib
+import os
 import random
 import re
 from pathlib import Path
@@ -23,6 +25,71 @@ import pytest
 if TYPE_CHECKING:
     from s19_app.tui.changes import ChangeDocument
     from s19_app.tui.models import LoadedFile
+
+
+# ---------------------------------------------------------------------------
+# C8 (batch-100 Inc 9a, LLR-172.1): no test may touch the real per-user
+# recent-sources store ``%LOCALAPPDATA%\s19_app\recent_sources.json``.
+# ---------------------------------------------------------------------------
+
+
+def _real_store_digest(localappdata: Optional[str]) -> Optional[str]:
+    """SHA-256 of the real store, or None when it (or the variable) is absent."""
+    if not localappdata:
+        return None
+    store = Path(localappdata) / "s19_app" / "recent_sources.json"
+    try:
+        return hashlib.sha256(store.read_bytes()).hexdigest()
+    except OSError:
+        return None
+
+
+def _real_store_folder_names(localappdata: Optional[str]) -> Optional[frozenset]:
+    """The names in the real ``%LOCALAPPDATA%\\s19_app`` folder, or None when
+    the folder (or the variable) is absent (E5 SEC9-7: a created folder or a
+    left staging file changes this even when the store's digest does not)."""
+    if not localappdata:
+        return None
+    try:
+        return frozenset(os.listdir(Path(localappdata) / "s19_app"))
+    except OSError:
+        return None
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _recent_store_session_guard(tmp_path_factory: pytest.TempPathFactory):
+    """Record the real store's SHA-256 (or its absence) before any test runs,
+    point ``LOCALAPPDATA`` at a session temporary folder for every
+    session/module/class-scoped fixture, and fail the session if the real
+    store changed (LLR-172.1's one guard, LED .41). ``recent_store_path``
+    reads the variable at call time (seam S9), so this takes effect."""
+    real = os.environ.get("LOCALAPPDATA")
+    before = _real_store_digest(real)
+    names_before = _real_store_folder_names(real)
+    patch = pytest.MonkeyPatch()
+    patch.setenv("LOCALAPPDATA", str(tmp_path_factory.mktemp("lad-session")))
+    yield
+    patch.undo()
+    after = _real_store_digest(real)
+    assert after == before, (
+        "the real per-user recent-sources store under LOCALAPPDATA changed during "
+        "the test run (C8 / LLR-172.1): a test or fixture wrote it"
+    )
+    names_after = _real_store_folder_names(real)
+    assert names_after == names_before, (
+        "the real LOCALAPPDATA\\s19_app folder was created, removed or changed its "
+        f"names during the test run (C8 / SEC9-7): {names_before} -> {names_after}"
+    )
+
+
+@pytest.fixture(autouse=True)
+def _recent_store_isolated(tmp_path_factory: pytest.TempPathFactory, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """Every test gets its own existing ``LOCALAPPDATA`` folder (outside its
+    ``tmp_path``, so no test's own folder listing changes). A test that needs
+    another value overrides it with ``monkeypatch``."""
+    lad = tmp_path_factory.mktemp("lad")
+    monkeypatch.setenv("LOCALAPPDATA", str(lad))
+    return lad
 
 
 # ---------------------------------------------------------------------------

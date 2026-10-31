@@ -1,0 +1,11 @@
+mutant: M55
+requirement: LLR-172.4
+target file: s19_app/tui/app.py
+edit: '        list_view = self.query_one("#files_list", ListView)\n        list_view.clear()\n        files = list_workarea_files(self.workarea)' -> '        list_view = self.query_one("#files_list", ListView)\n        list_view.clear()\n        temp_dir = self.workarea / WORKAREA_TEMP\n        list(temp_dir.glob("*"))\n        files = list_workarea_files(self.workarea)'
+sha256 before: 62232011882325626771cb015ccfce4b34c15945e90b8432fd628c61fcf22d80
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a
+command: pytest -q --tb=line tests/test_b100_recents.py::test_tc_b100_37_one_function_enumerates_the_temp_folder
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a\s19_app\__init__.py
+pytest summary: 1 failed in 1.18s
+verdict: KILLED
+restored = True

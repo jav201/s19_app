@@ -1,0 +1,11 @@
+mutant: M67
+requirement: LLR-172.5d
+target file: s19_app/tui/app.py
+edit: '        typed = os.path.abspath(normalized)' -> '        typed = os.path.abspath(normalized.resolve())'
+sha256 before: 62232011882325626771cb015ccfce4b34c15945e90b8432fd628c61fcf22d80
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a
+command: pytest -q --tb=line tests/test_b100_recents.py::test_tc_b100_38_typed_path_through_a_junction_is_refused[junction folder]
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a\s19_app\__init__.py
+pytest summary: 1 failed in 4.75s
+verdict: KILLED
+restored = True

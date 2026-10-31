@@ -1,0 +1,12 @@
+mutant: M03
+requirement: LLR-172.1 / seam S9
+target file: s19_app/tui/workspace.py
+edit: '    value = os.environ.get("LOCALAPPDATA")\n    if not value:\n        return None' -> '    value = _RECENT_LAD_SNAPSHOT\n    if not value:\n        return None'
+edit: '_DRIVE_ROOTED_RE = re.compile(r"^[A-Za-z]:[\\\\/]")' -> '_DRIVE_ROOTED_RE = re.compile(r"^[A-Za-z]:[\\\\/]")\n_RECENT_LAD_SNAPSHOT = os.environ.get("LOCALAPPDATA")'
+sha256 before: a3342ed048ebe157423bd68446455b556604d05a3d7bbe3349800aaca3a4cc04
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a
+command: pytest -q --tb=line tests/test_b100_recents.py::test_tc_b100_34_store_lives_under_localappdata
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a\s19_app\__init__.py
+pytest summary: 1 failed in 0.33s
+verdict: KILLED
+restored = True

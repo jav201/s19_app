@@ -1,0 +1,20 @@
+# mut-int-06 (integration sanity mutant, expected RED; run in a COPY of the worktree at scratchpad/int9a/mutwt, never in the worktree): s19_app/tui/app.py: S1 / HLR-172: load_a2l_from_path never records | applied 06 9f5518e6fa64565d | the copy's file is restored from a byte copy after the run and its sha256 verified
+# date: 2026-10-31T04:42:57-06:00
+fatal: not a git repository (or any of the parent directories): .git
+# cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int9a/mutwt  branch:  base: 4fef292 (uncommitted worktree)
+# interpreter: C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+# env: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<worktree>
+# sha256[:16] workspace.py=a3342ed048ebe157 app.py=9f5518e6fa64565d
+# s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int9a\mutwt\s19_app\__init__.py
+# command: python -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_recents.py::test_tc_b100_34_failed_store_write_never_fails_the_load tests/test_b100_recents.py::test_tc_b100_34_record_puts_newest_first_with_its_kind -rfE
+
+.F.F.                                                                    [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int9a\mutwt\tests\test_b100_recents.py:1098: AssertionError: the control load wrote no store
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int9a\mutwt\tests\test_b100_recents.py:1098: AssertionError: the control load wrote no store
+=========================== short test summary info ===========================
+FAILED tests/test_b100_recents.py::test_tc_b100_34_failed_store_write_never_fails_the_load[replace refused-a2l]
+FAILED tests/test_b100_recents.py::test_tc_b100_34_failed_store_write_never_fails_the_load[staging creation refused-a2l]
+2 failed, 3 passed in 15.10s
+# exit: 1
+# restore: restored OK sha256[:16]=6223201188232562

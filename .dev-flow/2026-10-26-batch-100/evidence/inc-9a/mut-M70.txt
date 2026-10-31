@@ -1,0 +1,11 @@
+mutant: M70
+requirement: LLR-172.5g
+target file: s19_app/tui/app.py
+edit: '        # LLR-172.5g / E3 R3: a name the project list does not list (by\n        # ``normcase``) is refused before ``validate_project_files`` and the\n        # reset, so a reserved home, a stream/8.3/trailing-dot spelling and a\n        # case-different name all stop here; a match loads the on-disk name.\n        try:\n            listed = self.list_projects()\n        except OSError:\n            self.set_status(\n                safe_text(\n                    f"Project NOT loaded: \'{painted_names([name])}\' could not be "\n                    "read — check that the folder can be opened, then load again."\n                ).plain\n            )\n            self.logger.warning("Project load refused (could not be read): %r", name)\n            return\n        match = next(\n            (\n                entry\n                for entry in listed\n                if os.path.normcase(entry) == os.path.normcase(name)\n            ),\n            None,\n        )\n        if match is None:\n            self.set_status(\n                safe_text(\n                    f"Project NOT loaded: \'{painted_names([name])}\' is not a "\n                    "project — pick a project in the list."\n                ).plain\n            )\n            self.logger.warning("Project load refused (not listed): %r", name)\n            return\n        name = match\n        project_dir = self.workarea / name' -> '        project_dir = self.workarea / name'
+sha256 before: 62232011882325626771cb015ccfce4b34c15945e90b8432fd628c61fcf22d80
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a
+command: pytest -q --tb=line tests/test_b100_recents.py::test_tc_b100_38_project_load_of_an_unlisted_name_is_refused[temp]
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a\s19_app\__init__.py
+pytest summary: 1 failed in 4.50s
+verdict: KILLED
+restored = True

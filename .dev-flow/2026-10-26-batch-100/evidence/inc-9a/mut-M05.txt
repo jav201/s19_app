@@ -1,0 +1,11 @@
+mutant: M05
+requirement: LLR-172.1f
+target file: s19_app/tui/workspace.py
+edit: '    value = os.environ.get("LOCALAPPDATA")\n    if not value:\n        return None' -> '    value = os.environ.get("LOCALAPPDATA")\n    if not value:\n        value = str(Path.home())'
+sha256 before: a3342ed048ebe157423bd68446455b556604d05a3d7bbe3349800aaca3a4cc04
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a
+command: pytest -q --tb=line tests/test_b100_recents.py::test_tc_b100_34_unusable_localappdata_gives_no_store_path[unset] tests/test_b100_recents.py::test_tc_b100_34_no_usable_localappdata_writes_no_store[unset]
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a\s19_app\__init__.py
+pytest summary: 2 failed in 0.35s
+verdict: KILLED
+restored = True
