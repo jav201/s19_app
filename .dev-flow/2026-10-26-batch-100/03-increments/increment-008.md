@@ -179,7 +179,7 @@ Orchestrator-owned captures, real Windows Terminal, 8 plans (`pe-clean`, `pe-sav
 
 First step start to the last logged step: 20:12:29Z to 00:40:08Z = about 4 h 28 min wall, against Inc 7's 687 min (`experiment-8a/baseline-inc7-timing.md`). Inc 8a is smaller than Inc 7, so wall time alone does not decide (`PLAN.md`); per-LLR time, where each MAJOR/HIGH was caught and the number of corrective passes are the comparison the operator reads. Raw facts for it: **E3 (design, no code) caught 9 MAJOR in round 1 and 4 MAJOR in round 2, 0 in round 3; E5 (code) caught 1 MAJOR (F1, tagged design-gap) and 0 HIGH; 1 corrective pass; 0 full-census launches** (Inc 7: 2 corrective passes, 6 full-census launches, 8 MAJOR/HIGH-class findings, all found on code). The conclusion stays with the operator.
 
-### Evidence files — bytes at a declared home, verbatim, hash-verified (C-59)
+### Evidence files — bytes at a declared home, verbatim, hash-verified (C-59); digests are of the committed blobs (git normalises line endings, so a Windows checkout of a text file may differ by CRLF)
 
 | Evidence artifact | Path — under `.dev-flow/2026-10-26-batch-100/evidence/inc-8a/` | SHA-256 |
 |---|---|---|
@@ -365,25 +365,24 @@ First step start to the last logged step: 20:12:29Z to 00:40:08Z = about 4 h 28 
 | E4-reader-notes.md | .dev-flow/2026-10-26-batch-100/experiment-8a/E4-reader-notes.md | d3903ef9b45a680f08b46c417b0f932873e73223357f6df211bc37e5419748c0 |
 | E4-tester-notes.md | .dev-flow/2026-10-26-batch-100/experiment-8a/E4-tester-notes.md | 1e023270ab8a8ebe44650ea32b85d632519c951b0a999595c854b4f81b24f220 |
 | E4-writer-gather-notes.md | .dev-flow/2026-10-26-batch-100/experiment-8a/E4-writer-gather-notes.md | 44ff30b3553f98520efadb69dabb7ca8c1cd10428466061aa6b22b28cf1b3e66 |
-| E5-cp1-notes.md | .dev-flow/2026-10-26-batch-100/experiment-8a/E5-cp1-notes.md | f791ed955c2b987afd4bcbe671f6fd871758495d637739892da0027232399791 |
-| PLAN.md | .dev-flow/2026-10-26-batch-100/experiment-8a/PLAN.md | fc6328cafbb177ffbd220827968d9b58d71c5b663d26bcddc3003a5151cc31e5 |
-| timing8a.cpython-312.pyc | .dev-flow/2026-10-26-batch-100/experiment-8a/__pycache__/timing8a.cpython-312.pyc | 10a576abaee21eb8715b6d8b816c81f00959dc7f1e047fcc207fa613f2c5633a |
-| baseline-inc7-timing.md | .dev-flow/2026-10-26-batch-100/experiment-8a/baseline-inc7-timing.md | b05d5d0c52c837687e85d15b4a128ef912afe9cf3e0164435ceeb6f8ad9fd2ec |
+| E5-cp1-notes.md | .dev-flow/2026-10-26-batch-100/experiment-8a/E5-cp1-notes.md | 282860a9838e533ae076bfffff1dd8d0f0d7fe2c8935a735fe035f9b7e4bd809 |
+| PLAN.md | .dev-flow/2026-10-26-batch-100/experiment-8a/PLAN.md | 67928afaa5854136cd8796e56a4b01c01ac3b2544b6a5db47be16a5c7f3ca96b |
+| baseline-inc7-timing.md | .dev-flow/2026-10-26-batch-100/experiment-8a/baseline-inc7-timing.md | f568c5d8d6734fbd7b20f6685ba9e3b9dcfc59926b1373a745819661d32c7928 |
 | baseline-8a.md | .dev-flow/2026-10-26-batch-100/experiment-8a/codewire/baseline-8a.md | e800f11b8763db8bf6b8245790adf32e60402e495799f9fa12374aaa439f2127 |
 | baseline-notes.md | .dev-flow/2026-10-26-batch-100/experiment-8a/codewire/baseline-notes.md | 81e79b651ad3f86d1c448494b537cadd8bbc08a1ef10a78f80d0acd5ef9e28ec |
-| diff-report-py311.md | .dev-flow/2026-10-26-batch-100/experiment-8a/codewire/extract-baseline/diff-report-py311.md | f55d45fe2f97c5e105b626282fe14fe109ab0808601561b8ecba1e7a3d8a7f9f |
-| diff-report.md | .dev-flow/2026-10-26-batch-100/experiment-8a/codewire/extract-baseline/diff-report.md | 80666aa0814da2136980db5290bfc14d73e31baf68a9b1c1b88b034c204ef19f |
-| extract-py311.json | .dev-flow/2026-10-26-batch-100/experiment-8a/codewire/extract-baseline/extract-py311.json | 7be57f137a2520094238fe23155b4b6f3a05979434bdac287a0a444df436e24d |
-| extract.json | .dev-flow/2026-10-26-batch-100/experiment-8a/codewire/extract-baseline/extract.json | edcf2ada238f7ff7574cabe309aff395b6b2d5fa5a8ff847161e4317fd8df1cc |
+| diff-report-py311.md | .dev-flow/2026-10-26-batch-100/experiment-8a/codewire/extract-baseline/diff-report-py311.md | bf32609998023b816a19e986525eee3b2300a1cbb49257e1fd61c038fb0c10d1 |
+| diff-report.md | .dev-flow/2026-10-26-batch-100/experiment-8a/codewire/extract-baseline/diff-report.md | 3948db0ff2648bba7c8e32b124c25f08e76d9e2e7cc8d149604ea9f64fdd6517 |
+| extract-py311.json | .dev-flow/2026-10-26-batch-100/experiment-8a/codewire/extract-baseline/extract-py311.json | 37bbca6cc4be9d59b43ac83118c82ac384026d57baedf3740a105e3fafe379cf |
+| extract.json | .dev-flow/2026-10-26-batch-100/experiment-8a/codewire/extract-baseline/extract.json | 8448512d0886b58c585104165440152bbc010b1f4d8d50802802cb96525f9b95 |
 | interfaces-8a.md | .dev-flow/2026-10-26-batch-100/experiment-8a/codewire/interfaces-8a.md | e79be24d8d894c76bc4504be306c50ef0262696ab249ae9bf808bfcbe9d386d2 |
 | proto-8a-app.md | .dev-flow/2026-10-26-batch-100/experiment-8a/codewire/proto-8a-app.md | 610fbd292f75dd060f5b1cbc3cb07e937f5e4e09cba20fef67dc593779efd1fe |
 | proto-8a-reader.md | .dev-flow/2026-10-26-batch-100/experiment-8a/codewire/proto-8a-reader.md | 9c70504c4f07df4a247ee137c76d28b7c85e3452643b1cdedf53df3f5b221637 |
 | proto-8a-writer-gather.md | .dev-flow/2026-10-26-batch-100/experiment-8a/codewire/proto-8a-writer-gather.md | 07a3268fa4575c559d7f61a1cae5df6c266a5c795168e9333be798bedd2bb476 |
 | report8a.py | .dev-flow/2026-10-26-batch-100/experiment-8a/report8a.py | ed2f858205a595d7a4284729a4fc55eb6cc094046f0577e0f3ae9e0949aaf549 |
 | steps.log | .dev-flow/2026-10-26-batch-100/experiment-8a/steps.log | bb639ff6a6460c93d46abcfe9219e34496e60b2ed16bdf69115285ef6b7949d1 |
-| timing-8a.md | .dev-flow/2026-10-26-batch-100/experiment-8a/timing-8a.md | aaf53b458843d0bcddd18203e4f00f3ddbed7414ecede820ff3703530b97230b |
-| timing.py | .dev-flow/2026-10-26-batch-100/experiment-8a/timing.py | 56d6bbd8941a907f03cbd1b4e803f92e96ea726a85156866eb5e1d07b6c88704 |
-| timing8a.py | .dev-flow/2026-10-26-batch-100/experiment-8a/timing8a.py | 87958304d4719034d67315a2b5a999bcf914a8e9c400037d250b4a23b683cfe9 |
+| timing-8a.md | .dev-flow/2026-10-26-batch-100/experiment-8a/timing-8a.md | 9ebc8ed3a51ce561203e71dc8947228d835991b24d02a27835240c35c967ba7b |
+| timing.py | .dev-flow/2026-10-26-batch-100/experiment-8a/timing.py | cb045179ee8cbc1b5ee3acecde8abb26cbd656a2e47ef9186c41201d6ce58a05 |
+| timing8a.py | .dev-flow/2026-10-26-batch-100/experiment-8a/timing8a.py | e46e3433783019646495c29d3673e833186478e5857593d26d7a520e3f88e330 |
 | green-at-08-20.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-8a/green-at-08-20.txt | ac966448b1c8a8097972677113202d23085c662a132cb34bb7388b42fef7b01a |
 | red-at-08-20-vs-base.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-8a/red-at-08-20-vs-base.txt | aa87301083ea0db5e83441f0c69b5991a42e875b69a0f42e1f3ce68f9fd521c8 |
 
