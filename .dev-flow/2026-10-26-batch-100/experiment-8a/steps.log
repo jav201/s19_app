@@ -1,0 +1,25 @@
+# <UTC start> <UTC end> <step> <agents> <outcome>
+2026-10-30T20:12:29Z 2026-10-30T20:20:36Z E2-baseline 1xOpus graph 25 nodes, extractor exit 0 (py3.12), 5 candidates C1-C5, 4 requirement-text notes (agent wall 7.3 min)
+2026-10-30T20:12:29Z 2026-10-30T20:24:38Z E1 1xOpus 1 HLR/11 LLR/2 AT/11 TC in scope, 12 requirements edited (LED .72), slice 22 nodes, 6 open questions (3 decisions)
+2026-10-30T20:25:36Z - E2-decisions orchestrator 6 E1 questions decided (LED .72 addendum, 4 LLR thresholds), interfaces-8a.md fixed
+2026-10-30T20:25:36Z 2026-10-30T20:34:51Z E2 3xOpus parallel (A app 9 nodes/66 ex, B writer+gather 8 nodes/~75 ex, C reader 9 nodes); graph only after operator correction (no source change); 3 design defects (B), 1 HIGH seam risk (C R1 = A R-6 = B P-B1), 13 interface proposals
+2026-10-30T20:35:47Z - E3-prerulings orchestrator 12 rulings on 13 proposals + seam risks (interfaces-8a.md)
+2026-10-30T20:35:47Z 2026-10-30T20:56:00Z E3-r1 2xOpus parallel: architect FAIL (5 MAJOR/6 MINOR/3 LOW, 9.5 min), security FAIL (0 HIGH/4 MAJOR/5 MINOR/3 LOW, 20 min); all on design, no code
+2026-10-30T20:57:23Z - E3-rulings orchestrator R1-R7 (R1 drops in-place rewrite: closes 6 findings)
+2026-10-30T20:58:00Z 2026-10-30T21:06:54Z E3-fix 1xSonnet design pass R1-R7 + 20 prototype edits, 6 LLR amended (LED .73); OBS: Sonnet truncated proto-8a-writer-gather.md twice and rebuilt it from its own cat -n output (model-assessment note)
+2026-10-30T21:07:21Z - E3-r2 start (R8, R9 added)
+2026-10-30T21:07:00Z 2026-10-30T21:16:00Z E3-r2 2xOpus parallel: architect FAIL (2 MAJOR/3 MINOR/4 LOW, 8 min), security FAIL (2 MAJOR/2 MINOR/4 LOW, 9 min); round-1 findings all closed; A3R2-5 = content lost in the Sonnet rebuild
+2026-10-30T21:16:55Z - E3-rulings-r2 orchestrator R10-R14; design pass 2 on Opus (Sonnet error -> model reassessment pending with operator)
+2026-10-30T21:16:59Z 2026-10-30T21:29:33Z E3-fix2 1xOpus design pass R8-R14 + 13 reviewer fixes (LED .74), no line loss
+2026-10-30T21:30:34Z - E3-r3 start (token table rows added by orchestrator)
+2026-10-30T21:30:37Z 2026-10-30T21:36:42Z E3-r3 2xOpus verify: architect PASS-WITH-NOTES (3 MINOR/2 LOW, 5 min), security PASS-WITH-NOTES (1 MINOR/2 LOW, 6 min) -> PDR approved
+2026-10-30T21:37:23Z - E3-close orchestrator R15-R19 addenda to E4, token rows amended
+2026-10-30T21:37:38Z 2026-10-30T22:19:20Z E4 4xOpus parallel: C reader 13 min (195 existing pass), A app 26 min, B writer+gather 27 min, tester 41 min (164 nodes; RED 160F/4P: 101 behavioural + 59 import on new symbols; 71 mutant rows); orchestrator rulings: keep-reason phrase, merge-row only with existing project.json, re-pins (stat import, 8 placements), G-1
+2026-10-30T22:20:32Z - E4-integration start (operator: per-increment = new/modified requirement tests only; full battery once at batch end)
+2026-10-30T22:20:42Z 2026-10-30T23:03:33Z E4-integration 1xOpus: 6 rulings applied, 6 re-pins, 7 gap tests + 7 mutants; GREEN 643 passed (1 registry count fixed), guards 75 passed, 0 snapshot cells changed
+2026-10-30T23:04:44Z - E5 start: mutants (copy of tree) + code review + security review in parallel; R20 pending
+2026-10-30T23:05:38Z 2026-10-30T23:35:00Z E5 3xOpus parallel: mutants 10 min (78: 72 killed, 5 survived = 3 equivalent + 2 test gaps, 1 not-run); code review 18 min FAIL (1 MAJOR design-gap F1 device-name document breaks every save; 4 MINOR, 4 LOW; impl 5 / design-gap 3 / inc7-cp2 1; code matches approved design node for node); security 30 min PASS-WITH-NOTES (0/0/0/5 LOW; impl 1 / design-gap 3 / inc7-cp2 1); Inc 7 cp2 round-3 closed
+2026-10-30T23:36:30Z - E5-cp1 start (1xOpus: F1-F9, R20, mutant gaps, SEC8a-1..5)
+2026-10-30T23:36:35Z 2026-10-31T00:30:00Z E5-cp1 1xOpus: 11 items fixed, 22 mutant runs (20 killed + 2 survivors re-killed with new tests), GREEN 655 + reruns, guards 75, probes 7/8 (Q4 prediction-vs-outcome: accepted by orchestrator)
+2026-10-31T00:40:08Z - E5-r2 code-reviewer PASS-WITH-NOTES (F1 closed, 2 LOW) 9 min; E13 24 captures (new pe-document) -> gate passed; close records start
+2026-10-31T01:08:31Z - close: records (Sonnet, LED .75), AT-B100-08 + AT-20 8a arm (tester, 20 min, GREEN 19 / RED 4), packet renumbered increment-008, evidence 203 rows verified; commit/merge/push next
