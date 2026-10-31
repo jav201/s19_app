@@ -212,3 +212,95 @@ def files_at_cap_missing(records: dict) -> dict:
     for i in range(ENTRY_CAP - len(files)):
         files[f"gone{i:04d}.s19"] = {"size": 1, "sha256": "0" * 64}
     return manifest(active_variant="firmware", files=files)
+
+
+# ---------------------------------------------------------------------------
+# Inc 8a (E4): recorded change documents for the reopen's classifier
+# (LLR-170.3, E3 R4 / R10 / R17 / R19). Stdlib only, as above.
+# ---------------------------------------------------------------------------
+
+#: The reopen's caps (E3 R4), restated as the oracle.
+DOCUMENT_BYTE_CAP = 1 << 20
+DOCUMENT_ENTRY_CAP = 1000
+
+
+def document_envelope(entries, kind: str = "change", **extra) -> dict:
+    """A v2 ``s19app-changeset`` envelope holding ``entries`` as given (any
+    JSON value, so the hostile ``entries`` shapes can be built)."""
+    payload = {
+        "format": "s19app-changeset",
+        "version": "2.0",
+        "kind": kind,
+        "encoding": "utf-8",
+        "value_mode": "text",
+        "entries": entries,
+    }
+    payload.update(extra)
+    return payload
+
+
+def address_entries(count: int, start: int = 0x80000000) -> list:
+    """``count`` one-byte address entries at distinct addresses."""
+    return [
+        {"type": "bytes", "address": f"0x{start + i:08X}", "bytes": "AA"}
+        for i in range(count)
+    ]
+
+
+def document_with_entries(count: int) -> bytes:
+    """A v2 change document of ``count`` one-byte entries (1 000 is under
+    the byte cap; 20 000 is over it)."""
+    return json.dumps(document_envelope(address_entries(count))).encode("utf-8")
+
+
+def document_over_byte_cap() -> bytes:
+    """A valid one-entry v2 document padded with white space to exactly
+    1 048 577 bytes: over the byte cap by one, under the entry cap."""
+    body = json.dumps(document_envelope(address_entries(1))).encode("utf-8")
+    return body + b" " * (DOCUMENT_BYTE_CAP + 1 - len(body))
+
+
+#: 1 048 576 x ``[``: the count step's ``RecursionError`` (probe P2).
+OPEN_BRACKETS_ONE_MIB = b"[" * DOCUMENT_BYTE_CAP
+
+#: ``{"entries":`` + 1 000 000 x ``[``: nesting under the ``entries`` key.
+OPEN_BRACKETS_UNDER_ENTRIES = b'{"entries":' + b"[" * 1_000_000
+
+#: ``entries`` is a number: not a list, so not readable (never too large).
+ENTRIES_IS_FIVE = json.dumps(document_envelope(5)).encode("utf-8")
+BARE_ENTRIES_IS_FIVE = b'{"entries": 5}'
+
+#: A 5 000-digit integer: ``json.loads`` raises a plain ``ValueError``
+#: (Python's int-digit limit, 4 300), not ``JSONDecodeError`` (E3 R19).
+FIVE_THOUSAND_DIGITS = (
+    b'{"format": "s19app-changeset", "version": "2.0", "pad": '
+    + b"9" * 5000
+    + b', "entries": []}'
+)
+
+#: ``entries`` as a 900 000-character string, and as an object of 1 001 keys.
+ENTRIES_LONG_STRING = json.dumps(document_envelope("x" * 900_000)).encode("utf-8")
+ENTRIES_WIDE_OBJECT = json.dumps(
+    document_envelope({f"k{i}": i for i in range(1001)})
+).encode("utf-8")
+
+#: A truncated document and a v1 (batch-04) unified document. The v1 body
+#: carries an ``entries`` list, so the classifier passes its "entries is a
+#: list" step and reaches the file-level code ``CHG-V1-FORMAT`` (E3 R17;
+#: Inc 8a cp1, review F6: without it the fixture was refused one step
+#: earlier and the R-19 mutant survived).
+TRUNCATED = b"{"
+V1_DOCUMENT = json.dumps(
+    {
+        "format": "s19app-unified-changeset",
+        "parameters": [],
+        "memory": [{"address": "0x80000010", "bytes": "DE AD"}],
+        "entries": [],
+    }
+).encode("utf-8")
+
+#: Bytes that are not UTF-8.
+NOT_UTF8 = b"\xff\xfe\x00{"
+
+#: A valid v2 document with ``"entries": []``.
+EMPTY_ENTRIES = json.dumps(document_envelope([])).encode("utf-8")

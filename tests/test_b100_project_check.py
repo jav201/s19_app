@@ -1540,3 +1540,203 @@ def test_at_b100_07_load_names_the_changed_file_and_the_hostile_record(
     assert not [entry for entry in painted_log if INTERNAL_CODE.search(entry)], painted_log
     log_file = base / WORKAREA_DIRNAME / "logs" / "s19tui.log"
     assert "MANIFEST-PATH-ESCAPE" in log_file.read_text(encoding="utf-8", errors="replace")
+
+
+
+# ---------------------------------------------------------------------------
+# Inc 8a arms (E4): TC-B100-23 / -24 / -25 for the recorded active document
+# (LLR-169.3, LLR-169.4, LLR-169.5 incl. E3 R7)
+# ---------------------------------------------------------------------------
+
+
+def _document_project(tmp_path: Path) -> tuple:
+    base = tmp_path / "app"
+    project_dir = projects.copy_sources(_workarea(base) / "P", projects.CASE01_DIR, "firmware.s19")
+    (project_dir / "patches").mkdir()
+    (project_dir / "patches" / "boost.json").write_bytes(projects.change_document_bytes())
+    (project_dir / "patches" / "other.json").write_bytes(
+        projects.change_document_bytes([projects.address_entry(0x80000060, (1,))])
+    )
+    vs = build_variant_set("P", [project_dir / "firmware.s19"])
+    vs.active_id = "firmware"
+    return base, project_dir, vs
+
+
+def test_tc_b100_23_active_document_changed_between_write_and_verify(tmp_path: Path) -> None:
+    """LLR-169.3 Inc 8a boundary: written and verified with
+    ``active_document`` "patches/boost.json" → verified, 0 drift; then
+    project.json edited so it records "patches/other.json" → mismatch,
+    drift exactly ``["active_document"]``. The leave-it-out-of-the-domain
+    mutant → 0 drift → RED."""
+    base, project_dir, vs = _document_project(tmp_path)
+    files = manifest_writer.project_file_records(project_dir)
+    written, issues = write_project_manifest(
+        vs, project_dir, base, files=files, active_document="patches/boost.json"
+    )
+    assert issues == [] and written is not None, issues
+    unchanged = manifest_writer.verify_written_manifest(
+        project_dir, vs, project_dir, files=files, active_document="patches/boost.json"
+    )
+    assert (unchanged.status, unchanged.drift) == (manifest_writer.MANIFEST_VERIFIED, [])
+    manifest = projects.read_manifest(project_dir)
+    manifest["active_document"] = "patches/other.json"
+    (project_dir / "project.json").write_text(json.dumps(manifest), encoding="utf-8")
+    result = manifest_writer.verify_written_manifest(
+        project_dir, vs, project_dir, files=files, active_document="patches/boost.json"
+    )
+    assert result.status == manifest_writer.MANIFEST_MISMATCH
+    assert result.drift == ["active_document"], result.drift
+
+
+def _record(path: Path) -> dict:
+    return projects.file_record_of(path)
+
+
+def test_tc_b100_24_files_key_of_the_active_document_is_read(tmp_path: Path) -> None:
+    """LLR-169.4 Inc 8a: the ``files`` key equal to the accepted
+    ``active_document`` is read (2 records, 0 issues); a second key under a
+    document home is refused (1 BAD-STRUCTURE naming it)."""
+    _base, project_dir, _vs = _document_project(tmp_path)
+    payload = {
+        "schema_version": 1,
+        "active_variant": "firmware",
+        "files": {
+            "firmware.s19": _record(project_dir / "firmware.s19"),
+            "patches/boost.json": _record(project_dir / "patches" / "boost.json"),
+        },
+        "active_document": "patches/boost.json",
+    }
+    _write_manifest(project_dir, payload)
+    manifest = read_project_manifest(project_dir)
+    assert manifest.issues == [], manifest.issues
+    assert len(manifest.files) == 2, manifest.files
+    payload["files"]["patches/other.json"] = _record(project_dir / "patches" / "other.json")
+    _write_manifest(project_dir, payload)
+    manifest = read_project_manifest(project_dir)
+    assert len(manifest.files) == 2, manifest.files
+    assert _codes(manifest) == [MANIFEST_BAD_STRUCTURE], manifest.issues
+    assert "patches/other.json" in json.dumps(manifest.issues[0].details) + manifest.issues[0].message
+
+
+def test_tc_b100_24_refused_document_refuses_its_files_key(tmp_path: Path) -> None:
+    """A refused ``active_document`` (``7``) → its ``files`` key is refused
+    too: 1 record (the image), 2 BAD-STRUCTURE issues."""
+    _base, project_dir, _vs = _document_project(tmp_path)
+    _write_manifest(
+        project_dir,
+        {
+            "schema_version": 1,
+            "active_variant": "firmware",
+            "files": {
+                "firmware.s19": _record(project_dir / "firmware.s19"),
+                "patches/boost.json": _record(project_dir / "patches" / "boost.json"),
+            },
+            "active_document": 7,
+        },
+    )
+    manifest = read_project_manifest(project_dir)
+    assert manifest.unknown_keys == ()
+    assert len(manifest.files) == 1, manifest.files
+    assert _codes(manifest) == [MANIFEST_BAD_STRUCTURE, MANIFEST_BAD_STRUCTURE], manifest.issues
+
+
+def test_tc_b100_24_derived_from_gets_no_document_exception(tmp_path: Path) -> None:
+    """The exception is ``files``-only: a ``derived_from`` key equal to the
+    active document → 0 records, 1 BAD-STRUCTURE (and the document itself
+    accepted)."""
+    _base, project_dir, _vs = _document_project(tmp_path)
+    _write_manifest(
+        project_dir,
+        {
+            "schema_version": 1,
+            "active_variant": "firmware",
+            "active_document": "patches/boost.json",
+            "derived_from": {
+                "patches/boost.json": {"base": "firmware.s19", "sha256": "a" * 64, "differ": 1}
+            },
+        },
+    )
+    manifest = read_project_manifest(project_dir)
+    assert manifest.unknown_keys == ()
+    assert getattr(manifest, "active_document", None) == "patches/boost.json"
+    assert len(manifest.derived_from) == 0
+    assert _codes(manifest) == [MANIFEST_BAD_STRUCTURE], manifest.issues
+
+
+def _check(project_dir: Path) -> list:
+    manifest = read_project_manifest(project_dir)
+    return [
+        (problem.kind, problem.file)
+        for problem in manifest_writer.check_project_files(project_dir, manifest)
+    ]
+
+
+@pytest.mark.parametrize("recorded", [True, False], ids=["with-record", "without-record"])
+def test_tc_b100_25_missing_active_document_is_one_problem(tmp_path: Path, recorded: bool) -> None:
+    """LLR-169.5 (2 arms): a recorded ``active_document`` absent from disk →
+    exactly 1 ``missing`` labelled "change document patches/boost.json"
+    (E3 R20; re-pinned in Inc 8a cp1 from the bare text), with and without
+    a ``files`` record. Mutants: the document skipped → 0 on the
+    without-record arm; the helper also run for a recorded one → 2 → RED."""
+    project_dir = projects.seed_document_project(tmp_path, record_document=recorded)
+    (project_dir / "patches" / "boost.json").unlink()
+    assert _check(project_dir) == [("missing", "change document patches/boost.json")]
+
+
+def test_tc_b100_25_missing_document_survives_the_no_digests_return(tmp_path: Path) -> None:
+    """P-B2: no ``files`` key and the document absent → 2 problems, 1
+    ``missing`` labelled as the change document (E3 R20, Inc 8a cp1
+    re-pin) and 1 ``no digests saved``."""
+    project_dir = tmp_path / "P"
+    projects.copy_sources(project_dir, projects.CASE01_DIR, "firmware.s19")
+    _write_manifest(
+        project_dir,
+        {"schema_version": 1, "active_variant": "firmware", "active_document": "patches/boost.json"},
+    )
+    assert sorted(_check(project_dir)) == [
+        ("missing", "change document patches/boost.json"),
+        ("no digests saved", "project.json"),
+    ]
+
+
+def test_tc_b100_25_recorded_document_present_and_equal_is_clean(tmp_path: Path) -> None:
+    project_dir = projects.seed_document_project(tmp_path)
+    assert _check(project_dir) == []
+
+
+def test_tc_b100_25_changed_document_is_named_by_its_project_text(tmp_path: Path) -> None:
+    """A3-1 / E3 R20: a recorded document whose bytes changed (same size)
+    → 1 ``changed on disk`` labelled "change document patches/boost.json"
+    (not "boost.json", not the bare text: re-pinned in Inc 8a cp1), the
+    label the reopen uses, so the load merge keeps one problem per file."""
+    project_dir = projects.seed_document_project(tmp_path)
+    target = project_dir / "patches" / "boost.json"
+    data = bytearray(target.read_bytes())
+    data[data.index(b"DE AD")] = ord("F")
+    target.write_bytes(bytes(data))
+    assert _check(project_dir) == [("changed on disk", "change document patches/boost.json")]
+
+
+def test_tc_b100_25_r7_missing_variant_never_names_the_document(tmp_path: Path) -> None:
+    """E3 R7 (LLR-169.5): a missing variant id ``boost`` with the document
+    ``patches/boost.json`` recorded first → the problem names the variant's
+    data file ``boost.s19`` (or the id when no data file is recorded), never
+    the document. The drop-the-suffix-restriction mutant → "boost.json" →
+    RED."""
+    from s19_app.tui.services.variant_execution_service import FileRecord
+    from s19_app.tui.services.variant_execution_service import ProjectManifest
+
+    root = (tmp_path / "P").resolve()
+    record = FileRecord(1, "0" * 64)
+    both = ProjectManifest(
+        schema_version=1,
+        active_variant="boost",
+        files={root / "patches" / "boost.json": record, root / "boost.s19": record},
+    )
+    assert service._missing_recorded(both, "boost") == "boost.s19"
+    only_document = ProjectManifest(
+        schema_version=1,
+        active_variant="boost",
+        files={root / "patches" / "boost.json": record},
+    )
+    assert service._missing_recorded(only_document, "boost") == "boost"

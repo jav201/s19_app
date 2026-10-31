@@ -407,3 +407,251 @@ def file_records(project_dir: Path) -> dict:
         for path in sorted(project_dir.iterdir(), key=lambda item: item.name)
         if path.is_file() and path.suffix.lower() in suffixes
     }
+
+
+# ---------------------------------------------------------------------------
+# Inc 8a (E4): projects that record an ``active_document`` (HLR-170), a
+# junction home, a file held open by another program, and one app session
+# driver with a full ``set_status`` log.
+# ---------------------------------------------------------------------------
+
+#: The default recorded document and its one address entry, inside
+#: case_01's image (``0x80000010`` is ``CAL_BLOCK_A``).
+DOCUMENT_TEXT = "patches/boost.json"
+DOCUMENT_ADDRESS = 0x80000010
+DOCUMENT_BYTES = (0xDE, 0xAD)
+
+
+def address_entry(address: int, run) -> dict:
+    return {
+        "type": "bytes",
+        "address": f"0x{address:08X}",
+        "bytes": " ".join(f"{byte:02X}" for byte in run),
+    }
+
+
+def symbol_entry(symbol: str, address: int, run) -> dict:
+    entry = address_entry(address, run)
+    entry["symbol"] = symbol
+    return entry
+
+
+def change_document_bytes(entries=None, kind: str = "change") -> bytes:
+    """A v2 change (or check) document; by default one address entry at
+    :data:`DOCUMENT_ADDRESS`."""
+    if entries is None:
+        entries = [address_entry(DOCUMENT_ADDRESS, DOCUMENT_BYTES)]
+    return json.dumps(
+        {
+            "format": "s19app-changeset",
+            "version": "2.0",
+            "kind": kind,
+            "encoding": "utf-8",
+            "value_mode": "text",
+            "entries": list(entries),
+        },
+        indent=2,
+    ).encode("utf-8")
+
+
+def file_record_of(path: Path) -> dict:
+    """``{"size", "sha256"}`` of ``path``'s bytes, computed with hashlib."""
+    import hashlib
+
+    data = path.read_bytes()
+    return {"size": len(data), "sha256": hashlib.sha256(data).hexdigest()}
+
+
+_SAME = object()
+
+
+def seed_document_project(
+    workarea: Path,
+    name: str = "P",
+    *,
+    document: str = DOCUMENT_TEXT,
+    body: Optional[bytes] = b"",
+    data_files: Iterable[str] = ("firmware.s19",),
+    record_document: bool = True,
+    active_document: object = _SAME,
+    extra: Optional[dict] = None,
+) -> Path:
+    """A project folder holding case_01's ``data_files``, the document file
+    ``document`` with ``body`` (``b""`` = the default one-entry document,
+    ``None`` = no file), and a hand-written ``project.json`` recording
+    ``active_variant`` ``firmware``, the ``files`` digests (hashlib) of the
+    data files and — when ``record_document`` and the file exists — of the
+    document, and ``active_document`` (``document`` unless given; any JSON
+    value, so the reader's hostile arms can be seeded)."""
+    project_dir = workarea / name
+    copy_sources(project_dir, CASE01_DIR, *data_files)
+    target = project_dir / document
+    if body is not None:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(body or change_document_bytes())
+    files = {item: file_record_of(project_dir / item) for item in data_files}
+    if record_document and body is not None:
+        files[document] = file_record_of(target)
+    manifest = {
+        "schema_version": 1,
+        "active_variant": "firmware",
+        "files": files,
+        "active_document": document if active_document is _SAME else active_document,
+    }
+    manifest.update(extra or {})
+    (project_dir / "project.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    return project_dir
+
+
+def junction_home(project_dir: Path, home: str, private: Path, name: str = "boost.json") -> Path:
+    """Replace ``project_dir/home`` with a directory junction to ``private``
+    (created, holding a valid one-entry document ``name``). Returns the
+    private file. Windows only: the caller runs ``require_junctions``."""
+    from tests.support.b100_links import create_junction
+
+    private.mkdir(parents=True, exist_ok=True)
+    secret = private / name
+    secret.write_bytes(change_document_bytes())
+    home_dir = project_dir / home
+    if home_dir.exists():
+        shutil.rmtree(home_dir)
+    create_junction(home_dir, private)
+    return secret
+
+
+class held_exclusively:
+    """Context manager: ``path`` open by "another program" with share mode
+    0 (``CreateFileW``), so any open for reading fails with a sharing
+    violation while ``os.lstat`` still answers. Windows only."""
+
+    def __init__(self, path: Path) -> None:
+        self.path = path
+        self.handle = None
+
+    def __enter__(self):
+        import ctypes
+        from ctypes import wintypes
+
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        create = kernel32.CreateFileW
+        create.argtypes = [
+            wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD, wintypes.LPVOID,
+            wintypes.DWORD, wintypes.DWORD, wintypes.HANDLE,
+        ]
+        create.restype = wintypes.HANDLE
+        handle = create(str(self.path), 0x80000000, 0, None, 3, 0x80, None)
+        if handle is None or handle == ctypes.c_void_p(-1).value:
+            raise OSError(ctypes.get_last_error(), "could not hold the file", str(self.path))
+        self.handle = handle
+        self._close = kernel32.CloseHandle
+        self._close.argtypes = [wintypes.HANDLE]
+        return self
+
+    def __exit__(self, *exc) -> None:
+        if self.handle is not None:
+            self._close(self.handle)
+            self.handle = None
+
+
+class StatusLog:
+    """Every ``set_status`` message, in full, while painting it for real."""
+
+    def __init__(self, app) -> None:
+        self.messages: list = []
+        original = app.set_status
+
+        def _record(message, *args, **kwargs):
+            self.messages.append(str(message))
+            return original(message, *args, **kwargs)
+
+        app.set_status = _record
+
+    def since(self, mark: int) -> list:
+        return self.messages[mark:]
+
+
+def run_app(base: Path, scenario, size: tuple = (160, 50)):
+    """Run ``await scenario(app, pilot, log)`` in a fresh app rooted at
+    ``base``; return what it returns."""
+    import asyncio
+
+    from s19_app.tui.app import S19TuiApp
+
+    async def _drive():
+        app = S19TuiApp(base_dir=base)
+        log = StatusLog(app)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            return await scenario(app, pilot, log)
+
+    return asyncio.run(_drive())
+
+
+async def wait_for(pilot, predicate, description: str, attempts: int = 400) -> None:
+    for _ in range(attempts):
+        if predicate():
+            return
+        await pilot.pause()
+    raise AssertionError(f"timed out waiting for {description}")
+
+
+async def load_image(pilot, app, path: Path) -> None:
+    app.load_selected_file(path)
+    await wait_for(
+        pilot,
+        lambda: app.current_file is not None and app.current_file.path.name == path.name,
+        f"the load of {path.name}",
+    )
+
+
+async def load_project(pilot, app, name: str = "P") -> float:
+    """Open project ``name`` through the shipped handler; returns the
+    handler's wall time in seconds (the reopen runs inside it)."""
+    import time
+
+    start = time.perf_counter()
+    app._handle_load_project(name)
+    elapsed = time.perf_counter() - start
+    await wait_for(
+        pilot,
+        lambda: app.current_project == name and app.current_file is not None,
+        f"the project load of {name}",
+    )
+    for _ in range(6):
+        await pilot.pause()
+    return elapsed
+
+
+SAVE_OUTCOMES = ("Saved project to", "NOT saved", "could not save", "Could not save", "was not written")
+
+
+async def save_project(pilot, app, log: StatusLog, name: str = "P") -> list:
+    """Run the shipped Save project handler for ``name`` and wait for its
+    outcome line; returns every status message the save painted."""
+    from s19_app.tui.screens import SaveProjectPayload
+
+    mark = len(log.messages)
+    app._handle_save_dialog(
+        SaveProjectPayload(parent_folder=str(app.workarea), project_name=name)
+    )
+    await wait_for(
+        pilot,
+        lambda: any(
+            outcome in message for message in log.since(mark) for outcome in SAVE_OUTCOMES
+        ),
+        f"the Save project outcome for {name}",
+    )
+    for _ in range(6):
+        await pilot.pause()
+    return log.since(mark)
+
+
+def tree_files(root: Path) -> dict:
+    """Every file under ``root`` (relative POSIX text) -> its bytes."""
+    if not root.exists():
+        return {}
+    return {
+        path.relative_to(root).as_posix(): path.read_bytes()
+        for path in sorted(root.rglob("*"))
+        if path.is_file()
+    }

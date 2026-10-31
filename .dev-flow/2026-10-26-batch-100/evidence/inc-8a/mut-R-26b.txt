@@ -1,0 +1,22 @@
+# mutant R-26b  (R5 / R6 phrase)
+# description: manifest_keep_reason names the key instead of the user-term phrase
+# file: s19_app/tui/services/variant_execution_service.py
+# source sha256 before: 5f2ab3268d9cdc4dafdb696628313642438fd208cd3e3039c4059ad507510d09
+# edit 1 OLD:
+#   |         return "holds a change document path this version cannot use"
+# edit 1 NEW:
+#   |         return "holds an active_document this version refused"
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_28_refused_value_is_a_keep_reason
+# started 2026-10-30T23:13:50Z  finished 2026-10-30T23:13:51Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:566: AssertionError: holds an active_document this version refused
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_28_refused_value_is_a_keep_reason
+1 failed in 0.62s
+
+# pytest summary: 1 failed in 0.62s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 5f2ab3268d9cdc4dafdb696628313642438fd208cd3e3039c4059ad507510d09)

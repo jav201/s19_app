@@ -1,0 +1,22 @@
+# mutant R-28  (pre-ruling 1)
+# description: ACTIVE_DOCUMENT_HOMES drifts from the gather's homes
+# file: s19_app/tui/services/variant_execution_service.py
+# source sha256 before: 5f2ab3268d9cdc4dafdb696628313642438fd208cd3e3039c4059ad507510d09
+# edit 1 OLD:
+#   | ACTIVE_DOCUMENT_HOMES = frozenset({"patches", "checks"})
+# edit 1 NEW:
+#   | ACTIVE_DOCUMENT_HOMES = frozenset({"patches", "checks", "templates"})
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_28_document_homes_equal_the_gather_homes
+# started 2026-10-30T23:13:51Z  finished 2026-10-30T23:13:53Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:249: AssertionError: assert {'checks', 'p..., 'templates'} == {'checks', 'patches'}
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_28_document_homes_equal_the_gather_homes
+1 failed in 0.62s
+
+# pytest summary: 1 failed in 0.62s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 5f2ab3268d9cdc4dafdb696628313642438fd208cd3e3039c4059ad507510d09)

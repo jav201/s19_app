@@ -1,0 +1,29 @@
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc8a\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+== W pasted-document write
+  W1 new P: files ['firmware.s19', 'patches/', 'patches\\changes.json', 'project.json'] | active_document patches/changes.json
+     bound source_path C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s8a\runs\W1_1793401918421762500\app\.s19tool\workarea\P\patches\changes.json | textual (not resolved): True
+   painted[W1]: lines=3 codes=[] class_names=[] control_lines=0
+  W2 P/patches junction -> Q/patches: Q diff {'created': [], 'removed': [], 'changed': []} | source_path None
+     P manifest active_document: None
+     | Project saved + manifest verified
+     | Saved + verified: firmware_1.s19 — 0 entries applied before this save; includes 1 entry not applied before this save (0x8000007C)
+     | Saved project to C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s8a\runs\W2_1793401920458617500\app\.s19tool\workarea\P (variant 'firmware
+     | Change document changes_1.json was not saved into the project — the file could not be written; its entries stay in the Patch Editor
+   painted[W2]: lines=4 codes=[] class_names=[] control_lines=0
+  W3a different: P diff {'created': ['firmware_1.s19', 'patches\\changes_1.json', 'project.json'], 'removed': [], 'changed': []} | active_document patches/changes_1.json
+   painted[W3a different]: lines=3 codes=[] class_names=[] control_lines=0
+  W3b identical: P diff {'created': ['firmware_1.s19', 'project.json'], 'removed': [], 'changed': []} | active_document patches/changes.json
+   painted[W3b identical]: lines=3 codes=[] class_names=[] control_lines=0
+  W4a fresh P: P exists=False diff {'created': [], 'removed': [], 'changed': []}
+     | Project NOT saved: could not save — [Errno 28] No space left on device (injected). check the folder.
+   painted[W4a fresh P]: lines=1 codes=[] class_names=[] control_lines=0
+  W4b P with identical changes.json: P exists=True diff {'created': [], 'removed': [], 'changed': []}
+     | Project NOT saved: could not save — [Errno 28] No space left on device (injected). check the folder.
+   painted[W4b P with identical changes.json]: lines=1 codes=[] class_names=[] control_lines=0
+  W4c P without patches/: P exists=True diff {'created': [], 'removed': [], 'changed': []}
+     | Project NOT saved: could not save — [Errno 28] No space left on device (injected). check the folder.
+   painted[W4c P without patches/]: lines=1 codes=[] class_names=[] control_lines=0
+# links created: 1 | reparse points left under runs/: []
+   painted[ALL]: lines=32 codes=[] class_names=[] control_lines=0
+exit=0

@@ -1,0 +1,38 @@
+# mutant M-01  (LLR-170.1)
+# description: reader: skip the form predicate after the text rules
+# file: s19_app/tui/services/variant_execution_service.py
+# source sha256 before: 5f2ab3268d9cdc4dafdb696628313642438fd208cd3e3039c4059ad507510d09
+# edit 1 OLD:
+#   |     if text is not None and not is_active_document_form(raw):
+# edit 1 NEW:
+#   |     if False and text is not None and not is_active_document_form(raw):
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form
+# started 2026-10-30T23:11:48Z  finished 2026-10-30T23:11:50Z  rc=1
+...FFFFFFFFF......                                                       [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:336: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:336: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:336: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:336: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:336: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:336: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:336: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:336: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:336: AssertionError: []
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form['firmware.s19'-'MANIFEST-BAD-STRUCTURE']
+FAILED tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form['project.json'-'MANIFEST-BAD-STRUCTURE']
+FAILED tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form['patches/x.txt'-'MANIFEST-BAD-STRUCTURE']
+FAILED tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form['patches\\\\boost.json'-'MANIFEST-BAD-STRUCTURE']
+FAILED tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form['boost.json'-'MANIFEST-BAD-STRUCTURE']
+FAILED tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form['patches/sub/x.json'-'MANIFEST-BAD-STRUCTURE']
+FAILED tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form['templates/t.json'-'MANIFEST-BAD-STRUCTURE']
+FAILED tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form['Patches/boost.json'-'MANIFEST-BAD-STRUCTURE']
+FAILED tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form['patches/\\x1b]0;x\\x07a.json'-'MANIFEST-BAD-STRUCTURE']
+9 failed, 9 passed in 0.72s
+
+# pytest summary: 9 failed, 9 passed in 0.72s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 5f2ab3268d9cdc4dafdb696628313642438fd208cd3e3039c4059ad507510d09)

@@ -1,0 +1,4 @@
+# mutant R-12  (R10 catch set)
+# description: TypeError removed from the classifier's catch set (_DOCUMENT_PARSE_ERRORS in s19_app/tui/app.py)
+# verdict: not-run
+# reason: no test node exists for this mutant — E4 named it a gap (no input was found that makes json.loads or parse_change_document raise TypeError on bytes), and E4 integration kept it a named gap; no source was mutated, nothing to restore.

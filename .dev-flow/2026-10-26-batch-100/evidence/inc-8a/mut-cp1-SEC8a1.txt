@@ -1,0 +1,22 @@
+# mutant cp1-SEC8a1  (SEC8a-1)
+# description: the inside-the-project test case-folds the text again
+# file: s19_app/tui/services/project_gather_service.py
+# source sha256 before: bd6f926590c17abd7711edee84667bb24f3463fd50f04eff96286fb1e65237de
+# edit 1 OLD:
+#   |     if str(absolute).startswith(project_text + os.sep):
+# edit 1 NEW:
+#   |     if os.path.normcase(str(absolute)).startswith(os.path.normcase(project_text) + os.sep):
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_29_cp1_case_sensitive_work_area_keeps_two_projects_apart
+# started 2026-10-30T23:57:29Z  finished 2026-10-30T23:57:30Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_document.py:1768: AssertionError: assert ('inside_elsewhere', None) == ('outside', 'x.json')
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_29_cp1_case_sensitive_work_area_keeps_two_projects_apart
+1 failed in 0.69s
+
+# pytest summary: 1 failed in 0.69s
+# verdict: KILLED
+# restored = True  (sha256 after restore: bd6f926590c17abd7711edee84667bb24f3463fd50f04eff96286fb1e65237de)

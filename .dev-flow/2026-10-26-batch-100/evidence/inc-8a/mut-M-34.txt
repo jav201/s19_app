@@ -1,0 +1,22 @@
+# mutant M-34  (LLR-169.5)
+# description: check_project_files skips an unrecorded active document
+# file: s19_app/tui/services/manifest_writer.py
+# source sha256 before: a638b23d2bb861b112345b3dcc6e1d045796615a527aa8bf5f7d9d88bab43f5a
+# edit 1 OLD:
+#   |     document_missing = _active_document_missing(project_dir, manifest)
+# edit 1 NEW:
+#   |     document_missing = None
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_project_check.py::test_tc_b100_25_missing_active_document_is_one_problem
+# started 2026-10-30T23:13:30Z  finished 2026-10-30T23:13:31Z  rc=1
+.F                                                                       [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_project_check.py:1682: AssertionError: assert [] == [('missing', .../boost.json')]
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_check.py::test_tc_b100_25_missing_active_document_is_one_problem[without-record]
+1 failed, 1 passed in 0.63s
+
+# pytest summary: 1 failed, 1 passed in 0.63s
+# verdict: KILLED
+# restored = True  (sha256 after restore: a638b23d2bb861b112345b3dcc6e1d045796615a527aa8bf5f7d9d88bab43f5a)

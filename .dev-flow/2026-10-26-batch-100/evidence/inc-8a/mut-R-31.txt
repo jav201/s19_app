@@ -1,0 +1,22 @@
+# mutant R-31  (P5)
+# description: "active_document": null gives an issue (absent still None)
+# file: s19_app/tui/services/variant_execution_service.py
+# source sha256 before: 5f2ab3268d9cdc4dafdb696628313642438fd208cd3e3039c4059ad507510d09
+# edit 1 OLD:
+#   |         payload.get("active_document"), issues, walk
+# edit 1 NEW:
+#   |         (0 if "active_document" in payload and payload["active_document"] is None else payload.get("active_document")), issues, walk
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_28_reader_null_and_absent_are_none
+# started 2026-10-30T23:13:55Z  finished 2026-10-30T23:13:57Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:377: AssertionError: ('null', [ValidationIssue(code='MANIFEST-BAD-STRUCTURE', severity=<ValidationSeverity.ERROR: 'error'>, message='manife... symbol=None, address=None, line_number=None, related_artifacts=[], details={'entry': '0', 'key': 'active_document'})])
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_28_reader_null_and_absent_are_none
+1 failed in 0.60s
+
+# pytest summary: 1 failed in 0.60s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 5f2ab3268d9cdc4dafdb696628313642438fd208cd3e3039c4059ad507510d09)

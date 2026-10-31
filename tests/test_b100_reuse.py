@@ -794,9 +794,26 @@ def test_tc_b100_01_app_placements_name_the_workarea_root() -> None:
     # calls (image, MAC, A2L) became ONE call inside the plan-row loop, so
     # 9 -> 7; the emitted image is placed by ``save_patched_image`` and its
     # root is threaded through the two emit entry points checked below.
-    assert len(calls) == 7, (
-        f"expected the 7 app.py placement calls (LED .50), found {len(calls)}"
+    # batch-100 Inc 8a re-pin (LLR-170.2, E3 R1, E4 integration RP-2): the
+    # pasted change document is written through ONE more placement, in
+    # ``_write_editor_document``, so 7 -> 8; it names the root like the rest.
+    assert len(calls) == 8, (
+        f"expected the 8 app.py placement calls (LED .50), found {len(calls)}"
     )
+    document_writer = next(
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.FunctionDef) and node.name == "_write_editor_document"
+    )
+    document_calls = [
+        node
+        for node in ast.walk(document_writer)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id in placements
+    ]
+    assert len(document_calls) == 1, [call.lineno for call in document_calls]
+    assert any(keyword.arg == "workarea_root" for keyword in document_calls[0].keywords)
     emit_calls = [
         node
         for node in ast.walk(tree)

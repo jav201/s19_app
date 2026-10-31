@@ -1,0 +1,25 @@
+# mutant R-25  (E3 R6 painted)
+# description: Save project's drop line paints the classifier detail (exception class / reader code) after the user-term reason
+# file: s19_app/tui/app.py
+# source sha256 before: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2
+# edit 1 OLD:
+#   | f"{_DOCUMENT_DROP_REASON[carried_state.outcome]}"
+# edit 1 NEW:
+#   | f"{_DOCUMENT_DROP_REASON[carried_state.outcome]} ({carried_state.detail})"
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_save_guards.py::test_tc_b100_05_merge_drops_a_faulty_carried_document_with_one_line
+# started 2026-10-30T23:12:05Z  finished 2026-10-30T23:12:11Z  rc=1
+FF                                                                       [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d\tests\test_b100_save_guards.py:2446: AssertionError: Change document record patches/boost.json was dropped from project.json — the file is missing (FileNotFoundError)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d\tests\test_b100_save_guards.py:2446: AssertionError: Change document record patches/boost.json was dropped from project.json — the file is not a change or check document the app can read (JSONDecodeError)
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_05_merge_drops_a_faulty_carried_document_with_one_line[deleted]
+FAILED tests/test_b100_save_guards.py::test_tc_b100_05_merge_drops_a_faulty_carried_document_with_one_line[unreadable]
+2 failed in 4.83s
+
+# pytest summary: 2 failed in 4.83s
+# verdict: KILLED
+# note: one painting site (Save project's carried-drop line); the ruling's other sites (document write failure, file-backed not placed, Load reopen) are separate code paths not mutated in this lane
+# restored = True  (sha256 after restore: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2)

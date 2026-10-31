@@ -1,0 +1,22 @@
+# mutant cp1-R20-reason  (E3 R20)
+# description: the out-of-form reason is not set (the reader's own reason stays)
+# file: s19_app/tui/services/variant_execution_service.py
+# source sha256 before: 699c38bd2cce77cd455c134acabda82a5ace290fb4a9ea270f292b8e03fb9c92
+# edit 1 OLD:
+#   |             else DOCUMENT_REASON_OUT_OF_FORM
+# edit 1 NEW:
+#   |             else issue.details.get(_ISSUE_REASON, '')
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_refused_record_is_one_not_readable_row_and_no_reopen
+# started 2026-10-30T23:56:57Z  finished 2026-10-30T23:57:01Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_document.py:1242: AssertionError: [('not readable', 'change document firmware.s19', 'a recorded entry has the wrong shape - replace the file, or Save project to drop it')]
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_30_refused_record_is_one_not_readable_row_and_no_reopen
+1 failed in 2.76s
+
+# pytest summary: 1 failed in 2.76s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 699c38bd2cce77cd455c134acabda82a5ace290fb4a9ea270f292b8e03fb9c92)

@@ -1,0 +1,26 @@
+# mutant M-08  (LLR-170.3 (P-8))
+# description: the reopen is not called (editor document stays empty)
+# file: s19_app/tui/app.py
+# source sha256 before: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2
+# edit 1 OLD:
+#   |         document_problem = self._reopen_active_document(
+#   |             project_dir, manifest, a2l_context
+#   |         )
+# edit 1 NEW:
+#   |         document_problem = None
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_reopen_lists_the_recorded_document tests/test_b100_save_image.py::test_tc_b100_70_natural_path_load_edit_save_keeps_the_flag
+# started 2026-10-30T23:09:57Z  finished 2026-10-30T23:10:03Z  rc=1
+FF                                                                       [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b\tests\test_b100_document.py:1093: assert 0 == 1
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b\tests\test_b100_save_image.py:1981: AssertionError: Load P did not reopen the recorded document
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_30_reopen_lists_the_recorded_document
+FAILED tests/test_b100_save_image.py::test_tc_b100_70_natural_path_load_edit_save_keeps_the_flag
+2 failed in 4.82s
+
+# pytest summary: 2 failed in 4.82s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2)

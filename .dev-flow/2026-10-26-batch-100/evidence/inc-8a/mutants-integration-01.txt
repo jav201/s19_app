@@ -1,0 +1,10 @@
+# E4 integration — mutation probes of the tests added/re-pinned at integration (batch-100 Inc 8a)
+# cwd C:/Users/jjgh8/Github/s19_app-b100-inc8a; NO_COLOR unset; each mutant applied to one source, the named node(s) run, the source restored from a byte copy (sha256[:16] after all probes: app.py 8c627b717172ccd8, variant_execution_service.py 5f2ab3268d9cdc4d, project_gather_service.py 6f2d419ea0d2ee56)
+# expected: every mutant RED (failed)
+M-I2 R12 bind to the placement's resolved path: 1 failed in 2.31s
+M-I3 R8 link not in the drop set: 1 failed in 2.19s
+M-I4 ruling 1 next step by kind only: 2 failed, 2 passed, 134 deselected in 0.40s
+M-I1 R13 gathered carried on every save: 1 failed in 2.80s
+M-I5 ruling 3 refused files key not skipped: 1 failed in 2.37s
+M-I6 ruling 3 refused document stays manifest damaged: 3 failed, 135 deselected in 6.49s
+M-I7 ruling 2 merge row on a folder without project.json: 1 failed in 0.45s

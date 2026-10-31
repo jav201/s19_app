@@ -1,0 +1,22 @@
+# mutant R-27  (R9)
+# description: the >=1-entry rule applied to a file-backed document (no plan row for 0 entries)
+# file: s19_app/tui/app.py
+# source sha256 before: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2
+# edit 1 OLD:
+#   |             if kind in _PLACED_DOCUMENT_CLASSES and name is not None:
+# edit 1 NEW:
+#   |             if kind in _PLACED_DOCUMENT_CLASSES and name is not None and document.entries:
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_29_file_backed_zero_entries_is_recorded
+# started 2026-10-30T23:10:50Z  finished 2026-10-30T23:10:54Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1044: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30649\\test_tc_b100_29_file_backed_ze0\\app\\.s19tool\\workarea\\P\\patches\\boost.json'
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_29_file_backed_zero_entries_is_recorded
+1 failed in 2.58s
+
+# pytest summary: 1 failed in 2.58s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2)

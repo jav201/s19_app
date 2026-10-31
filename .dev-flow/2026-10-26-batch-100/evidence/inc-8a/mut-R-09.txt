@@ -1,0 +1,25 @@
+# mutant R-09  (R10 catch set (R19))
+# description: ValueError removed from the catch set
+# file: s19_app/tui/app.py
+# source sha256 before: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2
+# edit 1 OLD:
+#   |     UnicodeDecodeError,
+#   |     ValueError,
+# edit 1 NEW:
+#   |     UnicodeDecodeError,
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[5000-digit-integer] tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[5000-digit-integer]
+# started 2026-10-30T23:10:21Z  finished 2026-10-30T23:10:24Z  rc=1
+FF                                                                       [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError: Exceeds the limit (4300 digits) for integer string conversion: value has 5000 digits; use sys.set_int_max_str_digits() to increase the limit
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError: Exceeds the limit (4300 digits) for integer string conversion: value has 5000 digits; use sys.set_int_max_str_digits() to increase the limit
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[5000-digit-integer]
+FAILED tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[5000-digit-integer]
+2 failed in 1.94s
+
+# pytest summary: 2 failed in 1.94s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2)

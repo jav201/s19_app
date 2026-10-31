@@ -1,0 +1,25 @@
+# mutant M-04  (LLR-170.2 (P-8))
+# description: Save project never writes the pasted document (the rows loop skips the pasted document row)
+# file: s19_app/tui/app.py
+# source sha256 before: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2
+# edit 1 OLD:
+#   |                     # home it created joins the rollback either way (A3R2-8).
+# edit 1 NEW:
+#   |                     # home it created joins the rollback either way (A3R2-8).
+#   |                     continue
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_29_pasted_document_lands_and_is_recorded tests/test_b100_save_image.py::test_tc_b100_59_document_row_in_a_fresh_folder
+# started 2026-10-30T23:09:30Z  finished 2026-10-30T23:09:37Z  rc=1
+FF                                                                       [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c\tests\test_b100_document.py:624: AssertionError: dict_keys(['firmware.s19', 'project.json'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c\tests\test_b100_save_image.py:1568: AssertionError: assert ('schema_vers...derived_from') == ('schema_vers...ed_from', ...)
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_29_pasted_document_lands_and_is_recorded
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_document_row_in_a_fresh_folder
+2 failed in 5.16s
+
+# pytest summary: 2 failed in 5.16s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2)

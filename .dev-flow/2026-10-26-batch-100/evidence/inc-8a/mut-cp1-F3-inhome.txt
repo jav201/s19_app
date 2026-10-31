@@ -1,0 +1,22 @@
+# mutant cp1-F3-inhome  (F3)
+# description: the in-home name case words the folder as the reason
+# file: s19_app/tui/app.py
+# source sha256 before: ebc6dbf4d1b6aa98e7f5e5fde06895c66c98e8704d182e34efa408e01f332b7f
+# edit 1 OLD:
+#   |         if document_class == "inside_elsewhere" and in_home_folder:
+# edit 1 NEW:
+#   |         if False:
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_29_cp1_in_home_document_outside_the_form_names_its_name
+# started 2026-10-30T23:57:21Z  finished 2026-10-30T23:57:25Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_document.py:1627: AssertionError: ['Change document boost.txt was not recorded in the project — it is in the project but not in its patches folder']
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_29_cp1_in_home_document_outside_the_form_names_its_name
+1 failed in 2.82s
+
+# pytest summary: 1 failed in 2.82s
+# verdict: KILLED
+# restored = True  (sha256 after restore: ebc6dbf4d1b6aa98e7f5e5fde06895c66c98e8704d182e34efa408e01f332b7f)

@@ -1,0 +1,11 @@
+# GREEN cp1 re-run of the 10 green-cp1 failures after the re-pins (PC25 x4, TC-59, TC-07 x2) — and the 3 environment failures (TC-61 timing under the concurrent guard/mutant runs; TC-06 x2 path depth from --basetemp) run alone
+# UTC: 2026-10-31T00:27:30Z  cwd: /c/Users/jjgh8/Github/s19_app-b100-inc8a  PYTHONPATH=<cwd>  NO_COLOR unset  (default pytest temp dir, nothing else running)
+# s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc8a\s19_app\__init__.py
+#   ebc6dbf4d1b6aa98 tui/app.py
+#   254693df5dcdf38a tui/services/manifest_writer.py
+#   699c38bd2cce77cd tui/services/variant_execution_service.py
+#   bd6f926590c17abd tui/services/project_gather_service.py
+# command: pytest -p no:cacheprovider -q --tb=short -rfE tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling tests/test_b100_project_check.py::test_tc_b100_25_missing_active_document_is_one_problem tests/test_b100_project_check.py::test_tc_b100_25_missing_document_survives_the_no_digests_return tests/test_b100_project_check.py::test_tc_b100_25_changed_document_is_named_by_its_project_text tests/test_b100_save_image.py::test_tc_b100_59_gather_service_imports_no_change_module tests/test_b100_save_guards.py::test_tc_b100_06_name_cap_boundary tests/test_b100_save_guards.py::test_tc_b100_06_path_limit_met_and_exceeded tests/test_b100_save_guards.py::test_tc_b100_07_rollback_keeps_the_previous_copy_unless_restored
+...........                                                              [100%]
+11 passed in 28.20s
+# pytest exit code: 0

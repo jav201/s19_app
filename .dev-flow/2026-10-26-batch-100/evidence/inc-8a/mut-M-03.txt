@@ -1,0 +1,37 @@
+# mutant M-03  (LLR-170.1)
+# description: remove "active_document" from KNOWN_MANIFEST_KEYS
+# file: s19_app/tui/services/variant_execution_service.py
+# source sha256 before: 5f2ab3268d9cdc4dafdb696628313642438fd208cd3e3039c4059ad507510d09
+# edit 1 OLD:
+#   |         "derived_from",
+#   |         "active_document",
+#   |     }
+#   | )
+# edit 1 NEW:
+#   |         "derived_from",
+#   |     }
+#   | )
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_28_valid_key_is_carried_not_kept_aside tests/test_b100_document.py::test_tc_b100_28_variant_append_keeps_the_key tests/test_b100_active_variant.py::test_tc_b100_20_writers_carry_the_active_document
+# started 2026-10-30T23:11:51Z  finished 2026-10-30T23:13:14Z  rc=1
+FFFFFF                                                                   [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:544: AssertionError: assert ('active_document',) == ()
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\support\b100_projects.py:390: AssertionError: the variant append of firmware.s19 did not land: ["Loaded project 'P' -> firmware.s19 - variant 1 of 1, 0 problems - details: p", 'Copying into workarea temp...', 'Parsing firmware.s19...', 'Loaded firmware.s19', "project.json in project 'P' holds keys this version does not know and was not rewritten - firmware_1.s19 stays in the project; Save project rewrites it", "Added variant 'firmware_1' to project 'P'"]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_active_variant.py:1302: AssertionError: project.json was not rewritten
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_active_variant.py:102: AssertionError: timed out waiting for the variant-append manifest rewrite
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_active_variant.py:102: AssertionError: timed out waiting for the mac-sync manifest rewrite
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_active_variant.py:102: AssertionError: timed out waiting for the a2l-sync manifest rewrite
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_28_valid_key_is_carried_not_kept_aside
+FAILED tests/test_b100_document.py::test_tc_b100_28_variant_append_keeps_the_key
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_writers_carry_the_active_document[save-back]
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_writers_carry_the_active_document[variant-append]
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_writers_carry_the_active_document[mac-sync]
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_writers_carry_the_active_document[a2l-sync]
+6 failed in 82.23s (0:01:22)
+
+# pytest summary: 6 failed in 82.23s (0:01:22)
+# verdict: KILLED
+# restored = True  (sha256 after restore: 5f2ab3268d9cdc4dafdb696628313642438fd208cd3e3039c4059ad507510d09)

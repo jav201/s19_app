@@ -1,0 +1,6 @@
+# lane B2 base re-run for M-26 (timing-only kill), unmutated copy, other lanes running — 2026-10-30T23:12:39Z
+# sha256[:16] app.py: 8c627b717172ccd8
+.                                                                        [100%]
+============================= slowest 1 durations =============================
+2.07s call     tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
+1 passed in 2.67s

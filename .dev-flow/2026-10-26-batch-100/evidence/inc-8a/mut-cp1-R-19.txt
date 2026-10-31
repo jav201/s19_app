@@ -1,0 +1,25 @@
+# mutant cp1-R-19  (R17 (old R-19 re-run))
+# description: CHG-V1-FORMAT left out of the file-level codes
+# file: s19_app/tui/app.py
+# source sha256 before: ebc6dbf4d1b6aa98e7f5e5fde06895c66c98e8704d182e34efa408e01f332b7f
+# edit 1 OLD:
+#   |         MF_BAD_STRUCTURE,
+#   |         CHG_V1_FORMAT,
+#   |         CHG_FORMAT,
+# edit 1 NEW:
+#   |         MF_BAD_STRUCTURE,
+#   |         CHG_FORMAT,
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document]
+# started 2026-10-30T23:57:50Z  finished 2026-10-30T23:57:52Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_document.py:959: AssertionError: ('v1-document', 'ok')
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document]
+1 failed in 0.68s
+
+# pytest summary: 1 failed in 0.68s
+# verdict: KILLED
+# restored = True  (sha256 after restore: ebc6dbf4d1b6aa98e7f5e5fde06895c66c98e8704d182e34efa408e01f332b7f)

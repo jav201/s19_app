@@ -1,0 +1,24 @@
+# mutant M-29  (LLR-169.2 (A-15))
+# description: project_file_records leaves the active document out
+# file: s19_app/tui/services/manifest_writer.py
+# source sha256 before: a638b23d2bb861b112345b3dcc6e1d045796615a527aa8bf5f7d9d88bab43f5a
+# edit 1 OLD:
+#   |     if active_document is not None and is_active_document_form(active_document):
+#   |         home, name = active_document.split("/")
+# edit 1 NEW:
+#   |     if False and active_document is not None and is_active_document_form(active_document):
+#   |         home, name = active_document.split("/")
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_28_a15_files_records_the_active_document
+# started 2026-10-30T23:13:23Z  finished 2026-10-30T23:13:25Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:508: AssertionError: ['firmware.a2l', 'firmware.mac', 'firmware.s19', 'prg.srec']
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_28_a15_files_records_the_active_document
+1 failed in 0.64s
+
+# pytest summary: 1 failed in 0.64s
+# verdict: KILLED
+# restored = True  (sha256 after restore: a638b23d2bb861b112345b3dcc6e1d045796615a527aa8bf5f7d9d88bab43f5a)

@@ -56,6 +56,7 @@ import json
 import os
 import re
 import stat
+import unicodedata
 from dataclasses import dataclass, field
 from pathlib import Path, PureWindowsPath
 from typing import Callable, Optional, Sequence, Tuple, Union
@@ -79,6 +80,7 @@ from ..workspace import (
     A2L_EXTENSIONS,
     MAC_EXTENSIONS,
     PROJECT_DATA_EXTENSIONS,
+    PROJECT_PRIMARY_DATA_EXTENSIONS,
     _path_traverses_reparse_point,
     is_windows_device_name,
     validate_project_files,
@@ -142,8 +144,15 @@ KNOWN_MANIFEST_KEYS = frozenset(
         "gathered",
         "files",
         "derived_from",
+        "active_document",
     }
 )
+
+#: The project folders an ``active_document`` may live in (LLR-170.1): the
+#: change and check document homes. Written here, not imported from
+#: ``project_gather_service`` (which imports this module); a test pins it
+#: equal to the gather's homes.
+ACTIVE_DOCUMENT_HOMES = frozenset({"patches", "checks"})
 
 #: The ``schema_version`` this version writes; a manifest carrying another
 #: one is never rewritten by an in-project writer (SEC6-2).
@@ -176,6 +185,11 @@ MANIFEST_PATH_ESCAPE = "MANIFEST-PATH-ESCAPE"
 _ISSUE_ENTRY = "entry"
 _ISSUE_SCOPE = "scope"
 _SCOPE_MANIFEST = "manifest"
+#: The top-level key a finding refused, when that key is a scalar whose
+#: refusal decides more than a skipped row: ``"active_document"`` makes
+#: :func:`manifest_keep_reason` keep the previous ``project.json`` (E3 R5).
+_ISSUE_KEY = "key"
+_KEY_ACTIVE_DOCUMENT = "active_document"
 #: The user-term reason a finding carries when its code alone would word
 #: it wrongly (a device name is not "outside the project"; an over-cap
 #: array is not "not an object"), so the panel never parses a message.
@@ -183,6 +197,28 @@ _ISSUE_REASON = "reason"
 #: The user-term reason of an entry that is no usable plain path in the
 #: project (a NUL, a drive or stream name, a device name, a path too long).
 _REASON_UNUSABLE = "a file path is not a plain name in the project"
+#: The user-term reason of an entry whose path goes through a link.
+_REASON_LINK = "a file path goes through a link or junction"
+#: The recorded ``active_document``'s ``not readable`` reasons in user
+#: terms (E3 R6, R16, R20), written once here: the reader, the manifest
+#: writer's check and the app's reopen all import them, so one document's
+#: rows always read the same.
+DOCUMENT_REASON_LINK = "the file is a link and is not opened"
+DOCUMENT_REASON_TOO_LARGE = "too large to reopen"
+DOCUMENT_REASON_UNREADABLE = "not a change or check document the app can read"
+DOCUMENT_REASON_IO_ERROR = "could not be read"
+DOCUMENT_REASON_OUT_OF_FORM = (
+    "the recorded change document path is not one the app can use"
+)
+#: The next-step marks of a document problem whose record Save project
+#: keeps (E3 R16): the composer picks the painted next step by this mark,
+#: never by the reason's text (review F5).
+STEP_OPEN_FROM_EDITOR = "open_from_editor"
+STEP_CHECK_THEN_LOAD = "check_then_load"
+DOCUMENT_NEXT_STEP: dict[str, str] = {
+    STEP_OPEN_FROM_EDITOR: "open it from the Patch Editor (it can take a while)",
+    STEP_CHECK_THEN_LOAD: "check that the file can be opened, then Load again",
+}
 #: The longest recorded entry a finding keeps (characters, ellipsis
 #: included): a manifest entry is any JSON value, so the panel row naming it
 #: stays one readable row (SEC6-7).
@@ -215,6 +251,95 @@ SizeProbe = Callable[[Path], int]
 #: The between-variant status sink (F-Q-18): the TUI worker passes a
 #: ``call_from_thread``-wrapped ``set_status``; headless callers pass None.
 StatusCallback = Callable[[str], None]
+
+
+def _has_control_character(text: str) -> bool:
+    """True when ``text`` holds a C0 (below 0x20) or C1 (0x7F to 0x9F)
+    control character."""
+    return any(ord(char) < 0x20 or 0x7F <= ord(char) <= 0x9F for char in text)
+
+
+def _plain_entry(path: Path, folder: bool) -> bool:
+    """One ``os.lstat`` of ``path``: True when it is a regular folder
+    (``folder``) or a regular file, and not a link or reparse point. Any
+    error is False."""
+    try:
+        info = os.lstat(path)
+    except (OSError, ValueError):
+        return False
+    if stat.S_ISLNK(info.st_mode) or (
+        getattr(info, "st_file_attributes", 0) & stat.FILE_ATTRIBUTE_REPARSE_POINT
+    ):
+        return False
+    return stat.S_ISDIR(info.st_mode) if folder else stat.S_ISREG(info.st_mode)
+
+
+def _has_format_character(text: str) -> bool:
+    """True when ``text`` holds a Unicode format character (category
+    ``Cf``: bidi controls, zero-width characters), which can make a painted
+    name read as another one (SEC8a-4)."""
+    return any(unicodedata.category(char) == "Cf" for char in text)
+
+
+def document_problem_file(text: str) -> str:
+    """The problem label of the recorded change document (E3 R20): one
+    document is one row, never merged with a data file of the same name."""
+    return f"change document {text}"
+
+
+def is_active_document_form(text: str) -> bool:
+    """
+    Summary:
+        The one form rule of an ``active_document`` text (LLR-170.1, S-11),
+        on the text alone: ``<home>/<name>.json`` with ``<home>`` one of
+        :data:`ACTIVE_DOCUMENT_HOMES`. Total: any value that is not a
+        ``str`` is ``False``; it never raises and makes no filesystem call.
+
+    Args:
+        text (str): The candidate, as recorded or about to be written; a
+            value of any other type is answered ``False``.
+
+    Returns:
+        bool: ``True`` only for a ``str`` of at most
+            :data:`MANIFEST_ENTRY_MAX_CHARS` characters with no backslash,
+            no ``:``, no C0 or C1 control character (NUL included), no
+            Unicode format character (SEC8a-4) and no leading ``/``, whose
+            ``/`` split is exactly ``[home, name]``: ``home`` in
+            :data:`ACTIVE_DOCUMENT_HOMES` (compared exactly), ``name``
+            ending ``.json`` (compared case-insensitively) after a non-empty
+            stem, and which the manifest-keys mode accepts on the text
+            (:func:`_manifest_key_refusal`: no device stem, no trailing dot
+            or space), so the app never records a landing the writer or the
+            reader would refuse (review F1).
+
+    Dependencies:
+        Used by:
+            - _parse_manifest_active_document (the reader, on the raw value)
+            - manifest_writer.serialize_manifest (the writer)
+            - project_gather_service / app.py (a landing before recording)
+
+    Example:
+        >>> is_active_document_form("patches/boost.json")
+        True
+        >>> is_active_document_form("patches/sub/x.json")
+        False
+    """
+    if not isinstance(text, str) or len(text) > MANIFEST_ENTRY_MAX_CHARS:
+        return False
+    if "\\" in text or ":" in text or _has_control_character(text):
+        return False
+    if _has_format_character(text):
+        return False
+    parts = text.split("/")
+    if len(parts) != 2:
+        return False
+    home, name = parts
+    return (
+        home in ACTIVE_DOCUMENT_HOMES
+        and len(name) > len(".json")
+        and name[-len(".json") :].lower() == ".json"
+        and _manifest_key_refusal(text) is None
+    )
 
 
 def _manifest_issue(
@@ -326,6 +451,11 @@ class ProjectManifest:
         unknown_keys (Tuple[str, ...]): Top-level keys this version does
             not read, so an in-project rewrite never drops them silently
             (SEC6-2).
+        active_document (Optional[str]): The project-relative POSIX text
+            of the change or check document open at the save, exactly as
+            recorded (``"patches/boost.json"``, LLR-170.1); ``None`` when
+            absent, JSON ``null`` or refused by the reader. Consumers join
+            it with the resolved project folder by its ``/`` parts.
 
     Returns:
         None: Dataclass container.
@@ -352,6 +482,7 @@ class ProjectManifest:
     files: dict[Path, FileRecord] = field(default_factory=dict)
     derived_from: dict[Path, DerivedFrom] = field(default_factory=dict)
     unknown_keys: Tuple[str, ...] = ()
+    active_document: Optional[str] = None
 
 
 def _entry_mark(entry: str) -> dict[str, str]:
@@ -668,10 +799,7 @@ def _walk_manifest_entry(
                 MANIFEST_PATH_ESCAPE,
                 f"manifest {context} entry traverses a symbolic link or "
                 f"reparse point - entry skipped: {text!r}",
-                details={
-                    **_entry_mark(text),
-                    _ISSUE_REASON: "a file path goes through a link or junction",
-                },
+                details={**_entry_mark(text), _ISSUE_REASON: _REASON_LINK},
             )
         )
         return None
@@ -810,10 +938,7 @@ def _resolve_manifest_entry(
                 MANIFEST_PATH_ESCAPE,
                 f"manifest {context} entry traverses a symbolic link or "
                 f"reparse point - entry skipped: {text!r}",
-                details={
-                    **_entry_mark(text),
-                    _ISSUE_REASON: "a file path goes through a link or junction",
-                },
+                details={**_entry_mark(text), _ISSUE_REASON: _REASON_LINK},
             )
         )
         return None
@@ -946,24 +1071,104 @@ def _over_cap_issues(payload: dict) -> list[ValidationIssue]:
     ]
 
 
+def _parse_manifest_active_document(
+    raw: object,
+    issues: list[ValidationIssue],
+    walk: _EntryWalk,
+) -> Optional[str]:
+    """
+    Summary:
+        Read the ``active_document`` key (LLR-170.1, LLR-169.4): the
+        recorded document text when it passes the shared text rules, the
+        form and the walk, else ``None`` with exactly one finding.
+
+    Args:
+        raw (object): The value of ``active_document`` (``None`` when the
+            key is absent or JSON ``null``).
+        issues (list[ValidationIssue]): Appended in place.
+        walk (_EntryWalk): The read's walk.
+
+    Returns:
+        Optional[str]: The raw text unchanged when accepted, else ``None``.
+
+    Data Flow:
+        - ``None`` -> ``None``, no finding (absent and ``null`` read alike).
+        - :func:`_entry_text` in the manifest-keys mode: its own code
+          (non-string or blank -> ``MANIFEST-BAD-STRUCTURE``; escape-type
+          rules -> ``MANIFEST-PATH-ESCAPE``).
+        - :func:`is_active_document_form` on the RAW value, so a stripped
+          space never changes the recorded text -> ``MANIFEST-BAD-STRUCTURE``.
+        - :func:`_walk_manifest_entry`: a link or junction ->
+          ``MANIFEST-PATH-ESCAPE``. A document absent from disk is accepted;
+          ``manifest_writer.check_project_files`` owns ``missing``.
+        - A refusal carries the ``_ISSUE_KEY`` mark, which
+          :func:`manifest_keep_reason` reads (E3 R5) and which makes
+          :func:`manifest_problems` name it ``not readable`` (a link worded
+          as the reopen words it).
+
+    Dependencies:
+        Uses:
+            - _entry_text / is_active_document_form / _walk_manifest_entry
+        Used by:
+            - read_project_manifest
+    """
+    if raw is None:
+        return None
+    first = len(issues)
+    text = _entry_text(raw, _KEY_ACTIVE_DOCUMENT, issues, ENTRY_MODE_MANIFEST_KEYS)
+    if text is not None and not is_active_document_form(raw):
+        issues.append(
+            _manifest_issue(
+                MANIFEST_BAD_STRUCTURE,
+                "manifest active_document is not a document in a project "
+                f"home - ignored: {raw!r}",
+                details=_entry_mark(str(raw)),
+            )
+        )
+        text = None
+    elif text is not None:
+        if _walk_manifest_entry(walk, text, _KEY_ACTIVE_DOCUMENT, issues) is not None:
+            return str(raw)
+        text = None
+    for issue in issues[first:]:
+        issue.details[_ISSUE_KEY] = _KEY_ACTIVE_DOCUMENT
+        issue.details[_ISSUE_REASON] = (
+            DOCUMENT_REASON_LINK
+            if issue.details.get(_ISSUE_REASON) == _REASON_LINK
+            else DOCUMENT_REASON_OUT_OF_FORM
+        )
+    return text
+
+
 def _recorded_file(
     raw_key: object,
     context: str,
     issues: list[ValidationIssue],
     walk: _EntryWalk,
+    document: Optional[str] = None,
+    refused_document: Optional[str] = None,
 ) -> Optional[Path]:
     """
     Summary:
         Check one ``files`` / ``derived_from`` key in the manifest-keys mode
         and require the O-2 scope: one top-level name with a project data or
         A2L suffix (LLR-169.4). The scope is decided on the text, before
-        any filesystem call (SEC7-1).
+        any filesystem call (SEC7-1). The one exception is a key whose raw
+        text equals the accepted ``active_document`` (LLR-169.4, Inc 8a).
 
     Args:
         raw_key (object): The recorded key.
         context (str): ``"files"`` or ``"derived_from"``.
         issues (list[ValidationIssue]): Appended in place.
         walk (_EntryWalk): The read's walk.
+        document (Optional[str]): The accepted ``active_document`` text, or
+            ``None``. Compared exactly: no case folding, no separator
+            mapping, no strip.
+        refused_document (Optional[str]): The ``active_document`` text the
+            read refused, or ``None``: a key equal to it that is out of
+            scope is skipped with no finding of its own, so the document
+            stays one Load problem (its own finding names it). A key in
+            scope (``firmware.s19`` refused as a document) is read as usual.
 
     Returns:
         Optional[Path]: The file in the project, or ``None`` when refused
@@ -976,14 +1181,19 @@ def _recorded_file(
         Used by:
             - _parse_manifest_files / _parse_manifest_derived_from
     """
+    if (
+        refused_document is not None
+        and raw_key == refused_document
+        and not _top_level_recorded(refused_document)
+    ):
+        return None
     text = _entry_text(raw_key, context, issues, ENTRY_MODE_MANIFEST_KEYS)
     if text is None:
         return None
     key = str(raw_key)
-    if (
-        len(re.split(r"[\\/]", key)) != 1
-        or Path(key).suffix.lower() not in PROJECT_RECORDED_SUFFIXES
-    ):
+    if document is not None and key == document:
+        return _walk_manifest_entry(walk, text, context, issues)
+    if not _top_level_recorded(key):
         issues.append(
             _manifest_issue(
                 MANIFEST_BAD_STRUCTURE,
@@ -994,6 +1204,15 @@ def _recorded_file(
         )
         return None
     return _walk_manifest_entry(walk, text, context, issues)
+
+
+def _top_level_recorded(key: str) -> bool:
+    """True for the O-2 scope of a ``files`` / ``derived_from`` key: one
+    top-level name with a project data or A2L suffix (LLR-169.4)."""
+    return (
+        len(re.split(r"[\\/]", key)) == 1
+        and Path(key).suffix.lower() in PROJECT_RECORDED_SUFFIXES
+    )
 
 
 def _is_count(value: object) -> bool:
@@ -1010,6 +1229,8 @@ def _parse_manifest_files(
     raw: object,
     issues: list[ValidationIssue],
     walk: _EntryWalk,
+    active_document: Optional[str] = None,
+    refused_document: Optional[str] = None,
 ) -> dict[Path, FileRecord]:
     """
     Summary:
@@ -1020,6 +1241,11 @@ def _parse_manifest_files(
         raw (object): The value of ``files``.
         issues (list[ValidationIssue]): Appended in place.
         walk (_EntryWalk): The read's walk.
+        active_document (Optional[str]): The accepted ``active_document``
+            text: the one key under a document home that is recorded
+            (Inc 8a); ``None`` -> no such key is.
+        refused_document (Optional[str]): The refused ``active_document``
+            text, whose ``files`` key is skipped silently (Inc 8a ruling 3).
 
     Returns:
         dict[Path, FileRecord]: The accepted records by resolved file.
@@ -1043,7 +1269,9 @@ def _parse_manifest_files(
         return {}
     records: dict[Path, FileRecord] = {}
     for key, value in raw.items():
-        resolved = _recorded_file(key, "files", issues, walk)
+        resolved = _recorded_file(
+            key, "files", issues, walk, active_document, refused_document
+        )
         if resolved is None:
             continue
         if (
@@ -1239,6 +1467,9 @@ def read_project_manifest(
           Python's digit limit, SEC6-8) is caught the same way, so the
           manifest reads as damaged.
         - Non-object top level → one ``MANIFEST-BAD-STRUCTURE``.
+        - ``active_document`` first (:func:`_parse_manifest_active_document`,
+          LLR-170.1); the accepted text is the one ``files`` key under a
+          document home that is recorded (LLR-169.4).
         - ``batch`` (array), ``assignments`` and ``gathered`` (objects of
           arrays) entries each resolve through
           :func:`_resolve_manifest_entry`; unsafe entries are skipped with
@@ -1347,6 +1578,11 @@ def read_project_manifest(
                 "manifest active_variant is not a string - ignored",
             )
         )
+    # Inc 8a: first among the entry checks, so its folder check is never
+    # past the ceiling and its finding is never folded (SEC6-5).
+    active_document = _parse_manifest_active_document(
+        payload.get("active_document"), issues, walk
+    )
 
     batch: list[Path] = []
     batch_raw = payload.get("batch", [])
@@ -1438,7 +1674,14 @@ def read_project_manifest(
     declared_regions = _parse_manifest_declared_regions(
         payload.get("declared_regions", []), issues
     )
-    files = _parse_manifest_files(payload.get("files", {}), issues, walk)
+    document_raw = payload.get("active_document")
+    files = _parse_manifest_files(
+        payload.get("files", {}),
+        issues,
+        walk,
+        active_document,
+        document_raw if active_document is None and isinstance(document_raw, str) else None,
+    )
     derived_from = _parse_manifest_derived_from(
         payload.get("derived_from", {}), issues, walk
     )
@@ -1456,6 +1699,7 @@ def read_project_manifest(
         unknown_keys=tuple(
             str(key) for key in payload if key not in KNOWN_MANIFEST_KEYS
         ),
+        active_document=active_document,
     )
 
 
@@ -1548,12 +1792,16 @@ class ProjectFileProblem:
         reason (str): What is wrong, in user terms ("" when the kind says
             it all).
         code (Optional[str]): The internal finding code, for the log.
+        step (Optional[str]): A ``STEP_*`` mark when the painted next step
+            is not the kind's (E3 R16: a document record Save project
+            keeps); ``None`` uses the kind's.
     """
 
     kind: str
     file: str
     reason: str = ""
     code: Optional[str] = None
+    step: Optional[str] = None
 
 
 @dataclass(frozen=True)
@@ -1728,8 +1976,10 @@ def _clip(text: str, limit: int) -> str:
 def manifest_problems(manifest: ProjectManifest) -> list[ProjectFileProblem]:
     """
     Summary:
-        One ``manifest damaged`` problem per manifest finding (HLR-169
-        wording): the reason comes from the finding's reason mark or code;
+        One problem per manifest finding (HLR-169 wording): ``manifest
+        damaged``, except a refused ``active_document``, which is ``not
+        readable`` (Inc 8a ruling 3); the reason comes from the finding's
+        reason mark or code;
         the code goes to the log only and the finding message (which can
         name an exception class) never reaches a problem.
 
@@ -1743,6 +1993,11 @@ def manifest_problems(manifest: ProjectManifest) -> list[ProjectFileProblem]:
         - A skipped entry names the entry it recorded (the ``_ISSUE_ENTRY``
           mark), so thirty skipped entries are thirty distinct rows; any
           other finding names ``project.json`` (manifest-level).
+        - A refused ``active_document`` (the ``_ISSUE_KEY`` mark) is a
+          ``not readable`` problem labelled ``change document <text>``
+          (:func:`document_problem_file`, E3 R20), never ``manifest
+          damaged`` (Inc 8a ruling 3): the same kind and label the reopen
+          gives a link.
 
     Dependencies:
         Uses:
@@ -1750,16 +2005,23 @@ def manifest_problems(manifest: ProjectManifest) -> list[ProjectFileProblem]:
         Used by:
             - manifest_writer.check_project_files
     """
-    return [
-        ProjectFileProblem(
-            PROBLEM_MANIFEST_DAMAGED,
-            issue.details.get(_ISSUE_ENTRY, PROJECT_MANIFEST_NAME),
-            issue.details.get(_ISSUE_REASON)
-            or _MANIFEST_REASON.get(issue.code, "a recorded entry has the wrong shape"),
-            issue.code,
+    problems: list[ProjectFileProblem] = []
+    for issue in manifest.issues:
+        reason = issue.details.get(_ISSUE_REASON) or _MANIFEST_REASON.get(
+            issue.code, "a recorded entry has the wrong shape"
         )
-        for issue in manifest.issues
-    ]
+        entry = issue.details.get(_ISSUE_ENTRY, PROJECT_MANIFEST_NAME)
+        if issue.details.get(_ISSUE_KEY) == _KEY_ACTIVE_DOCUMENT:
+            problems.append(
+                ProjectFileProblem(
+                    PROBLEM_NOT_READABLE, document_problem_file(entry), reason, issue.code
+                )
+            )
+        else:
+            problems.append(
+                ProjectFileProblem(PROBLEM_MANIFEST_DAMAGED, entry, reason, issue.code)
+            )
+    return problems
 
 
 def manifest_is_damaged(manifest: ProjectManifest) -> bool:
@@ -1796,8 +2058,10 @@ def manifest_keep_reason(manifest: ProjectManifest) -> Optional[str]:
     Summary:
         Why rewriting this ``project.json`` from app state would lose what
         it holds, or ``None`` (SEC6-2, SEC7-3): it is damaged, its
-        ``schema_version`` is not this version's, or it holds top-level keys
-        this version does not know.
+        ``schema_version`` is not this version's, it holds top-level keys
+        this version does not know, or it holds an ``active_document`` the
+        reader refused (E3 R5: a merge target is never loaded, so the
+        refused value would otherwise be dropped unseen).
 
     Args:
         manifest (ProjectManifest): The read manifest.
@@ -1805,12 +2069,16 @@ def manifest_keep_reason(manifest: ProjectManifest) -> Optional[str]:
     Returns:
         Optional[str]: The status phrase ("is damaged", "was written by a
             newer version", "was written by an unknown version", "holds
-            keys this version does not know"), or ``None``.
+            keys this version does not know", "holds a change document
+            path this version cannot use"), or ``None``.
 
     Data Flow:
         - Only the integer ``1`` (never ``True``, ``"1"`` or ``1.0``) or an
           absent key is this version (F8, SEC7-4 (a)); an integer above 1
           is a newer version, any other value an unknown one.
+        - A refused ``active_document`` is found by its finding's
+          ``_ISSUE_KEY`` mark, never by message text. A skipped ``batch``
+          or ``files`` entry is no keep reason.
 
     Dependencies:
         Uses:
@@ -1830,6 +2098,11 @@ def manifest_keep_reason(manifest: ProjectManifest) -> Optional[str]:
         return "was written by an unknown version"
     if manifest.unknown_keys:
         return "holds keys this version does not know"
+    if any(
+        issue.details.get(_ISSUE_KEY) == _KEY_ACTIVE_DOCUMENT
+        for issue in manifest.issues
+    ):
+        return "holds a change document path this version cannot use"
     return None
 
 
@@ -1909,16 +2182,26 @@ def _relation_line(
 
 def _missing_recorded(manifest: ProjectManifest, recorded: str) -> str:
     """The file a missing recorded variant id names: the image ``files``
-    key with that stem or name, else the id itself."""
+    key (a primary data suffix, so never a MAC, an A2L or the active
+    document, LLR-169.5) with that stem or name, else the id itself."""
     return next(
         (
             path.name
             for path in manifest.files
             if recorded in (path.stem, path.name)
-            and path.suffix.lower() not in MAC_EXTENSIONS | A2L_EXTENSIONS
+            and path.suffix.lower() in PROJECT_PRIMARY_DATA_EXTENSIONS
         ),
         recorded,
     )
+
+
+def _next_step(problem: ProjectFileProblem) -> str:
+    """The painted next step of one problem: the kind's token, except a
+    problem carrying a ``STEP_*`` mark (a document record Save project
+    keeps: too large, could not be read — E3 R16, review F5)."""
+    if problem.step is not None:
+        return DOCUMENT_NEXT_STEP[problem.step]
+    return PROBLEM_NEXT_STEP[problem.kind]
 
 
 def compose_load_announcement(
@@ -2016,7 +2299,7 @@ def compose_load_announcement(
             problem.kind,
             problem.file,
             " - ".join(
-                part for part in (problem.reason, PROBLEM_NEXT_STEP[problem.kind]) if part
+                part for part in (problem.reason, _next_step(problem)) if part
             ),
             PROBLEM_PRECEDENCE[problem.kind],
         )

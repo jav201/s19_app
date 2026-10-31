@@ -1,0 +1,26 @@
+# mutant M-07  (LLR-170.2 / E3 R1)
+# description: second Save project rewrites the bound in-home document in place (serialised panel document over the file)
+# file: s19_app/tui/app.py
+# source sha256 before: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2
+# edit 1 OLD:
+#   |                         # copied by the gather below (E3 R1, R11).
+#   |                         continue
+# edit 1 NEW:
+#   |                         # copied by the gather below (E3 R1, R11).
+#   |                         if document_class == _DOCUMENT_IN_HOME:
+#   |                             row.source.write_bytes(serialize_change_document(document))
+#   |                         continue
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_29_second_save_of_the_bound_document_writes_nothing
+# started 2026-10-30T23:09:47Z  finished 2026-10-30T23:09:57Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c\tests\test_b100_document.py:846: assert b'{\n  "forma...  }\n  ]\n}\n' == b'{\n  "forma...  }\n  ]\n}\n'
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_29_second_save_of_the_bound_document_writes_nothing
+1 failed in 8.33s
+
+# pytest summary: 1 failed in 8.33s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2)

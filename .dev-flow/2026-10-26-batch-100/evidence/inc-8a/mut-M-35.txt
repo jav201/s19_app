@@ -1,0 +1,23 @@
+# mutant M-35  (LLR-169.5)
+# description: the missing-document helper also runs for a recorded document
+# file: s19_app/tui/services/manifest_writer.py
+# source sha256 before: a638b23d2bb861b112345b3dcc6e1d045796615a527aa8bf5f7d9d88bab43f5a
+# edit 1 OLD:
+#   |     if project_dir.resolve() / text in manifest.files:
+#   |         return None
+# edit 1 NEW:
+#   | <deleted>
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_project_check.py::test_tc_b100_25_missing_active_document_is_one_problem
+# started 2026-10-30T23:13:31Z  finished 2026-10-30T23:13:32Z  rc=1
+F.                                                                       [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_project_check.py:1682: AssertionError: assert [('missing', .../boost.json')] == [('missing', .../boost.json')]
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_check.py::test_tc_b100_25_missing_active_document_is_one_problem[with-record]
+1 failed, 1 passed in 0.59s
+
+# pytest summary: 1 failed, 1 passed in 0.59s
+# verdict: KILLED
+# restored = True  (sha256 after restore: a638b23d2bb861b112345b3dcc6e1d045796615a527aa8bf5f7d9d88bab43f5a)

@@ -1,0 +1,111 @@
+# GREEN cp1 — new and touched requirements — batch-100 Inc 8a corrective pass 1
+# UTC start: 2026-10-30T23:56:35Z
+# cwd: /c/Users/jjgh8/Github/s19_app-b100-inc8a (branch b100-inc8a, base dc3b314, uncommitted tree)
+# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc8a
+# NO_COLOR state: unset (env -u NO_COLOR)
+# s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc8a\s19_app\__init__.py
+# sources sha256[:16]:
+#   ebc6dbf4d1b6aa98 s19_app/tui/app.py
+#   254693df5dcdf38a s19_app/tui/services/manifest_writer.py
+#   699c38bd2cce77cd s19_app/tui/services/variant_execution_service.py
+#   bd6f926590c17abd s19_app/tui/services/project_gather_service.py
+# command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc8a C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=short -rfE tests/test_b100_document.py tests/test_b100_project_check.py tests/test_b100_save_image.py tests/test_b100_save_guards.py tests/test_b100_active_variant.py tests/test_b100_announce.py tests/test_variant_execution.py tests/test_manifest_writer.py tests/test_manifest_verify.py tests/test_project_gather.py tests/test_tui_manifest_save.py tests/test_b100_reuse.py tests/test_b99_staging.py tests/test_b100_session_reset.py tests/test_tui_variants.py tests/test_id_registry.py
+
+........................................................................ [ 10%]
+........................................................................ [ 21%]
+........................................................................ [ 32%]
+.................F...............FFF.F.................................. [ 43%]
+........F.................................FF............................ [ 54%]
+..........FF............................................................ [ 64%]
+........................................................................ [ 75%]
+........................................................................ [ 86%]
+........................................................................ [ 97%]
+.................                                                        [100%]
+================================== FAILURES ===================================
+_____ test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling ______
+tests\test_b100_project_check.py:1105: in test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+    _assert_sec6_5_bounded(scene)
+tests\test_b100_project_check.py:951: in _assert_sec6_5_bounded
+    assert scene["appended"] < 1.0, timings
+E   AssertionError: {'appended': 1.0762701999628916, 'load': 0.8122037000139244, 'painted': 0.0007477999897673726, 'read': 0.2449794000131078}
+E   assert 1.0762701999628916 < 1.0
+---------------------------- Captured stdout call -----------------------------
+SEC6-5 timings (s): {'read': 0.245, 'load': 0.812, 'painted': 0.001, 'appended': 1.076}
+_____ test_tc_b100_25_missing_active_document_is_one_problem[with-record] _____
+tests\test_b100_project_check.py:1682: in test_tc_b100_25_missing_active_document_is_one_problem
+    assert _check(project_dir) == [("missing", "patches/boost.json")]
+E   AssertionError: assert [('missing', .../boost.json')] == [('missing', .../boost.json')]
+E     
+E     At index 0 diff: ('missing', 'change document patches/boost.json') != ('missing', 'patches/boost.json')
+E     Use -v to get more diff
+___ test_tc_b100_25_missing_active_document_is_one_problem[without-record] ____
+tests\test_b100_project_check.py:1682: in test_tc_b100_25_missing_active_document_is_one_problem
+    assert _check(project_dir) == [("missing", "patches/boost.json")]
+E   AssertionError: assert [('missing', .../boost.json')] == [('missing', .../boost.json')]
+E     
+E     At index 0 diff: ('missing', 'change document patches/boost.json') != ('missing', 'patches/boost.json')
+E     Use -v to get more diff
+_______ test_tc_b100_25_missing_document_survives_the_no_digests_return _______
+tests\test_b100_project_check.py:1694: in test_tc_b100_25_missing_document_survives_the_no_digests_return
+    assert sorted(_check(project_dir)) == [
+E   AssertionError: assert [('missing', ...roject.json')] == [('missing', ...roject.json')]
+E     
+E     At index 0 diff: ('missing', 'change document patches/boost.json') != ('missing', 'patches/boost.json')
+E     Use -v to get more diff
+________ test_tc_b100_25_changed_document_is_named_by_its_project_text ________
+tests\test_b100_project_check.py:1714: in test_tc_b100_25_changed_document_is_named_by_its_project_text
+    assert _check(project_dir) == [("changed on disk", "patches/boost.json")]
+E   AssertionError: assert [('changed on.../boost.json')] == [('changed on.../boost.json')]
+E     
+E     At index 0 diff: ('changed on disk', 'change document patches/boost.json') != ('changed on disk', 'patches/boost.json')
+E     Use -v to get more diff
+___________ test_tc_b100_59_gather_service_imports_no_change_module ___________
+tests\test_b100_save_image.py:1517: in test_tc_b100_59_gather_service_imports_no_change_module
+    assert modules == {
+E   AssertionError: ['...validation.model', '..workspace', '.variant_execution_service', '__future__', 'dataclasses', 'json', ...]
+E   assert {'...validati..., 'json', ...} == {'...validati..., 'json', ...}
+E     
+E     Extra items in the right set:
+E     'stat'
+E     Use -v to get more diff
+______________________ test_tc_b100_06_name_cap_boundary ______________________
+tests\test_b100_save_guards.py:706: in test_tc_b100_06_name_cap_boundary
+    assert any("Saved project" in message for message in messages), messages
+E   AssertionError: ['Project NOT saved: path too long — shorten the name.', 'Project NOT saved: name too long (at most 64 characters) — shorten the name.', 'Project NOT saved: name too long (at most 64 characters) — shorten the name.']
+E   assert False
+E    +  where False = any(<generator object test_tc_b100_06_name_cap_boundary.<locals>.<genexpr> at 0x000002218F9A02B0>)
+_________________ test_tc_b100_06_path_limit_met_and_exceeded _________________
+tests\test_b100_save_guards.py:727: in test_tc_b100_06_path_limit_met_and_exceeded
+    base = _padded_base(tmp_path)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests\test_b100_save_guards.py:719: in _padded_base
+    assert pad > 0, f"tmp_path too deep for the L = 150 enabler: {tail}"
+E   AssertionError: tmp_path too deep for the L = 150 enabler: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\bt\green\test_tc_b100_06_path_limit_met0\.s19tool\workarea
+E   assert -25 > 0
+___ test_tc_b100_07_rollback_keeps_the_previous_copy_unless_restored[held] ____
+tests\test_b100_save_guards.py:2114: in test_tc_b100_07_rollback_keeps_the_previous_copy_unless_restored
+    assert len(keeps) == 2, keeps
+E   AssertionError: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/cp8a-1/bt/green/test_tc_b100_07_rollback_keeps2/app/.s19tool/workarea/P/project.json')]
+E   assert 1 == 2
+E    +  where 1 = len([WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/cp8a-1/bt/green/test_tc_b100_07_rollback_keeps2/app/.s19tool/workarea/P/project.json')])
+_ test_tc_b100_07_rollback_keeps_the_previous_copy_unless_restored[no-space] __
+tests\test_b100_save_guards.py:2114: in test_tc_b100_07_rollback_keeps_the_previous_copy_unless_restored
+    assert len(keeps) == 2, keeps
+E   AssertionError: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/cp8a-1/bt/green/test_tc_b100_07_rollback_keeps3/app/.s19tool/workarea/P/project.json')]
+E   assert 1 == 2
+E    +  where 1 = len([WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/cp8a-1/bt/green/test_tc_b100_07_rollback_keeps3/app/.s19tool/workarea/P/project.json')])
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+FAILED tests/test_b100_project_check.py::test_tc_b100_25_missing_active_document_is_one_problem[with-record]
+FAILED tests/test_b100_project_check.py::test_tc_b100_25_missing_active_document_is_one_problem[without-record]
+FAILED tests/test_b100_project_check.py::test_tc_b100_25_missing_document_survives_the_no_digests_return
+FAILED tests/test_b100_project_check.py::test_tc_b100_25_changed_document_is_named_by_its_project_text
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_gather_service_imports_no_change_module
+FAILED tests/test_b100_save_guards.py::test_tc_b100_06_name_cap_boundary - As...
+FAILED tests/test_b100_save_guards.py::test_tc_b100_06_path_limit_met_and_exceeded
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_rollback_keeps_the_previous_copy_unless_restored[held]
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_rollback_keeps_the_previous_copy_unless_restored[no-space]
+10 failed, 655 passed in 1784.72s (0:29:44)
+
+# pytest exit code: not captured (the recorder printed the status of an echo); the summary line above (10 failed) is authoritative
+# UTC end: 2026-10-31T00:26:22Z

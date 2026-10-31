@@ -1,0 +1,33 @@
+# lane C baseline (unmutated copy) cwd=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut8a started 2026-10-30T23:11:06Z
+s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\s19_app\__init__.py
+# command: python -m pytest -p no:cacheprovider -q --tb=line -rfE <nodes below>
+#   tests/test_b100_active_variant.py::test_tc_b100_20_writers_carry_the_active_document
+#   tests/test_b100_document.py::test_tc_b100_28_a15_files_records_the_active_document
+#   tests/test_b100_document.py::test_tc_b100_28_document_homes_equal_the_gather_homes
+#   tests/test_b100_document.py::test_tc_b100_28_form_predicate_accepts
+#   tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses
+#   tests/test_b100_document.py::test_tc_b100_28_reader_null_and_absent_are_none
+#   tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form
+#   tests/test_b100_document.py::test_tc_b100_28_refused_value_is_a_keep_reason
+#   tests/test_b100_document.py::test_tc_b100_28_valid_key_is_carried_not_kept_aside
+#   tests/test_b100_document.py::test_tc_b100_28_variant_append_keeps_the_key
+#   tests/test_b100_document.py::test_tc_b100_28_writer_refuses_a_sub_folder_files_key_unless_it_is_the_document
+#   tests/test_b100_document.py::test_tc_b100_28_writer_refuses_a_value_out_of_form
+#   tests/test_b100_document.py::test_tc_b100_29_identical_changes_json_is_reused
+#   tests/test_b100_document.py::test_tc_b100_29_r18_document_behind_a_junctioned_home_is_never_copied
+#   tests/test_b100_document.py::test_tc_b100_30_linked_document_is_one_not_readable_row
+#   tests/test_b100_document.py::test_tc_b100_30_not_readable_document_paints_the_next_step_of_its_reason
+#   tests/test_b100_document.py::test_tc_b100_30_refused_record_is_one_not_readable_row_and_no_reopen
+#   tests/test_b100_project_check.py::test_tc_b100_23_active_document_changed_between_write_and_verify
+#   tests/test_b100_project_check.py::test_tc_b100_24_derived_from_gets_no_document_exception
+#   tests/test_b100_project_check.py::test_tc_b100_24_files_key_of_the_active_document_is_read
+#   tests/test_b100_project_check.py::test_tc_b100_25_changed_document_is_named_by_its_project_text
+#   tests/test_b100_project_check.py::test_tc_b100_25_missing_active_document_is_one_problem
+#   tests/test_b100_project_check.py::test_tc_b100_25_missing_document_survives_the_no_digests_return
+#   tests/test_b100_project_check.py::test_tc_b100_25_r7_missing_variant_never_names_the_document
+#   tests/test_b100_save_image.py::test_tc_b100_59_merge_plans_a_merge_row
+#   tests/test_b100_save_image.py::test_tc_b100_59_planning_writes_nothing_and_hashes_no_payload
+........................................................................ [ 79%]
+...................                                                      [100%]
+91 passed in 35.44s
+# finished 2026-10-30T23:11:44Z

@@ -1,0 +1,23 @@
+# mutant cp1-gathered  (F1 (gather))
+# description: a gathered row project.json cannot hold is listed
+# file: s19_app/tui/services/project_gather_service.py
+# source sha256 before: bd6f926590c17abd7711edee84667bb24f3463fd50f04eff96286fb1e65237de
+# edit 1 OLD:
+#   |         if _manifest_key_refusal(relative) is None:
+#   |             gathered_rows.setdefault(home, []).append(relative)
+# edit 1 NEW:
+#   |         gathered_rows.setdefault(home, []).append(relative)
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_29_cp1_device_stem_document_never_refuses_the_save[aux.json]
+# started 2026-10-30T23:57:34Z  finished 2026-10-30T23:57:39Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_document.py:1576: AssertionError: ['Manifest write failed', 'Project NOT saved: could not save — project.json was not written. check the folder.']
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_29_cp1_device_stem_document_never_refuses_the_save[aux.json]
+1 failed in 3.33s
+
+# pytest summary: 1 failed in 3.33s
+# verdict: KILLED
+# restored = True  (sha256 after restore: bd6f926590c17abd7711edee84667bb24f3463fd50f04eff96286fb1e65237de)

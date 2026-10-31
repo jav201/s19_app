@@ -1,0 +1,22 @@
+# mutant M-21  (LLR-167.8 / Q2)
+# description: _save_clears_panel_flag ignores unparsed paste text (written -> always clear)
+# file: s19_app/tui/app.py
+# source sha256 before: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2
+# edit 1 OLD:
+#   |     return paste_text in ("", DUMMY_CHANGESET_TEXT) or paste_text == parsed_paste_text
+# edit 1 NEW:
+#   |     return True
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_save_image.py::test_tc_b100_70_unparsed_paste_text_keeps_the_flag
+# started 2026-10-30T23:10:46Z  finished 2026-10-30T23:10:50Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c\tests\test_b100_save_image.py:2025: assert False is True
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_image.py::test_tc_b100_70_unparsed_paste_text_keeps_the_flag
+1 failed in 3.34s
+
+# pytest summary: 1 failed in 3.34s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2)

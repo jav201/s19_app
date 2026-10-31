@@ -18,6 +18,9 @@ Scenarios:
   pe-unreadable   Load project P whose active variant broken.s19 holds no S19
                   data (the red "not readable" mark; Load opens the next
                   valid variant, Inc 7)
+  pe-document     Load project P whose recorded change document
+                  patches/boost.json holds 1 001 entries (the "change document
+                  … not readable, too large to reopen" row, Inc 8a)
 
 ``--close`` dismisses the panel after it opens, so the capture shows the
 summary line and ``#status_text`` the load left behind.
@@ -39,7 +42,7 @@ ROOT = Path(__file__).resolve().parents[2]
 CASE01 = ROOT / "examples" / "case_01_basic_valid" / "firmware.s19"
 CASE02 = ROOT / "examples" / "case_02_gaps_and_patch_targets" / "firmware.s19"
 SCENARIOS = ("pe-clean", "pe-saveback", "pe-problems", "pe-damaged", "pe-patched",
-             "pe-unreadable")
+             "pe-unreadable", "pe-document")
 
 
 def seed(workarea: Path, scenario: str) -> None:
@@ -68,6 +71,13 @@ def seed(workarea: Path, scenario: str) -> None:
     if scenario == "pe-unreadable":
         (project / "broken.s19").write_text("not an s19 file\n", encoding="utf-8")
         manifest["active_variant"] = "broken"
+    if scenario == "pe-document":
+        (project / "patches").mkdir()
+        entries = [{"address": "0x0", "data": "00"}] * 1001
+        (project / "patches" / "boost.json").write_text(
+            json.dumps({"entries": entries}), encoding="utf-8"
+        )
+        manifest["active_document"] = "patches/boost.json"
     text = json.dumps(manifest, indent=2)
     if scenario == "pe-damaged":
         text = '{"schema_version": 1, "active_variant": '

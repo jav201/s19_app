@@ -1,0 +1,21 @@
+# mutant R-19  (R17)
+# description: CHG-V1-FORMAT left out of the file-level codes
+# file: s19_app/tui/app.py
+# source sha256 before: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2
+# edit 1 OLD:
+#   |         MF_BAD_STRUCTURE,
+#   |         CHG_V1_FORMAT,
+#   |         CHG_FORMAT,
+# edit 1 NEW:
+#   |         MF_BAD_STRUCTURE,
+#   |         CHG_FORMAT,
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document]
+# started 2026-10-30T23:10:40Z  finished 2026-10-30T23:10:41Z  rc=0
+.                                                                        [100%]
+1 passed in 0.61s
+
+# pytest summary: 1 passed in 0.61s
+# verdict: SURVIVED
+# restored = True  (sha256 after restore: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2)

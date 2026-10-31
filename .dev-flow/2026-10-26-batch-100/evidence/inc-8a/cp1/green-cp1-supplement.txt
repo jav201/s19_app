@@ -1,0 +1,7 @@
+# GREEN cp1 (supplement) — the two R20 check-side arms added after green-cp1 started (green-cp1 collected the module before they existed)
+# UTC: 2026-10-31T00:06:22Z  cwd: /c/Users/jjgh8/Github/s19_app-b100-inc8a  PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc8a  NO_COLOR unset
+# s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc8a\s19_app\__init__.py
+# command: pytest -p no:cacheprovider -q --tb=short -rfE tests/test_b100_document.py -k "cp1_changed_document_row or cp1_missing_unrecorded"
+..                                                                       [100%]
+2 passed, 159 deselected in 5.11s
+# pytest exit code: 0

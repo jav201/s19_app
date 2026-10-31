@@ -72,11 +72,19 @@ from typing import Optional, Sequence
 from ...validation.model import ValidationIssue, ValidationSeverity
 from ..workspace import (
     WorkareaContainmentError,
+    _find_workarea_root,
     _guarded_destination,
+    _path_traverses_reparse_point,
     place_into_workarea,
     predict_placement,
 )
-from .variant_execution_service import MANIFEST_ARTIFACT, PROJECT_MANIFEST_NAME
+from .variant_execution_service import (
+    MANIFEST_ARTIFACT,
+    PROJECT_MANIFEST_NAME,
+    _manifest_key_refusal,
+    _plain_entry,
+    is_active_document_form,
+)
 
 #: The per-artifact project homes (change 1, folders.html §1 — the drawn
 #: tree names them ``patches\`` / ``checks\`` / ``templates\``).
@@ -102,6 +110,19 @@ GATHER_SOURCE_MISSING = "GATHER-SOURCE-MISSING"
 #: the copy itself raised ``OSError``. A WARNING (collect-don't-abort): the
 #: save proceeds, the artifact simply is not gathered.
 GATHER_CONTAINMENT = "GATHER-CONTAINMENT"
+
+#: Gather finding — the active document is not recorded as
+#: ``active_document``: it sits in the project but not directly in its
+#: kind's home, or its landing is not a ``.json`` name the manifest
+#: accepts (LLR-170.2). A WARNING: the save proceeds without the key.
+GATHER_DOCUMENT_NOT_RECORDED = "GATHER-DOCUMENT-NOT-RECORDED"
+
+#: The four classes of a file-backed active document
+#: (:func:`classify_active_document`, E3 R11).
+DOCUMENT_IN_HOME = "in_home"
+DOCUMENT_OUTSIDE = "outside"
+DOCUMENT_INSIDE_ELSEWHERE = "inside_elsewhere"
+DOCUMENT_MISSING = "missing"
 
 #: The manifest artifact tag every gather finding carries, so a gather
 #: finding renders under the same artifact family as the manifest it rode in
@@ -204,6 +225,119 @@ def read_document_kind(path: Path) -> str:
     if isinstance(payload, dict) and isinstance(payload.get("kind"), str):
         return payload["kind"]
     return "change"
+
+
+def document_in_home(project_dir: Path, source: Path, home: str) -> bool:
+    """
+    Summary:
+        The one test for "the file-backed document is already in its home"
+        (A3-9, LLR-167.6, LLR-170.2): the class ``in_home`` of
+        :func:`classify_active_document`.
+
+    Args:
+        project_dir (Path): The project folder, as the app names it
+            (unresolved).
+        source (Path): The document's file, unresolved.
+        home (str): The home of its kind (``"patches"`` / ``"checks"``).
+
+    Returns:
+        bool: True only when ``f"{home}/{source.name}"`` passes
+            ``is_active_document_form``, the source's folder is named
+            ``home`` exactly (case-sensitive, A3R2-7), that folder's parent
+            is ``project_dir`` (absolute paths compared as exact text, never
+            case-folded and never resolved: a case-sensitive work area holds
+            ``P`` and ``p`` as two projects, SEC8a-1), and
+            ``os.lstat`` finds the home a regular folder and the source a
+            regular file, neither a link nor a reparse point.
+
+    Raises:
+        None: Any ``OSError`` or ``ValueError`` gives False.
+
+    Dependencies:
+        Uses:
+            - is_active_document_form / _plain_entry
+        Used by:
+            - classify_active_document
+    """
+    try:
+        absolute = Path(os.path.abspath(source))
+        if not is_active_document_form(f"{home}/{absolute.name}"):
+            return False
+        if absolute.parent.name != home:
+            return False
+        if str(absolute.parent.parent) != os.path.abspath(project_dir):
+            return False
+    except (OSError, ValueError):
+        return False
+    return _plain_entry(Path(project_dir) / home, folder=True) and _plain_entry(
+        absolute, folder=False
+    )
+
+
+def classify_active_document(
+    project_dir: Path, source: Path, home: str
+) -> tuple[str, Optional[str]]:
+    """
+    Summary:
+        The one gather classifier of a file-backed active document (E3 R11):
+        the planner, the gather and the app's plan all call it, so the plan
+        and the written tree agree.
+
+    Args:
+        project_dir (Path): The project folder the save writes, unresolved.
+        source (Path): The document's file, unresolved.
+        home (str): The home of its kind (``"patches"`` / ``"checks"``).
+
+    Returns:
+        tuple[str, Optional[str]]: ``(kind, name)``. ``kind`` is
+            :data:`DOCUMENT_IN_HOME` (recorded as it is, ``keep``),
+            :data:`DOCUMENT_OUTSIDE` (copied into the home),
+            :data:`DOCUMENT_INSIDE_ELSEWHERE` or :data:`DOCUMENT_MISSING`
+            (no row, nothing copied). ``name`` is the source's file name
+            for the first two, ``None`` for the other two.
+
+    Raises:
+        None.
+
+    Data Flow:
+        - ``os.lstat(source)``: absent, unreadable, not a regular file, or
+          a link or reparse point → ``missing`` (a link is never followed
+          or copied, S3R2-5).
+        - "Inside the project" is decided on the UNRESOLVED exact text
+          (``os.path.abspath``, no case folding, no ``resolve()``, SEC8a-1):
+          inside and :func:`document_in_home` → ``in_home``; inside
+          otherwise → ``inside_elsewhere``.
+        - Outside: a source under a ``.s19tool/workarea`` whose folders
+          below that root include a link or junction → ``missing`` (R18:
+          another project's ``patches`` swapped for a junction is never
+          read through); otherwise ``outside``.
+
+    Dependencies:
+        Uses:
+            - document_in_home / _plain_entry
+            - workspace._find_workarea_root /
+              workspace._path_traverses_reparse_point
+        Used by:
+            - plan_project_save / gather_project_artifacts
+            - s19_app.tui.app.S19TuiApp._plan_project_save
+    """
+    if not _plain_entry(Path(source), folder=False):
+        return DOCUMENT_MISSING, None
+    try:
+        absolute = Path(os.path.abspath(source))
+        project_text = os.path.abspath(project_dir)
+    except (OSError, ValueError):
+        return DOCUMENT_MISSING, None
+    if str(absolute).startswith(project_text + os.sep):
+        if document_in_home(project_dir, source, home):
+            return DOCUMENT_IN_HOME, absolute.name
+        return DOCUMENT_INSIDE_ELSEWHERE, None
+    workarea = _find_workarea_root(absolute)
+    if workarea is not None and _path_traverses_reparse_point(
+        absolute, stop_at=workarea
+    ):
+        return DOCUMENT_MISSING, None
+    return DOCUMENT_OUTSIDE, absolute.name
 
 
 def _check_home_contained(home: Path, workarea_root: Optional[Path] = None) -> Path:
@@ -342,6 +476,11 @@ class GatherOutcome:
         created_homes (list[Path]): The project home folders this gather
             created on demand — they did not exist when the gather
             started. A pre-existing home never appears here.
+        active_document (Optional[str]): The project-relative POSIX text of
+            the placed active document, ``f"{home}/{landing name}"`` built
+            from the home constant (A3-12) — copied this save or already in
+            its home; ``None`` when there is no document, it was not
+            placed, or the text fails ``is_active_document_form``.
 
     Returns:
         None: Dataclass container.
@@ -363,6 +502,7 @@ class GatherOutcome:
     issues: list[ValidationIssue] = field(default_factory=list)
     written: list[Path] = field(default_factory=list)
     created_homes: list[Path] = field(default_factory=list)
+    active_document: Optional[str] = None
 
 
 def gather_project_artifacts(
@@ -395,7 +535,8 @@ def gather_project_artifacts(
         composition_names (Sequence[str]): The save payload's ``batch`` +
             ``assignments`` document names (project-relative strings).
         active_document (Optional[Path]): The Patch Editor's loaded
-            document path, when one is loaded.
+            document path, when one is loaded, UNRESOLVED (E3 R11); for a
+            pasted document, the landing the app wrote.
         active_document_kind (str): That document's wire ``kind`` (the
             in-memory discriminator — the file itself is the source).
         active_template (Optional[Path]): The CRC Designer's last
@@ -434,9 +575,18 @@ def gather_project_artifacts(
     Data Flow:
         - Build the used set: composition names (project-dir hit → already
           home; COMMON hit by bare name → gather; neither → one
-          ``GATHER-SOURCE-MISSING`` finding) + the active document (when
-          its resolved path is not already inside the project dir) + the
+          ``GATHER-SOURCE-MISSING`` finding) + the active document + the
           active template.
+        - The active document is classified first, on the UNRESOLVED paths
+          (:func:`classify_active_document`): ``in_home`` → not copied,
+          named in ``outcome.active_document``; ``outside`` → copied (the
+          unresolved source is passed to the placement, R18) and named by
+          its landing; ``inside_elsewhere`` → one
+          ``GATHER-DOCUMENT-NOT-RECORDED``; ``missing`` → one
+          ``GATHER-SOURCE-MISSING`` (absent) or ``GATHER-CONTAINMENT`` (a
+          link or not a regular file). A landing text that fails
+          ``is_active_document_form`` stays copied, unnamed, with one
+          ``GATHER-DOCUMENT-NOT-RECORDED``.
         - De-duplicate by resolved source path so a document both
           referenced and active is gathered once.
         - Each artifact COPYs through :func:`_gather_copy` into its home;
@@ -465,16 +615,20 @@ def gather_project_artifacts(
     """
     outcome = GatherOutcome()
     resolved_project = project_dir.resolve()
-    pending: dict[Path, str] = {}  # resolved source → home name
+    # resolved source → (home name, the path handed to the placement)
+    pending: dict[Path, tuple[str, Path]] = {}
 
-    def _schedule(source: Path, home: str) -> None:
+    def _schedule(source: Path, home: str, unresolved: bool = False) -> Path:
         try:
             resolved_source = source.resolve()
         except OSError:
             resolved_source = source
         if resolved_source in pending:
-            return
-        pending[resolved_source] = home
+            if unresolved:
+                pending[resolved_source] = (pending[resolved_source][0], source)
+            return resolved_source
+        pending[resolved_source] = (home, source if unresolved else resolved_source)
+        return resolved_source
 
     # Predicate limb 1 — the save's own composition.
     for name in composition_names:
@@ -493,26 +647,44 @@ def gather_project_artifacts(
                 )
             )
 
-    # Predicate limb 2a — the active editor document.
+    # Predicate limb 2a — the active editor document, classified on the
+    # unresolved paths before anything is resolved (E3 R11, S3R2-5).
+    document_key: Optional[Path] = None
     if active_document is not None:
-        try:
-            resolved_active = active_document.resolve()
-        except OSError:
-            resolved_active = active_document
-        if not resolved_active.is_relative_to(resolved_project):
-            if resolved_active.is_file():
-                _schedule(
-                    resolved_active,
-                    document_home_for_kind(active_document_kind),
+        document_home = document_home_for_kind(active_document_kind)
+        kind, name = classify_active_document(
+            project_dir, active_document, document_home
+        )
+        if kind == DOCUMENT_IN_HOME:
+            outcome.active_document = f"{document_home}/{name}"
+        elif kind == DOCUMENT_OUTSIDE:
+            document_key = _schedule(active_document, document_home, unresolved=True)
+        elif kind == DOCUMENT_INSIDE_ELSEWHERE:
+            outcome.issues.append(
+                _gather_issue(
+                    GATHER_DOCUMENT_NOT_RECORDED,
+                    f"gather: active document {active_document} is in the "
+                    f"project but not directly in {document_home}/ — not "
+                    f"recorded",
                 )
-            else:
-                outcome.issues.append(
-                    _gather_issue(
-                        GATHER_SOURCE_MISSING,
-                        f"gather: active document {active_document} no "
-                        f"longer exists — skipped",
-                    )
+            )
+        elif not os.path.lexists(active_document):
+            outcome.issues.append(
+                _gather_issue(
+                    GATHER_SOURCE_MISSING,
+                    f"gather: active document {active_document} no "
+                    f"longer exists — skipped",
                 )
+            )
+        else:
+            outcome.issues.append(
+                _gather_issue(
+                    GATHER_CONTAINMENT,
+                    f"gather: active document {active_document} is a link, "
+                    f"goes through a link or junction, or is not a regular "
+                    f"file — not copied",
+                )
+            )
 
     # Predicate limb 2b — the active CRC template.
     if active_template is not None:
@@ -533,7 +705,9 @@ def gather_project_artifacts(
                 )
 
     gathered_rows: dict[str, list[str]] = {}
-    for resolved_source, home in sorted(pending.items(), key=lambda item: str(item[0])):
+    for resolved_source, (home, source) in sorted(
+        pending.items(), key=lambda item: str(item[0])
+    ):
         home_dir = resolved_project / home
         # LED .53 / R5-1: remember what THIS gather creates — the home's
         # existence BEFORE the copy decides ``created_homes`` (a reused
@@ -541,9 +715,7 @@ def gather_project_artifacts(
         # created home implies bytes were written into it).
         home_preexisted = home_dir.is_dir()
         try:
-            copied, destination = _gather_copy(
-                resolved_source, home_dir, workarea_root
-            )
+            copied, destination = _gather_copy(source, home_dir, workarea_root)
         except (WorkareaContainmentError, OSError) as exc:
             outcome.issues.append(
                 _gather_issue(
@@ -575,7 +747,24 @@ def gather_project_artifacts(
         ):
             outcome.created_homes.append(home_dir)
         relative = destination.relative_to(resolved_project).as_posix()
-        gathered_rows.setdefault(home, []).append(relative)
+        # Review F1: a row project.json cannot hold (a device stem) is
+        # copied but not listed, so it never refuses the manifest write.
+        if _manifest_key_refusal(relative) is None:
+            gathered_rows.setdefault(home, []).append(relative)
+        if resolved_source == document_key:
+            # A3-12: built from the home constant and the landing's name,
+            # never from the resolved path.
+            text = f"{home}/{destination.name}"
+            if is_active_document_form(text):
+                outcome.active_document = text
+            else:
+                outcome.issues.append(
+                    _gather_issue(
+                        GATHER_DOCUMENT_NOT_RECORDED,
+                        f"gather: active document copied to {text}, a name "
+                        f"project.json does not record — not recorded",
+                    )
+                )
     outcome.gathered = {
         home: sorted(rows)
         for home, rows in sorted(
@@ -689,11 +878,12 @@ def scoped_home_target(
 # ---------------------------------------------------------------------------
 
 #: Save-plan action words (LLR-167.6). Inc 5 produces ``new``, ``keep`` and
-#: ``rewrite``; ``replace`` and ``merge`` are added with the merge rows that
-#: produce them (Inc 8a).
+#: ``rewrite``; ``merge`` is added at 8a; ``replace`` is not produced at 8a
+#: (E3 R1: Save project never overwrites a file in the project).
 PLAN_ACTION_NEW = "new"
 PLAN_ACTION_KEEP = "keep"
 PLAN_ACTION_REWRITE = "rewrite"
+PLAN_ACTION_MERGE = "merge"
 
 #: Save-plan target kinds (LLR-167.6): a folder this save creates, the open
 #: project, or another existing project the save merges into.
@@ -704,29 +894,37 @@ PLAN_TARGET_MERGE = "merge"
 #: The row role of the ``project.json`` row.
 PLAN_ROLE_MANIFEST = "manifest"
 
+#: The row role of the active change or check document (LLR-167.6, 8a).
+PLAN_ROLE_DOCUMENT = "document"
+
 
 @dataclass(frozen=True)
 class PlannedFile:
     """
     Summary:
-        One top-level file a Save project will place — an input of
+        One file a Save project will place — an input of
         :func:`plan_project_save`. The digest and size are computed by the
         app (once per dialog open), so the planner hashes no payload.
 
     Args:
-        role (str): ``"image"``, ``"mac"`` or ``"a2l"``.
-        source (Path): The file the row derives from (for an emitted image,
-            the loaded source).
+        role (str): ``"image"``, ``"mac"``, ``"a2l"`` or ``"document"``.
+        source (Optional[Path]): The file the row derives from (for an
+            emitted image, the loaded source); ``None`` for a pasted
+            document, the unresolved file for a file-backed one.
         name (str): The requested landing name.
         digest (str): The SHA-256 hex digest of the bytes that will land.
         size (int): Their size, in bytes.
+        home (Optional[str]): The project home the file lands in
+            (``"patches"`` / ``"checks"`` for the document row); ``None``
+            → the project folder itself.
     """
 
     role: str
-    source: Path
+    source: Optional[Path]
     name: str
     digest: str
     size: int
+    home: Optional[str] = None
 
 
 @dataclass(frozen=True)
@@ -736,12 +934,15 @@ class SavePlanRow:
         One row of the save plan, at plan granularity (LLR-167.6).
 
     Args:
-        role (str): ``"image"``, ``"mac"``, ``"a2l"`` or ``"manifest"``.
+        role (str): ``"image"``, ``"mac"``, ``"a2l"``, ``"document"`` or
+            ``"manifest"``.
         source (Optional[Path]): The row's source (``None`` for
-            ``project.json``).
+            ``project.json`` and for a pasted document).
         landing (Path): The predicted full landing path, in the resolved
-            form :func:`place_into_workarea` returns.
-        action (str): One of the ``PLAN_ACTION_*`` words.
+            form :func:`place_into_workarea` returns (under its home for
+            the document row).
+        action (str): One of the ``PLAN_ACTION_*`` words; ``new`` or
+            ``keep`` for the document row.
     """
 
     role: str
@@ -814,14 +1015,22 @@ def plan_project_save(
 
     Data Flow:
         - A refusal → a row-less plan carrying it.
-        - Each file → ``predict_placement(digest, size, target, name)``:
-          a reuse is ``keep``, a claimed name is ``new``.
-        - ``project.json`` → ``rewrite`` when the target holds one, else
-          ``new``.
+        - Each file → ``predict_placement(digest, size, target / home,
+          name)`` (``target`` itself when ``home`` is None): a reuse is
+          ``keep``, a claimed name is ``new``.
+        - A file-backed document row (role ``"document"`` with a
+          ``source``) is classified first (:func:`classify_active_document`,
+          the gather's call): ``in_home`` → its own file, ``keep``;
+          ``outside`` → predicted under its home with the classifier's
+          name; ``inside_elsewhere`` / ``missing`` → no row. A pasted
+          document (``source`` None) is always predicted.
+        - ``project.json`` → ``new`` when the target holds none; else
+          ``merge`` for a merge target, else ``rewrite``.
 
     Dependencies:
         Uses:
             - predict_placement (B100-I22)
+            - classify_active_document (E3 R11)
         Used by:
             - s19_app.tui.app.S19TuiApp._handle_save_dialog
     """
@@ -830,9 +1039,27 @@ def plan_project_save(
         return SavePlan(target, target_kind, (), image, keys, refusal)
     rows: list[SavePlanRow] = []
     for planned in files:
-        predicted = predict_placement(
-            planned.digest, planned.size, target, planned.name
-        )
+        landing_dir = target if planned.home is None else Path(target) / planned.home
+        name = planned.name
+        if (
+            planned.role == PLAN_ROLE_DOCUMENT
+            and planned.source is not None
+            and planned.home is not None
+        ):
+            kind, name = classify_active_document(target, planned.source, planned.home)
+            if kind == DOCUMENT_IN_HOME:
+                rows.append(
+                    SavePlanRow(
+                        planned.role,
+                        planned.source,
+                        landing_dir.resolve() / name,
+                        PLAN_ACTION_KEEP,
+                    )
+                )
+                continue
+            if kind != DOCUMENT_OUTSIDE:
+                continue
+        predicted = predict_placement(planned.digest, planned.size, landing_dir, name)
         rows.append(
             SavePlanRow(
                 planned.role,
@@ -842,14 +1069,11 @@ def plan_project_save(
             )
         )
     manifest = Path(target).resolve() / PROJECT_MANIFEST_NAME
-    rows.append(
-        SavePlanRow(
-            PLAN_ROLE_MANIFEST,
-            None,
-            manifest,
-            PLAN_ACTION_REWRITE
-            if os.path.lexists(manifest)
-            else PLAN_ACTION_NEW,
-        )
-    )
+    if not os.path.lexists(manifest):
+        manifest_action = PLAN_ACTION_NEW
+    elif target_kind == PLAN_TARGET_MERGE:
+        manifest_action = PLAN_ACTION_MERGE
+    else:
+        manifest_action = PLAN_ACTION_REWRITE
+    rows.append(SavePlanRow(PLAN_ROLE_MANIFEST, None, manifest, manifest_action))
     return SavePlan(target, target_kind, tuple(rows), image, keys)

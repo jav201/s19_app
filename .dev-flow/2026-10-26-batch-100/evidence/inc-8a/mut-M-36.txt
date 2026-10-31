@@ -1,0 +1,32 @@
+# mutant M-36  (LLR-169.5 (P-B2))
+# description: the document check placed after the no-digests return
+# file: s19_app/tui/services/manifest_writer.py
+# source sha256 before: a638b23d2bb861b112345b3dcc6e1d045796615a527aa8bf5f7d9d88bab43f5a
+# edit 1 OLD:
+#   |     document_missing = _active_document_missing(project_dir, manifest)
+#   |     if document_missing is not None:
+#   |         problems.append(document_missing)
+#   |     if not manifest.files:
+#   |         problems.append(ProjectFileProblem(PROBLEM_NO_DIGESTS, PROJECT_MANIFEST_NAME))
+#   |         return problems
+# edit 1 NEW:
+#   |     if not manifest.files:
+#   |         problems.append(ProjectFileProblem(PROBLEM_NO_DIGESTS, PROJECT_MANIFEST_NAME))
+#   |         return problems
+#   |     document_missing = _active_document_missing(project_dir, manifest)
+#   |     if document_missing is not None:
+#   |         problems.append(document_missing)
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_project_check.py::test_tc_b100_25_missing_document_survives_the_no_digests_return
+# started 2026-10-30T23:13:32Z  finished 2026-10-30T23:13:34Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_project_check.py:1694: AssertionError: assert [('no digests...roject.json')] == [('missing', ...roject.json')]
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_check.py::test_tc_b100_25_missing_document_survives_the_no_digests_return
+1 failed in 0.60s
+
+# pytest summary: 1 failed in 0.60s
+# verdict: KILLED
+# restored = True  (sha256 after restore: a638b23d2bb861b112345b3dcc6e1d045796615a527aa8bf5f7d9d88bab43f5a)

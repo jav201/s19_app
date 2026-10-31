@@ -1,0 +1,24 @@
+# mutant R-29  (pre-ruling 4)
+# description: the writer accepts a sub-folder files key other than the document
+# file: s19_app/tui/services/manifest_writer.py
+# source sha256 before: a638b23d2bb861b112345b3dcc6e1d045796615a527aa8bf5f7d9d88bab43f5a
+# edit 1 OLD:
+#   |             context == "files"
+#   |             and entry != active_document
+# edit 1 NEW:
+#   |             context == "files-never"
+#   |             and entry != active_document
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_28_writer_refuses_a_sub_folder_files_key_unless_it_is_the_document
+# started 2026-10-30T23:13:53Z  finished 2026-10-30T23:13:54Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:459: AssertionError: []
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_28_writer_refuses_a_sub_folder_files_key_unless_it_is_the_document
+1 failed in 0.61s
+
+# pytest summary: 1 failed in 0.61s
+# verdict: KILLED
+# restored = True  (sha256 after restore: a638b23d2bb861b112345b3dcc6e1d045796615a527aa8bf5f7d9d88bab43f5a)

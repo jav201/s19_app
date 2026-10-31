@@ -1,0 +1,25 @@
+# mutant M-I4  (ruling 1 (G-1 / D-B5))
+# description: next step by kind only (reason table ignored)
+# file: s19_app/tui/services/variant_execution_service.py
+# source sha256 before: 5f2ab3268d9cdc4dafdb696628313642438fd208cd3e3039c4059ad507510d09
+# edit 1 OLD:
+#   |         if by_reason is not None:
+#   |             return by_reason
+# edit 1 NEW:
+#   | <deleted>
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_not_readable_document_paints_the_next_step_of_its_reason
+# started 2026-10-30T23:13:57Z  finished 2026-10-30T23:13:58Z  rc=1
+FF..                                                                     [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:1447: AssertionError: assert [('not readab... to drop it')] == [('not readab...ke a while)')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:1447: AssertionError: assert [('not readab... to drop it')] == [('not readab... Load again')]
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_30_not_readable_document_paints_the_next_step_of_its_reason[too_large]
+FAILED tests/test_b100_document.py::test_tc_b100_30_not_readable_document_paints_the_next_step_of_its_reason[io_error]
+2 failed, 2 passed in 0.61s
+
+# pytest summary: 2 failed, 2 passed in 0.61s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 5f2ab3268d9cdc4dafdb696628313642438fd208cd3e3039c4059ad507510d09)

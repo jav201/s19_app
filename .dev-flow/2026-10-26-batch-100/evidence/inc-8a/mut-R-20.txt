@@ -1,0 +1,22 @@
+# mutant R-20  (R18)
+# description: classify_active_document checks only the source file, not the folders above it (no reparse-point walk)
+# file: s19_app/tui/services/project_gather_service.py
+# source sha256 before: 6f2d419ea0d2ee56cb28c2ed9df3c6d958afd793d8f05c2904304a1cbf6c091e
+# edit 1 OLD:
+#   |     if workarea is not None and _path_traverses_reparse_point(
+# edit 1 NEW:
+#   |     if False and workarea is not None and _path_traverses_reparse_point(
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_29_r18_document_behind_a_junctioned_home_is_never_copied
+# started 2026-10-30T23:13:36Z  finished 2026-10-30T23:13:42Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:905: AssertionError: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30682/test_tc_b100_29_r18_document_b0/app/.s19tool/workarea/Q/patches/boost.json')]
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_29_r18_document_behind_a_junctioned_home_is_never_copied
+1 failed in 4.54s
+
+# pytest summary: 1 failed in 4.54s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 6f2d419ea0d2ee56cb28c2ed9df3c6d958afd793d8f05c2904304a1cbf6c091e)

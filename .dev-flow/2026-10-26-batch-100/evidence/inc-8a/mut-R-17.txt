@@ -1,0 +1,22 @@
+# mutant R-17  (R16)
+# description: io_error painted with the generic not-readable reason
+# file: s19_app/tui/app.py
+# source sha256 before: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2
+# edit 1 OLD:
+#   |     DOCUMENT_IO_ERROR: "could not be read",
+# edit 1 NEW:
+#   |     DOCUMENT_IO_ERROR: "not a change or check document the app can read",
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_held_document_is_not_readable_and_stays_recorded tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_held_document_with_one_line
+# started 2026-10-30T23:10:32Z  finished 2026-10-30T23:10:38Z  rc=1
+.F                                                                       [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b\tests\test_b100_save_guards.py:2551: AssertionError: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytes...t a change or check document the app can read — it stays recorded; check that the file can be opened, then Load again']
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_held_document_with_one_line
+1 failed, 1 passed in 4.96s
+
+# pytest summary: 1 failed, 1 passed in 4.96s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2)

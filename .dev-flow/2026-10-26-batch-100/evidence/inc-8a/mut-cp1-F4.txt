@@ -1,0 +1,23 @@
+# mutant cp1-F4  (F4 / LLR-167.6)
+# description: the predicted plan is kept after the document is not recorded
+# file: s19_app/tui/app.py
+# source sha256 before: ebc6dbf4d1b6aa98e7f5e5fde06895c66c98e8704d182e34efa408e01f332b7f
+# edit 1 OLD:
+#   |             if recorded_document is None and _KEY_ACTIVE_DOCUMENT in plan.manifest_keys:
+#   |                 plan = _plan_without_document_key(plan)
+# edit 1 NEW:
+#   | <deleted>
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_29_cp1_failed_document_write_drops_the_key_from_the_plan
+# started 2026-10-30T23:57:25Z  finished 2026-10-30T23:57:29Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_document.py:1745: AssertionError: (('schema_version', 'active_variant', 'batch', 'assignments', 'files', 'derived_from', ...), ('schema_version', 'active_variant', 'batch', 'assignments', 'files', 'derived_from'))
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_29_cp1_failed_document_write_drops_the_key_from_the_plan
+1 failed in 2.76s
+
+# pytest summary: 1 failed in 2.76s
+# verdict: KILLED
+# restored = True  (sha256 after restore: ebc6dbf4d1b6aa98e7f5e5fde06895c66c98e8704d182e34efa408e01f332b7f)

@@ -1,0 +1,26 @@
+# mutant M-13  (LLR-170.3 / Q6)
+# description: the reopened document's entries are applied to the loaded image (after the install, where an image exists)
+# file: s19_app/tui/app.py
+# source sha256 before: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2
+# edit 1 OLD:
+#   |         loaded = self.current_file
+#   |         announcement = compose_load_announcement(
+# edit 1 NEW:
+#   |         loaded = self.current_file
+#   |         if loaded is not None and self._change_service.document.entries:
+#   |             self._change_service.apply(loaded.mem_map, loaded.ranges, loaded.mac_records, None)
+#   |         announcement = compose_load_announcement(
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_reopen_never_applies_the_entries
+# started 2026-10-30T23:10:13Z  finished 2026-10-30T23:10:17Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b\tests\test_b100_document.py:1129: assert {2147483664: ...147483665: 90} == {2147483664: 3, 2147483665: 0}
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_30_reopen_never_applies_the_entries
+1 failed in 2.68s
+
+# pytest summary: 1 failed in 2.68s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2)

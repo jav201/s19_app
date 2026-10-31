@@ -1,0 +1,57 @@
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc8a\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+== S Save project into a hostile merge target Q (R8 drop/keep)
+  S1 absent: save 0.73s | active_document after = None | Q diff (excl. project.json) {'created': [], 'removed': [], 'changed': []} | doc bytes unchanged - | private diff {'created': [], 'removed': [], 'changed': []}
+     | Change document record patches/boost.json was dropped from project.json — the file is missing
+   painted[S1 absent]: lines=3 codes=[] class_names=[] control_lines=0
+  S2 20 000 entries (too_large): save 0.71s | active_document after = 'patches/boost.json' | Q diff (excl. project.json) {'created': [], 'removed': [], 'changed': []} | doc bytes unchanged True | private diff {'created': [], 'removed': [], 'changed': []}
+   painted[S2 20 000 entries (too_large)]: lines=2 codes=[] class_names=[] control_lines=0
+  S3 1 MiB of [ (unreadable): save 0.94s | active_document after = None | Q diff (excl. project.json) {'created': [], 'removed': [], 'changed': []} | doc bytes unchanged True | private diff {'created': [], 'removed': [], 'changed': []}
+     | Change document record patches/boost.json was dropped from project.json — the file is not a change or check document the app can read
+   painted[S3 1 MiB of [ (unreadable)]: lines=3 codes=[] class_names=[] control_lines=0
+  S4 5000-digit int (unreadable): save 0.71s | active_document after = None | Q diff (excl. project.json) {'created': [], 'removed': [], 'changed': []} | doc bytes unchanged True | private diff {'created': [], 'removed': [], 'changed': []}
+     | Change document record patches/boost.json was dropped from project.json — the file is not a change or check document the app can read
+   painted[S4 5000-digit int (unreadable)]: lines=3 codes=[] class_names=[] control_lines=0
+  S5 held (io_error): save 0.81s | active_document after = 'patches/boost.json' | Q diff (excl. project.json) {'created': [], 'removed': [], 'changed': []} | doc bytes unchanged True | private diff {'created': [], 'removed': [], 'changed': []}
+     | Change document patches/boost.json could not be read — it stays recorded; check that the file can be opened, then Load again
+   painted[S5 held (io_error)]: lines=3 codes=[] class_names=[] control_lines=0
+  S6 Q/patches junction -> private (link): save 0.83s | active_document after = None | Q diff (excl. project.json) {'created': [], 'removed': [], 'changed': []} | doc bytes unchanged - | private diff {'created': [], 'removed': [], 'changed': []}
+     | project.json holds a change document path this version cannot use: its previous content is kept as project.json.previous-20261030T231240Z in C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-cld
+     | Change document record patches/boost.json was dropped from project.json — its previous content is kept as project.json.previous-20261030T231240Z
+   painted[S6 Q/patches junction -> private (link)]: lines=4 codes=[] class_names=[] control_lines=0
+  S7 valid 1-entry (ok): save 0.81s | active_document after = 'patches/boost.json' | Q diff (excl. project.json) {'created': [], 'removed': [], 'changed': []} | doc bytes unchanged True | private diff {'created': [], 'removed': [], 'changed': []}
+   painted[S7 valid 1-entry (ok)]: lines=2 codes=[] class_names=[] control_lines=0
+  S8 1 001 tiny entries (too_large): save 0.81s | active_document after = 'patches/boost.json' | Q diff (excl. project.json) {'created': [], 'removed': [], 'changed': []} | doc bytes unchanged True | private diff {'created': [], 'removed': [], 'changed': []}
+   painted[S8 1 001 tiny entries (too_large)]: lines=2 codes=[] class_names=[] control_lines=0
+  S9 refused value (ESC/BEL + 300 chars): kept copies ['project.json.previous-20261030T231247Z'] | longest painted line 305
+     | Change document record patches/x]0;pwnAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA… was dropped from project.json — its previous content is ke
+   painted[S9]: lines=4 codes=[] class_names=[] control_lines=0
+== G gather classifier: reopened P document, then Save project into Q
+  G0 control (no swap): reopened 1 entries from C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s8a\runs\G_1793401968657790000\app\.s19tool\workarea\P\patches\settings.json
+     target diff {'created': ['firmware.s19', 'patches/', 'patches\\settings.json', 'project.json'], 'removed': [], 'changed': []} | files holding the private marker: [] | active_document patches/settings.json
+   painted[G0 control (no swap)]: lines=3 codes=[] class_names=[] control_lines=0
+  G1 file swapped for a symlink: reopened 1 entries from C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s8a\runs\G_1793401971648116300\app\.s19tool\workarea\P\patches\settings.json
+     target diff {'created': ['firmware.s19', 'project.json'], 'removed': [], 'changed': []} | files holding the private marker: [] | active_document None
+     | Change document settings.json was not recorded in the project — its file is missing or is a link
+   painted[G1 file swapped for a symlink]: lines=4 codes=[] class_names=[] control_lines=0
+  G2 P/patches swapped for a junction (R18): reopened 1 entries from C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s8a\runs\G_1793401974679139700\app\.s19tool\workarea\P\patches\settings.json
+     target diff {'created': ['firmware.s19', 'project.json'], 'removed': [], 'changed': []} | files holding the private marker: [] | active_document None
+     | Change document settings.json was not recorded in the project — its file is missing or is a link
+   painted[G2 P/patches swapped for a junction (R18)]: lines=4 codes=[] class_names=[] control_lines=0
+  G3 P/patches junction, save into P: reopened 1 entries from C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s8a\runs\G_1793401977715045700\app\.s19tool\workarea\P\patches\settings.json
+     target diff {'created': ['firmware_1.s19', 'project.json.previous-20261030T231300Z'], 'removed': [], 'changed': ['project.json']} | files holding the private marker: [] | active_document None
+     | Change document settings.json was not recorded in the project — it is in the project but not in its patches folder
+     | Change document record patches/settings.json was dropped from project.json — its previous content is kept as project.json.previous-20261030T231300Z
+   painted[G3 P/patches junction, save into P]: lines=6 codes=[] class_names=[] control_lines=0
+== D DoS at the caps: Load handler + panel, Save project
+  D1 1 000 x 326 B (~1 MiB, ok): load handler 0.76s (to settled 1.64s), editor entries 1000, Save project 0.72s
+   painted[D1 1 000 x 326 B (~1 MiB, ok)]: lines=3 codes=[] class_names=[] control_lines=0
+  D2 1 000 overlapping: load handler 0.80s (to settled 1.70s), editor entries 1000, Save project 0.91s
+   painted[D2 1 000 overlapping]: lines=2 codes=[] class_names=[] control_lines=0
+  D3 20 000 entries (too_large): load handler 0.04s (to settled 1.05s), editor entries 0, Save project 0.43s
+   painted[D3 20 000 entries (too_large)]: lines=3 codes=[] class_names=[] control_lines=0
+  D4 1 MiB of [: load handler 0.04s (to settled 0.84s), editor entries 0, Save project 0.62s
+   painted[D4 1 MiB of []: lines=4 codes=[] class_names=[] control_lines=0
+# links created: 4 | reparse points left under runs/: []
+   painted[ALL]: lines=110 codes=[] class_names=[] control_lines=0
+exit=0

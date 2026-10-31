@@ -1,0 +1,17 @@
+# lane B2 baseline (unmutated copy) — cwd /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut8a-d
+# started 2026-10-30T23:09:05Z; source sha256[:16]: 8c627b717172ccd8 a638b23d2bb861b1 6f2d419ea0d2ee56 5f2ab3268d9cdc4d 
+# s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d\s19_app\__init__.py
+# command: python -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_save_guards.py::test_tc_b100_05_merge_carries_the_document_and_gathered tests/test_b100_save_guards.py::test_tc_b100_05_merge_drops_a_faulty_carried_document_with_one_line tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_held_document_with_one_line tests/test_b100_save_guards.py::test_tc_b100_05_r3_failed_write_carries_the_target_document tests/test_b100_save_guards.py::test_tc_b100_05_r5_refused_target_value_is_kept_aside_and_named tests/test_b100_save_guards.py::test_tc_b100_05_r15_placed_document_replaces_a_missing_carried_one_silently tests/test_b100_save_guards.py::test_tc_b100_05_r8_target_document_that_is_a_link_is_not_carried tests/test_b100_save_guards.py::test_tc_b100_05_r8_document_turned_into_a_link_before_the_check_is_dropped tests/test_b100_save_guards.py::test_tc_b100_05_r13_open_project_save_does_not_carry_gathered tests/test_b100_save_image.py::test_tc_b100_59_open_project_carry_sets_the_keys tests/test_b100_document.py::test_tc_b100_28_refused_value_is_a_keep_reason
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collected 16 items
+
+tests\test_b100_save_guards.py ...........                               [ 68%]
+tests\test_b100_save_image.py ....                                       [ 93%]
+tests\test_b100_document.py .                                            [100%]
+
+============================= 16 passed in 40.17s =============================
+# finished 2026-10-30T23:09:47Z

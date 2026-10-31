@@ -1,0 +1,28 @@
+# mutant M-I6  (ruling 3)
+# description: refused document stays manifest damaged
+# file: s19_app/tui/services/variant_execution_service.py
+# source sha256 before: 5f2ab3268d9cdc4dafdb696628313642438fd208cd3e3039c4059ad507510d09
+# edit 1 OLD:
+#   |             PROBLEM_NOT_READABLE
+#   |             if issue.details.get(_ISSUE_KEY) == _KEY_ACTIVE_DOCUMENT
+#   |             else PROBLEM_MANIFEST_DAMAGED,
+# edit 1 NEW:
+#   |             PROBLEM_MANIFEST_DAMAGED,
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_linked_document_is_one_not_readable_row tests/test_b100_document.py::test_tc_b100_30_refused_record_is_one_not_readable_row_and_no_reopen
+# started 2026-10-30T23:14:04Z  finished 2026-10-30T23:14:12Z  rc=1
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:1263: AssertionError: [('manifest damaged', 'patches/boost.json', 'the file is a link and is not opened - Save project rewrites it')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:1263: AssertionError: [('manifest damaged', 'patches/boost.json', 'the file is a link and is not opened - Save project rewrites it')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:1231: AssertionError: [('manifest damaged', 'firmware.s19', 'a recorded entry has the wrong shape - Save project rewrites it')]
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_30_linked_document_is_one_not_readable_row[recorded]
+FAILED tests/test_b100_document.py::test_tc_b100_30_linked_document_is_one_not_readable_row[unrecorded]
+FAILED tests/test_b100_document.py::test_tc_b100_30_refused_record_is_one_not_readable_row_and_no_reopen
+3 failed in 7.14s
+
+# pytest summary: 3 failed in 7.14s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 5f2ab3268d9cdc4dafdb696628313642438fd208cd3e3039c4059ad507510d09)

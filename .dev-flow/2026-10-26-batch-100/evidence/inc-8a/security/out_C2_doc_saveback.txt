@@ -1,0 +1,5 @@
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc8a\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+[doc only      save-back     ] {'bytes': 236860, 'longest path': 250, 'trigger->outcome s': 27.106, 'reads s': [], 'outcome': None} wall=30.3s
+     last statuses: ['Patched image not saved - 1001 entries blocked - see issues', '[CHG-COLLISION] error: change entry 0 at address 0x80000000 (326 bytes) collides with the entry at address 0x8000007C — ', '[CHG-COLLISION] error: change entry 1000 at address 0x8000007C (4 bytes) collides with the entry at address 0x80000000 —']
+exit=0

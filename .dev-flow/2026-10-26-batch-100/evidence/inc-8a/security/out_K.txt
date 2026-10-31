@@ -1,0 +1,7 @@
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc8a\s19_app\__init__.py
+fsutil: 0 6584595600\.s19tool\workarea is enabled. 
+work area entries: ['P', 'p']
+source in p, save into P (P/patches/x.json absent): ('in_home', 'x.json')
+source in p, save into P (P/patches/x.json present, other bytes): ('in_home', 'x.json')
+control, source in p, save into Q: ('outside', 'x.json')
+exit=0

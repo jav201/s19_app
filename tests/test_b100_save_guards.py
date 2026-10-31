@@ -73,6 +73,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -2054,7 +2055,11 @@ def test_tc_b100_07_rollback_keeps_the_previous_copy_unless_restored(
     copy is removed.
 
     RED (cp1 tree): the rollback deleted the first copy, the only file
-    still holding the previous bytes."""
+    still holding the previous bytes.
+
+    Re-pinned at Inc 8a cp1 (SEC8a-5): the restore no longer tries a second
+    copy when one already holds those bytes (2 claims → 1), and no line
+    says the previous content "could not be kept" while it is kept."""
     if block == "held" and os.name != "nt":
         pytest.skip("an open handle blocks a replace only on Windows (PDR C-QA-6)")
     base = tmp_path / "app"
@@ -2110,11 +2115,12 @@ def test_tc_b100_07_rollback_keeps_the_previous_copy_unless_restored(
         assert holding == ["project.json"], holding
         assert copies == [], copies
         return
-    assert len(keeps) == 2, keeps
+    assert len(keeps) == 1, keeps
     assert len(copies) == 1, copies
     assert holding == [copies[0].name], holding
     named = [m for m in messages if f"is kept as {copies[0].name}" in m]
     assert len(named) == 1, messages
+    assert not [m for m in messages if "could not be kept" in m], messages
 
 
 def test_tc_b100_07_gather_home_created_then_copy_fails_no_folder_left(
@@ -2393,3 +2399,312 @@ def test_at_b100_02_name_refusals_through_the_save_dialog(
     assert ab_digest_after == ab_digest_before, (
         "the refused save changed the not-open project ab"
     )
+
+
+
+# ---------------------------------------------------------------------------
+# TC-B100-05 Inc 8a arms (E4) — LLR-164.2: the merge and open-project carry
+# of ``active_document`` (and ``gathered`` for a merge), E3 R2 / R3 / R5 /
+# R8 refined / R10 / R15 / R16
+# ---------------------------------------------------------------------------
+
+_DOC_CODE = re.compile(r"\b(MF|CHG|MANIFEST|GATHER)-[A-Z0-9-]+")
+_DOC_CLASS = re.compile(r"\b[A-Z][A-Za-z]*(Error|Exception)\b")
+
+
+def _merge_into_ab(tmp_path: Path, *, body=b"", active_document=None, extra=None,
+                   paste: bool = False, before_save=None, timed: bool = False):
+    """Seed ``ab`` (not open) recording ``patches/boost.json`` (``body`` as
+    in ``seed_document_project``), load case_01's S19 in a fresh app,
+    optionally paste a 1-entry document, run ``before_save(app, ab)`` and
+    Save project ``ab``. Returns (messages, ab folder, save seconds)."""
+    from tests.support import b100_projects as docs
+
+    base = tmp_path / "app"
+    kwargs = {} if active_document is None else {"active_document": active_document}
+    ab = docs.seed_document_project(
+        base / ".s19tool" / "workarea", name="ab", body=body, extra=extra, **kwargs
+    )
+    src = _copy_source(tmp_path)
+
+    async def scenario(app, pilot, log):
+        await docs.load_image(pilot, app, src)
+        if paste:
+            app._change_service.add_entry("0x8000007C", "", "DE AD BE EF")
+        if before_save is not None:
+            before_save(app, ab)
+        start = time.perf_counter()
+        messages = await docs.save_project(pilot, app, log, "ab")
+        return messages, time.perf_counter() - start
+
+    messages, elapsed = docs.run_app(base, scenario)
+    return messages, ab, elapsed
+
+
+def _doc_lines(messages, needle: str = "patches/boost.json") -> list:
+    return [m for m in messages if needle in m]
+
+
+def _clean(messages) -> None:
+    text = "\n".join(messages)
+    assert _DOC_CODE.search(text) is None, text
+    assert _DOC_CLASS.search(text) is None, text
+
+
+def test_tc_b100_05_merge_carries_the_document_and_gathered(tmp_path: Path) -> None:
+    """``ab`` records ``gathered`` "patches/boost.json" and
+    ``active_document`` "patches/boost.json"; a merge with 0 session
+    entries → both carried, ``ab/patches/boost.json`` 0 bytes changed. The
+    pass-the-session's-``None`` mutant drops the key → RED."""
+    extra = {"gathered": {"patches": ["patches/boost.json"]}}
+
+    def _keep_bytes(app, ab):
+        _keep_bytes.before = (ab / "patches" / "boost.json").read_bytes()
+
+    messages, ab, _ = _merge_into_ab(tmp_path, extra=extra, before_save=_keep_bytes)
+    assert any(m.startswith("Saved project to") for m in messages), messages
+    written = json.loads((ab / "project.json").read_text(encoding="utf-8"))
+    assert written.get("active_document") == "patches/boost.json", written
+    assert "patches/boost.json" in written.get("gathered", {}).get("patches", []), written
+    assert (ab / "patches" / "boost.json").read_bytes() == _keep_bytes.before
+
+
+def test_tc_b100_05_merge_with_a_pasted_document_names_it(tmp_path: Path) -> None:
+    """A3-7: the same target, a pasted 1-entry session document →
+    ``ab/patches/changes.json`` written beside ``boost.json``,
+    ``active_document`` "patches/changes.json", ``gathered`` still holds
+    "patches/boost.json" (0 target entries dropped), ``boost.json``
+    unchanged."""
+    extra = {"gathered": {"patches": ["patches/boost.json"]}}
+    messages, ab, _ = _merge_into_ab(tmp_path, extra=extra, paste=True)
+    assert any(m.startswith("Saved project to") for m in messages), messages
+    assert (ab / "patches" / "changes.json").is_file()
+    written = json.loads((ab / "project.json").read_text(encoding="utf-8"))
+    assert written.get("active_document") == "patches/changes.json", written
+    assert "patches/boost.json" in written.get("gathered", {}).get("patches", []), written
+
+
+def test_tc_b100_05_r15_placed_document_replaces_a_missing_carried_one_silently(
+    tmp_path: Path,
+) -> None:
+    """E3 R15: the target's recorded document is missing, a pasted session
+    document is placed and replaces it → 0 drop lines about
+    "patches/boost.json"."""
+    messages, ab, _ = _merge_into_ab(tmp_path, body=None, paste=True)
+    assert any(m.startswith("Saved project to") for m in messages), messages
+    written = json.loads((ab / "project.json").read_text(encoding="utf-8"))
+    assert written.get("active_document") == "patches/changes.json", written
+    assert _doc_lines(messages) == [], messages
+
+
+@pytest.mark.parametrize("state", ["deleted", "unreadable"])
+def test_tc_b100_05_merge_drops_a_faulty_carried_document_with_one_line(
+    tmp_path: Path, state: str
+) -> None:
+    """E3 R2 / R8 refined: the target's document deleted, or holding
+    ``{`` → the merge drops the record and paints 1 line naming
+    "patches/boost.json" in user terms (0 codes, 0 class names). Mutants
+    carrying it → the next Load repeats the row → RED."""
+    body = None if state == "deleted" else b"{"
+    messages, ab, _ = _merge_into_ab(tmp_path, body=body)
+    assert any(m.startswith("Saved project to") for m in messages), messages
+    written = json.loads((ab / "project.json").read_text(encoding="utf-8"))
+    assert "active_document" not in written, written
+    assert len(_doc_lines(messages)) == 1, messages
+    _clean(_doc_lines(messages))
+
+
+def test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second(tmp_path: Path) -> None:
+    """E3 R10 / R8 refined: ``ab`` (never loaded) records a 20 000-entry
+    document → Save project completes under 1 s, the record kept, 0 lines
+    about it. Mutants: dropping ``too_large``; the check without caps
+    (over 1 s) → RED."""
+    from tests.support import b100_manifests
+
+    messages, ab, elapsed = _merge_into_ab(
+        tmp_path, body=b100_manifests.document_with_entries(20000)
+    )
+    assert any(m.startswith("Saved project to") for m in messages), messages
+    written = json.loads((ab / "project.json").read_text(encoding="utf-8"))
+    assert written.get("active_document") == "patches/boost.json", written
+    assert _doc_lines(messages) == [], messages
+    assert elapsed < 1.0, f"Save project took {elapsed:.3f} s"
+
+
+def test_tc_b100_05_merge_keeps_a_held_document_with_one_line(tmp_path: Path) -> None:
+    """E3 R8 refined / R16: the target's document held open by another
+    program during the save (``io_error``) → the record kept, 1 line naming
+    it with "could not be read"."""
+    if os.name != "nt":
+        pytest.skip("share-mode locks are a Windows-only test arm (PDR C-QA-6)")
+    from tests.support import b100_projects as docs
+
+    held = {}
+
+    def _hold(app, ab):
+        held["lock"] = docs.held_exclusively(ab / "patches" / "boost.json").__enter__()
+
+    try:
+        messages, ab, _ = _merge_into_ab(tmp_path, before_save=_hold)
+    finally:
+        if "lock" in held:
+            held["lock"].__exit__(None, None, None)
+    assert any(m.startswith("Saved project to") for m in messages), messages
+    written = json.loads((ab / "project.json").read_text(encoding="utf-8"))
+    assert written.get("active_document") == "patches/boost.json", written
+    lines = _doc_lines(messages)
+    assert len(lines) == 1 and "could not be read" in lines[0], messages
+
+
+def test_tc_b100_05_r3_failed_write_carries_the_target_document(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """E3 R3: a pasted document whose write is forced to fail in a merge →
+    the target's ``active_document`` carried, 1 line holding "not saved"
+    and "changes.json". The drop-after-failed-write mutant → RED."""
+    from s19_app.tui.changes import io as changes_io
+    from s19_app.validation.model import ValidationIssue, ValidationSeverity
+
+    def _refuse(*args, **kwargs):
+        return None, [ValidationIssue(code="MF-WRITE-CONTAINMENT", message="forced",
+                                      severity=ValidationSeverity.ERROR, artifact="change")]
+
+    monkeypatch.setattr(changes_io, "write_change_document", _refuse)
+    monkeypatch.setattr(app_module, "write_change_document", _refuse, raising=False)
+    messages, ab, _ = _merge_into_ab(tmp_path, paste=True)
+    assert any(m.startswith("Saved project to") for m in messages), messages
+    written = json.loads((ab / "project.json").read_text(encoding="utf-8"))
+    assert written.get("active_document") == "patches/boost.json", written
+    assert len([m for m in messages if "not saved" in m.lower() and "changes.json" in m]) == 1, messages
+
+
+def test_tc_b100_05_r5_refused_target_value_is_kept_aside_and_named(tmp_path: Path) -> None:
+    """E3 R5: ``ab`` records ``active_document`` "templates/x.json"
+    (refused by the reader) → ``project.json.previous-<UTC>`` kept, the
+    status names the copy and the dropped value, the new project.json has
+    no ``active_document``. The drop-with-no-copy mutant → RED."""
+    messages, ab, _ = _merge_into_ab(tmp_path, active_document="templates/x.json")
+    assert any(m.startswith("Saved project to") for m in messages), messages
+    kept = sorted(p.name for p in ab.iterdir() if p.name.startswith("project.json.previous-"))
+    assert len(kept) == 1, sorted(p.name for p in ab.iterdir())
+    named = [m for m in messages if kept[0] in m and "templates/x.json" in m]
+    assert len(named) == 1, messages
+    written = json.loads((ab / "project.json").read_text(encoding="utf-8"))
+    assert "active_document" not in written, written
+
+
+def test_tc_b100_05_r5_overlong_refused_value_is_clipped_in_the_status(tmp_path: Path) -> None:
+    """S3R2-7: a refused value of 100 000 characters → every status line
+    holds at most 120 characters of it; the copy is still named."""
+    messages, ab, _ = _merge_into_ab(tmp_path, active_document="a" * 100_000)
+    assert any(m.startswith("Saved project to") for m in messages), messages
+    longest = max((len(run) for m in messages for run in re.findall(r"a{20,}", m)), default=0)
+    assert longest <= 120, longest
+    kept = [p.name for p in ab.iterdir() if p.name.startswith("project.json.previous-")]
+    assert len(kept) == 1 and any(kept[0] in m and "a" * 20 in m for m in messages), messages
+
+
+# ---------------------------------------------------------------------------
+# E4 integration — the tester's named gaps (R-08 link at Save, R-33 / R13)
+# ---------------------------------------------------------------------------
+
+
+def _link_or_skip(link: Path, target: Path) -> None:
+    try:
+        os.symlink(target, link)
+    except (OSError, NotImplementedError):
+        pytest.skip("file symlinks need privilege on this platform (PDR C-QA-6)")
+
+
+def test_tc_b100_05_r8_target_document_that_is_a_link_is_not_carried(tmp_path: Path) -> None:
+    """R-08 / E3 R8 refined, end to end: ``ab``'s recorded document is a
+    symbolic link to a private file → the merge writes no
+    ``active_document`` (a link is never recorded again), names the value
+    once, in user terms, and the private file is untouched. The reader
+    refuses the link at its walk, so this is the R5 skipped-entry path:
+    ``project.json.previous-<UTC>`` is kept. A carry-as-recorded mutant
+    re-records the link → RED."""
+    private = tmp_path / "private.json"
+
+    def _swap(app, ab):
+        from tests.support import b100_projects as docs
+
+        private.write_bytes(docs.change_document_bytes())
+        target = ab / "patches" / "boost.json"
+        target.unlink()
+        _link_or_skip(target, private)
+        _swap.before = private.read_bytes()
+
+    messages, ab, _ = _merge_into_ab(tmp_path, before_save=_swap)
+    assert any(m.startswith("Saved project to") for m in messages), messages
+    written = json.loads((ab / "project.json").read_text(encoding="utf-8"))
+    assert "active_document" not in written, written
+    assert len(_doc_lines(messages)) == 1, messages
+    _clean(_doc_lines(messages))
+    assert private.read_bytes() == _swap.before
+
+
+def test_tc_b100_05_r8_document_turned_into_a_link_before_the_check_is_dropped(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """R-08 / E3 R8 refined, the classifier's own ``link`` branch: the
+    record passes the read, then the file is swapped for a symbolic link
+    before Save project classifies it (the read-to-check gap) → the record
+    is dropped with exactly 1 line naming "patches/boost.json" in user
+    terms (0 codes, 0 class names) and no ``project.json.previous-*`` (the
+    read accepted it). Dropping only ``missing`` / ``unreadable`` (the
+    pre-refinement set) carries the link → RED."""
+    import s19_app.tui.app as app_module
+
+    private = tmp_path / "private.json"
+    original = app_module.recorded_document_state
+    swapped: list = []
+
+    def _swap_then_classify(project_dir, text, a2l_context=None):
+        target = Path(project_dir) / text
+        if not swapped and not os.path.islink(target):
+            from tests.support import b100_projects as docs
+
+            private.write_bytes(docs.change_document_bytes())
+            target.unlink()
+            _link_or_skip(target, private)
+            swapped.append(target)
+        return original(project_dir, text, a2l_context)
+
+    monkeypatch.setattr(app_module, "recorded_document_state", _swap_then_classify)
+    messages, ab, _ = _merge_into_ab(tmp_path)
+    assert swapped, "vacuity guard: Save project never classified the carried record"
+    assert any(m.startswith("Saved project to") for m in messages), messages
+    written = json.loads((ab / "project.json").read_text(encoding="utf-8"))
+    assert "active_document" not in written, written
+    lines = _doc_lines(messages)
+    assert len(lines) == 1, messages
+    _clean(lines)
+    assert not [p for p in ab.iterdir() if p.name.startswith("project.json.previous-")]
+
+
+def test_tc_b100_05_r13_open_project_save_does_not_carry_gathered(tmp_path: Path) -> None:
+    """R-33 / E3 R13: ``gathered`` is carried for a merge only. ``P``
+    records ``gathered`` "patches/boost.json"; Load P and Save project
+    into P with no new gather → the written ``gathered`` does not hold the
+    old row (an open-project save records this save's rows only), while
+    ``active_document`` is still carried (the vacuity guard: the carry ran).
+    The carry-gathered-on-every-save mutant keeps the row → RED."""
+    from tests.support import b100_projects as docs
+
+    base = tmp_path / "app"
+    docs.seed_document_project(
+        base / ".s19tool" / "workarea",
+        extra={"gathered": {"patches": ["patches/boost.json"]}},
+    )
+
+    async def scenario(app, pilot, log):
+        await docs.load_project(pilot, app, "P")
+        return await docs.save_project(pilot, app, log, "P")
+
+    messages = docs.run_app(base, scenario)
+    assert any(m.startswith("Saved project to") for m in messages), messages
+    project_dir = base / ".s19tool" / "workarea" / "P"
+    written = json.loads((project_dir / "project.json").read_text(encoding="utf-8"))
+    assert written.get("active_document") == "patches/boost.json", written
+    assert "patches/boost.json" not in written.get("gathered", {}).get("patches", []), written

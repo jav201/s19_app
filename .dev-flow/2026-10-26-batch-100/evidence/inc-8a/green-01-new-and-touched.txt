@@ -1,0 +1,34 @@
+# GREEN 01 — new and touched requirements — batch-100 Inc 8a (E4 integration)
+# UTC start: 2026-10-30T22:35:32Z
+# cwd: /c/Users/jjgh8/Github/s19_app-b100-inc8a  (branch b100-inc8a, base dc3b314, uncommitted tree)
+# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc8a
+# NO_COLOR state: unset (env -u NO_COLOR)
+# s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc8a\s19_app\__init__.py
+# sources sha256[:16]:
+#   8c627b717172ccd8  s19_app/tui/app.py
+#   a638b23d2bb861b1  s19_app/tui/services/manifest_writer.py
+#   5f2ab3268d9cdc4d  s19_app/tui/services/variant_execution_service.py
+#   6f2d419ea0d2ee56  s19_app/tui/services/project_gather_service.py
+# command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc8a C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=short -rfE tests/test_b100_document.py tests/test_b100_project_check.py tests/test_b100_save_image.py tests/test_b100_save_guards.py tests/test_b100_active_variant.py tests/test_b100_announce.py tests/test_variant_execution.py tests/test_manifest_writer.py tests/test_manifest_verify.py tests/test_project_gather.py tests/test_tui_manifest_save.py tests/test_b100_reuse.py tests/test_b99_staging.py tests/test_b100_session_reset.py tests/test_tui_variants.py tests/test_id_registry.py
+
+........................................................................ [ 11%]
+........................................................................ [ 22%]
+........................................................................ [ 33%]
+........................................................................ [ 44%]
+........................................................................ [ 55%]
+........................................................................ [ 67%]
+........................................................................ [ 78%]
+........................................................................ [ 89%]
+..............................................................F.....     [100%]
+================================== FAILURES ===================================
+____________ test_tc607_scanned_corpus_matches_the_declared_bound _____________
+tests\test_id_registry.py:577: in test_tc607_scanned_corpus_matches_the_declared_bound
+    assert actual == EXPECTED_SCANNED_TEST_FILES, (
+E   AssertionError: the guard scanned 225 test modules, not the declared 224. If tests/ legitimately grew, bump EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a decision rather than a rubber stamp.
+E   assert 225 == 224
+=========================== short test summary info ===========================
+FAILED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+1 failed, 643 passed in 1508.70s (0:25:08)
+
+# pytest exit code: 1
+# UTC end: 2026-10-30T23:00:43Z

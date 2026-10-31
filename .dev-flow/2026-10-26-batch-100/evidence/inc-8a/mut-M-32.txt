@@ -1,0 +1,22 @@
+# mutant M-32  (LLR-169.4)
+# description: the exception widened to any key under a document home
+# file: s19_app/tui/services/variant_execution_service.py
+# source sha256 before: 5f2ab3268d9cdc4dafdb696628313642438fd208cd3e3039c4059ad507510d09
+# edit 1 OLD:
+#   |     if document is not None and key == document:
+# edit 1 NEW:
+#   |     if document is not None and key.split("/")[0] in ACTIVE_DOCUMENT_HOMES:
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_project_check.py::test_tc_b100_24_files_key_of_the_active_document_is_read
+# started 2026-10-30T23:13:27Z  finished 2026-10-30T23:13:29Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_project_check.py:1616: AssertionError: {WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30675/test_tc_b100_24_files_key_of_t0/app/.s19t.../patches/other.json'): FileRecord(size=227, sha256='98342328aced63e7a37f6907cc9a51d03c0c252f3cfb7a9e23f9e7e48af24535')}
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_check.py::test_tc_b100_24_files_key_of_the_active_document_is_read
+1 failed in 0.60s
+
+# pytest summary: 1 failed in 0.60s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 5f2ab3268d9cdc4dafdb696628313642438fd208cd3e3039c4059ad507510d09)

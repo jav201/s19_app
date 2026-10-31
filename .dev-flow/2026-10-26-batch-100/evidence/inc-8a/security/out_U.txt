@@ -1,0 +1,75 @@
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc8a\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+== U1 hostile documents under / at the caps
+  U1a 1 MiB of [                     bytes= 1048576 outcome=unreadable detail='RecursionError' entries=- t=0.006s
+  U1b entries + 1e6 [                bytes= 1000011 outcome=unreadable detail='RecursionError' entries=- t=0.005s
+  U1c 5000-digit int                 bytes=    5042 outcome=unreadable detail='ValueError' entries=- t=0.001s
+  U1d entries: 5                     bytes=      14 outcome=unreadable detail='no entries list at the top level' entries=- t=0.001s
+  U1e 1 MiB + 1 byte                 bytes= 1048577 outcome=too_large detail='1048577 bytes' entries=- t=0.000s
+  U1f 20 000 entries                 bytes= 1120112 outcome=too_large detail='1120112 bytes' entries=- t=0.000s
+  U1g 1 001 tiny entries             bytes=   17129 outcome=too_large detail='1001 entries' entries=- t=0.006s
+  U1h 1 000 x 326 B disjoint         bytes= 1028112 outcome=ok detail='' entries=1000 t=0.171s
+  U1i 1 000 x 326 B overlapping      bytes= 1028112 outcome=ok detail='' entries=1000 t=0.197s
+  U1j 1 000 symbol entries no A2L    bytes=   69002 outcome=ok detail='' entries=0 t=0.010s
+  U1k UTF-16 BOM document            bytes=     228 outcome=ok detail='' entries=0 t=0.009s
+  U1l UTF-8 BOM document             bytes=     168 outcome=ok detail='' entries=1 t=0.010s
+  U1m deep nested object in entry    bytes=    1963 outcome=ok detail='' entries=1 t=0.006s
+  U1n 999 deep nesting value         bytes=  400153 outcome=unreadable detail='RecursionError' entries=- t=0.008s
+== U2 parse fuzz: per-field hostile values (only exceptions outside the catch set matter)
+  documents parsed: 4466; exception classes escaping the classifier's catch set: {}
+== U3 links, held file, swap between lstat and open
+  U3a home is a junction -> link
+  U3b file is a symlink -> link
+  U3c held (share mode 0) -> io_error PermissionError
+  U3d a folder named boost.json -> unreadable
+  U3e patches is a file -> unreadable
+  U3f home swapped for a junction after the lstat checks -> ok, entries ['0x90000000'] (0x90000000 = the private file was read; ruling 11 window)
+  U3g file grown to 1120112 B after the size check -> too_large (grew past the cap) t=0.006s
+  U3h form('patches/CON.json')=True state=missing
+  U3h form('patches/NUL.json')=True state=missing
+  U3h form('patches/COM1.json')=True state=missing
+  U3h form('patches/AUX.json')=True state=missing
+  U3h form('patches/con.json')=True state=missing
+  U3h form('patches/CONIN$.json')=True state=missing
+  U3h form('patches/boost.json::$DATA')=False state=-
+== U4 writer/reader symmetry of active_document
+  OK  'patches/boost.json'                         writer=accept     reader=accept  []
+  OK  'patches/BOOST.JSON'                         writer=accept     reader=accept  []
+  OK  'patches/boost.JSON'                         writer=accept     reader=accept  []
+  OK  'checks/a.json'                              writer=accept     reader=accept  []
+  OK  'templates/a.json'                           writer=refuse(1)  reader=refuse  ['MANIFEST-BAD-STRUCTURE']
+  OK  'Patches/boost.json'                         writer=refuse(1)  reader=refuse  ['MANIFEST-BAD-STRUCTURE']
+  OK  'patches/a/b.json'                           writer=refuse(1)  reader=refuse  ['MANIFEST-BAD-STRUCTURE']
+  OK  '../patches/a.json'                          writer=refuse(1)  reader=refuse  ['MANIFEST-PATH-ESCAPE']
+  OK  '/patches/a.json'                            writer=refuse(1)  reader=refuse  ['MANIFEST-PATH-ESCAPE']
+  OK  'patches\\a.json'                            writer=refuse(1)  reader=refuse  ['MANIFEST-BAD-STRUCTURE']
+  OK  'patches/a.json\x1b'                         writer=refuse(1)  reader=refuse  ['MANIFEST-BAD-STRUCTURE']
+  OK  'patches/a\x85.json'                         writer=refuse(1)  reader=refuse  ['MANIFEST-BAD-STRUCTURE']
+  OK  'patches/a\x7f.json'                         writer=refuse(1)  reader=refuse  ['MANIFEST-BAD-STRUCTURE']
+  OK  'patches/.json'                              writer=refuse(1)  reader=refuse  ['MANIFEST-BAD-STRUCTURE']
+  OK  'patches/ .json'                             writer=accept     reader=accept  []
+  OK  'patches/a.json '                            writer=refuse(1)  reader=refuse  ['MANIFEST-PATH-ESCAPE']
+  OK  'patches/a.json.'                            writer=refuse(1)  reader=refuse  ['MANIFEST-PATH-ESCAPE']
+  OK  'patches/CON.json'                           writer=refuse(1)  reader=refuse  ['MANIFEST-PATH-ESCAPE']
+  OK  'patches/a:b.json'                           writer=refuse(1)  reader=refuse  ['MANIFEST-PATH-ESCAPE']
+  OK  'patches/a?.json'                            writer=refuse(1)  reader=refuse  ['MANIFEST-PATH-ESCAPE']
+  OK  'patches/a*.json'                            writer=refuse(1)  reader=refuse  ['MANIFEST-PATH-ESCAPE']
+  OK  'patches/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'   writer=accept     reader=accept  []
+  OK  'patches/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'   writer=refuse(1)  reader=refuse  ['MANIFEST-PATH-ESCAPE']
+  OK  'patches/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'   writer=refuse(1)  reader=refuse  ['MANIFEST-PATH-ESCAPE']
+  OK  ''                                           writer=refuse(1)  reader=refuse  ['MANIFEST-BAD-STRUCTURE']
+  OK  'patches/'                                   writer=refuse(1)  reader=refuse  ['MANIFEST-BAD-STRUCTURE']
+  OK  '7'                                          writer=refuse(1)  reader=refuse  ['MANIFEST-BAD-STRUCTURE']
+  OK  'None'                                       writer=refuse(0)  reader=refuse  []
+  OK  "['patches/a.json']"                         writer=refuse(1)  reader=refuse  ['MANIFEST-BAD-STRUCTURE']
+  OK  'patches/\u202eosj.exe.json'                 writer=accept     reader=accept  []
+== U5 classify_active_document
+  U5a regular source, save into Q -> ('outside', 'settings.json')
+  U5a' regular source, save into P -> ('in_home', 'settings.json')
+  U5b source is a file symlink, into Q -> ('missing', None)
+  U5c P/patches is a junction (R18), into Q -> ('missing', None)
+  U5c' same, into P -> ('inside_elsewhere', None)
+  U5d source outside any work area via a junction folder -> ('outside', 'settings.json')
+  U5e upper-case spelling of the junctioned source, into Q -> ('missing', None)
+# links left in runs/: []
+exit=0
