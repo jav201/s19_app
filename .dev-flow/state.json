@@ -211,6 +211,11 @@
       "station": "P3",
       "date": "2026-10-30",
       "decision": "P3 increment 007 approved under the batch's standing authorization (code-reviewer r2 PASS-WITH-NOTES, security-reviewer r2 PASS-WITH-NOTES); corrective pass 2 verification cut by the operator, census/guards/probes/round-3 review deferred to Inc 8a (LED .70); Inc 8a runs as the design-first experiment (experiment-8a/PLAN.md)."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-30",
+      "decision": "P3 increment 008 (Inc 8a) approved under the batch's standing authorization (code-reviewer r2 PASS-WITH-NOTES, security-reviewer PASS-WITH-NOTES; design reviewed code-free in 3 rounds); run as the design-first experiment (experiment-8a/); per-increment test scope = new/modified requirements + guards, full battery at batch end (LED .75)."
     }
   ],
   "obsidian_synced": false,

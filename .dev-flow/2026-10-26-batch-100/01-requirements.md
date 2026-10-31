@@ -480,7 +480,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### HLR-170 — The change document is saved and reopened with the project
 - **Traceability:** US-160
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.42, LED-2026-10-26-batch-100.72, LED-2026-10-26-batch-100.74
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.42, LED-2026-10-26-batch-100.72, LED-2026-10-26-batch-100.74, LED-2026-10-26-batch-100.75
 - **Statement:** When Save project runs while the Patch Editor holds a document — a pasted document with at least one entry, or a file-backed document whatever its entry count (E3 R9) — the system shall place that document in the project's `patches/` (or `checks/` by kind) — a document that has no file is written by the app as `changes.json` in the home for its kind through the M-1 rule, landing as `changes_<N>.json` when a different `changes.json` is there — and record the landed project-relative path as `active_document` in `project.json`. When the project is loaded, the system shall reopen that document in the Patch Editor after the project's A2L is attached. If the recorded document is missing, unreadable, outside `patches/` or `checks/`, or not a `.json` file, then the load shall continue and list the problem. If the document cannot be written or placed, then Save project shall complete without it, record no `active_document` of its own (a merge or an open-project save carries the target's value, LLR-164.2; E3 R3) and name the unsaved document in the status.
 - **Rationale (informative):** the gathered document is not reopened and a pasted one is not saved (P-8). D4 = `reabrir`; Q-5; A-12 (the app writes, the gather only places); S-11 (the reader enforces the writer's rule).
 - **Validation:** `test`
@@ -716,7 +716,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-164.2 — Q-2: clash, merge and the open project
 - **Traceability:** HLR-164
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.5, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.22, LED-2026-10-26-batch-100.23, LED-2026-10-26-batch-100.52, LED-2026-10-26-batch-100.72, LED-2026-10-26-batch-100.73, LED-2026-10-26-batch-100.74
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.5, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.22, LED-2026-10-26-batch-100.23, LED-2026-10-26-batch-100.52, LED-2026-10-26-batch-100.72, LED-2026-10-26-batch-100.73, LED-2026-10-26-batch-100.74, LED-2026-10-26-batch-100.75
 - **Statement:** `_handle_save_dialog` shall decide by Q-2. A project is a direct child of this work area holding a `project.json` or a data file, not a reserved home and not a link. (a) A disguised clash — the sanitised name equals a project's folder name compared case-folded while the typed name differs from it — shall be refused before writing, with the `already a project` and `choose another name` tokens naming both names. (b) A name equal to a project that is not open shall merge: it keeps the target's other keys and variants, adds the new files as variants (LLR-005.1), rewrites `project.json` through the seam carrying every key it does not own (the LLR-168.3 rule), and sets `active_variant` per D2; sub-folders and the target's document file are untouched (a session document is placed beside it and recorded, HLR-170); if the merge fails, the files it placed are removed and listed in the status. (c) A name equal to the open project, typed exactly or as its unsanitised form, shall save into the open project. A target folder that is a link or junction is refused before `resolve()` with the `link or junction` tokens. The completed save's status shall name the folder written.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-05 — `pytest tests/test_b100_save_guards.py -k tc_b100_05`
@@ -876,7 +876,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-167.8 — Save project clears the Patch Editor's dirty flag
 - **Traceability:** HLR-167
-- **Ledger:** LED-2026-10-26-batch-100.17, LED-2026-10-26-batch-100.61, LED-2026-10-26-batch-100.72, LED-2026-10-26-batch-100.73
+- **Ledger:** LED-2026-10-26-batch-100.17, LED-2026-10-26-batch-100.61, LED-2026-10-26-batch-100.72, LED-2026-10-26-batch-100.73, LED-2026-10-26-batch-100.75
 - **Statement:** When a Save project completes after the app wrote the editor's document into the project (LLR-170.2), `_handle_save_dialog` shall clear the Patch Editor panel's dirty flag through `PatchEditorPanel.mark_saved` (`screens_directionb.py`); a refused or rolled-back save, a failed document write, and a file-backed document copied or recorded as on disk while the panel holds unsaved edits leave the flag set, because no file on disk holds those edits (LED .61). `ChangeService.mark_saved` runs after every completed Save project (LLR-167.5).
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-70 — `pytest tests/test_b100_save_image.py -k tc_b100_70`
@@ -906,7 +906,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-168.3 — Every in-project writer rewrites the manifest, carrying every key it does not own
 - **Traceability:** HLR-168
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.16, LED-2026-10-26-batch-100.67
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.16, LED-2026-10-26-batch-100.67, LED-2026-10-26-batch-100.75
 - **Statement:** The Load-file variant append and the MAC and A2L syncs (`app.py:8591`, `:8622`, `:8630`, `:8652`) shall place their files through `place_into_workarea` and each end in `_write_and_verify_manifest`, passing every key of the existing manifest they do not change — `batch`, `assignments`, `declared_regions`, `gathered`, `active_document`, `derived_from` — converted from the reader's absolute paths back to project-relative POSIX strings. The variant append shall make the appended file active and paint a status line naming the project and the file it now opens.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-20 — `pytest tests/test_b100_active_variant.py -k tc_b100_20`
@@ -936,7 +936,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-169.2 — The seam computes `files` from disk, over the O-2 scope
 - **Traceability:** HLR-169
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.72
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.72, LED-2026-10-26-batch-100.75
 - **Statement:** `_write_and_verify_manifest` (`app.py:8272`) shall compute `files` itself, after every copy has landed, over the top-level regular files whose suffix is in `PROJECT_DATA_EXTENSIONS | A2L_EXTENSIONS` (`workspace.py:75-77`, `.srec` and `.ihex` included) and the active document, and over no file under a sub-folder.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-22 — `pytest tests/test_b100_project_check.py -k tc_b100_22`
@@ -946,7 +946,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-169.3 — Verify covers the new keys
 - **Traceability:** HLR-169
-- **Ledger:** LED-2026-10-26-batch-100.33, LED-2026-10-26-batch-100.72
+- **Ledger:** LED-2026-10-26-batch-100.33, LED-2026-10-26-batch-100.72, LED-2026-10-26-batch-100.75
 - **Statement:** `verify_written_manifest` (`manifest_writer.py:632`) shall include `files`, `active_document` and `derived_from` — the keys the B100-I1 envelope adds — in its drift domain (today `:717-723`).
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-23 — `pytest tests/test_b100_project_check.py -k tc_b100_23`
@@ -956,7 +956,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-169.4 — The reader treats `project.json` as untrusted (C6)
 - **Traceability:** HLR-169
-- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.29, LED-2026-10-26-batch-100.71, LED-2026-10-26-batch-100.72
+- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.29, LED-2026-10-26-batch-100.71, LED-2026-10-26-batch-100.72, LED-2026-10-26-batch-100.75
 - **Statement:** `read_project_manifest` shall read at most 1 MiB of `project.json` (an excess gives one `MANIFEST-SIZE-CAP`), parse at most 1 000 entries in each of `batch`, `declared_regions`, `gathered`, `files` and `derived_from`, and at most 1 000 entries in total across all `assignments` lists with at most 1 000 `assignments` keys (an excess gives one `MANIFEST-BAD-STRUCTURE`), and parse `files` into `dict[Path, FileRecord]`. A `files` key passes the manifest-key predicate (LLR-169.8) or gives one `MANIFEST-PATH-ESCAPE`; a contained key outside the scope (not a top-level name with a project data or A2L suffix, and not `active_document`) gives one `MANIFEST-BAD-STRUCTURE`. A record whose `size` is not an `int` ≥ 0 (a `bool` included) or whose `sha256` is not 64 hex characters gives one `MANIFEST-BAD-STRUCTURE`. Every refused record is skipped; an absent key gives an empty dict and no issue. These codes go to the log; the panel words them in user terms (LLR-169.9).
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-24 — `pytest tests/test_b100_project_check.py -k tc_b100_24`
@@ -966,7 +966,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-169.5 — `check_project_files`: manifest and disk problems
 - **Traceability:** HLR-169
-- **Ledger:** LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.72, LED-2026-10-26-batch-100.73
+- **Ledger:** LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.72, LED-2026-10-26-batch-100.73, LED-2026-10-26-batch-100.75
 - **Statement:** `check_project_files(project_dir, manifest) -> list[ProjectFileProblem]` (NEW, `manifest_writer.py`) shall return manifest and disk problems only: `manifest damaged` (`MANIFEST-JSON-PARSE`, `-SIZE-CAP`, top-level `-BAD-STRUCTURE`, an over-cap record count), `no project.json`, `missing` (a recorded file absent), `changed on disk` (size or digest differs; only `S_ISREG` files are hashed, any other type is `not readable`), `not recorded` (a top-level data or A2L file absent from a present `files`), and `no digests saved` (no `files` key). It shall never raise, and shall not parse images.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-25 — `pytest tests/test_b100_project_check.py -k tc_b100_25`
@@ -1016,7 +1016,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-170.1 — The `active_document` key
 - **Traceability:** HLR-170
-- **Ledger:** LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.72
+- **Ledger:** LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.72, LED-2026-10-26-batch-100.75
 - **Statement:** The `active_document` manifest key shall hold one project-relative POSIX path with a `patches/` or `checks/` prefix and a `.json` suffix, enforced by one predicate at both ends (S-11): `serialize_manifest` emits the key only when set and refuses the whole serialize (no text, one write finding) for a value outside that form or refused by `_reject_unsafe_entry`; `read_project_manifest` accepts it through `_resolve_manifest_entry` (manifest-keys mode) only in that form, and otherwise gives one issue and `None` and reads the rest of the manifest. The key is a known top-level key (`KNOWN_MANIFEST_KEYS`), so a manifest holding it is carried by an in-project rewrite, not refused as holding unknown keys (SEC6-2).
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-28 — `pytest tests/test_b100_document.py -k tc_b100_28`
@@ -1026,7 +1026,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-170.2 — The app writes a pasted document; the gather places
 - **Traceability:** HLR-170
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.72, LED-2026-10-26-batch-100.73, LED-2026-10-26-batch-100.74
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.72, LED-2026-10-26-batch-100.73, LED-2026-10-26-batch-100.74, LED-2026-10-26-batch-100.75
 - **Statement:** When Save project runs while the Patch Editor holds a document with at least one entry and no `source_path`, `_handle_save_dialog` shall write it through `write_change_document` (`changes/io.py`) into the home for its kind (`patches/`, or `checks/` for a check document) as `changes.json` — placed by the M-1 rule, so an identical `changes.json` is reused and a different one gives `changes_<N>.json` — and pass the landed path to `gather_project_artifacts` (`project_gather_service.py`) as the active document, which only places files (a file already in its home is reused, and still named) and whose `GatherOutcome` names the landed project-relative path. A write that fails leaves the save to complete with no document placed, no `active_document` of its own recorded (a merge or an open-project save carries the target's value, LLR-164.2; E3 R3) and one status line naming the document as not saved; a failure later in the same save removes a document this save created (it joins the save's placed files).
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-29 — `pytest tests/test_b100_document.py -k tc_b100_29`
@@ -1036,7 +1036,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-170.3 — Load reopens the document after the A2L
 - **Traceability:** HLR-170
-- **Ledger:** LED-2026-10-26-batch-100.72, LED-2026-10-26-batch-100.73, LED-2026-10-26-batch-100.74
+- **Ledger:** LED-2026-10-26-batch-100.72, LED-2026-10-26-batch-100.73, LED-2026-10-26-batch-100.74, LED-2026-10-26-batch-100.75
 - **Statement:** When a project whose `project.json` records an accepted `active_document` (LLR-170.1) is loaded, `_handle_load_project` shall end with exactly one of two outcomes for that document: it is loaded into the session's `ChangeService`, parsed with the project's A2L context (`a2l_context`, so symbol entries resolve against the project's A2L; E3 R10: the parse of the classifier's bytes, not a second read through `ChangeService.load`), after that A2L is loaded (with no context when the project has no A2L), the Patch Editor lists its entries and its dirty flag is clear; or, if the file cannot be read or does not parse as a change or check document, the Patch Editor holds no document, the load adds one `not readable` problem naming the file with its reason in user terms, and the load continues. A missing document is not reported here: `check_project_files` owns `missing` for it (LLR-169.5, the recorded `active_document` counts as a recorded file), and LLR-169.9's merge keeps one problem per file. A document that parses with entry issues (an unresolved symbol, a blocked entry) is loaded and shows them; that is not a load problem. The file is read once through one classifier shared with Save project (E3 R10): `lstat` of the home and the file (a link → not readable), the 1 MiB byte cap, one bounded read, a guarded decode of those bytes and the entry count (only when `entries` is a list; more than 1 000 → too large; not a list → not readable), then the parse of the same bytes; a decode or parse exception (`JSONDecodeError`, `RecursionError`, `UnicodeDecodeError`, `ValueError`, `TypeError`) is `not readable`, never a raise, and an `OSError` on the read is `not readable` ("could not be read now"). The record stays in `project.json` in every case; only Save project drops it (LLR-164.2).
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-30 — `pytest tests/test_b100_document.py -k tc_b100_30`
