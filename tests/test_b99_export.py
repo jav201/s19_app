@@ -48,9 +48,9 @@ import pytest
 
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.segment_split_view import SegRow
-from s19_app.tui.screens import LoadProjectScreen
 from tests.support.independent_reader import read_hex, read_s19
 from tests.support.b100_projects import dismiss_load_result_panel
+from tests.support.b100_load_dialog import highlight_row, is_load_dialog
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE00 = ROOT / "examples" / "case_00_public"
@@ -956,23 +956,16 @@ async def _open_split_join_window(app: S19TuiApp, pilot) -> None:
 
 
 async def _load_project_pilot(app: S19TuiApp, pilot, name: str) -> None:
-    """Load a project through the Load project dialog (rail key ``p``)."""
-    from textual.widgets import Label
+    """Load a project through the Load dialog (rail key ``p``)."""
 
     await pilot.press("p")
     await _wait_for(
         pilot,
-        lambda: isinstance(app.screen, LoadProjectScreen),
-        "the Load project dialog",
+        lambda: is_load_dialog(app.screen),
+        "the Load dialog",
     )
-    row = next(
-        row
-        for row in app.screen.query("#project_list ListItem")
-        if name in str(row.query_one(Label).render())
-    )
-    await pilot.click(row)
-    await pilot.pause()
-    assert await pilot.click("#project_ok"), "click missed #project_ok"
+    await highlight_row(pilot, app, name)
+    assert await pilot.click("#load_ok"), "click missed #load_ok"
     await _wait_for(
         pilot,
         lambda: f"Loaded project '{name}'" in _status_text(app),
@@ -1064,9 +1057,9 @@ def test_at_b99_11_sanitised_mac_only_second_export_takes_suffix(
             await pilot.press("l")
             await _wait_for(
                 pilot,
-                lambda: "LoadFileScreen" in type(app.screen).__name__
+                lambda: is_load_dialog(app.screen)
                 and len(app.screen.query("#load_path")) > 0,
-                "the Load file dialog",
+                "the Load dialog",
             )
             assert await pilot.click("#load_path"), "click missed #load_path"
             await pilot.press(*str(mac_src))
@@ -1251,9 +1244,9 @@ def test_tc_b99_41_part_way_failure_status_names_the_first_file(
             await pilot.press("l")
             await _wait_for(
                 pilot,
-                lambda: "LoadFileScreen" in type(app.screen).__name__
+                lambda: is_load_dialog(app.screen)
                 and len(app.screen.query("#load_path")) > 0,
-                "the Load file dialog",
+                "the Load dialog",
             )
             assert await pilot.click("#load_path"), "click missed #load_path"
             await pilot.press(*str(src))

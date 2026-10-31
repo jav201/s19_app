@@ -36,8 +36,6 @@ from textual.widgets import Label
 
 from s19_app.tui import workspace as workspace_mod
 from s19_app.tui.app import S19TuiApp
-from s19_app.tui.screens import LoadFileScreen
-from s19_app.tui.screens import LoadProjectScreen
 from s19_app.tui.segment_split_view import SegRow
 from s19_app.tui.segment_split_view import write_split_join_export
 from s19_app.tui.services.project_gather_service import _gather_copy
@@ -57,6 +55,7 @@ from s19_app.tui.workspace import (
 from tests.support import b100_links
 from tests.support.independent_reader import read_s19
 from tests.support.b100_projects import dismiss_load_result_panel
+from tests.support.b100_load_dialog import highlight_row, is_load_dialog
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE01 = ROOT / "examples" / "case_01_basic_valid" / "firmware.s19"
@@ -1287,21 +1286,16 @@ def test_tc_b100_68_forced_claim_between_prediction_and_placement(
 
 
 async def _open_project(pilot, app: S19TuiApp, name: str) -> None:
-    """Open a project through the Load project dialog: rail key ``p``,
-    click the named row, confirm with ``#project_ok``."""
+    """Open a project through the Load dialog: rail key ``p``, move the
+    highlight to the named row, confirm with ``#load_ok``."""
     await pilot.press("p")
     await _wait_for(
         pilot,
-        lambda: isinstance(app.screen, LoadProjectScreen),
-        "the Load project dialog",
+        lambda: is_load_dialog(app.screen),
+        "the Load dialog",
     )
-    row = next(
-        item
-        for item in app.screen.query("#project_list ListItem")
-        if str(item.query_one(Label).render()) == name
-    )
-    await pilot.click(row)
-    assert await pilot.click("#project_ok"), "click missed #project_ok"
+    await highlight_row(pilot, app, name)
+    assert await pilot.click("#load_ok"), "click missed #load_ok"
     await _wait_for(
         pilot,
         lambda: f"Loaded project '{name}'" in _status_text(app),
@@ -1323,8 +1317,8 @@ async def _load_file_through_dialog(pilot, app: S19TuiApp, src: Path) -> None:
     await pilot.press("l")
     await _wait_for(
         pilot,
-        lambda: isinstance(app.screen, LoadFileScreen),
-        "the Load file dialog",
+        lambda: is_load_dialog(app.screen),
+        "the Load dialog",
     )
     assert await pilot.click("#load_path"), "click missed #load_path"
     await pilot.press("ctrl+a")
@@ -1333,7 +1327,7 @@ async def _load_file_through_dialog(pilot, app: S19TuiApp, src: Path) -> None:
     assert await pilot.click("#load_ok"), "click missed #load_ok"
     await _wait_for(
         pilot,
-        lambda: not isinstance(app.screen, LoadFileScreen)
+        lambda: not is_load_dialog(app.screen)
         and _file_status_text(app).startswith("Loaded "),
         f"the durable load line after loading {src.name}",
     )

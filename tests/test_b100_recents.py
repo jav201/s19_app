@@ -45,6 +45,7 @@ import io
 import json
 import logging
 import os
+import pathlib
 import random
 import shutil
 import sys
@@ -2642,7 +2643,7 @@ def _raise_permission(*args, **kwargs):
     [
         "route: walk lstat",
         "route: list_projects",
-        "route: validate_project_files",
+        "route: _list_project_files",
         "project load: list_projects",
     ],
 )
@@ -2651,9 +2652,12 @@ def test_tc_b100_38_unreadable_folder_paints_could_not_be_read(
 ) -> None:
     """LLR-172.5 family, the four ``OSError`` arms (E5 CR9-6): a
     ``PermissionError`` injected into the typed route's ``os.lstat`` of
-    ``<workarea>/ab``, its ``list_projects``, its
-    ``validate_project_files`` (project ``cd`` holds a data file and no
-    ``project.json``), and ``_handle_load_project``'s ``list_projects`` →
+    ``<workarea>/ab``, its ``list_projects``, its project-folder listing
+    (project ``cd`` holds a data file and no ``project.json``; Inc 9b
+    re-pin A9b-R3-1: the listing is ``_list_project_files``, which replaced
+    ``validate_project_files`` on this route, R2-N2/R2-N4 — the folder is
+    listed fail-open and the route's step 11 refuses it ``unreadable``),
+    and ``_handle_load_project``'s ``list_projects`` →
     0 raises, 0 project loads, 0 session resets, 1 line holding ``could not
     be read`` and ``check that the folder can be opened, then load again``.
 
@@ -2663,7 +2667,7 @@ def test_tc_b100_38_unreadable_folder_paints_could_not_be_read(
     workarea = _workarea(base)
     (workarea / "cd").mkdir()
     shutil.copyfile(projects.CASE01_DIR / "firmware.s19", workarea / "cd" / "firmware.s19")
-    target = workarea / ("cd" if arm == "route: validate_project_files" else "ab")
+    target = workarea / ("cd" if arm == "route: _list_project_files" else "ab")
     real_lstat = os.lstat
     key = os.path.normcase(str(target))
 
@@ -2678,8 +2682,8 @@ def test_tc_b100_38_unreadable_folder_paints_could_not_be_read(
         with monkeypatch.context() as patch:
             if arm == "route: walk lstat":
                 patch.setattr(app_module.os, "lstat", _lstat)
-            elif arm == "route: validate_project_files":
-                patch.setattr(app_module, "validate_project_files", _raise_permission)
+            elif arm == "route: _list_project_files":
+                patch.setattr(app_module.S19TuiApp, "_list_project_files", _raise_permission)
             else:
                 patch.setattr(app_module.S19TuiApp, "list_projects", _raise_permission)
             try:
@@ -2839,17 +2843,17 @@ def test_tc_b100_39_picked_row_loads_the_file_as_named(tmp_path: Path, label: st
 
 async def _at_load_file(pilot, app, text: str) -> None:
     """``l`` (Load file), type ``text`` into the path field, click OK."""
-    from s19_app.tui.screens import LoadFileScreen
+    from tests.support.b100_load_dialog import highlight_row, is_load_dialog
 
     await pilot.press("l")
-    await projects.wait_for(pilot, lambda: isinstance(app.screen, LoadFileScreen), "the Load file dialog")
+    await projects.wait_for(pilot, lambda: is_load_dialog(app.screen), "the Load dialog")
     assert await pilot.click("#load_path"), "click missed #load_path"
     await pilot.press("ctrl+a")
     await pilot.press("delete")
     await pilot.press(*text)
     assert await pilot.click("#load_ok"), "click missed #load_ok"
     await projects.wait_for(
-        pilot, lambda: not isinstance(app.screen, LoadFileScreen), "the Load file dialog to close"
+        pilot, lambda: not is_load_dialog(app.screen), "the Load dialog to close"
     )
 
 
@@ -2944,3 +2948,267 @@ def test_at_b100_13_workarea_files_show_names_as_named(tmp_path: Path, size: tup
     assert painted == sorted(_expected_label(n) for n in names), [ascii(p) for p in painted]
     assert [spans for _, spans, _ in rows] == [[], [], [], []], rows
     assert all(_scrubbed_categories(plain) == [] for plain, _, _ in rows), [ascii(p) for p, _, _ in rows]
+
+
+# ===========================================================================
+# Inc 9b — TC-B100-34 (LLR-172.1n, CR9-1) and TC-B100-37 widened (LLR-173.4b,
+# CR9-11). Written by the Inc 9b tester from inc-9b/E1-requirements-draft.md
+# and inc-9b/codewire/proto-9b-app.md (B24 … B30, B37).
+# ===========================================================================
+
+
+def _fallback_scene(base: Path, monkeypatch: pytest.MonkeyPatch, cwd: Path, typed: str, a2l: bool = False):
+    """With the working folder ``cwd``, run the shipped typed-path dispatcher
+    on ``typed``; return (status messages, installed file name or A2L name)."""
+    monkeypatch.chdir(cwd)
+
+    async def _scenario(app, pilot, log):
+        mark = len(log.messages)
+        app._load_path_from_user_input(Path(typed))
+        if a2l:
+            await _wait_a2l(pilot, app)
+            name = app.current_a2l_path.name
+        else:
+            await projects.wait_for(pilot, lambda: app.current_file is not None, "the typed load")
+            name = app.current_file.path.name
+        for _ in range(8):
+            await pilot.pause()
+        return log.since(mark), name
+
+    return projects.run_app(base, _scenario)
+
+
+@STORE_WRITE
+@JUNCTION_ARM
+def test_tc_b100_34_source_found_through_a_junction_fallback_is_not_recorded(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-172.1n arm 1 + control arm 4 (B24, B27; CR9-1; Windows only): the
+    working folder ``Wd`` is not the base folder ``B``, and ``B\\j`` is a
+    junction to ``R`` holding ``x.s19``. Typed ``j\\x.s19`` (relative, found
+    only through the base-folder fallback, whose ``resolve()`` follows the
+    junction) → 1 load, the store bytes unchanged, 0 ``Recent sources not
+    updated`` lines. Control: typed absolute ``B\\j\\x.s19`` → 1 entry
+    ``B\\j\\x.s19`` (the link not followed, LLR-172.1a).
+
+    Why: the fallback's resolved path follows links (against LLR-172.1a),
+    and on a mapped drive it records a UNC path the store refuses with a
+    warning on every load.
+    RED (base, executed probe CR9-1): the store gains ``R\\x.s19``."""
+    store = _store_of(_lad(tmp_path, monkeypatch))
+    seed = _seed(store, [_entry("C:\\seed\\s.s19")])
+    base = tmp_path / "B"
+    base.mkdir()
+    real = tmp_path / "R"
+    real.mkdir()
+    shutil.copyfile(projects.CASE01_DIR / "firmware.s19", real / "x.s19")
+    b100_links.create_junction(base / "j", real)
+    work = tmp_path / "Wd"
+    work.mkdir()
+    messages, name = _fallback_scene(base, monkeypatch, work, os.path.join("j", "x.s19"))
+    assert name == "x.s19", messages
+    assert _sha(store) == seed, _entries(store)
+    assert _with(messages, "Recent sources not updated") == [], messages
+    _, name = _fallback_scene(tmp_path / "B2", monkeypatch, work, str(base / "j" / "x.s19"))
+    assert name == "x.s19"
+    assert _entries(store)[0] == (str(base / "j" / "x.s19"), "s19"), _entries(store)
+
+
+@STORE_WRITE
+def test_tc_b100_34_source_found_only_in_the_base_folder_is_not_recorded(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-172.1n arm 2 + control arm 3 (B25, B26): typed ``fw.s19`` from a
+    working folder ``Wd`` where it does not exist, present only in the base
+    folder ``B`` → 1 load, the store bytes unchanged. Control: the same
+    typed ``fw.s19`` with the working folder ``B`` (found as typed) → 1
+    entry whose path is ``os.path.abspath("fw.s19")`` = ``B\\fw.s19``.
+
+    Why: "found only through the fallback" means the typed text is relative
+    and does not exist relative to the working folder; such a source is not
+    the file the engineer named, so it is not remembered (ruling Q1).
+    Negative control: the ``via_fallback`` condition dropped → arm 2
+    records ``B\\fw.s19`` → RED. RED (base): arm 2 records it."""
+    store = _store_of(_lad(tmp_path, monkeypatch))
+    seed = _seed(store, [_entry("C:\\seed\\s.s19")])
+    base = tmp_path / "B"
+    base.mkdir()
+    shutil.copyfile(projects.CASE01_DIR / "firmware.s19", base / "fw.s19")
+    work = tmp_path / "Wd"
+    work.mkdir()
+    messages, name = _fallback_scene(base, monkeypatch, work, "fw.s19")
+    assert name == "fw.s19", messages
+    assert _sha(store) == seed, _entries(store)
+    assert _with(messages, "Recent sources not updated") == [], messages
+    _, name = _fallback_scene(base, monkeypatch, base, "fw.s19")
+    assert name == "fw.s19"
+    assert _entries(store)[0] == (os.path.abspath(str(base / "fw.s19")), "s19"), _entries(store)
+
+
+@STORE_WRITE
+def test_tc_b100_34_a2l_found_only_through_the_fallback_is_not_recorded(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-172.1n, the A2L arm (B30, F-6 — proposed as arm 5 of TC-B100-34):
+    typed relative ``cal.a2l``, present only in the base folder, from a
+    working folder ``Wd`` → ``A2L loaded: cal.a2l`` and the store bytes
+    unchanged; the same file typed absolute → 1 entry ``B\\cal.a2l``, kind
+    ``a2l``.
+
+    Negative control: the condition removed from ``load_a2l_from_path``
+    only → 1 entry after the relative load → RED. RED (base): the relative
+    load records ``B\\cal.a2l``."""
+    store = _store_of(_lad(tmp_path, monkeypatch))
+    seed = _seed(store, [_entry("C:\\seed\\s.s19")])
+    base = tmp_path / "B"
+    base.mkdir()
+    shutil.copyfile(projects.CASE01_DIR / "firmware.a2l", base / "cal.a2l")
+    work = tmp_path / "Wd"
+    work.mkdir()
+    messages, name = _fallback_scene(base, monkeypatch, work, "cal.a2l", a2l=True)
+    assert name == "cal.a2l" and _with(messages, "A2L loaded: cal.a2l"), messages
+    assert _sha(store) == seed, _entries(store)
+    _fallback_scene(tmp_path / "B2", monkeypatch, work, str(base / "cal.a2l"), a2l=True)
+    assert _entries(store)[0] == (str(base / "cal.a2l"), "a2l"), _entries(store)
+
+
+def _refers_to_temp_widened(node, names: set) -> bool:
+    """``_refers_to_temp`` plus CR9-11's reach: a string literal equal to
+    ``temp`` in any letter case."""
+    if _refers_to_temp(node, names):
+        return True
+    for sub in ast.walk(node):
+        if isinstance(sub, ast.Constant) and isinstance(sub.value, str) and sub.value.casefold() == "temp":
+            return True
+    return False
+
+
+def _temp_enumerators_widened(root: Path) -> list:
+    """The TC-B100-37 census of ``_temp_enumerators`` with the widened temp
+    test (a literal ``"temp"`` joined to a path expression counts)."""
+    found = []
+    for path in sorted((root / "s19_app").rglob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for function in ast.walk(tree):
+            if not isinstance(function, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+            names: set = set()
+            changed = True
+            while changed:
+                changed = False
+                for sub in ast.walk(function):
+                    if isinstance(sub, (ast.Assign, ast.AnnAssign, ast.NamedExpr)):
+                        targets = sub.targets if isinstance(sub, ast.Assign) else [sub.target]
+                        value = sub.value
+                        if (
+                            value is not None
+                            and isinstance(value, (ast.BinOp, ast.Call, ast.Attribute, ast.Name))
+                            and _refers_to_temp_widened(value, names)
+                        ):
+                            for target in targets:
+                                for leaf in ast.walk(target):
+                                    if isinstance(leaf, ast.Name) and leaf.id not in names:
+                                        names.add(leaf.id)
+                                        changed = True
+            for sub in ast.walk(function):
+                if not isinstance(sub, ast.Call):
+                    continue
+                func = sub.func
+                callee = func.attr if isinstance(func, ast.Attribute) else getattr(func, "id", None)
+                target_expr = None
+                if isinstance(func, ast.Attribute) and func.attr in _ENUM_METHODS:
+                    target_expr = func.value
+                elif callee in _ENUM_FUNCTIONS and sub.args:
+                    target_expr = sub.args[0]
+                if target_expr is None or isinstance(target_expr, ast.Constant):
+                    continue
+                if _refers_to_temp_widened(target_expr, names):
+                    entry = (path.relative_to(root).as_posix(), function.name)
+                    if entry not in found:
+                        found.append(entry)
+    return found
+
+
+def test_tc_b100_37_widened_census_and_one_enumeration_at_dialog_open(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-173.4b, LLR-172.4 widened (B37, CR9-11; 2 of the 3 arms, the row
+    arm is in ``test_b100_load_dialog.py``): (1) the TC-B100-37 census
+    widened to count a string literal equal to ``temp`` in any letter case
+    joined to a path expression → exactly 1 enumerating function,
+    ``list_workarea_files`` in ``workspace.py``; (2) a runtime spy on
+    ``os.scandir``, ``os.listdir``, ``Path.iterdir`` and ``Path.glob``
+    during one Load dialog open (``l``) → ``temp/`` enumerated exactly once,
+    from inside ``list_workarea_files``.
+
+    Why: the 9a census saw only ``WORKAREA_TEMP``; a second lister written
+    with the literal ``"temp"`` escaped it (CR9-11), and two listers can
+    disagree about what the work area holds.
+    Negative control: a dialog section built as ``(self.workarea /
+    "temp").iterdir()`` → census 2 functions and spy 2 enumerations → RED.
+    RED (base): the base Load dialog has no files section, so the spy sees
+    0 enumerations at dialog open (arm 1 holds on the base and is RED only
+    as that mutation)."""
+    found = _temp_enumerators_widened(projects.ROOT)
+    assert found == [("s19_app/tui/workspace.py", "list_workarea_files")], found
+
+    from tests.support import b100_load_dialog as ld
+
+    base = tmp_path / "app"
+    temp = _workarea(base) / workspace_module.WORKAREA_TEMP
+    temp.mkdir(parents=True)
+    shutil.copyfile(projects.CASE01_DIR / "firmware.s19", temp / "a.s19")
+    key = os.path.normcase(str(temp))
+    seen: list = []
+    real = {
+        "scandir": os.scandir,
+        "listdir": os.listdir,
+        "iterdir": pathlib.Path.iterdir,
+        "glob": pathlib.Path.glob,
+    }
+
+    def note(target, how) -> None:
+        try:
+            if os.path.normcase(os.fspath(target)) != key:
+                return
+        except TypeError:
+            return
+        frames, frame = [], sys._getframe(2)
+        while frame is not None:
+            frames.append(frame.f_code.co_name)
+            frame = frame.f_back
+        seen.append((how, "list_workarea_files" in frames))
+
+    def scandir(path=".", *a, **k):
+        note(path, "scandir")
+        return real["scandir"](path, *a, **k)
+
+    def listdir(path=".", *a, **k):
+        note(path, "listdir")
+        return real["listdir"](path, *a, **k)
+
+    def iterdir(self):
+        note(self, "iterdir")
+        return real["iterdir"](self)
+
+    def glob(self, *a, **k):
+        note(self, "glob")
+        return real["glob"](self, *a, **k)
+
+    async def _scenario(app, pilot, log):
+        await pilot.press("1")
+        for _ in range(4):
+            await pilot.pause()
+        with monkeypatch.context() as patch:
+            patch.setattr(os, "scandir", scandir)
+            patch.setattr(os, "listdir", listdir)
+            patch.setattr(pathlib.Path, "iterdir", iterdir)
+            patch.setattr(pathlib.Path, "glob", glob)
+            await pilot.press("l")
+            for _ in range(12):
+                await pilot.pause()
+        return ld.is_load_dialog(app.screen), list(seen)
+
+    opened, enumerations = projects.run_app(base, _scenario, size=(118, 54))
+    assert opened, "l did not open the Load dialog"
+    assert len(enumerations) == 1 and enumerations[0][1], enumerations

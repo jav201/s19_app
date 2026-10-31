@@ -49,8 +49,6 @@ from textual.widgets import Label
 
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.models import ProjectVariantSet
-from s19_app.tui.screens import LoadFileScreen
-from s19_app.tui.screens import LoadProjectScreen
 from s19_app.tui.screens import SaveProjectScreen
 from s19_app.tui.services import manifest_writer
 from s19_app.tui.services import variant_execution_service as service
@@ -70,6 +68,7 @@ from s19_app.tui.workspace import build_variant_set
 from tests.support import b100_links
 from tests.support import b100_manifests as hostile
 from tests.support import b100_projects as projects
+from tests.support.b100_load_dialog import highlight_row, is_load_dialog
 from tests.support.timing import timing_bound
 
 SIZES = [(118, 54), (220, 60)]
@@ -764,19 +763,25 @@ def test_tc_b100_61_seven_kinds_seven_next_steps_no_codes() -> None:
         assert not INTERNAL_CODE.search(detail) and not EXCEPTION_NAME.search(detail), detail
 
 
+def _paint_clock_start(app: S19TuiApp, pressed: float) -> float:
+    """Inc 9b re-pin: the panel paint clock starts when the timed load returns.
+
+    Before 9b the project pick's dismiss callback ran the load inside the
+    ``#project_ok`` click, so ``pressed`` (taken after the click) already
+    followed the load. The one Load dialog router defers the load with
+    ``call_after_refresh`` (LLR-173.1e), so the load now runs after the
+    click; starting the clock at the later of the two keeps this bound on
+    the panel paint alone. The load itself keeps its own 1 s bound."""
+    return max(pressed, getattr(app, "_load_returned_at", pressed))
+
+
 async def _open_panel_through_the_dialog(pilot, app: S19TuiApp, name: str = "P") -> None:
     await pilot.press("p")
     await _wait_for(
-        pilot, lambda: isinstance(app.screen, LoadProjectScreen), "the Load project dialog"
+        pilot, lambda: is_load_dialog(app.screen), "the Load dialog"
     )
-    row = next(
-        item
-        for item in app.screen.query("#project_list ListItem")
-        if str(item.query_one(Label).render()) == name
-    )
-    await pilot.click(row)
-    await pilot.pause()
-    assert await pilot.click("#project_ok"), "click missed #project_ok"
+    await highlight_row(pilot, app, name)
+    assert await pilot.click("#load_ok"), "click missed #load_ok"
 
 
 def test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second(
@@ -803,6 +808,7 @@ def test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second(
             started = time.perf_counter()
             real_load(name)
             timing.append(time.perf_counter() - started)
+            app._load_returned_at = time.perf_counter()
 
         app._handle_load_project = _timed
         async with app.run_test(size=(118, 54)) as pilot:
@@ -816,7 +822,7 @@ def test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second(
                 "the painted Load-result panel",
                 attempts=4000,
             )
-            painted = time.perf_counter() - pressed
+            painted = time.perf_counter() - _paint_clock_start(app, pressed)
             rows = len(app.screen.query("#result_body .result-problem"))
             return timing, painted, rows
 
@@ -870,7 +876,7 @@ async def _timed_load_panel_and_append(pilot, app: S19TuiApp, source: Path) -> t
         "the painted Load-result panel",
         attempts=4000,
     )
-    painted = time.perf_counter() - pressed
+    painted = time.perf_counter() - _paint_clock_start(app, pressed)
     rows = len(app.screen.query("#result_body .result-problem"))
     await pilot.press("escape")
     await _wait_for(pilot, lambda: len(app.screen.query("#result_ok")) == 0, "the panel closed")
@@ -921,6 +927,7 @@ def _sec6_5_filesystem_scene(tmp_path: Path, payload: dict, setup=None) -> dict:
             begun = time.perf_counter()
             real_load(name)
             timing.append(time.perf_counter() - begun)
+            app._load_returned_at = time.perf_counter()
 
         app._handle_load_project = _timed
         async with app.run_test(size=(118, 54)) as pilot:
@@ -1287,6 +1294,7 @@ def test_tc_b100_61_files_at_the_cap_all_missing_are_bounded(tmp_path: Path) -> 
             begun = time.perf_counter()
             real_load(name)
             timing.append(time.perf_counter() - begun)
+            app._load_returned_at = time.perf_counter()
 
         app._handle_load_project = _timed
         async with app.run_test(size=(118, 54)) as pilot:
@@ -1300,7 +1308,7 @@ def test_tc_b100_61_files_at_the_cap_all_missing_are_bounded(tmp_path: Path) -> 
                 "the painted Load-result panel",
                 attempts=4000,
             )
-            painted = time.perf_counter() - pressed
+            painted = time.perf_counter() - _paint_clock_start(app, pressed)
             rows = len(app.screen.query("#result_body .result-problem"))
             title = str(app.screen.query_one(".modal-title", Label).render())
             summary = [line for line in app.log_lines if line.endswith("details: p")]
@@ -1446,7 +1454,7 @@ def _log_line_4(app: S19TuiApp) -> str:
 
 async def _load_file_through_dialog(pilot, app: S19TuiApp, src: Path) -> None:
     await pilot.press("l")
-    await _wait_for(pilot, lambda: isinstance(app.screen, LoadFileScreen), "the Load file dialog")
+    await _wait_for(pilot, lambda: is_load_dialog(app.screen), "the Load dialog")
     assert await pilot.click("#load_path"), "click missed #load_path"
     await pilot.press("ctrl+a")
     await pilot.press("delete")
@@ -1454,7 +1462,7 @@ async def _load_file_through_dialog(pilot, app: S19TuiApp, src: Path) -> None:
     assert await pilot.click("#load_ok"), "click missed #load_ok"
     await _wait_for(
         pilot,
-        lambda: not isinstance(app.screen, LoadFileScreen)
+        lambda: not is_load_dialog(app.screen)
         and str(app.query_one("#status_text", Label).render()).startswith("Loaded "),
         f"the durable load line after loading {src.name}",
     )

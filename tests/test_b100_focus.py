@@ -53,12 +53,11 @@ from textual.widgets import Input, Label, ListItem, ListView, TextArea
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.screens import (
     LegendScreen,
-    LoadFileScreen,
-    LoadProjectScreen,
     ReportViewerScreen,
 )
 from s19_app.tui.screens_directionb import MemoryMapPanel, RegionRow
 from s19_app.tui.workspace import WORKAREA_DIRNAME, WORKAREA_SUBDIR, WORKAREA_TEMP
+from tests.support.b100_load_dialog import highlight_row, is_load_dialog
 
 EXAMPLES_DIR = Path(__file__).resolve().parent.parent / "examples"
 CASE01_DIR = EXAMPLES_DIR / "case_01_basic_valid"
@@ -230,14 +229,14 @@ async def _assert_p_opens_the_project_dialog(app: S19TuiApp, pilot) -> None:
     await pilot.press("p")
     await _wait_for(
         pilot,
-        lambda: isinstance(app.screen, LoadProjectScreen),
-        "the Load project dialog (the `p` binding reached its action)",
+        lambda: is_load_dialog(app.screen),
+        "the Load dialog (the `p` binding reached its action)",
     )
-    assert await pilot.click("#project_cancel"), "click missed #project_cancel"
+    assert await pilot.click("#load_cancel"), "click missed #load_cancel"
     await _wait_for(
         pilot,
-        lambda: not isinstance(app.screen, LoadProjectScreen),
-        "the Load project dialog closed",
+        lambda: not is_load_dialog(app.screen),
+        "the Load dialog closed",
     )
 
 
@@ -443,7 +442,7 @@ def test_tc_b100_12_split_join_window_target_is_its_table(tmp_path: Path) -> Non
             # dialog must NOT open, and the focus stays on the table.
             await pilot.press("p")
             await _flush(pilot)
-            assert not isinstance(app.screen, LoadProjectScreen), (
+            assert not is_load_dialog(app.screen), (
                 "`p` on the Split / Join table pads there; the Load project "
                 "dialog is a rail-window key (LLR-135)"
             )
@@ -861,8 +860,8 @@ def test_tc_b100_12_modal_keeps_its_focus_while_a_load_finishes(
             await pilot.press("l")
             await _wait_for(
                 pilot,
-                lambda: isinstance(app.screen, LoadFileScreen),
-                "the Load file dialog",
+                lambda: is_load_dialog(app.screen),
+                "the Load dialog",
             )
             assert await pilot.click("#load_path"), "click missed #load_path"
             await _flush(pilot)
@@ -876,7 +875,7 @@ def test_tc_b100_12_modal_keeps_its_focus_while_a_load_finishes(
             )
             # The tail — and the deferred render hooks behind it — have run.
             await _flush(pilot, 10)
-            assert isinstance(app.screen, LoadFileScreen), (
+            assert is_load_dialog(app.screen), (
                 "the modal stays open while a load finishes"
             )
             assert app.focused is not None and app.focused.id == "load_path", (
@@ -917,8 +916,8 @@ def test_tc_b100_12_bad_default_focus_is_rehomed_behind_a_modal(
             await pilot.press("p")
             await _wait_for(
                 pilot,
-                lambda: isinstance(app.screen, LoadProjectScreen),
-                "the Load project dialog",
+                lambda: is_load_dialog(app.screen),
+                "the Load dialog",
             )
             await _flush(pilot)
             modal_focused = app.focused
@@ -1088,16 +1087,11 @@ async def _open_project_and_wait_for_the_panel(
     await pilot.press("p")
     await _wait_for(
         pilot,
-        lambda: isinstance(app.screen, LoadProjectScreen),
-        "the Load project dialog",
+        lambda: is_load_dialog(app.screen),
+        "the Load dialog",
     )
-    row = next(
-        item
-        for item in app.screen.query("#project_list ListItem")
-        if str(item.query_one(Label).render()) == name
-    )
-    await pilot.click(row)
-    assert await pilot.click("#project_ok"), "click missed #project_ok"
+    await highlight_row(pilot, app, name)
+    assert await pilot.click("#load_ok"), "click missed #load_ok"
     await _wait_for(
         pilot,
         lambda: f"Loaded project '{name}'" in _status_text(app)
@@ -1124,8 +1118,8 @@ async def _load_file_through_dialog(pilot, app: S19TuiApp, src: Path) -> None:
     await pilot.press("l")
     await _wait_for(
         pilot,
-        lambda: isinstance(app.screen, LoadFileScreen),
-        "the Load file dialog",
+        lambda: is_load_dialog(app.screen),
+        "the Load dialog",
     )
     assert await pilot.click("#load_path"), "click missed #load_path"
     await pilot.press("ctrl+a")
@@ -1134,7 +1128,7 @@ async def _load_file_through_dialog(pilot, app: S19TuiApp, src: Path) -> None:
     assert await pilot.click("#load_ok"), "click missed #load_ok"
     await _wait_for(
         pilot,
-        lambda: not isinstance(app.screen, LoadFileScreen)
+        lambda: not is_load_dialog(app.screen)
         and _file_status_text(app).startswith("Loaded "),
         f"the durable load line after loading {src.name}",
     )
@@ -1243,6 +1237,112 @@ def test_tc_b100_12_panel_close_lands_on_the_windows_target(
             await _wait_for(
                 pilot, lambda: not _result_panel_open(app), "the panel closed"
             )
+            await _wait_for_focus_on_target(pilot, app, "files_list")
+
+    asyncio.run(_drive())
+
+
+# ---------------------------------------------------------------------------
+# TC-B100-12, Inc 9b arms — the Load dialog's two closes (LLR-166.1, A9b-03)
+# ---------------------------------------------------------------------------
+
+
+async def _close_load_dialog(pilot, app: S19TuiApp, close: str) -> None:
+    """Close the open Load dialog with ``escape`` or a click on
+    ``#load_cancel`` (a cancelled load), and wait for it to leave."""
+    if close == "escape":
+        await pilot.press("escape")
+    else:
+        assert await pilot.click("#load_cancel"), "click missed #load_cancel"
+    await _wait_for(pilot, lambda: not is_load_dialog(app.screen), "the Load dialog closed")
+
+
+@pytest.mark.parametrize("close", ["escape", "cancel"])
+def test_tc_b100_12_load_dialog_close_rehomes_a_stale_input_focus(
+    tmp_path: Path, close: str
+) -> None:
+    """LLR-166.1, Inc 9b arms (A9b-03, B14): with an image loaded, the
+    focus sits in the A2L window's Find field, the A2L window is hidden by a
+    workspace switch, and that stale input focus is re-installed (the shape
+    of ``test_tc_b100_12_stale_text_input_in_a_content_window_is_rehomed``).
+    ``ctrl+l`` (a priority key, live from an input) opens the Load dialog;
+    ``escape`` — and, as the second arm, a click on ``#load_cancel`` —
+    closes it with no result → the focus settles on the displayed window's
+    target ``#files_list``, never back on the hidden input.
+
+    Why: a close with no result is the end of a (cancelled) load; leaving
+    the focus on a hidden input swallows the next keys (CW-U-2, P-16).
+    Negative control: the router returns on ``None`` with no re-home →
+    Textual restores the stale input focus → RED. RED (base): ``escape``
+    leaves ``LoadFileScreen`` open (P-18) and the base dialog is not the
+    Load dialog."""
+
+    async def _drive() -> None:
+        app = S19TuiApp(base_dir=tmp_path)
+        _seed_project_p1(app.workarea)
+        async with app.run_test(size=(118, 54)) as pilot:
+            await pilot.pause()
+            app.load_selected_file(CASE01_DIR / "firmware.s19")
+            await _flush(pilot)
+            await _wait_for(
+                pilot,
+                lambda: _file_status_text(app).startswith("Loaded "),
+                "the durable file-state line",
+            )
+            await pilot.press("2")
+            await _flush(pilot)
+            app.query_one("#a2l_tag_find_input", Input).focus()
+            await _flush(pilot)
+            app.action_show_screen("workspace")
+            await _flush(pilot)
+            stale_input = app.query_one("#a2l_tag_find_input", Input)
+            app.default_screen.set_focus(stale_input)
+            assert app.default_screen.focused is stale_input
+            await pilot.press("ctrl+l")
+            await _wait_for(pilot, lambda: is_load_dialog(app.screen), "the Load dialog")
+            await _flush(pilot, 4)
+            await _close_load_dialog(pilot, app, close)
+            await _wait_for_focus_on_target(pilot, app, "files_list")
+
+    asyncio.run(_drive())
+
+
+@pytest.mark.parametrize("close", ["escape", "cancel"])
+def test_tc_b100_12_load_dialog_close_from_the_p16_shape_lands_on_the_target(
+    tmp_path: Path, close: str
+) -> None:
+    """LLR-166.1, Inc 9b arms (A9b-03, B14, the P-16 shape): with an image
+    loaded, the Split / Join / Export window is opened and hidden again
+    (rail key ``1``), and its hidden table is made the focused widget (the
+    zero-area focus P-16 leaves). ``ctrl+l``, then ``escape`` / a click on
+    ``#load_cancel`` → the focus settles on ``#files_list``.
+
+    Negative control: no re-home on a ``None`` result → the focus returns to
+    the hidden table (region area 0) → RED. RED (base): ``escape`` leaves
+    ``LoadFileScreen`` open (P-18)."""
+
+    async def _drive() -> None:
+        app = S19TuiApp(base_dir=tmp_path)
+        _seed_project_p1(app.workarea)
+        async with app.run_test(size=(118, 54), notifications=True) as pilot:
+            await pilot.pause()
+            app.load_selected_file(CASE01_DIR / "firmware.s19")
+            await _flush(pilot)
+            await _wait_for(
+                pilot,
+                lambda: _file_status_text(app).startswith("Loaded "),
+                "the durable file-state line",
+            )
+            await _open_split_join_via_palette(pilot, app)
+            await pilot.press("1")
+            await _flush(pilot)
+            table = app.query_one("#sje_table")
+            app.default_screen.set_focus(table)
+            assert app.default_screen.focused is table and table.region.area == 0
+            await pilot.press("ctrl+l")
+            await _wait_for(pilot, lambda: is_load_dialog(app.screen), "the Load dialog")
+            await _flush(pilot, 4)
+            await _close_load_dialog(pilot, app, close)
             await _wait_for_focus_on_target(pilot, app, "files_list")
 
     asyncio.run(_drive())

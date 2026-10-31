@@ -1017,14 +1017,19 @@ def test_tc_b100_32_data_file_loaded_into_a2l_only_project_is_recorded(tmp_path:
 def test_tc_b100_32_empty_folder_is_refused_before_any_reset(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str
 ) -> None:
-    """LLR-171.2d / .2e: a folder E holding only ``project.json`` (recording
-    an absent ``firmware.s19``) → 1 status message holding "no data or A2L
-    file" and "load a file and Save project"; an empty folder E → 1 message
-    holding "no project.json" and "load a file and Save project"; in both,
-    0 session resets and the open project N stays open.
+    """LLR-171.2d / LLR-173.4a: a folder E holding only ``project.json``
+    (recording an absent ``firmware.s19``) → 1 status message holding "no
+    data or A2L file" and "load a file and Save project"; an empty folder E
+    → 1 message holding "is not a project" and "pick a project in the list"
+    (Inc 9b re-pin, E2 F-1: LLR-171.2e is retired, superseded by
+    LLR-173.4a — an empty folder is no longer a listed project, so the
+    project load's listing match refuses it before any file check); in
+    both, 0 session resets and the open project N stays open.
 
-    RED (base): "No supported files in project: E". Negative controls:
-    the old line; the ``no data or A2L file`` branch reached for 2e."""
+    RED (base, Inc 8b): "No supported files in project: E". Negative
+    controls: the old line; the ``no data or A2L file`` branch reached for
+    the empty folder; at Inc 9b, the empty folder still listed (``no
+    project.json`` painted instead of ``is not a project``)."""
     base = tmp_path / "app"
     projects.save_case01_project(base, "N", files=("firmware.s19",))
     empty = _workarea(base) / "E"
@@ -1043,7 +1048,11 @@ def test_tc_b100_32_empty_folder_is_refused_before_any_reset(
         return messages, len(resets), app.current_project
 
     messages, resets, project = projects.run_app(base, _scenario)
-    assert len(_with(messages, case, "load a file and Save project")) == 1, messages
+    expected = {
+        "no data or A2L file": ("no data or A2L file", "load a file and Save project"),
+        "no project.json": ("is not a project", "pick a project in the list"),
+    }[case]
+    assert len(_with(messages, *expected)) == 1, messages
     assert resets == 0, resets
     assert project == "N", project
 
@@ -1382,27 +1391,21 @@ async def _at_open_project(pilot, app, name: str) -> None:
     click OK; close a Load-result panel if one opens."""
     from textual.widgets import Label
 
-    from s19_app.tui.screens import LoadProjectScreen
+    from tests.support.b100_load_dialog import highlight_row, is_load_dialog
 
     await pilot.press("1")
     for _ in range(4):
         await pilot.pause()
     await pilot.press("p")
     await projects.wait_for(
-        pilot, lambda: isinstance(app.screen, LoadProjectScreen), "the Load project dialog"
+        pilot, lambda: is_load_dialog(app.screen), "the Load dialog"
     )
-    row = next(
-        item
-        for item in app.screen.query("#project_list ListItem")
-        if str(item.query_one(Label).render()) == name
-    )
-    await pilot.click(row)
-    await pilot.pause()
-    assert await pilot.click("#project_ok"), "click missed #project_ok"
+    await highlight_row(pilot, app, name)
+    assert await pilot.click("#load_ok"), "click missed #load_ok"
     await projects.wait_for(
         pilot,
-        lambda: not isinstance(app.screen, LoadProjectScreen),
-        "the Load project dialog to close",
+        lambda: not is_load_dialog(app.screen),
+        "the Load dialog to close",
     )
     for _ in range(60):
         if len(app.screen.query(LOAD_RESULT_CLOSE)) > 0:
@@ -1412,22 +1415,21 @@ async def _at_open_project(pilot, app, name: str) -> None:
 
 
 async def _at_listed_projects(pilot, app) -> list:
-    """Open the Load project dialog by keys, read its rows, cancel it."""
-    from textual.widgets import Label
-
-    from s19_app.tui.screens import LoadProjectScreen
+    """Open the Load dialog by keys (``p``), read the loadable rows of its
+    Projects section, cancel it."""
+    from tests.support.b100_load_dialog import is_load_dialog, section_prompts
 
     await pilot.press("1")
     for _ in range(4):
         await pilot.pause()
     await pilot.press("p")
     await projects.wait_for(
-        pilot, lambda: isinstance(app.screen, LoadProjectScreen), "the Load project dialog"
+        pilot, lambda: is_load_dialog(app.screen), "the Load dialog"
     )
-    rows = [str(item.query_one(Label).render()) for item in app.screen.query("#project_list ListItem")]
-    assert await pilot.click("#project_cancel"), "click missed #project_cancel"
+    rows = section_prompts(app.screen, "Projects")
+    assert await pilot.click("#load_cancel"), "click missed #load_cancel"
     await projects.wait_for(
-        pilot, lambda: not isinstance(app.screen, LoadProjectScreen), "the Load project dialog to close"
+        pilot, lambda: not is_load_dialog(app.screen), "the Load dialog to close"
     )
     return rows
 
@@ -1452,17 +1454,17 @@ async def _at_save_through_dialog(pilot, app, log, name: str) -> list:
 
 
 async def _at_load_file(pilot, app, path: Path) -> None:
-    from s19_app.tui.screens import LoadFileScreen
+    from tests.support.b100_load_dialog import highlight_row, is_load_dialog
 
     await pilot.press("l")
-    await projects.wait_for(pilot, lambda: isinstance(app.screen, LoadFileScreen), "the Load file dialog")
+    await projects.wait_for(pilot, lambda: is_load_dialog(app.screen), "the Load dialog")
     assert await pilot.click("#load_path"), "click missed #load_path"
     await pilot.press("ctrl+a")
     await pilot.press("delete")
     await pilot.press(*str(path))
     assert await pilot.click("#load_ok"), "click missed #load_ok"
     await projects.wait_for(
-        pilot, lambda: not isinstance(app.screen, LoadFileScreen), "the Load file dialog to close"
+        pilot, lambda: not is_load_dialog(app.screen), "the Load dialog to close"
     )
 
 

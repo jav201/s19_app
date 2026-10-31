@@ -1509,7 +1509,7 @@ def test_at_b99_04_duplicate_refused_distinct_parallel_markers(tmp_path: Path) -
     lane files and the reports of run (b) legitimately stay).
 
     Every entry is the shipped control: the project loads through the Load
-    project dialog (rail key ``p``, the ``proj`` row, ``#project_ok``), the
+    dialog (rail key ``p``, the ``proj`` row, ``#load_ok``), the
     lanes import through ``#fx_import`` clicks, the mode and Run are
     clicks; every wait and assertion reads the painted surface, a file on
     disk, or an ``isinstance`` screen predicate — never
@@ -1518,7 +1518,7 @@ def test_at_b99_04_duplicate_refused_distinct_parallel_markers(tmp_path: Path) -
     """
     from textual.widgets import Label, Static
 
-    from s19_app.tui.screens import LoadProjectScreen
+    from tests.support.b100_load_dialog import highlight_row, is_load_dialog
     from tests.b97_fixtures import make_project, write_flow
     from tests.b97_probes import settle
 
@@ -1551,19 +1551,13 @@ def test_at_b99_04_duplicate_refused_distinct_parallel_markers(tmp_path: Path) -
                 [SourceBlock("base_b.s19"), WriteOutBlock("SAME.s19")],
             )
 
-            # load the project through the Load project dialog (rail key ``p``)
+            # load the project through the Load dialog (rail key ``p``)
             await pilot.press("p")
             assert await _poll(
-                pilot, lambda: isinstance(app.screen, LoadProjectScreen)
-            ), "the Load project dialog never opened"
-            row = next(
-                item
-                for item in app.screen.query("#project_list ListItem")
-                if str(item.query_one(Label).render()) == "proj"
-            )
-            await pilot.click(row)
-            await pilot.pause()
-            assert await pilot.click("#project_ok"), "click missed #project_ok"
+                pilot, lambda: is_load_dialog(app.screen)
+            ), "the Load dialog never opened"
+            await highlight_row(pilot, app, "proj")
+            assert await pilot.click("#load_ok"), "click missed #load_ok"
             assert await _poll(
                 pilot, lambda: "Loaded project 'proj'" in _painted_status(app)
             ), f"the project load did not paint: {_painted_status(app)}"

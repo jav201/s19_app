@@ -158,8 +158,13 @@ from tools.id_registry import (
 # tests/support/b100_projects.py).
 # batch-100 Inc-7: 222 -> 224 (tests/test_b100_project_check.py, tests/support/b100_manifests.py).
 # batch-100 Inc-8a: 224 -> 225 (tests/test_b100_document.py).
-EXPECTED_SCANNED_TEST_FILES = 228
+EXPECTED_SCANNED_TEST_FILES = 230
 """Test modules scanned, including this one.
+
+batch-100 Inc 9b: 228 -> 230. ``tests/test_b100_load_dialog.py`` (TC-B100-40,
+-41, -42, -43, -63, -64, -66 and AT-B100-14, HLR-173) and
+``tests/support/b100_load_dialog.py`` (its drivers) were added. MEASURED, not
+incremented: ``scanned_test_files()`` reports 230.
 
 batch-100 Inc 9a: 227 -> 228. ``tests/test_b100_recents.py`` was added for
 TC-B100-34/35/36/37/38/39 and AT-B100-12/13 (HLR-172, HLR-172a, HLR-172b).

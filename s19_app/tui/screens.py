@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TYPE_CHECKING, List, Mapping, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Callable, List, Literal, Mapping, Optional, Sequence, Tuple
 
 from rich.markup import escape as escape_markup
 from rich.table import Table
@@ -22,6 +22,7 @@ from textual.widgets import (
     ListItem,
     ListView,
     Markdown,
+    OptionList,
     Select,
     SelectionList,
     Static,
@@ -181,50 +182,371 @@ class SaveProjectPayload:
     assignments: Mapping[str, tuple[str, ...]] = field(default_factory=dict)
 
 
-class LoadFileScreen(ModalScreen[Optional[Path]]):
-    """Modal dialog for loading S19/HEX/MAC data files or an A2L file.
+LoadKind = Literal["project", "workarea", "recent", "path"]
 
-    Re-skinned to the Calm Dark theme in batch-02 increment 8 (LLR-015.1):
-    the dialog carries the shared ``.modal-dialog`` class so it picks up the
-    Calm Dark accent border, panel background and foreground tokens from
-    ``styles.tcss``. Behavior is unchanged (LLR-015.2).
+
+@dataclass(frozen=True)
+class LoadChoice:
+    """A Load-dialog choice: the kind plus its on-disk value or typed text.
+
+    Summary:
+        The single dismiss value of the Load dialog (``LoadDialog``). ``value``
+        is always ``str``: the on-disk project name, the on-disk work-area
+        file name, the recorded recent-path text, or the typed path text.
+        There is no runtime check on ``kind``; the dialog and the app router
+        trust the producer. Frozen, equal by value, hashable and immutable, so
+        a ``LoadChoice`` can key a set or dict and the row object built by the
+        app is the very object the dialog dismisses (never one rebuilt from a
+        painted label).
+
+    Args:
+        kind: One of ``project``, ``workarea``, ``recent`` or ``path``.
+        value: The on-disk name / recorded path / typed text (verbatim).
+
+    Dependencies:
+        Used by:
+            - ``LoadDialog`` (the row choices and the typed-path choice)
+            - ``S19TuiApp`` (``rows`` / ``verdict`` / ``preview`` producers and
+              the load router)
     """
 
-    #: Route initial focus to the path Input so Ctrl+V and typing land
-    #: there instead of on the Load button. Without this, Textual's default
-    #: auto-focus picks the first focusable descendant of the dialog — often
-    #: the primary button — and the user's paste is silently dropped.
-    AUTO_FOCUS = "#load_path"
+    kind: LoadKind
+    value: str
+
+
+LoadRow = tuple[str, str, Optional[LoadChoice]]
+PreviewLine = tuple[str, bool]
+
+
+#: ``(reason, step)`` token pair painted in ``#load_reason`` when a load
+#: request has nothing selected (an empty path field, or no highlighted /
+#: enabled row).
+LOAD_NOTHING_SELECTED = ("nothing selected", "pick a row or type a path")
+#: Prefix painted before a marked preview line (U+25CF U+0020).
+LOAD_MARK = "● "
+
+
+class LoadDialog(ModalScreen[Optional[LoadChoice]]):
+    """Modal Load dialog: pick a project / work-area / recent row or type a path.
+
+    Summary:
+        The single Load entry point that replaces the retired Load-file and
+        Load-project screens. In ``mode="path"`` it opens with the path field
+        focused and dismisses with a ``LoadChoice("path", typed_text)``; in
+        ``mode="list"`` it opens with the row list focused and dismisses with
+        the ``LoadChoice`` object the highlighted row holds. The caller (the
+        app) supplies three callables: ``rows`` builds the section heading /
+        label rows (labels already scrubbed and clipped), ``verdict`` answers
+        ``None`` to allow a load or a ``(reason, step)`` pair that keeps the
+        dialog open, and ``preview`` returns the ``(text, marked)`` lines
+        shown beside the list. The dialog paints nothing from disk except
+        through those callables, so it needs no filesystem or workspace import.
+
+        Markup safety: the list is an ``OptionList(markup=False)`` fed plain
+        ``str`` prompts, and the preview body is a ``markup=False`` ``Static``
+        updated with a ``rich.text.Text``, so no label or path is ever parsed
+        as console markup.
+
+    Args:
+        mode: ``"path"`` to focus the path field first, ``"list"`` to focus
+            the row list first. Also the initial load source.
+        highlight: Project name to highlight on open (list mode), or ``None``.
+        rows: Called once on mount; returns the section heading / label rows.
+        verdict: Called once per load request with the chosen ``LoadChoice``;
+            ``None`` allows the load, a ``(reason, step)`` pair is painted in
+            ``#load_reason`` and the dialog stays open.
+        preview: Called for every list highlight; returns the lines to paint.
+
+    Returns:
+        Optional[LoadChoice]: the choice on Load, or ``None`` on Cancel /
+        Escape (``ModalScreen[Optional[LoadChoice]]``).
+
+    Data Flow:
+        - ``on_mount`` fills ``_rows``, populates and disables ``#load_list``
+          rows whose choice is ``None``, sets the initial highlight and focus,
+          then applies the stacked / side-by-side pane layout.
+        - ``on_key`` intercepts ``escape``, ``enter`` (list / preview) and
+          printable keys redirected from the list into ``#load_path``.
+        - ``action_load`` resolves the source (row or typed text), runs
+          ``verdict``, and either paints ``#load_reason`` or dismisses.
+
+    Dependencies:
+        Uses:
+            - ``OptionList`` / ``OsClipboardInput`` / ``Container`` /
+              ``Horizontal`` / ``VerticalScroll`` / ``Label`` / ``Static`` /
+              ``Button`` / ``Binding``
+            - :class:`LoadChoice`, :data:`LOAD_NOTHING_SELECTED`,
+              :data:`LOAD_MARK`
+        Used by:
+            - ``S19TuiApp`` (pushed and routed via the Load choice handler)
+
+    Example:
+        >>> dialog = LoadDialog(  # doctest: +SKIP
+        ...     mode="list",
+        ...     highlight=None,
+        ...     rows=lambda: [],
+        ...     verdict=lambda c: None,
+        ...     preview=lambda c: [],
+        ... )
+    """
+
+    BINDINGS = [
+        Binding("escape", "cancel", show=False),
+        Binding("alt+l", "load", show=False, priority=True),
+    ]
+
+    def __init__(
+        self,
+        *,
+        mode: Literal["path", "list"],
+        highlight: Optional[str],
+        rows: Callable[[], list[LoadRow]],
+        verdict: Callable[[LoadChoice], Optional[tuple[str, str]]],
+        preview: Callable[[LoadChoice], list[PreviewLine]],
+    ) -> None:
+        super().__init__()
+        self._mode = mode
+        self._highlight = highlight
+        self._rows_fn = rows
+        self._verdict = verdict
+        self._preview_fn = preview
+        self._rows: list[LoadRow] = []
+        self._source = mode
+        self._dismissed = False
 
     def compose(self) -> ComposeResult:
         yield Container(
-            Label("Load file (S19/HEX/MAC/A2L):", classes="modal-title"),
-            OsClipboardInput(
-                placeholder="C:\\path\\to\\file.s19, .hex, .mac, or .a2l",
-                id="load_path",
+            Label("Load", classes="modal-title"),
+            Horizontal(
+                Container(
+                    OsClipboardInput(
+                        placeholder=r"C:\path\to\file.s19, .hex, .mac, .a2l, or a project folder",
+                        id="load_path",
+                        restrict=r"[^\x00-\x1f\x7f]*",
+                    ),
+                    OptionList(id="load_list", markup=False),
+                    id="load_left",
+                ),
+                VerticalScroll(
+                    Static("", markup=False),
+                    id="load_preview",
+                ),
+                id="load_panes",
             ),
+            Static("", id="load_reason", markup=False),
             Container(
-                Button("Load", id="load_ok", classes="modal-confirm"),
-                Button("Cancel", id="load_cancel"),
-                id="loadfile_buttons",
+                Button("Load (alt+l)", id="load_ok", classes="modal-confirm"),
+                Button("Cancel (esc)", id="load_cancel"),
+                id="load_buttons",
                 classes="modal-buttons",
             ),
-            id="load_dialog",
+            id="load_box",
             classes="modal-dialog",
         )
 
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "load_cancel":
-            logger.info("LoadFileScreen dismissed by cancel.")
-            self.dismiss(None)
+    def on_mount(self) -> None:
+        """Fill the row list, set the initial highlight and focus, lay the panes.
+
+        Data Flow:
+            - ``_rows_fn`` is called exactly once here (never in ``__init__``).
+            - Row order is kept exactly as given: no sort, no filter.
+            - Rows whose choice is ``None`` (headings and empty / problem
+              token lines) are disabled, so they cannot be highlighted by key
+              or click and cannot be loaded.
+        """
+        self._rows = list(self._rows_fn())
+        lst = self.query_one("#load_list", OptionList)
+        lst.add_options([label for _s, label, _c in self._rows])
+        for i, row in enumerate(self._rows):
+            if row[2] is None:
+                lst.disable_option_at_index(i)
+        lst.highlighted = self._initial_index()
+        self.query_one(
+            "#load_list" if self._mode == "list" else "#load_path"
+        ).focus()
+        self._apply_stack(self.app.size.width)
+
+    def _initial_index(self) -> Optional[int]:
+        """Return the row to highlight on open (same rule in both modes).
+
+        Data Flow:
+            First match of: a project row whose value equals ``_highlight``;
+            else the first project row; else the first row with a choice;
+            else ``None``.
+        """
+        for i, (_s, _label, choice) in enumerate(self._rows):
+            if (
+                choice is not None
+                and choice.kind == "project"
+                and choice.value == self._highlight
+            ):
+                return i
+        for i, (_s, _label, choice) in enumerate(self._rows):
+            if choice is not None and choice.kind == "project":
+                return i
+        for i, (_s, _label, choice) in enumerate(self._rows):
+            if choice is not None:
+                return i
+        return None
+
+    def on_key(self, event: events.Key) -> None:
+        """Intercept keys before the non-priority bindings see them.
+
+        Data Flow:
+            - ``escape`` cancels from any focus, at the same hop as ``enter``.
+            - ``enter`` on ``#load_list`` or ``#load_preview`` loads (this
+              stops ``OptionList``'s own ``enter`` → ``OptionSelected``).
+            - A printable key with ``#load_list`` focused is redirected into
+              ``#load_path``: the field text grows, ``_source`` becomes
+              ``"path"`` at once, and the preview clears.
+            - All other keys (``up`` / ``down`` / ``home`` / ``end`` /
+              ``pageup`` / ``pagedown`` / ``tab``) keep their bindings.
+        """
+        f = self.focused
+        if f is None:
             return
+        if event.key == "escape":
+            event.stop()
+            event.prevent_default()
+            self.action_cancel()
+            return
+        if event.key == "enter" and f.id in ("load_list", "load_preview"):
+            event.stop()
+            event.prevent_default()
+            self.action_load()
+            return
+        if f.id == "load_list" and event.is_printable:
+            event.stop()
+            event.prevent_default()
+            inp = self.query_one("#load_path", Input)
+            inp.value = inp.value + event.character
+            inp.cursor_position = len(inp.value)
+            self._source = "path"
+            self._schedule_preview(None)
+            inp.focus()
+
+    def on_input_submitted(self, event: Input.Submitted) -> None:
+        """Route an ``enter`` in ``#load_path`` to ``action_load``."""
+        if event.input.id == "load_path":
+            event.stop()
+            self.action_load()
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        """Route ``#load_ok`` / ``#load_cancel`` to load / cancel."""
+        event.stop()
         if event.button.id == "load_ok":
-            value = self.query_one("#load_path", Input).value.strip()
-            logger.info("LoadFileScreen load_ok pressed. has_value=%s", bool(value))
-            if not value:
-                return
-            logger.info("LoadFileScreen dismissing with path=%s", value)
-            self.dismiss(Path(value))
+            self.action_load()
+        elif event.button.id == "load_cancel":
+            self.action_cancel()
+
+    def action_load(self) -> None:
+        """Resolve the source, run ``verdict``, then dismiss or paint a reason.
+
+        Data Flow:
+            - The source decides the choice: the highlighted row's ``LoadChoice``
+              object when ``_source == "list"``, else ``LoadChoice("path",
+              field value)`` with the text verbatim.
+            - ``None`` choice (empty field, or no / disabled highlighted row)
+              paints ``LOAD_NOTHING_SELECTED`` and returns.
+            - A non-``None`` ``verdict`` pair is painted and the dialog stays
+              open with the field untouched; only ``None`` dismisses.
+        """
+        if self._dismissed:
+            return
+        choice = self._row_choice() if self._source == "list" else self._path_choice()
+        if choice is None:
+            self._say(*LOAD_NOTHING_SELECTED)
+            return
+        pair = self._verdict(choice)
+        if pair is not None:
+            self._say(*pair)
+            return
+        self._close(choice)
+
+    def action_cancel(self) -> None:
+        """Dismiss with ``None`` — ``escape`` and ``#load_cancel`` mirror here."""
+        self._close(None)
+
+    def _row_choice(self) -> Optional[LoadChoice]:
+        """Return the highlighted row's choice object, or ``None``."""
+        i = self.query_one("#load_list", OptionList).highlighted
+        if i is None:
+            return None
+        return self._rows[i][2]
+
+    def _path_choice(self) -> Optional[LoadChoice]:
+        """Return ``LoadChoice("path", field)`` with the text verbatim, or ``None``."""
+        t = self.query_one("#load_path", Input).value
+        if t.strip() == "":
+            return None
+        return LoadChoice("path", t)
+
+    def _say(self, reason: str, step: str) -> None:
+        """Paint ``reason — step`` into ``#load_reason`` (the only writer)."""
+        self.query_one("#load_reason", Static).update(f"{reason} — {step}")
+
+    def _close(self, result: Optional[LoadChoice]) -> None:
+        """Dismiss once; a second queued close / load request returns at once."""
+        if self._dismissed:
+            return
+        self._dismissed = True
+        self.dismiss(result)
+
+    def on_descendant_focus(self, event: events.DescendantFocus) -> None:
+        """Track the last-focused source widget (``#load_list`` vs ``#load_path``).
+
+        Data Flow:
+            - Focus on the preview or a button changes nothing.
+            - A source change updates ``_source`` and asks for the new source's
+              preview (the row's choice for the list, none for the path field).
+        """
+        if event.widget.id in ("load_list", "load_path"):
+            src = "list" if event.widget.id == "load_list" else "path"
+            if src != self._source:
+                self._source = src
+                self._schedule_preview(self._row_choice() if src == "list" else None)
+
+    def on_option_list_option_highlighted(
+        self, event: OptionList.OptionHighlighted
+    ) -> None:
+        """Refresh the preview on every list highlight, while the list is source."""
+        if self._source == "list":
+            self._schedule_preview(self._row_choice())
+
+    def _schedule_preview(self, choice: Optional[LoadChoice]) -> None:
+        """Clear the preview body, then paint ``preview(choice)`` when non-``None``.
+
+        Data Flow:
+            - The body is cleared first so no ``●`` of the previous target
+              stays visible. ``None`` leaves it empty (the path-field-source
+              case). ``preview`` returns the lines synchronously.
+        """
+        self.query_one("#load_preview Static", Static).update("")
+        if choice is None:
+            return
+        self.show_preview(self._preview_fn(choice))
+
+    def show_preview(self, lines: list[PreviewLine]) -> None:
+        """Paint the preview lines, prefixing ``● `` only where ``marked``.
+
+        Args:
+            lines: ``(text, marked)`` pairs; the dialog paints the ``● `` mark
+                exactly where ``marked`` is ``True`` and never parses the text
+                as markup (a ``rich.text.Text`` into a ``markup=False``
+                ``Static``).
+        """
+        body = "\n".join(
+            (LOAD_MARK + text) if marked else text for text, marked in lines
+        )
+        self.query_one("#load_preview Static", Static).update(Text(body))
+
+    def on_resize(self, event: events.Resize) -> None:
+        """Re-apply the stacked / side-by-side pane layout on terminal resize."""
+        self._apply_stack(event.size.width)
+
+    def _apply_stack(self, width: int) -> None:
+        """Set the ``stacked`` class on ``#load_panes`` below 100 columns."""
+        self.query_one("#load_panes").set_class(width < 100, "stacked")
 
 
 class ChangeSetJsonScreen(ModalScreen[Optional[str]]):
@@ -278,7 +600,7 @@ class ChangeSetJsonScreen(ModalScreen[Optional[str]]):
     """
 
     #: Route initial focus to the editor so typing / paste land there rather
-    #: than on the Confirm button (mirrors :class:`LoadFileScreen`).
+    #: than on the Confirm button (mirrors the Load dialog).
     AUTO_FOCUS = "#changeset_json_text"
 
     #: ``Escape`` cancels the modal, mirroring the Cancel button (batch-41
@@ -693,48 +1015,6 @@ class SaveProjectScreen(ModalScreen[Optional[SaveProjectPayload]]):
             )
 
 
-class LoadProjectScreen(ModalScreen[Optional[str]]):
-    """Modal dialog for selecting an existing project.
-
-    Re-skinned to the Calm Dark theme in batch-02 increment 8 (LLR-015.1):
-    the dialog carries the shared ``.modal-dialog`` class. The project list
-    selection behavior is unchanged (LLR-015.2).
-    """
-
-    def __init__(self, projects: List[str]):
-        super().__init__()
-        self.projects = projects
-
-    def compose(self) -> ComposeResult:
-        yield Container(
-            Label("Load project:", classes="modal-title"),
-            ListView(
-                *[ListItem(Label(name)) for name in self.projects],
-                id="project_list",
-            ),
-            Container(
-                Button("Load", id="project_ok", classes="modal-confirm"),
-                Button("Cancel", id="project_cancel"),
-                id="loadproject_buttons",
-                classes="modal-buttons",
-            ),
-            id="load_dialog",
-            classes="modal-dialog",
-        )
-
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "project_cancel":
-            self.dismiss(None)
-            return
-        if event.button.id == "project_ok":
-            # The name comes from self.projects by index: Textual's Label has
-            # no .text, and str(Label) is "Label()" (CW-U-1).
-            index = self.query_one("#project_list", ListView).index
-            if index is None or not 0 <= index < len(self.projects):
-                return
-            self.dismiss(self.projects[index])
-
-
 class SaveFlowScreen(ModalScreen[Optional[str]]):
     """Modal to name and save the current Flow Builder pipeline (batch-53 FB-P1).
 
@@ -814,7 +1094,7 @@ class LoadFlowScreen(ModalScreen[Optional[str]]):
         containment- and size-guarded); the new stem is appended to the list. A
         containment/size rejection (or any raise) shows an inline status line,
         never a crash. Load dismisses with the highlighted stem; Cancel with
-        ``None`` (LLR-003.3/.4). Mirrors :class:`LoadProjectScreen`.
+        ``None`` (LLR-003.3/.4). Mirrors the Load dialog.
 
     Args:
         flows (List[str]): The saved flow stems to list.
@@ -950,7 +1230,7 @@ class ConfirmDiscardScreen(ModalScreen[bool]):
 class SelectVariantScreen(ModalScreen[Optional[str]]):
     """Modal dialog for selecting the active S19/HEX variant of a project.
 
-    Follows the ``LoadProjectScreen`` pattern (LLR-005.5): a ``ListView`` of
+    Follows the Load dialog pattern (LLR-005.5): a ``ListView`` of
     display labels plus confirm/cancel buttons, dismissing with the chosen
     ``variant_id`` or ``None`` on cancel. The caller supplies pre-computed
     ``(variant_id, display_label)`` pairs — when two variants share a
@@ -1683,7 +1963,7 @@ class ReportViewerScreen(ModalScreen[None]):
         - Selection resolves by list index into ``self.reports`` (never by
           parsing label text back).
         - ``Generate new report`` parses the context input as a plain
-          decimal int; an unparsable value is ignored (the LoadFileScreen
+          decimal int; an unparsable value is ignored (the Load dialog
           empty-input pattern) while DOMAIN errors (F-S-05) surface later
           via the app's ``ReportOptions`` status line.
 
@@ -1993,7 +2273,7 @@ class ReportViewerScreen(ModalScreen[None]):
         Summary:
             Forward a submitted free filter path to the app as a
             :class:`FilterPathTyped` message (LLR-056.4). An empty submit
-            is ignored (the LoadFileScreen empty-input pattern).
+            is ignored (the Load dialog empty-input pattern).
 
         Args:
             event (Input.Submitted): The Enter-key submission event.

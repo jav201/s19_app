@@ -75,7 +75,7 @@ def test_tc1815_root_created_once_across_repeated_pastes(
     executor thread.
     """
     from s19_app.tui.app import S19TuiApp
-    from s19_app.tui.screens import LoadFileScreen
+    from tests.support.b100_load_dialog import bare_path_dialog
 
     mod, fresh, state, roots = tk_singleton
     paste_count = 3
@@ -85,7 +85,7 @@ def test_tc1815_root_created_once_across_repeated_pastes(
         values: list[str] = []
         async with app.run_test(size=(160, 48)) as pilot:
             await pilot.pause()
-            app.push_screen(LoadFileScreen())
+            app.push_screen(bare_path_dialog())
             for _ in range(6):
                 await pilot.pause()
             input_widget = app.screen.query_one("#load_path", Input)

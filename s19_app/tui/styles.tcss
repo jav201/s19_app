@@ -1578,14 +1578,25 @@ ModalScreen {
     background: $bg-base 70%;
 }
 
-.modal-dialog,
-#load_dialog {
+.modal-dialog {
     border: round $accent-calm;
     background: $bg-panel;
     color: $fg-base;
     padding: 1 2;
     width: 70%;
     height: auto;
+}
+
+/* Load dialog (batch-100 increment 9b, HLR-173): the single Load entry
+ * point that replaces the retired Load-file / Load-project screens. Its
+ * outer container carries the id `#load_box` (only this dialog — the other
+ * modals keep their shared `#load_dialog` id), so the box is sized by width
+ * and height fractions with a column cap instead of the shared 70 % width,
+ * giving the list + preview panes room. */
+#load_box {
+    width: 96%;
+    max-width: 160;
+    height: 90%;
 }
 
 .modal-title {
@@ -1759,10 +1770,73 @@ ModalScreen {
     border: round $accent-calm;
 }
 
-#project_list, #variant_list {
+#variant_list {
     border: round $rule;
     background: $bg-base;
     height: 10;
+}
+
+/* --- Load dialog panes / list / preview (batch-100 increment 9b) ---------
+ * The Load dialog lays its row list and preview side by side when there is
+ * room, and stacks them below 100 columns. The list and preview never wrap
+ * (nowrap + ellipsis) so a single long name stays one line high and a
+ * continuation line can never start with the preview mark. */
+#load_panes {
+    layout: horizontal;
+    height: 1fr;
+}
+
+#load_panes.stacked {
+    layout: vertical;
+}
+
+#load_panes.stacked #load_left,
+#load_panes.stacked #load_preview {
+    width: 100%;
+}
+
+#load_left {
+    width: 1fr;
+    height: 1fr;
+}
+
+#load_list {
+    height: 1fr;
+    border: round $rule;
+    background: $bg-base;
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
+}
+
+#load_list:focus {
+    border: round $accent-calm;
+}
+
+#load_preview {
+    width: 1fr;
+    height: 1fr;
+    border: round $rule;
+    background: $bg-base;
+    padding: 0 1;
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* text-wrap / text-overflow are not inherited in Textual 8.2.8, so the
+ * preview body Static needs its own nowrap rule (S9b-8). */
+#load_preview Static {
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
+}
+
+#load_preview:focus {
+    border: round $accent-calm;
+}
+
+#load_reason {
+    height: auto;
+    padding: 0 1;
+    text-style: bold;
 }
 
 /* --- Save-project per-variant assignment lists (batch-16 LLR-017.3) --------

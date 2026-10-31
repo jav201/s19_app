@@ -711,32 +711,26 @@ def _stage_project(
 
 
 async def _load_project_dialog(app, pilot, name: str) -> None:
-    """Load ``name`` through the Load project dialog: rail key ``p``, click
-    the named item in ``#project_list``, confirm with ``#project_ok``."""
-    from textual.widgets import Label
+    """Load ``name`` through the Load dialog: rail key ``p``, click the
+    named row of ``#load_list``, confirm with ``#load_ok`` (Inc 9b re-pin,
+    ruling Q9: the separate Load project dialog is retired; a click on a
+    row only highlights it, LLR-173.2j)."""
+    from tests.support.b100_load_dialog import click_row, is_load_dialog, section_prompts
 
     await pilot.press("p")
     for _ in range(20):
         await pilot.pause()
-        if app.screen.query("#project_list"):
+        if is_load_dialog(app.screen):
             break
     else:
-        raise AssertionError("the Load project dialog did not open")
-    target, labels = None, []
-    for item in app.screen.query("#project_list ListItem"):
-        label = str(item.query_one(Label).render())
-        labels.append(label)
-        if label.strip() == name:
-            target = item
-    assert target is not None, f"{name} is not listed: {labels}"
-    target.scroll_visible(animate=False)
+        raise AssertionError("the Load dialog did not open")
+    labels = section_prompts(app.screen, "Projects")
+    assert name in labels, f"{name} is not listed: {labels}"
+    # The click return value is informational; the outcome is verified by
+    # the load status line below.
+    await click_row(pilot, app, name)
     await pilot.pause()
-    await pilot.pause()
-    # The click return value is informational (the child Label sits under the
-    # pointer); the outcome is verified by the load status line below.
-    await pilot.click(target)
-    await pilot.pause()
-    assert await pilot.click("#project_ok"), "click missed #project_ok"
+    assert await pilot.click("#load_ok"), "click missed #load_ok"
     for _ in range(100):
         await pilot.pause()
         if f"Loaded project '{name}'" in _status_text(app):

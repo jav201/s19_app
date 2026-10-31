@@ -1,0 +1,340 @@
+# Inc 9b E4 — RED of the new tests against the base revision
+# base tree: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/base9b
+# base sha: 89476669906b8e036c447970d88ba18af61e2d18  (batch-100 P3 increment 017 (Inc 9a) decision, atlas regenerated)
+# base source state: 0 modified file(s) under s19_app/ (0 = pristine)
+# tests copied in from the worktree (tests only): 25 entries
+# s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\__init__.py
+# python 3.11.15 | textual 8.2.8
+# command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<scratch lad-red> python -m pytest -p no:cacheprovider -q -rfEs --tb=line <ids>
+# started: 2026-10-31T16:20:38-06:00
+
+## Part 1 — tests/test_b100_load_dialog.py (new file, every test)
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF [ 54%]
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF            [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:40: ImportError: cannot import name 'LoadChoice' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\test_b100_load_dialog.py:519: AssertionError: assert not True
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:40: ImportError: cannot import name 'LoadChoice' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:40: ImportError: cannot import name 'LoadChoice' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:40: ImportError: cannot import name 'LoadChoice' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:40: ImportError: cannot import name 'LoadChoice' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:40: ImportError: cannot import name 'LoadChoice' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\test_b100_load_dialog.py:736: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:40: ImportError: cannot import name 'LoadChoice' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\test_b100_load_dialog.py:813: AttributeError: <class 's19_app.tui.app.S19TuiApp'> has no attribute '_list_project_files'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\test_b100_load_dialog.py:2752: AttributeError: type object 'S19TuiApp' has no attribute '_list_project_files'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\test_b100_load_dialog.py:2826: AssertionError: screens.py defines no LoadDialog class
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the Load dialog
+=========================== short test summary info ===========================
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_40_load_choice_is_a_frozen_value_of_four_kinds
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_40_retired_load_screens_are_gone
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_40_dialog_dismisses_a_load_choice_per_kind_or_none
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_40_project_choice_opens_the_load_result_panel
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_40_workarea_data_choice_loads_in_place_with_no_copy
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_40_workarea_a2l_choice_equals_the_files_list_pick
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_40_path_choice_takes_the_typed_route
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_40_one_router_receives_every_dialog_result
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_40_recent_choice_loads_the_recorded_text_unchanged
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_40_unreadable_picked_project_paints_one_status_line
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_l_and_ctrl_l_open_the_dialog_on_the_path_field
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_p_and_the_button_open_the_dialog_on_the_list
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_list_opens_on_the_open_project
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_open_project_highlight_falls_back_to_the_first_project
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_tab_order_wraps_both_ways
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_printable_key_in_the_list_types_into_the_path_field[p-p]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_printable_key_in_the_list_types_into_the_path_field[l-l]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_printable_key_in_the_list_types_into_the_path_field[q-q]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_printable_key_in_the_list_types_into_the_path_field[s-s]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_printable_key_in_the_list_types_into_the_path_field[r-r]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_printable_key_in_the_list_types_into_the_path_field[question_mark-?]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_navigation_keys_in_the_list_are_not_redirected
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_priority_keys_are_inert_while_the_dialog_is_open
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_list_last_takes_the_highlighted_row[2-expected0-enter]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_list_last_takes_the_highlighted_row[2-expected0-alt+l]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_list_last_takes_the_highlighted_row[2-expected0-load_ok]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_list_last_takes_the_highlighted_row[5-expected1-enter]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_list_last_takes_the_highlighted_row[5-expected1-alt+l]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_list_last_takes_the_highlighted_row[5-expected1-load_ok]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_list_last_takes_the_highlighted_row[7-expected2-enter]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_list_last_takes_the_highlighted_row[7-expected2-alt+l]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_list_last_takes_the_highlighted_row[7-expected2-load_ok]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_text_in_the_field_then_tab_into_the_list_loads_the_row
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_path_last_takes_the_typed_text[enter]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_path_last_takes_the_typed_text[alt+l]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_path_last_takes_the_typed_text[load_ok]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_alt_l_with_the_focus_on_the_path_field_loads_and_types_nothing
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_empty_or_spaces_text_is_explained[]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_empty_or_spaces_text_is_explained[   ]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_no_loadable_row_highlighted_is_explained
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_click_highlights_and_never_loads
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_escape_closes_with_no_result_from_every_focus
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_cancel_closes_with_no_result
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_double_enter_dismisses_once
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_type_ahead_c_then_enter_loads_the_typed_text
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_type_ahead_escape_then_enter_closes_with_none
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_printable_key_clears_the_preview
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_preview_follows_the_load_target
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_42_project_rows_are_painted_literally[markup bold]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_42_project_rows_are_painted_literally[markup action]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_42_project_rows_are_painted_literally[bidi override U+202E]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_42_project_rows_are_painted_literally[C1 control U+009B]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_42_work_area_file_rows_are_painted_literally[markup bold]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_42_work_area_file_rows_are_painted_literally[markup link]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_42_work_area_file_rows_are_painted_literally[markup action]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_42_work_area_file_rows_are_painted_literally[C1 control U+009B]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_42_work_area_file_rows_are_painted_literally[bidi override U+202E]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_42_work_area_file_rows_are_painted_literally[unpaired surrogate U+DC80]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_42_work_area_file_rows_are_painted_literally[130 characters]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_42_recent_rows_are_painted_literally[C:\\x\\[bold]a.s19-[bold]a.s19]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_42_recent_rows_are_painted_literally[C:\\x\\[link=y]b.hex-[link=y]b.hex]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_42_recent_rows_are_painted_literally[C:\\x\\[@click=app.bell]c.a2l-[@click=app.bell]c.a2l]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_42_preview_names_are_painted_literally
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_42_a_pick_loads_the_on_disk_name
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_43_sections_hold_the_projects_files_and_recents
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_43_a_folder_that_is_not_a_project_is_not_listed[empty]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_43_a_folder_that_is_not_a_project_is_not_listed[notes only]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_43_a_folder_that_is_not_a_project_is_not_listed[project.json only]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_43_a_folder_that_is_not_a_project_is_not_listed[s19 only]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_43_a_folder_that_is_not_a_project_is_not_listed[a2l only]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_43_files_section_is_the_one_lister_filtered_to_loadable_files
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_43_recents_section_is_the_store_read_in_order[3 in order]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_43_recents_section_is_the_store_read_in_order[20 entries]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_43_recents_section_is_the_store_read_in_order[2 valid of 3]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_43_empty_projects_section_paints_its_tokens
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_43_empty_files_section_paints_its_tokens[empty temp]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_43_empty_files_section_paints_its_tokens[only an A2L dump]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_43_empty_recents_section_paints_its_token[no store file]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_43_empty_recents_section_paints_its_token[LOCALAPPDATA unset]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_43_store_problem_is_painted_in_the_recents_section[too large]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_43_store_problem_is_painted_in_the_recents_section[could not be read]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_43_recent_row_shows_the_file_name_and_kind_only
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_43_recent_preview_shows_the_store_facts_only
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_43_no_filesystem_call_touches_a_recent_before_load
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_43_missing_recent_is_explained_inside_the_dialog
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_43_unreadable_project_list_says_so
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_path_not_found_is_explained[missing file]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_path_not_found_is_explained[missing folder]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_unsupported_file_is_explained[unsupported suffix]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_unsupported_file_is_explained[trailing dot]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_unsupported_file_is_explained[relative folder]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_folder_that_is_not_a_project_is_explained[temp]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_folder_that_is_not_a_project_is_explained[TEMP]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_folder_that_is_not_a_project_is_explained[empty folder]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_folder_that_is_not_a_project_is_explained[sub-folder]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_folder_outside_the_work_area_is_explained[folder]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_folder_outside_the_work_area_is_explained[manifest]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_path_through_a_junction_is_explained[junction folder]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_path_through_a_junction_is_explained[manifest through it]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_folder_that_cannot_be_read_is_explained[walk lstat]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_folder_that_cannot_be_read_is_explained[list_projects]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_63_folder_named_like_a_data_file
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_63_pasted_nul_is_not_inserted
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_project_preview_marks_equal_the_install[clean]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_project_preview_marks_equal_the_install[save-back]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_project_preview_marks_equal_the_install[recorded active missing]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_project_preview_marks_equal_the_install[A2L-only]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_a_load_that_installs_another_variant_names_it
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_file_row_preview_marks_what_the_session_keeps[nothing loaded, S19 row]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_file_row_preview_marks_what_the_session_keeps[A2L loaded, S19 row]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_file_row_preview_marks_what_the_session_keeps[S19 + MAC loaded, HEX row]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_file_row_preview_marks_what_the_session_keeps[S19 loaded, A2L row]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_open_project_note_on_a_data_file_row
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_project_preview_lists_every_variant
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_project_preview_states_the_manifest[valid]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_project_preview_states_the_manifest[absent]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_project_preview_states_the_manifest[over the cap]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_project_preview_read_error_says_so[listing]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_project_preview_read_error_says_so[manifest read]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_the_dialog_reads_nothing_itself
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_panes_stack_below_100_columns[99-True]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_panes_stack_below_100_columns[100-False]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_panes_stack_below_100_columns[118-False]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_panes_restack_on_a_live_resize
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_list_rows_never_wrap[99]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_list_rows_never_wrap[100]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_list_rows_never_wrap[118]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_preview_line_never_wraps
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_linked_file_in_a_project_is_neither_listed_nor_installed
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_project_json_that_is_not_a_regular_file_is_refused
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_more_than_one_mac_marks_nothing
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_66_painted_text_carries_no_decision_id
+FAILED tests/test_b100_load_dialog.py::test_at_b100_14_one_load_dialog_from_record_to_reopen
+133 failed in 1277.08s (0:21:17)
+## exit: 1
+
+## Part 2 — new arms in tests/test_b100_recents.py
+FFFF                                                                     [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\test_b100_recents.py:3010: AssertionError: [('C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-31106\\test_tc_b100_34_source_found_t0\\R\\x.s19', 's19'), ('C:\\seed\\s.s19', 's19')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\test_b100_recents.py:3041: AssertionError: [('C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-31106\\test_tc_b100_34_source_found_o0\\B\\fw.s19', 's19'), ('C:\\seed\\s.s19', 's19')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\test_b100_recents.py:3070: AssertionError: [('C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-31106\\test_tc_b100_34_a2l_found_only0\\B\\cal.a2l', 'a2l'), ('C:\\seed\\s.s19', 's19')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\test_b100_recents.py:3213: AssertionError: l did not open the Load dialog
+=========================== short test summary info ===========================
+FAILED tests/test_b100_recents.py::test_tc_b100_34_source_found_through_a_junction_fallback_is_not_recorded
+FAILED tests/test_b100_recents.py::test_tc_b100_34_source_found_only_in_the_base_folder_is_not_recorded
+FAILED tests/test_b100_recents.py::test_tc_b100_34_a2l_found_only_through_the_fallback_is_not_recorded
+FAILED tests/test_b100_recents.py::test_tc_b100_37_widened_census_and_one_enumeration_at_dialog_open
+4 failed, 157 deselected in 10.39s
+## exit: 1
+
+## Part 3 — new arms in tests/test_b100_focus.py
+FFFF                                                                     [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\test_b100_focus.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\test_b100_focus.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\test_b100_focus.py:77: AssertionError: timed out waiting for the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\test_b100_focus.py:77: AssertionError: timed out waiting for the Load dialog
+=========================== short test summary info ===========================
+FAILED tests/test_b100_focus.py::test_tc_b100_12_load_dialog_close_rehomes_a_stale_input_focus[escape]
+FAILED tests/test_b100_focus.py::test_tc_b100_12_load_dialog_close_rehomes_a_stale_input_focus[cancel]
+FAILED tests/test_b100_focus.py::test_tc_b100_12_load_dialog_close_from_the_p16_shape_lands_on_the_target[escape]
+FAILED tests/test_b100_focus.py::test_tc_b100_12_load_dialog_close_from_the_p16_shape_lands_on_the_target[cancel]
+4 failed, 34 deselected in 43.48s
+## exit: 1
+
+## Part 4 � a SAMPLE of re-pinned tests (not the whole re-pin set; the full re-pinned modules are deferred to the batch-end battery)
+F....F..F.FFF                                                            [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\test_tui_app.py:1279: ImportError: cannot import name 'LoadChoice' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\test_b100_project_homes.py:1055: AssertionError: ["Project NOT loaded: 'E' has no project.json — load a file and Save project."]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\test_b100_recents.py:2686: AttributeError: <class 's19_app.tui.app.S19TuiApp'> has no attribute '_list_project_files'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\test_b97_load_project_dialog.py:50: AssertionError: p must open the Load dialog
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\test_tui_directionb.py:9108: AssertionError: pressing the button must push the Load dialog (same as key 'p')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\tests\support\b100_load_dialog.py:33: ImportError: cannot import name 'LoadDialog' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9b\s19_app\tui\screens.py)
+=========================== short test summary info ===========================
+FAILED tests/test_tui_app.py::test_handle_load_dialog_defers_load_until_after_modal_dismiss
+FAILED tests/test_b100_project_homes.py::test_tc_b100_32_empty_folder_is_refused_before_any_reset[no project.json]
+FAILED tests/test_b100_recents.py::test_tc_b100_38_unreadable_folder_paints_could_not_be_read[route: _list_project_files]
+FAILED tests/test_b97_load_project_dialog.py::test_load_project_button_loads_the_picked_project
+FAILED tests/test_tui_directionb.py::test_ac7_workspace_load_project_button
+FAILED tests/test_loadfilescreen_input.py::test_loadfilescreen_auto_focus_lands_on_input
+PASSED tests/test_tui_app.py::test_list_projects_skips_files_and_sorts_names
+PASSED tests/test_tui_helpers.py::test_list_projects_ignores_temp
+PASSED tests/test_b99_load_project.py::test_tc_b99_35_reserved_homes_are_not_projects
+PASSED tests/test_b100_project_homes.py::test_tc_b100_32_empty_folder_is_refused_before_any_reset[no data or A2L file]
+PASSED tests/test_b100_recents.py::test_tc_b100_38_unreadable_folder_paints_could_not_be_read[route: walk lstat]
+PASSED tests/test_b100_recents.py::test_tc_b100_38_unreadable_folder_paints_could_not_be_read[route: list_projects]
+PASSED tests/test_b100_recents.py::test_tc_b100_38_unreadable_folder_paints_could_not_be_read[project load: list_projects]
+6 failed, 7 passed in 24.98s
+## exit: 1
+# finished: 2026-10-31T16:43:20-06:00

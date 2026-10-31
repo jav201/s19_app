@@ -72,8 +72,6 @@ import pytest
 from textual.widgets import Label
 
 from s19_app.tui.app import S19TuiApp
-from s19_app.tui.screens import LoadFileScreen
-from s19_app.tui.screens import LoadProjectScreen
 from s19_app.tui.screens import SaveProjectScreen
 from s19_app.tui.screens_directionb import PatchEditorPanel
 from s19_app.tui.services.variant_execution_service import MANIFEST_BAD_STRUCTURE
@@ -83,6 +81,9 @@ from s19_app.tui.workspace import WORKAREA_DIRNAME
 from s19_app.tui.workspace import WORKAREA_SUBDIR
 
 from tests.support import b100_projects as projects
+from tests.support.b100_load_dialog import highlight_row
+from tests.support.b100_load_dialog import is_load_dialog
+from tests.support.b100_load_dialog import load_choice_cls
 from tests.support.independent_reader import read_s19
 from tests.support.timing import timing_bound
 
@@ -207,7 +208,7 @@ def test_tc_b100_18_absent_key_is_empty_with_no_issue(tmp_path: Path) -> None:
 
 
 async def _load_through_handler(pilot, app: S19TuiApp, src: Path) -> None:
-    app._handle_load_dialog(src)
+    app._handle_load_dialog(load_choice_cls()("path", str(src)))
     await _wait_for(
         pilot,
         lambda: app.current_file is not None
@@ -980,7 +981,7 @@ def test_tc_b100_71_variant_append_carries_derived_from(tmp_path: Path) -> None:
 async def _load_file_through_dialog(pilot, app: S19TuiApp, src: Path) -> None:
     await pilot.press("l")
     await _wait_for(
-        pilot, lambda: isinstance(app.screen, LoadFileScreen), "the Load file dialog"
+        pilot, lambda: is_load_dialog(app.screen), "the Load dialog"
     )
     assert await pilot.click("#load_path"), "click missed #load_path"
     await pilot.press("ctrl+a")
@@ -989,7 +990,7 @@ async def _load_file_through_dialog(pilot, app: S19TuiApp, src: Path) -> None:
     assert await pilot.click("#load_ok"), "click missed #load_ok"
     await _wait_for(
         pilot,
-        lambda: not isinstance(app.screen, LoadFileScreen)
+        lambda: not is_load_dialog(app.screen)
         and str(app.query_one("#status_text", Label).render()).startswith("Loaded "),
         f"the durable load line after loading {src.name}",
     )
@@ -1065,20 +1066,14 @@ async def _open_project_through_dialog(pilot, app: S19TuiApp, name: str) -> None
         await pilot.pause()
     await pilot.press("p")
     await _wait_for(
-        pilot, lambda: isinstance(app.screen, LoadProjectScreen), "the Load project dialog"
+        pilot, lambda: is_load_dialog(app.screen), "the Load dialog"
     )
-    row = next(
-        item
-        for item in app.screen.query("#project_list ListItem")
-        if str(item.query_one(Label).render()) == name
-    )
-    await pilot.click(row)
-    await pilot.pause()
-    assert await pilot.click("#project_ok"), "click missed #project_ok"
+    await highlight_row(pilot, app, name)
+    assert await pilot.click("#load_ok"), "click missed #load_ok"
     await _wait_for(
         pilot,
-        lambda: not isinstance(app.screen, LoadProjectScreen),
-        f"the Load project dialog to close after loading {name}",
+        lambda: not is_load_dialog(app.screen),
+        f"the Load dialog to close after loading {name}",
     )
 
 
@@ -1145,14 +1140,14 @@ def test_at_b100_06_reopen_opens_the_saved_back_variant(
 async def _load_through_dialog_until(pilot, app: S19TuiApp, src: Path, until, what: str) -> None:
     await pilot.press("l")
     await _wait_for(
-        pilot, lambda: isinstance(app.screen, LoadFileScreen), "the Load file dialog"
+        pilot, lambda: is_load_dialog(app.screen), "the Load dialog"
     )
     assert await pilot.click("#load_path"), "click missed #load_path"
     await pilot.press("ctrl+a")
     await pilot.press("delete")
     await pilot.press(*str(src))
     assert await pilot.click("#load_ok"), "click missed #load_ok"
-    await _wait_for(pilot, lambda: not isinstance(app.screen, LoadFileScreen) and until(), what)
+    await _wait_for(pilot, lambda: not is_load_dialog(app.screen) and until(), what)
 
 
 async def _open_and_close_the_panel(pilot, app: S19TuiApp, name: str) -> str:

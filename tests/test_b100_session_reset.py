@@ -726,26 +726,20 @@ async def _open_project_through_dialog(pilot, app: S19TuiApp, name: str) -> None
     ``p`` route; the Workspace is reached first with rail key ``1`` when a
     rail screen took the focus — only the Segment Split window re-binds
     ``p``, and it is never displayed in this scene)."""
-    from s19_app.tui.screens import LoadProjectScreen
+    from tests.support.b100_load_dialog import highlight_row, is_load_dialog
 
     await pilot.press("1")
     await _flush(pilot, 4)
     await pilot.press("p")
     await _wait_for(
-        pilot, lambda: isinstance(app.screen, LoadProjectScreen), "the Load project dialog"
+        pilot, lambda: is_load_dialog(app.screen), "the Load dialog"
     )
-    row = next(
-        item
-        for item in app.screen.query("#project_list ListItem")
-        if str(item.query_one(Label).render()) == name
-    )
-    await pilot.click(row)
-    await pilot.pause()
-    assert await pilot.click("#project_ok"), "click missed #project_ok"
+    await highlight_row(pilot, app, name)
+    assert await pilot.click("#load_ok"), "click missed #load_ok"
     await _wait_for(
         pilot,
-        lambda: not isinstance(app.screen, LoadProjectScreen),
-        f"the Load project dialog to close after loading {name}",
+        lambda: not is_load_dialog(app.screen),
+        f"the Load dialog to close after loading {name}",
     )
     # Inc 6 (HLR-178): the dialog route opens the Load-result panel;
     # dismiss it first with its shown key ``esc``.
