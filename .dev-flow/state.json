@@ -221,6 +221,11 @@
       "station": "P3",
       "date": "2026-10-31",
       "decision": "P3 increment 016 (Inc 8b) approved under the batch's standing authorization (autonomous; stop only on HIGH or operator decision): code review r2 PASS-WITH-NOTES, security PASS-WITH-NOTES; 5th source file operator-approved for F2 (2026-10-31); P3 increment for Inc 9a is next."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-31",
+      "decision": "P3 increment 017 (Inc 9a) approved under the batch's standing authorization (autonomous; stop only on HIGH or operator decision): code review PASS-WITH-NOTES, security PASS-WITH-NOTES, no round 2 (nothing blocking); per-increment test scope per the operator override of 2026-10-31; P3 increment for Inc 9b is next."
     }
   ],
   "obsidian_synced": false,
