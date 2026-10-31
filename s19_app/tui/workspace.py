@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import logging
 import os
 import re
@@ -9,10 +10,11 @@ import stat
 import sys
 import tempfile
 import time
+import unicodedata
 from collections import Counter
 from dataclasses import dataclass
 from logging.handlers import RotatingFileHandler
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 from typing import Iterator, Optional, Sequence
 
 from .models import ProjectVariantSet, VariantDescriptor
@@ -2032,3 +2034,560 @@ def resolve_input_path(raw_path: Path, base_dir: Path) -> Optional[Path]:
             if repo_candidate.exists():
                 return repo_candidate
     return None
+
+
+# ---------------------------------------------------------------------------
+# Recent sources (Inc 9a, HLR-172 / LLR-172.1* / LLR-172.2* / LLR-172.3).
+# A per-user convenience store at %LOCALAPPDATA%\s19_app\recent_sources.json,
+# outside every base folder and work area (privacy decision S-16 / PDR-C3:
+# the local, non-roaming profile, so the absolute paths never travel).
+# Bounded to RECENT_LIMIT entries and RECENT_STORE_MAX_BYTES bytes.
+# ---------------------------------------------------------------------------
+#: Store folder and file name under ``%LOCALAPPDATA%`` (LLR-172.1).
+RECENT_STORE_DIRNAME = "s19_app"
+RECENT_STORE_FILENAME = "recent_sources.json"
+#: Reader size cap, also the writer's output bound (LLR-172.2a / LLR-172.1m).
+RECENT_STORE_MAX_BYTES: int = 65_536
+#: Maximum entries the store keeps, newest first (LLR-172.1c / LLR-172.2).
+RECENT_LIMIT: int = 20
+#: Store problem words exported for G2's reader (seam S5).
+RECENT_PROBLEM_TOO_LARGE = "too large"
+RECENT_PROBLEM_UNREADABLE = "could not be read"
+#: The one drive-rooted test shared by the store location and the entry
+#: check: a drive letter followed by a root, on every platform (D-1 / R5).
+_DRIVE_ROOTED_RE = re.compile(r"^[A-Za-z]:[\\/]")
+
+
+@dataclass(frozen=True)
+class RecentEntry:
+    """One recent source (LLR-172.1a).
+
+    Summary:
+        ``path`` is the absolute source path as recorded — the text
+        ``os.path.abspath(str(source))`` produced at record time (lexical:
+        no link resolved, no network call), never re-normalised on read so
+        a store read touches no source and no network path. ``kind`` is
+        :func:`recent_kind` of that path. Every instance
+        :func:`read_recent_sources` returns was accepted by
+        :func:`_recent_entry_ok`.
+
+    Args:
+        path (str): The absolute source path as recorded.
+        kind (str): The kind :func:`recent_kind` maps the suffix to.
+    """
+
+    path: str
+    kind: str
+
+
+@dataclass(frozen=True)
+class RecentSources:
+    """The sanitised result of one store read (LLR-172.2).
+
+    Summary:
+        ``entries`` holds the accepted entries, newest first (stored
+        order), at most :data:`RECENT_LIMIT`. ``problem`` is ``None``, or
+        :data:`RECENT_PROBLEM_TOO_LARGE` / :data:`RECENT_PROBLEM_UNREADABLE`.
+        Invariant: a non-``None`` ``problem`` means ``entries == ()``.
+
+    Args:
+        entries (tuple[RecentEntry, ...]): Accepted entries, newest first.
+        problem (Optional[str]): ``None`` or the store problem word.
+    """
+
+    entries: tuple[RecentEntry, ...]
+    problem: Optional[str]
+
+
+def recent_store_path() -> Optional[Path]:
+    """
+    Summary:
+        The recent-sources store path ``%LOCALAPPDATA%\\s19_app\\
+        recent_sources.json`` (LLR-172.1), or ``None`` when
+        ``LOCALAPPDATA`` is missing, empty or not drive-rooted (LLR-172.1f).
+        ``None`` means "no store" to every caller (seam S4).
+
+    Returns:
+        Optional[Path]: The store path, or ``None`` when the variable is
+            unusable.
+
+    Raises:
+        None: Pure — touches no file and creates no folder.
+
+    Data Flow:
+        - Read ``os.environ.get("LOCALAPPDATA")`` once per call, at call
+          time (never at import, seam S9).
+        - Refuse a value that does not match ``^[A-Za-z]:[\\/]`` on every
+          platform (the same drive-rooted test as LLR-172.2e, decision D-1).
+
+    Dependencies:
+        Uses:
+            - _DRIVE_ROOTED_RE
+            - RECENT_STORE_DIRNAME / RECENT_STORE_FILENAME
+        Used by:
+            - record_recent_source
+            - read_recent_sources
+    """
+    value = os.environ.get("LOCALAPPDATA")
+    if not value:
+        return None
+    if _DRIVE_ROOTED_RE.match(value) is None:
+        return None
+    return Path(value) / RECENT_STORE_DIRNAME / RECENT_STORE_FILENAME
+
+
+def recent_kind(path: Path) -> Optional[str]:
+    """
+    Summary:
+        The kind of a source path from the loader's own extension sets
+        (LLR-172.1a): "s19", "hex", "mac" or "a2l", or ``None`` for any
+        other suffix (an empty suffix included). Windows suffix rules apply
+        on every host (``PureWindowsPath``, ruling C6 / R-1).
+
+    Args:
+        path (Path): The source path.
+
+    Returns:
+        Optional[str]: The kind, or ``None`` for an unmapped suffix.
+
+    Raises:
+        None: Pure, never raises.
+
+    Data Flow:
+        - ``suffix = PureWindowsPath(str(path)).suffix.casefold()``.
+        - Map through S19_EXTENSIONS / HEX_EXTENSIONS / MAC_EXTENSIONS /
+          A2L_EXTENSIONS, read at call time.
+
+    Dependencies:
+        Uses:
+            - PureWindowsPath
+            - S19_EXTENSIONS / HEX_EXTENSIONS / MAC_EXTENSIONS / A2L_EXTENSIONS
+        Used by:
+            - _recent_entry_ok (reader)
+            - record_recent_source (writer)
+    """
+    suffix = PureWindowsPath(str(path)).suffix.casefold()
+    if suffix in S19_EXTENSIONS:
+        return "s19"
+    if suffix in HEX_EXTENSIONS:
+        return "hex"
+    if suffix in MAC_EXTENSIONS:
+        return "mac"
+    if suffix in A2L_EXTENSIONS:
+        return "a2l"
+    return None
+
+
+def _recent_entry_ok(raw: object) -> Optional[RecentEntry]:
+    """
+    Summary:
+        The one entry check shared by the store writer and reader
+        (LLR-172.1l): one decoded JSON value to a :class:`RecentEntry`, or
+        ``None`` when any check fails. Checks run in a fixed order so no
+        later check can raise on what an earlier check let through.
+
+    Args:
+        raw (object): One decoded JSON value from the store's ``sources``.
+
+    Returns:
+        Optional[RecentEntry]: The accepted entry, or ``None``.
+
+    Raises:
+        None: Pure (no filesystem access), never raises (LLR-172.2j).
+
+    Data Flow:
+        - (LLR-172.2i) ``raw`` is a dict whose ``path`` and ``kind`` are
+          ``str`` (``type(...) is str``); extra keys are ignored.
+        - (LLR-172.2g) the path holds no control character (U+0000-U+001F
+          or U+007F-U+009F, the ``_CONTROL_SCRUB`` range).
+        - (LLR-172.2e) the path is drive-rooted (``_DRIVE_ROOTED_RE``).
+        - (LLR-172.2k) no ``<>:"|?*`` after the 2-character drive prefix
+          (streams, ``CON:``, the NT-prefix form) and no character of
+          Unicode category Cf, Zl, Zp or Cs.
+        - (LLR-172.2f) no component after the drive is a Windows device
+          name.
+        - (LLR-172.2h) ``kind`` equals :func:`recent_kind` of the path and
+          that kind is not ``None``.
+
+    Dependencies:
+        Uses:
+            - _DRIVE_ROOTED_RE
+            - PureWindowsPath
+            - is_windows_device_name
+            - recent_kind
+        Used by:
+            - read_recent_sources
+            - record_recent_source
+    """
+    if not isinstance(raw, dict):
+        return None
+    path = raw.get("path")
+    kind = raw.get("kind")
+    if type(path) is not str or type(kind) is not str:
+        return None
+    if any(ord(ch) < 0x20 or 0x7F <= ord(ch) <= 0x9F for ch in path):
+        return None
+    if _DRIVE_ROOTED_RE.match(path) is None:
+        return None
+    if any(ch in '<>:"|?*' for ch in path[2:]):
+        return None
+    if any(unicodedata.category(ch) in ("Cf", "Zl", "Zp", "Cs") for ch in path):
+        return None
+    for component in PureWindowsPath(path).parts[1:]:
+        if is_windows_device_name(component):
+            return None
+    expected_kind = recent_kind(Path(path))
+    if expected_kind is None or kind != expected_kind:
+        return None
+    return RecentEntry(path=path, kind=kind)
+
+
+def read_recent_sources() -> RecentSources:
+    """
+    Summary:
+        The bounded, shape-checked store read (LLR-172.2). Returns the
+        accepted entries in stored order (newest first), at most
+        :data:`RECENT_LIMIT`, with a problem word when the store is too
+        large or could not be read. Never raises.
+
+    Returns:
+        RecentSources: Sanitised entries and an optional problem word.
+
+    Raises:
+        None: Every failure path returns an empty, problem-carrying result;
+            the body sits inside one ``except Exception`` guard as the last
+            resort.
+
+    Data Flow:
+        - ``recent_store_path()``; ``None`` -> empty, no problem (LLR-172.2d).
+        - Link check before any open (R6): a linked store file or folder ->
+          "could not be read", 0 bytes read (LLR-172.2c).
+        - ``open(store, "rb")``: ``FileNotFoundError`` /
+          ``NotADirectoryError`` -> empty, no problem; any other ``OSError``
+          -> "could not be read".
+        - One ``read(RECENT_STORE_MAX_BYTES + 1)``; more than
+          ``RECENT_STORE_MAX_BYTES`` -> "too large" (LLR-172.2a).
+        - Strict UTF-8 decode -> ``UnicodeDecodeError`` -> empty, no problem
+          (LLR-172.2b); ``json.loads`` -> ``(ValueError, RecursionError)``
+          -> empty, no problem.
+        - Shape: a dict with ``schema_version`` an int equal to 1 and
+          ``sources`` a list; else empty, no problem (LLR-172.2b).
+        - Walk ``sources`` in order, keep what :func:`_recent_entry_ok`
+          accepts, stop at :data:`RECENT_LIMIT`.
+
+    Dependencies:
+        Uses:
+            - recent_store_path
+            - _is_reparse_point
+            - _recent_entry_ok
+            - RECENT_STORE_MAX_BYTES / RECENT_LIMIT / RECENT_PROBLEM_*
+        Used by:
+            - record_recent_source
+    """
+    store = recent_store_path()
+    if store is None:
+        return RecentSources((), None)
+    try:
+        if _is_reparse_point(store.parent) or _is_reparse_point(store):
+            return RecentSources((), RECENT_PROBLEM_UNREADABLE)
+        try:
+            handle = open(store, "rb")
+        except (FileNotFoundError, NotADirectoryError):
+            return RecentSources((), None)
+        except OSError:
+            return RecentSources((), RECENT_PROBLEM_UNREADABLE)
+        with handle:
+            try:
+                data = handle.read(RECENT_STORE_MAX_BYTES + 1)
+            except OSError:
+                return RecentSources((), RECENT_PROBLEM_UNREADABLE)
+        if len(data) > RECENT_STORE_MAX_BYTES:
+            return RecentSources((), RECENT_PROBLEM_TOO_LARGE)
+        try:
+            text = data.decode("utf-8")
+        except UnicodeDecodeError:
+            return RecentSources((), None)
+        try:
+            doc = json.loads(text)
+        except (ValueError, RecursionError):
+            return RecentSources((), None)
+        if not isinstance(doc, dict):
+            return RecentSources((), None)
+        schema_version = doc.get("schema_version")
+        sources = doc.get("sources")
+        if type(schema_version) is not int or schema_version != 1:
+            return RecentSources((), None)
+        if not isinstance(sources, list):
+            return RecentSources((), None)
+        entries: list[RecentEntry] = []
+        refused = 0
+        for raw in sources:
+            entry = _recent_entry_ok(raw)
+            if entry is None:
+                refused += 1
+                continue
+            entries.append(entry)
+            if len(entries) >= RECENT_LIMIT:
+                break
+        logging.getLogger("s19tui").debug(
+            "recent_sources read: accepted=%d refused=%d problem=%s",
+            len(entries),
+            refused,
+            "none",
+        )
+        return RecentSources(tuple(entries), None)
+    except Exception as exc:
+        logging.getLogger("s19tui").debug(
+            "recent_sources read failed: %s", type(exc).__name__
+        )
+        return RecentSources((), RECENT_PROBLEM_UNREADABLE)
+
+
+def _encode_recent_store(entries: Sequence[RecentEntry]) -> bytes:
+    """
+    Summary:
+        Encode the store document from at most :data:`RECENT_LIMIT`
+        entries, newest first, and shrink it until it fits
+        :data:`RECENT_STORE_MAX_BYTES` (LLR-172.1m): drop the oldest (last)
+        entry while the payload is too long and more than one entry
+        remains; a single entry that still cannot fit yields ``b""`` so the
+        caller writes nothing. The writer therefore never produces a store
+        the reader refuses as "too large" (R-3).
+
+    Args:
+        entries (Sequence[RecentEntry]): Newest-first entries to encode.
+
+    Returns:
+        bytes: The ASCII store bytes (``json.dumps(..., ensure_ascii=True,
+            separators=(",", ":"))`` — decision D-3), or ``b""`` when even
+            one entry cannot fit.
+
+    Raises:
+        None: Pure.
+
+    Data Flow:
+        - Build ``{"schema_version": 1, "sources": [{"path", "kind"}, ...]}``
+          from the first :data:`RECENT_LIMIT` entries.
+        - Re-encode after dropping the last (oldest) entry until the
+          payload fits, or return ``b""`` for an oversized single entry.
+
+    Dependencies:
+        Uses:
+            - json
+            - RECENT_LIMIT / RECENT_STORE_MAX_BYTES
+        Used by:
+            - record_recent_source
+    """
+    kept = list(entries)[:RECENT_LIMIT]
+    while True:
+        doc = {
+            "schema_version": 1,
+            "sources": [{"path": entry.path, "kind": entry.kind} for entry in kept],
+        }
+        payload = json.dumps(
+            doc, ensure_ascii=True, separators=(",", ":")
+        ).encode("ascii")
+        if len(payload) <= RECENT_STORE_MAX_BYTES:
+            return payload
+        if len(kept) <= 1:
+            return b""
+        kept.pop()
+
+
+def record_recent_source(path: Path) -> bool:
+    """
+    Summary:
+        Record one source the caller has already copied into the work area
+        (HLR-172 / LLR-172.1a). The caller checks "outside the work area"
+        (seam S2) and the copy order (seam S1); this function records
+        ``os.path.abspath(str(path))`` first in the store, de-duplicates by
+        ``normcase(abspath)``, caps at :data:`RECENT_LIMIT` and replaces the
+        store atomically. Never raises; ``True`` only when the store was
+        replaced.
+
+    Args:
+        path (Path): The source path as G2 copied it (``normalized``, seam
+            S7).
+
+    Returns:
+        bool: True when the store was replaced; False on any skip or
+            failure, with the store left as it was.
+
+    Raises:
+        None: One outer ``except Exception`` guard returns False.
+
+    Data Flow:
+        - ``recent_store_path()``; ``None`` -> False (LLR-172.1f).
+        - ``recent_kind(path)``; ``None`` -> False (ruling C6).
+        - ``text = os.path.abspath(str(path))`` (R1: lexical); ``ValueError``
+          or ``OSError`` -> False.
+        - ``_recent_entry_ok``; ``None`` -> False (LLR-172.1l).
+        - ``folder.mkdir(parents=False, exist_ok=True)`` (R7: only
+          ``s19_app``); a missing ``LOCALAPPDATA`` folder raises
+          ``FileNotFoundError`` -> False. Then ``_is_reparse_point(folder)``
+          -> False (LLR-172.1g).
+        - ``read_recent_sources()``; "could not be read" -> False, store
+          unchanged (LLR-172.1k).
+        - ``[new] + existing entries`` de-duplicated by ``normcase`` and cut
+          to :data:`RECENT_LIMIT` (LLR-172.1b / .1c).
+        - ``_encode_recent_store``; ``b""`` -> False (LLR-172.1m).
+        - ``tempfile.mkstemp`` + write + flush + close + ``os.replace``
+          (LLR-172.1h); any ``OSError`` -> unlink the staging file, False
+          (LLR-172.1i).
+
+    Dependencies:
+        Uses:
+            - recent_store_path
+            - recent_kind
+            - _recent_entry_ok
+            - _is_reparse_point
+            - read_recent_sources
+            - _encode_recent_store
+            - tempfile.mkstemp / os.replace
+        Used by:
+            - s19_app.tui.app.S19TuiApp (after the copy, seam S1)
+    """
+    logger = logging.getLogger("s19tui")
+    try:
+        store = recent_store_path()
+        if store is None:
+            logger.debug("recent_sources record: skipped (no store path)")
+            return False
+        kind = recent_kind(path)
+        if kind is None:
+            logger.debug("recent_sources record: skipped (unsupported kind)")
+            return False
+        try:
+            text = os.path.abspath(str(path))
+        except (ValueError, OSError) as exc:
+            logger.debug(
+                "recent_sources record: failed at abspath: %s",
+                type(exc).__name__,
+            )
+            return False
+        new = _recent_entry_ok({"path": text, "kind": kind})
+        if new is None:
+            logger.debug(
+                "recent_sources record: skipped (entry would be dropped on read)"
+            )
+            return False
+        folder = store.parent
+        try:
+            folder.mkdir(parents=False, exist_ok=True)
+        except OSError as exc:
+            logger.debug(
+                "recent_sources record: failed at mkdir: %s",
+                type(exc).__name__,
+            )
+            return False
+        if _is_reparse_point(folder):
+            logger.debug("recent_sources record: skipped (linked store folder)")
+            return False
+        current = read_recent_sources()
+        if current.problem == RECENT_PROBLEM_UNREADABLE:
+            logger.debug(
+                "recent_sources record: skipped (store could not be read)"
+            )
+            return False
+        entries = [new]
+        entries.extend(
+            entry
+            for entry in current.entries
+            if os.path.normcase(entry.path) != os.path.normcase(text)
+        )
+        entries = entries[:RECENT_LIMIT]
+        payload = _encode_recent_store(entries)
+        if payload == b"":
+            logger.debug("recent_sources record: skipped (entry too large)")
+            return False
+        staging = None
+        try:
+            fd, staging = tempfile.mkstemp(
+                prefix=".recent_sources-", suffix=".tmp", dir=folder
+            )
+            try:
+                handle = os.fdopen(fd, "wb")
+            except Exception:
+                os.close(fd)
+                raise
+            with handle:
+                handle.write(payload)
+                handle.flush()
+            os.replace(staging, store)
+            staging = None
+        except OSError as exc:
+            logger.debug(
+                "recent_sources record: failed at write: %s",
+                type(exc).__name__,
+            )
+            return False
+        finally:
+            if staging is not None:
+                try:
+                    os.unlink(staging)
+                except OSError:
+                    pass
+        return True
+    except Exception as exc:
+        logger.debug(
+            "recent_sources record: unexpected %s", type(exc).__name__
+        )
+        return False
+
+
+def list_workarea_files(workarea: Path) -> list[Path]:
+    """
+    Summary:
+        The one enumeration of the work-area temp folder (LLR-172.4):
+        the regular, non-link direct children of ``workarea/temp``, sorted
+        by name. A missing, linked or unlistable temp folder gives an empty
+        list (LLR-172.4c).
+
+    Args:
+        workarea (Path): The work-area root.
+
+    Returns:
+        list[Path]: The child ``Path`` objects with their on-disk names
+            untouched (seam S3), sorted by ``(name.casefold(), name)``.
+
+    Raises:
+        None: Any ``OSError`` from ``scandir`` or the iteration returns
+            ``[]``, never a partial list.
+
+    Data Flow:
+        - ``temp_dir = workarea / WORKAREA_TEMP``; ``_is_reparse_point`` ->
+          ``[]`` (LLR-172.4c after R11).
+        - ``os.scandir(temp_dir)``; keep each entry that is a regular file
+          via ``is_file(follow_symlinks=False)`` AND is not a reparse point
+          (two gates: a failed ``lstat`` cannot let a symbolic link through,
+          LLR-172.4b).
+        - (LLR-172.4d) a name ending in a dot or a space is skipped before
+          the ``lstat``: Win32 opens it as another file.
+
+    Dependencies:
+        Uses:
+            - WORKAREA_TEMP
+            - _is_reparse_point
+            - os.scandir
+        Used by:
+            - s19_app.tui.app.S19TuiApp.refresh_files
+    """
+    temp_dir = workarea / WORKAREA_TEMP
+    if _is_reparse_point(temp_dir):
+        return []
+    files: list[Path] = []
+    try:
+        with os.scandir(temp_dir) as it:
+            for entry in it:
+                if not entry.is_file(follow_symlinks=False):
+                    continue
+                if entry.name != entry.name.rstrip(" ."):
+                    continue
+                entry_path = Path(entry.path)
+                if _is_reparse_point(entry_path):
+                    continue
+                files.append(entry_path)
+    except OSError:
+        return []
+    files.sort(key=lambda p: (p.name.casefold(), p.name))
+    return files

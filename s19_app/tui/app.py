@@ -5,7 +5,7 @@ from dataclasses import dataclass, field, replace
 import hashlib
 import json
 import os
-from pathlib import Path, PurePosixPath
+from pathlib import Path, PurePath, PurePosixPath
 import shutil
 import stat
 import time
@@ -274,7 +274,9 @@ from .workspace import (
     copy_into_workarea,
     ensure_workarea,
     is_windows_device_name,
+    list_workarea_files,
     place_into_workarea,
+    record_recent_source,
     resolve_input_path,
     sanitize_project_name,
     setup_logging,
@@ -7302,21 +7304,24 @@ class S19TuiApp(App):
 
         Every file load copies into ``workarea/temp`` (HLR-162 / LLR-162.3,
         CW-U-3), so that — never the work-area root, never the private
-        ``temp/.staging`` home — is the folder this list reads. Each item
-        carries its file name on ``item.data`` (the Inc-9 dialog-fix idiom),
-        which ``_load_from_item`` reads back; ``str(Label)`` is never the
-        source (Textual 8.2.8 ``Label`` has no ``.text``, CW-U-1).
+        ``temp/.staging`` home — is the folder this list reads. The rows come
+        from ``list_workarea_files`` (LLR-172.4, seam S3): the regular,
+        non-link direct children of ``workarea/temp``, sorted, or ``[]``
+        when the folder is missing or cannot be listed. Each row paints its
+        name through ``painted_names`` (the one category scrub — Cc, Cf, Zl
+        and Zp removed, an unpaired surrogate as U+FFFD, clipped to 120
+        characters) with markup off through ``safe_text`` (LLR-172.6, E3 R4);
+        ``item.data`` keeps the on-disk name, which ``_load_from_item`` reads
+        (LLR-172.6a, C5).
         """
         list_view = self.query_one("#files_list", ListView)
         list_view.clear()
-        temp_dir = self.workarea / WORKAREA_TEMP
-        files = sorted(temp_dir.glob("*"))
-        for item in files:
-            if item.is_file():
-                entry = ListItem(Label(item.name))
-                entry.data = item.name
-                list_view.append(entry)
-        self.logger.info("Workarea refreshed. files=%d", len([f for f in files if f.is_file()]))
+        files = list_workarea_files(self.workarea)
+        for path in files:
+            entry = ListItem(Label(safe_text(painted_names([path.name]))))
+            entry.data = path.name
+            list_view.append(entry)
+        self.logger.info("Workarea refreshed. files=%d", len(files))
 
     def action_refresh_files(self) -> None:
         self.refresh_files()
@@ -11701,6 +11706,40 @@ class S19TuiApp(App):
             self.set_status(f"Project not found: {name}")
             self.logger.warning("Project not found: %s", name)
             return
+        # LLR-172.5g / E3 R3: a name the project list does not list (by
+        # ``normcase``) is refused before ``validate_project_files`` and the
+        # reset, so a reserved home, a stream/8.3/trailing-dot spelling and a
+        # case-different name all stop here; a match loads the on-disk name.
+        try:
+            listed = self.list_projects()
+        except OSError:
+            self.set_status(
+                safe_text(
+                    f"Project NOT loaded: '{painted_names([name])}' could not be "
+                    "read — check that the folder can be opened, then load again."
+                ).plain
+            )
+            self.logger.warning("Project load refused (could not be read): %r", name)
+            return
+        match = next(
+            (
+                entry
+                for entry in listed
+                if os.path.normcase(entry) == os.path.normcase(name)
+            ),
+            None,
+        )
+        if match is None:
+            self.set_status(
+                safe_text(
+                    f"Project NOT loaded: '{painted_names([name])}' is not a "
+                    "project — pick a project in the list."
+                ).plain
+            )
+            self.logger.warning("Project load refused (not listed): %r", name)
+            return
+        name = match
+        project_dir = self.workarea / name
         data_files, a2l_files, error = validate_project_files(project_dir)
         if error:
             self.set_status(error)
@@ -12079,6 +12118,11 @@ class S19TuiApp(App):
         projects = []
         for item in sorted(self.workarea.iterdir()):
             if item.name.casefold() in reserved_folded:
+                continue
+            # E3 R14: Win32 opens ``temp.`` / ``ab `` as ``temp`` / ``ab``,
+            # so a name ending in a dot or a space would load another folder.
+            # Other platforms open the name as written (CR9-9).
+            if os.name == "nt" and item.name.endswith((".", " ")):
                 continue
             if self._project_folder_refusal(item) is not None:
                 continue
@@ -12712,21 +12756,215 @@ class S19TuiApp(App):
             self.set_status(f"A2L sync rejected: {exc}")
             self.logger.warning("A2L sync rejected by workarea guard: %s", exc)
 
-    def _load_path_from_user_input(self, path: Path) -> None:
-        """Resolve path and dispatch to data load (S19/HEX/MAC) or A2L load."""
+    def _typed_load_route(self, path: Path) -> Tuple[str, str]:
+        """
+        Summary:
+            Classify one user-typed Load path into an action and a reason
+            word, reading only metadata (HLR-172a, LLR-172.5): a project,
+            a data file, an A2L file, or a refusal. It never paints, never
+            writes, and never raises — every ``OSError`` becomes a reason.
+
+        Args:
+            path (Path): The path typed into the Load dialog (or the
+                start-up ``load_path``).
+
+        Returns:
+            Tuple[str, str]: ``("project", name)`` with ``name`` the on-disk
+                name of a listed project; ``("data", "")``; ``("a2l", "")``;
+                or ``("refuse", reason)`` with ``reason`` one of
+                ``not found``, ``not a supported file``, ``not a project``,
+                ``outside``, ``link``, ``unreadable``.
+
+        Data Flow:
+            - A relative typed path keeps the file route only (step 0): a
+              folder is refused ``not a supported file`` (LLR-172.5h), so the
+              base-folder fallback's resolved path never feeds the project
+              route.
+            - An absolute path is matched lexically against this work area
+              (``os.path.abspath``, no ``resolve``), walked with ``os.lstat``
+              for links/junctions, matched by ``normcase`` against
+              ``list_projects`` (the on-disk spelling is routed, E3 R3), then
+              tested for project content (§1.3).
+
+        Dependencies:
+            Uses:
+                - ``resolve_input_path`` / ``list_projects``
+                - ``validate_project_files`` / ``_is_reparse_point``
+            Used by:
+                - ``_load_path_from_user_input``
+        """
+        text = str(path).strip().strip('"')
+        if not Path(text).is_absolute():
+            normalized = resolve_input_path(path, self.base_dir)
+            if normalized is None:
+                return ("refuse", "not found")
+            if os.path.isdir(normalized):
+                return ("refuse", "not a supported file")
+            suffix = normalized.suffix.lower()
+            if suffix in A2L_EXTENSIONS:
+                return ("a2l", "")
+            if suffix in SUPPORTED_EXTENSIONS:
+                return ("data", "")
+            return ("refuse", "not a supported file")
+
         normalized = resolve_input_path(path, self.base_dir)
-        if not normalized:
-            self.set_status(f"File not found: {path}")
-            self.logger.warning("File not found: %s", path)
-            return
-        suffix = normalized.suffix.lower()
-        if suffix in A2L_EXTENSIONS:
-            self.load_a2l_from_path(path)
-        elif suffix in SUPPORTED_EXTENSIONS:
-            self.load_from_path(path)
+        if normalized is None:
+            return ("refuse", "not found")
+        typed = os.path.abspath(normalized)
+        w = os.path.abspath(self.workarea)
+        ntyped = os.path.normcase(typed)
+        nw = os.path.normcase(w)
+        inside = ntyped == nw or ntyped.startswith(nw + os.sep)
+        parts: List[str]
+        if inside:
+            if ntyped == nw:
+                parts = []
+            else:
+                parts = typed[len(w):].lstrip(os.sep).split(os.sep)
         else:
-            self.set_status(f"Unsupported file type: {normalized.suffix}")
-            self.logger.warning("Unsupported file type: %s", normalized.suffix)
+            parts = []
+        is_manifest = PurePath(typed).name.casefold() == "project.json"
+        # CR9-3: the suffix the loaders test; ``abspath`` drops a trailing dot.
+        suffix = normalized.suffix.lower()
+
+        if not inside:
+            if is_manifest:
+                return ("refuse", "outside")
+            if os.path.isdir(typed):
+                return ("refuse", "outside")
+            if suffix in A2L_EXTENSIONS:
+                return ("a2l", "")
+            if suffix in SUPPORTED_EXTENSIONS:
+                return ("data", "")
+            return ("refuse", "not a supported file")
+
+        if not is_manifest and suffix in A2L_EXTENSIONS:
+            return ("a2l", "")
+        if not is_manifest and suffix in SUPPORTED_EXTENSIONS:
+            return ("data", "")
+
+        last_stat: Optional[os.stat_result] = None
+        for i in range(1, len(parts) + 1):
+            prefix = os.path.join(w, *parts[:i])
+            try:
+                st_info = os.lstat(prefix)
+            except FileNotFoundError:
+                return ("refuse", "not found")
+            except OSError:
+                return ("refuse", "unreadable")
+            if stat.S_ISLNK(st_info.st_mode) or _is_reparse_point(Path(prefix)):
+                return ("refuse", "link")
+            last_stat = st_info
+
+        if is_manifest:
+            folder_parts = parts[:-1]
+        else:
+            if last_stat is not None and not stat.S_ISDIR(last_stat.st_mode):
+                return ("refuse", "not a supported file")
+            folder_parts = parts
+
+        if len(folder_parts) != 1:
+            return ("refuse", "not a project")
+        typed_name = folder_parts[0]
+
+        try:
+            listed = self.list_projects()
+        except OSError:
+            return ("refuse", "unreadable")
+        name = next(
+            (
+                entry
+                for entry in listed
+                if os.path.normcase(entry) == os.path.normcase(typed_name)
+            ),
+            None,
+        )
+        if name is None:
+            return ("refuse", "not a project")
+
+        folder = self.workarea / name
+        manifest_path = folder / PROJECT_MANIFEST_NAME
+        try:
+            manifest_stat = os.lstat(manifest_path)
+        except OSError:
+            manifest_stat = None
+        if (
+            manifest_stat is not None
+            and stat.S_ISREG(manifest_stat.st_mode)
+            and not _is_reparse_point(manifest_path)
+        ):
+            return ("project", name)
+        try:
+            data_files, a2l_files, error = validate_project_files(folder)
+        except OSError:
+            return ("refuse", "unreadable")
+        if data_files or a2l_files or error:
+            return ("project", name)
+        return ("refuse", "not a project")
+
+    def _load_path_from_user_input(self, path: Path) -> None:
+        """
+        Summary:
+            Route a user-typed path through the classifier and dispatch to a
+            project, data or A2L load, or paint one refusal status line
+            (HLR-172a, LLR-172.5b–.5f/.5h).
+
+        Args:
+            path (Path): The path typed into the Load dialog.
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``_typed_load_route`` reads only metadata and returns
+              ``(action, value)``.
+            - ``project`` -> ``_route_load_project`` (the Load-result panel
+              opens as for a picked project, Q3); ``a2l`` / ``data`` -> the
+              existing load functions with the raw ``path``.
+            - ``refuse`` -> one status line from the six reason words, the
+              typed text through ``painted_names`` with markup off.
+
+        Dependencies:
+            Uses:
+                - ``_typed_load_route`` / ``_route_load_project``
+                - ``load_a2l_from_path`` / ``load_from_path``
+            Used by:
+                - ``on_mount`` / ``_handle_load_dialog``
+        """
+        action, value = self._typed_load_route(path)
+        if action == "project":
+            self._route_load_project(value)
+            return
+        if action == "a2l":
+            self.load_a2l_from_path(path)
+            return
+        if action == "data":
+            self.load_from_path(path)
+            return
+        t = painted_names([str(path)])
+        if value == "not found":
+            line = f"File NOT loaded: '{t}' not found — check the path."
+        elif value == "not a supported file":
+            line = f"File NOT loaded: '{t}' is not a supported file — check the path."
+        elif value == "not a project":
+            line = f"Project NOT loaded: '{t}' is not a project — pick a project in the list."
+        elif value == "outside":
+            line = (
+                f"Project NOT loaded: '{t}' is outside the work area — copy "
+                "the folder into the work area."
+            )
+        elif value == "link":
+            line = (
+                f"Project NOT loaded: '{t}' passes through a link or junction — "
+                "pick a project in the list."
+            )
+        else:
+            line = (
+                f"Project NOT loaded: '{t}' could not be read — check that "
+                "the folder can be opened, then load again."
+            )
+        self.set_status(safe_text(line).plain)
+        self.logger.warning("Typed load refused (%s): %r", value, str(path))
 
     def _handle_load_dialog(self, path: Optional[Path]) -> None:
         """
@@ -12823,6 +13061,9 @@ class S19TuiApp(App):
             copy_elapsed,
         )
         self._flush_logger()
+        if not contained_in_workarea(normalized, self.workarea):
+            if not record_recent_source(normalized):
+                self.logger.warning("Recent sources not updated: %r", str(normalized))
         self.set_progress(50, f"Parsing {copied.name}...")
         # Kick the worker off before anything else so the modal-dismiss callback yields
         # control back to the event loop promptly. Workarea refresh + diagnostic log are
@@ -12887,6 +13128,9 @@ class S19TuiApp(App):
             self.logger.warning("A2L load rejected by workarea guard: %s", exc)
             return
         copy_elapsed = time.perf_counter() - copy_started
+        if not contained_in_workarea(normalized, self.workarea):
+            if not record_recent_source(normalized):
+                self.logger.warning("Recent sources not updated: %r", str(normalized))
         self.refresh_files()
         copied_size = copied.stat().st_size
         self.logger.info(

@@ -1,0 +1,12 @@
+mutant: M61
+requirement: LLR-172.5 (R3)
+target file: s19_app/tui/app.py
+edit: '            return ("project", name)\n        try:\n            data_files, a2l_files, error = validate_project_files(folder)' -> '            return ("project", typed_name)\n        try:\n            data_files, a2l_files, error = validate_project_files(folder)'
+edit: '        if data_files or a2l_files or error:\n            return ("project", name)' -> '        if data_files or a2l_files or error:\n            return ("project", typed_name)'
+sha256 before: 62232011882325626771cb015ccfce4b34c15945e90b8432fd628c61fcf22d80
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a
+command: pytest -q --tb=line tests/test_b100_recents.py::test_tc_b100_38_typed_project_folder_loads_the_project[name in upper case]
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a\s19_app\__init__.py
+pytest summary: 1 passed in 4.76s
+verdict: SURVIVED
+restored = True

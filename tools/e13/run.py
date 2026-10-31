@@ -45,7 +45,7 @@ ROOT = Path(__file__).resolve().parents[2]
 CASE01 = ROOT / "examples" / "case_01_basic_valid" / "firmware.s19"
 CASE02 = ROOT / "examples" / "case_02_gaps_and_patch_targets" / "firmware.s19"
 SCENARIOS = ("pe-clean", "pe-saveback", "pe-problems", "pe-damaged", "pe-patched",
-             "pe-unreadable", "pe-document", "pe-a2l-only")
+             "pe-unreadable", "pe-document", "pe-a2l-only", "wa-files")
 
 
 def seed(workarea: Path, scenario: str) -> None:
@@ -91,6 +91,16 @@ def seed(workarea: Path, scenario: str) -> None:
             json.dumps({"entries": entries}), encoding="utf-8"
         )
         manifest["active_document"] = "patches/boost.json"
+    if scenario == "wa-files":
+        # Inc 9a: Workarea Files rows painted literally (LLR-172.6), names
+        # ending in a dot or space left out (LLR-172.4d).
+        temp = workarea / "temp"
+        temp.mkdir()
+        for name in ("plain.s19", "[b]markup[red]text.s19", "fw\u202egpj.s19",
+                     "x" * 130 + ".s19", "del\x7fname.s19", "dot.s19.", "space.s19 "):
+            # The long-path prefix keeps the 134-character name and the
+            # trailing dot or space that Win32 would otherwise strip.
+            shutil.copy2(CASE01, "\\\\?\\" + str(temp / name))
     text = json.dumps(manifest, indent=2)
     if scenario == "pe-damaged":
         text = '{"schema_version": 1, "active_variant": '

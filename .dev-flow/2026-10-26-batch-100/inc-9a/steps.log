@@ -1,0 +1,29 @@
+# <UTC start> <UTC end> <step> <agents> <outcome>
+2026-10-31T07:42:48Z - setup worktree b100-inc9a + base9a at 4fef292 (orchestrator)
+2026-10-31T07:43:34Z - E1 start (1xOpus) || E2-baseline start (1xOpus)
+2026-10-31T07:51:48Z E2-baseline end (1xOpus): 28 nodes (app 19, screens 2, workspace 6, utils 1), 59 ex (24 target), extractor exit 0, 43 calls; C1-C8; P-15 and S-01 hold at 4fef292
+2026-10-31T08:04:32Z E1 end (1xOpus): 7 -> 40 single-shall (E10 U8 UW22), LED .82, Q1-Q9
+2026-10-31T08:05:11Z E1-rulings Q1-Q9 + C1-C8 (orchestrator); interfaces-9a.md fixed; E2 start (2xOpus G1 workspace, G2 app)
+2026-10-31T08:14:39Z E2-G1 end (1xOpus): 11 nodes, 94 ex, 0/31 reqs uncovered, P9a-G1-1..6, risks R-1..R-6
+2026-10-31T08:16:22Z E2-G2 end (1xOpus): 8 nodes, 84 ex, 0/25 uncovered, P-1..P-4, F-2 F-3 F-5
+2026-10-31T08:16:22Z E3-prerulings (orchestrator) 12 rulings; E3 r1 start (2xOpus architect, security)
+2026-10-31T08:21:31Z E3-r1 security end (1xOpus): FAIL — S9-1 MAJOR (temp::$INDEX_ALLOCATION / 8.3 names reach reserved homes), 2 MINOR 3 LOW
+2026-10-31T08:23:15Z E3-r1 architect end (1xOpus): FAIL — A9-1 MAJOR (resolve() drops mapped drives; P9a-G1-2 unstated), A9-2 MAJOR (absolute-only route unwritten); 5 MINOR 5 LOW
+2026-10-31T08:23:15Z E3-rulings R1-R13 (orchestrator); E3-fix1 start (1xOpus)
+2026-10-31T08:44:09Z E3-fix1 end (1xOpus): R1-R13 applied; +4 LLR (172.1k .1l .1m .5h), LED .83; G1 106 ex, G2 97 ex; cap kept (no per-entry bound); E3-r2 start (2xOpus verify)
+2026-10-31T08:47:31Z E3-r2 architect end (1xOpus): PASS-WITH-NOTES; A9-1/A9-2 closed; A9R2-1..3 LOW -> E4 addenda
+2026-10-31T08:47:42Z E3-r2 security end (1xOpus): PASS; S9-1 closed (probe on real list_projects); S9R2-1 LOW -> PDR approved
+2026-10-31T08:47:42Z E4 start: G1 workspace + G2 app = DeepSeek v4 Pro (pi) x2; tester = 1xOpus
+2026-10-31T08:56:31Z E4-G2 end (DeepSeek v4 Pro via pi): app.py +284/-? , 3 deviations noted; R14 (list_projects dot/space skip) NOT applied -> integration; sha 559ef0a79aab2ce1
+2026-10-31T08:57:46Z E4-G1 end (DeepSeek v4 Pro via pi): workspace.py +544, 2 trivial deviations noted; sha a3342ed048ebe157
+2026-10-31T09:17:15Z E4-tester end (1xOpus): 141 nodes (54 Windows-only), RED 135F/6P (71 import, 64 behavioural; 6 pass by declaration/M59), conftest C8 fixtures, registry 228, 79 mutants planned; E4-integration start (1xOpus)
+2026-10-31T04:41 CI 41181522185 (push of 8b close; 4fef292 local only, pushed with 9a): 7 failed = 6 known + NEW tc_b100_33[upper case] (Linux is case-sensitive: str(workarea).upper() does not exist -> 'Parent folder not found'); test-portability defect, not product; timing failures gone (timing_bound works). Fix in 9a E5 corrective pass: skip 'upper case' arm unless os.name=='nt'. E4-integration agent stalled mid green-02 (empty output); resumed via SendMessage (1xOpus)
+2026-10-31T12:23:33Z E4-integration report on disk (Opus): 1 fix (R14), 5 declared deviations accepted, 1 test re-pin (TC-B99-13 allow-list, design-gap), 13/13 int mutants RED, guards 75 passed; green-02 re-run still going. E5 start: mutants (DeepSeek v4 Pro via pi, copy scratchpad/mut9a, LOCALAPPDATA forced to scratch) ∥ code review (1xOpus) ∥ security review (1xOpus)
+2026-10-31T12:33:07Z E5 security review end (1xOpus): PASS-WITH-NOTES, 0 HIGH/0 MAJOR/3 MINOR (SEC9-1 lister shows trailing dot/space names; SEC9-2 pick-time recheck, pre-existing; SEC9-3 entry check accepts ADS/device/bidi/surrogate) /5 NIT; all design-gap
+2026-10-31T12:35:16Z E5 code review end (1xOpus): PASS-WITH-NOTES, 0 HIGH/0 MAJOR/7 MINOR/4 NIT (CR9-1..11); predicts M28 survives (abspath does not raise on NUL)
+2026-10-31T12:55:08Z E5 mutants end (DeepSeek v4 Pro, ~2h): 70 KILLED/9 SURVIVED/0 INVALID; 4 equivalent, 5 weak tests -> corrective; DeepSeek mis-applied M29 once and self-corrected; real LOCALAPPDATA untouched. Integration agent stopped (stale green-02 superseded by corrective pass). E5 rulings written (orchestrator).
+2026-10-31T12:55:36Z E5 corrective pass start (1xOpus): 11 fix rows + 5 weak-test survivors; LLR-172.4d, LLR-172.2k
+2026-10-31T13:39:17Z OPERATOR OVERRIDE: per-increment touched-module run dropped (bottleneck); per increment = new/modified tests + targeted nodes + guards + new-arm mutants; touched modules go to batch-end battery with fix rounds. Corrective agent told to skip green-04-touched.
+2026-10-31T13:52:09Z E5 corrective end (1xOpus, 53 min): red-02 7 RED, green-03 157 passed, green-04-targeted 10 passed, guards-02 75 passed, 13/13 mut-c KILLED; workspace 0af4b92489233ff2 app bbf04117fbf0d3f5. E13 wa-files 3 PNGs (orchestrator). Close records start (DeepSeek v4 Pro via pi)
+2026-10-31 14:30  close records relaunch (DeepSeek v4 Pro via pi; first run hung 6.5h on stdin, killed; now < /dev/null, timeout 90m)
+2026-10-31 14:42  close records end (DeepSeek v4 Pro, 12 min; V26 .84 back-pointers + C7 bullet added by orchestrator)

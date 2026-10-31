@@ -1,0 +1,11 @@
+mutant: M65
+requirement: LLR-172.5b
+target file: s19_app/tui/app.py
+edit: '        try:\n            listed = self.list_projects()\n        except OSError:\n            return ("refuse", "unreadable")\n        name = next(\n            (\n                entry\n                for entry in listed\n                if os.path.normcase(entry) == os.path.normcase(typed_name)\n            ),\n            None,\n        )\n        if name is None:\n            return ("refuse", "not a project")\n\n        folder = self.workarea / name' -> '        name = typed_name\n\n        folder = self.workarea / name'
+sha256 before: 62232011882325626771cb015ccfce4b34c15945e90b8432fd628c61fcf22d80
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a
+command: pytest -q --tb=line tests/test_b100_recents.py::test_tc_b100_38_typed_folder_that_is_not_a_project_is_refused[temp]
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a\s19_app\__init__.py
+pytest summary: 1 passed in 4.37s
+verdict: SURVIVED
+restored = True

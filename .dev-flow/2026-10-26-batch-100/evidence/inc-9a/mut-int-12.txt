@@ -1,0 +1,24 @@
+# mut-int-12 (integration sanity mutant, expected RED; run in a COPY of the worktree at scratchpad/int9a/mutwt, never in the worktree): s19_app/tui/workspace.py: S6: record_recent_source logs its own WARNING on a failed write (2 in all) | applied 12 42a86202f50584c4 | the copy's file is restored from a byte copy after the run and its sha256 verified
+# date: 2026-10-31T04:45:13-06:00
+fatal: not a git repository (or any of the parent directories): .git
+# cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int9a/mutwt  branch:  base: 4fef292 (uncommitted worktree)
+# interpreter: C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+# env: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<worktree>
+# sha256[:16] workspace.py=42a86202f50584c4 app.py=6223201188232562
+# s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int9a\mutwt\s19_app\__init__.py
+# command: python -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_recents.py::test_tc_b100_34_failed_store_write_never_fails_the_load -rfE
+
+FFFF                                                                     [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int9a\mutwt\tests\test_b100_recents.py:1102: AssertionError: (0, 2)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int9a\mutwt\tests\test_b100_recents.py:1102: AssertionError: (0, 2)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int9a\mutwt\tests\test_b100_recents.py:1102: AssertionError: (0, 2)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int9a\mutwt\tests\test_b100_recents.py:1102: AssertionError: (0, 2)
+=========================== short test summary info ===========================
+FAILED tests/test_b100_recents.py::test_tc_b100_34_failed_store_write_never_fails_the_load[replace refused-data]
+FAILED tests/test_b100_recents.py::test_tc_b100_34_failed_store_write_never_fails_the_load[replace refused-a2l]
+FAILED tests/test_b100_recents.py::test_tc_b100_34_failed_store_write_never_fails_the_load[staging creation refused-data]
+FAILED tests/test_b100_recents.py::test_tc_b100_34_failed_store_write_never_fails_the_load[staging creation refused-a2l]
+4 failed in 14.17s
+# exit: 1
+# restore: restored OK sha256[:16]=a3342ed048ebe157

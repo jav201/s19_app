@@ -1204,7 +1204,21 @@ def test_tc_b100_33_foreign_parent_is_refused_before_any_folder(
     assert not (parent / "P").exists()
 
 
-@pytest.mark.parametrize("spelling", ["trailing separator", "upper case", "dot-dot segment", "junction alias"])
+@pytest.mark.parametrize(
+    "spelling",
+    [
+        "trailing separator",
+        pytest.param(
+            "upper case",
+            marks=pytest.mark.skipif(
+                os.name != "nt",
+                reason="not run: the upper-case spelling needs a case-insensitive file system (Windows)",
+            ),
+        ),
+        "dot-dot segment",
+        "junction alias",
+    ],
+)
 def test_tc_b100_33_work_area_under_another_spelling_saves_there(
     tmp_path: Path, spelling: str
 ) -> None:

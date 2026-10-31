@@ -1,0 +1,25 @@
+# mut-c-CR9-9 - Inc 9a E5 corrective kill check
+# date: 2026-10-31T07:12:23-06:00
+mutant: CR9-9
+description: CR9-9: the R14 skip not gated on os.name
+target file: s19_app/tui/app.py
+edit: '            if os.name == "nt" and item.name.endswith((".", " ")):' -> '            if item.name.endswith((".", " ")):'
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt  (a copy of the worktree, never the worktree)
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt\s19_app\__init__.py
+sha256 before: bbf04117fbf0d3f5951e8c5a493bed65e66c4fe87a838b861ae606f71e5934cb
+env: env -u NO_COLOR LOCALAPPDATA=<scratchpad>/e5fix/lad/<run id> PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=.
+command: python -m pytest -p no:cacheprovider -q --tb=line -rA 'tests/test_b100_recents.py::test_tc_b100_38_project_list_keeps_a_trailing_dot_name_off_windows'
+
+--- pytest per-node summary ---
+FAILED tests/test_b100_recents.py::test_tc_b100_38_project_list_keeps_a_trailing_dot_name_off_windows
+--- failure lines ---
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt\tests\test_b100_recents.py:2593: AssertionError: ['ab', 'fw-v1']
+--- pytest tail ---
+=========================== short test summary info ===========================
+FAILED tests/test_b100_recents.py::test_tc_b100_38_project_list_keeps_a_trailing_dot_name_off_windows
+1 failed in 3.46s
+
+passed=0 failed=1 rc=1
+verdict: KILLED
+sha256 after restore: bbf04117fbf0d3f5951e8c5a493bed65e66c4fe87a838b861ae606f71e5934cb
+restored = True

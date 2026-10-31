@@ -1,0 +1,104 @@
+# RED-02 — Inc 9a E5 corrective pass: the new and changed arms against the PRE-FIX worktree state
+# Pre-fix tree: <scratchpad>/e5fix/prefix = the worktree copied with tar (minus .git, .dev-flow, __pycache__) BEFORE any E5 edit;
+#   its source shas are the E4 integration shas (workspace.py a3342ed048ebe157, app.py 6223201188232562).
+#   The E5 test files were then copied in: tests/test_b100_recents.py, tests/conftest.py, tests/test_b100_project_homes.py.
+# cwd of the run = the pre-fix tree (the pytest cwd trap: s19_app.__file__ below is inside it).
+#
+# Classification of the 30 node results (7 FAILED = RED for a behavioural reason; 23 PASSED, each declared):
+#   RED  SEC9-5  test_tc_b100_34_failed_store_write_returns_false_and_keeps_the_store[staging open refused]
+#                -> 1 staging file left ('.recent_sou...tmp'): the fd was never closed, so Windows refused the unlink
+#   RED  SEC9-3/SEC9-4 test_tc_b100_34_source_with_a_win32_forbidden_character_is_not_recorded
+#                -> all 7 records returned True (incl. 'NT prefix \??\' True)
+#   RED  SEC9-3  test_tc_b100_35_entry_with_a_win32_forbidden_character_is_dropped
+#                -> 8 entries read (the 6 refused ones came back)
+#   RED  SEC9-1  test_tc_b100_37_lister_skips_a_name_ending_in_a_dot_or_space[a.s19.] -> ['a.s19.', 'c.s19']
+#   RED  SEC9-1  test_tc_b100_37_lister_skips_a_name_ending_in_a_dot_or_space[b.s19 ] -> ['b.s19 ', 'c.s19']
+#   RED  CR9-3   test_tc_b100_38_typed_unsupported_file_is_refused[fw.s19.] -> ['Unsupported file type: '] (no LLR-172.5e tokens)
+#   RED  CR9-9   test_tc_b100_38_project_list_keeps_a_trailing_dot_name_off_windows -> off-Windows half ['ab', 'fw-v1'] (fw-v1. skipped)
+#   PASS (declared; RED is the mutant, see mut-c-*.txt):
+#        M19   test_tc_b100_34_source_that_copies_then_fails_to_parse_is_recorded (behaviour already right; mut-c-M19)
+#        M57   test_tc_b100_37_lister_sorts_whatever_order_the_folder_yields (mut-c-M57)
+#        M61/M64/M65 test_tc_b100_38_route_matches_the_typed_folder_against_the_listing[4 arms] (mut-c-M61/M64/M65)
+#        CR9-6 test_tc_b100_38_unreadable_folder_paints_could_not_be_read[4 arms] (the catches exist; mut-c-CR9-6a..d)
+#   PASS (declared; docstring-only changes, no behaviour to turn RED): CR9-4 ..._record_with_an_embedded_nul_never_raises,
+#        CR9-10 ..._unlistable_temp_shows_no_rows[3 arms]
+#   PASS (existing arms of an extended test): ..._failed_store_write_returns_false...[replace refused], [staging creation refused];
+#        ..._typed_unsupported_file_is_refused[firmware], [notes.txt], [x.json]
+#   PASS (n/a on Windows): CI fix tests/test_b100_project_homes.py::test_tc_b100_33_...[4 arms] — the change is a skip of
+#        [upper case] when os.name != "nt"; on this Windows host the arm runs and passes as before. The Linux CI failure it
+#        fixes cannot be reproduced here (no case-sensitive volume run) — state: not-run for the Linux half.
+#
+# The "ERROR s19_app.core ... can't decode byte 0xff" log line is the M19 arm's intended parse failure (captured log), not a test error.
+#
+# red-02 raw
+# date: 2026-10-31T07:05:04-06:00
+# cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/e5fix/prefix
+# sha256[:16] workspace.py=a3342ed048ebe157 app.py=6223201188232562
+# s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\prefix\s19_app\__init__.py
+# env: env -u NO_COLOR LOCALAPPDATA=<scratchpad>/e5fix/lad/<run id> PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=.
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rA tests/test_b100_recents.py::test_tc_b100_34_source_that_copies_then_fails_to_parse_is_recorded tests/test_b100_recents.py::test_tc_b100_34_record_with_an_embedded_nul_never_raises tests/test_b100_recents.py::test_tc_b100_34_failed_store_write_returns_false_and_keeps_the_store tests/test_b100_recents.py::test_tc_b100_34_source_with_a_win32_forbidden_character_is_not_recorded tests/test_b100_recents.py::test_tc_b100_35_entry_with_a_win32_forbidden_character_is_dropped tests/test_b100_recents.py::test_tc_b100_37_lister_sorts_whatever_order_the_folder_yields tests/test_b100_recents.py::test_tc_b100_37_lister_skips_a_name_ending_in_a_dot_or_space tests/test_b100_recents.py::test_tc_b100_37_unlistable_temp_shows_no_rows tests/test_b100_recents.py::test_tc_b100_38_typed_unsupported_file_is_refused tests/test_b100_recents.py::test_tc_b100_38_project_list_keeps_a_trailing_dot_name_off_windows tests/test_b100_recents.py::test_tc_b100_38_route_matches_the_typed_folder_against_the_listing tests/test_b100_recents.py::test_tc_b100_38_unreadable_folder_paints_could_not_be_read tests/test_b100_project_homes.py::test_tc_b100_33_work_area_under_another_spelling_saves_there
+
+....FFF.FF......FF............                                           [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\prefix\tests\test_b100_recents.py:1060: AssertionError: assert ['.recent_sou...yz_9cymt.tmp'] == []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\prefix\tests\test_b100_recents.py:1267: AssertionError: {'NT prefix \\??\\': True, 'bidi override U+202E': True, 'device CON:': True, 'line separator U+2028': True, ...}
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\prefix\tests\test_b100_recents.py:1617: AssertionError: [('C:\\x\\a.s19', 's19'), ('C:\\x\\a:b.s19', 's19'), ('C:\\x\\CON:.s19', 's19'), ('C:\\x\\a::$DATA.s19', 's19'), ('C:\\x\\a\u202eb.s19', 's19'), ('C:\\x\\a\u2028b.s19', 's19'), ...]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\prefix\tests\test_b100_recents.py:2006: AssertionError: ['a.s19.', 'c.s19']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\prefix\tests\test_b100_recents.py:2006: AssertionError: ['b.s19 ', 'c.s19']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\prefix\tests\test_b100_recents.py:2430: AssertionError: ['Unsupported file type: ']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\prefix\tests\test_b100_recents.py:2593: AssertionError: ['ab', 'fw-v1']
+=================================== PASSES ====================================
+_____ test_tc_b100_34_source_that_copies_then_fails_to_parse_is_recorded ______
+------------------------------ Captured log call ------------------------------
+ERROR    s19_app.core:core.py:364 Unexpected error while loading file: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+Traceback (most recent call last):
+  File "C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\prefix\s19_app\core.py", line 313, in _load
+    for line_number, line in enumerate(f, 1):
+  File "<frozen codecs>", line 322, in decode
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+=========================== short test summary info ===========================
+PASSED tests/test_b100_recents.py::test_tc_b100_34_source_that_copies_then_fails_to_parse_is_recorded
+PASSED tests/test_b100_recents.py::test_tc_b100_34_record_with_an_embedded_nul_never_raises
+PASSED tests/test_b100_recents.py::test_tc_b100_34_failed_store_write_returns_false_and_keeps_the_store[replace refused]
+PASSED tests/test_b100_recents.py::test_tc_b100_34_failed_store_write_returns_false_and_keeps_the_store[staging creation refused]
+PASSED tests/test_b100_recents.py::test_tc_b100_37_lister_sorts_whatever_order_the_folder_yields
+PASSED tests/test_b100_recents.py::test_tc_b100_37_unlistable_temp_shows_no_rows[temp removed]
+PASSED tests/test_b100_recents.py::test_tc_b100_37_unlistable_temp_shows_no_rows[listing refused]
+PASSED tests/test_b100_recents.py::test_tc_b100_37_unlistable_temp_shows_no_rows[temp a junction]
+PASSED tests/test_b100_recents.py::test_tc_b100_38_typed_unsupported_file_is_refused[firmware]
+PASSED tests/test_b100_recents.py::test_tc_b100_38_typed_unsupported_file_is_refused[notes.txt]
+PASSED tests/test_b100_recents.py::test_tc_b100_38_typed_unsupported_file_is_refused[x.json]
+PASSED tests/test_b100_recents.py::test_tc_b100_38_route_matches_the_typed_folder_against_the_listing[name in upper case]
+PASSED tests/test_b100_recents.py::test_tc_b100_38_route_matches_the_typed_folder_against_the_listing[temp]
+PASSED tests/test_b100_recents.py::test_tc_b100_38_route_matches_the_typed_folder_against_the_listing[temp::$INDEX_ALLOCATION]
+PASSED tests/test_b100_recents.py::test_tc_b100_38_route_matches_the_typed_folder_against_the_listing[8.3 name of templates]
+PASSED tests/test_b100_recents.py::test_tc_b100_38_unreadable_folder_paints_could_not_be_read[route: walk lstat]
+PASSED tests/test_b100_recents.py::test_tc_b100_38_unreadable_folder_paints_could_not_be_read[route: list_projects]
+PASSED tests/test_b100_recents.py::test_tc_b100_38_unreadable_folder_paints_could_not_be_read[route: validate_project_files]
+PASSED tests/test_b100_recents.py::test_tc_b100_38_unreadable_folder_paints_could_not_be_read[project load: list_projects]
+PASSED tests/test_b100_project_homes.py::test_tc_b100_33_work_area_under_another_spelling_saves_there[trailing separator]
+PASSED tests/test_b100_project_homes.py::test_tc_b100_33_work_area_under_another_spelling_saves_there[upper case]
+PASSED tests/test_b100_project_homes.py::test_tc_b100_33_work_area_under_another_spelling_saves_there[dot-dot segment]
+PASSED tests/test_b100_project_homes.py::test_tc_b100_33_work_area_under_another_spelling_saves_there[junction alias]
+FAILED tests/test_b100_recents.py::test_tc_b100_34_failed_store_write_returns_false_and_keeps_the_store[staging open refused]
+FAILED tests/test_b100_recents.py::test_tc_b100_34_source_with_a_win32_forbidden_character_is_not_recorded
+FAILED tests/test_b100_recents.py::test_tc_b100_35_entry_with_a_win32_forbidden_character_is_dropped
+FAILED tests/test_b100_recents.py::test_tc_b100_37_lister_skips_a_name_ending_in_a_dot_or_space[a.s19.]
+FAILED tests/test_b100_recents.py::test_tc_b100_37_lister_skips_a_name_ending_in_a_dot_or_space[b.s19 ]
+FAILED tests/test_b100_recents.py::test_tc_b100_38_typed_unsupported_file_is_refused[fw.s19.]
+FAILED tests/test_b100_recents.py::test_tc_b100_38_project_list_keeps_a_trailing_dot_name_off_windows
+7 failed, 23 passed in 46.91s
+# exit: 1
+# sha256[:16] after: workspace.py=a3342ed048ebe157 app.py=6223201188232562
+
+# ---------------------------------------------------------------------------
+# SEC9-7 (conftest session guard) — probe, not a pytest node (the guard runs at session end and cannot be RED inside one session)
+# script: <scratchpad>/e5fix/probes/probe_sec9_7.py; interpreter s19env python -I; LOCALAPPDATA = a scratch folder (asserted != the real one)
+# pre-fix conftest: <scratchpad>/e5fix/probes/conftest_prefix.py, reconstructed by reversing the E5 edit; sha256 aa7f1b6fa274f50f0b25bea77a21b658255823d5404f84462237f4f7e48a1483
+#   == the sha of tests/conftest.py in the pre-fix copy taken before any edit (byte-identical)
+# fixed conftest: the worktree's tests/conftest.py
+scratch LOCALAPPDATA: C:\Users\jjgh8\AppData\Local\Temp\sec97-lad-zx_yzwaj
+A folder s19_app created (no store): pre-fix guard detects=False  fixed guard detects=True  names None -> frozenset()
+B staging file left in the folder: pre-fix guard detects=False  fixed guard detects=True  names frozenset() -> frozenset({'.recent_sources-x.tmp'})
+C store created then deleted (control: no net change): pre-fix guard detects=False  fixed guard detects=False  names frozenset() -> frozenset()
+# Result: the pre-fix guard (store digest only) misses A and B; the fixed guard (digest + the folder's name set) catches both. C is a declared residual of both guards: a net-zero create-then-delete leaves no trace.

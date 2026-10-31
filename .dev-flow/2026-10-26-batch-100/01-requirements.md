@@ -277,7 +277,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 | P-21 | PH-3, L-1 and the outside-work-area L-3 are closed (batch-99). | axiom | ✅ TRUE | `proj-p08`: `work copy exists after save-back: True`; `proj-p04` [12]: `list_projects(): ['P']`; `proj-p05`: `left behind: []` | out of scope (§1.2) |
 | P-22 | Of the 4 test files that name a `_2+` file, only `test_b99_export.py::test_tc_b99_31_changed_bytes_take_the_next_free_name` re-places identical bytes through `copy_into_workarea`. | premise | ✅ TRUE | `grep -nE "_[2-9]\.(s19\|json\|bin\|addr)" <the 4 files>`: `test_b99_export.py:415`, whose third export re-uses the second's `changed` map (`:396-412`) through `segment_split_view.py:940` (`copy_into_workarea`); `:487` goes through `place_group_into_workarea` (`segment_split_view.py:949`, unchanged); `test_flow_a2b_b94.py:529-536` and `test_tui_flow_builder_b94.py:306` save different blocks; `test_b99_staging.py:1962` is docstring text | LLR-163.4 re-pins the one; the others stay |
 | P-23 | R-TUI-012 says Save project copies the loaded file, while LLR-015.3 routes the project save through the emitter, and its TC-220 drives `ChangeService.save_patched`. | premise | ✅ TRUE | `REQUIREMENTS.md:1244-1245`; `2026-06-23-batch-14/01-requirements.md:222-225`; `tests/test_changes_apply.py:926-929` (`TC-220 — ChangeService.save_patched (the project/service save path)`) | R-TUI-012 amended (LED-2026-10-26-batch-100.1) |
-| P-24 | Textual 8.2.8 `Label` parses markup by default, and both the project list and the work-area list build `Label(name)` from disk names. | premise | ✅ TRUE | `python -I -c "import inspect; from textual.widgets import Label; print(inspect.signature(Label.__init__))"` → `… markup: 'bool' = True …`; `screens.py:707` `ListItem(Label(name))`; `app.py:6559` `ListItem(Label(item.name))` | LLR-172.6, LLR-173.3 |
+| P-24 | Textual 8.2.8 `Label` parses markup by default, and both the project list and the work-area list build `Label(name)` from disk names. | premise | ✅ TRUE | `python -I -c "import inspect; from textual.widgets import Label; print(inspect.signature(Label.__init__))"` → `… markup: 'bool' = True …`; `screens.py:707` `ListItem(Label(name))`; `app.py:6559` `ListItem(Label(item.name))` (at `1d677ba`; at `4fef292`: `screens.py:712`, `app.py:7316`, LED .82) | LLR-172.6, LLR-173.3 |
 | P-25 | `current_a2l_data` has two writers and none clears it, not even `_apply_unload`. | premise | ✅ TRUE | `grep -n "current_a2l_data\s*=" s19_app/tui/app.py` → `:8844`, `:11112` only; `_apply_unload` clears `current_a2l_path` alone (`:10250-10251`) | LLR-165.4 |
 | P-26 | Nothing outside `app.py` holds the change service, so a rebind resets it completely. | premise | ✅ TRUE | `grep -n "_change_service[,)]" s19_app/tui/app.py` → 0 hits; `grep -rn "_change_service" s19_app --include=*.py \| grep -v tui/app.py` → 0 hits | LLR-165.3 |
 | P-27 | The manifest is staged at the fixed `temp/project.json`, and the manifest reader accepts any `int \| str` schema version. | premise | ✅ TRUE | `manifest_writer.py:509` `staged = workarea / WORKAREA_TEMP / PROJECT_MANIFEST_NAME`; `variant_execution_service.py:478-486` | LLR-169.7; no `schema_version` bump |
@@ -344,14 +344,14 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 > | blocked document entry | `blocked entries` | `fix or remove them in the Patch Editor` |
 > | empty name | `name is empty` | `type a project name` |
 > | empty Load | `nothing selected` | `pick a row or type a path` |
-> | typed path not found / unsupported | `not found` / `not a supported file` | `check the path` |
-> | typed folder in the work area, not a project | `not a project` | `pick a project in the list` |
+> | typed path not found / unsupported, a relative typed folder path included (Inc 9a, LLR-172.5h) | `not found` / `not a supported file` | `check the path` |
+> | typed folder in the work area, not a project, a reserved home included (Inc 9a, LLR-172.5b); a name the project list does not list passed to a project load, a reserved home and its other spellings included (LLR-172.5g) | `not a project` | `pick a project in the list` |
 > | typed folder outside the work area | `outside the work area` | `copy the folder into the work area` |
 > | project folder with no data or A2L file | `no data or A2L file` | `load a file and Save project` |
 > | save-as larger than the free space | `not enough free space` | `free disk space or remove files from the project` |
 > | Save target is a link or junction | `link or junction` | `choose another name` |
 > | Save parent is not this work area (Inc 8b, LLR-171.3) | `not the work area folder` | `choose the work area as the parent folder` |
-> | Load: the project folder is a link or junction (Inc 8b, LLR-171.4e) | `link or junction` | `pick a project in the list` |
+> | Load: the project folder is a link or junction (Inc 8b, LLR-171.4e); a typed folder or `project.json` path through a link or junction (Inc 9a, LLR-172.5d) | `link or junction` | `pick a project in the list` |
 > | Load: the project folder is not one folder of this work area, or resolves outside it (Inc 8b, LLR-171.4f) | `outside the work area` | `copy the folder into the work area` |
 > | Load or Save target: the project folder cannot be inspected, such as a permission error (Inc 8b E5 F7(a), LLR-171.4f) | `could not be read` | `check that the folder can be opened, then load again` / `then save again` |
 > | second MAC file in the target (Inc 8b, LLR-167.6c) | `already has a MAC file` + the target's MAC name | `choose another name` |
@@ -566,21 +566,59 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
   - **Acceptance test(s):** AT-B100-11
   - **Boundary catalog (QC-3):** ☒ boundary ☒ invalid ☒ error — boundary: a normal folder, the work area under another spelling; invalid: junctions into another work area, into this work area and to a plain outside folder; error: a foreign parent.
 
-### HLR-172 — Recent sources, typed project paths and literal file names
+### HLR-172 — Recent sources are remembered per user
 - **Traceability:** US-162
-- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.21, LED-2026-10-26-batch-100.30
-- **Statement:** When a file from outside the work area loads successfully through Load or the A2L load, the system shall record it in the per-user store `%LOCALAPPDATA%\s19_app\recent_sources.json`, outside every work area and every `.s19tool` folder, newest first, de-duplicated by resolved path, at most 20 entries, staged under a unique name. Reading that store shall return only safe entries and shall never raise; an unparseable file shall read as empty, and an oversized one as empty with a `too large` problem. The Workarea Files list and the Load dialog shall enumerate the work-area files through one function. When a typed path resolves to a project in this work area, or to its `project.json`, the system shall load that project; a reserved home shall never load as a project; any other folder inside the work area shall be answered with the `not a project` tokens, and a folder outside it with the `outside the work area` tokens. The Workarea Files list shall render file names through `safe_text`.
-- **Rationale (informative):** L-2 (P-15); the unified dialog needs its data sources (ARQ §6); file names are parsed as markup (P-24); `temp` loads as a project (S-01); store entries could reach the network or carry control characters (S-06, S-07, S-12). The operator's S-16 decision moves the store per user, which also removes the planted-store route S-07 started from.
+- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.21, LED-2026-10-26-batch-100.30, LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83, LED-2026-10-26-batch-100.84, LED-2026-10-26-batch-100.85
+- **Statement (EARS event):** When Load copies a data or A2L file from outside this work area into the work area, the system shall record that file's absolute path in the per-user recent-sources store.
+- **Decomposition:** LLR-172.1, LLR-172.1a … LLR-172.1m (the write; LLR-172.1k, LLR-172.1l and LLR-172.1m's entry-that-cannot-fit arm are the three declared exceptions to the record — an unreadable store is left unchanged, a path the store read would drop is not recorded, and a single entry that cannot fit is not recorded — and LLR-172.1m also bounds the file the writer produces); LLR-172.2, LLR-172.2a … LLR-172.2j, LLR-172.2k (the read; LLR-172.2k is also the record's entry check, LLR-172.1l); LLR-172.3. The split of the former compound HLR-172 (store, read, lister, typed path, literal names) into HLR-172, HLR-172a and HLR-172b is LED .82.
+- **Rationale (informative):** the unified dialog needs its recent sources (ARQ §6); store entries could reach the network or carry control characters (S-06, S-07, S-12). The operator's S-16 decision moves the store per user, which also removes the planted-store route S-07 started from.
 - **Validation:** `test`
-- **Executed verification:** `pytest tests/test_b100_recents.py`
-- **Numeric pass threshold:** 25 outside loads → 20 entries, newest first, in the per-user store; 0 files named `recent_sources.json` under the base folder; the hostile store set (LLR-172.2) → 0 raises, 0 unsafe entries returned; `ab` and `ab/project.json` typed → 2 project loads of `ab`; `temp`, `TEMP`, `patches` typed → 0 project loads, 0 files written; 4 hostile file names → 4 literal rows, 0 markup spans, 0 control characters.
+- **Executed verification:** `pytest tests/test_b100_recents.py -k "tc_b100_34 or tc_b100_35 or tc_b100_36 or at_b100_12"`
+- **Numeric pass threshold:** 25 distinct outside sources → 20 entries, newest first, in `<LOCALAPPDATA>/s19_app/recent_sources.json`; 0 files named `recent_sources.json` under the base folder; the hostile store set of LLR-172.2a … LLR-172.2i → 0 raises, 0 refused entries returned.
+- **Negative control:** code read on `4fef292`: `grep -rn LOCALAPPDATA s19_app` → 0 hits, so a load writes no store file → AT-B100-12's store half RED.
 - **Priority:** medium
 - **Acceptance (black-box):**
-  - **Observable outcome:** (AT-B100-12) the engineer loads `examples/case_01_basic_valid/firmware.s19` through Load, then types the work-area path of project `ab`: the per-user store on disk (the test points `LOCALAPPDATA` at a temporary folder) lists the example's absolute path, nothing is written under the base folder, and the status log names project `ab` loaded. (AT-B100-13) Files named `[bold]x.s19`, `[link=x]a.s19`, `[@click=app.bell]x.s19` and one with U+009B in the work area appear in the Workarea Files list exactly as named, with no style and no control character.
-  - **Shipped surface:** Load (`l`, `#load_path`), the Workarea Files list (`#files_list`), the status log, the per-user store on disk.
-  - **Acceptance test(s):** AT-B100-12, AT-B100-13
-  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☒ error — empty: no store file (an empty list); boundary: the 20th and 21st entry, exactly 65 536 bytes; invalid: hostile store entries and markup-shaped names; error: an unreadable store file, `LOCALAPPDATA` unset.
-  - **Negative control:** executed on `1d677ba` (P-15): `Load file 'ab' -> status=['Unsupported file type: ']` → AT-B100-12 RED today. AT-B100-13: with today's `Label(item.name)` (`app.py:6559`, markup on) `[bold]x.s19` paints 1 span (QA-02 probe) → RED.
+  - **Observable outcome:** (AT-B100-12, store half) the engineer loads `examples/case_01_basic_valid/firmware.s19` through Load: the per-user store on disk (the test points `LOCALAPPDATA` at a temporary folder) lists the example's absolute path, and nothing is written under the base folder.
+  - **Shipped surface:** Load (`l`, `#load_path`), the per-user store on disk.
+  - **Acceptance test(s):** AT-B100-12
+  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☒ error — empty: no store file (an empty list); boundary: the 20th and 21st entry, exactly 65 536 bytes; invalid: hostile store entries; error: an unreadable store file, `LOCALAPPDATA` unset.
+  - **Negative control:** code read on `4fef292` (above): no store file after the load → AT-B100-12 RED.
+
+### HLR-172a — A typed project path opens the project
+- **Traceability:** US-162
+- **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
+- **Statement (EARS event):** When the absolute path typed into Load names a project folder of this work area or that folder's `project.json`, the system shall load that project.
+- **Decomposition:** LLR-172.5, LLR-172.5a … LLR-172.5h. "Absolute" is `Path.is_absolute()` on the typed text (on Windows a drive and a root; `\x` and `C:x` are relative); a relative typed path keeps the file route and never reaches the project route, so the base-folder fallback of `resolve_input_path` never runs for it (LLR-172.5h).
+- **Rationale (informative):** L-2 (P-15); `temp` loads as a project (S-01).
+- **Validation:** `test`
+- **Executed verification:** `pytest tests/test_b100_recents.py -k "tc_b100_38 or at_b100_12"`
+- **Numeric pass threshold:** `<workarea>/ab` and `<workarea>/ab/project.json` typed → 2 project loads of `ab`; `<workarea>/temp`, `<workarea>/TEMP`, `<workarea>/patches` and the relative `.s19tool/workarea/ab` typed → 0 project loads, 0 files written.
+- **Negative control:** executed on `4fef292` (`evidence/inc-9a/e1-probe-4fef292.md`): typed `<workarea>/ab` → `['Unsupported file type: ']`, no project; `<workarea>/ab/project.json` → `['Unsupported file type: .json']` → AT-B100-12's typed half RED.
+- **Priority:** medium
+- **Acceptance (black-box):**
+  - **Observable outcome:** (AT-B100-12, typed half) after the load above, the engineer types the absolute work-area path of project `ab` into Load: the status log names project `ab` loaded. The two halves of AT-B100-12 are independent at Inc 9a: the typed half reads no store, and the consume link (a recent picked in the Load dialog) is Inc 9b's (LLR-173.4).
+  - **Shipped surface:** Load (`l`, `#load_path`), the status log.
+  - **Acceptance test(s):** AT-B100-12
+  - **Boundary catalog (QC-3):** ☒ boundary ☒ invalid ☒ error — boundary: `..` segments, the work area under another case spelling, the work area itself; invalid: reserved homes and other spellings of them, a relative folder path, a link or junction folder, a folder outside the work area, a folder that is not a project, an unsupported suffix; error: a path that does not exist.
+  - **Negative control:** executed on `4fef292` (above) → AT-B100-12 RED.
+
+### HLR-172b — Work-area file names render literally
+- **Traceability:** US-162
+- **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.84
+- **Statement (EARS ubiquitous):** The system shall show each file name of the Workarea Files list as named on disk, with no markup applied and every control character removed.
+- **Decomposition:** LLR-172.4, LLR-172.4a, LLR-172.4b, LLR-172.4c, LLR-172.4d, LLR-172.6, LLR-172.6a.
+- **Rationale (informative):** file names are parsed as markup (P-24); the unified dialog needs one work-area lister (ARQ §6).
+- **Validation:** `test`
+- **Executed verification:** `pytest tests/test_b100_recents.py -k "tc_b100_37 or tc_b100_39 or at_b100_13"`
+- **Numeric pass threshold:** 4 hostile file names → 4 rows whose plain text equals the name minus control characters, 0 markup spans, 0 control characters.
+- **Negative control:** executed on `4fef292` (`evidence/inc-9a/e1-probe-4fef292.md`): the `[bold]x.s19` row paints `Content('x.s19', spans=[Span(0, 5, style='bold')])` → AT-B100-13 RED.
+- **Priority:** medium
+- **Acceptance (black-box):**
+  - **Observable outcome:** (AT-B100-13) Files named `[bold]x.s19`, `[link=x]a.s19`, `[@click=app.bell]x.s19` and one with U+009B in the work area appear in the Workarea Files list exactly as named, with no style and no control character.
+  - **Shipped surface:** the Workarea Files list (`#files_list`).
+  - **Acceptance test(s):** AT-B100-13
+  - **Boundary catalog (QC-3):** ☒ empty ☒ invalid ☒ error — empty: an empty temp folder; invalid: markup-shaped names, a control character, a file link; error: a temp folder that is missing or cannot be listed.
+  - **Negative control:** executed on `4fef292` (above) → AT-B100-13 RED.
 
 ### HLR-173 — One Load dialog
 - **Traceability:** US-163
@@ -1489,21 +1527,21 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-171.4e — A link or junction project folder is not loaded
 - **Traceability:** HLR-171b · trace: `_handle_load_project` (`app.py`), `_is_reparse_point` (`workspace.py`)
-- **Ledger:** LED-2026-10-26-batch-100.76
+- **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.82
 - **Statement (EARS unwanted):** If a project folder to be loaded is a link or junction, then the system shall refuse the load.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_homes.py -k tc_b100_62`
-- **Numeric pass threshold:** `evil` and `alias`, each picked from a list built before the junction appeared (the picked arm, the only load path at 8b: `_route_load_project`) → 0 loads, 0 session resets, 1 status line each. The typed arm is LLR-172.5's, at Inc 9a. The refusal's token row is drafted in E2 and confirmed in E3 (orchestrator ruling Q5).
+- **Numeric pass threshold:** `evil` and `alias`, each picked from a list built before the junction appeared (the picked arm, the only load path at 8b: `_route_load_project`) → 0 loads, 0 session resets, 1 status line each. The typed arm is LLR-172.5d's, at Inc 9a. The refusal's token row is drafted in E2 and confirmed in E3 (orchestrator ruling Q5).
 - **Negative control:** a mutation without the link check → `alias` loads → RED.
 - **Boundary catalog:** ☒ invalid — junctions into another work area and into this work area.
 
 ### LLR-171.4f — A project folder resolving outside this work area is not loaded
 - **Traceability:** HLR-171b · trace: `_handle_load_project` (`app.py`), `contained_in_workarea` (`workspace.py`)
-- **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.80
+- **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.80, LED-2026-10-26-batch-100.82
 - **Statement (EARS unwanted):** If a project folder to be loaded is not one direct child folder of this work area or resolves outside this work area, then the system shall refuse the load.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_homes.py -k tc_b100_62`
-- **Numeric pass threshold:** a picked name with `..` segments that reaches another work area's project (no link involved) → 0 loads, 0 session resets, 1 status line holding `outside the work area`; a picked name `sub/P` with `workarea/sub` a junction to `workarea/R` → 0 loads, 0 resets (E3-security S3-7); `evil` → 0 loads. The typed arm is LLR-172.5's, at Inc 9a. `lstat` of the picked folder fails with a permission error (E5 F7(a), LED-2026-10-26-batch-100.80) → refused with 1 line holding `could not be read` and `check that the folder can be opened, then load again` (the Save project target: `then save again`), 0 lines holding `outside the work area` or `is not the work area folder`; pre snapshot: the `outside` texts → RED; a mutation mapping the error to `outside` → RED.
+- **Numeric pass threshold:** a picked name with `..` segments that reaches another work area's project (no link involved) → 0 loads, 0 session resets, 1 status line holding `outside the work area`; a picked name `sub/P` with `workarea/sub` a junction to `workarea/R` → 0 loads, 0 resets (E3-security S3-7); `evil` → 0 loads. The typed arms are LLR-172.5c's (outside the work area) and LLR-172.5d's (through a link or junction), at Inc 9a. `lstat` of the picked folder fails with a permission error (E5 F7(a), LED-2026-10-26-batch-100.80) → refused with 1 line holding `could not be read` and `check that the folder can be opened, then load again` (the Save project target: `then save again`), 0 lines holding `outside the work area` or `is not the work area folder`; pre snapshot: the `outside` texts → RED; a mutation mapping the error to `outside` → RED.
 - **Negative control:** a mutation without the one-component name check (S3-7) → the `..` name and `sub/P` load → RED. The containment check stays as defence and, after the name check, has no independent RED (declared, as for LLR-171.4d).
 - **Boundary catalog:** ☒ invalid — `..` segments; a junction into another work area.
 
@@ -1627,65 +1665,436 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 - **Negative control:** pre snapshot: (a) R's files deleted (probe B3: 6 of 7) → RED; a mutation without the reparse check → (b) RED; a mutation without the identity check → (c) RED.
 - **Boundary catalog:** ☒ error ☒ invalid — a folder swapped for a junction; a file replaced; no change.
 
-### LLR-172.1 — The recent-sources store is written per user
-- **Traceability:** HLR-172
-- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.21, LED-2026-10-26-batch-100.30, LED-2026-10-26-batch-100.41
-- **Statement:** `recent_store_path() -> Path` (NEW, `workspace.py`) shall return `%LOCALAPPDATA%\s19_app\recent_sources.json` (from the `LOCALAPPDATA` environment variable, the per-user, per-machine profile that does not roam; when it is unset, the store is disabled and nothing is written). `record_recent_source(path)` (NEW) shall write `{"schema_version": 1, "sources": [{"path", "kind"}]}` there, newest first, de-duplicated by resolved path, at most 20 entries, staged under a unique `tempfile.mkstemp` name in the same folder and placed with `os.replace` after an `_is_reparse_point` check on that folder. `load_from_path` (`app.py:8710`) and `load_a2l_from_path` (`:8789`) shall call it after a successful copy, for sources outside the work area only. No file of the store is written under the base folder or any `.s19tool`.
+### LLR-172.1 — The recent-sources store lives in the per-user local profile
+- **Traceability:** HLR-172 · trace: `recent_store_path` (NEW, `workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.21, LED-2026-10-26-batch-100.30, LED-2026-10-26-batch-100.41, LED-2026-10-26-batch-100.82
+- **Statement (EARS ubiquitous):** The system shall keep the recent-sources store at `%LOCALAPPDATA%\s19_app\recent_sources.json`, in the per-user profile folder that does not roam.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`; an autouse fixture in `tests/conftest.py` points `LOCALAPPDATA` at `tmp_path` for every test (Inc 9a)
-- **Numeric pass threshold:** 25 distinct outside loads → 20 entries, newest first; the same file twice → 1 entry; a source inside the work area → 0 entries; a failed load → 0 entries; the store folder as a junction → 0 writes; 2 concurrent writers → a valid file, 0 fixed staging names; `LOCALAPPDATA` unset → 0 files written; 0 `recent_sources.json` under the base folder; the real `%LOCALAPPDATA%\s19_app\recent_sources.json` → its digest (or its absence) unchanged after a full test run (1 guard).
-- **Negative control:** a mutation dropping the de-duplication → 2 entries → RED; a mutation writing to `<base>/.s19tool/` (round-2 location) → the base-folder arm RED.
-- **Boundary catalog:** ☒ boundary ☒ error — the 20th and 21st entry; a junctioned store folder; `LOCALAPPDATA` unset.
+- **Numeric pass threshold:** `LOCALAPPDATA` = `<tmp>/lad`, 1 outside load → 1 file at `<tmp>/lad/s19_app/recent_sources.json` and 0 files named `recent_sources.json` under the base folder (`.s19tool` included); the real `%LOCALAPPDATA%\s19_app\recent_sources.json` → its SHA-256 (or its absence) unchanged after a full test run (1 guard, LED .41).
+- **Negative control:** code read on `4fef292`: `grep -rn LOCALAPPDATA s19_app` → 0 hits, so 0 store files after the load → RED; a mutation writing to `<base>/.s19tool/recent_sources.json` (the round-2 location) → the base-folder arm RED; a mutation reading `APPDATA` (the round-3 location, LED .30) → 0 files at the `LOCALAPPDATA` path → RED.
+- **Boundary catalog:** none — one location; the unusable-variable cases are LLR-172.1f.
 
-### LLR-172.2 — The store is read as untrusted input (C6)
-- **Traceability:** HLR-172
-- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.21
-- **Statement:** `read_recent_sources() -> RecentSources(entries, problem)` (NEW, `workspace.py`) shall read the per-user store with `read(65 536 + 1)`; a file over 65 536 bytes gives no entries and the problem `too large`; an unparseable or wrongly shaped file gives no entries. It shall return only entries whose `path` has a drive letter and a root (not UNC, not `\\?\` or `\\.\`, not drive-relative), no path component for which `is_windows_device_name` is true, no C0 or C1 control character, and whose `kind` is one of `s19`, `hex`, `mac`, `a2l` and matches the path's suffix, at most 20, in order. It shall never raise. A mapped network drive letter cannot be told from a local one by syntax; the guard against touching it is that a recent is never touched before Enter (LLR-173.4).
+### LLR-172.1a — A source loaded from outside the work area is recorded first
+- **Traceability:** HLR-172 · trace: `record_recent_source` (NEW, `workspace.py`); `load_from_path`, `load_a2l_from_path` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
+- **Statement (EARS event):** When Load copies a data or A2L file from outside this work area into the work area, the system shall put that file's absolute path and its kind first in the recent-sources store.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
+- **Numeric pass threshold:** the absolute path is the lexical form `os.path.abspath` gives (`.` and `..` folded, no link resolved, no network call), so a mapped network drive keeps its letter. `examples/case_01_basic_valid/firmware.s19` typed into Load → the store reads `{"schema_version": 1, "sources": [{"path": <the absolute path>, "kind": "s19"}]}` (1 entry); a relative `firmware.s19` found in the working folder `<src>` → `<src>\firmware.s19`; `<tmp>/j/x.s19` with `<tmp>/j` a junction to `<tmp>/real` → `<tmp>\j\x.s19` (Windows only; reported not run, never passed, when no junction can be made); then an outside `.a2l`, `.mac` and `.hex` → 4 entries, newest first, kinds `hex`, `mac`, `a2l`, `s19`. The kind follows the suffix, case-folded: `.s19` and `.srec` → `s19`, `.hex` and `.ihex` → `hex`, `.mac` → `mac`, `.a2l` → `a2l` (the load's own sets, `workspace.py:107-110`); `<tmp>/A.SREC` → kind `s19`. The entry is written once the copy into `workarea/temp` succeeds (Q1).
+- **Negative control:** code read on `4fef292` (LLR-172.1) → 0 entries → RED; a mutation recording the work copy's path (`workarea/temp/firmware.s19`) → the path arm RED; a mutation appending the entry last → the order arm RED; a mutation recording `Path.resolve()` → the junction arm records `<tmp>\real\x.s19` → RED (on a mapped network drive the same mutation gives the `\\server\share` form, which LLR-172.2e drops; E3 A9-1).
+- **Boundary catalog:** ☒ boundary — each of the 4 kinds; `.srec` in upper case.
+
+### LLR-172.1b — A source already in the store keeps one entry
+- **Traceability:** HLR-172 · trace: `record_recent_source` (NEW, `workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
+- **Statement (EARS event):** When the system records a source whose absolute path is already in the recent-sources store, the system shall keep one entry for that path, in first place.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
+- **Numeric pass threshold:** paths are compared with `os.path.normcase` after `os.path.abspath` (stored texts are not re-normalised). The same file twice → 1 entry; the same file spelled in another case (`<d>\A.s19`, then `<D>\a.S19`) → 1 entry, its text the second call's; `<d>\sub\..\A.s19` after `<d>\A.s19` → 1 entry; A, then B, then A → 2 entries, A first. Two link spellings of one file make two entries (declared; the list is a convenience). The case arm is Windows only (`normcase` folds case only there), reported not run on the Linux CI.
+- **Negative control:** a mutation without the de-duplication → 2 entries for the same file → RED; a mutation keeping the old position → B first → RED; a case-sensitive comparison → 2 entries for the case arm → RED.
+- **Boundary catalog:** ☒ boundary — the same file; another case spelling.
+
+### LLR-172.1c — The store holds at most 20 entries
+- **Traceability:** HLR-172 · trace: `record_recent_source` (NEW, `workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82
+- **Statement (EARS ubiquitous):** The system shall keep at most 20 entries in the recent-sources store, dropping the oldest entry first.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
+- **Numeric pass threshold:** 20 distinct sources recorded → 20 entries, source 1 last; the 21st → 20 entries, source 1 gone, source 21 first; 25 → 20 entries, entry 1 = source 25, entry 20 = source 6.
+- **Negative control:** a mutation capped at 21, or uncapped → 21 entries after the 21st → RED; a mutation dropping the newest → source 21 missing → RED.
+- **Boundary catalog:** ☒ boundary — the 20th and the 21st entry.
+
+### LLR-172.1d — A load that fails before its copy records nothing
+- **Traceability:** HLR-172 · trace: `load_from_path`, `load_a2l_from_path` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.84
+- **Statement (EARS unwanted):** If a Load fails before its copy into the work area completes, then the system shall leave the recent-sources store unchanged.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
+- **Numeric pass threshold:** a store holding 1 entry, then: a path that does not exist, a file with an unsupported suffix, an outside source over the placement's per-file cap (the cap lowered in the test; `Cannot load file:`), and an outside A2L while the open project already holds an A2L (`Project already has an A2L file.`) → the store's SHA-256 unchanged after each of the 4 arms. A data file that copies and then fails to parse is recorded (Q1, declared).
+- **Negative control:** a mutation recording before the copy → the over-cap arm adds 1 entry → RED.
+- **Boundary catalog:** ☒ error — the 4 failure arms.
+
+### LLR-172.1e — A source inside this work area is not recorded
+- **Traceability:** HLR-172 · trace: `load_from_path`, `load_a2l_from_path` (`app.py`); `contained_in_workarea` (`workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82
+- **Statement (EARS unwanted):** If the source a load copies lies inside this work area, then the system shall not record that source in the recent-sources store.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
+- **Numeric pass threshold:** typed `<workarea>/ab/firmware.s19`, a Workarea Files pick of an `.a2l` work copy (`_load_from_item` → `load_a2l_from_path`) and a variant switch (`_handle_select_variant` → `load_from_path` with the project's variant) → 0 entries for each of the 3 arms. "Inside" is §1.3's (`contained_in_workarea`).
+- **Negative control:** a mutation without the inside check → typed `<workarea>/ab/firmware.s19` adds 1 entry → RED.
+- **Boundary catalog:** ☒ boundary — a project's own file; a work copy; a variant.
+
+### LLR-172.1f — No usable `LOCALAPPDATA`, no store file
+- **Traceability:** HLR-172 · trace: `recent_store_path`, `record_recent_source` (NEW, `workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
+- **Statement (EARS unwanted):** If `LOCALAPPDATA` is unset, is empty, does not start with a drive letter followed by a root, or names a folder that does not exist, then the system shall write no recent-sources store file.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
+- **Numeric pass threshold:** the drive-and-root test is the text test `^[A-Za-z]:[\/]` on every platform. `LOCALAPPDATA` unset, `""`, `relative\lad`, `/tmp/lad` (a POSIX absolute path) and `<tmp>/absent` (drive-rooted, no such folder; only the `s19_app` folder is ever created, never its parents), the process working folder set to `<tmp>` → 0 files named `recent_sources.json` under `<tmp>` and the base folder, 0 folders created, the image installed, 0 raises (5 of 5 arms). Tester note: every fixture value derives from `tmp_path`, never a literal drive path (off Windows a `C:\…` text passes the test and names a relative folder).
+- **Negative control:** a mutation using a relative `LOCALAPPDATA` as a folder → `<tmp>/relative/lad/s19_app/recent_sources.json` written → RED; a mutation falling back to `Path.home()` → 1 file → RED; a mutation creating the missing parents (`mkdir(parents=True)`) → `<tmp>/absent/s19_app/recent_sources.json` written → RED.
+- **Boundary catalog:** ☒ error — unset; empty; relative; a POSIX absolute path; a folder that does not exist.
+
+### LLR-172.1g — A linked store folder is not written
+- **Traceability:** HLR-172 · trace: `record_recent_source` (NEW), `_is_reparse_point` (`workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82
+- **Statement (EARS unwanted):** If the store folder `%LOCALAPPDATA%\s19_app` is a link or junction, then the system shall not write the recent-sources store.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
+- **Numeric pass threshold:** `<tmp>/lad/s19_app` a junction to `<tmp>/elsewhere` → 0 files in `<tmp>/elsewhere` after an outside load, the image installed, 0 raises.
+- **Negative control:** a mutation without the reparse-point check → 1 file in `<tmp>/elsewhere` → RED.
+- **Boundary catalog:** ☒ invalid — a junctioned store folder.
+
+### LLR-172.1h — The store is replaced through a uniquely named staging file
+- **Traceability:** HLR-172 · trace: `record_recent_source` (NEW, `workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
+- **Statement (EARS ubiquitous):** The system shall write the recent-sources store through a staging file with a unique name in the store folder and then replace the store in one step.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
+- **Numeric pass threshold:** 100 records → 100 distinct staging names (a spy on the staging creation), each in `%LOCALAPPDATA%\s19_app`, 100 `os.replace` calls onto `recent_sources.json`, 0 staging files left; a read of the store file after each of the 100 records → it parses as version 1 each time, 0 partial files (S-12: a reader sees the old or the new file). Every record runs on the UI thread, so no two writers of one process exist; two app instances are last-writer-wins, never a broken file (accepted, E3 A9-4).
+- **Negative control:** a mutation with a fixed staging name → 1 distinct name in 100 → RED; a mutation writing the store in place → 0 `os.replace` calls → RED.
+- **Boundary catalog:** ☒ boundary — 100 successive records.
+
+### LLR-172.1i — A failed store write never fails the load
+- **Traceability:** HLR-172 · trace: `record_recent_source` (NEW, `workspace.py`); `load_from_path`, `load_a2l_from_path` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.84
+- **Statement (EARS unwanted):** If writing the recent-sources store fails, then the system shall complete the load with the store left as it was.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
+- **Numeric pass threshold:** `os.replace` raising `PermissionError` and the staging creation raising `OSError` (2 injected arms), for a data file and for an A2L → the file installed as without the store, 0 raises out of the load, the store's SHA-256 unchanged, 0 staging files left, 1 log warning and 0 status lines about the store (Q5) — 4 of 4.
+- **Negative control:** a mutation letting the `OSError` out → the load stops before the install → RED.
+- **Boundary catalog:** ☒ error — the 2 injected failures.
+
+### LLR-172.1j — Recording writes back only the entries the store read accepts
+- **Traceability:** HLR-172 · trace: `record_recent_source`, `read_recent_sources` (NEW, `workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
+- **Statement (EARS event):** When the system writes the recent-sources store, the system shall carry over only those existing entries that the store read (LLR-172.2) returns.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
+- **Numeric pass threshold:** a store holding 2 accepted entries and 3 refused ones (`\\host\share\x.s19`, `kind: exe`, a path holding `\x1b[2J`) → after 1 record: 3 entries, 0 refused; an unparseable store and a 65 537-byte store → after 1 record: 1 entry each. A store the read reports `could not be read` is not written (LLR-172.1k), and a source the read would drop is not recorded (LLR-172.1l).
+- **Negative control:** a mutation carrying the raw entries forward → the UNC entry written back → RED.
+- **Boundary catalog:** ☒ invalid ☒ error — refused entries; an unparseable and an oversized store.
+
+### LLR-172.1k — An unreadable store is left unchanged by a record
+- **Traceability:** HLR-172 · trace: `record_recent_source`, `read_recent_sources` (NEW, `workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.83
+- **Statement (EARS unwanted):** If the store read reports `could not be read` while the system records a source, then the system shall leave the recent-sources store unchanged.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
+- **Numeric pass threshold:** a store holding 3 accepted entries, then 1 record of an outside `<src>\n.s19` with (1) the store open raising `PermissionError` (injected, as a transient sharing violation) and (2) the store read raising `OSError` (injected) → the store's SHA-256 unchanged, `record_recent_source` returns `False`, 0 staging files, 0 raises (2 of 2). Through Load the image is installed as without the store.
+- **Negative control:** a mutation treating `could not be read` as an empty store → after the record the store holds 1 entry, its SHA-256 changed → RED (a transient read failure would wipe 20 entries to 1, G1 R-2).
+- **Boundary catalog:** ☒ error — a refused open; a failed read.
+
+### LLR-172.1l — A source the store read would drop is not recorded
+- **Traceability:** HLR-172 · trace: `record_recent_source`, `_recent_entry_ok` (NEW, `workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.83
+- **Statement (EARS unwanted):** If the absolute path of the source to record fails an entry check of the store read (LLR-172.2e, LLR-172.2f or LLR-172.2g), then the system shall not record that source.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
+- **Numeric pass threshold:** a store holding 1 accepted entry, then 3 records: `\\host\share\x.s19` (UNC; `abspath` keeps it), `<src>\a` + U+009B + `.s19` (a control character) and `C:\CON\a.s19` (a device component) → `False` each, the store's SHA-256 unchanged, 0 staging files, 0 raises (3 of 3); `<src>\b.s19` → `True`, 2 entries (control arm). A typed UNC source loads but is not remembered (declared); a mapped drive letter is remembered (LLR-172.1a).
+- **Negative control:** a mutation writing without the entry check → the UNC entry is written (SHA-256 changed) and dropped again on the next read → RED.
+- **Boundary catalog:** ☒ invalid — a UNC path; a control character; a device component.
+
+### LLR-172.1m — The store file the writer produces fits the read's size cap
+- **Traceability:** HLR-172 · trace: `record_recent_source`, `_encode_recent_store` (NEW, `workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.83
+- **Statement (EARS ubiquitous):** The system shall keep each recent-sources store file it writes at most 65 536 bytes long, dropping the oldest entries first.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
+- **Numeric pass threshold:** (unit arms; the record reads no source, so the paths need not exist) 20 entries `C:\` + 3 240 × `p` + `.s19` → 65 492 bytes, 20 entries kept; 20 entries of 3 245 × `p` → 19 entries kept, 62 314 bytes, the oldest dropped; 1 new entry `C:\` + 11 000 × `é` + `.s19` (its path alone 66 008 bytes escaped) → 0 writes, the store's SHA-256 unchanged, `False` (3 of 3).
+- **Note (E3 R10, the cap kept):** the store bytes are `json.dumps(..., ensure_ascii=True, separators=(",", ":"))`; the document costs 32 bytes and each entry 25 bytes plus its escaped path (probe p9a-g1: `32 + k × (33 + n)` for a path of `n + 7` characters), so 20 entries fit only if each escaped path is at most (65 536 − 32) / 20 − 25 = 3 250 bytes. The store read has no per-entry length bound (LLR-172.2e … LLR-172.2i check the form only), so the bound is the operating system's: with long paths off a path is at most 259 UTF-16 units, at most 6 bytes each escaped (`\uXXXX`; an astral character is 2 units and 12 bytes) → at most about 1 554 bytes, which fits; with `LongPathsEnabled` a path reaches 32 767 units → up to about 196 602 bytes, which does not. Without this requirement a store above 65 536 bytes reads as `too large` (LLR-172.2a) and the next record keeps 1 entry (LLR-172.1j). So the cap stays.
+- **Negative control:** a mutation without the size rule → the 3 245 arm writes 65 592 bytes, which the next read reports `too large` → RED; a mutation dropping the newest → the new entry missing → RED.
+- **Boundary catalog:** ☒ boundary — 65 492 and 65 592 bytes; one entry that cannot fit.
+
+### LLR-172.2 — The store read returns the accepted entries in order
+- **Traceability:** HLR-172 · trace: `read_recent_sources`, `RecentSources` (NEW, `workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.21, LED-2026-10-26-batch-100.82
+- **Statement (EARS event):** When the recent-sources store is read, the system shall return, in stored order, at most the first 20 entries that pass the entry checks of LLR-172.2e … LLR-172.2i.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-35 — `pytest tests/test_b100_recents.py -k tc_b100_35`
-- **Numeric pass threshold:** 1 000 distinct valid entries (`C:\NNN.s19`, about 41 KB) → exactly the first 20, in order; exactly 65 536 bytes → parsed; 65 537 → 0 entries and `too large`; `{not json`, a top-level list, `schema_version: 2` → 0 entries; `kind: exe`, a relative path, a NUL, `\x1b[2J` in a path, U+009B, `\\host\share\x.s19`, `\\?\GLOBALROOT\x.s19`, `C:x.s19`, `C:\x\NUL.s19`, `C:\x\a.s19:ads`, `C:\x\a.s19.`, a `.s19` path with `kind: a2l` → 0 returned; 0 raises.
-- **Negative control:** a mutation removing the size cap → the 65 537-byte arm returns entries → RED; S-07's executed probe: `\\host\share\x.s19 … is_absolute = True` → RED for an absolute-only filter.
-- **Boundary catalog:** ☒ empty ☒ boundary ☒ invalid ☒ error — no file; 65 536 and 65 537 bytes; hostile entries; an unreadable file.
+- **Numeric pass threshold:** 1 000 distinct accepted entries (`C:\NNN.s19`, about 41 KB) → exactly the first 20, in order; 5 accepted entries with 2 refused ones between them → the 5, in order; the problem is `None` in both arms.
+- **Negative control:** a mutation without the cap → 1 000 entries → RED; a mutation sorting the entries → the order arm RED.
+- **Boundary catalog:** ☒ boundary — 20 of 1 000 entries.
 
-### LLR-172.3 — Recent paths stay out of projects, reports and every work area
-- **Traceability:** HLR-172
-- **Ledger:** LED-2026-10-26-batch-100.21
-- **Statement:** No writer of `project.json`, of a report, of a project folder or of any file under the base folder or a `.s19tool` shall copy an entry of the recent-sources store.
+### LLR-172.2a — An oversized store reads as empty with `too large`
+- **Traceability:** HLR-172 · trace: `read_recent_sources` (NEW, `workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82
+- **Statement (EARS unwanted):** If the recent-sources store file is larger than 65 536 bytes, then the system shall return no entries with the problem `too large`.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-35 — `pytest tests/test_b100_recents.py -k tc_b100_35`
+- **Numeric pass threshold:** exactly 65 536 bytes of valid store → parsed; 65 537 bytes → 0 entries, problem `too large`; 1 read of at most 65 537 bytes (a spy on the read size, S-12).
+- **Negative control:** a mutation without the size cap → the 65 537-byte arm returns entries → RED; `>=` → the 65 536-byte arm RED; a stat followed by a full read → the read-size arm RED.
+- **Boundary catalog:** ☒ boundary — 65 536 and 65 537 bytes.
+
+### LLR-172.2b — A store of the wrong shape reads as empty
+- **Traceability:** HLR-172 · trace: `read_recent_sources` (NEW, `workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82
+- **Statement (EARS unwanted):** If the recent-sources store file is not a JSON object holding `schema_version` 1 and a `sources` list, then the system shall return no entries.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-35 — `pytest tests/test_b100_recents.py -k tc_b100_35`
+- **Numeric pass threshold:** `{not json`, bytes that are not UTF-8, a top-level list, `schema_version: 2`, `sources` a string → 0 entries, problem `None`, 0 raises (5 of 5).
+- **Negative control:** a mutation without the shape check → the top-level list raises → RED; a mutation accepting any `schema_version` → the `2` arm returns entries → RED.
+- **Boundary catalog:** ☒ invalid — 5 wrong shapes.
+
+### LLR-172.2c — An unreadable store reads as empty with `could not be read`
+- **Traceability:** HLR-172 · trace: `read_recent_sources` (NEW, `workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
+- **Statement (EARS unwanted):** If the recent-sources store file exists but cannot be opened or read, or the file or its folder is a link or junction, then the system shall return no entries with the problem `could not be read`.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-35 — `pytest tests/test_b100_recents.py -k tc_b100_35`
+- **Numeric pass threshold:** the open raising `PermissionError` (injected), a directory at the store path, the store file a symbolic link to a valid store `<tmp>/other.json`, and the store folder a junction to `<tmp>/elsewhere` holding a valid store → 0 entries, problem `could not be read`, 0 raises, 0 bytes read through a link (a spy on the open: 0 opens of the link arms) (4 of 4) (Q6; E3 S9-4). The file-link arm is reported not run, never passed, when the platform refuses to create a file symbolic link.
+- **Negative control:** a mutation without the catch → `PermissionError` raised → RED; a mutation returning problem `None` → RED; a mutation without the link check → the two link arms return the target's entries → RED.
+- **Boundary catalog:** ☒ error ☒ invalid — a refused open; a directory; a linked store file; a linked store folder.
+
+### LLR-172.2d — A missing store reads as empty with no problem
+- **Traceability:** HLR-172 · trace: `read_recent_sources`, `recent_store_path` (NEW, `workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82
+- **Statement (EARS unwanted):** If the recent-sources store file does not exist or `LOCALAPPDATA` is not usable (LLR-172.1f), then the system shall return no entries and no problem.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-35 — `pytest tests/test_b100_recents.py -k tc_b100_35`
+- **Numeric pass threshold:** no store file → 0 entries, problem `None`; `LOCALAPPDATA` unset → 0 entries, problem `None`, 0 files or folders created (2 of 2).
+- **Negative control:** a mutation reporting `could not be read` for a missing file → RED; a mutation raising `FileNotFoundError` → RED.
+- **Boundary catalog:** ☒ empty — no store file; no variable.
+
+### LLR-172.2e — An entry not rooted at a drive is dropped
+- **Traceability:** HLR-172 · trace: `read_recent_sources` (NEW, `workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82
+- **Statement (EARS unwanted):** If the path of a store entry is not a drive letter followed by a root, then the system shall drop that entry.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-35 — `pytest tests/test_b100_recents.py -k tc_b100_35`
+- **Numeric pass threshold:** `x.s19`, `C:x.s19`, `\x.s19`, `\\host\share\x.s19`, `\\?\GLOBALROOT\x.s19` and `\\.\C:\x.s19` → 0 returned (6 of 6); `C:\x\a.s19` → returned. A mapped network drive letter cannot be told from a local one by syntax; the guard against touching it is that a recent is never touched before Enter (LLR-173.4).
+- **Negative control:** S-07's executed probe: `\\host\share\x.s19 … is_absolute = True` → an absolute-only filter returns it → RED; a mutation accepting `\\?\` → RED.
+- **Boundary catalog:** ☒ invalid — 6 path forms.
+
+### LLR-172.2f — An entry naming a device is dropped
+- **Traceability:** HLR-172 · trace: `read_recent_sources` (NEW), `is_windows_device_name` (`workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82
+- **Statement (EARS unwanted):** If a component of a store entry's path is a Windows device name, then the system shall drop that entry.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-35 — `pytest tests/test_b100_recents.py -k tc_b100_35`
+- **Numeric pass threshold:** `C:\x\NUL.s19`, `C:\CON\a.s19` and `C:\x\com1.s19` → 0 returned (3 of 3); `C:\x\console.s19` → returned.
+- **Negative control:** a mutation checking the last component only → `C:\CON\a.s19` returned → RED.
+- **Boundary catalog:** ☒ invalid ☒ boundary — device names in the folder and the file; `console`.
+
+### LLR-172.2g — An entry holding a control character is dropped
+- **Traceability:** HLR-172 · trace: `read_recent_sources` (NEW, `workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82
+- **Statement (EARS unwanted):** If the path of a store entry holds a control character (U+0000–U+001F or U+007F–U+009F), then the system shall drop that entry.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-35 — `pytest tests/test_b100_recents.py -k tc_b100_35`
+- **Numeric pass threshold:** a NUL, `\x1b[2J`, U+007F and U+009B in a path → 0 returned (4 of 4).
+- **Negative control:** a mutation refusing NUL only → the `\x1b[2J` arm returned → RED (S-06).
+- **Boundary catalog:** ☒ invalid — 4 control characters.
+
+### LLR-172.2h — An entry whose kind does not match its suffix is dropped
+- **Traceability:** HLR-172 · trace: `read_recent_sources` (NEW, `workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82
+- **Statement (EARS unwanted):** If a store entry's `kind` is not the kind that LLR-172.1a maps its path's suffix to, then the system shall drop that entry.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-35 — `pytest tests/test_b100_recents.py -k tc_b100_35`
+- **Numeric pass threshold:** `kind: exe`; `C:\x\a.s19` with `kind: a2l`; `C:\x\a.s19:ads` (a stream) with `s19`; `C:\x\a.s19.` (a trailing dot) with `s19`; `C:\x\a.exe` with `s19` → 0 returned (5 of 5); `C:\x\A.SREC` with `s19` → returned.
+- **Negative control:** a mutation not comparing the kind with the suffix → the `a2l` arm returned → RED (S-07).
+- **Boundary catalog:** ☒ invalid ☒ boundary — 5 mismatches; an upper-case suffix.
+
+### LLR-172.2i — A malformed entry is dropped
+- **Traceability:** HLR-172 · trace: `read_recent_sources` (NEW, `workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82
+- **Statement (EARS unwanted):** If a store entry is not an object holding a string `path` and a string `kind`, then the system shall drop that entry.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-35 — `pytest tests/test_b100_recents.py -k tc_b100_35`
+- **Numeric pass threshold:** `null`, `"C:\\x.s19"`, `{"path": 7, "kind": "s19"}` and `{"path": "C:\\x.s19"}` between 2 accepted entries → the 2 accepted entries returned, 0 of the 4, 0 raises.
+- **Negative control:** a mutation indexing the entry without the type check → `null` raises → RED.
+- **Boundary catalog:** ☒ invalid — 4 malformed entries.
+
+### LLR-172.2j — The store read never raises
+- **Traceability:** HLR-172 · trace: `read_recent_sources` (NEW, `workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82
+- **Statement (EARS ubiquitous):** The system shall return from every read of the recent-sources store without raising.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-35 — `pytest tests/test_b100_recents.py -k tc_b100_35`
+- **Numeric pass threshold:** the stores of LLR-172.2a … LLR-172.2i and 200 seeded random byte strings of 0 to 70 000 bytes → 0 raises.
+- **Negative control:** a mutation without the decode guard → the non-UTF-8 store raises → RED.
+- **Boundary catalog:** ☒ invalid ☒ error — random bytes.
+
+### LLR-172.2k — A store path holding a character no Win32 file name can hold is dropped and never recorded
+- **Traceability:** HLR-172 · trace: `_recent_entry_ok` (`workspace.py`), the one entry check shared by `read_recent_sources` and `record_recent_source` (LLR-172.1l)
+- **Ledger:** LED-2026-10-26-batch-100.84
+- **Statement (EARS unwanted):** If a store entry's path holds any of `<>:"|?*` after its 2-character drive prefix, or a character of Unicode category Cf, Zl, Zp or Cs, then the system shall drop that entry when it reads the store and refuse to record that path.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-35 (read) and TC-B100-34 (record) — `pytest tests/test_b100_recents.py -k win32_forbidden_character`
+- **Numeric pass threshold:** (read) a store of `C:\x\a.s19`, the 6 entries `C:\x\a:b.s19`, `C:\x\CON:.s19`, `C:\x\a::$DATA.s19` and `C:\x\a` + U+202E / U+2028 / U+DC80 + `b.s19`, then `C:/x/../TEMPLA~1/b.s19` → the 2 valid entries, in order, problem none (a `..` segment and an 8.3 spelling stay legal); (record) a store of 2 accepted entries, then records of the same 6 names under `<src>` and of the typed `\??\<src>\x.s19` (which `os.path.abspath` turns into `C:\??\C:\…`, E5 SEC9-4) → False each (7 of 7), the store's SHA-256 unchanged, 0 staging files; control `<src>\c.s19` → True, 3 entries. The record half is Windows only (LLR-172.1f), reported not run on the Linux CI.
+- **Negative control:** the E4 integration state (`workspace.py` `a3342ed048ebe157`): 8 entries read and 7 of 7 records True → RED (`evidence/inc-9a/red-02-corrective.txt`); a mutation removing the check → RED (`evidence/inc-9a/mut-c-SEC9-3.txt`).
+- **Boundary catalog:** ☒ invalid — an alternate data stream, a device spelling with a colon, the NT prefix, a bidi override, a line separator, an unpaired surrogate.
+
+### LLR-172.3 — Recent paths stay out of every file under the base folder
+- **Traceability:** HLR-172 · trace: the `project.json`, report and gather writers (`manifest_writer.py`, `project_gather_service.py`, the report writers in `app.py`); none of them changes at Inc 9a
+- **Ledger:** LED-2026-10-26-batch-100.21, LED-2026-10-26-batch-100.82
+- **Statement (EARS ubiquitous):** The system shall not copy an entry of the recent-sources store into any file under the base folder.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-36 — `pytest tests/test_b100_recents.py -k tc_b100_36`
-- **Numeric pass threshold:** after an outside load, Save project and a report → 0 occurrences of the recent path's unique marker directory in any file under the base folder.
-- **Negative control:** a mutation adding the recents to the manifest → 1 occurrence → RED.
-- **Boundary catalog:** none — no input class; the arm is one end-to-end save and report.
+- **Numeric pass threshold:** (1) a store seeded with 3 entries under the marker folder `<tmp>/m4rk3r-9a/`, never loaded in the session, then an outside load of another file, Save project and a report → 0 occurrences of `m4rk3r-9a` in any file under the base folder, the log included; (2) an outside load from `<tmp>/m4rk3r-9b/firmware.s19`, Save project and a report → 0 occurrences of `m4rk3r-9b` in any file under the base folder other than `.s19tool/logs/` (the log records the load's own source path, §6.3).
+- **Negative control:** a mutation adding the store's entries to `project.json` → 3 occurrences in arm (1) → RED. Declared: both arms hold on `4fef292` (no store exists), so the mutation is the only RED.
+- **Boundary catalog:** none — no input class; one end-to-end save and report per arm.
 
-### LLR-172.4 — One work-area lister
-- **Traceability:** HLR-172
-- **Ledger:** none
-- **Statement:** `list_workarea_files(workarea)` (NEW, `workspace.py`) shall return the regular, non-link files of `workarea/temp/`, excluding `.staging`, and `refresh_files` (`app.py:6543`) shall build its list from it.
+### LLR-172.4 — One function enumerates the work-area temp folder
+- **Traceability:** HLR-172b · trace: `list_workarea_files` (NEW, `workspace.py`); `refresh_files` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82
+- **Statement (EARS ubiquitous):** The system shall enumerate the work-area temp folder for a file list in exactly one function.
 - **Validation:** `test (unit)`
-- **Executed verification:** TC-B100-37 — `pytest tests/test_b100_recents.py -k tc_b100_37` (an AST census: one enumeration of the temp folder in `s19_app/`)
-- **Numeric pass threshold:** the census → 1 function enumerating `temp/`; the list equals `refresh_files`' items (0 differences); a link and `.staging` → 0 listed.
-- **Negative control:** a mutation adding a second enumeration of `temp/` in `app.py` → the census counts 2 → RED.
-- **Boundary catalog:** ☒ empty ☒ invalid — an empty temp; a link.
+- **Executed verification:** TC-B100-37 — `pytest tests/test_b100_recents.py -k tc_b100_37` (an AST census of `s19_app/`)
+- **Numeric pass threshold:** the census (calls of `iterdir`, `glob`, `rglob`, `scandir`, `listdir` or `walk` on a path built from `WORKAREA_TEMP`) → 1 function, `list_workarea_files` in `workspace.py`, and 0 in `app.py`.
+- **Negative control:** base `4fef292`: the census finds `refresh_files` (`app.py:7313`, `temp_dir.glob("*")`) → the `workspace.py` arm RED; a mutation adding a second enumeration in `app.py` → 2 functions → RED.
+- **Boundary catalog:** none — a code census.
 
-### LLR-172.5 — A typed project path opens the project (L-2); reserved homes never do (S-01)
-- **Traceability:** HLR-172
-- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.10
-- **Statement:** `_load_path_from_user_input` (`app.py:8658`) shall resolve the typed path; when it is a project of this work area (§1.3), or that folder's `project.json`, it shall load that project; `_handle_load_project` shall refuse any name that `list_projects` would not list (a reserved home compared case-folded, a link, a non-project). Any other folder inside the work area shall give the `not a project` tokens; a folder outside it shall give the `outside the work area` tokens; a file with no or an unsupported suffix shall give `not a supported file`.
+### LLR-172.4a — The Workarea Files list shows each regular file of the temp folder
+- **Traceability:** HLR-172b · trace: `list_workarea_files` (NEW, `workspace.py`); `refresh_files` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.84
+- **Statement (EARS event):** When the Workarea Files list is refreshed, the system shall show one row per regular file directly in the work-area temp folder, sorted by name.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-37 — `pytest tests/test_b100_recents.py -k tc_b100_37`
+- **Numeric pass threshold:** `b.s19`, `a.hex`, `c.a2l` → 3 rows `a.hex`, `b.s19`, `c.a2l`, equal to `list_workarea_files` (0 differences); the private `.staging` folder holding 1 file and a sub-folder `sub/x.s19` → 0 rows for them; an empty temp folder → 0 rows.
+- **Negative control:** a mutation listing recursively → the `.staging` and `sub/x.s19` files listed → RED; a mutation without the sort → the order arm RED.
+- **Boundary catalog:** ☒ empty ☒ boundary — an empty temp folder; nested folders.
+
+### LLR-172.4b — A file link in the temp folder is not listed
+- **Traceability:** HLR-172b · trace: `list_workarea_files` (NEW), `_is_reparse_point` (`workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82
+- **Statement (EARS unwanted):** If an entry of the work-area temp folder is a symbolic link or reparse point, then the system shall leave that entry out of the Workarea Files list.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-37 — `pytest tests/test_b100_recents.py -k tc_b100_37`
+- **Numeric pass threshold:** `temp/l.s19`, a file symbolic link to an outside file → 0 rows for it, and the other files listed. Feasibility: when the test cannot create a file symbolic link it is reported not run, never passed (as LLR-171.1b).
+- **Negative control:** base `4fef292`: `refresh_files` tests `is_file()`, which follows a file link → `l.s19` listed → RED (code read; executed when a link can be made); a mutation using `is_file()` without the link check → RED.
+- **Boundary catalog:** ☒ invalid — a file symbolic link.
+
+### LLR-172.4c — A temp folder that cannot be listed gives an empty list
+- **Traceability:** HLR-172b · trace: `list_workarea_files` (NEW, `workspace.py`); `refresh_files` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
+- **Statement (EARS unwanted):** If the work-area temp folder is missing, is a link or junction, or cannot be listed, then the system shall show an empty Workarea Files list.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-37 — `pytest tests/test_b100_recents.py -k tc_b100_37`
+- **Numeric pass threshold:** the temp folder removed → 0 rows, 0 raises; the listing raising `PermissionError` (injected) → 0 rows, 0 raises; `temp` a junction to `<tmp>/elsewhere` holding `z.s19` → 0 rows, 0 raises (3 of 3). The junction arm is reported not run, never passed, when no junction can be made.
+- **Negative control:** a mutation without the catch → the injected arm raises out of `refresh_files` → RED; base `4fef292`: `glob` follows the junction and lists `z.s19` → the junction arm RED (code read; executed when a junction can be made); a mutation without the folder link check → `z.s19` listed → RED. Declared: `glob` on `4fef292` returns nothing for a missing folder, so for that arm the mutation is the only RED.
+- **Boundary catalog:** ☒ error ☒ invalid — a missing folder; a refused listing; a junctioned temp folder.
+
+### LLR-172.4d — A temp file whose name ends in a dot or a space is not listed
+- **Traceability:** HLR-172b · trace: `list_workarea_files` (`workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.84
+- **Statement (EARS unwanted):** If a regular file in the work-area temp folder has a name that ends in a dot or a space, then the system shall leave that file out of the Workarea Files list.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-37 — `pytest tests/test_b100_recents.py -k tc_b100_37_lister_skips_a_name_ending_in_a_dot_or_space`
+- **Numeric pass threshold:** `a.s19.` and `b.s19 ` (each made through a `\?\` path, one arm each) beside the regular file `c.s19` → the lister returns `[temp/c.s19]` and the list shows 1 row `c.s19`, 0 rows naming either (2 of 2 arms). Win32 opens `a.s19.` as `a.s19`, so a pick of that row would load another file (E5 SEC9-1, probe G). The arms are Windows only (the `\?\` spelling), reported not run on the Linux CI.
+- **Negative control:** the E4 integration state (`workspace.py` `a3342ed048ebe157`): `['a.s19.', 'c.s19']` and `['b.s19 ', 'c.s19']` → RED (`evidence/inc-9a/red-02-corrective.txt`); a mutation removing the skip → 1 extra row in each arm (2 in all) → RED (`evidence/inc-9a/mut-c-SEC9-1.txt`).
+- **Boundary catalog:** ☒ invalid ☒ boundary — a trailing dot; a trailing space.
+
+### LLR-172.5 — A typed project folder path loads the project (L-2)
+- **Traceability:** HLR-172a · trace: `_load_path_from_user_input`, `_route_load_project`, `_handle_load_project`, `_project_folder_refusal` (`app.py`); `resolve_input_path` (`workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83, LED-2026-10-26-batch-100.84
+- **Statement (EARS event):** When the absolute path typed into Load names a project folder of this work area, the system shall load that project.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-38 — `pytest tests/test_b100_recents.py -k tc_b100_38`
-- **Numeric pass threshold:** `ab`, `ab/project.json` and `ab` reached through a `..` segment → 3 loads of `ab`; `temp`, `TEMP`, `patches` → 0 project loads, 0 files written; an empty folder inside → 1 `not a project`; a folder outside holding a `project.json` → 1 `outside the work area`, 0 project loads; `firmware` (no suffix) → 1 `not a supported file`.
-- **Negative control:** executed on `1d677ba` (P-15): `Unsupported file type: ` → RED; S-01's executed probe: `validate_project_files(workarea/temp)` accepts → RED.
-- **Boundary catalog:** ☒ boundary ☒ invalid — `..` segments; reserved homes; a folder outside the work area.
+- **Numeric pass threshold:** project `ab` (a `project.json` and `firmware.s19`): `<workarea>/ab`, `<workarea>/temp/../ab`, `<workarea>` spelled in upper case followed by `/ab`, and `<workarea>/AB` → 4 loads of `ab` (`current_project == "ab"`, the on-disk name, 1 line naming `ab` loaded each). A project folder is §1.3's Project; the typed path is normalised lexically, and no link is followed before the link check (LLR-172.5d). The folder is matched by listing, not by spelling: the typed last component must equal (on Windows after `os.path.normcase`) the name of a folder the project list (`list_projects`) lists, and the load uses that on-disk name. The two case arms are Windows only (case-insensitive file system), reported not run on the Linux CI.
+- **Negative control:** executed on `4fef292` (`evidence/inc-9a/e1-probe-4fef292.md`): `<workarea>/ab` and `<workarea>/temp/../ab` → `['Unsupported file type: ']`, no project → RED.
+- **Boundary catalog:** ☒ boundary — `..` segments; the work area under another case spelling.
 
-### LLR-172.6 — The Workarea Files list renders names literally (C8)
-- **Traceability:** HLR-172
-- **Ledger:** LED-2026-10-26-batch-100.10
-- **Statement:** `refresh_files` shall build each item's label through `safe_text` (`utils.py:44`, markup off and control characters removed), replacing today's `Label(item.name)` (`app.py:6559`).
+### LLR-172.5a — A typed `project.json` path loads its project
+- **Traceability:** HLR-172a · trace: `_load_path_from_user_input` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
+- **Statement (EARS event):** When the absolute path typed into Load names the `project.json` of a project folder of this work area, the system shall load that project.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-38 — `pytest tests/test_b100_recents.py -k tc_b100_38`
+- **Numeric pass threshold:** `<workarea>/ab/project.json` and `<workarea>/ab/PROJECT.JSON` → 2 loads of `ab`; `<workarea>/ab/flows/project.json` → 0 loads, 1 line holding `not a project` (its folder is not a project folder). The `PROJECT.JSON` arm is Windows only (case-insensitive file system), reported not run on the Linux CI.
+- **Negative control:** executed on `4fef292` (`evidence/inc-9a/e1-probe-4fef292.md`): `<workarea>/ab/project.json` → `['Unsupported file type: .json']` → RED.
+- **Boundary catalog:** ☒ boundary — the name in another case; a `project.json` below a project.
+
+### LLR-172.5b — A typed folder inside the work area that is not a project is refused (S-01)
+- **Traceability:** HLR-172a · trace: `_load_path_from_user_input` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83, LED-2026-10-26-batch-100.84
+- **Statement (EARS unwanted):** If the absolute path typed into Load names a folder inside this work area that is not a project folder, then the system shall load nothing and paint the `not a project` and `pick a project in the list` tokens.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-38 — `pytest tests/test_b100_recents.py -k tc_b100_38`
+- **Numeric pass threshold:** a folder is matched by listing, not by spelling (LLR-172.5): a typed last component that equals no name the project list lists is not a project folder, and the project list never lists a reserved home. `<workarea>/temp`, `<workarea>/TEMP` and `<workarea>/patches` (reserved homes; `temp` holding a work copy), `<workarea>/temp::$INDEX_ALLOCATION` (a stream spelling of `temp`), `<workarea>/TEMPLA~1` (the 8.3 name of `templates`, holding a file), `<workarea>/temp.` (a trailing dot), an empty folder `<workarea>/empty`, the sub-folder `<workarea>/ab/flows` and `<workarea>` itself → 0 project loads, 0 files written, 1 line holding both tokens each (9 of 9) (Q9; E3 S9-1). The `TEMP`, stream, 8.3 and trailing-dot arms are Windows only (case-insensitive file system, Win32 name rules); the 8.3 arm is reported not run when the volume makes no 8.3 names; each is reported not run on the Linux CI. A project typed by its 8.3 name is refused the same way (declared: fail closed).
+- **Negative control:** executed on `4fef292` (`evidence/inc-9a/e1-probe-4fef292.md`): `<workarea>/temp` → `['Unsupported file type: ']`, neither token → RED; S-01's executed probe (`validate_project_files(workarea/temp)` accepts the work copy) → a route that loads any folder holding a data file loads `temp` → RED; a mutation comparing the typed name case-folded with the reserved homes instead of matching the listing (the E2 design) → `temp::$INDEX_ALLOCATION` loads `temp` (E3 S9-1 P2: every other predicate passes) → RED.
+- **Boundary catalog:** ☒ boundary ☒ invalid — the work area itself; reserved homes in two cases; a stream, an 8.3 and a trailing-dot spelling of a reserved home; a project's sub-folder; an empty folder.
+
+### LLR-172.5c — A typed folder outside the work area is refused
+- **Traceability:** HLR-172a · trace: `_load_path_from_user_input`, `_project_folder_refusal` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
+- **Statement (EARS unwanted):** If the absolute path typed into Load names a folder outside this work area, or the `project.json` of such a folder, then the system shall load nothing and paint the `outside the work area` and `copy the folder into the work area` tokens.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-38 — `pytest tests/test_b100_recents.py -k tc_b100_38`
+- **Numeric pass threshold:** `<tmp>/elsewhere/P` holding a `project.json` and an image, that folder's `project.json`, another work area's project `<tmp>/other/.s19tool/workarea/R`, and the base folder → 0 project loads, 0 files written, 1 line holding both tokens each (4 of 4). This is LLR-171.4f's typed arm.
+- **Negative control:** code read on `4fef292`: the same `Unsupported file type: ` branch as the probe's `<workarea>/ab` → neither token → RED; a mutation loading any folder that holds a `project.json` → `<tmp>/elsewhere/P` loads → RED.
+- **Boundary catalog:** ☒ invalid — an outside folder, its manifest, another work area, the base folder.
+
+### LLR-172.5d — A typed folder path through a link or junction is refused
+- **Traceability:** HLR-172a · trace: `_load_path_from_user_input`, `_project_folder_refusal` (`app.py`); `_is_reparse_point` (`workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
+- **Statement (EARS unwanted):** If the absolute folder or `project.json` path typed into Load passes through a symbolic link or junction inside this work area, then the system shall load nothing and paint the `link or junction` and `pick a project in the list` tokens.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-38 — `pytest tests/test_b100_recents.py -k tc_b100_38`
+- **Numeric pass threshold:** `<workarea>/alias` (a junction to `<workarea>/ab`), `<workarea>/alias/project.json`, and `<workarea>/sub/P` with `<workarea>/sub` a junction to another work area → 0 project loads, 0 session resets, 1 line holding both tokens each (3 of 3). This is LLR-171.4e's typed arm.
+- **Negative control:** code read on `4fef292`: `resolve_input_path` returns the path and `exists()` follows the junction → `Unsupported file type: `, neither token → RED; a mutation resolving the path before the link check → `alias` loads `ab` → RED.
+- **Boundary catalog:** ☒ invalid — a junction to this work area's project, its manifest, a junction to another work area.
+
+### LLR-172.5e — A typed file with no or an unsupported suffix is refused
+- **Traceability:** HLR-172a · trace: `_load_path_from_user_input` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.84
+- **Statement (EARS unwanted):** If the path typed into Load names a file whose suffix is missing or is not a supported data or A2L suffix, then the system shall load nothing and paint the `not a supported file` and `check the path` tokens.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-38 — `pytest tests/test_b100_recents.py -k tc_b100_38`
+- **Numeric pass threshold:** `<tmp>/firmware` (no suffix), `<tmp>/notes.txt` and `<tmp>/x.json` → 0 loads, 0 files copied into `temp/`, 1 line holding both tokens each (3 of 3).
+- **Negative control:** code read on `4fef292` (`_load_path_from_user_input`): `Unsupported file type: <suffix>`, neither token → RED.
+- **Boundary catalog:** ☒ invalid — no suffix; 2 unsupported suffixes.
+
+### LLR-172.5f — A typed path that does not exist is refused
+- **Traceability:** HLR-172a · trace: `_load_path_from_user_input` (`app.py`); `resolve_input_path` (`workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82
+- **Statement (EARS unwanted):** If the path typed into Load does not exist, then the system shall load nothing and paint the `not found` and `check the path` tokens.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-38 — `pytest tests/test_b100_recents.py -k tc_b100_38`
+- **Numeric pass threshold:** `<tmp>/missing.s19` and `<workarea>/nope` → 0 loads, 1 line holding both tokens each (2 of 2).
+- **Negative control:** code read on `4fef292`: `File not found: <path>` holds `not found` but not `check the path` → RED.
+- **Boundary catalog:** ☒ error — a missing file; a missing folder.
+
+### LLR-172.5g — A project load of a name the project list does not list is refused (S-01)
+- **Traceability:** HLR-172a · trace: `_handle_load_project`, `list_projects` (`app.py`); `RESERVED_WORKAREA_HOMES` (`workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
+- **Statement (EARS unwanted):** If a project load is asked for a name that equals no name the project list of this work area lists, then the system shall refuse the load.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-38 — `pytest tests/test_b100_recents.py -k tc_b100_38`
+- **Numeric pass threshold:** names are compared on Windows after `os.path.normcase`; a match loads the listed on-disk name. The project list (`list_projects`, `app.py:12057` at `4fef292`) skips every entry whose case-folded name is in `RESERVED_WORKAREA_HOMES`, so no reserved home is ever listed. `_handle_load_project("temp")`, `("TEMP")`, `("patches")`, `("temp::$INDEX_ALLOCATION")`, `("TEMPLA~1")` (the 8.3 name of `templates`, holding a file) and `("temp.")`, with a work copy in `temp/` → 0 project loads, 0 session resets, 0 files written (`temp/project.json` and `templates/project.json` absent), 1 line holding `not a project` and `pick a project in the list` each (6 of 6); `("AB")` for the project `ab` → 1 load, `current_project == "ab"` (control). The refusal comes after the existing link, outside, unreadable and not-found refusals (LLR-171.4e, LLR-171.4f), so their tokens are unchanged. Every arm except `temp` and `patches` is Windows only (case-insensitive file system, Win32 name rules), reported not run on the Linux CI; the 8.3 arm is reported not run when the volume makes no 8.3 names.
+- **Negative control:** executed on `4fef292` (`evidence/inc-9a/e1-probe-4fef292.md`): `_handle_load_project('temp')` → `Loaded project 'temp' -> [bold]x.s19 - variant 1 of 2 …`, `current_project = temp` → RED; a mutation comparing the name case-folded with the reserved homes instead of matching the listing (the E2 design) → `temp::$INDEX_ALLOCATION` and `TEMPLA~1` load (E3 S9-1 P2) → RED.
+- **Boundary catalog:** ☒ invalid ☒ boundary — reserved homes in two cases; a stream, an 8.3 and a trailing-dot spelling; a project name in another case.
+
+### LLR-172.5h — A typed relative folder path is refused
+- **Traceability:** HLR-172a · trace: `_load_path_from_user_input` (`app.py`); `resolve_input_path` (`workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.83
+- **Statement (EARS unwanted):** If a relative path typed into Load names a folder, then the system shall load nothing and paint the `not a supported file` and `check the path` tokens.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-38 — `pytest tests/test_b100_recents.py -k tc_b100_38`
+- **Numeric pass threshold:** "relative" is `not Path(text).is_absolute()` on the typed text (stripped as `resolve_input_path` strips it). With a working folder other than the base folder: `.s19tool/workarea/ab` (found by the base-folder fallback), `.s19tool/workarea/alias` (a junction to `ab`, which the fallback's `resolve()` follows), and the root-relative `\…\.s19tool\workarea\ab` (no drive) → 0 project loads, 0 session resets, 0 files copied into `temp/`, 1 line holding both tokens each (3 of 3). The root-relative and junction arms are Windows only, reported not run on the Linux CI; the junction arm is reported not run when no junction can be made.
+- **Negative control:** code read on `4fef292` (`_load_path_from_user_input`): a folder gives `Unsupported file type: ` (an empty suffix), neither token → RED; a mutation sending a relative folder to the project route → `.s19tool/workarea/ab` loads `ab` and the `alias` arm loads `ab` through the junction → RED; a mutation testing `os.path.isabs` (true for `\x` on Python 3.12, E3 S9-6) → the root-relative arm routes as a project → RED.
+- **Boundary catalog:** ☒ invalid — a relative folder; a relative junction; a root-relative folder.
+
+### LLR-172.6 — Workarea Files rows paint names literally (C8)
+- **Traceability:** HLR-172b · trace: `refresh_files` (`app.py`); `painted_names` (`project_gather_service.py:965`); `safe_text` (`utils.py:44`)
+- **Ledger:** LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
+- **Statement (EARS ubiquitous):** The system shall paint the file name of each Workarea Files row with no markup applied, every character of Unicode category Cc, Cf, Zl or Zp removed and every unpaired surrogate replaced by U+FFFD.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-39 — `pytest tests/test_b100_recents.py -k tc_b100_39`
-- **Numeric pass threshold:** `[bold]x.s19`, `[link=x]a.s19`, `[@click=app.bell]x.s19` and a name holding U+009B → 4 rows whose plain text equals the name minus control characters, 0 spans, 0 control characters, 0 raises.
-- **Negative control:** today's markup-on `Label` paints 1 span for `[bold]x.s19` (QA-02 probe) → RED.
-- **Boundary catalog:** ☒ invalid — the four hostile names.
+- **Numeric pass threshold:** the label is the project's one category scrub, `painted_names([name])` (8b S3R2-4; clipped to 120 characters ending in `…`), painted with markup off. `[bold]x.s19`, `[link=x]a.s19`, `[@click=app.bell]x.s19`, a name holding U+009B, `x` + U+202E + `gpj.s19` (a bidi override) and `a` + U+DC80 + `b.s19` (an unpaired surrogate) → 6 rows whose plain text equals the name with those characters removed (the surrogate as U+FFFD), 0 spans, 0 characters of category Cc, Cf or Cs, 0 raises; a 130-character name → a label of 120 characters ending in `…` (7 of 7). The surrogate arm is reported not run, never passed, where the test cannot create that name.
+- **Negative control:** executed on `4fef292` (`evidence/inc-9a/e1-probe-4fef292.md`): the `[bold]x.s19` row (built at `app.py:7316`) paints `Content('x.s19', spans=[Span(0, 5, style='bold')])` → RED; a mutation painting `safe_text(name)` (C0 / C1 only, the E2 design) → the U+202E row keeps the Cf character and the U+DC80 row keeps the surrogate → RED (E3 S9-2).
+- **Boundary catalog:** ☒ invalid ☒ boundary — the six hostile names; a name over the 120-character clip.
+
+### LLR-172.6a — A picked Workarea Files row loads the file as named on disk
+- **Traceability:** HLR-172b · trace: `refresh_files`, `_load_from_item` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
+- **Statement (EARS event):** When the engineer picks a Workarea Files row, the system shall load the file whose exact on-disk name that row holds.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-39 — `pytest tests/test_b100_recents.py -k tc_b100_39`
+- **Numeric pass threshold:** picking the `[bold]x.s19` row, the U+009B row, the U+202E row and the 130-character row (its label clipped) → `current_file.path.name` equals each on-disk name (4 of 4); the row's data is the on-disk name, never the painted label (`painted_names`, LLR-172.6).
+- **Negative control:** a mutation storing the painted text as the row's name → the U+009B pick loads nothing → RED. Declared: on `4fef292` the row holds `item.name`, so the mutation is the only RED.
+- **Boundary catalog:** ☒ invalid — a markup-shaped name; a control character.
 
 ### LLR-173.1 — `LoadChoice` and one router
 - **Traceability:** HLR-173
@@ -2488,6 +2897,17 @@ ATs drive through the ids the verdict fixed (P-30), with the Load dialog's focus
 | TC-B100-31 (LLR-171.6, LLR-171.6a, LLR-171.6b) | Inc 8b: the carried `batch` and `assignments` kept when nothing is selected, for the three target kinds; the gather fed from the recorded `batch` plus the recorded `assignments` names (LED .78, .79) | — |
 | TC-B100-31 (LLR-171.7, LLR-171.7a, LLR-171.7b) | Inc 8b: names scrubbed by Unicode category and clipped to 120; at most 10 entries then `and K more`; a failed copy painted in user terms (LED .78, .79) | — |
 | TC-B100-32 (LLR-171.2f, LLR-171.2g) | Inc 8b: a linked or over-cap A2L of an A2L-only folder refused before the reset; beside an image or a MAC left out with 1 `not readable` problem and 0 parses (LED .78, .79) | — |
+| TC-B100-34 (LLR-172.1, LLR-172.1a, LLR-172.1b, LLR-172.1c, LLR-172.1d, LLR-172.1e, LLR-172.1f, LLR-172.1g, LLR-172.1h, LLR-172.1i, LLR-172.1j) | Inc 9a: the per-user store location, the record of an outside source (first, kind by suffix), one entry per path, 20 entries, nothing recorded on a failed or inside load, no store without a usable `LOCALAPPDATA` or through a linked folder, unique staging, a failed write never fails the load, refused entries not written back (LED .82) | — |
+| TC-B100-34 (LLR-172.1k, LLR-172.1l, LLR-172.1m) | Inc 9a E3: an unreadable store left unchanged by a record; a source the read would drop (UNC, control character, device component) not recorded; the written store at most 65 536 bytes, oldest dropped first (LED .83) | — |
+| TC-B100-34 (LLR-172.2k) | Inc 9a E5: a source path holding `<>:"\|?*` after the drive prefix, a Cf / Zl / Zp / Cs character, or the NT prefix `\??\` not recorded (LED .84) | — |
+| TC-B100-35 (LLR-172.2, LLR-172.2a, LLR-172.2b, LLR-172.2c, LLR-172.2d, LLR-172.2e, LLR-172.2f, LLR-172.2g, LLR-172.2h, LLR-172.2i, LLR-172.2j) | Inc 9a: the store read — order and cap, `too large`, wrong shape, `could not be read`, missing, the five entry checks, never raises (LED .82) | — |
+| TC-B100-35 (LLR-172.2k) | Inc 9a E5: a store entry holding `<>:"\|?*` after the drive prefix or a Cf / Zl / Zp / Cs character dropped; a `..` segment and an 8.3 spelling kept (LED .84) | — |
+| TC-B100-36 (LLR-172.3) | Inc 9a: the two marker arms (LED .82) | — |
+| TC-B100-37 (LLR-172.4, LLR-172.4a, LLR-172.4b, LLR-172.4c) | Inc 9a: the one-lister census, the listed rows, a file link left out, an unlistable temp folder (LED .82) | Inc 9b: the Load dialog's files section reads the same lister (LLR-173.4) |
+| TC-B100-37 (LLR-172.4d) | Inc 9a E5: a temp file whose name ends in a dot or a space not listed (LED .84) | — |
+| TC-B100-38 (LLR-172.5, LLR-172.5a, LLR-172.5b, LLR-172.5c, LLR-172.5d, LLR-172.5e, LLR-172.5f, LLR-172.5g) | Inc 9a: the typed project folder and `project.json`, the four typed refusals by token pair, a missing path, a reserved home refused by the project load (LED .82) | Inc 9b: the refusals painted in `#load_reason` (LLR-173.5) |
+| TC-B100-38 (LLR-172.5h) | Inc 9a E3: a relative typed folder path (base-folder fallback, a relative junction, a root-relative path) refused with `not a supported file` / `check the path`, never routed as a project (LED .83) | Inc 9b: painted in `#load_reason` (LLR-173.5) |
+| TC-B100-39 (LLR-172.6, LLR-172.6a) | Inc 9a: literal rows, the picked row loads the on-disk name (LED .82) | — |
 | TC-B100-71 (LLR-168.4) | Inc 7 | — |
 | TC-B100-72 (LLR-174.4) | Inc 10: all four routes | — |
 | TC-B100-55 (LLR-178.1) | Inc 6: the reasons and the counts | Inc 7: the "first variant by name" mutation arm and the `derived_from` lines (ARCH-PDR-3) |
@@ -2548,7 +2968,7 @@ D1–D7 and O-1..O-11 are mapped to the requirements they shape in LED-2026-10-2
 ### 6.3 Open risks
 
 **Security questions (trigger family C; the `devflow-scan-spec.py` verdict is recorded in LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.13 and LED-2026-10-26-batch-100.23):**
-- **Input surface (C6).** Four untrusted inputs: the typed project name (HLR-164: sanitised, case-folded, reserved and device names refused on the raw and sanitised name, capped at 64 and by path length, a junction target refused), the typed load path (LLR-172.5: resolved, contained in this work area, reserved homes refused), `project.json` (LLR-169.4, LLR-169.8, LLR-170.1, LLR-168.1, LLR-168.4: 1 MiB, 1 000 entries per array, a manifest-keys mode that refuses drive-relative, stream and device names per path component), and the per-user recent store (LLR-172.2: size-capped, parse-guarded, drive-rooted paths only, kind matching the suffix, no control characters, never touched before Enter). Every placement requires containment in this work area inside `place_into_workarea` (LLR-163.1, LLR-171.4), so no writer can be left off a list; save-as never follows a directory link (LLR-171.1).
+- **Input surface (C6).** Four untrusted inputs: the typed project name (HLR-164: sanitised, case-folded, reserved and device names refused on the raw and sanitised name, capped at 64 and by path length, a junction target refused), the typed load path (LLR-172.5: the project route for an absolute path only, normalised lexically with no link followed, matched by listing against the project list, which never lists a reserved home; LLR-172.5g, LLR-172.5h), `project.json` (LLR-169.4, LLR-169.8, LLR-170.1, LLR-168.1, LLR-168.4: 1 MiB, 1 000 entries per array, a manifest-keys mode that refuses drive-relative, stream and device names per path component), and the per-user recent store (LLR-172.2: size-capped, parse-guarded, drive-rooted paths only, kind matching the suffix, no control characters, never touched before Enter). Every placement requires containment in this work area inside `place_into_workarea` (LLR-163.1, LLR-171.4), so no writer can be left off a list; save-as never follows a directory link (LLR-171.1).
 - **Markup and control-character injection (C8).** Every name from disk or the store renders through `safe_text` (`utils.py:44`): LLR-172.6, LLR-173.3, LLR-174.2, LLR-175.4, LLR-178.2, LLR-178.3.
 - **Privacy (S-16, decided).** The operator chose a per-user store, outside every work area and every `.s19tool` (LLR-172.1). The orchestrator's PDR-C3 ruling places it at `%LOCALAPPDATA%\s19_app\recent_sources.json`, the per-machine profile, because a roaming `%APPDATA%` would copy the paths to a domain profile server, against the operator's choice that the paths never travel. Zipping or syncing a work area no longer carries absolute local paths, and a shared folder can no longer plant a store. The store holds the same paths the log already holds (`app.py:10820-10825`), bounded to 20.
 - **Known gap.** A mapped network drive letter cannot be told from a local one by syntax; the protection is that a recent entry is never touched before Enter (LLR-173.4), and pressing Enter is the engineer's own action.
