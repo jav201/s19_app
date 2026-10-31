@@ -534,7 +534,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### HLR-171a — An A2L-only project opens
 - **Traceability:** US-161
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.24, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77, LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.81
+- **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77, LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.81
 - **Statement (EARS event):** When a project folder that holds one A2L file and no data file is loaded, the system shall open that project with its A2L attached.
 - **Decomposition:** LLR-171.2, LLR-171.2a … LLR-171.2g (LLR-171.2f and .2g, the A2L link and cap guard of both load branches, are LED .78).
 - **Rationale (informative):** an A2L-only project saves and then cannot be loaded (P-12).
@@ -551,7 +551,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### HLR-171b — Only folders inside this work area are listed, loaded or written as projects
 - **Traceability:** US-161
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.28, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77, LED-2026-10-26-batch-100.81
+- **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77, LED-2026-10-26-batch-100.81
 - **Statement (EARS ubiquitous):** The system shall treat a folder as a project only when that folder is not a link or junction and resolves inside this work area.
 - **Decomposition:** LLR-171.3, LLR-171.3a, LLR-171.4, LLR-171.4a, .4b, .4c, .4e … .4h (listing, load, Save project's target and parent, and the 8 named writers each have their own LLR). LLR-171.4d is withdrawn into .4c; LLR-171.4i and .4j (SEC-5) are routed out of 8b to the LED .50 backlog item (LED .77).
 - **Rationale (informative):** a save elsewhere is never listed (P-11); a junction in the work area escapes every containment check (S-02, security R2-01); a junction `flows/` sends a saved flow outside (SEC-5, `security-increment-001.md`).
@@ -922,7 +922,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-167.6a — The save-as plan has one row per sub-folder with its file count
 - **Traceability:** HLR-167, HLR-171 · trace: `plan_project_save`, `SavePlanRow` (`project_gather_service.py`), `_plan_project_save` (`app.py`)
-- **Ledger:** LED-2026-10-26-batch-100.23, LED-2026-10-26-batch-100.63, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
+- **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
 - **Statement (EARS event):** When Save project computes the plan for a save as, the system shall include one row for each top-level sub-folder of the open project, holding the count of files LLR-171.1 copies under it.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-59 — `pytest tests/test_b100_save_image.py -k tc_b100_59`
@@ -932,7 +932,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-167.6b — The save-as plan lists each skipped link
 - **Traceability:** HLR-167, HLR-171 · trace: `plan_project_save` (`project_gather_service.py`), `_plan_project_save` (`app.py`)
-- **Ledger:** LED-2026-10-26-batch-100.23, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
+- **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
 - **Statement (EARS event):** When Save project computes the plan for a save as, the system shall list in the plan each link or junction that the save-as enumeration skips.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-59 — `pytest tests/test_b100_save_image.py -k tc_b100_59`
@@ -942,7 +942,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-167.6c — A second MAC file is refused in the plan
 - **Traceability:** HLR-167 · trace: `_plan_project_save`, `_handle_save_dialog` (`app.py`) — LED .63 (b), LED .66
-- **Ledger:** LED-2026-10-26-batch-100.63, LED-2026-10-26-batch-100.66, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.78
+- **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.78
 - **Statement (EARS unwanted):** If the target project folder holds a MAC file and the session holds a MAC file other than it, then the system shall put the `already has a MAC file` refusal into the save plan.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-59 — `pytest tests/test_b100_save_image.py -k tc_b100_59`
@@ -952,7 +952,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-167.6d — A second A2L file is refused in the plan
 - **Traceability:** HLR-167 · trace: `_plan_project_save`, `_handle_save_dialog` (`app.py`) — LED .63 (b), LED .66
-- **Ledger:** LED-2026-10-26-batch-100.63, LED-2026-10-26-batch-100.66, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
+- **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
 - **Statement (EARS unwanted):** If the target project folder holds an A2L file and the session holds an A2L file other than it, then the system shall put the `already has an A2L file` refusal into the save plan.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-59 — `pytest tests/test_b100_save_image.py -k tc_b100_59`
@@ -1182,7 +1182,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-171.1a — The save-as enumeration never descends into a directory link
 - **Traceability:** HLR-171 · trace: `walk_tree_no_links`, `_is_reparse_point` (`workspace.py`)
-- **Ledger:** LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.44, LED-2026-10-26-batch-100.76
+- **Ledger:** LED-2026-10-26-batch-100.76
 - **Statement (EARS state):** While the system enumerates the open project's sub-folders for a save as, the system shall not descend into a directory that is a symbolic link or junction.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
@@ -1192,7 +1192,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-171.1b — The save-as copy skips a file link
 - **Traceability:** HLR-171 · trace: `walk_tree_no_links`, `_is_reparse_point` (`workspace.py`)
-- **Ledger:** LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.76
+- **Ledger:** LED-2026-10-26-batch-100.76
 - **Statement (EARS state):** While the system enumerates the open project's sub-folders for a save as, the system shall not copy a file that is a symbolic link.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
@@ -1202,7 +1202,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-171.1c — Each skipped link is named in the status
 - **Traceability:** HLR-171 · trace: `_handle_save_dialog` (`app.py`)
-- **Ledger:** LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.78
+- **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.78
 - **Statement (EARS event):** When the save-as enumeration skips a link or junction, the system shall name that link's project-relative path in the Save project status, within the 10-name limit of LLR-171.7a.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
@@ -1212,7 +1212,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-171.1d — Bytes behind a link do not count toward the save-as total
 - **Traceability:** HLR-171 · trace: `_handle_save_dialog` (`app.py`), `walk_tree_no_links` (`workspace.py`)
-- **Ledger:** LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
+- **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
 - **Statement (EARS ubiquitous):** The system shall exclude every byte reached through a link or junction from the save-as size total.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
@@ -1222,7 +1222,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-171.1e — A save as larger than the free space is refused before any folder exists
 - **Traceability:** HLR-171 · trace: `_handle_save_dialog` (`app.py`), `shutil.disk_usage`
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77, LED-2026-10-26-batch-100.78
+- **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77, LED-2026-10-26-batch-100.78
 - **Statement (EARS unwanted):** If the save-as size total exceeds the free space of the work area's volume, then the system shall refuse the save, with the `not enough free space` tokens, before creating the project folder.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
@@ -1232,7 +1232,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-171.1f — Save as leaves the open project unchanged
 - **Traceability:** HLR-171 · trace: `_handle_save_dialog` (`app.py`)
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.76
+- **Ledger:** LED-2026-10-26-batch-100.76
 - **Statement (EARS ubiquitous):** The system shall not modify, add or remove any file of the open project when it saves that project into a new project folder.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
@@ -1293,7 +1293,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-171.1l — After a save as, the Flow panels use the new project folder
 - **Traceability:** HLR-171 · trace: `_handle_save_dialog`, `_publish_flow_session_dir` (`app.py`) — orchestrator ruling R9, E3-architect A3-11
-- **Ledger:** LED-2026-10-26-batch-100.78
+- **Ledger:** LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.81
 - **Statement (EARS event):** When a save as completes, the system shall make the new project folder the Flow panels' session folder.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
@@ -1343,7 +1343,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-171.2a — Loading an A2L-only project clears the previous data file
 - **Traceability:** HLR-171a · trace: `_handle_load_project`, `_reset_project_session` (`app.py`)
-- **Ledger:** LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.76
+- **Ledger:** LED-2026-10-26-batch-100.76
 - **Statement (EARS event):** When a project folder that holds one A2L file and no data file is loaded, the system shall remove the previously loaded data file from the session.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-32 — `pytest tests/test_b100_project_homes.py -k tc_b100_32`
@@ -1353,7 +1353,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-171.2b — An A2L-only project becomes the open project
 - **Traceability:** HLR-171a · trace: `_handle_load_project` (`app.py`)
-- **Ledger:** LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.76
+- **Ledger:** LED-2026-10-26-batch-100.76
 - **Statement (EARS event):** When a project folder that holds one A2L file and no data file is loaded, the system shall make that folder the open project.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-32 — `pytest tests/test_b100_project_homes.py -k tc_b100_32`
@@ -1363,7 +1363,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-171.2c — A data file loaded into an open A2L-only project is recorded
 - **Traceability:** HLR-171a · trace: the variant append (`app.py`), `build_variant_set` (A-14)
-- **Ledger:** LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.76
+- **Ledger:** LED-2026-10-26-batch-100.76
 - **Statement (EARS state):** While an A2L-only project is open, the system shall record a data file loaded into it in that project's `project.json`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-32 — `pytest tests/test_b100_project_homes.py -k tc_b100_32`
@@ -1373,7 +1373,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-171.2d — A project with neither a data file nor an A2L is refused with its tokens
 - **Traceability:** HLR-171a · trace: `_handle_load_project` (`app.py`)
-- **Ledger:** LED-2026-10-26-batch-100.24, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.78
+- **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.78
 - **Statement (EARS unwanted):** If a project folder that holds a `project.json` holds neither a data file nor an A2L file, then the system shall refuse the load with the `no data or A2L file` tokens.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-32 — `pytest tests/test_b100_project_homes.py -k tc_b100_32`
@@ -1383,7 +1383,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-171.2e — A folder with no project.json and no project file is refused with its tokens
 - **Traceability:** HLR-171a · trace: `_handle_load_project` (`app.py`), `PROBLEM_NO_MANIFEST` (`variant_execution_service.py`)
-- **Ledger:** LED-2026-10-26-batch-100.24, LED-2026-10-26-batch-100.76
+- **Ledger:** LED-2026-10-26-batch-100.76
 - **Statement (EARS unwanted):** If a folder given to the project load has no `project.json` and holds neither a data file nor an A2L file, then the system shall refuse the load with the `no project.json` tokens.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-32 — `pytest tests/test_b100_project_homes.py -k tc_b100_32`
@@ -1434,7 +1434,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-171.3a — The work area under another spelling is accepted as the parent
 - **Traceability:** HLR-171b · trace: `_handle_save_dialog` (`app.py`)
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.76
+- **Ledger:** LED-2026-10-26-batch-100.76
 - **Statement (EARS event):** When the Save project parent folder resolves to this work area under a different spelling, the system shall save the project into this work area.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-33 — `pytest tests/test_b100_project_homes.py -k tc_b100_33`
@@ -1454,7 +1454,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-171.4a — A placement outside this work area is refused
 - **Traceability:** HLR-171b · trace: `place_into_workarea` (LLR-163.1), which every placing writer uses
-- **Ledger:** LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.44, LED-2026-10-26-batch-100.76
+- **Ledger:** LED-2026-10-26-batch-100.76
 - **Statement (EARS unwanted):** If a placement's destination is not inside this work area, then the system shall refuse the placement.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-62 — `pytest tests/test_b100_reuse.py -k tc_b100_62` (Inc 1)
@@ -1464,7 +1464,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-171.4b — A manifest write outside this work area is refused
 - **Traceability:** HLR-171b · trace: `write_project_manifest`, `_check_destination_contained` (`manifest_writer.py`)
-- **Ledger:** LED-2026-10-26-batch-100.28, LED-2026-10-26-batch-100.76
+- **Ledger:** LED-2026-10-26-batch-100.76
 - **Statement (EARS unwanted):** If the `project.json` destination is not inside this work area, then the system shall refuse the manifest write.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_check.py -k tc_b100_62` (Inc 1 / LED .28)
@@ -1474,7 +1474,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-171.4c — A link or junction folder is not listed as a project
 - **Traceability:** HLR-171b · trace: `list_projects` (`app.py`), `_is_reparse_point` (`workspace.py`); absorbs the withdrawn LLR-171.4d's arm (orchestrator ruling Q6, LED .77)
-- **Ledger:** LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
+- **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
 - **Statement (EARS unwanted):** If a folder of the work area is a link or junction, then the system shall leave that folder out of the project list.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_homes.py -k tc_b100_62`
@@ -1484,12 +1484,12 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-171.4d — Withdrawn: merged into LLR-171.4c
 - **Traceability:** HLR-171b
-- **Ledger:** LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
+- **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
 - **Status:** withdrawn at Inc 8b E1 by orchestrator ruling Q6 (LED .77). It had no independent RED: a direct child of the work area resolves outside only through a link or junction, which LLR-171.4c drops. Its arm (`workarea/evil` → 0 rows) is LLR-171.4c's first arm. The id is kept and not reused.
 
 ### LLR-171.4e — A link or junction project folder is not loaded
 - **Traceability:** HLR-171b · trace: `_handle_load_project` (`app.py`), `_is_reparse_point` (`workspace.py`)
-- **Ledger:** LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.76
+- **Ledger:** LED-2026-10-26-batch-100.76
 - **Statement (EARS unwanted):** If a project folder to be loaded is a link or junction, then the system shall refuse the load.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_homes.py -k tc_b100_62`
@@ -1499,7 +1499,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-171.4f — A project folder resolving outside this work area is not loaded
 - **Traceability:** HLR-171b · trace: `_handle_load_project` (`app.py`), `contained_in_workarea` (`workspace.py`)
-- **Ledger:** LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.80
+- **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.80
 - **Statement (EARS unwanted):** If a project folder to be loaded is not one direct child folder of this work area or resolves outside this work area, then the system shall refuse the load.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_homes.py -k tc_b100_62`
@@ -1509,7 +1509,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-171.4g — A Save project target that is a link or junction is refused before it is resolved
 - **Traceability:** HLR-171b · trace: `_handle_save_dialog` (`app.py`, the HLR-164(f) check), `_is_reparse_point` (`workspace.py`)
-- **Ledger:** LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.76
+- **Ledger:** LED-2026-10-26-batch-100.76
 - **Statement (EARS unwanted):** If the Save project target folder is a link or junction, then the system shall refuse the save, with the `link or junction` tokens, before resolving the target.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_homes.py -k tc_b100_62`
@@ -1519,7 +1519,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-171.4h — Eight writers write nothing outside this work area
 - **Traceability:** HLR-171b · trace: `place_into_workarea` (LLR-171.4a) and `write_project_manifest` (LLR-171.4b), reached by the writers below
-- **Ledger:** LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.28, LED-2026-10-26-batch-100.76
+- **Ledger:** LED-2026-10-26-batch-100.76
 - **Statement (EARS ubiquitous):** The system shall write 0 bytes outside this work area through Save project (new name, merge and emit), the save-back, the variant append, the MAC sync, the A2L sync and the manifest seam.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_homes.py -k tc_b100_62`
