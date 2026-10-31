@@ -1,11 +1,11 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 76 requirement files | corpus digest: 3a4609edf929bb3c -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 76 requirement files | corpus digest: b78944a25a8529fe -->
 
 # ATLAS-ORPHANS — where are the holes?
 
-- US/HLR/LLR in the batch record, never in the canon: **1338**
+- US/HLR/LLR in the batch record, never in the canon: **1390**
 - US/HLR/LLR in the canon, in no batch record: **4** — `LLR-045A`, `LLR-045D`, `LLR-051.1-.8`, `US-77`
-- corpus heading ids never in the canon: **406**
+- corpus heading ids never in the canon: **457**
 - registry ids never mentioned by tests/: **542**
 
 ## UNPARSED census — what this Atlas failed to read (§5.3)

@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 76 requirement files | corpus digest: 3a4609edf929bb3c -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 76 requirement files | corpus digest: b78944a25a8529fe -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -1522,7 +1522,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 2019 unique id(s)
+## family US/HLR/LLR — 2071 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -1773,7 +1773,9 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `HLR-168` | batches, tests |
 | `HLR-169` | batches, tests |
 | `HLR-170` | batches, tests |
-| `HLR-171` | batches |
+| `HLR-171` | batches, tests |
+| `HLR-171a` | batches, tests |
+| `HLR-171b` | batches, tests |
 | `HLR-172` | batches |
 | `HLR-173` | batches |
 | `HLR-173..178` | batches |
@@ -2916,6 +2918,13 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-167.4` | batches, tests |
 | `LLR-167.5` | batches, tests |
 | `LLR-167.6` | batches, tests |
+| `LLR-167.6a` | batches, tests |
+| `LLR-167.6b` | batches, tests |
+| `LLR-167.6c` | batches, tests |
+| `LLR-167.6d` | batches |
+| `LLR-167.6e` | batches, tests |
+| `LLR-167.6f` | batches, tests |
+| `LLR-167.6g` | batches, tests |
 | `LLR-167.7` | batches, tests |
 | `LLR-167.8` | batches, tests |
 | `LLR-168.1` | batches, tests |
@@ -2955,9 +2964,52 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-170.2` | batches, tests |
 | `LLR-170.3` | batches, tests |
 | `LLR-171.1` | batches, tests |
-| `LLR-171.2` | batches |
-| `LLR-171.3` | batches |
+| `LLR-171.1a` | batches, tests |
+| `LLR-171.1b` | batches |
+| `LLR-171.1c` | batches, tests |
+| `LLR-171.1d` | batches, tests |
+| `LLR-171.1e` | batches, tests |
+| `LLR-171.1f` | batches, tests |
+| `LLR-171.1g` | batches, tests |
+| `LLR-171.1h` | batches, tests |
+| `LLR-171.1i` | batches, tests |
+| `LLR-171.1j` | batches, tests |
+| `LLR-171.1k` | batches, tests |
+| `LLR-171.1l` | batches, tests |
+| `LLR-171.1m` | batches, tests |
+| `LLR-171.1n` | batches, tests |
+| `LLR-171.1o` | batches |
+| `LLR-171.2` | batches, tests |
+| `LLR-171.2a` | batches, tests |
+| `LLR-171.2b` | batches |
+| `LLR-171.2c` | batches, tests |
+| `LLR-171.2d` | batches, tests |
+| `LLR-171.2e` | batches |
+| `LLR-171.2f` | batches, tests |
+| `LLR-171.2g` | batches, tests |
+| `LLR-171.2h` | batches |
+| `LLR-171.3` | batches, tests |
+| `LLR-171.3a` | batches, tests |
 | `LLR-171.4` | batches, tests |
+| `LLR-171.4a` | batches |
+| `LLR-171.4b` | batches |
+| `LLR-171.4c` | batches, tests |
+| `LLR-171.4d` | batches |
+| `LLR-171.4e` | batches, tests |
+| `LLR-171.4f` | batches, tests |
+| `LLR-171.4g` | batches, tests |
+| `LLR-171.4h` | batches, tests |
+| `LLR-171.4i` | batches |
+| `LLR-171.4j` | batches |
+| `LLR-171.5` | batches, tests |
+| `LLR-171.6` | batches, tests |
+| `LLR-171.6a` | batches |
+| `LLR-171.6b` | batches, tests |
+| `LLR-171.7` | batches, tests |
+| `LLR-171.7a` | batches, tests |
+| `LLR-171.7b` | batches, tests |
+| `LLR-171.7c` | batches |
+| `LLR-171.x` | batches |
 | `LLR-172.1` | batches |
 | `LLR-172.2` | batches |
 | `LLR-172.3` | batches |
@@ -4267,9 +4319,9 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `AT-B100-06` | batches, tests |
 | `AT-B100-07` | batches, tests |
 | `AT-B100-08` | batches, tests |
-| `AT-B100-09` | batches |
-| `AT-B100-10` | batches |
-| `AT-B100-11` | batches |
+| `AT-B100-09` | batches, tests |
+| `AT-B100-10` | batches, tests |
+| `AT-B100-11` | batches, tests |
 | `AT-B100-12` | batches |
 | `AT-B100-13` | batches |
 | `AT-B100-14` | batches |
@@ -5403,9 +5455,9 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-B100-28` | batches, tests |
 | `TC-B100-29` | batches, tests |
 | `TC-B100-30` | batches, tests |
-| `TC-B100-31` | batches |
-| `TC-B100-32` | batches |
-| `TC-B100-33` | batches |
+| `TC-B100-31` | batches, tests |
+| `TC-B100-32` | batches, tests |
+| `TC-B100-33` | batches, tests |
 | `TC-B100-34` | batches |
 | `TC-B100-35` | batches |
 | `TC-B100-36` | batches |
