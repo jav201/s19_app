@@ -1,0 +1,32 @@
+s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc8b\s19_app\__init__.py
+
+== D2 foreign-parent spellings for Save as ==
+  plain: parent='f-122b894659b2\\scratchpad\\s8b\\runs\\D2\\base\\.s19tool\\workarea' -> landed in W=True current_project_dir textual W child=True stray=['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D2\\alias_to_W\\Q_plain']
+      ['Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D2\\base\\.s19tool\\workarea\\Q_plain (']
+  trailing_sep: parent='-122b894659b2\\scratchpad\\s8b\\runs\\D2\\base\\.s19tool\\workarea\\' -> landed in W=True current_project_dir textual W child=True stray=['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D2\\alias_to_W\\Q_trailing_sep']
+      ['Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D2\\base\\.s19tool\\workarea\\Q_trailin']
+  upper: parent='F-122B894659B2\\SCRATCHPAD\\S8B\\RUNS\\D2\\BASE\\.S19TOOL\\WORKAREA' -> landed in W=True current_project_dir textual W child=True stray=['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D2\\alias_to_W\\Q_upper']
+      ['Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D2\\base\\.s19tool\\workarea\\Q_upper (']
+  dotdot: parent='b894659b2\\scratchpad\\s8b\\runs\\D2\\base\\.s19tool\\workarea\\P\\..' -> landed in W=True current_project_dir textual W child=True stray=['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D2\\alias_to_W\\Q_dotdot']
+      ['Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D2\\base\\.s19tool\\workarea\\Q_dotdot ']
+  forward: parent='f-122b894659b2/scratchpad/s8b/runs/D2/base/.s19tool/workarea' -> landed in W=True current_project_dir textual W child=True stray=['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D2\\alias_to_W\\Q_forward']
+      ['Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D2\\base\\.s19tool\\workarea\\Q_forward']
+  short83: parent='-C5D1~1\\A8FEAB~1\\SCRATC~1\\s8b\\runs\\D2\\base\\S19TOO~1\\workarea' -> landed in W=True current_project_dir textual W child=True stray=['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D2\\alias_to_W\\Q_short83']
+      ['Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D2\\base\\.s19tool\\workarea\\Q_short83']
+  junction_alias: parent='248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D2\\alias_to_W' -> landed in W=True current_project_dir textual W child=True stray=['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D2\\alias_to_W\\Q_junction_alias']
+      ['Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D2\\base\\.s19tool\\workarea\\Q_junctio']
+  extended: parent='f-122b894659b2\\scratchpad\\s8b\\runs\\D2\\base\\.s19tool\\workarea' -> landed in W=False current_project_dir textual W child=- stray=[]
+      ['Project NOT saved: \\\\?\\C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D2\\base\\.s19tool\\workarea is ']
+  unc_admin_share: parent='f-122b894659b2\\scratchpad\\s8b\\runs\\D2\\base\\.s19tool\\workarea' -> landed in W=False current_project_dir textual W child=- stray=[]
+      ['Project NOT saved: \\\\localhost\\C$\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D2\\base\\.s19tool\\work']
+  subdir_P: parent='122b894659b2\\scratchpad\\s8b\\runs\\D2\\base\\.s19tool\\workarea\\P' -> landed in W=False current_project_dir textual W child=- stray=[]
+      ['Project NOT saved: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D2\\base\\.s19tool\\workarea\\P is no']
+  sibling: parent='4659b2\\scratchpad\\s8b\\runs\\D2\\base\\.s19tool\\workarea_sibling' -> landed in W=False current_project_dir textual W child=- stray=[]
+      ['Project NOT saved: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D2\\base\\.s19tool\\workarea_sibling']
+  parent_of_W: parent='-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D2\\base\\.s19tool' -> landed in W=False current_project_dir textual W child=- stray=[]
+      ['Project NOT saved: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D2\\base\\.s19tool is not the work ']
+  subst: parent='Q:\\workarea' -> landed in W=True current_project_dir textual W child=True stray=['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D2\\alias_to_W\\Q_subst']
+      ['Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D2\\base\\.s19tool\\workarea\\Q_subst (']
+  subst removed: True
+
+links removed: 1  reparse points left in scratch: 0

@@ -158,8 +158,16 @@ from tools.id_registry import (
 # tests/support/b100_projects.py).
 # batch-100 Inc-7: 222 -> 224 (tests/test_b100_project_check.py, tests/support/b100_manifests.py).
 # batch-100 Inc-8a: 224 -> 225 (tests/test_b100_document.py).
-EXPECTED_SCANNED_TEST_FILES = 225
+EXPECTED_SCANNED_TEST_FILES = 227
 """Test modules scanned, including this one.
+
+batch-100 Inc 8b E5 corrective pass 1: 226 -> 227. ``tests/support/timing.py``
+was added (the CI factor for the 1 s timing bounds, LED .80). MEASURED, not
+incremented: ``scanned_test_files()`` reports 227.
+
+batch-100 Inc 8b: 225 -> 226. ``tests/test_b100_project_homes.py`` was added for
+TC-B100-31/32/33/62 and AT-B100-09/10/11 (HLR-171, HLR-171a, HLR-171b). MEASURED,
+not incremented: ``scanned_test_files()`` reports 226.
 
 batch-97 Inc-8: 197 -> 198. ``tests/test_b97_key_bar.py`` was added for the
 two-row key bar (HLR-150, D18). MEASURED, not incremented:

@@ -1,0 +1,68 @@
+# E5 corrective pass 1 — reviewer probes P-1..P-5 (unchanged copies of evidence/inc-8b/review/test_r8b_probes*.py) and security probes B3, B7, E1 (unchanged copies of evidence/inc-8b/security/*.py)
+# started (UTC): 2026-10-31T05:58:52Z
+# cwd: /c/Users/jjgh8/Github/s19_app-b100-inc8b
+# sources sha256[:16]: app.py=87c7f9d74909138c project_gather_service.py=524c3409037cae26 workspace.py=d9f361f3fb092ae2 screens_directionb.py=e94f8e764f950b1a variant_execution_service.py=8a38dde7fcd14211 
+# NOTE: the reviewer probes ASSERT THE DEFECT; after the fix a probe whose defect is gone FAILS on that assertion (read the printed facts).
+# (final run after F2; earlier runs on the pre-F2 sources are superseded)
+
+## reviewer probes: python -m pytest -p no:cacheprovider -q -s --tb=line --rootdir <probe dir> <copies>
+s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc8b\s19_app\__init__.py
+.FIRST PANEL: Project P opened with 1 problem Opened firmware.s19 recorded as the active variant (the latest saved) Variants 1 in the project MAC (none) A2L (none) Problems found (the rest loaded) ! not readable: firmware.a2l too large to open - replace the A2L file, then Load again
+SAVE LINES: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\cp8b-1\\bt-probes2\\test_probe_d3_save_project_doe0\\app\\.s19tool\\workarea\\P (variant 'firmware')"]
+SECOND PANEL: Project P opened with 1 problem Opened firmware.s19 recorded as the active variant (the latest saved) Variants 1 in the project MAC (none) A2L (none) Problems found (the rest loaded) ! not readable: firmware.a2l too large to open - replace the A2L file, then Load again
+Ftemplate is_file (normal spelling): True
+SAVE LINES: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\cp8b-1\\bt-probes2\\test_probe_i1_crc_template_rea0\\app\\.s19tool\\workarea\\P (variant 'firmware')", 'templates/con.json was copied but not recorded in project.json (Windows reserves that name) — rename it in the common folder, select the new name, then Save project.']
+UNRECORDED LINES: ['templates/con.json was copied but not recorded in project.json (Windows reserves that name) — rename it in the common folder, select the new name, then Save project.']
+.BEFORE: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\bt-probes2\test_probe_i2_unload_of_an_a2l0\app\.s19tool\workarea\P\firmware.a2l AFTER: None LINES: ['Unloaded A2L.']
+Fs19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc8b\s19_app\__init__.py
+.open project after the image load: P C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\bt-probes2\test_probe_missing_source_bloc0\app\.s19tool\workarea\P
+SAVE P: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\cp8b-1\\bt-probes2\\test_probe_missing_source_bloc0\\app\\.s19tool\\workarea\\P (variant 'firmware')", "The open project folder 'P' was not found — its other files were not copied; copy them into 'P' if you still have them."]
+SAVE Q: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\cp8b-1\\bt-probes2\\test_probe_missing_source_bloc0\\app\\.s19tool\\workarea\\Q (variant 'firmware')"]
+FBEFORE has file: True AFTER file: None project: P LINES: ["Loaded project 'P' -> (no image) - 0 variants, 1 problem - details: p"]
+F
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\probes\review\test_r8b_probes.py:55: AssertionError: assert 'Save project to drop it' in 'Project P opened with 1 problem Opened firmware.s19 recorded as the active variant (the latest saved) Variants 1 in t...roblems found (the rest loaded) ! not readable: firmware.a2l too large to open - replace the A2L file, then Load again'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\probes\review\test_r8b_probes.py:107: AssertionError: assert (WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/cp8b-1/bt-probes2/test_probe_i2_unload_of_an_a2l0/app/.s19tool/workarea/P/firmware.a2l') is not None and None == WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/cp8b-1/bt-probes2/test_probe_i2_unload_of_an_a2l0/app/.s19tool/workarea/P/firmware.a2l'))
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\probes\review\test_r8b_probes2.py:38: assert not True
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\probes\review\test_r8b_probes2.py:69: assert False
+=========================== short test summary info ===========================
+FAILED ..\..\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\probes\review\test_r8b_probes.py::test_probe_d3_save_project_does_not_drop_the_a2l
+FAILED ..\..\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\probes\review\test_r8b_probes.py::test_probe_i2_unload_of_an_a2l_only_session_does_nothing
+FAILED ..\..\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\probes\review\test_r8b_probes2.py::test_probe_missing_source_blocks_every_new_save
+FAILED ..\..\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\probes\review\test_r8b_probes2.py::test_probe_r7_unparseable_a2l_only_project_resets_the_session
+4 failed, 3 passed in 28.93s
+# reviewer exit code: 1
+
+## security probes: python run_b3_b7_e1.py (PYTHONPATH=<worktree>;<probe folder>)
+s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc8b\s19_app\__init__.py
+
+== B3 Q/reports swapped for a junction to R/reports after a placement; rollback ==
+  R/reports before: ['r.md', 'z0.md', 'z1.md', 'z2.md', 'z3.md', 'z4.md', 'z5.md']
+  R/reports after : ['r.md', 'z0.md', 'z1.md', 'z2.md', 'z3.md', 'z4.md', 'z5.md']
+  R user files deleted by the rollback: []
+  B3: Q exists=True files=8 marker files=[] outside unchanged=True
+    | 'Project NOT saved: could not save \u2014 reports/z5.md could not be copied \u2014 check the folder.'
+    | 'Not removed after the failed save: r.md, z0.md, z1.md, z2.md, z3.md, z4.md \u2014 a folder changed while saving; check the project folders.'
+    scan: {}
+
+== B7-outside W/P swapped for a junction between plan and copy ==
+  B7-outside: Q exists=False files=0 marker files=[] outside unchanged=True
+    | 'Project NOT saved: could not save \u2014 checks/ck.json changed while saving \u2014 check the folder.'
+    scan: {}
+
+== B7-other_wa W/P swapped for a junction between plan and copy ==
+  B7-other_wa: Q exists=False files=0 marker files=[] outside unchanged=True
+    | 'Project NOT saved: could not save \u2014 checks/ck.json changed while saving \u2014 check the folder.'
+    scan: {}
+
+== E1 linked project.json carried? ==
+  | 'Project saved + manifest verified'
+  | "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\cp8b-1\\probes\\security\\runs\\E1\\base\\.s19tool\\workarea\\Q (variant 'firmware')"
+  | 'Save as: links or junctions not copied: project.json \u2014 copy those files into the project if it needs them.'
+  Q batch: []  gathered: None  active_document: None
+  Q carried OUTSIDE_BATCH_NAME: False
+links removed: 1
+
+links removed: 2  reparse points left in scratch: 0
+# security exit code: 0
+# ended (UTC): 2026-10-31T05:59:37Z

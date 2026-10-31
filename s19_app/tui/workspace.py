@@ -252,7 +252,11 @@ def _is_reparse_point(path: Path) -> bool:
     return False
 
 
-def walk_tree_no_links(root: Path) -> Iterator[Path]:
+def walk_tree_no_links(
+    root: Path,
+    unreadable: Optional[list[Path]] = None,
+    max_entries: Optional[int] = None,
+) -> Iterator[Path]:
     """
     Summary:
         Yield every file and folder under ``root`` as a path RELATIVE to
@@ -263,6 +267,16 @@ def walk_tree_no_links(root: Path) -> Iterator[Path]:
 
     Args:
         root (Path): Existing directory to walk.
+        unreadable (Optional[list[Path]]): When given, the relative path of
+            every folder that cannot be listed is appended to it before the
+            folder is skipped (R8, DR-5); ``root`` itself is reported as
+            ``Path(".")``.
+        max_entries (Optional[int]): When given, the walk counts every
+            entry it reads from ``os.scandir``; once the count passes
+            ``max_entries`` it stops reading the current folder BEFORE
+            sorting it, yields what it read, and ends — at most
+            ``max_entries + 1`` entries in all, so one huge folder is never
+            sorted whole (R13, S3R2-1).
 
     Returns:
         Iterator[Path]: Relative paths of all files and folders below ``root``,
@@ -283,23 +297,37 @@ def walk_tree_no_links(root: Path) -> Iterator[Path]:
           consumes it (LED .53: it walks no folder at all).
         - Depth-first via an explicit stack; reparse points are never pushed,
           so the walk terminates even on ``loop -> root`` cycles.
+        - Callers that pass neither ``unreadable`` nor ``max_entries`` get
+          the walk unchanged.
 
     Dependencies:
         Uses:
             - os.scandir
             - _is_reparse_point
         Used by:
-            - save-as (LLR-171.1)
+            - project_gather_service.inventory_project_tree (save-as,
+              LLR-171.1)
             - tests (the walker's unit arm)
     """
     stack = [root]
+    read = 0
     while stack:
         current = stack.pop()
+        listed = []
+        stopped = False
         try:
             with os.scandir(current) as iterator:
-                entries = sorted(iterator, key=lambda entry: entry.name)
+                for entry in iterator:
+                    listed.append(entry)
+                    if max_entries is not None and read + len(listed) > max_entries:
+                        stopped = True
+                        break
         except OSError:
+            if unreadable is not None:
+                unreadable.append(current.relative_to(root))
             continue
+        read += len(listed)
+        entries = sorted(listed, key=lambda entry: entry.name)
         for entry in entries:
             child = current / entry.name
             yield child.relative_to(root)
@@ -308,6 +336,8 @@ def walk_tree_no_links(root: Path) -> Iterator[Path]:
                     stack.append(child)
             except OSError:
                 continue
+        if stopped:
+            return
 
 
 def _path_traverses_reparse_point(path: Path, stop_at: Optional[Path] = None) -> bool:

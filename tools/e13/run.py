@@ -21,6 +21,9 @@ Scenarios:
   pe-document     Load project P whose recorded change document
                   patches/boost.json holds 1 001 entries (the "change document
                   … not readable, too large to reopen" row, Inc 8a)
+  pe-a2l-only     Load project P holding only firmware.a2l (with its files
+                  record) -> the panel's A2L slot names it with its tag
+                  count, no image (D-5, AT-B100-10, Inc 8b)
 
 ``--close`` dismisses the panel after it opens, so the capture shows the
 summary line and ``#status_text`` the load left behind.
@@ -42,13 +45,23 @@ ROOT = Path(__file__).resolve().parents[2]
 CASE01 = ROOT / "examples" / "case_01_basic_valid" / "firmware.s19"
 CASE02 = ROOT / "examples" / "case_02_gaps_and_patch_targets" / "firmware.s19"
 SCENARIOS = ("pe-clean", "pe-saveback", "pe-problems", "pe-damaged", "pe-patched",
-             "pe-unreadable", "pe-document")
+             "pe-unreadable", "pe-document", "pe-a2l-only")
 
 
 def seed(workarea: Path, scenario: str) -> None:
     """Project ``P`` on disk in the state the scenario names."""
     project = workarea / "P"
     project.mkdir(parents=True)
+    if scenario == "pe-a2l-only":
+        a2l = project / "firmware.a2l"
+        shutil.copy2(CASE01.with_name("firmware.a2l"), a2l)
+        record = {"size": a2l.stat().st_size,
+                  "sha256": hashlib.sha256(a2l.read_bytes()).hexdigest()}
+        (project / "project.json").write_text(
+            json.dumps({"schema_version": 1, "files": {"firmware.a2l": record}}, indent=2),
+            encoding="utf-8",
+        )
+        return
     shutil.copy2(CASE01, project / "firmware.s19")
     manifest: object = {"schema_version": 1, "active_variant": "firmware"}
     if scenario in ("pe-saveback", "pe-problems", "pe-patched"):

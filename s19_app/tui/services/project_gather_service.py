@@ -65,22 +65,31 @@ from __future__ import annotations
 
 import json
 import os
+import stat
+import unicodedata
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional, Sequence
 
 from ...validation.model import ValidationIssue, ValidationSeverity
+from .. import workspace as _workspace
 from ..workspace import (
+    A2L_EXTENSIONS,
+    MAC_EXTENSIONS,
     WorkareaContainmentError,
     _find_workarea_root,
     _guarded_destination,
+    _is_reparse_point,
     _path_traverses_reparse_point,
     place_into_workarea,
     predict_placement,
+    validate_project_files,
+    walk_tree_no_links,
 )
 from .variant_execution_service import (
     MANIFEST_ARTIFACT,
     PROJECT_MANIFEST_NAME,
+    _clip,
     _manifest_key_refusal,
     _plain_entry,
     is_active_document_form,
@@ -481,6 +490,11 @@ class GatherOutcome:
             from the home constant (A3-12) — copied this save or already in
             its home; ``None`` when there is no document, it was not
             placed, or the text fails ``is_active_document_form``.
+        unrecorded (tuple[str, ...]): The project-relative POSIX text of
+            every gathered file placed in the project (written or reused)
+            that ``project.json`` cannot record, sorted (LLR-171.5). The
+            active document is never listed here: it keeps its own
+            ``GATHER-DOCUMENT-NOT-RECORDED`` finding (pre-ruling 7).
 
     Returns:
         None: Dataclass container.
@@ -503,6 +517,7 @@ class GatherOutcome:
     written: list[Path] = field(default_factory=list)
     created_homes: list[Path] = field(default_factory=list)
     active_document: Optional[str] = None
+    unrecorded: tuple[str, ...] = ()
 
 
 def gather_project_artifacts(
@@ -597,6 +612,10 @@ def gather_project_artifacts(
           appends to ``outcome.created_homes`` — a reused byte-identical
           sibling and a pre-existing home never appear, so a failed
           save's rollback removes exactly what this gather created.
+        - A placed row (written or reused) whose project-relative text
+          ``project.json`` cannot record stays out of ``gathered`` and is
+          named in ``outcome.unrecorded`` (LLR-171.5); the active document
+          is never named there.
 
     Dependencies:
         Uses:
@@ -705,6 +724,7 @@ def gather_project_artifacts(
                 )
 
     gathered_rows: dict[str, list[str]] = {}
+    unrecorded: list[str] = []
     for resolved_source, (home, source) in sorted(
         pending.items(), key=lambda item: str(item[0])
     ):
@@ -748,9 +768,13 @@ def gather_project_artifacts(
             outcome.created_homes.append(home_dir)
         relative = destination.relative_to(resolved_project).as_posix()
         # Review F1: a row project.json cannot hold (a device stem) is
-        # copied but not listed, so it never refuses the manifest write.
+        # copied but not listed, so it never refuses the manifest write;
+        # LLR-171.5: it is named in ``unrecorded`` instead, except the
+        # active document, which keeps its own finding (pre-ruling 7).
         if _manifest_key_refusal(relative) is None:
             gathered_rows.setdefault(home, []).append(relative)
+        elif resolved_source != document_key:
+            unrecorded.append(relative)
         if resolved_source == document_key:
             # A3-12: built from the home constant and the landing's name,
             # never from the resolved path.
@@ -772,6 +796,7 @@ def gather_project_artifacts(
             key=lambda item: PROJECT_HOME_NAMES.index(item[0]),
         )
     }
+    outcome.unrecorded = tuple(sorted(unrecorded))
     return outcome
 
 
@@ -897,6 +922,177 @@ PLAN_ROLE_MANIFEST = "manifest"
 #: The row role of the active change or check document (LLR-167.6, 8a).
 PLAN_ROLE_DOCUMENT = "document"
 
+#: The row role of a top-level file of the open project that a save as
+#: copies as it is (R3, LLR-167.6): one row per such file.
+PLAN_ROLE_CARRIED = "carried"
+
+#: Save-as ceilings (R1, R13, LLR-171.1j), read at call time so a test can
+#: lower one constant: copyable files, walked entries (folders, links,
+#: unreadable entries and files) and path components below the project.
+SAVE_AS_FILE_CEILING = 2000
+SAVE_AS_ENTRY_CEILING = 10000
+SAVE_AS_DEPTH_CEILING = 32
+
+#: ``ProjectInventory.over_ceiling`` values: the ceiling the walk stopped at.
+OVER_CEILING_FILES = "files"
+OVER_CEILING_ENTRIES = "entries"
+OVER_CEILING_DEPTH = "depth"
+
+#: Free-space rule (R7, LLR-171.1i): each file rounded up to this block,
+#: plus the margin for ``project.json`` and the folders of a new target.
+_SPACE_BLOCK_BYTES = 4096
+_NEW_TARGET_MARGIN_BYTES = 65536
+
+#: Unicode categories :func:`painted_names` removes (S3R2-4): controls,
+#: format characters (bidi, zero-width, soft hyphen, tags) and the line and
+#: paragraph separators.
+_UNPAINTED_CATEGORIES = frozenset({"Cc", "Cf", "Zl", "Zp"})
+
+#: Windows reserved device stems (S3R2-6): a name whose stem is one of these
+#: can open the device, so the inventory never reads it.
+_RESERVED_STEMS = frozenset(
+    {"CON", "PRN", "AUX", "NUL", "CONIN$", "CONOUT$"}
+    | {f"COM{n}" for n in range(1, 10)}
+    | {f"LPT{n}" for n in range(1, 10)}
+)
+
+
+#: The most names one painted list shows before ``and K more`` (R6,
+#: LLR-171.7a); the one definition (F6).
+PAINTED_NAME_LIMIT = 10
+
+
+def painted_names(
+    names: Sequence[str], limit: int = PAINTED_NAME_LIMIT, clip: int = 120
+) -> str:
+    """
+    Summary:
+        The one way a name taken from the open project's tree reaches
+        painted text (R6, S3-4, LLR-171.7 / .7a): each name scrubbed and
+        clipped, at most ``limit`` names, then ``and K more``.
+
+    Args:
+        names (Sequence[str]): The names, in the order to paint.
+        limit (int): How many names are shown.
+        clip (int): The most characters one painted name keeps.
+
+    Returns:
+        str: The first ``limit`` names joined with ``", "``, followed by
+            ``", and K more"`` when more were given; ``""`` for no names.
+
+    Data Flow:
+        - Every character of Unicode category Cc, Cf, Zl or Zp is removed
+          and every unpaired surrogate (Cs) becomes U+FFFD (S3R2-4), so the
+          text always encodes as UTF-8.
+        - Then each name is cut to ``clip`` characters with the clip
+          ``variant_execution_service._clip`` uses (ending in "…").
+        - Pure: the full list goes to the log from the caller, never here.
+
+    Dependencies:
+        Uses:
+            - unicodedata.category / variant_execution_service._clip
+        Used by:
+            - plan_project_save / _second_file_refusal (refusal texts)
+            - s19_app.tui.app.S19TuiApp._handle_save_dialog (status lines)
+
+    Example:
+        >>> painted_names(["a", "b\u202ec"], limit=1)
+        'a, and 1 more'
+    """
+    items = list(names)
+    shown = [_clip(_scrubbed(name), clip) for name in items[:limit]]
+    text = ", ".join(shown)
+    if len(items) > limit:
+        text += f", and {len(items) - limit} more"
+    return text
+
+
+def _scrubbed(name: str) -> str:
+    """``name`` without Cc / Cf / Zl / Zp characters, surrogates as U+FFFD."""
+    kept = []
+    for char in name:
+        category = unicodedata.category(char)
+        if category in _UNPAINTED_CATEGORIES:
+            continue
+        kept.append("\ufffd" if category == "Cs" else char)
+    return "".join(kept)
+
+
+@dataclass(frozen=True)
+class InventoryFile:
+    """
+    Summary:
+        One regular file of the walked project that a save as may copy
+        (pre-ruling 1, LLR-171.1): at the top level (``relative`` is its
+        bare name, R3) or under a top-level sub-folder (``relative`` is its
+        project-relative POSIX text).
+
+    Args:
+        relative (str): Project-relative POSIX text, e.g.
+            ``"flows/sub/g.json"``.
+        size (int): Its ``os.lstat`` size, in bytes (the per-file cap,
+            LLR-167.6g, and the free-space total, LLR-171.1i).
+    """
+
+    relative: str
+    size: int
+
+
+@dataclass(frozen=True)
+class PlannedFolder:
+    """
+    Summary:
+        One top-level sub-folder of the open project in a save-as plan
+        (LLR-167.6a / .6b). A folder holding only links, or nothing, is
+        still a row with ``file_count`` 0 (ruling Q9).
+
+    Args:
+        name (str): The top-level folder name.
+        file_count (int): How many regular files the save copies under it,
+            at any depth; equals ``len(files)``.
+        skipped_links (tuple[str, ...]): Project-relative POSIX text of the
+            links found under it, sorted.
+        files (tuple[InventoryFile, ...]): Those files, sorted by
+            ``relative``.
+    """
+
+    name: str
+    file_count: int
+    skipped_links: tuple[str, ...]
+    files: tuple[InventoryFile, ...] = ()
+
+
+@dataclass(frozen=True)
+class ProjectInventory:
+    """
+    Summary:
+        One link-free enumeration of the open project for a save as
+        (:func:`inventory_project_tree`, LLR-171.1 / .1a / .1b / .1j / .1k).
+
+    Args:
+        root (Path): The unresolved folder that was walked (pre-ruling 2).
+        folders (tuple[PlannedFolder, ...]): One per top-level sub-folder,
+            sorted by name; a top-level directory link is not a folder.
+        top_level (tuple[InventoryFile, ...]): Every top-level regular file
+            that is not a link, sorted by name, except ``project.json`` and
+            its ``project.json.previous-*`` backups (R3, R10).
+        skipped_links (tuple[str, ...]): Every link or reparse point found,
+            at any depth, sorted, project-relative.
+        unreadable (tuple[str, ...]): Every folder the walk could not list
+            (``"."`` for the project folder itself) and every entry it
+            could not classify, sorted (R8, S3-2, S3R2-6).
+        over_ceiling (Optional[str]): ``None``, or ``"files"`` /
+            ``"entries"`` / ``"depth"`` when the walk stopped at a ceiling
+            (R1, R13); the other fields are then partial.
+    """
+
+    root: Path
+    folders: tuple[PlannedFolder, ...]
+    top_level: tuple[InventoryFile, ...]
+    skipped_links: tuple[str, ...]
+    unreadable: tuple[str, ...]
+    over_ceiling: Optional[str] = None
+
 
 @dataclass(frozen=True)
 class PlannedFile:
@@ -970,6 +1166,19 @@ class SavePlan:
             writes (an input, LED .45).
         refusal (Optional[str]): The refusal with its tokens; a refused plan
             has no rows.
+        folders (tuple[PlannedFolder, ...]): The sub-folders a save as to a
+            new folder copies (LLR-167.6a); empty for a merge, an
+            open-project save, a save with no open project and a refused
+            plan (LLR-171.1g).
+        skipped_links (tuple[str, ...]): The inventory's links when
+            ``folders`` is planned, else empty (LLR-167.6b).
+        copies (tuple[InventoryFile, ...]): The copy list the app executes
+            exactly (pre-ruling 1): the top-level copies first (R3), then
+            the sub-folder files, each part in POSIX order, after the
+            landing-owner rule (LLR-167.6e).
+        total_bytes (int): Every file this save writes as new, each rounded
+            up to 4 KiB, plus 64 KiB for a new folder (R7, R14,
+            LLR-171.1i); 0 for a refused plan.
     """
 
     target: Path
@@ -978,6 +1187,329 @@ class SavePlan:
     image: str
     manifest_keys: tuple[str, ...]
     refusal: Optional[str] = None
+    folders: tuple[PlannedFolder, ...] = ()
+    skipped_links: tuple[str, ...] = ()
+    copies: tuple[InventoryFile, ...] = ()
+    total_bytes: int = 0
+
+
+def inventory_project_tree(project_dir: Path) -> ProjectInventory:
+    """
+    Summary:
+        One link-free enumeration of the open project for a save as
+        (LLR-171.1 / .1a / .1b / .1j / .1k, LLR-167.6a / .6b): writes
+        nothing, hashes nothing, follows no link.
+
+    Args:
+        project_dir (Path): The open project's folder, unresolved.
+
+    Returns:
+        ProjectInventory: The folders, top-level files, links, unreadable
+            entries and the ceiling the walk stopped at, if any. Two runs
+            on one tree give equal inventories.
+
+    Raises:
+        None: An unlistable folder or an entry ``lstat`` cannot read is an
+            ``unreadable`` entry, never an exception.
+
+    Data Flow:
+        - ``walk_tree_no_links(project_dir, unreadable=..., max_entries=
+          SAVE_AS_ENTRY_CEILING)``: one walker, never descending into a
+          reparse point; it reports every folder it could not list (R8).
+        - Every yielded entry counts toward the entry ceiling (R13); the
+          walker yields at most ``SAVE_AS_ENTRY_CEILING + 1`` entries, so
+          they are collected first and past the ceiling →
+          ``over_ceiling = "entries"`` with no entry classified (this
+          ceiling takes precedence over the other two). More than
+          ``SAVE_AS_DEPTH_CEILING`` path components → ``"depth"`` (R1).
+        - A name ending in "." or " ", or whose stem (before the first dot,
+          case-insensitive) is a reserved device name, is ``unreadable``
+          before any ``lstat`` (S3-2, S3R2-6); entries below such a folder
+          are not classified (the folder is already named).
+        - ``os.lstat``: ``OSError`` → unreadable; a link or reparse point →
+          ``skipped_links`` (and its top-level folder's list); a top-level
+          directory → a folder row; a regular file → ``top_level`` or its
+          folder's ``files``, except ``project.json`` and its
+          ``project.json.previous-*`` backups (``normcase``, R10), which are
+          neither listed nor counted; anything else → unreadable.
+        - More than ``SAVE_AS_FILE_CEILING + 4`` counted files →
+          ``over_ceiling = "files"`` (R1, R10: the copy list leaves out at
+          most the image, MAC, A2L and the document's own file).
+        - The ceilings are read at call time; the lists are not logged
+          here (this module has no logging) — the app logs them.
+
+    Dependencies:
+        Uses:
+            - workspace.walk_tree_no_links / workspace._is_reparse_point
+            - os.lstat / stat
+        Used by:
+            - s19_app.tui.app.S19TuiApp._plan_project_save (save as)
+
+    Example:
+        >>> inventory = inventory_project_tree(project_dir)  # doctest: +SKIP
+        >>> [folder.name for folder in inventory.folders]  # doctest: +SKIP
+        ['flows', 'patches']
+    """
+    entry_ceiling = SAVE_AS_ENTRY_CEILING
+    depth_ceiling = SAVE_AS_DEPTH_CEILING
+    file_stop = SAVE_AS_FILE_CEILING + 4
+    manifest_name = os.path.normcase(PROJECT_MANIFEST_NAME)
+    backup_prefix = manifest_name + ".previous-"
+    unlisted: list[Path] = []
+    folder_files: dict[str, list[InventoryFile]] = {}
+    folder_links: dict[str, list[str]] = {}
+    top_level: list[InventoryFile] = []
+    skipped_links: list[str] = []
+    unreadable: list[str] = []
+    over_ceiling: Optional[str] = None
+    counted_files = 0
+    walked = list(
+        walk_tree_no_links(project_dir, unreadable=unlisted, max_entries=entry_ceiling)
+    )
+    if len(walked) > entry_ceiling:
+        over_ceiling = OVER_CEILING_ENTRIES
+        walked = []
+    for relative in walked:
+        parts = relative.parts
+        if len(parts) > depth_ceiling:
+            over_ceiling = OVER_CEILING_DEPTH
+            break
+        if any(_unopenable_name(part) for part in parts[:-1]):
+            continue
+        text = relative.as_posix()
+        if _unopenable_name(parts[-1]):
+            unreadable.append(text)
+            continue
+        path = project_dir / relative
+        try:
+            status = os.lstat(path)
+        except OSError:
+            unreadable.append(text)
+            continue
+        mode = status.st_mode
+        if stat.S_ISLNK(mode) or _is_reparse_point(path):
+            skipped_links.append(text)
+            if len(parts) > 1:
+                folder_links.setdefault(parts[0], []).append(text)
+        elif stat.S_ISDIR(mode):
+            if len(parts) == 1:
+                folder_files.setdefault(parts[0], [])
+        elif stat.S_ISREG(mode):
+            if len(parts) == 1:
+                name = os.path.normcase(parts[0])
+                if name == manifest_name or name.startswith(backup_prefix):
+                    continue
+                top_level.append(InventoryFile(text, status.st_size))
+            else:
+                folder_files.setdefault(parts[0], []).append(
+                    InventoryFile(text, status.st_size)
+                )
+            counted_files += 1
+            if counted_files > file_stop:
+                over_ceiling = OVER_CEILING_FILES
+                break
+        else:
+            unreadable.append(text)
+    unreadable.extend(path.as_posix() for path in unlisted)
+    folders = tuple(
+        PlannedFolder(
+            name,
+            len(files),
+            tuple(sorted(folder_links.get(name, ()))),
+            tuple(sorted(files, key=lambda item: item.relative)),
+        )
+        for name, files in sorted(folder_files.items())
+    )
+    return ProjectInventory(
+        root=project_dir,
+        folders=folders,
+        top_level=tuple(sorted(top_level, key=lambda item: item.relative)),
+        skipped_links=tuple(sorted(skipped_links)),
+        unreadable=tuple(sorted(set(unreadable))),
+        over_ceiling=over_ceiling,
+    )
+
+
+def _unopenable_name(name: str) -> bool:
+    """True for a name Windows cannot open by its normal path (S3-2, S3R2-6):
+    ending in "." or " ", or a reserved device stem before the first dot."""
+    if name.endswith((".", " ")):
+        return True
+    return name.split(".", 1)[0].upper() in _RESERVED_STEMS
+
+
+def _second_file_refusal(
+    target: Path,
+    existing: Sequence[Path],
+    planned: PlannedFile,
+    kind_label: str,
+    exempt: frozenset[str],
+) -> Optional[str]:
+    """
+    Summary:
+        The single-MAC / single-A2L refusal of a save (LED .63 (b) / .66,
+        LLR-167.6c / .6d / .6f): one rule for both kinds, decided before
+        any folder exists.
+
+    Args:
+        target (Path): The project folder the save writes.
+        existing (Sequence[Path]): The target's files of this kind (from
+            ``validate_project_files``); empty for a target that does not
+            exist.
+        planned (PlannedFile): The session's file of this kind (the caller
+            calls only when there is one).
+        kind_label (str): ``"MAC"`` or ``"A2L"``.
+        exempt (frozenset[str]): The target's MAC / A2L names that are the
+            open project's own (same path, or same name and same bytes and
+            not a link — decided by the app, pre-ruling 5).
+
+    Returns:
+        Optional[str]: ``None`` when ``existing`` is empty or an existing
+            name (``normcase``) is exempt; otherwise the refusal text
+            (token rows 4 / 5), every name through :func:`painted_names`.
+
+    Data Flow:
+        - Name comparison only; no digest is computed here (Inc 5 rule).
+
+    Dependencies:
+        Uses:
+            - painted_names
+        Used by:
+            - plan_project_save
+    """
+    if not existing:
+        return None
+    exempt_names = {os.path.normcase(name) for name in exempt}
+    if any(os.path.normcase(path.name) in exempt_names for path in existing):
+        return None
+    article = "an" if kind_label[:1] in "AEIOU" else "a"
+    return (
+        f"Project NOT saved: '{painted_names([Path(target).name])}' already "
+        f"has {article} {kind_label} file "
+        f"({painted_names([path.name for path in existing])}) — choose "
+        f"another name."
+    )
+
+
+def _count_text(count: int) -> str:
+    """``count`` with a space between thousands (``2 000``, ``10 000``)."""
+    return f"{count:,}".replace(",", " ")
+
+
+def _limit_text(limit: int) -> str:
+    """The cap in MiB, or in bytes under 1 MiB (A3-7)."""
+    mib = 1024 * 1024
+    return f"{limit / mib:g} MiB" if limit >= mib else f"{limit} bytes"
+
+
+def _rounded_up(size: int) -> int:
+    """``size`` rounded up to a multiple of 4 096 (R7); 0 stays 0."""
+    return -(-size // _SPACE_BLOCK_BYTES) * _SPACE_BLOCK_BYTES
+
+
+def _walk_refusal(inventory: ProjectInventory) -> Optional[str]:
+    """The R1 / R13 ceiling refusal, then the R8 unreadable refusal, of a
+    save-as inventory (LLR-171.1j / .1k), in that precedence (A3-13)."""
+    project = f"'{painted_names([inventory.root.name])}'"
+    move = "move files out of the project, then save again."
+    if inventory.over_ceiling == OVER_CEILING_FILES:
+        return (
+            f"Project NOT saved: {project} has too many files to copy "
+            f"(over {_count_text(SAVE_AS_FILE_CEILING)}) — {move}"
+        )
+    if inventory.over_ceiling == OVER_CEILING_ENTRIES:
+        return (
+            f"Project NOT saved: {project} has too many files to copy "
+            f"(over {_count_text(SAVE_AS_ENTRY_CEILING)} entries) — {move}"
+        )
+    if inventory.over_ceiling == OVER_CEILING_DEPTH:
+        return (
+            f"Project NOT saved: {project} has folders nested too deep "
+            f"(over {SAVE_AS_DEPTH_CEILING} levels) — {move}"
+        )
+    if inventory.unreadable:
+        names = [
+            project if text == "." else text for text in inventory.unreadable
+        ]
+        return (
+            f"Project NOT saved: {painted_names(names)} could not be read — "
+            f"check that they can be opened, then save again."
+        )
+    return None
+
+
+def _source_key(path: Path) -> str:
+    """The unresolved, case-folded text the landing-owner rule compares."""
+    return os.path.normcase(os.path.abspath(path))
+
+
+def _plan_copies(
+    inventory: ProjectInventory, files: Sequence[PlannedFile]
+) -> tuple[tuple[PlannedFolder, ...], tuple[InventoryFile, ...], set[str]]:
+    """
+    Summary:
+        The save-as copy list (R3, R10, pre-rulings 1 and 3, LLR-167.6e).
+
+    Args:
+        inventory (ProjectInventory): The open project's inventory.
+        files (Sequence[PlannedFile]): The files the save places itself.
+
+    Returns:
+        tuple: ``(folders, copies, owned)`` — the folders without the
+            document's own file, the copy list (top-level copies, then the
+            sub-folder files, each part in POSIX order) and the source keys
+            of the sub-folder files a document row owns.
+
+    Data Flow:
+        - Top level: ``inventory.top_level`` minus the names (``normcase``)
+          of the image / MAC / A2L rows, minus every MAC file when a MAC
+          row is planned and every A2L file when an A2L row is planned.
+        - Sub-folders: each folder's files minus the file a document row
+          names as its source (``root / relative``, ``normcase``): that row
+          owns the landing.
+    """
+    row_names = {
+        os.path.normcase(Path(planned.name).name)
+        for planned in files
+        if planned.home is None
+    }
+    has_mac = any(planned.role == "mac" for planned in files)
+    has_a2l = any(planned.role == "a2l" for planned in files)
+    top: list[InventoryFile] = []
+    for item in inventory.top_level:
+        suffix = os.path.splitext(item.relative)[1].lower()
+        if os.path.normcase(item.relative) in row_names:
+            continue
+        if has_mac and suffix in MAC_EXTENSIONS:
+            continue
+        if has_a2l and suffix in A2L_EXTENSIONS:
+            continue
+        top.append(item)
+    documents = {
+        _source_key(planned.source)
+        for planned in files
+        if planned.role == PLAN_ROLE_DOCUMENT
+        and planned.source is not None
+        and planned.home is not None
+    }
+    owned: set[str] = set()
+    folders: list[PlannedFolder] = []
+    for folder in inventory.folders:
+        kept = []
+        for item in folder.files:
+            key = _source_key(inventory.root / item.relative)
+            if key in documents:
+                owned.add(key)
+            else:
+                kept.append(item)
+        folders.append(
+            PlannedFolder(folder.name, len(kept), folder.skipped_links, tuple(kept))
+        )
+    nested = sorted(
+        (item for folder in folders for item in folder.files),
+        key=lambda item: item.relative,
+    )
+    return tuple(folders), tuple(top) + tuple(nested), owned
 
 
 def plan_project_save(
@@ -988,13 +1520,17 @@ def plan_project_save(
     image: str,
     manifest_keys: Sequence[str],
     refusal: Optional[str] = None,
+    inventory: Optional[ProjectInventory] = None,
+    size_cap: Optional[int] = None,
+    exempt: frozenset[str] = frozenset(),
 ) -> SavePlan:
     """
     Summary:
         Compute the Save project plan WITHOUT writing (B100-I17, LLR-167.6):
-        one row per top-level file, each landing name predicted by
-        :func:`predict_placement` — the placement's own rule — with its
-        action word, plus the ``project.json`` row. A pure function of its
+        every refusal first, then one row per top-level file, each landing
+        name predicted by :func:`predict_placement` — the placement's own
+        rule — with its action word, one ``carried`` row per top-level copy
+        of a save as, and the ``project.json`` row. A pure function of its
         inputs and the target's listing: no byte is written and no payload
         is hashed (the digests are inputs).
 
@@ -1007,37 +1543,113 @@ def plan_project_save(
         manifest_keys (Sequence[str]): The keys the app writes into
             ``project.json`` (LED .45: an input, so a new key changes no
             signature here).
-        refusal (Optional[str]): A refusal the app found (a blocked
+        refusal (Optional[str]): A refusal the app found (row 9, a blocked
             re-derive); the plan then has no rows.
+        inventory (Optional[ProjectInventory]): The open project's
+            inventory, for a save as to a new folder (pre-ruling 4);
+            ``None`` for a merge, an open-project save and a save with no
+            open project.
+        size_cap (Optional[int]): The per-file cap; ``None`` reads
+            ``workspace.DEFAULT_COPY_SIZE_CAP_BYTES`` at call time.
+        exempt (frozenset[str]): The target's MAC / A2L names that are the
+            open project's own (pre-ruling 5, decided by the app).
 
     Returns:
-        SavePlan: The frozen plan.
+        SavePlan: The frozen plan. A refused plan has 0 rows, 0 folders,
+            0 links, 0 copies and total 0.
 
     Data Flow:
-        - A refusal → a row-less plan carrying it.
+        - Refusal precedence (A3-13): (1) the passed ``refusal``; for a save
+          as with an inventory, (2) a walk ceiling (R1, R13) and (3)
+          unreadable entries (R8, ``"."`` painted as the project's name);
+          (4) the copy list (:func:`_plan_copies`); (5) more than
+          ``SAVE_AS_FILE_CEILING`` copies; (6) the MAC then the A2L rule
+          (:func:`_second_file_refusal`, LED .66 / .63 (b)); (7) the
+          per-file cap: the first planned file (row 6b), then the first
+          copy (row 6a), with size > cap, whatever the action.
         - Each file → ``predict_placement(digest, size, target / home,
           name)`` (``target`` itself when ``home`` is None): a reuse is
-          ``keep``, a claimed name is ``new``.
-        - A file-backed document row (role ``"document"`` with a
-          ``source``) is classified first (:func:`classify_active_document`,
-          the gather's call): ``in_home`` → its own file, ``keep``;
-          ``outside`` → predicted under its home with the classifier's
-          name; ``inside_elsewhere`` / ``missing`` → no row. A pasted
-          document (``source`` None) is always predicted.
+          ``keep``, a claimed name is ``new``. A file-backed document row
+          is classified first (:func:`classify_active_document`):
+          ``in_home`` → ``keep``; ``outside`` → predicted;
+          ``inside_elsewhere`` / ``missing`` → no row.
+        - Save as with an inventory: a home row that does not own a
+          sub-folder file is predicted against ``inventory.root / home``
+          (the folder the sub-folder copy mirrors into the target before
+          the rows loop, R2, DR-1); every home row's landing is spelled
+          ``Path(target).resolve() / home / name`` (A3-9). One ``carried``
+          row (action ``new``, landing ``target / name``) per top-level copy
+          (R3, R11).
         - ``project.json`` → ``new`` when the target holds none; else
           ``merge`` for a merge target, else ``rewrite``.
+        - ``total_bytes`` = the rounded sizes of the file rows whose action
+          is ``new`` (carried rows left out, R14) + the rounded sizes of the
+          copies + 64 KiB for a new target (R7).
 
     Dependencies:
         Uses:
             - predict_placement (B100-I22)
             - classify_active_document (E3 R11)
+            - validate_project_files / _second_file_refusal
+            - _walk_refusal / _plan_copies / painted_names
         Used by:
-            - s19_app.tui.app.S19TuiApp._handle_save_dialog
+            - s19_app.tui.app.S19TuiApp._plan_project_save
     """
     keys = tuple(manifest_keys)
+
+    def _refused(text: str) -> SavePlan:
+        return SavePlan(target, target_kind, (), image, keys, text)
+
     if refusal is not None:
-        return SavePlan(target, target_kind, (), image, keys, refusal)
+        return _refused(refusal)
+    copying = target_kind == PLAN_TARGET_NEW and inventory is not None
+    folders: tuple[PlannedFolder, ...] = ()
+    links: tuple[str, ...] = ()
+    copies: tuple[InventoryFile, ...] = ()
+    owned: set[str] = set()
+    if copying:
+        walk_refusal = _walk_refusal(inventory)
+        if walk_refusal is not None:
+            return _refused(walk_refusal)
+        folders, copies, owned = _plan_copies(inventory, files)
+        links = inventory.skipped_links
+        if len(copies) > SAVE_AS_FILE_CEILING:
+            return _refused(
+                f"Project NOT saved: '{painted_names([inventory.root.name])}' "
+                f"has too many files to copy "
+                f"(over {_count_text(SAVE_AS_FILE_CEILING)}) — move files out "
+                f"of the project, then save again."
+            )
+
+    by_role = {planned.role: planned for planned in reversed(files)}
+    if ("mac" in by_role or "a2l" in by_role) and Path(target).is_dir():
+        data_files, a2l_files, _ = validate_project_files(Path(target))
+        mac_files = [path for path in data_files if path.suffix.lower() in MAC_EXTENSIONS]
+        for role, existing, label in (("mac", mac_files, "MAC"), ("a2l", a2l_files, "A2L")):
+            if role in by_role:
+                clash = _second_file_refusal(target, existing, by_role[role], label, exempt)
+                if clash is not None:
+                    return _refused(clash)
+
+    cap = _workspace.DEFAULT_COPY_SIZE_CAP_BYTES if size_cap is None else size_cap
+    limit = _limit_text(cap)
+    for planned in files:
+        if planned.size > cap:
+            return _refused(
+                f"Project NOT saved: {painted_names([planned.name])} is too "
+                f"large to copy (over {limit}) — a project cannot hold files "
+                f"over {limit}."
+            )
+    for item in copies:
+        if item.size > cap:
+            return _refused(
+                f"Project NOT saved: {painted_names([item.relative])} is too "
+                f"large to copy (over {limit}) — move it out of the project "
+                f"folder, then save again."
+            )
+
     rows: list[SavePlanRow] = []
+    total = 0
     for planned in files:
         landing_dir = target if planned.home is None else Path(target) / planned.home
         name = planned.name
@@ -1059,15 +1671,32 @@ def plan_project_save(
                 continue
             if kind != DOCUMENT_OUTSIDE:
                 continue
-        predicted = predict_placement(planned.digest, planned.size, landing_dir, name)
-        rows.append(
-            SavePlanRow(
-                planned.role,
-                planned.source,
-                predicted.path,
-                PLAN_ACTION_KEEP if predicted.reused else PLAN_ACTION_NEW,
+        predict_dir = landing_dir
+        if copying and planned.home is not None:
+            owns = planned.source is not None and _source_key(planned.source) in owned
+            if not owns:
+                predict_dir = inventory.root / planned.home
+        predicted = predict_placement(planned.digest, planned.size, predict_dir, name)
+        landing = predicted.path
+        if copying and planned.home is not None:
+            landing = Path(target).resolve() / planned.home / predicted.path.name
+        action = PLAN_ACTION_KEEP if predicted.reused else PLAN_ACTION_NEW
+        rows.append(SavePlanRow(planned.role, planned.source, landing, action))
+        if action == PLAN_ACTION_NEW:
+            total += _rounded_up(planned.size)
+    for item in copies:
+        if "/" not in item.relative:
+            rows.append(
+                SavePlanRow(
+                    PLAN_ROLE_CARRIED,
+                    inventory.root / item.relative,
+                    Path(target).resolve() / item.relative,
+                    PLAN_ACTION_NEW,
+                )
             )
-        )
+        total += _rounded_up(item.size)
+    if target_kind == PLAN_TARGET_NEW:
+        total += _NEW_TARGET_MARGIN_BYTES
     manifest = Path(target).resolve() / PROJECT_MANIFEST_NAME
     if not os.path.lexists(manifest):
         manifest_action = PLAN_ACTION_NEW
@@ -1076,4 +1705,14 @@ def plan_project_save(
     else:
         manifest_action = PLAN_ACTION_REWRITE
     rows.append(SavePlanRow(PLAN_ROLE_MANIFEST, None, manifest, manifest_action))
-    return SavePlan(target, target_kind, tuple(rows), image, keys)
+    return SavePlan(
+        target,
+        target_kind,
+        tuple(rows),
+        image,
+        keys,
+        folders=folders,
+        skipped_links=links,
+        copies=copies,
+        total_bytes=total,
+    )

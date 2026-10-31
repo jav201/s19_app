@@ -1,0 +1,17 @@
+mutant: M16
+target: s19_app/tui/app.py
+old -> new:             if plan.total_bytes > free_bytes:  ->              if plan.total_bytes >= free_bytes:
+sha256_before: b75f9125c9eb12c122ce1bbd05d6de1e8027403a87cc2e800be8227a5c42011f
+command: cd C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b && env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_project_homes.py::test_tc_b100_31_free_space_is_checked_before_any_folder[T saved]
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b
+---
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:499: AssertionError: (102400, ['Project NOT saved: not enough free space (needs 102400 bytes, 102400 free) — free disk space or remove files from the project.'])
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_free_space_is_checked_before_any_folder[T saved]
+1 failed in 4.75s
+---
+summary: 1 failed in 4.75s
+verdict: KILLED
+restored = True

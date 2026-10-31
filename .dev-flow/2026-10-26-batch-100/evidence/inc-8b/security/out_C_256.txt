@@ -1,0 +1,19 @@
+s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc8b\s19_app\__init__.py
+
+== C2 depth ceiling: 32 vs 33 components ==
+  32: save 0.56s Q exists=True deep file copied=True
+     ['Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\C2_32\\base\\.s19tool\\worka']
+  33: save 0.39s Q exists=False deep file copied=False
+     ["Project NOT saved: 'P' has folders nested too deep (over 32 levels) — move files out of the project, then save again."]
+
+== C5 per-file cap read at call time (cap lowered to 4096) ==
+  4096: Q exists=True  ['Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\C5_4096\\base\\.s19tool\\wor']
+  4097: Q exists=False  ['Project NOT saved: reports/big.bin is too large to copy (over 4096 bytes) — move it out of the project folder, then save again.']
+  top-level 4097: Q exists=False  ['Project NOT saved: notes.bin is too large to copy (over 4096 bytes) — move it out of the project folder, then save again.']
+
+== C6 free space with rounding ==
+  plan rows: [('image', 'new', 'firmware.s19'), ('carried', 'new', 'notes.txt'), ('manifest', 'new', 'project.json')]
+  plan total: 90112  independent (image + copies rounded + 64 KiB): 90112
+  measure: Q exists=False  ['Project NOT saved: not enough free space (needs 90112 bytes, 0 free) — free disk space or remove files from the project.']
+  equal: Q exists=True  ['Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\C6_equal\\base\\.s19tool\\wo']
+  short: Q exists=False  ['Project NOT saved: not enough free space (needs 90112 bytes, 90111 free) — free disk space or remove files from the project.']

@@ -1,0 +1,29 @@
+mutant: M69
+target: s19_app/tui/app.py
+old -> new:                 if (
+                    os.path.normcase(item.name) != os.path.normcase(planned.name)
+                    or item_stat.st_size != planned.size
+                ):
+                    continue
+                try:
+                    digest, _size = _file_digest(item)
+                except OSError:
+                    continue
+                if digest == planned.digest:
+                    exempt.add(item.name)  ->                  if os.path.normcase(item.name) != os.path.normcase(planned.name):
+                    continue
+                exempt.add(item.name)
+sha256_before: b75f9125c9eb12c122ce1bbd05d6de1e8027403a87cc2e800be8227a5c42011f
+command: cd C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b && env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_save_image.py::test_tc_b100_59_own_a2l_by_name_and_bytes[False]
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b
+---
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_save_image.py:2477: AssertionError: ['Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30859\\test_tc_b100_59_own_a2l_by_nam0\\app\\.s19tool\\workarea\\ab']
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_own_a2l_by_name_and_bytes[False]
+1 failed in 2.57s
+---
+summary: 1 failed in 2.57s
+verdict: KILLED
+restored = True

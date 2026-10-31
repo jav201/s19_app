@@ -1,0 +1,14 @@
+# r2 probes, 2026-10-31T01:07:15-06:00, cwd=C:/Users/jjgh8/Github/s19_app-b100-inc8b
+# sha256[:16] app.py 87c7f9d74909138c gather 524c3409037cae26 variant_exec 8a38dde7fcd14211
+s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc8b\s19_app\__init__.py
+3.11.15 | packaged by Anaconda, Inc. | (main, Jun 11 2026, 15:12:53) [MSC v.1942 64 bit (AMD64)]
+s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc8b\s19_app\__init__.py
+.SAVE P: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\r8b\\r2\\bt\\test_p4_round1_sequence_save_p0\\app\\.s19tool\\workarea\\P (variant 'firmware')", "The open project folder 'P' was not found — its other files were not copied; copy them into 'P' if you still have them."]
+SAVE Q: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\r8b\\r2\\bt\\test_p4_round1_sequence_save_p0\\app\\.s19tool\\workarea\\Q (variant 'firmware')"]
+.SAVE Q: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\r8b\\r2\\bt\\test_p4_variant_save_q_first0\\app\\.s19tool\\workarea\\Q (variant 'firmware')", "The open project folder 'P' was not found — its other files were not copied; copy them into 'Q' if you still have them."] current: Q
+.SAVE Q (W/P unreadable): ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\r8b\\r2\\bt\\test_p4c_unreadable_open_proje0\\app\\.s19tool\\workarea\\Q (variant 'firmware')", "The open project folder 'P' was not found — its other files were not copied; copy them into 'Q' if you still have them."] current: Q
+Q exists: True P exists: True
+row 9 'could not be read' painted: False
+'was not found' painted: True
+.
+4 passed in 15.72s

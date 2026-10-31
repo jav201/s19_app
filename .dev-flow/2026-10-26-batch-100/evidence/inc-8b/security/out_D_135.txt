@@ -1,0 +1,35 @@
+s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc8b\s19_app\__init__.py
+
+== D1 list / load / save target: junction projects, two-part names ==
+  list_projects: ['P', 'real']
+  'J_other_wa': ('None', ["Project NOT loaded: 'J_other_wa' is a link or junction \u2014 pick a project in the list."])
+  'J_outside': ('None', ["Project NOT loaded: 'J_outside' is a link or junction \u2014 pick a project in the list."])
+  'sub': ('None', ["Project NOT loaded: 'sub' is a link or junction \u2014 pick a project in the list."])
+  'sub/P': ('None', ["Project NOT loaded: 'sub/P' is outside the work area \u2014 copy the folder into the work area."])
+  'real/P2': ('None', ["Project NOT loaded: 'real/P2' is outside the work area \u2014 copy the folder into the work area."])
+  '..': ('None', ["Project NOT loaded: '..' is outside the work area \u2014 copy the folder into the work area."])
+  '../workarea/P': ('None', ["Project NOT loaded: '../workarea/P' is outside the work area \u2014 copy the folder into the work area."])
+  'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D1\\outside': ('None', ["Project NOT loaded: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D\u2026' is outs"])
+  'P/../J_outside': ('None', ["Project NOT loaded: 'P/../J_outside' is outside the work area \u2014 copy the folder into the work area."])
+  '\\\\?\\C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D1\\base\\.s19tool\\workarea\\P': ('None', ["Project NOT loaded: '\\\\?\\C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\ru\u2026' is outs"])
+  'save:J_other_wa': ["Project NOT saved: 'J_other_wa' is a link or junction \u2014 choose another name."]
+  'save:J_outside': ["Project NOT saved: 'J_outside' is a link or junction \u2014 choose another name."]
+  R2 / outside untouched: True
+
+== D3 P swapped for a junction after the load ==
+  other_wa: save-as -> ["Project NOT saved: the open project folder 'P' is a link or junction \u2014 pick a project in the list."]
+      Save P -> ["Project NOT saved: 'P' is a link or junction \u2014 choose another name."]
+      reads of the junction target's project.json: []
+      target unchanged: True  Q exists: False
+  outside: save-as -> ['Project NOT saved: source file missing: firmware.s19 \u2014 reload it or remove it from the project.']
+      Save P -> ['Project NOT saved: source file missing: firmware.s19 \u2014 reload it or remove it from the project.']
+      reads of the junction target's project.json: []
+      target unchanged: True  Q exists: False
+
+== D5 unreadable / reserved / trailing-dot entries ==
+  created via \\?\: ['flows\\x.json.', 'flows\\y.json ', 'CON.txt', 'flows\\nul.json', 'COM1', 'flows\\CONIN$.md']
+  icacls deny list on 'locked': True
+  inventory unreadable: ('COM1', 'CON.txt', 'flows/CONIN$.md', 'flows/nul.json', 'flows/x.json.', 'flows/y.json ', 'locked')  over_ceiling: None
+  save as: ['Project NOT saved: COM1, CON.txt, flows/CONIN$.md, flows/nul.json, flows/x.json., flows/y.json , locked could not be read \u2014 check that they can be opened, then save again.']  Q exists: False
+
+links removed: 5  reparse points left in scratch: 0

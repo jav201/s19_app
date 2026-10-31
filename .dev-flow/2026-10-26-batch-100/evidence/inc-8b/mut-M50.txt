@@ -1,0 +1,20 @@
+mutant: M50
+target: s19_app/tui/app.py
+old -> new:                 if not stat.S_ISREG(a2l_stat.st_mode) or _is_reparse_point(
+                    a2l_files[0]
+                ):  ->                  if False:
+                    pass
+sha256_before: b75f9125c9eb12c122ce1bbd05d6de1e8027403a87cc2e800be8227a5c42011f
+command: cd C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b && env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_project_homes.py::test_tc_b100_32_a2l_guard_of_an_a2l_only_folder[link]
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b
+---
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:1094: AssertionError: ["Loaded project 'P' -> (no image) - 0 variants, 1 problem - details: p"]
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_32_a2l_guard_of_an_a2l_only_folder[link]
+1 failed in 2.29s
+---
+summary: 1 failed in 2.29s
+verdict: KILLED
+restored = True

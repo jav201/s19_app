@@ -1,0 +1,17 @@
+mutant: M77
+target: s19_app/tui/services/project_gather_service.py
+old -> new:             owns = planned.source is not None and _source_key(planned.source) in owned  ->              owns = planned.source is None or _source_key(planned.source) in owned
+sha256_before: 7f1ecfefde90ee6bf926e49e88d362ee0c1de4d7909b28451b96ada45176ceff
+command: cd C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b && env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_project_homes.py::test_e4_r2_pasted_document_beside_a_different_p_file_lands_changes_1
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b
+---
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:1682: AssertionError: ['Project NOT saved: the plan named C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30865\\test_e4_r2_...ytest-30865\\test_e4_r2_pasted_document_bes0\\app\\.s19tool\\workarea\\Q\\patches\\changes_1.json (new) — save again.']
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_e4_r2_pasted_document_beside_a_different_p_file_lands_changes_1
+1 failed in 4.70s
+---
+summary: 1 failed in 4.70s
+verdict: KILLED
+restored = True

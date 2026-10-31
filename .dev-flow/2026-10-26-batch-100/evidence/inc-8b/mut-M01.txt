@@ -1,0 +1,21 @@
+mutant: M01
+target: s19_app/tui/app.py
+old -> new:             subfolder_copies = [entry for entry in plan.copies if "/" in entry.relative]  ->              subfolder_copies = []
+sha256_before: b75f9125c9eb12c122ce1bbd05d6de1e8027403a87cc2e800be8227a5c42011f
+command: cd C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b && env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_project_homes.py::test_tc_b100_31_save_as_copies_every_subfolder_file tests/test_b100_project_homes.py::test_at_b100_09_save_as_copies_the_project_and_q_lists_its_flow[size0] tests/test_b100_project_homes.py::test_at_b100_09_save_as_copies_the_project_and_q_lists_its_flow[size1]
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b
+---
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:215: AssertionError: (['checks/ck.json', 'flows/f1.json', 'flowsets/s1.json', 'patches/boost.json', 'reports/2026/r2.md', 'reports/r.md', ....emp\\pytest-of-jjgh8\\pytest-30796\\test_tc_b100_31_save_as_copies0\\app\\.s19tool\\workarea\\Q (variant 'firmware')"])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:1477: AssertionError: ('flows/f1.json', ['firmware.s19', 'project.json'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:1477: AssertionError: ('flows/f1.json', ['firmware.s19', 'project.json'])
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_save_as_copies_every_subfolder_file
+FAILED tests/test_b100_project_homes.py::test_at_b100_09_save_as_copies_the_project_and_q_lists_its_flow[size0]
+FAILED tests/test_b100_project_homes.py::test_at_b100_09_save_as_copies_the_project_and_q_lists_its_flow[size1]
+3 failed in 19.13s
+---
+summary: 3 failed in 19.13s
+verdict: KILLED
+restored = True

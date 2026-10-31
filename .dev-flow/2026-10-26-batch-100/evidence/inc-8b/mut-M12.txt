@@ -1,0 +1,19 @@
+mutant: M12
+target: s19_app/tui/services/project_gather_service.py
+old -> new:         if category in _UNPAINTED_CATEGORIES:  ->          if char in "\u202e\u200b\x1b":
+sha256_before: 7f1ecfefde90ee6bf926e49e88d362ee0c1de4d7909b28451b96ada45176ceff
+command: cd C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b && env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_project_homes.py::test_tc_b100_31_link_names_are_scrubbed tests/test_b100_project_homes.py::test_tc_b100_31_painted_names_clip_scrub_and_count
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b
+---
+FF                                                                       [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:414: AssertionError: ('patches/ab', 'Save as: links or junctions not copied: patches/a\u061cb, patches/c\u2028d, patches/osj.exe.json — copy those files into the project if it needs them.')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:443: AssertionError: ('cd', 'patches/osj.exe.json, abc, a\u061cb, c\u2028d, e�f')
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_link_names_are_scrubbed
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_painted_names_clip_scrub_and_count
+2 failed in 4.84s
+---
+summary: 2 failed in 4.84s
+verdict: KILLED
+restored = True

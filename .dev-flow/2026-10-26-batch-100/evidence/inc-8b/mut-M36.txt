@@ -1,0 +1,19 @@
+mutant: M36
+target: s19_app/tui/services/project_gather_service.py
+old -> new:     if inventory.unreadable:  ->      if False:
+sha256_before: 7f1ecfefde90ee6bf926e49e88d362ee0c1de4d7909b28451b96ada45176ceff
+command: cd C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b && env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_project_homes.py::test_tc_b100_31_unreadable_entries_refuse_the_save[1] tests/test_b100_project_homes.py::test_tc_b100_31_unreadable_entries_refuse_the_save[12]
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b
+---
+FF                                                                       [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:805: AssertionError: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30828\\test_tc_b100_31_unreadable_ent0\\app\\.s19tool\\workarea\\Q (variant 'firmware')"]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:805: AssertionError: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30828\\test_tc_b100_31_unreadable_ent1\\app\\.s19tool\\workarea\\Q (variant 'firmware')"]
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_unreadable_entries_refuse_the_save[1]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_unreadable_entries_refuse_the_save[12]
+2 failed in 9.94s
+---
+summary: 2 failed in 9.94s
+verdict: KILLED
+restored = True

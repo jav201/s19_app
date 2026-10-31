@@ -2060,7 +2060,14 @@ class LoadedArtifactsPanel(Container):
                 - ``render_slots``.
         """
         if loaded is None:
-            return False, "", ""
+            # Inc 8b D-5 (AT-B100-10): an A2L-only project opens with no
+            # image, so no ``LoadedFile`` exists; the A2L slot then names
+            # the session's own A2L.
+            a2l_path = getattr(self.app, "current_a2l_path", None)
+            if artifact != "a2l" or a2l_path is None:
+                return False, "", ""
+            count = len((getattr(self.app, "current_a2l_data", None) or {}).get("tags", []))
+            return True, a2l_path.name, f"{count} tag{'' if count == 1 else 's'}"
         if artifact == "primary":
             present = loaded.file_type in {"s19", "hex"} and bool(loaded.ranges)
             if not present:

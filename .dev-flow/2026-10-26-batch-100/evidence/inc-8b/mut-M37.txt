@@ -1,0 +1,17 @@
+mutant: M37
+target: s19_app/tui/services/project_gather_service.py
+old -> new:             f"Project NOT saved: {painted_names(names)} could not be read — "  ->              f"Project NOT saved: {painted_names(names, limit=len(names))} could not be read — "
+sha256_before: 7f1ecfefde90ee6bf926e49e88d362ee0c1de4d7909b28451b96ada45176ceff
+command: cd C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b && env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_project_homes.py::test_tc_b100_31_unreadable_entries_refuse_the_save[12]
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b
+---
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:808: AssertionError: Project NOT saved: flows/x.json., flows/x01.json., flows/x02.json., flows/x03.json., flows/x04.json., flows/x05.json., flows/x06.json., flows/x07.json., flows/x08.json., flows/x09.json., flows/x10.json., flows/x11.json. could not be read — check that they can be opened, then save again.
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_unreadable_entries_refuse_the_save[12]
+1 failed in 4.87s
+---
+summary: 1 failed in 4.87s
+verdict: KILLED
+restored = True

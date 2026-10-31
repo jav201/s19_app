@@ -797,9 +797,26 @@ def test_tc_b100_01_app_placements_name_the_workarea_root() -> None:
     # batch-100 Inc 8a re-pin (LLR-170.2, E3 R1, E4 integration RP-2): the
     # pasted change document is written through ONE more placement, in
     # ``_write_editor_document``, so 7 -> 8; it names the root like the rest.
-    assert len(calls) == 8, (
-        f"expected the 8 app.py placement calls (LED .50), found {len(calls)}"
+    # batch-100 Inc 8b re-pin (LLR-171.1, pre-ruling 1, E4 integration RP-5):
+    # the save-as copy places each ``SavePlan.copies`` entry through ONE
+    # more placement, in ``_copy_project_subfolders``, so 8 -> 9; it names
+    # the root like the rest (asserted for every call below).
+    assert len(calls) == 9, (
+        f"expected the 9 app.py placement calls (LED .50), found {len(calls)}"
     )
+    copier = next(
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.FunctionDef) and node.name == "_copy_project_subfolders"
+    )
+    copier_calls = [
+        node
+        for node in ast.walk(copier)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id in placements
+    ]
+    assert len(copier_calls) == 1, [call.lineno for call in copier_calls]
     document_writer = next(
         node
         for node in ast.walk(tree)

@@ -655,3 +655,217 @@ def tree_files(root: Path) -> dict:
         for path in sorted(root.rglob("*"))
         if path.is_file()
     }
+
+
+# ---------------------------------------------------------------------------
+# Inc 8b (E4): save-as trees — sub-folders at depth, links and junctions at
+# depth, a links-only folder, bulk files for the copy ceiling, nested empty
+# folders for the entry ceiling, a deep path, Windows-unreadable names, an
+# own A2L, a second MAC / A2L, an oversize file. Stdlib only; junctions
+# through ``b100_links.create_junction``; Save project only through the
+# shipped handler (``save_case01_project``, LED .42).
+# ---------------------------------------------------------------------------
+
+#: One file in each project home of LLR-171.1 plus a nested one: relative
+#: POSIX path -> distinct bytes (a wrong copy is visible by digest).
+SUBFOLDER_FILES = {
+    "flows/f1.json": b'{"blocks": [], "tag": "f1"}',
+    "flowsets/s1.json": b'{"set": "s1"}',
+    "patches/boost.json": b'{"entries": [], "tag": "boost"}',
+    "checks/ck.json": b'{"entries": [], "tag": "ck"}',
+    "reports/r.md": b"# report r\n",
+    "templates/t.json": b'{"template": "t"}',
+    "splits/part.bin": bytes(range(64)),
+    "reports/2026/r2.md": b"# nested report r2\n",
+}
+
+#: AT-B100-09's three named files.
+AT09_FILES = {
+    key: SUBFOLDER_FILES[key] for key in ("flows/f1.json", "patches/boost.json", "reports/r.md")
+}
+
+
+def write_tree(project_dir: Path, files: dict) -> dict:
+    """Write ``files`` (relative POSIX -> bytes) under ``project_dir``."""
+    for relative, payload in files.items():
+        target = project_dir.joinpath(*PurePosixPath(relative).parts)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(payload)
+    return files
+
+
+def build_save_as_project(
+    base: Path,
+    name: str = "P",
+    *,
+    sub_files: Optional[dict] = None,
+    top_files: Optional[dict] = None,
+    data_files: Iterable[str] = ("firmware.s19",),
+) -> Path:
+    """Project ``name`` saved by the shipped Save project (case_01's
+    ``data_files``), then ``sub_files`` (default :data:`SUBFOLDER_FILES`)
+    and ``top_files`` written beside it on disk. Returns the folder."""
+    project_dir = save_case01_project(base, name, files=tuple(data_files))
+    write_tree(project_dir, SUBFOLDER_FILES if sub_files is None else sub_files)
+    write_tree(project_dir, top_files or {})
+    return project_dir
+
+
+def outside_folder(base: Path, name: str = "outside") -> Path:
+    """A plain folder outside every work area holding ``secret.txt`` and
+    ``secret.json``."""
+    folder = base.parent / name
+    folder.mkdir(parents=True, exist_ok=True)
+    (folder / "secret.txt").write_bytes(b"outside secret")
+    (folder / "secret.json").write_bytes(b'{"outside": true}')
+    return folder
+
+
+def add_junctions(project_dir: Path, target: Path, names: Iterable[str]) -> list:
+    """One directory junction to ``target`` per relative name."""
+    from tests.support.b100_links import create_junction
+
+    made = []
+    for relative in names:
+        link = project_dir.joinpath(*PurePosixPath(relative).parts)
+        link.parent.mkdir(parents=True, exist_ok=True)
+        create_junction(link, target)
+        made.append(relative)
+    return made
+
+
+def add_three_links(project_dir: Path, outside: Path) -> tuple:
+    """LLR-171.1a/b/c's three links: the top-level junction ``linked`` and
+    the nested junction ``reports/j`` to ``outside``, and the file symbolic
+    link ``patches/l.json`` to ``outside/secret.json``. Raises ``OSError``
+    when a link cannot be made (the caller reports the arm as not run)."""
+    import os
+
+    add_junctions(project_dir, outside, ["linked", "reports/j"])
+    (project_dir / "patches").mkdir(exist_ok=True)
+    os.symlink(outside / "secret.json", project_dir / "patches" / "l.json")
+    return ("linked", "reports/j", "patches/l.json")
+
+
+def bulk_files(project_dir: Path, folder: str, count: int, start: int = 0) -> list:
+    """``count`` one-byte files ``<folder>/b<NNNNN>.txt``."""
+    home = project_dir.joinpath(*PurePosixPath(folder).parts)
+    home.mkdir(parents=True, exist_ok=True)
+    names = []
+    for index in range(start, start + count):
+        (home / f"b{index:05d}.txt").write_bytes(b"x")
+        names.append(f"{folder}/b{index:05d}.txt")
+    return names
+
+
+def nested_empty_folders(project_dir: Path, total: int, folder: str = "reports") -> None:
+    """``total`` empty folders below ``project_dir/folder`` (created, not
+    counted), nested two levels — groups ``g<NNN>`` of up to 100 leaves —
+    so a walk must OPEN folders, not only list one (R16)."""
+    root = project_dir / folder
+    root.mkdir(parents=True, exist_ok=True)
+    made = 0
+    group = 0
+    while made < total:
+        group_dir = root / f"g{group:03d}"
+        group_dir.mkdir()
+        made += 1
+        leaf = 0
+        while made < total and leaf < 100:
+            (group_dir / f"d{leaf:03d}").mkdir()
+            made += 1
+            leaf += 1
+        group += 1
+
+
+def _is_link(entry) -> bool:
+    # ``DirEntry.is_junction`` is 3.12+; on 3.11 a junction is read from
+    # the reparse-point attribute of ``os.lstat``.
+    import os
+    import stat
+
+    if entry.is_symlink():
+        return True
+    attributes = getattr(os.lstat(entry.path), "st_file_attributes", 0)
+    return bool(attributes & getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400))
+
+
+def walked_entries(project_dir: Path) -> int:
+    """Entries below ``project_dir`` (folders, files, links; the root not
+    counted), never following a link — the entry-ceiling fixture's oracle."""
+    import os
+
+    count = 0
+    stack = [project_dir]
+    while stack:
+        with os.scandir(stack.pop()) as entries:
+            for entry in entries:
+                count += 1
+                if not _is_link(entry) and entry.is_dir(follow_symlinks=False):
+                    stack.append(Path(entry.path))
+    return count
+
+
+def deep_file(project_dir: Path, components: int, folder: str = "reports") -> str:
+    """A file whose project-relative path has exactly ``components`` parts."""
+    parts = [folder] + ["a"] * (components - 2) + ["f.md"]
+    target = project_dir.joinpath(*parts)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(b"deep")
+    return "/".join(parts)
+
+
+EXTENDED_PREFIX = "\\\\?\\"
+
+
+def write_unnormalised(path: Path, payload: bytes = b"{}") -> None:
+    """Write a file Windows cannot open by its normal path (a trailing dot,
+    a reserved device stem) through the extended-length form. Raises
+    ``OSError`` where the platform refuses the name."""
+    with open(EXTENDED_PREFIX + str(path), "wb") as handle:
+        handle.write(payload)
+
+
+def remove_unnormalised(path: Path) -> None:
+    import os
+
+    try:
+        os.remove(EXTENDED_PREFIX + str(path))
+    except OSError:
+        pass
+
+
+def tree_digests(root: Path) -> dict:
+    """Every regular file under ``root`` reached without a link (relative
+    POSIX -> SHA-256): LLR-171.1f's (path, digest) set."""
+    import hashlib
+    import os
+
+    found = {}
+    stack = [root]
+    while stack:
+        with os.scandir(stack.pop()) as entries:
+            for entry in entries:
+                if _is_link(entry):
+                    continue
+                path = Path(entry.path)
+                if entry.is_dir(follow_symlinks=False):
+                    stack.append(path)
+                elif entry.is_file(follow_symlinks=False):
+                    found[path.relative_to(root).as_posix()] = hashlib.sha256(
+                        path.read_bytes()
+                    ).hexdigest()
+    return found
+
+
+def save_as_total(sizes: Iterable[int], new_target: bool = True) -> int:
+    """R7's free-space total, computed independently of the app: each size
+    rounded up to a multiple of 4 096, plus 65 536 once for a new target."""
+    total = sum(-(-size // 4096) * 4096 for size in sizes)
+    return total + (65536 if new_target else 0)
+
+
+def other_work_area_project(base: Path, name: str = "R") -> Path:
+    """A project ``name`` saved in ANOTHER app root's work area (``base``
+    must differ from the test's app root); returns its folder."""
+    return save_case01_project(base, name, files=("firmware.s19",))

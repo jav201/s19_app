@@ -1,0 +1,48 @@
+# RED on pre snapshot + E5-cp1 tests (after test fixes); cwd=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/cp8b-1/red
+# started (UTC): 2026-10-31T05:47:58Z
+# pre sources sha256[:16]: app.py=b75f9125c9eb12c1 project_gather_service.py=7f1ecfefde90ee6b workspace.py=d9f361f3fb092ae2 screens_directionb.py=e94f8e764f950b1a
+# s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\red\s19_app\__init__.py
+# command: python -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_project_homes.py -k <12 new node names>
+FF.F.FFFFFFFFFF..                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\red\tests\test_b100_project_homes.py:2158: AssertionError: ["Project NOT saved: 'P' could not be read — check that they can be opened, then save again."]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\red\tests\test_b100_project_homes.py:2158: AssertionError: ["Project NOT saved: 'P' could not be read — check that they can be opened, then save again."]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\red\tests\test_b100_project_homes.py:2191: AssertionError: (WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/cp8b-1/bt-red2/test_tc_b100_32_unload_of_an_a0/app/.s19tool/workarea/P/firmware.a2l'), 3, ['Nothing to unload.'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\red\tests\test_b100_project_homes.py:2254: AssertionError: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8...oject.json (the path is too long to record) — rename it in the common folder, select the new name, then Save project.']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\red\tests\test_b100_project_homes.py:2288: AssertionError: ['Project NOT saved: the plan named fw.s19 (new) but the file landed at fw_2.s19 (keep) — save again.']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\red\tests\test_b100_project_homes.py:2322: AssertionError: WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/cp8b-1/bt-red2/test_tc_b100_31_document_with_0/app/.s19tool/workarea/Q/patches/changes.json')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\red\tests\test_b100_project_homes.py:2373: AssertionError: ["Project NOT loaded: 'P' is outside the work area — copy the folder into the work area."]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\red\tests\test_b100_project_homes.py:2373: AssertionError: ['Project NOT saved: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b...-c248-4ccb-86cf-122b894659b2\\scratchpad\\cp8b-1\\bt-red2\\test_tc_b100_62_folder_check_p1\\app\\.s19tool\\workarea).']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\red\tests\test_b100_project_homes.py:2445: AssertionError: another project's files were deleted
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\red\tests\test_b100_project_homes.py:2448: AssertionError: ['z5.md']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\red\tests\test_b100_project_homes.py:2451: AssertionError: the user's moved-in file was deleted
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\red\tests\test_b100_project_homes.py:2492: AssertionError: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8...4659b2\\scratchpad\\cp8b-1\\bt-red2\\test_tc_b100_31_copy_refuses_w0\\app\\.s19tool\\workarea\\Q (variant 'firmware')"]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\red\tests\test_b100_project_homes.py:2529: AssertionError: {'active_variant': 'firmware', 'assignments': {}, 'batch': ['OUTSIDE_BATCH_NAME.s19'], 'files': {'firmware.s19': {'sha256': '8a35f3808f25ff85a9ce1100bbce23783a7031b82c6f3d14cc1f749a0df40e51', 'size': 358}}, ...}
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_open_project_folder_gone_saves_without_a_copy[gone, save as P]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_open_project_folder_gone_saves_without_a_copy[gone, save as Q]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_32_unload_of_an_a2l_only_session_clears_the_a2l
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_unrecorded_name_reason_is_not_too_long
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_identical_copy_mismatch_names_a_true_step
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_document_with_an_identical_sibling_follows_its_landing
+FAILED tests/test_b100_project_homes.py::test_tc_b100_62_folder_check_permission_error_has_its_own_text[load]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_62_folder_check_permission_error_has_its_own_text[save target]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_rollback_never_deletes_through_a_swapped_folder[junction to R]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_rollback_never_deletes_through_a_swapped_folder[junction to itself]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_rollback_never_deletes_through_a_swapped_folder[replaced file]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_copy_refuses_when_p_itself_becomes_a_junction
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_linked_project_json_is_not_carried
+13 failed, 4 passed, 70 deselected in 94.06s (0:01:34)
+# exit code: 1
+# ended (UTC): 2026-10-31T05:49:34Z
+
+# --- F2 (operator-approved 2026-10-31) RED on the pre snapshot: variant_execution_service.py=699c38bd2cce77cd app.py=b75f9125c9eb12c1
+# started (UTC): 2026-10-31T05:57:49Z
+# command: python -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_project_homes.py::test_tc_b100_32_unreadable_a2l_row_paints_the_true_next_step
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\red\tests\test_b100_project_homes.py:1163: AssertionError: Project P opened with 1 problem Opened firmware.s19 recorded as the active variant (the latest saved) Variants 1 in the project MAC (none) A2L (none) Problems found (the rest loaded) ! not readable: firmware.a2l too large to open - replace the file, or Save project to drop it
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_32_unreadable_a2l_row_paints_the_true_next_step
+1 failed in 4.20s
+# exit code: 1

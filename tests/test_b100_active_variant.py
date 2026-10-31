@@ -84,6 +84,7 @@ from s19_app.tui.workspace import WORKAREA_SUBDIR
 
 from tests.support import b100_projects as projects
 from tests.support.independent_reader import read_s19
+from tests.support.timing import timing_bound
 
 SIZES = [(118, 54), (220, 60)]
 PATCH_ADDRESS = 0x8000007C
@@ -705,7 +706,7 @@ def test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second(
     outcomes = [s for s in statuses if any(o in s for o in WRITER_OUTCOMES)]
     print(f"{writer}: trigger -> outcome {took:.3f} s; {outcomes[:1]}")
     assert "manifest verified" in outcomes[0], outcomes
-    assert took < 1.0, took
+    assert took < timing_bound(1.0), took
 
 
 def test_tc_b100_20_append_says_now_opens_only_after_the_write(tmp_path: Path) -> None:

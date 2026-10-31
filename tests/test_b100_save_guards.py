@@ -96,6 +96,7 @@ from s19_app.tui.workspace import WORKAREA_SUBDIR
 from s19_app.tui.workspace import is_windows_device_name
 
 from tests.support import b100_links
+from tests.support.timing import timing_bound
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE01 = ROOT / "examples" / "case_01_basic_valid" / "firmware.s19"
@@ -2528,7 +2529,7 @@ def test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second(tmp_path: 
     written = json.loads((ab / "project.json").read_text(encoding="utf-8"))
     assert written.get("active_document") == "patches/boost.json", written
     assert _doc_lines(messages) == [], messages
-    assert elapsed < 1.0, f"Save project took {elapsed:.3f} s"
+    assert elapsed < timing_bound(1.0), f"Save project took {elapsed:.3f} s"
 
 
 def test_tc_b100_05_merge_keeps_a_held_document_with_one_line(tmp_path: Path) -> None:

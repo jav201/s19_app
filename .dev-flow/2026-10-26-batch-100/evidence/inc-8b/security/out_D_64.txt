@@ -1,0 +1,27 @@
+s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc8b\s19_app\__init__.py
+
+== D4 A2L guard (link A2L, over-cap A2L, MAC + linked A2L) ==
+  data+link: parses=[] current_a2l_path=None project=P file=True
+     | "Loaded project 'P' -> firmware.s19 - variant 1 of 1, 2 problems - details: p"
+  a2l_only_link: parses=[] current_a2l_path=None project=None file=False
+     | "Project NOT loaded: firmware.a2l in 'P' is a link or junction \u2014 replace the A2L file, then Load again."
+  mac+link: parses=[] current_a2l_path=None project=P file=True
+     | "Loaded project 'P' -> firmware.mac - 0 variants, 2 problems - details: p"
+  data+overcap: parses=[] current_a2l_path=None project=P file=True
+     | "Loaded project 'P' -> firmware.s19 - variant 1 of 1, 2 problems - details: p"
+  a2l_only_overcap: parses=[] current_a2l_path=None project=None file=False
+     | "Project NOT loaded: firmware.a2l in 'P' is too large to open \u2014 replace the A2L file, then Load again."
+  a2l_only_ok: parses=[('cache', 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D4_a2l_only_ok\\base\\.s19tool\\workarea\\P\\firmware.a2l'), ('parse', 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\D4_a2l_only_ok\\base\\.s19tool\\workarea\\P\\firmware.a2l')] current_a2l_path=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s8b\runs\D4_a2l_only_ok\base\.s19tool\workarea\P\firmware.a2l project=P file=False
+     | "Loaded project 'P' -> (no image) - 0 variants, 1 problem - details: p"
+
+== D6 painted_names ==
+  out: 'a[31mb, cd, ef, gh, ij, kl, m\ufffdn, op, qr, st, and 3 more'
+  encodes utf-8: True
+  remaining Cc/Cf/Zl/Zp/Cs: []
+  longest painted name: 10
+  25 names -> 5, n6, n7, n8, n9, and 15 more
+  0 names -> ''  exactly 10 -> 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+  RTL letters kept: '\u05d0\u05d1.json'
+  combining flood length: 120
+
+links removed: 3  reparse points left in scratch: 0

@@ -1,0 +1,17 @@
+mutant: M34
+target: s19_app/tui/services/project_gather_service.py
+old -> new:     if len(walked) > entry_ceiling:  ->      if len(walked) >= entry_ceiling:
+sha256_before: 7f1ecfefde90ee6bf926e49e88d362ee0c1de4d7909b28451b96ada45176ceff
+command: cd C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b && env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10000 saved]
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b
+---
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:755: AssertionError: ["Project NOT saved: 'P' has too many files to copy (over 10 000 entries) — move files out of the project, then save again."]
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10000 saved]
+1 failed in 8.07s
+---
+summary: 1 failed in 8.07s
+verdict: KILLED
+restored = True

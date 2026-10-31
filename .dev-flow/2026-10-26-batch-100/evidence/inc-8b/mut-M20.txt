@@ -1,0 +1,21 @@
+mutant: M20
+target: s19_app/tui/services/project_gather_service.py
+old -> new:     return -(-size // _SPACE_BLOCK_BYTES) * _SPACE_BLOCK_BYTES  ->      return size
+sha256_before: 7f1ecfefde90ee6bf926e49e88d362ee0c1de4d7909b28451b96ada45176ceff
+command: cd C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b && env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_save_image.py::test_tc_b100_59_plan_total_counts_every_written_byte tests/test_b100_save_image.py::test_tc_b100_59_plan_total_rounding_per_file tests/test_b100_project_homes.py::test_tc_b100_31_free_space_is_checked_before_any_folder[T-1 refused]
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b
+---
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_save_image.py:2578: AssertionError: 70896
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_save_image.py:2609: AssertionError: 73730
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:495: AssertionError: (102400, ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjg... 'firmware')", 'Save as: links or junctions not copied: linked — copy those files into the project if it needs them.'])
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_plan_total_counts_every_written_byte
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_plan_total_rounding_per_file
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_free_space_is_checked_before_any_folder[T-1 refused]
+3 failed in 5.01s
+---
+summary: 3 failed in 5.01s
+verdict: KILLED
+restored = True
