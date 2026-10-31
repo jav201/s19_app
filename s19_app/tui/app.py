@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import stat
 import time
 from datetime import datetime, timezone
 from typing import Any, Callable, List, Mapping, Optional, Sequence, Tuple
@@ -44,6 +45,14 @@ from ..utils import safe_text
 from .changes.apply import render_patched_image
 from .changes.check import run_check_document
 from .changes.io import (
+    CHG_ENCODING_UNKNOWN,
+    CHG_FORMAT,
+    CHG_KIND_UNKNOWN,
+    CHG_V1_FORMAT,
+    CHG_VALUE_MODE_UNKNOWN,
+    DUMMY_CHANGESET_TEXT,
+    MF_BAD_STRUCTURE,
+    MF_JSON_PARSE,
     list_change_documents,
     parse_change_document,
     read_change_document,
@@ -172,17 +181,22 @@ from .services.manifest_writer import (
     write_project_manifest,
 )
 from .services.project_gather_service import (
+    GATHER_DOCUMENT_NOT_RECORDED,
     PLAN_ACTION_KEEP,
     PLAN_ACTION_NEW,
+    PLAN_ROLE_DOCUMENT,
     PLAN_ROLE_MANIFEST,
     PLAN_TARGET_MERGE,
     PLAN_TARGET_NEW,
     PLAN_TARGET_OPEN,
     PROJECT_CHECKS_DIR,
+    PROJECT_HOME_NAMES,
     PROJECT_PATCHES_DIR,
     PlannedFile,
     SavePlan,
     SavePlanRow,
+    classify_active_document,
+    document_home_for_kind,
     gather_project_artifacts,
     plan_project_save,
     scoped_home,
@@ -198,10 +212,20 @@ from .services.validation_service import (
     build_validation_report,
 )
 from .services.variant_execution_service import (
+    DOCUMENT_NEXT_STEP,
+    DOCUMENT_REASON_IO_ERROR,
+    DOCUMENT_REASON_LINK,
+    DOCUMENT_REASON_TOO_LARGE,
+    DOCUMENT_REASON_UNREADABLE,
     EXECUTION_SCOPES,
     PROBLEM_NOT_READABLE,
     PROJECT_MANIFEST_NAME,
     SCOPE_ACTIVE,
+    STEP_CHECK_THEN_LOAD,
+    STEP_OPEN_FROM_EDITOR,
+    _ISSUE_ENTRY,
+    _ISSUE_KEY,
+    _KEY_ACTIVE_DOCUMENT,
     DerivedFrom,
     FileRecord,
     LoadAnnouncement,
@@ -209,7 +233,9 @@ from .services.variant_execution_service import (
     ProjectManifest,
     VariantExecutionResult,
     compose_load_announcement,
+    document_problem_file,
     execute_project_variants,
+    is_active_document_form,
     manifest_is_damaged,
     manifest_keep_reason,
     manifest_rewrite_refusal,
@@ -1457,6 +1483,7 @@ def _save_manifest_keys(
     declared_regions: Sequence[DeclaredRegion],
     *,
     derived: bool = False,
+    active_document: bool = False,
 ) -> tuple[str, ...]:
     """
     Summary:
@@ -1469,6 +1496,10 @@ def _save_manifest_keys(
             writes; the writer adds ``declared_regions`` only when any exist.
         derived (bool): True when the save emits a patched image, which
             records ``derived_from`` (LLR-168.4).
+        active_document (bool): True when the save records an
+            ``active_document`` (LLR-167.6, LLR-170.1): the plan holds a
+            document row the write records, or the save carries the
+            target's value that Save project did not drop (LLR-164.2).
 
     Returns:
         tuple[str, ...]: The keys, in the writer's order. ``files`` is
@@ -1478,7 +1509,8 @@ def _save_manifest_keys(
 
     Data Flow:
         - Serialize an empty composition with these regions, one ``files``
-          record and, for an emit, one ``derived_from`` record through
+          record, for an emit one ``derived_from`` record and, for a
+          recorded document, a placeholder ``active_document`` through
           ``serialize_manifest`` (no file is touched).
         - Parse the text back and keep its top-level key order.
 
@@ -1496,6 +1528,9 @@ def _save_manifest_keys(
         files={"image.s19": FileRecord(0, digest)},
         derived_from=(
             {"image.s19": DerivedFrom("base.s19", digest, 0)} if derived else None
+        ),
+        active_document=(
+            f"{PROJECT_PATCHES_DIR}/changes.json" if active_document else None
         ),
     )
     return tuple(json.loads(text))
@@ -1689,6 +1724,257 @@ def _plan_row_mismatch(row: SavePlanRow, placed: PlacementResult) -> Optional[st
     )
 
 
+#: The reopen caps of a recorded ``active_document`` (E3 R4, LLR-170.3):
+#: a file over 1 MiB or over 1 000 entries is never parsed — the parse of
+#: a 20 000-entry document took 33 s (probe P1).
+REOPEN_MAX_BYTES = 1_048_576
+REOPEN_MAX_ENTRIES = 1_000
+
+#: The outcomes of :func:`recorded_document_state` (E3 R10).
+DOCUMENT_OK = "ok"
+DOCUMENT_MISSING = "missing"
+DOCUMENT_LINK = "link"
+DOCUMENT_TOO_LARGE = "too_large"
+DOCUMENT_UNREADABLE = "unreadable"
+DOCUMENT_IO_ERROR = "io_error"
+
+#: The ``classify_active_document`` classes (E3 R11) of a file-backed
+#: document that gets a plan row: recorded as on disk, or copied.
+_DOCUMENT_IN_HOME = "in_home"
+_PLACED_DOCUMENT_CLASSES = frozenset({_DOCUMENT_IN_HOME, "outside"})
+
+#: The outcomes for which Save project drops a carried ``active_document``
+#: (E3 R8 refined): a real file fault. ``too_large`` and ``io_error`` keep
+#: the record.
+_DOCUMENT_DROP_OUTCOMES = frozenset(
+    {DOCUMENT_MISSING, DOCUMENT_LINK, DOCUMENT_UNREADABLE}
+)
+
+#: The file-level codes that make a recorded document unreadable (E3 R17);
+#: an entry-level finding (an unresolved symbol, a blocked entry) never does.
+_DOCUMENT_FILE_FAULT_CODES = frozenset(
+    {
+        MF_JSON_PARSE,
+        MF_BAD_STRUCTURE,
+        CHG_V1_FORMAT,
+        CHG_FORMAT,
+        CHG_KIND_UNKNOWN,
+        CHG_ENCODING_UNKNOWN,
+        CHG_VALUE_MODE_UNKNOWN,
+    }
+)
+
+#: The exceptions a decode or parse of a recorded document can raise
+#: (E3 R10, R19: ``ValueError`` covers an over-long integer literal, and
+#: ``json.JSONDecodeError`` and ``UnicodeDecodeError``, its subclasses).
+_DOCUMENT_PARSE_ERRORS = (ValueError, RecursionError, TypeError)
+
+#: What each not-readable outcome means, in user terms (E3 R6, R16); the
+#: exception class and the reader code go to the log only. The strings
+#: live once, in the reader module (review F5).
+_DOCUMENT_REASON: dict[str, str] = {
+    DOCUMENT_LINK: DOCUMENT_REASON_LINK,
+    DOCUMENT_TOO_LARGE: DOCUMENT_REASON_TOO_LARGE,
+    DOCUMENT_UNREADABLE: DOCUMENT_REASON_UNREADABLE,
+    DOCUMENT_IO_ERROR: DOCUMENT_REASON_IO_ERROR,
+}
+#: The next-step mark of the outcomes whose record Save project keeps
+#: (E3 R16); the composer paints the step by this mark (review F5).
+_DOCUMENT_STEP: dict[str, str] = {
+    DOCUMENT_TOO_LARGE: STEP_OPEN_FROM_EDITOR,
+    DOCUMENT_IO_ERROR: STEP_CHECK_THEN_LOAD,
+}
+
+
+def _plan_without_document_key(plan: SavePlan) -> SavePlan:
+    """The save plan once the change document is known not to be
+    recorded (LLR-167.6, review F4): the same rows, ``project.json``'s keys
+    without ``active_document``, so the plan lists the keys the save
+    writes."""
+    return replace(
+        plan,
+        manifest_keys=tuple(
+            key for key in plan.manifest_keys if key != _KEY_ACTIVE_DOCUMENT
+        ),
+    )
+
+#: Why Save project dropped a carried ``active_document`` (E3 R2, R8
+#: refined), in user terms.
+_DOCUMENT_DROP_REASON: dict[str, str] = {
+    DOCUMENT_MISSING: "the file is missing",
+    DOCUMENT_LINK: "the file is a link",
+    DOCUMENT_UNREADABLE: "the file is not a change or check document the app can read",
+}
+
+
+@dataclass(frozen=True)
+class RecordedDocumentState:
+    """
+    Summary:
+        What one read of a recorded ``active_document`` found (E3 R10): the
+        outcome, the parsed document for ``ok``, and a detail for the log.
+
+    Args:
+        outcome (str): One of the ``DOCUMENT_*`` outcomes.
+        document (Optional[ChangeDocument]): The parsed document (``ok``
+            only), else ``None``.
+        detail (str): The exception class or reader code — log only, never
+            painted (E3 R6).
+    """
+
+    outcome: str
+    document: Optional[ChangeDocument] = None
+    detail: str = ""
+
+
+def _is_link_stat(result: os.stat_result) -> bool:
+    """True when an ``os.lstat`` result is a symbolic link or a reparse
+    point (a junction on Windows)."""
+    attributes = getattr(result, "st_file_attributes", 0)
+    return stat.S_ISLNK(result.st_mode) or bool(
+        attributes & stat.FILE_ATTRIBUTE_REPARSE_POINT
+    )
+
+
+def recorded_document_state(
+    project_dir: Path, text: str, a2l_context: Optional[dict] = None
+) -> RecordedDocumentState:
+    """
+    Summary:
+        The ONE classifier of a recorded ``active_document`` (E3 R10,
+        LLR-170.3, LLR-164.2): reads the file once and says whether it is a
+        change or check document the app can reopen. Load reopens through
+        it and Save project decides its drop with it, so a file Load lists
+        as ``not readable`` is the same file Save project judges. Holds no
+        app state, never touches a ``ChangeService`` and never raises.
+
+    Args:
+        project_dir (Path): The project folder (unresolved; never
+            ``resolve()``-d here).
+        text (str): The recorded project-relative POSIX text, one the
+            reader accepted (``is_active_document_form`` True), e.g.
+            ``"patches/boost.json"``.
+        a2l_context (Optional[dict]): The project's parsed A2L payload, so
+            symbol entries resolve; ``None`` for Save project. The outcome
+            never depends on it (it only changes entry-level findings).
+
+    Returns:
+        RecordedDocumentState: ``ok`` with the parsed document, or
+            ``missing``, ``link``, ``too_large``, ``unreadable``,
+            ``io_error`` with no document.
+
+    Data Flow:
+        - ``os.lstat`` of the home, then of the file, on the absolute
+          textual path: absent -> ``missing``; a link or reparse point ->
+          ``link`` (0 bytes read); the home not a folder or the file not a
+          regular file -> ``unreadable``; any other ``OSError`` ->
+          ``io_error``.
+        - ``st_size`` over :data:`REOPEN_MAX_BYTES` -> ``too_large``.
+        - One bounded read of at most ``REOPEN_MAX_BYTES + 1`` bytes;
+          ``OSError`` -> ``io_error``; more than the cap -> ``too_large``.
+        - A guarded ``json.loads`` of THOSE bytes: an exception ->
+          ``unreadable``; not an object or ``entries`` not a list ->
+          ``unreadable``; more than :data:`REOPEN_MAX_ENTRIES` entries ->
+          ``too_large``.
+        - ``parse_change_document`` of the same bytes under the same catch
+          set; a file-level code (E3 R17) -> ``unreadable``; else ``ok``.
+
+    Dependencies:
+        Uses:
+            - changes.io.parse_change_document
+        Used by:
+            - S19TuiApp._reopen_active_document (Load)
+            - S19TuiApp._handle_save_dialog (Save project's drop test)
+    """
+    home_name, _, file_name = text.partition("/")
+    home = project_dir.absolute() / home_name
+    path = home / file_name
+    for item, expect_dir in ((home, True), (path, False)):
+        try:
+            found = os.lstat(item)
+        except FileNotFoundError:
+            return RecordedDocumentState(DOCUMENT_MISSING, detail="FileNotFoundError")
+        except OSError as exc:
+            return RecordedDocumentState(DOCUMENT_IO_ERROR, detail=type(exc).__name__)
+        if _is_link_stat(found):
+            return RecordedDocumentState(DOCUMENT_LINK, detail=f"link: {item.name}")
+        is_expected = (
+            stat.S_ISDIR(found.st_mode) if expect_dir else stat.S_ISREG(found.st_mode)
+        )
+        if not is_expected:
+            return RecordedDocumentState(
+                DOCUMENT_UNREADABLE, detail=f"not a regular entry: {item.name}"
+            )
+    if found.st_size > REOPEN_MAX_BYTES:
+        return RecordedDocumentState(DOCUMENT_TOO_LARGE, detail=f"{found.st_size} bytes")
+    try:
+        with open(path, "rb") as handle:
+            data = handle.read(REOPEN_MAX_BYTES + 1)
+    except OSError as exc:
+        return RecordedDocumentState(DOCUMENT_IO_ERROR, detail=type(exc).__name__)
+    if len(data) > REOPEN_MAX_BYTES:
+        return RecordedDocumentState(DOCUMENT_TOO_LARGE, detail="grew past the cap")
+    try:
+        top = json.loads(data)
+    except _DOCUMENT_PARSE_ERRORS as exc:
+        return RecordedDocumentState(DOCUMENT_UNREADABLE, detail=type(exc).__name__)
+    entries = top.get("entries") if isinstance(top, dict) else None
+    if not isinstance(entries, list):
+        return RecordedDocumentState(
+            DOCUMENT_UNREADABLE, detail="no entries list at the top level"
+        )
+    if len(entries) > REOPEN_MAX_ENTRIES:
+        return RecordedDocumentState(
+            DOCUMENT_TOO_LARGE, detail=f"{len(entries)} entries"
+        )
+    try:
+        document = parse_change_document(data, a2l_context=a2l_context)
+    except _DOCUMENT_PARSE_ERRORS as exc:
+        return RecordedDocumentState(DOCUMENT_UNREADABLE, detail=type(exc).__name__)
+    faults = sorted(
+        {issue.code for issue in document.issues} & _DOCUMENT_FILE_FAULT_CODES
+    )
+    if faults:
+        return RecordedDocumentState(DOCUMENT_UNREADABLE, detail=", ".join(faults))
+    return RecordedDocumentState(DOCUMENT_OK, document=document)
+
+
+def _save_clears_panel_flag(
+    document_written: bool, paste_text: str, parsed_paste_text: Optional[str]
+) -> bool:
+    """
+    Summary:
+        Whether a completed Save project clears the Patch Editor's dirty
+        flag (LLR-167.8, LED .72 Q2): only when a file in the project now
+        holds every entry the panel shows and the paste buffer holds no
+        text that was never parsed.
+
+    Args:
+        document_written (bool): True when this save wrote or reused the
+            editor's PASTED document in the project. A file-backed
+            document (copied or recorded as on disk) never sets it: no file
+            holds the panel's edits (E3 R1).
+        paste_text (str): The paste buffer's current text.
+        parsed_paste_text (Optional[str]): The text of the last successful
+            Parse pasted, ``None`` when none.
+
+    Returns:
+        bool: True to call ``PatchEditorPanel.mark_saved``.
+
+    Data Flow:
+        - Not written -> False.
+        - The buffer empty, the shipped placeholder, or the text last
+          parsed -> True; any other text is unparsed work -> False.
+
+    Dependencies:
+        Used by:
+            - S19TuiApp._handle_save_dialog (the commit block)
+    """
+    if not document_written:
+        return False
+    return paste_text in ("", DUMMY_CHANGESET_TEXT) or paste_text == parsed_paste_text
+
+
 #: The session-snapshot domain (HLR-165, LLR-165.2): every attribute name
 #: ``S19TuiApp``'s own source assigns via ``self.<name> =``. The TEST
 #: census re-derives the same set from the live source at run time and
@@ -1745,6 +2031,7 @@ _SESSION_SNAPSHOT_NAMES: Tuple[str, ...] = (
     "_mac_view_cache_summary",
     "_mac_view_cache_widths",
     "_mac_window_start",
+    "_parsed_paste_text",
     "_pending_variant_id",
     "_report_filter_path",
     "_split_join_return_screen",
@@ -1982,6 +2269,11 @@ class S19TuiApp(App):
         #: succeeds; a since-deleted path is tolerated by the gather (one
         #: skip finding, never a crash).
         self._last_template_path: Optional[Path] = None
+        #: The paste text of the last successful Parse pasted (LED .72 Q2,
+        #: pre-ruling 10): Save project clears the Patch Editor's dirty flag
+        #: only while the buffer holds no text beyond it
+        #: (``_save_clears_panel_flag``). Cleared by the project reset.
+        self._parsed_paste_text: Optional[str] = None
         #: Monotonic image-load generation (batch-48 LLR-077.2). Bumped once
         #: per image install in ``_apply_prepared_load`` and pushed into
         #: ``_change_service``, which stamps it onto each check run so the
@@ -3654,6 +3946,7 @@ class S19TuiApp(App):
                 # Load asks first (was w4 `mark_loaded`, batch-94 LLR-005.1).
                 if result.ok:
                     panel.mark_pasted()
+                    self._parsed_paste_text = event.paste_text
             elif event.action == "refresh_doc":
                 # batch-94 (annotation 6 / HLR-008 / LLR-008.2): Refresh
                 # repopulates the file dropdown from the patches-folder
@@ -8888,7 +9181,15 @@ class S19TuiApp(App):
         # SEC2-10 (LED .54 (a)): a restore that cannot land never loses
         # the previous bytes silently.
         for manifest_path, previous_bytes in manifest_restores:
-            self._restore_manifest(manifest_path, previous_bytes)
+            self._restore_manifest(
+                manifest_path,
+                previous_bytes,
+                already_kept=any(
+                    copy.with_name(PROJECT_MANIFEST_NAME) == manifest_path
+                    and kept_bytes == previous_bytes
+                    for copy, kept_bytes in kept_copies
+                ),
+            )
         # LED .53: unlink only the files THIS save created — each path
         # was recorded the moment its placement claim or gather copy
         # wrote it. A reused byte-identical file and anything a
@@ -8932,7 +9233,9 @@ class S19TuiApp(App):
             except OSError:
                 pass  # not empty or already gone — the rollback must never raise
 
-    def _restore_manifest(self, manifest_path: Path, previous_bytes: bytes) -> None:
+    def _restore_manifest(
+        self, manifest_path: Path, previous_bytes: bytes, already_kept: bool = False
+    ) -> None:
         """
         Summary:
             Put a failed save's previous ``project.json`` back (SEC2-9), and
@@ -8942,6 +9245,9 @@ class S19TuiApp(App):
         Args:
             manifest_path (Path): The project's ``project.json``.
             previous_bytes (bytes): What it held before the save.
+            already_kept (bool): A ``project.json.previous-<UTC>`` copy of
+                these bytes already exists (SEC7-R2-4): no second copy and
+                no line here; ``_abort_save`` names the kept copy (SEC8a-5).
 
         Returns:
             None: Never raises (the rollback keeps the app running).
@@ -8984,6 +9290,15 @@ class S19TuiApp(App):
         finally:
             if staged_dir is not None:
                 shutil.rmtree(staged_dir, ignore_errors=True)
+        if already_kept:
+            self.logger.warning(
+                "Manifest restore failed; the previous content is already kept: "
+                "%s (%s: %s)",
+                manifest_path,
+                type(failure).__name__,
+                failure,
+            )
+            return
         kept = self._keep_previous_manifest(manifest_path, previous_bytes)
         folder = manifest_path.parent
         # SEC7-5: the exception class goes to the log only.
@@ -9270,11 +9585,53 @@ class S19TuiApp(App):
             # keys the save writes (an emit whose base cannot be read again
             # records none, and the plan shows none).
             existing = read_project_manifest(project_dir)
-            carried_derived: dict[str, DerivedFrom] = (
-                dict(self._manifest_carry(project_dir, existing)["derived_from"])
+            target_carry = (
+                self._manifest_carry(project_dir, existing)
                 if existing is not None and not manifest_is_damaged(existing)
                 else {}
             )
+            carried_derived: dict[str, DerivedFrom] = dict(
+                target_carry.get("derived_from", {})
+            )
+            # LLR-164.2 / pre-ruling 7: a merge or an open-project save
+            # carries the target's active_document. E3 R2 / R8 refined /
+            # R10: the one document classifier drops it on a real file
+            # fault and keeps it otherwise; its status line is painted in
+            # the commit step, and only when the carried record is the one
+            # written (E3 R15).
+            carried_active_document: Optional[str] = target_carry.get(
+                "active_document"
+            )
+            carried_document_line: Optional[str] = None
+            if carried_active_document is not None:
+                carried_state = recorded_document_state(
+                    project_dir, carried_active_document
+                )
+                if carried_state.outcome in _DOCUMENT_DROP_OUTCOMES:
+                    self.logger.warning(
+                        "Save project drops the recorded change document: %s %s (%s)",
+                        carried_active_document,
+                        carried_state.outcome,
+                        carried_state.detail,
+                    )
+                    carried_document_line = (
+                        f"Change document record {carried_active_document} "
+                        f"was dropped from {PROJECT_MANIFEST_NAME} — "
+                        f"{_DOCUMENT_DROP_REASON[carried_state.outcome]}"
+                    )
+                    carried_active_document = None
+                elif carried_state.outcome == DOCUMENT_IO_ERROR:
+                    self.logger.warning(
+                        "Save project could not read the recorded change "
+                        "document: %s (%s)",
+                        carried_active_document,
+                        carried_state.detail,
+                    )
+                    carried_document_line = (
+                        f"Change document {carried_active_document} "
+                        f"{DOCUMENT_REASON_IO_ERROR} — it stays recorded; "
+                        f"{DOCUMENT_NEXT_STEP[STEP_CHECK_THEN_LOAD]}"
+                    )
             emitted_record = (
                 self._derived_record(self.current_file.path, image_step.derived or {})
                 if image_step.emit and self.current_file is not None
@@ -9285,6 +9642,7 @@ class S19TuiApp(App):
                 cleaned,
                 image_step,
                 derived=bool(carried_derived) or emitted_record is not None,
+                carried_active_document=carried_active_document,
             )
         except OSError as exc:
             unreadable = (
@@ -9348,6 +9706,27 @@ class S19TuiApp(App):
         # excepts reads them once the save has succeeded.
         saved_variant_id: Optional[str] = None
         saved_primary_name: Optional[str] = None
+        # HLR-170 / LLR-170.2: the Patch Editor's document. A pasted one
+        # (no source_path, at least 1 entry) is written by the app; a
+        # file-backed one is recorded as on disk (in its home) or copied by
+        # the gather, and never written by the app (E3 R1). The status
+        # lines about it are painted after the success line (E3 R15).
+        document = self._change_service.document
+        document_home = document_home_for_kind(document.kind)
+        document_class = (
+            classify_active_document(project_dir, document.source_path, document_home)[0]
+            if document.source_path is not None
+            else None
+        )
+        document_row = next(
+            (row for row in plan.rows if row.role == PLAN_ROLE_DOCUMENT), None
+        )
+        pasted_placed: Optional[PlacementResult] = None
+        document_write_failure: Optional[str] = None
+        recorded_document: Optional[str] = None
+        document_lines: list[str] = []
+        # LLR-164.2: the merge carries the target's gathered rows.
+        target_gathered: Mapping[str, Sequence[str]] = target_carry.get("gathered", {})
         # LLR-164.4: from the folder's creation on, EVERY statement of this
         # body runs under one OSError handler — it reports the error with
         # the ``could not save`` tokens and rolls the failed save back
@@ -9415,7 +9794,27 @@ class S19TuiApp(App):
             for row in plan.rows:
                 if row.role == PLAN_ROLE_MANIFEST:
                     continue
-                if row.role == "image" and image_step.emit:
+                if row.role == PLAN_ROLE_DOCUMENT:
+                    if row.source is not None:
+                        # A file-backed document: recorded as on disk or
+                        # copied by the gather below (E3 R1, R11).
+                        continue
+                    # A pasted document: written as a NEW file (E3 R1). A
+                    # failed write does not abort the save (LLR-170.2); the
+                    # home it created joins the rollback either way (A3R2-8).
+                    written_document, created_home, failure = (
+                        self._write_editor_document(row, project_dir)
+                    )
+                    if created_home is not None:
+                        created_dirs.append(created_home)
+                    if written_document is None:
+                        document_write_failure = failure
+                        continue
+                    if not written_document.reused:
+                        placed_files.append(written_document.path)
+                    placed = written_document
+                    pasted_placed = written_document
+                elif row.role == "image" and image_step.emit:
                     landed: list[PlacementResult] = []
 
                     def _emit_landed(placed: PlacementResult) -> None:
@@ -9535,11 +9934,23 @@ class S19TuiApp(App):
                 for entries in payload.assignments.values()
                 for name in entries
             ]
+            # HLR-170 / LLR-170.2: the gather gets the pasted document's
+            # landing (unresolved, built from the home, so it is ``in_home``
+            # and named, never copied) or the file-backed document the plan
+            # placed; a document with no plan row is not placed (E3 R3).
+            if pasted_placed is not None:
+                gather_document: Optional[Path] = (
+                    project_dir / document_home / pasted_placed.path.name
+                )
+            elif document_row is not None:
+                gather_document = document_row.source
+            else:
+                gather_document = None
             gather_outcome = gather_project_artifacts(
                 project_dir,
                 composition_names=composition_names,
-                active_document=self._change_service.document.source_path,
-                active_document_kind=self._change_service.document.kind,
+                active_document=gather_document,
+                active_document_kind=document.kind,
                 active_template=self._last_template_path,
                 common_patches_dir=self.workarea / WORKAREA_PATCHES,
                 common_templates_dir=self.base_dir / WORKAREA_DIRNAME / WORKAREA_TEMPLATES,
@@ -9553,6 +9964,64 @@ class S19TuiApp(App):
             # file or a pre-existing home.
             placed_files.extend(gather_outcome.written)
             created_dirs.extend(gather_outcome.created_homes)
+            # HLR-170 / pre-ruling 2: the session document's landing is
+            # recorded only when the gather named it in the form; a session
+            # document not placed counts as none, so the target's carried
+            # value is recorded instead (E3 R3), with one line about it.
+            landed_document = (
+                gather_outcome.active_document if gather_document is not None else None
+            )
+            if landed_document is not None and is_active_document_form(landed_document):
+                recorded_document = landed_document
+            elif document_write_failure is not None:
+                document_lines.append(document_write_failure)
+            elif document.source_path is None:
+                if document.entries and document_row is None:
+                    # SEC8a-3: the plan gave no row (the home failed the
+                    # guarded write's containment check), so nothing was
+                    # written; the line names the file the save would write.
+                    document_lines.append(
+                        "Change document changes.json was not saved into the "
+                        f"project — the project's {document_home} folder is a "
+                        "link or is outside the work area; its entries stay in "
+                        "the Patch Editor"
+                    )
+            else:
+                document_lines.extend(
+                    self._unrecorded_document_lines(
+                        project_dir,
+                        document.source_path,
+                        document_home,
+                        document_class,
+                        copied=document_row is not None
+                        and any(
+                            issue.code == GATHER_DOCUMENT_NOT_RECORDED
+                            for issue in gather_outcome.issues
+                        ),
+                        carried=carried_active_document,
+                        carried_line=carried_document_line,
+                    )
+                )
+            if recorded_document is None:
+                recorded_document = carried_active_document
+                if carried_document_line is not None:
+                    document_lines.append(carried_document_line)
+            if recorded_document is None and _KEY_ACTIVE_DOCUMENT in plan.manifest_keys:
+                plan = _plan_without_document_key(plan)
+            # LLR-164.2 / E3 R13: a merge keeps the target's gathered rows
+            # and adds this save's; an open-project save records this
+            # save's rows only.
+            gathered = gather_outcome.gathered
+            if plan.target_kind == PLAN_TARGET_MERGE:
+                gathered = {}
+                for home in dict.fromkeys(
+                    (*PROJECT_HOME_NAMES, *target_gathered, *gather_outcome.gathered)
+                ):
+                    rows = set(target_gathered.get(home, ())) | set(
+                        gather_outcome.gathered.get(home, ())
+                    )
+                    if rows:
+                        gathered[home] = sorted(rows)
             # SEC2-8 / SEC2-9 (security round 4): the manifest write is the
             # last post-creation stage. Keep the previous project.json
             # bytes BEFORE the write — when no manifest existed, the write
@@ -9598,6 +10067,22 @@ class S19TuiApp(App):
                     f"{PROJECT_MANIFEST_NAME} {keep_reason}: its previous content "
                     f"is kept as {kept.name} in {project_dir}"
                 )
+                # E3 R5 / S3R2-7: a refused active_document is a skipped
+                # entry — named through the reader's clipped mark.
+                refused_document = next(
+                    (
+                        issue.details.get(_ISSUE_ENTRY, "")
+                        for issue in existing.issues
+                        if issue.details.get(_ISSUE_KEY) == _KEY_ACTIVE_DOCUMENT
+                    ),
+                    None,
+                )
+                if refused_document is not None:
+                    document_lines.append(
+                        f"Change document record {refused_document} was "
+                        f"dropped from {PROJECT_MANIFEST_NAME} — its previous "
+                        f"content is kept as {kept.name}"
+                    )
 
             def _manifest_written(written: Path) -> None:
                 # Invoked by ``_write_and_verify_manifest`` the moment the
@@ -9612,8 +10097,9 @@ class S19TuiApp(App):
                 batch=payload.batch,
                 assignments=payload.assignments,
                 declared_regions=self._declared_regions,
-                gathered=gather_outcome.gathered,
+                gathered=gathered,
                 derived_from=derived_from,
+                active_document=recorded_document,
                 on_written=_manifest_written,
             )
             if not manifest_ok:
@@ -9744,6 +10230,43 @@ class S19TuiApp(App):
             self.set_status(f"Saved project to {project_dir}{image_clause}")
         if kept_note is not None:
             self.set_status(safe_text(kept_note).plain)
+        # LED .72 Q1 / E3 R12: the pasted document is bound to its landing,
+        # spelled unresolved from the home (never PlacementResult.path), so
+        # the next save's in-home test sees the same spelling; from now on
+        # it is file-backed and never rewritten (E3 R1).
+        if pasted_placed is not None:
+            document.source_path = project_dir / document_home / pasted_placed.path.name
+        try:
+            panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+            paste_text = self.query_one("#patch_paste_text", TextArea).text
+        except Exception:
+            # Not mounted (headless unit tests): the bind above holds.
+            panel = None
+        if panel is not None:
+            if pasted_placed is not None:
+                self._patch_editor_load_tail(panel)
+            # LLR-167.8: the dirty flag clears only when a file now holds
+            # every entry and no unparsed paste text is left (LED .72 Q2).
+            if _save_clears_panel_flag(
+                pasted_placed is not None, paste_text, self._parsed_paste_text
+            ):
+                panel.mark_saved()
+            elif (
+                document_class == _DOCUMENT_IN_HOME
+                and recorded_document is not None
+                and panel._dirty
+            ):
+                # E3 R1: recorded as on disk; the panel's edits are in no
+                # file. Inc 10 adds the panel's public dirty reader.
+                document_lines.append(
+                    f"Change document {document.source_path.name} has unsaved "
+                    "edits — the project records the file as it is on disk; "
+                    "save it from the Patch Editor to keep them"
+                )
+        # HLR-170 / E3 R6: every line about the document is in user terms
+        # and goes through safe_text; painted before the MISMATCH re-paint.
+        for line in document_lines:
+            self.set_status(safe_text(line).plain)
         # R2-5: a manifest verify MISMATCH (LLR-004.2 — reported, not a
         # failure) stays the NEWEST status line: the drift report is
         # re-painted after the success line, never buried beneath it.
@@ -9872,39 +10395,64 @@ class S19TuiApp(App):
         project_name: str,
         image_step: _ProjectImageStep,
         derived: bool = False,
+        carried_active_document: Optional[str] = None,
     ) -> SavePlan:
         """
         Summary:
             Build the one save plan (LLR-167.6, R-PC) from what this save
-            will place: the image (the emitted bytes or the source), the MAC
-            and the A2L, each with the digest the app computes here so the
-            planner hashes nothing, plus the manifest keys (LED .45).
+            will place: the image (the emitted bytes or the source), the MAC,
+            the A2L and the Patch Editor's document, each with the digest
+            the app computes here so the planner hashes nothing, plus the
+            manifest keys (LED .45).
 
         Args:
             project_dir (Path): The UNRESOLVED target folder.
             project_name (str): The target's on-disk name.
             image_step (_ProjectImageStep): The image decision.
+            derived (bool): True when the save records ``derived_from``.
+            carried_active_document (Optional[str]): The target's recorded
+                ``active_document`` a merge or an open-project save carries,
+                already dropped by the caller when the one document
+                classifier said ``missing``, ``link`` or ``unreadable``
+                (E3 R2, R8 refined); it sets the keys flag.
 
         Returns:
             SavePlan: The frozen plan the handler executes.
 
         Raises:
             OSError: A source the plan digests cannot be read (the caller
-                refuses the save before any folder exists).
+                refuses the save before any folder exists). The document's
+                own digest never raises: it is "not placed" (A3R2-1).
 
         Data Flow:
             - The image row: the emitted bytes' digest (an emit) or the
               source file's (a copy); then the MAC and the A2L, each
               digested from its file. A refused decision plans no file.
+            - The document row (LLR-170.2, A3-6), exactly when a file lands
+              or is recorded: a pasted document (no ``source_path``) with at
+              least 1 entry -> role ``document``, name ``changes.json`` in
+              its kind's home, the digest of its serialized bytes. A
+              file-backed document at any entry count (pre-ruling 8) ->
+              ``classify_active_document`` (E3 R11): ``in_home`` /
+              ``outside`` -> a row with the source file's digest (an
+              ``OSError`` there -> no row); ``inside_elsewhere`` /
+              ``missing`` -> no row.
             - The target kind: ``new`` when nothing exists at the target,
               ``open project`` for the open project's name, else ``merge``.
             - The manifest keys come from the manifest writer
-              (``_save_manifest_keys``).
+              (``_save_manifest_keys``), with ``active_document`` when a
+              document row's landing passes the form or a carried value
+              remains.
+            - A document copied or written into its home gets a row only
+              when the home passes the guarded write's containment check
+              (SEC8a-3, ``_document_home_contained``).
 
         Dependencies:
             Uses:
                 - _file_digest / _save_manifest_keys
-                - project_gather_service.plan_project_save
+                - project_gather_service.classify_active_document /
+                  document_home_for_kind / plan_project_save
+                - changes.io.serialize_change_document
             Used by:
                 - _handle_save_dialog (before the project folder exists)
         """
@@ -9947,6 +10495,45 @@ class S19TuiApp(App):
                     *_file_digest(self.current_a2l_path),
                 )
             )
+        records_document = False
+        document = self._change_service.document
+        home = document_home_for_kind(document.kind)
+        source = document.source_path
+        if image_step.refusal is None and source is None:
+            if document.entries and self._document_home_contained(project_dir, home):
+                data = serialize_change_document(document)
+                name = "changes.json"
+                files.append(
+                    PlannedFile(
+                        PLAN_ROLE_DOCUMENT, None, name,
+                        hashlib.sha256(data).hexdigest(), len(data), home=home,
+                    )
+                )
+                records_document = is_active_document_form(f"{home}/{name}")
+        elif image_step.refusal is None:
+            kind, name = classify_active_document(project_dir, source, home)
+            if (
+                kind in _PLACED_DOCUMENT_CLASSES
+                and name is not None
+                and (
+                    kind == _DOCUMENT_IN_HOME
+                    or self._document_home_contained(project_dir, home)
+                )
+            ):
+                try:
+                    digest, size = _file_digest(source)
+                except OSError as exc:
+                    self.logger.warning(
+                        "Save plan: change document not readable: %s (%s)",
+                        source, type(exc).__name__,
+                    )
+                else:
+                    files.append(
+                        PlannedFile(
+                            PLAN_ROLE_DOCUMENT, source, name, digest, size, home=home
+                        )
+                    )
+                    records_document = is_active_document_form(f"{home}/{name}")
         if not os.path.lexists(project_dir):
             target_kind = PLAN_TARGET_NEW
         elif (self.current_project or "").casefold() == project_name.casefold():
@@ -9958,9 +10545,203 @@ class S19TuiApp(App):
             target_kind=target_kind,
             files=files,
             image=image,
-            manifest_keys=_save_manifest_keys(self._declared_regions, derived=derived),
+            manifest_keys=_save_manifest_keys(
+                self._declared_regions,
+                derived=derived,
+                active_document=(
+                    records_document or carried_active_document is not None
+                ),
+            ),
             refusal=image_step.refusal,
         )
+
+    def _unrecorded_document_lines(
+        self,
+        project_dir: Path,
+        source: Path,
+        home: str,
+        document_class: Optional[str],
+        *,
+        copied: bool,
+        carried: Optional[str],
+        carried_line: Optional[str],
+    ) -> list[str]:
+        """
+        Summary:
+            The one true status line about a file-backed change document
+            this save does not record (E3 R3, review F2 / F3), or none when
+            the carried record's own line already says it.
+
+        Args:
+            project_dir (Path): The target folder (unresolved).
+            source (Path): The document's file.
+            home (str): The home of its kind.
+            document_class (Optional[str]): ``classify_active_document``'s
+                class for ``source``.
+            copied (bool): The gather copied it into ``home`` but did not
+                name it (its name is outside the form).
+            carried (Optional[str]): The carried ``active_document`` text
+                that will be recorded, or ``None``.
+            carried_line (Optional[str]): The carried record's own line.
+
+        Returns:
+            list[str]: Zero or one line.
+
+        Data Flow:
+            - The document IS the carried record (same project-relative
+              text): no "not recorded" line; the carried line, when there
+              is one, is the one line, else one line that the record stays
+              as it was (F2).
+            - Copied but not named, or already in ``home`` with a name
+              outside the form: the name is the reason (F3).
+            - Otherwise the class's reason.
+        """
+        absolute = Path(os.path.abspath(source))
+        try:
+            text = absolute.relative_to(os.path.abspath(project_dir)).as_posix()
+        except ValueError:
+            text = None
+        in_home_folder = str(absolute.parent) == os.path.join(
+            os.path.abspath(project_dir), home
+        )
+        name_reason = f"its name is not one {PROJECT_MANIFEST_NAME} records"
+        if text is not None and text == carried:
+            if carried_line is not None:
+                return []
+            where = (
+                name_reason
+                if in_home_folder
+                else f"it is not in the project's {home} folder"
+            )
+            return [
+                f"Change document {text} stays recorded in "
+                f"{PROJECT_MANIFEST_NAME} as it was — {where}"
+            ]
+        if copied:
+            return [
+                f"Change document {source.name} was copied into the project's "
+                f"{home} folder but is not recorded — {name_reason}"
+            ]
+        if document_class == "inside_elsewhere" and in_home_folder:
+            reason = f"it is in the project's {home} folder, but {name_reason}"
+        elif document_class == "inside_elsewhere":
+            reason = f"it is in the project but not in its {home} folder"
+        elif document_class == "missing":
+            reason = "its file is missing or is a link"
+        elif document_class == _DOCUMENT_IN_HOME:
+            reason = "the file could not be read"
+        else:
+            reason = f"it could not be placed in the project's {home} folder"
+        return [
+            f"Change document {source.name} was not recorded in the project "
+            f"— {reason}"
+        ]
+
+    def _document_home_contained(self, project_dir: Path, home: str) -> bool:
+        """SEC8a-3: the guarded write's own containment check
+        (``_guarded_destination`` with this app's work area, as
+        ``place_into_workarea`` runs it) on the document's home, so the plan
+        never promises a document row the write refuses."""
+        try:
+            _guarded_destination(project_dir / home, self.workarea)
+        except (WorkareaContainmentError, OSError) as exc:
+            self.logger.warning(
+                "Save plan: change document home refused: %s (%s)",
+                project_dir / home,
+                type(exc).__name__,
+            )
+            return False
+        return True
+
+    def _write_editor_document(
+        self, row: SavePlanRow, project_dir: Path
+    ) -> Tuple[Optional[PlacementResult], Optional[Path], Optional[str]]:
+        """
+        Summary:
+            Write the Patch Editor's PASTED document into the project as a
+            new file (LLR-170.2, HLR-170): ``changes.json`` in its kind's
+            home through the one placement, so an identical file is reused
+            and a different one gives ``changes_<N>.json`` (LLR-155.3 holds:
+            Save project never overwrites a project file, E3 R1). Never
+            raises: a failure is a fixed phrase in user terms.
+
+        Args:
+            row (SavePlanRow): The plan's document row (no ``source``).
+            project_dir (Path): The UNRESOLVED target folder, as the
+                handler built it — the placement guard reads the work-area
+                anchor off the textual path (S3R2-8).
+
+        Returns:
+            Tuple[Optional[PlacementResult], Optional[Path], Optional[str]]:
+                ``(placed, created_home, failure)``: where the file landed
+                and whether it was reused (``None`` on failure); the home
+                folder when it did not exist before the write (returned on
+                every outcome, so the rollback can remove it, A3-5,
+                A3R2-8); the failure phrase, ``None`` on success.
+
+        Data Flow:
+            - ``os.lstat`` of ``project_dir / home``: absent ->
+              ``created_home``.
+            - ``write_change_document`` with a ``copy_fn`` that calls
+              ``place_into_workarea(staged, home, workarea_root=...)`` and
+              keeps its ``PlacementResult`` (the reuse flag decides whether
+              the file joins the rollback list, LED .53).
+            - ``(None, issues)``, ``WorkareaContainmentError`` (and its
+              subclass ``WorkareaPlacementError``) or ``OSError`` -> the
+              failure phrase; the codes and class names go to the log only
+              (E3 R6).
+
+        Dependencies:
+            Uses:
+                - changes.io.write_change_document
+                - workspace.place_into_workarea
+                - project_gather_service.document_home_for_kind
+            Used by:
+                - _handle_save_dialog (the rows loop)
+        """
+        document = self._change_service.document
+        home_dir = project_dir / document_home_for_kind(document.kind)
+        created_home: Optional[Path] = None
+        try:
+            os.lstat(home_dir)
+        except FileNotFoundError:
+            created_home = home_dir
+        except OSError:
+            pass
+        landed: list[PlacementResult] = []
+
+        def _place(staged: Path, destination: Path) -> Path:
+            placed = place_into_workarea(
+                staged, destination, workarea_root=self.workarea
+            )
+            landed.append(placed)
+            return placed.path
+
+        failure = (
+            f"Change document {row.landing.name} was not saved into the project "
+            "— the file could not be written; its entries stay in the Patch Editor"
+        )
+        try:
+            written, issues = write_change_document(
+                document,
+                self.base_dir,
+                file_name="changes.json",
+                copy_fn=_place,
+                dest_dir=home_dir,
+            )
+        except (WorkareaContainmentError, OSError) as exc:
+            self.logger.warning(
+                "Change document not written: %s (%s)", home_dir, type(exc).__name__
+            )
+            return None, created_home, failure
+        if written is None or not landed:
+            self.logger.warning(
+                "Change document not written: %s (%s)",
+                home_dir,
+                "; ".join(f"{issue.code}: {issue.message}" for issue in issues),
+            )
+            return None, created_home, failure
+        return landed[0], created_home, None
 
     def _write_and_verify_manifest(
         self,
@@ -9971,6 +10752,7 @@ class S19TuiApp(App):
         declared_regions: Sequence[DeclaredRegion] = (),
         gathered: Optional[Mapping[str, Sequence[str]]] = None,
         derived_from: Optional[Mapping[str, DerivedFrom]] = None,
+        active_document: Optional[str] = None,
         on_written: Optional[Callable[[Path], None]] = None,
     ) -> bool:
         """
@@ -10013,6 +10795,13 @@ class S19TuiApp(App):
                 ``derived_from`` records to write (LLR-168.4): the ones the
                 writer carries plus the one a save-back or an emit adds.
                 Threaded into the write AND the verify (LLR-169.3).
+            active_document (Optional[str]): The project-relative POSIX
+                text of the document the manifest records (LLR-170.1), as
+                ``ProjectManifest.active_document`` holds it; ``None``
+                records none. Threaded into the ``files`` records (the
+                document's own record, LLR-169.2), the write and the
+                verify (drift domain, LLR-169.3). A value the writer
+                refuses makes the write fail (returns False).
             on_written (Optional[Callable[[Path], None]]): A hook the save
                 handler passes — invoked with the written manifest path
                 the MOMENT the write returns, before the verify can raise
@@ -10070,7 +10859,7 @@ class S19TuiApp(App):
         self._last_manifest_verify_result = None
         if variant_set is None:
             return True
-        files = project_file_records(project_dir)
+        files = project_file_records(project_dir, active_document=active_document)
         written, issues = write_project_manifest(
             variant_set,
             project_dir,
@@ -10081,6 +10870,7 @@ class S19TuiApp(App):
             gathered=gathered,
             files=files,
             derived_from=derived_from,
+            active_document=active_document,
         )
         if written is None:
             detail = "; ".join(issue.message for issue in issues) or "unknown error"
@@ -10115,6 +10905,7 @@ class S19TuiApp(App):
             assignments=assignments,
             files=files,
             derived_from=derived_from,
+            active_document=active_document,
         )
         self._last_manifest_verify_result = result
         self._surface_manifest_verify_result(result)
@@ -10312,6 +11103,9 @@ class S19TuiApp(App):
         # service exactly as the install point does (LLR-165.3).
         self._change_service = ChangeService()
         self._change_service.set_image_generation(self._image_generation)
+        # The paste text the outgoing document was parsed from goes with it
+        # (LED .72 Q2): the buffer is cleared below.
+        self._parsed_paste_text = None
         # Repaint the Patch panel through refresh_entries (LLR-165.1) —
         # the empty-session call shape ``_refresh_patch_history_view``
         # uses; without it the panel would keep painting the outgoing
@@ -10529,10 +11323,13 @@ class S19TuiApp(App):
         # F1 (LLR-169.9): the project's A2L is read on its own, before any
         # image, so an A2L that cannot be read is a problem on the A2L file
         # and the images still open without it — never "not readable" on a
-        # valid image.
+        # valid image. The parsed payload is kept as the change document's
+        # A2L context (LLR-170.3, C4): ``current_a2l_data`` is set only when
+        # an image install attaches the A2L.
+        a2l_context: Optional[dict] = None
         if a2l_files:
             try:
-                self._load_a2l_data_with_cache(a2l_files[0])
+                a2l_context = self._load_a2l_data_with_cache(a2l_files[0])
             except Exception as exc:  # noqa: BLE001 - an untrusted A2L file
                 self.logger.warning(
                     "Project A2L not readable: %s (%s)", a2l_files[0], type(exc).__name__
@@ -10548,6 +11345,15 @@ class S19TuiApp(App):
             self.set_status(f"No supported files in project: {name}")
             self.logger.warning("No loadable data file in project: %s", name)
             return
+        # HLR-170 / LLR-170.3 (C4): reopen the recorded change document
+        # after the A2L parse and before the install — the install and the
+        # deferred load steps never reset the document. One problem per
+        # file: ``missing`` stays ``check_project_files``'s.
+        document_problem = self._reopen_active_document(
+            project_dir, manifest, a2l_context
+        )
+        if document_problem is not None:
+            problems.append(document_problem)
         self.current_project = name
         # LED .50 / security finding SEC-1: stored UNRESOLVED — the path
         # under this app's work area, never the resolved form — so any
@@ -10619,6 +11425,87 @@ class S19TuiApp(App):
         )
         self.update_project_labels()
         self._publish_flow_session_dir()
+
+    def _reopen_active_document(
+        self,
+        project_dir: Path,
+        manifest: Optional[ProjectManifest],
+        a2l_context: Optional[dict],
+    ) -> Optional[ProjectFileProblem]:
+        """
+        Summary:
+            Reopen the project's recorded ``active_document`` in the Patch
+            Editor (HLR-170, LLR-170.3), parsed with the project's A2L so
+            symbol entries resolve, or name it ``not readable``. The entries
+            are listed, never applied again (LED .72 Q6).
+
+        Args:
+            project_dir (Path): The project folder.
+            manifest (Optional[ProjectManifest]): Its manifest, read once by
+                the caller (``None`` without ``project.json``).
+            a2l_context (Optional[dict]): The project's parsed A2L payload,
+                ``None`` when it has no A2L or the A2L did not parse.
+
+        Returns:
+            Optional[ProjectFileProblem]: One ``not readable`` problem
+                labelled ``change document <text>`` (E3 R20) with the
+                outcome's next-step mark, or ``None`` (reopened, nothing
+                recorded, or ``missing`` — ``check_project_files`` owns
+                ``missing``, LLR-169.5).
+
+        Data Flow:
+            - No manifest, a damaged one, or no accepted ``active_document``
+              -> ``None``, no read.
+            - One ``recorded_document_state`` call (E3 R10): the file is
+              read once and the document comes from those bytes
+              (``ChangeService.load`` is not called).
+            - ``ok`` -> the parsed document goes into the fresh service the
+              project reset bound (no history push), its ``source_path`` the
+              absolute textual path; the panel is marked loaded and
+              re-rendered. ``link`` / ``too_large`` / ``unreadable`` /
+              ``io_error`` -> the service is not touched and the problem's
+              reason is in user terms (the detail goes to the log only).
+
+        Dependencies:
+            Uses:
+                - recorded_document_state
+                - PatchEditorPanel.mark_loaded / _patch_editor_load_tail
+            Used by:
+                - _handle_load_project (after the A2L, before the install)
+        """
+        if (
+            manifest is None
+            or manifest_is_damaged(manifest)
+            or manifest.active_document is None
+        ):
+            return None
+        text = manifest.active_document
+        state = recorded_document_state(project_dir, text, a2l_context)
+        if state.outcome == DOCUMENT_MISSING:
+            return None
+        if state.outcome != DOCUMENT_OK:
+            self.logger.warning(
+                "Project change document not reopened: %s %s (%s)",
+                text, state.outcome, state.detail,
+            )
+            return ProjectFileProblem(
+                PROBLEM_NOT_READABLE,
+                document_problem_file(text),
+                _DOCUMENT_REASON[state.outcome],
+                step=_DOCUMENT_STEP.get(state.outcome),
+            )
+        document = state.document
+        document.source_path = project_dir.absolute() / text
+        self._change_service.document = document
+        try:
+            panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+        except Exception:
+            # Not mounted (headless unit tests): the service holds the
+            # document either way, as in the project reset.
+            return None
+        panel.mark_loaded()
+        self._patch_editor_load_tail(panel)
+        return None
 
     def _install_project_image(
         self, variant: VariantDescriptor, a2l_files: Sequence[Path]
@@ -10699,7 +11586,8 @@ class S19TuiApp(App):
 
         Returns:
             dict: ``batch``, ``assignments``, ``declared_regions``,
-                ``gathered`` and ``derived_from`` keyword arguments for
+                ``gathered``, ``derived_from`` and ``active_document``
+                keyword arguments for
                 ``_write_and_verify_manifest``; empty when the project has
                 no ``project.json``. ``files`` is not carried: the seam
                 recomputes it from disk.
@@ -10713,6 +11601,9 @@ class S19TuiApp(App):
         Dependencies:
             Used by:
                 - ``_rewrite_project_manifest``
+                - ``_handle_save_dialog`` (``derived_from``; a merge's
+                  ``gathered``; a merge's or open-project save's
+                  ``active_document``, LLR-164.2)
         """
         if manifest is None:
             return {}
@@ -10735,6 +11626,11 @@ class S19TuiApp(App):
                 path.relative_to(root).as_posix(): record
                 for path, record in manifest.derived_from.items()
             },
+            # LLR-168.3 / LLR-164.2: already project-relative text as the
+            # reader accepted it (``None`` when absent or refused). Carried
+            # as recorded whether or not its file exists or reads —
+            # dropping a faulty record is Save project's job (E3 R2, R8).
+            "active_document": manifest.active_document,
         }
 
     def _rewrite_project_manifest(

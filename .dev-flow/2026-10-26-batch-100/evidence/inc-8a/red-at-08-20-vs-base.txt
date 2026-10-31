@@ -1,0 +1,31 @@
+# E4 RED run vs base — batch-100 Inc 8a
+# UTC start: 2026-10-31T01:03:12Z
+# tree (cwd): /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/base8a  (git HEAD dc3b314, detached at dc3b314)
+# test files copied byte-for-byte from /c/Users/jjgh8/Github/s19_app-b100-inc8a (sha256 below); s19_app/ untouched
+#   b1df66779b4f86e0  tests/test_b100_document.py
+#   e47de01aa733f37c  tests/test_b100_project_check.py
+#   c8a6d6a9195c6e06  tests/test_b100_save_image.py
+#   b273df705d0d3923  tests/test_b100_save_guards.py
+#   c33433c76bc98294  tests/test_b100_active_variant.py
+#   2e5bcb6d73d98957  tests/support/b100_projects.py
+#   2f56ca6bd0e94f62  tests/support/b100_manifests.py
+# PYTHONPATH=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/base8a
+# NO_COLOR state: unset (env -u NO_COLOR)
+# s19_app.__file__ (same interpreter, same cwd, same PYTHONPATH): C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8a\s19_app\__init__.py
+# command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/base8a C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_at_b100_08_saved_document_reopens_with_the_project tests/test_b100_active_variant.py::test_at_b100_20_inc8a_every_writer_carries_the_active_document
+
+FFFF                                                                     [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8a\tests\test_b100_document.py:2116: AssertionError: ['firmware.s19', 'project.json']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8a\tests\test_b100_document.py:2116: AssertionError: ['firmware.s19', 'project.json']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8a\tests\test_b100_active_variant.py:102: AssertionError: timed out waiting for firmware-patched.s19 placed and project.json rewritten by the save-back
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8a\tests\test_b100_active_variant.py:102: AssertionError: timed out waiting for firmware-patched.s19 placed and project.json rewritten by the save-back
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_at_b100_08_saved_document_reopens_with_the_project[size0]
+FAILED tests/test_b100_document.py::test_at_b100_08_saved_document_reopens_with_the_project[size1]
+FAILED tests/test_b100_active_variant.py::test_at_b100_20_inc8a_every_writer_carries_the_active_document[size0]
+FAILED tests/test_b100_active_variant.py::test_at_b100_20_inc8a_every_writer_carries_the_active_document[size1]
+4 failed in 68.07s (0:01:08)
+
+# pytest exit code: 1
+# UTC end: 2026-10-31T01:04:23Z

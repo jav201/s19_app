@@ -27,9 +27,12 @@ Covers HLR-167 / LLR-167.1–LLR-167.8 (PH-1, D1, R-PC):
     save-back with a junction project open leaves 0 entries in the other
     work area.
   - TC-B100-70 — LLR-167.8: a refused Save project keeps the Patch Editor's
-    dirty flag set; a Save project that did not write the editor's document
-    keeps it set too (see the increment packet §6 for the Inc 5 scope of
-    this LLR).
+    dirty flag set. Inc 8a: a Save project that wrote the editor's document
+    clears it (the Inc 5 not-written arm is re-pinned as the positive arm);
+    a failed document write, a file-backed document (copied, or recorded as
+    on disk on the natural path) and unparsed paste text keep it set.
+  - TC-B100-59 Inc 8a arms — the document row, the open-project carry of
+    ``active_document`` in the plan's keys, the merge row.
   - AT-B100-05 — HLR-167 black-box: a pending patch, Save project by keys
     through the current dialog, reopen in a fresh app — the project image
     read by the independent reader equals source + patch.
@@ -466,8 +469,14 @@ def test_tc_b100_15_patched_s19_is_emitted(tmp_path: Path) -> None:
     assert lengths and max(lengths) <= 32 and max(lengths) > 16, lengths
     assert written.header == read_s19(CASE01_DIR / "firmware.s19").header
     assert variant == "firmware"
-    assert sorted(p.name for p in project.iterdir()) == [
+    # Inc 8a re-pin (LLR-170.2, E4 integration RP-3): the pasted document
+    # is now written into the project as patches/changes.json; still one
+    # image, no other file.
+    assert sorted(
+        p.relative_to(project).as_posix() for p in project.rglob("*") if p.is_file()
+    ) == [
         "firmware.s19",
+        "patches/changes.json",
         "project.json",
     ]
 
@@ -1349,13 +1358,16 @@ def test_tc_b100_59_pending_patch_in_the_open_project(
 ) -> None:
     """A pending patch saved into the open project → the image row is
     ``firmware_1.s19`` ``new`` (a clashing landing name), the MAC ``keep``;
-    the tree equals the rows."""
+    the tree equals the rows. Inc 8a re-pin (LLR-167.6 / LLR-170.2, E4
+    integration RP-5): the pending document is pasted (no file), so it is
+    also a ``document`` row ``changes.json`` ``new``."""
     plans = _capture_plans(monkeypatch)
     before, after = _open_project_session(tmp_path, patch=True)
     plan = plans[-1]
     assert [(row.role, row.landing.name, row.action) for row in plan.rows] == [
         ("image", "firmware_1.s19", "new"),
         ("mac", "firmware.mac", "keep"),
+        ("document", "changes.json", "new"),
         ("manifest", "project.json", "new"),
     ]
     assert plan.image == "firmware.s19 + 1 change entry, 0 applied by this save"
@@ -1490,7 +1502,13 @@ def test_tc_b100_59_planning_writes_nothing_and_hashes_no_payload(
 
 def test_tc_b100_59_gather_service_imports_no_change_module() -> None:
     """0 new imports from ``project_gather_service``: no edge to the change
-    service or the ``changes`` package (the digests are inputs)."""
+    service or the ``changes`` package (the digests are inputs). Re-pinned
+    at Inc 8a (E4 integration, RP-4): the stdlib ``stat`` joins the set (one
+    ``lstat`` decides "regular file, not a reparse point" for the gather
+    classifier, E3 R11 / S3R2-5); the intent is asserted on its own too.
+    Re-pinned at Inc 8a cp1 (review F7): that ``lstat`` helper is now the
+    one ``_plain_entry`` in ``variant_execution_service``, so ``stat``
+    leaves the set again."""
     tree = ast.parse(Path(gather_module.__file__).read_text(encoding="utf-8"))
     modules = set()
     for node in ast.walk(tree):
@@ -1498,6 +1516,7 @@ def test_tc_b100_59_gather_service_imports_no_change_module() -> None:
             modules.add("." * node.level + (node.module or ""))
         elif isinstance(node, ast.Import):
             modules.update(alias.name for alias in node.names)
+    assert not [m for m in modules if "change" in m.lower()], sorted(modules)
     assert modules == {
         "__future__",
         "json",
@@ -1514,6 +1533,132 @@ def test_tc_b100_59_gather_service_imports_no_change_module() -> None:
 # ---------------------------------------------------------------------------
 # TC-B100-69 — LLR-167.7: the split
 # ---------------------------------------------------------------------------
+
+
+def test_tc_b100_59_document_row_in_a_fresh_folder(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Inc 8a arm (LLR-167.6, LLR-170.2): fresh ``P1``, a pasted document
+    with 1 entry -> the plan holds one ``document`` row landing
+    ``P1/patches/changes.json`` with action ``new``, its keys hold
+    ``active_document`` and equal the written keys, and the plan equals
+    the written tree by full path and action."""
+    plans = _capture_plans(monkeypatch)
+    src = _copy_case01(tmp_path) / "firmware.s19"
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=tmp_path / "app")
+        log = b100_projects.StatusLog(app)
+        async with app.run_test(size=(220, 60)) as pilot:
+            await pilot.pause()
+            await _load_image(pilot, app, src)
+            _add(app, PATCH_ADDRESS, PATCH_BYTES)
+            before = _tree_digests(app.workarea)
+            messages = await b100_projects.save_project(pilot, app, log, "P1")
+            after = _tree_digests(app.workarea)
+        return before, after, messages, app.workarea / "P1"
+
+    before, after, messages, project = asyncio.run(_drive())
+    assert any(m.startswith("Saved project to") for m in messages), messages
+    plan = plans[-1]
+    documents = [row for row in plan.rows if row.role == "document"]
+    assert [(r.landing.parent.name, r.landing.name, r.action) for r in documents] == [
+        ("patches", "changes.json", "new")
+    ], plan.rows
+    assert "active_document" in plan.manifest_keys
+    written = json.loads((project / "project.json").read_text(encoding="utf-8"))
+    assert tuple(written) == plan.manifest_keys
+    _assert_plan_equals_tree(plan, before, after)
+
+
+def test_tc_b100_59_zero_entries_plans_no_document_row(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A pasted document with 0 entries -> 0 ``document`` rows, keys lack
+    ``active_document`` (holds at the base)."""
+    plans = _capture_plans(monkeypatch)
+    src = _copy_case01(tmp_path) / "firmware.s19"
+
+    async def _drive() -> list:
+        app = S19TuiApp(base_dir=tmp_path / "app")
+        log = b100_projects.StatusLog(app)
+        async with app.run_test(size=(220, 60)) as pilot:
+            await pilot.pause()
+            await _load_image(pilot, app, src)
+            return await b100_projects.save_project(pilot, app, log, "P1")
+
+    messages = asyncio.run(_drive())
+    assert any(m.startswith("Saved project to") for m in messages), messages
+    plan = plans[-1]
+    assert [row for row in plan.rows if row.role == "document"] == []
+    assert "active_document" not in plan.manifest_keys
+
+
+@pytest.mark.parametrize("state", ["present", "deleted", "unreadable", "too-large"])
+def test_tc_b100_59_open_project_carry_sets_the_keys(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, state: str
+) -> None:
+    """LLR-164.2 / A3-8 / E3 R2 / R8 refined: ``P`` open, its project.json
+    records ``patches/boost.json``, the session document emptied, Save
+    project into ``P`` -> the written ``active_document`` is kept when the
+    file is ``ok`` or ``too_large`` (1 500 entries) and dropped when it is
+    deleted or ``unreadable``; the plan's keys equal the written keys."""
+    from tests.support import b100_manifests
+
+    plans = _capture_plans(monkeypatch)
+    base = tmp_path / "app"
+    bodies = {
+        "present": b"",
+        "deleted": b"",
+        "unreadable": b"{",
+        "too-large": b100_manifests.document_with_entries(1500),
+    }
+    project = b100_projects.seed_document_project(_workarea(base), body=bodies[state])
+
+    async def _drive() -> list:
+        app = S19TuiApp(base_dir=base)
+        log = b100_projects.StatusLog(app)
+        async with app.run_test(size=(220, 60)) as pilot:
+            await pilot.pause()
+            await b100_projects.load_project(pilot, app, "P")
+            if state == "deleted":
+                (project / "patches" / "boost.json").unlink()
+            app._change_service.document = ChangeService._empty_document()
+            return await b100_projects.save_project(pilot, app, log, "P")
+
+    messages = asyncio.run(_drive())
+    assert any(m.startswith("Saved project to") for m in messages), messages
+    written = json.loads((project / "project.json").read_text(encoding="utf-8"))
+    plan = plans[-1]
+    kept = state in ("present", "too-large")
+    assert written.get("active_document") == ("patches/boost.json" if kept else None), written
+    assert tuple(written) == plan.manifest_keys, (tuple(written), plan.manifest_keys)
+
+
+def test_tc_b100_59_merge_plans_a_merge_row(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-164.2 merge arm: the exact name ``ab`` of a project that is not
+    open -> plan.target_kind ``merge`` and the ``project.json`` row's action
+    ``merge`` (not ``rewrite``)."""
+    plans = _capture_plans(monkeypatch)
+    base = tmp_path / "app"
+    b100_projects.seed_document_project(_workarea(base), name="ab")
+    src = _copy_case01(tmp_path) / "firmware.s19"
+
+    async def _drive() -> list:
+        app = S19TuiApp(base_dir=base)
+        log = b100_projects.StatusLog(app)
+        async with app.run_test(size=(220, 60)) as pilot:
+            await pilot.pause()
+            await _load_image(pilot, app, src)
+            return await b100_projects.save_project(pilot, app, log, "ab")
+
+    messages = asyncio.run(_drive())
+    assert any(m.startswith("Saved project to") for m in messages), messages
+    plan = plans[-1]
+    assert plan.target_kind == "merge"
+    assert [row.action for row in plan.rows if row.role == "manifest"] == ["merge"], plan.rows
 
 
 def test_tc_b100_69_rederive_writes_nothing_into_the_session_map() -> None:
@@ -1695,16 +1840,191 @@ def test_tc_b100_70_refused_save_keeps_the_flag(tmp_path: Path) -> None:
     assert dirty_after is True
 
 
-def test_tc_b100_70_unwritten_document_keeps_the_flag(tmp_path: Path) -> None:
-    """A Save project that emits the image but does NOT write the editor's
-    document into the project (an unsaved, typed document — the document
-    is written by Save project only from Inc 8a) keeps the flag set: the
-    entries exist only in the editor and the image, so nothing on disk
-    holds the document."""
-    dirty_before, dirty_after, status = _dirty_after_save(tmp_path, blocked=False)
+def test_tc_b100_70_written_document_clears_the_flag(tmp_path: Path) -> None:
+    """LLR-167.8 positive arm (Inc 8a re-pin of Inc 5's
+    ``test_tc_b100_70_unwritten_document_keeps_the_flag``, C5): the typed
+    document is now written into the project by Save project (LLR-170.2),
+    so a file holds every entry -> the flag is cleared, and a following
+    Patch Editor Load raises 0 ``LoadGuardScreen``. The skip-``mark_saved``
+    mutant leaves the flag set and the Load asks -> RED."""
+    from textual.widgets import Button, Input
+
+    from s19_app.tui.screens_directionb import LoadGuardScreen
+
+    src = _copy_case01(tmp_path) / "firmware.s19"
+    other = tmp_path / "other.json"
+    other.write_bytes(b100_projects.change_document_bytes())
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=tmp_path / "app")
+        log = b100_projects.StatusLog(app)
+        async with app.run_test(size=(220, 60)) as pilot:
+            await pilot.pause()
+            await _load_image(pilot, app, src)
+            await _add_entry_through_the_panel(
+                pilot, app, "0x8000007C", "DE AD BE EF", entries_after=1
+            )
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            dirty_before = panel._dirty
+            messages = await b100_projects.save_project(pilot, app, log, "P1")
+            dirty_after = panel._dirty
+            panel.query_one("#patch_doc_path_input", Input).value = str(other)
+            panel.query_one("#patch_doc_load_button", Button).press()
+            asked = False
+            for _ in range(12):
+                await pilot.pause()
+                asked = asked or isinstance(app.screen, LoadGuardScreen)
+            return dirty_before, dirty_after, messages, asked, app.workarea / "P1"
+
+    dirty_before, dirty_after, messages, asked, project = asyncio.run(_drive())
     assert dirty_before is True
-    assert status.startswith("Saved project to"), status
-    assert dirty_after is True
+    assert any(m.startswith("Saved project to") for m in messages), messages
+    assert (project / "patches" / "changes.json").is_file(), "the document was not written"
+    assert dirty_after is False
+    assert asked is False, "the Patch Editor Load asked a question after the save"
+
+
+def test_tc_b100_70_failed_document_write_keeps_the_flag(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A forced document-write failure -> the project is saved, 1 line names
+    the unsaved document, the flag stays set (no file holds the edits)."""
+    from s19_app.tui.changes import io as changes_io
+    from s19_app.validation.model import ValidationIssue, ValidationSeverity
+
+    def _refuse(*args, **kwargs):
+        return None, [ValidationIssue(code="MF-WRITE-CONTAINMENT", message="forced",
+                                      severity=ValidationSeverity.ERROR, artifact="change")]
+
+    monkeypatch.setattr(changes_io, "write_change_document", _refuse)
+    monkeypatch.setattr(app_module, "write_change_document", _refuse, raising=False)
+    src = _copy_case01(tmp_path) / "firmware.s19"
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=tmp_path / "app")
+        log = b100_projects.StatusLog(app)
+        async with app.run_test(size=(220, 60)) as pilot:
+            await pilot.pause()
+            await _load_image(pilot, app, src)
+            await _add_entry_through_the_panel(
+                pilot, app, "0x8000007C", "DE AD BE EF", entries_after=1
+            )
+            messages = await b100_projects.save_project(pilot, app, log, "P1")
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            return messages, panel._dirty
+
+    messages, dirty = asyncio.run(_drive())
+    assert any(m.startswith("Saved project to") for m in messages), messages
+    assert any("not saved" in m.lower() and "changes.json" in m for m in messages), messages
+    assert dirty is True
+
+
+def test_tc_b100_70_file_backed_document_from_outside_keeps_the_flag(tmp_path: Path) -> None:
+    """A file-backed ``boost.json`` loaded from the common folder, 1 entry
+    added through the panel, Save project -> the copy holds the file's
+    bytes, not the edit -> the flag stays set (the copy landed and was
+    recorded: vacuity guard). The call-``mark_saved``-after-every-save
+    mutant -> False -> RED."""
+    src = _copy_case01(tmp_path) / "firmware.s19"
+    body = b100_projects.change_document_bytes()
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=tmp_path / "app")
+        log = b100_projects.StatusLog(app)
+        async with app.run_test(size=(220, 60)) as pilot:
+            await pilot.pause()
+            await _load_image(pilot, app, src)
+            common = app.workarea / "patches"
+            common.mkdir(parents=True, exist_ok=True)
+            (common / "boost.json").write_bytes(body)
+            assert app._change_service.load(str(common / "boost.json"), app.base_dir).ok
+            await _add_entry_through_the_panel(
+                pilot, app, "0x8000007C", "DE AD BE EF", entries_after=2
+            )
+            messages = await b100_projects.save_project(pilot, app, log, "P1")
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            return messages, panel._dirty, app.workarea / "P1"
+
+    messages, dirty, project = asyncio.run(_drive())
+    assert any(m.startswith("Saved project to") for m in messages), messages
+    assert (project / "patches" / "boost.json").read_bytes() == body
+    assert json.loads((project / "project.json").read_text(encoding="utf-8")).get(
+        "active_document"
+    ) == "patches/boost.json"
+    assert dirty is True
+
+
+def test_tc_b100_70_natural_path_load_edit_save_keeps_the_flag(tmp_path: Path) -> None:
+    """E3 R1 natural path: Load ``P`` (the reopen binds
+    ``P/patches/boost.json``, 1 entry), add 1 entry, Save project into
+    ``P`` -> the flag stays set, the file's bytes unchanged, still
+    recorded, 1 status line naming the Patch Editor save."""
+    base = tmp_path / "app"
+    project = b100_projects.seed_document_project(_workarea(base))
+    before = (project / "patches" / "boost.json").read_bytes()
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=base)
+        log = b100_projects.StatusLog(app)
+        async with app.run_test(size=(220, 60)) as pilot:
+            await pilot.pause()
+            await b100_projects.load_project(pilot, app, "P")
+            reopened = len(app._change_service.document.entries)
+            if reopened != 1:
+                return reopened, [], None
+            await _add_entry_through_the_panel(
+                pilot, app, "0x8000007C", "DE AD BE EF", entries_after=2
+            )
+            messages = await b100_projects.save_project(pilot, app, log, "P")
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            return reopened, messages, panel._dirty
+
+    reopened, messages, dirty = asyncio.run(_drive())
+    assert reopened == 1, "Load P did not reopen the recorded document"
+    assert any(m.startswith("Saved project to") for m in messages), messages
+    assert (project / "patches" / "boost.json").read_bytes() == before
+    assert b100_projects.read_manifest(project).get("active_document") == "patches/boost.json"
+    assert dirty is True
+    assert len([m for m in messages if "unsaved" in m.lower() and "Patch Editor" in m]) == 1, messages
+
+
+def test_tc_b100_70_unparsed_paste_text_keeps_the_flag(tmp_path: Path) -> None:
+    """LED .72 Q2: entries parsed from the paste buffer, then more text
+    typed into it and not parsed, Save project -> the flag stays set (the
+    document still lands: vacuity guard). The clear-it-anyway mutant ->
+    False -> RED."""
+    from textual.widgets import Button, TextArea
+
+    src = _copy_case01(tmp_path) / "firmware.s19"
+    text = b100_projects.change_document_bytes(
+        [b100_projects.address_entry(PATCH_ADDRESS, PATCH_BYTES)]
+    ).decode("utf-8")
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=tmp_path / "app")
+        log = b100_projects.StatusLog(app)
+        async with app.run_test(size=(220, 60)) as pilot:
+            await pilot.pause()
+            await _load_image(pilot, app, src)
+            app.action_show_screen("patch")
+            await _wait_for(pilot, lambda: len(app.query("#patch_paste_parse_button")) > 0,
+                            "the Patch Editor")
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            buffer = panel.query_one("#patch_paste_text", TextArea)
+            buffer.load_text(text)
+            panel.query_one("#patch_paste_parse_button", Button).press()
+            await _wait_for(pilot, lambda: len(app._change_service.document.entries) == 1,
+                            "the parsed paste")
+            buffer.load_text(text + '\n{ "entries": [')
+            for _ in range(6):
+                await pilot.pause()
+            messages = await b100_projects.save_project(pilot, app, log, "P1")
+            return messages, panel._dirty, app.workarea / "P1"
+
+    messages, dirty, project = asyncio.run(_drive())
+    assert any(m.startswith("Saved project to") for m in messages), messages
+    assert (project / "patches" / "changes.json").is_file(), "the document was not written"
+    assert dirty is True
 
 
 # ---------------------------------------------------------------------------

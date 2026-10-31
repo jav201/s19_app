@@ -1,0 +1,25 @@
+# mutant cp1-SEC8a3  (SEC8a-3)
+# description: the planner skips the guarded write's containment check
+# file: s19_app/tui/app.py
+# source sha256 before: ebc6dbf4d1b6aa98e7f5e5fde06895c66c98e8704d182e34efa408e01f332b7f
+# edit 1 OLD:
+#   |         never promises a document row the write refuses."""
+#   |         try:
+# edit 1 NEW:
+#   |         never promises a document row the write refuses."""
+#   |         return True
+#   |         try:
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_29_cp1_junctioned_home_gives_no_document_row
+# started 2026-10-30T23:57:30Z  finished 2026-10-30T23:57:34Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_document.py:1805: AssertionError: (SavePlanRow(role='image', source=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30706/test_tc_...emp/pytest-of-jjgh8/pytest-30706/test_tc_b100_29_cp1_junctioned0/app/.s19tool/workarea/P/project.json'), action='new'))
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_29_cp1_junctioned_home_gives_no_document_row
+1 failed in 2.99s
+
+# pytest summary: 1 failed in 2.99s
+# verdict: KILLED
+# restored = True  (sha256 after restore: ebc6dbf4d1b6aa98e7f5e5fde06895c66c98e8704d182e34efa408e01f332b7f)

@@ -1,0 +1,21 @@
+# GUARDS cp1 — batch-100 Inc 8a corrective pass 1 (run 2: default pytest temp dir; run 1 used --basetemp in the scratchpad, which TC-016s refuses by design — see guards-cp1-run1-basetemp-artefact.txt)
+# UTC start: 2026-10-31T00:01:22Z
+# cwd: /c/Users/jjgh8/Github/s19_app-b100-inc8a (branch b100-inc8a, base dc3b314, uncommitted tree)
+# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc8a
+# NO_COLOR state: unset (env -u NO_COLOR)
+# s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc8a\s19_app\__init__.py
+# sources sha256[:16]:
+#   ebc6dbf4d1b6aa98 s19_app/tui/app.py
+#   254693df5dcdf38a s19_app/tui/services/manifest_writer.py
+#   699c38bd2cce77cd s19_app/tui/services/variant_execution_service.py
+#   bd6f926590c17abd s19_app/tui/services/project_gather_service.py
+# command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc8a C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=short -rfE tests/test_import_census.py tests/test_tui_snapshot.py tests/test_id_registry.py tests/test_batch91_registry_hygiene.py tests/test_address_census.py tests/test_engine_unchanged.py
+
+........................................................................ [ 96%]
+...                                                                      [100%]
+--------------------------- snapshot report summary ---------------------------
+29 snapshots passed.
+75 passed in 169.08s (0:02:49)
+
+# pytest exit code: 0
+# UTC end: 2026-10-31T00:04:13Z

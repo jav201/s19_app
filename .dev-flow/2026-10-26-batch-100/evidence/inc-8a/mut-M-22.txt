@@ -1,0 +1,22 @@
+# mutant M-22  (LLR-164.2)
+# description: the merge records the session's active_document (None) instead of the target's carried value
+# file: s19_app/tui/app.py
+# source sha256 before: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2
+# edit 1 OLD:
+#   |                 recorded_document = carried_active_document
+# edit 1 NEW:
+#   |                 recorded_document = None
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_save_guards.py::test_tc_b100_05_merge_carries_the_document_and_gathered
+# started 2026-10-30T23:10:16Z  finished 2026-10-30T23:10:20Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d\tests\test_b100_save_guards.py:2462: AssertionError: {'active_variant': 'firmware', 'assignments': {}, 'batch': [], 'files': {'firmware.s19': {'sha256': '8a35f3808f25ff85a9ce1100bbce23783a7031b82c6f3d14cc1f749a0df40e51', 'size': 358}}, ...}
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_05_merge_carries_the_document_and_gathered
+1 failed in 2.68s
+
+# pytest summary: 1 failed in 2.68s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2)

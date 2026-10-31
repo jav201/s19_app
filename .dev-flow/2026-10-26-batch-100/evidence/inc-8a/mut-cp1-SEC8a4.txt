@@ -1,0 +1,29 @@
+# mutant cp1-SEC8a4  (SEC8a-4 / LLR-170.1)
+# description: the form predicate drops the Unicode format-character test
+# file: s19_app/tui/services/variant_execution_service.py
+# source sha256 before: 699c38bd2cce77cd455c134acabda82a5ace290fb4a9ea270f292b8e03fb9c92
+# edit 1 OLD:
+#   |     if _has_format_character(text):
+#   |         return False
+# edit 1 NEW:
+#   | <deleted>
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_28_cp1_form_refuses_device_stems_and_format_characters -k u202e or u200b or u2066 or ufeff
+# started 2026-10-30T23:56:40Z  finished 2026-10-30T23:56:41Z  rc=1
+FFFF                                                                     [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_document.py:1522: AssertionError: assert True is False
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_document.py:1522: AssertionError: assert True is False
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_document.py:1522: AssertionError: assert True is False
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_document.py:1522: AssertionError: assert True is False
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_28_cp1_form_refuses_device_stems_and_format_characters[patches/\u202eosj.exe.json]
+FAILED tests/test_b100_document.py::test_tc_b100_28_cp1_form_refuses_device_stems_and_format_characters[patches/a\u200bb.json]
+FAILED tests/test_b100_document.py::test_tc_b100_28_cp1_form_refuses_device_stems_and_format_characters[checks/\u2066x.json]
+FAILED tests/test_b100_document.py::test_tc_b100_28_cp1_form_refuses_device_stems_and_format_characters[patches/\ufeffx.json]
+4 failed, 5 deselected in 0.69s
+
+# pytest summary: 4 failed, 5 deselected in 0.69s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 699c38bd2cce77cd455c134acabda82a5ace290fb4a9ea270f292b8e03fb9c92)

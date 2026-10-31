@@ -1,0 +1,15 @@
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc8a\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+[T1 load          ] {'bytes': 236860, 'longest path': 245, 'handler s': 0.19, 'click->panel s': 1.051, 'rows': 1, 'reads s': [0.156]}
+[T1 variant-append] {'bytes': 236860, 'longest path': 255, 'trigger->outcome s': 0.919, 'reads s': [0.132], 'outcome': 'Project saved + manifest verified'}
+[T1 mac-sync      ] {'bytes': 236860, 'longest path': 249, 'trigger->outcome s': 0.925, 'reads s': [0.149], 'outcome': 'Project saved + manifest verified'}
+[T1 a2l-sync      ] {'bytes': 236860, 'longest path': 249, 'trigger->outcome s': 0.55, 'reads s': [0.144], 'outcome': 'Project saved + manifest verified'}
+[T1 save-back     ] {'bytes': 236860, 'longest path': 250, 'trigger->outcome s': 0.729, 'reads s': [0.324], 'outcome': 'Project saved + manifest verified'}
+[T1 save-project  ] {'bytes': 236860, 'longest path': 253, 'trigger->outcome s': 0.198, 'reads s': [0.14], 'outcome': 'Project saved + manifest verified'}
+[T2 load          ] {'bytes': 236860, 'longest path': 245, 'handler s': 0.156, 'click->panel s': 1.138, 'rows': 1, 'reads s': [0.121]}
+[T2 variant-append] {'bytes': 236860, 'longest path': 255, 'trigger->outcome s': 0.948, 'reads s': [0.109], 'outcome': 'Project saved + manifest verified'}
+[T2 mac-sync      ] {'bytes': 236860, 'longest path': 249, 'trigger->outcome s': 0.725, 'reads s': [0.112], 'outcome': 'Project saved + manifest verified'}
+[T2 a2l-sync      ] {'bytes': 236860, 'longest path': 249, 'trigger->outcome s': 0.478, 'reads s': [0.118], 'outcome': 'Project saved + manifest verified'}
+[T2 save-back     ] {'bytes': 236860, 'longest path': 250, 'trigger->outcome s': 0.457, 'reads s': [0.13], 'outcome': 'Project saved + manifest verified'}
+[T2 save-project  ] {'bytes': 236860, 'longest path': 253, 'trigger->outcome s': 0.184, 'reads s': [0.122], 'outcome': 'Project saved + manifest verified'}
+exit=0 wall=45s

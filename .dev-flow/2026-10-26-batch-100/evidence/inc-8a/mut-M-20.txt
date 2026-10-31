@@ -1,0 +1,28 @@
+# mutant M-20  (LLR-167.8)
+# description: call the panel's mark_saved after every completed save
+# file: s19_app/tui/app.py
+# source sha256 before: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2
+# edit 1 OLD:
+#   |             if _save_clears_panel_flag(
+#   |                 pasted_placed is not None, paste_text, self._parsed_paste_text
+#   |             ):
+# edit 1 NEW:
+#   |             if True:
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_save_image.py::test_tc_b100_70_file_backed_document_from_outside_keeps_the_flag tests/test_b100_save_image.py::test_tc_b100_70_natural_path_load_edit_save_keeps_the_flag tests/test_b100_save_image.py::test_tc_b100_70_failed_document_write_keeps_the_flag
+# started 2026-10-30T23:10:27Z  finished 2026-10-30T23:10:46Z  rc=1
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c\tests\test_b100_save_image.py:1952: assert False is True
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c\tests\test_b100_save_image.py:1985: assert False is True
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c\tests\test_b100_save_image.py:1917: assert False is True
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_image.py::test_tc_b100_70_file_backed_document_from_outside_keeps_the_flag
+FAILED tests/test_b100_save_image.py::test_tc_b100_70_natural_path_load_edit_save_keeps_the_flag
+FAILED tests/test_b100_save_image.py::test_tc_b100_70_failed_document_write_keeps_the_flag
+3 failed in 17.48s
+
+# pytest summary: 3 failed in 17.48s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2)

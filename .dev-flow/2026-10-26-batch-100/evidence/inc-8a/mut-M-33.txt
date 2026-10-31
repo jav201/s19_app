@@ -1,0 +1,41 @@
+# mutant M-33  (LLR-169.4)
+# description: the exception extended to derived_from (the accepted document passed to the derived_from parser)
+# file: s19_app/tui/services/variant_execution_service.py
+# source sha256 before: 5f2ab3268d9cdc4dafdb696628313642438fd208cd3e3039c4059ad507510d09
+# edit 1 OLD:
+#   | def _parse_manifest_derived_from(
+#   |     raw: object,
+#   |     issues: list[ValidationIssue],
+#   |     walk: _EntryWalk,
+#   | )
+# edit 1 NEW:
+#   | def _parse_manifest_derived_from(
+#   |     raw: object,
+#   |     issues: list[ValidationIssue],
+#   |     walk: _EntryWalk,
+#   |     active_document: Optional[str] = None,
+#   | )
+# edit 2 OLD:
+#   | _recorded_file(key, "derived_from", issues, walk)
+# edit 2 NEW:
+#   | _recorded_file(key, "derived_from", issues, walk, active_document)
+# edit 3 OLD:
+#   |         payload.get("derived_from", {}), issues, walk
+#   |     )
+# edit 3 NEW:
+#   |         payload.get("derived_from", {}), issues, walk, active_document
+#   |     )
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_project_check.py::test_tc_b100_24_derived_from_gets_no_document_exception
+# started 2026-10-30T23:13:29Z  finished 2026-10-30T23:13:30Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_project_check.py:1662: AssertionError: assert 1 == 0
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_check.py::test_tc_b100_24_derived_from_gets_no_document_exception
+1 failed in 0.59s
+
+# pytest summary: 1 failed in 0.59s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 5f2ab3268d9cdc4dafdb696628313642438fd208cd3e3039c4059ad507510d09)

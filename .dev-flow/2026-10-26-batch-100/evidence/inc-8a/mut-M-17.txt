@@ -1,0 +1,24 @@
+# mutant M-17  (LLR-167.6 / LLR-164.2)
+# description: the plan's manifest_keys ignore a carried active_document
+# file: s19_app/tui/app.py
+# source sha256 before: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2
+# edit 1 OLD:
+#   |                     records_document or carried_active_document is not None
+# edit 1 NEW:
+#   |                     records_document
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_save_image.py::test_tc_b100_59_open_project_carry_sets_the_keys
+# started 2026-10-30T23:10:06Z  finished 2026-10-30T23:10:19Z  rc=1
+F..F                                                                     [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c\tests\test_b100_save_image.py:1633: AssertionError: (('schema_version', 'active_variant', 'batch', 'assignments', 'files', 'active_document'), ('schema_version', 'active_variant', 'batch', 'assignments', 'files'))
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c\tests\test_b100_save_image.py:1633: AssertionError: (('schema_version', 'active_variant', 'batch', 'assignments', 'files', 'active_document'), ('schema_version', 'active_variant', 'batch', 'assignments', 'files'))
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_open_project_carry_sets_the_keys[present]
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_open_project_carry_sets_the_keys[too-large]
+2 failed, 2 passed in 11.28s
+
+# pytest summary: 2 failed, 2 passed in 11.28s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2)

@@ -1,0 +1,24 @@
+# mutant cp1-SEC8a5  (SEC8a-5)
+# description: the restore claims a second copy even when one already holds the bytes
+# file: s19_app/tui/app.py
+# source sha256 before: ebc6dbf4d1b6aa98e7f5e5fde06895c66c98e8704d182e34efa408e01f332b7f
+# edit 1 OLD:
+#   |                 already_kept=any(
+# edit 1 NEW:
+#   |                 already_kept=False and any(
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_save_guards.py::test_tc_b100_07_rollback_keeps_the_previous_copy_unless_restored
+# started 2026-10-31T00:28:39Z  finished 2026-10-31T00:28:51Z  rc=1
+FF.                                                                      [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_save_guards.py:2118: AssertionError: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30719/test_tc_b100_07_rollback_keeps0/app/.s19t...AppData/Local/Temp/pytest-of-jjgh8/pytest-30719/test_tc_b100_07_rollback_keeps0/app/.s19tool/workarea/P/project.json')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_save_guards.py:2118: AssertionError: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30719/test_tc_b100_07_rollback_keeps1/app/.s19t...AppData/Local/Temp/pytest-of-jjgh8/pytest-30719/test_tc_b100_07_rollback_keeps1/app/.s19tool/workarea/P/project.json')]
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_rollback_keeps_the_previous_copy_unless_restored[held]
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_rollback_keeps_the_previous_copy_unless_restored[no-space]
+2 failed, 1 passed in 11.26s
+
+# pytest summary: 2 failed, 1 passed in 11.26s
+# verdict: KILLED
+# restored = True  (sha256 after restore: ebc6dbf4d1b6aa98e7f5e5fde06895c66c98e8704d182e34efa408e01f332b7f)

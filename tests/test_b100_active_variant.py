@@ -1252,3 +1252,184 @@ def test_at_b100_20_every_writer_carries_the_keys_it_does_not_own(
         assert manifest.get("derived_from") == seeded_derived, (step, manifest)
     panel = asyncio.run(_reopen())
     assert "Opened    firmware_1.s19" in panel, panel
+
+
+
+# ---------------------------------------------------------------------------
+# TC-B100-20 / AT-B100-20 Inc 8a arm (E4) — LLR-168.3: every in-project
+# writer carries ``active_document``
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("writer", ["save-back", "variant-append", "mac-sync", "a2l-sync"])
+def test_tc_b100_20_writers_carry_the_active_document(tmp_path: Path, writer: str) -> None:
+    """``P`` records ``active_document`` "patches/boost.json"; each of the
+    four carry writers rewrites ``project.json`` (bytes changed) and keeps
+    the key equal, with 0 absolute paths. On the base the key is unknown,
+    so the writer refuses the rewrite (SEC6-2)."""
+    base = tmp_path / "app"
+    project_dir = projects.seed_document_project(_workarea(base))
+    before = (project_dir / "project.json").read_bytes()
+    sources = {
+        "variant-append": (projects.CASE02_DIR, "firmware.s19"),
+        "mac-sync": (projects.CASE01_DIR, "firmware.mac"),
+        "a2l-sync": (projects.CASE01_DIR, "firmware.a2l"),
+    }
+
+    async def _drive() -> None:
+        app = S19TuiApp(base_dir=base)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await _open_seeded_project(pilot, app)
+            if writer == "save-back":
+                _apply_patch(app)
+                await _save_back(pilot, app, "firmware.s19")
+                return
+            folder, name = sources[writer]
+            src = projects.copy_sources(tmp_path / "src", folder, name) / name
+            if writer == "a2l-sync":
+                app.load_a2l_from_path(src)
+            else:
+                app.load_from_path(src)
+            await _wait_for(
+                pilot,
+                lambda: (project_dir / "project.json").read_bytes() != before,
+                f"the {writer} manifest rewrite",
+            )
+
+    asyncio.run(_drive())
+    after = (project_dir / "project.json").read_bytes()
+    assert after != before, "project.json was not rewritten"
+    manifest = json.loads(after)
+    assert manifest.get("active_document") == "patches/boost.json", manifest
+    assert projects.absolute_strings(manifest) == [], manifest
+
+
+# ---------------------------------------------------------------------------
+# AT-B100-20 Inc 8a extension (AT index: ``active_document`` carried) —
+# black-box: the four carry writers keep the key and a fresh Load still
+# reopens the document
+# ---------------------------------------------------------------------------
+
+
+def _ledger(app: S19TuiApp) -> str:
+    """The Patch Editor ledger as painted (its rendered strips)."""
+    return "\n".join(projects.painted_lines(app.query_one("#patch_doc_entries_table")))
+
+
+def _script_border(app: S19TuiApp) -> str:
+    """The SCRIPT window's bottom border row as the screen paints it (the
+    composited strip; a widget's own ``render_line`` excludes its border):
+    it carries ``N entries`` and the unsaved marker (LLR-005.1)."""
+    region = app.query_one("#patch_win_script").region
+    strips = app.screen._compositor.render_strips()
+    return strips[region.y + region.height - 1].text[region.x : region.x + region.width]
+
+
+@pytest.mark.parametrize("size", SIZES)
+def test_at_b100_20_inc8a_every_writer_carries_the_active_document(
+    tmp_path: Path, size: tuple
+) -> None:
+    """HLR-168's carry scene, Inc 8a arm, by keys and clicks: P records
+    ``batch``, ``assignments``, ``declared_regions``, ``gathered`` and
+    ``active_document`` "patches/boost.json" (one entry at ``0x80000010``).
+    With P open through the Load project dialog, the engineer (1) adds and
+    applies ``0x8000007C DE AD BE EF`` in the Patch Editor and saves back
+    under the default name, then loads through Load (2) a new S19, (3) a
+    MAC and (4) an A2L. After each writer ``project.json`` on disk was
+    rewritten, keeps ``active_document`` and the four other not-owned keys
+    equal (JSON compare) with 0 absolute paths, and the document file's
+    bytes are unchanged. A fresh app opening P through the dialog paints
+    no problem naming the document in the Load-result panel, and the Patch
+    Editor ledger paints the document's entry ``80000010`` with the SCRIPT
+    window at ``1 entry`` and no unsaved marker.
+
+    RED (base dc3b314): ``active_document`` is an unknown key there, so
+    the in-project writers refuse to rewrite the manifest (SEC6-2) and the
+    first writer's rewrite never comes."""
+    base = tmp_path / "app"
+    project_dir = projects.seed_document_project(_workarea(base), extra=projects.seeded_keys())
+    for relative in (projects.SEEDED_PATCH, projects.SEEDED_CHECK):
+        target = project_dir / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text('{"entries": []}', encoding="utf-8")
+    document_bytes = (project_dir / projects.DOCUMENT_TEXT).read_bytes()
+    s19 = projects.copy_sources(tmp_path / "s19", projects.CASE02_DIR, "firmware.s19")
+    side = projects.copy_sources(
+        tmp_path / "side", projects.CASE01_DIR, "firmware.mac", "firmware.a2l"
+    )
+    manifest_path = project_dir / "project.json"
+    dirty_marker = "●"
+    snapshots: list = []
+
+    def _stamp() -> tuple:
+        stat = manifest_path.stat()
+        return (stat.st_ino, stat.st_mtime_ns, manifest_path.read_bytes())
+
+    async def _writers() -> None:
+        app = S19TuiApp(base_dir=base)
+        async with app.run_test(size=size, notifications=True) as pilot:
+            await pilot.pause()
+            await _open_project_through_dialog(pilot, app, "P")
+            await projects.dismiss_load_result_panel(pilot, app)
+            # (1) save-back
+            previous = _stamp()
+            await _add_and_apply_through_the_panel(pilot, app)
+            await _save_back_through_the_prompt(pilot, app, None)
+            await _wait_for(
+                pilot,
+                lambda: (project_dir / "firmware-patched.s19").is_file()
+                and _stamp() != previous,
+                "firmware-patched.s19 placed and project.json rewritten by the save-back",
+            )
+            snapshots.append(("save-back", json.loads(manifest_path.read_bytes())))
+            # (2) variant append, (3) MAC sync, (4) A2L sync, through Load
+            for writer, src, landed in (
+                ("variant-append", s19 / "firmware.s19", "firmware_1.s19"),
+                ("mac-sync", side / "firmware.mac", "firmware.mac"),
+                ("a2l-sync", side / "firmware.a2l", "firmware.a2l"),
+            ):
+                previous = _stamp()
+                await _load_through_dialog_until(
+                    pilot,
+                    app,
+                    src,
+                    lambda: (project_dir / landed).is_file() and _stamp() != previous,
+                    f"{landed} placed and project.json rewritten by the {writer}",
+                )
+                snapshots.append((writer, json.loads(manifest_path.read_bytes())))
+
+    async def _reopen() -> tuple:
+        app = S19TuiApp(base_dir=base)
+        async with app.run_test(size=size, notifications=True) as pilot:
+            await pilot.pause()
+            panel = await _open_and_close_the_panel(pilot, app, "P")
+            await pilot.press("6")
+            await _wait_for(
+                pilot,
+                lambda: len(app.query("#patch_doc_entries_table")) > 0
+                and f"{projects.DOCUMENT_ADDRESS:08X}" in _ledger(app).upper(),
+                "the reopened document's entry painted in the ledger",
+            )
+            return panel, _ledger(app), _script_border(app)
+
+    asyncio.run(_writers())
+    assert [writer for writer, _ in snapshots] == [
+        "save-back", "variant-append", "mac-sync", "a2l-sync"
+    ]
+    for writer, manifest in snapshots:
+        assert manifest.get("active_document") == projects.DOCUMENT_TEXT, (writer, manifest)
+        assert projects.not_owned(manifest) == projects.seeded_keys(), (writer, manifest)
+        assert projects.absolute_strings(manifest) == [], (writer, manifest)
+    assert snapshots[0][1]["active_variant"] == "firmware-patched", snapshots[0]
+    assert [m["active_variant"] for _, m in snapshots[1:]] == ["firmware_1"] * 3, snapshots
+    # No writer rewrote the document file itself.
+    assert (project_dir / projects.DOCUMENT_TEXT).read_bytes() == document_bytes
+
+    panel, ledger, border = asyncio.run(_reopen())
+    flat = projects.flat(panel)
+    assert "Opened    firmware_1.s19" in panel, panel
+    assert "boost.json" not in flat, panel  # no problem row names the document
+    assert f"{projects.DOCUMENT_ADDRESS:08X}" in ledger.upper(), ledger
+    assert "1 entry" in border and "1 entry" == border.split("─")[-2].strip(), border
+    assert dirty_marker not in border, border

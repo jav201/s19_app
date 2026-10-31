@@ -1,0 +1,25 @@
+# mutant cp1-R20-missing-b  (E3 R20)
+# description: the check's missing-document row uses the bare text
+# file: s19_app/tui/services/manifest_writer.py
+# source sha256 before: 254693df5dcdf38a5045f40e321862c130fad80865b98217fba4436642de58b4
+# edit 1 OLD:
+#   |             PROBLEM_MISSING,
+#   |             document_problem_file(text),
+# edit 1 NEW:
+#   |             PROBLEM_MISSING,
+#   |             text,
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_cp1_missing_unrecorded_document_is_one_change_document_row
+# started 2026-10-31T00:01:05Z  finished 2026-10-31T00:01:09Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_document.py:1907: AssertionError: [('missing', 'patches/boost.json', 'recorded in project.json, not on disk - restore the file, or Save project to drop it')]
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_30_cp1_missing_unrecorded_document_is_one_change_document_row
+1 failed in 2.81s
+
+# pytest summary: 1 failed in 2.81s
+# verdict: KILLED
+# note: re-run of cp1-R20-missing (SURVIVED: a recorded document's absence is _disk_problem's row) with an unrecorded-document arm
+# restored = True  (sha256 after restore: 254693df5dcdf38a5045f40e321862c130fad80865b98217fba4436642de58b4)

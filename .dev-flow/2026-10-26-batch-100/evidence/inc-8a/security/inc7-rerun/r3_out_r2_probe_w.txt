@@ -1,0 +1,40 @@
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc8a\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+[W1 intermediate junction] issues: [('MANIFEST-PATH-ESCAPE', 'jdir/secret.json'), ('MANIFEST-PATH-ESCAPE', './jdir/secret.json'), ('MANIFEST-PATH-ESCAPE', 'real/../jdir/secret.json'), ('MANIFEST-PATH-ESCAPE', 'real\\..\\jdir\\secret.json'), ('MANIFEST-PATH-ESCAPE', 'JDIR/secret.json'), ('MANIFEST-PATH-ESCAPE', 'real/inner/secret.json'), ('MANIFEST-PATH-ESCAPE', 'real/./inner/secret.json'), ('MANIFEST-PATH-ESCAPE', 'jdir/secret.json'), ('MANIFEST-PATH-ESCAPE', 'real/inner/secret.json')]
+   accepted: 'real\\a.json'                     INSIDE exists=True
+   fsutil: 6979\app\.s19tool\workarea\P is enabled.
+   folder entries: ['SUB', 'project.json', 'sub']
+[W2a real-then-junction] issues: [('MANIFEST-PATH-ESCAPE', 'SUB/secret.json'), ('MANIFEST-PATH-ESCAPE', 'SUB/secret.json'), ('MANIFEST-PATH-ESCAPE', 'SUB/secret.json')]
+   accepted: 'sub\\a.json'                      INSIDE exists=True
+   accepted: 'sub\\a.json'                      INSIDE exists=True
+   accepted: 'sub\\a.json'                      INSIDE exists=True
+   rewrite refusal: holds entries that were skipped
+   fsutil: 7022\app\.s19tool\workarea\P is enabled.
+   folder entries: ['SUB', 'project.json', 'sub']
+[W2b junction-first] issues: [('MANIFEST-PATH-ESCAPE', 'SUB/secret.json'), ('MANIFEST-PATH-ESCAPE', 'SUB/secret.json'), ('MANIFEST-PATH-ESCAPE', 'SUB/secret.json')]
+   accepted: 'sub\\a.json'                      INSIDE exists=True
+   accepted: 'sub\\a.json'                      INSIDE exists=True
+   accepted: 'sub\\a.json'                      INSIDE exists=True
+   rewrite refusal: holds entries that were skipped
+   fsutil: 7063\app\.s19tool\workarea\P is enabled.
+   folder entries: ['SUB', 'project.json']
+[W2c missing-name-then-junction] issues: [('MANIFEST-PATH-ESCAPE', 'SUB/secret.json'), ('MANIFEST-PATH-ESCAPE', 'SUB/secret.json'), ('MANIFEST-PATH-ESCAPE', 'SUB/secret.json')]
+   accepted: 'sub\\missing.json'                INSIDE exists=False
+   accepted: 'sub\\missing.json'                INSIDE exists=False
+   accepted: 'sub\\missing.json'                INSIDE exists=False
+   rewrite refusal: holds entries that were skipped
+   fsutil: 7102\app\.s19tool\workarea\P is enabled.
+   folder entries: ['A.s19', 'a.s19', 'project.json']
+[W2d files key through a file symlink (case-sensitive)] issues: [('MANIFEST-PATH-ESCAPE', 'A.s19'), ('MANIFEST-PATH-ESCAPE', 'a.s19')]
+   accepted: 'a.s19'                            INSIDE exists=True
+   check_project_files problems: [('manifest damaged', 'A.s19'), ('manifest damaged', 'a.s19')]
+[W2e control: symlink key first] issues: [('MANIFEST-PATH-ESCAPE', 'A.s19')]
+   accepted: 'a.s19'                            INSIDE exists=True
+   8.3 name of the junction: A_LONG~1
+[W3 short name / ADS / dots / spaces] issues: [('MANIFEST-PATH-ESCAPE', 'f.s19:secret'), ('MANIFEST-PATH-ESCAPE', 'f.s19::$DATA'), ('MANIFEST-PATH-ESCAPE', 'a_long_junction_name_here./secret.json'), ('MANIFEST-PATH-ESCAPE', 'a_long_junction_name_here /secret.json'), ('MANIFEST-PATH-ESCAPE', 'A_LONG~1/secret.json'), ('MANIFEST-PATH-ESCAPE', 'a_long~1/secret.json')]
+   accepted: 'a_long_junction_name_here\u3000\\secret.json' INSIDE exists=False
+[W4 ceiling] lstat calls=2004 batch=1000 assignments={'firmware': 1000} gathered={'patches': ['keep.json']} files=['firmware.s19'] derived_from=['firmware.s19']
+   fold: []
+   any lstat of jdir: True | rewrite refusal: holds entries that were skipped | keep reason (Save project): None
+# links created: 8 | removed: 8
+exit=0 wall=1s

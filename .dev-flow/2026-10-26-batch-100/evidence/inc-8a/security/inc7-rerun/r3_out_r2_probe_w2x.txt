@@ -1,0 +1,8 @@
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc8a\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+fsutil rc: 0
+reader issues: [('MANIFEST-PATH-ESCAPE', 'SUB/secret.json')]
+  batch 'sub\\missing.json'    realpath=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s8a\inc7\runs\W2x_1793401718013\app\.s19tool\workarea\P\sub\missing.json
+      read_change_document opened it: False | codes: ['MF-PATH-UNRESOLVED'] | mentions marker: False
+# junction removed: True
+exit=0 wall=1s

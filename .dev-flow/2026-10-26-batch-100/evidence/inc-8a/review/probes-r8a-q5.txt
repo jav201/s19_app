@@ -1,0 +1,21 @@
+
+s19_app: C:\Users\jjgh8\Github\s19_app-b100-inc8a\s19_app\__init__.py
+8c627b717172ccd8 tui/app.py
+a638b23d2bb861b1 tui/services/manifest_writer.py
+5f2ab3268d9cdc4d tui/services/variant_execution_service.py
+6f2d419ea0d2ee56 tui/services/project_gather_service.py
+.
+first save:
+   Project saved + manifest verified
+   Saved + verified: firmware.s19 — 0 entries applied before this save; includes 1 entry not applied before this save (0x8000007C)
+   Saved project to C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r8a\bt5\test_q5_round_trip_save_load_s0\app\.s19tool\workarea\P (variant 'firmware') — firmware.s19 + 1 change entry, 1 applied by this save
+tree1: ['firmware.s19', 'patches/changes.json', 'project.json']
+manifest1 active_variant/derived: firmware {'firmware.s19': {'base': 'firmware.s19', 'sha256': '8a35f3808f25ff85a9ce1100bbce23783a7031b82c6f3d14cc1f749a0df40e51', 'differ': 4}}
+reopened entries: 1
+second save:
+   Project saved + manifest verified
+   Saved project to C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r8a\bt5\test_q5_round_trip_save_load_s0\app\.s19tool\workarea\P (variant 'firmware')
+tree2: ['firmware.s19', 'patches/changes.json', 'project.json']
+manifest2 active_variant/derived: firmware {'firmware.s19': {'base': 'firmware.s19', 'sha256': '8a35f3808f25ff85a9ce1100bbce23783a7031b82c6f3d14cc1f749a0df40e51', 'differ': 4}}
+.
+2 passed in 93.03s (0:01:33)

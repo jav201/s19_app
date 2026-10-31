@@ -1,0 +1,28 @@
+# mutant R-16  (E3 R15)
+# description: the carried record's drop line is painted even when a placed session document replaces the record
+# file: s19_app/tui/app.py
+# source sha256 before: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2
+# edit 1 OLD:
+#   |             if recorded_document is None:
+#   |                 recorded_document = carried_active_document
+#   |                 if carried_document_line is not None:
+#   |                     document_lines.append(carried_document_line)
+# edit 1 NEW:
+#   |             if carried_document_line is not None:
+#   |                 document_lines.append(carried_document_line)
+#   |             if recorded_document is None:
+#   |                 recorded_document = carried_active_document
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_save_guards.py::test_tc_b100_05_r15_placed_document_replaces_a_missing_carried_one_silently
+# started 2026-10-30T23:12:01Z  finished 2026-10-30T23:12:05Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d\tests\test_b100_save_guards.py:2492: AssertionError: ['Project saved + manifest verified', 'Saved + verified: firmware_1.s19 — 0 entries applied before this save; includes...applied by this save", 'Change document record patches/boost.json was dropped from project.json — the file is missing']
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_05_r15_placed_document_replaces_a_missing_carried_one_silently
+1 failed in 2.69s
+
+# pytest summary: 1 failed in 2.69s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2)

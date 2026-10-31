@@ -1,0 +1,58 @@
+.
+source_path: c:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30727\test_r2p1_own_document_reopene0\app\.s19tool\workarea\P\patches\boost.json
+.
+source_path: C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30727\test_r2p1_own_document_reopene1\app\.s19tool\workarea\p\patches\boost.json
+..                                                                     [100%]
+=================================== PASSES ====================================
+_________________________________ test_header _________________________________
+---------------------------- Captured stdout call -----------------------------
+
+s19_app: C:\Users\jjgh8\Github\s19_app-b100-inc8a\s19_app\__init__.py
+ebc6dbf4d1b6aa98 tui/app.py
+254693df5dcdf38a tui/services/manifest_writer.py
+699c38bd2cce77cd tui/services/variant_execution_service.py
+bd6f926590c17abd tui/services/project_gather_service.py
+________ test_r2p1_own_document_reopened_with_another_spelling[drive] _________
+---------------------------- Captured stdout call -----------------------------
+messages:
+   Project saved + manifest verified
+   Saved + verified: firmware_1.s19 — 0 entries applied before this save; includes 1 entry not applied before this save (0x80000010)
+   Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30727\test_r2p1_own_document_reopene0\app\.s19tool\workarea\P (variant 'firmware_1') — firmware.s19 + 1 change entry, 1 applied by this save
+tree before: ['firmware.s19', 'patches/boost.json', 'project.json']
+tree after: ['firmware.s19', 'firmware_1.s19', 'patches/boost.json', 'project.json']
+active_document written: patches/boost.json
+gathered: {'patches': ['patches/boost.json']}
+plan row: image C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30727\test_r2p1_own_document_reopene0\app\.s19tool\workarea\P\firmware_1.s19 new
+plan row: document C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30727\test_r2p1_own_document_reopene0\app\.s19tool\workarea\P\patches\boost.json keep
+plan row: manifest C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30727\test_r2p1_own_document_reopene0\app\.s19tool\workarea\P\project.json rewrite
+_______ test_r2p1_own_document_reopened_with_another_spelling[project] ________
+---------------------------- Captured stdout call -----------------------------
+messages:
+   Project saved + manifest verified
+   Saved + verified: firmware_1.s19 — 0 entries applied before this save; includes 1 entry not applied before this save (0x80000010)
+   Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30727\test_r2p1_own_document_reopene1\app\.s19tool\workarea\P (variant 'firmware_1') — firmware.s19 + 1 change entry, 1 applied by this save
+tree before: ['firmware.s19', 'patches/boost.json', 'project.json']
+tree after: ['firmware.s19', 'firmware_1.s19', 'patches/boost.json', 'project.json']
+active_document written: patches/boost.json
+gathered: {'patches': ['patches/boost.json']}
+plan row: image C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30727\test_r2p1_own_document_reopene1\app\.s19tool\workarea\P\firmware_1.s19 new
+plan row: document C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30727\test_r2p1_own_document_reopene1\app\.s19tool\workarea\P\patches\boost.json keep
+plan row: manifest C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30727\test_r2p1_own_document_reopene1\app\.s19tool\workarea\P\project.json rewrite
+_____________ test_r2p2_file_backed_document_with_junctioned_home _____________
+---------------------------- Captured stdout call -----------------------------
+
+messages:
+   Project saved + manifest verified
+   Saved + verified: firmware_1.s19 — 0 entries applied before this save; includes 1 entry not applied before this save (0x80000010)
+   Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30727\test_r2p2_file_backed_document0\app\.s19tool\workarea\P (variant 'firmware_1') — firmware.s19 + 1 change entry, 1 applied by this save
+   Change document boost.json was not recorded in the project — it could not be placed in the project's patches folder
+plan row: image C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30727\test_r2p2_file_backed_document0\app\.s19tool\workarea\P\firmware_1.s19 new
+plan row: manifest C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30727\test_r2p2_file_backed_document0\app\.s19tool\workarea\P\project.json new
+Q/patches after: ['boost.json']
+active_document: None
+=========================== short test summary info ===========================
+PASSED .dev-flow/2026-10-26-batch-100/evidence/inc-8a/review/test_r8a_round2_probes.py::test_header
+PASSED .dev-flow/2026-10-26-batch-100/evidence/inc-8a/review/test_r8a_round2_probes.py::test_r2p1_own_document_reopened_with_another_spelling[drive]
+PASSED .dev-flow/2026-10-26-batch-100/evidence/inc-8a/review/test_r8a_round2_probes.py::test_r2p1_own_document_reopened_with_another_spelling[project]
+PASSED .dev-flow/2026-10-26-batch-100/evidence/inc-8a/review/test_r8a_round2_probes.py::test_r2p2_file_backed_document_with_junctioned_home
+4 passed in 8.37s

@@ -1,0 +1,13 @@
+# RED cp1 (supplement) — the two R20 check-side arms on the PRE snapshot
+# UTC: 2026-10-31T00:00:39Z  cwd: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/cp8a-1/pre  PYTHONPATH=<cwd>  NO_COLOR unset
+# s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\s19_app\__init__.py
+# command: pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py -k "cp1_changed_document_row or cp1_missing_unrecorded"
+FF                                                                       [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1886: AssertionError: [('changed on disk', 'patches/boost.json', 'saved 230 B, now 323 B - Save project records the new state')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1907: AssertionError: [('missing', 'patches/boost.json', 'recorded in project.json, not on disk - restore the file, or Save project to drop it')]
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_30_cp1_changed_document_row_is_labelled_as_the_change_document
+FAILED tests/test_b100_document.py::test_tc_b100_30_cp1_missing_unrecorded_document_is_one_change_document_row
+2 failed, 159 deselected in 5.31s
+# pytest exit code: 1

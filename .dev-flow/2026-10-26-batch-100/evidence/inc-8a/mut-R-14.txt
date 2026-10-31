@@ -1,0 +1,28 @@
+# mutant R-14  (R10 OSError)
+# description: an OSError on open re-raised (not io_error)
+# file: s19_app/tui/app.py
+# source sha256 before: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2
+# edit 1 OLD:
+#   |     except OSError as exc:
+#   |         return RecordedDocumentState(DOCUMENT_IO_ERROR, detail=type(exc).__name__)
+#   |     if len(data)
+# edit 1 NEW:
+#   |     except OSError:
+#   |         raise
+#   |     if len(data)
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_classifier_held_file_is_io_error tests/test_b100_document.py::test_tc_b100_30_held_document_is_not_readable_and_stays_recorded
+# started 2026-10-30T23:10:28Z  finished 2026-10-30T23:10:31Z  rc=1
+FF                                                                       [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b\s19_app\tui\app.py:1887: PermissionError: [Errno 13] Permission denied: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30639\\test_tc_b100_30_classifier_hel0\\P\\patches\\boost.json'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b\s19_app\tui\app.py:1887: PermissionError: [Errno 13] Permission denied: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30639\\test_tc_b100_30_held_document_0\\app\\.s19tool\\workarea\\P\\patches\\boost.json'
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_30_classifier_held_file_is_io_error
+FAILED tests/test_b100_document.py::test_tc_b100_30_held_document_is_not_readable_and_stays_recorded
+2 failed in 1.93s
+
+# pytest summary: 2 failed in 1.93s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2)

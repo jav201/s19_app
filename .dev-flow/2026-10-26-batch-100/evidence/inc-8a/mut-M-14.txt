@@ -1,0 +1,22 @@
+# mutant M-14  (LLR-167.6 / A3R2-1)
+# description: no inside_elsewhere class: a document inside the project but outside its home is classed outside (planned and copied)
+# file: s19_app/tui/services/project_gather_service.py
+# source sha256 before: 6f2d419ea0d2ee56cb28c2ed9df3c6d958afd793d8f05c2904304a1cbf6c091e
+# edit 1 OLD:
+#   |         return DOCUMENT_INSIDE_ELSEWHERE, None
+# edit 1 NEW:
+#   |         return DOCUMENT_OUTSIDE, absolute.name
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_29_document_inside_the_project_outside_its_home_is_not_placed
+# started 2026-10-30T23:09:57Z  finished 2026-10-30T23:10:03Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c\tests\test_b100_document.py:874: AssertionError: assert not True
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_29_document_inside_the_project_outside_its_home_is_not_placed
+1 failed in 4.83s
+
+# pytest summary: 1 failed in 4.83s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 6f2d419ea0d2ee56cb28c2ed9df3c6d958afd793d8f05c2904304a1cbf6c091e)

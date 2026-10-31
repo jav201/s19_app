@@ -1,0 +1,28 @@
+# mutant M-25  (LLR-164.2 / E3 R8 refined)
+# description: decision site: a carried too_large document is dropped (reason lookup made total so the drop line still paints)
+# file: s19_app/tui/app.py
+# source sha256 before: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2
+# edit 1 OLD:
+#   |                 if carried_state.outcome in _DOCUMENT_DROP_OUTCOMES:
+# edit 1 NEW:
+#   |                 if carried_state.outcome in _DOCUMENT_DROP_OUTCOMES or carried_state.outcome == DOCUMENT_TOO_LARGE:
+# edit 2 OLD:
+#   | f"{_DOCUMENT_DROP_REASON[carried_state.outcome]}"
+# edit 2 NEW:
+#   | f"{_DOCUMENT_DROP_REASON.get(carried_state.outcome, 'the file is too large')}"
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second tests/test_b100_save_image.py::test_tc_b100_59_open_project_carry_sets_the_keys[too-large]
+# started 2026-10-30T23:10:34Z  finished 2026-10-30T23:10:40Z  rc=1
+FF                                                                       [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d\tests\test_b100_save_guards.py:2524: AssertionError: {'active_variant': 'firmware', 'assignments': {}, 'batch': [], 'files': {'firmware.s19': {'sha256': '8a35f3808f25ff85a9ce1100bbce23783a7031b82c6f3d14cc1f749a0df40e51', 'size': 358}}, ...}
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d\tests\test_b100_save_image.py:1632: AssertionError: {'active_variant': 'firmware', 'assignments': {}, 'batch': [], 'files': {'firmware.s19': {'sha256': '8a35f3808f25ff85a9ce1100bbce23783a7031b82c6f3d14cc1f749a0df40e51', 'size': 358}}, ...}
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_open_project_carry_sets_the_keys[too-large]
+2 failed in 5.47s
+
+# pytest summary: 2 failed in 5.47s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2)

@@ -1,0 +1,29 @@
+# mutant R-05  (E3 R8 refined)
+# description: drop set: io_error added (with a drop reason) - Save project drops a held document
+# file: s19_app/tui/app.py
+# source sha256 before: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2
+# edit 1 OLD:
+#   |     {DOCUMENT_MISSING, DOCUMENT_LINK, DOCUMENT_UNREADABLE}
+# edit 1 NEW:
+#   |     {DOCUMENT_MISSING, DOCUMENT_LINK, DOCUMENT_UNREADABLE, DOCUMENT_IO_ERROR}
+# edit 2 OLD:
+#   |     DOCUMENT_UNREADABLE: "the file is not a change or check document the app can read",
+#   | }
+# edit 2 NEW:
+#   |     DOCUMENT_UNREADABLE: "the file is not a change or check document the app can read",
+#   |     DOCUMENT_IO_ERROR: "the file could not be read",
+#   | }
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_held_document_with_one_line
+# started 2026-10-30T23:11:32Z  finished 2026-10-30T23:11:36Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d\tests\test_b100_save_guards.py:2549: AssertionError: {'active_variant': 'firmware', 'assignments': {}, 'batch': [], 'files': {'firmware.s19': {'sha256': '8a35f3808f25ff85a9ce1100bbce23783a7031b82c6f3d14cc1f749a0df40e51', 'size': 358}}, ...}
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_held_document_with_one_line
+1 failed in 2.70s
+
+# pytest summary: 1 failed in 2.70s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2)

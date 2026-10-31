@@ -1,0 +1,82 @@
+# RED cp1 — new and re-pinned arms on the PRE snapshot (Inc 8a cp1)
+# UTC start: 2026-10-30T23:54:06Z
+# cwd: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/cp8a-1/pre (snapshot of the 4 sources before cp1, tests from the cp1 tree)
+# PYTHONPATH=<cwd>; NO_COLOR unset
+# s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\s19_app\__init__.py
+#   8c627b717172ccd8 tui/app.py
+#   a638b23d2bb861b1 tui/services/manifest_writer.py
+#   5f2ab3268d9cdc4d tui/services/variant_execution_service.py
+#   6f2d419ea0d2ee56 tui/services/project_gather_service.py
+# command: pytest -p no:cacheprovider -q --tb=line -rfEs tests/test_b100_document.py -k "cp1 or tc_b100_30_missing or truncated or hostile or held or refused_record or linked_document or next_step or v1-document"
+...FFFFFFFFFFFFFFFFFFFFFFFFFFFF.FFFFF                                    [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1147: AssertionError: assert [('missing', .../boost.json')] == [('missing', .../boost.json')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1164: AssertionError: [('not readable', 'patches/boost.json', 'not a change or check document the app can read - replace the file, or Save project to drop it')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1195: AssertionError: [('not readable', 'patches/boost.json', 'too large to reopen - open it from the Patch Editor (it can take a while)')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1195: AssertionError: [('not readable', 'patches/boost.json', 'not a change or check document the app can read - replace the file, or Save project to drop it')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1195: AssertionError: [('not readable', 'patches/boost.json', 'not a change or check document the app can read - replace the file, or Save project to drop it')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1215: AssertionError: [('not readable', 'patches/boost.json', 'could not be read - check that the file can be opened, then Load again')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1242: AssertionError: [('not readable', 'firmware.s19', 'a recorded entry has the wrong shape - replace the file, or Save project to drop it')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1281: AssertionError: [('not readable', 'patches/boost.json', 'the file is a link and is not opened - replace the file, or Save project to drop it')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1281: AssertionError: [('not readable', 'patches/boost.json', 'the file is a link and is not opened - replace the file, or Save project to drop it')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1479: TypeError: ProjectFileProblem.__init__() got an unexpected keyword argument 'step'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1479: TypeError: ProjectFileProblem.__init__() got an unexpected keyword argument 'step'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1479: TypeError: ProjectFileProblem.__init__() got an unexpected keyword argument 'step'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1479: TypeError: ProjectFileProblem.__init__() got an unexpected keyword argument 'step'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1522: AssertionError: assert True is False
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1522: AssertionError: assert True is False
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1522: AssertionError: assert True is False
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1522: AssertionError: assert True is False
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1522: AssertionError: assert True is False
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1522: AssertionError: assert True is False
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1522: AssertionError: assert True is False
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1522: AssertionError: assert True is False
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1522: AssertionError: assert True is False
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1576: AssertionError: ['Manifest write failed', 'Project NOT saved: could not save — project.json was not written. check the folder.']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1576: AssertionError: ['Manifest write failed', 'Project NOT saved: could not save — project.json was not written. check the folder.']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1604: AssertionError: ["Change document boost.txt was not recorded in the project — it could not be placed in the project's patches folder"]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1627: AssertionError: ['Change document boost.txt was not recorded in the project — it is in the project but not in its patches folder']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1653: AssertionError: ['Project saved + manifest verified', 'Saved + verified: firmware_1.s19 — 0 entries applied before this save; includes...document patches/boost.json could not be read — it stays recorded; check that the file can be opened, then Load again']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1676: AssertionError: ['Change document boost.json was not recorded in the project — it is in the project but not in its patches folder']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1725: AttributeError: module 's19_app.tui.app' has no attribute '_plan_without_document_key'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1768: AssertionError: assert ('in_home', 'x.json') == ('outside', 'x.json')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1805: AssertionError: (SavePlanRow(role='image', source=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c...94659b2/scratchpad/cp8a-1/bt/red/test_tc_b100_29_cp1_junctioned0/app/.s19tool/workarea/P/project.json'), action='new'))
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1830: AssertionError: [('not readable', 'patches/boost.json', 'could not be read - check that the file can be opened, then Load again')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_document.py:1856: AssertionError: assert ['too large t...ake a while)'] == ['too large t...t to drop it']
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_30_missing_document_is_one_missing_problem
+FAILED tests/test_b100_document.py::test_tc_b100_30_truncated_document_is_one_not_readable
+FAILED tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[20000-entries]
+FAILED tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[5000-digit-integer]
+FAILED tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[brackets-1MiB]
+FAILED tests/test_b100_document.py::test_tc_b100_30_held_document_is_not_readable_and_stays_recorded
+FAILED tests/test_b100_document.py::test_tc_b100_30_refused_record_is_one_not_readable_row_and_no_reopen
+FAILED tests/test_b100_document.py::test_tc_b100_30_linked_document_is_one_not_readable_row[recorded]
+FAILED tests/test_b100_document.py::test_tc_b100_30_linked_document_is_one_not_readable_row[unrecorded]
+FAILED tests/test_b100_document.py::test_tc_b100_30_not_readable_document_paints_the_next_step_of_its_reason[too_large]
+FAILED tests/test_b100_document.py::test_tc_b100_30_not_readable_document_paints_the_next_step_of_its_reason[io_error]
+FAILED tests/test_b100_document.py::test_tc_b100_30_not_readable_document_paints_the_next_step_of_its_reason[link]
+FAILED tests/test_b100_document.py::test_tc_b100_30_not_readable_document_paints_the_next_step_of_its_reason[unreadable]
+FAILED tests/test_b100_document.py::test_tc_b100_28_cp1_form_refuses_device_stems_and_format_characters[patches/aux.json]
+FAILED tests/test_b100_document.py::test_tc_b100_28_cp1_form_refuses_device_stems_and_format_characters[checks/CON.json]
+FAILED tests/test_b100_document.py::test_tc_b100_28_cp1_form_refuses_device_stems_and_format_characters[patches/nul.JSON]
+FAILED tests/test_b100_document.py::test_tc_b100_28_cp1_form_refuses_device_stems_and_format_characters[patches/com1.json]
+FAILED tests/test_b100_document.py::test_tc_b100_28_cp1_form_refuses_device_stems_and_format_characters[patches/lpt9.json]
+FAILED tests/test_b100_document.py::test_tc_b100_28_cp1_form_refuses_device_stems_and_format_characters[patches/\u202eosj.exe.json]
+FAILED tests/test_b100_document.py::test_tc_b100_28_cp1_form_refuses_device_stems_and_format_characters[patches/a\u200bb.json]
+FAILED tests/test_b100_document.py::test_tc_b100_28_cp1_form_refuses_device_stems_and_format_characters[checks/\u2066x.json]
+FAILED tests/test_b100_document.py::test_tc_b100_28_cp1_form_refuses_device_stems_and_format_characters[patches/\ufeffx.json]
+FAILED tests/test_b100_document.py::test_tc_b100_29_cp1_device_stem_document_never_refuses_the_save[aux.json]
+FAILED tests/test_b100_document.py::test_tc_b100_29_cp1_device_stem_document_never_refuses_the_save[con.json]
+FAILED tests/test_b100_document.py::test_tc_b100_29_cp1_copied_document_outside_the_form_says_so
+FAILED tests/test_b100_document.py::test_tc_b100_29_cp1_in_home_document_outside_the_form_names_its_name
+FAILED tests/test_b100_document.py::test_tc_b100_29_cp1_held_reopened_document_paints_one_true_line
+FAILED tests/test_b100_document.py::test_tc_b100_29_cp1_document_recorded_elsewhere_paints_one_true_line
+FAILED tests/test_b100_document.py::test_tc_b100_29_cp1_failed_document_write_drops_the_key_from_the_plan
+FAILED tests/test_b100_document.py::test_tc_b100_29_cp1_case_sensitive_work_area_keeps_two_projects_apart
+FAILED tests/test_b100_document.py::test_tc_b100_29_cp1_junctioned_home_gives_no_document_row
+FAILED tests/test_b100_document.py::test_tc_b100_30_cp1_held_unrecorded_document_paints_the_reopen_reason
+FAILED tests/test_b100_document.py::test_tc_b100_30_cp1_next_step_follows_the_mark_not_the_reason_text
+33 failed, 4 passed, 122 deselected in 54.72s
+# pytest exit code: 1
+# UTC end: 2026-10-30T23:55:03Z

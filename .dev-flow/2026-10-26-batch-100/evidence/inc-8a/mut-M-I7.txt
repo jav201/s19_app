@@ -1,0 +1,28 @@
+# mutant M-I7  (ruling 2)
+# description: merge row on a folder without project.json
+# file: s19_app/tui/services/project_gather_service.py
+# source sha256 before: 6f2d419ea0d2ee56cb28c2ed9df3c6d958afd793d8f05c2904304a1cbf6c091e
+# edit 1 OLD:
+#   |     if not os.path.lexists(manifest):
+#   |         manifest_action = PLAN_ACTION_NEW
+#   |     elif target_kind == PLAN_TARGET_MERGE:
+#   |         manifest_action = PLAN_ACTION_MERGE
+# edit 1 NEW:
+#   |     if target_kind == PLAN_TARGET_MERGE:
+#   |         manifest_action = PLAN_ACTION_MERGE
+#   |     elif not os.path.lexists(manifest):
+#   |         manifest_action = PLAN_ACTION_NEW
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_save_image.py::test_tc_b100_59_planning_writes_nothing_and_hashes_no_payload
+# started 2026-10-30T23:14:12Z  finished 2026-10-30T23:14:14Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_save_image.py:1479: AssertionError: assert [('firmware_1...on', 'merge')] == [('firmware_1...json', 'new')]
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_planning_writes_nothing_and_hashes_no_payload
+1 failed in 0.61s
+
+# pytest summary: 1 failed in 0.61s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 6f2d419ea0d2ee56cb28c2ed9df3c6d958afd793d8f05c2904304a1cbf6c091e)

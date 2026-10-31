@@ -1,0 +1,24 @@
+# mutant M-18  (LLR-164.2)
+# description: the merge project.json row keeps rewrite
+# file: s19_app/tui/services/project_gather_service.py
+# source sha256 before: 6f2d419ea0d2ee56cb28c2ed9df3c6d958afd793d8f05c2904304a1cbf6c091e
+# edit 1 OLD:
+#   |     elif target_kind == PLAN_TARGET_MERGE:
+#   |         manifest_action = PLAN_ACTION_MERGE
+# edit 1 NEW:
+#   |     elif target_kind == PLAN_TARGET_MERGE:
+#   |         manifest_action = PLAN_ACTION_REWRITE
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_save_image.py::test_tc_b100_59_merge_plans_a_merge_row
+# started 2026-10-30T23:13:20Z  finished 2026-10-30T23:13:23Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_save_image.py:1659: AssertionError: (SavePlanRow(role='image', source=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30671/test_tc_...ytest-of-jjgh8/pytest-30671/test_tc_b100_59_merge_plans_a_0/app/.s19tool/workarea/ab/project.json'), action='rewrite'))
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_merge_plans_a_merge_row
+1 failed in 2.52s
+
+# pytest summary: 1 failed in 2.52s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 6f2d419ea0d2ee56cb28c2ed9df3c6d958afd793d8f05c2904304a1cbf6c091e)

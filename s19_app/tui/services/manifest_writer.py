@@ -43,6 +43,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import shutil
 import stat
 from dataclasses import dataclass, field
@@ -70,12 +71,17 @@ from .variant_execution_service import (
     PROBLEM_NOT_RECORDED,
     PROJECT_MANIFEST_NAME,
     PROJECT_RECORDED_SUFFIXES,
+    DOCUMENT_REASON_IO_ERROR,
+    STEP_CHECK_THEN_LOAD,
     DerivedFrom,
     FileRecord,
     ProjectFileProblem,
     ProjectManifest,
     _EntryWalk,
+    _plain_entry,
     _resolve_manifest_entry,
+    document_problem_file,
+    is_active_document_form,
     manifest_is_damaged,
     manifest_problems,
     read_project_manifest,
@@ -262,6 +268,7 @@ def serialize_manifest(
     files: Optional[Mapping[str, FileRecord]] = None,
     derived_from: Optional[Mapping[str, DerivedFrom]] = None,
     schema_version: int = DEFAULT_SCHEMA_VERSION,
+    active_document: Optional[str] = None,
 ) -> tuple[Optional[str], list[ValidationIssue]]:
     """
     Summary:
@@ -313,6 +320,15 @@ def serialize_manifest(
             refusal predicate; omitted when ``None`` / empty.
         schema_version (int): The literal written for ``schema_version``;
             defaults to :data:`DEFAULT_SCHEMA_VERSION` (``1``).
+        active_document (Optional[str]): The project-relative POSIX text of
+            the Patch Editor's document (LLR-170.1), e.g.
+            ``"patches/boost.json"``. It must pass
+            ``is_active_document_form`` (the reader's predicate) and then
+            the refusal predicate; it is checked FIRST in the serialize's
+            one walk (S3-11) and emitted LAST, verbatim. ``None`` → no key
+            (byte-identical output). It also allows the one ``files`` key
+            equal to it; any other ``files`` key with more than one
+            component is refused (LLR-169.4 at the writer, P-B3).
 
     Returns:
         tuple[Optional[str], list[ValidationIssue]]: ``(text, [])`` with the
@@ -324,10 +340,15 @@ def serialize_manifest(
             (collect-don't-abort, C-5).
 
     Data Flow:
+        - ``active_document`` first: a text outside the form → one finding
+          and no walk; otherwise :func:`_reject_unsafe_entry` on the shared
+          walk, so a link or junction on the way or as the file refuses it.
         - Check every ``batch`` then every ``assignments`` entry through
           :func:`_reject_unsafe_entry`; collect all refusals. The change-1
           ``gathered`` rows (HLR-138) go through the same predicate
           (context ``gathered[<home>]``).
+        - A ``files`` key with more than one component that is not the
+          ``active_document`` text → one finding (the reader refuses it).
         - On any refusal → return ``(None, findings)`` (write nothing).
         - Otherwise normalize entries to POSIX, build the 4-key dict, and
           ``json.dumps`` it with stable key order (``sort_keys=False``,
@@ -354,6 +375,24 @@ def serialize_manifest(
     # or file is checked once and the folder ceiling bounds the writer too.
     walk = _EntryWalk(project_root)
 
+    # S3-11: the document is walked before every other entry, so its folder
+    # check is never past the walk's folder ceiling.
+    if active_document is not None:
+        if not is_active_document_form(active_document):
+            findings.append(
+                _manifest_write_issue(
+                    "refusing to serialize manifest active_document that is not "
+                    "a .json file directly in patches/ or checks/: "
+                    f"{active_document!r}"
+                )
+            )
+        else:
+            issue = _reject_unsafe_entry(
+                project_root, active_document, "active_document", walk
+            )
+            if issue is not None:
+                findings.append(issue)
+
     for entry in batch:
         issue = _reject_unsafe_entry(project_root, entry, "batch", walk)
         if issue is not None:
@@ -378,6 +417,18 @@ def serialize_manifest(
         *(("derived_from", key) for key in derived_from),
         *(("derived_from base", record.base) for record in derived_from.values()),
     ):
+        if (
+            context == "files"
+            and entry != active_document
+            and len(re.split(r"[\\/]", entry)) != 1
+        ):
+            findings.append(
+                _manifest_write_issue(
+                    "refusing to serialize manifest files key that is neither a "
+                    f"top-level file nor the active document: {entry!r}"
+                )
+            )
+            continue
         issue = _reject_unsafe_entry(project_root, entry, context, walk)
         if issue is not None:
             findings.append(issue)
@@ -429,6 +480,10 @@ def serialize_manifest(
             }
             for key, record in derived_from.items()
         }
+    # LLR-170.1: emitted LAST and only when set, so every manifest without
+    # it stays byte-identical (TC-B100-21).
+    if active_document is not None:
+        envelope["active_document"] = active_document
     return json.dumps(envelope, indent=2), []
 
 
@@ -480,6 +535,7 @@ def write_project_manifest(
     files: Optional[Mapping[str, FileRecord]] = None,
     derived_from: Optional[Mapping[str, DerivedFrom]] = None,
     schema_version: int = DEFAULT_SCHEMA_VERSION,
+    active_document: Optional[str] = None,
 ) -> tuple[Optional[Path], list[ValidationIssue]]:
     """
     Summary:
@@ -521,6 +577,8 @@ def write_project_manifest(
         derived_from (Optional[Mapping[str, DerivedFrom]]): The
             ``derived_from`` records — see :func:`serialize_manifest`.
         schema_version (int): The literal written for ``schema_version``.
+        active_document (Optional[str]): The ``active_document`` text — see
+            :func:`serialize_manifest`; a refused value writes nothing.
 
     Returns:
         tuple[Optional[Path], list[ValidationIssue]]: ``(written_path, [])`` on
@@ -574,6 +632,7 @@ def write_project_manifest(
         files=files,
         derived_from=derived_from,
         schema_version=schema_version,
+        active_document=active_document,
     )
     if text is None:
         return None, findings
@@ -589,10 +648,13 @@ def write_project_manifest(
         destination.parent.mkdir(parents=True, exist_ok=True)
         os.replace(staged, destination)
     except (WorkareaContainmentError, OSError) as exc:
+        # F9 (as SEC7-R2-3): the message is painted; the exception class
+        # rides in ``details`` for the caller's log only.
         return None, [
             _manifest_write_containment_issue(
                 "the manifest write target failed work-area containment "
-                f"validation — no file was written: {type(exc).__name__}: {exc}"
+                "validation — no file was written",
+                details={"exception": f"{type(exc).__name__}: {exc}"},
             )
         ]
     finally:
@@ -729,6 +791,7 @@ def verify_written_manifest(
     assignments: Optional[Mapping[str, Sequence[str]]] = None,
     files: Optional[Mapping[str, FileRecord]] = None,
     derived_from: Optional[Mapping[str, DerivedFrom]] = None,
+    active_document: Optional[str] = None,
 ) -> ManifestVerifyResult:
     """
     Summary:
@@ -758,12 +821,15 @@ def verify_written_manifest(
             records (LLR-169.3); ``None`` → empty.
         derived_from (Optional[Mapping[str, DerivedFrom]]): The intended
             ``derived_from`` records (LLR-169.3); ``None`` → empty.
+        active_document (Optional[str]): The intended ``active_document``
+            text (LLR-169.3), compared as text with the re-read value;
+            ``None`` equals an absent key.
 
     Returns:
         ManifestVerifyResult: ``status`` + ``drift`` + ``issues`` +
         ``written_path``. ``drift`` lists every field of
         ``{"active_variant", "batch", "assignments", "files",
-        "derived_from"}`` that differs (LLR-169.3); ``issues``
+        "derived_from", "active_document"}`` that differs (LLR-169.3); ``issues``
         carries any re-read reader findings (non-empty → MISMATCH, R-1).
 
     Raises:
@@ -800,7 +866,14 @@ def verify_written_manifest(
     if manifest is None:
         return ManifestVerifyResult(
             status=MANIFEST_MISMATCH,
-            drift=["active_variant", "batch", "assignments", "files", "derived_from"],
+            drift=[
+                "active_variant",
+                "batch",
+                "assignments",
+                "files",
+                "derived_from",
+                "active_document",
+            ],
             issues=[],
             written_path=None,
         )
@@ -831,6 +904,8 @@ def verify_written_manifest(
         drift.append("files")
     if manifest.derived_from != intended_derived:
         drift.append("derived_from")
+    if manifest.active_document != active_document:
+        drift.append("active_document")
 
     status = (
         MANIFEST_VERIFIED
@@ -909,24 +984,39 @@ def _top_level_project_files(project_dir: Path) -> list[Path]:
     return sorted(found, key=lambda item: item.name)
 
 
-def project_file_records(project_dir: Path) -> dict[str, FileRecord]:
+def project_file_records(
+    project_dir: Path, active_document: Optional[str] = None
+) -> dict[str, FileRecord]:
     """
     Summary:
         The ``files`` map the manifest seam writes (LLR-169.2): one record
-        per top-level data or A2L file, computed from disk after every copy
-        has landed.
+        per top-level data or A2L file, plus the active document, computed
+        from disk after every copy has landed.
 
     Args:
         project_dir (Path): The project folder.
+        active_document (Optional[str]): The ``active_document`` text the
+            save records (e.g. ``"patches/boost.json"``); ``None`` → the
+            top-level records only.
 
     Returns:
-        dict[str, FileRecord]: File name -> record, sorted by name. A file
-            that cannot be read is left out (Load then reports it as
-            ``not recorded``) rather than failing the write.
+        dict[str, FileRecord]: Project-relative POSIX key -> record, sorted
+            by key. A file that cannot be read is left out (Load then
+            reports it as ``not recorded``) rather than failing the write.
+            The document gets a record, keyed by its exact text, only when
+            the text passes ``is_active_document_form`` and both its home
+            folder and the file are regular and not links or junctions
+            (S3-8); otherwise no record and no raise.
+
+    Data Flow:
+        - The O-2 top-level scan (no sub-folder listing).
+        - The document: two ``os.lstat`` calls (home, file) and one read to
+          hash it; the home folder is never listed.
 
     Dependencies:
         Uses:
-            - _top_level_project_files / file_record
+            - _top_level_project_files / file_record / _plain_entry
+            - is_active_document_form
         Used by:
             - s19_app.tui.app.S19TuiApp._write_and_verify_manifest
     """
@@ -936,7 +1026,17 @@ def project_file_records(project_dir: Path) -> dict[str, FileRecord]:
             records[path.name] = file_record(path)
         except OSError:
             continue
-    return records
+    if active_document is not None and is_active_document_form(active_document):
+        home, name = active_document.split("/")
+        path = project_dir / home / name
+        if _plain_entry(project_dir / home, folder=True) and _plain_entry(
+            path, folder=False
+        ):
+            try:
+                records[active_document] = file_record(path)
+            except OSError:
+                pass
+    return dict(sorted(records.items()))
 
 
 def count_differing_bytes(base: Mapping[int, int], derived: Mapping[int, int]) -> int:
@@ -998,7 +1098,9 @@ def derive_record(
     )
 
 
-def _disk_problem(path: Path, record: FileRecord) -> Optional[ProjectFileProblem]:
+def _disk_problem(
+    path: Path, record: FileRecord, name: Optional[str] = None
+) -> Optional[ProjectFileProblem]:
     """
     Summary:
         Compare one recorded file with disk (LLR-169.5): ``missing``,
@@ -1008,6 +1110,11 @@ def _disk_problem(path: Path, record: FileRecord) -> Optional[ProjectFileProblem
     Args:
         path (Path): The recorded file, resolved inside the project.
         record (FileRecord): Its record.
+        name (Optional[str]): The recorded ``active_document`` text, or
+            ``None`` for any other file (named ``path.name``). The document
+            is labelled ``change document <text>`` (E3 R20), the label the
+            reopen uses, so Load keeps one row for it; its read failure
+            carries the R16 reason and next-step mark the reopen uses.
 
     Returns:
         Optional[ProjectFileProblem]: The problem, or ``None``.
@@ -1025,29 +1132,89 @@ def _disk_problem(path: Path, record: FileRecord) -> Optional[ProjectFileProblem
         Used by:
             - check_project_files
     """
-    name = path.name
+    # R16 / R20: the document's read failure carries the one io_error
+    # reason, mark and label the reopen uses, so the merged Load row reads
+    # the same whichever is kept.
+    if name is None:
+        label = path.name
+        unreadable = ProjectFileProblem(
+            PROBLEM_NOT_READABLE, label, "the file cannot be read"
+        )
+    else:
+        label = document_problem_file(name)
+        unreadable = ProjectFileProblem(
+            PROBLEM_NOT_READABLE,
+            label,
+            DOCUMENT_REASON_IO_ERROR,
+            step=STEP_CHECK_THEN_LOAD,
+        )
     try:
         info = os.lstat(path)
     except FileNotFoundError:
         return ProjectFileProblem(
-            PROBLEM_MISSING, name, "recorded in project.json, not on disk"
+            PROBLEM_MISSING, label, "recorded in project.json, not on disk"
         )
     except (OSError, ValueError):
-        return ProjectFileProblem(PROBLEM_NOT_READABLE, name, "the file cannot be read")
+        return unreadable
     if not stat.S_ISREG(info.st_mode) or _is_reparse_point(path):
-        return ProjectFileProblem(PROBLEM_NOT_READABLE, name, "not a regular file")
+        return ProjectFileProblem(PROBLEM_NOT_READABLE, label, "not a regular file")
     if info.st_size != record.size:
         return ProjectFileProblem(
-            PROBLEM_CHANGED, name, f"saved {record.size} B, now {info.st_size} B"
+            PROBLEM_CHANGED, label, f"saved {record.size} B, now {info.st_size} B"
         )
     try:
         actual = file_record(path)
     except OSError:
-        return ProjectFileProblem(PROBLEM_NOT_READABLE, name, "the file cannot be read")
+        return unreadable
     if actual != record:
         return ProjectFileProblem(
-            PROBLEM_CHANGED, name, f"same size ({record.size} B), different content"
+            PROBLEM_CHANGED, label, f"same size ({record.size} B), different content"
         )
+    return None
+
+
+def _active_document_missing(
+    project_dir: Path, manifest: ProjectManifest
+) -> Optional[ProjectFileProblem]:
+    """
+    Summary:
+        The ``missing`` problem of a recorded ``active_document`` that has
+        no ``files`` record (LLR-169.5); a recorded one is judged by
+        :func:`_disk_problem` instead, so it is never reported twice.
+
+    Args:
+        project_dir (Path): The project folder.
+        manifest (ProjectManifest): Its read manifest.
+
+    Returns:
+        Optional[ProjectFileProblem]: One ``missing`` labelled ``change
+            document <text>`` (E3 R20) when ``os.lstat`` of the file raises ``FileNotFoundError``;
+            ``None`` otherwise (no document, a ``files`` record, a present
+            file of any type, or any other error: a present but unreadable
+            document is the reopen's ``not readable``, LLR-170.3).
+
+    Raises:
+        None.
+
+    Dependencies:
+        Used by:
+            - check_project_files
+    """
+    text = manifest.active_document
+    if text is None:
+        return None
+    if project_dir.resolve() / text in manifest.files:
+        return None
+    try:
+        os.lstat(project_dir / text)
+    except FileNotFoundError:
+        return ProjectFileProblem(
+            PROBLEM_MISSING,
+            document_problem_file(text),
+            "recorded in project.json, not on disk",
+        )
+    except (OSError, ValueError):
+        pass
     return None
 
 
@@ -1075,8 +1242,13 @@ def check_project_files(
         - The manifest's own findings → ``manifest damaged`` (one per
           skipped entry, or one for ``project.json``); a manifest damaged
           as a whole stops here.
+        - A recorded ``active_document`` without a ``files`` record and
+          absent from disk → one ``missing`` named by its text
+          (:func:`_active_document_missing`), before the next step.
         - No ``files`` records → ``no digests saved``.
-        - Each record → :func:`_disk_problem`.
+        - Each record → :func:`_disk_problem`; the document's record is
+          labelled ``change document <text>`` (E3 R20), every other is
+          named by file name.
         - Each top-level data or A2L file without a record → ``not
           recorded`` (three writers still place files without the seam,
           P-36).
@@ -1084,7 +1256,7 @@ def check_project_files(
     Dependencies:
         Uses:
             - manifest_problems / manifest_is_damaged / _disk_problem /
-              _top_level_project_files
+              _active_document_missing / _top_level_project_files
         Used by:
             - s19_app.tui.app.S19TuiApp._handle_load_project
     """
@@ -1093,11 +1265,23 @@ def check_project_files(
     problems = manifest_problems(manifest)
     if manifest_is_damaged(manifest):
         return problems
+    document_missing = _active_document_missing(project_dir, manifest)
+    if document_missing is not None:
+        problems.append(document_missing)
     if not manifest.files:
         problems.append(ProjectFileProblem(PROBLEM_NO_DIGESTS, PROJECT_MANIFEST_NAME))
         return problems
+    document_path = (
+        None
+        if manifest.active_document is None
+        else project_dir.resolve() / manifest.active_document
+    )
     for path, record in manifest.files.items():
-        problem = _disk_problem(path, record)
+        problem = _disk_problem(
+            path,
+            record,
+            manifest.active_document if path == document_path else None,
+        )
         if problem is not None:
             problems.append(problem)
     recorded = {path.name for path in manifest.files}

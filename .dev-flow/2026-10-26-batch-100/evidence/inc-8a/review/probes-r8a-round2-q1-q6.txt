@@ -1,0 +1,141 @@
+....F...                                                                 [100%]
+================================== FAILURES ===================================
+________ test_q4_plan_keys_vs_written_keys_on_a_document_write_failure ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30726/test_q4_plan_keys_vs_written_k0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001368684FF10>
+
+    def test_q4_plan_keys_vs_written_keys_on_a_document_write_failure(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A forced pasted-document write failure: the plan's project.json keys
+        vs the keys written (LLR-167.6: the plan lists the keys the save writes)."""
+        import s19_app.tui.changes.io as changes_io
+        from s19_app.validation.model import ValidationIssue, ValidationSeverity
+    
+        def _refuse(*args, **kwargs):
+            return None, [ValidationIssue(code=changes_io.MF_WRITE_CONTAINMENT,
+                                          severity=ValidationSeverity.ERROR,
+                                          message="forced", artifact="change")]
+    
+        monkeypatch.setattr(changes_io, "write_change_document", _refuse)
+        monkeypatch.setattr(app_module, "write_change_document", _refuse, raising=False)
+        plans: list = []
+        original = app_module.plan_project_save
+    
+        def _spy(*args, **kwargs):
+            plan = original(*args, **kwargs)
+            plans.append(plan)
+            return plan
+    
+        monkeypatch.setattr(app_module, "plan_project_save", _spy)
+        src = _source(tmp_path)
+    
+        async def scenario(app, pilot, log):
+            await projects.load_image(pilot, app, src)
+            app._change_service.add_entry("0x8000007C", "", "DE AD BE EF")
+            messages = await projects.save_project(pilot, app, log, "P")
+            return messages, app.workarea / "P"
+    
+        messages, project_dir = projects.run_app(tmp_path / "app", scenario)
+        written = tuple(json.loads((project_dir / "project.json").read_text(encoding="utf-8")))
+        print("\nplan keys   :", plans[-1].manifest_keys)
+        print("written keys:", written)
+        for m in messages:
+            print("  ", m)
+>       assert tuple(plans[-1].manifest_keys) == written
+E       AssertionError: assert ('schema_vers...ed_from', ...) == ('schema_vers...derived_from')
+E         
+E         Left contains one more item: 'active_document'
+E         Use -v to get more diff
+
+.dev-flow\2026-10-26-batch-100\evidence\inc-8a\review\test_r8a_probes.py:157: AssertionError
+---------------------------- Captured stdout call -----------------------------
+
+plan keys   : ('schema_version', 'active_variant', 'batch', 'assignments', 'files', 'derived_from', 'active_document')
+written keys: ('schema_version', 'active_variant', 'batch', 'assignments', 'files', 'derived_from')
+   Project saved + manifest verified
+   Saved + verified: firmware.s19 — 0 entries applied before this save; includes 1 entry not applied before this save (0x8000007C)
+   Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30726\test_q4_plan_keys_vs_written_k0\app\.s19tool\workarea\P (variant 'firmware') — firmware.s19 + 1 change entry, 1 applied by this save
+   Change document changes.json was not saved into the project — the file could not be written; its entries stay in the Patch Editor
+=================================== PASSES ====================================
+_________________________________ test_header _________________________________
+---------------------------- Captured stdout call -----------------------------
+
+s19_app: C:\Users\jjgh8\Github\s19_app-b100-inc8a\s19_app\__init__.py
+ebc6dbf4d1b6aa98 tui/app.py
+254693df5dcdf38a tui/services/manifest_writer.py
+699c38bd2cce77cd tui/services/variant_execution_service.py
+bd6f926590c17abd tui/services/project_gather_service.py
+____ test_q1_held_in_home_document_save_paints_not_recorded_but_records_it ____
+---------------------------- Captured stdout call -----------------------------
+
+messages:
+   Project saved + manifest verified
+   Saved + verified: firmware_1.s19 — 0 entries applied before this save; includes 1 entry not applied before this save (0x80000010)
+   Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30726\test_q1_held_in_home_document_0\app\.s19tool\workarea\P (variant 'firmware_1') — firmware.s19 + 1 change entry, 1 applied by this save
+   Change document patches/boost.json could not be read — it stays recorded; check that the file can be opened, then Load again
+active_document written: patches/boost.json
+files keys: ['firmware.s19', 'firmware_1.s19']
+_______ test_q2_outside_txt_document_is_copied_but_line_says_not_placed _______
+---------------------------- Captured stdout call -----------------------------
+
+messages:
+   Project saved + manifest verified
+   Saved + verified: firmware.s19 — 0 entries applied before this save; includes 1 entry not applied before this save (0x80000010)
+   Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30726\test_q2_outside_txt_document_i0\app\.s19tool\workarea\P (variant 'firmware') — firmware.s19 + 1 change entry, 1 applied by this save
+   Change document boost.txt was copied into the project's patches folder but is not recorded — its name is not one project.json records
+tree: ['firmware.s19', 'patches/boost.txt', 'project.json']
+active_document: None
+____ test_q3_change_document_recorded_under_checks_line_contradicts_record ____
+---------------------------- Captured stdout call -----------------------------
+
+reopened (entries, kind): (1, 'change')
+   Project saved + manifest verified
+   Saved + verified: firmware_1.s19 — 0 entries applied before this save; includes 1 entry not applied before this save (0x80000010)
+   Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30726\test_q3_change_document_record0\app\.s19tool\workarea\P (variant 'firmware_1') — firmware.s19 + 1 change entry, 1 applied by this save
+   Change document checks/boost.json stays recorded in project.json as it was — it is not in the project's patches folder
+active_document written: checks/boost.json
+______________________ test_q5_round_trip_save_load_save ______________________
+---------------------------- Captured stdout call -----------------------------
+
+first save:
+   Project saved + manifest verified
+   Saved + verified: firmware.s19 — 0 entries applied before this save; includes 1 entry not applied before this save (0x8000007C)
+   Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30726\test_q5_round_trip_save_load_s0\app\.s19tool\workarea\P (variant 'firmware') — firmware.s19 + 1 change entry, 1 applied by this save
+tree1: ['firmware.s19', 'patches/changes.json', 'project.json']
+manifest1 active_variant/derived: firmware {'firmware.s19': {'base': 'firmware.s19', 'sha256': '8a35f3808f25ff85a9ce1100bbce23783a7031b82c6f3d14cc1f749a0df40e51', 'differ': 4}}
+reopened entries: 1
+second save:
+   Project saved + manifest verified
+   Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30726\test_q5_round_trip_save_load_s0\app\.s19tool\workarea\P (variant 'firmware')
+tree2: ['firmware.s19', 'patches/changes.json', 'project.json']
+manifest2 active_variant/derived: firmware {'firmware.s19': {'base': 'firmware.s19', 'sha256': '8a35f3808f25ff85a9ce1100bbce23783a7031b82c6f3d14cc1f749a0df40e51', 'differ': 4}}
+____ test_q6_document_with_a_device_stem_refuses_the_whole_save[aux.json] _____
+---------------------------- Captured stdout call -----------------------------
+
+messages:
+   Project saved + manifest verified
+   Saved + verified: firmware.s19 — 0 entries applied before this save; includes 1 entry not applied before this save (0x80000010)
+   Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30726\test_q6_document_with_a_device0\app\.s19tool\workarea\P (variant 'firmware') — firmware.s19 + 1 change entry, 1 applied by this save
+   Change document aux.json was copied into the project's patches folder but is not recorded — its name is not one project.json records
+P exists: True ['firmware.s19', 'patches/aux.json', 'project.json']
+____ test_q6_document_with_a_device_stem_refuses_the_whole_save[con.json] _____
+---------------------------- Captured stdout call -----------------------------
+
+messages:
+   Project saved + manifest verified
+   Saved + verified: firmware.s19 — 0 entries applied before this save; includes 1 entry not applied before this save (0x80000010)
+   Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30726\test_q6_document_with_a_device1\app\.s19tool\workarea\P (variant 'firmware') — firmware.s19 + 1 change entry, 1 applied by this save
+   Change document con.json was copied into the project's patches folder but is not recorded — its name is not one project.json records
+P exists: True ['firmware.s19', 'patches/con.json', 'project.json']
+=========================== short test summary info ===========================
+PASSED .dev-flow/2026-10-26-batch-100/evidence/inc-8a/review/test_r8a_probes.py::test_header
+PASSED .dev-flow/2026-10-26-batch-100/evidence/inc-8a/review/test_r8a_probes.py::test_q1_held_in_home_document_save_paints_not_recorded_but_records_it
+PASSED .dev-flow/2026-10-26-batch-100/evidence/inc-8a/review/test_r8a_probes.py::test_q2_outside_txt_document_is_copied_but_line_says_not_placed
+PASSED .dev-flow/2026-10-26-batch-100/evidence/inc-8a/review/test_r8a_probes.py::test_q3_change_document_recorded_under_checks_line_contradicts_record
+PASSED .dev-flow/2026-10-26-batch-100/evidence/inc-8a/review/test_r8a_probes.py::test_q5_round_trip_save_load_save
+PASSED .dev-flow/2026-10-26-batch-100/evidence/inc-8a/review/test_r8a_probes.py::test_q6_document_with_a_device_stem_refuses_the_whole_save[aux.json]
+PASSED .dev-flow/2026-10-26-batch-100/evidence/inc-8a/review/test_r8a_probes.py::test_q6_document_with_a_device_stem_refuses_the_whole_save[con.json]
+FAILED .dev-flow/2026-10-26-batch-100/evidence/inc-8a/review/test_r8a_probes.py::test_q4_plan_keys_vs_written_keys_on_a_document_write_failure
+1 failed, 7 passed in 21.55s

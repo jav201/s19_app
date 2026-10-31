@@ -1,0 +1,24 @@
+
+s19_app: C:\Users\jjgh8\Github\s19_app-b100-inc8a\s19_app\__init__.py
+8c627b717172ccd8 tui/app.py
+a638b23d2bb861b1 tui/services/manifest_writer.py
+5f2ab3268d9cdc4d tui/services/variant_execution_service.py
+6f2d419ea0d2ee56 tui/services/project_gather_service.py
+.
+messages:
+   Manifest write failed
+   Project NOT saved: could not save — project.json was not written. check the folder.
+P exists: False []
+F
+messages:
+   Manifest write failed
+   Project NOT saved: could not save — project.json was not written. check the folder.
+P exists: False []
+F
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r8a\test_r8a_probes.py:215: AssertionError: ['Manifest write failed', 'Project NOT saved: could not save — project.json was not written. check the folder.']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r8a\test_r8a_probes.py:215: AssertionError: ['Manifest write failed', 'Project NOT saved: could not save — project.json was not written. check the folder.']
+=========================== short test summary info ===========================
+FAILED ::test_q6_document_with_a_device_stem_refuses_the_whole_save[aux.json]
+FAILED ::test_q6_document_with_a_device_stem_refuses_the_whole_save[con.json]
+2 failed, 1 passed in 92.84s (0:01:32)

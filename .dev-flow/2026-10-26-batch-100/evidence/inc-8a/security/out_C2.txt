@@ -1,0 +1,33 @@
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc8a\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+[doc+manifest  load          ] {'bytes': 236860, 'longest path': 245, 'handler s': 0.721, 'click->panel s': 1.214, 'rows': 1, 'reads s': [0.12]} wall=3.0s
+     last statuses: ["Loaded project 'P' -> firmware.s19 - variant 1 of 1, 1 problem - details: p"]
+[doc+manifest  load          ] {'bytes': 236860, 'longest path': 245, 'handler s': 0.741, 'click->panel s': 1.504, 'rows': 1, 'reads s': [0.118]} wall=3.4s
+     last statuses: ["Loaded project 'P' -> firmware.s19 - variant 1 of 1, 1 problem - details: p"]
+[doc+manifest  save-project  ] {'bytes': 236860, 'longest path': 253, 'trigger->outcome s': 0.456, 'reads s': [0.117], 'outcome': 'Project saved + manifest verified'} wall=4.0s
+     last statuses: ["Loaded project 'P' -> firmware.s19 - variant 1 of 1, 1 problem - details: p", 'Project saved + manifest verified', 'Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scrat']
+[doc+manifest  variant-append] {'bytes': 236860, 'longest path': 255, 'trigger->outcome s': 0.994, 'reads s': [0.113], 'outcome': 'Project saved + manifest verified'} wall=4.7s
+     last statuses: ['Project saved + manifest verified', "Project 'P' now opens firmware_1.s19", "Added variant 'firmware_1' to project 'P'"]
+exit=0 (both)
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc8a\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+[doc only      load          ] {'bytes': 236860, 'longest path': 245, 'handler s': 0.596, 'click->panel s': 1.36, 'rows': 1, 'reads s': [0.002]} wall=3.3s
+     last statuses: ["Loaded project 'P' -> firmware.s19 - variant 1 of 1, 1 problem - details: p"]
+[doc only      load          ] {'bytes': 236860, 'longest path': 245, 'handler s': 0.641, 'click->panel s': 1.435, 'rows': 1, 'reads s': [0.002]} wall=3.5s
+     last statuses: ["Loaded project 'P' -> firmware.s19 - variant 1 of 1, 1 problem - details: p"]
+[doc only      save-project  ] {'bytes': 236860, 'longest path': 253, 'trigger->outcome s': 0.298, 'reads s': [0.001], 'outcome': 'Project saved + manifest verified'} wall=3.8s
+     last statuses: ["Loaded project 'P' -> firmware.s19 - variant 1 of 1, 1 problem - details: p", 'Project saved + manifest verified', 'Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scrat']
+[doc only      variant-append] {'bytes': 236860, 'longest path': 255, 'trigger->outcome s': 0.422, 'reads s': [0.001], 'outcome': 'Project saved + manifest verified'} wall=4.2s
+     last statuses: ['Project saved + manifest verified', "Project 'P' now opens firmware_1.s19", "Added variant 'firmware_1' to project 'P'"]
+exit=0 (doc)
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc8a\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+[manifest only load          ] {'bytes': 236860, 'longest path': 245, 'handler s': 0.163, 'click->panel s': 0.998, 'rows': 1, 'reads s': [0.129]} wall=2.9s
+     last statuses: ["Loaded project 'P' -> firmware.s19 - variant 1 of 1, 1 problem - details: p"]
+[manifest only load          ] {'bytes': 236860, 'longest path': 245, 'handler s': 0.154, 'click->panel s': 1.183, 'rows': 1, 'reads s': [0.121]} wall=3.1s
+     last statuses: ["Loaded project 'P' -> firmware.s19 - variant 1 of 1, 1 problem - details: p"]
+[manifest only save-project  ] {'bytes': 236860, 'longest path': 253, 'trigger->outcome s': 0.178, 'reads s': [0.115], 'outcome': 'Project saved + manifest verified'} wall=3.1s
+     last statuses: ["Loaded project 'P' -> firmware.s19 - variant 1 of 1, 1 problem - details: p", 'Project saved + manifest verified', 'Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scrat']
+[manifest only variant-append] {'bytes': 236860, 'longest path': 255, 'trigger->outcome s': 0.878, 'reads s': [0.111], 'outcome': 'Project saved + manifest verified'} wall=3.9s
+     last statuses: ['Project saved + manifest verified', "Project 'P' now opens firmware_1.s19", "Added variant 'firmware_1' to project 'P'"]
+exit=0 (man)

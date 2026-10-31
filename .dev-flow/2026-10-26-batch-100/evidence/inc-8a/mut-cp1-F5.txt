@@ -1,0 +1,25 @@
+# mutant cp1-F5  (F5 / E3 R16)
+# description: the composer ignores the step mark (kind's token always)
+# file: s19_app/tui/services/variant_execution_service.py
+# source sha256 before: 699c38bd2cce77cd455c134acabda82a5ace290fb4a9ea270f292b8e03fb9c92
+# edit 1 OLD:
+#   |     if problem.step is not None:
+#   |         return DOCUMENT_NEXT_STEP[problem.step]
+# edit 1 NEW:
+#   | <deleted>
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_not_readable_document_paints_the_next_step_of_its_reason[too_large] tests/test_b100_document.py::test_tc_b100_30_cp1_held_unrecorded_document_paints_the_reopen_reason
+# started 2026-10-30T23:57:01Z  finished 2026-10-30T23:57:04Z  rc=1
+FF                                                                       [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_document.py:1482: AssertionError: assert [('not readab... to drop it')] == [('not readab...ke a while)')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_document.py:1830: AssertionError: [('not readable', 'change document patches/boost.json', 'could not be read - replace the file, or Save project to drop it')]
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_30_not_readable_document_paints_the_next_step_of_its_reason[too_large]
+FAILED tests/test_b100_document.py::test_tc_b100_30_cp1_held_unrecorded_document_paints_the_reopen_reason
+2 failed in 2.83s
+
+# pytest summary: 2 failed in 2.83s
+# verdict: KILLED
+# restored = True  (sha256 after restore: 699c38bd2cce77cd455c134acabda82a5ace290fb4a9ea270f292b8e03fb9c92)

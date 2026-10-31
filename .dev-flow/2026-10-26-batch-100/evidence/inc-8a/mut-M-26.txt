@@ -1,0 +1,35 @@
+# mutant M-26  (LLR-164.2 / E3 R10)
+# description: the classifier Save project uses parses with no byte cap and no entry cap (full read, no size checks)
+# file: s19_app/tui/app.py
+# source sha256 before: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2
+# edit 1 OLD:
+#   |     if found.st_size > REOPEN_MAX_BYTES:
+# edit 1 NEW:
+#   |     if False:
+# edit 2 OLD:
+#   |             data = handle.read(REOPEN_MAX_BYTES + 1)
+# edit 2 NEW:
+#   |             data = handle.read()
+# edit 3 OLD:
+#   |     if len(data) > REOPEN_MAX_BYTES:
+# edit 3 NEW:
+#   |     if False:
+# edit 4 OLD:
+#   |     if len(entries) > REOPEN_MAX_ENTRIES:
+# edit 4 NEW:
+#   |     if False:
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
+# started 2026-10-30T23:10:40Z  finished 2026-10-30T23:11:18Z  rc=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d\tests\test_b100_save_guards.py:2526: AssertionError: Save project took 34.210 s
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
+1 failed in 36.25s
+
+# pytest summary: 1 failed in 36.25s
+# verdict: KILLED
+# note: the caps live only in recorded_document_state (shared with Load's reopen); a Save-only cap removal has no separate code site, so this mutant equals M-11's behaviour on the Save path
+# restored = True  (sha256 after restore: 8c627b717172ccd866a704bfd5d9ea805688f74f577d4579bba1c69add671fd2)

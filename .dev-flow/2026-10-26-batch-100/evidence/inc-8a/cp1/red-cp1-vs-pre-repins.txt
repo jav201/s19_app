@@ -1,0 +1,27 @@
+# RED cp1 — the re-pinned nodes of the second batch on the PRE snapshot
+# UTC: 2026-10-31T00:27:59Z  cwd: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/cp8a-1/pre  PYTHONPATH=<cwd>  NO_COLOR unset  (default pytest temp dir, nothing else running)
+# s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\s19_app\__init__.py
+#   8c627b717172ccd8 tui/app.py
+#   a638b23d2bb861b1 tui/services/manifest_writer.py
+#   5f2ab3268d9cdc4d tui/services/variant_execution_service.py
+#   6f2d419ea0d2ee56 tui/services/project_gather_service.py
+# command: pytest -p no:cacheprovider -q --tb=short -rfE tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling tests/test_b100_project_check.py::test_tc_b100_25_missing_active_document_is_one_problem tests/test_b100_project_check.py::test_tc_b100_25_missing_document_survives_the_no_digests_return tests/test_b100_project_check.py::test_tc_b100_25_changed_document_is_named_by_its_project_text tests/test_b100_save_image.py::test_tc_b100_59_gather_service_imports_no_change_module tests/test_b100_save_guards.py::test_tc_b100_06_name_cap_boundary tests/test_b100_save_guards.py::test_tc_b100_06_path_limit_met_and_exceeded tests/test_b100_save_guards.py::test_tc_b100_07_rollback_keeps_the_previous_copy_unless_restored
+.FFFFF..FF.                                                              [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_project_check.py:1683: AssertionError: assert [('missing', .../boost.json')] == [('missing', .../boost.json')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_project_check.py:1683: AssertionError: assert [('missing', .../boost.json')] == [('missing', .../boost.json')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_project_check.py:1696: AssertionError: assert [('missing', ...roject.json')] == [('missing', ...roject.json')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_project_check.py:1717: AssertionError: assert [('changed on.../boost.json')] == [('changed on.../boost.json')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_save_image.py:1520: AssertionError: ['...validation.model', '..workspace', '.variant_execution_service', '__future__', 'dataclasses', 'json', ...]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_save_guards.py:2118: AssertionError: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30718/test_tc_b100_07_rollback_keeps0/app/.s19t...AppData/Local/Temp/pytest-of-jjgh8/pytest-30718/test_tc_b100_07_rollback_keeps0/app/.s19tool/workarea/P/project.json')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\pre\tests\test_b100_save_guards.py:2118: AssertionError: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30718/test_tc_b100_07_rollback_keeps1/app/.s19t...AppData/Local/Temp/pytest-of-jjgh8/pytest-30718/test_tc_b100_07_rollback_keeps1/app/.s19tool/workarea/P/project.json')]
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_check.py::test_tc_b100_25_missing_active_document_is_one_problem[with-record]
+FAILED tests/test_b100_project_check.py::test_tc_b100_25_missing_active_document_is_one_problem[without-record]
+FAILED tests/test_b100_project_check.py::test_tc_b100_25_missing_document_survives_the_no_digests_return
+FAILED tests/test_b100_project_check.py::test_tc_b100_25_changed_document_is_named_by_its_project_text
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_gather_service_imports_no_change_module
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_rollback_keeps_the_previous_copy_unless_restored[held]
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_rollback_keeps_the_previous_copy_unless_restored[no-space]
+7 failed, 4 passed in 28.71s
+# pytest exit code: 1

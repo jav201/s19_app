@@ -1,0 +1,29 @@
+# mutant cp1-M-15  (LLR-167.6 / A3R2-1 (old M-15 re-run))
+# description: the plan lets the document digest's OSError propagate
+# file: s19_app/tui/app.py
+# source sha256 before: ebc6dbf4d1b6aa98e7f5e5fde06895c66c98e8704d182e34efa408e01f332b7f
+# edit 1 OLD:
+#   |                 except OSError as exc:
+#   |                     self.logger.warning(
+#   |                         "Save plan: change document not readable: %s (%s)",
+# edit 1 NEW:
+#   |                 except OSError as exc:
+#   |                     raise
+#   |                     self.logger.warning(
+#   |                         "Save plan: change document not readable: %s (%s)",
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_29_cp1_unreadable_outside_document_is_not_placed tests/test_b100_document.py::test_tc_b100_29_cp1_held_reopened_document_paints_one_true_line
+# started 2026-10-30T23:57:39Z  finished 2026-10-30T23:57:46Z  rc=1
+FF                                                                       [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_document.py:1697: AssertionError: ['Project NOT saved: boost.json could not be read: Permission denied. Nothing written.']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_document.py:1650: AssertionError: ['Project NOT saved: boost.json could not be read: Permission denied. Nothing written.']
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_29_cp1_unreadable_outside_document_is_not_placed
+FAILED tests/test_b100_document.py::test_tc_b100_29_cp1_held_reopened_document_paints_one_true_line
+2 failed in 6.08s
+
+# pytest summary: 2 failed in 6.08s
+# verdict: KILLED
+# restored = True  (sha256 after restore: ebc6dbf4d1b6aa98e7f5e5fde06895c66c98e8704d182e34efa408e01f332b7f)

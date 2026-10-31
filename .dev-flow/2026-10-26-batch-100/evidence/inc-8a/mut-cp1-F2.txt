@@ -1,0 +1,24 @@
+# mutant cp1-F2  (F2 / E3 R3)
+# description: the same-file branch is dropped (the 'not recorded' line is painted)
+# file: s19_app/tui/app.py
+# source sha256 before: ebc6dbf4d1b6aa98e7f5e5fde06895c66c98e8704d182e34efa408e01f332b7f
+# edit 1 OLD:
+#   |         if text is not None and text == carried:
+# edit 1 NEW:
+#   |         if False:
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_29_cp1_held_reopened_document_paints_one_true_line tests/test_b100_document.py::test_tc_b100_29_cp1_document_recorded_elsewhere_paints_one_true_line
+# started 2026-10-30T23:57:08Z  finished 2026-10-30T23:57:17Z  rc=1
+FF                                                                       [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_document.py:1653: AssertionError: ['Project saved + manifest verified', 'Saved + verified: firmware_1.s19 — 0 entries applied before this save; includes...document patches/boost.json could not be read — it stays recorded; check that the file can be opened, then Load again']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_document.py:1676: AssertionError: ['Change document boost.json was not recorded in the project — it is in the project but not in its patches folder']
+=========================== short test summary info ===========================
+FAILED tests/test_b100_document.py::test_tc_b100_29_cp1_held_reopened_document_paints_one_true_line
+FAILED tests/test_b100_document.py::test_tc_b100_29_cp1_document_recorded_elsewhere_paints_one_true_line
+2 failed in 7.14s
+
+# pytest summary: 2 failed in 7.14s
+# verdict: KILLED
+# restored = True  (sha256 after restore: ebc6dbf4d1b6aa98e7f5e5fde06895c66c98e8704d182e34efa408e01f332b7f)

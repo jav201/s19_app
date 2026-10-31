@@ -1,0 +1,2185 @@
+{
+  "marks": [
+    {
+      "name": "_save_manifest_keys",
+      "reqs": [
+        "LLR-167.6",
+        "LLR-170.1"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 1456,
+      "def": {
+        "qualname": "_save_manifest_keys",
+        "line": 1457,
+        "params": [
+          {
+            "name": "declared_regions",
+            "type": "Sequence[DeclaredRegion]",
+            "default": null
+          },
+          {
+            "name": "derived",
+            "type": "bool",
+            "default": "False"
+          }
+        ],
+        "returns": "tuple[str, ...]"
+      }
+    },
+    {
+      "name": "S19TuiApp.on_patch_editor_panel_save_back_decision",
+      "reqs": [
+        "LLR-168.2",
+        "LLR-168.3",
+        "LLR-168.4"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 3768,
+      "def": {
+        "qualname": "S19TuiApp.on_patch_editor_panel_save_back_decision",
+        "line": 3769,
+        "params": [
+          {
+            "name": "event",
+            "type": "PatchEditorPanel.SaveBackDecision",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._patch_editor_load",
+      "reqs": [
+        "LLR-008.1",
+        "LLR-170.3"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 5834,
+      "def": {
+        "qualname": "S19TuiApp._patch_editor_load",
+        "line": 5835,
+        "params": [
+          {
+            "name": "panel",
+            "type": "PatchEditorPanel",
+            "default": null
+          },
+          {
+            "name": "path_text",
+            "type": "str",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._handle_save_dialog",
+      "reqs": [
+        "HLR-170",
+        "LLR-170.2",
+        "LLR-167.8",
+        "LLR-164.2",
+        "LLR-167.6"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 9067,
+      "def": {
+        "qualname": "S19TuiApp._handle_save_dialog",
+        "line": 9068,
+        "params": [
+          {
+            "name": "payload",
+            "type": "Optional[SaveProjectPayload]",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._plan_project_save",
+      "reqs": [
+        "LLR-167.6",
+        "LLR-170.2"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 9873,
+      "def": {
+        "qualname": "S19TuiApp._plan_project_save",
+        "line": 9874,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "project_name",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "image_step",
+            "type": "_ProjectImageStep",
+            "default": null
+          },
+          {
+            "name": "derived",
+            "type": "bool",
+            "default": "False"
+          }
+        ],
+        "returns": "SavePlan"
+      }
+    },
+    {
+      "name": "S19TuiApp._write_and_verify_manifest",
+      "reqs": [
+        "LLR-169.2",
+        "LLR-170.1",
+        "LLR-168.3"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 9970,
+      "def": {
+        "qualname": "S19TuiApp._write_and_verify_manifest",
+        "line": 9971,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "batch",
+            "type": "Sequence[str]",
+            "default": "()"
+          },
+          {
+            "name": "assignments",
+            "type": "Optional[Mapping[str, Sequence[str]]]",
+            "default": "None"
+          },
+          {
+            "name": "declared_regions",
+            "type": "Sequence[DeclaredRegion]",
+            "default": "()"
+          },
+          {
+            "name": "gathered",
+            "type": "Optional[Mapping[str, Sequence[str]]]",
+            "default": "None"
+          },
+          {
+            "name": "derived_from",
+            "type": "Optional[Mapping[str, DerivedFrom]]",
+            "default": "None"
+          },
+          {
+            "name": "on_written",
+            "type": "Optional[Callable[[Path], None]]",
+            "default": "None"
+          }
+        ],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "S19TuiApp._reset_project_session",
+      "reqs": [
+        "LLR-165.1",
+        "LLR-165.3"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 10199,
+      "def": {
+        "qualname": "S19TuiApp._reset_project_session",
+        "line": 10200,
+        "params": [],
+        "returns": "int"
+      }
+    },
+    {
+      "name": "S19TuiApp._handle_load_project",
+      "reqs": [
+        "LLR-170.3",
+        "HLR-170",
+        "LLR-169.6"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 10487,
+      "def": {
+        "qualname": "S19TuiApp._handle_load_project",
+        "line": 10488,
+        "params": [
+          {
+            "name": "name",
+            "type": "Optional[str]",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._manifest_carry",
+      "reqs": [
+        "LLR-168.3",
+        "LLR-164.2"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 10691,
+      "def": {
+        "qualname": "S19TuiApp._manifest_carry",
+        "line": 10692,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "manifest",
+            "type": "Optional[ProjectManifest]",
+            "default": null
+          }
+        ],
+        "returns": "dict"
+      }
+    },
+    {
+      "name": "S19TuiApp._rewrite_project_manifest",
+      "reqs": [
+        "LLR-168.3"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 10749,
+      "def": {
+        "qualname": "S19TuiApp._rewrite_project_manifest",
+        "line": 10750,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "placed",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "derived",
+            "type": "Optional[DerivedFrom]",
+            "default": "None"
+          }
+        ],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "S19TuiApp._sync_loaded_file_to_project",
+      "reqs": [
+        "LLR-168.3"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 10916,
+      "def": {
+        "qualname": "S19TuiApp._sync_loaded_file_to_project",
+        "line": 10917,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._sync_loaded_a2l_to_project",
+      "reqs": [
+        "LLR-168.3"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 11055,
+      "def": {
+        "qualname": "S19TuiApp._sync_loaded_a2l_to_project",
+        "line": 11056,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "write_change_document",
+      "reqs": [
+        "LLR-170.2"
+      ],
+      "file": "s19_app/tui/changes/io.py",
+      "line": 1504,
+      "def": {
+        "qualname": "write_change_document",
+        "line": 1505,
+        "params": [
+          {
+            "name": "document",
+            "type": "ChangeDocument",
+            "default": null
+          },
+          {
+            "name": "base_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "file_name",
+            "type": "str",
+            "default": "DEFAULT_CHANGE_FILE_NAME"
+          },
+          {
+            "name": "copy_fn",
+            "type": "Optional[CopyIntoWorkarea]",
+            "default": "None"
+          },
+          {
+            "name": "dest_dir",
+            "type": "Optional[Path]",
+            "default": "None"
+          }
+        ],
+        "returns": "tuple[Optional[Path], list[ValidationIssue]]"
+      }
+    },
+    {
+      "name": "PatchEditorPanel.mark_saved",
+      "reqs": [
+        "LLR-167.8",
+        "LLR-005.1"
+      ],
+      "file": "s19_app/tui/screens_directionb.py",
+      "line": 5806,
+      "def": {
+        "qualname": "PatchEditorPanel.mark_saved",
+        "line": 5807,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "ChangeService.load",
+      "reqs": [
+        "LLR-003.4",
+        "LLR-141",
+        "LLR-170.3"
+      ],
+      "file": "s19_app/tui/services/change_service.py",
+      "line": 1538,
+      "def": {
+        "qualname": "ChangeService.load",
+        "line": 1539,
+        "params": [
+          {
+            "name": "path_text",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "base_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "a2l_context",
+            "type": "Optional[dict]",
+            "default": "None"
+          }
+        ],
+        "returns": "ChangeActionResult"
+      }
+    },
+    {
+      "name": "serialize_manifest",
+      "reqs": [
+        "LLR-170.1",
+        "LLR-169.1",
+        "LLR-168.4"
+      ],
+      "file": "s19_app/tui/services/manifest_writer.py",
+      "line": 254,
+      "def": {
+        "qualname": "serialize_manifest",
+        "line": 255,
+        "params": [
+          {
+            "name": "variant_set",
+            "type": "ProjectVariantSet",
+            "default": null
+          },
+          {
+            "name": "project_root",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "batch",
+            "type": "Sequence[str]",
+            "default": "()"
+          },
+          {
+            "name": "assignments",
+            "type": "Optional[Mapping[str, Sequence[str]]]",
+            "default": "None"
+          },
+          {
+            "name": "declared_regions",
+            "type": "Sequence[DeclaredRegion]",
+            "default": "()"
+          },
+          {
+            "name": "gathered",
+            "type": "Optional[Mapping[str, Sequence[str]]]",
+            "default": "None"
+          },
+          {
+            "name": "files",
+            "type": "Optional[Mapping[str, FileRecord]]",
+            "default": "None"
+          },
+          {
+            "name": "derived_from",
+            "type": "Optional[Mapping[str, DerivedFrom]]",
+            "default": "None"
+          },
+          {
+            "name": "schema_version",
+            "type": "int",
+            "default": "DEFAULT_SCHEMA_VERSION"
+          }
+        ],
+        "returns": "tuple[Optional[str], list[ValidationIssue]]"
+      }
+    },
+    {
+      "name": "write_project_manifest",
+      "reqs": [
+        "LLR-169.7",
+        "LLR-170.1"
+      ],
+      "file": "s19_app/tui/services/manifest_writer.py",
+      "line": 472,
+      "def": {
+        "qualname": "write_project_manifest",
+        "line": 473,
+        "params": [
+          {
+            "name": "variant_set",
+            "type": "ProjectVariantSet",
+            "default": null
+          },
+          {
+            "name": "project_root",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "base_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "batch",
+            "type": "Sequence[str]",
+            "default": "()"
+          },
+          {
+            "name": "assignments",
+            "type": "Optional[Mapping[str, Sequence[str]]]",
+            "default": "None"
+          },
+          {
+            "name": "declared_regions",
+            "type": "Sequence[DeclaredRegion]",
+            "default": "()"
+          },
+          {
+            "name": "gathered",
+            "type": "Optional[Mapping[str, Sequence[str]]]",
+            "default": "None"
+          },
+          {
+            "name": "files",
+            "type": "Optional[Mapping[str, FileRecord]]",
+            "default": "None"
+          },
+          {
+            "name": "derived_from",
+            "type": "Optional[Mapping[str, DerivedFrom]]",
+            "default": "None"
+          },
+          {
+            "name": "schema_version",
+            "type": "int",
+            "default": "DEFAULT_SCHEMA_VERSION"
+          }
+        ],
+        "returns": "tuple[Optional[Path], list[ValidationIssue]]"
+      }
+    },
+    {
+      "name": "verify_written_manifest",
+      "reqs": [
+        "LLR-169.3"
+      ],
+      "file": "s19_app/tui/services/manifest_writer.py",
+      "line": 725,
+      "def": {
+        "qualname": "verify_written_manifest",
+        "line": 726,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "variant_set",
+            "type": "ProjectVariantSet",
+            "default": null
+          },
+          {
+            "name": "project_root",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "batch",
+            "type": "Sequence[str]",
+            "default": "()"
+          },
+          {
+            "name": "assignments",
+            "type": "Optional[Mapping[str, Sequence[str]]]",
+            "default": "None"
+          },
+          {
+            "name": "files",
+            "type": "Optional[Mapping[str, FileRecord]]",
+            "default": "None"
+          },
+          {
+            "name": "derived_from",
+            "type": "Optional[Mapping[str, DerivedFrom]]",
+            "default": "None"
+          }
+        ],
+        "returns": "ManifestVerifyResult"
+      }
+    },
+    {
+      "name": "project_file_records",
+      "reqs": [
+        "LLR-169.2"
+      ],
+      "file": "s19_app/tui/services/manifest_writer.py",
+      "line": 915,
+      "def": {
+        "qualname": "project_file_records",
+        "line": 916,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "dict[str, FileRecord]"
+      }
+    },
+    {
+      "name": "check_project_files",
+      "reqs": [
+        "LLR-169.5",
+        "HLR-170"
+      ],
+      "file": "s19_app/tui/services/manifest_writer.py",
+      "line": 1058,
+      "def": {
+        "qualname": "check_project_files",
+        "line": 1059,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "manifest",
+            "type": "Optional[ProjectManifest]",
+            "default": null
+          }
+        ],
+        "returns": "list[ProjectFileProblem]"
+      }
+    },
+    {
+      "name": "gather_project_artifacts",
+      "reqs": [
+        "LLR-170.2",
+        "LLR-138.1"
+      ],
+      "file": "s19_app/tui/services/project_gather_service.py",
+      "line": 368,
+      "def": {
+        "qualname": "gather_project_artifacts",
+        "line": 369,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "composition_names",
+            "type": "Sequence[str]",
+            "default": "()"
+          },
+          {
+            "name": "active_document",
+            "type": "Optional[Path]",
+            "default": "None"
+          },
+          {
+            "name": "active_document_kind",
+            "type": "str",
+            "default": "'change'"
+          },
+          {
+            "name": "active_template",
+            "type": "Optional[Path]",
+            "default": "None"
+          },
+          {
+            "name": "common_patches_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "common_templates_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "workarea_root",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "GatherOutcome"
+      }
+    },
+    {
+      "name": "plan_project_save",
+      "reqs": [
+        "LLR-167.6"
+      ],
+      "file": "s19_app/tui/services/project_gather_service.py",
+      "line": 783,
+      "def": {
+        "qualname": "plan_project_save",
+        "line": 784,
+        "params": [
+          {
+            "name": "target",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "target_kind",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "files",
+            "type": "Sequence[PlannedFile]",
+            "default": null
+          },
+          {
+            "name": "image",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "manifest_keys",
+            "type": "Sequence[str]",
+            "default": null
+          },
+          {
+            "name": "refusal",
+            "type": "Optional[str]",
+            "default": "None"
+          }
+        ],
+        "returns": "SavePlan"
+      }
+    },
+    {
+      "name": "read_project_manifest",
+      "reqs": [
+        "LLR-170.1",
+        "LLR-168.1",
+        "LLR-169.4"
+      ],
+      "file": "s19_app/tui/services/variant_execution_service.py",
+      "line": 1205,
+      "def": {
+        "qualname": "read_project_manifest",
+        "line": 1206,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "size_probe",
+            "type": "Optional[SizeProbe]",
+            "default": "None"
+          }
+        ],
+        "returns": "Optional[ProjectManifest]"
+      }
+    },
+    {
+      "name": "manifest_keep_reason",
+      "reqs": [
+        "LLR-168.3",
+        "SEC7-3"
+      ],
+      "file": "s19_app/tui/services/variant_execution_service.py",
+      "line": 1795,
+      "def": {
+        "qualname": "manifest_keep_reason",
+        "line": 1796,
+        "params": [
+          {
+            "name": "manifest",
+            "type": "ProjectManifest",
+            "default": null
+          }
+        ],
+        "returns": "Optional[str]"
+      }
+    },
+    {
+      "name": "manifest_rewrite_refusal",
+      "reqs": [
+        "LLR-168.3"
+      ],
+      "file": "s19_app/tui/services/variant_execution_service.py",
+      "line": 1838,
+      "def": {
+        "qualname": "manifest_rewrite_refusal",
+        "line": 1839,
+        "params": [
+          {
+            "name": "manifest",
+            "type": "ProjectManifest",
+            "default": null
+          }
+        ],
+        "returns": "Optional[str]"
+      }
+    }
+  ],
+  "graph_nodes": [
+    {
+      "name": "_save_manifest_keys",
+      "reqs": [
+        "LLR-167.6",
+        "LLR-170.1"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Sequence[DeclaredRegion]",
+          "name": "declared_regions",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "derived",
+          "default": "False"
+        }
+      ],
+      "out": {
+        "type": "tuple[str, ...]",
+        "names": [
+          "keys"
+        ],
+        "raw": "tuple[str, ...] keys"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(TC-B100-59, test_tc_b100_59_plan_keys_equal_written_keys_with_derived_from) declared_regions () and derived `True` → keys hold \"files\" and \"derived_from\" (holds at dc3b314)",
+        "(TC-B100-59, LLR-167.6 \"the app passes the keys it writes\") a save whose Patch Editor holds `patches/boost.json` with 1 entry → keys hold \"active_document\" (target (8a))"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the project.json keys a Save project writes, read off serialize_manifest, passed to the save plan as an input. 8a changes: an active document adds `active_document` to the keys (today the function has no document input, so the plan can never list it).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._plan_project_save",
+      "reqs": [
+        "LLR-167.6",
+        "LLR-170.2"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "project_name",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "_ProjectImageStep",
+          "name": "image_step",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "derived",
+          "default": "False"
+        }
+      ],
+      "out": {
+        "type": "SavePlan",
+        "names": [
+          "plan"
+        ],
+        "raw": "SavePlan plan"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(TC-B100-59, test_tc_b100_59_fresh_folder) fresh folder `P1`, image `firmware.s19` unchanged → plan.rows image action \"new\", plan.target_kind \"new\" (holds at dc3b314)",
+        "(TC-B100-59 Inc 8a arm, LLR-170.2) a pasted document with 1 entry → plan has one row landing `patches/changes.json` with action \"new\"; a different `changes.json` already in `P/patches/` → landing `patches/changes_1.json` (target (8a))"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "builds the PlannedFile list (image, MAC, A2L) with digests and the target kind (new, open project, merge), then calls plan_project_save. 8a changes: the document row (the active change or check document, or the pasted document as `patches/changes.json`) and its landing name.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "plan_project_save",
+      "reqs": [
+        "LLR-167.6"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "target",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "target_kind",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[PlannedFile]",
+          "name": "files",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "image",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[str]",
+          "name": "manifest_keys",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "refusal",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "SavePlan",
+        "names": [
+          "plan"
+        ],
+        "raw": "SavePlan plan"
+      },
+      "module": "s19_app/tui/services/project_gather_service.py",
+      "examples": [
+        "(TC-B100-59, test_tc_b100_59_fresh_folder) target `P1` new, files [image `firmware.s19`] → rows image \"new\" and manifest `project.json` \"new\" (holds at dc3b314)",
+        "(TC-B100-59 Inc 8a arm) files [image `firmware.s19`, document `patches/boost.json`] into a merge target → a row for `patches/boost.json` and the manifest row \"rewrite\" (target (8a))"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "pure planner: one row per top-level file with its predicted landing name and action word, plus the project.json row; writes nothing and hashes nothing. 8a changes: a row for the document (LLR-167.6 \"the document\"); SavePlan has no document field at dc3b314.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._handle_save_dialog",
+      "reqs": [
+        "HLR-170",
+        "LLR-170.2",
+        "LLR-167.8",
+        "LLR-164.2",
+        "LLR-167.6"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[SaveProjectPayload]",
+          "name": "payload",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(AT-B100-08, HLR-170) one entry pasted at `0x8000007C`, Save project `P` → `P/patches/changes.json` holds 1 entry and `P/project.json` has active_document \"patches/changes.json\" (target (8a); P-8: nothing under `patches/` at 1d677ba)",
+        "(TC-B100-05 Inc 8a arm, LLR-164.2) exact name `ab` of a project that is not open, whose project.json holds gathered and active_document \"patches/boost.json\" → after the merge both keys equal (0 changed) (target (8a))",
+        "(TC-B100-70, test_tc_b100_70_refused_save_keeps_the_flag) a blocked document → status holds \"blocked\" and the panel flag stays `True` (holds at dc3b314)",
+        "(TC-B100-70 positive arm, LLR-167.8) an entry added → Save project wrote the document → panel flag `False`, then a project load asks 0 questions (target (8a); test_tc_b100_70_unwritten_document_keeps_the_flag asserts the flag stays `True` for this case today and must be re-pinned)"
+      ],
+      "modify": [
+        "[Data: S19TuiApp._change_service]",
+        "[I/O: project folder]"
+      ],
+      "assign": [
+        "replace",
+        "append"
+      ],
+      "func": "Save project: name guards, plan, folder, placements, gather, manifest write through the seam, commit block (adopt the re-derived image, ChangeService.mark_saved, status). 8a changes: (a) write a document with no source_path through write_change_document into `<project>/patches/` (LLR-170.2); (b) pass the landed document as `active_document` to _write_and_verify_manifest; (c) in a merge, carry the target's `gathered` and `active_document` (LLR-164.2; the code comment at app.py:9207 says \"the full merge carry arrives at Inc 8a\"); (d) call PatchEditorPanel.mark_saved after the document is written (LLR-167.8; the commit block at dc3b314 calls only ChangeService.mark_saved).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "gather_project_artifacts",
+      "reqs": [
+        "LLR-170.2",
+        "LLR-138.1"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[str]",
+          "name": "composition_names",
+          "default": "()"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Path]",
+          "name": "active_document",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "active_document_kind",
+          "default": "\"change\""
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Path]",
+          "name": "active_template",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "common_patches_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "common_templates_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "workarea_root",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "GatherOutcome",
+        "names": [
+          "outcome"
+        ],
+        "raw": "GatherOutcome outcome"
+      },
+      "module": "s19_app/tui/services/project_gather_service.py",
+      "examples": [
+        "(test_project_gather.py::test_tc700_active_editor_document_is_gathered_by_kind) active_document `boost.json` of kind \"change\" in the common library → outcome.gathered \"patches\" holds \"patches/boost.json\" (holds at dc3b314)",
+        "(TC-B100-29, LLR-170.2) a file-backed document → 1 file in `P/patches/`, byte-equal to the source, and the outcome names its project-relative path (target (8a) for the naming; a document already in `P/patches/` gets no row today)"
+      ],
+      "modify": [
+        "[I/O: project folder]"
+      ],
+      "assign": [
+        "append"
+      ],
+      "func": "copies the documents the project uses into `patches/` or `checks/` by kind (and the CRC template into `templates/`); returns the `gathered` rows, the files it wrote and the homes it created. A document already inside the project is skipped and gets no row. 8a changes: the outcome names the landed project-relative path of the active document (LLR-170.2 \"whose GatherOutcome names the landed project-relative path\").",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "write_change_document",
+      "reqs": [
+        "LLR-170.2"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "ChangeDocument",
+          "name": "document",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "base_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "file_name",
+          "default": "DEFAULT_CHANGE_FILE_NAME"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[CopyIntoWorkarea]",
+          "name": "copy_fn",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Path]",
+          "name": "dest_dir",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "tuple[Optional[Path], list[ValidationIssue]]",
+        "names": [
+          "result"
+        ],
+        "raw": "tuple[Optional[Path], list[ValidationIssue]] result"
+      },
+      "module": "s19_app/tui/changes/io.py",
+      "examples": [
+        "(TC-B100-29, LLR-170.2) a pasted document with 1 entry, dest_dir `P/patches` → path ends \"changes.json\", issues `0`; a different `changes.json` there → path ends \"changes_1.json\" (target (8a) as a Save project path)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "serializes a change document and places it through copy_into_workarea (M-1 rule: a byte-identical file is reused, a clash lands as `_<N>`); `dest_dir` selects the project home. No Save project caller at dc3b314; 8a adds _handle_save_dialog as a caller.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._write_and_verify_manifest",
+      "reqs": [
+        "LLR-169.2",
+        "LLR-170.1",
+        "LLR-168.3"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[str]",
+          "name": "batch",
+          "default": "()"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[str, Sequence[str]]]",
+          "name": "assignments",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[DeclaredRegion]",
+          "name": "declared_regions",
+          "default": "()"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[str, Sequence[str]]]",
+          "name": "gathered",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[str, DerivedFrom]]",
+          "name": "derived_from",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Callable[[Path], None]]",
+          "name": "on_written",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "ok"
+        ],
+        "raw": "bool ok"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(TC-B100-22, test_tc_b100_22_seam_scope_is_top_level_data_and_a2l) a project with `firmware.s19`, `firmware.mac`, `firmware.a2l`, `prg.srec`, `flows/f1.json`, `reports/r.md` → files keys are the 4 top-level files, ok `True` (holds at dc3b314)",
+        "(TC-B100-28 A-15 arm, LLR-169.2) the same project with active document `patches/boost.json` → files holds \"patches/boost.json\" beside the 4 top-level files (target (8a); LLR-170.1's threshold says \"4 keys\" — see baseline-notes)"
+      ],
+      "modify": [
+        "[I/O: project.json]",
+        "[Data: S19TuiApp._last_manifest_verify_result]"
+      ],
+      "assign": [
+        "replace",
+        "replace"
+      ],
+      "func": "the manifest seam: computes `files` from disk (project_file_records), writes project.json through write_project_manifest, verifies it, surfaces the result. 8a changes: an `active_document` input threaded into the write and the verify, and the active document added to `files` (LLR-169.2 active-document arm).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "serialize_manifest",
+      "reqs": [
+        "LLR-170.1",
+        "LLR-169.1",
+        "LLR-168.4"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "ProjectVariantSet",
+          "name": "variant_set",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_root",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[str]",
+          "name": "batch",
+          "default": "()"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[str, Sequence[str]]]",
+          "name": "assignments",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[DeclaredRegion]",
+          "name": "declared_regions",
+          "default": "()"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[str, Sequence[str]]]",
+          "name": "gathered",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[str, FileRecord]]",
+          "name": "files",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[str, DerivedFrom]]",
+          "name": "derived_from",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "schema_version",
+          "default": "DEFAULT_SCHEMA_VERSION"
+        }
+      ],
+      "out": {
+        "type": "tuple[Optional[str], list[ValidationIssue]]",
+        "names": [
+          "result"
+        ],
+        "raw": "tuple[Optional[str], list[ValidationIssue]] result"
+      },
+      "module": "s19_app/tui/services/manifest_writer.py",
+      "examples": [
+        "(TC-B100-21, test_manifest_writer.py pins) no files, no derived_from → text byte-identical to the `1d677ba` output (holds at dc3b314)",
+        "(TC-B100-28) active_document \"patches/boost.json\" → text holds \"patches/boost.json\" and reads back equal (target (8a))"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the canonical project.json text; optional keys are written only when non-empty, each path through _reject_unsafe_entry. 8a changes: an `active_document` input, emitted as a project-relative POSIX path under `patches/` or `checks/`, only when set.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "write_project_manifest",
+      "reqs": [
+        "LLR-169.7",
+        "LLR-170.1"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "ProjectVariantSet",
+          "name": "variant_set",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_root",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "base_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[str]",
+          "name": "batch",
+          "default": "()"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[str, Sequence[str]]]",
+          "name": "assignments",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[DeclaredRegion]",
+          "name": "declared_regions",
+          "default": "()"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[str, Sequence[str]]]",
+          "name": "gathered",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[str, FileRecord]]",
+          "name": "files",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[str, DerivedFrom]]",
+          "name": "derived_from",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "schema_version",
+          "default": "DEFAULT_SCHEMA_VERSION"
+        }
+      ],
+      "out": {
+        "type": "tuple[Optional[Path], list[ValidationIssue]]",
+        "names": [
+          "result"
+        ],
+        "raw": "tuple[Optional[Path], list[ValidationIssue]] result"
+      },
+      "module": "s19_app/tui/services/manifest_writer.py",
+      "examples": [
+        "(TC-B100-27) 8 concurrent writes for 8 projects → 8 paths returned, each manifest holds its own active_variant (holds at dc3b314)",
+        "(TC-B100-28) active_document \"patches/boost.json\" → the written file holds \"patches/boost.json\" (target (8a))"
+      ],
+      "modify": [
+        "[I/O: project.json]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "serializes and writes project.json through a private staging directory and os.replace. 8a changes: threads `active_document` to serialize_manifest.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "verify_written_manifest",
+      "reqs": [
+        "LLR-169.3"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "ProjectVariantSet",
+          "name": "variant_set",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_root",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[str]",
+          "name": "batch",
+          "default": "()"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[str, Sequence[str]]]",
+          "name": "assignments",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[str, FileRecord]]",
+          "name": "files",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[str, DerivedFrom]]",
+          "name": "derived_from",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "ManifestVerifyResult",
+        "names": [
+          "result"
+        ],
+        "raw": "ManifestVerifyResult result"
+      },
+      "module": "s19_app/tui/services/manifest_writer.py",
+      "examples": [
+        "(TC-B100-23) one digest changed between write and verify → status \"mismatch\", drift holds \"files\" (holds at dc3b314)",
+        "(TC-B100-23 boundary, LLR-169.3) only active_document changed between write and verify → status \"mismatch\", drift holds \"active_document\" (target (8a))"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "re-reads project.json and compares active_variant, batch, assignments, files and derived_from with the intent. 8a changes: `active_document` joins the drift domain (LLR-169.3 names it; the \"changed active_document only\" boundary arm is the 8a part).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "project_file_records",
+      "reqs": [
+        "LLR-169.2"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "dict[str, FileRecord]",
+        "names": [
+          "records"
+        ],
+        "raw": "dict[str, FileRecord] records"
+      },
+      "module": "s19_app/tui/services/manifest_writer.py",
+      "examples": [
+        "(TC-B100-22) `firmware.s19`, `firmware.mac`, `firmware.a2l`, `prg.srec`, `flows/f1.json`, `reports/r.md` → records keys \"firmware.s19\", \"firmware.mac\", \"firmware.a2l\", \"prg.srec\" (holds at dc3b314)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "one size + SHA-256 record per top-level data or A2L file, from disk; walks no sub-folder. 8a changes: the active document under `patches/` or `checks/` must be recorded too (LLR-169.2 \"and the active document\"); today it cannot be, because the scan is top-level only and has no document input.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "PatchEditorPanel.mark_saved",
+      "reqs": [
+        "LLR-167.8",
+        "LLR-005.1"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb.py",
+      "examples": [
+        "(TC-B94-10 save-then-check arm, cited in the docstring) a clean save_doc → [Data: PatchEditorPanel._dirty] `False` (holds at dc3b314)"
+      ],
+      "modify": [
+        "[Data: PatchEditorPanel._dirty]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "clears the panel's dirty flag and repaints the indicator. No change; 8a adds _handle_save_dialog as a caller.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "read_project_manifest",
+      "reqs": [
+        "LLR-170.1",
+        "LLR-168.1",
+        "LLR-169.4"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[SizeProbe]",
+          "name": "size_probe",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "Optional[ProjectManifest]",
+        "names": [
+          "manifest"
+        ],
+        "raw": "Optional[ProjectManifest] manifest"
+      },
+      "module": "s19_app/tui/services/variant_execution_service.py",
+      "examples": [
+        "(TC-B100-18, test_tc_b100_18_valid_gathered_is_an_equal_dict) gathered {\"patches\": [\"patches/boost.json\"]} → manifest.gathered equal dict, 0 issues (holds at dc3b314)",
+        "(TC-B100-28) active_document \"patches/boost.json\" → manifest.active_document round-trips; \"../x.json\", an absolute path, `7`, \"firmware.s19\", \"project.json\" → 5 issues, active_document `None` each; absent → `None`, 0 issues (target (8a); at dc3b314 the key lands in unknown_keys \"active_document\")"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the capped, collect-don't-abort reader of project.json. Keys outside KNOWN_MANIFEST_KEYS go to `unknown_keys`; `files` keys must be top-level data or A2L names. 8a changes: parse `active_document` (prefix `patches/` or `checks/`, suffix `.json`, else one issue and `None`), add it to KNOWN_MANIFEST_KEYS, and accept the active document's path as a `files` key (LLR-169.4 \"and not active_document\").",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "manifest_keep_reason",
+      "reqs": [
+        "LLR-168.3",
+        "SEC7-3"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "ProjectManifest",
+          "name": "manifest",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[str]",
+        "names": [
+          "reason"
+        ],
+        "raw": "Optional[str] reason"
+      },
+      "module": "s19_app/tui/services/variant_execution_service.py",
+      "examples": [
+        "(TC-B100-05 Inc 8a merge arm) a target project.json holding active_document \"patches/boost.json\" → reason `None`, no kept copy (target (8a); at dc3b314 → \"holds keys this version does not know\")"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "why Save project must keep a copy of the previous project.json before rebuilding it: damaged, another schema_version, or unknown keys. No code change in 8a; its result changes once `active_document` is a known key.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "manifest_rewrite_refusal",
+      "reqs": [
+        "LLR-168.3"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "ProjectManifest",
+          "name": "manifest",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[str]",
+        "names": [
+          "reason"
+        ],
+        "raw": "Optional[str] reason"
+      },
+      "module": "s19_app/tui/services/variant_execution_service.py",
+      "examples": [
+        "(TC-B100-20, test_tc_b100_20_rewrite_never_drops_what_it_cannot_carry) a manifest with an unknown top-level key → reason \"holds keys this version does not know\" (holds at dc3b314)",
+        "(AT-B100-20, LLR-168.3) a manifest with batch, assignments, declared_regions, gathered and active_document all set → reason `None` (target (8a))"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "why an in-project writer must not rewrite project.json (keep reason, or skipped entries). No code change in 8a; its result decides whether the four carry writers rewrite a manifest that holds `active_document`.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "check_project_files",
+      "reqs": [
+        "LLR-169.5",
+        "HLR-170"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[ProjectManifest]",
+          "name": "manifest",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "list[ProjectFileProblem]",
+        "names": [
+          "problems"
+        ],
+        "raw": "list[ProjectFileProblem] problems"
+      },
+      "module": "s19_app/tui/services/manifest_writer.py",
+      "examples": [
+        "(TC-B100-25) a clean project → 0 problems; a hand-copied `firmware_9.s19` absent from `files` → 1 problem \"not recorded\" (holds at dc3b314)",
+        "(HLR-170 threshold) a recorded `patches/boost.json` deleted → 1 problem naming \"boost.json\", the project opens (target (8a))"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the Load-side check of manifest and disk problems; never raises. 8a: the active document's `files` record is checked like the others (\"changed on disk\", \"missing\"); whether a missing recorded document is listed here or by _handle_load_project (LLR-170.3) is open (see baseline-notes).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._manifest_carry",
+      "reqs": [
+        "LLR-168.3",
+        "LLR-164.2"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[ProjectManifest]",
+          "name": "manifest",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "dict",
+        "names": [
+          "carry"
+        ],
+        "raw": "dict carry"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(TC-B100-20, test_tc_b100_20_variant_append_carries_every_key_and_activates) a seeded project with every key → carry holds \"batch\", \"assignments\", \"declared_regions\", \"gathered\", \"derived_from\" as project-relative strings (holds at dc3b314)",
+        "(AT-B100-20 Inc 8a arm, LLR-168.3) a project.json with active_document \"patches/boost.json\" → carry active_document \"patches/boost.json\" (target (8a))"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the keys an in-project writer does not own, read back from disk and made project-relative: batch, assignments, declared_regions, gathered, derived_from. 8a changes: carry `active_document` (and the Save project merge uses the full carry, not only `derived_from`).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._rewrite_project_manifest",
+      "reqs": [
+        "LLR-168.3"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "placed",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[DerivedFrom]",
+          "name": "derived",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "ok"
+        ],
+        "raw": "bool ok"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(TC-B100-20, test_tc_b100_20_save_back_carries_every_key) a save-back into a project seeded with every key → ok `True`, active_variant \"firmware_1\", the other keys unchanged (holds at dc3b314 for the keys written before 8a)",
+        "(AT-B100-20 Inc 8a arm) a project with active_document \"patches/boost.json\" → ok `True` and project.json still holds \"patches/boost.json\" (target (8a); at dc3b314 the unknown key refuses the rewrite and ok is `False`)"
+      ],
+      "modify": [
+        "[I/O: project.json]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "the one rewrite of the in-project writers: read once, refuse a manifest it cannot carry whole, else write through the seam with the carry (plus `derived` for a save-back). No own change in 8a beyond what _manifest_carry and the reader change.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._sync_loaded_file_to_project",
+      "reqs": [
+        "LLR-168.3"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(AT-B100-20 arm 1) with P open and all five keys set, Load a new S19 → project.json keeps the five keys equal, 0 absolute paths, and names the new active_variant (target (8a) for the active_document key)",
+        "(AT-B100-20 arm 2, test_tc_b100_20_mac_sync_carries_every_key) Load a MAC → the carried keys equal (holds at dc3b314 for four keys)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the Load-file variant append and MAC sync: place the loaded file into the open project, activate it, rewrite project.json with the carry. No own change in 8a; it is one of the three AT-B100-20 writers that must keep `active_document`.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._sync_loaded_a2l_to_project",
+      "reqs": [
+        "LLR-168.3"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(AT-B100-20 arm 3, test_tc_b100_20_a2l_sync_carries_every_key) Load an A2L with P open and all five keys set → the five keys equal, 0 absolute paths (target (8a) for the active_document key)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the A2L sync: place a loaded A2L into the open project and rewrite project.json with the carry. No own change in 8a; the third AT-B100-20 writer.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.on_patch_editor_panel_save_back_decision",
+      "reqs": [
+        "LLR-168.2",
+        "LLR-168.3",
+        "LLR-168.4"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "PatchEditorPanel.SaveBackDecision",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(TC-B100-20, test_tc_b100_20_save_back_carries_every_key) a save-back as \"firmware.s19\" into a project seeded with every key → active_variant \"firmware_1\", the other keys unchanged (holds at dc3b314)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the Patch Editor save-back: writes the image, marks the change service saved, activates the written variant and rewrites project.json with the carry plus its derived_from. No own change in 8a; a fourth carry writer (TC-B100-20).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._handle_load_project",
+      "reqs": [
+        "LLR-170.3",
+        "HLR-170",
+        "LLR-169.6"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "name",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(AT-B100-08 / HLR-170 `p06` A) project.json active_document \"patches/boost.json\" with 1 entry → after Load the Patch Editor document is `patches/boost.json` with 1 entry (target (8a); P-8 at 1d677ba: editor doc `None`, entries `0`)",
+        "(TC-B100-30, LLR-170.3) a symbol entry in the recorded document → resolved against the project's A2L, 0 unresolved (target (8a))",
+        "(TC-B100-30) the recorded document missing → 1 problem, the project opens (target (8a))"
+      ],
+      "modify": [
+        "[Data: S19TuiApp._change_service]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "Load project: validate, reset the session, read project.json, check files, attach the A2L, install the active or next valid variant, MAC, one summary line. 8a changes: after the A2L is attached, load `active_document` into the change service (through the Patch Editor load seam), and list a missing or unreadable document as a problem and continue.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._reset_project_session",
+      "reqs": [
+        "LLR-165.1",
+        "LLR-165.3"
+      ],
+      "in": [],
+      "out": {
+        "type": "int",
+        "names": [
+          "discarded"
+        ],
+        "raw": "int discarded"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(TC-B100-10, test_tc_b100_10_interim_discard_notice) P1 open with 1 entry, then Load P2 → discarded `1` and the status \"Closed the Patch Editor document (1 entries); unsaved changes were not kept\" (holds at dc3b314)"
+      ],
+      "modify": [
+        "[Data: S19TuiApp._change_service]",
+        "[Data: PatchEditorPanel._dirty]"
+      ],
+      "assign": [
+        "replace",
+        "replace"
+      ],
+      "func": "the one reset seam of a project load: rebinds the change service (empty document), clears the panel buffer and calls mark_loaded; returns the outgoing document's entry count. No change in 8a; the document reopen must run after it (it would wipe a document loaded earlier).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._patch_editor_load",
+      "reqs": [
+        "LLR-008.1",
+        "LLR-170.3"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "PatchEditorPanel",
+          "name": "panel",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "path_text",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(LLR-170.3 via the reopen) path_text \"<P>/patches/boost.json\" with 1 address entry → the document has 1 entry and [Data: PatchEditorPanel._dirty] `False` (target (8a) as a reopen; the seam itself holds at dc3b314)"
+      ],
+      "modify": [
+        "[Data: S19TuiApp._change_service]",
+        "[Data: PatchEditorPanel._dirty]"
+      ],
+      "assign": [
+        "replace",
+        "replace"
+      ],
+      "func": "the shared change-document load seam (typed path, dropdown, dirty-guard accept): ChangeService.load, report, mark_loaded on success, re-render. Passes no A2L context. Candidate seam for the 8a reopen.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "ChangeService.load",
+      "reqs": [
+        "LLR-003.4",
+        "LLR-141",
+        "LLR-170.3"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "path_text",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "base_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[dict]",
+          "name": "a2l_context",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "ChangeActionResult",
+        "names": [
+          "result"
+        ],
+        "raw": "ChangeActionResult result"
+      },
+      "module": "s19_app/tui/services/change_service.py",
+      "examples": [
+        "(TC-B100-30, LLR-170.3) the recorded document with a symbol entry and the project's A2L context → ok `True`, 0 unresolved (target (8a) for the caller)",
+        "(docstring, LLR-141) a2l_context `None` and a symbol entry → the entry is refused (holds at dc3b314)"
+      ],
+      "modify": [
+        "[Data: ChangeService.document]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "reads a v2 change or check JSON file into the owned document, replacing it; `a2l_context` `None` refuses every symbol entry. No change expected in 8a; the caller must pass the project's A2L context for LLR-170.3's symbol arm.",
+      "volatile": [],
+      "oracle": []
+    }
+  ],
+  "calls": [
+    {
+      "caller": "S19TuiApp._handle_load_project",
+      "callee": "PatchEditorPanel.mark_saved",
+      "sites": [
+        "s19_app/tui/app.py:13474"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_load_project",
+      "callee": "S19TuiApp._reset_project_session",
+      "sites": [
+        "s19_app/tui/app.py:10511"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_load_project",
+      "callee": "check_project_files",
+      "sites": [
+        "s19_app/tui/app.py:10527"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_load_project",
+      "callee": "read_project_manifest",
+      "sites": [
+        "s19_app/tui/app.py:10518"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "PatchEditorPanel.mark_saved",
+      "sites": [
+        "s19_app/tui/app.py:9736"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "S19TuiApp._manifest_carry",
+      "sites": [
+        "s19_app/tui/app.py:9278"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "S19TuiApp._plan_project_save",
+      "sites": [
+        "s19_app/tui/app.py:9287"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "S19TuiApp._write_and_verify_manifest",
+      "sites": [
+        "s19_app/tui/app.py:9614"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "gather_project_artifacts",
+      "sites": [
+        "s19_app/tui/app.py:9542"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "manifest_keep_reason",
+      "sites": [
+        "s19_app/tui/app.py:9578"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "read_project_manifest",
+      "sites": [
+        "s19_app/tui/app.py:9276"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._patch_editor_load",
+      "callee": "ChangeService.load",
+      "sites": [
+        "s19_app/tui/app.py:5850"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._plan_project_save",
+      "callee": "_save_manifest_keys",
+      "sites": [
+        "s19_app/tui/app.py:9966"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._plan_project_save",
+      "callee": "plan_project_save",
+      "sites": [
+        "s19_app/tui/app.py:9961"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._rewrite_project_manifest",
+      "callee": "S19TuiApp._manifest_carry",
+      "sites": [
+        "s19_app/tui/app.py:10814"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._rewrite_project_manifest",
+      "callee": "S19TuiApp._write_and_verify_manifest",
+      "sites": [
+        "s19_app/tui/app.py:10820"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._rewrite_project_manifest",
+      "callee": "manifest_rewrite_refusal",
+      "sites": [
+        "s19_app/tui/app.py:10800"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._rewrite_project_manifest",
+      "callee": "read_project_manifest",
+      "sites": [
+        "s19_app/tui/app.py:10799"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._sync_loaded_a2l_to_project",
+      "callee": "S19TuiApp._rewrite_project_manifest",
+      "sites": [
+        "s19_app/tui/app.py:11081"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._sync_loaded_file_to_project",
+      "callee": "S19TuiApp._rewrite_project_manifest",
+      "sites": [
+        "s19_app/tui/app.py:11006",
+        "s19_app/tui/app.py:11050"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._write_and_verify_manifest",
+      "callee": "project_file_records",
+      "sites": [
+        "s19_app/tui/app.py:10079"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._write_and_verify_manifest",
+      "callee": "verify_written_manifest",
+      "sites": [
+        "s19_app/tui/app.py:10116"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._write_and_verify_manifest",
+      "callee": "write_project_manifest",
+      "sites": [
+        "s19_app/tui/app.py:10080"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.on_patch_editor_panel_save_back_decision",
+      "callee": "PatchEditorPanel.mark_saved",
+      "sites": [
+        "s19_app/tui/app.py:3862"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.on_patch_editor_panel_save_back_decision",
+      "callee": "S19TuiApp._rewrite_project_manifest",
+      "sites": [
+        "s19_app/tui/app.py:3872"
+      ]
+    },
+    {
+      "caller": "_save_manifest_keys",
+      "callee": "serialize_manifest",
+      "sites": [
+        "s19_app/tui/app.py:1493"
+      ]
+    },
+    {
+      "caller": "gather_project_artifacts",
+      "callee": "ChangeService.load",
+      "sites": [
+        "s19_app/tui/services/project_gather_service.py:201"
+      ]
+    },
+    {
+      "caller": "manifest_rewrite_refusal",
+      "callee": "manifest_keep_reason",
+      "sites": [
+        "s19_app/tui/services/variant_execution_service.py:1863"
+      ]
+    },
+    {
+      "caller": "verify_written_manifest",
+      "callee": "read_project_manifest",
+      "sites": [
+        "s19_app/tui/services/manifest_writer.py:802"
+      ]
+    },
+    {
+      "caller": "write_project_manifest",
+      "callee": "serialize_manifest",
+      "sites": [
+        "s19_app/tui/services/manifest_writer.py:569"
+      ]
+    }
+  ],
+  "top_level_sites": {
+    "ChangeService.load": [
+      "prototypes/fb_p1_flow_persistence.prototype.py:352",
+      "s19_app/tui/services/flow_persistence_service.py:1543",
+      "s19_app/tui/services/flow_persistence_service.py:967"
+    ],
+    "PatchEditorPanel.mark_saved": [
+      "s19_app/tui/app.py:3076",
+      "s19_app/tui/app.py:3399",
+      "s19_app/tui/app.py:3710"
+    ],
+    "S19TuiApp._patch_editor_load": [
+      "s19_app/tui/app.py:3647",
+      "s19_app/tui/app.py:5832",
+      "s19_app/tui/app.py:5934"
+    ],
+    "read_project_manifest": [
+      "s19_app/tui/app.py:4753",
+      "s19_app/tui/app.py:5227",
+      "s19_app/tui/app.py:5335",
+      "s19_app/tui/services/variant_execution_service.py:2456"
+    ],
+    "write_change_document": [
+      "s19_app/tui/app.py:6053",
+      "s19_app/tui/services/change_service.py:1773"
+    ],
+    "S19TuiApp._handle_load_project": [
+      "s19_app/tui/app.py:7151"
+    ],
+    "S19TuiApp._sync_loaded_a2l_to_project": [
+      "s19_app/tui/app.py:11304"
+    ]
+  },
+  "findings": [],
+  "parse_failures": []
+}

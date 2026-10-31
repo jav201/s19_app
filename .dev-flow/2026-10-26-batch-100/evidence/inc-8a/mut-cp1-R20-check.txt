@@ -1,0 +1,18 @@
+# mutant cp1-R20-check  (E3 R20)
+# description: the check's disk problem labels the document with the bare text
+# file: s19_app/tui/services/manifest_writer.py
+# source sha256 before: 254693df5dcdf38a5045f40e321862c130fad80865b98217fba4436642de58b4
+# edit 1 OLD:
+#   |         label = document_problem_file(name)
+# edit 1 NEW:
+#   |         label = name
+# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1
+# env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_truncated_document_is_one_not_readable
+# started 2026-10-30T23:56:45Z  finished 2026-10-30T23:56:49Z  rc=0
+.                                                                        [100%]
+1 passed in 2.68s
+
+# pytest summary: 1 passed in 2.68s
+# verdict: SURVIVED
+# restored = True  (sha256 after restore: 254693df5dcdf38a5045f40e321862c130fad80865b98217fba4436642de58b4)
