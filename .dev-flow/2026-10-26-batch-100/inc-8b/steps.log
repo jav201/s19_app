@@ -29,3 +29,5 @@
 2026-10-31T07:05:50Z E13 pe-a2l-only captured 6/6 (orchestrator, Opus); OBS-8b-1..3 MINOR -> backlog
 2026-10-31T07:12:23Z close records start (DeepSeek v4 Pro via pi)
 2026-10-31T07:34:08Z close records end (DeepSeek: packet 415 lines, LED .81, 9 backlog bullets; 1 V4 threshold fixed by orchestrator)
+2026-10-31T07:02:30Z 2026-10-31T07:11:00Z E5-r2 1xOpus code-reviewer narrow re-review: PASS-WITH-NOTES, F1 discharged (P-4 re-run), R2-1 LOW, R2-2 LOW, TOCTOU hand-off
+2026-10-31T07:34:08Z 2026-10-31T07:40:21Z close orchestrator (Opus): 130/130 digests vs committed blobs, merge 254359d, decision, V26 split-requirement pairings + LLR-171.1l threshold fixed (LED .81), atlas, push 9bec70e
