@@ -1,0 +1,64 @@
+# started (UTC): 2026-10-31T03:50:11Z
+# cwd: /c/Users/jjgh8/Github/s19_app-b100-inc8b
+# HEAD: ebe6d0ccecfb89a2ec9d8a01efcf0c6b6a850783 (uncommitted Inc 8b work on top)
+# s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc8b\s19_app\__init__.py
+# python: Python 3.11.15
+# command: python -m pytest -p no:cacheprovider -q --tb=short -rfE tests/test_b100_project_homes.py tests/test_b100_save_image.py tests/test_b100_save_guards.py tests/test_b100_document.py tests/test_b99_load_project.py tests/test_project_gather.py tests/test_tui_workspace.py tests/test_tui_workspace_insight.py tests/test_tui_workspace_layout.py tests/test_workspace_variants.py tests/test_tui_app.py tests/test_b100_reuse.py tests/test_b99_staging.py tests/test_id_registry.py tests/test_b100_active_variant.py tests/test_b100_announce.py tests/test_b100_focus.py tests/test_b100_project_check.py tests/test_b100_session_reset.py tests/test_b97_load_project_dialog.py tests/test_b99_patch_truth.py tests/test_report_progress.py tests/test_tui_commandbar.py tests/test_tui_helpers.py tests/test_tui_manifest_save.py tests/test_tui_patch_variant.py tests/test_tui_report_filter_surface.py tests/test_tui_report_seam.py tests/test_tui_report_view.py tests/test_tui_variants.py tests/test_variant_execution.py
+
+........................................................................ [  6%]
+........................................................................ [ 13%]
+..................................................................F..... [ 20%]
+........................................................................ [ 27%]
+........................................................................ [ 34%]
+........................................................................ [ 40%]
+........................................................................ [ 47%]
+..............x.........................F............................... [ 54%]
+........................................................................ [ 61%]
+........................................................................ [ 68%]
+........................................................................ [ 75%]
+........................................................................ [ 81%]
+............................................................F........... [ 88%]
+.....................................................F.................. [ 95%]
+................................................                         [100%]
+================================== FAILURES ===================================
+______ test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second ______
+tests\test_b100_save_guards.py:2531: in test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
+    assert elapsed < 1.0, f"Save project took {elapsed:.3f} s"
+E   AssertionError: Save project took 1.094 s
+E   assert 1.0937385000288486 < 1.0
+____________ test_tc_b100_01_app_placements_name_the_workarea_root ____________
+tests\test_b100_reuse.py:800: in test_tc_b100_01_app_placements_name_the_workarea_root
+    assert len(calls) == 8, (
+E   AssertionError: expected the 8 app.py placement calls (LED .50), found 9
+E   assert 9 == 8
+E    +  where 9 = len([<ast.Call object at 0x000002423AFC2020>, <ast.Call object at 0x000002424168EC20>, <ast.Call object at 0x0000024241701...l object at 0x000002423E5E5060>, <ast.Call object at 0x000002424169BBB0>, <ast.Call object at 0x0000024241698A90>, ...])
+______ test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact ______
+tests\test_tui_commandbar.py:2704: in test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+    assert observed_pre_change == list(expected), (
+E   AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+E     missing: []
+E     unexpected: ['a2l_describe_tag', 'confirm_attention']
+E   assert ['focus_palet...us_goto', ...] == ['focus_palet...us_goto', ...]
+E     
+E     At index 13 diff: 'a2l_describe_tag' != 'view_reports'
+E     Left contains 2 more items, first extra item: 'open_settings_menu'
+E     Use -v to get more diff
+________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
+tests\test_tui_report_filter_surface.py:773: in test_at_056e_a2b_diff_report_byte_identical_despite_selection
+    assert set(baseline) == expected, f"baseline wrote {sorted(baseline)}"
+E   AssertionError: baseline wrote []
+E   assert set() == {'20260710T12...ff-report.md'}
+E     
+E     Extra items in the right set:
+E     '20260710T120000Z-diff-report.html'
+E     '20260710T120000Z-diff-report.md'
+E     Use -v to get more diff
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
+FAILED tests/test_b100_reuse.py::test_tc_b100_01_app_placements_name_the_workarea_root
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+4 failed, 1051 passed, 1 xfailed in 3361.84s (0:56:01)
+
+# exit code: 1
+# ended (UTC): 2026-10-31T04:46:15Z

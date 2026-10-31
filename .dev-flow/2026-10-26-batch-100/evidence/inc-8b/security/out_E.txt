@@ -1,0 +1,7 @@
+s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc8b\s19_app\__init__.py
+  | 'Project saved + manifest verified'
+  | "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\E1\\base\\.s19tool\\workarea\\Q (variant 'firmware')"
+  | 'Save as: links or junctions not copied: project.json \u2014 copy those files into the project if it needs them.'
+  Q batch: ['OUTSIDE_BATCH_NAME.s19']  gathered: {'patches': ['patches/boost.json'], 'flows': ['flows/f1.json']}  active_document: patches/boost.json
+  Q carried OUTSIDE_BATCH_NAME: True
+links removed: 1

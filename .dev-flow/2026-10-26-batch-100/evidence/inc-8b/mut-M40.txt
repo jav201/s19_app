@@ -1,0 +1,23 @@
+mutant: M40
+target: s19_app/tui/app.py
+old -> new:         if save_as_source is not None:
+            # R9 / LLR-171.1l: the Flow panels' session folder follows the
+            # copy.
+            self._publish_flow_session_dir()  ->          if False:
+            # R9 / LLR-171.1l: the Flow panels' session folder follows the
+            # copy.
+            self._publish_flow_session_dir()
+sha256_before: b75f9125c9eb12c122ce1bbd05d6de1e8027403a87cc2e800be8227a5c42011f
+command: cd C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b && env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_project_homes.py::test_tc_b100_31_flow_session_folder_follows_q
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b
+---
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:882: AssertionError: session: C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30832\test_tc_b100_31_flow_session_f0\app\.s19tool\workarea\P — on confirm, the output file is copied here
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_flow_session_folder_follows_q
+1 failed in 4.92s
+---
+summary: 1 failed in 4.92s
+verdict: KILLED
+restored = True

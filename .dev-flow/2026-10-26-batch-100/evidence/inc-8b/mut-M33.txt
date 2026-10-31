@@ -1,0 +1,21 @@
+mutant: M33
+target: s19_app/tui/services/project_gather_service.py
+old -> new:     if len(walked) > entry_ceiling:
+        over_ceiling = OVER_CEILING_ENTRIES
+        walked = []  ->      if sum(1 for rel in walked if (project_dir / rel).is_file()) > entry_ceiling:
+        over_ceiling = OVER_CEILING_ENTRIES
+        walked = []
+sha256_before: 7f1ecfefde90ee6bf926e49e88d362ee0c1de4d7909b28451b96ada45176ceff
+command: cd C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b && env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10001 refused]
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b
+---
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:763: AssertionError: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30825\\test_tc_b100_31_entry_ceiling_0\\app\\.s19tool\\workarea\\Q (variant 'firmware')"]
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10001 refused]
+1 failed in 9.83s
+---
+summary: 1 failed in 9.83s
+verdict: KILLED
+restored = True

@@ -67,6 +67,7 @@ from tests.support import b100_links
 from tests.support import b100_manifests as documents
 from tests.support import b100_projects as projects
 from tests.support.independent_reader import read_s19
+from tests.support.timing import timing_bound
 
 PATCH_ADDRESS = 0x8000007C
 PATCH_BYTES = (0xDE, 0xAD, 0xBE, 0xEF)
@@ -361,7 +362,7 @@ def test_tc_b100_28_document_finding_is_kept_first_beside_a_full_batch(tmp_path:
     assert manifest.issues[0].details.get("key") == "active_document", manifest.issues[0]
     assert manifest.issues[0].code == MANIFEST_BAD_STRUCTURE
     assert len(manifest.issues) < 1001, len(manifest.issues)
-    assert elapsed < 1.0, elapsed
+    assert elapsed < timing_bound(1.0), elapsed
 
 
 def test_tc_b100_28_reader_null_and_absent_are_none(tmp_path: Path) -> None:
@@ -957,7 +958,7 @@ def test_tc_b100_30_classifier_outcome(tmp_path: Path, case: str) -> None:
     state = recorded_document_state(project_dir, "patches/boost.json")
     elapsed = time.perf_counter() - start
     assert state.outcome == outcome, (case, state.outcome)
-    assert elapsed < 1.0, f"{case}: {elapsed:.3f} s"
+    assert elapsed < timing_bound(1.0), f"{case}: {elapsed:.3f} s"
     if outcome == "ok":
         assert len(state.document.entries) == count
     else:
@@ -1199,7 +1200,7 @@ def test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second(
         assert reason in problems[0][2], problems
     assert count == 0
     assert image
-    assert elapsed < 1.0, f"{case}: Load took {elapsed:.3f} s"
+    assert elapsed < timing_bound(1.0), f"{case}: Load took {elapsed:.3f} s"
 
 
 def test_tc_b100_30_held_document_is_not_readable_and_stays_recorded(tmp_path: Path) -> None:

@@ -1,0 +1,21 @@
+mutant: M55
+target: s19_app/tui/app.py
+old -> new: foreign-parent refusal after mkdir
+sha256_before: b75f9125c9eb12c122ce1bbd05d6de1e8027403a87cc2e800be8227a5c42011f
+command: cd C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b && env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_project_homes.py::test_tc_b100_33_foreign_parent_is_refused_before_any_folder[other work area] tests/test_b100_project_homes.py::test_tc_b100_33_foreign_parent_is_refused_before_any_folder[outside] tests/test_b100_project_homes.py::test_tc_b100_33_foreign_parent_is_refused_before_any_folder[W/patches]
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b
+---
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:1171: AssertionError: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30845/test_tc_b100_33_foreign_parent0/other/.s19tool/workarea/P')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:1171: AssertionError: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30845/test_tc_b100_33_foreign_parent1/plain/P')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:1171: AssertionError: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30845/test_tc_b100_33_foreign_parent2/app/.s19tool/workarea/patches/P')]
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_33_foreign_parent_is_refused_before_any_folder[other work area]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_33_foreign_parent_is_refused_before_any_folder[outside]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_33_foreign_parent_is_refused_before_any_folder[W/patches]
+3 failed in 6.82s
+---
+summary: 3 failed in 6.82s
+verdict: KILLED
+restored = True

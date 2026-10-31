@@ -1,0 +1,12 @@
+# started (UTC): 2026-10-31T04:46:55Z
+# cwd: /c/Users/jjgh8/Github/s19_app-b100-inc8b
+# HEAD: ebe6d0ccecfb89a2ec9d8a01efcf0c6b6a850783 (uncommitted Inc 8b work on top)
+# s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc8b\s19_app\__init__.py
+# python: Python 3.11.15
+# command: python -m pytest -p no:cacheprovider -q --tb=short -rfE tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
+
+.                                                                        [100%]
+1 passed in 2.46s
+
+# exit code: 0
+# ended (UTC): 2026-10-31T04:46:59Z

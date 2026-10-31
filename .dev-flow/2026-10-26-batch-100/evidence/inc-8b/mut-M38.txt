@@ -1,0 +1,23 @@
+mutant: M38
+target: s19_app/tui/app.py
+old -> new:                 return (
+                    f"Project NOT saved: could not save — {painted} could not be "
+                    "copied — check the folder."
+                )  ->                  return (
+                    f"Project NOT saved: could not save — {painted} could not be "
+                    f"copied ({exc}) — check the folder."
+                )
+sha256_before: b75f9125c9eb12c122ce1bbd05d6de1e8027403a87cc2e800be8227a5c42011f
+command: cd C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b && env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_project_homes.py::test_tc_b100_31_failed_copy_rolls_back_in_user_terms
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b
+---
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:853: AssertionError: ["Project NOT saved: could not save — patches/boost.json could not be copied ([Errno 13] [WinError 5] Access is denied...\\\test_tc_b100_31_failed_copy_ro0\\\\app\\\\.s19tool\\\\workarea\\\\P\\\\patches\\\\boost.json') — check the folder."]
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_failed_copy_rolls_back_in_user_terms
+1 failed in 4.80s
+---
+summary: 1 failed in 4.80s
+verdict: KILLED
+restored = True

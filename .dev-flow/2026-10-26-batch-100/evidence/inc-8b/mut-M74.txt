@@ -1,0 +1,21 @@
+mutant: M74
+target: s19_app/tui/services/project_gather_service.py
+old -> new: _NEW_TARGET_MARGIN_BYTES = 65536  ->  _NEW_TARGET_MARGIN_BYTES = 65536
+
+#: The per-file copy cap, bound at import (M74): a cap lowered at call time
+#: is not seen.
+_IMPORT_CAP_BYTES = _workspace.DEFAULT_COPY_SIZE_CAP_BYTES ||     cap = _workspace.DEFAULT_COPY_SIZE_CAP_BYTES if size_cap is None else size_cap  ->      cap = _IMPORT_CAP_BYTES if size_cap is None else size_cap
+sha256_before: 7f1ecfefde90ee6bf926e49e88d362ee0c1de4d7909b28451b96ada45176ceff
+command: cd C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b && env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_save_image.py::test_tc_b100_59_file_over_the_cap_is_refused_in_the_plan[1]
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b
+---
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_save_image.py:2507: AssertionError: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30864\\test_tc_b100_59_file_over_the_0\\app\\.s19tool\\workarea\\Q (variant 'firmware')"]
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_file_over_the_cap_is_refused_in_the_plan[1]
+1 failed in 4.84s
+---
+summary: 1 failed in 4.84s
+verdict: KILLED
+restored = True

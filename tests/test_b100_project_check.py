@@ -70,6 +70,7 @@ from s19_app.tui.workspace import build_variant_set
 from tests.support import b100_links
 from tests.support import b100_manifests as hostile
 from tests.support import b100_projects as projects
+from tests.support.timing import timing_bound
 
 SIZES = [(118, 54), (220, 60)]
 INTERNAL_CODE = re.compile(r"MANIFEST-[A-Z-]+")
@@ -359,7 +360,7 @@ def test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast(tmp_path: Path, key
     elapsed = time.perf_counter() - started
     assert _codes(manifest) == [MANIFEST_BAD_STRUCTURE], (key, _codes(manifest)[:3])
     assert service.manifest_is_damaged(manifest)
-    assert elapsed < 1.0, f"{key}: read took {elapsed:.2f} s"
+    assert elapsed < timing_bound(1.0), f"{key}: read took {elapsed:.2f} s"
 
 
 def test_tc_b100_24_exactly_the_cap_is_read(tmp_path: Path) -> None:
@@ -379,7 +380,7 @@ def test_tc_b100_24_assignments_75_by_1000_is_one_issue_fast(tmp_path: Path) -> 
     manifest = read_project_manifest(tmp_path / "P")
     elapsed = time.perf_counter() - started
     assert _codes(manifest) == [MANIFEST_BAD_STRUCTURE], _codes(manifest)[:3]
-    assert elapsed < 1.0, f"read took {elapsed:.2f} s"
+    assert elapsed < timing_bound(1.0), f"read took {elapsed:.2f} s"
 
 
 def test_tc_b100_24_one_byte_over_one_mib_is_size_cap(tmp_path: Path) -> None:
@@ -820,8 +821,8 @@ def test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second(
             return timing, painted, rows
 
     timing, painted, rows = asyncio.run(_drive())
-    assert timing and timing[0] < 1.0, f"the load took {timing}"
-    assert painted < 1.0, f"the panel took {painted:.2f} s to paint"
+    assert timing and timing[0] < timing_bound(1.0), f"the load took {timing}"
+    assert painted < timing_bound(1.0), f"the panel took {painted:.2f} s to paint"
     assert rows <= LOAD_PANEL_ROW_BOUND, rows
 
 
@@ -945,10 +946,10 @@ def _sec6_5_filesystem_scene(tmp_path: Path, payload: dict, setup=None) -> dict:
 def _assert_sec6_5_bounded(scene: dict) -> None:
     timings = {key: scene[key] for key in ("read", "load", "painted", "appended")}
     print("SEC6-5 timings (s):", {key: round(value, 3) for key, value in timings.items()})
-    assert scene["read"] < 1.0, timings
-    assert scene["load"] is not None and scene["load"] < 1.0, timings
-    assert scene["painted"] < 1.0, timings
-    assert scene["appended"] < 1.0, timings
+    assert scene["read"] < timing_bound(1.0), timings
+    assert scene["load"] is not None and scene["load"] < timing_bound(1.0), timings
+    assert scene["painted"] < timing_bound(1.0), timings
+    assert scene["appended"] < timing_bound(1.0), timings
     assert scene["rows"] <= LOAD_PANEL_ROW_BOUND, scene["rows"]
     assert scene["rows"] == len(scene["problems"])
 
@@ -991,7 +992,7 @@ def test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read(
     deep = tmp_path / "deep"
     _write_manifest(deep, hostile.dumps(hostile.deep_missing_at_cap()))
     manifest, calls, took = _counted_read(deep, monkeypatch)
-    assert calls == 1 and took < 1.0, (calls, took)
+    assert calls == 1 and took < timing_bound(1.0), (calls, took)
     assert len(manifest.batch) == hostile.ENTRY_CAP
 
     keyed = tmp_path / "keyed"
@@ -1002,7 +1003,7 @@ def test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read(
         ),
     )
     manifest, calls, took = _counted_read(keyed, monkeypatch)
-    assert calls == 0 and took < 1.0, (calls, took)
+    assert calls == 0 and took < timing_bound(1.0), (calls, took)
     assert _codes(manifest)[:100] == [MANIFEST_BAD_STRUCTURE] * 100
 
     too_deep = tmp_path / "too_deep"
@@ -1018,7 +1019,7 @@ def test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read(
     _write_manifest(chain, hostile.dumps(hostile.existing_parent_at_cap(parent)))
     manifest, calls, took = _counted_read(chain, monkeypatch)
     assert calls == 8 + 3 * hostile.ENTRY_CAP, calls
-    assert took < 1.0, took
+    assert took < timing_bound(1.0), took
     assert manifest.issues == [], manifest.issues[-1:]
 
     spread = tmp_path / "spread"
@@ -1034,7 +1035,7 @@ def test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read(
     )
     manifest, calls, took = _counted_read(spread, monkeypatch)
     assert calls == service.MANIFEST_FOLDER_CHECK_CAP == 1000, calls
-    assert took < 1.0, took
+    assert took < timing_bound(1.0), took
     assert manifest.issues[-1].details["entry"] == "2000 more recorded entries"
 
 
@@ -1151,7 +1152,7 @@ def test_tc_b100_61_r2_2_legitimate_manifest_inside_every_cap_is_checked_whole(
     started = time.perf_counter()
     manifest = read_project_manifest(project_dir)
     took = time.perf_counter() - started
-    assert took < 1.0, took
+    assert took < timing_bound(1.0), took
     assert manifest.issues == [], manifest.issues[-1:]
     assert len(manifest.batch) == 1000
     assert len(manifest.assignments["firmware"]) == 1000
@@ -1236,7 +1237,7 @@ def test_tc_b100_61_sec7_r2_2_one_serialize_checks_each_name_once(
     took = time.perf_counter() - started
     assert issues == [] and text is not None, issues[:1]
     assert len(calls) == len(projects.CHAIN) + 1000, len(calls)
-    assert took < 1.0, took
+    assert took < timing_bound(1.0), took
 
 
 def test_tc_b100_61_sec6_5_junction_loop_costs_one_failure(tmp_path: Path) -> None:
@@ -1307,8 +1308,8 @@ def test_tc_b100_61_files_at_the_cap_all_missing_are_bounded(tmp_path: Path) -> 
 
     timing, painted, rows, announcement, title, summary = asyncio.run(_drive())
     print(f"load {timing} s; panel painted {painted:.2f} s; rows {rows}")
-    assert timing and timing[0] < 1.0, timing
-    assert painted < 1.0, painted
+    assert timing and timing[0] < timing_bound(1.0), timing
+    assert painted < timing_bound(1.0), painted
     assert rows == LOAD_PANEL_ROW_BOUND, rows
     last = announcement.problems[-1]
     assert (last.label, last.file) == ("more problems", "897 more files"), last

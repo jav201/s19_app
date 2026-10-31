@@ -1,0 +1,12 @@
+# started (UTC): 2026-10-31T03:55:26Z
+# cwd: /c/Users/jjgh8/Github/s19_app-b100-inc8b
+# HEAD: ebe6d0ccecfb89a2ec9d8a01efcf0c6b6a850783 (uncommitted Inc 8b work on top)
+# s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc8b\s19_app\__init__.py
+# python: Python 3.11.15
+# command: python -m pytest -p no:cacheprovider -q --tb=short -rfE tests/test_address_census.py tests/test_b100_project_homes.py::test_e4_a3_13_refusal_precedence_in_the_plan
+
+........................                                                 [100%]
+24 passed in 24.98s
+
+# exit code: 0
+# ended (UTC): 2026-10-31T03:55:52Z

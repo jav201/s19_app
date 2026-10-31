@@ -1,0 +1,17 @@
+s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc8b\s19_app\__init__.py
+
+== B7-outside W/P swapped for a junction between plan and copy ==
+  B7-outside: Q exists=True files=16 marker files=['firmware.s19', 'templates/t.json', 'splits/part.bin', 'reports/r.md', 'reports/z0.md', 'reports/z1.md', 'reports/z2.md', 'reports/z3.md', 'reports/z4.md', 'reports/z5.md', 'reports/2026/r2.md', 'patches/boost.json', 'flowsets/s1.json', 'flows/f1.json', 'checks/ck.json'] outside unchanged=True
+    | 'Project saved + manifest verified'
+    | "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\B7outside\\base\\.s19tool\\workarea\\Q (variant 'firmware')"
+    scan: {}
+   Q files whose bytes came from the junction target: ['checks/ck.json', 'firmware.s19', 'flows/f1.json', 'flowsets/s1.json', 'patches/boost.json', 'reports/2026/r2.md', 'reports/r.md', 'reports/z0.md', 'reports/z1.md', 'reports/z2.md', 'reports/z3.md', 'reports/z4.md', 'reports/z5.md', 'splits/part.bin', 'templates/t.json']
+
+== B7-other_wa W/P swapped for a junction between plan and copy ==
+  B7-other_wa: Q exists=True files=16 marker files=['firmware.s19', 'templates/t.json', 'splits/part.bin', 'reports/r.md', 'reports/z0.md', 'reports/z1.md', 'reports/z2.md', 'reports/z3.md', 'reports/z4.md', 'reports/z5.md', 'reports/2026/r2.md', 'patches/boost.json', 'flowsets/s1.json', 'flows/f1.json', 'checks/ck.json'] outside unchanged=True
+    | 'Project saved + manifest verified'
+    | "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\B7other_wa\\base\\.s19tool\\workarea\\Q (variant 'firmware')"
+    scan: {}
+   Q files whose bytes came from the junction target: ['checks/ck.json', 'firmware.s19', 'flows/f1.json', 'flowsets/s1.json', 'patches/boost.json', 'reports/2026/r2.md', 'reports/r.md', 'reports/z0.md', 'reports/z1.md', 'reports/z2.md', 'reports/z3.md', 'reports/z4.md', 'reports/z5.md', 'splits/part.bin', 'templates/t.json']
+
+links removed: 2

@@ -1,0 +1,52 @@
+s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc8b\s19_app\__init__.py
+
+== B1 P/reports swapped for a junction to outside between plan and copy ==
+  B1: Q exists=False files=0 marker files=[] outside unchanged=True
+    | 'Project NOT saved: could not save \u2014 reports/2026/r2.md changed while saving \u2014 check the folder.'
+    scan: {}
+
+== B2-outside a folder swapped between two placements ==
+  B2-outside: Q exists=False files=0 marker files=[] outside unchanged=True
+    | 'Project NOT saved: could not save \u2014 reports/2026/r2.md changed while saving \u2014 check the folder.'
+    scan: {}
+    other-project files in Q: []
+
+== B2-other a folder swapped between two placements ==
+  B2-other: Q exists=False files=0 marker files=[] outside unchanged=True
+    | 'Project NOT saved: could not save \u2014 reports/2026/r2.md changed while saving \u2014 check the folder.'
+    scan: {}
+    other-project files in Q: []
+
+== B2-insideP a folder swapped between two placements ==
+  B2-insideP: Q exists=False files=0 marker files=[] outside unchanged=True
+    | 'Project NOT saved: could not save \u2014 reports/2026/r2.md could not be copied \u2014 check the folder.'
+    scan: {}
+    other-project files in Q: []
+
+== B3 Q/reports swapped for a junction to R/reports after a placement; rollback ==
+  R/reports before: ['r.md', 'z0.md', 'z1.md', 'z2.md', 'z3.md', 'z4.md', 'z5.md']
+  R/reports after : ['z5.md']
+  R user files deleted by the rollback: ['r.md', 'z0.md', 'z1.md', 'z2.md', 'z3.md', 'z4.md']
+  B3: Q exists=True files=8 marker files=[] outside unchanged=True
+    | 'Project NOT saved: could not save \u2014 reports/z5.md could not be copied \u2014 check the folder.'
+    scan: {}
+
+== B4 4th placement raises PermissionError; rollback ==
+  B4: Q exists=False files=0 marker files=[] outside unchanged=True
+    | 'Project NOT saved: could not save \u2014 patches/boost.json could not be copied \u2014 check the folder.'
+    scan: {}
+    current_project_dir after: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s8b\runs\B4\base\.s19tool\workarea\P
+
+== B5 Q created by another writer between the plan and mkdir (user files) ==
+  Q contents after: ['keep.txt', 'reports/r.md']
+  user files intact: True
+  B5: Q exists=True files=2 marker files=[] outside unchanged=True
+    | 'Project NOT saved: could not save \u2014 reports/r.md did not land at its path \u2014 check the folder.'
+    scan: {}
+
+== B6 a copied file replaced by a link to outside after the plan (file level) ==
+  B6: Q exists=False files=0 marker files=[] outside unchanged=True
+    | 'Project NOT saved: could not save \u2014 reports/r.md changed while saving \u2014 check the folder.'
+    scan: {}
+
+links removed: 5  reparse points left in scratch: 0

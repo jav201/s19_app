@@ -1,0 +1,21 @@
+mutant: M57
+target: s19_app/tui/app.py
+old -> new:         if os.path.normcase(os.path.realpath(parent_resolved)) != os.path.normcase(
+            os.path.realpath(self.workarea)
+        ):  ->          if os.path.normcase(str(parent_resolved)) != os.path.normcase(str(self.workarea)):
+sha256_before: b75f9125c9eb12c122ce1bbd05d6de1e8027403a87cc2e800be8227a5c42011f
+command: cd C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b && env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_project_homes.py::test_tc_b100_33_work_area_under_another_spelling_saves_there[trailing separator] tests/test_b100_project_homes.py::test_tc_b100_33_work_area_under_another_spelling_saves_there[upper case] tests/test_b100_project_homes.py::test_tc_b100_33_work_area_under_another_spelling_saves_there[dot-dot segment] tests/test_b100_project_homes.py::test_tc_b100_33_work_area_under_another_spelling_saves_there[junction alias]
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b
+---
+..FF                                                                     [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:1210: AssertionError: ['Project NOT saved: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30847\\test_tc_b100_33_work_area_...jgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30847\\test_tc_b100_33_work_area_unde2\\app\\.s19tool\\workarea).']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:1210: AssertionError: ['Project NOT saved: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30847\\test_tc_b100_33_work_area_...jgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30847\\test_tc_b100_33_work_area_unde3\\app\\.s19tool\\workarea).']
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_33_work_area_under_another_spelling_saves_there[dot-dot segment]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_33_work_area_under_another_spelling_saves_there[junction alias]
+2 failed, 2 passed in 9.61s
+---
+summary: 2 failed, 2 passed in 9.61s
+verdict: KILLED
+restored = True

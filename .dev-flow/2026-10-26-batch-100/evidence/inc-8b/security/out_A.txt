@@ -1,0 +1,29 @@
+s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc8b\s19_app\__init__.py
+
+== A1 links at depth + .previous + hostile carry + rebind ==
+status lines:
+  | 'Project saved + manifest verified'
+  | "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\A1\\base\\.s19tool\\workarea\\Q (variant 'firmware')"
+  | 'Save as: links or junctions not copied: flows/a/b/c/l2.json, linked, patches/l.json, reports/2026/deep/j3, reports/j, splits/j00, splits/j01, splits/j02, splits/j03, splits/j04, and 8 more \u2014 copy those files into the project if it needs them.'
+Q files: ['checks/ck.json', 'firmware.s19', 'flows/f1.json', 'flowsets/s1.json', 'notes.txt', 'patches/boost.json', 'patches/x.json', 'project.json', 'reports/2026/r2.md', 'reports/r.md', 'splits/part.bin', 'templates/t.json']
+Q links: 0
+Q files holding OUTSIDE/OTHER markers: []
+Q holds .previous-*: []
+Q manifest batch: ['ok_name.json']
+Q manifest assignments: {'v1': []}
+Q manifest gathered: {'patches': ['patches/boost.json', 'patches/x.json']}
+Q manifest active_document: patches/x.json
+Q manifest derived_from keys: []
+Q manifest has ':\\' or ':/' (absolute): False  has '..': False  has ESC: False
+document source_path after: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s8b\runs\A1\base\.s19tool\workarea\Q\patches\x.json
+current_project_dir: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s8b\runs\A1\base\.s19tool\workarea\Q  active: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s8b\runs\A1\base\.s19tool\workarea\Q  flow session: ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\A1\\base\\.s19tool\\workarea\\Q']
+outside unchanged: True  other WA unchanged: True
+scan: {}
+
+== A2 rebind with '..' spelling and skipped-junction document ==
+  dotdot: outcome=['Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c24'] source_path -> C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s8b\runs\A2\base\.s19tool\workarea\P\..\R\patches\x.json
+  dotdot_into_P: outcome=['Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c24'] source_path -> C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s8b\runs\A2\base\.s19tool\workarea\P\patches\..\patches\x.json
+  skipped_junction: outcome=['Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c24'] source_path -> C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s8b\runs\A2\base\.s19tool\workarea\P\patches\j\y.json
+  upper_case: outcome=['Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c24'] source_path -> C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s8b\runs\A2\base\.s19tool\workarea\p\PATCHES\X.JSON
+
+links removed: 19  reparse points left in scratch: 0

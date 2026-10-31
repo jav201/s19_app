@@ -1,0 +1,19 @@
+mutant: M18
+target: s19_app/tui/workspace.py
+old -> new:                 if entry.is_dir(follow_symlinks=False) and not _is_reparse_point(child):  ->                  if entry.is_dir(follow_symlinks=False):
+sha256_before: d9f361f3fb092ae2b296bb2757c23a0ffa9e40561dfebe7d6915bb4a5a0b83aa
+command: cd C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b && env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_project_homes.py::test_tc_b100_31_free_space_is_checked_before_any_folder[T saved] tests/test_b100_save_image.py::test_tc_b100_59_plan_total_counts_every_written_byte
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b
+---
+FF                                                                       [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:499: AssertionError: (102400, ['Project NOT saved: not enough free space (needs 10596352 bytes, 102400 free) — free disk space or remove files from the project.'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_save_image.py:2573: AssertionError: assert {'flows': 3, 'patches': 1} == {'flows': 2, 'patches': 1}
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_free_space_is_checked_before_any_folder[T saved]
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_plan_total_counts_every_written_byte
+2 failed in 5.02s
+---
+summary: 2 failed in 5.02s
+verdict: KILLED
+restored = True

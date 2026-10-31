@@ -12,7 +12,8 @@ param(
 $cap = Join-Path $PSScriptRoot "capture.ps1"
 $plan = @(
   @("pe-clean", $false), @("pe-saveback", $false), @("pe-saveback", $true),
-  @("pe-problems", $false), @("pe-damaged", $false), @("pe-patched", $false), @("pe-unreadable", $false), @("pe-document", $false)
+  @("pe-problems", $false), @("pe-damaged", $false), @("pe-patched", $false), @("pe-unreadable", $false), @("pe-document", $false),
+  @("pe-a2l-only", $false), @("pe-a2l-only", $true)
 )
 $sizes = @(@(118, 54), @(220, 60), @(99, 54))
 $fail = 0

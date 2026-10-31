@@ -1,0 +1,71 @@
+s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc8b\s19_app\__init__.py
+.FIRST PANEL: Project P opened with 1 problem Opened firmware.s19 recorded as the active variant (the latest saved) Variants 1 in the project MAC (none) A2L (none) Problems found (the rest loaded) ! not readable: firmware.a2l too large to open - replace the file, or Save project to drop it
+SAVE LINES: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30781\\test_probe_d3_save_project_doe0\\app\\.s19tool\\workarea\\P (variant 'firmware')"]
+SECOND PANEL: Project P opened with 1 problem Opened firmware.s19 recorded as the active variant (the latest saved) Variants 1 in the project MAC (none) A2L (none) Problems found (the rest loaded) ! not readable: firmware.a2l too large to open - replace the file, or Save project to drop it
+.template is_file (normal spelling): True
+SAVE LINES: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30781\\test_probe_i1_crc_template_rea0\\app\\.s19tool\\workarea\\P (variant 'firmware')", 'templates/con.json was copied but not recorded in project.json (Windows reserves that name) — rename it in the common folder, select the new name, then Save project.']
+UNRECORDED LINES: ['templates/con.json was copied but not recorded in project.json (Windows reserves that name) — rename it in the common folder, select the new name, then Save project.']
+.F
+================================== FAILURES ===================================
+__________ test_probe_i2_unload_of_an_a2l_only_session_does_nothing ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30781/test_probe_i2_unload_of_an_a2l0')
+
+    def test_probe_i2_unload_of_an_a2l_only_session_does_nothing(tmp_path):
+        """I-2: after D-5 the A2L slot of an A2L-only project is present (with
+        its [u] control), but the A2L unload paints 'Nothing to unload.' and
+        leaves the A2L attached."""
+        base = tmp_path / "app"
+        projects.save_case01_project(base, "P", files=("firmware.a2l",))
+    
+        async def _scenario(app, pilot, log):
+            await projects.load_project(pilot, app, "P")
+            await projects.wait_for(pilot, lambda: app.current_a2l_path is not None, "a2l")
+            before = app.current_a2l_path
+            mark = len(log.messages)
+            app._apply_unload("a2l")
+            await pilot.pause()
+            return before, app.current_a2l_path, log.messages[mark:]
+    
+>       before, after, lines = projects.run_app(base, _scenario)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+..\..\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r8b\test_r8b_probes.py:105: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\support\b100_projects.py:587: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\support\b100_projects.py:585: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r8b\test_r8b_probes.py:97: in _scenario
+    await projects.load_project(pilot, app, "P")
+tests\support\b100_projects.py:615: in load_project
+    await wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function load_project.<locals>.<lambda> at 0x000001F23391F600>
+description = 'the project load of P', attempts = 400
+
+    async def wait_for(pilot, predicate, description: str, attempts: int = 400) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the project load of P
+
+tests\support\b100_projects.py:595: AssertionError
+=========================== short test summary info ===========================
+FAILED ::test_probe_i2_unload_of_an_a2l_only_session_does_nothing - Assertion...
+1 failed, 3 passed in 132.69s (0:02:12)

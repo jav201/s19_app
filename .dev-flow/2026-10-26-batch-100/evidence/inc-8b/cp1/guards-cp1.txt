@@ -1,0 +1,17 @@
+# started (UTC): 2026-10-31T05:58:39Z
+# cwd: /c/Users/jjgh8/Github/s19_app-b100-inc8b
+# HEAD: ebe6d0ccecfb89a2ec9d8a01efcf0c6b6a850783 (uncommitted Inc 8b + E5 corrective pass 1 work on top)
+# sources sha256[:16]: app.py=87c7f9d74909138c project_gather_service.py=524c3409037cae26 workspace.py=d9f361f3fb092ae2 screens_directionb.py=e94f8e764f950b1a variant_execution_service.py=8a38dde7fcd14211 
+# s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc8b\s19_app\__init__.py
+# python: Python 3.11.15
+# env: NO_COLOR unset, PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=.
+# command: python -m pytest -p no:cacheprovider -q --tb=short -rfE tests/test_import_census.py tests/test_tui_snapshot.py tests/test_id_registry.py tests/test_batch91_registry_hygiene.py tests/test_address_census.py tests/test_engine_unchanged.py
+
+........................................................................ [ 96%]
+...                                                                      [100%]
+--------------------------- snapshot report summary ---------------------------
+29 snapshots passed.
+75 passed in 172.82s (0:02:52)
+
+# exit code: 0
+# ended (UTC): 2026-10-31T06:01:35Z

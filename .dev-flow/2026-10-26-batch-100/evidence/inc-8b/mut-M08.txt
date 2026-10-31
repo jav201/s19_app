@@ -1,0 +1,17 @@
+mutant: M08
+target: s19_app/tui/services/project_gather_service.py
+old -> new:             status = os.lstat(path)  ->              status = os.stat(path) ||         if stat.S_ISLNK(mode) or _is_reparse_point(path):  ->          if _is_reparse_point(path) and stat.S_ISDIR(mode):
+sha256_before: 7f1ecfefde90ee6bf926e49e88d362ee0c1de4d7909b28451b96ada45176ceff
+command: cd C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b && env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_project_homes.py::test_tc_b100_31_links_are_skipped_and_named
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b
+---
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:324: AssertionError: ['Project NOT saved: could not save — patches/l.json changed while saving — check the folder.']
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_links_are_skipped_and_named
+1 failed in 5.00s
+---
+summary: 1 failed in 5.00s
+verdict: KILLED
+restored = True

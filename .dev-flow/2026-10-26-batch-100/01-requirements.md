@@ -30,11 +30,11 @@ This document states what the Load + projects batch obliges. A saved project res
 ### 1.3 Definitions, acronyms, abbreviations
 | Term | Definition |
 |------|------------|
-| Work area | `<base>/.s19tool/workarea/`, the folder Load lists (`app.py:8519-8524`). "Inside the work area" means inside `self.workarea.resolve()` after every link and junction is resolved (`contained_in_workarea`, LLR-171.4), never inside some other `.s19tool/workarea`. |
+| Work area | `<base>/.s19tool/workarea/`, the folder Load lists (`list_projects`, `app.py`). "Inside the work area" means inside `self.workarea.resolve()` after every link and junction is resolved (`contained_in_workarea`, LLR-171.4), never inside some other `.s19tool/workarea`. |
 | Work copy | The copy of a loaded source in `workarea/temp/` (`WORKAREA_TEMP`, `workspace.py:20`). |
 | Data differs | The emit decision (LLR-167.1): the change document's entries, re-derived onto a copy of the source image (the `save_patched` split, LLR-167.7), give data that differs from the source file's data. A check document never counts. It decides whether Save project emits or copies. |
 | Unsaved | `ChangeService.differs_from_last_saved(mem_map)` (NEW, LLR-167.5): the image differs from the copy last loaded or written. With the Patch Editor dirty flag and the Flow Builder dirty flag it decides the load question (HLR-174) and the Save summary's pending line (HLR-175). It never decides emit or copy. |
-| Project | A direct child folder of this work area, not a link or junction, not a reserved home, holding a `project.json` or a data file (Q-2). |
+| Project | A direct child folder of this work area, not a link or junction, not a reserved home, holding a `project.json`, a data file or an A2L file (Q-2; the A2L file since Inc 8b, HLR-171a, E3-architect A3-16). |
 | Save plan | The one object `plan_project_save` (NEW, LLR-167.6) returns: target folder and kind, one row per top-level file, one row per sub-folder with its file count, and one row for `project.json`, each with its source, landing name (from `predict_placement`, LLR-163.7) and action word (`new`, `keep`, `merge`, `rewrite`; no increment through Inc 8a produces `replace`, E3 R1 — a later increment adds it only with its own requirement arm). The Save dialog paints it and `_handle_save_dialog` executes it (R-PC). |
 | `derived_from` | The `project.json` per-variant key (NEW, LLR-168.4) naming the variant a patched variant was derived from; written by the save-back and by Save project's emit, carried by every rewrite. |
 | Active set | The image variant, MAC and A2L that a load will install. The Load dialog's preview marks it with `●` (P-A verdict note). |
@@ -350,6 +350,26 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 > | project folder with no data or A2L file | `no data or A2L file` | `load a file and Save project` |
 > | save-as larger than the free space | `not enough free space` | `free disk space or remove files from the project` |
 > | Save target is a link or junction | `link or junction` | `choose another name` |
+> | Save parent is not this work area (Inc 8b, LLR-171.3) | `not the work area folder` | `choose the work area as the parent folder` |
+> | Load: the project folder is a link or junction (Inc 8b, LLR-171.4e) | `link or junction` | `pick a project in the list` |
+> | Load: the project folder is not one folder of this work area, or resolves outside it (Inc 8b, LLR-171.4f) | `outside the work area` | `copy the folder into the work area` |
+> | Load or Save target: the project folder cannot be inspected, such as a permission error (Inc 8b E5 F7(a), LLR-171.4f) | `could not be read` | `check that the folder can be opened, then load again` / `then save again` |
+> | second MAC file in the target (Inc 8b, LLR-167.6c) | `already has a MAC file` + the target's MAC name | `choose another name` |
+> | second A2L file in the target (Inc 8b, LLR-167.6d) | `already has an A2L file` + the target's A2L name | `choose another name` |
+> | a project file over the per-file cap: sub-folder file or top-level copy (Inc 8b, LLR-167.6g) | `too large to copy` + the file + the limit | `move it out of the project folder, then save again` |
+> | a session file over the per-file cap: image, MAC, A2L or document (Inc 8b, LLR-167.6g) | `too large to copy` + the file + the limit | `a project cannot hold files over <limit>` |
+> | save as: copy list over 2 000 files, a walk over 10 000 entries, or a path over 32 components (Inc 8b, LLR-171.1j) | `too many files to copy` (over 2 000 / over 10 000 entries) / `nested too deep` | `move files out of the project, then save again` |
+> | save as: a sub-folder that cannot be listed, or an entry that cannot be classified (Inc 8b, LLR-171.1k) | `could not be read` + the entries | `check that they can be opened, then save again` |
+> | save as: the open project folder became a link, left the work area, or cannot be inspected (Inc 8b; `could not be read` E5 F7(a)) | `link or junction` / `outside the work area` / `could not be read` | `pick a project in the list` |
+> | save as: a copy landed on a file of the new project that holds the same bytes under another name, so every save repeats it (Inc 8b E5 F5) | `the plan named` + both names + `already holds the same bytes as` | `remove the duplicate copy from the open project folder '<P>', then save again` |
+> | save to a new folder while the open project's folder is gone, one line after the success line (Inc 8b E5, LLR-171.1n) | `The open project folder '<P>' was not found` + `its other files were not copied` | `copy them into '<target>' if you still have them` |
+> | save as: a copy changed while saving, landed under another name, or failed (Inc 8b, LLR-171.7b) | `could not save` + the file | `check the folder` |
+> | links or junctions the save as skipped, one line after the success line (Inc 8b, LLR-171.1c) | `links or junctions not copied` + the paths | `copy those files into the project if it needs them` |
+> | a gathered file `project.json` cannot record, one line per file (Inc 8b, LLR-171.5) | `copied but not recorded` + the file + why (`Windows reserves that name` for a device stem, `the name is not one project.json records` for any other reason, E5 F4) | `rename it in the common folder, select the new name, then Save project` |
+> | more than 10 entries of the open project's tree in one status list (Inc 8b, LLR-171.7a; the 10 is defined once, `PAINTED_NAME_LIMIT`, E5 F6) | the first 10 entries + `and K more` | — |
+> | a failed save's rollback kept a file because a folder changed while saving (Inc 8b E5, LLR-171.7c) | `Not removed after the failed save` + the files + `a folder changed while saving` | `check the project folders` |
+> | Load: no `project.json` and no data or A2L file (Inc 8b, LLR-171.2e) | `no project.json` | `load a file and Save project` |
+> | Load: an A2L-only project's A2L is a link or over the cap (Inc 8b, LLR-171.2f) | `link or junction` / `too large to open` + the A2L | `replace the A2L file, then Load again` |
 > | empty Projects / work-area files / recents | `no projects` / `no work-area files` / `no recent sources` | `ctrl+s saves a project` / `l loads a file` / — |
 > | recent source missing on pick | `not found` | `the entry was removed` |
 > | an image-replacing or project action while a worker runs | `busy` + the running action's label | `wait for it to finish` |
@@ -360,6 +380,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 > | problem: not readable | `not readable` + the reason in user terms | `replace the file, or Save project to drop it` |
 > | problem: not readable — the active document too large to reopen (Inc 8a, R10) | `not readable` + `too large to reopen` | `open it from the Patch Editor (it can take a while)` |
 > | problem: not readable — the active document could not be read (Inc 8a, R10/R16) | `not readable` + `could not be read` | `check that the file can be opened, then Load again` |
+> | problem: not readable — the project's A2L beside a data file is a link or over the cap (Inc 8b, LLR-171.2g; painted through the `STEP_REPLACE_A2L` mark since E5 F2) | `not readable` + `link or junction` / `too large to open` | `replace the A2L file, then Load again` |
 > | problem: changed on disk | `changed on disk` | `Save project records the new state` |
 > | problem: not recorded | `not recorded` | `Save project records it` |
 > | problem: no digests saved | `no digests saved` | `Save project records them` |
@@ -494,21 +515,56 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
   - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☒ error — empty: a pasted document with 0 entries (not recorded); boundary: a file-backed document already in `P/patches/` (recorded as on disk, `keep`, E3 R1), a file-backed document with 0 entries (recorded, E3 R9), a clashing `changes.json`; invalid: an `active_document` outside `patches/`/`checks/` or not `.json`; error: a document write that fails (the save completes without it). A missing document is a listed problem.
   - **Negative control:** executed on `1d677ba` (P-8): `after Load: editor doc = None entries = 0` → AT-B100-08 is RED today.
 
-### HLR-171 — Projects live in this work area and reopen complete
+### HLR-171 — Save as copies the whole project
 - **Traceability:** US-161
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.22, LED-2026-10-26-batch-100.42
-- **Statement:** When Save project saves the open project under a new name, the system shall copy every sub-folder of the open project, with its regular files, into the new project, without following any directory link or junction, and listing each link it skipped; one link-pruned walk shall produce both the file list and the total, and the save shall be refused before the new folder is created when that total exceeds the free space of the work area's volume. When a project holds an A2L and no data file, Load shall open its A2L. Every placement — every file any writer lands in the work area, the save-back and Save project's emit included — shall be refused unless its destination is inside this app's work area after links and junctions are resolved; this check lives in the one placement function, so no writer is left off a list. A project folder that is itself a link or junction shall not be listed, loaded or written, and Save project shall check its target for a link or junction before resolving it. When Save project is given a parent folder that does not resolve to this work area, the system shall refuse the save before creating any folder.
-- **Rationale (informative):** "save as" leaves flows, patches and reports behind (P-9); an A2L-only project cannot be loaded (P-12); a save elsewhere is never listed (P-11); a junction in the work area escapes every containment check (S-02, security R2-01); a junction inside a sub-folder copies an outside tree (S-03, security R2-06); a large copy can fill the disk (S-15).
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.22, LED-2026-10-26-batch-100.42, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77, LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.79, LED-2026-10-26-batch-100.81
+- **Statement (EARS event):** When Save project saves the open project into a new project folder, the system shall make the new project hold every regular file of the open project, at the top level and in its sub-folders, that is not reached through a link or junction and that the save does not write itself, other than `project.json` backups (`project.json.previous-*`).
+- **Decomposition:** LLR-171.1, LLR-171.1a … LLR-171.1m, LLR-171.5, LLR-171.6, LLR-171.6a, LLR-171.6b, LLR-171.7, LLR-171.7a, LLR-171.7b; the plan rows LLR-167.6a, LLR-167.6b, LLR-167.6g. The split of the former compound HLR-171 (save as, A2L-only, containment) into HLR-171, HLR-171a and HLR-171b is LED .76; the top-level files, the ceilings, the unreadable entries, the session switch, the carried `batch` rule and the painted names are LED .78.
+- **Rationale (informative):** "save as" leaves flows, patches and reports behind (P-9); a junction inside a sub-folder copies an outside tree (S-03, security R2-06); a large copy can fill the disk (S-15).
 - **Validation:** `test`
-- **Executed verification:** `pytest tests/test_b100_project_homes.py`
-- **Numeric pass threshold:** `p06` C → Q holds every file of P's sub-folders (0 missing, 0 differing bytes); a top-level directory junction, a nested junction and a file symlink in P → 0 files copied through them, 3 skips listed, 0 bytes added to the total; `p04` 10 → the A2L-only project opens with 3 A2L tags; a junction project folder pointing into another work area → 0 listed, 0 loads, and 0 bytes written outside `self.workarea` by Save project (new name and merge), the save-back, the variant append and the MAC and A2L syncs; a foreign parent → refused, 0 folders.
+- **Executed verification:** `pytest tests/test_b100_project_homes.py -k "tc_b100_31 or at_b100_09"`
+- **Numeric pass threshold:** `p06` C → Q holds every regular file of P's sub-folders and every top-level file of P the save does not write itself (0 missing, 0 differing bytes), and 0 of P's `project.json.previous-*` backups; a top-level directory junction, a nested junction and a file symlink in P → 0 files copied through them.
+- **Negative control:** executed on `1d677ba` (P-9): `Q tree: ['firmware.a2l', 'firmware.s19', 'project.json']` → AT-B100-09 RED.
 - **Priority:** high
 - **Acceptance (black-box):**
-  - **Observable outcome:** (AT-B100-09) the engineer opens P (with `flows/f1.json`, `patches/boost.json`, `reports/r.md`) and saves it as Q: Q's folder holds those files, and Q's flow list shows `f1`. (AT-B100-10) An A2L-only project saved and reopened shows its A2L in the Loaded panel. (AT-B100-11) A project folder in the work area that is a junction into another work area is not listed in the Load dialog, and typing its name in Save project is refused with `link or junction`, while a project saved through the dialog is listed.
-  - **Shipped surface:** Save project, Load, the Loaded panel, the Flow Execution import list, the project folders on disk.
-  - **Acceptance test(s):** AT-B100-09, AT-B100-10, AT-B100-11
-  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☒ error — empty: a project with no sub-folder; boundary: a nested sub-folder, a copy exactly at the free space; invalid: links and junctions; error: a foreign parent, a copy over the free space.
-  - **Negative control:** executed on `1d677ba`: P-9 → AT-B100-09 RED; P-12 → AT-B100-10 RED; S-02's executed probe (a junction folder is listed and written through) → AT-B100-11 RED.
+  - **Observable outcome:** (AT-B100-09) the engineer opens P (with `flows/f1.json`, `patches/boost.json`, `reports/r.md`) and saves it as Q: Q's folder holds those files, and Q's flow list shows `f1`.
+  - **Shipped surface:** Save project, the Flow Execution import list, the project folders on disk.
+  - **Acceptance test(s):** AT-B100-09
+  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☒ error — empty: a project with no sub-folder; boundary: a nested sub-folder, a copy exactly at the free space; invalid: links and junctions; error: a copy over the free space.
+
+### HLR-171a — An A2L-only project opens
+- **Traceability:** US-161
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.24, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77, LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.81
+- **Statement (EARS event):** When a project folder that holds one A2L file and no data file is loaded, the system shall open that project with its A2L attached.
+- **Decomposition:** LLR-171.2, LLR-171.2a … LLR-171.2g (LLR-171.2f and .2g, the A2L link and cap guard of both load branches, are LED .78).
+- **Rationale (informative):** an A2L-only project saves and then cannot be loaded (P-12).
+- **Validation:** `test`
+- **Executed verification:** `pytest tests/test_b100_project_homes.py -k "tc_b100_32 or at_b100_10"`
+- **Numeric pass threshold:** `p04` 10 → the project opens, 3 A2L tags, 0 `No supported files` status lines, the session's A2L is the project's own file (orchestrator ruling Q4, LED .77).
+- **Negative control:** executed on `1d677ba` (P-12): `status=['No supported files in project: P']` → AT-B100-10 RED.
+- **Priority:** high
+- **Acceptance (black-box):**
+  - **Observable outcome:** (AT-B100-10) an A2L-only project saved and reopened shows its A2L in the Loaded panel.
+  - **Shipped surface:** Save project, Load, the Loaded panel.
+  - **Acceptance test(s):** AT-B100-10
+  - **Boundary catalog (QC-3):** ☒ empty — a folder with no data file and no A2L, with and without a `project.json`.
+
+### HLR-171b — Only folders inside this work area are listed, loaded or written as projects
+- **Traceability:** US-161
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.28, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77, LED-2026-10-26-batch-100.81
+- **Statement (EARS ubiquitous):** The system shall treat a folder as a project only when that folder is not a link or junction and resolves inside this work area.
+- **Decomposition:** LLR-171.3, LLR-171.3a, LLR-171.4, LLR-171.4a, .4b, .4c, .4e … .4h (listing, load, Save project's target and parent, and the 8 named writers each have their own LLR). LLR-171.4d is withdrawn into .4c; LLR-171.4i and .4j (SEC-5) are routed out of 8b to the LED .50 backlog item (LED .77).
+- **Rationale (informative):** a save elsewhere is never listed (P-11); a junction in the work area escapes every containment check (S-02, security R2-01); a junction `flows/` sends a saved flow outside (SEC-5, `security-increment-001.md`).
+- **Validation:** `test`
+- **Executed verification:** `pytest tests/test_b100_project_homes.py -k "tc_b100_33 or tc_b100_62 or at_b100_11"` (plus the Inc 1 arms of TC-B100-62 in `tests/test_b100_reuse.py` and `tests/test_b100_project_check.py`)
+- **Numeric pass threshold:** a junction project folder pointing into another work area → 0 listed, 0 loads, 0 bytes written outside this work area by the 8 writers of LLR-171.4h; a foreign parent → refused, 0 folders.
+- **Negative control:** executed (S-02 probe) on `1d677ba`: a junction folder is listed and written through → AT-B100-11 RED.
+- **Priority:** high
+- **Acceptance (black-box):**
+  - **Observable outcome:** (AT-B100-11) a project folder in the work area that is a junction into another work area is not listed in the Load dialog, and typing its name in Save project is refused with `link or junction`, while a project saved through the dialog is listed.
+  - **Shipped surface:** Save project, Load, the project folders on disk.
+  - **Acceptance test(s):** AT-B100-11
+  - **Boundary catalog (QC-3):** ☒ boundary ☒ invalid ☒ error — boundary: a normal folder, the work area under another spelling; invalid: junctions into another work area, into this work area and to a plain outside folder; error: a foreign parent.
 
 ### HLR-172 — Recent sources, typed project paths and literal file names
 - **Traceability:** US-162
@@ -856,13 +912,83 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-167.6 — One save plan, painted and executed (R-PC)
 - **Traceability:** HLR-167
-- **Ledger:** LED-2026-10-26-batch-100.4, LED-2026-10-26-batch-100.15, LED-2026-10-26-batch-100.23, LED-2026-10-26-batch-100.26, LED-2026-10-26-batch-100.45, LED-2026-10-26-batch-100.63, LED-2026-10-26-batch-100.72, LED-2026-10-26-batch-100.73, LED-2026-10-26-batch-100.74, LED-2026-10-26-batch-100.75
+- **Ledger:** LED-2026-10-26-batch-100.4, LED-2026-10-26-batch-100.15, LED-2026-10-26-batch-100.23, LED-2026-10-26-batch-100.26, LED-2026-10-26-batch-100.45, LED-2026-10-26-batch-100.63, LED-2026-10-26-batch-100.72, LED-2026-10-26-batch-100.73, LED-2026-10-26-batch-100.74, LED-2026-10-26-batch-100.75, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77, LED-2026-10-26-batch-100.79
 - **Statement:** `plan_project_save(...) -> SavePlan` (NEW, a pure function in `services/project_gather_service.py`) shall compute, without writing, the target folder and its kind (new, open project, merge), one row per top-level file, one row per sub-folder with its file count, and one row for `project.json`, each with its source, landing name (from `predict_placement`, LLR-163.7) and action word (`new`, `keep`, `merge`, `rewrite`; `replace` is not produced through Inc 8a, E3 R1), plus the image description (source + N change entries, K applied by this save, or an unchanged copy), the document, skipped links and the manifest keys, or the refusal with its tokens. The manifest-key list is an input of `plan_project_save` from Inc 5 (the app passes the keys it writes), so the function does not change when Inc 7 or Inc 8a adds a key. The emitted image's bytes and digest, and the copied files' digests, are computed once per dialog open on a worker (LLR-175.4) and passed in, so `project_gather_service` gains no import of `change_service` or `changes`. `_handle_save_dialog` shall execute exactly that plan.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-59 — `pytest tests/test_b100_save_image.py -k tc_b100_59`
-- **Numeric pass threshold:** written at Inc 5: fresh, open-project, pending patch and refused scenarios → the plan's rows equal the written tree at the plan's granularity, by full path and action (0 differences), the refused scenario → 0 files; extended at Inc 8a: a pasted document → 1 document row with its landing under its home (`changes.json` `new`; `changes_1.json` `new` beside a different one; `keep` for an identical one), a file-backed document that is placed or recorded → 1 row with its landing name; one the gather does not place (inside the project but outside its home, its source gone, or its source a link) → 0 document rows and the save completes (E3 R11, A3R2-1); no document → 0 document rows, and a merge → target kind `merge` with its `project.json` row `merge` — each equal to the written tree by full path and action (0 differences), the document's digest and size an input like the image's, and `manifest_keys` holding `active_document` exactly when the write records it; extended at Inc 8b (save-as with sub-folders); computing a plan writes 0 bytes, leaves `mem_map` unchanged and computes 0 digests; 0 new imports from `project_gather_service`. Orchestrator decision (E1 §4 Q3, LED .72; amended by E3 R1, LED .73): the document row's action is `new` when the document is written or copied this save and `keep` when it is recorded as already in its home; the document row never has `replace`; mutation always writing `new` → 1 action-word difference on the `keep` arm → RED; the plan's key list is settled after the write outcome is known (Inc 8a F4).
+- **Numeric pass threshold:** written at Inc 5: fresh, open-project, pending patch and refused scenarios → the plan's rows equal the written tree at the plan's granularity, by full path and action (0 differences), the refused scenario → 0 files; extended at Inc 8a: a pasted document → 1 document row with its landing under its home (`changes.json` `new`; `changes_1.json` `new` beside a different one; `keep` for an identical one), a file-backed document that is placed or recorded → 1 row with its landing name; one the gather does not place (inside the project but outside its home, its source gone, or its source a link) → 0 document rows and the save completes (E3 R11, A3R2-1); no document → 0 document rows, and a merge → target kind `merge` with its `project.json` row `merge` — each equal to the written tree by full path and action (0 differences), the document's digest and size an input like the image's, and `manifest_keys` holding `active_document` exactly when the write records it; extended at Inc 8b by LLR-167.6a (sub-folder rows), LLR-167.6b (skipped links), LLR-167.6c and LLR-167.6d (the MAC and A2L refusals decided in the plan, LED .66), LLR-167.6e (one row per landing path), LLR-167.6f (the open project's own A2L) and LLR-167.6g (the per-file cap), each with its own threshold and negative control, and a save as with top-level copies → 1 `carried` row per copy, action `new`, equal to the written tree by full path and action (0 differences; orchestrator rulings R3, R11, E3-architect A3R2-6); computing a plan writes 0 bytes, leaves `mem_map` unchanged and computes 0 digests; 0 new imports from `project_gather_service`. Orchestrator decision (E1 §4 Q3, LED .72; amended by E3 R1, LED .73): the document row's action is `new` when the document is written or copied this save and `keep` when it is recorded as already in its home; the document row never has `replace`; mutation always writing `new` → 1 action-word difference on the `keep` arm → RED; the plan's key list is settled after the write outcome is known (Inc 8a F4).
 - **Negative control:** a mutation where the handler places a file the plan did not name → 1 tree row without a plan row → RED; a mutation planning without the `inside_elsewhere` class → 1 document row with no file in the tree → RED; a mutation letting the document digest's `OSError` propagate → "Project NOT saved" → RED (E3 R11, A3R2-1).
 - **Boundary catalog:** ☒ empty ☒ boundary ☒ error — a fresh empty folder; a clashing landing name; a refused name.
+
+### LLR-167.6a — The save-as plan has one row per sub-folder with its file count
+- **Traceability:** HLR-167, HLR-171 · trace: `plan_project_save`, `SavePlanRow` (`project_gather_service.py`), `_plan_project_save` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.23, LED-2026-10-26-batch-100.63, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
+- **Statement (EARS event):** When Save project computes the plan for a save as, the system shall include one row for each top-level sub-folder of the open project, holding the count of files LLR-171.1 copies under it.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-59 — `pytest tests/test_b100_save_image.py -k tc_b100_59`
+- **Numeric pass threshold:** P with the 7 sub-folders of LLR-171.1 → 7 sub-folder rows, each count equal to the files written under that sub-folder (0 differences, `reports` = 2 with the nested file); P with no sub-folder → 0 sub-folder rows; a sub-folder holding only a junction → 1 row with 0 files (orchestrator ruling Q9, LED .77); computing the plan writes 0 bytes.
+- **Negative control:** a mutation planning without sub-folder rows → 7 written sub-folders with no plan row → RED; a mutation omitting a sub-folder with 0 files → the links-only sub-folder has no row → RED.
+- **Boundary catalog:** ☒ empty ☒ boundary — no sub-folder; a nested sub-folder.
+
+### LLR-167.6b — The save-as plan lists each skipped link
+- **Traceability:** HLR-167, HLR-171 · trace: `plan_project_save` (`project_gather_service.py`), `_plan_project_save` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.23, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
+- **Statement (EARS event):** When Save project computes the plan for a save as, the system shall list in the plan each link or junction that the save-as enumeration skips.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-59 — `pytest tests/test_b100_save_image.py -k tc_b100_59`
+- **Numeric pass threshold:** the 3 links of LLR-171.1a and LLR-171.1b → 3 skipped-link entries in the plan, equal to the 3 paths LLR-171.1c names in the status (0 differences); 0 links → 0 entries; the junction of a links-only sub-folder is listed against that sub-folder's 0-file row (orchestrator ruling Q9, LED .77).
+- **Negative control:** a mutation that drops the skipped links from the plan → 0 of 3 → RED.
+- **Boundary catalog:** ☒ empty ☒ invalid — no link; three links.
+
+### LLR-167.6c — A second MAC file is refused in the plan
+- **Traceability:** HLR-167 · trace: `_plan_project_save`, `_handle_save_dialog` (`app.py`) — LED .63 (b), LED .66
+- **Ledger:** LED-2026-10-26-batch-100.63, LED-2026-10-26-batch-100.66, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.78
+- **Statement (EARS unwanted):** If the target project folder holds a MAC file and the session holds a MAC file other than it, then the system shall put the `already has a MAC file` refusal into the save plan.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-59 — `pytest tests/test_b100_save_image.py -k tc_b100_59`
+- **Numeric pass threshold:** a merge target holding `a.mac` and a session MAC `b.mac` → the plan carries the refusal and 0 rows; 0 `mkdir` calls on the target (a spy: the decision is taken before any folder creation is attempted), 0 bytes written, 0 rollback runs; 1 status line holding `already has a MAC file` and `choose another name`. "Other than it" means not the same path (compared as text) and not the same name with the same bytes, the A2L rule of LLR-167.6d / .6f (pre-ruling 5, E3-architect A3-4, Code-Wire DR-6): a session MAC `a.mac` with other bytes than the target's `a.mac` → refused; with the same bytes → not refused; a target MAC that is a link → never the session's own (E3-security S3-8). A new target folder cannot hold a MAC file, so this arm is a merge or open-project target (Code-Wire note).
+- **Negative control:** base `ebe6d0c`: the refusal runs in the save body after `project_dir.mkdir` (LED .63 (b)) → the spy records 1 `mkdir` call and the plan has rows → RED; a mutation keeping the check only in the save body → RED; a mutation exempting by name only (the `ebe6d0c` rule, `app.py:9746-9758`) → the other-bytes arm is saved as a second MAC → RED.
+- **Boundary catalog:** ☒ invalid — a second MAC file.
+
+### LLR-167.6d — A second A2L file is refused in the plan
+- **Traceability:** HLR-167 · trace: `_plan_project_save`, `_handle_save_dialog` (`app.py`) — LED .63 (b), LED .66
+- **Ledger:** LED-2026-10-26-batch-100.63, LED-2026-10-26-batch-100.66, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
+- **Statement (EARS unwanted):** If the target project folder holds an A2L file and the session holds an A2L file other than it, then the system shall put the `already has an A2L file` refusal into the save plan.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-59 — `pytest tests/test_b100_save_image.py -k tc_b100_59`
+- **Numeric pass threshold:** a merge target holding `a.a2l` and a session A2L `b.a2l` → the plan carries the refusal and 0 rows; 0 `mkdir` calls on the target (spy), 0 bytes written, 0 rollback runs; 1 status line holding `already has an A2L file`. "Other than it" means not the same path and not the same name with the same bytes; the exemption is LLR-167.6f (orchestrator ruling Q3, LED .77; Code-Wire C3).
+- **Negative control:** base `ebe6d0c`: the refusal runs in the save body after `project_dir.mkdir` → the spy records 1 `mkdir` call and the plan has rows → RED; a mutation keeping the check only in the save body → RED.
+- **Boundary catalog:** ☒ invalid — a second A2L file.
+
+### LLR-167.6e — One plan row per landing path
+- **Traceability:** HLR-167, HLR-171 · trace: `plan_project_save` (`project_gather_service.py`), `_plan_project_save` (`app.py`) — Code-Wire C5
+- **Ledger:** LED-2026-10-26-batch-100.76
+- **Statement (EARS ubiquitous):** The system shall give each landing path of a Save project at most one plan row.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-59 — `pytest tests/test_b100_save_image.py -k tc_b100_59`
+- **Numeric pass threshold:** P open with the Patch Editor document `P/patches/boost.json`, saved as Q → 1 plan row for `Q/patches/boost.json`, whose action equals what the tree shows (0 differences); every landing path of the plan appears once (0 duplicates). Which row owns that landing (the document row or the sub-folder copy) is a design seam for E2.
+- **Negative control:** a mutation planning both the document row and the sub-folder copy for the same landing → 2 rows for 1 path, one with action `new` over a reused file → RED.
+- **Boundary catalog:** ☒ boundary — a document inside a copied sub-folder.
+
+### LLR-167.6f — The open project's own A2L is not refused
+- **Traceability:** HLR-167, HLR-171a · trace: `_plan_project_save` (`app.py`) — orchestrator ruling Q3 (LED .77), Code-Wire C3
+- **Ledger:** LED-2026-10-26-batch-100.77
+- **Statement (EARS event):** When Save project plans a save into a target project folder whose A2L file is the session's A2L file (the same path, or the same name with the same bytes), the system shall plan the save without the `already has an A2L file` refusal.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-59 — `pytest tests/test_b100_save_image.py -k tc_b100_59`
+- **Numeric pass threshold:** the A2L-only project `p04` 10 loaded and saved into itself twice → 2 saves, 0 refusals, 1 A2L file in P (0 `_1` copies); a project with an image and an A2L loaded and saved into itself → saved, 0 refusals; a target A2L with the same name and different bytes → refused (LLR-167.6d).
+- **Negative control:** base `ebe6d0c` (Code-Wire C3): the second save into itself is refused with `Project already has an A2L file.` → RED; a mutation exempting by name only → the different-bytes arm is saved → RED.
+- **Boundary catalog:** ☒ boundary — the same path; the same name and bytes; the same name and other bytes.
+
+### LLR-167.6g — A file over the per-file cap is refused in the plan
+- **Traceability:** HLR-167, HLR-171 · trace: `_plan_project_save` (`app.py`), `DEFAULT_COPY_SIZE_CAP_BYTES` (`workspace.py`, read, not changed) — orchestrator ruling Q10 (LED .77), Code-Wire C6
+- **Ledger:** LED-2026-10-26-batch-100.77
+- **Statement (EARS unwanted):** If a file the save would copy is larger than the placement's per-file size cap, then the system shall put a refusal naming that file into the save plan.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-59 — `pytest tests/test_b100_save_image.py -k tc_b100_59`
+- **Numeric pass threshold:** with the cap lowered for the test (the shipped cap is 256 MiB), `P/splits/big.bin` at cap + 1 bytes → the plan carries a refusal naming `splits/big.bin`, 0 rows, 0 `mkdir` calls (spy), 0 bytes written; at exactly the cap → saved.
+- **Negative control:** base `ebe6d0c`: `place_into_workarea` raises `WorkareaPlacementError` after `project_dir.mkdir` and the save rolls back → the spy records 1 `mkdir` call → RED; a mutation refusing at size ≥ cap → the boundary arm is refused → RED.
+- **Boundary catalog:** ☒ boundary ☒ error — exactly the cap; one byte over.
 
 ### LLR-167.7 — `save_patched` split into re-derive and emit-and-verify
 - **Traceability:** HLR-167
@@ -1044,45 +1170,462 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 - **Negative control:** executed on `1d677ba` (P-8): `editor doc = None` → RED; a mutation loading without `a2l_context` (C1: no app caller passes it today) or before the A2L is loaded → the symbol arm has 1 unresolved entry → RED; a mutation where the load also reports `missing` for the document → 2 problems for one file → RED; a mutation with the reopen caps removed → a 20 000-entry document takes more than 1 s → RED (R4); a mutation whose catch set lacks `RecursionError` → the 1 MiB `[` file raises out of Load → RED (R10).
 - **Boundary catalog:** ☒ boundary ☒ error — a symbol entry; no A2L; a missing document; an unreadable one; a 1 MiB `[` file; a link; a locked file.
 
-### LLR-171.1 — Save as copies every sub-folder, never through a link
-- **Traceability:** HLR-171
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.44
-- **Statement:** When `_handle_save_dialog` saves an open project to a new folder, one walk of `current_project_dir` shall prune every directory entry for which `_is_reparse_point` (`workspace.py:172`) is true before descending, at every depth including the top-level sub-folder, and skip file links; that walk's file list gives both the total and the copy. The save shall be refused, before the folder is created and with the `not enough free space` tokens, when the total exceeds `shutil.disk_usage` free space of the work area's volume; otherwise each file is copied through `place_into_workarea` into the same relative path, and each skipped link is listed in the summary and the status.
+### LLR-171.1 — Save as copies each file of the open project to the same path
+- **Traceability:** HLR-171 · trace: `_handle_save_dialog`, `_copy_project_subfolders` (NEW) (`app.py`), `inventory_project_tree`, `plan_project_save` (`project_gather_service.py`), `walk_tree_no_links` (`workspace.py`), `place_into_workarea` (every copy places through it, LLR-171.4a)
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.44, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.79
+- **Statement (EARS event):** When Save project saves the open project into a new project folder, the system shall copy each regular file of the open project that the save does not write itself, other than `project.json` backups (`project.json.previous-*`), at the top level and at every depth of its sub-folders, to the same project-relative path in the new project folder.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
-- **Numeric pass threshold:** P with `flows/`, `flowsets/`, `patches/`, `checks/`, `reports/`, `templates/`, `splits/` (one file each; the expected set derived from P's listing) → 0 missing and 0 differing files in Q; P → 0 changed digests; a top-level directory junction, a nested junction and a file symlink → 0 files copied through them, 3 skips listed, 0 bytes added to the total; a total over the free space (simulated) → refused with tokens, 0 folders.
-- **Negative control:** executed on `1d677ba` (P-9): Q lacks the sub-folders → RED; S-03's executed probe: `os.walk(P)` lists `flows\secret.txt` through a junction → RED; security R2-06's probe: a plain walk descends a junction → the total arm RED.
-- **Boundary catalog:** ☒ empty ☒ boundary ☒ invalid ☒ error — no sub-folder; a nested sub-folder; links and junctions; a copy over the free space.
+- **Numeric pass threshold:** P with `flows/`, `flowsets/`, `patches/`, `checks/`, `reports/`, `templates/`, `splits/` (one file each) and a nested `reports/2026/r2.md`, the expected set derived from P's link-free listing → 100 % of the expected set present in Q (0 missing), 0 files with a differing SHA-256; P with the top-level `a.json`, `other.s19` (a second variant) and `notes.txt` beside the session's image, A2L and `project.json` → `a.json`, `other.s19` and `notes.txt` present in Q byte-equal at the same names, the session's image and A2L written once by their rows, Q's `project.json` written by the save, 0 `_1` copies (orchestrator ruling R3, E3-architect A3-2); P with no sub-folder and no other top-level file → 0 copied files in Q and the save completes; a fresh session with no open project → no enumeration, 0 copied files (the trigger needs an open project). The files the save writes itself are `project.json`, the files of the image, MAC and A2L rows, and, when the session plans a MAC or an A2L row, every other MAC or A2L file of P (Q holds one of each, LED .63 (b) / .66; Code-Wire F-7); P's `project.json.previous-*` backups are not copied (R10): P with `project.json.previous-20261030T000000Z` beside `a.json` → Q holds `a.json` and 0 files whose name, compared with `normcase`, starts `project.json.previous-`. A save into an existing project copies no sub-folder (LLR-171.1g, orchestrator ruling Q2). The sub-folder copy runs right after the project folder is created, before the first home placement; the top-level copy runs after the image, MAC and A2L rows are placed and before the gather (orchestrator rulings R2, R11). P holding `firmware.s19` (the session image) and `firmware_1.s19` byte-identical to the image this save emits → saved, Q holds both names, 0 lines holding `the plan named`.
+- **Negative control:** executed on `1d677ba` (P-9): Q lacks the sub-folders → RED; a mutation copying only the first level of each sub-folder → `reports/2026/r2.md` missing → RED; a mutation copying the sub-folders only → `Q/a.json` absent → RED (R3); a mutation without the backup exclusion → `Q/project.json.previous-20261030T000000Z` present → RED (R10); a mutation copying the top-level entries before the rows loop, with P holding `firmware_1.s19` byte-identical to the emitted image → the image row reuses it and the save aborts → RED (R11).
+- **Boundary catalog:** ☒ empty ☒ boundary — no sub-folder; a nested sub-folder.
 
-### LLR-171.2 — An A2L-only project opens
-- **Traceability:** HLR-171
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.24
-- **Statement:** `_handle_load_project` shall, when the project has no data file and one A2L, reset the session, set the project and `_variant_set = build_variant_set(name, [])`, attach the A2L through the A2L load path and report it, instead of `No supported files in project`; a project folder holding neither a data file nor an A2L shall be answered with the `no data or A2L file` tokens.
+### LLR-171.1a — The save-as enumeration never descends into a directory link
+- **Traceability:** HLR-171 · trace: `walk_tree_no_links`, `_is_reparse_point` (`workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.44, LED-2026-10-26-batch-100.76
+- **Statement (EARS state):** While the system enumerates the open project's sub-folders for a save as, the system shall not descend into a directory that is a symbolic link or junction.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
+- **Numeric pass threshold:** a top-level directory junction (`P/linked` → an outside folder holding `secret.txt`) and a nested junction (`P/reports/j` → the same) → 0 files of the outside folder in Q; a junction cycle `P/flows/loop` → `P` → the save completes in under 5 s with 0 files copied through the cycle.
+- **Negative control:** S-03's executed probe: `os.walk(P)` lists `flows\secret.txt` through a junction → RED; a mutation testing only `DirEntry.is_dir(follow_symlinks=False)` without the reparse-point re-check (Python 3.11 reads a junction as a plain directory) → `secret.txt` copied → RED.
+- **Boundary catalog:** ☒ invalid — junctions at the top level, nested, and in a cycle.
+
+### LLR-171.1b — The save-as copy skips a file link
+- **Traceability:** HLR-171 · trace: `walk_tree_no_links`, `_is_reparse_point` (`workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.76
+- **Statement (EARS state):** While the system enumerates the open project's sub-folders for a save as, the system shall not copy a file that is a symbolic link.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
+- **Numeric pass threshold:** `P/patches/l.json`, a symbolic link to an outside file → 0 files at `Q/patches/l.json`, the link's target 0 bytes changed. Feasibility: creating a file symbolic link on Windows needs Developer Mode or the create-symlink privilege; when the test cannot create one it is reported as not run, never as passed.
+- **Negative control:** a mutation following file links → `Q/patches/l.json` present → RED.
+- **Boundary catalog:** ☒ invalid — a file symbolic link.
+
+### LLR-171.1c — Each skipped link is named in the status
+- **Traceability:** HLR-171 · trace: `_handle_save_dialog` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.78
+- **Statement (EARS event):** When the save-as enumeration skips a link or junction, the system shall name that link's project-relative path in the Save project status, within the 10-name limit of LLR-171.7a.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
+- **Numeric pass threshold:** the three links of LLR-171.1a and LLR-171.1b → 3 of 3 project-relative paths named in the full `set_status` message (read whole, as TC-B100-16 does, because the status log clips at the terminal width, LED .64), with `links or junctions not copied` and `copy those files into the project if it needs them`; 0 links → 0 skip clauses; 25 links → 1 line naming 10 and holding `and 15 more` (orchestrator ruling R6, E3-security S3-4).
+- **Negative control:** a mutation that skips silently → 0 of 3 named → RED.
+- **Boundary catalog:** ☒ empty ☒ invalid — no link; three links.
+
+### LLR-171.1d — Bytes behind a link do not count toward the save-as total
+- **Traceability:** HLR-171 · trace: `_handle_save_dialog` (`app.py`), `walk_tree_no_links` (`workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
+- **Statement (EARS ubiquitous):** The system shall exclude every byte reached through a link or junction from the save-as size total.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
+- **Numeric pass threshold:** the save-as total is T bytes (LLR-171.1i) and a junction in P reaches a 10 MiB outside file; with the work area's free space simulated at exactly T → the save completes (0 refusals).
+- **Negative control:** security R2-06's probe: a plain walk descends the junction → total T + 10 MiB > T → refused → RED.
+- **Boundary catalog:** ☒ invalid — a junction reaching a large file.
+
+### LLR-171.1e — A save as larger than the free space is refused before any folder exists
+- **Traceability:** HLR-171 · trace: `_handle_save_dialog` (`app.py`), `shutil.disk_usage`
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77, LED-2026-10-26-batch-100.78
+- **Statement (EARS unwanted):** If the save-as size total exceeds the free space of the work area's volume, then the system shall refuse the save, with the `not enough free space` tokens, before creating the project folder.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
+- **Numeric pass threshold:** with T the total of LLR-171.1i (each file rounded up to a multiple of 4 096 bytes, plus 65 536 bytes; orchestrator ruling R7), free space simulated at T − 1 → 1 status line holding `not enough free space` and `free disk space or remove files from the project`, 0 folders created, 0 bytes written; free space simulated at exactly T → the save completes.
+- **Negative control:** a mutation checking after the folder is created → 1 folder exists after the refusal → RED; a mutation refusing at `total >= free` → the boundary arm is refused → RED.
+- **Boundary catalog:** ☒ boundary ☒ error — exactly the free space; one byte over.
+
+### LLR-171.1f — Save as leaves the open project unchanged
+- **Traceability:** HLR-171 · trace: `_handle_save_dialog` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.76
+- **Statement (EARS ubiquitous):** The system shall not modify, add or remove any file of the open project when it saves that project into a new project folder.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
+- **Numeric pass threshold:** P's (path, SHA-256) set before and after the save as → 0 changed, 0 added, 0 removed.
+- **Negative control:** a mutation moving the sub-folder files instead of copying them → P loses them → RED.
+- **Boundary catalog:** ☒ boundary — a P with every sub-folder of LLR-171.1.
+
+### LLR-171.1g — A save into an existing project copies no sub-folder of the open project
+- **Traceability:** HLR-171 · trace: `_handle_save_dialog`, `_plan_project_save` (`app.py`) — orchestrator ruling Q2 (LED .77)
+- **Ledger:** LED-2026-10-26-batch-100.77
+- **Statement (EARS state):** While the Save project target is an existing project folder, the system shall not copy the open project's sub-folders into it.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
+- **Numeric pass threshold:** P open with the 7 sub-folders of LLR-171.1, saved into an existing project R (a merge) → 0 files of P's sub-folders in R other than the rows the gather places (the Patch Editor document, the composition documents, the CRC template), 0 sub-folder rows in the plan; P saved into itself → 0 sub-folder copies, P's tree unchanged apart from the gather's rows.
+- **Negative control:** a mutation running the sub-folder copy for a merge target → `R/flows/f1.json` present → RED.
+- **Boundary catalog:** ☒ boundary — a merge target; the open project as its own target.
+
+### LLR-171.1h — Save as carries the open project's records into the new project.json
+- **Traceability:** HLR-171 · trace: `_handle_save_dialog`, `_manifest_carry`, `_write_and_verify_manifest` (`app.py`) — orchestrator ruling Q7 (LED .77)
+- **Ledger:** LED-2026-10-26-batch-100.77, LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.80
+- **Statement (EARS event):** When Save project saves the open project into a new project folder, the system shall write the open project's `batch`, `assignments`, `declared_regions`, `gathered`, `active_document` and `derived_from` records, as project-relative paths, into the new project's `project.json`.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
+- **Numeric pass threshold:** P holding the top-level `a.json` and `c.json`, whose `project.json` (written by the shipped Save project, so in the dialog's form: `batch` `["a.json"]`, `assignments` naming `c.json`) sets all 6 records, with no Patch Editor document in the session and nothing selected in the dialog, saved as Q → 6 of 6 records in Q's `project.json` equal to P's as project-relative strings, every file they name present in Q (copied with the top level and the tree, LLR-171.1), `gathered` = P's rows plus this save's rows (0 dropped); Q's `files` keeps its scope (top-level data and A2L files plus the active document, LLR-169.2); Load of Q → 0 `missing` problems. `batch` and `assignments` follow LLR-171.6 / .6a (a non-empty dialog selection wins). `derived_from` carries only the records whose key names a top-level data file Q holds after the save; a record for a variant file P no longer holds → not carried; when the image is emitted, its key holds this save's record (pre-ruling 9, E3-architect A3-8). A session that holds a Patch Editor document records its own landing as `active_document` (HLR-170), not P's value.
+- **Linked source manifest (E5 SEC8b-3, LED-2026-10-26-batch-100.80):** P's `project.json` replaced by a file link to an outside manifest whose `batch` is `["OUTSIDE_BATCH_NAME.s19"]` after the load, saved as Q → saved, Q's `batch` does not hold `OUTSIDE_BATCH_NAME.s19` (0 records carried from a linked manifest), 1 line naming `project.json` with `links or junctions not copied`; pre snapshot (sha `b75f9125c9eb12c1`): Q's `batch` = the outside value (probe E1) → RED; a mutation without the `lstat` check → RED.
+- **Negative control:** a mutation writing a fresh manifest for a save as → Q's `batch` empty → RED; a mutation carrying absolute paths → the serializer refuses the manifest → RED; a mutation dropping `derived_from` → Q lacks P's record for `firmware.s19` → RED. (The former fixture form `batch` `["patches/a.json"]` can only come from a hand-written manifest and is withdrawn, A3-2.)
+- **Boundary catalog:** ☒ empty ☒ boundary — P with no records (0 carried); P with all 6.
+
+### LLR-171.1i — The save-as total counts every byte the save writes
+- **Traceability:** HLR-171 · trace: `_plan_project_save`, `_handle_save_dialog` (`app.py`) — orchestrator ruling Q8 (LED .77)
+- **Ledger:** LED-2026-10-26-batch-100.77, LED-2026-10-26-batch-100.78
+- **Statement (EARS ubiquitous):** The system shall count in the save-as size total every file the save as copies or writes — the top-level files, the emitted image and the sub-folder files — each rounded up to a multiple of 4 096 bytes, plus 65 536 bytes for `project.json` and the folders.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
+- **Numeric pass threshold:** P with `firmware.s19` of 4 000 bytes, `firmware.a2l` of 1 200 bytes and 8 sub-folder files of 100 bytes, saved as Q with a pending patch (the emitted image is 5 000 bytes) → T = 8 192 + 4 096 + 8 × 4 096 + 65 536 = 110 592 bytes; free space simulated at 110 591 → refused (LLR-171.1e); at 110 592 → saved; files of 0, 1, 4 096 and 4 097 bytes count 0, 4 096, 4 096 and 8 192 (orchestrator ruling R7, E3-security S3-9: NTFS allocates per 4 KiB cluster, and `project.json` was not counted).
+- **Negative control:** a mutation counting the sub-folder files only → free space T − 1 accepted → RED; a mutation counting the source image instead of the emitted bytes (4 096 rounded in place of 8 192) → T − 1 accepted → RED (the fixture's source and emitted image fall on different 4 KiB steps); a mutation summing raw sizes (72 536) → RED; a mutation without the 65 536-byte margin → RED.
+- **Boundary catalog:** ☒ boundary — exactly the free space with the top-level files counted; file sizes on and one byte over a 4 KiB step.
+
+### LLR-171.1j — A save as with too many files or too deep a tree is refused before any folder exists
+- **Traceability:** HLR-171 · trace: `inventory_project_tree`, `plan_project_save` (`project_gather_service.py`), `walk_tree_no_links` (`workspace.py`, `max_entries`), `_handle_save_dialog` (`app.py`) — orchestrator rulings R1, R13 (`inc-8b/E3-rulings.md`), E3-security S3-1, S3R2-1
+- **Ledger:** LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.79
+- **Statement (EARS unwanted):** If the files a save as would copy from the open project number more than 2 000, the save-as enumeration walks more than 10 000 entries of the open project's tree, or an entry of that tree lies more than 32 path components deep, then the system shall refuse the save, naming the limit, before creating the project folder.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
+- **Numeric pass threshold:** a copy list of 2 000 files (1 999 one-byte files under `reports/` plus the top-level `a.json`; `project.json` and the session's image are not in it) → saved, 2 000 copied files in Q; 2 001 → 1 status line holding `too many files to copy` and `move files out of the project, then save again`, 0 `mkdir` calls (spy), 0 bytes written; a file at 32 path components → saved; at 33 → 1 status line holding `nested too deep`, 0 `mkdir` calls; a walk of exactly 10 000 entries (folders, links, unreadable entries and files all count; `project.json`, `firmware.s19`, `reports/` and 9 997 empty folders under it) → saved; 10 001 entries with 0 files to copy → 1 status line holding `too many files to copy` and `over 10 000 entries`, 0 `mkdir` calls, the refusal painted in under 2 s; one folder of 50 000 files → refused with at most 10 001 entries read and no folder of more than 10 001 names sorted (R13, the ceiling read at call time). The time of the 2 000-file save is measured at E4 and reported, not gated: a background copy with progress and cancel stays with Inc 12a (R1).
+- **Negative control:** the ceiling removed → the 2 001 arm saves → RED; a ceiling at `>=` → the 2 000 arm is refused → RED; the depth check removed → the 33 arm saves → RED; the entry count removed (regular files only) → the 10 001-folder arm passes the plan → RED (R13).
+- **Boundary catalog:** ☒ boundary ☒ error — exactly 2 000 files, 10 000 entries and 32 components; one over each.
+
+### LLR-171.1k — An unreadable part of the open project refuses the save as before any folder exists
+- **Traceability:** HLR-171 · trace: `walk_tree_no_links` (`workspace.py`), `inventory_project_tree`, `plan_project_save`, `painted_names` (`project_gather_service.py`) — orchestrator ruling R8, E3-architect A3-5, E3-security S3-2, S3R2-6, pre-ruling 6
+- **Ledger:** LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.79
+- **Statement (EARS unwanted):** If the save-as enumeration cannot list a sub-folder of the open project or cannot classify one of its entries, then the system shall refuse the save, naming each such entry, before creating the project folder.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
+- **Numeric pass threshold:** `P/reports/locked` that cannot be listed → 1 status line holding `reports/locked`, `could not be read` and `check that they can be opened, then save again`, 0 `mkdir` calls (spy), 0 bytes written; `P/flows/x.json.` (a name ending in a dot), alone and beside `P/flows/x.json` → the same refusal naming `flows/x.json.`; 12 such entries → 10 named and `and 2 more` (LLR-171.7a); 0 such entries → 0 such lines and the save goes on; the open project folder itself cannot be listed → the refusal names `'P'` (the project's name), never `.`; `P/NUL.txt` made through the `\\?\` form → the refusal names `NUL.txt` (reported as not run where the platform refuses to create the name). "Cannot classify" means `lstat` fails, the entry is neither a regular file, a folder nor a link, its name ends in a dot or a space, or its stem (case-insensitive, before the first dot) is a reserved device name: `CON`, `PRN`, `AUX`, `NUL`, `COM1`–`COM9`, `LPT1`–`LPT9`, `CONIN$`, `CONOUT$` (S3R2-6).
+- **Negative control:** a mutation skipping an unlistable folder silently (the walker's behaviour at `ebe6d0c`, `workspace.py:296-299`) → saved, Q lacks the folder's files with 0 lines → RED; a mutation dropping an unclassifiable entry → saved with 0 lines → RED; a mutation without the device-name rule → `NUL.txt` reaches the copy list → RED (where the name can be created).
+- **Boundary catalog:** ☒ invalid ☒ error — a trailing-dot name; a reserved device name; an unlistable folder; the unlistable project folder.
+
+### LLR-171.1l — After a save as, the Flow panels use the new project folder
+- **Traceability:** HLR-171 · trace: `_handle_save_dialog`, `_publish_flow_session_dir` (`app.py`) — orchestrator ruling R9, E3-architect A3-11
+- **Ledger:** LED-2026-10-26-batch-100.78
+- **Statement (EARS event):** When a save as completes, the system shall make the new project folder the Flow panels' session folder.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
+- **Numeric pass threshold:** P open, saved as Q → 1 session strip naming Q, 0 naming P, and the session folder equals `workarea/Q` (unresolved); a refused or failed save as → 0 changes to the session folder (it stays `workarea/P`).
+- **Negative control:** base `ebe6d0c`: `_publish_flow_session_dir` has one caller, the load (`app.py:11427`) → the strip still names P after the save as → RED.
+- **Boundary catalog:** ☒ boundary ☒ error — a completed save as; a refused one.
+
+### LLR-171.1m — After a save as, a Patch Editor document from the previous project is bound to its copy
+- **Traceability:** HLR-171, HLR-170 · trace: `_handle_save_dialog` (`app.py`) — orchestrator ruling R9, E3-architect A3-11, E3-security S3R2-5
+- **Ledger:** LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.79, LED-2026-10-26-batch-100.80
+- **Statement (EARS event):** When a save as completes, the system shall bind a Patch Editor document whose file lies inside the previous project folder to that file's copy in the new project folder.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
+- **Numeric pass threshold:** P open with the file-backed Patch Editor document `P/patches/boost.json`, saved as Q → the document's file is `workarea/Q/patches/boost.json` (unresolved, the 8a R12 spelling); an edit, then Save project → P's files 0 bytes changed; a document from outside P (the common folder) → its binding unchanged; the document is bound only to a file this save copied (an entry of the copy list) or to the document row's landing, never to a path whose part relative to P holds `..`: `workarea/P/../R/x.json` → binding unchanged and 0 writes under `workarea/R` on the next Save project; a document under a skipped junction of P → binding unchanged (S3R2-5). P records `patches/changes.json` and also holds a byte-identical `patches/changes_1.json` (E5 F5 (b), LED-2026-10-26-batch-100.80) → saved; the document is bound to the file the gather placed or reused in Q (the one Q's `active_document` names, which exists and holds the document's bytes), never to the planned name the gather did not write; pre snapshot: bound to `workarea/Q/patches/changes.json`, which does not exist → RED.
+- **Negative control:** a mutation without the rebind → the document stays bound to `workarea/P/patches/boost.json` → RED; a mutation rebinding after a file-exists probe of the new path → the `..` arm binds `workarea/Q/../R/x.json` → RED (S3R2-5).
+- **Boundary catalog:** ☒ boundary ☒ invalid — a document inside P; a document outside P; a `..` spelling; an identical sibling at the landing.
+
+### LLR-171.1n — A save to a new folder while the open project folder is gone saves the session
+- **Traceability:** HLR-171, HLR-164 · trace: `_handle_save_dialog`, `_save_as_source_for`, `_plan_project_save` (`app.py`) — E5 code review F1 (MAJOR, design-gap)
+- **Ledger:** LED-2026-10-26-batch-100.80
+- **Statement (EARS unwanted):** If the open project's folder does not exist when Save project saves to a folder that does not exist, then the system shall save the session's files to that folder without a copy from the open project and paint one status line naming the missing folder.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k open_project_folder_gone`
+- **Numeric pass threshold:** P open, the session image loaded from outside P, `workarea/P` moved away outside the app; Save project under P's own name and as Q → each: `Saved project to`, the target holds the session image byte-equal, the open project is the target, 1 status line holding `The open project folder 'P' was not found`, `its other files were not copied` and `copy them into '<target>' if you still have them`, 0 lines holding `could not be read`. P still present, save as Q → P is copied (LLR-171.1) and 0 such lines.
+- **Negative control:** pre snapshot (sha `b75f9125c9eb12c1`): both saves refused with `'P' could not be read — check that they can be opened, then save again`, no folder created (probe P-4) → RED; a mutation that ignores whether P's folder exists → the same refusal → RED.
+- **Boundary catalog:** ☒ error ☒ boundary — P gone, saved under its own name; P gone, saved as Q; P present.
+
+### LLR-171.1o — The save-as copy refuses when a folder above a copied file becomes a link
+- **Traceability:** HLR-171, HLR-171b · trace: `_copy_project_subfolders` (`app.py`), `_path_traverses_reparse_point` (`workspace.py`) — E5 security SEC8b-2
+- **Ledger:** LED-2026-10-26-batch-100.80
+- **Statement (EARS unwanted):** If a folder from the work area down to a file the save-as copy reads, the open project folder included, is a link or junction when the copy reads that file, then the system shall refuse the save with a status line holding `changed while saving`.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k p_itself_becomes_a_junction`
+- **Numeric pass threshold:** P open; between the plan and the copy, `workarea/P` replaced by a junction to a look-alike folder outside every work area (same names, other bytes) → 1 line holding `changed while saving`, Q absent (the rollback, LLR-171.7b), 0 saved files; no swap → saved (every other save-as node).
+- **Negative control:** pre snapshot: saved and Q holds the look-alike's bytes (probe B7: 15 of 16 files) → RED; a mutation with the check back to `contained_in_workarea(source, source_dir)` only → RED.
+- **Boundary catalog:** ☒ invalid — the open project folder swapped for a junction after the S3-6 check.
+
+### LLR-171.2 — An A2L-only project attaches its A2L
+- **Traceability:** HLR-171a · trace: `_handle_load_project` (`app.py`), `_load_a2l_data_with_cache` (in place; not `load_a2l_from_path`)
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.24, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
+- **Statement (EARS event):** When a project folder that holds one A2L file and no data file is loaded, the system shall attach that project's A2L file, in place, to the session.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-32 — `pytest tests/test_b100_project_homes.py -k tc_b100_32`
-- **Numeric pass threshold:** `p04` 10 → 3 A2L tags, the project set, no `current_file`; then a Load file → `project.json` rewritten (1 arm, A-14); a folder whose `project.json` records no missing file and that holds no data and no A2L file → 1 status with the `no data or A2L file` / `load a file and Save project` tokens (UX-22); a folder with neither and no `project.json` → the `no project.json` tokens.
-- **Negative control:** executed on `1d677ba` (P-12): `No supported files in project: P` → RED; a mutation leaving `_variant_set` as `None` → the rewrite arm writes nothing → RED.
-- **Boundary catalog:** ☒ empty — a folder with no data file and no A2L, with and without a `project.json`.
+- **Numeric pass threshold:** `p04` 10 → 3 A2L tags, the Loaded panel names `firmware.a2l`, 0 status lines holding `No supported files`, 0 status lines holding `already has an A2L file`; the session's A2L path is the project's file (`workarea/P/firmware.a2l`, unresolved) and 0 files are created under `workarea/temp` (orchestrator ruling Q4, LED .77; Code-Wire C4).
+- **Negative control:** executed on `1d677ba` (P-12): `No supported files in project: P` → RED; a mutation attaching through the Load-file A2L path (`load_a2l_from_path`) → a `workarea/temp` copy (or the `already has an A2L file` refusal of its own project) → RED.
+- **Boundary catalog:** ☒ boundary — one A2L, no data file.
 
-### LLR-171.3 — Only this work area is a parent
-- **Traceability:** HLR-171
-- **Ledger:** LED-2026-10-26-batch-100.1
-- **Statement:** `_handle_save_dialog` shall refuse, before creating any folder, a `SaveProjectPayload.parent_folder` (`screens.py:144-176`) that does not resolve to `self.workarea`.
+### LLR-171.2a — Loading an A2L-only project clears the previous data file
+- **Traceability:** HLR-171a · trace: `_handle_load_project`, `_reset_project_session` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.76
+- **Statement (EARS event):** When a project folder that holds one A2L file and no data file is loaded, the system shall remove the previously loaded data file from the session.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-32 — `pytest tests/test_b100_project_homes.py -k tc_b100_32`
+- **Numeric pass threshold:** a data file loaded, then `p04` 10 loaded → 0 data files in the session (`current_file` is None), 0 images shown.
+- **Negative control:** a mutation skipping the session reset on the A2L-only arm → the previous image stays → RED.
+- **Boundary catalog:** ☒ boundary — a data file loaded before.
+
+### LLR-171.2b — An A2L-only project becomes the open project
+- **Traceability:** HLR-171a · trace: `_handle_load_project` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.76
+- **Statement (EARS event):** When a project folder that holds one A2L file and no data file is loaded, the system shall make that folder the open project.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-32 — `pytest tests/test_b100_project_homes.py -k tc_b100_32`
+- **Numeric pass threshold:** `p04` 10 → the open project is `P` (1 project label naming P), its folder the unresolved `workarea/P`.
+- **Negative control:** a mutation not setting the project → the open project is None → RED.
+- **Boundary catalog:** ☒ boundary — no project open before.
+
+### LLR-171.2c — A data file loaded into an open A2L-only project is recorded
+- **Traceability:** HLR-171a · trace: the variant append (`app.py`), `build_variant_set` (A-14)
+- **Ledger:** LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.76
+- **Statement (EARS state):** While an A2L-only project is open, the system shall record a data file loaded into it in that project's `project.json`.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-32 — `pytest tests/test_b100_project_homes.py -k tc_b100_32`
+- **Numeric pass threshold:** `p04` 10 open, then Load file `firmware.s19` → `project.json` rewritten, 1 variant recorded, `active_variant` = `firmware`.
+- **Negative control:** a mutation leaving the session's variant set empty (`None`) → the rewrite writes nothing → RED.
+- **Boundary catalog:** ☒ boundary — the first data file of an A2L-only project.
+
+### LLR-171.2d — A project with neither a data file nor an A2L is refused with its tokens
+- **Traceability:** HLR-171a · trace: `_handle_load_project` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.24, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.78
+- **Statement (EARS unwanted):** If a project folder that holds a `project.json` holds neither a data file nor an A2L file, then the system shall refuse the load with the `no data or A2L file` tokens.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-32 — `pytest tests/test_b100_project_homes.py -k tc_b100_32`
+- **Numeric pass threshold:** such a folder → 1 status line holding `no data or A2L file` and `load a file and Save project` (UX-22), 0 session resets, the open project unchanged; the same folder whose `project.json` records the absent `firmware.s19` → the same 1 line, 0 resets (E3-architect A3-6: one line for both arms; the `missing` problem names absent records once a project loads, and the next step is true in both because the save rebuilds `files`).
+- **Negative control:** a mutation painting `No supported files in project` → 0 tokens → RED.
+- **Boundary catalog:** ☒ empty — a `project.json` and no data or A2L file.
+
+### LLR-171.2e — A folder with no project.json and no project file is refused with its tokens
+- **Traceability:** HLR-171a · trace: `_handle_load_project` (`app.py`), `PROBLEM_NO_MANIFEST` (`variant_execution_service.py`)
+- **Ledger:** LED-2026-10-26-batch-100.24, LED-2026-10-26-batch-100.76
+- **Statement (EARS unwanted):** If a folder given to the project load has no `project.json` and holds neither a data file nor an A2L file, then the system shall refuse the load with the `no project.json` tokens.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-32 — `pytest tests/test_b100_project_homes.py -k tc_b100_32`
+- **Numeric pass threshold:** such a folder (passed by name to the project load) → 1 status line holding `no project.json`, 0 session resets.
+- **Negative control:** a mutation reaching the `no data or A2L file` branch for it → `no project.json` absent → RED.
+- **Boundary catalog:** ☒ empty — an empty folder.
+
+### LLR-171.2f — An A2L-only project whose A2L is a link or over the cap is refused before the session is reset
+- **Traceability:** HLR-171a · trace: `_handle_load_project` (`app.py`), `DEFAULT_COPY_SIZE_CAP_BYTES` (`workspace.py`, read at call time) — orchestrator ruling R5, E3-security S3-3
+- **Ledger:** LED-2026-10-26-batch-100.78
+- **Statement (EARS unwanted):** If the A2L file of a project folder that holds no data file is a link or junction or is larger than the placement's per-file size cap, then the system shall refuse the load, with the `link or junction` or `too large to open` tokens, before resetting the session.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-32 — `pytest tests/test_b100_project_homes.py -k tc_b100_32`
+- **Numeric pass threshold:** `workarea/P/firmware.a2l` a file symbolic link to an outside A2L, no data file → 1 status line holding `link or junction` and `replace the A2L file, then Load again`, 0 session resets, 0 parses of the outside file, the open project unchanged; with the cap lowered for the test, an A2L of cap + 1 bytes → 1 status line holding `too large to open`, 0 resets; an A2L of exactly the cap → the project opens with its A2L (3 tags). When the test cannot create a file link, that arm is reported as not run, never as passed (LLR-171.1b feasibility).
+- **Negative control:** a mutation without the guard → the link arm parses the outside file and attaches it → RED; a mutation refusing at size ≥ cap → the exactly-the-cap arm is refused → RED.
+- **Boundary catalog:** ☒ invalid ☒ boundary — a linked A2L; exactly the cap; one byte over.
+
+### LLR-171.2g — A project's linked or over-cap A2L beside a data file is left out and listed
+- **Traceability:** HLR-171a, HLR-169 · trace: `_handle_load_project` (`app.py`) — orchestrator ruling R5, E3-security S3-3, S3R2-3
+- **Ledger:** LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.79, LED-2026-10-26-batch-100.80
+- **Statement (EARS unwanted):** If the A2L file of a project folder that holds a data file is a link or junction or is larger than the placement's per-file size cap, then the system shall open the project without that A2L file and list it as a `not readable` problem.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-32 — `pytest tests/test_b100_project_homes.py -k tc_b100_32`
+- **Numeric pass threshold:** `firmware.s19` and a linked `firmware.a2l` → the project opens with its image, 0 A2L tags, the session holds no A2L, 1 `not readable` problem naming `firmware.a2l` with `link or junction` and `replace the A2L file, then Load again`; an A2L of cap + 1 bytes (cap lowered) → the same with `too large to open`; an A2L of exactly the cap → attached; `firmware.mac` and a linked `firmware.a2l` → the project opens with the MAC, 0 calls of the A2L parse with that path (spy on `_load_a2l_data_with_cache` and `parse_a2l_file`), the session holds no A2L, 1 `not readable` problem naming `firmware.a2l` (S3R2-3).
+- **Painted next step (E5 F2, LED-2026-10-26-batch-100.80; ruling D-3 reversed):** the `not readable` row of that A2L paints `replace the A2L file, then Load again` (the `STEP_REPLACE_A2L` mark), never `Save project to drop it` — Save project does not drop the A2L (probe P-1: load, save, load again → the same row); pre snapshot: `replace the file, or Save project to drop it` → RED; a mutation without the mark → RED. Document-record rows keep the composer's step.
+- **Negative control:** base `ebe6d0c`: `_handle_load_project` parses the project A2L in place with no link check and no cap (`app.py:11316`) → the outside A2L is parsed and attached → RED; a mutation dropping the problem → 0 `not readable` problems → RED; a mutation leaving the A2L out of the install-set choice only → the MAC load parses the linked A2L (1 parse call) → RED (S3R2-3).
+- **Boundary catalog:** ☒ invalid ☒ boundary — a linked A2L beside an image; a linked A2L beside a MAC; exactly the cap; one byte over.
+
+### LLR-171.2h — The A2L unload of a session with no data file detaches the A2L
+- **Traceability:** HLR-171a · trace: `_apply_unload` (`app.py`), the Loaded panel's A2L slot (`screens_directionb.py`, ruling D-5) — E5 code review F3 (I-2)
+- **Ledger:** LED-2026-10-26-batch-100.80
+- **Statement (EARS event):** When the A2L unload is chosen in a session that holds an A2L file and no data file, the system shall detach that A2L file from the session.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-32 — `pytest tests/test_b100_project_homes.py -k unload_of_an_a2l_only_session`
+- **Numeric pass threshold:** an A2L-only project P open (3 A2L tags, no data file) → the A2L unload → the session holds no A2L, 0 tags, the status `Unloaded A2L.`, 0 lines `Nothing to unload.`; no A2L and no data file → `Nothing to unload.` (unchanged).
+- **Negative control:** pre snapshot: `Nothing to unload.` and the A2L stays attached (probe P-3) → RED; a mutation without the A2L-only branch → RED.
+- **Boundary catalog:** ☒ boundary — an A2L-only session; an empty session.
+
+### LLR-171.3 — Save project refuses a parent other than this work area
+- **Traceability:** HLR-171b · trace: `_handle_save_dialog` (`app.py`), `SaveProjectPayload.parent_folder` (`screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.76
+- **Statement (EARS unwanted):** If the Save project parent folder does not resolve to this work area, then the system shall refuse the save before creating any folder.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-33 — `pytest tests/test_b100_project_homes.py -k tc_b100_33`
-- **Numeric pass threshold:** parent = another `.s19tool/workarea` → refused, 0 folders; a parent outside any work area → refused, 0 folders; the work area under a different spelling (a trailing separator, mixed case) → saved and listed (1 listing).
-- **Negative control:** executed on `1d677ba` (P-11): the other work area accepted, not listed → RED.
-- **Boundary catalog:** ☒ boundary ☒ invalid — equivalent spellings; foreign parents.
+- **Numeric pass threshold:** parent = another `.s19tool/workarea` → 1 status line starting `Project NOT saved` and 0 `mkdir` calls (a spy on folder creation, because the rollback already leaves 0 folders net); a parent outside any work area → the same; a parent below this work area (`workarea/patches`) → the same. The refusal's token row is drafted in E2 and confirmed in E3 (orchestrator ruling Q5).
+- **Negative control:** base `ebe6d0c` (Code-Wire C2): the foreign parent is refused by the placement's explicit-root guard only after `project_dir.mkdir`, with the rollback removing the folder → the spy records 1 `mkdir` call → RED (P-11 at `1d677ba` is superseded as the control: there the save was accepted); a mutation accepting any parent below the work area (`is_relative_to` instead of equality) → `workarea/patches/P` created → RED.
+- **Boundary catalog:** ☒ invalid ☒ error — another work area; outside any work area; below this work area.
 
-### LLR-171.4 — Containment means this work area, checked inside the placement (S-02)
-- **Traceability:** HLR-171
-- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.28, LED-2026-10-26-batch-100.44, LED-2026-10-26-batch-100.50, LED-2026-10-26-batch-100.65, LED-2026-10-26-batch-100.66, LED-2026-10-26-batch-100.68
-- **Statement:** `contained_in_workarea(path, workarea) -> bool` (NEW, `workspace.py`, B100-I14, frozen before Inc 1) shall be true iff the path, after resolving every link and junction, is inside `workarea.resolve()`. `place_into_workarea` (LLR-163.1) shall require it for every destination, so every placing writer — Save project's image, MAC, A2L and sub-folder copies, its emit (`save_patched_image` places through `copy_into_workarea`, `changes/apply.py:781`), the save-back, the variant append, the MAC and A2L syncs, and document placement — is covered by construction. The manifest seam replaces `project.json` rather than placing it, so `write_project_manifest`'s `_check_destination_contained` (`manifest_writer.py:366`) shall call `contained_in_workarea` with this app's work area. `list_projects` and `_handle_load_project` (picked or typed) shall require it too, and `_handle_save_dialog`, `list_projects` and `_handle_load_project` shall refuse a project folder for which `_is_reparse_point` is true, checked before `resolve()`, for new and merge targets alike.
+### LLR-171.3a — The work area under another spelling is accepted as the parent
+- **Traceability:** HLR-171b · trace: `_handle_save_dialog` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.76
+- **Statement (EARS event):** When the Save project parent folder resolves to this work area under a different spelling, the system shall save the project into this work area.
 - **Validation:** `test (integration)`
-- **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_homes.py -k tc_b100_62` (the placement guard and its junction arm are written at Inc 1 with `place_into_workarea`; the listing and load uses at Inc 8b)
-- **Numeric pass threshold:** at Inc 1: `place_into_workarea` into a junction pointing at another work area and at a plain outside folder → 2 refusals, 0 bytes written; at Inc 8b: a junction `workarea/evil` into another work area's project → 0 listed, 0 loads (picked and typed), and 0 bytes written outside `self.workarea` by 8 writers (Save project new name, Save project merge, Save project emit, the save-back, the variant append, the MAC sync, the A2L sync, and the manifest seam `write_project_manifest`); a junction to a plain outside folder → the same; a normal project → listed, loaded and saved.
-- **Negative control:** executed (S-02 probe): `_check_destination_contained PASSED (no raise)` and `copy_into_workarea WROTE …\other\.s19tool\workarea\target\src.s19` at `1d677ba` → RED.
+- **Executed verification:** TC-B100-33 — `pytest tests/test_b100_project_homes.py -k tc_b100_33`
+- **Numeric pass threshold:** the work area with a trailing separator, in mixed case (Windows) and through a `..` segment → 3 of 3 saved, each listed once by the project list.
+- **Negative control:** a mutation comparing the parent as text → the mixed-case arm is refused → RED.
+- **Boundary catalog:** ☒ boundary — equivalent spellings.
+
+### LLR-171.4 — Inside this work area means inside its resolved root
+- **Traceability:** HLR-171b · trace: `contained_in_workarea` (`workspace.py`, B100-I14)
+- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.28, LED-2026-10-26-batch-100.44, LED-2026-10-26-batch-100.50, LED-2026-10-26-batch-100.65, LED-2026-10-26-batch-100.66, LED-2026-10-26-batch-100.68, LED-2026-10-26-batch-100.76
+- **Statement (EARS ubiquitous):** The system shall judge a path inside this work area only when the path, with every link and junction resolved, equals the work area's resolved root or lies below it.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-62 — `pytest tests/test_b100_reuse.py -k tc_b100_62_containment_predicate` (Inc 1)
+- **Numeric pass threshold:** written at Inc 1: a junction into another work area → outside; a plain outside folder → outside; the work area itself and a child → inside; a resolution `OSError` → outside (5 of 5).
+- **Negative control:** executed (S-02 probe): `copy_into_workarea WROTE …\other\.s19tool\workarea\target\src.s19` at `1d677ba` → RED.
+- **Boundary catalog:** ☒ boundary ☒ invalid — the root itself; junctions into another work area and outside.
+
+### LLR-171.4a — A placement outside this work area is refused
+- **Traceability:** HLR-171b · trace: `place_into_workarea` (LLR-163.1), which every placing writer uses
+- **Ledger:** LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.44, LED-2026-10-26-batch-100.76
+- **Statement (EARS unwanted):** If a placement's destination is not inside this work area, then the system shall refuse the placement.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-62 — `pytest tests/test_b100_reuse.py -k tc_b100_62` (Inc 1)
+- **Numeric pass threshold:** written at Inc 1: a destination through a junction into another work area and through one to a plain outside folder → 2 refusals, 0 bytes written.
+- **Negative control:** executed (S-02 probe) at `1d677ba`: `copy_into_workarea WROTE …` → RED.
+- **Boundary catalog:** ☒ invalid — junctions into another work area and outside.
+
+### LLR-171.4b — A manifest write outside this work area is refused
+- **Traceability:** HLR-171b · trace: `write_project_manifest`, `_check_destination_contained` (`manifest_writer.py`)
+- **Ledger:** LED-2026-10-26-batch-100.28, LED-2026-10-26-batch-100.76
+- **Statement (EARS unwanted):** If the `project.json` destination is not inside this work area, then the system shall refuse the manifest write.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_check.py -k tc_b100_62` (Inc 1 / LED .28)
+- **Numeric pass threshold:** a project swapped for a junction into another work area → 0 bytes of `project.json` written outside.
+- **Negative control:** executed (S-02 probe): `_check_destination_contained PASSED (no raise)` at `1d677ba` → RED.
+- **Boundary catalog:** ☒ invalid — a junction project folder.
+
+### LLR-171.4c — A link or junction folder is not listed as a project
+- **Traceability:** HLR-171b · trace: `list_projects` (`app.py`), `_is_reparse_point` (`workspace.py`); absorbs the withdrawn LLR-171.4d's arm (orchestrator ruling Q6, LED .77)
+- **Ledger:** LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
+- **Statement (EARS unwanted):** If a folder of the work area is a link or junction, then the system shall leave that folder out of the project list.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_homes.py -k tc_b100_62`
+- **Numeric pass threshold:** `workarea/evil` (a junction into another work area's project) → 0 rows; `workarea/alias` (a junction to `workarea/P`) → 0 rows while `P` is listed once; a junction to a plain outside folder → 0 rows; a normal project → 1 row.
+- **Negative control:** executed (S-02 probe) on `1d677ba`: the junction folder is listed → RED; a mutation without the link check → `alias` listed → RED.
+- **Boundary catalog:** ☒ boundary ☒ invalid — a normal folder; junctions into another work area, into this work area and outside.
+
+### LLR-171.4d — Withdrawn: merged into LLR-171.4c
+- **Traceability:** HLR-171b
+- **Ledger:** LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
+- **Status:** withdrawn at Inc 8b E1 by orchestrator ruling Q6 (LED .77). It had no independent RED: a direct child of the work area resolves outside only through a link or junction, which LLR-171.4c drops. Its arm (`workarea/evil` → 0 rows) is LLR-171.4c's first arm. The id is kept and not reused.
+
+### LLR-171.4e — A link or junction project folder is not loaded
+- **Traceability:** HLR-171b · trace: `_handle_load_project` (`app.py`), `_is_reparse_point` (`workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.76
+- **Statement (EARS unwanted):** If a project folder to be loaded is a link or junction, then the system shall refuse the load.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_homes.py -k tc_b100_62`
+- **Numeric pass threshold:** `evil` and `alias`, each picked from a list built before the junction appeared (the picked arm, the only load path at 8b: `_route_load_project`) → 0 loads, 0 session resets, 1 status line each. The typed arm is LLR-172.5's, at Inc 9a. The refusal's token row is drafted in E2 and confirmed in E3 (orchestrator ruling Q5).
+- **Negative control:** a mutation without the link check → `alias` loads → RED.
+- **Boundary catalog:** ☒ invalid — junctions into another work area and into this work area.
+
+### LLR-171.4f — A project folder resolving outside this work area is not loaded
+- **Traceability:** HLR-171b · trace: `_handle_load_project` (`app.py`), `contained_in_workarea` (`workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.80
+- **Statement (EARS unwanted):** If a project folder to be loaded is not one direct child folder of this work area or resolves outside this work area, then the system shall refuse the load.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_homes.py -k tc_b100_62`
+- **Numeric pass threshold:** a picked name with `..` segments that reaches another work area's project (no link involved) → 0 loads, 0 session resets, 1 status line holding `outside the work area`; a picked name `sub/P` with `workarea/sub` a junction to `workarea/R` → 0 loads, 0 resets (E3-security S3-7); `evil` → 0 loads. The typed arm is LLR-172.5's, at Inc 9a. `lstat` of the picked folder fails with a permission error (E5 F7(a), LED-2026-10-26-batch-100.80) → refused with 1 line holding `could not be read` and `check that the folder can be opened, then load again` (the Save project target: `then save again`), 0 lines holding `outside the work area` or `is not the work area folder`; pre snapshot: the `outside` texts → RED; a mutation mapping the error to `outside` → RED.
+- **Negative control:** a mutation without the one-component name check (S3-7) → the `..` name and `sub/P` load → RED. The containment check stays as defence and, after the name check, has no independent RED (declared, as for LLR-171.4d).
+- **Boundary catalog:** ☒ invalid — `..` segments; a junction into another work area.
+
+### LLR-171.4g — A Save project target that is a link or junction is refused before it is resolved
+- **Traceability:** HLR-171b · trace: `_handle_save_dialog` (`app.py`, the HLR-164(f) check), `_is_reparse_point` (`workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.76
+- **Statement (EARS unwanted):** If the Save project target folder is a link or junction, then the system shall refuse the save, with the `link or junction` tokens, before resolving the target.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_homes.py -k tc_b100_62`
+- **Numeric pass threshold:** typing `evil` (new name) and typing it while it is a merge target → 2 status lines holding `link or junction` and `choose another name`, 0 folders created, 0 bytes written outside this work area.
+- **Negative control:** a mutation resolving the target before the check → the check sees a plain folder and the save writes through it → RED.
+- **Boundary catalog:** ☒ invalid — a junction as a new and as a merge target.
+
+### LLR-171.4h — Eight writers write nothing outside this work area
+- **Traceability:** HLR-171b · trace: `place_into_workarea` (LLR-171.4a) and `write_project_manifest` (LLR-171.4b), reached by the writers below
+- **Ledger:** LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.28, LED-2026-10-26-batch-100.76
+- **Statement (EARS ubiquitous):** The system shall write 0 bytes outside this work area through Save project (new name, merge and emit), the save-back, the variant append, the MAC sync, the A2L sync and the manifest seam.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_homes.py -k tc_b100_62`
+- **Numeric pass threshold:** for each of the 8 writers, with the open or target project folder swapped for a junction into another work area's project, and again for a junction to a plain outside folder → 0 bytes written outside (16 of 16 arms); a normal project → each writer writes inside (8 of 8).
+- **Negative control:** a mutation removing the containment check from `place_into_workarea` → at least 1 writer writes outside → RED.
 - **Boundary catalog:** ☒ boundary ☒ invalid — a normal folder; junctions into another work area and outside, for each writer.
+
+### LLR-171.4i — A flow is not saved outside this work area
+- **Traceability:** HLR-171b · trace: `save_flow_json` (`flow_persistence_service.py`), reached from `on_flow_builder_panel_save_requested` (`app.py`) — SEC-5, Code-Wire C1. **Not in Inc 8b:** routed to the LED .50 backlog item and `.dev-flow/BACKLOG-CODE.md` by orchestrator ruling Q1 (LED .77).
+- **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
+- **Statement (EARS unwanted):** If the folder a flow is saved into is not inside this work area, then the system shall refuse to save the flow.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_homes.py -k tc_b100_62`
+- **Numeric pass threshold:** `P/flows` a junction to an outside folder → 0 files in the outside folder, 1 refusal; a normal `P/flows` → the flow saved.
+- **Negative control:** executed (`sec_inc1_r2_flow_probe.out`): `files in the OUTSIDE folder: ['probe.json']` → RED.
+- **Boundary catalog:** ☒ invalid — a junction `flows/`.
+
+### LLR-171.4j — A flowset is not saved outside this work area
+- **Traceability:** HLR-171b · trace: `save_chain_set` / the flowset writer (`flow_persistence_service.py`), reached from `on_flow_execution_panel_save_requested` (`app.py`) — SEC-5, Code-Wire C1. **Not in Inc 8b:** routed to the LED .50 backlog item and `.dev-flow/BACKLOG-CODE.md` by orchestrator ruling Q1 (LED .77).
+- **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
+- **Statement (EARS unwanted):** If the folder a flowset is saved into is not inside this work area, then the system shall refuse to save the flowset.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_homes.py -k tc_b100_62`
+- **Numeric pass threshold:** `P/flowsets` a junction to an outside folder → 0 files in the outside folder, 1 refusal; a normal `P/flowsets` → the flowset saved.
+- **Negative control:** a mutation leaving the flowset writer's plain `mkdir` and `write_text` → 1 file outside → RED (the SEC-5 probe pattern).
+- **Boundary catalog:** ☒ invalid — a junction `flowsets/`.
+
+### LLR-171.5 — A copied file project.json cannot record is named in the status
+- **Traceability:** HLR-171 · trace: `gather_project_artifacts` (`project_gather_service.py`, the review F1 device-stem guard), `_handle_save_dialog` (`app.py`) — BACKLOG-CODE R2-1
+- **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.80
+- **Statement (EARS unwanted):** If Save project copies into the project a file whose project-relative path `project.json` cannot record, then the system shall paint one status line naming that file.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
+- **Numeric pass threshold:** the active CRC template is a file outside the project whose name `project.json` cannot record (`con.json`, created where the platform allows it; otherwise reported as not run) → the save completes, 1 status line naming `templates/con.json` with `copied but not recorded`, `Windows reserves that name` and `rename it in the common folder, select the new name, then Save project`, 0 raises; no such file → 0 such lines. The 10-line cap (12 rows → 10 lines and 1 line holding `and 2 more`, LLR-171.7a) is verified at the painting seam with `GatherOutcome.unrecorded` injected, because one save gathers at most one template; a row refused for another reason than a device stem → `the name is not one project.json records` (no length rule exists; E5 F4, LED-2026-10-26-batch-100.80). A dialog `batch` entry with a device stem fails the whole save at the manifest writer (pre-existing, backlog), so it is not this requirement's example. The active document keeps its own Inc 8a finding and never gets a second line (pre-ruling 7). The save-as tree copy records nothing in `project.json`, so it adds no line here.
+- **Negative control:** base `ebe6d0c` (R2-1, code read, not executed): the row is copied and left out of `gathered` with 0 status lines → RED expected; a mutation dropping the line → RED.
+- **Boundary catalog:** ☒ invalid — a device-stem name.
+
+### LLR-171.6 — Save project keeps the carried batch when the dialog selects none
+- **Traceability:** HLR-171, HLR-164 · trace: `_handle_save_dialog` (`app.py`), `SaveProjectPayload.batch` (`screens.py`) — orchestrator ruling R4, E3-architect A3-3 (C-7 confirmed)
+- **Ledger:** LED-2026-10-26-batch-100.78
+- **Statement (EARS event):** When Save project writes the target's `project.json`, the system shall record as `batch` the Save dialog's batch selection when that selection is non-empty, and otherwise the carried `batch` value.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
+- **Numeric pass threshold:** the carried value is the open project's for a save as, the target's for a save into the open project or a merge, and none for a fresh session's new folder. P with `batch` `["a.json"]` (written by the shipped Save project) loaded, Save project into P with nothing selected → P's `batch` `["a.json"]` (0 changed); then save as Q with nothing selected → Q's `batch` `["a.json"]` and Q holds `a.json` (LLR-171.1); a merge into R whose `batch` is `["r.json"]`, nothing selected → R's `batch` `["r.json"]`; a selection `["b.json"]` → `batch` `["b.json"]` for each of the three targets. An empty selection cannot clear a `batch`: an untouched dialog and an empty selection cannot be told apart (A3-3, G1 R-10).
+- **Negative control:** base `ebe6d0c`: `app.py:10097-10098` writes the dialog's selection for every target → P's `batch` `[]` after the save into P → RED; a mutation writing the selection only → the same → RED.
+- **Boundary catalog:** ☒ empty ☒ boundary — no selection; a selection; the three target kinds.
+
+### LLR-171.6a — Save project keeps the carried assignments when the dialog selects none
+- **Traceability:** HLR-171, HLR-164 · trace: `_handle_save_dialog` (`app.py`), `SaveProjectPayload.assignments` (`screens.py`) — orchestrator ruling R4, E3-architect A3-3
+- **Ledger:** LED-2026-10-26-batch-100.78
+- **Statement (EARS event):** When Save project writes the target's `project.json`, the system shall record as `assignments` the Save dialog's assignment selection when that selection is non-empty, and otherwise the carried `assignments` value.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
+- **Numeric pass threshold:** the carried value as in LLR-171.6. P with `assignments` naming `c.json` for `firmware` loaded, Save project into P with nothing selected → P's `assignments` unchanged; then save as Q with nothing selected → Q's `assignments` equal P's and Q holds `c.json`; a merge into R with nothing selected → R's `assignments` unchanged; a selection → the selection for each of the three targets.
+- **Negative control:** base `ebe6d0c`: `app.py:10097-10098` writes the dialog's selection for every target → P's `assignments` `{}` after the save into P → RED.
+- **Boundary catalog:** ☒ empty ☒ boundary — no selection; a selection; the three target kinds.
+
+### LLR-171.6b — The gather takes the composition documents from the recorded batch and assignments
+- **Traceability:** HLR-171, HLR-164 · trace: `_handle_save_dialog` (`app.py`), `gather_project_artifacts` (`project_gather_service.py`, unchanged) — orchestrator ruling R4, E3-architect A3-3, A3R2-3, A3R2-4
+- **Ledger:** LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.79
+- **Statement (EARS event):** When Save project gathers the composition documents, the system shall take their names from the `batch` value that LLR-171.6 records plus the names in the `assignments` value that LLR-171.6a records.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
+- **Numeric pass threshold:** P with `batch` `["a.json"]`, P's top-level `a.json` and `patches/a.json` removed, the common library holding `a.json`, Save project into P with nothing selected → the `composition_names` passed to the gather hold `a.json` (spy) and `P/patches/a.json` is present (gathered this save); the same P with `assignments` naming `c.json` for `firmware`, P's top-level `c.json` and `patches/c.json` removed, the common library holding `c.json` → the `composition_names` hold `a.json` and `c.json` and `P/patches/c.json` is present (LLR-138.1 kept).
+- **Negative control:** base `ebe6d0c`: `app.py:9932-9936` builds the list from the dialog's selection → the `composition_names` spy holds 0 names, `P/patches/a.json` absent → RED; a mutation feeding the gather from the recorded `batch` only → `c.json` absent from the spy and `P/patches/c.json` absent → RED.
+- **Boundary catalog:** ☒ empty — no selection with a carried `batch` and carried `assignments`.
+
+### LLR-171.7 — Names from the open project's tree are painted scrubbed and clipped
+- **Traceability:** HLR-171 · trace: `painted_names` (NEW, `project_gather_service.py`), `_handle_save_dialog`, `_copy_project_subfolders` (`app.py`) — orchestrator ruling R6, E3-security S3-4, S3R2-4, SEC8a-4
+- **Ledger:** LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.79
+- **Statement (EARS ubiquitous):** The system shall paint each name taken from the open project's tree without characters of the Unicode categories Cc, Cf, Zl and Zp, with each unpaired surrogate replaced by U+FFFD, and clipped to 120 characters.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
+- **Numeric pass threshold:** a skipped junction named `patches/` + U+202E + `osj.exe.json` → the painted line holds `patches/osj.exe.json` and 0 characters of the categories Cc, Cf, Zl or Zp (U+0000–U+001F, U+007F–U+009F, U+200B–U+200F, U+202A–U+202E, U+2066–U+2069 among them); names holding U+061C, U+2028 and the unpaired surrogate U+DC80 → painted without U+061C and U+2028 and with U+FFFD in place of U+DC80, 0 raises in the paint or the log, the log holding each name in its escaped (`%r`) form; a name of 300 characters → painted as 120 characters ending in `…`; a plain name → painted unchanged. The rule covers every Inc 8b line that names an entry of P's tree: rows 7, 8 and 11 and the refusals that name a file.
+- **Negative control:** a mutation without the scrub → U+202E painted → RED; a mutation scrubbing round 1's fixed list instead of the categories → U+061C painted → RED (S3R2-4); a mutation without the clip → 300 characters painted → RED.
+- **Boundary catalog:** ☒ invalid ☒ boundary — a bidi character; a line separator; an unpaired surrogate; a name of exactly 120 and of 300 characters.
+
+### LLR-171.7a — A status list names at most 10 entries of the open project's tree
+- **Traceability:** HLR-171 · trace: `painted_names` (NEW, `project_gather_service.py`), `_handle_save_dialog` (`app.py`) — orchestrator ruling R6, E3-security S3-4
+- **Ledger:** LED-2026-10-26-batch-100.78
+- **Statement (EARS event):** When Save project would name more than 10 entries of the open project's tree in one status list, the system shall paint the first 10 entries followed by `and K more`, K being the number of entries not named.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
+- **Numeric pass threshold:** 25 skipped junctions → 1 line naming 10 and holding `and 15 more`; 12 unrecorded gathered rows → 10 lines and 1 line holding `and 2 more`; 12 unreadable entries → the refusal names 10 and holds `and 2 more`; exactly 10 entries → 10 named, 0 `more`.
+- **Negative control:** a mutation naming every entry → 25 named → RED; a limit of 9 → the 10-entry arm holds `more` → RED.
+- **Boundary catalog:** ☒ boundary — exactly 10 entries; 11 and more.
+
+### LLR-171.7b — A failed save-as copy is reported in user terms
+- **Traceability:** HLR-171 · trace: `_copy_project_subfolders` (NEW), `_handle_save_dialog`, `_abort_save` (`app.py`) — orchestrator ruling R6, E3-security S3-4, S3-5
+- **Ledger:** LED-2026-10-26-batch-100.78
+- **Statement (EARS unwanted):** If a save-as copy fails after the project folder is created, then the system shall paint the `could not save` and `check the folder` tokens naming the file, with no exception text.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
+- **Numeric pass threshold:** the 4th of 8 copies raising `PermissionError` → 1 status line holding `could not save`, the file's project-relative path and `check the folder`, 0 lines holding `WinError` or `Refusing`, Q absent and P 0 bytes changed (LLR-164.4, LLR-171.1f); `P/reports` swapped for a junction after the plan → the same line holding `changed while saving`.
+- **Negative control:** a mutation without the copy's own exception handling → the existing handlers (`app.py:10123-10180`) paint the exception text (`[WinError 5] …`) → RED.
+- **Boundary catalog:** ☒ error — a copy that raises; a source changed during the copy.
+
+### LLR-171.7c — The rollback of a failed save never removes a file through a changed folder
+- **Traceability:** HLR-164, HLR-171 · trace: `_abort_save`, `_PlacedFiles` (`app.py`), `_path_traverses_reparse_point` (`workspace.py`) — E5 security SEC8b-1 (the mechanism is from Inc 2, LED .53; save as widens it)
+- **Ledger:** LED-2026-10-26-batch-100.80
+- **Statement (EARS unwanted):** If a failed Save project's rollback finds a file it recorded under a folder that is now a link or junction, or a file whose `(st_dev, st_ino)` differs from the one recorded when the save wrote it, then the system shall keep that file and paint one status line naming it.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k rollback_never_deletes`
+- **Numeric pass threshold:** a save as fails right after its last `reports` copy, once `Q/reports` (a) is replaced by a junction to another project's `R/reports` holding files of the same names → R's 7 files unchanged; (b) is replaced by a junction to Q's own moved folder → the 7 copies kept; (c) holds a user's file moved over Q's first copy → that file kept with its bytes; each arm: 1 line holding `Not removed after the failed save` and `a folder changed while saving`, 0 lines holding `WinError`. No change → every file the save wrote is removed and Q is absent (LLR-171.7b).
+- **Negative control:** pre snapshot: (a) R's files deleted (probe B3: 6 of 7) → RED; a mutation without the reparse check → (b) RED; a mutation without the identity check → (c) RED.
+- **Boundary catalog:** ☒ error ☒ invalid — a folder swapped for a junction; a file replaced; no change.
 
 ### LLR-172.1 — The recent-sources store is written per user
 - **Traceability:** HLR-172
@@ -1931,13 +2474,20 @@ ATs drive through the ids the verdict fixed (P-30), with the Load dialog's focus
 |---|---|---|
 | TC-B100-05 (LLR-164.2) | Inc 2: refusals, open-project save, an exact-name save that adds a variant | Inc 8a: the merge carry of `gathered` and `active_document` |
 | TC-B100-12 (LLR-166.1) | Inc 4: the load tails | Inc 6: panel closes; Inc 9b: dialog `esc`, cancelled load; Inc 10: question `n` |
-| TC-B100-59 (LLR-167.6) | Inc 5: fresh, open project, pending patch, refused | Inc 7: the `files` row; Inc 8a: the document row and the merge; Inc 8b: save-as with sub-folders |
+| TC-B100-59 (LLR-167.6, LLR-167.6a–g) | Inc 5: fresh, open project, pending patch, refused | Inc 7: the `files` row; Inc 8a: the document row and the merge; Inc 8b: sub-folder rows, skipped links, the MAC and A2L plan refusals, one row per landing, the own-A2L exemption, the per-file cap (LLR-167.6a–g) |
 | TC-B100-70 (LLR-167.8) | Inc 5: refused save; document not written | Inc 8a: the positive arm (re-pins the not-written arm), the failed-write and file-backed arms; Inc 10: the project-load question arm |
 | TC-B100-20 (LLR-168.3) | Inc 6 | Inc 8a: `active_document` carried (with AT-B100-20) |
 | TC-B100-22 (LLR-169.2) | Inc 7 | Inc 8a: the active-document arm, run in TC-B100-28 (A-15) |
 | TC-B100-23 (LLR-169.3) | Inc 7 | Inc 8a: the `active_document` drift arm |
 | TC-B100-24 (LLR-169.4) | Inc 7 | Inc 8a: the `files` key of the active document |
-| TC-B100-62 (LLR-171.4) | Inc 1: the placement guard, junction arms | Inc 8b: listing, load, the 7 writers |
+| TC-B100-62 (LLR-171.4, LLR-171.4a–c, LLR-171.4e–h) | Inc 1: the predicate, the placement guard and the manifest seam (LLR-171.4, .4a, .4b) | Inc 8b: listing (.4c; .4d withdrawn into it), the picked load (.4e, .4f), the Save target (.4g), the 8 writers (.4h); the flow and flowset writers (.4i, .4j) routed to the LED .50 backlog item (LED .77) |
+| TC-B100-31 (LLR-171.1j, LLR-171.1k) | Inc 8b: the file (2 000 / 2 001), entry (10 000 / 10 001, R13) and depth (32 / 33) ceilings; unlistable folders, trailing-dot and device names, the unlistable project folder painted `'P'` — each refused before any folder exists (LED .78, .79) | — |
+| TC-B100-31 (LLR-171.1l, LLR-171.1m) | Inc 8b: the Flow panels' session folder becomes Q; a Patch Editor document inside P rebound to its copy in Q, never through a `..` path (LED .78, .79); bound to the gather's landing when an identical sibling is reused (LED .80) | — |
+| TC-B100-31 (LLR-171.1n, LLR-171.1o, LLR-171.7c) | Inc 8b E5: a save to a new folder while P's folder is gone; the copy refused when P itself becomes a junction; the rollback never deletes through a changed folder (LED .80) | — |
+| TC-B100-32 (LLR-171.2h) | Inc 8b E5: the A2L unload of an A2L-only session (LED .80) | — |
+| TC-B100-31 (LLR-171.6, LLR-171.6a, LLR-171.6b) | Inc 8b: the carried `batch` and `assignments` kept when nothing is selected, for the three target kinds; the gather fed from the recorded `batch` plus the recorded `assignments` names (LED .78, .79) | — |
+| TC-B100-31 (LLR-171.7, LLR-171.7a, LLR-171.7b) | Inc 8b: names scrubbed by Unicode category and clipped to 120; at most 10 entries then `and K more`; a failed copy painted in user terms (LED .78, .79) | — |
+| TC-B100-32 (LLR-171.2f, LLR-171.2g) | Inc 8b: a linked or over-cap A2L of an A2L-only folder refused before the reset; beside an image or a MAC left out with 1 `not readable` problem and 0 parses (LED .78, .79) | — |
 | TC-B100-71 (LLR-168.4) | Inc 7 | — |
 | TC-B100-72 (LLR-174.4) | Inc 10: all four routes | — |
 | TC-B100-55 (LLR-178.1) | Inc 6: the reasons and the counts | Inc 7: the "first variant by name" mutation arm and the `derived_from` lines (ARCH-PDR-3) |

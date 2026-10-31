@@ -1,0 +1,19 @@
+mutant: M10
+target: s19_app/tui/services/project_gather_service.py
+old -> new:     shown = [_clip(_scrubbed(name), clip) for name in items[:limit]]  ->      shown = [_clip(_scrubbed(name), clip) for name in items] ||     if len(items) > limit:  ->      if False:
+sha256_before: 7f1ecfefde90ee6bf926e49e88d362ee0c1de4d7909b28451b96ada45176ceff
+command: cd C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b && env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_project_homes.py::test_tc_b100_31_link_line_names_at_most_ten tests/test_b100_project_homes.py::test_tc_b100_31_painted_names_clip_scrub_and_count
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b
+---
+FF                                                                       [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:387: AssertionError: (['reports/l00', 'reports/l01', 'reports/l02', 'reports/l03', 'reports/l04', 'reports/l05', ...], 'Save as: links or j...reports/l20, reports/l21, reports/l22, reports/l23, reports/l24 — copy those files into the project if it needs them.')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:431: AssertionError: reports/l00, reports/l01, reports/l02, reports/l03, reports/l04, reports/l05, reports/l06, reports/l07, reports/l08, reports/l09, reports/l10, reports/l11, reports/l12, reports/l13, reports/l14, reports/l15, reports/l16, reports/l17, reports/l18, reports/l19, reports/l20, reports/l21, reports/l22, reports/l23, reports/l24
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_link_line_names_at_most_ten
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_painted_names_clip_scrub_and_count
+2 failed in 4.85s
+---
+summary: 2 failed in 4.85s
+verdict: KILLED
+restored = True

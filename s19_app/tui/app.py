@@ -5,7 +5,7 @@ from dataclasses import dataclass, field, replace
 import hashlib
 import json
 import os
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import shutil
 import stat
 import time
@@ -184,6 +184,7 @@ from .services.project_gather_service import (
     GATHER_DOCUMENT_NOT_RECORDED,
     PLAN_ACTION_KEEP,
     PLAN_ACTION_NEW,
+    PLAN_ROLE_CARRIED,
     PLAN_ROLE_DOCUMENT,
     PLAN_ROLE_MANIFEST,
     PLAN_TARGET_MERGE,
@@ -192,16 +193,21 @@ from .services.project_gather_service import (
     PROJECT_CHECKS_DIR,
     PROJECT_HOME_NAMES,
     PROJECT_PATCHES_DIR,
+    InventoryFile,
     PlannedFile,
     SavePlan,
     SavePlanRow,
     classify_active_document,
     document_home_for_kind,
     gather_project_artifacts,
+    inventory_project_tree,
+    PAINTED_NAME_LIMIT,
+    painted_names,
     plan_project_save,
     scoped_home,
 )
 from .services import folder_open_service
+from . import workspace
 from .open_folder_chip import OpenFolderChip, titled_header
 from .window_help import KeyBar, WindowHelpChip, WindowSection
 from .a2l_describe import CurveDescriptionScreen
@@ -223,6 +229,7 @@ from .services.variant_execution_service import (
     SCOPE_ACTIVE,
     STEP_CHECK_THEN_LOAD,
     STEP_OPEN_FROM_EDITOR,
+    STEP_REPLACE_A2L,
     _ISSUE_ENTRY,
     _ISSUE_KEY,
     _KEY_ACTIVE_DOCUMENT,
@@ -244,6 +251,7 @@ from .services.variant_execution_service import (
 from .workspace import (
     _guarded_destination,
     _is_reparse_point,
+    _path_traverses_reparse_point,
     _private_stage_dir,
     A2L_EXTENSIONS,
     HEX_EXTENSIONS,
@@ -262,6 +270,7 @@ from .workspace import (
     WorkareaContainmentError,
     WorkareaPlacementError,
     build_variant_set,
+    contained_in_workarea,
     copy_into_workarea,
     ensure_workarea,
     is_windows_device_name,
@@ -1696,6 +1705,29 @@ def _file_digest(path: Path) -> Tuple[str, int]:
             exc.filename = str(path)
         raise
     return digest.hexdigest(), size
+
+
+class _PlacedFiles(list):
+    """The save's rollback list of files (LED .53). Each path is recorded
+    with its ``(st_dev, st_ino)`` the moment it is appended, right after its
+    claim, so the rollback unlinks only the file this save wrote
+    (SEC8b-1)."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.identity: dict[Path, Tuple[int, int]] = {}
+
+    def append(self, path: Path) -> None:
+        super().append(path)
+        try:
+            path_stat = os.lstat(path)
+        except OSError:
+            return
+        self.identity[path] = (path_stat.st_dev, path_stat.st_ino)
+
+    def extend(self, paths: Sequence[Path]) -> None:
+        for path in paths:
+            self.append(path)
 
 
 def _plan_row_mismatch(row: SavePlanRow, placed: PlacementResult) -> Optional[str]:
@@ -9194,11 +9226,42 @@ class S19TuiApp(App):
         # was recorded the moment its placement claim or gather copy
         # wrote it. A reused byte-identical file and anything a
         # concurrent writer created survive by construction.
+        # SEC8b-1: a file is unlinked only while no folder between it and
+        # the work area is a link or junction AND it is still the file the
+        # claim wrote (the st_dev / st_ino recorded then); otherwise it
+        # stays, and one line names it.
+        identity = getattr(placed_files, "identity", {})
+        kept_names: list[str] = []
+        try:
+            resolved_workarea = self.workarea.resolve()
+        except OSError:
+            resolved_workarea = self.workarea
         for path in placed_files:
+            try:
+                path_stat = os.lstat(path)
+            except OSError:
+                continue  # already gone; the rollback must never raise
+            stop_at = (
+                self.workarea if self.workarea in path.parents else resolved_workarea
+            )
+            if _path_traverses_reparse_point(
+                path.parent, stop_at=stop_at
+            ) or identity.get(path) != (path_stat.st_dev, path_stat.st_ino):
+                kept_names.append(path.name)
+                continue
             try:
                 path.unlink()
             except OSError:
                 pass  # the rollback must never raise
+        if kept_names:
+            self.logger.warning("Save rollback kept files: %r", kept_names[:100])
+            self.set_status(
+                safe_text(
+                    "Not removed after the failed save: "
+                    f"{painted_names(kept_names)} — a folder changed while "
+                    "saving; check the project folders."
+                ).plain
+            )
         for copy, previous_bytes in kept_copies:
             try:
                 restored = (
@@ -9389,6 +9452,22 @@ class S19TuiApp(App):
             self.set_status("Parent folder not found or not a directory.")
             self.logger.warning("Invalid parent folder: %s", payload.parent_folder)
             return
+        # LLR-171.3 / LLR-171.3a: a project is saved only as a direct child
+        # of THIS work area — equality of the real paths, never "below" it,
+        # decided before any plan or folder exists.
+        if os.path.normcase(os.path.realpath(parent_resolved)) != os.path.normcase(
+            os.path.realpath(self.workarea)
+        ):
+            self.set_status(
+                f"Project NOT saved: {parent_resolved} is not the work area "
+                "folder — choose the work area as the parent folder "
+                f"({self.workarea})."
+            )
+            self.logger.warning(
+                "Save project refused: parent is not the work area: %r",
+                str(parent_resolved),
+            )
+            return
         typed_name = payload.project_name
         # HLR-164: the name guards run BEFORE any folder is created, in the
         # contract's order — empty, device, reserved, the 64-character cap,
@@ -9554,11 +9633,14 @@ class S19TuiApp(App):
         # LED .50 / security finding SEC-1: the target stays UNRESOLVED —
         # the placement guard reads the work-area root off the textual path
         # (or the explicit root every app placement passes), so any junction
-        # under the parent is seen instead of resolved away.
-        project_dir = parent_resolved / cleaned
-        # LLR-164.2 / HLR-164(f): a target that exists and is a link or
-        # junction is refused BEFORE any resolve or write.
-        if _is_reparse_point(project_dir):
+        # under the parent is seen instead of resolved away. LLR-171.3a: the
+        # parent IS this work area, spelled as the app spells it, so the
+        # save's spelling equals the load's.
+        project_dir = self.workarea / cleaned
+        # LLR-164.2 / HLR-164(f) / LLR-171.4g: a target that exists and is a
+        # link or junction is refused BEFORE any resolve or write.
+        target_reason = self._project_folder_refusal(project_dir)
+        if target_reason == "link":
             self.set_status(
                 f"Project NOT saved: '{cleaned}' is a link or junction — "
                 "choose another name."
@@ -9567,6 +9649,47 @@ class S19TuiApp(App):
                 "Save project refused: link/junction target: %s", project_dir
             )
             return
+        if target_reason == "unreadable":
+            self.set_status(
+                safe_text(
+                    f"Project NOT saved: '{painted_names([cleaned])}' could not be "
+                    "read — check that the folder can be opened, then save again."
+                ).plain
+            )
+            self.logger.warning(
+                "Save project refused: target not readable: %s", project_dir
+            )
+            return
+        if target_reason is not None:
+            self.set_status(
+                f"Project NOT saved: {project_dir.parent} is not the work area "
+                "folder — choose the work area as the parent folder "
+                f"({self.workarea})."
+            )
+            self.logger.warning(
+                "Save project refused: target outside the work area: %s", project_dir
+            )
+            return
+        # LLR-171.1 / S3-6: a save as (a new target while a project is open)
+        # checks the open project's folder ONCE, before any read of it; a
+        # folder that became a link or left the work area refuses in the
+        # plan and is never walked or read.
+        save_as_source = self._save_as_source_for(project_dir)
+        # LLR-171.1n (F1): the open project's folder is gone (renamed or
+        # removed outside the app) — the save is a fresh-session save, as
+        # at ebe6d0c, and one line names the missing folder.
+        source_gone: Optional[str] = (
+            self.current_project_dir.name
+            if save_as_source is None
+            and self.current_project_dir is not None
+            and not os.path.lexists(project_dir)
+            else None
+        )
+        source_reason = (
+            self._project_folder_refusal(save_as_source)
+            if save_as_source is not None
+            else None
+        )
         # HLR-167 / LLR-167.1 / LLR-167.6: decide the image on DATA and
         # compute the save plan BEFORE anything is created — a blocked
         # re-derive refuses the whole save and no folder is made.
@@ -9585,9 +9708,24 @@ class S19TuiApp(App):
             # keys the save writes (an emit whose base cannot be read again
             # records none, and the plan shows none).
             existing = read_project_manifest(project_dir)
+            # LLR-171.1h: a save as carries the SOURCE project's records
+            # (relative text, valid in the copy); a merge or an open-project
+            # save carries the target's, as before. A source that failed
+            # the folder check is never read (S3-6).
+            if (
+                save_as_source is not None
+                and source_reason is None
+                and not self._manifest_is_link(save_as_source)
+            ):
+                carry_dir: Path = save_as_source
+                carry_manifest = read_project_manifest(save_as_source)
+            elif save_as_source is not None:
+                carry_dir, carry_manifest = save_as_source, None
+            else:
+                carry_dir, carry_manifest = project_dir, existing
             target_carry = (
-                self._manifest_carry(project_dir, existing)
-                if existing is not None and not manifest_is_damaged(existing)
+                self._manifest_carry(carry_dir, carry_manifest)
+                if carry_manifest is not None and not manifest_is_damaged(carry_manifest)
                 else {}
             )
             carried_derived: dict[str, DerivedFrom] = dict(
@@ -9605,7 +9743,7 @@ class S19TuiApp(App):
             carried_document_line: Optional[str] = None
             if carried_active_document is not None:
                 carried_state = recorded_document_state(
-                    project_dir, carried_active_document
+                    carry_dir, carried_active_document
                 )
                 if carried_state.outcome in _DOCUMENT_DROP_OUTCOMES:
                     self.logger.warning(
@@ -9643,6 +9781,7 @@ class S19TuiApp(App):
                 image_step,
                 derived=bool(carried_derived) or emitted_record is not None,
                 carried_active_document=carried_active_document,
+                source_reason=source_reason,
             )
         except OSError as exc:
             unreadable = (
@@ -9673,6 +9812,42 @@ class S19TuiApp(App):
             )
             self.logger.warning("Save project refused: %s", plan.refusal)
             return
+        # LLR-171.1e / R7: a save to a new folder needs the plan's total
+        # (each file rounded up, plus the margin) in free space BEFORE the
+        # folder exists; exactly the free space is enough.
+        if plan.target_kind == PLAN_TARGET_NEW:
+            try:
+                free_bytes = shutil.disk_usage(self.workarea).free
+            except OSError as exc:
+                self.set_status(
+                    "Project NOT saved: could not save — the free space of the "
+                    "work area could not be read — check the folder."
+                )
+                self.logger.warning(
+                    "Save project refused: free space not readable (%s)",
+                    type(exc).__name__,
+                )
+                return
+            if plan.total_bytes > free_bytes:
+                message = (
+                    "Project NOT saved: not enough free space (needs "
+                    f"{plan.total_bytes} bytes, {free_bytes} free) — free disk "
+                    "space or remove files from the project."
+                )
+                self.set_status(message)
+                self.notify(
+                    message,
+                    title="Project not saved",
+                    severity="error",
+                    timeout=10.0,
+                    markup=False,
+                )
+                self.logger.warning(
+                    "Save project refused: needs %d bytes, %d free",
+                    plan.total_bytes,
+                    free_bytes,
+                )
+                return
         # Review findings F6(a)/S-F5: remember whether THIS call creates the
         # folder, so a later failure can remove exactly what it created — a
         # pre-existing project folder is never touched. The ownership
@@ -9695,7 +9870,7 @@ class S19TuiApp(App):
             self.current_project,
             self.current_project_dir,
         )
-        placed_files: list[Path] = []
+        placed_files = _PlacedFiles()
         created_dirs: list[Path] = []
         # SEC2-9 (security round 4): at most one (manifest path, previous
         # bytes) pair — armed the moment a merge's manifest write returns,
@@ -9737,7 +9912,7 @@ class S19TuiApp(App):
             # exactly what THIS save creates, recorded per placement and
             # per gather copy below, never "what the snapshot lacks"
             # (SEC2-5's unreadable folder, SEC2-6's concurrent writer).
-            data_files, a2l_files, error = validate_project_files(project_dir)
+            _data_files, _a2l_files, error = validate_project_files(project_dir)
             if error:
                 self.set_status(error)
                 self.logger.warning("Project validation failed: %s", error)
@@ -9750,17 +9925,22 @@ class S19TuiApp(App):
                     manifest_restores,
                 )
                 return
-            existing_suffixes = {item.suffix.lower() for item in data_files}
-            # Multi-variant model (E5b, US-005): saving an S19/HEX into a project
-            # that already holds primaries is a legitimate variant addition — the
-            # pre-batch cross-suffix rejection is retired. Filename collisions are
-            # deduplicated by the placement (`_<N>` suffix); the single-MAC
-            # and single-A2L guards below are preserved (LLR-005.1).
-            if self.current_file and self.current_file.mac_path:
-                has_mac = ".mac" in existing_suffixes
-                if has_mac and self.current_file.mac_path.name not in {item.name for item in data_files}:
-                    self.set_status("Project already has a MAC file.")
-                    self.logger.warning("Project already has MAC file: %s", project_dir)
+            # LED .66 / LLR-167.6c/d: the single-MAC and single-A2L
+            # refusals are decided by the plan, before any folder exists.
+            # R2 / R11: the sub-folder entries of the copy list land right
+            # after the folder is created, before the rows loop and the
+            # gather, so a home row lands where the plan predicted it.
+            subfolder_copies = [entry for entry in plan.copies if "/" in entry.relative]
+            top_level_copies = [
+                entry for entry in plan.copies if "/" not in entry.relative
+            ]
+            if subfolder_copies:
+                copy_failure = self._copy_project_subfolders(
+                    save_as_source, project_dir, subfolder_copies,
+                    placed_files, created_dirs,
+                )
+                if copy_failure is not None:
+                    self.set_status(safe_text(copy_failure).plain)
                     self._abort_save(
                         project_dir,
                         created_project_dir,
@@ -9770,18 +9950,6 @@ class S19TuiApp(App):
                         manifest_restores,
                     )
                     return
-            if a2l_files and self.current_a2l_path and self.current_a2l_path.suffix.lower() in A2L_EXTENSIONS:
-                self.set_status("Project already has an A2L file.")
-                self.logger.warning("Project already has A2L file: %s", project_dir)
-                self._abort_save(
-                    project_dir,
-                    created_project_dir,
-                    placed_files,
-                    created_dirs,
-                    save_state,
-                    manifest_restores,
-                )
-                return
             # LLR-168.4 / B100-I7: the target's readable derived_from
             # records are carried; an emit below adds its own (both decided
             # before the plan, F3).
@@ -9792,7 +9960,9 @@ class S19TuiApp(App):
             # so the rollback removes exactly what THIS save created. Every
             # landed placement is checked against its row.
             for row in plan.rows:
-                if row.role == PLAN_ROLE_MANIFEST:
+                if row.role in (PLAN_ROLE_MANIFEST, PLAN_ROLE_CARRIED):
+                    # A carried row is placed by the top-level copy below
+                    # (R11), never a second time here.
                     continue
                 if row.role == PLAN_ROLE_DOCUMENT:
                     if row.source is not None:
@@ -9895,6 +10065,32 @@ class S19TuiApp(App):
                     and placed.path.suffix.lower() in PROJECT_PRIMARY_DATA_EXTENSIONS
                 ):
                     saved_primary_name = placed.path.name
+            # R11 / R3: the source's other top-level files land after the
+            # rows loop (an identical copy can never be reused by the image
+            # row) and before the variant rebuild, so the rebuilt variant
+            # set and the manifest include them; each landing is checked
+            # against its "carried" row.
+            if top_level_copies:
+                copy_failure = self._copy_project_subfolders(
+                    save_as_source, project_dir, top_level_copies,
+                    placed_files, created_dirs,
+                    carried={
+                        row.landing.name: row
+                        for row in plan.rows
+                        if row.role == PLAN_ROLE_CARRIED
+                    },
+                )
+                if copy_failure is not None:
+                    self.set_status(safe_text(copy_failure).plain)
+                    self._abort_save(
+                        project_dir,
+                        created_project_dir,
+                        placed_files,
+                        created_dirs,
+                        save_state,
+                        manifest_restores,
+                    )
+                    return
             # F-09 (LLR-056.3): project CREATE/SAVE swaps the active project
             # without reloading a file (no ``_apply_prepared_load`` pass), so
             # the sticky report-filter selection resets here.
@@ -9929,9 +10125,23 @@ class S19TuiApp(App):
             # ``project_gather_service``) into their per-artifact project homes,
             # leaving the COMMON originals untouched. The gather is best-effort:
             # its per-artifact findings are logged, never save-blocking.
-            composition_names = list(payload.batch) + [
+            # R4 / LLR-171.6 / .6a: for every target, batch and assignments
+            # are the dialog's selection when it selected any, otherwise the
+            # carried records; the gather list is the resolved batch plus
+            # the names in the resolved assignments (LLR-171.6b, LLR-138.1).
+            batch = (
+                tuple(payload.batch)
+                if payload.batch
+                else tuple(target_carry.get("batch", ()))
+            )
+            assignments = (
+                dict(payload.assignments)
+                if any(payload.assignments.values())
+                else dict(target_carry.get("assignments", {}))
+            )
+            composition_names = list(batch) + [
                 name
-                for entries in payload.assignments.values()
+                for entries in assignments.values()
                 for name in entries
             ]
             # HLR-170 / LLR-170.2: the gather gets the pasted document's
@@ -10010,9 +10220,10 @@ class S19TuiApp(App):
                 plan = _plan_without_document_key(plan)
             # LLR-164.2 / E3 R13: a merge keeps the target's gathered rows
             # and adds this save's; an open-project save records this
-            # save's rows only.
+            # save's rows only. LLR-171.1h: a save as keeps the source's
+            # rows (their files were copied) and adds this save's.
             gathered = gather_outcome.gathered
-            if plan.target_kind == PLAN_TARGET_MERGE:
+            if plan.target_kind == PLAN_TARGET_MERGE or save_as_source is not None:
                 gathered = {}
                 for home in dict.fromkeys(
                     (*PROJECT_HOME_NAMES, *target_gathered, *gather_outcome.gathered)
@@ -10092,10 +10303,22 @@ class S19TuiApp(App):
                 else:
                     manifest_restores.append((written, manifest_previous))
 
+            if save_as_source is not None:
+                # LLR-171.1h / A3-8: a save as keeps the source's
+                # derived_from records only for a top-level data file the
+                # copy holds — the image row's landing or a top-level copy.
+                held_names = {
+                    row.landing.name for row in plan.rows if row.role == "image"
+                } | {entry.relative for entry in top_level_copies}
+                derived_from = {
+                    key: record
+                    for key, record in derived_from.items()
+                    if key in held_names
+                }
             manifest_ok = self._write_and_verify_manifest(
                 project_dir,
-                batch=payload.batch,
-                assignments=payload.assignments,
+                batch=batch,
+                assignments=assignments,
                 declared_regions=self._declared_regions,
                 gathered=gathered,
                 derived_from=derived_from,
@@ -10230,12 +10453,103 @@ class S19TuiApp(App):
             self.set_status(f"Saved project to {project_dir}{image_clause}")
         if kept_note is not None:
             self.set_status(safe_text(kept_note).plain)
+        # LLR-171.1c / LLR-171.7a: one line names the links the save as did
+        # not follow; every name from the source tree goes through
+        # painted_names (R6).
+        if plan.skipped_links:
+            self.set_status(
+                safe_text(
+                    "Save as: links or junctions not copied: "
+                    f"{painted_names(plan.skipped_links)} — copy those files into "
+                    "the project if it needs them."
+                ).plain
+            )
+            self.logger.info(
+                "Save as skipped %d links: %r",
+                len(plan.skipped_links),
+                list(plan.skipped_links[:100]),
+            )
+        if source_gone is not None:
+            self.set_status(
+                safe_text(
+                    f"The open project folder '{painted_names([source_gone])}' was "
+                    "not found — its other files were not copied; copy them into "
+                    f"'{painted_names([cleaned])}' if you still have them."
+                ).plain
+            )
+        # LLR-171.5 / LLR-171.7a: one line per gathered file project.json
+        # cannot record, at most 10, then one line with the rest's count.
+        unrecorded = gather_outcome.unrecorded
+        for relative in unrecorded[:PAINTED_NAME_LIMIT]:
+            why = (
+                "Windows reserves that name"
+                if any(
+                    is_windows_device_name(part)
+                    for part in PurePosixPath(relative).parts
+                )
+                else "the name is not one project.json records"
+            )
+            self.set_status(
+                safe_text(
+                    f"{painted_names([relative])} was copied but not recorded in "
+                    f"{PROJECT_MANIFEST_NAME} ({why}) — rename it in the common "
+                    "folder, select the new name, then Save project."
+                ).plain
+            )
+        if len(unrecorded) > PAINTED_NAME_LIMIT:
+            self.set_status(
+                f"and {len(unrecorded) - PAINTED_NAME_LIMIT} more files not "
+                f"recorded in {PROJECT_MANIFEST_NAME}"
+            )
         # LED .72 Q1 / E3 R12: the pasted document is bound to its landing,
         # spelled unresolved from the home (never PlacementResult.path), so
         # the next save's in-home test sees the same spelling; from now on
         # it is file-backed and never rewritten (E3 R1).
         if pasted_placed is not None:
             document.source_path = project_dir / document_home / pasted_placed.path.name
+        elif save_as_source is not None and document.source_path is not None:
+            # R9 / LLR-171.1m: a document whose file is inside the source
+            # follows its copy. Textual relative_to on the unnormalised
+            # spellings; a ".." or absolute part keeps the binding, and the
+            # new path is built from the plan entry, never from the source
+            # text and never after a probe (S3R2-5).
+            try:
+                document_relative: Optional[str] = (
+                    document.source_path.absolute()
+                    .relative_to(save_as_source.absolute())
+                    .as_posix()
+                )
+            except ValueError:
+                document_relative = None
+            plan_entries = {entry.relative for entry in plan.copies}
+            row_relative: Optional[str] = None
+            if document_row is not None:
+                try:
+                    row_relative = document_row.landing.relative_to(
+                        project_dir.resolve()
+                    ).as_posix()
+                except (ValueError, OSError):
+                    pass
+                else:
+                    plan_entries.add(row_relative)
+            if (
+                document_relative is not None
+                and ".." not in PurePosixPath(document_relative).parts
+                and not PurePosixPath(document_relative).is_absolute()
+                and document_relative in plan_entries
+            ):
+                # F5 (b): the document row's file lands where the gather
+                # placed it — a byte-identical sibling it reused
+                # (``changes_1.json``) is the copy, not the planned name.
+                if (
+                    document_relative == row_relative
+                    and landed_document is not None
+                    and recorded_document == landed_document
+                ):
+                    document_relative = landed_document
+                document.source_path = project_dir.joinpath(
+                    *PurePosixPath(document_relative).parts
+                )
         try:
             panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
             paste_text = self.query_one("#patch_paste_text", TextArea).text
@@ -10280,6 +10594,10 @@ class S19TuiApp(App):
         self.current_project_dir = project_dir
         self.update_project_labels()
         self.refresh_files()
+        if save_as_source is not None:
+            # R9 / LLR-171.1l: the Flow panels' session folder follows the
+            # copy.
+            self._publish_flow_session_dir()
 
     def _decide_project_image(self) -> _ProjectImageStep:
         """
@@ -10396,6 +10714,7 @@ class S19TuiApp(App):
         image_step: _ProjectImageStep,
         derived: bool = False,
         carried_active_document: Optional[str] = None,
+        source_reason: Optional[str] = None,
     ) -> SavePlan:
         """
         Summary:
@@ -10403,7 +10722,12 @@ class S19TuiApp(App):
             will place: the image (the emitted bytes or the source), the MAC,
             the A2L and the Patch Editor's document, each with the digest
             the app computes here so the planner hashes nothing, plus the
-            manifest keys (LED .45).
+            manifest keys (LED .45). For a save as (a new target while a
+            project is open) it also passes the open project's link-free
+            inventory, so the plan lists the files the copy places
+            (LLR-171.1, LLR-167.6a); for an existing target, the names of
+            its MAC / A2L files that are the open project's own (LLR-167.6f,
+            pre-ruling 5).
 
         Args:
             project_dir (Path): The UNRESOLVED target folder.
@@ -10415,16 +10739,29 @@ class S19TuiApp(App):
                 already dropped by the caller when the one document
                 classifier said ``missing``, ``link`` or ``unreadable``
                 (E3 R2, R8 refined); it sets the keys flag.
+            source_reason (Optional[str]): The open project folder's
+                ``_project_folder_refusal`` reason for a save as, checked
+                once by the caller (S3-6); set -> the plan refuses (token
+                row 9) and walks nothing.
 
         Returns:
             SavePlan: The frozen plan the handler executes.
 
         Raises:
-            OSError: A source the plan digests cannot be read (the caller
-                refuses the save before any folder exists). The document's
-                own digest never raises: it is "not placed" (A3R2-1).
+            OSError: A source the plan digests cannot be read, or the save
+                as inventory cannot list the open project's folder (the
+                caller refuses the save before any folder exists). The
+                document's own digest never raises: it is "not placed"
+                (A3R2-1).
 
         Data Flow:
+            - The target kind first: ``new`` when nothing exists at the
+              target, ``open project`` for the open project's name, else
+              ``merge``.
+            - A ``new`` target with an open project: ``source_reason`` set
+              -> the row 9 refusal (before the re-derive refusal, A3-13);
+              else ``inventory_project_tree`` of the open project. Every
+              other target passes no inventory (LLR-171.1g).
             - The image row: the emitted bytes' digest (an emit) or the
               source file's (a copy); then the MAC and the A2L, each
               digested from its file. A refused decision plans no file.
@@ -10437,8 +10774,12 @@ class S19TuiApp(App):
               ``outside`` -> a row with the source file's digest (an
               ``OSError`` there -> no row); ``inside_elsewhere`` /
               ``missing`` -> no row.
-            - The target kind: ``new`` when nothing exists at the target,
-              ``open project`` for the open project's name, else ``merge``.
+            - An existing target: ``exempt`` holds each of its MAC / A2L
+              names that is the open project's own — the same path as text,
+              or the same name with the target file a regular file (never a
+              link), the same size and the same SHA-256 as the session's
+              file; only that file is hashed, here (no payload digests in
+              the planner, Inc 5).
             - The manifest keys come from the manifest writer
               (``_save_manifest_keys``), with ``active_document`` when a
               document row's landing passes the form or a carried value
@@ -10451,15 +10792,38 @@ class S19TuiApp(App):
             Uses:
                 - _file_digest / _save_manifest_keys
                 - project_gather_service.classify_active_document /
-                  document_home_for_kind / plan_project_save
+                  document_home_for_kind / inventory_project_tree /
+                  plan_project_save
                 - changes.io.serialize_change_document
             Used by:
                 - _handle_save_dialog (before the project folder exists)
         """
+        if not os.path.lexists(project_dir):
+            target_kind = PLAN_TARGET_NEW
+        elif (self.current_project or "").casefold() == project_name.casefold():
+            target_kind = PLAN_TARGET_OPEN
+        else:
+            target_kind = PLAN_TARGET_MERGE
+        source_dir = self._save_as_source_for(project_dir)
+        refusal = image_step.refusal
+        inventory = None
+        if source_dir is not None and source_reason is not None:
+            # Token row 9 (S3-6): first, with no walk and no re-derive text.
+            where = {
+                "link": "is a link or junction",
+                "unreadable": "could not be read",
+            }.get(source_reason, "is outside the work area")
+            refusal = (
+                f"Project NOT saved: the open project folder "
+                f"'{painted_names([source_dir.name])}' {where} — pick a project "
+                "in the list."
+            )
+        elif source_dir is not None and refusal is None:
+            inventory = inventory_project_tree(source_dir)
         loaded = self.current_file
         files: list[PlannedFile] = []
         image = ""
-        if loaded is not None and image_step.refusal is None:
+        if loaded is not None and refusal is None:
             if image_step.emit:
                 payload = image_step.payload
                 files.append(
@@ -10488,7 +10852,7 @@ class S19TuiApp(App):
                         *_file_digest(loaded.mac_path),
                     )
                 )
-        if self.current_a2l_path and image_step.refusal is None:
+        if self.current_a2l_path and refusal is None:
             files.append(
                 PlannedFile(
                     "a2l", self.current_a2l_path, self.current_a2l_path.name,
@@ -10499,7 +10863,7 @@ class S19TuiApp(App):
         document = self._change_service.document
         home = document_home_for_kind(document.kind)
         source = document.source_path
-        if image_step.refusal is None and source is None:
+        if refusal is None and source is None:
             if document.entries and self._document_home_contained(project_dir, home):
                 data = serialize_change_document(document)
                 name = "changes.json"
@@ -10510,7 +10874,7 @@ class S19TuiApp(App):
                     )
                 )
                 records_document = is_active_document_form(f"{home}/{name}")
-        elif image_step.refusal is None:
+        elif refusal is None:
             kind, name = classify_active_document(project_dir, source, home)
             if (
                 kind in _PLACED_DOCUMENT_CLASSES
@@ -10534,12 +10898,42 @@ class S19TuiApp(App):
                         )
                     )
                     records_document = is_active_document_form(f"{home}/{name}")
-        if not os.path.lexists(project_dir):
-            target_kind = PLAN_TARGET_NEW
-        elif (self.current_project or "").casefold() == project_name.casefold():
-            target_kind = PLAN_TARGET_OPEN
-        else:
-            target_kind = PLAN_TARGET_MERGE
+        exempt: set[str] = set()
+        if target_kind != PLAN_TARGET_NEW and refusal is None:
+            target_data, target_a2l, _target_error = validate_project_files(project_dir)
+            planned_by_role = {planned.role: planned for planned in files}
+            for item in (*target_data, *target_a2l):
+                suffix = item.suffix.lower()
+                if suffix in A2L_EXTENSIONS:
+                    planned = planned_by_role.get("a2l")
+                elif suffix in MAC_EXTENSIONS:
+                    planned = planned_by_role.get("mac")
+                else:
+                    continue
+                if planned is None:
+                    continue
+                try:
+                    item_stat = os.lstat(item)
+                except OSError:
+                    continue
+                if not stat.S_ISREG(item_stat.st_mode) or _is_reparse_point(item):
+                    continue
+                if os.path.normcase(os.path.abspath(item)) == os.path.normcase(
+                    os.path.abspath(planned.source)
+                ):
+                    exempt.add(item.name)
+                    continue
+                if (
+                    os.path.normcase(item.name) != os.path.normcase(planned.name)
+                    or item_stat.st_size != planned.size
+                ):
+                    continue
+                try:
+                    digest, _size = _file_digest(item)
+                except OSError:
+                    continue
+                if digest == planned.digest:
+                    exempt.add(item.name)
         return plan_project_save(
             project_dir,
             target_kind=target_kind,
@@ -10552,7 +10946,9 @@ class S19TuiApp(App):
                     records_document or carried_active_document is not None
                 ),
             ),
-            refusal=image_step.refusal,
+            refusal=refusal,
+            inventory=inventory,
+            exempt=frozenset(exempt),
         )
 
     def _unrecorded_document_lines(
@@ -11276,6 +11672,31 @@ class S19TuiApp(App):
             self.logger.info("Load project canceled.")
             return
         project_dir = self.workarea / name
+        # LLR-171.4e / LLR-171.4f: a picked folder that is a link, is not
+        # one folder of this work area, or resolves outside it is refused
+        # before ``exists()`` (which follows a junction) and before any
+        # reset.
+        folder_reason = self._project_folder_refusal(project_dir)
+        if folder_reason is not None:
+            painted = painted_names([name])
+            if folder_reason == "link":
+                message = (
+                    f"Project NOT loaded: '{painted}' is a link or junction — "
+                    "pick a project in the list."
+                )
+            elif folder_reason == "unreadable":
+                message = (
+                    f"Project NOT loaded: '{painted}' could not be read — check "
+                    "that the folder can be opened, then load again."
+                )
+            else:
+                message = (
+                    f"Project NOT loaded: '{painted}' is outside the work area — "
+                    "copy the folder into the work area."
+                )
+            self.set_status(safe_text(message).plain)
+            self.logger.warning("Project load refused (%s): %r", folder_reason, name)
+            return
         if not project_dir.exists():
             self.set_status(f"Project not found: {name}")
             self.logger.warning("Project not found: %s", name)
@@ -11285,9 +11706,73 @@ class S19TuiApp(App):
             self.set_status(error)
             self.logger.warning("Project validation failed: %s", error)
             return
-        if not data_files:
-            self.set_status(f"No supported files in project: {name}")
-            self.logger.warning("No data files in project: %s", name)
+        # R5 / LLR-171.2f / LLR-171.2g: the project's A2L is parsed only
+        # when it is a regular file within the placement's size cap (read
+        # at call time). Without a data file the load is refused before the
+        # reset; beside a data file the A2L is left out for every consumer
+        # and named as a problem.
+        a2l_problem: Optional[ProjectFileProblem] = None
+        if a2l_files:
+            try:
+                a2l_stat = os.lstat(a2l_files[0])
+            except OSError as exc:
+                self.logger.warning(
+                    "Project A2L not readable: %r (%s)",
+                    str(a2l_files[0]), type(exc).__name__,
+                )
+                a2l_reason: Optional[str] = "could not be read"
+            else:
+                if not stat.S_ISREG(a2l_stat.st_mode) or _is_reparse_point(
+                    a2l_files[0]
+                ):
+                    a2l_reason = "is a link or junction"
+                elif a2l_stat.st_size > workspace.DEFAULT_COPY_SIZE_CAP_BYTES:
+                    a2l_reason = "is too large to open"
+                else:
+                    a2l_reason = None
+            if a2l_reason is not None and not data_files:
+                self.set_status(
+                    safe_text(
+                        f"Project NOT loaded: {painted_names([a2l_files[0].name])} "
+                        f"in '{painted_names([name])}' {a2l_reason} — replace the "
+                        "A2L file, then Load again."
+                    ).plain
+                )
+                self.logger.warning(
+                    "Project load refused: A2L %r %s", str(a2l_files[0]), a2l_reason
+                )
+                return
+            if a2l_reason is not None:
+                # F2 (LLR-171.2g): Save project does not drop the A2L, so the
+                # painted step is "replace the A2L file, then Load again".
+                a2l_problem = ProjectFileProblem(
+                    PROBLEM_NOT_READABLE,
+                    a2l_files[0].name,
+                    a2l_reason.removeprefix("is "),
+                    step=STEP_REPLACE_A2L,
+                )
+                a2l_files = []
+        # LLR-171.2d / LLR-171.2e: a folder with neither a data file nor an
+        # A2L file is refused before the reset; an A2L-only folder goes on.
+        if not data_files and not a2l_files:
+            try:
+                has_manifest = stat.S_ISREG(
+                    os.lstat(project_dir / PROJECT_MANIFEST_NAME).st_mode
+                )
+            except OSError:
+                has_manifest = False
+            if has_manifest:
+                message = (
+                    f"Project NOT loaded: '{painted_names([name])}' has no data or "
+                    "A2L file — load a file and Save project."
+                )
+            else:
+                message = (
+                    f"Project NOT loaded: '{painted_names([name])}' has no "
+                    "project.json — load a file and Save project."
+                )
+            self.set_status(safe_text(message).plain)
+            self.logger.warning("No data or A2L file in project: %r", name)
             return
         # HLR-165 / LLR-165.1: the ONE reset seam — after the project
         # validates, before the first install — so the primary parse's
@@ -11315,6 +11800,8 @@ class S19TuiApp(App):
             self.logger.warning(
                 "Project %s: %s %s (%s)", name, problem.kind, problem.file, problem.code
             )
+        if a2l_problem is not None:
+            problems.append(a2l_problem)
         recorded = (
             manifest.active_variant
             if manifest is not None and not manifest_is_damaged(manifest)
@@ -11341,10 +11828,18 @@ class S19TuiApp(App):
                 )
                 a2l_files = []
         install = choose_install_set(variant_set, recorded, data_files, a2l_files)
-        if install.variant is None and install.mac is None:
+        if install.variant is None and install.mac is None and install.a2l is None:
             self.set_status(f"No supported files in project: {name}")
             self.logger.warning("No loadable data file in project: %s", name)
             return
+        if install.variant is None and install.mac is None:
+            # HLR-171a / LLR-171.2: an A2L-only project attaches its own A2L
+            # in place — never a work-area temp copy (no load_a2l_from_path).
+            self.current_a2l_path = install.a2l
+            self.current_a2l_data = a2l_context
+            self.update_a2l_view()
+            self._refresh_loaded_panel()
+            self._apply_empty_state()
         # HLR-170 / LLR-170.3 (C4): reopen the recorded change document
         # after the A2L parse and before the install — the install and the
         # deferred load steps never reset the document. One problem per
@@ -11560,12 +12055,262 @@ class S19TuiApp(App):
         return None
 
     def list_projects(self) -> List[str]:
+        """
+        Summary:
+            The projects of this work area, in sorted order: each direct
+            child folder that is not a reserved home and passes the one
+            "is this folder a project here" check (LLR-171.4c) — a link or
+            junction is never listed.
+
+        Returns:
+            List[str]: The project folder names.
+
+        Data Flow:
+            - The link check runs before ``is_dir()``, which follows a
+              junction; no folder content is read.
+
+        Dependencies:
+            Uses:
+                - _project_folder_refusal
+            Used by:
+                - the Load project dialog
+        """
         reserved_folded = {home.casefold() for home in RESERVED_WORKAREA_HOMES}
         projects = []
         for item in sorted(self.workarea.iterdir()):
-            if item.is_dir() and item.name.casefold() not in reserved_folded:
+            if item.name.casefold() in reserved_folded:
+                continue
+            if self._project_folder_refusal(item) is not None:
+                continue
+            if item.is_dir():
                 projects.append(item.name)
         return projects
+
+    @staticmethod
+    def _manifest_is_link(folder: Path) -> bool:
+        """SEC8b-3: True when ``folder/project.json`` is a link or reparse
+        point (or cannot be inspected); a save as then carries nothing from
+        it, and the inventory's link line names it."""
+        manifest = folder / PROJECT_MANIFEST_NAME
+        try:
+            manifest_stat = os.lstat(manifest)
+        except FileNotFoundError:
+            return False
+        except OSError:
+            return True
+        return stat.S_ISLNK(manifest_stat.st_mode) or _is_reparse_point(manifest)
+
+    def _save_as_source_for(self, project_dir: Path) -> Optional[Path]:
+        """The open project's folder when Save project to ``project_dir`` is
+        a save as (LLR-171.1): a target that does not exist while a project
+        is open whose folder is still there. A folder that is gone is no
+        source (LLR-171.1n, F1). Used by the handler and the plan alike."""
+        if (
+            self.current_project_dir is None
+            or os.path.lexists(project_dir)
+            or not os.path.lexists(self.current_project_dir)
+        ):
+            return None
+        return self.current_project_dir
+
+    def _project_folder_refusal(self, folder: Path) -> Optional[str]:
+        """
+        Summary:
+            The one "is this folder a project here" check (HLR-171b), used
+            by the project list, the project load, the Save project target
+            and the save-as source: a reason word, or ``None``.
+
+        Args:
+            folder (Path): The folder, as the caller spells it (never
+                resolved first).
+
+        Returns:
+            Optional[str]: ``"outside"`` when the folder is not one plain
+                component of this work area or resolves outside it;
+                ``"unreadable"`` when it cannot be inspected (F7(a));
+                ``"link"`` when it is a symbolic link or a junction;
+                ``None`` when it is a plain folder here or absent (absent
+                is the caller's "not found" case).
+
+        Data Flow:
+            - (S3-7) ``folder.parent`` textually equal to the work area and
+              a name other than "", "." or ".."; else ``"outside"``.
+            - ``os.lstat``: absent -> ``None``; any other ``OSError`` ->
+              ``"unreadable"`` (fail closed); a link or reparse point ->
+              ``"link"``.
+            - ``contained_in_workarea``: kept as defence; after the two
+              steps above a plain direct child cannot resolve outside.
+
+        Dependencies:
+            Uses:
+                - workspace._is_reparse_point / contained_in_workarea
+            Used by:
+                - list_projects / _handle_load_project / _handle_save_dialog
+        """
+        if str(folder.parent) != str(self.workarea) or folder.name in ("", ".", ".."):
+            return "outside"
+        try:
+            folder_stat = os.lstat(folder)
+        except FileNotFoundError:
+            return None
+        except OSError:
+            return "unreadable"
+        if stat.S_ISLNK(folder_stat.st_mode) or _is_reparse_point(folder):
+            return "link"
+        if not contained_in_workarea(folder, self.workarea):
+            return "outside"
+        return None
+
+    def _copy_project_subfolders(
+        self,
+        source_dir: Path,
+        project_dir: Path,
+        copies: Sequence[InventoryFile],
+        placed_files: list[Path],
+        created_dirs: list[Path],
+        carried: Optional[Mapping[str, SavePlanRow]] = None,
+    ) -> Optional[str]:
+        """
+        Summary:
+            Copy exactly the given entries of ``SavePlan.copies`` from the
+            open project into the new one (LLR-171.1, pre-ruling 1): the
+            files under the sub-folders right after the folder is created,
+            and the top-level files after the rows loop (R11). It never
+            walks the source, so it cannot descend into a link the plan
+            skipped, and it writes nothing under ``source_dir``.
+
+        Args:
+            source_dir (Path): The open project's folder (unresolved).
+            project_dir (Path): The new project's folder (unresolved).
+            copies (Sequence[InventoryFile]): The plan entries to copy, in
+                plan order.
+            placed_files (list[Path]): The save's rollback list of files;
+                each new landing is appended before the next copy.
+            created_dirs (list[Path]): The save's rollback list of
+                folders; each folder is appended the moment it exists.
+            carried (Optional[Mapping[str, SavePlanRow]]): The plan's
+                "carried" rows by landing name, for the top-level call.
+
+        Returns:
+            Optional[str]: ``None`` when every entry landed at its path;
+                otherwise the failure line in user terms (token row 11, or
+                the "the plan named" line for a carried row), the names
+                through ``painted_names``. Exception text goes to the log
+                only (R6).
+
+        Data Flow:
+            - Per entry: the source must still resolve inside the source
+              project (A3-12), with no link or junction from the work
+              area down to it (SEC8b-2); each missing folder level is checked by the
+              guarded destination and then created (S3-5 b); the file goes
+              through ``place_into_workarea`` with the destination
+              unresolved; the source is checked again after the placement
+              (S3-5 a).
+            - A carried entry's landing is checked with
+              ``_plan_row_mismatch`` (A3R2-5); any other entry must land at
+              its own name.
+
+        Dependencies:
+            Uses:
+                - workspace.place_into_workarea / _guarded_destination /
+                  contained_in_workarea
+                - project_gather_service.painted_names
+            Used by:
+                - _handle_save_dialog (twice for a save as)
+        """
+        def _source_in_place(source: Path) -> bool:
+            # SEC8b-2: anchored on fixed ground — no folder from the work
+            # area down to the file (P itself included) may be a link or
+            # junction; the containment test alone moves with P.
+            return not _path_traverses_reparse_point(
+                source, stop_at=self.workarea
+            ) and contained_in_workarea(source, source_dir)
+
+        ensured: set[Path] = set()
+        for entry in copies:
+            parts = PurePosixPath(entry.relative).parts
+            source = source_dir.joinpath(*parts)
+            painted = painted_names([entry.relative])
+            changed = (
+                f"Project NOT saved: could not save — {painted} changed while "
+                "saving — check the folder."
+            )
+            try:
+                if not _source_in_place(source):
+                    self.logger.warning(
+                        "Save as copy refused: source left the project: %r",
+                        entry.relative,
+                    )
+                    return changed
+                level = project_dir
+                for part in parts[:-1]:
+                    level = level / part
+                    if level in ensured:
+                        continue
+                    _guarded_destination(level.parent, self.workarea)
+                    try:
+                        level.mkdir()
+                    except FileExistsError:
+                        pass
+                    else:
+                        created_dirs.append(level)
+                    ensured.add(level)
+                placed = place_into_workarea(
+                    source, level, workarea_root=self.workarea
+                )
+                if not placed.reused:
+                    placed_files.append(placed.path)
+                if not _source_in_place(source):
+                    self.logger.warning(
+                        "Save as copy refused: source changed during the copy: %r",
+                        entry.relative,
+                    )
+                    return changed
+            except (WorkareaContainmentError, OSError) as exc:
+                self.logger.warning(
+                    "Save as copy failed: %r (%s: %r)",
+                    entry.relative, type(exc).__name__, str(exc),
+                )
+                return (
+                    f"Project NOT saved: could not save — {painted} could not be "
+                    "copied — check the folder."
+                )
+            row = carried.get(parts[-1]) if carried and len(parts) == 1 else None
+            if row is not None:
+                if _plan_row_mismatch(row, placed) is not None:
+                    landed_action = PLAN_ACTION_KEEP if placed.reused else PLAN_ACTION_NEW
+                    self.logger.warning(
+                        "Save as plan mismatch: %r planned %r, landed %r",
+                        entry.relative, str(row.landing), str(placed.path),
+                    )
+                    # F5: a reuse at another name repeats on every save —
+                    # the copy holds a file with the same bytes already.
+                    step = (
+                        f"{painted_names([placed.path.name])} already holds the "
+                        f"same bytes as {painted_names([parts[-1]])} — remove the "
+                        "duplicate copy from the open project folder "
+                        f"'{painted_names([source_dir.name])}', then save again."
+                        if placed.reused
+                        and os.path.normcase(placed.path.name)
+                        != os.path.normcase(row.landing.name)
+                        else "save again."
+                    )
+                    return (
+                        "Project NOT saved: the plan named "
+                        f"{painted_names([row.landing.name])} ({row.action}) but "
+                        f"the file landed at {painted_names([placed.path.name])} "
+                        f"({landed_action}) — {step}"
+                    )
+            elif os.path.normcase(placed.path.name) != os.path.normcase(parts[-1]):
+                self.logger.warning(
+                    "Save as copy landed elsewhere: %r at %r",
+                    entry.relative, str(placed.path),
+                )
+                return (
+                    f"Project NOT saved: could not save — {painted} did not land "
+                    "at its path — check the folder."
+                )
+        return None
 
     def _manifest_carry(
         self, project_dir: Path, manifest: Optional[ProjectManifest]
@@ -13528,10 +14273,15 @@ class S19TuiApp(App):
         if kind == "all":
             new: Optional[LoadedFile] = None
             label = "all artifacts"
-        else:
-            if self.current_file is None:
+        elif self.current_file is None:
+            # F3: an A2L-only session (no image) holds its A2L outside
+            # ``current_file``; its unload clears that A2L.
+            if kind != "a2l" or self.current_a2l_path is None:
                 self.set_status("Nothing to unload.")
                 return
+            new = None
+            label = "A2L"
+        else:
             if kind == "primary":
                 new = _unload_primary(self.current_file)
                 label = "primary image"

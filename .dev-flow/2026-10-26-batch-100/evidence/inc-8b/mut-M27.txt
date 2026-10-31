@@ -1,0 +1,21 @@
+mutant: M27
+target: s19_app/tui/app.py
+old -> new:             batch = (
+                tuple(payload.batch)
+                if payload.batch
+                else tuple(target_carry.get("batch", ()))
+            )  ->              batch = tuple(payload.batch)
+sha256_before: b75f9125c9eb12c122ce1bbd05d6de1e8027403a87cc2e800be8227a5c42011f
+command: cd C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b && env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_project_homes.py::test_tc_b100_31_empty_selection_keeps_batch_for_every_target
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b
+---
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:593: AssertionError: {'active_variant': 'firmware', 'assignments': {'firmware': ['checks/ck_seed.json']}, 'batch': [], 'declared_regions': [{'end': 2147483775, 'name': 'cal_block', 'start': 2147483712}], ...}
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_empty_selection_keeps_batch_for_every_target
+1 failed in 3.27s
+---
+summary: 1 failed in 3.27s
+verdict: KILLED
+restored = True

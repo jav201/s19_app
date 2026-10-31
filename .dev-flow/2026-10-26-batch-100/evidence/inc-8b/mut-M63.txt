@@ -1,0 +1,23 @@
+mutant: M63
+target: s19_app/tui/app.py
+old -> new:         target_reason = self._project_folder_refusal(project_dir)  ->          target_reason = self._project_folder_refusal(project_dir.resolve())
+sha256_before: b75f9125c9eb12c122ce1bbd05d6de1e8027403a87cc2e800be8227a5c42011f
+command: cd C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b && env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_project_homes.py::test_tc_b100_62_save_target_junction_is_refused[new name] tests/test_b100_project_homes.py::test_tc_b100_62_save_target_junction_is_refused[merge target] tests/test_b100_project_homes.py::test_at_b100_11_junction_project_is_not_listed_and_save_refuses_it[size0] tests/test_b100_project_homes.py::test_at_b100_11_junction_project_is_not_listed_and_save_refuses_it[size1]
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b
+---
+FFFF                                                                     [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:1325: AssertionError: ['Project NOT saved: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30853\\test_tc_b100_62_save_targe...jgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30853\\test_tc_b100_62_save_target_ju0\\app\\.s19tool\\workarea).']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:1325: AssertionError: ['Project NOT saved: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30853\\test_tc_b100_62_save_targe...jgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30853\\test_tc_b100_62_save_target_ju1\\app\\.s19tool\\workarea).']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:1592: AssertionError: ['Project NOT saved: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30853\\test_at_b100_11_junction_p...jgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30853\\test_at_b100_11_junction_proje0\\app\\.s19tool\\workarea).']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:1592: AssertionError: ['Project NOT saved: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30853\\test_at_b100_11_junction_p...jgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30853\\test_at_b100_11_junction_proje1\\app\\.s19tool\\workarea).']
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_62_save_target_junction_is_refused[new name]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_62_save_target_junction_is_refused[merge target]
+FAILED tests/test_b100_project_homes.py::test_at_b100_11_junction_project_is_not_listed_and_save_refuses_it[size0]
+FAILED tests/test_b100_project_homes.py::test_at_b100_11_junction_project_is_not_listed_and_save_refuses_it[size1]
+4 failed in 44.53s
+---
+summary: 4 failed in 44.53s
+verdict: KILLED
+restored = True

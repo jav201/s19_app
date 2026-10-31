@@ -1,0 +1,18 @@
+s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc8b\s19_app\__init__.py
+
+== C1 file ceiling: 2 000 copies vs 2 001 ==
+  2000: save 17.79s  Q exists=True files in Q/reports=2000 mkdir under Q=2004
+     ['Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\C1_2000\\base\\.s19tool\\wor'] {}
+  2001: save 0.78s  Q exists=False files in Q/reports=0 mkdir under Q=0
+     ["Project NOT saved: 'P' has too many files to copy (over 2 000) — move files out of the project, then save again."] {}
+
+== C3 entry ceiling: nested empty folders (10 000 vs 10 001 walked entries) ==
+  walked=10000: inventory 2.50s over_ceiling=None; save 2.98s Q exists=True
+     ['Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\s8b\\runs\\C3_10000\\base\\.s19tool\\wo']
+  walked=10001: inventory 1.42s over_ceiling=entries; save 1.69s Q exists=False
+     ["Project NOT saved: 'P' has too many files to copy (over 10 000 entries) — move files out of the project, then save again."]
+
+== C4 one folder of 50 000 files ==
+  created in 15.8s
+  inventory 0.20s over_ceiling=entries walker yields (two runs)=20002; save 0.87s Q exists=False
+     ["Project NOT saved: 'P' has too many files to copy (over 10 000 entries) — move files out of the project, then save again."]

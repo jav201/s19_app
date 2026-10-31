@@ -1,0 +1,148 @@
+# Inc 8b E4 RED run vs base
+# started (UTC): 2026-10-31T03:25:04Z
+# cwd: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/base8b
+# base HEAD: ebe6d0ccecfb89a2ec9d8a01efcf0c6b6a850783
+# s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\s19_app\__init__.py
+# python: Python 3.12.7
+# test files copied from the worktree /c/Users/jjgh8/Github/s19_app-b100-inc8b (tests/test_b100_project_homes.py, tests/test_b100_save_image.py, tests/support/b100_projects.py, tests/test_id_registry.py)
+# command: python -m pytest tests/test_b100_project_homes.py tests/test_b100_save_image.py -k "project_homes or (tc_b100_59 and (save_as_plans or links_only or document_row_owns or second_companion or own_a2l or over_the_cap or plan_total or plan_cap))" -p no:cacheprovider -rA -q --tb=line -s
+
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+FF.F[timing] save as with a junction cycle: 0.50 s
+FFFFF..FFFFFF[timing] save as over a 10000-entry tree: 0.60 s
+.[timing] save as over a 10001-entry tree: 0.42 s
+FFFFFFFFFFFFFFFFF.FFFFFFFF..FFFFFFFF.FFFFFFFFFF
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:214: AssertionError: (['checks/ck.json', 'flows/f1.json', 'flowsets/s1.json', 'patches/boost.json', 'reports/2026/r2.md', 'reports/r.md', ....emp\\pytest-of-jjgh8\\pytest-30749\\test_tc_b100_31_save_as_copies0\\app\\.s19tool\\workarea\\Q (variant 'firmware')"])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:269: AssertionError: ('a.json', ['firmware.s19', 'project.json'], ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\...emp\\pytest-of-jjgh8\\pytest-30749\\test_tc_b100_31_save_as_copies1\\app\\.s19tool\\workarea\\Q (variant 'firmware')"])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:328: AssertionError: ['firmware.s19', 'project.json']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:363: AssertionError: ['firmware.s19', 'project.json']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:384: AssertionError: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30749\\test_tc_b100_31_link_line_name0\\app\\.s19tool\\workarea\\Q (variant 'firmware')"]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:411: AssertionError: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30749\\test_tc_b100_31_link_names_are0\\app\\.s19tool\\workarea\\Q (variant 'firmware')"]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:426: ImportError: cannot import name 'painted_names' from 's19_app.tui.services.project_gather_service' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\s19_app\tui\services\project_gather_service.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:494: AssertionError: (102400, ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30749\\test_tc_b100_31_free_space_is_0\\app\\.s19tool\\workarea\\Q (variant 'firmware')"])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:561: AssertionError: {'active_variant': 'firmware', 'assignments': {}, 'batch': [], 'declared_regions': [{'end': 2147483775, 'name': 'cal_block', 'start': 2147483712}], ...}
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:592: AssertionError: {'active_variant': 'firmware', 'assignments': {}, 'batch': [], 'declared_regions': [{'end': 2147483775, 'name': 'cal_block', 'start': 2147483712}], ...}
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:642: AssertionError: [()]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:676: AssertionError: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30749\\test_tc_b100_31_copy_ceiling_20\\app\\.s19tool\\workarea\\Q1 (variant 'firmware')"]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:715: AssertionError: ['firmware.s19', 'project.json']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:717: AssertionError: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30749\\test_tc_b100_31_depth_ceiling_1\\app\\.s19tool\\workarea\\Q (variant 'firmware')"]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:762: AssertionError: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30749\\test_tc_b100_31_entry_ceiling_1\\app\\.s19tool\\workarea\\Q (variant 'firmware')"]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:804: AssertionError: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30749\\test_tc_b100_31_unreadable_ent0\\app\\.s19tool\\workarea\\Q (variant 'firmware')"]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:804: AssertionError: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30749\\test_tc_b100_31_unreadable_ent1\\app\\.s19tool\\workarea\\Q (variant 'firmware')"]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:851: AssertionError: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30749\\test_tc_b100_31_failed_copy_ro0\\app\\.s19tool\\workarea\\Q (variant 'firmware')"]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:881: AssertionError: session: C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30749\test_tc_b100_31_flow_session_f0\app\.s19tool\workarea\P — on confirm, the output file is copied here
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:956: AssertionError: ['No supported files in project: P']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:981: AssertionError: ['No supported files in project: P']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:1009: AssertionError: ('the A2L-only project did not open', ['No supported files in project: P'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:1045: AssertionError: ['No supported files in project: E']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:1045: AssertionError: ['No supported files in project: E']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:1093: AssertionError: ['No supported files in project: P']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:1093: AssertionError: ['No supported files in project: P']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:1090: AssertionError: ['No supported files in project: P']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:1129: AssertionError: (WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30749/test_tc_b100_32_over_cap_a2l_b0/app/.s19tool/workarea/P/firmware.a2l'), 3)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:1169: AssertionError: ['Cannot save project: Refusing to place: destination is not contained inside <base>/.s19tool/workarea/: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30749\\test_tc_b100_33_foreign_parent0\\other\\.s19tool\\workarea\\P']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:1169: AssertionError: ['Cannot save project: Refusing to place: destination is not contained inside <base>/.s19tool/workarea/: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30749\\test_tc_b100_33_foreign_parent1\\plain\\P']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:1169: AssertionError: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30749\\test_tc_b100_33_foreign_parent2\\app\\.s19tool\\workarea\\patches\\P (variant 'firmware')"]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:1211: AssertionError: C:\USERS\JJGH8\APPDATA\LOCAL\TEMP\PYTEST-OF-JJGH8\PYTEST-30749\TEST_TC_B100_33_WORK_AREA_UNDE1\APP\.S19TOOL\WORKAREA\P
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:1211: AssertionError: C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30749\test_tc_b100_33_work_area_unde2\app\.s19tool\workarea\patches\..\P
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:1209: AssertionError: ['Cannot save project: Refusing to place: destination traverses a symbolic link or reparse point: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30749\\test_tc_b100_33_work_area_unde3\\alias\\P']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:1248: AssertionError: ['alias', 'evil', 'out', 'P', 'P2']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:1270: AssertionError: ["Loaded project 'evil' -> firmware.s19 - variant 1 of 1, 0 problems - details: p"]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:1270: AssertionError: ["Loaded project 'alias' -> firmware.s19 - variant 1 of 1, 0 problems - details: p"]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:1302: AssertionError: ["Loaded project '..\\..\\..\\other\\.s19tool\\workarea\\R' -> firmware.s19 - variant 1 of 1, 0 problems - details: p"]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:1302: AssertionError: ["Loaded project 'sub/P' -> firmware.s19 - variant 1 of 1, 0 problems - details: p"]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:1476: AssertionError: ('flows/f1.json', ['firmware.s19', 'project.json'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:1476: AssertionError: ('flows/f1.json', ['firmware.s19', 'project.json'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:1535: AssertionError: ['No supported files in project: P']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:1535: AssertionError: ['No supported files in project: P']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:1584: AssertionError: ['evil', 'Q']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_project_homes.py:1584: AssertionError: ['evil', 'Q']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_save_image.py:2288: AssertionError: {}
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_save_image.py:2319: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_save_image.py:2417: AssertionError: ['Project already has a MAC file.']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_save_image.py:2417: AssertionError: ['Project already has an A2L file.']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_save_image.py:2456: AssertionError: ['Project already has an A2L file.']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_save_image.py:2460: AssertionError: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30749/test_tc_b100_59_own_a2l_by_nam1/app/.s19tool/workarea/ab')]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_save_image.py:2489: AssertionError: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30749\\test_tc_b100_59_file_over_the_0\\app\\.s19tool\\workarea\\Q (variant 'firmware')"]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_save_image.py:2494: AssertionError: ['firmware.s19', 'project.json']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_save_image.py:2544: ImportError: cannot import name 'inventory_project_tree' from 's19_app.tui.services.project_gather_service' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\s19_app\tui\services\project_gather_service.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_save_image.py:2574: ImportError: cannot import name 'inventory_project_tree' from 's19_app.tui.services.project_gather_service' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\s19_app\tui\services\project_gather_service.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_save_image.py:2605: ImportError: cannot import name 'inventory_project_tree' from 's19_app.tui.services.project_gather_service' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\s19_app\tui\services\project_gather_service.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\tests\test_b100_save_image.py:2605: ImportError: cannot import name 'inventory_project_tree' from 's19_app.tui.services.project_gather_service' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base8b\s19_app\tui\services\project_gather_service.py)
+=================================== PASSES ====================================
+=========================== short test summary info ===========================
+PASSED tests/test_b100_project_homes.py::test_tc_b100_31_save_as_with_no_subfolder_copies_none
+PASSED tests/test_b100_project_homes.py::test_tc_b100_31_free_space_is_checked_before_any_folder[T saved]
+PASSED tests/test_b100_project_homes.py::test_tc_b100_31_merge_and_save_into_itself_copy_no_subfolder
+PASSED tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10000 saved]
+PASSED tests/test_b100_project_homes.py::test_tc_b100_33_work_area_under_another_spelling_saves_there[trailing separator]
+PASSED tests/test_b100_project_homes.py::test_tc_b100_62_save_target_junction_is_refused[new name]
+PASSED tests/test_b100_project_homes.py::test_tc_b100_62_save_target_junction_is_refused[merge target]
+PASSED tests/test_b100_save_image.py::test_tc_b100_59_document_row_owns_its_landing
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_save_as_copies_every_subfolder_file
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_save_as_copies_the_top_level_files_but_not_the_backups
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_links_are_skipped_and_named
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_junction_cycle_ends
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_link_line_names_at_most_ten
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_link_names_are_scrubbed
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_painted_names_clip_scrub_and_count
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_free_space_is_checked_before_any_folder[T-1 refused]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_save_as_carries_the_open_projects_records
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_empty_selection_keeps_batch_for_every_target
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_gather_takes_names_from_the_recorded_batch_and_assignments
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_copy_ceiling_2000_files
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_depth_ceiling[32] - ...
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_depth_ceiling[33] - ...
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10001 refused]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_unreadable_entries_refuse_the_save[1]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_unreadable_entries_refuse_the_save[12]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_failed_copy_rolls_back_in_user_terms
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_flow_session_folder_follows_q
+FAILED tests/test_b100_project_homes.py::test_tc_b100_32_a2l_only_project_opens_with_its_own_a2l
+FAILED tests/test_b100_project_homes.py::test_tc_b100_32_a2l_only_load_clears_the_previous_data_file
+FAILED tests/test_b100_project_homes.py::test_tc_b100_32_data_file_loaded_into_a2l_only_project_is_recorded
+FAILED tests/test_b100_project_homes.py::test_tc_b100_32_empty_folder_is_refused_before_any_reset[no data or A2L file]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_32_empty_folder_is_refused_before_any_reset[no project.json]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_32_a2l_guard_of_an_a2l_only_folder[link]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_32_a2l_guard_of_an_a2l_only_folder[over cap]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_32_a2l_guard_of_an_a2l_only_folder[at cap]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_32_over_cap_a2l_beside_a_data_file_is_left_out
+FAILED tests/test_b100_project_homes.py::test_tc_b100_33_foreign_parent_is_refused_before_any_folder[other work area]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_33_foreign_parent_is_refused_before_any_folder[outside]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_33_foreign_parent_is_refused_before_any_folder[W/patches]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_33_work_area_under_another_spelling_saves_there[upper case]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_33_work_area_under_another_spelling_saves_there[dot-dot segment]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_33_work_area_under_another_spelling_saves_there[junction alias]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_62_listing_leaves_out_links_and_junctions
+FAILED tests/test_b100_project_homes.py::test_tc_b100_62_load_refuses_a_junction_project[evil]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_62_load_refuses_a_junction_project[alias]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_62_load_refuses_a_folder_outside_the_work_area[dot-dot name]
+FAILED tests/test_b100_project_homes.py::test_tc_b100_62_load_refuses_a_folder_outside_the_work_area[two-part name]
+FAILED tests/test_b100_project_homes.py::test_at_b100_09_save_as_copies_the_project_and_q_lists_its_flow[size0]
+FAILED tests/test_b100_project_homes.py::test_at_b100_09_save_as_copies_the_project_and_q_lists_its_flow[size1]
+FAILED tests/test_b100_project_homes.py::test_at_b100_10_a2l_only_project_saves_and_reopens[size0]
+FAILED tests/test_b100_project_homes.py::test_at_b100_10_a2l_only_project_saves_and_reopens[size1]
+FAILED tests/test_b100_project_homes.py::test_at_b100_11_junction_project_is_not_listed_and_save_refuses_it[size0]
+FAILED tests/test_b100_project_homes.py::test_at_b100_11_junction_project_is_not_listed_and_save_refuses_it[size1]
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_save_as_plans_one_row_per_subfolder
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_links_only_folder_and_skipped_links
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_second_companion_is_refused_before_any_folder[mac-b.mac-a.mac-already has a MAC file]
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_second_companion_is_refused_before_any_folder[a2l-b.a2l-a.a2l-already has an A2L file]
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_own_a2l_by_name_and_bytes[True]
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_own_a2l_by_name_and_bytes[False]
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_file_over_the_cap_is_refused_in_the_plan[1]
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_file_over_the_cap_is_refused_in_the_plan[0]
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_plan_total_counts_every_written_byte
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_plan_total_rounding_per_file
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_plan_cap_refusal_names_the_file[1025-True]
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_plan_cap_refusal_names_the_file[1024-False]
+57 failed, 8 passed, 63 deselected in 348.38s (0:05:48)
+
+# exit code: 1
+# ended (UTC): 2026-10-31T03:30:57Z
+base git status after restore:
+(end of status)

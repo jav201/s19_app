@@ -1,0 +1,21 @@
+mutant: M56
+target: s19_app/tui/app.py
+old -> new:         if os.path.normcase(os.path.realpath(parent_resolved)) != os.path.normcase(
+            os.path.realpath(self.workarea)
+        ):  ->          if not Path(os.path.realpath(parent_resolved)).is_relative_to(
+            os.path.realpath(self.workarea)
+        ):
+sha256_before: b75f9125c9eb12c122ce1bbd05d6de1e8027403a87cc2e800be8227a5c42011f
+command: cd C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b && env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_project_homes.py::test_tc_b100_33_foreign_parent_is_refused_before_any_folder[W/patches]
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b
+---
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8b\tests\test_b100_project_homes.py:1170: AssertionError: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30846\\test_tc_b100_33_foreign_parent0\\app\\.s19tool\\workarea\\P (variant 'firmware')"]
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_33_foreign_parent_is_refused_before_any_folder[W/patches]
+1 failed in 2.41s
+---
+summary: 1 failed in 2.41s
+verdict: KILLED
+restored = True

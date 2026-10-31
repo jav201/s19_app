@@ -1,0 +1,71 @@
+# started (UTC): 2026-10-31T05:58:37Z
+# cwd: /c/Users/jjgh8/Github/s19_app-b100-inc8b
+# HEAD: ebe6d0ccecfb89a2ec9d8a01efcf0c6b6a850783 (uncommitted Inc 8b + E5 corrective pass 1 work on top)
+# sources sha256[:16]: app.py=87c7f9d74909138c project_gather_service.py=524c3409037cae26 workspace.py=d9f361f3fb092ae2 screens_directionb.py=e94f8e764f950b1a variant_execution_service.py=8a38dde7fcd14211 
+# s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc8b\s19_app\__init__.py
+# python: Python 3.11.15
+# env: NO_COLOR unset, PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=.
+# command: python -m pytest -p no:cacheprovider -q --tb=short -rfE tests/test_b100_project_homes.py tests/test_b100_save_image.py tests/test_b100_save_guards.py tests/test_b100_document.py tests/test_b99_load_project.py tests/test_project_gather.py tests/test_tui_workspace.py tests/test_tui_workspace_insight.py tests/test_tui_workspace_layout.py tests/test_workspace_variants.py tests/test_tui_app.py tests/test_b100_reuse.py tests/test_b99_staging.py tests/test_id_registry.py tests/test_b100_active_variant.py tests/test_b100_announce.py tests/test_b100_focus.py tests/test_b100_project_check.py tests/test_b100_session_reset.py tests/test_b97_load_project_dialog.py tests/test_b99_patch_truth.py tests/test_report_progress.py tests/test_tui_commandbar.py tests/test_tui_helpers.py tests/test_tui_manifest_save.py tests/test_tui_patch_variant.py tests/test_tui_report_filter_surface.py tests/test_tui_report_seam.py tests/test_tui_report_view.py tests/test_tui_variants.py tests/test_variant_execution.py
+
+........................................................................ [  6%]
+........................................................................ [ 13%]
+........................................................................ [ 20%]
+............F........................................................... [ 26%]
+........................................................................ [ 33%]
+........................................................................ [ 40%]
+........................................................................ [ 46%]
+................................x....................................... [ 53%]
+........................................................................ [ 60%]
+........................................................................ [ 67%]
+........................................................................ [ 73%]
+.............................................F.......................... [ 80%]
+........................................................................ [ 87%]
+......F................................................................F [ 93%]
+..................................................................       [100%]
+================================== FAILURES ===================================
+______ test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second ______
+tests\test_b100_save_guards.py:2532: in test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
+    assert elapsed < timing_bound(1.0), f"Save project took {elapsed:.3f} s"
+E   AssertionError: Save project took 1.096 s
+E   assert 1.0961464999709278 < 1.0
+E    +  where 1.0 = timing_bound(1.0)
+_____ test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling ______
+tests\test_b100_project_check.py:1106: in test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+    _assert_sec6_5_bounded(scene)
+tests\test_b100_project_check.py:951: in _assert_sec6_5_bounded
+    assert scene["painted"] < timing_bound(1.0), timings
+E   AssertionError: {'appended': 0.8235806000302546, 'load': 0.4525681000086479, 'painted': 1.031214100017678, 'read': 0.22443190001649782}
+E   assert 1.031214100017678 < 1.0
+E    +  where 1.0 = timing_bound(1.0)
+---------------------------- Captured stdout call -----------------------------
+SEC6-5 timings (s): {'read': 0.224, 'load': 0.453, 'painted': 1.031, 'appended': 0.824}
+______ test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact ______
+tests\test_tui_commandbar.py:2704: in test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+    assert observed_pre_change == list(expected), (
+E   AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+E     missing: []
+E     unexpected: ['a2l_describe_tag', 'confirm_attention']
+E   assert ['focus_palet...us_goto', ...] == ['focus_palet...us_goto', ...]
+E     
+E     At index 13 diff: 'a2l_describe_tag' != 'view_reports'
+E     Left contains 2 more items, first extra item: 'open_settings_menu'
+E     Use -v to get more diff
+________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
+tests\test_tui_report_filter_surface.py:773: in test_at_056e_a2b_diff_report_byte_identical_despite_selection
+    assert set(baseline) == expected, f"baseline wrote {sorted(baseline)}"
+E   AssertionError: baseline wrote []
+E   assert set() == {'20260710T12...ff-report.md'}
+E     
+E     Extra items in the right set:
+E     '20260710T120000Z-diff-report.html'
+E     '20260710T120000Z-diff-report.md'
+E     Use -v to get more diff
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
+FAILED tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+4 failed, 1069 passed, 1 xfailed in 3721.05s (1:02:01)
+
+# exit code: 1
+# ended (UTC): 2026-10-31T07:00:41Z

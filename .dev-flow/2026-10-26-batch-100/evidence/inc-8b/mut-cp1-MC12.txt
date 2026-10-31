@@ -1,0 +1,18 @@
+mutant: MC12
+requirement: LLR-171.1h (SEC8b-3)
+target: s19_app/tui/app.py
+old -> new: 'and source_reason is None\n                and not self._manifest_is_link(save_as_source)' -> 'and source_reason is None'
+sha256_before: 7e89e529eb589590ea3ab1314f47b7127336433637d3e6158ed1411ea6d27c20
+command: cd C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\mutB && env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_project_homes.py::test_tc_b100_31_linked_project_json_is_not_carried
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\mutB
+---
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\mutB\tests\test_b100_project_homes.py:2527: AssertionError: {'active_variant': 'firmware', 'assignments': {}, 'batch': ['OUTSIDE_BATCH_NAME.s19'], 'files': {'firmware.s19': {'sha256': '8a35f3808f25ff85a9ce1100bbce23783a7031b82c6f3d14cc1f749a0df40e51', 'size': 358}}, ...}
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_linked_project_json_is_not_carried
+1 failed in 5.04s
+---
+summary: 1 failed in 5.04s
+verdict: KILLED
+restored = True

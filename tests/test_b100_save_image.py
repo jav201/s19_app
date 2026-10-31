@@ -1508,7 +1508,12 @@ def test_tc_b100_59_gather_service_imports_no_change_module() -> None:
     classifier, E3 R11 / S3R2-5); the intent is asserted on its own too.
     Re-pinned at Inc 8a cp1 (review F7): that ``lstat`` helper is now the
     one ``_plain_entry`` in ``variant_execution_service``, so ``stat``
-    leaves the set again."""
+    leaves the set again.
+    Re-pinned at Inc 8b (E4 integration, RP-1): the stdlib ``stat`` (the
+    inventory's ``lstat`` mode test, LLR-171.1a/.1k) and ``unicodedata``
+    (``painted_names`` removes categories Cc/Cf/Zl/Zp, S3R2-4) join the
+    set, and ``..`` (``from .. import workspace``: the size cap read at
+    call time, pre-ruling 4). Still 0 change-module imports."""
     tree = ast.parse(Path(gather_module.__file__).read_text(encoding="utf-8"))
     modules = set()
     for node in ast.walk(tree):
@@ -1521,10 +1526,13 @@ def test_tc_b100_59_gather_service_imports_no_change_module() -> None:
         "__future__",
         "json",
         "os",
+        "stat",
+        "unicodedata",
         "dataclasses",
         "pathlib",
         "typing",
         "...validation.model",
+        "..",
         "..workspace",
         ".variant_execution_service",
     }, sorted(modules)
@@ -1735,7 +1743,14 @@ def test_tc_b100_69_sec4_junction_save_back_stages_in_this_work_area(
 ) -> None:
     """SEC-4 (LED .56): with a junction project open, a save-back leaves
     0 entries in the other work area — no ``temp/`` or ``temp/.staging/``
-    is created there (the executed RED at base created both)."""
+    is created there (the executed RED at base created both).
+
+    Re-routed at Inc 8b (E4 integration, RP-2): LLR-171.4e refuses to load
+    a junction project, so the open project becomes a junction AFTER the
+    load — ``W/J`` is a real folder when loaded, then swapped for a
+    junction to the other work area's project before the save-back (the
+    swap LLR-171.4h names). The intent is unchanged: a save-back through
+    a junction stages nothing in the other work area."""
     b100_links.require_junctions()
     other_workarea = _workarea(tmp_path / "other")
     other_project = other_workarea / "T"
@@ -1743,7 +1758,8 @@ def test_tc_b100_69_sec4_junction_save_back_stages_in_this_work_area(
     shutil.copy2(CASE01_DIR / "firmware.s19", other_project / "firmware.s19")
     base = tmp_path / "app"
     app = S19TuiApp(base_dir=base)
-    b100_links.create_junction(app.workarea / "J", other_project)
+    (app.workarea / "J").mkdir(parents=True)
+    shutil.copy2(CASE01_DIR / "firmware.s19", app.workarea / "J" / "firmware.s19")
     other_before = sorted(
         str(p.relative_to(other_workarea)) for p in other_workarea.rglob("*")
     )
@@ -1752,6 +1768,8 @@ def test_tc_b100_69_sec4_junction_save_back_stages_in_this_work_area(
         async with app.run_test(size=(220, 60)) as pilot:
             await pilot.pause()
             await _load_project(pilot, app, "J")
+            (app.workarea / "J").rename(app.workarea / "J-loaded")
+            b100_links.create_junction(app.workarea / "J", other_project)
             _add(app, PATCH_ADDRESS, PATCH_BYTES)
             _apply(app)
             await _save_back(pilot, app, "patched.s19")
@@ -2197,3 +2215,425 @@ def test_at_b100_05_save_project_saves_the_patched_image(
         in b100_projects.flat(reopened_panels[0])
     ), reopened_panels
     assert "identical" not in reopened_panels[0], reopened_panels
+
+
+# ---------------------------------------------------------------------------
+# TC-B100-59 Inc 8b arms — LLR-167.6a–g: the save-as plan's sub-folder rows,
+# skipped links, one owner per landing, the MAC / A2L refusals before any
+# folder (with the own-A2L exemption), the per-file cap, the R7 total.
+# New Inc 8b symbols are imported inside their node; plan fields new at 8b
+# are read with ``getattr`` so the base fails on the assertion.
+# ---------------------------------------------------------------------------
+
+
+def _spy_mkdir_8b(monkeypatch: pytest.MonkeyPatch, root: Path) -> list:
+    """Every ``Path.mkdir`` call at or below ``root`` (made or refused)."""
+    calls: list = []
+    original = Path.mkdir
+    anchor = os.path.normcase(os.path.abspath(str(root)))
+
+    def _mkdir(self, *args, **kwargs):
+        here = os.path.normcase(os.path.abspath(str(self)))
+        if here == anchor or here.startswith(anchor.rstrip("\\/") + os.sep):
+            calls.append(Path(self))
+        return original(self, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "mkdir", _mkdir)
+    return calls
+
+
+def _spy_abort_8b(monkeypatch: pytest.MonkeyPatch) -> list:
+    calls: list = []
+    original = S19TuiApp._abort_save
+
+    def _abort(self, *args, **kwargs):
+        calls.append(1)
+        return original(self, *args, **kwargs)
+
+    monkeypatch.setattr(S19TuiApp, "_abort_save", _abort)
+    return calls
+
+
+async def _save_tolerant_8b(pilot, app: S19TuiApp, log, name: str) -> list:
+    """Run the shipped Save project handler for ``name``; poll until an
+    outcome line (the base's own refusal texts included) is painted, then
+    return every message, so a RED on the base is read from its line and
+    not from a wait that timed out."""
+    from s19_app.tui.screens import SaveProjectPayload
+
+    tokens = b100_projects.SAVE_OUTCOMES + ("already has", "Refusing")
+    mark = len(log.messages)
+    app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name=name))
+    for _ in range(200):
+        if any(token in m for m in log.since(mark) for token in tokens):
+            break
+        await pilot.pause()
+    for _ in range(6):
+        await pilot.pause()
+    return log.since(mark)
+
+
+def _save_as_plan_8b(base: Path, monkeypatch: pytest.MonkeyPatch, name: str = "Q") -> tuple:
+    """Open P, Save project as ``name``; returns (messages, last plan)."""
+    plans = _capture_plans(monkeypatch)
+
+    async def _drive() -> list:
+        app = S19TuiApp(base_dir=base)
+        log = b100_projects.StatusLog(app)
+        async with app.run_test(size=(220, 60)) as pilot:
+            await pilot.pause()
+            await b100_projects.load_project(pilot, app, "P")
+            return await _save_tolerant_8b(pilot, app, log, name)
+
+    messages = asyncio.run(_drive())
+    return messages, (plans[-1] if plans else None)
+
+
+def test_tc_b100_59_save_as_plans_one_row_per_subfolder(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-167.6a: P with the 7 project homes and ``reports/2026/r2.md``,
+    saved as Q → ``plan.folders`` 7 rows, ``reports`` count 2, the others
+    1, and ``plan.copies`` 8 entries (P has no other top-level file).
+
+    RED (base): the plan has no sub-folder rows. Negative control: no
+    sub-folder rows → 0 rows."""
+    base = tmp_path / "app"
+    b100_projects.build_save_as_project(base)
+    messages, plan = _save_as_plan_8b(base, monkeypatch)
+    assert plan is not None, messages
+    folders = {f.name: f.file_count for f in getattr(plan, "folders", ())}
+    assert folders == {
+        "flows": 1, "flowsets": 1, "patches": 1, "checks": 1,
+        "reports": 2, "templates": 1, "splits": 1,
+    }, folders
+    assert len(getattr(plan, "copies", ())) == 8, getattr(plan, "copies", ())
+
+
+def test_tc_b100_59_links_only_folder_and_skipped_links(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-167.6a (ruling Q9) / LLR-167.6b: ``splits`` holding only the
+    junction ``splits/j`` → 1 folder row ``splits`` with count 0 whose
+    skipped links hold ``splits/j``; with the three links of LLR-171.1a/b
+    (``linked``, ``reports/j``, ``patches/l.json``) ``plan.skipped_links``
+    holds exactly those 4 names.
+
+    RED (base): no folder rows, no skipped links. Negative controls: a
+    0-file folder omitted; links dropped from the plan."""
+    b100_links.require_junctions()
+    base = tmp_path / "app"
+    sub = {k: v for k, v in b100_projects.SUBFOLDER_FILES.items() if not k.startswith("splits/")}
+    project_dir = b100_projects.build_save_as_project(base, sub_files=sub)
+    outside = b100_projects.outside_folder(tmp_path)
+    b100_projects.add_junctions(project_dir, outside, ["splits/j"])
+    try:
+        links = b100_projects.add_three_links(project_dir, outside)
+    except OSError as exc:
+        pytest.skip(f"not run: a link could not be created here ({exc})")
+    messages, plan = _save_as_plan_8b(base, monkeypatch)
+    assert plan is not None, messages
+    folders = {f.name: f for f in getattr(plan, "folders", ())}
+    assert "splits" in folders, sorted(folders)
+    assert folders["splits"].file_count == 0
+    assert "splits/j" in folders["splits"].skipped_links, folders["splits"]
+    assert sorted(getattr(plan, "skipped_links", ())) == sorted(list(links) + ["splits/j"])
+
+
+def test_tc_b100_59_document_row_owns_its_landing(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-167.6e (C5): P open with its recorded document
+    ``patches/boost.json`` reopened in the Patch Editor, saved as Q → 1
+    plan row lands at ``Q/patches/boost.json`` (the document row), the
+    copy list lacks ``patches/boost.json``, and every landing appears once
+    among the rows. Holds at base for the rows; guards the "both own the
+    landing" mutant once the copy exists."""
+    base = tmp_path / "app"
+    b100_projects.seed_document_project(_workarea(base), "P")
+    messages, plan = _save_as_plan_8b(base, monkeypatch)
+    assert plan is not None, messages
+    landings = [os.path.normcase(str(row.landing)) for row in plan.rows]
+    assert len(landings) == len(set(landings)), landings
+    boost = [row for row in plan.rows if row.landing.as_posix().endswith("Q/patches/boost.json")]
+    assert len(boost) == 1, plan.rows
+    assert "patches/boost.json" not in [c.relative for c in getattr(plan, "copies", ())]
+
+
+def _merge_target_8b(base: Path, companion: str, payload: bytes) -> Path:
+    """Existing project ``ab`` (not open) holding case_01's
+    ``firmware.s19`` and the companion file ``companion``."""
+    target = _workarea(base) / "ab"
+    target.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(CASE01_DIR / "firmware.s19", target / "firmware.s19")
+    (target / companion).write_bytes(payload)
+    return target
+
+
+async def _load_companion_8b(pilot, app: S19TuiApp, path: Path) -> None:
+    if path.suffix.lower() == ".a2l":
+        app.load_a2l_from_path(path)
+        await _wait_for(pilot, lambda: app.current_a2l_path is not None, "the A2L load")
+    else:
+        app._load_path_from_user_input(path)
+        await _wait_for(
+            pilot,
+            lambda: app.current_file is not None
+            and app.current_file.mac_path is not None
+            and app.current_file.mac_path.name == path.name,
+            "the MAC load",
+        )
+
+
+@pytest.mark.parametrize(
+    "kind, session_name, target_name, token",
+    [
+        ("mac", "b.mac", "a.mac", "already has a MAC file"),
+        ("a2l", "b.a2l", "a.a2l", "already has an A2L file"),
+    ],
+)
+def test_tc_b100_59_second_companion_is_refused_before_any_folder(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    kind: str,
+    session_name: str,
+    target_name: str,
+    token: str,
+) -> None:
+    """LLR-167.6c / .6d (LED .66): merge target ``ab`` holding ``a.mac``
+    (``a.a2l``) and a session MAC ``b.mac`` (A2L ``b.a2l``) → 1 status
+    message holding "already has a MAC file" ("an A2L file") and "choose
+    another name", 0 ``mkdir`` calls at or below ``ab`` (spy), 0
+    ``_abort_save`` runs, ``ab`` unchanged.
+
+    RED (base): the refusal is decided after ``project_dir.mkdir`` (spy 1
+    call) and its line has no next step. Negative control: the in-body
+    check kept after ``mkdir``."""
+    base = tmp_path / "app"
+    companion = "firmware.mac" if kind == "mac" else "firmware.a2l"
+    source_bytes = (CASE01_DIR / companion).read_bytes()
+    target = _merge_target_8b(base, target_name, source_bytes)
+    before = b100_projects.tree_digests(target)
+    src = _copy_case01(tmp_path, "firmware.s19", companion)
+    session_file = src / session_name
+    (src / companion).rename(session_file)
+    calls = _spy_mkdir_8b(monkeypatch, target)
+    aborts = _spy_abort_8b(monkeypatch)
+
+    async def _drive() -> list:
+        app = S19TuiApp(base_dir=base)
+        log = b100_projects.StatusLog(app)
+        async with app.run_test(size=(220, 60)) as pilot:
+            await pilot.pause()
+            await _load_image(pilot, app, src / "firmware.s19")
+            await _load_companion_8b(pilot, app, session_file)
+            calls.clear()
+            return await _save_tolerant_8b(pilot, app, log, "ab")
+
+    messages = asyncio.run(_drive())
+    lines = [m for m in messages if token in m and "choose another name" in m]
+    assert len(lines) == 1, messages
+    assert calls == [], calls
+    assert aborts == [], aborts
+    assert b100_projects.tree_digests(target) == before
+
+
+@pytest.mark.parametrize("same_bytes", [True, False])
+def test_tc_b100_59_own_a2l_by_name_and_bytes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, same_bytes: bool
+) -> None:
+    """LLR-167.6f (pre-ruling 5): merge target ``ab`` holding
+    ``firmware.a2l``; the session A2L is ``firmware.a2l`` loaded from
+    elsewhere. Same bytes → saved, 1 A2L file in ``ab``, 0
+    ``firmware_1.a2l``; one byte different → 1 status message holding
+    "already has an A2L file", 0 ``mkdir`` calls at or below ``ab``.
+
+    RED (base): the other-bytes arm is refused after ``mkdir`` (spy 1
+    call) — or, if the base refuses by name, the same-bytes arm. Negative
+    control: exempting by name only → the other-bytes arm saves."""
+    base = tmp_path / "app"
+    source_bytes = (CASE01_DIR / "firmware.a2l").read_bytes()
+    target_bytes = source_bytes if same_bytes else source_bytes + b"\n"
+    target = _merge_target_8b(base, "firmware.a2l", target_bytes)
+    src = _copy_case01(tmp_path, "firmware.s19", "firmware.a2l")
+    calls = _spy_mkdir_8b(monkeypatch, target)
+
+    async def _drive() -> list:
+        app = S19TuiApp(base_dir=base)
+        log = b100_projects.StatusLog(app)
+        async with app.run_test(size=(220, 60)) as pilot:
+            await pilot.pause()
+            await _load_image(pilot, app, src / "firmware.s19")
+            await _load_companion_8b(pilot, app, src / "firmware.a2l")
+            calls.clear()
+            return await _save_tolerant_8b(pilot, app, log, "ab")
+
+    messages = asyncio.run(_drive())
+    a2l_files = sorted(p.name for p in target.iterdir() if p.suffix.lower() == ".a2l")
+    if same_bytes:
+        assert any(m.startswith("Saved project to") for m in messages), messages
+        assert a2l_files == ["firmware.a2l"], a2l_files
+    else:
+        assert len([m for m in messages if "already has an A2L file" in m]) == 1, messages
+        assert calls == [], calls
+
+
+@pytest.mark.parametrize("extra", [1, 0])
+def test_tc_b100_59_file_over_the_cap_is_refused_in_the_plan(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, extra: int
+) -> None:
+    """LLR-167.6g (cap lowered to 1 024 bytes for the test, read at call
+    time): ``P/splits/big.bin`` at cap + 1 → 1 status message naming
+    ``splits/big.bin`` and holding "too large to copy" and "move it out of
+    the project folder, then save again", 0 ``mkdir`` calls at or below Q,
+    Q absent; at exactly the cap → saved and ``Q/splits/big.bin`` byte-equal.
+
+    RED (base): the sub-folder is not copied, nothing refuses. Negative
+    controls: ``>=`` → the at-cap arm refused; the check after ``mkdir``."""
+    base = tmp_path / "app"
+    payload = b"\x5a" * (1024 + extra)
+    b100_projects.build_save_as_project(base, sub_files={"splits/big.bin": payload})
+    monkeypatch.setattr(workspace_module, "DEFAULT_COPY_SIZE_CAP_BYTES", 1024)
+    target = _workarea(base) / "Q"
+    calls = _spy_mkdir_8b(monkeypatch, target)
+    messages, _ = _save_as_plan_8b(base, monkeypatch)
+    if extra:
+        lines = [
+            m for m in messages
+            if "splits/big.bin" in m
+            and "too large to copy" in m
+            and "move it out of the project folder, then save again" in m
+        ]
+        assert len(lines) == 1, messages
+        assert calls == [] and not target.exists(), calls
+    else:
+        assert any(m.startswith("Saved project to") for m in messages), messages
+        landed = target / "splits" / "big.bin"
+        assert landed.is_file() and landed.read_bytes() == payload, sorted(b100_projects.tree_digests(target))
+
+
+def _reference_tree_8b(tmp_path: Path) -> Path:
+    """The gather prototype's reference tree: ``flows/f.json``,
+    ``flows/sub/g.json`` (30 bytes), ``patches/a.json``, the junction
+    ``flows/link`` reaching a 10 MiB outside file, the top-level
+    ``firmware.s19`` (4 000 bytes), ``firmware.a2l`` (300 bytes) and
+    ``project.json``."""
+    project_dir = tmp_path / "ref" / "P"
+    b100_projects.write_tree(
+        project_dir,
+        {
+            "flows/f.json": b"f" * 10,
+            "flows/sub/g.json": b"g" * 30,
+            "patches/a.json": b"a" * 20,
+            "firmware.s19": b"s" * 4000,
+            "firmware.a2l": b"l" * 300,
+            "project.json": b"{}",
+        },
+    )
+    outside = tmp_path / "ref" / "outside"
+    outside.mkdir(parents=True)
+    (outside / "big.bin").write_bytes(b"\0" * (10 * 1024 * 1024))
+    b100_projects.add_junctions(project_dir, outside, ["flows/link"])
+    return project_dir
+
+
+def _planned_8b(project_dir: Path, image_size: int = 5000):
+    from s19_app.tui.services.project_gather_service import PlannedFile
+
+    return [
+        PlannedFile(role="image", source=project_dir / "firmware.s19", name="firmware.s19",
+                    digest="0" * 64, size=image_size),
+        PlannedFile(role="a2l", source=project_dir / "firmware.a2l", name="firmware.a2l",
+                    digest="1" * 64, size=300),
+    ]
+
+
+def test_tc_b100_59_plan_total_counts_every_written_byte(tmp_path: Path) -> None:
+    """LLR-171.1i / .1d (R7, R14) through the planner: the reference tree,
+    target Q new, image row 5 000 bytes (the EMITTED size), A2L row 300 →
+    folders ``flows`` 2 and ``patches`` 1, skipped links ``flows/link``,
+    copies 3 (0 top-level copies), ``total_bytes`` 90 112 (8 192 + 4 096 +
+    3 × 4 096 + 65 536): not 86 016 (source image), not 70 896 (no
+    rounding), not 24 576 (no margin); the 10 MiB behind the link not
+    counted. Merge target with the same inventory → 0 folders, 0 copies.
+
+    RED (base): ``inventory_project_tree`` does not exist (new symbol)."""
+    b100_links.require_junctions()
+    from s19_app.tui.services.project_gather_service import inventory_project_tree
+    from s19_app.tui.services.project_gather_service import plan_project_save
+
+    project_dir = _reference_tree_8b(tmp_path)
+    inventory = inventory_project_tree(project_dir)
+    target = tmp_path / "ref" / "Q"
+    plan = plan_project_save(
+        target, target_kind="new", files=_planned_8b(project_dir), image="test image",
+        manifest_keys=(), inventory=inventory,
+    )
+    assert plan.refusal is None, plan.refusal
+    assert {f.name: f.file_count for f in plan.folders} == {"flows": 2, "patches": 1}
+    assert list(plan.skipped_links) == ["flows/link"], plan.skipped_links
+    assert sorted(c.relative for c in plan.copies) == [
+        "flows/f.json", "flows/sub/g.json", "patches/a.json"
+    ]
+    assert plan.total_bytes == 90112, plan.total_bytes
+    merge = plan_project_save(
+        tmp_path / "ref" / "P", target_kind="merge", files=_planned_8b(project_dir),
+        image="test image", manifest_keys=(), inventory=inventory,
+    )
+    assert merge.folders == () and merge.copies == (), (merge.folders, merge.copies)
+
+
+def test_tc_b100_59_plan_total_rounding_per_file(tmp_path: Path) -> None:
+    """LLR-171.1i rounding (R7): copies of 0, 1, 4 096 and 4 097 bytes and
+    no file rows → ``total_bytes`` 0 + 4 096 + 4 096 + 8 192 + 65 536 =
+    81 920.
+
+    RED (base): new symbols."""
+    from s19_app.tui.services.project_gather_service import inventory_project_tree
+    from s19_app.tui.services.project_gather_service import plan_project_save
+
+    project_dir = tmp_path / "round" / "P"
+    b100_projects.write_tree(
+        project_dir,
+        {
+            "reports/z0": b"",
+            "reports/z1": b"x",
+            "reports/z4096": b"x" * 4096,
+            "reports/z4097": b"x" * 4097,
+        },
+    )
+    plan = plan_project_save(
+        tmp_path / "round" / "Q", target_kind="new", files=[], image="none",
+        manifest_keys=(), inventory=inventory_project_tree(project_dir),
+    )
+    assert plan.total_bytes == 81920, plan.total_bytes
+
+
+@pytest.mark.parametrize("size, refused", [(1025, True), (1024, False)])
+def test_tc_b100_59_plan_cap_refusal_names_the_file(
+    tmp_path: Path, size: int, refused: bool
+) -> None:
+    """LLR-167.6g (row 6a) through the planner, ``size_cap`` 1 024:
+    ``splits/big.bin`` of 1 025 bytes → the refusal holds
+    ``splits/big.bin``, "too large to copy", "over 1024 bytes" and "move it
+    out of the project folder, then save again", 0 rows; 1 024 bytes →
+    refusal None and the folder ``splits`` counts 1.
+
+    RED (base): new symbols. Negative control: ``>=`` → 1 024 refused."""
+    from s19_app.tui.services.project_gather_service import inventory_project_tree
+    from s19_app.tui.services.project_gather_service import plan_project_save
+
+    project_dir = tmp_path / "cap" / "P"
+    b100_projects.write_tree(project_dir, {"splits/big.bin": b"b" * size})
+    plan = plan_project_save(
+        tmp_path / "cap" / "Q", target_kind="new", files=[], image="none",
+        manifest_keys=(), inventory=inventory_project_tree(project_dir), size_cap=1024,
+    )
+    if refused:
+        for token in ("splits/big.bin", "too large to copy", "over 1024 bytes",
+                      "move it out of the project folder, then save again"):
+            assert token in (plan.refusal or ""), (token, plan.refusal)
+        assert plan.rows == ()
+    else:
+        assert plan.refusal is None, plan.refusal
+        assert {f.name: f.file_count for f in plan.folders} == {"splits": 1}

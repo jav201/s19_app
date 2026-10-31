@@ -215,9 +215,14 @@ DOCUMENT_REASON_OUT_OF_FORM = (
 #: never by the reason's text (review F5).
 STEP_OPEN_FROM_EDITOR = "open_from_editor"
 STEP_CHECK_THEN_LOAD = "check_then_load"
+#: batch-100 Inc 8b E5 F2 (LLR-171.2g): the project's A2L beside a data file
+#: is a link or over the cap. Save project does not drop it, so the true next
+#: step is the §3 token row's, not the composer's ``not readable`` step.
+STEP_REPLACE_A2L = "replace_a2l"
 DOCUMENT_NEXT_STEP: dict[str, str] = {
     STEP_OPEN_FROM_EDITOR: "open it from the Patch Editor (it can take a while)",
     STEP_CHECK_THEN_LOAD: "check that the file can be opened, then Load again",
+    STEP_REPLACE_A2L: "replace the A2L file, then Load again",
 }
 #: The longest recorded entry a finding keeps (characters, ellipsis
 #: included): a manifest entry is any JSON value, so the panel row naming it

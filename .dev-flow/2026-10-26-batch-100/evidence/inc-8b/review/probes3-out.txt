@@ -1,0 +1,6 @@
+s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc8b\s19_app\__init__.py
+.open project after the image load: P C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r8b\bt2\test_probe_missing_source_bloc0\app\.s19tool\workarea\P
+SAVE P: ["Project NOT saved: 'P' could not be read — check that they can be opened, then save again."]
+SAVE Q: ["Project NOT saved: 'P' could not be read — check that they can be opened, then save again."]
+.
+2 passed in 117.59s (0:01:57)

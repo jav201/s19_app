@@ -1,0 +1,18 @@
+mutant: MC13
+requirement: LLR-171.1g (M24 re-run)
+target: s19_app/tui/services/project_gather_service.py
+old -> new: 'copying = target_kind == PLAN_TARGET_NEW and inventory is not None' -> 'copying = inventory is not None'
+sha256_before: 524c3409037cae269e691b43ae92c73d14671719f25e8b073459d4d4ace66201
+command: cd C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\mutA && env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_project_homes.py::test_tc_b100_59_merge_and_open_targets_plan_no_copy
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\mutA
+---
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\mutA\tests\test_b100_project_homes.py:2559: AssertionError: ('merge', (PlannedFolder(name='flows', file_count=1, skipped_links=(), files=(InventoryFile(relative='flows/f.json', s...json', size=2),))), (InventoryFile(relative='flows/f.json', size=2), InventoryFile(relative='patches/a.json', size=2)))
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_59_merge_and_open_targets_plan_no_copy
+1 failed in 0.64s
+---
+summary: 1 failed in 0.64s
+verdict: KILLED
+restored = True

@@ -1,0 +1,18 @@
+mutant: MC15
+requirement: LLR-171.2g / token row (F2)
+target: s19_app/tui/app.py
+old -> new: 'a2l_reason.removeprefix("is "),\n                    step=STEP_REPLACE_A2L,' -> 'a2l_reason.removeprefix("is "),'
+sha256_before: 87c7f9d74909138c8e294257f31a9259f62a0e6c42e870ee59a8d1ee37332a97
+command: cd C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\mutA && env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_project_homes.py::test_tc_b100_32_unreadable_a2l_row_paints_the_true_next_step
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\mutA
+---
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\mutA\tests\test_b100_project_homes.py:1163: AssertionError: Project P opened with 1 problem Opened firmware.s19 recorded as the active variant (the latest saved) Variants 1 in the project MAC (none) A2L (none) Problems found (the rest loaded) ! not readable: firmware.a2l too large to open - replace the file, or Save project to drop it
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_32_unreadable_a2l_row_paints_the_true_next_step
+1 failed in 4.14s
+---
+summary: 1 failed in 4.14s
+verdict: KILLED
+restored = True

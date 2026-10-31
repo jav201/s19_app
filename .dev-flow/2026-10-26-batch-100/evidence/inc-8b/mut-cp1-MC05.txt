@@ -1,0 +1,18 @@
+mutant: MC05
+requirement: token row F5 (a)
+target: s19_app/tui/app.py
+old -> new: 'if placed.reused\n                        and os.path.normcase(placed.path.name)' -> 'if False\n                        and os.path.normcase(placed.path.name)'
+sha256_before: 7e89e529eb589590ea3ab1314f47b7127336433637d3e6158ed1411ea6d27c20
+command: cd C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\mutB && env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_project_homes.py::test_tc_b100_31_identical_copy_mismatch_names_a_true_step
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\mutB
+---
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8b-1\mutB\tests\test_b100_project_homes.py:2287: AssertionError: ['Project NOT saved: the plan named fw.s19 (new) but the file landed at fw_2.s19 (keep) — save again.']
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_identical_copy_mismatch_names_a_true_step
+1 failed in 5.75s
+---
+summary: 1 failed in 5.75s
+verdict: KILLED
+restored = True

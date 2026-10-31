@@ -1,0 +1,31 @@
+# <UTC start> <UTC end> <step> <agents> <outcome>
+2026-10-31T01:26:46Z 2026-10-31T01:33:37Z E2-baseline 1xOpus graph 23 nodes, extractor exit 0, 6 candidates C1-C6, 9 requirement notes (6 min)
+2026-10-31T01:26:46Z 2026-10-31T01:38:14Z E1 1xOpus strict EARS: 6 requirements (~20 clauses) -> 35 single-shall (event 10, state 3, ubiquitous 6, unwanted 16), LED .76, slice 9-16 nodes, 11 open questions
+2026-10-31T01:39:19Z - E1-rulings orchestrator Q1-Q11 decided, sent to E1 to apply
+2026-10-31T01:39:49Z 2026-10-31T01:44:37Z E1-apply 1xOpus rulings Q1-Q11 applied (LED .77): 37 single-shall (event 12, state 4, ubiquitous 7, unwanted 14), slice 10 firm / 17 max, 2 groups
+2026-10-31T01:45:24Z - E2 start (interfaces-8b.md fixed; 2xOpus G1 app, G2 gather)
+2026-10-31T01:45:51Z 2026-10-31T01:57:32Z E2 2xOpus parallel: G1 app 7 nodes/79 ex (12 min), G2 gather 11 nodes/57 ex (9.5 min); 25 design risks, 11 interface proposals; both found the missing copy list
+2026-10-31T01:58:50Z - E3-prerulings orchestrator 11 rulings; E3 r1 start
+2026-10-31T01:58:55Z 2026-10-31T02:10:42Z E3-r1 2xOpus: architect FAIL (3 MAJOR incl. C-7 confirmed pre-existing bug; 14 MINOR/LOW, 12 min), security FAIL (1 MAJOR copy unbounded; 3 MINOR 6 LOW, 10 min)
+2026-10-31T02:11:46Z - E3-rulings R1-R9; design pass 1 (Opus) start
+2026-10-31T02:11:50Z 2026-10-31T02:34:51Z E3-fix1 1xOpus R1-R9 + accepted items; workspace.py becomes 3rd source; app 117 ex, gather 80 ex; LED .78
+2026-10-31T02:35:57Z - E3-r2 start (R10-R12)
+2026-10-31T02:36:01Z 2026-10-31T02:44:00Z E3-r2 2xOpus: architect FAIL text-only (1 MAJOR R11 not written, 3 MINOR 2 LOW, 7 min), security PASS-WITH-NOTES (3 MINOR 3 LOW, 7 min)
+2026-10-31T02:43:24Z - E3-fix2 start (Opus)
+2026-10-31T02:43:28Z 2026-10-31T02:53:37Z E3-fix2 1xOpus 12 items + R13 applied (LED .79); G1 127 ex, G2 90 ex
+2026-10-31T02:54:14Z - E3-r3 architect verify A3R2 lines
+2026-10-31T02:54:19Z 2026-10-31T02:58:00Z E3-r3 architect verify PASS-WITH-NOTES (1 MINOR, 1 LOW) -> PDR approved; R14-R16 addenda
+2026-10-31T02:59:02Z - E4 start (G1 app, G2 gather+workspace, tester)
+2026-10-31T02:59:00Z 2026-10-31T03:34:00Z E4 3xOpus parallel: G2 gather+workspace 15 min, G1 app 35 min (2 000-file save-as 14 s main thread; entry ceiling 0.97 s), tester 32 min (65 nodes, RED 57F/8P: 52 behavioural + 5 import; 75 mutant rows, 11 test gaps)
+2026-10-31T03:35:42Z - E4-integration start (Opus); rulings D-5 screens_directionb 4th source, D-3 composer step
+2026-10-31T03:35:47Z 2026-10-31T04:47:46Z E4-integration 1xOpus: D-5 (screens_directionb 4th source), D-3, 5 re-pins, 13 gap nodes + 13 mutants killed; GREEN 1051 passed (2 base-known, 1 timing re-run ok, 1 re-pinned), guards 0 cells changed
+2026-10-31T04:48:28Z - E5 start: mutants DeepSeek v4 Pro via pi (copy mut8b); code + security review Opus
+2026-10-31T04:49:11Z 2026-10-31T05:27:12Z E5-mutants 1xDeepSeek-v4-pro (pi): 72 run -> 69 killed, 3 survived (1 equivalent, 1 weak test, 1 wrong target), 0 invalid; all restored; spot-check 4/4 valid (1 vague old->new text)
+2026-10-31T04:49:00Z 2026-10-31T05:04:00Z E5-reviews 2xOpus: code FAIL (1 MAJOR design-gap F1 absent source folder; 3 MINOR 3 LOW), security PASS-WITH-NOTES (1 MINOR rollback via junction, pre-existing since Inc 2; 2 LOW)
+2026-10-31T05:27:59Z - E5-cp1 start (Opus); F2 5th source pending operator
+2026-10-31T05:56:04Z - operator approved 5th source file (variant_execution_service.py) for F2; sent to cp1
+2026-10-31T05:28:04Z 2026-10-31T07:01:22Z E5-cp1 1xOpus F1,F3-F7,SEC8b-1..3,M24/M35 + F2 (operator-approved 5th source); RED 14F/4P by design, 15/15 mutants killed, GREEN 1069 passed (2 base-known, 2 timing re-run ok), guards 0 cells changed; LED .80
+2026-10-31T07:01:22Z E5 cp1 end (Opus, agent abe490fa) — 11 items + F2; 15/15 MC killed; GREEN 1069p/4f (2 base, 2 timing pass alone); guards 0 cells; ~93 min vs 60 timebox
+2026-10-31T07:05:50Z E13 pe-a2l-only captured 6/6 (orchestrator, Opus); OBS-8b-1..3 MINOR -> backlog
+2026-10-31T07:12:23Z close records start (DeepSeek v4 Pro via pi)
+2026-10-31T07:34:08Z close records end (DeepSeek: packet 415 lines, LED .81, 9 backlog bullets; 1 V4 threshold fixed by orchestrator)
