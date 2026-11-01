@@ -1,0 +1,10 @@
+mutant id: 112
+target file: s19_app/tui/a2l.py
+old -> new: build_section_tree: final report moved into a finally
+sha256 before: d70b17982f1cee30240e701a9480eb722f5a087935359ce608fbd9781436175d
+command: timeout 900 env -u NO_COLOR LOCALAPPDATA='C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut12b-lad' PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line "tests/test_b100_a2l_progress.py::test_tc_b100_73_a_failed_read_reports_no_final_total"
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut12b
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut12b\s19_app\__init__.py
+pytest summary: 1 failed in 0.52s
+verdict: KILLED
+restored = True
