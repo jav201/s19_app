@@ -343,17 +343,18 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 > | folder cannot be created or written | `could not save` | `check the folder` |
 > | blocked document entry | `blocked entries` | `fix or remove them in the Patch Editor` |
 > | empty name | `name is empty` | `type a project name` |
-> | empty Load | `nothing selected` | `pick a row or type a path` |
-> | typed path not found / unsupported, a relative typed folder path included (Inc 9a, LLR-172.5h) | `not found` / `not a supported file` | `check the path` |
-> | typed folder in the work area, not a project, a reserved home included (Inc 9a, LLR-172.5b); a name the project list does not list passed to a project load, a reserved home and its other spellings included (LLR-172.5g) | `not a project` | `pick a project in the list` |
-> | typed folder outside the work area | `outside the work area` | `copy the folder into the work area` |
+> | empty Load (Inc 9b, LLR-173.2h, LLR-173.2i) | `nothing selected` | `pick a row or type a path` |
+> | typed path not found / unsupported, a relative typed folder path included (Inc 9a, LLR-172.5h); painted in `#load_reason` from the dialog (Inc 9b, LLR-173.5 … LLR-173.5e) | `not found` / `not a supported file` | `check the path` |
+> | typed folder in the work area, not a project, a reserved home included (Inc 9a, LLR-172.5b); a name the project list does not list passed to a project load, a reserved home and its other spellings included (LLR-172.5g); painted in `#load_reason` from the dialog (Inc 9b, LLR-173.5 … LLR-173.5e) | `not a project` | `pick a project in the list` |
+> | typed folder outside the work area; painted in `#load_reason` from the dialog (Inc 9b, LLR-173.5 … LLR-173.5e) | `outside the work area` | `copy the folder into the work area` |
 > | project folder with no data or A2L file | `no data or A2L file` | `load a file and Save project` |
 > | save-as larger than the free space | `not enough free space` | `free disk space or remove files from the project` |
 > | Save target is a link or junction | `link or junction` | `choose another name` |
 > | Save parent is not this work area (Inc 8b, LLR-171.3) | `not the work area folder` | `choose the work area as the parent folder` |
-> | Load: the project folder is a link or junction (Inc 8b, LLR-171.4e); a typed folder or `project.json` path through a link or junction (Inc 9a, LLR-172.5d) | `link or junction` | `pick a project in the list` |
+> | Load: the project folder is a link or junction (Inc 8b, LLR-171.4e); a typed folder or `project.json` path through a link or junction (Inc 9a, LLR-172.5d); painted in `#load_reason` from the dialog (Inc 9b, LLR-173.5 … LLR-173.5e) | `link or junction` | `pick a project in the list` |
+> | a typed data or A2L file inside the work area that is a link (Inc 9b E5, CR9b-03) | `is a link or junction` | `open the file it points to` |
 > | Load: the project folder is not one folder of this work area, or resolves outside it (Inc 8b, LLR-171.4f) | `outside the work area` | `copy the folder into the work area` |
-> | Load or Save target: the project folder cannot be inspected, such as a permission error (Inc 8b E5 F7(a), LLR-171.4f) | `could not be read` | `check that the folder can be opened, then load again` / `then save again` |
+> | Load or Save target: the project folder cannot be inspected, such as a permission error (Inc 8b E5 F7(a), LLR-171.4f); painted in `#load_reason` from the dialog for the typed arm (Inc 9b, LLR-173.5e) | `could not be read` | `check that the folder can be opened, then load again` / `then save again` |
 > | second MAC file in the target (Inc 8b, LLR-167.6c) | `already has a MAC file` + the target's MAC name | `choose another name` |
 > | second A2L file in the target (Inc 8b, LLR-167.6d) | `already has an A2L file` + the target's A2L name | `choose another name` |
 > | a project file over the per-file cap: sub-folder file or top-level copy (Inc 8b, LLR-167.6g) | `too large to copy` + the file + the limit | `move it out of the project folder, then save again` |
@@ -371,7 +372,9 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 > | Load: no `project.json` and no data or A2L file (Inc 8b, LLR-171.2e) | `no project.json` | `load a file and Save project` |
 > | Load: an A2L-only project's A2L is a link or over the cap (Inc 8b, LLR-171.2f) | `link or junction` / `too large to open` + the A2L | `replace the A2L file, then Load again` |
 > | empty Projects / work-area files / recents | `no projects` / `no work-area files` / `no recent sources` | `ctrl+s saves a project` / `l loads a file` / — |
-> | recent source missing on pick | `not found` | `the entry was removed` |
+> | recent source missing on pick (Inc 9b, LLR-173.4k) | `not found` | `check the path` |
+> | recent-sources store problem (Inc 9b, LLR-173.4g) | `too large` / `could not be read` | `the next load starts a new list` / `check that the recent-sources file can be opened` |
+> | load question (Inc 10, LLR-174.2k, LLR-174.2o, LLR-174.2p, LLR-174.2q) | `unsaved changes` | `Load <target> anyway?` — buttons `Replace (y)` / `Cancel (n)` |
 > | an image-replacing or project action while a worker runs | `busy` + the running action's label | `wait for it to finish` |
 > | quit while a worker runs | `still working` + the running action's label | `wait, or quit after it finishes` |
 > | problem: manifest damaged | `manifest damaged` + what is wrong in user terms | `Save project rewrites it` |
@@ -568,9 +571,9 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### HLR-172 — Recent sources are remembered per user
 - **Traceability:** US-162
-- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.21, LED-2026-10-26-batch-100.30, LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83, LED-2026-10-26-batch-100.84, LED-2026-10-26-batch-100.85
+- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.21, LED-2026-10-26-batch-100.30, LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83, LED-2026-10-26-batch-100.84, LED-2026-10-26-batch-100.85, LED-2026-10-26-batch-100.86
 - **Statement (EARS event):** When Load copies a data or A2L file from outside this work area into the work area, the system shall record that file's absolute path in the per-user recent-sources store.
-- **Decomposition:** LLR-172.1, LLR-172.1a … LLR-172.1m (the write; LLR-172.1k, LLR-172.1l and LLR-172.1m's entry-that-cannot-fit arm are the three declared exceptions to the record — an unreadable store is left unchanged, a path the store read would drop is not recorded, and a single entry that cannot fit is not recorded — and LLR-172.1m also bounds the file the writer produces); LLR-172.2, LLR-172.2a … LLR-172.2j, LLR-172.2k (the read; LLR-172.2k is also the record's entry check, LLR-172.1l); LLR-172.3. The split of the former compound HLR-172 (store, read, lister, typed path, literal names) into HLR-172, HLR-172a and HLR-172b is LED .82.
+- **Decomposition:** LLR-172.1, LLR-172.1a … LLR-172.1n (… LLR-172.1n leaves out a source found only through the relative fallback, CR9-1) (the write; LLR-172.1k, LLR-172.1l and LLR-172.1m's entry-that-cannot-fit arm are the three declared exceptions to the record — an unreadable store is left unchanged, a path the store read would drop is not recorded, and a single entry that cannot fit is not recorded — and LLR-172.1m also bounds the file the writer produces); LLR-172.2, LLR-172.2a … LLR-172.2j, LLR-172.2k (the read; LLR-172.2k is also the record's entry check, LLR-172.1l); LLR-172.3. The split of the former compound HLR-172 (store, read, lister, typed path, literal names) into HLR-172, HLR-172a and HLR-172b is LED .82.
 - **Rationale (informative):** the unified dialog needs its recent sources (ARQ §6); store entries could reach the network or carry control characters (S-06, S-07, S-12). The operator's S-16 decision moves the store per user, which also removes the planted-store route S-07 started from.
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b100_recents.py -k "tc_b100_34 or tc_b100_35 or tc_b100_36 or at_b100_12"`
@@ -620,39 +623,254 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
   - **Boundary catalog (QC-3):** ☒ empty ☒ invalid ☒ error — empty: an empty temp folder; invalid: markup-shaped names, a control character, a file link; error: a temp folder that is missing or cannot be listed.
   - **Negative control:** executed on `4fef292` (above) → AT-B100-13 RED.
 
-### HLR-173 — One Load dialog
+### HLR-173 — One Load dialog lists everything that can be loaded
 - **Traceability:** US-163
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.18, LED-2026-10-26-batch-100.36, LED-2026-10-26-batch-100.40
-- **Statement:** When the engineer opens Load, the system shall show one two-pane dialog: on the left a typed-path field and the work area's projects, the work-area files and the recent sources; on the right a preview of the highlighted item that marks with `●` the active set — the image variant, MAC and A2L that loading it will install, including what the session keeps and, with a project open, the note that a loaded file becomes its active variant. The panes shall stack below 100 columns. In that dialog: `l` and `ctrl+l` shall open it with the focus on the path field, and `p` with the focus on the list and the open project's row (else the first project) highlighted; `tab` shall move path → list → preview → buttons; a printable key typed while the list has the focus shall move to the path field and type there, never reaching an app binding; `enter`, `alt+l` and `#load_ok` shall load the highlighted row when the list has the focus and the typed path otherwise; `escape` shall close it and change nothing; a Load with nothing selected or typed, or with a typed path that is invalid, shall keep the dialog open, keep the typed text and paint the reason and next-step tokens in `#load_reason`; a click shall select a row and not load it. Every name read from disk or from the store shall render through `safe_text`. A recent row shall show only what the store holds — its path and kind — say that it is checked when loaded, carry no `●`, and touch the filesystem only after Enter. A project row's preview shall read the manifest on a worker with a bounded read, so a highlight never blocks the dialog. The dialog shall dismiss with `LoadChoice(kind, value)`, routed through the one load seam (LLR-174.4), and a work-area pick shall load that file in place, with no second copy. The files installed by a load shall be the files the preview marked.
-- **Variant slots (filled by the P-A verdict C, LED-2026-10-26-batch-100.2; corrected by LED-2026-10-26-batch-100.18):** VS-PA-1 = two panes, preview on the right. VS-PA-2 = a click selects; Enter loads; a double-click is not bound. VS-PA-3 = the `pa_C` ids (`#load_dialog`, `#load_list`, `#load_path`, `#load_preview`, `#load_reason`, `#load_ok`, `#load_cancel`); `#project_list` and the separate Load project dialog retire. VS-PA-4 = `l` and `ctrl+l` open this dialog with the focus on the path field; `p` opens it with the focus on `#load_list` and the open project's row highlighted, else the first project; the key bar labels them "Load" and "Projects". VS-PA-5 = the preview marks the active set with `●` for project, file and work-area rows; a recent row shows its path and kind and "checked when loaded" instead of a mark, because nothing is read before Enter. VS-PA-6 = the focus order above (the path field first for `l` / `ctrl+l`, the list first for `p`).
-- **Rationale (informative):** the dialog has no list, ignores `escape`, and an empty or Enter-only Load does nothing (P-18..P-20). The operator's P-A note asks for the active-set symbol. UX-05 / QA R2-06 (focus), UX-36 (marks for every row kind), UX-37 (`p`), security R2-03 (the preview never blocks).
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.18, LED-2026-10-26-batch-100.36, LED-2026-10-26-batch-100.40, LED-2026-10-26-batch-100.86, LED-2026-10-26-batch-100.88
+- **Statement (EARS event):** When the engineer opens Load, the system shall show one dialog that holds a typed-path field, one list of this work area's projects, the work-area files and the recent sources, and a preview pane of the highlighted row.
+- **Decomposition:**
+  - LLR-173.1, LLR-173.1e, LLR-173.1g: the dialog's one result and its one router.
+  - LLR-173.2, LLR-173.2a, LLR-173.2b, LLR-173.2c, LLR-173.2d, LLR-173.2e, LLR-173.2j: opening, focus, keys, clicks.
+  - LLR-173.3, LLR-173.3a, LLR-173.3b, LLR-173.3c, LLR-173.3d: literal names.
+  - LLR-173.4, LLR-173.4a, LLR-173.4b, LLR-173.4c, LLR-173.4d, LLR-173.4e, LLR-173.4f, LLR-173.4g, LLR-173.4l, LLR-173.4m: the sections.
+  - LLR-173.6d, LLR-173.6f, LLR-173.6k, LLR-173.6l, LLR-173.6m, LLR-173.6n: the preview's content and the layout.
+  - LLR-173.7: no internal decision id in the painted text.
+  - The compound HLR-173 (about 20 behaviours) is split here into HLR-173 and HLR-173a … HLR-173e (LED .NN).
+- **Variant slots (filled by the P-A verdict C, LED-2026-10-26-batch-100.2; corrected by LED-2026-10-26-batch-100.18):**
+  - VS-PA-1 = two panes, preview on the right; stacked below 100 columns.
+  - VS-PA-2 = a click selects; Enter loads; a double-click is not bound.
+  - VS-PA-3 = the `pa_C` ids (`#load_dialog`, `#load_list`, `#load_path`, `#load_preview`, `#load_reason`, `#load_ok`, `#load_cancel`); `#project_list` and the separate Load project dialog retire.
+  - VS-PA-4 = `l` and `ctrl+l` open this dialog with the focus on the path field; `p` opens it with the focus on `#load_list` and the open project's row highlighted, else the first project.
+  - VS-PA-5 = the preview marks the active set with `●` for project, file and work-area rows; a recent row shows its path and kind and "checked when loaded" instead of a mark, because nothing is read before Enter.
+  - VS-PA-6 = the focus order of LLR-173.2c.
+- **Rationale (informative):**
+  - The dialog has no list, ignores `escape`, and an empty or Enter-only Load does nothing (P-18 … P-20).
+  - The operator's P-A note asks for the active-set symbol.
+  - Review sources: UX-05 / QA R2-06 (focus), UX-36 (marks for every row kind), UX-37 (`p`), security R2-03 (the preview reads no image and follows no link).
 - **Validation:** `test`
-- **Executed verification:** `pytest tests/test_b100_load_dialog.py`
-- **Numeric pass threshold:** 4 `LoadChoice` kinds → 4 routes; `enter` on each section → 1 load; for a project, a file and a file with a project open, the `●` rows = the installed image, MAC and A2L paths (3 of 3 each); `escape` → 0 changes to the session; an empty Load and 3 invalid typed paths → 4 painted token pairs, the dialog open, the typed text kept; `p` typed while the list has the focus → the path field holds `p`, 0 app actions; 4 hostile names → 0 markup spans, 0 control characters; a recent entry rendered → 0 filesystem calls before Enter; highlighting a project with an over-cap manifest → a key answered within 200 ms; a work-area pick → 0 new files in `temp/`; at 99 columns → panes stacked, at 118 → side by side.
+- **Executed verification:** `pytest tests/test_b100_load_dialog.py -k "tc_b100_40 or tc_b100_41 or tc_b100_42 or tc_b100_43 or tc_b100_64 or tc_b100_66 or at_b100_14"`
+- **Numeric pass threshold:** The fixture holds 2 projects, a reserved folder, a junction folder, 2 loadable work-area files and 3 recent entries. Opening Load gives 1 dialog on the screen stack, 3 sections in the order projects, work-area files, recent sources, and 2 + 2 + 3 rows.
+  - A project named `[b]P` → 1 row whose plain text is `[b]P`, with 0 markup spans.
+  - At 99 columns → panes stacked; at 118 → side by side.
+- **Negative control:** executed on `1d677ba` (P-20): `dialog has a list/picker widget? none`. `LoadFileScreen` is unchanged at `4fef292` and in the 9a tree (code read) → AT-B100-14's list half is RED.
 - **Priority:** high
 - **Acceptance (black-box):**
-  - **Observable outcome:** the engineer loads an example through Load (which records it), restarts the app, opens Load, moves to the recent source and presses Enter: that file loads. Highlighting a project, the preview marks `●` on its active image, MAC and A2L, and after Enter the Loaded panel names exactly those three. `escape` closes the dialog with the session unchanged. An empty Load paints `nothing selected`. A project named `[b]P` is listed as written.
-  - **Shipped surface:** the Load dialog (`l`, `p`; `#load_path`, `#load_list`, `#load_preview`, `#load_reason`, `alt+l`), the Loaded panel, the status log, the screen stack.
+  - **Observable outcome:** (AT-B100-14, list half) the engineer opens Load. The dialog lists the work area's projects, its loadable work-area files and the recent sources, each in its own section, and a project named `[b]P` is listed exactly as written.
+  - **Shipped surface:** the Load dialog (`l`, `ctrl+l`, `p`; `#load_list`, `#load_preview`).
   - **Acceptance test(s):** AT-B100-14
-  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☒ error — empty: no project, no file, no recent (each section shows its tokens); boundary: one item per section, 99 and 100 columns; invalid: hostile names, a hostile store, an invalid typed path, an over-cap manifest; error: a recent source missing on pick (`not found`, the entry removed).
-  - **Negative control:** executed on `1d677ba` (P-18, P-19): `escape on LoadFileScreen -> screen: LoadFileScreen`; `Enter with a typed path -> current_file before/after: firmware_1.s19 / firmware_1.s19` → AT-B100-14 RED today.
+  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid
+    - empty: no project, no file and no recent (each section paints its tokens);
+    - boundary: one item per section; 99 and 100 columns;
+    - invalid: hostile names, a hostile store.
+  - **Negative control:** executed on `1d677ba` (P-20, above) → AT-B100-14 RED.
 
-### HLR-174 — One short question before unsaved work is lost, on every route
-- **Traceability:** US-164
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.3, LED-2026-10-26-batch-100.17
-- **Statement:** When an image-replacing route — the Load dialog, the Workarea Files pick, the variant switch (`v`, the panel's `v`) or a project load — would lose unsaved work, the system shall ask once before loading, in the one load seam every such route passes. Unsaved work is: an image that differs from the copy last loaded or saved (lost by any image replacement and any project load), Patch Editor entries the dirty flag marks (lost by a project load), and Flow Builder edits not saved (lost by a project load). Loading a MAC or an A2L only attaches it, loses nothing and never asks. The question shall be short and name what would be lost, all items in one question. `y` shall replace and continue; `n` and `escape` shall cancel and leave the session unchanged; the focus shall start on `n`, and `enter` shall act on the focused button. A load that would lose nothing shall not ask, whether or not a project is open. The question shall be answered before the project-session reset runs, and never inside `_handle_load_project`.
-- **Variant slots (filled by the P-B verdict A, LED-2026-10-26-batch-100.2):** VS-PB-1 = the short question. VS-PB-2 = no "save first" key. VS-PB-3 = the `pb_A` ids (`#confirm_yes`, `#confirm_no`).
-- **Rationale (informative):** a patched image is replaced with no question (P-17). UX-01, UX-11, QA-03, UX-12, O-3. B-02 / QA R2-03: the Workarea pick and the variant switch bypassed the dialog's route (P-42). QA R2-02: an attach loses nothing. UX-27: Save project clears the document flag (LLR-167.8).
+### HLR-173a — The preview marks the set a load installs
+- **Traceability:** US-163
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS ubiquitous):** The system shall mark with `●`, in the Load dialog's preview, exactly the image variant, MAC and A2L files that loading the highlighted project or work-area file installs.
+- **Decomposition:** LLR-173.6, LLR-173.6a, LLR-173.6b, LLR-173.6c, LLR-173.4n.
+- **Rationale (informative):** the operator's P-A note ("the symbol for the set that will be used as the active files"); UX-36.
 - **Validation:** `test`
-- **Executed verification:** `pytest tests/test_b100_confirm.py`
-- **Numeric pass threshold:** the 24-cell trigger table (LLR-174.1) → 24 of 24 cells as tabulated (11 ask, 13 load); 4 routes with an unsaved patch → 4 questions; patched → Save project → load = 0 questions; patched + entries → Save project → project load = 0 questions; patched → save-back → load = 0 questions; patched → saved → patched again → load = 1 question; an unsaved patch, then an A2L load → 0 questions, the patch kept; `n`, `escape` and an immediate `enter` → 0 changes to the image digest, the file path and the project; `y` → 1 load; 2 items unsaved → 1 question listing both.
+- **Executed verification:** `pytest tests/test_b100_load_dialog.py -k "tc_b100_64 or at_b100_14"`
+- **Numeric pass threshold:** 4 projects (clean; after a save-back, so the recorded active variant is not first by name; recorded active variant missing; A2L-only), plus 1 file row with nothing loaded, 1 file row with an A2L loaded, and 1 file row with project P open. After Enter, the image, MAC and A2L paths the Loaded panel names equal the `●` rows (7 of 7).
+- **Negative control:** a mutation that marks the first variant by name → the save-back project's `●` differs from the installed variant → RED. On the 9a tree no preview exists (P-20) → RED.
 - **Priority:** high
 - **Acceptance (black-box):**
-  - **Observable outcome:** the engineer applies a patch and loads another file: a question appears naming the patched image, with the focus on No; `enter` keeps the patched image (the hex view still shows the patch); repeating with `y` loads the new file. A Workarea Files pick with an unsaved patch asks the same question. After Save project, the same load asks nothing.
-  - **Shipped surface:** Load, the Workarea Files list, `v`, the question (`#confirm_yes`, `#confirm_no`, `y` / `n` / `escape`), the hex view, the status log.
+  - **Observable outcome:** (AT-B100-14, preview half) the engineer highlights a project saved after a save-back. The preview marks `●` on its active image, MAC and A2L, and after Enter the Loaded panel names exactly those three.
+  - **Shipped surface:** the Load dialog (`#load_list`, `#load_preview`), the Loaded panel.
+  - **Acceptance test(s):** AT-B100-14
+  - **Boundary catalog (QC-3):** ☒ boundary ☒ error
+    - boundary: recorded variant missing; A2L-only project; a project open while a file row is highlighted;
+    - error: the marked variant is unreadable at install (LLR-173.6a).
+  - **Negative control:** as above → AT-B100-14 RED.
+
+### HLR-173b — A recent source reopens from the dialog
+- **Traceability:** US-163
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS event):** When the engineer loads a recent row of the Load dialog, the system shall load the file at that row's recorded path.
+- **Decomposition:** LLR-173.1f, LLR-173.4h, LLR-173.4i, LLR-173.4j, LLR-173.4k.
+- **Rationale (informative):** the consume half of AT-B100-12's chain (9a recorded the source; 9b reopens it). A recent entry may name a network or removable drive, so nothing touches it before Enter (S-07; §6 "Known gap").
+- **Validation:** `test`
+- **Executed verification:** `pytest tests/test_b100_load_dialog.py -k "tc_b100_40 or tc_b100_43 or at_b100_14"`
+- **Numeric pass threshold:** the engineer loads `examples/case_01_basic_valid/firmware.s19` by its absolute path, a new app instance starts with the same `LOCALAPPDATA`, Load opens, and Enter on that recent row → `current_file` holds a work copy whose bytes equal the example's (1 of 1), and the store's first entry is that path.
+- **Negative control:** on the 9a tree, `LoadFileScreen` has no list, so no recent row can be picked (P-20, code read) → RED.
+- **Priority:** medium
+- **Acceptance (black-box):**
+  - **Observable outcome:** (AT-B100-14, recent half) the engineer loads an example through Load (which records it), restarts the app, opens Load, moves to the recent source and presses Enter: that file loads.
+  - **Shipped surface:** the Load dialog (`#load_list`, `#load_reason`), the per-user store, the Loaded panel.
+  - **Acceptance test(s):** AT-B100-14
+  - **Boundary catalog (QC-3):** ☒ boundary ☒ error
+    - boundary: a recent A2L (routed by kind);
+    - error: a recent source missing on pick (`not found`, `check the path`; the entry stays, LLR-173.4k).
+  - **Negative control:** as above → AT-B100-14 RED.
+
+### HLR-173c — Enter loads what has the focus
+- **Traceability:** US-163
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS event):** When the engineer asks the Load dialog to load, the system shall load the highlighted row if `#load_list` held the focus more recently than `#load_path`, and the typed path otherwise.
+- **Decomposition:** LLR-173.1a, LLR-173.1b, LLR-173.1c, LLR-173.2f, LLR-173.2g.
+- **Rationale (informative):** P-19: Enter with a typed path loads nothing today. VS-PA-2: Enter loads and a click only selects. "Asks to load" means `enter`, `alt+l` or `#load_ok`.
+- **Validation:** `test`
+- **Executed verification:** `pytest tests/test_b100_load_dialog.py -k "tc_b100_40 or tc_b100_41"`
+- **Numeric pass threshold:** each of the three triggers, from list focus on a project, a work-area file and a recent row → 9 loads of the highlighted item; from path focus with a typed valid file path → 3 loads of the typed file (12 of 12).
+- **Negative control:** executed on `1d677ba` (P-19): `Enter with a typed path -> current_file before/after: firmware_1.s19 / firmware_1.s19` → RED.
+- **Priority:** high
+- **Acceptance (black-box):**
+  - **Observable outcome:** (AT-B100-14, Enter half) the engineer highlights a project and presses Enter: the project loads. They open Load again, type a file path and press Enter: the file loads.
+  - **Shipped surface:** the Load dialog (`enter`, `alt+l`, `#load_ok`), the Loaded panel.
+  - **Acceptance test(s):** AT-B100-14
+  - **Boundary catalog (QC-3):** ☒ boundary — the focus on the preview or on a button when the request comes (the last of list / path decides).
+  - **Negative control:** executed on `1d677ba` (P-19, above) → RED.
+
+### HLR-173d — An empty or refused Load is explained inside the dialog
+- **Traceability:** US-163
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS unwanted):** If the engineer asks the Load dialog to load while nothing is highlighted and nothing is typed, or while the typed path is refused, then the system shall keep the dialog open with the typed text unchanged and paint the reason and the next step in `#load_reason`.
+- **Decomposition:** LLR-173.2h, LLR-173.2i, LLR-173.5, LLR-173.5a, LLR-173.5b, LLR-173.5c, LLR-173.5d, LLR-173.5e.
+- **Rationale (informative):** CW-U-13 (P-19: an empty Load says nothing). UX-06: a refused path is explained where it was typed.
+- **Validation:** `test`
+- **Executed verification:** `pytest tests/test_b100_load_dialog.py -k "tc_b100_41 or tc_b100_63 or at_b100_14"`
+- **Numeric pass threshold:** an empty Load plus the 6 typed refusal reasons → 7 token pairs in `#load_reason`, 0 dismisses, the field text unchanged (7 of 7).
+- **Negative control:** executed on `1d677ba` (P-19): `empty Load click -> … new status: [] | new notices: []` → RED.
+- **Priority:** high
+- **Acceptance (black-box):**
+  - **Observable outcome:** (AT-B100-14, empty half) an empty Load paints `nothing selected` and `pick a row or type a path`, and the dialog stays.
+  - **Shipped surface:** the Load dialog (`#load_reason`, `#load_path`).
+  - **Acceptance test(s):** AT-B100-14
+  - **Boundary catalog (QC-3):** ☒ empty ☒ invalid ☒ error
+    - empty: no row and no text; spaces only;
+    - invalid: an unsupported suffix, a relative folder, a non-project folder, an outside folder, a link;
+    - error: a missing path, an unreadable folder.
+  - **Negative control:** executed on `1d677ba` (P-19, above) → RED.
+
+### HLR-173e — `escape` closes the dialog and changes nothing
+- **Traceability:** US-163
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS event):** When the engineer presses `escape` in the Load dialog, the system shall close the dialog and leave the session unchanged.
+- **Decomposition:** LLR-173.2k, LLR-173.2l. The focus after the close is LLR-166.1 (TC-B100-12, Inc 9b arms).
+- **Rationale (informative):** CW-U-12 (P-18).
+- **Validation:** `test`
+- **Executed verification:** `pytest tests/test_b100_load_dialog.py -k "tc_b100_41 or at_b100_14"`
+- **Numeric pass threshold:** `escape` with the focus on each of `#load_path`, `#load_list`, `#load_preview` and `#load_ok` → 4 closes, the session digest unchanged and the store bytes unchanged (4 of 4).
+- **Negative control:** executed on `1d677ba` (P-18): `escape on LoadFileScreen -> screen: LoadFileScreen` → RED.
+- **Priority:** high
+- **Acceptance (black-box):**
+  - **Observable outcome:** (AT-B100-14, escape half) `escape` closes the dialog with the session unchanged.
+  - **Shipped surface:** the Load dialog, the screen stack, the Loaded panel.
+  - **Acceptance test(s):** AT-B100-14
+  - **Boundary catalog (QC-3):** ☒ boundary — `escape` from each focus position; `escape` after a refused path was painted.
+  - **Negative control:** executed on `1d677ba` (P-18, above) → RED.
+
+### HLR-174 — One question before an image-replacing route replaces unsaved work
+- **Traceability:** US-164
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.3, LED-2026-10-26-batch-100.17, LED-2026-10-26-batch-100.89, LED-2026-10-26-batch-100.91
+- **Statement (EARS event):** When an image-replacing route requests a load while unsaved work it would replace or move to another project exists (D for an image replacement; D, W or F for a project load), the system shall ask the engineer one question before the load changes the session.
+- **Decomposition:**
+  - LLR-174.1, LLR-174.1a, LLR-174.1b, LLR-174.1c: when the guard asks (the 24-cell table) and the public reader of the Patch Editor flag.
+  - LLR-174.2, LLR-174.2a, LLR-174.2b, LLR-174.2c, LLR-174.2d, LLR-174.2e, LLR-174.2f, LLR-174.2g, LLR-174.2h, LLR-174.2j, LLR-174.2r, LLR-174.2s, LLR-174.2t: the modal, its focus, its keys, its layout, and the two unwanted-behaviour guards (a second answer; the Patch Editor's change-file dropdown).
+  - LLR-174.3, LLR-174.3a, LLR-174.3b, LLR-174.3c, LLR-174.3d: the question comes before the project-session reset, never inside the project-load handler, and a cancelled variant switch leaves the pending selection unchanged.
+  - LLR-174.4, LLR-174.4a, LLR-174.4b, LLR-174.4c: one load seam for every route, one question per request, the load kind of each route.
+  - The compound HLR-174 (about 12 behaviours, 8 normative clauses) is split here into HLR-174 and HLR-174a … HLR-174d (LED .89).
+- **Variant slots (filled by the P-B verdict A, LED-2026-10-26-batch-100.2):** VS-PB-1 = the short question. VS-PB-2 = no "save first" key. VS-PB-3 = the `pb_A` ids (`#confirm_yes`, `#confirm_no`).
+- **Rationale (informative):**
+  - A load over a patched image asks nothing (P-17 on `1d677ba`; this E1's probe on the 9a tree: the Workarea pick, the Load dialog router and the variant switch each replace a patched image with the stack `['Screen']`).
+  - Review sources: UX-01, UX-11, QA-03, UX-12, O-3. B-02 / QA R2-03: the Workarea pick and the variant switch bypassed the dialog's route (P-42).
+  - The operator's P-B note: "Pregunta corta, hace el trabajo y crea menos dependencias."
+- **Validation:** `test`
+- **Executed verification:** `pytest tests/test_b100_load_question.py -k "tc_b100_44 or tc_b100_45 or tc_b100_72 or at_b100_15"`
+- **Numeric pass threshold:**
+  - With an unsaved patch (D), by keys: the Load dialog with a typed data file, a Workarea Files pick of a data file, and `v` to another variant → 3 questions, 1 per request, each pushed before the image changes (the session digest read when the question is on top equals the digest before the request).
+  - The Load-result panel's `v` with D forced through a private call (declared: by keys the panel opens only right after a project load, which records the image as saved) → 1 question.
+  - 4 of 4.
+- **Negative control:** executed on `1d677ba` (P-17): `Load file over patched image -> stack: ['Screen'] … image still patched? False`. Executed on the 9a tree (this E1, `work/probe_p10.out.txt`): `WORKAREA pick over patch: stack ['Screen'] | … patched image kept = False`; `LOAD DIALOG router over patch: stack ['Screen']`; `VARIANT switch over patch: stack ['Screen']` → RED.
+- **Priority:** high
+- **Acceptance (black-box):**
+  - **Observable outcome:** (AT-B100-15, question half) the engineer adds and applies a patch in the Patch Editor and loads another data file through Load. A question appears naming the patched image, with the focus on Cancel. A Workarea Files pick of a data file, and `v` in a project, ask the same question.
+  - **Shipped surface:** Load (`l`, `#load_path`), the Workarea Files list, `v`, the question (`#confirm_yes`, `#confirm_no`).
   - **Acceptance test(s):** AT-B100-15
-  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☐ invalid ☐ error — empty: nothing unsaved, with or without a project open (no question); boundary: a patch that writes the bytes already there (no question), saved-then-patched-again (asks), an A2L or MAC attach (no question). Invalid/error: N/A — the answer keys are a closed set.
-  - **Negative control:** executed on `1d677ba` (P-17): `Load file over patched image -> stack: ['Screen'] … image still patched? False` → AT-B100-15 RED today.
+  - **Boundary catalog (QC-3):** ☒ boundary — the three key-reachable routes; the panel's `v` (TC arm, forced state).
+  - **Negative control:** as above → AT-B100-15 RED.
+
+### HLR-174a — A load that would replace or move no unsaved work does not ask
+- **Traceability:** US-164
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS event):** When an image-replacing route requests a load and no unsaved work it would replace or move to another project exists (D for an image replacement; D, W or F for a project load), the system shall load without the question.
+- **Decomposition:** LLR-174.1, LLR-174.1a, LLR-174.1b (the cells that load).
+- **Rationale (informative):** QA R2-02 (an attach loses nothing); UX-27 (Save project clears the document flag, LLR-167.8). The `pb_A` prototype asked whenever a project was open; HLR-174's approved text overrides it ("whether or not a project is open"), and this split keeps that.
+- **Validation:** `test`
+- **Executed verification:** `pytest tests/test_b100_load_question.py -k "tc_b100_44 or at_b100_15"`
+- **Numeric pass threshold:** 0 questions in each of these 7 scenes:
+  - nothing unsaved, no project open, data load;
+  - nothing unsaved, project P open, project load of Q;
+  - patched → Save project → data load;
+  - patched + 1 Patch Editor entry → Save project → project load;
+  - patched → save-back → data load;
+  - an unsaved patch, then an A2L load (the patched byte kept);
+  - an unsaved patch, then a MAC load (the patched byte kept).
+  - 7 of 7.
+- **Negative control:** the `pb_A` prototype rule ("ask when a project is open", `_pb_common.install`) → the scene with P open asks → RED. A mutation asking on an attach when D → the A2L and MAC scenes ask → RED.
+- **Priority:** high
+- **Acceptance (black-box):**
+  - **Observable outcome:** (AT-B100-15, after-save half) after Save project, the same load that asked before asks nothing and loads.
+  - **Shipped surface:** Load, Save project, the status log.
+  - **Acceptance test(s):** AT-B100-15
+  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary
+    - empty: nothing unsaved, with and without a project open;
+    - boundary: a patch that writes the bytes already there; undo alone asks (C13); undo then Apply does not (C12); an A2L or MAC attach.
+  - **Negative control:** as above → AT-B100-15 RED.
+
+### HLR-174b — Replace continues the load
+- **Traceability:** US-164
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS event):** When the engineer answers the question with replace, the system shall run the load that asked.
+- **Decomposition:** LLR-174.2c, LLR-174.2e, LLR-174.2f, LLR-174.3.
+- **Rationale (informative):** VS-PB-1; `y` replaces.
+- **Validation:** `test`
+- **Executed verification:** `pytest tests/test_b100_load_question.py -k "tc_b100_45 or tc_b100_72 or at_b100_15"`
+- **Numeric pass threshold:** `y` on each of the 4 routes → 1 load of the requested item each (`current_file.path.name` or `current_project` equals the request), and the question closed (4 of 4).
+- **Negative control:** a mutation that dismisses the question and drops `go` → 0 loads → RED. On the 9a tree there is no question (probe above) → RED.
+- **Priority:** high
+- **Acceptance (black-box):**
+  - **Observable outcome:** (AT-B100-15, replace half) the engineer repeats the load and presses `y`: the new file loads.
+  - **Shipped surface:** the question (`y`), the Loaded panel.
+  - **Acceptance test(s):** AT-B100-15
+  - **Boundary catalog (QC-3):** ☒ boundary — `y` with the focus on either button; a click on `#confirm_yes`.
+  - **Negative control:** as above → AT-B100-15 RED.
+
+### HLR-174c — Cancel keeps everything
+- **Traceability:** US-164
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS event):** When the engineer cancels the question, the system shall leave the session and the kept work unchanged.
+- **Decomposition:** LLR-174.2b, LLR-174.2d, LLR-174.2e, LLR-174.3a. The focus after the close is LLR-166.1 (TC-B100-12, Inc 10 arm).
+- **Rationale (informative):** "Cancel" means `n`, `escape`, `enter` on the initial focus, or a click on `#confirm_no`.
+- **Validation:** `test`
+- **Executed verification:** `pytest tests/test_b100_load_question.py -k "tc_b100_45 or at_b100_15"`
+- **Numeric pass threshold:** a project load with D, F and W, and a data load with D; each cancelled by `n`, `escape` and an immediate `enter` → the session digest and the kept work unchanged, 0 status lines (6 of 6).
+- **Negative control:** a mutation focusing `#confirm_yes` first → the immediate `enter` replaces → RED. On the 9a tree the load runs with no question (probe above) → RED.
+- **Priority:** high
+- **Acceptance (black-box):**
+  - **Observable outcome:** (AT-B100-15, keep half) at the question the engineer presses `enter`: the patched image stays, and the hex view still shows the patched byte.
+  - **Shipped surface:** the question (`n`, `escape`, `enter`), the hex view, the Loaded panel.
+  - **Acceptance test(s):** AT-B100-15
+  - **Boundary catalog (QC-3):** ☒ boundary — each cancel key; a typed path whose recent entry would be recorded (the store unchanged).
+  - **Negative control:** as above → AT-B100-15 RED.
+
+### HLR-174d — The question names every unsaved item
+- **Traceability:** US-164
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS ubiquitous):** The system shall name in one question every unsaved item that made the guard ask.
+- **Decomposition:** LLR-174.2i, LLR-174.2k, LLR-174.2l, LLR-174.2m, LLR-174.2n, LLR-174.2o, LLR-174.2p, LLR-174.2q.
+- **Rationale (informative):** "name what would be lost, all items in one question" (HLR-174 as approved). The Flow Builder item is named as holding unsaved changes; whether a project load clears it is ruling Q1.
+- **Validation:** `test`
+- **Executed verification:** `pytest tests/test_b100_load_question.py -k "tc_b100_45 or at_b100_15"`
+- **Numeric pass threshold:** a project load with D, F and W → 1 question whose painted text holds the image file name, `Patch Editor entries` and `flow <name>` (3 items, 1 modal); D and F only → 2 items; W only → 1 item (3 of 3).
+- **Negative control:** a mutation naming only the first unsaved item → the 3-item arm finds 1 → RED.
+- **Priority:** medium
+- **Acceptance (black-box):**
+  - **Observable outcome:** (AT-B100-15, items half) with a patched image and unsaved Flow Builder edits, the engineer opens a project: one question names both.
+  - **Shipped surface:** the question.
+  - **Acceptance test(s):** AT-B100-15
+  - **Boundary catalog (QC-3):** ☒ boundary — 1, 2 and 3 items.
+  - **Negative control:** as above → AT-B100-15 RED.
 
 ### HLR-175 — The Save project dialog shows exactly what the save will do
 - **Traceability:** US-165
@@ -860,12 +1078,12 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-165.3 — The change service is rebound
 - **Traceability:** HLR-165
-- **Ledger:** LED-2026-10-26-batch-100.51, LED-2026-10-26-batch-100.55, LED-2026-10-26-batch-100.60
-- **Statement:** The reset shall assign a new `ChangeService()` and re-push `set_image_generation(self._image_generation)` (`change_service.py:2494`); it shall not add a reset method to the service. **Interim, until Inc 10 lands the question (LLR-174.x):** when the outgoing Patch Editor document holds N > 0 unsaved entries, the project load's status names them — `Closed the Patch Editor document (N entries); unsaved changes were not kept` (LED .55) — so the discard is never silent; Inc 10 replaces this line with the question, and its test arm is re-pinned there.
+- **Ledger:** LED-2026-10-26-batch-100.51, LED-2026-10-26-batch-100.55, LED-2026-10-26-batch-100.60, LED-2026-10-26-batch-100.89
+- **Statement:** The reset shall assign a new `ChangeService()` and re-push `set_image_generation(self._image_generation)` (`change_service.py:2494`); it shall not add a reset method to the service.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-10 — `pytest tests/test_b100_session_reset.py -k tc_b100_10`
-- **Numeric pass threshold:** after a load over P1: a different service object, 0 document entries, 0 undo steps, an image generation equal to the app's.
-- **Negative control:** a mutation keeping the old object → 1 leaked entry → RED.
+- **Numeric pass threshold:** after a load over P1: a different service object, 0 document entries, 0 undo steps, an image generation equal to the app's; and a project load whose outgoing document held N > 0 entries paints 0 lines holding `Closed the Patch Editor document` (Inc 10, ruling Q2).
+- **Negative control:** a mutation keeping the old object → 1 leaked entry → RED; a mutation that keeps the interim line → the Inc 10 arm finds 1 line → RED.
 - **Boundary catalog:** ☒ boundary — a worker that captured the old service finishes against it (no exception).
 
 ### LLR-165.4 — Unload clears the parsed A2L
@@ -880,12 +1098,12 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-166.1 — The load tails and the modal closes put the focus on the window's target
 - **Traceability:** HLR-166
-- **Ledger:** LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.23, LED-2026-10-26-batch-100.57, LED-2026-10-26-batch-100.58, LED-2026-10-26-batch-100.59
+- **Ledger:** LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.23, LED-2026-10-26-batch-100.57, LED-2026-10-26-batch-100.58, LED-2026-10-26-batch-100.59, LED-2026-10-26-batch-100.89
 - **Statement:** Each window shall declare its focus target, a non-text widget (NEW, a per-window table in `app.py`, derived at Phase 3 from the window registry and checked by TC-B100-12 against every window). The load tail `_step_finalize` (`app.py:11191`), the dismiss of the Load dialog, of the load question and of the Load-result panel, and a cancelled load shall move the focus to the displayed window's target when the focused widget has region area 0, belongs to a window that is not displayed, or is an `Input` / `TextArea`. While the Load-result panel is open, the focus stays in it.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-12 — `pytest tests/test_b100_focus.py -k tc_b100_12`
-- **Numeric pass threshold:** every window in the registry → 1 declared target, 0 of type `Input` / `TextArea`; written at Inc 4: 3 load paths (Load file, Load project, Workarea Files pick) → the focus on the target, then `p` → a dialog opens (3 of 3); extended at Inc 6 (panel `enter`, panel `esc`), Inc 9b (dialog `esc`, cancelled load) and Inc 10 (question `n`) → the focus on the target each time.
-- **Negative control:** executed on `1d677ba` (P-16): `focused region area: 0` → RED.
+- **Numeric pass threshold:** every window in the registry → 1 declared target, 0 of type `Input` / `TextArea`; written at Inc 4: 3 load paths (Load file, Load project, Workarea Files pick) → the focus on the target, then `p` → a dialog opens (3 of 3); extended at Inc 6 (panel `enter`, panel `esc`), Inc 9b (dialog `esc`, cancelled load) and Inc 10 (question `n`) — Inc 10's arm (LLR-166.1 governs, ruling 7): the Patch window with the focus on `#patch_entry_address_input` (an `Input`) and D set, `ctrl+l` + a typed data file + `enter` → the question → `n` → the focus stays on `patch_entry_address_input` (a visible, healthy `Input` keeps the focus) and `_rehome_focus_after_load` was called once (spy); the Workspace window with the focus on `#files_list` and D set, pick a data file → the question → `escape` → the focus stays on `files_list` and the spy count is 1 (2 of 2).
+- **Negative control:** executed on `1d677ba` (P-16): `focused region area: 0` → RED; a mutation whose cancel branch skips the re-home → the spy count is 0 (not 1) → RED (M36).
 - **Boundary catalog:** ☒ empty ☒ boundary — a cancelled load; the Split/Join window displayed (its table is the target).
 
 ### LLR-166.2 — The A2L load tail re-homes the focus
@@ -1040,11 +1258,11 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-167.8 — Save project clears the Patch Editor's dirty flag
 - **Traceability:** HLR-167
-- **Ledger:** LED-2026-10-26-batch-100.17, LED-2026-10-26-batch-100.61, LED-2026-10-26-batch-100.72, LED-2026-10-26-batch-100.73, LED-2026-10-26-batch-100.75
+- **Ledger:** LED-2026-10-26-batch-100.17, LED-2026-10-26-batch-100.61, LED-2026-10-26-batch-100.72, LED-2026-10-26-batch-100.73, LED-2026-10-26-batch-100.75, LED-2026-10-26-batch-100.89
 - **Statement:** When a Save project completes after the app wrote the editor's document into the project (LLR-170.2), `_handle_save_dialog` shall clear the Patch Editor panel's dirty flag through `PatchEditorPanel.mark_saved` (`screens_directionb.py`); a refused or rolled-back save, a failed document write, and a file-backed document copied or recorded as on disk while the panel holds unsaved edits leave the flag set, because no file on disk holds those edits (LED .61). `ChangeService.mark_saved` runs after every completed Save project (LLR-167.5).
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-70 — `pytest tests/test_b100_save_image.py -k tc_b100_70`
-- **Numeric pass threshold:** an entry pasted → Save project → the panel's flag False, and a following Patch Editor Load → 0 `LoadGuardScreen` pushes; a refused Save project → the flag True; a forced document-write failure → True; a file-backed document with 1 entry added after its load → Save project → True, both for a document from outside the project (copied) and on the natural path Load P → add 1 entry → Save project into P (the document in P's home is recorded as on disk, not written; E3 R1, LED .73) (5 arms, 1 assertion each). Inc 5's `test_tc_b100_70_unwritten_document_keeps_the_flag` is re-pinned at Inc 8a: its typed document is now written, so it becomes the first arm. The project-load question arm (0 questions) runs at Inc 10, where the question exists (LLR-174.1); until then a project load clears the flag itself (LED .55 (b)), so that arm cannot fail at Inc 8a. Orchestrator decision (E1 §4 Q2, LED .72): pasted text not yet parsed into entries counts as unsaved — Save project with an unparsed paste buffer keeps the flag True; mutation clearing it → flag False → RED.
+- **Numeric pass threshold:** an entry pasted → Save project → the panel's flag False, and a following Patch Editor Load → 0 `LoadGuardScreen` pushes; a refused Save project → the flag True; a forced document-write failure → True; a file-backed document with 1 entry added after its load → Save project → True, both for a document from outside the project (copied) and on the natural path Load P → add 1 entry → Save project into P (the document in P's home is recorded as on disk, not written; E3 R1, LED .73) (5 arms, 1 assertion each). Inc 5's `test_tc_b100_70_unwritten_document_keeps_the_flag` is re-pinned at Inc 8a: its typed document is now written, so it becomes the first arm. The project-load question arm runs at Inc 10: an entry pasted → Save project → a project load through the Load dialog → 0 questions (Save project cleared the flag); a refused Save project (the flag stays set) → a project load through the Load dialog → 1 question naming `Patch Editor entries` — 2 of 2 (LLR-174.1b). Orchestrator decision (E1 §4 Q2, LED .72): pasted text not yet parsed into entries counts as unsaved — Save project with an unparsed paste buffer keeps the flag True; mutation clearing it → flag False → RED.
 - **Negative control:** a mutation skipping the panel's `mark_saved` → flag True and the Patch Editor Load asks → RED; a mutation calling it after every completed save → the file-backed arm False → RED.
 - **Boundary catalog:** ☒ boundary ☒ error — a check document; a file-backed document with unsaved edits; a refused save; a failed write.
 
@@ -1421,7 +1639,8 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-171.2e — A folder with no project.json and no project file is refused with its tokens
 - **Traceability:** HLR-171a · trace: `_handle_load_project` (`app.py`), `PROBLEM_NO_MANIFEST` (`variant_execution_service.py`)
-- **Ledger:** LED-2026-10-26-batch-100.76
+- **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.86
+- **Status:** retired — superseded by LLR-173.4a (Inc 9b, Q7).
 - **Statement (EARS unwanted):** If a folder given to the project load has no `project.json` and holds neither a data file nor an A2L file, then the system shall refuse the load with the `no project.json` tokens.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-32 — `pytest tests/test_b100_project_homes.py -k tc_b100_32`
@@ -1806,6 +2025,21 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 - **Negative control:** a mutation without the size rule → the 3 245 arm writes 65 592 bytes, which the next read reports `too large` → RED; a mutation dropping the newest → the new entry missing → RED.
 - **Boundary catalog:** ☒ boundary — 65 492 and 65 592 bytes; one entry that cannot fit.
 
+### LLR-172.1n — A source found only through the relative fallback is not recorded (CR9-1)
+- **Traceability:** HLR-172 · trace: `load_from_path`, `load_a2l_from_path` (`app.py`); `resolve_input_path` (`workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS unwanted):** If a Load copies a source that the path resolver found only through its base-folder or repository-root fallback, then the system shall leave the recent-sources store unchanged.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
+- **Numeric pass threshold:** 4 of 4 — "found only through the fallback" means the typed text is relative and does not exist relative to the working folder. Arms:
+  - Working folder `W` ≠ base folder `B`, `B\j` a junction to `R`, typed `j\x.s19` → 1 load, the store bytes unchanged, 0 `Recent sources not updated` warnings.
+  - Typed `fw.s19`, present only in `B` → 1 load, the store unchanged.
+  - The same relative file typed with `W` = `B` (found as typed) → 1 entry, `os.path.abspath` of the typed text (control).
+  - Typed absolute `B\j\x.s19` → 1 entry `B\j\x.s19`, the link not followed (control, LLR-172.1a).
+  - 4 of 4. The junction arms are Windows only and are reported not run when no junction can be made.
+- **Negative control:** executed probe on the 9a tree (`review-increment-017.md` CR9-1): typed `j/x.s19` → the store holds `R\x.s19` (the link followed, against LLR-172.1a) → RED.
+- **Boundary catalog:** ☒ invalid ☒ boundary — a relative path through a junction; a base-only file; the same file found as typed; an absolute path through a junction.
+
 ### LLR-172.2 — The store read returns the accepted entries in order
 - **Traceability:** HLR-172 · trace: `read_recent_sources`, `RecentSources` (NEW, `workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.21, LED-2026-10-26-batch-100.82
@@ -2096,115 +2330,982 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 - **Negative control:** a mutation storing the painted text as the row's name → the U+009B pick loads nothing → RED. Declared: on `4fef292` the row holds `item.name`, so the mutation is the only RED.
 - **Boundary catalog:** ☒ invalid — a markup-shaped name; a control character.
 
-### LLR-173.1 — `LoadChoice` and one router
-- **Traceability:** HLR-173
-- **Ledger:** LED-2026-10-26-batch-100.12
-- **Statement:** The Load dialog (`screens.py`) shall dismiss with `LoadChoice(kind, value)` (NEW, B100-I8), `kind` one of `project`, `workarea`, `recent`, `path`; one app handler shall route `project` to `_handle_load_project`, `workarea` to `load_selected_file` in place, `recent` to `load_from_path` (or `load_a2l_from_path` by kind), and `path` to `_load_path_from_user_input`. `_handle_load_dialog` keeps accepting a `Path` (routed as `path`), so `tests/test_tui_app.py:1254`, `:1288` stay valid. The load question (HLR-174) runs in this router.
+### LLR-173.1 — The dialog closes with one `LoadChoice`
+- **Traceability:** HLR-173 · trace: `LoadChoice` (NEW, B100-I8), the Load dialog class (NEW, `screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.12, LED-2026-10-26-batch-100.86
+- **Statement (EARS ubiquitous):** The system shall close the Load dialog with either no result or one `LoadChoice(kind, value)` whose `kind` is one of `project`, `workarea`, `recent` and `path`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-40 — `pytest tests/test_b100_load_dialog.py -k tc_b100_40`
-- **Numeric pass threshold:** 4 kinds → 4 routes; a `Path` → the `path` route; a work-area pick → 0 new files in `temp/`; a direct `_handle_load_project` call → 0 questions.
-- **Negative control:** a mutation routing `workarea` through `load_from_path` → 1 new copy → RED.
-- **Boundary catalog:** ☒ boundary — a recent A2L (routed by kind).
+- **Numeric pass threshold:** A load from each section and from the path field → 4 dismiss values, each a `LoadChoice` of the matching kind, `value` the on-disk project name, the on-disk work-area file name, the recorded path text or the typed text respectively (4 of 4).
+  - `escape` → `None`.
+- **Negative control:** code read, 9a tree: `LoadFileScreen` dismisses with a `Path` and `LoadProjectScreen` with a `str` → no `LoadChoice` → RED.
+- **Boundary catalog:** ☒ boundary — each of the four kinds; no result.
 
-### LLR-173.2 — Keys, focus order and the empty Load
-- **Traceability:** HLR-173
-- **Ledger:** LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.18, LED-2026-10-26-batch-100.36
-- **Statement:** The Load dialog shall start with the focus on `#load_path` when opened by `l` or `ctrl+l`, and on `#load_list` when opened by `p`; bind `tab` to the order `#load_path` → `#load_list` → `#load_preview` → buttons; move a printable key typed while `#load_list` has the focus to `#load_path` and type it there, so it never reaches an app binding; bind `enter` and `alt+l`, and make `#load_ok`, load the highlighted row when `#load_list` had the focus last and the typed text otherwise; bind `escape` to dismiss with `None`; a click selects a row and does not load. A Load with no selection and no typed text shall paint `nothing selected` and `pick a row or type a path` in `#load_reason` and stay open. `p` opens the dialog with the open project's row highlighted, else the first project.
+### LLR-173.1a — A project choice opens the project through the project route
+- **Traceability:** HLR-173c · trace: `_handle_load_dialog`, `_route_load_project` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS event):** When the Load dialog closes with a `project` choice, the system shall load that project through the route that opens the Load-result panel.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-40 — `pytest tests/test_b100_load_dialog.py -k tc_b100_40`
+- **Numeric pass threshold:** `LoadChoice("project", "ab")` → `current_project == "ab"` and 1 `LoadResultScreen` on the stack (2 of 2).
+- **Negative control:** a mutation that calls `_handle_load_project` directly → 0 Load-result panels → RED.
+- **Boundary catalog:** ☒ boundary — a project name in another case than on disk (the listed spelling loads, LLR-172.5g).
+
+### LLR-173.1b — A work-area choice loads that file as the list pick does
+- **Traceability:** HLR-173c · trace: `_handle_load_dialog`, `_load_from_item`, `load_selected_file`, `load_a2l_from_path` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS event):** When the Load dialog closes with a `workarea` choice, the system shall load the named file of `workarea/temp` as the Workarea Files list's pick of that name loads it.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-40 — `pytest tests/test_b100_load_dialog.py -k tc_b100_40`
+- **Numeric pass threshold:** `LoadChoice("workarea", "x.s19")` → `current_file.path == <workarea>/temp/x.s19`, 0 calls to `copy_into_workarea` (spy, the data arm only), and the set of names in `temp/` unchanged.
+  - `LoadChoice("workarea", "c.a2l")` → the same session digest as a `#files_list` pick of `c.a2l` on a twin fixture, and the set of names in `temp/` unchanged (the copy is an identical-file reuse, G-005) (2 of 2).
+- **Negative control:**
+  - A mutation that routes the `workarea` data choice through `load_from_path` → 1 `copy_into_workarea` call → RED.
+  - Declared: since Inc 1 that copy reuses the identical file (G-005), so the name-set arm alone passes on the mutant; the spy is the RED. The A2L arm keeps the 9a `load_a2l_from_path` route (its `copy_into_workarea`, 256 MB cap and link re-check), so it carries no 0-copy spy (A9b-05).
+- **Boundary catalog:** ☒ boundary — a data file and an A2L file.
+
+### LLR-173.1c — A path choice takes the typed-path route
+- **Traceability:** HLR-173c · trace: `_handle_load_dialog`, `_load_path_from_user_input`, `_typed_load_route` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS event):** When the Load dialog closes with a `path` choice, the system shall load the typed text through the typed-path route.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-40 — `pytest tests/test_b100_load_dialog.py -k tc_b100_40`
+- **Numeric pass threshold:** typed `<tmp>/a.s19`, `<tmp>/b.a2l` and `<workarea>/ab` (absolute) → 1 data load, 1 A2L attach and 1 project load of `ab` (3 of 3).
+- **Negative control:** a mutation that routes `path` to `load_from_path` → the `<workarea>/ab` arm loads nothing → RED.
+- **Boundary catalog:** ☒ boundary — a data file, an A2L file, a project folder.
+
+### LLR-173.1e — One router receives every Load dialog result
+- **Traceability:** HLR-173 · trace: `_handle_load_dialog`, `action_load_file`, `action_load_project` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS ubiquitous):** The system shall pass every Load dialog result to one app handler.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-40 — `pytest tests/test_b100_load_dialog.py -k tc_b100_40`
+- **Numeric pass threshold:** AST census of `s19_app/tui/app.py`: every `push_screen` call whose first argument constructs the Load dialog passes `self._handle_load_dialog` as its callback. That gives 2 sites (`action_load_file`, `action_load_project`), 2 of 2, and 0 other callbacks.
+- **Negative control:**
+  - Code read, 9a tree: `action_load_project` pushes `LoadProjectScreen` with `_route_load_project` → 2 callbacks → RED.
+  - A mutation that gives `action_load_project` its own callback → RED.
+- **Boundary catalog:** none — a structural census; its set is every push site of the dialog.
+- **Note (informative):** the load question (HLR-174) is inserted at Inc 10, through the one seam (LLR-174.4) in this router. Inc 9b adds no question.
+
+### LLR-173.1f — A recent choice loads the recorded path unchanged
+- **Traceability:** HLR-173b · trace: `_handle_load_dialog`, `_load_path_from_user_input`, `load_from_path`, `load_a2l_from_path` (`app.py`); `resolve_input_path` (`workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86, LED-2026-10-26-batch-100.87
+- **Statement (EARS event):** When the Load dialog closes with a `recent` choice, the system shall load the recorded path text, with no change, through the typed-path route.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-40 — `pytest tests/test_b100_load_dialog.py -k tc_b100_40`
+- **Numeric pass threshold:** A recent `C:\…\src\fw.s19` → 1 data load, and `fw.s19`'s work copy is installed.
+  - A recent `C:\…\src\cal.a2l` → 1 A2L attach.
+  - After the data load, that path is the store's first entry (the 9a record, LLR-172.1b).
+  - A recent `C:\…\gone\fw.s19` that is missing, while `<base>\fw.s19` exists → 0 loads (a recorded path is drive-rooted, LLR-172.2e, so the relative fallback of `resolve_input_path` never runs).
+  - 4 of 4.
+- **Negative control:** a mutation that loads the recent by its file name relative to the base folder → the `gone` arm loads `<base>\fw.s19` → RED.
+- **Boundary catalog:** ☒ boundary ☒ error — a data and an A2L recent; a missing recent whose name exists under the base folder.
+
+### LLR-173.1g — An unreadable picked project paints one status line and does not crash
+- **Traceability:** HLR-173 · trace: `_handle_load_project`, `_list_project_files` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86, LED-2026-10-26-batch-100.87
+- **Statement (EARS unwanted):** If the picked project cannot be read (`OSError`), then the system shall paint one status line with `could not be read`, keep the session unchanged, and not crash.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-40 — `pytest tests/test_b100_load_dialog.py -k tc_b100_40`
+- **Numeric pass threshold:** `PermissionError` injected into `_list_project_files` of a listed project, then `enter` → 1 status line holding `could not be read`, 0 raises, the session digest unchanged (1 of 1).
+- **Negative control:** a mutation with no catch at `:11743` → the `OSError` leaves the dismiss callback and the app stops → RED.
+- **Boundary catalog:** ☒ error — a listed project that cannot be inspected.
+
+### LLR-173.2 — `l` and `ctrl+l` open the dialog on the path field
+- **Traceability:** HLR-173 · trace: `action_load_file`, `BINDINGS` (`app.py`); the Load dialog (`screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.18, LED-2026-10-26-batch-100.36, LED-2026-10-26-batch-100.86
+- **Statement (EARS event):** When the engineer presses `l` or `ctrl+l` on the main screen, the system shall open the Load dialog with the focus on `#load_path`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
-- **Numeric pass threshold:** opened by `l` → the focus on `#load_path`; opened by `p` → the focus on `#load_list` (2 assertions); `p`, then `enter` → the highlighted project loads (1 arm); `enter` in each section → 1 dismiss with the item; `#load_ok` after a list highlight vs after typing → the row and the typed path respectively (2 arms); `p` typed with the list focused → `#load_path` holds `p`, 0 app actions; `escape` → 1 dismiss with `None`; an empty Load → 1 token pair, 0 dismisses; 1 click → 0 loads; `p` with project P open → P's row highlighted; every shown key pressed → its action (5 of 5).
-- **Negative control:** executed on `1d677ba` (P-18, P-19) → RED; a mutation starting every open on `#load_list` → the `l` arm RED; a mutation starting the `p` open on `#load_path` → the `p`, `enter` arm loads nothing → RED.
-- **Boundary catalog:** ☒ empty ☒ boundary — an empty Load; both precedence cases; no project open for `p`.
+- **Numeric pass threshold:** `l` → the dialog open and `focused.id == "load_path"`; `ctrl+l` → the same (2 of 2); `#load_list` exists in that dialog (1).
+- **Negative control:**
+  - Code read, 9a tree: `LoadFileScreen` has no `#load_list` (P-20) → RED.
+  - A mutation that opens every Load on `#load_list` → the `l` arm RED.
+- **Boundary catalog:** ☒ boundary — both keys.
 
-### LLR-173.3 — Every list renders names through `safe_text` (C8)
-- **Traceability:** HLR-173
-- **Ledger:** LED-2026-10-26-batch-100.10
-- **Statement:** Every row and preview line of the Load dialog built from names on disk or from the recent store shall render through `safe_text` (today's `screens.py:707` builds `Label(name)` with markup on).
+### LLR-173.2a — `p` opens the dialog on the list
+- **Traceability:** HLR-173 · trace: `action_load_project`, `on_button_pressed` (`#ws_load_project_button`) (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS event):** When the engineer presses `p` on the main screen or activates `#ws_load_project_button`, the system shall open the Load dialog with the focus on `#load_list`.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
+- **Numeric pass threshold:** `p` → `focused.id == "load_list"`; the button → the same; `p` in a work area with 0 projects → the dialog opens and the projects section paints `no projects` (3 of 3).
+- **Negative control:**
+  - Code read, 9a tree: `action_load_project` pushes `LoadProjectScreen` (`#project_list`), and with 0 projects it paints `No saved projects found.` and opens nothing → RED.
+  - A mutation that opens the `p` dialog on `#load_path` → `p`, then `enter`, loads nothing → RED.
+- **Boundary catalog:** ☒ empty ☒ boundary — 0 projects; the key and the button.
+
+### LLR-173.2b — The list opens on the open project
+- **Traceability:** HLR-173 · trace: the Load dialog `on_mount` (`screens.py`); `current_project` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS event):** When the Load dialog opens with the focus on `#load_list`, the system shall highlight the open project's row, or the first project row when no project is open.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
+- **Numeric pass threshold:** 3 of 3 — Projects `A`, `P`, `Z` with `P` open, then `p` → `P`'s row highlighted.
+  - No project open → `A`'s row highlighted.
+  - 0 projects and 1 work-area file → the file's row highlighted (3 of 3).
+- **Negative control:** a mutation that always highlights row 0 → the `P` arm highlights `A` → RED.
+- **Boundary catalog:** ☒ empty ☒ boundary — no project open; 0 projects.
+
+### LLR-173.2c — `tab` order
+- **Traceability:** HLR-173 · trace: the Load dialog compose order and focus chain (`screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS event):** When the engineer presses `tab` in the Load dialog, the system shall move the focus along `#load_path`, `#load_list`, `#load_preview`, `#load_ok`, `#load_cancel` and back to `#load_path`.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
+- **Numeric pass threshold:** from `#load_path`, 5 `tab` presses → the focused ids in that order, ending on `#load_path` (5 of 5); `shift+tab` → the reverse order (5 of 5).
+- **Negative control:** a mutation that leaves `#load_preview` unfocusable → the third press lands on `#load_ok` → RED.
+- **Boundary catalog:** ☒ boundary — the wrap from `#load_cancel` to `#load_path`.
+
+### LLR-173.2d — A printable key in the list types into the path field
+- **Traceability:** HLR-173 · trace: the Load dialog `on_key` (`screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS event):** When the engineer types a printable character while `#load_list` has the focus, the system shall move the focus to `#load_path` and append that character to its text.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
+- **Numeric pass threshold:** 6 of 6 — Each of `p`, `l`, `q`, `s`, `r` and `?` pressed with the list focused and the field empty → `#load_path` holds that one character and has the focus.
+  - The screen stack depth is unchanged and 0 app actions run (a spy on `S19TuiApp.run_action`) (6 of 6).
+  - `up`, `down`, `enter` and `tab` → not redirected (4 of 4).
+- **Negative control:**
+  - A mutation with no key redirect → `p` leaves `#load_path` empty → RED.
+  - Declared: under Textual 8.2.8 a modal screen already stops the app's non-priority bindings (`Screen._modal_binding_chain`, `textual/screen.py:449-455`), so the "0 app actions" arm passes without the redirect; the field arm is the RED.
+- **Boundary catalog:** ☒ boundary — printable keys that are app bindings on the main screen; non-printable navigation keys.
+
+### LLR-173.2e — App priority keys are inert while the dialog is open
+- **Traceability:** HLR-173 · trace: `BINDINGS` (`priority=True` entries), `check_action` or the four actions (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86, LED-2026-10-26-batch-100.87
+- **Statement (EARS unwanted):** If the engineer presses `ctrl+l`, `ctrl+s`, `ctrl+k` or `ctrl+d` while the Load dialog is open, then the system shall run no app action for that key.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
+- **Numeric pass threshold:** each of the 4 keys pressed with the dialog open → the screen stack stays the main screen plus the Load dialog (depth 2), the focus is inside the dialog, and the density and palette are unchanged (4 of 4); `ctrl+p` over the dialog (the command palette opens over it), then `ctrl+s` and `ctrl+l` → 0 Save pushes and 0 second dialogs (the guard reads the whole screen stack, S9b-1) (2 of 2).
+- **Negative control:** code read on Textual 8.2.8 and the 9a tree. `App._check_bindings(priority=True)` walks `reversed(self.screen._binding_chain)`, App included (`textual/app.py:3978-3981`), and the four bindings are `priority=True` (`BINDINGS` in `app.py`). So `ctrl+l` pushes a second Load dialog and `ctrl+s` pushes the Save dialog over it → RED. Status: `executed` (the S9b-1 probe: after `ctrl+l`, `ctrl+p` then `ctrl+s` stacks `Save` under the old stack-top guard → RED; the whole-stack guard keeps the stack `['Screen','Dlg','CommandPalette']`).
+- **Boundary catalog:** ☒ invalid — the four priority keys, and `ctrl+p` over the dialog.
+
+### LLR-173.2f — A load asked with the list last loads the highlighted row
+- **Traceability:** HLR-173c · trace: the Load dialog `action_load`, `on_button_pressed`, focus tracking (`screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS event):** When the engineer presses `enter` or `alt+l`, or activates `#load_ok`, while `#load_list` held the focus more recently than `#load_path`, the system shall close the Load dialog with the highlighted row's choice.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
+- **Numeric pass threshold:** The 3 triggers × a project, a work-area file and a recent row highlighted → 9 dismisses with the matching `LoadChoice` (9 of 9).
+  - Text in `#load_path`, then `tab` into the list, then `enter` → the row's choice (1).
+- **Negative control:** a mutation that always takes the typed text → the list arms dismiss with `path` → RED.
+- **Boundary catalog:** ☒ boundary — text present in the field while the list was last.
+
+### LLR-173.2g — A load asked with the path field last loads the typed text
+- **Traceability:** HLR-173c · trace: the Load dialog `action_load`, `on_input_submitted` (`screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS event):** When the engineer presses `enter` or `alt+l`, or activates `#load_ok`, while `#load_path` held the focus more recently than `#load_list` and holds a path the typed-path route accepts, the system shall close the Load dialog with a `path` choice of that text.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
+- **Numeric pass threshold:** a valid typed file path with a row highlighted → the 3 triggers give 3 `path` choices of the text (3 of 3).
+- **Negative control:** a mutation that always takes the highlighted row → `path` arms dismiss with the row → RED.
+- **Boundary catalog:** ☒ boundary — a row highlighted while the field was last.
+
+### LLR-173.2h — An empty typed text is explained
+- **Traceability:** HLR-173d · trace: the Load dialog `action_load` (`screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS unwanted):** If a load is asked while `#load_path` held the focus more recently than `#load_list` and its text is empty or only spaces, then the system shall keep the Load dialog open and paint `nothing selected` and `pick a row or type a path` in `#load_reason`.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
+- **Numeric pass threshold:** `""` and `"   "` → 2 token pairs, 0 dismisses, the field text unchanged (2 of 2).
+- **Negative control:** executed on `1d677ba` (P-19): an empty Load gives no status and no notice → RED.
+- **Boundary catalog:** ☒ empty — no text; spaces only.
+
+### LLR-173.2i — A load with no highlighted row is explained
+- **Traceability:** HLR-173d · trace: the Load dialog `action_load` (`screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS unwanted):** If a load is asked while `#load_list` held the focus more recently than `#load_path` and no loadable row is highlighted, then the system shall keep the Load dialog open and paint `nothing selected` and `pick a row or type a path` in `#load_reason`.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
+- **Numeric pass threshold:** An empty work area, an empty temp folder and no store → `p`, then `enter` → 1 token pair, 0 dismisses.
+  - A section heading or an empty-section token line highlighted → 1 token pair, 0 dismisses (2 of 2).
+- **Negative control:** a mutation that dismisses with the heading row's text → 1 dismiss → RED.
+- **Boundary catalog:** ☒ empty ☒ boundary — every section empty; a heading highlighted.
+
+### LLR-173.2j — A click selects and never loads
+- **Traceability:** HLR-173 · trace: the Load dialog list message handlers (`screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS event):** When the engineer clicks a row of `#load_list`, the system shall highlight that row and keep the Load dialog open.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
+- **Numeric pass threshold:** 1 click on the second project row → that row highlighted, 0 dismisses; 2 clicks within 300 ms (a double-click) → 0 dismisses (2 of 2).
+- **Negative control:** a dialog that loads on the list's selected message → 1 dismiss on the first click → RED. Textual 8.2.8 posts the same `Selected` message for a click as for `enter` (`textual/widgets/_option_list.py:721-730`), so the dialog cannot load on that message.
+- **Boundary catalog:** ☒ boundary — a single and a double click.
+
+### LLR-173.2k — `escape` closes with no result
+- **Traceability:** HLR-173e · trace: the Load dialog `BINDINGS` / `action_cancel` (`screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS event):** When the engineer presses `escape` in the Load dialog, the system shall close it with no result.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
+- **Numeric pass threshold:** `escape` from `#load_path`, `#load_list`, `#load_preview` and `#load_ok` → 4 dismisses with `None`, the session digest unchanged and the store bytes unchanged (4 of 4).
+- **Negative control:** executed on `1d677ba` (P-18): `escape on LoadFileScreen -> screen: LoadFileScreen` → RED.
+- **Boundary catalog:** ☒ boundary — each focus position.
+
+### LLR-173.2l — `#load_cancel` closes with no result
+- **Traceability:** HLR-173e · trace: the Load dialog `on_button_pressed` (`screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS event):** When the engineer activates `#load_cancel`, the system shall close the Load dialog with no result.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
+- **Numeric pass threshold:** a click and `enter` on `#load_cancel` → 2 dismisses with `None`, the session digest unchanged (2 of 2).
+- **Negative control:** a mutation that maps `#load_cancel` to the load action → the empty-Load tokens and 0 dismisses → RED.
+- **Boundary catalog:** ☒ boundary — click and key activation.
+
+### LLR-173.3 — Project rows are painted literally (C8)
+- **Traceability:** HLR-173 · trace: the dialog rows builder (NEW, `app.py`); `painted_names` (`project_gather_service.py`); `safe_text` (`utils.py`)
+- **Ledger:** LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.86
+- **Statement (EARS ubiquitous):** The system shall paint each project row of the Load dialog literally.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-42 — `pytest tests/test_b100_load_dialog.py -k tc_b100_42`
-- **Numeric pass threshold:** a project `[b]P`, a file `[@click=app.bell]x.s19`, a file `[link=x]a.s19` and a name with U+009B → 4 literal rows, 0 spans, 0 control characters, 0 raises.
-- **Negative control:** today's `Label(name)` paints 1 span for `[b]P` (QA-02 probe) → RED.
-- **Boundary catalog:** ☒ invalid — hostile names.
+- **Numeric pass threshold:** projects named `[b]P`, `[@click=app.bell]Q`, `x` + U+202E + `R` and `a` + U+009B + `S` → 4 rows whose plain text equals the name with the Cc / Cf characters removed, 0 spans, 0 characters of category Cc, Cf or Cs, 0 raises (4 of 4). The U+009B arm is reported not run where the volume refuses that folder name.
+- **Negative control:** code read, `4fef292` and 9a tree: `screens.py:712` builds `ListItem(Label(name))` with markup on, and `[b]P` paints 1 span (QA-02 probe) → RED. A mutation that paints `safe_text(name)` (C0 / C1 only) keeps U+202E → RED.
+- **Boundary catalog:** ☒ invalid — markup-shaped, bidi and C1 names.
 
-### LLR-173.4 — The dialog's sources, empty sections and recent rows
-- **Traceability:** HLR-173
-- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.18, LED-2026-10-26-batch-100.40
-- **Statement:** The Load dialog shall take projects from `list_projects`, files from `list_workarea_files` and recents from `read_recent_sources`; each empty section shall paint its tokens. A recent row shall show only its path and kind from the store, and "checked when loaded"; a recent entry shall not be stat-ed, previewed or read before the engineer presses Enter on it, and a recent source missing on pick shall paint `not found` and drop the entry. A project row's preview shall read its manifest on a worker with the LLR-169.4 caps, cancelled when the highlight moves.
+### LLR-173.3a — Work-area file rows are painted literally (C8)
+- **Traceability:** HLR-173 · trace: the dialog rows builder (NEW, `app.py`); `painted_names`; `safe_text`
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS ubiquitous):** The system shall paint each work-area file row of the Load dialog literally.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-42 — `pytest tests/test_b100_load_dialog.py -k tc_b100_42`
+- **Numeric pass threshold:** The six hostile names of LLR-172.6 (each given a loadable suffix) → 6 literal rows, 0 spans, 0 Cc / Cf / Cs characters.
+  - A 130-character name → a 120-character label ending in `…` (7 of 7). The surrogate arm is reported not run where the name cannot be made.
+- **Negative control:** a mutation that builds the row as `Label(name)` → the `[bold]x.s19` row paints 1 span → RED.
+- **Boundary catalog:** ☒ invalid ☒ boundary — the hostile names; the 120-character clip.
+
+### LLR-173.3b — Recent rows are painted literally (C8)
+- **Traceability:** HLR-173 · trace: the dialog rows builder (NEW, `app.py`); `painted_names`; `safe_text`
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS ubiquitous):** The system shall paint each recent row of the Load dialog literally.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-42 — `pytest tests/test_b100_load_dialog.py -k tc_b100_42`
+- **Numeric pass threshold:** store entries `C:\x\[bold]a.s19`, `C:\x\[link=y]b.hex` and `C:\x\[@click=app.bell]c.a2l` (each accepted by the 9a read) → 3 rows with 0 spans whose plain text holds the literal file name (3 of 3).
+- **Negative control:** a mutation that builds the row as `Label(path)` → 1 span per row → RED.
+- **Boundary catalog:** ☒ invalid — markup-shaped paths the store read accepts.
+
+### LLR-173.3c — Preview lines are painted literally (C8)
+- **Traceability:** HLR-173 · trace: the preview builder (NEW, `app.py`); the Load dialog preview pane (`screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS ubiquitous):** The system shall paint literally every file, variant and problem name shown in the Load dialog's preview.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-42 — `pytest tests/test_b100_load_dialog.py -k tc_b100_42`
+- **Numeric pass threshold:** project `P` holding `[b]v.s19`, `[i]m.mac` and `[u]c.a2l` → the preview's plain text holds the 3 literal names and 0 spans come from them; a recent `C:\x\[bold]a.s19` previewed → 0 spans (4 of 4).
+- **Negative control:** a mutation that writes the preview with markup on → `[b]v.s19` paints bold → RED.
+- **Boundary catalog:** ☒ invalid — markup-shaped names in every preview line kind.
+
+### LLR-173.3d — A picked row loads the on-disk name, never the label
+- **Traceability:** HLR-173 · trace: the dialog rows builder (NEW, `app.py`); the Load dialog row data (`screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS event):** When the engineer loads a project or work-area file row, the system shall load the exact on-disk name that row holds.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-42 — `pytest tests/test_b100_load_dialog.py -k tc_b100_42`
+- **Numeric pass threshold:** the `[b]P` project → `current_project == "[b]P"`; the U+009B file and the 130-character file (label clipped) → `current_file.path.name` equals each on-disk name (3 of 3).
+- **Negative control:** a mutation that stores the painted label as the row's value → the U+009B and clipped arms load nothing → RED.
+- **Boundary catalog:** ☒ invalid ☒ boundary — a C1 name; a clipped label.
+
+### LLR-173.4 — The projects section is the project list
+- **Traceability:** HLR-173 · trace: `list_projects`, the dialog rows builder (NEW) (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.18, LED-2026-10-26-batch-100.40, LED-2026-10-26-batch-100.86
+- **Statement (EARS event):** When the Load dialog opens, the system shall list in its projects section exactly the names the project list of this work area returns, in that order.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
-- **Numeric pass threshold:** 2 projects + 1 reserved folder + 1 junction, 2 files, 3 recents → 2 + 2 + 3 rows; empty sources → 3 token lines; rendering and highlighting 3 recents → 0 filesystem calls (a counting probe on `os.stat` / `open`) and painted text = path + kind + `checked when loaded`, 0 `●`; a missing recent picked → 1 `not found`, the store without it; highlighting a project with a 1 MiB manifest → a key answered within 200 ms.
-- **Negative control:** a mutation listing folders without `list_projects` → the reserved folder listed → RED; a mutation previewing a recent on highlight → 1 filesystem call → RED; a main-thread preview read → the 200 ms arm RED.
-- **Boundary catalog:** ☒ empty ☒ invalid ☒ error — every section empty; an over-cap manifest; a missing recent.
+- **Numeric pass threshold:** projects `ab` and `cd`, the reserved folders `temp` and `patches`, and a junction folder `jx` → 2 project rows, `ab` then `cd`. The junction arm is Windows only and is reported not run when no junction can be made.
+- **Negative control:** a mutation that lists the work area's folders without `list_projects` → `temp`, `patches` and `jx` listed → RED.
+- **Boundary catalog:** ☒ invalid — reserved homes; a junction.
 
-### LLR-173.5 — An invalid typed path is explained inside the dialog (UX-06)
-- **Traceability:** HLR-173
-- **Ledger:** LED-2026-10-26-batch-100.10
-- **Statement:** When the typed path does not exist, has an unsupported suffix, or is a folder that is not a project or lies outside the work area, the Load dialog shall stay open, keep the typed text and paint the matching tokens (LLR-172.5) in `#load_reason`, without dismissing.
+### LLR-173.4a — A folder that is not a project is not listed (§1.3; 9a C4, Q9)
+- **Traceability:** HLR-173 · trace: `list_projects`, `validate_project_files` (`app.py`, `workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS unwanted):** If a direct child folder of this work area holds no `project.json`, no data file and no A2L file, then the system shall leave it out of the Load dialog's projects section.
 - **Validation:** `test (integration)`
-- **Executed verification:** TC-B100-63 — `pytest tests/test_b100_load_dialog.py -k tc_b100_63`
-- **Numeric pass threshold:** 4 invalid paths → 4 token pairs, 0 dismisses, the field unchanged (4 of 4).
-- **Negative control:** a mutation dismissing with the path → the dialog closes → RED.
-- **Boundary catalog:** ☒ invalid — the four invalid kinds.
+- **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
+- **Numeric pass threshold:** An empty folder `e` and a folder `n` holding only `notes.txt` → 0 rows.
+  - A folder holding only `project.json`, one holding only `x.s19` and one holding only `c.a2l` → 1 row each (5 of 5).
+  - A typed `<workarea>/e` still gives `not a project` (LLR-172.5b, unchanged).
+- **Negative control:** code read, 9a tree: `list_projects` appends every folder that passes the link and reserved checks and `is_dir()`, so `e` and `n` are listed → RED.
+- **Boundary catalog:** ☒ empty ☒ boundary — an empty folder; each of the three contents alone.
 
-### LLR-173.6 — The preview marks the active set for every row kind, and the load installs it
-- **Traceability:** HLR-173
-- **Ledger:** LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.18, LED-2026-10-26-batch-100.34, LED-2026-10-26-batch-100.40, LED-2026-10-26-batch-100.46
-- **Statement:** `#load_preview` shall mark with `●` the files a load of the highlighted row installs, computed by `choose_install_set` (NEW, a pure module-level function in `app.py`, landed at Inc 7 with the fallback rule of LLR-169.6 and reused by the Inc 9b preview, so Inc 9b stays at 3 files): for a project, its variant, MAC and A2L, with its variants, sub-folders, manifest state and problems listed; for a file or work-area row, the file plus the MAC and A2L the session keeps, and, with a project open, the note that the file becomes that project's active variant; for a recent row, no `●` and nothing beyond LLR-173.4's path and kind. The dialog obtains the marks and the preview from `app.py` (a callback or message to the app, which runs the manifest read on an app-side worker); `screens.py` imports no service module, and the import census at Inc 9b confirms it. The panes shall stack below 100 columns, and no row shall wrap.
+### LLR-173.4b — The files section is the one lister, filtered to loadable files (CR9-11, 9a C7)
+- **Traceability:** HLR-173 · trace: `list_workarea_files`, `recent_kind` (`workspace.py`); the dialog rows builder (NEW, `app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS event):** When the Load dialog opens, the system shall list in its work-area files section each file `list_workarea_files` returns whose suffix maps to a load kind.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`; TC-B100-37 (the census, widened) — `pytest tests/test_b100_recents.py -k tc_b100_37`
+- **Numeric pass threshold:** `temp/` holding `a.s19`, `b.hex`, `c.a2l`, `d.a2l.json`, `e.txt` and the folder `.staging/` → 3 rows, `a.s19`, `b.hex`, `c.a2l`, in the lister's order.
+  - The TC-B100-37 census, widened to count a string literal equal to `temp` in any letter case joined to a path expression (CR9-11) → 1 enumerating function, `list_workarea_files`.
+  - A runtime spy on `os.scandir`, `os.listdir`, `Path.iterdir` and `Path.glob` during one dialog open → 1 enumeration of `temp/`, from `list_workarea_files`.
+  - 3 of 3.
+- **Negative control:**
+  - A dialog section written as `(self.workarea / "temp").iterdir()` → the widened census finds 2 functions and the spy 2 enumerations → RED. The 9a census misses it, as CR9-11 showed.
+  - A mutation with no suffix filter → 5 rows → RED.
+- **Boundary catalog:** ☒ invalid — an A2L JSON dump, a text file, the staging folder.
+
+### LLR-173.4c — The recents section is the store read
+- **Traceability:** HLR-173 · trace: `read_recent_sources` (`workspace.py`); the dialog rows builder (NEW, `app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS event):** When the Load dialog opens, the system shall list in its recents section each entry the recent-sources read returns, in the returned order.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
+- **Numeric pass threshold:** a store of 3 entries → 3 rows in stored order; a store of 20 → 20 rows; a store of 2 valid entries among 3 the read refuses → 2 rows (3 of 3).
+- **Negative control:** a mutation that sorts the rows by path → the 3-entry arm order differs → RED.
+- **Boundary catalog:** ☒ boundary ☒ invalid — 20 entries; refused entries.
+
+### LLR-173.4d — An empty projects section paints its tokens
+- **Traceability:** HLR-173 · trace: the dialog rows builder (NEW, `app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS unwanted):** If the project list returns no name, then the system shall paint `no projects` and `ctrl+s saves a project` in the Load dialog's projects section.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
+- **Numeric pass threshold:** 0 projects → 1 line holding both tokens, and that line cannot be loaded (LLR-173.2i) (1 of 1).
+- **Negative control:** a mutation that paints nothing → 0 lines → RED.
+- **Boundary catalog:** ☒ empty — no project.
+
+### LLR-173.4e — An empty files section paints its tokens
+- **Traceability:** HLR-173 · trace: the dialog rows builder (NEW, `app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS unwanted):** If the work-area files section has no row, then the system shall paint `no work-area files` and `l loads a file` in it.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
+- **Numeric pass threshold:** an empty `temp/`, and a `temp/` holding only `d.a2l.json` → 1 token line each (2 of 2).
+- **Negative control:** a mutation that paints the tokens only when `list_workarea_files` is empty → the `d.a2l.json` arm paints nothing → RED.
+- **Boundary catalog:** ☒ empty — no file; only unloadable files.
+
+### LLR-173.4f — An empty recents section paints its token
+- **Traceability:** HLR-173 · trace: the dialog rows builder (NEW, `app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS unwanted):** If the recent-sources read returns no entry and no problem, then the system shall paint `no recent sources` in the Load dialog's recents section.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
+- **Numeric pass threshold:** no store file; and a `LOCALAPPDATA` that is unset → 1 line holding `no recent sources` each (2 of 2).
+- **Negative control:** a mutation that paints nothing → 0 lines → RED.
+- **Boundary catalog:** ☒ empty — no store; no usable variable.
+
+### LLR-173.4g — A store problem is painted in the recents section
+- **Traceability:** HLR-173 · trace: `read_recent_sources` (`RecentSources.problem`) (`workspace.py`); the dialog rows builder (NEW, `app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS unwanted):** If the recent-sources read reports a problem, then the system shall paint that problem word and its next-step token in the Load dialog's recents section.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
+- **Numeric pass threshold:** A 65 537-byte store → 1 line holding `too large` and `the next load starts a new list`.
+  - A store whose read raises `PermissionError` (injected) → 1 line holding `could not be read` and `check that the recent-sources file can be opened`.
+  - 0 recent rows each (2 of 2).
+- **Negative control:** a mutation that ignores `problem` → `no recent sources` painted → RED.
+- **Boundary catalog:** ☒ error — too large; unreadable.
+
+### LLR-173.4h — A recent row shows the recorded file name and kind only
+- **Traceability:** HLR-173b · trace: the dialog rows builder (NEW, `app.py`); `RecentEntry` (`workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS ubiquitous):** The system shall paint each recent row as the recorded path's file name followed by the recorded kind.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
+- **Numeric pass threshold:** `C:\cal\v2\fw.s19` (kind `s19`) → plain text `fw.s19` then `s19`, 0 `●` (1); a 300-character recorded path → a row of 1 line (LLR-173.6n).
+- **Negative control:** a mutation that adds a size or a date to the row → that value can only come from a filesystem call, so LLR-173.4j turns RED; the text arm also differs → RED.
+- **Boundary catalog:** ☒ boundary — a long path.
+
+### LLR-173.4i — A highlighted recent previews the store's facts and nothing else
+- **Traceability:** HLR-173b · trace: the preview builder (NEW, `app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86, LED-2026-10-26-batch-100.87
+- **Statement (EARS event):** When a recent row is highlighted, the system shall paint in the preview its full recorded path, its kind and `checked when loaded`, with no `●`.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
+- **Numeric pass threshold:** 3 recents highlighted in turn → 3 previews, each holding the full recorded path (the preview's content text, not the clipped painted strip — S9b-8 governs the paint), the kind and `checked when loaded`, 0 `●` (3 of 3).
+- **Negative control:** code read, `1d677ba` prototype `pa_C.preview_file` reads the recent's bytes on highlight (`r.path.read_bytes()`) → a dialog copied from it previews size and "same bytes" → RED here and on LLR-173.4j.
+- **Boundary catalog:** ☒ boundary — each kind.
+
+### LLR-173.4j — No filesystem call touches a recent before it is loaded
+- **Traceability:** HLR-173b · trace: the dialog rows builder, the preview builder (NEW, `app.py`); the Load dialog (`screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS ubiquitous):** The system shall make no filesystem call on a recent entry's path before the engineer loads that row.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
+- **Numeric pass threshold:** the dialog opened and 3 recents highlighted (one present, one missing, one on an unassigned drive letter `Q:`) → 0 calls naming any of the 3 paths among `os.stat`, `os.lstat`, `os.scandir`, `os.listdir`, `open`, `os.path.exists` and `Path.exists` / `is_file` / `resolve` (a counting spy).
+- **Negative control:** a mutation that previews a recent's size on highlight → 1 call per highlight → RED.
+- **Boundary catalog:** ☒ invalid ☒ error — a missing entry; an unassigned drive.
+
+### LLR-173.4k — A recent missing on pick is explained inside the dialog
+- **Traceability:** HLR-173b · trace: the dialog verdict callback (NEW), `_typed_load_route` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS unwanted):** If a recent row the engineer loads names a path that does not exist, then the system shall keep the Load dialog open and paint `not found` and `check the path` in `#load_reason`.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
+- **Numeric pass threshold:** a recent whose file was deleted, then `enter` → 1 token pair, 0 dismisses, 0 loads, the store bytes unchanged (the entry stays; ruling Q3) (1 of 1).
+- **Negative control:** a mutation that dismisses and lets the router paint the status line → the dialog closes → RED.
+- **Boundary catalog:** ☒ error — a deleted source.
+
+### LLR-173.4l — The list order is projects, files, recents
+- **Traceability:** HLR-173 · trace: the Load dialog compose (`screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS ubiquitous):** The system shall order the Load dialog's list as the projects section, then the work-area files section, then the recents section, each under a heading that cannot be loaded.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
+- **Numeric pass threshold:** 1 item per section → 6 list lines in the order heading, project, heading, file, heading, recent (6 of 6); the headings read "Projects", "Work area" and "Recent".
+- **Negative control:** a mutation that lists recents first → RED.
+- **Boundary catalog:** ☒ boundary — one item per section.
+
+### LLR-173.4m — An unreadable project list says so in the projects section
+- **Traceability:** HLR-173 · trace: the dialog rows builder (NEW, `app.py`); `list_projects` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS unwanted):** If the project list cannot be read, then the system shall paint `could not be read` and `check that the folder can be opened, then load again` in the Load dialog's projects section, and the other sections still load.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
+- **Numeric pass threshold:** `PermissionError` injected into `list_projects` → 1 token line in the projects section, the files and recents sections built as usual, 0 raises, the dialog open (1 of 1).
+- **Negative control:** a mutation with no catch in the rows builder → the exception leaves `rows()` on mount and the app stops (Textual `exit_on_error`) → RED.
+- **Boundary catalog:** ☒ error — an unreadable project list.
+
+### LLR-173.4n — A linked file in a project folder is neither listed in the Load dialog preview nor installed by a project load
+- **Traceability:** HLR-173a · trace: `_list_project_files`, `_handle_load_project` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86, LED-2026-10-26-batch-100.87
+- **Statement (EARS unwanted):** If a file in a project folder is a link, then the system shall neither list it in the Load dialog preview nor install it in a project load.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-64 — `pytest tests/test_b100_load_dialog.py -k tc_b100_64`
-- **Numeric pass threshold:** 4 projects (clean, after a save-back, active variant missing, A2L-only), a file row and a file row with a project open → the `●` rows equal the installed paths after Enter (6 of 6); the project-open file row carries the active-variant note; at 99 columns → stacked, at 100 and 118 → side by side; 0 wrapped rows at 118.
-- **Negative control:** a mutation computing the mark from the first variant by name → the save-back project's mark differs from the install → RED.
-- **Boundary catalog:** ☒ boundary — 99 and 100 columns; the six row kinds.
+- **Numeric pass threshold:** a project `P` holding `a.s19` and a symlink `b.s19` (to a regular file), with `active_variant` `b` → 1 preview row (`a.s19`), 1 `●`, and after `enter` 1 install (`a.s19`) and 0 opens of the link target (1 of 1).
+- **Negative control:** a mutation whose scan follows links lists 2 rows → RED.
+- **Boundary catalog:** ☒ invalid — a linked `.s19` beside a regular `.s19`.
+
+### LLR-173.5 — A typed path not found is explained inside the dialog (UX-06)
+- **Traceability:** HLR-173d · trace: the dialog verdict callback (NEW), `_typed_load_route` (`app.py`); the Load dialog (`screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.86, LED-2026-10-26-batch-100.87
+- **Statement (EARS unwanted):** If the engineer asks the Load dialog to load a typed path that does not exist, then the system shall keep the dialog open with the typed text unchanged and paint `not found` and `check the path` in `#load_reason`.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-63 — `pytest tests/test_b100_load_dialog.py -k tc_b100_63`
+- **Numeric pass threshold:** `<tmp>/missing.s19` and `<workarea>/nope` → 1 token pair each, 0 dismisses, 0 status lines, the field text unchanged (2 of 2). SEC9b-1 (ruling B: refused, not truncated): an over-long paste (40 000 characters, over `#load_path`'s 4096 `max_length`) → the field unchanged and the app stays up; a `resolve_input_path` `ValueError`/`RuntimeError` → `not found` / `check the path`.
+- **Negative control:** code read, 9a tree: `LoadFileScreen` dismisses with the `Path` and the refusal becomes a status line after the dialog has closed (LLR-172.5f) → RED.
+- **Boundary catalog:** ☒ error — a missing file; a missing folder.
+
+### LLR-173.5a — A typed unsupported file or relative folder is explained inside the dialog
+- **Traceability:** HLR-173d · trace: the dialog verdict callback (NEW), `_typed_load_route` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86, LED-2026-10-26-batch-100.87
+- **Statement (EARS unwanted):** If the engineer asks the Load dialog to load a typed path that the typed-path route refuses as not a supported file, then the system shall keep the dialog open with the typed text unchanged and paint `not a supported file` and `check the path` in `#load_reason`.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-63 — `pytest tests/test_b100_load_dialog.py -k tc_b100_63`
+- **Numeric pass threshold:** `<tmp>/notes.txt`, `<tmp>/fw.s19.` (trailing dot, CR9-3) and the relative `.s19tool/workarea/ab` → 1 token pair each, 0 dismisses, the field text unchanged (3 of 3).
+- **Negative control:** code read, 9a tree (as LLR-173.5) → RED.
+- **Boundary catalog:** ☒ invalid — an unsupported suffix; a trailing dot; a relative folder.
+
+### LLR-173.5b — A typed folder that is not a project is explained inside the dialog
+- **Traceability:** HLR-173d · trace: the dialog verdict callback (NEW), `_typed_load_route` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS unwanted):** If the engineer asks the Load dialog to load a typed folder of this work area that is not a project, then the system shall keep the dialog open with the typed text unchanged and paint `not a project` and `pick a project in the list` in `#load_reason`.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-63 — `pytest tests/test_b100_load_dialog.py -k tc_b100_63`
+- **Numeric pass threshold:** `<workarea>/temp`, `<workarea>/TEMP`, an empty `<workarea>/e` and `<workarea>/ab/flows` → 1 token pair each, 0 dismisses, 0 session resets (4 of 4). The `TEMP` arm is Windows only.
+- **Negative control:** code read, 9a tree (as LLR-173.5) → RED.
+- **Boundary catalog:** ☒ invalid — reserved homes in two cases; an empty folder; a sub-folder.
+
+### LLR-173.5c — A typed folder outside the work area is explained inside the dialog
+- **Traceability:** HLR-173d · trace: the dialog verdict callback (NEW), `_typed_load_route` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS unwanted):** If the engineer asks the Load dialog to load a typed folder, or a typed `project.json`, outside this work area, then the system shall keep the dialog open with the typed text unchanged and paint `outside the work area` and `copy the folder into the work area` in `#load_reason`.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-63 — `pytest tests/test_b100_load_dialog.py -k tc_b100_63`
+- **Numeric pass threshold:** `<tmp>/P` and `<tmp>/P/project.json` → 1 token pair each, 0 dismisses (2 of 2).
+- **Negative control:** code read, 9a tree (as LLR-173.5) → RED.
+- **Boundary catalog:** ☒ invalid — an outside folder; an outside manifest.
+
+### LLR-173.5d — A typed path through a link or junction is explained inside the dialog
+- **Traceability:** HLR-173d · trace: the dialog verdict callback (NEW), `_typed_load_route` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS unwanted):** If the engineer asks the Load dialog to load a typed work-area folder path that passes through a link or junction, then the system shall keep the dialog open with the typed text unchanged and paint `link or junction` and `pick a project in the list` in `#load_reason`.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-63 — `pytest tests/test_b100_load_dialog.py -k tc_b100_63`
+- **Numeric pass threshold:** `<workarea>/jx` (a junction to `ab`) and `<workarea>/jx/project.json` → 1 token pair each, 0 dismisses, 0 resets (2 of 2). Windows only; reported not run when no junction can be made.
+- **Negative control:** code read, 9a tree (as LLR-173.5) → RED.
+- **Boundary catalog:** ☒ invalid — a junction folder; a manifest through it.
+
+### LLR-173.5e — A typed folder that cannot be read is explained inside the dialog
+- **Traceability:** HLR-173d · trace: the dialog verdict callback (NEW), `_typed_load_route` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS unwanted):** If the engineer asks the Load dialog to load a typed work-area folder that cannot be inspected, then the system shall keep the dialog open with the typed text unchanged and paint `could not be read` and `check that the folder can be opened, then load again` in `#load_reason`.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-63 — `pytest tests/test_b100_load_dialog.py -k tc_b100_63`
+- **Numeric pass threshold:** `PermissionError` injected into `os.lstat` of a walk prefix, and separately into `list_projects` → 1 token pair each, 0 dismisses, 0 raises (2 of 2). These are the CR9-6 arms painted in the dialog.
+- **Negative control:** code read, 9a tree (as LLR-173.5) → RED; a mutation that drops the classifier's `OSError` catch → the exception leaves the key handler → RED.
+- **Boundary catalog:** ☒ error — a walk error; a listing error.
+
+### LLR-173.6 — A project row's preview marks what `choose_install_set` installs
+- **Traceability:** HLR-173a · trace: `choose_install_set`, `build_variant_set`, `read_project_manifest`, `manifest_is_damaged`, the project preview builder (NEW) (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.18, LED-2026-10-26-batch-100.34, LED-2026-10-26-batch-100.40, LED-2026-10-26-batch-100.46, LED-2026-10-26-batch-100.86
+- **Statement (EARS event):** When a project row is highlighted, the system shall mark with `●` in the preview the variant, MAC and A2L that the project-load install rule selects for that project with no variant known to be unreadable.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-64 — `pytest tests/test_b100_load_dialog.py -k tc_b100_64`
+- **Numeric pass threshold:** 4 projects: clean; after a save-back (recorded active ≠ first by name); recorded active missing; A2L-only. Each highlighted, then `enter` → the `●` rows equal the Loaded panel's image, MAC and A2L paths (4 of 4). The A2L-only project marks the A2L only.
+- **Negative control:** a mutation that computes the mark from the first variant by name → the save-back arm differs → RED.
+- **Boundary catalog:** ☒ boundary — the four project kinds.
+
+### LLR-173.6a — A load that installs another variant than the one marked names it
+- **Traceability:** HLR-173a · trace: `_handle_load_project`, `choose_install_set` (`unreadable`), the Load-result composition (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS unwanted):** If a project load installs a variant other than the one the preview marked, then the system shall name the opened variant and the reason in the Load-result panel.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-64 — `pytest tests/test_b100_load_dialog.py -k tc_b100_64`
+- **Numeric pass threshold:** a project whose recorded active variant is a 0-byte file → the preview marks it (no image is read before Enter); after `enter` the Load-result panel names the next valid variant and `not readable` on the marked one (2 of 2).
+- **Negative control:**
+  - A mutation that drops the reason line from the panel → RED.
+  - Declared: the panel behaviour holds since Inc 7 (LLR-169.6, HLR-178), so this arm passes on the 9a tree; the requirement fixes the one case where the mark and the install may differ, and the mutation is the RED.
+- **Boundary catalog:** ☒ error — the marked variant unreadable at install.
+
+### LLR-173.6b — A file row's preview marks the file and what the session keeps
+- **Traceability:** HLR-173a · trace: the file preview builder (NEW), the install of a data or A2L load (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS event):** When a work-area file row is highlighted, the system shall mark with `●` in the preview that file and the MAC and A2L the session keeps after loading it.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-64 — `pytest tests/test_b100_load_dialog.py -k tc_b100_64`
+- **Numeric pass threshold:** each case highlighted, then `enter` → the `●` rows equal the Loaded panel's image, MAC and A2L paths:
+  - nothing loaded and an S19 row → 1 `●`;
+  - an A2L loaded and an S19 row → 2 `●`;
+  - an S19 and a MAC loaded and a HEX row → as the install keeps them;
+  - an S19 loaded and an A2L row → 2 `●`.
+  - 4 of 4.
+- **Negative control:** a mutation that marks only the highlighted file → the second arm differs → RED.
+- **Boundary catalog:** ☒ boundary — nothing loaded; A2L kept; MAC present; A2L attach.
+
+### LLR-173.6c — With a project open, a file row's preview says it becomes the active variant
+- **Traceability:** HLR-173a · trace: the file preview builder (NEW), `current_project` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS state):** While a project is open, the system shall paint, in the preview of a highlighted data-file row, a note that the file becomes that project's active variant.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-64 — `pytest tests/test_b100_load_dialog.py -k tc_b100_64`
+- **Numeric pass threshold:** project `P` open, S19 row → 1 note naming `P` (painted literally); no project open → 0 notes; project `P` open, A2L row → 0 notes (3 of 3).
+- **Negative control:** a mutation that paints the note whatever the state → the no-project arm RED.
+- **Boundary catalog:** ☒ boundary — no project; an A2L row.
+
+### LLR-173.6d — A project row's preview lists its variants
+- **Traceability:** HLR-173 · trace: `build_variant_set`, the project preview builder (NEW) (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS event):** When a project row's preview read completes, the system shall list every variant of that project in the preview in `build_variant_set` order.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-64 — `pytest tests/test_b100_load_dialog.py -k tc_b100_64`
+- **Numeric pass threshold:** a project with `b.s19`, `a.s19` and `c.hex` → 3 variant lines in `build_variant_set` order, exactly one carrying `●` (1 of 1).
+- **Negative control:** a mutation that lists only the marked variant → 1 line → RED.
+- **Boundary catalog:** ☒ boundary — three variants of two kinds.
+
+### LLR-173.6f — A project row's preview states the manifest
+- **Traceability:** HLR-173 · trace: `read_project_manifest`, `manifest_is_damaged` (`variant_execution_service.py`, called from `app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS event):** When a project row's preview read completes, the system shall paint the state of that project's `project.json` as `ok`, `no project.json` or `manifest damaged`.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-64 — `pytest tests/test_b100_load_dialog.py -k tc_b100_64`
+- **Numeric pass threshold:** a valid manifest → `ok`; none → `no project.json`; a 1 MiB + 1 byte manifest → `manifest damaged` (3 of 3).
+- **Negative control:** a mutation that paints `ok` whenever the file exists → the over-cap arm RED.
+- **Boundary catalog:** ☒ empty ☒ boundary — absent; over the 1 MiB cap.
+
+### LLR-173.6k — A project preview that cannot be read says so
+- **Traceability:** HLR-173 · trace: the project preview builder (NEW) (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS unwanted):** If a project's preview read raises an `OSError`, then the system shall paint `could not be read` and `check that the folder can be opened, then load again` in the preview, with no `●`.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-64 — `pytest tests/test_b100_load_dialog.py -k tc_b100_64`
+- **Numeric pass threshold:** `PermissionError` injected into the folder listing and, separately, into the manifest read → 1 token pair each, 0 `●`, 0 raises, the dialog open (2 of 2).
+- **Negative control:** a mutation with no catch in the preview builder → the builder error ends the app's run (Textual's default `exit_on_error`) → RED.
+- **Boundary catalog:** ☒ error — a listing error; a manifest read error.
+
+### LLR-173.6l — The dialog reads nothing itself
+- **Traceability:** HLR-173 · trace: the Load dialog (`screens.py`); its callables (NEW, `app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS ubiquitous):** The system shall give the Load dialog its rows, its previews and its typed-path verdicts only through callables from `app.py`.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-64 — `pytest tests/test_b100_load_dialog.py -k tc_b100_64`
+- **Numeric pass threshold:** AST census: the Load dialog class references 0 names bound by imports from `s19_app.tui.services.*`, `s19_app.tui.workspace` or `os` / `pathlib` filesystem calls.
+  - `screens.py`'s set of imported modules gains 0 modules over the 9a tree (2 of 2).
+- **Negative control:** a mutation where the dialog calls `list_workarea_files` itself → census 1 and 1 new import → RED.
+- **Note (defect fixed):** the old text "`screens.py` imports no service module" is false at `4fef292`. `screens.py` already imports `operation_service`, `report_service`, `entropy_service` and `report_addendum` (lines 66-73). So the census is scoped to the dialog class and to no new module.
+- **Boundary catalog:** none — a structural census.
+
+### LLR-173.6m — The panes stack below 100 columns
+- **Traceability:** HLR-173 · trace: the Load dialog `on_resize` (`screens.py`); `#load_dialog` rules (`styles.tcss`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS state):** While the terminal is narrower than 100 columns, the system shall place the Load dialog's preview below its list.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-64 — `pytest tests/test_b100_load_dialog.py -k tc_b100_64`
+- **Numeric pass threshold:** at 99 columns → the preview's region starts below the list's region (`preview.y >= list.y + list.height`); at 100 and 118 → the preview's region starts right of the list (`preview.x >= list.x + list.width`) (3 of 3); a resize from 118 to 99 with the dialog open → stacked (1).
+- **Negative control:** a mutation that sets the break at 118 → the 100-column arm stacks → RED.
+- **Boundary catalog:** ☒ boundary — 99, 100, 118; a live resize.
+
+### LLR-173.6n — A list row never wraps
+- **Traceability:** HLR-173 · trace: the Load dialog rows (`screens.py`); `#load_list` rules (`styles.tcss`)
+- **Ledger:** LED-2026-10-26-batch-100.86
+- **Statement (EARS ubiquitous):** The system shall paint each row of `#load_list` on one terminal line.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-64 — `pytest tests/test_b100_load_dialog.py -k tc_b100_64`
+- **Numeric pass threshold:** a 120-character project name, a 130-character file name and a 300-character recent path, at 99, 100 and 118 columns → every row's region height is 1 (9 of 9).
+- **Negative control:** a mutation that allows wrapping → the 130-character row is 2 lines high at 99 columns → RED.
+- **Boundary catalog:** ☒ boundary — long names at three widths.
 
 ### LLR-173.7 — Painted text carries no internal decision id
 - **Traceability:** HLR-173
-- **Ledger:** LED-2026-10-26-batch-100.10
-- **Statement:** No string painted by a surface this batch adds or changes — the Load dialog, the load question, the Save dialog, the busy indicator, the Load-result panel and the refusal tokens — shall carry an internal decision id (`D<n>`, `O-<n>`, `VS-…`, `LLR-…`, `HLR-…`).
+- **Ledger:** LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.86, LED-2026-10-26-batch-100.89
+- **Statement (EARS ubiquitous):** No string painted by a surface this batch adds or changes — the Load dialog, the load question, the Save dialog, the busy indicator, the Load-result panel and the refusal tokens — shall carry an internal decision id (`D<n>`, `O-<n>`, `VS-…`, `LLR-…`, `HLR-…`).
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-66 — `pytest tests/test_b100_load_dialog.py -k tc_b100_66` (renders each surface at 118×54 and greps its painted text)
-- **Numeric pass threshold:** 5 surfaces × their scenarios → 0 matches of `\bD\d+\b`, `\bO-\d+`, `VS-`, `LLR-`, `HLR-`.
-- **Negative control:** the prototypes paint "Browse is gone (D7)" and "D10: click loads OFF" (UX-18 captures) → a surface copied from them → RED.
-- **Boundary catalog:** none — the scan has no input classes; its set is every painted string of the five surfaces.
+- **Numeric pass threshold:** Written at Inc 9b: the Load dialog in 6 scenarios (each section highlighted, the empty Load, a refused path, a store problem), the Load-result panel and the refusal-token constants → 0 matches of `\bD\d+\b`, `\bO-\d+`, `VS-`, `LLR-`, `HLR-`.
+  - Extended at Inc 10 (the load question in 3 scenes — 1 item, 3 items, a project target — and the quit-parameter arm of LLR-174.2a), Inc 11 (the Save dialog) and Inc 12a (the busy indicator).
+- **Negative control:** the prototypes paint "Browse is gone (D7)" and "D10: click loads OFF" (UX-18 captures; `pa_C` via `_pa_common._paint_d10`) → a surface copied from them → RED; the prototypes' decision-id strings (UX-18) copied into the question → RED.
+- **Boundary catalog:** none — the scan has no input classes; its set is every painted string of the surfaces written so far.
 
-### LLR-174.1 — The trigger truth table
-- **Traceability:** HLR-174
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.3, LED-2026-10-26-batch-100.17
-- **Statement:** The load guard (NEW, in the one load seam, LLR-174.4) shall decide over unsaved image (D, `differs_from_last_saved`) × Flow Builder dirty (F, `is_dirty`, `flow_screens.py:1354`) × Patch Editor document dirty (W, a public accessor added to the panel, `screens_directionb.py:4808`) × load kind (image replace, attach, project): an image replace asks iff D; an attach (MAC or A2L) never asks; a project load asks iff D or F or W. Of the 24 cells, 11 ask and 13 load. A project open with nothing unsaved does not ask.
+### LLR-174.1 — An image replacement asks exactly when the image is unsaved
+- **Traceability:** HLR-174, HLR-174a · trace: `_confirm_then_load` (NEW, B100-I20), the load guard (NEW, `app.py`); `ChangeService.differs_from_last_saved` (`change_service.py`)
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.3, LED-2026-10-26-batch-100.17, LED-2026-10-26-batch-100.89
+- **Statement (EARS event):** When a route requests an image replacement, the system shall ask the question if and only if the loaded image differs from the copy last loaded or written.
 - **Validation:** `test (unit)`
-- **Executed verification:** TC-B100-44 — `pytest tests/test_b100_confirm.py -k tc_b100_44`
-- **Numeric pass threshold:** 24 of 24 cells as tabulated (executed: `cells 24 ask 11 load 13`); patched → Save project → image replace → load; patched + entries → Save project → project load → load; patched → save-back → image replace → load.
-- **Negative control:** dropping D → 5 cells wrong, dropping F → 1, dropping W → 1 (executed); making an attach ask on D (the round-2 table) → 4 cells wrong → RED.
-- **Boundary catalog:** ☒ boundary — every cell is one; the saved-then-patched cell.
+- **Executed verification:** TC-B100-44 — `pytest tests/test_b100_load_question.py -k tc_b100_44`
+- **Numeric pass threshold:** 14 of 14 arms:
+  - The 8 image-replacement cells of the table (D × F × W) → 4 ask (D = 1), 4 load (D = 0), 8 of 8.
+  - Boundaries, 0 questions each: patched → Save project → data load; patched → save-back → data load; a patch that writes the bytes already there; undo then Apply of the now-empty document (C12, the byte restored) (4 of 4).
+  - Boundary, 1 question: `undo()` alone (C13, the patched byte stays) (1 of 1).
+  - Boundary, 1 question: patched → Save project → patched again → data load (1 of 1).
+- **Negative control:**
+  - Dropping D from the rule → 4 cells wrong (executed enumeration, LED .17).
+  - Executed on the 9a tree (this E1's probe): `after apply: D = True`, then the Workarea pick runs with the stack `['Screen']` → RED.
+- **Boundary catalog:** ☒ boundary — every cell; the saved-then-patched cell.
 
-### LLR-174.2 — One short question, safe focus, keys
-- **Traceability:** HLR-174
-- **Ledger:** LED-2026-10-26-batch-100.3, LED-2026-10-26-batch-100.38
-- **Statement:** The confirm modal (NEW, `screens.py`, on the `pb_A` ids `#confirm_yes`, `#confirm_no`) shall take the question text and both button labels as parameters, and shall name in one short question every item that would be lost, start with the focus on `#confirm_no`, bind `y` to replace and `n` and `escape` to cancel, let `enter` act on the focused button, render names through `safe_text`, and push no second modal; cancel leaves the session unchanged. `LoadGuardScreen` (`screens_directionb.py:4279`) keeps guarding the Patch Editor's own document load.
-- **Validation:** `test (integration)`
-- **Executed verification:** TC-B100-45 — `pytest tests/test_b100_confirm.py -k tc_b100_45`
-- **Numeric pass threshold:** `n`, `escape` and an immediate `enter` → 0 changes to the image digest, `current_file.path` and `current_project`; `y` → 1 load; D, F and W together → 1 modal naming 3 items; 3 shown keys pressed → 3 actions; the modal built with a quit question and the labels "Quit (y)" / "Stay (n)" → those labels painted and both keys acting (1 arm).
-- **Negative control:** a mutation focusing `#confirm_yes` first → the immediate `enter` replaces → RED.
-- **Boundary catalog:** ☒ invalid — a key outside the set (ignored).
+### LLR-174.1a — An attach never asks
+- **Traceability:** HLR-174a · trace: the load guard (NEW, `app.py`); `_merge_mac_with_existing_primary`, `load_a2l_from_path` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS event):** When a route requests a MAC or A2L attach, the system shall attach the file without the question.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-44 — `pytest tests/test_b100_load_question.py -k tc_b100_44`
+- **Numeric pass threshold:** 10 of 10 arms:
+  - The 8 attach cells → 0 ask (8 of 8).
+  - An unsaved patch, then a MAC attach → the patched byte unchanged and D still true; then an A2L attach → the same (2 of 2).
+- **Negative control:**
+  - The round-2 rule (an attach asks on D) → 4 cells wrong (executed enumeration, LED .17).
+  - Executed on the 9a tree (this E1's probe): `MAC attach over patch: stack ['Screen'] | byte kept = True | D = True` — the attach keeps the patch, so asking would be a false alarm.
+- **Boundary catalog:** ☒ boundary — a MAC attach with and without a loaded image; an A2L attach.
 
-### LLR-174.3 — The question comes before the reset
-- **Traceability:** HLR-174
-- **Ledger:** none
-- **Statement:** For a project load, the answer shall be taken before `_reset_project_session` runs; a cancel shall not run it.
+### LLR-174.1b — A project load asks when any of the three flags is set
+- **Traceability:** HLR-174, HLR-174a · trace: the load guard (NEW, `app.py`); `ChangeService.differs_from_last_saved`; `FlowBuilderPanel.is_dirty` (`flow_screens.py`, unchanged); `PatchEditorPanel.is_dirty` (NEW, LLR-174.1c)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS event):** When a route requests a project load, the system shall ask the question if and only if the image is unsaved, the Flow Builder is dirty or the Patch Editor is dirty.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-44 — `pytest tests/test_b100_load_question.py -k tc_b100_44`
+- **Numeric pass threshold:** 10 of 10 arms:
+  - The 8 project cells → 7 ask, 1 load (8 of 8). With LLR-174.1 and LLR-174.1a: 24 of 24 cells, 11 ask, 13 load.
+  - Project P open, nothing unsaved, project load of Q → 0 questions (1 of 1).
+  - Patched + 1 Patch Editor entry → Save project → project load → 0 questions (1 of 1).
+- **Negative control:**
+  - Dropping F → 1 cell wrong; dropping W → 1 cell wrong; dropping D → 1 project cell wrong (executed enumeration, LED .17).
+  - The `pb_A` rule "ask when a project is open" → the P-open arm asks → RED.
+- **Boundary catalog:** ☒ boundary — every cell; re-loading the open project.
+
+### LLR-174.1c — The Patch Editor flag is read through a public reader
+- **Traceability:** HLR-174 · trace: `PatchEditorPanel.is_dirty` (NEW, `screens_directionb.py`); `_handle_save_dialog` (`app.py`, the E3 R1 read at the 9a tree's `:10576`); the load guard (NEW)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS ubiquitous):** The system shall read the Patch Editor panel's dirty flag only through a public reader of that panel.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-44 — `pytest tests/test_b100_load_question.py -k tc_b100_44`
+- **Numeric pass threshold:** 6 of 6 arms:
+  - AST census of `s19_app/` outside `screens_directionb.py`: 0 attribute reads of `_dirty` on a `PatchEditorPanel` value (1 of 1).
+  - The reader follows the flag's writers: True after an entry edit, after typing in the paste buffer and after Parse pasted; False after `mark_saved` and after `mark_loaded` (5 of 5).
+- **Negative control:** executed on the 9a tree (this E1's probe): `hasattr(PatchEditorPanel,'is_dirty') = False`; `private reads of panel._dirty in app.py: 1 [10576]` → RED.
+- **Boundary catalog:** ☒ boundary — each of the five writers of the flag.
+- **Note (premise):** P-43. The reader is the reason `screens_directionb.py` is Inc 10's fourth file (§5.5).
+
+### LLR-174.2 — One modal with exactly two buttons
+- **Traceability:** HLR-174 · trace: the question modal (NEW, `screens.py`); `_confirm_then_load` (NEW, `app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.3, LED-2026-10-26-batch-100.38, LED-2026-10-26-batch-100.89
+- **Statement (EARS event):** When the guard asks, the system shall show one modal question holding exactly the two buttons `#confirm_yes` and `#confirm_no`.
 - **Validation:** `test (integration)`
-- **Executed verification:** TC-B100-46 — `pytest tests/test_b100_confirm.py -k tc_b100_46`
-- **Numeric pass threshold:** cancel → 0 reset calls; replace → 1 reset call after the answer.
-- **Negative control:** a mutation resetting before asking → the cancelled session is empty → RED.
+- **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
+- **Numeric pass threshold:** one guarded data load with D → the screen stack grows by 1, the top screen holds 2 `Button` widgets with ids `confirm_yes` and `confirm_no`, 0 other buttons and 0 `Input` / `TextArea` widgets; while it is open, the question itself pushes 0 screens (VS-PB-2, no "save first" key) (4 of 4).
+- **Negative control:** the `pb_B` variant (a third "Save first" button bound to `s`) → 3 buttons → RED. On the 9a tree: 0 modals (probe) → RED.
+- **Boundary catalog:** ☒ boundary — one modal per request.
+
+### LLR-174.2a — The modal takes its text and labels as parameters
+- **Traceability:** HLR-174 · trace: the question modal `__init__` (NEW, `screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS ubiquitous):** The system shall build the question modal from a title, a question text and two button labels passed to it as parameters.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
+- **Numeric pass threshold:** the modal built with the title `Quit?`, the text `A save is running.` and the labels `Quit (y)` / `Stay (n)` → those 4 strings painted, 0 painted `Replace`; `y` → the replace answer and `n` → the cancel answer (6 of 6).
+- **Negative control:** a mutation that hard-codes `Replace (y)` → the quit arm paints `Replace (y)` → RED.
+- **Boundary catalog:** ☒ boundary — the load question and the quit question (Inc 12 reuses the modal, C-UX-4).
+
+### LLR-174.2b — The focus starts on Cancel
+- **Traceability:** HLR-174c · trace: the question modal `AUTO_FOCUS` (NEW, `screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS event):** When the question opens, the system shall put the focus on `#confirm_no`.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
+- **Numeric pass threshold:** the question pushed → `focused.id == "confirm_no"` (1 of 1; Q1-2).
+- **Negative control:** a mutation with `AUTO_FOCUS = "#confirm_yes"` → RED (and HLR-174c's immediate `enter` replaces).
+- **Boundary catalog:** ☒ boundary — the question pushed.
+
+### LLR-174.2c — `y` answers replace
+- **Traceability:** HLR-174b · trace: the question modal `BINDINGS` (NEW, `screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS event):** When the engineer presses `y` in the question, the system shall close the question with the replace answer.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
+- **Numeric pass threshold:** `y` with the focus on `#confirm_no` and with the focus on `#confirm_yes` → the replace answer each time (2 of 2).
+- **Negative control:** a mutation with no `y` binding → the question stays open → RED.
+- **Boundary catalog:** ☒ boundary — the focus on either button.
+
+### LLR-174.2d — `n` and `escape` answer cancel
+- **Traceability:** HLR-174c · trace: the question modal `BINDINGS` (NEW, `screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS event):** When the engineer presses `n` or `escape` in the question, the system shall close the question with the cancel answer.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
+- **Numeric pass threshold:** `n` and `escape`, each with the focus on each button → the cancel answer 4 times (4 of 4).
+- **Negative control:** a mutation with no `escape` binding (the P-18 shape) → the question stays open → RED.
+- **Boundary catalog:** ☒ boundary — both keys, the focus on either button.
+
+### LLR-174.2e — `enter` acts on the focused button
+- **Traceability:** HLR-174b, HLR-174c · trace: Textual `Button` (`enter` → press); the question modal `on_button_pressed` (NEW, `screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS event):** When the engineer presses `enter` in the question, the system shall give the answer of the focused button.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
+- **Numeric pass threshold:** an immediate `enter` → cancel; `tab`, then `enter` → replace; `tab`, `tab`, then `enter` → cancel (3 of 3).
+- **Negative control:** a mutation that maps `enter` to replace at the screen level → the immediate `enter` replaces → RED.
+- **Boundary catalog:** ☒ boundary — the focus wrapping after two `tab`s.
+
+### LLR-174.2f — A click answers with the clicked button
+- **Traceability:** HLR-174b, HLR-174c · trace: the question modal `on_button_pressed` (NEW, `screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS event):** When the engineer clicks `#confirm_yes` or `#confirm_no`, the system shall close the question with that button's answer.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
+- **Numeric pass threshold:** a click on `#confirm_yes` → replace; a click on `#confirm_no` → cancel (2 of 2).
+- **Negative control:** a mutation that ignores `Button.Pressed` → the click leaves the question open → RED.
+- **Boundary catalog:** ☒ boundary — both buttons.
+
+### LLR-174.2g — Any other key leaves the question open
+- **Traceability:** HLR-174 · trace: the question modal `BINDINGS` (NEW, `screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS unwanted):** If the engineer presses a key that no priority binding holds, other than `y`, `n`, `escape`, `enter`, `tab` or `shift+tab`, while the question is open, then the system shall keep the question open with the session unchanged.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
+- **Numeric pass threshold:** `a`, `l`, `p`, `s`, `q` and `space` → the question still the top screen and the session digest unchanged (6 of 6).
+- **Negative control:** the `pb_B` binding of `s` (save first) → the `s` arm leaves the question → RED.
+- **Boundary catalog:** ☒ invalid — six keys outside the set, two of them app keys (`l`, `p`) and `q` (quit).
+- **Note (informative):** priority keys are LLR-174.2h's subject; `ctrl+q` and the palette's Quit under the question belong to Inc 12's quit question, and no guard is added here (A10-06).
+
+### LLR-174.2h — The priority keys are inert under the question
+- **Traceability:** HLR-174 · trace: `S19TuiApp.check_action` (`app.py`; the 9b guard `_LOAD_DIALOG_INERT_ACTIONS`); `BINDINGS` (`ctrl+k`, `ctrl+d`, `ctrl+l`, `ctrl+s`, `priority=True`)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS unwanted):** If the engineer presses `ctrl+l`, `ctrl+s`, `ctrl+k` or `ctrl+d` while the question is open, then the system shall keep the question as the top screen and run no app action.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
+- **Numeric pass threshold:** each of the 4 keys → the stack depth unchanged, the question on top, 0 calls of `action_load_file`, `action_save_project`, `action_focus_palette` and `action_cycle_density` (spies) (4 of 4).
+- **Negative control:** code read, Textual 8.2.8: priority bindings walk the full chain, the App included, through a modal (the 9b finding behind LLR-173.2e), and 9b's guard is keyed on `LoadDialog` only → `ctrl+l` pushes a Load dialog over the question → RED. The executed probe is `planned` for the E2 baseline.
+- **Boundary catalog:** ☒ invalid — the four priority keys.
+
+### LLR-174.2i — Names are painted literally
+- **Traceability:** HLR-174d · trace: the question text composer (NEW, `app.py`); `painted_names` (`project_gather_service.py`); the question modal widgets with markup off (`screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS ubiquitous):** The system shall paint every name in the question literally.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
+- **Numeric pass threshold:** a loaded image `[b]x.s19`, a flow named `[red]f`, a project `[i]P` as the open project and as the target, and an image name holding U+202E → each painted name equals `painted_names([name])` and the painted text has 0 markup spans (5 of 5).
+- **Negative control:** a mutation that paints with markup on → `[b]x.s19` paints as `x.s19` → RED.
+- **Boundary catalog:** ☒ invalid — markup, a bidirectional control, a 130-character name (clipped to 120 with `…`).
+
+### LLR-174.2j — The Patch Editor's own load keeps its guard
+- **Traceability:** HLR-174 · trace: `LoadGuardScreen`, `PatchEditorPanel.DirtyLoadRequested` (`screens_directionb.py`, unchanged); `on_patch_editor_panel_dirty_load_requested` (`app.py`, unchanged)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS ubiquitous):** The system shall guard the Patch Editor's own document load with its existing dirty-load warning, not with the load question.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
+- **Numeric pass threshold:** a dirty Patch Editor, then its Load button → 1 `LoadGuardScreen`, 0 load questions (1 of 1).
+- **Negative control:** a mutation routing `DirtyLoadRequested` through the load question → 0 `LoadGuardScreen` → RED.
+- **Boundary catalog:** none — one route, kept as it is.
+
+### LLR-174.2k — The title names what is replaced
+- **Traceability:** HLR-174d · trace: the question text composer (NEW, `app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS ubiquitous):** The system shall title the load question `Replace <current>?`, where `<current>` is the open project's name, else the loaded image's file name, else `the current session`.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
+- **Numeric pass threshold:** project P open → `Replace P?`; no project, image `fw.s19` loaded → `Replace fw.s19?`; neither, a dirty Flow Builder, then a project load → `Replace the current session?` (3 of 3).
+- **Negative control:** a mutation that always uses the image name → the P arm paints `Replace fw.s19?` → RED.
+- **Boundary catalog:** ☒ boundary — project, image only, neither.
+
+### LLR-174.2l — The unsaved image is named by its file name
+- **Traceability:** HLR-174d · trace: the question text composer (NEW, `app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS event):** When the guard asks while the image is unsaved, the system shall name the loaded image's file name in the question.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
+- **Numeric pass threshold:** D with `fw.s19` loaded → the question text holds `fw.s19`, for a data load and for a project load (2 of 2).
+- **Negative control:** a mutation that names the project instead of the image → the data-load arm (no project) misses `fw.s19` → RED.
+- **Boundary catalog:** ☒ boundary — an image replacement and a project load.
+
+### LLR-174.2m — Unsaved Patch Editor work is named
+- **Traceability:** HLR-174d · trace: the question text composer (NEW, `app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS event):** When the guard asks for a project load while the Patch Editor is dirty, the system shall name `Patch Editor entries` in the question.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
+- **Numeric pass threshold:** W only → `Patch Editor entries` present; D only → absent (2 of 2).
+- **Negative control:** a mutation that names it on D → the D-only arm holds it → RED.
+- **Boundary catalog:** ☒ boundary — an entry edit; an unparsed paste buffer (both set W).
+
+### LLR-174.2n — Unsaved Flow Builder edits are named
+- **Traceability:** HLR-174d · trace: the question text composer (NEW, `app.py`); `FlowBuilderPanel.current_flow`, `FlowBuilderPanel.is_dirty` (`flow_screens.py`, unchanged)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS event):** When the guard asks for a project load while the Flow Builder is dirty, the system shall name `flow <flow name>` in the question.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
+- **Numeric pass threshold:** F with the flow `patch_chain` → `flow patch_chain` present; F with an unnamed flow → `flow flow` (the panel's default name) present; D only → no `flow ` item (3 of 3).
+- **Negative control:** a mutation that drops the flow item → the F arm misses it → RED.
+- **Boundary catalog:** ☒ boundary — a named flow, the default name.
+
+### LLR-174.2o — The load target is named
+- **Traceability:** HLR-174d · trace: the question text composer (NEW, `app.py`); `_confirm_then_load` (NEW)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS ubiquitous):** The system shall end the load question with `Load <target> anyway?`, where `<target>` is `project <name>` for a project load and the file name of the requested file otherwise.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
+- **Numeric pass threshold:** a project row `Q` → `Load project Q anyway?`; a typed `<tmp>/b.s19` → `Load b.s19 anyway?`; a Workarea pick `x.hex` → `Load x.hex anyway?`; `v` to `firmware_b` → `Load firmware_b.s19 anyway?` (4 of 4).
+- **Negative control:** a mutation that names the current file as the target → the typed arm paints the old name → RED.
+- **Boundary catalog:** ☒ boundary — one target per route.
+
+### LLR-174.2p — The load question's buttons say Replace and Cancel
+- **Traceability:** HLR-174b, HLR-174c · trace: `_confirm_then_load` (NEW, `app.py`); the question modal (NEW, `screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS ubiquitous):** The system shall label the load question's buttons `Replace (y)` on `#confirm_yes` and `Cancel (n)` on `#confirm_no`.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
+- **Numeric pass threshold:** 2 labels painted, each on its id (2 of 2); each shown key pressed acts (the "every shown key is verified" rule, §3 preface) (2 of 2).
+- **Negative control:** a mutation that reuses `ConfirmDiscardScreen`'s labels `Discard` / `Cancel` (`screens.py:934-935`) → 0 `Replace (y)` painted → RED.
+- **Boundary catalog:** none — two fixed labels.
+
+### LLR-174.2q — The question says the items hold unsaved changes, in two sentences
+- **Traceability:** HLR-174d · trace: the question text composer (NEW, `app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS ubiquitous):** The system shall state in the load question, in at most two sentences, that the named items hold unsaved changes.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
+- **Numeric pass threshold:** with 1, 2 and 3 items → the body holds the token `unsaved changes` once and at most 2 sentence ends (`.` or `?` outside names) (3 of 3).
+- **Negative control:** a mutation that writes one sentence per item → the 3-item arm has 4 sentences → RED.
+- **Boundary catalog:** ☒ boundary — 1, 2 and 3 items.
+
+### LLR-174.2r — Both buttons and the body stay on screen
+- **Traceability:** HLR-174 · trace: the question modal box rules (`styles.tcss`); the question modal (`screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS ubiquitous):** The system shall keep both buttons and the body of the question fully visible: each of the three regions equals its clipped region and lies inside the screen region.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
+- **Numeric pass threshold:** 3 items whose names are 120 characters long, at 99×54, 118×54 and 220×60 → both buttons and the body fully visible (each region equals its clipped region and lies inside the screen region) (3 of 3); the same at 118×54 with 1 short item (1).
+- **Negative control:** a mutation setting `min-width: 120` on `#confirm_box` → at 99 columns `#confirm_no` has 0 visible columns → RED; a mutation that fixes the box height at 7 rows with `#confirm_buttons` undocked → both buttons have 0 visible rows → RED.
+- **Boundary catalog:** ☒ boundary — 99, 118 and 220 columns; the longest names.
+
+### LLR-174.2s — A second answer is ignored
+- **Traceability:** HLR-174 · trace: the question modal `_close` `_dismissed` guard (NEW, `screens.py`)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS unwanted):** If a second answer reaches the question after the first, then the system shall ignore it.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
+- **Numeric pass threshold:** Q5-1 (`_close(True); _close(False)` in one tick) → 1 callback `True`, 1 pop, 0 exceptions; Q5-2 (`y` then `n` queued) → 1 answer; Q5-3 (the `_dismissed` flag, `escape` returns) → `CB == [False]` (3 of 3).
+- **Negative control:** the `_dismissed` guard removed → `ScreenStackError` (K7, executed) → RED.
+- **Boundary catalog:** ☒ error — a double answer in one tick.
+
+### LLR-174.2t — The Patch Editor's change-file dropdown keeps the guard
+- **Traceability:** HLR-174 · trace: `PatchEditorPanel.ChangeFileSelected`; `on_patch_editor_panel_change_file_selected` (`app.py`); `LoadGuardScreen` (`screens_directionb.py`, unchanged)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS unwanted):** If the engineer picks a change file in the Patch Editor's dropdown while the panel holds unsaved entries, then the system shall show the Patch Editor's load guard before replacing them.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
+- **Numeric pass threshold:** dirty + pick → 1 `LoadGuardScreen`, 0 loads, the entry count and the flag unchanged; clean + pick → 0 guards and the file loads (2 of 2).
+- **Negative control:** the `is_dirty` read removed → the dirty pick replaces the entries with no guard → RED.
+- **Boundary catalog:** ☒ boundary — a dirty panel; a clean panel.
+
+### LLR-174.3 — The answer comes before the project-session reset
+- **Traceability:** HLR-174b · trace: `_confirm_then_load` (NEW); `_route_load_project`, `_handle_load_project`, `_reset_project_session` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS event):** When the engineer confirms a project load, the system shall run the project-session reset after the answer.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-46 — `pytest tests/test_b100_load_question.py -k tc_b100_46`
+- **Numeric pass threshold:** `y` on a project load with W → 1 reset call, recorded after the question closed (an order spy on the dismiss and the reset); the same for re-loading the open project (2 of 2).
+- **Negative control:** a mutation that resets before asking → the reset is recorded before the dismiss → RED.
 - **Boundary catalog:** ☒ boundary — re-loading the open project.
 
-### LLR-174.4 — One load seam for every image-replacing route
-- **Traceability:** HLR-174
-- **Ledger:** LED-2026-10-26-batch-100.17, LED-2026-10-26-batch-100.27
-- **Statement:** `_confirm_then_load(kind, go)` (NEW, `app.py`) shall be the one seam through which every image-replacing route passes before it changes the session: the `LoadChoice` router (LLR-173.1), the Workarea Files pick (`_load_from_item`, `app.py:9021`, before `load_selected_file`), the variant switch (`_handle_select_variant`, `app.py:6736`, before `load_from_path`, reached by `v` and by the panel's `v`) and a project load from the dialog. It runs the guard (LLR-174.1) and the worker refusal (LLR-177.1). `_handle_load_project` called directly by tests is not a route and meets no modal.
+### LLR-174.3a — A cancelled project load runs no reset
+- **Traceability:** HLR-174c · trace: `_confirm_then_load` (NEW); `_reset_project_session` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS unwanted):** If the engineer cancels the question of a project load, then the system shall not run the project-session reset.
 - **Validation:** `test (integration)`
-- **Executed verification:** TC-B100-72 — `pytest tests/test_b100_confirm.py -k tc_b100_72`
-- **Numeric pass threshold:** with an unsaved patch: the Load dialog, a Workarea pick, `v` and the panel's `v` → 4 questions; `n` on each → 0 changes; a direct `_handle_load_project` call → 0 questions; an AST census of `load_selected_file` / `load_from_path` / `_handle_load_project` callers reachable from a binding or a list event → each passes the seam (0 bypasses).
-- **Negative control:** executed on `1d677ba` (P-42): the Workarea pick and `v` replace the image with no question → RED.
-- **Boundary catalog:** ☒ boundary — the four routes; a direct test call.
+- **Executed verification:** TC-B100-46 — `pytest tests/test_b100_load_question.py -k tc_b100_46`
+- **Numeric pass threshold:** `n`, `escape` and an immediate `enter` on a project load with D, F and W → 0 reset calls, the Patch Editor entry count unchanged and the Flow Builder blocks unchanged (3 of 3).
+- **Negative control:** a mutation that resets before asking → the cancelled session is empty → RED.
+- **Boundary catalog:** ☒ boundary — each cancel key.
+
+### LLR-174.3b — The project-load handler asks nothing
+- **Traceability:** HLR-174 · trace: `_handle_load_project` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS ubiquitous):** The system shall ask no question from inside the project-load handler.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-46 — `pytest tests/test_b100_load_question.py -k tc_b100_46`
+- **Numeric pass threshold:** 2 of 2 arms:
+  - A direct `_handle_load_project("P")` with D, F and W → 0 questions and 1 load (`current_project == "P"`).
+  - AST: the body of `_handle_load_project` holds 0 calls of `push_screen` and 0 calls of the seam (2 of 2).
+- **Negative control:** a mutation that moves the guard into `_handle_load_project` → the direct call pushes 1 question (and the 13 test files that call it directly, §5.4, wait on a modal) → RED.
+- **Boundary catalog:** none — a structural census plus one direct call.
+
+### LLR-174.3c — A confirmed project load that is then refused keeps the work
+- **Traceability:** HLR-174b, HLR-174c · trace: `_confirm_then_load` (NEW); `_handle_load_project` (`app.py`, the refusals before the reset)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS unwanted):** If a project load that the engineer confirmed is refused before the project-session reset, then the system shall keep the unsaved work.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-46 — `pytest tests/test_b100_load_question.py -k tc_b100_46`
+- **Numeric pass threshold:** a listed project `M2` holding 1 data file and 2 MAC files (listed by §1.3; refused by `_list_project_files`), with D and W → `y` → 1 refusal line, 0 reset calls, the session digest unchanged, D still true, the Patch Editor entry count and W unchanged (5 of 5); an A2L-only project `A2LONLY` whose one A2L cannot be read (an ACL deny-read or a lock) → `y` → 1 refusal line `No supported files in project: A2LONLY`, 0 reset calls, `current_file` unchanged, the entry count unchanged and the flag unchanged (5 of 5; probe_sec_refuse).
+- **Negative control:** a mutation that clears the flags or runs the reset when `y` is pressed → D or W false after the refusal → RED; the base order (the reset before the A2L read) → the A2L arm finds `current_file` `None`, 0 entries and the flag cleared after `y` → RED.
+- **Boundary catalog:** ☒ error — a project refused after the answer.
+
+### LLR-174.3d — A cancelled variant switch leaves the pending selection unchanged
+- **Traceability:** HLR-174c · trace: `_handle_select_variant` (`app.py`); `_pending_variant_id`
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS unwanted):** If the engineer cancels the question of a variant switch, then the system shall leave the pending variant selection unchanged.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-46 — `pytest tests/test_b100_load_question.py -k tc_b100_46`
+- **Numeric pass threshold:** `n` on the C40 switch → `_pending_variant_id is None` and `0` `load_from_path` calls; then a `#files_list` pick of `other.s19` answered `y` → after the install `current_file.variant_id is None` and `_variant_set.active_id == "firmware_a"` (2 of 2; C42).
+- **Negative control:** the stamp set before the seam (the base order) → `_pending_variant_id == "firmware_b"` after `n`, and the next install stamps `other.s19` as `firmware_b` → RED.
+- **Boundary catalog:** ☒ boundary — a cancelled switch; the next confirmed load.
+
+### LLR-174.4 — One load seam for every image-replacing route
+- **Traceability:** HLR-174 · trace: `_confirm_then_load` (NEW, B100-I20); `_handle_load_dialog`, `_load_workarea_file`, `_load_from_item`, `_handle_select_variant`, `_route_load_project`, `_load_path_from_user_input` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.17, LED-2026-10-26-batch-100.27, LED-2026-10-26-batch-100.89
+- **Statement (EARS ubiquitous):** The system shall pass every image-replacing route through one load guard before the route changes the session.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-72 — `pytest tests/test_b100_load_question.py -k tc_b100_72`
+- **Numeric pass threshold:** 8 of 8 arms plus the census:
+  - With an unsaved patch: the Load dialog, a Workarea Files pick and `v` by keys, and the Load-result panel's `v` with D forced through a private call (declared) → 4 questions; `n` on each → the session digest unchanged (4 + 4).
+  - AST census of `app.py`: every call of `load_selected_file`, `load_from_path`, `load_a2l_from_path` and `_handle_load_project` is inside a `go` passed to the load seam, inside `_handle_load_project`, or is `load_from_path`'s worker start; `_route_load_project`'s body is the project seam, so its callers are exempt (0 bypasses).
+- **Negative control:** executed on the 9a tree (this E1's probe): the Workarea pick, the Load dialog router and the variant switch each replace a patched image with the stack `['Screen']`; on `1d677ba` (P-42) the same for the Workarea pick and `v` → RED.
+- **Boundary catalog:** ☒ boundary — the four routes; the start-up load.
+- **Note (informative):** the old text also had the seam run the worker refusal (LLR-177.1). That refusal lands at Inc 12b, which adds it to this seam; Inc 10 adds no refusal.
+
+### LLR-174.4a — One question per load request
+- **Traceability:** HLR-174 · trace: `_confirm_then_load` (NEW); `_handle_load_dialog`, `_load_path_from_user_input`, `_route_load_project` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS event):** When one load request passes the load guard, the system shall ask at most one question for that request.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-72 — `pytest tests/test_b100_load_question.py -k tc_b100_72`
+- **Numeric pass threshold:** with D and W: a typed absolute project folder (the router, the typed-path route, then the project route) → 1 question; a recent data path → 1; a project row → 1 (3 of 3). After `y`, 0 further questions until the load ends.
+- **Negative control:** a mutation that guards both the dialog router and the project route → the typed project folder asks twice → RED.
+- **Boundary catalog:** ☒ boundary — a request that passes two routing functions.
+
+### LLR-174.4b — A typed or recent path takes its load kind from the resolved path
+- **Traceability:** HLR-174, HLR-174a · trace: `_load_path_from_user_input`, `_typed_load_route` (`app.py`); `_confirm_then_load` (NEW); `resolve_input_path` (`workspace.py`)
+- **Ledger:** LED-2026-10-26-batch-100.89, LED-2026-10-26-batch-100.90
+- **Statement (EARS event):** When the Load dialog closes with a `path` or `recent` choice, the system shall take the load kind from the path the typed-path route resolves, not from the typed text: an attach only when the resolved suffix is a MAC suffix and equals the typed suffix, else an image (fail closed).
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-72 — `pytest tests/test_b100_load_question.py -k tc_b100_72`
+- **Numeric pass threshold:** with D and W: typed `.mac` → 0 questions (attach); typed `.a2l` → 0; typed `.s19` → 1 question (image); typed `<W>/P` → 1 question naming `Patch Editor entries` (project); a typed file removed after the dialog's verdict (the classification refuses `not found`) → 0 questions and 1 refusal line; a relative `cal.mac` that is a symlink to a `.s19` → 1 question (the resolved suffix differs, fail closed to image, CR10-01); a plain relative `.mac` → 0 questions and the attach keeps D (CR10-01) (7 of 7).
+- **Negative control:** a mutation that keys the kind on the dismiss kind (`path` → image) → the `.mac` arm asks → RED; a mutation that keys the kind on the typed suffix (the 1747479 rule) → the `cal.mac`-link arm attaches with no question → RED (MC2).
+- **Boundary catalog:** ☒ boundary ☒ error — the three kinds; a refusal found at routing time; a typed suffix that differs from the resolved suffix.
+
+### LLR-174.4c — A work-area file takes its load kind from its suffix
+- **Traceability:** HLR-174, HLR-174a · trace: `_load_workarea_file` (9b G1), `_load_from_item` (`app.py`); `_confirm_then_load` (NEW)
+- **Ledger:** LED-2026-10-26-batch-100.89
+- **Statement (EARS event):** When the engineer picks a work-area file, the system shall treat a MAC or A2L file as an attach and any other file as an image replacement.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-72 — `pytest tests/test_b100_load_question.py -k tc_b100_72`
+- **Numeric pass threshold:** with D: `x.mac`, `c.a2l`, `x.s19` and `x.hex`, from the Load dialog's `workarea` rows and from the Workarea Files list → 0, 0, 1 and 1 questions on each surface (8 of 8).
+- **Negative control:** a suffix-blind mutation (every pick is an image replacement) → the `.mac` and `.a2l` arms ask → RED.
+- **Boundary catalog:** ☒ boundary — each loadable suffix on both surfaces; a suffix in upper case (`X.MAC`).
 
 ### LLR-175.1 — The dialog's lines follow the name rules
 - **Traceability:** HLR-175
@@ -2642,13 +3743,17 @@ FLOW: unsaved_work_to_question
       owner : LLR-174.1
       in    : unsaved image, flow dirty, document dirty, load kind
       out   : ask or load
+    - fn    : the public dirty reader (screens_directionb.py PatchEditorPanel.is_dirty)
+      owner : LLR-174.1c
+      in    : the panel's flag
+      out   : bool
     - fn    : the one load seam for every image-replacing route (app.py _confirm_then_load)
       owner : LLR-174.4
       in    : the Load dialog, the Workarea pick, the variant switch, a project load
       out   : the guard run once, then the load
     - fn    : the confirm modal (screens.py)
       owner : LLR-174.2
-      in    : what would be lost
+      in    : title, question text, two labels
       out   : replace or cancel
   SINK   : the load continues, or the session stays unchanged
 ```
@@ -2807,13 +3912,13 @@ COMPONENT: busy_status_line
 COMPONENT: load_question
   PARENT : SYSTEM
   SURFACE: Load question (P-B A)
-  INPUTS : unsaved_items: list[str]
+  INPUTS : title: str, body: str, yes_label: str, no_label: str
   OUTPUTS:
     - id          : confirm_no
       value       : the safe answer, focused first; y replaces, n and escape cancel
       address     : query("#confirm_no")
       cardinality : 1
-      consumers   : s19_app/tui/app.py::_handle_load_dialog
+      consumers   : s19_app/tui/app.py::_confirm_then_load
       owner       : LLR-174.2
 ```
 
@@ -2871,7 +3976,7 @@ ATs drive through the ids the verdict fixed (P-30), with the Load dialog's focus
 | AT-B100-12 | US-162 | Inc 9a | — (typed path, path field focused) | Load → per-user store |
 | AT-B100-13 | US-162 | Inc 9a | — | — |
 | AT-B100-14 | US-163 | Inc 9b | — | Load → store → Load dialog; preview marks → install |
-| AT-B100-15 | US-164 | Inc 10 (all four routes) | — | — |
+| AT-B100-15 | US-164 | Inc 10 (the three key-reachable routes — Load, the Workarea Files pick, `v` — plus the question, keep, replace, items and after-save halves; the panel's `v` is TC-B100-72's forced-state arm, because by keys the panel opens only on an image just recorded as saved) | — | — |
 | AT-B100-16 | US-165 | Inc 11 | — | — |
 | AT-B100-17 | US-166 | Inc 12a+12b (the bar rises ≥ 2 times during the A2L parse) | — | — |
 | AT-B100-18 | US-167 | Inc 12a+12b | — | — |
@@ -2882,9 +3987,10 @@ ATs drive through the ids the verdict fixed (P-30), with the Load dialog's focus
 | TC arm | Written at | Extended at |
 |---|---|---|
 | TC-B100-05 (LLR-164.2) | Inc 2: refusals, open-project save, an exact-name save that adds a variant | Inc 8a: the merge carry of `gathered` and `active_document` |
-| TC-B100-12 (LLR-166.1) | Inc 4: the load tails | Inc 6: panel closes; Inc 9b: dialog `esc`, cancelled load; Inc 10: question `n` |
+| TC-B100-12 (LLR-166.1) | Inc 4: the load tails | Inc 6: panel closes; Inc 9b: dialog `esc`, cancelled load; Inc 10: question `n` (a visible healthy `Input` keeps the focus — LLR-166.1 governs) and `escape` (a healthy focus kept) (LED .89) |
+| TC-B100-10 (LLR-165.3) | Inc 3 | Inc 10: the interim line removed — 0 closed-document lines; `test_tc_b100_10_interim_discard_notice` and `test_tc_b100_10_notice_names_every_discarded_entry` re-pinned to that arm (LED .89) |
 | TC-B100-59 (LLR-167.6, LLR-167.6a–g) | Inc 5: fresh, open project, pending patch, refused | Inc 7: the `files` row; Inc 8a: the document row and the merge; Inc 8b: sub-folder rows, skipped links, the MAC and A2L plan refusals, one row per landing, the own-A2L exemption, the per-file cap (LLR-167.6a–g) |
-| TC-B100-70 (LLR-167.8) | Inc 5: refused save; document not written | Inc 8a: the positive arm (re-pins the not-written arm), the failed-write and file-backed arms; Inc 10: the project-load question arm |
+| TC-B100-70 (LLR-167.8) | Inc 5: refused save; document not written | Inc 8a: the positive arm (re-pins the not-written arm), the failed-write and file-backed arms; Inc 10: the project-load question arm — 0 questions after Save project, 1 after a refused one (LED .89) |
 | TC-B100-20 (LLR-168.3) | Inc 6 | Inc 8a: `active_document` carried (with AT-B100-20) |
 | TC-B100-22 (LLR-169.2) | Inc 7 | Inc 8a: the active-document arm, run in TC-B100-28 (A-15) |
 | TC-B100-23 (LLR-169.3) | Inc 7 | Inc 8a: the `active_document` drift arm |
@@ -2903,13 +4009,24 @@ ATs drive through the ids the verdict fixed (P-30), with the Load dialog's focus
 | TC-B100-35 (LLR-172.2, LLR-172.2a, LLR-172.2b, LLR-172.2c, LLR-172.2d, LLR-172.2e, LLR-172.2f, LLR-172.2g, LLR-172.2h, LLR-172.2i, LLR-172.2j) | Inc 9a: the store read — order and cap, `too large`, wrong shape, `could not be read`, missing, the five entry checks, never raises (LED .82) | — |
 | TC-B100-35 (LLR-172.2k) | Inc 9a E5: a store entry holding `<>:"\|?*` after the drive prefix or a Cf / Zl / Zp / Cs character dropped; a `..` segment and an 8.3 spelling kept (LED .84) | — |
 | TC-B100-36 (LLR-172.3) | Inc 9a: the two marker arms (LED .82) | — |
-| TC-B100-37 (LLR-172.4, LLR-172.4a, LLR-172.4b, LLR-172.4c) | Inc 9a: the one-lister census, the listed rows, a file link left out, an unlistable temp folder (LED .82) | Inc 9b: the Load dialog's files section reads the same lister (LLR-173.4) |
+| TC-B100-37 (LLR-172.4, LLR-172.4a, LLR-172.4b, LLR-172.4c) | Inc 9a: the one-lister census, the listed rows, a file link left out, an unlistable temp folder (LED .82) | Inc 9b: the Load dialog's files section reads the same lister, the census widened to the string literal "temp" in any letter case, and a runtime enumeration spy during a dialog open (LLR-173.4b, CR9-11) |
 | TC-B100-37 (LLR-172.4d) | Inc 9a E5: a temp file whose name ends in a dot or a space not listed (LED .84) | — |
 | TC-B100-38 (LLR-172.5, LLR-172.5a, LLR-172.5b, LLR-172.5c, LLR-172.5d, LLR-172.5e, LLR-172.5f, LLR-172.5g) | Inc 9a: the typed project folder and `project.json`, the four typed refusals by token pair, a missing path, a reserved home refused by the project load (LED .82) | Inc 9b: the refusals painted in `#load_reason` (LLR-173.5) |
 | TC-B100-38 (LLR-172.5h) | Inc 9a E3: a relative typed folder path (base-folder fallback, a relative junction, a root-relative path) refused with `not a supported file` / `check the path`, never routed as a project (LED .83) | Inc 9b: painted in `#load_reason` (LLR-173.5) |
 | TC-B100-39 (LLR-172.6, LLR-172.6a) | Inc 9a: literal rows, the picked row loads the on-disk name (LED .82) | — |
+| TC-B100-34 (LLR-172.1n) | Inc 9b: a source found only through the base-folder or repository-root fallback (a junction arm and a base-only arm) not recorded; a file found as typed and an absolute junction path recorded lexically (LED .86) | — |
+| TC-B100-40 (LLR-173.1, LLR-173.1a, LLR-173.1b, LLR-173.1c, LLR-173.1e, LLR-173.1f, LLR-173.1g) | Inc 9b: one `LoadChoice` per kind, the project route with the Load-result panel, the work-area file in place (copy spy), the typed-path route, the one router census, the recent's recorded path unchanged, an unreadable picked project explained (LED .86) | Inc 10: the load question in this router (LLR-174.4) |
+| TC-B100-41 (LLR-173.2, LLR-173.2a, LLR-173.2b, LLR-173.2c, LLR-173.2d, LLR-173.2e, LLR-173.2f, LLR-173.2g, LLR-173.2h, LLR-173.2i, LLR-173.2j, LLR-173.2k, LLR-173.2l) | Inc 9b: the open keys and their focus, the open project highlighted, the `tab` order, printable keys typed into the path field, the priority keys inert, the list / path precedence of a load, the two empty-Load arms, a click selects, `escape` and Cancel close (LED .86) | — |
+| TC-B100-42 (LLR-173.3, LLR-173.3a, LLR-173.3b, LLR-173.3c, LLR-173.3d) | Inc 9b: project, file, recent and preview names painted literally; a pick loads the on-disk name (LED .86) | — |
+| TC-B100-43 (LLR-173.4, LLR-173.4a, LLR-173.4b, LLR-173.4c, LLR-173.4d, LLR-173.4e, LLR-173.4f, LLR-173.4g, LLR-173.4h, LLR-173.4i, LLR-173.4j, LLR-173.4k, LLR-173.4l, LLR-173.4m) | Inc 9b: the three sources and their order, a non-project folder left out, loadable files only, the empty-section and store-problem tokens, the recent row and preview, 0 filesystem calls before Enter, a missing recent explained in the dialog, an unreadable project list explained (LED .86) | — |
+| TC-B100-63 (LLR-173.5, LLR-173.5a, LLR-173.5b, LLR-173.5c, LLR-173.5d, LLR-173.5e) | Inc 9b: the six typed refusal reasons painted in `#load_reason`, the dialog open, the text kept (LED .86) | — |
+| TC-B100-64 (LLR-173.6, LLR-173.6a, LLR-173.6b, LLR-173.6c, LLR-173.6d, LLR-173.6f, LLR-173.6k, LLR-173.6l, LLR-173.6m, LLR-173.6n, LLR-173.4n) | Inc 9b: the `●` marks equal the install for project and file rows, a linked `.s19` neither marked nor installed, the project-open note, the project preview's lines, a read error, the dialog import census, the stacking break and one-line rows (LED .86) | — |
+| TC-B100-66 (LLR-173.7) | Inc 9b: the Load dialog, the Load-result panel and the refusal tokens (LED .86) | Inc 10: the question in 3 scenes and the quit-parameter arm (LED .89); Inc 11: the Save dialog; Inc 12a: the busy indicator |
 | TC-B100-71 (LLR-168.4) | Inc 7 | — |
-| TC-B100-72 (LLR-174.4) | Inc 10: all four routes | — |
+| TC-B100-44 (LLR-174.1, LLR-174.1a, LLR-174.1b, LLR-174.1c) | Inc 10: the 24-cell table by kind, the saved / save-back / saved-then-patched boundaries, an attach keeps the patch, the public reader of the Patch Editor flag (LED .89) | — |
+| TC-B100-45 (LLR-174.2, LLR-174.2a, LLR-174.2b, LLR-174.2c, LLR-174.2d, LLR-174.2e, LLR-174.2f, LLR-174.2g, LLR-174.2h, LLR-174.2i, LLR-174.2j, LLR-174.2k, LLR-174.2l, LLR-174.2m, LLR-174.2n, LLR-174.2o, LLR-174.2p, LLR-174.2q, LLR-174.2r, LLR-174.2s, LLR-174.2t) | Inc 10: one modal with two buttons, the parameters (quit arm), the focus, `y`, `n` / `escape`, `enter`, clicks, other keys, the priority keys inert, literal names, the Patch Editor's own guard kept, the title, the three items, the target, the labels, two sentences, the buttons and body on screen, a second answer ignored, the change-file dropdown keeps the guard (LED .89) | Inc 12a+12b: the quit question built through the same modal |
+| TC-B100-46 (LLR-174.3, LLR-174.3a, LLR-174.3b, LLR-174.3c, LLR-174.3d) | Inc 10: the reset after the answer, no reset on cancel, the project-load handler asks nothing, a confirmed and then refused project load keeps the work, a cancelled variant switch leaves the pending selection unchanged (LED .89) | — |
+| TC-B100-72 (LLR-174.4, LLR-174.4a, LLR-174.4b, LLR-174.4c) | Inc 10: all four routes (the panel's `v` with a forced state), the seam census, one question per request, the kind of a typed or recent path (from the resolved path, CR10-01), the kind of a work-area file (LED .89) | Inc 12b: the worker refusal in the seam (LLR-177.1) |
 | TC-B100-55 (LLR-178.1) | Inc 6: the reasons and the counts | Inc 7: the "first variant by name" mutation arm and the `derived_from` lines (ARCH-PDR-3) |
 | TC-B100-73 (LLR-176.4) | Inc 12: the parse callback | — |
 
@@ -2927,10 +4044,12 @@ Executed at `1d677ba` with `grep -rl --include=*.py <symbol> tests` (35 test sou
 | manifest API (Inc 6, 7, 8a) | 9 | additive keys (`files`, `active_document`, `derived_from`), no `schema_version` bump; pins `test_manifest_writer.py:99`, `:216`, `:481` hold |
 | `_resolve_manifest_entry` (Inc 7, LLR-169.8) | `test_b97_flow_builder.py`, `test_flow_persistence.py`, `test_flow_execution_service.py`, `test_manifest_writer.py`, `test_variant_execution.py` | the manifest-keys mode is used by `read_project_manifest` and `_reject_unsafe_entry` only; both flow-reference callers, `flow_persistence_service.py` and `flow_execution_service.py`, stay on the default mode, so `test_tc_b97_20_hostile_refs_render_literally` stays green (B-03) |
 | `_handle_save_dialog` (Inc 2, 5, 8a, 8b, 11) | 7: `test_b99_staging.py`, `test_project_gather.py`, `test_tui_app.py`, `test_tui_evidence_packs.py`, `test_tui_manifest_save.py`, `test_tui_report_seam.py`, `test_tui_variants.py` | under the emit decision on data (LLR-167.1) an unpatched session still byte-copies, so `test_save_project_creates_project_folder_on_disk` and the evidence-pack saves keep their files; `test_project_gather.py::test_tc700_active_editor_document_is_gathered_by_kind` (a check document) keeps a byte copy and its `checks/` placement; AT-B99-05 (save-back, then Save project) now emits and keeps `status.startswith("Project saved")` on `#log_line_4` with the entry-count suffix (LLR-167.3); the plan execution and the refusals are re-checked per file at each listed increment |
-| `_load_from_item`, `_handle_select_variant` (Inc 10) | callers through the Workarea Files list and `v` in `test_tui_directionb.py`, `test_tui_variants.py` | the one load seam asks only when something unsaved would be lost; tests without unsaved work meet no modal |
+| `_load_from_item`, `_handle_select_variant`, `_load_workarea_file` (9b G1), `_handle_load_dialog`, `_route_load_project`, `_load_path_from_user_input` (Inc 10) | the breaking set (E2 census): `test_at_b100_03…[size0/1]`, TC-B100-10 (`test_b100_session_reset.py`) and `test_tc_b99_40_strip_shows_new_file_source_byte` (`test_b99_editor_image.py`); `test_tui_patch_variant.py`, `test_b100_active_variant.py` and `test_loadfilescreen_input.py` were struck from the E1 first cut | the one load seam asks only when something unsaved would be lost; tests without unsaved work meet no modal; the 5 re-pinned nodes answer `y` or assert 0 closed-document lines |
+| interim closed-document line (Inc 10, LLR-165.3) | `tests/test_b100_session_reset.py`: `test_tc_b100_10_interim_discard_notice`, `test_tc_b100_10_notice_names_every_discarded_entry`, `test_at_b100_03_project_load_over_unsaved_work_saves_only_p2`; `test_tc_b100_10_no_discard_notice_when_nothing_unsaved` holds unchanged | re-pinned (§C.1, §C.5): the first two assert 0 closed-document lines, AT-B100-03 answers `y` |
+| `PatchEditorPanel._dirty` read outside its module (Inc 10, LLR-174.1c) | `app.py` `_handle_save_dialog` | replaced by the public reader `PatchEditorPanel.is_dirty` |
 | `#project_parent_path` (Inc 11, D7) | `test_b99_staging.py` (6 nodes: `test_tc_b99_14_save_project_missing_source`, `test_tc_b99_14_placement_failure_removes_created_folder`, `test_tc_b99_14_preexisting_folder_survives_placement_failure`, `test_at_b99_05_save_project_after_same_name_save_back`, `test_tc_b99_ux_c10_save_project_filename_renders_literally`, `test_tc_b99_ux_c10_placement_error_path_renders_literally`), `test_loadfilescreen_input.py:898`, `test_tui_directionb.py:3090` | re-pinned at Inc 11 with the same expectations and no parent typing (the payload's parent is the work area); AT-B99-05 keeps its outcome (LED-2026-10-26-batch-100.12) |
-| `LoadFileScreen` / `#load_path` / `#load_ok` (Inc 9b) | 4 / 10 | the ids survive in `pa_C`; class-name references re-pinned to the new dialog class |
-| `LoadProjectScreen` / `#project_list` / `#project_ok` (Inc 9b) | 7 / 7: `test_b97_load_project_dialog.py`, `test_b99_crc_region.py`, `test_b99_export.py`, `test_b99_load_project.py`, `test_b99_patch_truth.py`, `test_b99_staging.py`, `test_b99_truncation.py` | the dialog retires (VS-PA-3); project picks re-pinned to `#load_list` + `enter` |
+| `LoadFileScreen` / `#load_path` / `#load_ok` (Inc 9b) | 13 files / 60 references to `LoadFileScreen` | the ids survive in `pa_C`; class-name references re-pinned to the new dialog class |
+| `LoadProjectScreen` / `#project_list` / `#project_ok` (Inc 9b) | 17 files / 57 references to `LoadProjectScreen`; 17 files / 63 references to `#project_list` or `project_ok` | the dialog retires (VS-PA-3); project picks re-pinned to `#load_list` + `enter` |
 | `_handle_load_dialog(Path)` (Inc 9b) | `test_tui_app.py:1254`, `:1288` | unchanged: the handler keeps accepting a `Path` (LLR-173.1) |
 | `set_progress` / `#progress_bar` (Inc 12a+12b) | 5: `test_before_after_report.py`, `test_report_off_ui_thread.py`, `test_report_progress.py`, `test_tui_directionb.py`, `test_tui_report_attribution.py` | the bar keeps working (P-D A); value assertions re-pinned if the step mapping changes them |
 | snapshot cells (Inc 9b, 11, 12a) | 29 SVG cells carrying the status line or a dialog (QA-15 count) | rebaselined in the increment that changes them, each named in its packet |

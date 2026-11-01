@@ -1,0 +1,198 @@
+# red-02-corrective — batch-100 Inc 10 E5 corrective pass: the new arms on the base sources, before the fix
+# Part 1: 1747479 (CR10-01 arms + C60). Part 2: e4bfd6a, pre-Inc 10 (C60). Sources untouched; only the test file copied in.
+
+# RED on 1747479 (source untouched): CR10-01 arms (a) link, (b) plain; C60
+# tree: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/c10/base10c
+# HEAD: 17474791bde5dfea48f379883c91fd69c34853c7 ( M tests/test_b100_load_question.py )
+# s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\c10\base10c\s19_app\__init__.py
+# sha256[:16] s19_app/tui/app.py: 85ed4dabfc84d62f
+# sha256[:16] s19_app/tui/screens.py: 69a749f331f6d5c1
+# sha256[:16] s19_app/tui/screens_directionb.py: c53fd29b14f5c8ed
+# sha256[:16] tests/test_b100_load_question.py: c44244959bcd0e61
+# date: 2026-11-01T02:15:56Z
+# cmd: pytest tests/test_b100_load_question.py::test_tc_b100_72_relative_mac_takes_its_kind_from_the_resolved_path tests/test_b100_load_question.py::test_tc_b100_45_refusal_lines_paint_names_literally -p no:cacheprovider --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/c10/bt
+
+F..                                                                      [100%]
+================================== FAILURES ===================================
+__ test_tc_b100_72_relative_mac_takes_its_kind_from_the_resolved_path[link] ___
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/c10/bt/test_tc_b100_72_relative_mac_t0')
+arm = 'link'
+
+    @pytest.mark.parametrize("arm", ["link", "plain"])
+    def test_tc_b100_72_relative_mac_takes_its_kind_from_the_resolved_path(tmp_path: Path, arm: str) -> None:
+        """LLR-174.4b, HLR-174 (E5 ruling CR10-01 = SEC10-01): with an unsaved
+        patch on ``fw.s19`` (D), a relative path typed through the dialog that
+        the working folder does not hold, so ``resolve_input_path`` falls back
+        to the base folder and ``resolve()``s it:
+        (a) ``link``: ``<base>/cal.mac`` is a symlink to ``b.s19`` → 1 question
+        ``There are unsaved changes in fw.s19. Load b.s19 anyway?`` (the target
+        named from the resolved path); ``n`` → the session digest unchanged and
+        D still true (3 of 3);
+        (b) ``plain``: ``<base>/plain.mac`` is a real MAC file → 0 questions,
+        the MAC attached, the patched byte kept, D still true (4 of 4).
+        Live-guard control in each session: a typed ``b.s19`` asks 1 question.
+    
+        Why: the loader reads the resolved path, so the kind must too; a
+        ``.mac`` link to an image would otherwise replace the patched image
+        with no question.
+        Negative control: the kind from the typed suffix (the 1747479 rule) →
+        arm (a) asks nothing and installs ``b.s19`` → RED; every relative
+        fallback path an image → arm (b) asks → RED. RED (base 1747479): arm
+        (a). Arm (a) is skipped where ``os.symlink`` raises."""
+        scene = _scene(tmp_path)
+        typed_name = "cal.mac" if arm == "link" else "plain.mac"
+        target = scene.base / typed_name
+        if arm == "link":
+            try:
+                os.symlink(scene.src / "b.s19", target)
+            except (OSError, NotImplementedError) as exc:
+                pytest.skip(f"os.symlink raises here: {exc!r}")
+        else:
+            target.write_bytes((CASE01 / "firmware.mac").read_bytes())
+        assert not (Path.cwd() / typed_name).exists(), "setup: the working folder holds the typed name"
+    
+        async def scenario(app, pilot, log):
+            await _load(pilot, app, scene.src / "fw.s19")
+            address = await _patch(pilot, app)
+            byte = app.current_file.mem_map[address]
+            spy = PushSpy(app)
+            await _ask(pilot, app, lambda: app._handle_load_dialog(LC("path", str(scene.src / "b.s19"))))
+            control = spy.questions()
+            await _answer(pilot, app, "n")
+            before = _digest(app)
+            mark = spy.questions()
+            app._handle_load_dialog(LC("path", typed_name))
+            if arm == "link":
+                landed = lambda: Path(app.current_file.path).name == "b.s19"  # noqa: E731
+            else:
+                landed = lambda: _mac_name(app) == "plain.mac"  # noqa: E731
+            await ld.wait_for(pilot, lambda: is_question(app.screen) or landed(), f"the {arm} load")
+            await _settle(pilot, 6)
+            asked = spy.questions() - mark
+            body = q_body(app) if is_question(app.screen) else None
+            if is_question(app.screen):
+                await _answer(pilot, app, "n")
+                await _settle(pilot, 4)
+            if arm == "link":
+                result = (asked, body, _digest(app) == before, _D(app))
+            else:
+                result = (asked, _mac_name(app), app.current_file.mem_map.get(address) == byte, _D(app))
+            return result, control
+    
+        result, control = _run(scene.base, scenario)
+        if arm == "link":
+>           assert result == (1, "There are unsaved changes in fw.s19. Load b.s19 anyway?", True, True), result
+E           AssertionError: (0, None, False, False)
+E           assert (0, None, False, False) == (1, 'There ar...', True, True)
+E             
+E             At index 0 diff: 0 != 1
+E             Use -v to get more diff
+
+tests\test_b100_load_question.py:2485: AssertionError
+=================================== PASSES ====================================
+=========================== short test summary info ===========================
+PASSED tests/test_b100_load_question.py::test_tc_b100_72_relative_mac_takes_its_kind_from_the_resolved_path[plain]
+PASSED tests/test_b100_load_question.py::test_tc_b100_45_refusal_lines_paint_names_literally
+FAILED tests/test_b100_load_question.py::test_tc_b100_72_relative_mac_takes_its_kind_from_the_resolved_path[link]
+1 failed, 2 passed in 16.01s
+
+# ======================================================================
+
+# RED on e4bfd6a (pre-Inc 10, source untouched): C60
+# tree: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/c10/pre10
+# HEAD: e4bfd6a574962549b5a19bc4e9092222e3ff02a0 (?? tests/test_b100_load_question.py )
+# s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\c10\pre10\s19_app\__init__.py
+# sha256[:16] s19_app/tui/app.py: d0cfd46e22c3f60e
+# sha256[:16] s19_app/tui/screens.py: 120d39b9697fab0f
+# sha256[:16] s19_app/tui/screens_directionb.py: e94f8e764f950b1a
+# sha256[:16] tests/test_b100_load_question.py: c44244959bcd0e61
+# date: 2026-11-01T02:16:14Z
+# cmd: pytest tests/test_b100_load_question.py::test_tc_b100_45_refusal_lines_paint_names_literally -p no:cacheprovider --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/c10/bt
+
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________ test_tc_b100_45_refusal_lines_paint_names_literally _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/c10/bt/test_tc_b100_45_refusal_lines_0')
+
+    def test_tc_b100_45_refusal_lines_paint_names_literally(tmp_path: Path) -> None:
+        """LLR-174.2i, HLR-174d (C60, S10-04, E5 ruling SR-2): the three
+        refusal lines the seam functions paint scrub the name through
+        ``painted_names`` and paint it with markup off:
+        ``_handle_select_variant`` of an id ``[b]v`` + U+00AD + ``X`` + U+202E
+        with no descriptor → ``Variant not found: [b]vX``; a descriptor whose
+        ``path`` name is ``a`` + U+202E + ``[red]b.s19`` and does not exist →
+        ``Variant file missing: a[red]b.s19``; ``_handle_load_project`` of
+        ``A`` + U+202E + ``[i]B`` (an A2L-only project whose A2L read raises)
+        → ``No supported files in project: A[i]B``. Each line is the recorded
+        message AND the painted ``#log_line_4`` text, with 0 markup spans (3 of
+        3).
+    
+        Why: these names come from ``project.json`` and from disk; a
+        bidirectional control must never reverse a status line, and a bracket
+        must never style it.
+        Declared private calls: the ghost descriptor is added to
+        ``_variant_set``, and ``_load_a2l_data_with_cache`` is replaced by one
+        that raises (the untrusted-A2L arm, cross-platform).
+        Negative control: a raw name in any line (mutants M63, M64, M70) →
+        U+202E / U+00AD survive → RED. RED (pre-Inc 10 base e4bfd6a): the raw
+        names."""
+        from dataclasses import replace as dc_replace
+    
+        from s19_app.tui.models import VariantDescriptor
+    
+        scene = _scene(tmp_path)
+        hostile_project = "A\u202e[i]B"
+        _project(scene.wa, hostile_project, {"cal.a2l": (CASE01 / "firmware.a2l").read_bytes()})
+        ghost = scene.src / "a\u202e[red]b.s19"
+    
+        async def scenario(app, pilot, log):
+            out = {}
+    
+            def painted():
+                label = app.query_one("#log_line_4")
+                return (log.messages[-1], _plain(label), len(_spans(label)))
+    
+            await _open_project(pilot, app, "PV")
+            app._handle_select_variant("[b]v\u00adX\u202e")
+            await _settle(pilot, 4)
+            out["variant not found"] = painted()
+            app._variant_set = dc_replace(
+                app._variant_set,
+                variants=app._variant_set.variants + (VariantDescriptor("ghost", ghost, "s19"),),
+            )
+            app._handle_select_variant("ghost")
+            await _settle(pilot, 4)
+            out["variant file missing"] = painted()
+    
+            def unreadable(path):
+                raise ValueError("unreadable A2L")
+    
+            app._load_a2l_data_with_cache = unreadable
+            app._handle_load_project(hostile_project)
+            await _settle(pilot, 4)
+            out["no supported files"] = painted()
+            return out
+    
+        out = _run(scene.base, scenario)
+        expected = {
+            "variant not found": "Variant not found: [b]vX",
+            "variant file missing": "Variant file missing: a[red]b.s19",
+            "no supported files": "No supported files in project: A[i]B",
+        }
+>       assert out == {arm: (line, line, 0) for arm, line in expected.items()}, out
+E       AssertionError: {'no supported files': ('No supported files in project: A\u202e[i]B', 'No supported files in project: A\u202e[i]B', 0)...e[red]b.s19', 0), 'variant not found': ('Variant not found: [b]v\xadX\u202e', 'Variant not found: [b]v\xadX\u202e', 0)}
+E       assert {'no supporte...dX\u202e', 0)} == {'no supporte...d: [b]vX', 0)}
+E         
+E         Differing items:
+E         {'variant not found': ('Variant not found: [b]v\xadX\u202e', 'Variant not found: [b]v\xadX\u202e', 0)} != {'variant not found': ('Variant not found: [b]vX', 'Variant not found: [b]vX', 0)}
+E         {'no supported files': ('No supported files in project: A\u202e[i]B', 'No supported files in project: A\u202e[i]B', 0)} != {'no supported files': ('No supported files in project: A[i]B', 'No supported files in project: A[i]B', 0)}
+E         {'variant file missing': ('Variant file missing: a\u202e[red]b.s19', 'Variant file missing: a\u202e[red]b.s19', 0)} != {'variant file missing'...
+E         
+E         ...Full output truncated (2 lines hidden), use '-vv' to show
+
+tests\test_b100_load_question.py:1327: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_load_question.py::test_tc_b100_45_refusal_lines_paint_names_literally
+1 failed in 4.53s

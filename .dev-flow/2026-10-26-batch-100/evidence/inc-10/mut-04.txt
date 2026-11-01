@@ -1,0 +1,11 @@
+mutant id: M04
+target file: s19_app/tui/screens.py
+old text:         Binding("y", "answer(True)", show=False),
+new text:         Binding("y", "answer(False)", show=False),
+sha256 before: 69a749f331f6d5c1b64ec5757f69d9f737d9fb63fac07c1b28273c9d39ba270d
+command: pytest -q --tb=line tests/test_b100_load_question.py::test_tc_b100_45_y_replaces_with_the_focus_on_either_button tests/test_b100_load_question.py::test_tc_b100_72_replace_runs_the_load_on_every_route
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut10
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut10\s19_app\__init__.py
+pytest summary: 6 failed in 174.95s (0:02:54)
+verdict: KILLED
+restored = True

@@ -1,0 +1,16 @@
+mutant id: M08
+target file: s19_app/tui/screens.py
+old text:         Binding("escape", "answer(False)", show=False),
+new text:         Binding("escape", "answer(False)", show=False),
+            Binding("enter", "answer(True)", show=False),
+sha256 before: 69a749f331f6d5c1b64ec5757f69d9f737d9fb63fac07c1b28273c9d39ba270d
+occurrences of old text: 1
+command: pytest -q --tb=line -p no:cacheprovider --basetemp=<scratch>/c10/btm tests/test_b100_load_question.py -k tc_b100_45
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\c10\mutc
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\c10\mutc\s19_app\__init__.py
+pytest exit code: 0
+pytest summary: 25 passed, 32 deselected in 120.20s (0:02:00)
+verdict: SURVIVED
+restored = True
+
+--- pytest output (failure lines) ---

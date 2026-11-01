@@ -1,0 +1,31 @@
+mutant id: M71
+target file: s19_app/tui/app.py
+old text:         self._reset_project_session()
+        # LLR-028.1 — adopt the manifest's declared regions as app state so the
+        # next Reports dialog seeds from them (HLR-028 capture); reset to empty
+        # for a legacy/no-key project so a prior project's regions do not leak.
+        # A write, so it stays after the reset (S10-01).
+        self._declared_regions = (
+            tuple(manifest.declared_regions) if manifest is not None else ()
+        )
+new text:         self._declared_regions = (
+            tuple(manifest.declared_regions) if manifest is not None else ()
+        )
+        self._reset_project_session()
+        # LLR-028.1 — adopt the manifest's declared regions as app state so the
+        # next Reports dialog seeds from them (HLR-028 capture); reset to empty
+        # for a legacy/no-key project so a prior project's regions do not leak.
+        # A write, so it stays after the reset (S10-01).
+sha256 before: 5a9550c493ab6ad161b4a4d5e79f41681a3a964d4a2310751f81ff8441e925b7
+occurrences of old text: 1
+command: pytest -q --tb=line -p no:cacheprovider --basetemp=<scratch>/c10/btm tests/test_b100_load_question.py::test_tc_b100_46_project_load_adopts_declared_regions_after_the_reset
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\c10\mutc
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\c10\mutc\s19_app\__init__.py
+pytest exit code: 1
+pytest summary: 1 failed in 4.25s
+verdict: KILLED
+restored = True
+
+--- pytest output (failure lines) ---
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\c10\mutc\tests\test_b100_load_question.py:2180: AssertionError: []
+FAILED tests/test_b100_load_question.py::test_tc_b100_46_project_load_adopts_declared_regions_after_the_reset

@@ -1,0 +1,12 @@
+mutant id: M16
+target file: s19_app/tui/screens.py
+old text:     def on_button_pressed(self, event: Button.Pressed) -> None:
+        event.stop()
+new text:     def on_button_pressed(self, event: Button.Pressed) -> None:
+sha256 before: 69a749f331f6d5c1b64ec5757f69d9f737d9fb63fac07c1b28273c9d39ba270d
+command: pytest -q --tb=line tests/test_b100_load_question.py::test_tc_b100_45_click_answers_with_the_clicked_button
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut10
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut10\s19_app\__init__.py
+pytest summary: 1 passed in 3.33s
+verdict: SURVIVED
+restored = True

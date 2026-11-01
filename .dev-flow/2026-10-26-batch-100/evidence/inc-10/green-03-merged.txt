@@ -1,0 +1,290 @@
+# GREEN re-record (CR10-02) on the merged tree 1747479 + corrective edits: load_question module, 5 re-pinned nodes, 4 guard files
+# tree: C:/Users/jjgh8/Github/s19_app-b100-inc10
+# HEAD: 17474791bde5dfea48f379883c91fd69c34853c7 ( M s19_app/tui/app.py  M s19_app/tui/screens_directionb.py  M tests/test_b100_load_question.py  M tests/test_id_registry.py )
+# s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc10\s19_app\__init__.py
+# sha256[:16] s19_app/tui/app.py: 5a9550c493ab6ad1
+# sha256[:16] s19_app/tui/screens.py: 69a749f331f6d5c1
+# sha256[:16] s19_app/tui/screens_directionb.py: 1288d9015c281fe2
+# sha256[:16] tests/test_b100_load_question.py: c44244959bcd0e61
+# date: 2026-11-01T02:17:13Z
+# cmd: pytest tests/test_b100_load_question.py tests/test_b100_session_reset.py::test_tc_b100_10_interim_discard_notice tests/test_b100_session_reset.py::test_tc_b100_10_notice_names_every_discarded_entry tests/test_b100_session_reset.py::test_at_b100_03_project_load_over_unsaved_work_saves_only_p2 tests/test_b99_editor_image.py::test_tc_b99_40_strip_shows_new_file_source_byte tests/test_id_registry.py tests/test_b99_staging.py tests/test_engine_unchanged.py tests/test_b100_load_dialog.py -p no:cacheprovider --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/c10/bt
+
+........................................................................ [ 27%]
+........................................................................ [ 55%]
+.............................s.......................................... [ 82%]
+.................................sss.........                            [100%]
+=================================== PASSES ====================================
+_______ test_tc_b100_46_unreadable_a2l_project_after_yes_keeps_the_work _______
+------------------------------ Captured log call ------------------------------
+ERROR    s19_app.tui.a2l:a2l.py:213 A2L section parse failed: path=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\c10\bt\test_tc_b100_46_unreadable_a2l0\app\.s19tool\workarea\A2LONLY\cal.a2l reason=os_error
+Traceback (most recent call last):
+  File "C:\Users\jjgh8\Github\s19_app-b100-inc10\s19_app\tui\a2l.py", line 176, in build_section_tree
+    with path.open("r", encoding="utf-8", errors="replace") as handle:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py", line 1044, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\c10\\bt\\test_tc_b100_46_unreadable_a2l0\\app\\.s19tool\\workarea\\A2LONLY\\cal.a2l'
+=========================== short test summary info ===========================
+PASSED tests/test_b100_load_question.py::test_tc_b100_44_twenty_four_cells_ask_by_kind
+PASSED tests/test_b100_load_question.py::test_tc_b100_44_saved_states_load_without_asking
+PASSED tests/test_b100_load_question.py::test_tc_b100_44_undo_alone_and_repatch_after_save_ask
+PASSED tests/test_b100_load_question.py::test_tc_b100_44_attach_asks_nothing_and_keeps_the_patch
+PASSED tests/test_b100_load_question.py::test_tc_b100_44_project_load_asks_iff_a_flag_is_set
+PASSED tests/test_b100_load_question.py::test_tc_b100_44_patch_editor_reader_follows_its_writers
+PASSED tests/test_b100_load_question.py::test_tc_b100_44_no_private_dirty_read_outside_the_panel
+PASSED tests/test_b100_load_question.py::test_tc_b100_44_guard_reads_the_public_reader
+PASSED tests/test_b100_load_question.py::test_tc_b100_45_one_modal_with_replace_and_cancel
+PASSED tests/test_b100_load_question.py::test_tc_b100_45_modal_builds_from_its_parameters
+PASSED tests/test_b100_load_question.py::test_tc_b100_45_focus_starts_on_cancel_on_every_route
+PASSED tests/test_b100_load_question.py::test_tc_b100_45_y_replaces_with_the_focus_on_either_button
+PASSED tests/test_b100_load_question.py::test_tc_b100_45_n_and_escape_cancel_with_the_focus_on_either_button
+PASSED tests/test_b100_load_question.py::test_tc_b100_45_enter_answers_with_the_focused_button
+PASSED tests/test_b100_load_question.py::test_tc_b100_45_click_answers_with_the_clicked_button
+PASSED tests/test_b100_load_question.py::test_tc_b100_45_other_keys_leave_the_question_open
+PASSED tests/test_b100_load_question.py::test_tc_b100_45_priority_keys_are_inert_under_the_question
+PASSED tests/test_b100_load_question.py::test_tc_b100_45_names_paint_literally
+PASSED tests/test_b100_load_question.py::test_tc_b100_45_refusal_lines_paint_names_literally
+PASSED tests/test_b100_load_question.py::test_tc_b100_45_patch_editor_load_keeps_its_own_guard
+PASSED tests/test_b100_load_question.py::test_tc_b100_45_title_names_what_is_replaced
+PASSED tests/test_b100_load_question.py::test_tc_b100_45_unsaved_image_is_named_by_its_file_name
+PASSED tests/test_b100_load_question.py::test_tc_b100_45_patch_editor_entries_named_only_when_w
+PASSED tests/test_b100_load_question.py::test_tc_b100_45_flow_item_named_with_its_flow_name
+PASSED tests/test_b100_load_question.py::test_tc_b100_45_load_target_named_per_route
+PASSED tests/test_b100_load_question.py::test_tc_b100_45_body_says_unsaved_changes_once_in_two_sentences
+PASSED tests/test_b100_load_question.py::test_tc_b100_45_buttons_and_body_stay_fully_visible[size0-long]
+PASSED tests/test_b100_load_question.py::test_tc_b100_45_buttons_and_body_stay_fully_visible[size1-long]
+PASSED tests/test_b100_load_question.py::test_tc_b100_45_buttons_and_body_stay_fully_visible[size2-long]
+PASSED tests/test_b100_load_question.py::test_tc_b100_45_buttons_and_body_stay_fully_visible[size3-short]
+PASSED tests/test_b100_load_question.py::test_tc_b100_45_a_second_answer_is_ignored
+PASSED tests/test_b100_load_question.py::test_tc_b100_45_change_file_dropdown_keeps_the_guard
+PASSED tests/test_b100_load_question.py::test_tc_b100_45_modal_imports_nothing_from_the_app
+PASSED tests/test_b100_load_question.py::test_tc_b100_46_reset_runs_after_the_answer
+PASSED tests/test_b100_load_question.py::test_tc_b100_46_cancel_keeps_the_session_and_runs_no_reset
+PASSED tests/test_b100_load_question.py::test_tc_b100_46_project_load_handler_asks_nothing
+PASSED tests/test_b100_load_question.py::test_tc_b100_46_refused_project_after_yes_keeps_the_work
+PASSED tests/test_b100_load_question.py::test_tc_b100_46_unreadable_a2l_project_after_yes_keeps_the_work
+PASSED tests/test_b100_load_question.py::test_tc_b100_46_cancelled_variant_switch_keeps_the_pending_selection
+PASSED tests/test_b100_load_question.py::test_tc_b100_72_every_route_asks_and_cancel_keeps_the_session
+PASSED tests/test_b100_load_question.py::test_tc_b100_72_replace_runs_the_load_on_every_route[load dialog]
+PASSED tests/test_b100_load_question.py::test_tc_b100_72_replace_runs_the_load_on_every_route[workarea]
+PASSED tests/test_b100_load_question.py::test_tc_b100_72_replace_runs_the_load_on_every_route[v]
+PASSED tests/test_b100_load_question.py::test_tc_b100_72_replace_runs_the_load_on_every_route[panel v]
+PASSED tests/test_b100_load_question.py::test_tc_b100_72_replace_runs_the_load_on_every_route[project]
+PASSED tests/test_b100_load_question.py::test_tc_b100_72_every_load_call_passes_the_seam
+PASSED tests/test_b100_load_question.py::test_tc_b100_72_one_question_per_request
+PASSED tests/test_b100_load_question.py::test_tc_b100_72_typed_path_takes_its_kind_from_the_classification
+PASSED tests/test_b100_load_question.py::test_tc_b100_72_relative_mac_takes_its_kind_from_the_resolved_path[link]
+PASSED tests/test_b100_load_question.py::test_tc_b100_72_relative_mac_takes_its_kind_from_the_resolved_path[plain]
+PASSED tests/test_b100_load_question.py::test_tc_b100_72_workarea_file_takes_its_kind_from_its_suffix
+PASSED tests/test_b100_load_question.py::test_tc_b100_12_cancelled_question_rehomes_the_focus
+PASSED tests/test_b100_load_question.py::test_tc_b100_70_project_load_asks_only_while_the_document_is_unsaved
+PASSED tests/test_b100_load_question.py::test_tc_b100_66_question_text_holds_no_decision_ids
+PASSED tests/test_b100_load_question.py::test_at_b100_15_load_over_unsaved_work_asks_one_question_per_route
+PASSED tests/test_b100_session_reset.py::test_tc_b100_10_interim_discard_notice
+PASSED tests/test_b100_session_reset.py::test_tc_b100_10_notice_names_every_discarded_entry
+PASSED tests/test_b100_session_reset.py::test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size0]
+PASSED tests/test_b100_session_reset.py::test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size1]
+PASSED tests/test_b99_editor_image.py::test_tc_b99_40_strip_shows_new_file_source_byte
+PASSED tests/test_id_registry.py::test_tc600_g1_every_named_node_id_is_registered
+PASSED tests/test_id_registry.py::test_tc601_g2_live_entries_name_existing_nodes
+PASSED tests/test_id_registry.py::test_tc602_g3_every_citation_is_registered
+PASSED tests/test_id_registry.py::test_tc603_g4_requirements_citations_are_live
+PASSED tests/test_id_registry.py::test_tc604_g5_grammar_holds_or_is_registered_legacy
+PASSED tests/test_id_registry.py::test_tc605_g6_normalized_keys_are_unique
+PASSED tests/test_id_registry.py::test_tc606_g7_no_stem_exceeds_the_high_water_mark
+PASSED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+PASSED tests/test_id_registry.py::test_tc608_tokenizer_and_normalizer_edge_cases
+PASSED tests/test_id_registry.py::test_tc609_registry_file_is_well_formed
+PASSED tests/test_id_registry.py::test_tc610_reservations_are_recorded_and_respected
+PASSED tests/test_id_registry.py::test_at280_registry_and_repository_agree_in_both_directions
+PASSED tests/test_id_registry.py::test_at281_every_guard_rule_can_fail
+PASSED tests/test_b99_staging.py::test_tc_b99_11_same_name_save_back_keeps_work_copy
+PASSED tests/test_b99_staging.py::test_tc_b99_11_junction_at_staging_temp_is_refused
+PASSED tests/test_b99_staging.py::test_tc_b99_11_dangling_junction_at_staging_temp_is_refused
+PASSED tests/test_b99_staging.py::test_tc_b99_12_eight_writers_one_name_zero_mismatches
+PASSED tests/test_b99_staging.py::test_tc_b99_12_forced_permission_error_refuses_cleanly
+PASSED tests/test_b99_staging.py::test_tc_b99_12_directory_squatting_requested_name_takes_next_free
+PASSED tests/test_b99_staging.py::test_tc_b99_12_forced_oserror_in_replace_raises_placement_error
+PASSED tests/test_b99_staging.py::test_tc_b99_12_dangling_symlink_at_requested_name_takes_next_free
+PASSED tests/test_b99_staging.py::test_tc_b99_12_source_vanishes_mid_copy_is_wrapped
+PASSED tests/test_b99_staging.py::test_tc_b99_12_source_bytes_and_mtime_unchanged
+PASSED tests/test_b99_staging.py::test_tc_b99_13_concurrent_placements_one_name_own_bytes_returned
+PASSED tests/test_b99_staging.py::test_tc_b99_13_zero_byte_target_is_never_reused
+PASSED tests/test_b99_staging.py::test_tc_b99_13_symlink_target_is_never_reused
+PASSED tests/test_b99_staging.py::test_tc_b99_39_delete_calls_delete_only_owned_staging
+PASSED tests/test_b99_staging.py::test_tc_b99_44_change_document_stages_in_private_home
+PASSED tests/test_b99_staging.py::test_tc_b99_44_junction_at_staging_temp_is_refused
+PASSED tests/test_b99_staging.py::test_tc_b99_14_save_project_missing_source
+PASSED tests/test_b99_staging.py::test_tc_b99_14_placement_failure_removes_created_folder
+PASSED tests/test_b99_staging.py::test_tc_b99_14_preexisting_folder_survives_placement_failure
+PASSED tests/test_b99_staging.py::test_at_b99_05_save_project_after_same_name_save_back
+PASSED tests/test_b99_staging.py::test_at_b99_04_duplicate_refused_distinct_parallel_markers
+PASSED tests/test_b99_staging.py::test_tc_b99_ux_c10_save_project_filename_renders_literally
+PASSED tests/test_b99_staging.py::test_tc_b99_ux_c10_placement_error_path_renders_literally
+PASSED tests/test_b99_staging.py::test_tc_b99_15_duplicate_write_out_names_refused
+PASSED tests/test_b99_staging.py::test_tc_b99_15_distinct_names_run
+PASSED tests/test_b99_staging.py::test_tc_b99_16_corrupted_write_out_is_error_naming_address
+PASSED tests/test_b99_staging.py::test_tc_b99_16_intact_write_out_is_ok
+PASSED tests/test_b99_staging.py::test_tc_b99_13_gather_drift_places_next_free_name
+PASSED tests/test_b99_staging.py::test_tc_b99_13_unchanged_resave_after_drift_adds_no_duplicate
+PASSED tests/test_b99_staging.py::test_tc_b99_13_no_final_name_replace_outside_placement
+PASSED tests/test_b99_staging.py::test_tc_b99_ux_c10_d7_lane_name_renders_literally
+PASSED tests/test_engine_unchanged.py::test_tc027_engine_modules_unchanged_vs_main
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_40_load_choice_is_a_frozen_value_of_four_kinds
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_40_retired_load_screens_are_gone
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_40_dialog_dismisses_a_load_choice_per_kind_or_none
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_40_project_choice_opens_the_load_result_panel
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_40_workarea_data_choice_loads_in_place_with_no_copy
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_40_workarea_a2l_choice_equals_the_files_list_pick
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_40_a2l_status_line_paints_the_name_scrubbed
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_40_path_choice_takes_the_typed_route
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_40_one_router_receives_every_dialog_result
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_40_recent_choice_loads_the_recorded_text_unchanged
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_40_unreadable_picked_project_paints_one_status_line
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_l_and_ctrl_l_open_the_dialog_on_the_path_field
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_p_and_the_button_open_the_dialog_on_the_list
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_list_opens_on_the_open_project
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_open_project_highlight_falls_back_to_the_first_project
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_tab_order_wraps_both_ways
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_printable_key_in_the_list_types_into_the_path_field[p-p]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_printable_key_in_the_list_types_into_the_path_field[l-l]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_printable_key_in_the_list_types_into_the_path_field[q-q]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_printable_key_in_the_list_types_into_the_path_field[s-s]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_printable_key_in_the_list_types_into_the_path_field[r-r]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_printable_key_in_the_list_types_into_the_path_field[question_mark-?]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_navigation_keys_in_the_list_are_not_redirected
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_priority_keys_are_inert_while_the_dialog_is_open
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_list_last_takes_the_highlighted_row[2-expected0-enter]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_list_last_takes_the_highlighted_row[2-expected0-alt+l]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_list_last_takes_the_highlighted_row[2-expected0-load_ok]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_list_last_takes_the_highlighted_row[5-expected1-enter]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_list_last_takes_the_highlighted_row[5-expected1-alt+l]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_list_last_takes_the_highlighted_row[5-expected1-load_ok]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_list_last_takes_the_highlighted_row[7-expected2-enter]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_list_last_takes_the_highlighted_row[7-expected2-alt+l]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_list_last_takes_the_highlighted_row[7-expected2-load_ok]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_text_in_the_field_then_tab_into_the_list_loads_the_row
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_path_last_takes_the_typed_text[enter-path]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_path_last_takes_the_typed_text[enter-list]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_path_last_takes_the_typed_text[alt+l-path]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_path_last_takes_the_typed_text[alt+l-list]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_path_last_takes_the_typed_text[load_ok-path]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_path_last_takes_the_typed_text[load_ok-list]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_enter_on_the_preview_loads_the_highlighted_row
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_headings_cannot_be_reached_by_keys
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_typed_text_reaches_the_verdict_verbatim
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_path_mode_opens_with_an_empty_preview
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_moving_to_the_path_field_clears_the_list_preview
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_alt_l_with_the_focus_on_the_path_field_loads_and_types_nothing
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_empty_or_spaces_text_is_explained[]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_empty_or_spaces_text_is_explained[   ]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_no_loadable_row_highlighted_is_explained
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_click_highlights_and_never_loads
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_escape_closes_with_no_result_from_every_focus
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_cancel_closes_with_no_result
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_double_enter_dismisses_once[enter]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_double_enter_dismisses_once[escape]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_type_ahead_c_then_enter_loads_the_typed_text
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_type_ahead_escape_then_enter_closes_with_none
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_printable_key_clears_the_preview
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_preview_follows_the_load_target
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_42_project_rows_are_painted_literally[markup bold]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_42_project_rows_are_painted_literally[markup action]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_42_project_rows_are_painted_literally[bidi override U+202E]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_42_project_rows_are_painted_literally[C1 control U+009B]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_42_work_area_file_rows_are_painted_literally[markup bold]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_42_work_area_file_rows_are_painted_literally[markup link]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_42_work_area_file_rows_are_painted_literally[markup action]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_42_work_area_file_rows_are_painted_literally[C1 control U+009B]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_42_work_area_file_rows_are_painted_literally[bidi override U+202E]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_42_work_area_file_rows_are_painted_literally[unpaired surrogate U+DC80]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_42_recent_rows_are_painted_literally[C:\\x\\[bold]a.s19-[bold]a.s19]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_42_recent_rows_are_painted_literally[C:\\x\\[link=y]b.hex-[link=y]b.hex]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_42_recent_rows_are_painted_literally[C:\\x\\[@click=app.bell]c.a2l-[@click=app.bell]c.a2l]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_42_preview_names_are_painted_literally
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_42_a_pick_loads_the_on_disk_name
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_43_sections_hold_the_projects_files_and_recents
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_43_a_folder_that_is_not_a_project_is_not_listed[empty]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_43_a_folder_that_is_not_a_project_is_not_listed[notes only]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_43_a_folder_that_is_not_a_project_is_not_listed[project.json only]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_43_a_folder_that_is_not_a_project_is_not_listed[s19 only]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_43_a_folder_that_is_not_a_project_is_not_listed[a2l only]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_43_a_reparse_project_json_alone_is_not_a_project
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_43_files_section_is_the_one_lister_filtered_to_loadable_files
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_43_recents_section_is_the_store_read_in_order[3 in order]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_43_recents_section_is_the_store_read_in_order[20 entries]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_43_recents_section_is_the_store_read_in_order[2 valid of 3]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_43_empty_projects_section_paints_its_tokens
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_43_empty_files_section_paints_its_tokens[empty temp]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_43_empty_files_section_paints_its_tokens[only an A2L dump]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_43_empty_recents_section_paints_its_token[no store file]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_43_empty_recents_section_paints_its_token[LOCALAPPDATA unset]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_43_store_problem_is_painted_in_the_recents_section[too large]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_43_store_problem_is_painted_in_the_recents_section[could not be read]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_43_recent_row_shows_the_file_name_and_kind_only
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_43_recent_preview_shows_the_store_facts_only
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_43_no_filesystem_call_touches_a_recent_before_load
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_43_missing_recent_is_explained_inside_the_dialog
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_43_unreadable_project_list_says_so
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_path_not_found_is_explained[missing file]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_path_not_found_is_explained[missing folder]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_unsupported_file_is_explained[unsupported suffix]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_unsupported_file_is_explained[trailing dot]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_unsupported_file_is_explained[relative folder]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_folder_that_is_not_a_project_is_explained[temp]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_folder_that_is_not_a_project_is_explained[TEMP]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_folder_that_is_not_a_project_is_explained[empty folder]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_folder_that_is_not_a_project_is_explained[sub-folder]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_folder_outside_the_work_area_is_explained[folder]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_folder_outside_the_work_area_is_explained[manifest]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_path_through_a_junction_is_explained[junction folder]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_path_through_a_junction_is_explained[manifest through it]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_folder_that_cannot_be_read_is_explained[walk lstat]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_folder_that_cannot_be_read_is_explained[list_projects]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_folder_that_cannot_be_read_is_explained[content listing]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_folder_named_like_a_data_file
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_pasted_nul_is_not_inserted
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_linked_file_is_explained_as_a_file[linked s19]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_linked_file_is_explained_as_a_file[a2l through a junction]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_over_long_paste_is_refused_and_the_app_stays_up
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_resolve_error_is_refused_not_raised[ValueError-relative]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_resolve_error_is_refused_not_raised[ValueError-absolute]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_resolve_error_is_refused_not_raised[RuntimeError-relative]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_project_preview_marks_equal_the_install[clean]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_project_preview_marks_equal_the_install[save-back]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_project_preview_marks_equal_the_install[recorded active missing]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_project_preview_marks_equal_the_install[A2L-only]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_preview_does_not_mark_an_a2l_the_install_refuses
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_a_load_that_installs_another_variant_names_it
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_file_row_preview_marks_what_the_session_keeps[nothing loaded, S19 row]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_file_row_preview_marks_what_the_session_keeps[A2L loaded, S19 row]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_file_row_preview_marks_what_the_session_keeps[S19 + MAC loaded, HEX row]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_file_row_preview_marks_what_the_session_keeps[S19 loaded, A2L row]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_file_row_preview_marks_what_the_session_keeps[S19 loaded, MAC row]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_open_project_note_on_a_data_file_row
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_project_preview_lists_every_variant
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_project_preview_states_the_manifest[valid]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_project_preview_states_the_manifest[absent]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_project_preview_states_the_manifest[over the cap]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_project_preview_read_error_says_so[listing]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_project_preview_read_error_says_so[manifest read]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_the_dialog_reads_nothing_itself
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_panes_stack_below_100_columns[99-True]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_panes_stack_below_100_columns[100-False]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_panes_stack_below_100_columns[118-False]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_panes_restack_on_a_live_resize
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_preview_line_never_wraps
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_linked_file_in_a_project_is_neither_listed_nor_installed
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_project_json_that_is_not_a_regular_file_is_refused
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_project_json_that_is_a_reparse_point_is_refused
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_reparse_file_in_a_project_is_neither_listed_nor_installed
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_more_than_one_mac_marks_nothing[MAC]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_more_than_one_mac_marks_nothing[A2L]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_66_painted_text_carries_no_decision_id
+PASSED tests/test_b100_load_dialog.py::test_at_b100_14_one_load_dialog_from_record_to_reopen
+SKIPPED [1] tests\test_b100_load_dialog.py:377: the volume refuses this name (reported not run): [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\c10\\bt\\test_tc_b100_42_work_area_file6\\app\\.s19tool\\workarea\\temp\\nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.s19'
+SKIPPED [1] tests\test_b100_load_dialog.py:377: the volume refuses this name (reported not run): [WinError 3] The system cannot find the path specified: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\c10\\bt\\test_tc_b100_64_list_rows_neve0\\b\\.s19tool\\workarea\\PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP'
+SKIPPED [1] tests\test_b100_load_dialog.py:377: the volume refuses this name (reported not run): [WinError 3] The system cannot find the path specified: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\c10\\bt\\test_tc_b100_64_list_rows_neve1\\b\\.s19tool\\workarea\\PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP'
+SKIPPED [1] tests\test_b100_load_dialog.py:377: the volume refuses this name (reported not run): [WinError 3] The system cannot find the path specified: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\c10\\bt\\test_tc_b100_64_list_rows_neve2\\b\\.s19tool\\workarea\\PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP'
+257 passed, 4 skipped in 1472.62s (0:24:32)

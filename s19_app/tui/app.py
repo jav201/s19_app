@@ -7745,8 +7745,9 @@ class S19TuiApp(App):
             - Otherwise compose ``(title, body)`` through
               ``_load_question_text`` and push ``ConfirmQuestionScreen``
               with the ``answer`` closure: ``True`` (Replace) defers ``go``
-              through ``call_after_refresh``; ``False`` / ``None`` (Cancel,
-              escape, enter on ``#confirm_no``) re-homes the focus through
+              through ``call_after_refresh``; ``False`` (Cancel, escape,
+              enter on ``#confirm_no``; the modal never dismisses
+              ``None``) re-homes the focus through
               ``_rehome_focus_after_load`` and paints nothing.
             - The seam never reads ``_dirty`` directly (LLR-174.1c) and
               holds no ``try/except``.
@@ -14374,11 +14375,15 @@ class S19TuiApp(App):
               ``(action, value)``.
             - ``typed = Path(str(path).strip().strip('"'))`` — the same
               strip the classifier and ``resolve_input_path`` apply (F-1,
-              P-1) — decides the MAC test and the question's target name;
-              the loaders still receive the raw ``path``.
+              P-1); the loaders still receive the raw ``path``.
             - ``project`` -> ``_route_load_project`` (asked there, LLR-174.4a).
-            - ``a2l`` / ``data`` -> ``_confirm_then_load`` with ``attach``
-              (an A2L or MAC attach keeps the image) or ``image``.
+            - ``a2l`` -> ``_confirm_then_load`` with ``attach`` (an A2L
+              attach keeps the image and asks nothing).
+            - ``data`` -> the kind and the target name come from the path
+              ``resolve_input_path`` returns, the one ``load_from_path``
+              reads (CR10-01 / SEC10-01): ``attach`` (a MAC attach keeps the
+              image) only when that suffix is a MAC suffix AND equals the
+              typed suffix; otherwise ``image``, so the question asks.
             - ``refuse`` -> one status line from the six reason words, the
               typed text through ``painted_names`` with markup off; no
               question (LLR-174.4b race arm).
@@ -14402,9 +14407,20 @@ class S19TuiApp(App):
             )
             return
         if action == "data":
-            kind = "attach" if typed.suffix.lower() in MAC_EXTENSIONS else "image"
+            # CR10-01 / SEC10-01: the relative fallback's ``resolve()``
+            # follows a link, so a typed ``.mac`` can name an image; a
+            # typed suffix that differs from the resolved one fails closed.
+            resolved = resolve_input_path(path, self.base_dir)
+            suffix = resolved.suffix.lower() if resolved is not None else ""
+            kind = (
+                "attach"
+                if suffix in MAC_EXTENSIONS and suffix == typed.suffix.lower()
+                else "image"
+            )
             self._confirm_then_load(
-                kind, typed.name, lambda: self.load_from_path(path)
+                kind,
+                (resolved or typed).name,
+                lambda: self.load_from_path(path),
             )
             return
         t = painted_names([str(path)])
