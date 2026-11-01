@@ -74,12 +74,69 @@ Type a *set name* and press **Save Set**: *saved flowsets/bench_set.json* — th
 their bound inputs and last outputs. **Load Set** with a set picked in *saved sets*
 restores it.
 
+### 18.8 Parallel lanes with different variables
+
+This worked example runs the three flows built in Chapter 17.10 — `tune_a`, `tune_b`,
+`tune_c`: one change document with `${BOOST}` and `${MODE}`, different values per flow
+— as three lanes at the same time.
+
+**What belongs where.**
+
+| Level | What it holds | Where it is stored |
+|---|---|---|
+| per flow | the blocks, their refs, and the variables (funnel) | `flows\<name>.json` |
+| per lane | which flow the lane runs, its bound inputs (Bind), its last outputs | the set, `flowsets\<name>.json` |
+| per run | the mode (sequential / parallel), the run log, the chain-set report, a confirm of an external step | the screen and `reports\<time>-chain-set-report.md` |
+
+A lane cannot change a flow's variables: to run the same document with other values,
+save another flow (as here) and import it as its own lane. Two lanes of the *same*
+flow differ only by their bound inputs, and must not write the same output file — the
+run is then refused (*lanes … both write '…' — give each lane its own output*).
+
+![Three lanes](img/ch18-08-fx-three-lanes-parallel.png)
+
+**Import…** three times (`tune_a`, `tune_b`, `tune_c`), click **parallel**, and bind
+lane `tune_c` to `firmware_v2.s19` (its flow reads `firmware.s19`): the binding belongs
+to the lane; the flow file is unchanged.
+
+![Parallel, one waiting](img/ch18-09-fx-parallel-waiting.png)
+
+**Run**: all three lanes start at `00:00.000`. `tune_a` and `tune_b` finish (*done ·
+wrote tune_a_1.s19*, *wrote tune_b.s19*) while `tune_c` stops at its external step
+(*waiting for a human at #3*; the REQUIRED line names it). Each lane substituted its
+own flow's values.
+
+![Parallel, done](img/ch18-10-fx-parallel-done.png)
+
+After the bench log and result file exist, `c` confirms: `tune_c` re-runs from block 3
+and writes `tune_c_result.txt` and `tune_c.s19`. The confirm writes a second chain-set
+report for that lane alone, which records the mode as *sequential* (finding F-45).
+
+![Set saved](img/ch18-11-fx-tune-set-saved.png)
+
+**Save Set** as `tune_set` stores the three lanes with their inputs (`tune_c` keeps
+`firmware_v2.s19`) and their outputs. The variables are not in the set; they stay in
+each flow file.
+
+![Diff lane A vs lane B](img/ch18-12-diff-lane-a-vs-b.png)
+
+The substitution is visible in the written images. A2B Diff (Chapter 9) of
+`tune_a_1.s19` against `tune_b.s19` — both made from `firmware.s19` by the same
+document — finds exactly **2 runs**. Run #0 at `0x00800000`: `AA 55 AA 55` against
+`11 22 33 44`, the two `${BOOST}` values.
+
+![Diff, the MODE run](img/ch18-13-diff-lane-a-vs-b-mode.png)
+
+Run #1 at `0x00C0019B`, one byte: `CAL_MODE=1` against `CAL_MODE=2`, the two `${MODE}`
+values. Every other byte of the two images is identical.
+
 ## Features of this window
 
 | Feature | How | Capture |
 |---|---|---|
 | Import… a lane | button | 18.2, 18.3 |
-| sequential / parallel | click, Enter, space | 18.4 |
+| sequential / parallel | click, Enter, space | 18.4, 18.8 |
+| Parallel lanes with per-flow variables, per-lane bindings | Import…, Bind, Run | 18.8 |
 | Run, lane states, cable glyphs, run log | button | 18.5, 18.6 |
 | Image file + Bind per lane | type, button | 18.4 |
 | REQUIRED line, Confirm | `c` / button | 18.5, 18.6 |

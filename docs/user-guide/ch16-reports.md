@@ -31,7 +31,9 @@ new project report.
 
 **Generate new report** closes the viewer, runs the active variant's assigned
 documents first if nothing was run yet (*Report: no prior execution - running active
-scope…*), and writes `reports\<time>-report.md` (and an `.html` copy).
+scope…*), and writes `reports\<time>-report.md`. It writes Markdown only: no `.html`
+copy is produced, although the window's help says "the `*.md` + `*.html` pair"
+(finding F-41). The reports that do have an HTML copy are shown in Chapter 21.
 
 ### 16.3 Read a report
 

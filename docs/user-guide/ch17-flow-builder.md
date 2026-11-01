@@ -50,7 +50,8 @@ window.
 ![Variables](img/ch17-04-flow-variables.png)
 
 **Variables** opens the editor: a name of capitals, digits and `_` and its value.
-**+ Add var** declares it; a change document writes it as `${BOOST}`.
+**+ Add var** declares it; a change document writes it as `${BOOST}`. Section 17.10
+shows the variables (the *funnel*) at work.
 
 ### 17.5 Run
 
@@ -104,6 +105,50 @@ outside the app: *mode* Manual (an instruction) or Terminal (a command), the
 
 When a run reaches this card it waits until someone confirms it in Flow Execution.
 
+### 17.10 Variables in a change document (the funnel)
+
+The variables table of a flow — called the *funnel* in the code — lets one change
+document serve several flows. A change document writes a placeholder `${NAME}` where a
+value should go; when a flow runs, its PATCH block reads the document's text, replaces
+every exact `${NAME}` token with the value the flow declares, and only then parses and
+applies the document. The document file on disk is never changed.
+
+The demo document `guide_patch_funnel.changes.json` was derived (in scratch, for the
+guide) from the case change-set `demo_patch.changes.json`: the first entry's bytes at
+`0x00800000` became `${BOOST}` and the string at `0x00C00192` became
+`CAL_MODE=${MODE}`; the symbol entries were left out (finding F-01). It sits in the
+project's `patches\` folder.
+
+![One variable](img/ch17-13-funnel-one-variable.png)
+
+The flow is LOAD `firmware.s19` → PATCH `patches/guide_patch_funnel.changes.json` →
+WRITE-OUT `tune_a.s19`. Only `${BOOST} = AA 55 AA 55` is declared so far — a value may
+hold several byte tokens, because the replacement is plain text.
+
+![Undeclared variable](img/ch17-14-funnel-undeclared-notice.png)
+
+**Run** with `MODE` missing does not fail: the PATCH block ends with **notices** and the
+line *funnel: ${MODE} is not declared in the flow — the placeholder stays intact*; the
+run as a whole reads **NOTICES**. The undeclared placeholder is written into the image
+literally (`CAL_MODE=${MODE}`), so read the notices before you use the output.
+
+![Run clean](img/ch17-15-funnel-run-ok.png)
+
+After **+ Add var** `MODE` = `1` the same Run is **CLEAN**. The output is
+`tune_a_1.s19`: a write-out never overwrites a different file — the name already held
+the image of the first run, so the next free `_1` name was taken (a byte-identical file
+would have been reused instead).
+
+![Second flow](img/ch17-16-funnel-flow-b.png)
+
+**Save…** stores the variables with the flow (`flows\tune_a.json` holds
+`"funnel": [["BOOST", "AA 55 AA 55"], ["MODE", "1"]]`). The demo then builds two more
+flows on the same document: `tune_b` (`BOOST = 11 22 33 44`, `MODE = 2`, output
+`tune_b.s19`, shown here after **Save…**) and `tune_c` (`BOOST = CA FE CA FE`,
+`MODE = 3`, an EXT-STEP before its WRITE-OUT `tune_c.s19`). **Clear** empties the chain
+*and* the variables, so each flow is built from the start. Chapter 18.8 runs the three
+flows side by side.
+
 ## Features of these windows
 
 | Feature | How | Capture |
@@ -112,7 +157,8 @@ When a run reaches this card it waits until someone confirms it in Flow Executio
 | Gating advisory / block-own-op | dropdown | 17.3 |
 | A2B inputs (file or `#n`) | type | 17.3 |
 | External step: mode, instruction, log, output | select, type | 17.9 |
-| Variables editor | Variables, + Add var | 17.4 |
+| Variables editor | Variables, + Add var | 17.4, 17.10 |
+| Variables in a change document (`${NAME}`), undeclared-variable notice | Run | 17.10 |
 | Copy / Paste a block | buttons | 17.7 |
 | Run + per-block verdicts | button | 17.5 |
 | Save… / Load… / Import… / Discard | buttons | 17.6, 17.8 |

@@ -1,6 +1,6 @@
 # s19tui user guide — dossier
 
-Status: **Phase B done — chapter text and real captures, for review.** No slides yet:
+Status: **Phase C done — chapter text and real captures, for review** (Phase C added the funnel and parallel-lanes demo to Chapters 17 and 18, and Chapter 21 on the reports). No slides yet:
 slides are built only after this dossier is approved.
 
 - Product state: branch `b100-release-assets` at `9fd3638` (main `570b4b5` plus the
@@ -19,11 +19,11 @@ slides are built only after this dossier is approved.
 
 | Count | What |
 |---|---|
-| **20** | chapters (one file each, `ch01-…md` to `ch20-…md`) |
-| **151** | captures in `img/` |
+| **21** | chapters (one file each, `ch01-…md` to `ch21-…md`) |
+| **174** | captures in `img/` (168 Windows Terminal, 6 headless Microsoft Edge renders of HTML reports) |
 | **32** | user-reachable windows (1 app shell, 13 views, 18 modal dialogs) |
 | **372** | features inventoried from the code (§4) |
-| **40** | findings for the release fix (§5) |
+| **47** | findings for the release fix (§5) |
 
 ## 2. Chapters
 
@@ -45,10 +45,11 @@ slides are built only after this dossier is approved.
 | 14 | [ch14-split-join-export.md](ch14-split-join-export.md) — Split / Join / Export | Split / Join / Export (W21) | 12 |
 | 15 | [ch15-save-project.md](ch15-save-project.md) — Save the project and switch variants | Save project (W22), Select variant (W23) | 5 |
 | 16 | [ch16-reports.md](ch16-reports.md) — Reports | Reports viewer (W24) | 3 |
-| 17 | [ch17-flow-builder.md](ch17-flow-builder.md) — Flow Builder | Flow Builder (W25), Save flow as (W26), Load flow (W27), Discard unsaved flow edits? (W28) | 12 |
-| 18 | [ch18-flow-execution.md](ch18-flow-execution.md) — Flow Execution | Flow Execution (W29) | 7 |
+| 17 | [ch17-flow-builder.md](ch17-flow-builder.md) — Flow Builder | Flow Builder (W25), Save flow as (W26), Load flow (W27), Discard unsaved flow edits? (W28) | 16 |
+| 18 | [ch18-flow-execution.md](ch18-flow-execution.md) — Flow Execution | Flow Execution (W29) | 13 |
 | 19 | [ch19-help-palettes-settings.md](ch19-help-palettes-settings.md) — Help, palettes and settings | app shell (W00): help panel, command palette, Textual palette, Viewer settings, density; Window help (W30) | 9 |
 | 20 | [ch20-quit.md](ch20-quit.md) — Quit | app shell (`q`), Quit? question (W31) | 2 |
+| 21 | [ch21-html-reports.md](ch21-html-reports.md) — HTML reports: review what was modified, checked and compared | Patch Editor (W11), A2B Diff (W17), Flow Builder (W25), Reports viewer (W24); the report files | 13 |
 
 ## 3. How the captures were made
 
@@ -70,6 +71,12 @@ slides are built only after this dossier is approved.
   to show the target row, as a user does with the wheel (finding F-07).
 - **Window hygiene.** Every terminal window opened for the guide was closed; a
   final scan found no window titled `GUIDE-…` open.
+- **HTML reports (Chapter 21).** The `.html` files the app wrote during the Chapter 21
+  run were rendered with **Microsoft Edge in headless mode** (`msedge --headless=new
+  --screenshot`, 1280 px wide, a throw-away profile, no window), full page, cut into
+  1400 px slices; the slices shown are named `ch21-…-html-…png`. No report was edited.
+  For Chapter 21.4 one line (`{"kind": "report"}`) was added to a saved *flow* file,
+  because the builder cannot add a REPORT block (F-36).
 - **Not captured, on purpose:** the "📂 Open …" chips and `o` (they open the system
   file manager) and Flow **Import…** (system file dialog); their effect is described
   from the code.
@@ -740,6 +747,13 @@ app during the captures; "code" = read in the code.
 | F-38 | doc mismatch, code | README says 10 screens on keys 1–0 and a one-row footer; the app has 12 rail windows (`=` Check Editor, `]` Flow Execution), the palette-only Split / Join / Export and a two-row key bar. | `README.md` |
 | F-39 | defect, live | Issues grouped list shows the INFO group before the WARNING group (clean and faulty files); the legend states error → warning → info. | ch07-01, ch07-02 |
 | F-40 | defect, live | Patch Editor Checks tab keeps the results of an earlier check run after another document or a project is loaded. | ch08-20 |
+| F-41 | help mismatch, live + code | Reports → **Generate new report** writes Markdown only (`<time>-report.md`); the Reports help says it writes the `*.md` + `*.html` pair. | ch21-12; `report_service.py` (`-report.md` only) |
+| F-42 | defect, live | The before/after report is titled "Diff report" in both `.md` and `.html`; its header shows `a2l=absent; mac=absent` and the Runs *Symbols* column stays `-` although the A2L is loaded and the linkage table names the symbols. | ch21-02 |
+| F-43 | limitation, live | The diff report's `## Checks` addendum lists the declared fields with expected bytes only — no actual value and no pass/fail verdict. | ch21-06 |
+| F-44 | limitation, code + live | The flow report (REPORT block, FB-P1b), the fused flow report and the chain-set report are Markdown only; the only HTML reports are the before/after and diff reports. | `flow_report_service.py`, `flow_execution_service.py:write_chain_set_report`; ch21-11 |
+| F-45 | defect, live | After **Confirm** of an external step in a parallel run, the re-run writes a second chain-set report for that lane alone that records *Mode: sequential*, *Chains: 1*. | `reports\<time>-chain-set-report.md` of the Chapter 18.8 run |
+| F-46 | defect, live | A flow saved after **Clear** keeps the previous flow's name inside its file (`flows\tune_b.json` holds `"name": "tune_a"`, `tune_c.json` holds `tune_b`); lanes use the file name, so the stale name is only cosmetic so far. | saved flow files of the Chapter 17.10 run |
+| F-47 | to investigate, live | In the Chapter 17.10 / 18.8 run the log tail shows *Before/after report refused: No applied change summary…* right after start, before any key the driver sent that maps to `b`; the trigger is not identified. | ch17-13 … ch18-09 |
 
 ## 6. Live checks requested
 
