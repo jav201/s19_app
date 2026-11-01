@@ -135,6 +135,7 @@ func: changed (post-10 body; Inc 10 graph C02–C09). Steps:
 callers: `_route_load_project` (G-A's `go`), `_load_path_from_user_input` (a2l and data arms), `_load_workarea_file`, `_handle_select_variant` (post-10; not in code at base, extractor not run). Unchanged set.
 module: s19_app/tui/app.py
 examples: C12b-07 (LLR-177.3a, TC-B100-72 extension) a case_01 image with one patched byte (unsaved), project `PV` open, and an A2L attach of case_06 held at `parse_a2l_cached`: a `#files_list` pick of `x.s19`, and a direct `app._handle_select_variant("firmware_b")` (the selector's dismiss callback) → 2 lines `busy: Loading firmware.a2l is running — wait for it to finish.`; 0 `ConfirmQuestionScreen` pushed; the session digest unchanged; `_pending_variant_id is None` (the stamp sits inside `go`). Result 4 of 4. Negative control: a mutant that runs the busy check after the question (inside `go` only) → 1 question pushed before the refusal → RED.
+note: TC-B100-72 lives in `tests/test_b100_load_question.py` (the design's `test_b100_confirm.py` name does not exist — corrected at close: A-4).
 
 S19TuiApp.action_quit
 req: HLR-177b, LLR-177.4, LLR-177.4a, LLR-177.4d, Q-c2
