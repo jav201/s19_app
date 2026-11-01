@@ -2769,10 +2769,48 @@ def test_tc_b100_51_every_save_abort_return_ends_its_run_first() -> None:
     own text is no longer the outcome.
     Negative control (M-69, one arm's ``end_busy`` → ``set_status``): that
     return is listed without an end."""
-    tree = ast.parse(APP_SOURCE.read_text(encoding="utf-8"))
-    found = _commit_save_body_returns(_class_methods(tree)["_commit_project_save"])
-    assert len(found) >= 10, found
-    assert [line for line, has_end in found if not has_end] == [], found
+    # E4 integration re-pin (Inc 12b merge, MERGE-12b-2): the abort exits
+    # moved onto the Save worker step ``_save_project_files`` (proto P1-66 /
+    # ``_save_failure_outcome``: "11 abort exits"); each returns its own text
+    # as the outcome, and the main-thread handler ``_on_project_saved`` ends
+    # the run with that outcome before its failure arm returns.
+    methods = _class_methods(ast.parse(APP_SOURCE.read_text(encoding="utf-8")))
+    worker = methods["_save_project_files"]
+    mkdir_line = min(
+        n.lineno for n in ast.walk(worker)
+        if isinstance(n, ast.Call) and _callee(n.func) == "mkdir"
+    )
+    nested = {
+        id(sub)
+        for fn in ast.walk(worker)
+        if isinstance(fn, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)) and fn is not worker
+        for sub in ast.walk(fn)
+    }
+    returns = sorted(
+        (n for n in ast.walk(worker)
+         if isinstance(n, ast.Return) and n.lineno > mkdir_line and id(n) not in nested),
+        key=lambda n: n.lineno,
+    )
+    aborts = returns[:-1]
+    assert len(aborts) >= 10, [n.lineno for n in returns]
+    not_outcome = [
+        n.lineno for n in aborts
+        if not (isinstance(n.value, ast.Call) and _callee(n.value.func) == "_save_failure_outcome")
+    ]
+    assert not_outcome == [], not_outcome
+    handler = methods["_on_project_saved"]
+    failure_arm = next(
+        n for n in ast.walk(handler)
+        if isinstance(n, ast.If) and any(isinstance(s, ast.Return) for s in n.body)
+    )
+    ends = [
+        s for s in failure_arm.body
+        if isinstance(s, ast.Expr) and isinstance(s.value, ast.Call)
+        and _callee(s.value.func) == "end_busy"
+        and isinstance(s.value.args[0], ast.Constant) and s.value.args[0].value == "save_project"
+    ]
+    assert len(ends) == 1 and isinstance(failure_arm.body[-1], ast.Return), ast.dump(failure_arm)[:300]
+    assert failure_arm.body.index(ends[0]) == len(failure_arm.body) - 2, "the end must be the arm's last call"
 
 
 def test_tc_b100_51_save_validation_abort_ends_with_its_own_line(
@@ -2793,7 +2831,9 @@ def test_tc_b100_51_save_validation_abort_ends_with_its_own_line(
     real_validate = app_module.validate_project_files
 
     def _validate(folder, *args, **kwargs):
-        if sys._getframe(1).f_code.co_name == "_commit_project_save":
+        # E4 integration re-pin (MERGE-12b-2): the check runs in the Save
+        # worker step ``_save_project_files``.
+        if sys._getframe(1).f_code.co_name == "_save_project_files":
             return [], [], "synthetic validation error"
         return real_validate(folder, *args, **kwargs)
 
@@ -2804,7 +2844,7 @@ def test_tc_b100_51_save_validation_abort_ends_with_its_own_line(
         seam.bar.clear()
         mark = len(log.messages)
         app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name="S5"))
-        await _settle(pilot, 6)
+        await _drain(app, pilot)  # E4 integration re-pin: the save runs on its worker
         return log.since(mark), len(_busy_timers(app))
 
     added, timers = _run(tmp_path / "app", scenario)
@@ -2868,7 +2908,7 @@ def test_tc_b100_51_file_load_into_an_open_project_ends_after_the_sync(
 
     async def scenario(app, pilot, log):
         app._handle_load_project("P")
-        await _settle(pilot, 8)
+        await _drain(app, pilot)  # E4 integration re-pin (MERGE-12b-3): the project load is a worker
         opened = app.current_project
         mark = len(log.messages)
         app.load_from_path(other)
@@ -2881,3 +2921,192 @@ def test_tc_b100_51_file_load_into_an_open_project_ends_after_the_sync(
     assert [e.outcome for e in ends] == ["Loaded other.s19"], seam.ends
     assert added[-1] == "Loaded other.s19", added
     assert len(added) >= 2 and any("other" in m for m in added[:-1]), added
+
+
+
+# ===========================================================================
+# Inc 12b E4 integration — routed arms (SE5-12a-4, CR12a-1, OBS-12a-1)
+# ===========================================================================
+
+
+@pytest.mark.parametrize(
+    "exc",
+    [PermissionError(13, "injected: access denied"), ValueError("injected"), RuntimeError("injected")],
+    ids=["OSError", "ValueError", "RuntimeError"],
+)
+@pytest.mark.parametrize("loader", ["load_from_path", "load_a2l_from_path"])
+def test_tc_b100_53_use_time_resolve_error_refuses_and_keeps_the_app(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, loader: str, exc: BaseException
+) -> None:
+    """SE5-12a-4 (routed from Inc 12a; LLR-177.2): the loader's use-time
+    ``resolve_input_path`` raising an OS error, a too-long-path
+    ``ValueError`` or a no-home ``RuntimeError`` → nothing leaves the
+    loader; exactly one not-found line (``File not found: gone.s19`` /
+    ``A2L file not found: gone.a2l``); no busy run is begun; the app keeps
+    running (2 × 3).
+
+    Why: the loaders run as the deferred ``go`` of the Inc 10 question, which
+    can stay open for minutes; a share that goes stale meanwhile must refuse
+    the load, not exit the app from a callback.
+    Negative control (ef0cdb8): the raise leaves the loader → RED."""
+    typed = Path("gone.s19" if loader == "load_from_path" else "gone.a2l")
+
+    def _raise(path, base_dir):
+        raise exc
+
+    monkeypatch.setattr(app_module, "resolve_input_path", _raise)
+    seam = Seam(monkeypatch)
+
+    async def scenario(app, pilot, log):
+        mark = len(log.messages)
+        raised = None
+        try:
+            getattr(app, loader)(typed)
+        except BaseException as err:  # noqa: BLE001 — the threshold counts raises
+            raised = repr(err)
+        await _settle(pilot, 3)
+        return raised, log.since(mark), dict(app._busy.runs), app.is_running
+
+    raised, lines, runs, alive = _run(tmp_path / "app", scenario)
+    expected = (
+        f"File not found: {typed}" if loader == "load_from_path" else f"A2L file not found: {typed}"
+    )
+    assert raised is None, raised
+    assert lines == [expected], lines
+    assert seam.begins == [] and runs == {}, (seam.begins, runs)
+    assert alive
+
+
+def test_tc_b100_53_path_gone_under_the_load_question_keeps_the_app(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """SE5-12a-4, the user's route: an image with one unsaved patched byte;
+    the typed path of another image opens the Inc 10 question; while it is
+    open the path turns unreadable (``resolve_input_path`` raises
+    ``PermissionError``); ``y`` → the deferred load refuses with ``File not
+    found: <typed>`` as the last line, the app keeps running, no run is left
+    and the open image is unchanged.
+
+    Why: this is the security reviewer's scenario (a stale share or changed
+    permissions while the question waits).
+    Negative control (ef0cdb8): the deferred callback raises and the app
+    exits → RED."""
+    import shutil
+
+    from s19_app.tui.screens import ConfirmQuestionScreen
+
+    src = tmp_path / "src"
+    src.mkdir()
+    target = src / "fw.s19"
+    shutil.copyfile(CASE01 / "firmware.s19", target)
+    real = app_module.resolve_input_path
+    armed: list = []
+
+    def _resolve(path, base_dir):
+        if armed:
+            raise PermissionError(13, "injected: access denied", str(path))
+        return real(path, base_dir)
+
+    monkeypatch.setattr(app_module, "resolve_input_path", _resolve)
+
+    async def scenario(app, pilot, log):
+        await _load_case01_image(app, pilot)
+        cur = app.current_file
+        address = sorted(cur.mem_map)[0]
+        app._change_service.add_entry(f"0x{address:08X}", "", f"{(cur.mem_map[address] + 1) & 0xFF:02X}")
+        app._change_service.apply(cur.mem_map, cur.ranges, cur.mac_records, None)
+        await _settle(pilot, 4)
+        app._load_path_from_user_input(target)
+        await _wait(pilot, lambda: isinstance(app.screen, ConfirmQuestionScreen), "the load question")
+        armed.append(True)
+        mark = len(log.messages)
+        await pilot.press("y")
+        await _settle(pilot, 8)
+        return (
+            log.since(mark), app.is_running, dict(app._busy.runs),
+            app.current_file.path.name, isinstance(app.screen, ConfirmQuestionScreen),
+        )
+
+    lines, alive, runs, open_name, asking = _run(tmp_path / "app", scenario)
+    assert lines and lines[-1] == f"File not found: {target}", lines
+    assert (alive, runs, asking) == (True, {}, False), (alive, runs, asking)
+    assert open_name == "firmware.s19", open_name
+
+
+def test_tc_b100_51_raise_after_the_commit_keeps_the_saved_line(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """CR12a-1 (routed from Inc 12a; S12b-03): a save of the open image as
+    ``S3`` commits (``project.json`` on disk); a main-thread raise in the
+    committed arm of ``_on_project_saved`` (``_surface_manifest_verify_result``
+    forced to raise) → the one effective end is the committed ``Saved project
+    to …S3…`` line, ``Saving project S3 failed`` is never logged, the
+    manifest stays on disk, and the exception still surfaces (Q-d1 loud).
+
+    Why: the files are saved; a status log that then says the save failed
+    tells the user to redo work that is done.
+    Negative control (ef0cdb8): the worker's outer guard posts
+    ``_busy_fail`` → the end is ``Saving project S3 failed`` → RED."""
+    from s19_app.tui.screens import SaveProjectPayload
+
+    base = tmp_path / "app"
+    seam = Seam(monkeypatch)
+    monkeypatch.setattr(S19TuiApp, "_surface_manifest_verify_result", _boom)
+    captured: dict = {}
+
+    async def scenario(app, pilot, log):
+        await _load_case01_image(app, pilot)
+        captured["log"] = log
+        app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name="S3"))
+        try:
+            for _ in range(600):
+                if seam.effective("save_project"):
+                    break
+                await pilot.pause()
+        except Exception:  # noqa: BLE001 — the app may already be exiting
+            pass
+        return None
+
+    surfaced = None
+    try:
+        _run(base, scenario)
+    except BaseException as exc:  # noqa: BLE001 — WorkerFailed is the expected exit
+        surfaced = exc
+    target = _workarea(base) / "S3"
+    ends = [e.outcome for e in seam.effective("save_project")]
+    messages = captured["log"].messages
+    assert len(ends) == 1 and ends[0].startswith(f"Saved project to {target}"), seam.ends
+    assert "Saving project S3 failed" not in messages, messages
+    assert (target / "project.json").is_file()
+    assert surfaced is not None, "the handler's exception was swallowed"
+
+
+def test_tc_b100_50_progress_bar_paints_no_eta(tmp_path: Path) -> None:
+    """OBS-12a-1: ``#progress_bar`` holds no Textual ETA (no ``#eta``
+    child), idle and during a run; its painted row shows no clock
+    (``--:--:--`` or ``h:mm:ss``) beside the percentage; the seam's elapsed
+    ``mm:ss`` is painted in ``#status_text`` only (4 assertions).
+
+    Why: two clocks side by side (an ETA countdown and the elapsed time)
+    read as two different actions.
+    Negative control (ef0cdb8): the default ``show_eta=True`` paints
+    ``--:--:--`` → RED."""
+    clock = re.compile(r"--:--:--|\d+:\d{2}:\d{2}")
+
+    async def scenario(app, pilot, log):
+        from textual.widgets import ProgressBar
+
+        bar = app.query_one("#progress_bar", ProgressBar)
+        idle = (len(bar.query("#eta")), _bar_row(app))
+        gen = app.begin_busy("report", "R", ("a", "b"))
+        app.step_busy("report", gen, 2)
+        await _settle(pilot, 2)
+        during = (len(bar.query("#eta")), _bar_row(app), _status(app))
+        app.end_busy("report", gen, "")
+        return idle, during
+
+    idle, during = _run(tmp_path / "app", scenario)
+    assert (idle[0], during[0]) == (0, 0), (idle, during)
+    assert not any(clock.search(row) for row in idle[1] + during[1]), (idle[1], during[1])
+    assert any("50%" in row for row in during[1]), during[1]
+    assert re.search(r"step 2/2 b  ·  \d{2}:\d{2}$", during[2]), during[2]

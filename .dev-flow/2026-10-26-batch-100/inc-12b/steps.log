@@ -13,3 +13,5 @@
 2026-11-01 01:05 E4 a2l.py G-D done (DeepSeek v4 Pro): tui/a2l.py d70b17982f1cee30; 2 deviations (path is tui/a2l.py; _ENGINE_PATHS test edit owed by tester/integration)
 2026-11-01 01:24 E4 app.py G-C1/G-A/G-B/G-C2 done (DeepSeek v4 Pro): app 89b2d043c60f3a2f; 3 deviations declared; +1577/-1224 (w)
 2026-11-01 02:25 E4 tester done (Opus + 1 sub-agent): 82 new items (80 RED), large census re-pin; RED run 108 failed/195 passed on 71376a3; A-1..A-10 ruled
+2026-11-01 02:27 merged b100-inc12a 9012835 (e3b8ec2; conflict test_b100_busy.py, fixed as union in ef0cdb8, 68 fns); integration start (Opus software-dev) with routed items SE5-12a-4, CR12a-1, SE5-11-3, O-1, MERGE-12a-1, OBS-12a-1
+2026-11-01 E4 integration: Opus (agent ad9981585326163cf), 325 tool uses, ~4h09m; app.py 1 source fix set (F-1, F-13, SE5-12a-4, CR12a-1, OBS-12a-1); orchestrator rulings appended (Opus)

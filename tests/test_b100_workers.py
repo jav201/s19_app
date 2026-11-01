@@ -99,6 +99,19 @@ SAVE_FAILED_UNEXPECTED = (
 NO_SPACE_LINE = "Project NOT saved: could not save — [Errno 28] synthetic no space. check the folder."
 
 
+def on_disk_records(project_dir: Path, recorded: dict) -> dict:
+    """Size and SHA-256 (``hashlib``) of each file a manifest records,
+    read from the disk (a missing file reads ``None``)."""
+    out = {}
+    for relative in recorded:
+        path = project_dir.joinpath(*relative.split("/"))
+        out[relative] = (
+            {"size": path.stat().st_size, "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+            if path.is_file() else None
+        )
+    return out
+
+
 def busy(label: str) -> str:
     """LLR-177.3f's exact busy line."""
     return f"busy: {label} is running — wait for it to finish."
@@ -526,6 +539,16 @@ def test_tc_b100_53_project_load_reads_every_file_on_a_worker(
         for name in ("check_project_files", "read_project_manifest", "parse_a2l_file",
                      "build_loaded_s19", "recorded_document_state")
     }
+    # E4 integration re-pin: count only the reads the project load makes.
+    # The Load dialog's preview of the highlighted row reads the manifest on
+    # the main thread before the load starts (Inc 9b, out of 12b's scope).
+    marks: dict = {}
+
+    def _mark(*_a, **_k):
+        for name, spy in spies.items():
+            marks.setdefault(name, len(spy.calls))
+
+    Spy(monkeypatch, S19TuiApp, "_handle_load_project", before=_mark)
 
     async def scenario(app, pilot, log):
         main = _main_ident()
@@ -535,7 +558,9 @@ def test_tc_b100_53_project_load_reads_every_file_on_a_worker(
         return main, len(app._change_service.document.entries)
 
     main, n_entries = run(base, scenario)
-    seen = {name: (len(s.calls), main in s.threads()) for name, s in spies.items()}
+    assert marks, "the project load never started"
+    seen = {name: (len(s.calls[marks[name]:]), main in {c.thread for c in s.calls[marks[name]:]})
+            for name, s in spies.items()}
     assert all(count >= 1 for count, _ in seen.values()), seen
     on_main = sorted(name for name, (_, m) in seen.items() if m)
     assert on_main == [], f"read on the main thread: {on_main} ({seen})"
@@ -772,6 +797,7 @@ def test_tc_b100_53_workarea_pick_begins_a_file_load_and_never_syncs_the_project
     begins = Spy(monkeypatch, S19TuiApp, "begin_busy")
     steps = Spy(monkeypatch, S19TuiApp, "step_busy")
     syncs = Spy(monkeypatch, S19TuiApp, "_sync_loaded_file_to_project")
+    posts = StepPosts(monkeypatch)
 
     async def scenario(app, pilot, log):
         main = _main_ident()
@@ -781,7 +807,7 @@ def test_tc_b100_53_workarea_pick_begins_a_file_load_and_never_syncs_the_project
         await wait(pilot, lambda: app.current_file is not None, "the pick of x.s19")
         first = (log_tail(app, 2), status(app), [(c.args[1], c.args[3], c.thread) for c in steps.calls
                                                  if c.args[1] == "file_load"],
-                 [c.args[1:3] for c in begins.calls])
+                 [c.args[1:3] for c in begins.calls], posts.phases("file_load"))
         await open_trio_project(app, pilot, "P")
         listing = sorted(x.name for x in p.iterdir())
         manifest = (p / "project.json").read_bytes()
@@ -792,10 +818,13 @@ def test_tc_b100_53_workarea_pick_begins_a_file_load_and_never_syncs_the_project
         return main, first, (sorted(x.name for x in p.iterdir()) == listing,
                              (p / "project.json").read_bytes() == manifest, len(syncs.calls) - n_sync)
 
-    main, (lines, final, file_steps, begun), (same_listing, same_manifest, n_sync) = run(base, scenario)
+    main, (lines, final, file_steps, begun, posted), (same_listing, same_manifest, n_sync) = run(base, scenario)
     assert begun[:1] == [("file_load", "Loading x.s19")], begun
     assert [n for n, _t in [(s[1], s[2]) for s in file_steps]] == [2, 3], file_steps
-    assert file_steps[0][2] == main and file_steps[1][2] != main, file_steps
+    # E4 integration re-pin: both steps RUN on main (LLR-176.1q); step 2 is
+    # called there directly and step 3 is POSTED by the worker.
+    assert all(s[2] == main for s in file_steps), file_steps
+    assert [n for n, _t in posted] == [3] and posted[0][1] != main, posted
     assert lines == ["Loaded x.s19 (S19 only)", "Loaded x.s19"], lines
     assert final == "Loaded x.s19 (S19 only)", final
     assert (same_listing, same_manifest, n_sync) == (True, True, 0), (same_listing, same_manifest, n_sync)
@@ -861,6 +890,30 @@ def increases(values: list) -> int:
     return sum(1 for a, b in zip(values, values[1:]) if b > a)
 
 
+class StepPosts:
+    """E4 integration re-pin: the ``step_busy`` calls a thread posts through
+    ``call_from_thread``, as ``(key, n, done, posting thread)``. A posted
+    step RUNS on the main thread (LLR-176.1q: widgets are written on main
+    only), so "posted from the worker" is read at the post, never from the
+    thread that executes ``step_busy``."""
+
+    def __init__(self, monkeypatch) -> None:
+        self.posts: list = []
+        rec = self
+        real = S19TuiApp.call_from_thread
+
+        def _post(app, callback, *args, **kwargs):
+            if getattr(callback, "__func__", None) is S19TuiApp.__dict__.get("step_busy"):
+                done = args[3] if len(args) > 3 else None
+                rec.posts.append((args[0], args[2], done, threading.get_ident()))
+            return real(app, callback, *args, **kwargs)
+
+        monkeypatch.setattr(S19TuiApp, "call_from_thread", _post)
+
+    def phases(self, key: str) -> list:
+        return [(n, t) for k, n, done, t in self.posts if k == key and done is None]
+
+
 def test_tc_b100_53_case06_project_load_keeps_the_loop_free_and_reports_parse_bytes(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -899,7 +952,11 @@ def test_tc_b100_53_case06_project_load_keeps_the_loop_free_and_reports_parse_by
     assert ticks_before_install >= 10, f"{ticks_before_install} ticks before the install (event loop blocked)"
     step2 = progress.within_step("project_load", 2)
     assert increases(step2) >= 2, step2
-    assert all(25 < v <= 50 for v in step2), step2
+    # E4 integration re-pin (P1-21 reads "≥ 2 increasing values in (25, 50]"):
+    # the step opens at 25 and the first byte forwards (under 4 % of the
+    # file) still floor to 25, so 25 is inside the step's range.
+    assert all(25 <= v <= 50 for v in step2), step2
+    assert len({v for v in step2 if v > 25}) >= 2, step2
     assert step2[-1] == 50, step2
     assert len(progress.forwards("project_load", 2)) <= 101, len(progress.forwards("project_load", 2))
     assert got == D6, got
@@ -990,6 +1047,7 @@ def test_tc_b100_53_save_reports_each_file_placed(tmp_path: Path, monkeypatch: p
     projects.write_tree(s, {"flows/f1.json": projects.SUBFOLDER_FILES["flows/f1.json"]})
     trio(wa / "ONE", names=("firmware.s19",))
     progress = Progress(monkeypatch)
+    posts = StepPosts(monkeypatch)
 
     async def scenario(app, pilot, log):
         main = _main_ident()
@@ -997,10 +1055,12 @@ def test_tc_b100_53_save_reports_each_file_placed(tmp_path: Path, monkeypatch: p
         for project, target in (("P2", "Q"), ("S", "S2"), ("ONE", "ONE2")):
             await open_trio_project(app, pilot, project)
             progress.clear()
+            posts.posts.clear()
             save(app, target)
             await settle_workers(pilot)
             await wait(pilot, lambda: (wa / target / "project.json").exists(), f"the save of {target}")
-            out[target] = (list(progress.events), log_tail(app, 2))
+            # E4 integration re-pin: the full lines (``log_lines`` is width-capped).
+            out[target] = (list(progress.events), log.messages[-2:], posts.phases("save_project"))
         return main, out
 
     main, out = run(base, scenario)
@@ -1014,15 +1074,20 @@ def test_tc_b100_53_save_reports_each_file_placed(tmp_path: Path, monkeypatch: p
     assert q.bars() == [0, 25, 33, 41, 50, 50, 75, 0], q.bars()
     phase_steps = [(e[2], e[5]) for e in q.events if e[0] == "step" and e[1] == "save_project" and e[3] is None]
     assert [n for n, _t in phase_steps] == [2, 3, 4], phase_steps
-    assert all(t != main for _n, t in phase_steps), "a save step was painted from the main thread"
+    posted = out["Q"][2]
+    assert [n for n, _t in posted] == [2, 3, 4], posted
+    assert all(t != main for _n, t in posted), "a save step was posted from the main thread"
     assert out["Q"][1] == ["Project saved + manifest verified",
                            f"Saved project to {wa / 'Q'} (variant 'firmware')"], out["Q"][1]
     s2 = view(out["S2"][0])
     assert s2.forwards("save_project", 2) == [(1, 4), (2, 4), (3, 4), (4, 4)], s2.forwards("save_project", 2)
-    assert s2.within_step("save_project", 2) == [31, 37, 43, 50], s2.within_step("save_project", 2)
+    # E4 integration re-pin: ``within_step`` also records the step's own
+    # entry paint (25, written by ``step_busy`` itself); P1-63's values are
+    # the placements after it.
+    assert s2.within_step("save_project", 2) == [25, 31, 37, 43, 50], s2.within_step("save_project", 2)
     one = view(out["ONE2"][0])
     assert one.forwards("save_project", 2) == [(1, 1)], one.forwards("save_project", 2)
-    assert one.within_step("save_project", 2) == [50], one.within_step("save_project", 2)
+    assert one.within_step("save_project", 2) == [25, 50], one.within_step("save_project", 2)
 
 
 def test_tc_b100_53_a_two_thousand_file_save_moves_the_bar_ten_times(
@@ -1612,7 +1677,10 @@ def test_tc_b100_53_load_requests_are_refused_during_a_project_load(
                 ("l", lambda: pilot.press("l")),
                 ("ctrl+l", lambda: pilot.press("ctrl+l")),
                 ("p", lambda: pilot.press("p")),
-                ("button", lambda: pilot.click("#ws_load_project_button")),
+                # E4 integration re-pin: the Workspace button has a zero region at
+                # start-up (a click lands on the screen), so it is pressed through
+                # ``Button.press()``, which posts the same ``Button.Pressed``.
+                ("button", lambda: app.query_one("#ws_load_project_button").press()),
                 ("palette load_file", lambda: app.run_action("load_file")),
                 ("palette load_project", lambda: app.run_action("load_project")),
             ):
@@ -1663,8 +1731,11 @@ def test_tc_b100_53_variant_unload_and_save_are_refused_while_busy(
     async def scenario(app, pilot, log):
         save_label = "Saving project P1"
         try:
+            # E4 integration re-pin: released BEFORE the setup open of P2;
+            # released after it, the open waits on this hold until the
+            # 90 s setup timeout (the P2 open is setup, never held).
+            hold2.release.set()
             await start_held_save(app, pilot, hold)
-            hold2.release.set()  # the P2 open above is setup, never held
             a2l = app.current_a2l_path
             res = {}
             for name, gesture in (
@@ -2432,7 +2503,10 @@ def test_tc_b100_53_stay_keeps_the_save_running(tmp_path: Path, monkeypatch: pyt
         finally:
             hold.release.set()
         await settle_workers(pilot)
-        return out, log_tail(app)[0], running(app)
+        # E4 integration re-pin: the full outcome line from the status
+        # messages; ``log_lines`` is capped to the window width (N2) and the
+        # scratch path is longer than 118 columns.
+        return out, log.messages[-1], running(app)
 
     out, last, alive = run(base, scenario)
     assert out == [(True, False, True, False)] * 3, out
@@ -2476,6 +2550,10 @@ def test_tc_b100_53_confirmed_quit_waits_for_the_end(
         return real_exit(self, *args, **kwargs)
 
     monkeypatch.setattr(S19TuiApp, "exit", _exit)
+    # E4 integration re-pin: the toast is read from a ``notify`` spy; the
+    # ``save_fails`` arm first waits 60 s for an exit that must not come, and
+    # the 10 s toast has expired from ``_notifications`` by then.
+    toasts = Spy(monkeypatch, S19TuiApp, "notify")
     if arm in ("save", "save_fails"):
         hold = Hold(monkeypatch, app_module, "place_into_workarea",
                     raise_on_release=OSError(28, "synthetic no space") if arm == "save_fails" else None)
@@ -2514,7 +2592,8 @@ def test_tc_b100_53_confirmed_quit_waits_for_the_end(
         if exited:
             return SimpleNamespace(asked=asked, held_alive=held_alive, exited=True)
         await settle_workers(pilot)
-        notes = [(n.title, n.message) for n in getattr(app, "_notifications", [])]
+        notes = [(c.kwargs.get("title"), c.args[1] if len(c.args) > 1 else c.kwargs.get("message"))
+                 for c in toasts.calls]
         return SimpleNamespace(asked=asked, held_alive=held_alive, exited=False, last=log_tail(app)[0],
                                notes=notes, entries=len(entries(app)) == n_entries,
                                pending=getattr(app, "_quit_pending", None))
@@ -2526,7 +2605,12 @@ def test_tc_b100_53_confirmed_quit_waits_for_the_end(
         assert got.exited is True, "the app did not exit after the save ended"
         target = W(base) / "P1"
         manifest = projects.read_manifest(target)
-        assert manifest.get("files") == projects.file_records(target), manifest.get("files")
+        # E4 integration re-pin: the patched session's pasted document lands
+        # as ``patches/changes.json`` and the manifest records it (Inc 8a);
+        # ``file_records`` lists only the top-level data/A2L files.
+        recorded = manifest.get("files") or {}
+        assert recorded == on_disk_records(target, recorded), recorded
+        assert projects.file_records(target).items() <= recorded.items(), recorded
     elif arm == "save_fails":
         assert got.exited is False, "a failed save exited the app (the failure line was never shown)"
         assert got.last == NO_SPACE_LINE, got.last
@@ -2939,7 +3023,10 @@ def test_at_b100_18_quit_confirm_half_slow_save_as_leaves_no_partial_folder(tmp_
     assert asked is True, "q during the save-as exited without asking"
     assert alive_after_y is True, "the app stopped right after y, with the save still running"
     assert exited is True, "the app did not exit when the save ended"
-    folders = sorted(p.name for p in W(base).iterdir() if p.is_dir() and p.name not in ("S", WORKAREA_TEMP))
+    # E4 integration re-pin: ``ensure_workarea`` creates the common
+    # ``patches`` folder at start-up; it is not a project.
+    folders = sorted(p.name for p in W(base).iterdir()
+                     if p.is_dir() and p.name not in ("S", WORKAREA_TEMP, "patches"))
     assert folders == ["S9"], folders
     target = W(base) / "S9"
     manifest = projects.read_manifest(target)

@@ -932,6 +932,9 @@ def test_tc_b100_34_source_inside_the_work_area_is_not_recorded(
         variant_ids = [v.variant_id for v in app._variant_set.variants if v.path.name == "other.s19"]
         app._handle_select_variant(variant_ids[0])
         await _wait_image(pilot, app, "other.s19")
+        # E4 integration re-pin (A-10): the switch's file load ends after its
+        # project sync; the typed load below is refused while it runs.
+        await settle_workers(pilot)
         counts["variant switch"] = len(_entries(store))
         app._load_path_from_user_input(workarea / "ab" / "firmware.s19")
         await projects.wait_for(

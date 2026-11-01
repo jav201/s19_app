@@ -1766,6 +1766,7 @@ def test_tc_b99_ux_c10_placement_error_path_renders_literally(
             statuses = _statuses(app)
             app.load_from_path(image)
             await _poll(pilot, lambda: app.current_file is not None)
+            await settle_workers(pilot)  # E4 integration re-pin: the load's run ends first
             monkeypatch.setattr(os, "replace", _always_locked)
             app.action_save_project()
             # E4 integration: wait for the composed field, not only the push.
@@ -1786,6 +1787,9 @@ def test_tc_b99_ux_c10_placement_error_path_renders_literally(
             await sd.wait_for(
                 pilot, lambda: not sd.is_save_dialog(app.screen), "the Save dialog to close"
             )
+            # E4 integration re-pin (A-10): the save fails on its worker; its
+            # failure line and toast land after the dialog closes.
+            await settle_workers(pilot)
             for _ in range(4):
                 await pilot.pause()
             outcomes["statuses"] = list(statuses)

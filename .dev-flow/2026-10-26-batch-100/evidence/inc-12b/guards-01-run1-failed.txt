@@ -1,0 +1,44 @@
+# Inc 12b E4 integration — guards-01
+# sha: ef0cdb8d03d6481a06a80d6276b66a3a0871fd04 (+ working-tree edits); app.py sha256[:16]=5823c0ac306ee4ab a2l.py=d70b17982f1cee30 styles.tcss=f7b4f75911b296a4
+# s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc12b\s19_app\__init__.py
+# command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int12b/lad/guards-01 C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int12b/bt/guards-01 -q --no-header --tb=short -rfEXx <nodes>
+# nodes:
+#   tests/test_id_registry.py
+#   tests/test_b99_staging.py
+#   tests/test_engine_unchanged.py
+#   tests/test_address_census.py
+#   tests/test_b100_save_dialog.py
+#   tests/test_b100_load_dialog.py
+# started: 2026-11-01T03:29:49-06:00
+.......F....................................F........................... [ 18%]
+.....s.......................s.................s........................ [ 37%]
+...........................................................F............ [ 55%]
+........................................................................ [ 74%]
+...........s............................................................ [ 92%]
+...............sss...........                                            [100%]
+================================== FAILURES ===================================
+____________ test_tc607_scanned_corpus_matches_the_declared_bound _____________
+tests\test_id_registry.py:608: in test_tc607_scanned_corpus_matches_the_declared_bound
+    assert actual == EXPECTED_SCANNED_TEST_FILES, (
+E   AssertionError: the guard scanned 237 test modules, not the declared 234. If tests/ legitimately grew, bump EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a decision rather than a rubber stamp.
+E   assert 237 == 234
+_________________ test_tc027_engine_modules_unchanged_vs_main _________________
+tests\test_engine_unchanged.py:171: in test_tc027_engine_modules_unchanged_vs_main
+    assert changed == [], (
+E   AssertionError: TUI-side batches must not edit the parsing / range / validation engine (read-only constraint) — git reports these changed vs main: ['s19_app/tui/a2l.py']
+E   assert ['s19_app/tui/a2l.py'] == []
+E     
+E     Left contains one more item: 's19_app/tui/a2l.py'
+E     Use -v to get more diff
+________ test_tc_b100_65_recompute_at_most_three_of_twenty_keystrokes _________
+tests\test_b100_save_dialog.py:3483: in test_tc_b100_65_recompute_at_most_three_of_twenty_keystrokes
+    assert final <= 0.3, final
+E   AssertionError: 0.4690000000409782
+E   assert 0.4690000000409782 <= 0.3
+=========================== short test summary info ===========================
+FAILED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+FAILED tests/test_engine_unchanged.py::test_tc027_engine_modules_unchanged_vs_main
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_at_most_three_of_twenty_keystrokes
+3 failed, 379 passed, 7 skipped in 2835.60s (0:47:15)
+# exit: 1
+# finished: 2026-11-01T04:17:07-06:00

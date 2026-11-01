@@ -2722,7 +2722,19 @@ def test_tc_b100_07_each_save_stage_failure_on_the_worker_rolls_back(
     elif stage == "subfolder_copy":
         monkeypatch.setattr(S19TuiApp, "_copy_project_subfolders", _fail_with(no_space))
     elif stage == "placement":
-        monkeypatch.setattr(app_module, "place_into_workarea", _fail_with(no_space))
+        # E4 integration re-pin: a ROW placement fails. The save-as copies
+        # ``flows/f1.json`` first through the same function, and that copy
+        # reports its own line (``… could not be copied …``, base parity), so
+        # only the row sources raise here.
+        real_place = app_module.place_into_workarea
+        fail_place = _fail_with(no_space)
+
+        def _place(source, *args, **kwargs):
+            if Path(source).name.startswith("firmware."):
+                return fail_place(source, *args, **kwargs)
+            return real_place(source, *args, **kwargs)
+
+        monkeypatch.setattr(app_module, "place_into_workarea", _place)
     elif stage == "gather":
         monkeypatch.setattr(app_module, "gather_project_artifacts", _fail_with(no_space))
     else:
@@ -2810,8 +2822,18 @@ def test_tc_b100_07_ast_census_every_post_creation_return_removes() -> None:
         and getattr(n.type, "id", "") == "OSError" and n.lineno > first
     ]
     assert len(handlers) == 1 and _contains_abort_call(handlers[0]), len(handlers)
+    # E4 integration re-pin: the returns of the worker step itself; a nested
+    # closure's ``return`` (the document's ``copy_fn``, which the graph
+    # requires to return the placed path) is not an exit of the step.
+    nested = {
+        id(sub)
+        for fn in ast.walk(worker)
+        if isinstance(fn, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)) and fn is not worker
+        for sub in ast.walk(fn)
+    }
     returns = sorted(
-        (n for n in ast.walk(worker) if isinstance(n, ast.Return) and n.lineno > first),
+        (n for n in ast.walk(worker)
+         if isinstance(n, ast.Return) and n.lineno > first and id(n) not in nested),
         key=lambda n: n.lineno,
     )
     assert len(returns) >= 3, len(returns)

@@ -806,12 +806,22 @@ def test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second(
         timing: list = []
 
         def _timed(name, *args, **kwargs):  # Inc 12b X-6: the router passes routed=True
-            started = time.perf_counter()
+            app._load_started_at = time.perf_counter()
             real_load(name, *args, **kwargs)
-            timing.append(time.perf_counter() - started)
+
+        # E4 integration re-pin (A-8): at 12b the handler only starts the
+        # worker, so the load is timed to the end of the one install callback
+        # (the work the base did inside the handler), and the panel's paint
+        # clock starts there, as it did at the base.
+        real_install = app._install_prepared_project
+
+        def _installed(prepared):
+            real_install(prepared)
+            timing.append(time.perf_counter() - app._load_started_at)
             app._load_returned_at = time.perf_counter()
 
         app._handle_load_project = _timed
+        app._install_prepared_project = _installed
         async with app.run_test(size=(118, 54)) as pilot:
             await pilot.pause()
             await _open_panel_through_the_dialog(pilot, app)
@@ -925,12 +935,22 @@ def _sec6_5_filesystem_scene(tmp_path: Path, payload: dict, setup=None) -> dict:
         timing: list = []
 
         def _timed(name, *args, **kwargs):  # Inc 12b X-6: the router passes routed=True
-            begun = time.perf_counter()
+            app._load_started_at = time.perf_counter()
             real_load(name, *args, **kwargs)
-            timing.append(time.perf_counter() - begun)
+
+        # E4 integration re-pin (A-8): at 12b the handler only starts the
+        # worker, so the load is timed to the end of the one install callback
+        # (the work the base did inside the handler), and the panel's paint
+        # clock starts there, as it did at the base.
+        real_install = app._install_prepared_project
+
+        def _installed(prepared):
+            real_install(prepared)
+            timing.append(time.perf_counter() - app._load_started_at)
             app._load_returned_at = time.perf_counter()
 
         app._handle_load_project = _timed
+        app._install_prepared_project = _installed
         async with app.run_test(size=(118, 54)) as pilot:
             await pilot.pause()
             painted, rows, appended = await _timed_load_panel_and_append(
@@ -1292,12 +1312,22 @@ def test_tc_b100_61_files_at_the_cap_all_missing_are_bounded(tmp_path: Path) -> 
         timing: list = []
 
         def _timed(name, *args, **kwargs):  # Inc 12b X-6: the router passes routed=True
-            begun = time.perf_counter()
+            app._load_started_at = time.perf_counter()
             real_load(name, *args, **kwargs)
-            timing.append(time.perf_counter() - begun)
+
+        # E4 integration re-pin (A-8): at 12b the handler only starts the
+        # worker, so the load is timed to the end of the one install callback
+        # (the work the base did inside the handler), and the panel's paint
+        # clock starts there, as it did at the base.
+        real_install = app._install_prepared_project
+
+        def _installed(prepared):
+            real_install(prepared)
+            timing.append(time.perf_counter() - app._load_started_at)
             app._load_returned_at = time.perf_counter()
 
         app._handle_load_project = _timed
+        app._install_prepared_project = _installed
         async with app.run_test(size=(118, 54)) as pilot:
             await pilot.pause()
             await _open_panel_through_the_dialog(pilot, app)

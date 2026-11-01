@@ -281,6 +281,7 @@ def save_case01_project(
 
     from s19_app.tui.app import S19TuiApp
     from s19_app.tui.screens import SaveProjectPayload
+    from tests.support.b100_workers import settle_workers
 
     source = copy_sources(base.parent / f"{base.name}_src", CASE01_DIR, *files)
 
@@ -306,9 +307,13 @@ def save_case01_project(
                     await pilot.pause()
                 else:
                     raise AssertionError(f"the load of {item} did not land")
+                # E4 integration re-pin (A-10): the load's run ends after its
+                # install; the next load (or the save) is refused while it runs.
+                await settle_workers(pilot)
             app._handle_save_dialog(
                 SaveProjectPayload(parent_folder=str(app.workarea), project_name=name)
             )
+            await settle_workers(pilot)  # E4 integration re-pin: the save is a worker
             for _ in range(400):
                 if app.current_project == name:
                     break

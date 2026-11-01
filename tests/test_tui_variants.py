@@ -238,7 +238,10 @@ def test_no_new_parse_loaded_file_call_sites() -> None:
         f"unexpected _parse_loaded_file call sites: {sorted(call_sites['_parse_loaded_file'])} "
         "(LLR-005.4 allows only the pre-existing worker + sync-path sites)"
     )
-    assert sorted(call_sites["_parse_data_file"]) == [
+    # E4 integration re-pin: the call sites are compared as enclosing
+    # functions; ``_prepare_project_load`` calls the core twice (the image,
+    # step 8, and the MAC merged onto it, step 10 of the proto).
+    assert sorted(set(call_sites["_parse_data_file"])) == [
         "_parse_loaded_file",
         "_prepare_project_load",
     ], f"unexpected _parse_data_file call sites: {sorted(call_sites['_parse_data_file'])}"

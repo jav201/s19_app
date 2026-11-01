@@ -160,7 +160,9 @@ from tools.id_registry import (
 # batch-100 Inc-8a: 224 -> 225 (tests/test_b100_document.py).
 # batch-100 Inc 11: 231 -> 233 (tests/test_b100_save_dialog.py, tests/support/b100_save_dialog.py).
 # batch-100 Inc 12a: 233 -> 234 (tests/test_b100_busy.py).
-EXPECTED_SCANNED_TEST_FILES = 234
+# batch-100 Inc 12b: 234 -> 237 (tests/test_b100_workers.py, tests/test_b100_a2l_progress.py,
+# tests/support/b100_workers.py).
+EXPECTED_SCANNED_TEST_FILES = 237
 """Test modules scanned, including this one.
 
 batch-100 Inc 12a: 233 -> 234. ``tests/test_b100_busy.py`` (TC-B100-50, -51

@@ -3369,7 +3369,8 @@ class S19TuiApp(App):
                 Label("", id="status_context", markup=False),
                 id="status_line",
             ),
-            ProgressBar(total=100, id="progress_bar"),
+            # OBS-12a-1: no Textual ETA beside the seam's elapsed time.
+            ProgressBar(total=100, id="progress_bar", show_eta=False),
             # batch-33 (LLR-051.8, C-17): the log lines render FILE-DERIVED
             # text (issue messages embedding verbatim {kind!r}/{fmt!r}/... ,
             # check reasons) — markup=False at CONSTRUCTION is the single
@@ -11635,13 +11636,12 @@ class S19TuiApp(App):
                     if row.source is not None:
                         continue
                     home_dir = project_dir / document_home
-                    created_home: Optional[Path] = None
-                    try:
-                        os.lstat(home_dir)
-                    except FileNotFoundError:
-                        created_home = home_dir
-                    except OSError:
-                        pass
+                    # The home this write creates, for the rollback (base
+                    # ``_write_editor_document``); P1-66 keeps one ``except
+                    # OSError`` after the mkdir, so no try here.
+                    created_home: Optional[Path] = (
+                        None if os.path.lexists(home_dir) else home_dir
+                    )
                     landed_doc: list[PlacementResult] = []
 
                     def _place_doc(staged: Path, destination: Path) -> Path:
@@ -11817,12 +11817,12 @@ class S19TuiApp(App):
             batch = (
                 tuple(request.payload.batch)
                 if request.payload.batch
-                else tuple(target_carry.get("batch", ()))
+                else tuple(prepared.target_carry.get("batch", ()))
             )
             assignments = (
                 dict(request.payload.assignments)
                 if any(request.payload.assignments.values())
-                else dict(target_carry.get("assignments", {}))
+                else dict(prepared.target_carry.get("assignments", {}))
             )
             composition_names = list(batch) + [
                 name for entries in assignments.values() for name in entries
@@ -12171,104 +12171,116 @@ class S19TuiApp(App):
                 )
             self.end_busy("save_project", gen, safe_text(outcome.outcome).plain)
             return
-        self._report_filter_path = None
-        self._variant_set = outcome.variant_set
-        if outcome.saved_variant_id and self.current_file:
-            self.current_file.variant_id = outcome.saved_variant_id
-        self._last_manifest_verify_result = outcome.verify_result
-        if outcome.verify_result is not None:
-            self._surface_manifest_verify_result(outcome.verify_result)
-        mem_map = self.current_file.mem_map if self.current_file else None
-        if request.image is not None:
-            summary = request.image.summary
-            if summary is not None and outcome.emit_verify is not None:
-                summary.saved_path = outcome.emit_verify.written_path
-                summary.source_image_path = request.image.source_path
-                summary.verify_result = outcome.emit_verify
-            self._change_service.adopt_rederived(
-                mem_map, request.image.derived, summary
-            )
-            self._surface_verify_result()
-        if request.image is not None or not self._change_service.image_differs_from_source(
-            mem_map
-        ):
-            self._change_service.mark_saved(mem_map)
         image_clause = f" — {prepared.plan.image}" if request.image is not None else ""
         if outcome.saved_variant_id:
-            tail: list[str] = [
+            saved_line = (
                 f"Saved project to {prepared.project_dir} "
                 f"(variant '{outcome.saved_variant_id}'){image_clause}"
-            ]
+            )
         else:
-            tail = [f"Saved project to {prepared.project_dir}{image_clause}"]
-        if outcome.kept_note is not None:
-            tail.append(safe_text(outcome.kept_note).plain)
-        if outcome.skipped_links is not None:
-            tail.append(safe_text(outcome.skipped_links).plain)
-        if outcome.source_gone is not None:
-            tail.append(safe_text(outcome.source_gone).plain)
-        for relative in outcome.unrecorded_names[:PAINTED_NAME_LIMIT]:
-            why = (
-                "Windows reserves that name"
-                if any(
-                    is_windows_device_name(part)
-                    for part in PurePosixPath(relative).parts
-                )
-                else "the name is not one project.json records"
-            )
-            tail.append(
-                safe_text(
-                    f"{painted_names([relative])} was copied but not recorded in "
-                    f"{PROJECT_MANIFEST_NAME} ({why}) — rename it in the common "
-                    "folder, select the new name, then Save project."
-                ).plain
-            )
-        if len(outcome.unrecorded_names) > PAINTED_NAME_LIMIT:
-            tail.append(
-                f"and {len(outcome.unrecorded_names) - PAINTED_NAME_LIMIT} more "
-                f"files not recorded in {PROJECT_MANIFEST_NAME}"
-            )
-        for line in outcome.document_lines:
-            tail.append(safe_text(line).plain)
-        document = self._change_service.document
-        if outcome.document_source_path is not None:
-            document.source_path = outcome.document_source_path
+            saved_line = f"Saved project to {prepared.project_dir}{image_clause}"
+        # CR12a-1: the manifest is on disk, so a raise below ends the run
+        # with the committed line (never ``Saving project … failed``), then
+        # propagates (Q-d1: a handler defect stays loud).
+        saved_painted = False
         try:
-            panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
-            paste_text = self.query_one("#patch_paste_text", TextArea).text
-        except Exception:
-            panel = None
-        if panel is not None:
-            if outcome.pasted_placed:
-                self._patch_editor_load_tail(panel)
-            if _save_clears_panel_flag(
-                outcome.pasted_placed, paste_text, self._parsed_paste_text
-            ):
-                panel.mark_saved()
-            elif (
-                request.document_class == _DOCUMENT_IN_HOME
-                and outcome.recorded_document is not None
-                and panel.is_dirty
-            ):
-                tail.append(
-                    f"Change document {document.source_path.name} has unsaved "
-                    "edits — the project records the file as it is on disk; "
-                    "save it from the Patch Editor to keep them"
+            self._report_filter_path = None
+            self._variant_set = outcome.variant_set
+            if outcome.saved_variant_id and self.current_file:
+                self.current_file.variant_id = outcome.saved_variant_id
+            self._last_manifest_verify_result = outcome.verify_result
+            if outcome.verify_result is not None:
+                self._surface_manifest_verify_result(outcome.verify_result)
+            mem_map = self.current_file.mem_map if self.current_file else None
+            if request.image is not None:
+                summary = request.image.summary
+                if summary is not None and outcome.emit_verify is not None:
+                    summary.saved_path = outcome.emit_verify.written_path
+                    summary.source_image_path = request.image.source_path
+                    summary.verify_result = outcome.emit_verify
+                self._change_service.adopt_rederived(
+                    mem_map, request.image.derived, summary
                 )
-        if (
-            outcome.verify_result is not None
-            and outcome.verify_result.status != MANIFEST_VERIFIED
-        ):
-            tail.append("Manifest verify MISMATCH")
-        for line in tail[:-1]:
-            self.set_status(line)
-        self.current_project = prepared.cleaned
-        self.current_project_dir = prepared.project_dir
-        self.update_project_labels()
-        self.refresh_files()
-        if prepared.save_as_source is not None:
-            self._publish_flow_session_dir()
-        self.end_busy("save_project", gen, tail[-1])
+                self._surface_verify_result()
+            if request.image is not None or not self._change_service.image_differs_from_source(
+                mem_map
+            ):
+                self._change_service.mark_saved(mem_map)
+            tail: list[str] = [saved_line]
+            if outcome.kept_note is not None:
+                tail.append(safe_text(outcome.kept_note).plain)
+            if outcome.skipped_links is not None:
+                tail.append(safe_text(outcome.skipped_links).plain)
+            if outcome.source_gone is not None:
+                tail.append(safe_text(outcome.source_gone).plain)
+            for relative in outcome.unrecorded_names[:PAINTED_NAME_LIMIT]:
+                why = (
+                    "Windows reserves that name"
+                    if any(
+                        is_windows_device_name(part)
+                        for part in PurePosixPath(relative).parts
+                    )
+                    else "the name is not one project.json records"
+                )
+                tail.append(
+                    safe_text(
+                        f"{painted_names([relative])} was copied but not recorded in "
+                        f"{PROJECT_MANIFEST_NAME} ({why}) — rename it in the common "
+                        "folder, select the new name, then Save project."
+                    ).plain
+                )
+            if len(outcome.unrecorded_names) > PAINTED_NAME_LIMIT:
+                tail.append(
+                    f"and {len(outcome.unrecorded_names) - PAINTED_NAME_LIMIT} more "
+                    f"files not recorded in {PROJECT_MANIFEST_NAME}"
+                )
+            for line in outcome.document_lines:
+                tail.append(safe_text(line).plain)
+            document = self._change_service.document
+            if outcome.document_source_path is not None:
+                document.source_path = outcome.document_source_path
+            try:
+                panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+                paste_text = self.query_one("#patch_paste_text", TextArea).text
+            except Exception:
+                panel = None
+            if panel is not None:
+                if outcome.pasted_placed:
+                    self._patch_editor_load_tail(panel)
+                if _save_clears_panel_flag(
+                    outcome.pasted_placed, paste_text, self._parsed_paste_text
+                ):
+                    panel.mark_saved()
+                elif (
+                    request.document_class == _DOCUMENT_IN_HOME
+                    and outcome.recorded_document is not None
+                    and panel.is_dirty
+                ):
+                    tail.append(
+                        f"Change document {document.source_path.name} has unsaved "
+                        "edits — the project records the file as it is on disk; "
+                        "save it from the Patch Editor to keep them"
+                    )
+            if (
+                outcome.verify_result is not None
+                and outcome.verify_result.status != MANIFEST_VERIFIED
+            ):
+                tail.append("Manifest verify MISMATCH")
+            for line in tail[:-1]:
+                self.set_status(line)
+            saved_painted = len(tail) > 1
+            self.current_project = prepared.cleaned
+            self.current_project_dir = prepared.project_dir
+            self.update_project_labels()
+            self.refresh_files()
+            if prepared.save_as_source is not None:
+                self._publish_flow_session_dir()
+            self.end_busy("save_project", gen, tail[-1])
+        except BaseException:
+            run = self._busy.runs.get("save_project")
+            if run is not None and run.gen == gen:
+                self.end_busy("save_project", gen, "" if saved_painted else saved_line)
+            raise
 
     def _write_manifest_for_save(
         self,
@@ -14904,7 +14916,12 @@ class S19TuiApp(App):
             # CR10-01 / SEC10-01: the relative fallback's ``resolve()``
             # follows a link, so a typed ``.mac`` can name an image; a
             # typed suffix that differs from the resolved one fails closed.
-            resolved = resolve_input_path(path, self.base_dir)
+            # SE5-12a-4: an OS error here falls to the typed name; the
+            # loader's own use-time look then refuses it.
+            try:
+                resolved = resolve_input_path(path, self.base_dir)
+            except (OSError, ValueError, RuntimeError):
+                resolved = None
             suffix = resolved.suffix.lower() if resolved is not None else ""
             kind = (
                 "attach"
@@ -15029,7 +15046,12 @@ class S19TuiApp(App):
             return
         self.logger.info("Load phase boundary: dialog_callback_entry path=%s", path)
         self._flush_logger()
-        normalized = resolve_input_path(path, self.base_dir)
+        # SE5-12a-4: the use-time look (after the Inc 10 question) refuses an
+        # OS-refused path as not found instead of raising out of a callback.
+        try:
+            normalized = resolve_input_path(path, self.base_dir)
+        except (OSError, ValueError, RuntimeError):
+            normalized = None
         if not normalized:
             self._pending_variant_id = None
             self.set_status(f"File not found: {path}")
@@ -15113,7 +15135,10 @@ class S19TuiApp(App):
         """The A2L-attach kickoff (12b): refusals, begin, request, worker."""
         if self._refuse_if_busy():
             return
-        normalized = resolve_input_path(path, self.base_dir)
+        try:  # SE5-12a-4, as in load_from_path
+            normalized = resolve_input_path(path, self.base_dir)
+        except (OSError, ValueError, RuntimeError):
+            normalized = None
         if not normalized:
             self.set_status(f"A2L file not found: {path}")
             self.logger.warning("A2L file not found: %s", path)

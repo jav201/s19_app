@@ -561,7 +561,10 @@ def test_tc_b100_47_target_line_merge_and_existing_folder_kinds(tmp_path: Path) 
         await _type_and_wait(pilot, app, "ab", "merges into an existing project")
         out["ab"] = sd.where_text(app.screen)
         for name in ("ef", "nt"):
-            await _type_and_wait(pilot, app, name, "new project in an existing folder")
+            # E4 integration fix (fails on the base 71376a3 too): after ``ef``
+            # the kind text is already painted, so wait for the line that
+            # names THIS folder, not only the kind.
+            await _type_and_wait(pilot, app, name, f"{name} — new project in an existing folder")
             out[name] = sd.where_text(app.screen)
         return out
 
@@ -3633,6 +3636,9 @@ def test_tc_b100_65_save_as_then_patch_then_direct_save_plans_fresh(tmp_path: Pa
         await _open_project_direct(pilot, app, "P")
         decisions = _spy_method(app, "_decide_project_image")
         app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name="Q"))
+        # E4 integration re-pin: wait on the worker first; a 10 ms
+        # ``pilot.pause`` poll keeps the event loop hot and starves it.
+        await settle_workers(pilot)
         await sd.wait_for(pilot, lambda: (app.workarea / "Q" / "project.json").is_file(), "the save as Q", 10.0)
         await settle_workers(pilot)  # Inc 12b re-pin: the save ends on its worker
         await _settle(pilot, 6)
@@ -3641,6 +3647,9 @@ def test_tc_b100_65_save_as_then_patch_then_direct_save_plans_fresh(tmp_path: Pa
         _add_direct(app, 0x8000007C, (0xDE, 0xAD, 0xBE, 0xEF))
         _apply_direct(app)
         app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name="R"))
+        # E4 integration re-pin: wait on the worker first; a 10 ms
+        # ``pilot.pause`` poll keeps the event loop hot and starves it.
+        await settle_workers(pilot)
         await sd.wait_for(pilot, lambda: (app.workarea / "R" / "project.json").is_file(), "the save of R", 10.0)
         await settle_workers(pilot)  # Inc 12b re-pin: the save ends on its worker
         await _settle(pilot, 6)
@@ -3946,6 +3955,9 @@ def test_tc_b100_65_dialog_save_as_leaves_no_session_for_the_next_direct_save(tm
     async def scenario(app, pilot, log):
         await _open_project_direct(pilot, app, "P")
         await sd.save_through_dialog(pilot, app, "Q", confirm="alt+s")
+        # E4 integration re-pin: wait on the worker first; a 10 ms
+        # ``pilot.pause`` poll keeps the event loop hot and starves it.
+        await settle_workers(pilot)
         await sd.wait_for(pilot, lambda: (app.workarea / "Q" / "project.json").is_file(), "the save as Q", 10.0)
         await settle_workers(pilot)  # Inc 12b re-pin: the save ends on its worker
         await _settle(pilot, 6)
@@ -3953,6 +3965,9 @@ def test_tc_b100_65_dialog_save_as_leaves_no_session_for_the_next_direct_save(tm
         _add_direct(app, 0x8000007C, (0xDE, 0xAD, 0xBE, 0xEF))
         _apply_direct(app)
         app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name="R"))
+        # E4 integration re-pin: wait on the worker first; a 10 ms
+        # ``pilot.pause`` poll keeps the event loop hot and starves it.
+        await settle_workers(pilot)
         await sd.wait_for(pilot, lambda: (app.workarea / "R" / "project.json").is_file(), "the save of R", 10.0)
         await settle_workers(pilot)  # Inc 12b re-pin: the save ends on its worker
         await _settle(pilot, 6)
@@ -4148,6 +4163,9 @@ def test_at_b100_16_save_dialog_open_folder_clash_empty_escape(tmp_path: Path, s
         await _settle(pilot, 8)
         out["escape"] = (len(app.screen_stack), (app.workarea / "ab").exists())
         await sd.save_through_dialog(pilot, app, "ab", confirm="alt+s")
+        # E4 integration re-pin: wait on the worker first; a 10 ms
+        # ``pilot.pause`` poll keeps the event loop hot and starves it.
+        await settle_workers(pilot)
         await sd.wait_for(pilot, lambda: (app.workarea / "ab" / "project.json").is_file(), "ab saved")
         await settle_workers(pilot)  # Inc 12b re-pin: the save ends on its worker
         await sd.save_through_dialog(pilot, app, "P2", confirm="alt+s")
