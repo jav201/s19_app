@@ -1,0 +1,61 @@
+# red-03-corrective: Inc 12a E5 corrective test arms on the pre-corrective source (base12ac at 71376a3; the corrective test files copied in, source untouched; restored after).
+# Run 1: default basetemp (case-insensitive NTFS).
+# tree: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/base12ac
+# head: 71376a3
+# date: 2026-11-01T01:15:18-06:00
+s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12ac\s19_app\__init__.py
+# cmd: pytest -p no:cacheprovider -q -rs --tb=short --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12a/bt/red tests/test_b100_busy.py::test_tc_b100_50_names_paint_literally_through_load_from_path[bidi override] tests/test_b100_busy.py::test_tc_b100_50_names_paint_literally_through_load_from_path[ESC and BEL] tests/test_b100_busy.py::test_tc_b100_50_control_bytes_never_reach_the_status_log tests/test_b100_recents.py::test_tc_b100_38_one_project_match_prefers_the_exact_listed_name tests/test_b100_recents.py::test_tc_b100_38_picking_proj_loads_proj_when_proj_differs_by_case
+FsFFs                                                                    [100%]
+================================== FAILURES ===================================
+_ test_tc_b100_50_names_paint_literally_through_load_from_path[bidi override] _
+tests\test_b100_busy.py:1107: in test_tc_b100_50_names_paint_literally_through_load_from_path
+    assert outcome == ["Loaded fwgpj.s19"], [ascii(m) for m in added]
+E   AssertionError: ["'Loaded fw\\u202egpj.s19'"]
+E   assert ['Loaded fw\u202egpj.s19'] == ['Loaded fwgpj.s19']
+E     
+E     At index 0 diff: 'Loaded fw\u202egpj.s19' != 'Loaded fwgpj.s19'
+E     Use -v to get more diff
+__________ test_tc_b100_50_control_bytes_never_reach_the_status_log ___________
+tests\test_b100_busy.py:1156: in test_tc_b100_50_control_bytes_never_reach_the_status_log
+    assert [x for x in after_load if CONTROL.search(x)] == [], [ascii(x) for x in after_load]
+E   AssertionError: ["'Loaded a\\x1b]0;x\\x07.s19 (S19 only)'", "'Loaded good.s19'", "''", "''", "'Loaded a\\x1b]0;x.s19 (S19 only)'", "'Loaded good.s19'", ...]
+E   assert ['Loaded a\x1...9 (S19 only)'] == []
+E     
+E     Left contains 2 more items, first extra item: 'Loaded a\x1b]0;x\x07.s19 (S19 only)'
+E     Use -v to get more diff
+_______ test_tc_b100_38_one_project_match_prefers_the_exact_listed_name _______
+tests\test_b100_recents.py:3556: in test_tc_b100_38_one_project_match_prefers_the_exact_listed_name
+    assert out == {"proj": "proj", "Proj": "Proj", "PROJ": "Proj" if WIN else None}, out
+E   AssertionError: {'PROJ': 'Proj', 'Proj': 'Proj', 'proj': 'Proj'}
+E   assert {'PROJ': 'Pro...proj': 'Proj'} == {'PROJ': 'Pro...proj': 'proj'}
+E     
+E     Omitting 2 identical items, use -vv to show
+E     Differing items:
+E     {'proj': 'Proj'} != {'proj': 'proj'}
+E     Use -v to get more diff
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_b100_busy.py:1038: not run on Windows (the name cannot be created), never passed
+SKIPPED [1] tests\test_b100_recents.py:3574: the volume is case-insensitive: Proj and proj cannot both exist (not run)
+3 failed, 2 skipped in 9.51s
+# exit: 1
+
+# Run 2: SE5-12a-3 on-disk arm with --basetemp under a folder set case-sensitive (fsutil file setCaseSensitiveInfo <scratch>/corr12a/bt/csparent enable; new subfolders inherit it).
+# tree: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/base12ac
+# head: 71376a3
+# date: 2026-11-01T01:16:20-06:00
+s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12ac\s19_app\__init__.py
+# cmd: pytest -p no:cacheprovider -q -rs --tb=short --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12a/bt/csparent/red tests/test_b100_recents.py::test_tc_b100_38_picking_proj_loads_proj_when_proj_differs_by_case
+F                                                                        [100%]
+================================== FAILURES ===================================
+______ test_tc_b100_38_picking_proj_loads_proj_when_proj_differs_by_case ______
+tests\test_b100_recents.py:3585: in test_tc_b100_38_picking_proj_loads_proj_when_proj_differs_by_case
+    assert project == "proj", (project, messages)
+E   AssertionError: ('Proj', ["Loaded project 'Proj' -> firmware.s19 - variant 1 of 1, 1 problem - details: p"])
+E   assert 'Proj' == 'proj'
+E     
+E     - proj
+E     ? ^
+E     + Proj
+E     ? ^
+1 failed in 3.36s
+# exit: 1

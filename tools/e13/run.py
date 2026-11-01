@@ -40,6 +40,11 @@ Scenarios:
                   prefilled name with ``P2`` (a new folder): the dialog
                   stays open painting the "new project" plan for P2.
                   ``--close`` does not apply.
+  bz-busy         Load CASE01's firmware from workarea/temp/fw.s19 with the
+                  parse step slowed ~60 s (patched in run.py only): the
+                  capture stops at the ``step 2/3 Parse`` progress line
+                  while the load is still running, so the glyph and the
+                  elapsed time keep advancing. ``--close`` does not apply.
 
 ``--close`` dismisses the panel after it opens, so the capture shows the
 summary line and ``#status_text`` the load left behind.
@@ -55,6 +60,8 @@ import hashlib
 import json
 import os
 import shutil
+import sys
+import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -62,11 +69,18 @@ CASE01 = ROOT / "examples" / "case_01_basic_valid" / "firmware.s19"
 CASE02 = ROOT / "examples" / "case_02_gaps_and_patch_targets" / "firmware.s19"
 SCENARIOS = ("pe-clean", "pe-saveback", "pe-problems", "pe-damaged", "pe-patched",
              "pe-unreadable", "pe-document", "pe-a2l-only", "wa-files", "ld-dialog",
-             "lq-question", "sd-dialog")
+             "lq-question", "sd-dialog", "bz-busy")
 
 
 def seed(workarea: Path, scenario: str) -> None:
     """Project ``P`` on disk in the state the scenario names."""
+    if scenario == "bz-busy":
+        # The load source lives in workarea/temp (as a work-area file); the
+        # driver loads it through load_from_path with the parse slowed.
+        temp = workarea / "temp"
+        temp.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(CASE01, temp / "fw.s19")
+        return
     project = workarea / "P"
     project.mkdir(parents=True)
     if scenario == "pe-a2l-only":
@@ -172,6 +186,14 @@ def build_app(base: Path, scenario: str, close: bool):
             self.title = f"E13-{scenario}" + ("-closed" if close else "")
             self.e13_ready = asyncio.Event()
 
+        def _parse_loaded_file(self, path, a2l_files=None):
+            # bz-busy: slow the file-load worker's parse step (~60 s) so the
+            # capture can stop on the progress line with the load running.
+            # The sleep lives HERE (run.py only) — s19_app/ is never edited.
+            if scenario == "bz-busy":
+                time.sleep(60)
+            return super()._parse_loaded_file(path, a2l_files)
+
         def on_mount(self) -> None:
             super().on_mount()
             # Run the drive as its own task (not through call_after_refresh)
@@ -241,6 +263,19 @@ def build_app(base: Path, scenario: str, close: bool):
                             break
                         await asyncio.sleep(0.1)
                     await asyncio.sleep(0.5)
+                elif scenario == "bz-busy":
+                    # Load the seeded work-area file; wait until #status_text
+                    # paints the progress line (contains ``step `` and the
+                    # elapsed ``00:0``), then let the glyph and the elapsed
+                    # advance ~2.5 s and stop with the load still running.
+                    fw = self.workarea / "temp" / "fw.s19"
+                    self.load_from_path(fw)
+                    for _ in range(600):
+                        text = str(self.query_one("#status_text").render())
+                        if "step " in text and "00:0" in text:
+                            break
+                        await asyncio.sleep(0.1)
+                    await asyncio.sleep(2.5)
                 elif scenario == "sd-dialog":
                     from textual.widgets import Input
 
@@ -317,9 +352,16 @@ def main() -> None:
             print("s19_app:", s19_app.__file__)
             print("screen:", type(app.screen).__name__)
             print("status:", list(app.log_lines)[-2:])
+            print("status_text:", str(app.query_one("#status_text").render()))
 
     asyncio.run(_once())
-    print(f"SELFTEST OK scenario={args.scenario} close={args.close}")
+    print(f"SELFTEST OK scenario={args.scenario} close={args.close}", flush=True)
+    if args.scenario == "bz-busy":
+        # The slowed load worker is still sleeping (~60 s) on its worker
+        # thread; end the process explicitly so the selftest does not wait
+        # for the non-daemon worker at interpreter shutdown.
+        sys.stdout.flush()
+        os._exit(0)
 
 
 if __name__ == "__main__":

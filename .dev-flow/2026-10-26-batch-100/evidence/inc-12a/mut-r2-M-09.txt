@@ -1,0 +1,18 @@
+mutant: M-09
+what: restart keeps its old position (b.runs.pop removed)
+target: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\mutk\s19_app\tui\app.py
+sha256 before: 15ffc7bdbb599615
+old occurrences: 1
+sha256 mutated: 39a20906dccb6bab
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\mutk\s19_app\__init__.py
+command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line --basetemp=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\bt\mk-M-09 tests/test_b100_busy.py::test_tc_b100_50_a_restarted_key_becomes_the_newest_run
+pytest tail:
+  F                                                                        [100%]
+  ================================== FAILURES ===================================
+  C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\mutk\tests\test_b100_busy.py:2309: AssertionError: ('â ‹ A2  Â·  step 1/2 a  Â·  00:00', 0.0)
+  =========================== short test summary info ===========================
+  FAILED tests/test_b100_busy.py::test_tc_b100_50_a_restarted_key_becomes_the_newest_run
+  1 failed in 2.24s
+exit: 1
+verdict: KILLED
+restored: True
