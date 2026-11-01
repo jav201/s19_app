@@ -275,4 +275,153 @@ The batch-100 section of `BACKLOG-CODE.md` holds 73 rows, 8 of them closed. The 
 
 ## Part B — quality and test evidence (qa-reviewer)
 
-<!-- PART-B -->
+> **Mode:** `validation` (post-mortem). `qa-reviewer` evaluated the batch's records and ran read-only checks only: `pytest --collect-only` on `1d677ba` and `570b4b5`; `git diff --stat`, `git ls-tree` and `comm` against the battery's shard lists; an AST count of `skipif(not WIN)` functions; greps over `03-increments/`, `BACKLOG-CODE.md`, the CI logs in the orchestrator's session scratchpad and `evidence/`; and a script that builds `04-validation.md`'s Layer A rows. It ran no test node. Every run cited below names its executor. Part A's counts are cited, not repeated. Each value that only the gate run (CI 41338318239 on `570b4b5`) decides reads `<!-- CI-GATE -->`.
+
+### BLUF
+
+The batch reaches P4 with **no product defect open on the Windows evidence**, and with its gate still pending: <!-- CI-GATE -->. The cost of the operator's per-increment test-scope override shows up here as escapes.
+- **2 product defects reached `main` past their increment gates.** CI11-1 is the `..` rebind: found by CI, mislabelled "Linux-only", red on Windows too. R1-P1 is a Save-project slowdown, found only by the battery and still open. In all, 3 product fixes (CI11-1, the SE5-12b-2 tail, OBS-12b-2) landed at the batch end, each with a RED transcript before its fix.
+- **9 stale tests escaped their gates** while the product was correct. 5 of them sat in modules that the increment's selection did not run.
+- **Where the controls held:** RED-first, per-arm mutation (the 127 first-pass survivors in 8a–12b were killed, recorded equivalent or removed before the code shipped, except 3 `not-run`) and the independent reader.
+- **Where they leaked:** test selection under the override; wall-clock bounds of 1 s that measured the wrong interval or hid a real slowdown; oracles that read only the newest painted line; and the validation plan's own P4 acts, of which the expert inspection and the premise re-runs were never run.
+
+### 1 · Metrics (each with its source)
+
+| Metric | Value | Source |
+|---|---|---|
+| Iterations per station · increments · cap trips | see Part A, *Metrics (design/process)*. `state.json` stores 0 for every station (Part A, Record corrections) | Part A |
+| Stories · HLR · LLR · TC · AT | 16 stories · 42 HLR · **349 live LLR** (351 headings; LLR-171.2e retired, LLR-171.4d withdrawn) · 73 TC-B100 ids · 21 AT ids in 27 test functions, 51 collected nodes | `01-requirements.md` (script parse); `06-docs/traceability-matrix.md` §1 (349 rows, re-counted); `pytest --collect-only` on `570b4b5` |
+| Requirement coverage | 349 of 349 live LLRs have ≥ 1 collected node behind their TC. **378 of 391** requirement rows pass on the Windows evidence; 13 (6 LLR, 7 HLR) are decided by the gate run: <!-- CI-GATE --> | `04-validation.md` Layer A |
+| Test ledger | `3773 − 3 + 1484 = 5254` (collected, Windows) | collect-only on `1d677ba` / `570b4b5` (qa-reviewer) |
+| Batch-end battery (`9e4dd3b`, 4 shards, orchestrator) | **71 failed / 5,162 passed / 11 skipped / 4 xfailed**. Of the 71: 29 stale density snapshots, 5 known, 2 CI rows red on both hosts, 28 passed alone, 7 failed alone. Real: 9 nodes in 6 causes | `evidence/batch-end/full-shard0..3.log`, `rerun1.log`; `04-validation.md` *Battery classification* |
+| Gate run (`570b4b5`, Linux, `pytest -q`) | <!-- CI-GATE --> | CI 41338318239 |
+| Tests no host runs in full | 47 `skipif(not WIN)` functions in the `test_b100_*` files, AT-B100-12 and AT-B100-14 among them, are skipped on CI. The posix arms of CI9b-3, CI11-1 and CI11-3 cannot run on Windows. The CSS arm skips on CI (shallow clone, R2-CI) | AST count (qa-reviewer); `fix-round-1.md`; `fix-round-2.md` R-2 |
+| Mutation (C-40) | 8a–12b: 711 E5 rows (Part A). First-pass survivors: 127 (8a 5, 8b 3, 9a 9, 9b 26, 10 14, 11 18, 12a 22, 12b 30). All were killed in a later round, recorded equivalent or removed (Inc 11 M-47), except 3 `not-run` (8a R-12; 12a M-25 / M-48, Linux-only). Inc 2–7 and 3b: 138 mutants, all KILLED or the subject removed (Inc 4 R2); Inc 1 totals none in its packet | packets' gate row 11 (`increment-008.md:486` … `-022.md:109-120`); `increment-002.md:909` … `-015.md:153` |
+| Review findings at the P3 gates (raw) | `code-reviewer`: 16 HIGH · 36 MAJOR · 80 MINOR · 22 LOW · 17 NIT. `security-reviewer`: 4 HIGH · 13 MAJOR · 25 MINOR · 12 LOW · 12 NIT. **≈** — a grep of the severity column of the 29 report files, so one defect raised by both lenses counts twice. Part A's deduplicated HIGH count is 18 (§6) | `03-increments/review-*.md`, `security-*.md` |
+| Fix rounds | 2. Product fixes: 3 (CI11-1, SE5-12b-2 tail, OBS-12b-2). Test re-pins or test fixes: 9 (CI9b-3, CI9b-4, CI11-2, CI11-3, CI11-4, R-1 × 2 arms, R-2, R-3). New arms: 6. Tool: 1 (OBS-12b-1) | `fix-round-1.md`, `fix-round-2.md` |
+| Flakes | 28 battery failures passed alone (classes in §5). CI10-1/2 did not repeat on the next CI run | `rerun1.log`; `evidence/batch-end/ci-fix-list.md` |
+| P4 gaps | 13: 1 major (G-001), 12 minor | `04-validation.md` *Gaps detected* |
+
+### 2 · Where defects were caught
+
+| Station | blocker / HIGH | major / MEDIUM | minor / LOW / NIT | Total | Source |
+|---|---|---|---|---|---|
+| P2 (3 rounds) | 8 | 72 | 64 | **144** (86 + 58) | Part A Metrics; `02-review.md:15`, `:196` |
+| PDR | — | — | — | 25 ledger entries; PDR-ux raised 5 MAJOR conditions (C-UX-1..5), one of which, C-UX-5, is still open at P4 | Part A; `design/PDR-ux.md:33-41` |
+| P3 design stage (E3, 8a–12b) | 0 | **47** | — | 47 MAJOR | Part A |
+| P3 code and security gates (all 16 packets) | ≈ 20 raw (18 deduplicated, Part A) | ≈ 49 | ≈ 168 | ≈ 237 raw | §1 |
+| P3 E5 mutation (8a–12b), test-strength findings | — | — | 127 first-pass survivors | 127 | §1 |
+| CI on `main` between increments | 1 product (CI11-1) | — | 12 test or host rows (CI-6-1, `tc_b100_33[upper case]`, CI9b-1..4, CI10-1/2 flakes, CI11-2..4, CI12a-1 on 2 nodes) | 13 rows (14 nodes) | `ci-fix-list.md`; Part A |
+| Batch-end battery (Windows) | 1 product slowdown behind R-1 (R1-P1) | — | 4 new test causes (R-1 × 2 arms, R-2, R-3), 1 env (R-4) | 9 real nodes, 6 causes (2 of them already CI rows) | `rerun1.log`; `fix-round-2.md` |
+| Fix round 2, routed items | 1 product (SE5-12b-2 tail, found at 12b E5 and routed) | — | OBS-12b-2 (cosmetic), A12-51 (missing arm), OBS-12b-1 (tool), OBS-F2-1 (pre-existing, observed) | 5 | `fix-round-2.md` |
+| P4 | 0 | 1 (G-001) | 12 | 13 | `04-validation.md` |
+
+- **Escapes past an increment gate.**
+  - Product: **CI11-1** (Inc 11 → CI) and **R1-P1** (Inc 12b → battery). The SE5-12b-2 tail did not escape: E5 found it and routed it on purpose.
+  - Stale tests (the product was correct): CI-6-1, `tc_b100_33[upper case]`, CI9b-1, CI9b-2, CI11-4, CI12a-1, R-1's TC-05 clock, R-2 and R-3. CI11-2, CI9b-3, CI9b-4 and CI11-3 were host or wait-race arms written in the increment.
+- **Shift-left verdict.** E3 moved design defects ahead of code (Part A, *What worked*), and the code-gate HIGH count fell from 17 to 1. What E3 cannot see is the interaction between a change and **tests outside the increment's own file**. 5 of the 9 stale-test escapes sat in modules the increment did not run under the override: CI9b-1, CI9b-2, CI11-4, R-2 and R-3. That is a selection leak, not a design leak (§4, §7). The other four (CI-6-1, `tc_b100_33[upper case]`, CI12a-1 and R-1's TC-05 clock) failed on CI or under the battery's load after the increment's own run had passed.
+
+### 3 · Findings open vs closed
+
+| Station | Opened | Closed in batch | Open / routed |
+|---|---|---|---|
+| P2 | 144 | 144 (round 3 bounded at the cap) | 0 |
+| P3 gates → BACKLOG-CODE (batch-100 section) | 73 rows | 15 `✅ CLOSED` on `0063a78`. At `570b4b5` Part A counted 8: close part 1 flipped the 7 rows that Inc 12a had fixed | **58 open**, 12 of them re-routed "not handled by the Inc 12a sweep" and 3 "not handled at batch end" (close part 1) |
+| CI rows (13) | 13 | 11 fixed (CI12a-1 in 12b's corrective, the rest in Inc 7, 9a, 11 or the fix rounds) and 2 flakes closed (CI10-1/2, not repeated) | Posix confirmations of CI9b-3, CI11-1 and CI11-3, and the AT-01 / CI12a-1 re-check: <!-- CI-GATE --> |
+| Battery real causes (6) | 6 | 6 fixed or re-pinned | R1-P1 (product, BACKLOG-CODE) |
+| Fix round 2 routed | 5 | 4 (SE5-12b-2, OBS-12b-2, A12-51, OBS-12b-1) | OBS-F2-1 (design ruling owed) |
+| P4 | 13 | 0 (dispositions are the orchestrator's) | 13 (G-001..G-013) |
+
+**Totals** are from `BACKLOG-CODE.md` on `0063a78` (`awk` over the section `🆕 Routed 2026-10-26 — batch-100 P2 round 1`): 73 rows, 15 closed, 58 open. Not yet in BACKLOG-CODE: G-005, G-007, G-008 (3 known failures by id) and G-013 (the macOS row the fix-round-1 ruling promised).
+
+### 4 · Test-evidence controls — what held, what leaked
+
+**Held:**
+- **RED-first.** Every packet's gate row 4 cites executed RED transcripts. Each batch-end product fix has a RED before its fix: `fix-1/ci11-1-red-base.txt`, `fix-2/SE5-12b-2-RED.txt`, `fix-2/OBS-12b-2-RED.txt`. Each test re-pin has a negative control: CI11-4's mutant, R-2's 4 CSS mutants, A12-51's M-70.
+- **Per-arm mutation (C-40).** 127 first-pass survivors in the design-first increments were treated as weak-test findings. Each was killed by a new or strengthened arm, recorded equivalent or removed before the increment closed; 3 stayed `not-run` (§1). This is where test strength was actually measured; line coverage was never used.
+- **Independent oracles.** Image bytes go through `tests/support/independent_reader.py`, and manifests through a JSON compare in the test. No AT reads the app's own loader to judge a file (`04-validation.md` Layer B).
+- **Import-path proof.** Every battery shard and fix-round transcript opens with the `s19_app.__file__` probe. No worktree-trap result was found.
+- **Failure-level attribution at the batch end.** The 71 battery failures were re-run alone and split 28 / 7 before any fix (`rerun1.log`). The fix rounds then worked only the 7 and the CI rows.
+
+**Leaked or cost too much:**
+- **Selection under the override.** Part A explains the mechanism (*The override's blind spots*). The test-evidence consequence is that **CI11-4, R-2 and R-3 sat red for 1 to 5 increments in modules that cite the changed behaviour**. TC-59 tests the plan that Inc 11 re-ordered. The CSS arm guards the sheet that 9b, 11 and 12a edited. The b99 pick oracle reads the status lines that 12a re-ordered. None of them was in the increment's selection, because the selection keys on the requirement ids an increment amends, not on the behaviour its change touches.
+- **Wall-clock bounds of 1 s.** Three families failed under the battery's 4-shard load: TC-05, TC-20 and the TC-61 SEC6-5 arms.
+  - Two measured the wrong interval: poll plus settle, not the bounded action (R-1).
+  - One hid a real slowdown. Save project went from 0.71–0.79 s to 0.95–1.0 s at Inc 12b (`fix-2/R-1-*.txt`), and no packet noticed, because a timing arm reports pass / fail and not its margin. The re-pinned arm now passes alone with ≤ 0.05 s to spare (G-004).
+- **Newest-line oracles.** R-3 (3 nodes) and CI12a-1 (AT-B100-01) both read only the newest painted line. Inc 12a began painting the end line after the sync line, which broke both oracles while the product was right.
+- **A label without a run.** The CI list's "Linux-only" label (Part A finding 2) and packet 022's "5 Linux-only" were both first reads. All five known failures and CI11-1 / CI11-4 fail on Windows (`full-shard1.log`, `full-shard2.log`; `fix-round-1.md:22`).
+- **The validation plan's own P4 acts.** §5.1 and §5.2 committed to an expert inspection in a real terminal, premise probes re-run on the closing tree, and every AT at both sizes with notifications on.
+  - The expert inspection was never run, although PDR flagged its absence as MAJOR (C-UX-5).
+  - The probes were never re-run.
+  - 4 ATs run at one geometry (G-001, G-002, G-005).
+- **No host runs the whole suite.** 47 Windows-only functions skip on CI. The posix arms cannot run on Windows. The battery measured a tree before the fix rounds. The gated tree is therefore covered by two partial runs (G-003).
+
+### 5 · Flakes
+
+- **28 battery failures passed alone** (`rerun1.log`, orchestrator, on `dee0d96`):
+  - 10 `test_b97_width` nodes: `FileNotFoundError` on a long basetemp path, so path length, not timing;
+  - 4 `test_b99_export` nodes;
+  - 3 TC-61 SEC6-5 timing arms (1.00–1.27 s against 1 s);
+  - 2 `tc_b100_06` nodes;
+  - `tc_b100_20[mac-sync]` and `[a2l-sync]`;
+  - 3 Patch Editor v2 nodes, `tc344` among them, which batch-99 already recorded as failing on its base;
+  - `at075a`, `at077c`, `at063c`, `ac1_checks_panel`.
+- **Evidence form.** The alone run exists on disk (better than batch-99's G-004). But it ran on a different tree from the battery (`dee0d96`, fix round 1 applied), and no base-tree run exists for any of the 28. Batch-99's proposed QC-FL asked for both. G-011.
+- **Real failures behind flaky-looking ones.** `tc_b100_20[save-project]` and `tc_b100_05` also failed alone, which is how R1-P1 was found. The other two TC-20 writers passed alone at 0.40–0.59 s (`fix-2/R-1-final-alone-3-runs.txt`).
+- **On CI.** CI10-1/2 were treated as Linux timing flakes and did not repeat (`ci-fix-list.md`). The R-3 nodes are absent from the FAILED set of CI 41290452101 at `4dfb5a1` (`ci-12a-full.log` in the orchestrator's scratchpad), although fix round 2 reads that oracle as unable to hold since 12a (§6).
+- **Cost.** The battery took about 1 h 34 min wall over 4 shards (Part A). The alone re-run took 4 min 57 s. The R-1 diagnosis took 4 timing series and a breakdown script (`evidence/fix-2/R-1-*`).
+
+### 6 · Record discrepancies found while counting (P5 inputs, not new findings; none repeats Part A's Record corrections)
+
+- **The R-3 reading against the CI record.** `fix-round-2.md` R-3 says the old oracle "can never hold since 12a paints the end line last". Yet CI 41290452101 at `4dfb5a1` (12a) lists 13 failures, and none of them is a `test_b99_load_project` node. The `-q` log cannot show whether the 3 nodes passed or were skipped on Linux. One of the two readings is incomplete.
+- **Two counts of code-gate HIGH.** Part A gives Inc 1–7 = 17. A grep of the severity column gives 16 `code-reviewer` + 3 `security-reviewer` = 19 for Inc 1–7 (SEC-1 Inc 1, SEC2-7 Inc 2, SEC6-1 Inc 6). Part A's Inc 2 row (6) includes SEC2-7, but its Inc 1 (3) and Inc 6 (2) rows match the code-review rows alone. Whether SEC-1 and SEC6-1 are the same defects as code-review findings is not stated in the packets read. Reconcile in the synthesis.
+- **Packets 002, 003 and 005 leave gate rows 6 and 15 at `pending`.** Their §4b record the final verdicts: `increment-002.md:904` vs `:772`; `-003.md:399` vs `:354`; `-005.md:363` vs `:316`.
+- **A DDR station with no DDR record.** `state.json` `stations_active` lists `DDR`, but no DDR record exists in the batch folder (grep "DDR": `00-checklists.md` and the design proposal only).
+- **The batch-99 decision row is stale.** `BACKLOG-CODE.md:1812` (tc018 / at031b, "operator ruling") is still `▸`. LLR-163.3 re-pinned both tests in Inc 1, and neither is in the battery's FAILED list.
+- **A promised backlog row is missing.** The fix-round-1 ruling on the macOS `normcase` vs `lstat` risk says "BACKLOG-CODE", and no such row exists (G-013).
+- **TC-027 on `main` cannot fail.** `evidence/batch-end/tc027-full-on-main.txt` reads "1 passed" with no command line. On `main` the test compares `main` with itself (G-009).
+- **Two reads of the same backlog section.** Part A's "73 rows, 8 closed" was read at `570b4b5`. On `0063a78` the section reads 73 rows, 15 closed, after close part 1. Both counts are right for their trees.
+- **Part A's At a glance is now out of date.** It says `04-validation.md` is still a seed. It was a seed when Part A was written; this draft fills it.
+
+### 7 · Proposed controls (at most 3, each tied to a real defect)
+
+1. **QC-TM — a timing arm reports its margin, and it stops its clock on a product event.** Every wall-clock bound records its alone time in the packet. A margin under 20 % of the bound is a gate finding, with a base-tree time beside it. The clock stops at a stamp the product emits (the commit handler, the painted line), never when a poll notices.
+   - **It would have caught** R1-P1 at Inc 12b, where save-project moved from about 0.75 s to about 1.0 s against a 1.0 s bound.
+   - It would also have caught R-1's TC-05, whose clock measured settle pauses, before the battery.
+   - It complements Part A's process item 9, which enumerates waits; this one bounds what a timing arm may claim.
+2. **QC-OR — a status oracle reads every line the action painted, not the newest.** A test that waits on a painted outcome collects the lines painted since its trigger and asserts the one it needs, as the CI12a-1 re-pin does. A grep at the gate for `#log_line_4` / `#log_line_3` equality waits flags the old form.
+   - **It would have caught** R-3 (3 nodes, stale from 12a to the battery) and CI12a-1 (AT-B100-01, red on CI at 12a).
+   - Both broke when 12a re-ordered the end line, while the product was correct.
+3. **QC-BC — a behaviour census at every increment that re-orders an observable.** When an increment changes the order or the source of an observable, the gate greps `tests/` for every node that asserts that observable and runs them, whatever module they sit in. Examples: a refusal moved ahead of the plan, an end line painted after another line, a sheet edited mid-file. The trigger is the changed observable, not the amended requirement id.
+   - **It would have caught** CI11-4 at Inc 11 (TC-59 asserts the plan that Inc 11's session refusal now pre-empts).
+   - It would also have caught R-2 at 9b (the CSS arm asserts the sheet prefix 9b edited) and R-3 at 12a.
+   - It differs from Part A's gap list (process item 1): CI11-4 did run on CI and failed there, so a list of unrun tests would not name it.
+
+### 8 · Close-record §5 values (`templates/close-template.md`, the 13 keys)
+
+```yaml
+type: dev-flow-batch
+project: s19_app
+batch_id: 2026-10-26-batch-100
+mode: full
+verdict: null                  # <!-- CI-GATE --> — P4 Result is pending the gate run (04-validation.md)
+increments: 16                 # 15 planned + hotfix 3b = 16 packets (Part A, Scope drift)
+source_files_max: 5            # Inc 8b, operator-approved (Part A)
+notices_raised: 15             # distinct NOTICE ids declared in PLAN.md:125: V34, V36, V37, V38, V41, V43–V51, V54
+rework_returns: 35             # P2 iterate rounds 2 + P3 code re-rounds 15 (Inc 1–7 + 3b: 23 rounds over 8 packets) + 4 (8a–12b: 12 E5 rounds over 8) + E3 re-rounds 12 (20 rounds over 8) + 2 batch-end fix rounds — rounds from Part A's two tables
+triggers_fired: "A2,A3,B1,B4,C6,C8,D1,E1,E2"   # state.json; Part A finds A4 should have fired (Record corrections)
+tests_base_to_post: "3773 -> 5254"             # collected, Windows, collect-only (qa-reviewer)
+new_control: "proposed: QC-TM, QC-OR, QC-BC (Part B §7) and Part A's gap list of unrun tests — adoption is the gate's decision"
+open_items_next: 62            # 58 open rows in BACKLOG-CODE's batch-100 section on 0063a78 + 4 not yet routed (G-005, G-007, G-008, G-013); the P4 gaps the orchestrator routes may change it
+```
+
+### Evidence checklist — qa-reviewer
+
+- [✓] Mode declared: `validation`, header.
+- [✓] Every metric cites its record, and each run cited names its executor: the orchestrator (battery, alone re-run), the fix-round sub-agent, the implementers, and qa-reviewer (collect-only, greps) (§1, header).
+- [✓] Counts executed by qa-reviewer are named as such, and no test run is claimed (header; `04-validation.md` *Who did what*).
+- [✓] Absent results are stated, not implied: the gate run is <!-- CI-GATE -->; the expert inspection, the premise re-runs and 3 mutants are `not-run` (§4, §1).
+- [✓] The approximations are declared: the raw review-finding counts and their double counting (§1, §2, §6).
+- [✓] Every proposed control cites a real defect of this batch (§7: R1-P1 and R-1; R-3 and CI12a-1; CI11-4, R-2 and R-3).
+- [✓] Part A is cited, not repeated; Part A, Synthesis and Record corrections are untouched.
+- [✓] No real PII or credentials. No person is named.
