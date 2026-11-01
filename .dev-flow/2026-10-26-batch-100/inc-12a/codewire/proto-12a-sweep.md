@@ -175,7 +175,7 @@ func: changed (post-10 body, `:11675`); G-B's part only (interface S-k). G-A's b
   - the folder-refusal `unreadable` arm (`:11694`, `painted` already computed);
   - post-9b, the `_list_project_files` `OSError` catch (proto-9b-app B96);
   - post-9b, the `project.json` lstat gate `OSError` arm (proto-9b-app B99) — the `unreadable` pair;
-  - post-9b, the `project.json` lstat gate not-regular arm (proto-9b-app B99) — the `not a project` pair.
+  - post-9b, the `project.json` lstat gate not-regular arm (proto-9b-app B99) — the `unreadable` pair (corrected at close, SR-12a-3).
   - Every painted text is unchanged character for character.
 - (c) Unchanged: the `link` and `outside` folder-refusal sentences; `Project not found: <pn(name)>` (post-9b); the A2L refusal (its reason is a variable); the `No supported files in project: <pn(name)>` line (post-10); and every logger message.
 - All 6 G-B sentences sit before G-A's `project_load` begin (interface S-n, A12a-02: the begin is immediately before `build_variant_set`), so they paint no progress line and need no end.
@@ -306,7 +306,7 @@ sequence:
 | `_handle_load_project`, `_typed_load_route` | `_listed_project_name` (new) → `list_projects` | Same results; the one match lives in the new function (B12-18, B12-24, B12-25). |
 | `on_mount`, `action_refresh_files`, `load_from_path` (`call_later`), `load_a2l_from_path`, `_commit_project_save` (post-11) | `refresh_files` | Loadable rows only (B12-11). |
 | `_load_path_from_user_input`, `_load_dialog_verdict` | `_typed_load_route` | A NUL text is refused `not found`, never raised (B12-15, B12-21, B12-22). |
-| `_load_from_item`, `_handle_load_dialog` (`workarea`) | `_load_workarea_file` | A folder, junction, link or over-cap file paints 1 refusal line and loads nothing, before any question (B12-27 … B12-33). |
+| `_load_from_item`, `_handle_load_dialog` (`workarea`) | `_load_workarea_file` | A folder, junction, link or over-cap file paints 1 refusal line and loads nothing, inside `go`, after the question (B12-27 … B12-33) (corrected at close, D-6). |
 
 ## Seams with G-A (the indicator, same file)
 
