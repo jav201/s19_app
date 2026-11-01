@@ -1,0 +1,14 @@
+mutant id: M-94
+target file: s19_app/tui/services/project_gather_service.py
+old text:                 identical = _workspace._match_identical(
+                    listing, inventory.root / planned.home, name,
+                    planned.size, planned.digest,
+                )
+new text:                 identical = None
+sha256 before: e11a5e75d7346183d7b72c068d4ef80aa0c290f7bf344a8b70f365d4c4ecc30f
+command: cd C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut11 && timeout 900 env -u NO_COLOR LOCALAPPDATA='C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut11-lad' PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line "tests/test_b100_save_dialog.py::test_tc_b100_65_document_keep_row_is_what_the_save_writes"
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut11
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut11\s19_app\__init__.py
+pytest summary: 1 failed in 4.65s
+verdict: KILLED
+restored = True

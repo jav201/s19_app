@@ -1810,10 +1810,14 @@ class _SaveSession:
 
     Args:
         image_step (_ProjectImageStep): The image decision.
-        digests (Mapping[Path, Tuple[str, int]]): The image (copy case),
-            MAC and A2L digests, once each (S-d).
+        digests (dict[Path, Tuple[str, int]]): The image (copy case),
+            MAC and A2L digests, once each (S-d); a plain ``dict``, because
+            the planner writes the S11-11 memo key into it.
         refusal (Optional[str]): The session refusal (missing source,
             unreadable source, blocked entries).
+        image_generation (int): The app's ``_image_generation`` when the
+            session was built; a load that lands while the dialog is open
+            makes the session stale (SE5-11-1).
         inventory (Optional[ProjectInventory]): The save-as inventory,
             filled lazily at the first new-target preparation (P-1,
             S11-06).
@@ -1824,8 +1828,9 @@ class _SaveSession:
     """
 
     image_step: _ProjectImageStep
-    digests: Mapping[Path, Tuple[str, int]]
+    digests: dict[Path, Tuple[str, int]]
     refusal: Optional[str]
+    image_generation: int
     inventory: Optional[ProjectInventory] = None
     emitted_record: Optional[DerivedFrom] = None
     payload_sha256: Optional[str] = None
@@ -10306,6 +10311,9 @@ class S19TuiApp(App):
             self.set_status("Parent folder not found or not a directory.")
             self.logger.warning("Invalid parent folder: %s", payload.parent_folder)
             return
+        # LLR-171.3 / LLR-171.3a: a project is saved only as a direct child
+        # of THIS work area — equality of the real paths, never "below" it,
+        # decided before any plan or folder exists.
         if os.path.normcase(os.path.realpath(parent_resolved)) != os.path.normcase(
             os.path.realpath(self.workarea)
         ):
@@ -10325,6 +10333,8 @@ class S19TuiApp(App):
             and payload.plan is not None
             and confirmed.plan is payload.plan
             and confirmed.typed_name == payload.project_name
+            and session is not None
+            and session.image_generation == self._image_generation
         ):
             prepared = self._prepare_project_save(payload.project_name, session)
         if prepared.refusal is not None:
@@ -10387,6 +10397,10 @@ class S19TuiApp(App):
         project_dir = self.workarea
         save_as_source: Optional[Path] = None
         source_gone: Optional[str] = None
+        # SE5-11-1: a session built before a load landed is rebuilt below,
+        # so the plan never pairs one image's decision with another file.
+        if session is not None and session.image_generation != self._image_generation:
+            session = None
 
         def _refused(
             text: str, toast: bool = False, plan: Optional[SavePlan] = None
@@ -10409,15 +10423,21 @@ class S19TuiApp(App):
                 toast=toast,
             )
 
-        if not typed_name.strip():
-            return _refused(
-                "Project NOT saved: name is empty — type a project name."
-            )
+        # HLR-164: the name guards run BEFORE any folder is created, in the
+        # contract's order — empty, device, reserved, the 64-character cap,
+        # the full-path limit, the disguised clash, the link/junction target.
+        # Every refusal paints its fixed token and a next step (UX-07).
         cleaned = sanitize_project_name(typed_name)
         if not cleaned:
+            # A blank name, or one with no usable characters, is empty as a
+            # project name (``sanitize_project_name`` strips first).
             return _refused(
                 "Project NOT saved: name is empty — type a project name."
             )
+        # LLR-164.1: Windows device names are refused on the RAW typed name,
+        # on every path component of it and on the sanitised name — all
+        # case-folded, so ``con.txt`` is refused rather than saved as
+        # ``contxt``, and ``LPT¹`` names the same device as ``LPT1``.
         raw_components = [
             part
             for part in typed_name.replace("/", "\\").split("\\")
@@ -10450,6 +10470,16 @@ class S19TuiApp(App):
             return _refused(
                 "Project NOT saved: path too long — shorten the name."
             )
+        # LLR-164.2 (Q-2): a project is a direct child of this work area
+        # holding a ``project.json`` or a data file, not a reserved home and
+        # not a link. A sanitised name equal to a project's folder name
+        # case-folded is a disguised clash when the typed name differs from
+        # that folder name — refused naming both, never suggesting a merge
+        # (UX-35). The open project is exempt: its name typed exactly or as
+        # its unsanitised form saves into it (LLR-164.2(c)); its on-disk
+        # name typed in ANOTHER case saves into it under the on-disk
+        # spelling (LED .52(a)) — while a case-only match against ANOTHER
+        # project stays a clash.
         project_file_suffixes = PROJECT_DATA_EXTENSIONS | A2L_EXTENSIONS
         try:
             entries = sorted(self.workarea.iterdir())
@@ -10463,6 +10493,8 @@ class S19TuiApp(App):
         for item in entries:
             if not item.is_dir():
                 continue
+            # F8: the cheap name comparison comes first — a non-matching
+            # folder is never listed inside.
             if item.name.casefold() != cleaned.casefold():
                 continue
             if item.name == cleaned:
@@ -10478,6 +10510,9 @@ class S19TuiApp(App):
                     for child in item.iterdir()
                 )
             except OSError:
+                # SEC2-1: a folder that cannot be read is skipped, the
+                # same as ``list_projects`` treats it — it never crashes
+                # the save.
                 continue
             if not holds_project_file:
                 continue
@@ -10490,6 +10525,9 @@ class S19TuiApp(App):
                 except OSError:
                     is_open_project = False
             if is_open_project:
+                # LED .52(a): adopt the on-disk spelling — the save
+                # merges into the open project and ``current_project``
+                # keeps the spelling its folder has.
                 open_spelling = item.name
                 continue
             if typed_name != item.name:
@@ -10498,16 +10536,31 @@ class S19TuiApp(App):
                     f"already a project as '{painted_names([item.name])}' — "
                     "choose another name."
                 )
+            # The exact name against a project that is not open: the save
+            # merges — the files land as variants below (LLR-005.1); the
+            # full merge carry arrives at Inc 8a.
         # LED .52(a) rebinds to the open project's on-disk spelling unless a
         # folder holds the exact typed name (seam ruling SR-11-1, B11-82:
         # `straße` typed with `strasse` open merges into `straße`).
         if open_spelling is not None and not exact_folder:
             cleaned = open_spelling
+        # LLR-155.4: a source that vanished since the load (e.g. a same-name
+        # save-back used to delete the work copy) refuses BEFORE the project
+        # folder is created — no empty folder is left behind, the status
+        # leads with the outcome (UX-C4) and the app keeps running.
         if session is None:
             session = self._save_session_inputs()
         if session.refusal is not None:
             return _refused(session.refusal, toast=True)
+        # LED .50 / security finding SEC-1: the target stays UNRESOLVED —
+        # the placement guard reads the work-area root off the textual path
+        # (or the explicit root every app placement passes), so any junction
+        # under the parent is seen instead of resolved away. LLR-171.3a: the
+        # parent IS this work area, spelled as the app spells it, so the
+        # save's spelling equals the load's.
         project_dir = self.workarea / cleaned
+        # LLR-164.2 / HLR-164(f) / LLR-171.4g: a target that exists and is a
+        # link or junction is refused BEFORE any resolve or write.
         target_reason = self._project_folder_refusal(project_dir)
         if target_reason == "link":
             return _refused(
@@ -10528,7 +10581,14 @@ class S19TuiApp(App):
                 "folder — choose the work area as the parent folder "
                 f"({self.workarea})."
             )
+        # LLR-171.1 / S3-6: a save as (a new target while a project is open)
+        # checks the open project's folder ONCE, before any read of it; a
+        # folder that became a link or left the work area refuses in the
+        # plan and is never walked or read.
         save_as_source = self._save_as_source_for(project_dir)
+        # LLR-171.1n (F1): the open project's folder is gone (renamed or
+        # removed outside the app) — the save is a fresh-session save, as
+        # at ebe6d0c, and one line names the missing folder.
         source_gone = (
             self.current_project_dir.name
             if save_as_source is None
@@ -10541,10 +10601,25 @@ class S19TuiApp(App):
             if save_as_source is not None
             else None
         )
+        # HLR-167 / LLR-167.1 / LLR-167.6: decide the image on DATA and
+        # compute the save plan BEFORE anything is created — a blocked
+        # re-derive refuses the whole save and no folder is made.
+        # LLR-164.4 / review F2: the plan reads every source it digests; a
+        # source that cannot be read refuses here, before any folder
+        # exists, and the app keeps running.
         active_variant: Optional[str] = None
         try:
             image_step = session.image_step
+            # LLR-168.4 / LLR-167.6 (F3): the save's derived_from records —
+            # the target's readable ones, carried, and the emitted image's
+            # own — are decided HERE, once, so the plan lists exactly the
+            # keys the save writes (an emit whose base cannot be read again
+            # records none, and the plan shows none).
             existing = read_project_manifest(project_dir)
+            # LLR-171.1h: a save as carries the SOURCE project's records
+            # (relative text, valid in the copy); a merge or an open-project
+            # save carries the target's, as before. A source that failed
+            # the folder check is never read (S3-6).
             if (
                 save_as_source is not None
                 and source_reason is None
@@ -10564,6 +10639,12 @@ class S19TuiApp(App):
             carried_derived: dict[str, DerivedFrom] = dict(
                 target_carry.get("derived_from", {})
             )
+            # LLR-164.2 / pre-ruling 7: a merge or an open-project save
+            # carries the target's active_document. E3 R2 / R8 refined /
+            # R10: the one document classifier drops it on a real file
+            # fault and keeps it otherwise; its status line is painted in
+            # the commit step, and only when the carried record is the one
+            # written (E3 R15).
             carried_active_document: Optional[str] = target_carry.get(
                 "active_document"
             )
@@ -10618,7 +10699,7 @@ class S19TuiApp(App):
                 source_reason=source_reason,
                 save_as_source=save_as_source,
                 digests=session.digests,
-                inventory=session.inventory,
+                inventory=session.inventory if save_as_source is not None else None,
                 payload_sha256=session.payload_sha256,
             )
             if plan.target_kind == PLAN_TARGET_MERGE:
@@ -10650,6 +10731,9 @@ class S19TuiApp(App):
             return _refused(_unreadable_text(exc), toast=True)
         if plan.refusal is not None:
             return _refused(plan.refusal, toast=True, plan=plan)
+        # LLR-171.1e / R7: a save to a new folder needs the plan's total
+        # (each file rounded up, plus the margin) in free space BEFORE the
+        # folder exists; exactly the free space is enough.
         if plan.target_kind == PLAN_TARGET_NEW:
             try:
                 free_bytes = shutil.disk_usage(self.workarea).free
@@ -10712,6 +10796,7 @@ class S19TuiApp(App):
             Used by:
                 - _current_save_session / _prepare_project_save (direct path)
         """
+        generation = self._image_generation
         try:
             missing = [
                 p
@@ -10729,6 +10814,7 @@ class S19TuiApp(App):
                     f"Project NOT saved: source file missing: "
                     f"{painted_names([missing[0].name])} — reload it or "
                     "remove it from the project.",
+                    generation,
                 )
             loaded = self.current_file
             image_step = (
@@ -10755,19 +10841,24 @@ class S19TuiApp(App):
             )
         except OSError as exc:
             return _SaveSession(
-                _ProjectImageStep(emit=False), {}, _unreadable_text(exc)
+                _ProjectImageStep(emit=False), {}, _unreadable_text(exc), generation
             )
         return _SaveSession(
             image_step,
             digests,
             image_step.refusal,
+            generation,
             emitted_record=emitted_record,
             payload_sha256=payload_sha256,
         )
 
     def _current_save_session(self) -> _SaveSession:
-        """The dialog's live session, computed on first use (LLR-175.5b)."""
-        if self._save_session is None:
+        """The dialog's live session, computed on first use (LLR-175.5b) and
+        again when a load landed since it was built (SE5-11-1)."""
+        if (
+            self._save_session is None
+            or self._save_session.image_generation != self._image_generation
+        ):
             self._save_session = self._save_session_inputs()
         return self._save_session
 
@@ -11924,7 +12015,7 @@ class S19TuiApp(App):
         source_reason: Optional[str] = None,
         *,
         save_as_source: Optional[Path] = _UNSET,
-        digests: Optional[Mapping[Path, Tuple[str, int]]] = None,
+        digests: Optional[dict[Path, Tuple[str, int]]] = None,
         inventory: Optional[ProjectInventory] = None,
         payload_sha256: Optional[str] = None,
     ) -> SavePlan:
@@ -11959,12 +12050,13 @@ class S19TuiApp(App):
                 ``_UNSET`` (the sentinel) to derive it from the open
                 project (R2-08). A preparation call passes the value it
                 computed once (R2-2 closed).
-            digests (Optional[Mapping[Path, Tuple[str, int]]]): The
+            digests (Optional[dict[Path, Tuple[str, int]]]): The
                 session's image/MAC/A2L digests; ``None`` digests each
-                source as today (the positional caller).
+                source as today (the positional caller). A ``dict``: the
+                S11-11 memo key is written into it.
             inventory (Optional[ProjectInventory]): The save-as inventory,
                 computed lazily by the caller (P-1); ``None`` walks the
-                source (as today).
+                source (as today). Read only for a save as.
             payload_sha256 (Optional[str]): The emitted payload's sha256,
                 computed once per image generation (S11-06); ``None``
                 hashes the payload here (the positional caller).
@@ -12041,10 +12133,11 @@ class S19TuiApp(App):
             else save_as_source
         )
         prepared_call = save_as_source is not _UNSET
-        session_digests: Mapping[Path, Tuple[str, int]] = (
+        session_digests: dict[Path, Tuple[str, int]] = (
             digests if digests is not None else {}
         )
         refusal = image_step.refusal
+        walked: Optional[ProjectInventory] = None
         if source_dir is not None and source_reason is not None:
             # Token row 9 (S3-6): first, with no walk and no re-derive text.
             where = {
@@ -12057,8 +12150,13 @@ class S19TuiApp(App):
                 "in the list."
             )
         elif source_dir is not None and refusal is None:
-            if inventory is None:
-                inventory = inventory_project_tree(source_dir)
+            # CR11-F1: the caller's inventory is used only when this save is
+            # a save as; any other target walks nothing (LLR-171.1g).
+            walked = (
+                inventory
+                if inventory is not None
+                else inventory_project_tree(source_dir)
+            )
         loaded = self.current_file
         files: list[PlannedFile] = []
         image = ""
@@ -12147,6 +12245,8 @@ class S19TuiApp(App):
                             source, type(exc).__name__,
                         )
                         if prepared_call:
+                            # Cannot collide: real keys are absolute paths, and
+                            # '<' '>' are not allowed in a Windows file name.
                             session_digests[_DOCUMENT_UNREADABLE_KEY] = (0, 0)
                 else:
                     files.append(
@@ -12204,7 +12304,7 @@ class S19TuiApp(App):
                 ),
             ),
             refusal=refusal,
-            inventory=inventory,
+            inventory=walked,
             exempt=frozenset(exempt),
         )
 

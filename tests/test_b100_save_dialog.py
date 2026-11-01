@@ -934,7 +934,13 @@ def test_tc_b100_47_name_cap_64_65_300(tmp_path: Path, monkeypatch: pytest.Monke
     arm needs a work area of at most 141 characters, longer than the test
     temp root gives (E4 integration).
 
-    Negative control: the cap read as 65 → the 65 arm paints no pair → RED."""
+    The 65 and 300 refusals paint the same text, so each over-cap arm first
+    waits for a neutral ``bbb — new folder`` paint and then reads the field
+    value: the 300 arm can only pass on its own paint (E5, SR-11-name-cap).
+
+    Negative control: the cap read as 65 → the 65 arm paints no pair → RED;
+    a cap that refuses 65 but not 300 → the 300 arm paints ``new folder``
+    → RED."""
     import s19_app.tui.app as app_module
 
     monkeypatch.setattr(app_module, "_SAVE_FULL_PATH_LIMIT", 10_000)
@@ -949,9 +955,17 @@ def test_tc_b100_47_name_cap_64_65_300(tmp_path: Path, monkeypatch: pytest.Monke
         await _type_and_wait(pilot, app, "a" * 64, "new folder")
         out[64] = sd.where_text(app.screen)
         for n in (65, 300):
+            await sd.set_name(pilot, app, "bbb")
+            await sd.wait_for(
+                pilot,
+                lambda: _where_line_for_text(sd.where_text(app.screen), "bbb", "new folder"),
+                "the neutral paint of bbb",
+                10.0,
+            )
             await sd.set_name(pilot, app, "a" * n)
             await sd.wait_painted(pilot, app, *TOO_LONG)
             out[n] = sd.where_text(app.screen)
+            out[f"value{n}"] = sd.name_input(app.screen).value
         out["new"] = sorted(sd.workarea_listing(app.workarea) - listing0)
         out["running"] = app.is_running
         return out
@@ -959,6 +973,7 @@ def test_tc_b100_47_name_cap_64_65_300(tmp_path: Path, monkeypatch: pytest.Monke
     out = _run(base, scenario)
     assert TOO_LONG[0] not in out[64], out
     assert all(t in out[65] for t in TOO_LONG) and all(t in out[300] for t in TOO_LONG), out
+    assert out["value65"] == "a" * 65 and out["value300"] == "a" * 300, out
     assert out["new"] == [] and out["running"], out
 
 
@@ -3365,7 +3380,8 @@ def test_tc_b100_65_session_decided_once_per_open_case06(tmp_path: Path, monkeyp
     A2L, its S19 and MAC, 1 applied entry so the image is emitted): 1 dialog
     open, 20 keystrokes of a new name, then ``alt+s`` → 1 call of
     ``_decide_project_image``, 1 ``_file_digest`` call for the A2L and 1 for
-    the MAC (0 for the emitted image), 1 ``_derived_record`` call — 0 more
+    the MAC (0 for the emitted image, counted: MUT11-M-68), 1
+    ``_derived_record`` call — 0 more
     during the keystrokes and 0 more at ``alt+s``; the summary is painted
     within 2 s of ``ctrl+s`` (the measured time is recorded in the tester
     notes, C-QA-5).
@@ -3397,28 +3413,32 @@ def test_tc_b100_65_session_decided_once_per_open_case06(tmp_path: Path, monkeyp
         digests = _spy_digest(monkeypatch)
         a2l = os.path.normcase(str(Path(app.current_a2l_path).resolve()))
         mac = os.path.normcase(str(Path(app.current_file.mac_path).resolve()))
+        image = os.path.normcase(str(Path(app.current_file.path).resolve()))
         start = time.monotonic()
         await pilot.press("ctrl+s")
         await sd.wait_for(pilot, lambda: sd.is_save_dialog(app.screen), "the dialog")
         await sd.wait_for(pilot, lambda: bool(sd.summary_rows(app.screen)), "the first summary", 10.0)
         painted_after = time.monotonic() - start
         at_open = (len(decisions), digests.count(a2l), digests.count(mac), len(derived))
+        image_digests = [digests.count(image)]
         app.screen.set_focus(sd.name_input(app.screen))
         await sd.clear_name(pilot, app)
         await _post_keys(app, "newname1234567890abc")
         await sd.wait_painted(pilot, app, "newname1234567890abc", "new folder", timeout=10.0)
         after_keys = (len(decisions), digests.count(a2l), digests.count(mac), len(derived))
+        image_digests.append(digests.count(image))
         await pilot.press("alt+s")
         await sd.wait_for(pilot, lambda: not sd.is_save_dialog(app.screen), "the save", 30.0)
         await _settle(pilot, 6)
         after_save = (len(decisions), digests.count(a2l), digests.count(mac), len(derived))
-        return painted_after, at_open, after_keys, after_save
+        return painted_after, at_open, after_keys, after_save, image_digests
 
-    painted_after, at_open, after_keys, after_save = _run(base, scenario)
+    painted_after, at_open, after_keys, after_save, image_digests = _run(base, scenario)
     print(f"[C-QA-5] F-case06 summary painted {painted_after * 1000:.0f} ms after ctrl+s")
     assert at_open == (1, 1, 1, 1), at_open
     assert after_keys == at_open, (at_open, after_keys)
     assert after_save == at_open, (at_open, after_save)
+    assert image_digests == [0, 0], image_digests
     assert painted_after <= 2.0, painted_after
 
 
@@ -3663,6 +3683,351 @@ def test_tc_b100_65_document_digest_is_taken_in_each_preparation(
     assert doc_digests == previews, (previews, doc_digests)
 
 
+def test_tc_b100_65_vanished_source_after_a_save_as_preview_copies_nothing(tmp_path: Path) -> None:
+    """CR11-F1 (E5 corrective), LLR-171.1n / A11-16, LLR-171.1g, R3-01:
+    ``P`` open holding 3 files in ``reports/``; the dialog previews ``Q``
+    (a save as, which fills the session's inventory with ``P``'s tree);
+    ``P`` is renamed outside the app; ``R`` typed → the summary names the
+    vanished folder and lists 0 ``folder`` rows and no ``reports/`` file;
+    Save → the dialog closes, the app keeps running, no ``R/reports`` is
+    written and the moved folder is unchanged. (The loaded image lives in
+    ``P``, so it moved too: the commit then refuses and rolls back, which
+    is not under test here.)
+
+    Why: a save-as inventory cached in the live session must never reach a
+    plan that is not a save as. Otherwise the dialog paints copies the save
+    cannot make and the commit copies from no source (``AttributeError``),
+    which ends the app and loses the unsaved session. Negative control
+    (051f586): ``folder reports/ (3 files) — new`` painted for ``R`` →
+    RED."""
+    base = tmp_path / "app"
+    project = projects.save_case01_project(base, "P", files=("firmware.s19",))
+    projects.bulk_files(project, "reports", 3)
+
+    async def scenario(app, pilot, log):
+        await _open_project_direct(pilot, app, "P")
+        await sd.open_save_dialog(pilot, app)
+        await sd.wait_painted(pilot, app, "updates the open project")
+        await sd.type_name(pilot, app, "Q")
+        await sd.wait_painted(pilot, app, "new folder", "reports", timeout=10.0)
+        session = app._save_session
+        assert session is not None and session.inventory is not None, "precondition: the save-as preview filled the inventory"
+        moved = app.workarea / "P_moved"
+        os.rename(app.workarea / "P", moved)
+        moved_before = sd.tree_digests(moved)
+        await sd.type_name(pilot, app, "R")
+        await sd.wait_for(
+            pilot,
+            lambda: _where_line_for_text(sd.where_text(app.screen), "R", "new folder"),
+            "the summary of R",
+            10.0,
+        )
+        await sd.wait_recompute(pilot)
+        rows = sd.summary_rows(app.screen)
+        assert "P" in rows, rows
+        assert not [r for r in rows if r.startswith("folder ") or "reports/" in r], rows
+        for _attempt in range(2):
+            if not sd.is_save_dialog(app.screen):
+                break
+            await pilot.press("alt+s")
+            await _settle(pilot, 8)
+        await sd.wait_for(pilot, lambda: not sd.is_save_dialog(app.screen), "the dialog to close on Save", 10.0)
+        await _settle(pilot, 6)
+        return {
+            "running": app.is_running,
+            "dialog": sd.is_save_dialog(app.screen),
+            "r_reports": (app.workarea / "R" / "reports").exists(),
+            "moved_same": sd.tree_digests(moved) == moved_before,
+        }
+
+    out = _run(base, scenario, size=(220, 60))
+    assert out == {"running": True, "dialog": False, "r_reports": False, "moved_same": True}, out
+
+
+@pytest.mark.parametrize("layout", ["same_ranges", "other_ranges"])
+def test_tc_b100_65_a_load_landing_under_the_dialog_rebuilds_the_session(tmp_path: Path, layout: str) -> None:
+    """SE5-11-1 (E5 corrective), LLR-175.5 / ruling Q-4, LLR-175.4b,
+    HLR-175a: ``P`` open with ``firmware.s19`` + ``firmware.mac`` and 1
+    entry applied (unsaved); the dialog painted for the open project; a
+    load of ``other.s19`` (started before ``ctrl+s``) lands while the
+    dialog is up; Save, and Save again after ``the summary changed``.
+
+    same_ranges (case_01 with 1 data byte flipped): the image the save
+    writes is derived from ``other.s19`` — its ``derived_from`` base is
+    ``other.s19``, its bytes are ``other.s19``'s plus the entry, the
+    manifest's ``active_variant`` names it, and the in-memory image equals
+    it. other_ranges (case_02's image): the app keeps running and the save
+    plans from the fresh session — the entry does not re-derive case_02,
+    so ``other.s19`` is saved as an unchanged copy: no ``derived_from``
+    record, ``active_variant`` ``other`` (what a dialog opened after the
+    load paints).
+
+    Why: the per-open session caches the image decision; a load under the
+    modal makes it stale. A stale decision writes a patched copy of the
+    previous file as the project's active variant and installs it into
+    memory (same ranges), or renders it over the new file's ranges and
+    ends the app with a ``KeyError`` (other ranges). Negative control
+    (051f586): base ``firmware.s19`` → RED; other_ranges → the commit's
+    ``KeyError`` → RED."""
+    from tests.support.independent_reader import read_s19
+
+    base = tmp_path / "app"
+    projects.save_case01_project(base, "P", files=("firmware.s19", "firmware.mac"))
+    other = tmp_path / "other"
+    other.mkdir()
+    loaded = other / "other.s19"
+    shutil.copyfile((CASE01_DIR if layout == "same_ranges" else CASE02_DIR) / "firmware.s19", loaded)
+    if layout == "same_ranges":
+        projects.flip_data_byte(loaded)
+    other_data = dict(read_s19(loaded).data)
+    patch = {0x8000007C + i: b for i, b in enumerate((0xDE, 0xAD, 0xBE, 0xEF))}
+
+    async def scenario(app, pilot, log):
+        await _open_project_direct(pilot, app, "P")
+        _add_direct(app)
+        _apply_direct(app)
+        await _settle(pilot, 4)
+        await sd.open_save_dialog(pilot, app)
+        await sd.wait_painted(pilot, app, "updates the open project", "firmware_1.s19")
+        app._start_load_worker(loaded)
+        await sd.wait_for(
+            pilot,
+            lambda: app.current_file is not None and app.current_file.path.name == "other.s19",
+            "the load of other.s19 under the dialog",
+            15.0,
+        )
+        await _settle(pilot, 10)
+        assert sd.is_save_dialog(app.screen), "precondition: the load landed under the dialog"
+        for _attempt in range(2):
+            if not sd.is_save_dialog(app.screen):
+                break
+            await pilot.press("alt+s")
+            await _settle(pilot, 8)
+        out = {"painted": sd.painted(app.screen) if sd.is_save_dialog(app.screen) else None}
+        if out["painted"] is not None:
+            await pilot.press("escape")
+            await sd.wait_for(pilot, lambda: not sd.is_save_dialog(app.screen), "the dialog to close on escape")
+        await _settle(pilot, 6)
+        manifest = json.loads((app.workarea / "P" / "project.json").read_text(encoding="utf-8"))
+        out["derived"] = manifest.get("derived_from") or {}
+        out["active_variant"] = manifest.get("active_variant")
+        out["written"] = {name: dict(read_s19(app.workarea / "P" / name).data) for name in out["derived"]}
+        out["memory"] = dict(app.current_file.mem_map)
+        out["running"] = app.is_running
+        return out
+
+    out = _run(base, scenario, size=(220, 60))
+    assert out["running"], out["painted"]
+    assert all(rec.get("base") == "other.s19" for rec in out["derived"].values()), out["derived"]
+    if layout == "same_ranges":
+        assert out["painted"] is None, out["painted"]
+        assert len(out["derived"]) == 1, out["derived"]
+        name = next(iter(out["derived"]))
+        assert out["written"][name] == {**other_data, **patch}, name
+        assert out["active_variant"] == Path(name).stem, (out["active_variant"], name)
+        assert out["memory"] == out["written"][name]
+    else:
+        assert out["painted"] is None, out["painted"]
+        assert out["derived"] == {} and out["active_variant"] == "other", out["derived"]
+
+
+def test_tc_b100_65_a_change_before_the_first_preview_starts_no_recompute(tmp_path: Path) -> None:
+    """MUT11-M-09 (E5), LLR-175.5b, S4-1: the name field changes before the
+    first preview has run (a late first frame, stood in for by deferring
+    the first preview 500 ms) → ``preview`` is called once, by the first
+    preview with the dialog live, never by a recompute timer started before
+    it.
+
+    Why: a recompute before the first frame computes a plan for a dialog
+    that is not laid out yet (LLR-175.5b). Negative control: the change
+    handler without the live gate → a recompute 150 ms after the change,
+    before the first preview → 2 calls, the first one not live → RED."""
+    from textual.widgets import Input
+
+    from s19_app.tui.screens import SaveProjectScreen
+
+    class _LateFirstFrame(SaveProjectScreen):
+        def on_mount(self, event) -> None:
+            event.prevent_default()
+            self.set_timer(0.5, self._first_preview)
+            self.query_one("#project_name", Input).value = "early"
+
+    async def scenario(app, pilot, log):
+        fakes = _Fakes(app.workarea)
+        live_at_call: list = []
+        original = fakes.preview
+
+        def _preview(text):
+            live_at_call.append(screen._live)
+            return original(text)
+
+        screen = _LateFirstFrame(preview=_preview, confirm=fakes.confirm)
+        app.push_screen(screen)
+        await sd.wait_for(pilot, lambda: len(fakes.preview_calls) >= 1, "the first preview", 3.0)
+        await asyncio.sleep(0.6)
+        await _settle(pilot, 4)
+        return list(fakes.preview_calls), live_at_call
+
+    calls, live = _run(tmp_path / "app", scenario)
+    assert calls == ["early"] and live == [True], (calls, live)
+
+
+def test_tc_b100_65_a_save_queued_before_a_repaint_is_shown_repaints(tmp_path: Path) -> None:
+    """MUT11-M-14 (E5), S11-04, LLR-175.4b: the preview of ``one`` is painted
+    and shown; ``two`` is typed and its preview queues a Save on the dialog
+    before the frame that shows it → ``confirm`` gets ``("two", None)``, 0
+    dismisses, ``the summary changed`` painted; a second ``alt+s`` → 1
+    dismiss naming ``two``.
+
+    Why: every repaint must be seen before it can be saved, not only the
+    first one. Negative control: the shown mark not cleared by a repaint →
+    ``confirm`` gets the unseen plan of ``two`` and the dialog dismisses →
+    RED."""
+    from s19_app.tui.screens import SaveProjectScreen
+
+    async def scenario(app, pilot, log):
+        cb: list = []
+        queued: list = []
+        fakes = _Fakes(app.workarea)
+        original = fakes.preview
+
+        def _preview(text):
+            if text == "two" and not queued:
+                queued.append(True)
+                screen.call_next(screen.action_save)
+            return original(text)
+
+        screen = SaveProjectScreen(preview=_preview, confirm=fakes.confirm, initial_name="one")
+        app.push_screen(screen, cb.append)
+        await sd.wait_for(pilot, lambda: fakes.preview_calls == ["one"], "the first preview", 3.0)
+        await _settle(pilot, 6)
+        await sd.set_name(pilot, app, "two")
+        await sd.wait_for(pilot, lambda: len(fakes.confirm_calls) >= 1, "the queued save", 3.0)
+        await _settle(pilot, 4)
+        first = (fakes.confirm_calls[0], list(cb), sd.where_text(screen))
+        await pilot.press("alt+s")
+        await _settle(pilot, 8)
+        return first, list(cb)
+
+    (call, cb_first, where), cb_after = _run(tmp_path / "app", scenario)
+    assert call == ("two", None), call
+    assert cb_first == [], cb_first
+    assert all(t in where for t in CHANGED), where
+    assert len(cb_after) == 1 and cb_after[0] is not None and cb_after[0].project_name == "two", cb_after
+
+
+def test_tc_b100_65_dialog_save_as_leaves_no_session_for_the_next_direct_save(tmp_path: Path) -> None:
+    """MUT11-M-42 (E5), S11-10, R3-01, B11-89: ``P`` open; save as ``Q``
+    through the dialog (its live session holds the lazy inventory); after
+    the router returns the app holds no per-open Save state; then 1 entry
+    applied and a direct save of ``R`` → ``R`` holds the patched image.
+
+    Why: the router drops the dialog's session on every route out; a
+    session left behind would plan the next save from pre-patch inputs.
+    Negative control: the router leaves ``_save_session`` set → it survives
+    the save as, and ``R`` is planned with the unpatched image → RED."""
+    from s19_app.tui.screens import SaveProjectPayload
+    from tests.support.independent_reader import read_s19
+
+    base = tmp_path / "app"
+    project = projects.save_case01_project(base, "P", files=("firmware.s19",))
+    projects.write_tree(project, projects.AT09_FILES)
+
+    async def scenario(app, pilot, log):
+        await _open_project_direct(pilot, app, "P")
+        await sd.save_through_dialog(pilot, app, "Q", confirm="alt+s")
+        await sd.wait_for(pilot, lambda: (app.workarea / "Q" / "project.json").is_file(), "the save as Q", 10.0)
+        await _settle(pilot, 6)
+        state_q = (app._save_session, app._save_confirmed)
+        _add_direct(app, 0x8000007C, (0xDE, 0xAD, 0xBE, 0xEF))
+        _apply_direct(app)
+        app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name="R"))
+        await sd.wait_for(pilot, lambda: (app.workarea / "R" / "project.json").is_file(), "the save of R", 10.0)
+        await _settle(pilot, 6)
+        return state_q, sorted((app.workarea / "R").glob("*.s19"))
+
+    state_q, images = _run(base, scenario, size=(220, 60))
+    assert state_q == (None, None), state_q
+    patched = [p for p in images if read_s19(p).data.get(0x8000007C) == 0xDE]
+    assert patched, [p.name for p in images]
+
+
+def test_tc_b100_65_confirm_is_not_reused_for_another_typed_name(tmp_path: Path) -> None:
+    """MUT11-M-45 (E5), ruling Q-2, B11-14: ``confirm`` approved ``A`` (the
+    prepared save the router may reuse), then the router gets a payload with
+    that same plan object but the name ``B`` → the held save is not reused:
+    the router prepares ``B`` afresh and saves it; no folder ``A`` is made.
+
+    Why: the held save fixes its target folder; reusing it for another
+    typed name writes to a folder the payload does not name. Negative
+    control: the name clause dropped → the router commits the held save →
+    folder ``A`` is made and no ``B`` → RED."""
+    from s19_app.tui.screens import SaveProjectPayload
+
+    base = tmp_path / "app"
+    src = _sources(tmp_path)
+
+    async def scenario(app, pilot, log):
+        await _load_direct(pilot, app, src / "firmware.s19")
+        painted = app._save_dialog_preview("A", app._current_save_session())
+        verdict = app._confirm_project_save("A", painted.plan)
+        held = app._save_confirmed is not None
+        app._handle_save_dialog(
+            SaveProjectPayload(parent_folder=str(app.workarea), project_name="B", plan=painted.plan)
+        )
+        await _settle(pilot, 8)
+        return verdict, held, (app.workarea / "A").exists(), (app.workarea / "B" / "project.json").is_file()
+
+    verdict, held, a_made, b_saved = _run(base, scenario)
+    assert verdict is None and held, (verdict, held)
+    assert a_made is False and b_saved is True, (a_made, b_saved)
+
+
+def test_tc_b100_65_document_free_name_walk_folds_case(tmp_path: Path) -> None:
+    """MUT11-M-96 (E5), ruling Q10, R3-02, A11-04: ``P`` holds
+    ``patches/Changes.json`` (other bytes) and the change document
+    ``notes/changes.json``, loaded from that file; save as ``Q`` → the
+    document is placed into ``patches/`` beside the copied ``Changes.json``:
+    the painted row and the plan name ``patches/changes_1.json`` ``new``,
+    and ``Q`` holds ``patches/changes_1.json`` (the document's bytes) and
+    ``patches/Changes.json`` (unchanged).
+
+    Why: on a case-insensitive volume ``changes.json`` is taken by
+    ``Changes.json``, so the plan must walk to the free name the save uses.
+    Negative control: the free-name walk compares names without case
+    folding → the plan says ``changes.json`` while the save writes
+    ``changes_1.json`` → RED."""
+    base = tmp_path / "app"
+    _wa(base).mkdir(parents=True, exist_ok=True)
+    project = projects.seed_document_project(
+        _wa(base), "P", document="notes/changes.json", record_document=False, active_document=None
+    )
+    (project / "patches").mkdir()
+    sibling = b'{"other": 1}\n'
+    (project / "patches" / "Changes.json").write_bytes(sibling)
+    document_bytes = (project / "notes" / "changes.json").read_bytes()
+
+    async def scenario(app, pilot, log):
+        await _open_project_direct(pilot, app, "P")
+        assert app._change_service.load(str(app.workarea / "P" / "notes" / "changes.json"), app.base_dir).ok
+        await sd.open_save_dialog(pilot, app)
+        await sd.type_name(pilot, app, "Q")
+        await sd.wait_painted(pilot, app, "Q", "new folder", "project.json", timeout=10.0)
+        rows = sd.summary_rows(app.screen)
+        plan_doc = [(r.landing.name, r.action) for r in app.screen.plan.rows if r.role == "document"]
+        await pilot.press("alt+s")
+        await sd.wait_for(pilot, lambda: (app.workarea / "Q" / "project.json").is_file(), "the save as Q", 10.0)
+        await _settle(pilot, 6)
+        q = app.workarea / "Q" / "patches"
+        return rows, plan_doc, {p.name: p.read_bytes() for p in q.iterdir()}
+
+    rows, plan_doc, patches = _run(base, scenario, size=(220, 60))
+    doc_rows = [r for r in rows if r.startswith("document")]
+    assert doc_rows == ["document changes.json → patches/changes_1.json — new"], rows
+    assert plan_doc == [("changes_1.json", "new")], plan_doc
+    assert patches == {"Changes.json": sibling, "changes_1.json": document_bytes}, sorted(patches)
+
+
 # ---------------------------------------------------------------------------
 # TC-B100-66 — LLR-173.7 extended: the Save dialog paints no decision id
 # ---------------------------------------------------------------------------
@@ -3896,10 +4261,14 @@ def test_tc_b100_47_target_with_two_mac_files_refused_in_the_dialog(tmp_path: Pa
     project-files check does → the dialog paints ``more than one MAC file``
     before Save; ``alt+s`` keeps the dialog open; 0 new paths.
 
+    The refusal carries the merge plan (with rows); the dialog paints 0
+    summary rows (LLR-175.1i, MUT11-M-74).
+
     Why: the commit's "more than one MAC" refusal reached the engineer only
     after the dialog had said "merges". Negative control: the check's error
     discarded in the preparation (base) → the dialog paints ``merges into
-    an existing project`` and the commit refuses after it closed → RED."""
+    an existing project`` and the commit refuses after it closed → RED; a
+    refused preview that keeps the plan's rows → rows painted → RED."""
     base = tmp_path / "app"
     m2 = projects.save_case01_project(base, "m2", files=("firmware.s19",))
     for name in ("other.mac", "third.mac"):
@@ -3913,12 +4282,14 @@ def test_tc_b100_47_target_with_two_mac_files_refused_in_the_dialog(tmp_path: Pa
         await sd.type_name(pilot, app, "m2")
         await sd.wait_painted(pilot, app, "more than one MAC file")
         text = sd.where_text(app.screen)
+        refused = (len(app.screen.plan.rows) if app.screen.plan is not None else 0, sd.summary_rows(app.screen))
         await pilot.press("alt+s")
         await _settle(pilot, 8)
-        return text, sd.is_save_dialog(app.screen), sorted(sd.workarea_listing(app.workarea) - listing0)
+        return text, refused, sd.is_save_dialog(app.screen), sorted(sd.workarea_listing(app.workarea) - listing0)
 
-    text, still, new = _run(base, scenario)
+    text, (plan_rows, rows), still, new = _run(base, scenario)
     assert "merges into an existing project" not in text, text
+    assert plan_rows >= 1 and rows == [], (plan_rows, rows)
     assert still is True and new == [], (still, new)
 
 

@@ -1,0 +1,17 @@
+mutant id: M-78
+target file: s19_app/tui/app.py
+old text:         for folder in plan.folders:
+            rows.append(
+                f"folder {painted_names([folder.name])}/ "
+                f"({folder.file_count} "
+                f"{'file' if folder.file_count == 1 else 'files'}) — new"
+            )
+
+new text: 
+sha256 before: 7fb2fa5f01e2311c5d39996a78346daabb4fc4afdf59a6070aaa543d5f92cc68
+command: cd C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut11 && timeout 900 env -u NO_COLOR LOCALAPPDATA='C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut11-lad' PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line "tests/test_b100_project_homes.py::test_at_b100_09_save_as_copies_the_project_and_q_lists_its_flow"
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut11
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut11\s19_app\__init__.py
+pytest summary: 2 failed in 14.83s
+verdict: KILLED
+restored = True

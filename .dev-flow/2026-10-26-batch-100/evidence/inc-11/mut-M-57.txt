@@ -1,0 +1,16 @@
+mutant id: M-57
+target file: s19_app/tui/app.py
+old text:         # LED .52(a) rebinds to the open project's on-disk spelling unless a
+        # folder holds the exact typed name (seam ruling SR-11-1, B11-82:
+        # `straße` typed with `strasse` open merges into `straße`).
+        if open_spelling is not None and not exact_folder:
+            cleaned = open_spelling
+
+new text: 
+sha256 before: 7fb2fa5f01e2311c5d39996a78346daabb4fc4afdf59a6070aaa543d5f92cc68
+command: cd C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut11 && timeout 900 env -u NO_COLOR LOCALAPPDATA='C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut11-lad' PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line "tests/test_b100_save_dialog.py::test_tc_b100_47_target_line_open_project_in_another_case"
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut11
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut11\s19_app\__init__.py
+pytest summary: 1 failed in 6.07s
+verdict: KILLED
+restored = True
