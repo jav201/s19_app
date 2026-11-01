@@ -109,10 +109,15 @@ def _source_census() -> set[str]:
 # the G-B graph's A11-08 memo (proto-11-app ``__init__``); the fixed
 # interface names the other two.
 _SAVE_DIALOG_STATE_REASON = "per-open Save dialog state; dropped when the Save router runs"
+#
+# Inc 12a re-pin (census A8, interfaces S-b, A12-74): the progress
+# indicator's run state is one app attribute, main-thread UI state that a
+# load-over neither resets nor restores.
 SNAPSHOT_EXCLUSIONS: dict[str, str] = {
     "_save_session": _SAVE_DIALOG_STATE_REASON,
     "_save_confirmed": _SAVE_DIALOG_STATE_REASON,
     "_save_painted_preview": _SAVE_DIALOG_STATE_REASON,
+    "_busy": "progress indicator run state; main-thread UI state, not session state (Inc 12a)",
 }
 
 # The K1/K2 allow-list (ARQ §2.2): names a load-over may differ in BY

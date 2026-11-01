@@ -46,17 +46,41 @@ async def _load_project(app: S19TuiApp, pilot) -> None:
 # AC-2 / AC-3 — a real report drives the bar to 100
 # ---------------------------------------------------------------------------
 
-def test_report_generation_drives_progress_bar_to_100(tmp_path: Path) -> None:
-    async def _drive() -> float:
+def test_report_generation_drives_progress_bar_then_clears_it(tmp_path: Path, monkeypatch) -> None:
+    """Inc 12a re-pin (census A1; LLR-176.1k, A12-53 / A12-77): a real
+    report still DRIVES the bar — it moves off 0 while the report runs (the
+    ``Write the report`` step, 50) — and the end now CLEARS it: progress 0
+    of 100 and the report named on the last status-log line. The old pin
+    (the bar left at 100) encoded the stale-100 defect HLR-176c removes.
+
+    History: named ``test_report_generation_drives_progress_bar_to_100``
+    until Inc 12a E5 (CR12a-3); TC-644 is re-bound to this name."""
+    seen: list = []
+    original = S19TuiApp.set_progress
+
+    def _spy(self, value, message=None):
+        seen.append(value)
+        return original(self, value, message)
+
+    monkeypatch.setattr(S19TuiApp, "set_progress", _spy)
+
+    async def _drive() -> tuple:
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test() as pilot:
             await _load_project(app, pilot)
+            seen.clear()
             await _generate_through_surface(app, pilot)
-            return _bar_progress(app)
+            bar = app.query_one("#progress_bar", ProgressBar)
+            return bar.progress, bar.total, app.log_lines[-1]
 
-    assert asyncio.run(_drive()) == 100, (
-        "AC-2/3: a completed report must leave #progress_bar at 100"
+    progress, total, last = asyncio.run(_drive())
+    assert any(0 < value < 100 for value in seen), (
+        f"AC-2/3: the report must move the bar while it runs; sequence: {seen}"
     )
+    assert (progress, total) == (0, 100), (
+        f"LLR-176.1k: a completed report must leave the bar cleared; got {progress}/{total}"
+    )
+    assert last.startswith("Report: ") and last.endswith(".md"), last
 
 
 # ---------------------------------------------------------------------------
@@ -93,7 +117,16 @@ def test_failed_report_resets_progress_bar_to_zero(
 # ---------------------------------------------------------------------------
 
 def test_kickoff_sets_bar_in_progress_before_worker(tmp_path: Path) -> None:
-    async def _drive() -> float:
+    """Inc 12a re-pin (census A2; A12-75, LLR-176.1 / LLR-176.1a): the
+    kickoff must already show the report as in progress before the worker
+    runs. That is now the progress line in ``#status_text``
+    (``<glyph> Generating the project report  ·  step 1/2 Prepare the
+    results  ·  00:0x``) with the bar at 0 (the begin clears it); the old
+    ``0 < p < 100`` read the constant 15 the seam removed. The stubbed run
+    stays open until the app exits (risk R-7)."""
+    import re
+
+    async def _drive() -> tuple:
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test() as pilot:
             await _load_project(app, pilot)
@@ -106,26 +139,38 @@ def test_kickoff_sets_bar_in_progress_before_worker(tmp_path: Path) -> None:
             assert isinstance(screen, ReportViewerScreen)
             screen.query_one("#report_generate", Button).press()
             await _flush(pilot)
-            return _bar_progress(app)
+            return _bar_progress(app), str(app.query_one("#status_text").render())
 
-    progress = asyncio.run(_drive())
-    assert 0 < progress < 100, (
-        f"AC-1: kickoff must show in-progress (0<p<100), got {progress}"
+    progress, line = asyncio.run(_drive())
+    pattern = (
+        "^[⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏] Generating the project report"
+        "  ·  step 1/2 Prepare the results  ·  00:0[0-9]$"
     )
+    assert re.match(pattern, line), f"AC-1: kickoff must paint the progress line, got {line!r}"
+    assert progress == 0, f"LLR-176.1a: the begin sets the bar to 0, got {progress}"
 
 
 # ---------------------------------------------------------------------------
 # AC-3 (unit) — _finish_generate_report completes the bar
 # ---------------------------------------------------------------------------
 
-def test_finish_generate_report_completes_bar(tmp_path: Path) -> None:
-    async def _drive() -> float:
+def test_finish_generate_report_clears_bar(tmp_path: Path) -> None:
+    """Inc 12a re-pin (census A3; A12-77, interfaces S-m / Q-1): the finish
+    handler now ends the report run whose generation it is given — a run is
+    begun first (as the kickoff does), the bar set mid-way, and the finish
+    clears the bar (LLR-176.1k) and names the report on the last log line.
+
+    History: named ``test_finish_generate_report_completes_bar`` until
+    Inc 12a E5 (CR12a-3); TC-644 is re-bound to this name."""
+
+    async def _drive() -> tuple:
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test() as pilot:
             await pilot.pause()
+            gen = app.begin_busy("report", "x", ("a", "b"))
             app.set_progress(40)  # mid-way, as if a report were running
-            app._finish_generate_report(Path("proj") / "reports" / "r.md")
+            app._finish_generate_report(Path("proj") / "reports" / "r.md", gen)
             await pilot.pause()
-            return _bar_progress(app)
+            return _bar_progress(app), app.log_lines[-1]
 
-    assert asyncio.run(_drive()) == 100
+    assert asyncio.run(_drive()) == (0, "Report: reports/r.md")

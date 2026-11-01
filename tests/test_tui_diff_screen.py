@@ -3683,11 +3683,19 @@ _B79_COMMITTED_APP_BINDING_ROWS: frozenset = frozenset({
     ('9', "show_screen('checks')", 'Checks', False),
     ('U', 'unload_all', 'Unload all', False),
     ('b', 'before_after_report', 'Before/After report', False),
+    # batch-100 Inc 12a (orchestrator ruling D-1): the two rows the frozen set
+    # never carried -- `c` (batch-97 Inc-6, Flow Execution Confirm) and `d`
+    # (Describe tag) -- are added, so the set equals the live 42-row block.
+    ('c', 'confirm_attention', 'Confirm', False),
+    ('d', 'a2l_describe_tag', 'Describe tag', False),
     ('comma', 'hex_page_prev', 'Hex-', True),
     ('ctrl+d', 'cycle_density', 'Density', True),
     ('ctrl+k', 'focus_palette', 'Palette', True),
     ('ctrl+l', 'load_file', 'Load', True),
-    ('ctrl+s', 'save_project', 'Save', True),
+    # Inc 12a re-pin (census B2, E2 ruling G-B P-B4): the `ctrl+s` row says
+    # `Save project` since the batch-97 Inc-8 gate fold (LED-…97.38); this
+    # row was RED before Inc 12a.
+    ('ctrl+s', 'save_project', 'Save project', True),
     ('ctrl+y', 'patch_redo', 'Redo', False),
     ('ctrl+z', 'patch_undo', 'Undo', False),
     # batch-94 (R-1, PDR `pdr_rail_key_probe.txt`): `=` mounts the NEW Check
@@ -3697,10 +3705,11 @@ _B79_COMMITTED_APP_BINDING_ROWS: frozenset = frozenset({
     ('g', 'focus_goto', 'Go-to', True),
     ('j', 'dump_a2l_json', 'Dump A2L JSON', False),
     ('k', 'show_legend', 'Legend', True),
-    ('l', 'load_file', 'Load file', False),
+    # Inc 12a re-pin (census B2, LLR-173.2m): `l` and `p` say `Load` / `Projects`.
+    ('l', 'load_file', 'Load', False),
     ('minus', 'page_prev_context', 'Page-', True),
     ('o', 'open_workarea', 'Open workarea', False),
-    ('p', 'load_project', 'Load project', False),
+    ('p', 'load_project', 'Projects', False),
     ('pagedown', 'page_down_context', 'Page+', False),
     ('pageup', 'page_up_context', 'Page-', False),
     ('period', 'hex_page_next', 'Hex+', True),
@@ -3715,7 +3724,8 @@ _B79_COMMITTED_APP_BINDING_ROWS: frozenset = frozenset({
     ('x', 'operations_view', 'Operations', True),
 })
 
-_B79_COMMITTED_APP_BINDING_COUNT = 40
+#: batch-100 Inc 12a (ruling D-1): 40 -> 42 with the `c` and `d` rows above.
+_B79_COMMITTED_APP_BINDING_COUNT = 42
 
 
 def test_at_b78_28_run_list_keys_are_discoverable(tmp_path: Path) -> None:

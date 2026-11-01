@@ -1,0 +1,18 @@
+mutant: M-105
+what: _is_reparse_point dropped from the pick re-check
+target: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\mutk\s19_app\tui\app.py
+sha256 before: 15ffc7bdbb599615
+old occurrences: 1
+sha256 mutated: da278b4205b66cb8
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\mutk\s19_app\__init__.py
+command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line --basetemp=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\bt\mk-M-105 tests/test_b100_recents.py::test_tc_b100_39_pick_of_a_reparse_point_file_is_refused
+pytest tail:
+  F                                                                        [100%]
+  ================================== FAILURES ===================================
+  C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\mutk\tests\test_b100_recents.py:4056: AssertionError: (['x.s19'], LoadedFile(path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4c...76, sample_count=64, entropy=6.0, band='medium', low_confidence=False)], out_of_order_count=0, entry_point=2147483648))
+  =========================== short test summary info ===========================
+  FAILED tests/test_b100_recents.py::test_tc_b100_39_pick_of_a_reparse_point_file_is_refused
+  1 failed in 3.72s
+exit: 1
+verdict: KILLED
+restored: True

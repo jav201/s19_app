@@ -3789,7 +3789,12 @@ def test_tc_b100_65_a_load_landing_under_the_dialog_rebuilds_the_session(tmp_pat
         await _settle(pilot, 4)
         await sd.open_save_dialog(pilot, app)
         await sd.wait_painted(pilot, app, "updates the open project", "firmware_1.s19")
-        app._start_load_worker(loaded)
+        # Inc 12a re-pin (MERGE-12a-1): the worker takes the run's
+        # generation (keyword-only ``gen``), so the load starts the way
+        # ``load_from_path`` hands off to it — one begin through the 12a
+        # seam, then the worker. The copy step is skipped, as before.
+        gen = app._busy_begin_action("file_load", loaded.name)
+        app._start_load_worker(loaded, gen=gen)
         await sd.wait_for(
             pilot,
             lambda: app.current_file is not None and app.current_file.path.name == "other.s19",

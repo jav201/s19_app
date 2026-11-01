@@ -32,8 +32,9 @@ from tests.b97_probes import painted_rows, painted_style, settle, settled
 
 ROOT = Path(__file__).resolve().parents[1]
 SIZES = ((118, 54), (220, 60))
+#: Inc 12a re-pin (census B1, LLR-173.2m): `^l Load` (was `^l Load file`).
 GLOBAL_TEXTS = (
-    "^k Palette", "^d Density", "^l Load file", "^s Save project", "x Operations", "? Help", "q Quit",
+    "^k Palette", "^d Density", "^l Load", "^s Save project", "x Operations", "? Help", "q Quit",
     "^p palette",
 )
 #: The `.db-screen-title` pair and the accent (styles.tcss token block).
@@ -43,8 +44,9 @@ RESERVED = {"#e8ad3d", "#c9562b", "#f6ff8f"}
 #: The `main` container height at 118x54 (P-68) and at 220x60 (Inc-8's RED run
 #: on 9793fcd, `evidence/inc-8/red.txt`).
 MAIN_CONTAINER_ROWS = {(118, 54): 42, (220, 60): 48}
-#: Row 1 at 80x24 (operator decision at the Inc-8 gate, LED-…97.38): with the
-#: longer `Load file` / `Save project` labels `q Quit` and `^p palette` drop;
+#: Row 1 at 80x24 (operator decision at the Inc-8 gate, LED-…97.38; re-measured
+#: at Inc 12a, B12-02 / E2 P-B2): with `^s Save project` still on row 1,
+#: `q Quit` and `^p palette` drop even after `^l Load` got shorter;
 #: row 1 never paints `? more` (LLR-150.2) — `? Help` lists every binding.
 GLOBAL_TEXTS_80 = GLOBAL_TEXTS[:6]
 #: Rows that bound the repaint after a state change: no timer can meet it.

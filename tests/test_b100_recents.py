@@ -2546,19 +2546,23 @@ class _OsAsPosix:
         return getattr(os, attr)
 
 
-def test_tc_b100_38_project_list_keeps_a_trailing_dot_name_off_windows(
+def test_tc_b100_38_project_list_leaves_a_trailing_dot_name_out_off_windows(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, ab_template: Path
 ) -> None:
-    """E3 R14 platform scope (E5 CR9-9): a project folder ``fw-v1.`` holding
-    a data file → ``list_projects`` leaves it out where ``os.name == "nt"``
-    (Win32 opens ``fw-v1.`` as ``fw-v1``) and lists it elsewhere (ext4
-    opens the name as written). On Windows the folder is made through a
+    """Inc 12a re-pin (census C1; was
+    ``test_tc_b100_38_project_list_keeps_a_trailing_dot_name_off_windows``):
+    LLR-172.4e supersedes the CR9-9 platform scope. A project folder
+    ``fw-v1.`` holding a data file → ``list_projects`` leaves it out where
+    ``os.name == "nt"`` AND where it is not (the lister skips it on every
+    platform, LLR-172.4d). On Windows the folder is made through a
     ``\\\\?\\`` path beside a plain ``fw-v1`` (so its ``lstat`` finds a
     folder), and the off-Windows half runs with ``app.py``'s ``os.name``
     seen as ``posix``.
 
-    Negative control: the skip not gated on the platform → the off-Windows
-    half does not list ``fw-v1.`` → RED (mutant CR9-9)."""
+    Why: one rule for the lister and the project list; on ext4 a pick of
+    ``fw-v1.`` would load a folder Windows cannot open by that name.
+    Negative control: the gate put back → the ``posix`` reading lists
+    ``fw-v1.`` → RED."""
     base = _base_with_ab(tmp_path, ab_template)
     workarea = _workarea(base)
     firmware = (projects.CASE01_DIR / "firmware.s19").read_bytes()
@@ -2590,8 +2594,9 @@ def test_tc_b100_38_project_list_keeps_a_trailing_dot_name_off_windows(
                 (os.remove if target == inner else os.rmdir)(target)
             except OSError:
                 pass
-    assert ("fw-v1." in native) is (os.name != "nt"), native
-    assert "fw-v1." in off_windows, off_windows
+    assert "fw-v1." not in native, native
+    assert "fw-v1." not in off_windows, off_windows
+    assert "ab" in native and "ab" in off_windows, (native, off_windows)
 
 
 @pytest.mark.parametrize(
@@ -3212,3 +3217,841 @@ def test_tc_b100_37_widened_census_and_one_enumeration_at_dialog_open(
     opened, enumerations = projects.run_app(base, _scenario, size=(118, 54))
     assert opened, "l did not open the Load dialog"
     assert len(enumerations) == 1 and enumerations[0][1], enumerations
+
+
+# ===========================================================================
+# Inc 12a — the backlog sweep (TC-B100-37, TC-B100-38, TC-B100-39 new arms)
+# LLR-172.4e, LLR-172.4f, LLR-172.5i, LLR-172.5j, LLR-172.5k, LLR-172.6b,
+# LLR-172.6c. Oracles: inc-12a codewire/proto-12a-sweep.md (B12-NN).
+# ===========================================================================
+
+_APP_SOURCE = Path(app_module.__file__)
+NOT_REGULAR = "File NOT loaded: '{name}' is not a regular file — pick another file."
+TOO_LARGE_LINE = "File NOT loaded: '{name}' is too large to open — load a smaller file."
+
+
+def _sweep_methods() -> dict:
+    tree = ast.parse(_APP_SOURCE.read_text(encoding="utf-8"))
+    for node in tree.body:
+        if isinstance(node, ast.ClassDef) and node.name == "S19TuiApp":
+            return {
+                item.name: item for item in node.body
+                if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef))
+            }
+    raise AssertionError("S19TuiApp not found")
+
+
+def _calls_named(node, name: str) -> int:
+    count = 0
+    for inner in ast.walk(node):
+        if isinstance(inner, ast.Call):
+            func = inner.func
+            callee = func.attr if isinstance(func, ast.Attribute) else getattr(func, "id", None)
+            if callee == name:
+                count += 1
+    return count
+
+
+def test_tc_b100_37_project_list_skips_a_trailing_dot_on_every_platform(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-172.4e (B12-07, E2 ruling G-B P-B1): ``fw-v1.`` and ``fw-v2 ``,
+    each holding ``project.json`` and ``firmware.s19``, beside project ``P``
+    → neither is listed, natively and with ``app.py``'s ``os`` seen as
+    ``posix`` (the Linux arm, run on this host too); ``P`` is listed. On
+    Windows the two folders are made through ``\\\\?\\`` beside plain
+    ``fw-v1`` / ``fw-v2`` folders holding a data file (so their ``lstat``
+    finds a folder; the plain ones are ordinary projects and may be listed);
+    on Linux the list is exactly ``["P"]``.
+
+    Why: Win32 opens ``fw-v1.`` as ``fw-v1``, so a listed dot name loads
+    another folder; one rule on every platform matches the lister
+    (LLR-172.4d).
+    Negative control (P12a-4): the ``os.name == "nt"`` gate present → the
+    ``posix`` reading lists both → RED on every host."""
+    import json
+
+    base = tmp_path / "app"
+    workarea = _workarea(base)
+    firmware = (projects.CASE01_DIR / "firmware.s19").read_bytes()
+    manifest = json.dumps({"schema_version": 1}).encode("utf-8")
+    p_dir = workarea / "P"
+    p_dir.mkdir(parents=True)
+    (p_dir / "firmware.s19").write_bytes(firmware)
+    (p_dir / "project.json").write_bytes(manifest)
+    created: list = []
+    for name in ("fw-v1.", "fw-v2 "):
+        if WIN:
+            plain = workarea / name.rstrip(". ")
+            plain.mkdir()
+            (plain / "firmware.s19").write_bytes(firmware)
+            folder = projects.EXTENDED_PREFIX + str(workarea) + "\\" + name
+        else:
+            folder = str(workarea / name)
+        os.mkdir(folder)
+        created.append(("dir", folder))
+        for inner_name, payload in (("firmware.s19", firmware), ("project.json", manifest)):
+            inner = folder + os.sep + inner_name
+            with open(inner, "wb") as handle:
+                handle.write(payload)
+            created.insert(0, ("file", inner))
+    try:
+        async def _scenario(app, pilot, log):
+            native = app.list_projects()
+            with monkeypatch.context() as patch:
+                patch.setattr(app_module, "os", _OsAsPosix())
+                posix = app.list_projects()
+            return native, posix
+
+        native, posix = projects.run_app(base, _scenario)
+    finally:
+        for kind, target in created:
+            try:
+                (os.remove if kind == "file" else os.rmdir)(target)
+            except OSError:
+                pass
+    for listed in (native, posix):
+        assert "P" in listed, listed
+        assert "fw-v1." not in listed and "fw-v2 " not in listed, listed
+    if not WIN:
+        assert native == ["P"] and posix == ["P"], (native, posix)
+
+
+def _files_rows(app) -> list:
+    from textual.widgets import ListView
+
+    return [getattr(item, "data", None) for item in app.query_one("#files_list", ListView).children]
+
+
+@pytest.mark.parametrize(
+    "contents, expected",
+    [
+        (["a.s19", "b.hex", "c.mac", "d.a2l", "d.a2l.json", "e.txt"], ["a.s19", "b.hex", "c.mac", "d.a2l"]),
+        (["F.S19", "g.srec", "h.ihex", "notes", "x.a2l.json"], ["F.S19", "g.srec", "h.ihex"]),
+        (["d.a2l.json"], []),
+    ],
+    ids=["mixed", "suffix boundaries", "only a sidecar"],
+)
+def test_tc_b100_37_files_list_shows_loadable_suffixes_only(
+    tmp_path: Path, contents: list, expected: list
+) -> None:
+    """LLR-172.4f, C7 (B12-11, B12-12): ``temp`` holding ``a.s19``,
+    ``b.hex``, ``c.mac``, ``d.a2l``, ``d.a2l.json`` and ``e.txt`` → the
+    Workarea Files rows are the 4 loadable names, 0 rows for the sidecar or
+    the text file; ``F.S19`` (upper case), ``g.srec`` and ``h.ihex`` are
+    listed and ``notes`` / ``x.a2l.json`` are not; a ``temp`` holding only
+    a sidecar dump → 0 rows.
+
+    Why: a row the loaders refuse invites a pick that can only fail.
+    RED (base, C7, probe p12a U2.1): every regular file is listed (6 rows)."""
+    base = tmp_path / "app"
+    temp = _workarea(base) / "temp"
+    temp.mkdir(parents=True)
+    for name in contents:
+        (temp / name).write_bytes(b"x")
+
+    async def _scenario(app, pilot, log):
+        app.refresh_files()
+        await pilot.pause()
+        return _files_rows(app)
+
+    rows = projects.run_app(base, _scenario)
+    assert sorted(rows, key=str.casefold) == sorted(expected, key=str.casefold), rows
+
+
+def test_tc_b100_37_files_list_shows_loadable_suffixes_only_through_one_predicate() -> None:
+    """LLR-172.4f (B12-13, interfaces S-h): an AST read of ``app.py`` finds
+    a ``recent_kind(...)`` call in ``refresh_files`` and in
+    ``_load_dialog_rows`` (2 of 2), and ``refresh_files`` compares nothing
+    against a literal collection (no second suffix set).
+
+    Why: two suffix rules drift; the row count alone passes a mutant that
+    copies the suffix set into ``refresh_files``.
+    RED (base): ``refresh_files`` has no ``recent_kind`` call."""
+    methods = _sweep_methods()
+    assert _calls_named(methods["refresh_files"], "recent_kind") >= 1, "refresh_files"
+    assert _calls_named(methods["_load_dialog_rows"], "recent_kind") >= 1, "_load_dialog_rows"
+    literal_suffix_tests = [
+        node.lineno for node in ast.walk(methods["refresh_files"])
+        if isinstance(node, ast.Compare)
+        and any(isinstance(c, (ast.Set, ast.Tuple, ast.List)) for c in node.comparators)
+    ]
+    assert literal_suffix_tests == [], literal_suffix_tests
+
+
+def _load_reason(screen) -> str:
+    from textual.widgets import Static
+
+    found = list(screen.query("#load_reason Static")) or [screen.query_one("#load_reason")]
+    texts = []
+    for widget in found:
+        if isinstance(widget, Static):
+            visual = getattr(widget, "visual", None) or widget.render()
+            texts.append(str(getattr(visual, "plain", visual)))
+    return " ".join(" ".join(texts).split())
+
+
+@pytest.mark.parametrize(
+    "arm, route",
+    [
+        ("relative NUL", "status"),
+        ("absolute NUL", "status"),
+        ("relative NUL", "dialog"),
+        ("absolute NUL", "dialog"),
+        ("EACCES", "status"),
+        ("ENAMETOOLONG", "status"),
+        ("EACCES", "dialog"),
+        ("ENAMETOOLONG", "dialog"),
+    ],
+)
+def test_tc_b100_38_nul_in_typed_path_is_refused(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str, route: str
+) -> None:
+    """LLR-172.5i, S12a-01 (B12-15, B12-16, B12-21, B12-22, B12-38): a typed
+    text that the operating system's path calls refuse — a NUL (relative
+    and absolute), or a text whose ``Path.exists`` raises ``PermissionError``
+    (EACCES) or ``OSError(ENAMETOOLONG)`` — through the status-line route
+    (``_load_path_from_user_input``) and through the Load dialog
+    (``#load_reason``) → 0 exceptions, 0 loads, the ``not found`` and
+    ``check the path`` tokens painted, the dialog left open.
+
+    The NUL arms are regression arms, declared GREEN on the post-9b base
+    (E3 S12a-01, interfaces S-j); the EACCES / ENAMETOOLONG arms are the
+    requirement's RED.
+    Why: a typed text must never stop the app.
+    Negative control: the catch narrowed to ``ValueError`` /
+    ``RuntimeError`` → the ``PermissionError`` leaves the classifier."""
+    import errno
+    import pathlib
+
+    from tests.support import b100_load_dialog as ld
+
+    base = tmp_path / "app"
+    texts = {
+        "relative NUL": "fw\x00.s19",
+        "absolute NUL": str(tmp_path / "src") + os.sep + "fw\x00.s19",
+        "EACCES": "fw_eacces.s19",
+        "ENAMETOOLONG": "fw_toolong.s19",
+    }
+    text = texts[arm]
+    if arm in ("EACCES", "ENAMETOOLONG"):
+        error = (
+            PermissionError(errno.EACCES, "injected: access denied", text)
+            if arm == "EACCES"
+            else OSError(errno.ENAMETOOLONG, "injected: name too long", text)
+        )
+        real_exists = pathlib.Path.exists
+
+        def _exists(self, *args, **kwargs):
+            if str(self) == text:
+                raise error
+            return real_exists(self, *args, **kwargs)
+
+        monkeypatch.setattr(pathlib.Path, "exists", _exists)
+    loads: list = []
+    monkeypatch.setattr(app_module.S19TuiApp, "load_from_path", lambda self, p: loads.append(p))
+    monkeypatch.setattr(app_module.S19TuiApp, "load_a2l_from_path", lambda self, p: loads.append(p))
+
+    async def _scenario(app, pilot, log):
+        from textual.widgets import Input
+
+        mark = len(log.messages)
+        raised = None
+        if route == "status":
+            try:
+                app._load_path_from_user_input(Path(text))
+            except Exception as exc:  # noqa: BLE001 — the threshold counts raises
+                raised = repr(exc)
+            for _ in range(6):
+                await pilot.pause()
+            return raised, log.since(mark), None, None, app.current_file
+        await pilot.press("l")
+        await ld.wait_for_dialog(pilot, app)
+        for _ in range(3):
+            await pilot.pause()
+        app.screen.query_one("#load_path", Input).value = text
+        await pilot.press("enter")
+        for _ in range(6):
+            await pilot.pause()
+        return raised, log.since(mark), ld.is_load_dialog(app.screen), _load_reason(app.screen), app.current_file
+
+    raised, messages, still_open, reason, current = projects.run_app(base, _scenario, size=(118, 54))
+    assert raised is None, (raised, messages)
+    assert loads == [] and current is None, (loads, current)
+    if route == "status":
+        lines = [m for m in messages if "not found" in m and "check the path" in m]
+        assert len(lines) == 1 and lines[0].startswith("File NOT loaded: "), messages
+    else:
+        assert still_open is True, "the dialog closed on a refused text"
+        assert "not found" in reason and "check the path" in reason, reason
+        assert messages == [], messages
+
+
+def test_tc_b100_38_one_project_match() -> None:
+    """LLR-172.5j (B12-20): exactly one function in ``app.py`` compares a
+    name against the project list — every method that calls both
+    ``list_projects`` and ``os.path.normcase`` is ``_listed_project_name``.
+
+    Why: two copies of the match drift (CR9-7).
+    RED (base, P12a-4): ``_handle_load_project`` and ``_typed_load_route``."""
+    holders = []
+    for name, node in _sweep_methods().items():
+        if _calls_named(node, "list_projects") and _calls_named(node, "normcase"):
+            holders.append(name)
+    assert holders == ["_listed_project_name"], holders
+
+
+def test_tc_b100_38_one_project_match_returns_the_listed_spelling(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-172.5j (B12-19): with ``ab`` and ``cd`` listed,
+    ``_listed_project_name`` maps ``ab`` → ``ab``, ``AB`` → ``ab`` on
+    Windows and ``None`` elsewhere, ``ab.`` → ``None``, ``zz`` → ``None``,
+    ``""`` → ``None``; an ``OSError`` from the listing propagates.
+
+    Why: the one match returns the on-disk spelling (E3 R3), never the typed
+    one, and never matches a trailing-dot alias.
+    RED (base): no ``_listed_project_name``."""
+    base = tmp_path / "app"
+    for name in ("ab", "cd"):
+        folder = _workarea(base) / name
+        folder.mkdir(parents=True)
+        (folder / "firmware.s19").write_bytes((projects.CASE01_DIR / "firmware.s19").read_bytes())
+
+    async def _scenario(app, pilot, log):
+        out = {text: app._listed_project_name(text) for text in ("ab", "AB", "ab.", "zz", "")}
+        with monkeypatch.context() as patch:
+            patch.setattr(app, "list_projects", _raise_permission)
+            try:
+                app._listed_project_name("ab")
+                raised = None
+            except PermissionError as exc:
+                raised = type(exc).__name__
+        return out, raised
+
+    out, raised = projects.run_app(base, _scenario)
+    assert out == {"ab": "ab", "AB": "ab" if WIN else None, "ab.": None, "zz": None, "": None}, out
+    assert raised == "PermissionError", raised
+
+
+def test_tc_b100_38_one_project_match_prefers_the_exact_listed_name(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-172.5j (SE5-12a-3): with ``Proj`` and ``proj`` both listed (a
+    case-sensitive folder), ``_listed_project_name`` maps ``proj`` → ``proj``
+    and ``Proj`` → ``Proj``; ``PROJ`` → the first ``normcase`` match
+    ``Proj`` on Windows, ``None`` elsewhere.
+
+    Why: the picked row carries the exact on-disk name; the first
+    case-insensitive hit would open a different project from the one picked.
+    The listing is injected so the arm runs on a case-insensitive volume.
+    RED (71376a3, Windows): ``proj`` → ``Proj``."""
+    base = tmp_path / "app"
+
+    async def _scenario(app, pilot, log):
+        monkeypatch.setattr(app, "list_projects", lambda: ["Proj", "proj"])
+        return {text: app._listed_project_name(text) for text in ("proj", "Proj", "PROJ")}
+
+    out = projects.run_app(base, _scenario)
+    assert out == {"proj": "proj", "Proj": "Proj", "PROJ": "Proj" if WIN else None}, out
+
+
+def test_tc_b100_38_picking_proj_loads_proj_when_proj_differs_by_case(tmp_path: Path) -> None:
+    """LLR-172.5j (SE5-12a-3), on disk: folders ``Proj`` and ``proj`` both
+    hold a data file; picking ``proj`` → ``current_project == "proj"``.
+
+    Skipped (reported not run) when the volume is case-insensitive and
+    cannot hold both folders — the default on NTFS.
+    RED (71376a3, a case-sensitive Windows folder): ``Proj`` is loaded."""
+    base = tmp_path / "app"
+    workarea = _workarea(base)
+    upper = workarea / "Proj"
+    upper.mkdir(parents=True)
+    lower = workarea / "proj"
+    try:
+        lower.mkdir()
+    except FileExistsError:
+        pytest.skip("the volume is case-insensitive: Proj and proj cannot both exist (not run)")
+    if os.path.samefile(upper, lower):
+        pytest.skip("the volume is case-insensitive: Proj and proj are one folder (not run)")
+    for folder in (upper, lower):
+        (folder / "firmware.s19").write_bytes((projects.CASE01_DIR / "firmware.s19").read_bytes())
+
+    async def _scenario(app, pilot, log):
+        messages = await _project_load(pilot, app, log, "proj")
+        return messages, app.current_project
+
+    messages, project = projects.run_app(base, _scenario)
+    assert project == "proj", (project, messages)
+
+
+def _literal_texts(function) -> list:
+    """Every ``str`` literal text in ``function`` (docstring excluded); an
+    f-string reads with its placeholders written ``{}``."""
+    body = list(function.body)
+    if body and isinstance(body[0], ast.Expr) and isinstance(getattr(body[0], "value", None), ast.Constant):
+        body = body[1:]
+    texts: list = []
+    inside: set = set()
+    module = ast.Module(body=body, type_ignores=[])
+    for node in ast.walk(module):
+        if isinstance(node, ast.JoinedStr):
+            parts = []
+            for value in node.values:
+                inside.add(id(value))
+                if isinstance(value, ast.Constant) and isinstance(value.value, str):
+                    parts.append(value.value)
+                else:
+                    parts.append("{}")
+            texts.append("".join(parts))
+    for node in ast.walk(module):
+        if isinstance(node, ast.Constant) and isinstance(node.value, str) and id(node) not in inside:
+            texts.append(node.value)
+    return texts
+
+
+def _token_reads(function, key: str) -> int:
+    count = 0
+    for node in ast.walk(function):
+        if (
+            isinstance(node, ast.Subscript)
+            and isinstance(node.value, ast.Name)
+            and node.value.id == "_TYPED_REFUSAL_TOKENS"
+            and isinstance(node.slice, ast.Constant)
+            and node.slice.value == key
+        ):
+            count += 1
+    return count
+
+
+def test_tc_b100_38_one_wording_table() -> None:
+    """LLR-172.5k, A12a-01, ruling Q-7 (B12-37): in ``_handle_load_project``,
+    ``_load_path_from_user_input`` and ``_typed_load_route``, 0 literal
+    texts hold ``Project NOT loaded`` together with ``not a project`` or
+    ``could not be read``; the module defines each of the two token pairs
+    once; and the two painting functions read both pairs from
+    ``_TYPED_REFUSAL_TOKENS``. No exact site count is asserted (A12a-01).
+
+    Why: hand-written copies of one refusal drift apart (CR9-7).
+    RED (base, P12a-4): 5 to 7 literal sentences."""
+    methods = _sweep_methods()
+    literal = []
+    for name in ("_handle_load_project", "_load_path_from_user_input", "_typed_load_route"):
+        for text in _literal_texts(methods[name]):
+            if "Project NOT loaded" in text and ("not a project" in text or "could not be read" in text):
+                literal.append((name, text))
+    assert literal == [], literal
+    tree = ast.parse(_APP_SOURCE.read_text(encoding="utf-8"))
+    pairs = {
+        ("not a project", "pick a project in the list"): 0,
+        ("could not be read", "check that the folder can be opened, then load again"): 0,
+    }
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Tuple) and len(node.elts) == 2 and all(
+            isinstance(e, ast.Constant) and isinstance(e.value, str) for e in node.elts
+        ):
+            key = (node.elts[0].value, node.elts[1].value)
+            if key in pairs:
+                pairs[key] += 1
+    assert list(pairs.values()) == [1, 1], pairs
+    for name in ("_handle_load_project", "_load_path_from_user_input"):
+        assert _token_reads(methods[name], "not a project") >= 1, name
+        assert _token_reads(methods[name], "unreadable") >= 1, name
+
+
+def _parse_spy(monkeypatch: pytest.MonkeyPatch) -> list:
+    calls: list = []
+    original = app_module.S19TuiApp._parse_loaded_file
+
+    def _parse(self, path, *args, **kwargs):
+        calls.append(Path(path).name)
+        return original(self, path, *args, **kwargs)
+
+    monkeypatch.setattr(app_module.S19TuiApp, "_parse_loaded_file", _parse)
+    return calls
+
+
+def _replace_entry(temp: Path, outside: Path, arm: str) -> None:
+    """Replace ``temp/fw.s19`` by a folder, a junction (a directory link off
+    Windows) or a file link to a file outside the work area."""
+    entry = temp / "fw.s19"
+    entry.unlink()
+    if arm == "folder":
+        entry.mkdir()
+    elif arm == "junction":
+        target = outside / "dir"
+        target.mkdir(exist_ok=True)
+        if WIN:
+            b100_links.create_junction(entry, target)
+        else:
+            os.symlink(target, entry, target_is_directory=True)
+    else:
+        target = outside / "outside.s19"
+        target.write_bytes((projects.CASE01_DIR / "firmware.s19").read_bytes())
+        try:
+            os.symlink(target, entry)
+        except (OSError, NotImplementedError) as exc:
+            pytest.skip(f"file symbolic link cannot be made here (arm (c) reported not run): {exc}")
+
+
+@pytest.mark.parametrize("route", ["files list", "load dialog"])
+@pytest.mark.parametrize("arm", ["folder", "junction", "file link"])
+def test_tc_b100_39_pick_rechecks_the_entry(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str, route: str
+) -> None:
+    """LLR-172.6b, SEC9-2 (B12-27, B12-28, B12-29, B12-30): ``fw.s19`` is
+    listed (Workarea Files, or the Load dialog's Work area row), then
+    replaced before the pick by a folder, a junction (a directory link off
+    Windows) or a file link to a file outside the work area → 1 status line
+    ``File NOT loaded: 'fw.s19' is not a regular file — pick another file.``,
+    0 parses of ``fw.s19``, nothing installed. The dialog route refuses
+    after the dialog closed (E2 ruling B5: a status line, never
+    ``#load_reason``). The file-link arm needs the symbolic-link privilege;
+    where it cannot be made it is reported not run, never passed.
+
+    Why: the row was painted before the entry changed; ``exists()`` follows a
+    link, so the pick would parse a file outside the work area.
+    RED (base, probe p12a U2.2–U2.4): the pick parses the swapped entry."""
+    from textual.widgets import ListView
+
+    from tests.support import b100_load_dialog as ld
+
+    base = tmp_path / "app"
+    temp = _workarea(base) / "temp"
+    temp.mkdir(parents=True)
+    (temp / "fw.s19").write_bytes((projects.CASE01_DIR / "firmware.s19").read_bytes())
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    parses = _parse_spy(monkeypatch)
+
+    async def _scenario(app, pilot, log):
+        mark = len(log.messages)
+        if route == "files list":
+            app.refresh_files()
+            await pilot.pause()
+            rows = list(app.query_one("#files_list", ListView).children)
+            _replace_entry(temp, outside, arm)
+            app._load_from_item(rows[0])
+        else:
+            await pilot.press("p")
+            await ld.wait_for_dialog(pilot, app)
+            for _ in range(4):
+                await pilot.pause()
+            await ld.highlight_row(pilot, app, "fw.s19")
+            _replace_entry(temp, outside, arm)
+            await pilot.press("enter")
+            await ld.wait_for_dialog_closed(pilot, app)
+        for _ in range(12):
+            await pilot.pause()
+        return log.since(mark), app.current_file
+
+    messages, current = projects.run_app(base, _scenario, size=(118, 54))
+    refusal = NOT_REGULAR.format(name="fw.s19")
+    assert "fw.s19" not in parses, parses
+    assert current is None, current
+    assert [m for m in messages if m == refusal] == [refusal], messages
+
+
+def test_tc_b100_39_pick_rechecks_the_entry_after_the_question(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-172.6b, S12a-03 (B12-39): with an unsaved patched byte (the Inc 10
+    question's trigger), ``fw.s19`` is regular when picked, so the question
+    is asked; before ``y`` the entry is swapped for a folder → the re-check
+    inside the continuation refuses it: 1 ``not a regular file`` line, 0
+    parses of ``fw.s19``, the loaded image unchanged.
+
+    Why: the check must run at use, after the question, or a swap while the
+    question is open slips through.
+    RED (base): the continuation parses the folder."""
+    from textual.widgets import ListView
+
+    from tests.test_b100_load_question import _patch, is_question
+
+    base = tmp_path / "app"
+    temp = _workarea(base) / "temp"
+    temp.mkdir(parents=True)
+    (temp / "fw.s19").write_bytes((projects.CASE01_DIR / "firmware.s19").read_bytes())
+    (temp / "x.s19").write_bytes((projects.CASE01_DIR / "firmware.s19").read_bytes())
+    parses = _parse_spy(monkeypatch)
+
+    async def _scenario(app, pilot, log):
+        await projects.load_image(pilot, app, temp / "x.s19")
+        for _ in range(4):
+            await pilot.pause()
+        await _patch(pilot, app)
+        app.refresh_files()
+        await pilot.pause()
+        rows = {getattr(r, "data", None): r for r in app.query_one("#files_list", ListView).children}
+        parses.clear()
+        mark = len(log.messages)
+        app._load_from_item(rows["fw.s19"])
+        await projects.wait_for(pilot, lambda: is_question(app.screen), "the load question")
+        (temp / "fw.s19").unlink()
+        (temp / "fw.s19").mkdir()
+        await pilot.press("y")
+        for _ in range(12):
+            await pilot.pause()
+        return log.since(mark), Path(app.current_file.path).name
+
+    messages, current = projects.run_app(base, _scenario, size=(118, 54))
+    assert "fw.s19" not in parses, parses
+    assert current == "x.s19", current
+    assert messages.count(NOT_REGULAR.format(name="fw.s19")) == 1, messages
+
+
+@pytest.mark.parametrize("arm", ["lstat refused", "vanished"])
+def test_tc_b100_39_pick_rechecks_the_entry_and_fails_closed(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str
+) -> None:
+    """LLR-172.6b failure paths (B12-33, B12-32): ``os.lstat`` inside the
+    pick raising ``PermissionError`` for ``x.s19`` (from its second call on,
+    so the pre-question vanish look passes) → 1 ``not a regular file``
+    line, 0 parses, 0 raises; ``x.s19`` deleted after it was listed → 0
+    loads and 0 status lines (9b B88 kept).
+
+    Why: an entry the re-check cannot read is refused, never loaded.
+    RED (base, lstat arm): the base pick never calls ``os.lstat`` and parses
+    ``x.s19``. The vanished arm holds on base (regression)."""
+    from textual.widgets import ListView
+
+    base = tmp_path / "app"
+    temp = _workarea(base) / "temp"
+    temp.mkdir(parents=True)
+    (temp / "x.s19").write_bytes((projects.CASE01_DIR / "firmware.s19").read_bytes())
+    parses = _parse_spy(monkeypatch)
+    key = os.path.normcase(str(temp / "x.s19"))
+    real_lstat = os.lstat
+    seen: list = []
+
+    def _lstat(path, *args, **kwargs):
+        if not isinstance(path, int) and os.path.normcase(os.fspath(path)) == key:
+            seen.append(1)
+            if len(seen) >= 2:
+                raise PermissionError(13, "injected: access denied", os.fspath(path))
+        return real_lstat(path, *args, **kwargs)
+
+    async def _scenario(app, pilot, log):
+        app.refresh_files()
+        await pilot.pause()
+        rows = list(app.query_one("#files_list", ListView).children)
+        mark = len(log.messages)
+        raised = None
+        if arm == "vanished":
+            (temp / "x.s19").unlink()
+            app._load_from_item(rows[0])
+        else:
+            with monkeypatch.context() as patch:
+                patch.setattr(app_module.os, "lstat", _lstat)
+                try:
+                    app._load_from_item(rows[0])
+                except Exception as exc:  # noqa: BLE001 — the threshold counts raises
+                    raised = repr(exc)
+                for _ in range(12):
+                    await pilot.pause()
+        for _ in range(6):
+            await pilot.pause()
+        return raised, log.since(mark), app.current_file
+
+    raised, messages, current = projects.run_app(base, _scenario, size=(118, 54))
+    assert raised is None, raised
+    assert "x.s19" not in parses and current is None, (parses, current)
+    if arm == "vanished":
+        assert messages == [], messages
+    else:
+        assert messages == [NOT_REGULAR.format(name="x.s19")], messages
+
+
+@pytest.mark.parametrize("arm", ["over the cap", "at the cap", "A2L over the cap"])
+def test_tc_b100_39_pick_over_cap_is_refused(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+    """LLR-172.6c (B12-31): the copy cap read at call time and patched to
+    1 024 bytes → a 1 025-byte ``big.s19`` pick paints ``File NOT loaded:
+    'big.s19' is too large to open — load a smaller file.`` with 0 parses; a
+    1 024-byte ``edge.s19`` is parsed; a 1 025-byte ``c.a2l`` is refused the
+    same way with 0 calls of ``load_a2l_from_path``.
+
+    Why: the data arm of a work-area pick had no size check, so an
+    over-cap file was parsed in place.
+    Negative control: the cap read at import → the patch is not seen.
+    RED (base, probe p12a U2.5): the over-cap data pick parses. The
+    ``at the cap`` arm holds on base (its boundary twin)."""
+    from textual.widgets import ListView
+
+    from s19_app.tui import workspace
+
+    name = {"over the cap": "big.s19", "at the cap": "edge.s19", "A2L over the cap": "c.a2l"}[arm]
+    size = 1024 if arm == "at the cap" else 1025
+    base = tmp_path / "app"
+    temp = _workarea(base) / "temp"
+    temp.mkdir(parents=True)
+    (temp / name).write_bytes(b"S" * size)
+    monkeypatch.setattr(workspace, "DEFAULT_COPY_SIZE_CAP_BYTES", 1024)
+    parses = _parse_spy(monkeypatch)
+    a2l_loads: list = []
+    monkeypatch.setattr(app_module.S19TuiApp, "load_a2l_from_path", lambda self, p: a2l_loads.append(Path(p).name))
+
+    async def _scenario(app, pilot, log):
+        app.refresh_files()
+        await pilot.pause()
+        rows = list(app.query_one("#files_list", ListView).children)
+        mark = len(log.messages)
+        app._load_from_item(rows[0])
+        for _ in range(12):
+            await pilot.pause()
+        return log.since(mark)
+
+    messages = projects.run_app(base, _scenario, size=(118, 54))
+    refusal = TOO_LARGE_LINE.format(name=name)
+    if arm == "at the cap":
+        assert parses == [name], parses
+        assert refusal not in messages, messages
+    else:
+        assert parses == [] and a2l_loads == [], (parses, a2l_loads)
+        assert messages.count(refusal) == 1, messages
+
+# ---------------------------------------------------------------------------
+# Inc 12a E5 corrective, round 2 — arms that kill the surviving mutants
+# (evidence/inc-12a/mutation-summary.md; ids MUT12a-M-NN in E5-rulings.md)
+# ---------------------------------------------------------------------------
+
+
+def test_tc_b100_39_pick_of_a_vanished_entry_asks_nothing(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """F-11 / 9b B88, LLR-172.6b (MUT12a-M-101): with an unsaved patched
+    byte (the Inc 10 question's trigger), ``fw.s19`` is listed and then
+    deleted before it is picked → the pick opens no question, writes 0
+    status lines and parses nothing; ``x.s19`` stays loaded.
+
+    Why: the pre-question look exists so a file that is already gone does
+    not ask the user to give up unsaved work for nothing.
+    Negative control (M-101, the vanished look falls through): the question
+    opens for a file that does not exist."""
+    from textual.widgets import ListView
+
+    from tests.test_b100_load_question import _patch, is_question
+
+    base = tmp_path / "app"
+    temp = _workarea(base) / "temp"
+    temp.mkdir(parents=True)
+    (temp / "fw.s19").write_bytes((projects.CASE01_DIR / "firmware.s19").read_bytes())
+    (temp / "x.s19").write_bytes((projects.CASE01_DIR / "firmware.s19").read_bytes())
+    parses = _parse_spy(monkeypatch)
+
+    async def _scenario(app, pilot, log):
+        await projects.load_image(pilot, app, temp / "x.s19")
+        for _ in range(4):
+            await pilot.pause()
+        await _patch(pilot, app)
+        app.refresh_files()
+        await pilot.pause()
+        rows = {getattr(r, "data", None): r for r in app.query_one("#files_list", ListView).children}
+        parses.clear()
+        (temp / "fw.s19").unlink()
+        mark = len(log.messages)
+        app._load_from_item(rows["fw.s19"])
+        asked = False
+        for _ in range(12):
+            await pilot.pause()
+            asked = asked or is_question(app.screen)
+        return asked, log.since(mark), Path(app.current_file.path).name
+
+    asked, messages, current = projects.run_app(base, _scenario, size=(118, 54))
+    assert asked is False, "a question opened for a vanished file"
+    assert messages == [], messages
+    assert "fw.s19" not in parses and current == "x.s19", (parses, current)
+
+
+def test_tc_b100_39_pick_survives_an_error_at_the_first_look(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """S12a-R2-1 (MUT12a-M-102): ``os.lstat`` raising ``PermissionError``
+    for ``x.s19`` only at its FIRST call (the pre-question look) → the pick
+    goes on; the re-check inside the continuation reads the file and it is
+    loaded (``current_file`` is ``x.s19``, 0 refusal lines).
+
+    Why: an error at the look is not a verdict — the re-check at use decides
+    (it refuses an entry it cannot read, see the ``lstat refused`` arm).
+    Negative control (M-102, the look returns on ``OSError``): nothing is
+    loaded and nothing is said."""
+    from textual.widgets import ListView
+
+    base = tmp_path / "app"
+    temp = _workarea(base) / "temp"
+    temp.mkdir(parents=True)
+    (temp / "x.s19").write_bytes((projects.CASE01_DIR / "firmware.s19").read_bytes())
+    key = os.path.normcase(str(temp / "x.s19"))
+    real_lstat = os.lstat
+    seen: list = []
+
+    def _lstat(path, *args, **kwargs):
+        if not isinstance(path, int) and os.path.normcase(os.fspath(path)) == key:
+            seen.append(1)
+            if len(seen) == 1:
+                raise PermissionError(13, "injected: access denied", os.fspath(path))
+        return real_lstat(path, *args, **kwargs)
+
+    async def _scenario(app, pilot, log):
+        app.refresh_files()
+        await pilot.pause()
+        rows = list(app.query_one("#files_list", ListView).children)
+        mark = len(log.messages)
+        with monkeypatch.context() as patch:
+            patch.setattr(app_module.os, "lstat", _lstat)
+            app._load_from_item(rows[0])
+            for _ in range(40):
+                if app.current_file is not None:
+                    break
+                await pilot.pause()
+        for _ in range(6):
+            await pilot.pause()
+        current = None if app.current_file is None else Path(app.current_file.path).name
+        return len(seen), log.since(mark), current
+
+    calls, messages, current = projects.run_app(base, _scenario, size=(118, 54))
+    assert calls >= 2, calls
+    assert current == "x.s19", (current, messages)
+    assert NOT_REGULAR.format(name="x.s19") not in messages, messages
+
+
+def test_tc_b100_39_pick_of_a_reparse_point_file_is_refused(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-172.6b (MUT12a-M-105): ``x.s19`` is a regular file that
+    ``_is_reparse_point`` reports as a reparse point (a symlink-like file
+    entry a junction test cannot reach, since a junction is a folder) → 1
+    ``not a regular file`` line, 0 parses, nothing loaded.
+
+    Why: a reparse point that ``lstat`` sees as a regular file can still
+    redirect the open; the re-check refuses it on that test alone.
+    Negative control (M-105, the reparse test dropped): ``x.s19`` loads."""
+    from textual.widgets import ListView
+
+    base = tmp_path / "app"
+    temp = _workarea(base) / "temp"
+    temp.mkdir(parents=True)
+    (temp / "x.s19").write_bytes((projects.CASE01_DIR / "firmware.s19").read_bytes())
+    parses = _parse_spy(monkeypatch)
+    key = os.path.normcase(str(temp / "x.s19"))
+    real_reparse = app_module._is_reparse_point
+
+    def _reparse(path, *args, **kwargs):
+        if os.path.normcase(os.fspath(path)) == key:
+            return True
+        return real_reparse(path, *args, **kwargs)
+
+    monkeypatch.setattr(app_module, "_is_reparse_point", _reparse)
+
+    async def _scenario(app, pilot, log):
+        app.refresh_files()
+        await pilot.pause()
+        rows = list(app.query_one("#files_list", ListView).children)
+        mark = len(log.messages)
+        app._load_from_item(rows[0])
+        for _ in range(12):
+            await pilot.pause()
+        return log.since(mark), app.current_file
+
+    messages, current = projects.run_app(base, _scenario, size=(118, 54))
+    assert "x.s19" not in parses and current is None, (parses, current)
+    assert messages == [NOT_REGULAR.format(name="x.s19")], messages

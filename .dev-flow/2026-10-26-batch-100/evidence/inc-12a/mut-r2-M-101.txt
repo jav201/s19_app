@@ -1,0 +1,18 @@
+mutant: M-101
+what: pre-question vanish look falls through (FileNotFoundError: pass)
+target: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\mutk\s19_app\tui\app.py
+sha256 before: 15ffc7bdbb599615
+old occurrences: 1
+sha256 mutated: 7a1cd79d53958db6
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\mutk\s19_app\__init__.py
+command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line --basetemp=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\bt\mk-M-101 tests/test_b100_recents.py::test_tc_b100_39_pick_of_a_vanished_entry_asks_nothing
+pytest tail:
+  F                                                                        [100%]
+  ================================== FAILURES ===================================
+  C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\mutk\tests\test_b100_recents.py:3960: AssertionError: a question opened for a vanished file
+  =========================== short test summary info ===========================
+  FAILED tests/test_b100_recents.py::test_tc_b100_39_pick_of_a_vanished_entry_asks_nothing
+  1 failed in 3.97s
+exit: 1
+verdict: KILLED
+restored: True

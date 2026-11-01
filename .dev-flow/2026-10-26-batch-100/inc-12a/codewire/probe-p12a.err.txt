@@ -1,0 +1,12 @@
+Unexpected error while loading file: [Errno 13] Permission denied: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\inc-12a-design\\work\\ptmp3\\p12a_v7681mm1\\.s19tool\\workarea\\temp\\fw.s19'
+Traceback (most recent call last):
+  File "C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc-12a-design\work\tree\s19_app\core.py", line 312, in _load
+    with open(self.path, 'r') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\inc-12a-design\\work\\ptmp3\\p12a_v7681mm1\\.s19tool\\workarea\\temp\\fw.s19'
+Unexpected error while loading file: [Errno 13] Permission denied: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\inc-12a-design\\work\\ptmp3\\p12a_v7681mm1\\.s19tool\\workarea\\temp\\fw.s19'
+Traceback (most recent call last):
+  File "C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc-12a-design\work\tree\s19_app\core.py", line 312, in _load
+    with open(self.path, 'r') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\inc-12a-design\\work\\ptmp3\\p12a_v7681mm1\\.s19tool\\workarea\\temp\\fw.s19'

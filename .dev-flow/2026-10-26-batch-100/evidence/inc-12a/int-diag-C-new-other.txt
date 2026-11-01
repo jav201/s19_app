@@ -1,0 +1,24 @@
+# batch-100 Inc 12a — E4 integration — diagC
+# head: 051f58613efa8fab6c9d477babfbe19a06f59f67 (branch b100-inc12a), working tree with the Inc 12a edits
+# s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc12a\s19_app\__init__.py
+# interpreter: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe (3.11.15 textual 8.2.8)
+# env: NO_COLOR unset, PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int12a/lad
+# app.py sha256[:16]: cc89cbcaa2c066cd  styles.tcss sha256[:16]: f7b4f75911b296a4
+# started: 2026-11-01T00:11:38-06:00
+# command: python -m pytest -p no:cacheprovider --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int12a/bt/diagC --tb=short -rfEs -q tests/test_b100_load_dialog.py::test_tc_b100_41_labels_key_bar_and_palette_say_load_and_projects tests/test_b100_load_dialog.py::test_tc_b100_66_progress_lines_carry_no_decision_id tests/test_b100_load_dialog.py::test_tc_b100_66_pick_refusal_tokens_carry_no_decision_id tests/test_b100_announce.py::test_tc_b100_56_project_line_is_the_file_state_painted_at_the_last_end tests/test_b100_recents.py::test_tc_b100_37_project_list_skips_a_trailing_dot_on_every_platform tests/test_b100_recents.py::test_tc_b100_37_files_list_shows_loadable_suffixes_only tests/test_b100_recents.py::test_tc_b100_37_files_list_shows_loadable_suffixes_only_through_one_predicate tests/test_b100_recents.py::test_tc_b100_38_nul_in_typed_path_is_refused tests/test_b100_recents.py::test_tc_b100_38_one_project_match tests/test_b100_recents.py::test_tc_b100_38_one_project_match_returns_the_listed_spelling tests/test_b100_recents.py::test_tc_b100_38_one_wording_table tests/test_b100_recents.py::test_tc_b100_39_pick_rechecks_the_entry tests/test_b100_recents.py::test_tc_b100_39_pick_rechecks_the_entry_after_the_question tests/test_b100_recents.py::test_tc_b100_39_pick_rechecks_the_entry_and_fails_closed tests/test_b100_recents.py::test_tc_b100_39_pick_over_cap_is_refused
+
+.F..............................                                         [100%]
+================================== FAILURES ===================================
+_____________ test_tc_b100_66_progress_lines_carry_no_decision_id _____________
+tests\test_b100_load_dialog.py:3737: in test_tc_b100_66_progress_lines_carry_no_decision_id
+    assert len(painted) == 18, painted
+E   AssertionError: ['⠋ Loading x.s19  ·  step 1/3 Copy into the work area  ·  00:00', '⠋ Loading x.s19  ·  step 2/3 Parse  ·  00:00', '⠋ ...00', '⠋ Loading x.s19  ·  step 2/3 Parse  ·  00:00', '⠋ Loading x.s19  ·  step 3/3 Build the tag table  ·  00:00', ...]
+E   assert 19 == 18
+E    +  where 19 = len(['⠋ Loading x.s19  ·  step 1/3 Copy into the work area  ·  00:00', '⠋ Loading x.s19  ·  step 2/3 Parse  ·  00:00', '⠋ ...00', '⠋ Loading x.s19  ·  step 2/3 Parse  ·  00:00', '⠋ Loading x.s19  ·  step 3/3 Build the tag table  ·  00:00', ...])
+=========================== short test summary info ===========================
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_66_progress_lines_carry_no_decision_id
+1 failed, 31 passed in 102.08s (0:01:42)
+
+# pytest exit code: 0
+# finished: 2026-11-01T00:13:23-06:00
+# real %LOCALAPPDATA%\s19_app exists: no

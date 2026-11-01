@@ -1706,6 +1706,42 @@ def test_tc_b100_41_preview_follows_the_load_target(tmp_path: Path) -> None:
     assert tabbed[1] == [f"{MARK} project:ab", "note"], tabbed
 
 
+def test_tc_b100_41_labels_key_bar_and_palette_say_load_and_projects(tmp_path: Path) -> None:
+    """LLR-173.2m (Inc 12a, 9b ruling Q8 restored; B12-01, B12-02, B12-03):
+    at 118×54 the key bar's row 1 holds ``^l Load`` and no row holds
+    ``Load file``; the Workspace row 2 holds ``p Projects`` and no
+    ``p Load project``; the palette holds the entries ``("Load",
+    "load_file")`` and ``("Projects", "load_project")`` and 0 entries
+    ``Load file`` or ``Load project``. The Workspace button keeps
+    ``Load project (p)`` (ruling Q6), so the painted rows are read from the
+    key bar only.
+
+    Why: VS-PA-4 — the two entry points to the one Load dialog are named
+    for what the user picks, a file to load or one of the projects.
+    Negative control (code read on base): ``Binding(..., "Load file")`` and
+    ``Binding("p", ..., "Load project")`` → RED."""
+    from tests.test_b97_key_bar import bar_rows, pieces
+
+    base = tmp_path / "app"
+
+    async def scenario(app, pilot, log):
+        await _home(pilot)
+        await _settle(pilot, 3)
+        rows = bar_rows(app)
+        entries = [(entry.label, entry.action) for entry in app._build_palette_entries()]
+        return rows, entries
+
+    rows, entries = _run(base, scenario)
+    tokens = [pieces(row) for row in rows]
+    assert "^l Load" in tokens[0], tokens
+    assert not any("Load file" in row for row in rows), rows
+    assert any("p Projects" in row_tokens for row_tokens in tokens[1:]), tokens
+    assert not any("p Load project" in row for row in rows), rows
+    assert ("Load", "load_file") in entries, entries
+    assert ("Projects", "load_project") in entries, entries
+    assert [e for e in entries if e[0] in ("Load file", "Load project")] == [], entries
+
+
 # ===========================================================================
 # TC-B100-42 — literal names (LLR-173.3 … LLR-173.3d)
 # ===========================================================================
@@ -3663,6 +3699,78 @@ def test_tc_b100_66_painted_text_carries_no_decision_id(
     texts = _run(base, scenario)
     assert any("nothing selected" in t for t in texts), "the empty-Load scenario was not painted"
     assert [t for t in texts if DECISION_ID.search(t)] == []
+
+
+#: Example A12-27's wider scan for the progress strings (every internal id
+#: family of the batch, not only the LLR-173.7 five).
+PROGRESS_ID = re.compile(r"\bD\d+\b|\bO-\d+|VS-|LLR-|HLR-|US-|AT-|TC-|LED|UX-|\bCR\d|\bSEC\d")
+#: A painted progress line starts with one of the ten spinner frames.
+LINE_START = re.compile("^[⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏] ")
+
+
+def test_tc_b100_66_progress_lines_carry_no_decision_id(tmp_path: Path) -> None:
+    """LLR-173.7 (Inc 12a extension; A12-27, X-5): each of the 7 long
+    actions begun through its table row (with the name ``x.s19``) and
+    stepped through every step paints 19 progress lines (7 labels, 19 step
+    names; A12-27's "18" is an arithmetic slip, E4 integration SR-12a-1),
+    and each failure end writes ``<label> failed`` (7 log lines) → 0
+    matches of a decision id in any of the 26 texts.
+
+    Why: internal ids mean nothing to the engineer; the progress line is the
+    most-read text while an action runs.
+    RED (base): no action table and no progress seam."""
+    base = tmp_path / "app"
+
+    async def scenario(app, pilot, log):
+        painted = []
+        mark = len(log.messages)
+        for key, row in app_module._BUSY_ACTIONS.items():
+            gen = app._busy_begin_action(key, "x.s19")
+            painted.append(str(app.query_one("#status_text").render()))
+            for n in range(2, len(row.steps) + 1):
+                app.step_busy(key, gen, n)
+                painted.append(str(app.query_one("#status_text").render()))
+            app._busy_fail(key, gen)
+        await _settle(pilot, 2)
+        return painted, log.since(mark)
+
+    painted, failed = _run(base, scenario)
+    assert len(painted) == 19, painted
+    assert all(LINE_START.match(t) for t in painted), painted
+    assert len(failed) == 7 and all(line.endswith(" failed") for line in failed), failed
+    assert [t for t in painted + failed if PROGRESS_ID.search(t)] == []
+
+
+def test_tc_b100_66_pick_refusal_tokens_carry_no_decision_id(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-173.7 (Inc 12a extension; B12-36, §D.2): the two new Workarea
+    Files pick refusals — an entry that is no longer a regular file, and a
+    file over the copy cap — each paint one line holding their token pair
+    verbatim (``not a regular file`` + ``pick another file``; ``too large to
+    open`` + the name + ``load a smaller file``) and 0 decision ids.
+
+    Why: new refusal sentences enter the same painted surface the scan
+    guards. RED (base): neither refusal exists (the pick parses)."""
+    base = tmp_path / "app"
+    temp = _temp(base)
+    (temp / "fw.s19").mkdir()
+    (temp / "big.s19").write_bytes(b"S" * 1025)
+    monkeypatch.setattr(app_module.workspace, "DEFAULT_COPY_SIZE_CAP_BYTES", 1024)
+
+    async def scenario(app, pilot, log):
+        mark = len(log.messages)
+        app._load_workarea_file("fw.s19")
+        await _settle(pilot)
+        app._load_workarea_file("big.s19")
+        await _settle(pilot)
+        return log.since(mark)
+
+    lines = _run(base, scenario)
+    regular = [m for m in lines if "not a regular file" in m and "pick another file" in m]
+    large = [m for m in lines if "too large to open" in m and "big.s19" in m and "load a smaller file" in m]
+    assert len(regular) == 1 and len(large) == 1, lines
+    assert [t for t in lines if PROGRESS_ID.search(t)] == []
 
 
 # ===========================================================================

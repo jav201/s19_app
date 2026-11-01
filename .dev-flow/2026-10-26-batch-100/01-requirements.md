@@ -348,7 +348,9 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 > | a session file cannot be read at save (LLR-164.4; Inc 11, LLR-175.1l) | `could not be read` + the file | `check that the file can be opened, then save again` |
 > | empty name (painted in the Save dialog before Save, Inc 11, LLR-175.1a … LLR-175.1j, LLR-175.1o, LLR-175.1p) | `name is empty` | `type a project name` |
 > | empty Load (Inc 9b, LLR-173.2h, LLR-173.2i) | `nothing selected` | `pick a row or type a path` |
-> | typed path not found / unsupported, a relative typed folder path included (Inc 9a, LLR-172.5h); painted in `#load_reason` from the dialog (Inc 9b, LLR-173.5 … LLR-173.5e) | `not found` / `not a supported file` | `check the path` |
+> | typed path not found / unsupported, a relative typed folder path included (Inc 9a, LLR-172.5h), a typed text holding a character the path calls refuse (Inc 12a, LLR-172.5i); painted in `#load_reason` from the dialog (Inc 9b, LLR-173.5 … LLR-173.5e) | `not found` / `not a supported file` | `check the path` |
+| Workarea Files pick: the entry is no longer a regular file (Inc 12a, LLR-172.6b) | `not a regular file` | `pick another file` |
+| Workarea Files pick: the file is over the copy size cap (Inc 12a, LLR-172.6c) | `too large to open` + the file | `load a smaller file` |
 > | typed folder in the work area, not a project, a reserved home included (Inc 9a, LLR-172.5b); a name the project list does not list passed to a project load, a reserved home and its other spellings included (LLR-172.5g); painted in `#load_reason` from the dialog (Inc 9b, LLR-173.5 … LLR-173.5e) | `not a project` | `pick a project in the list` |
 > | typed folder outside the work area; painted in `#load_reason` from the dialog (Inc 9b, LLR-173.5 … LLR-173.5e) | `outside the work area` | `copy the folder into the work area` |
 > | project folder with no data or A2L file | `no data or A2L file` | `load a file and Save project` |
@@ -1019,22 +1021,83 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
     - boundary: 118×54 and 220×60; a 300-row plan.
   - **Negative control:** as above → RED.
 
-### HLR-176 — Worker actions show real progress in the status line
+### HLR-176 — A long action shows a progress line when it begins
 - **Traceability:** US-166
-- **Ledger:** LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.11, LED-2026-10-26-batch-100.19, LED-2026-10-26-batch-100.35, LED-2026-10-26-batch-100.39
-- **Statement:** When an action that runs on a worker starts — a file or project load, an A2L parse, Save project, a report, a diff report, a before/after run — the system shall paint in `#status_text` a spinner, the action's label, the step `n/m` and the elapsed time, and shall show the progress bar from 0. The bar shall advance within a step wherever progress is measurable (bytes copied, read or parsed) and by step only for an indivisible step. While the action runs, the spinner and the elapsed time shall advance, and `#status_text` shall have one owner, the progress line. When it ends, by success, failure or exception, one final writer shall paint, in this order, the outcome, then the project and file line, then the file state, and the bar shall be cleared — never left at a stale `100%`; when idle the bar is empty and keeps its row, so the status log lines never move. The A2L parse shall report progress within its step through an optional bytes-consumed callback of the parser (LLR-176.4). A step that cannot leave the main thread — the A2L tag-table build — shall have its step name painted before it starts; during it the indicator stays frozen, and this freeze is declared and not covered by the elapsed-time clause.
+- **Ledger:** LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.11, LED-2026-10-26-batch-100.19, LED-2026-10-26-batch-100.35, LED-2026-10-26-batch-100.39, LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.97
+- **Statement (EARS event):** When a long action begins, the system shall paint in `#status_text` one progress line that holds a spinner glyph, the action's label, the step `n/m` with the step's name, and the elapsed time.
+- **Decomposition:** LLR-176.1, LLR-176.1a, LLR-176.1g, LLR-176.1n, LLR-176.1p, LLR-176.1r, LLR-176.2, LLR-176.2a, LLR-176.2b.
+  - The compound HLR-176 (8 obligation clauses, about 14 behaviours) is split into HLR-176 … HLR-176d (LED .95).
+  - Its A2L parse callback clause and its main-thread freeze clause move with LLR-176.4 and LLR-176.3 to Inc 12b (ruling Q1).
 - **Variant slots (filled by the P-D verdict A, LED-2026-10-26-batch-100.2):** VS-PD-1 = the status line (`#status_text`), with the progress bar kept working. VS-PD-2 = no cancel.
-- **Rationale (informative):** N5. The operator's P-D note: "El spinner con la acción en progreso debe ser suficiente. asumiendo que la barra de progreso realmente hace su trabajo también, mostrando el progreso." — hence R-PD and UX-30: the bar moves within the long steps. UX-29 / B-11: one owner of `#status_text`.
+- **Rationale (informative):** N5. The operator's P-D note: "El spinner con la acción en progreso debe ser suficiente. asumiendo que la barra de progreso realmente hace su trabajo también, mostrando el progreso." The `pd_A` prototype paints `⠋ Loading <name>  ·  step 1/3 <step>  ·  00:03`. UX-29 / B-11: one owner of `#status_text`.
 - **Validation:** `test`
-- **Executed verification:** `pytest tests/test_b100_busy.py`
-- **Numeric pass threshold:** every action key → exactly 1 begin and 1 end on its success, failure and exception exits (0 indicators left showing); the case_06 A2L parse → the bar value increases ≥ 2 times within the parse step and the elapsed text changes ≥ 1 time before the end; after a project load ends → `#status_text` holds the project and file line, the bar cleared and its row height unchanged (2 assertions); the tag-table step → its name painted before it starts.
+- **Executed verification:** `pytest tests/test_b100_busy.py -k "tc_b100_50 or tc_b100_51 or at_b100_17"`
+- **Numeric pass threshold:** each of the 4 actions that run a worker today (file load, report, diff report, before/after) → the first `#status_text` text after the begin matches `^[⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏] .+  ·  step 1/[1-9] .+  ·  00:0[0-9]$` (4 of 4).
+- **Negative control:** executed P12a-2 on `8947666`: across a file load, `#status_text` takes only `Ready.` and `Loaded firmware.s19 (S19 only)`, with no glyph and no step → RED.
 - **Priority:** medium
 - **Acceptance (black-box):**
-  - **Observable outcome:** the engineer loads the case_06 A2L: `#status_text` shows a spinner, the label and a running elapsed time while it parses, the bar rises at least twice during the parse, and at the end the status names the outcome and the bar is gone.
+  - **Observable outcome:** (AT-B100-17, 12a half) the engineer loads a generated S19 holding 8 MiB of data by `l`, a typed path and Enter. While it parses, `#status_text` shows a spinner, `Loading <name>`, the step and an elapsed time that advances at least once. At the end, the status log names the file loaded, `#status_text` shows the file state, and the bar is empty.
   - **Shipped surface:** Load (`l`), `#status_text`, `#progress_bar`, the status log.
   - **Acceptance test(s):** AT-B100-17
-  - **Boundary catalog (QC-3):** ☐ empty ☒ boundary ☐ invalid ☒ error — boundary: an action shorter than one timer tick (shown and cleared); error: an action that raises (the indicator ends with the failure). Empty/invalid: N/A — no input.
-  - **Negative control:** executed on `1d677ba` by the round's capture (UX-02): the screen did not repaint between the start and the end of the case_06 parse → AT-B100-17 RED today.
+  - **Boundary catalog (QC-3):** ☐ empty ☒ boundary ☐ invalid ☒ error
+    - boundary: an action shorter than one timer tick (shown, then cleared);
+    - error: a load that fails (the indicator ends with `Load failed`);
+    - empty / invalid: N/A, no input.
+  - **Negative control:** as above → AT-B100-17 (12a half) RED.
+
+### HLR-176a — The spinner and the elapsed time advance while a worker runs
+- **Traceability:** US-166
+- **Ledger:** LED-2026-10-26-batch-100.95
+- **Statement (EARS state):** While a long action runs its worker, the system shall advance the spinner glyph and the elapsed time of the progress line.
+- **Decomposition:** LLR-176.1e, LLR-176.1f, LLR-176.1g, LLR-176.1q.
+- **Rationale (informative):** "so that I do not think the app froze" (US-166). Declared limit at 12a: the three main-thread actions (A2L load, project load, Save project) block the event loop, so nothing advances between their begin and end; Inc 12b moves them to workers (HLR-177).
+- **Validation:** `test`
+- **Executed verification:** `pytest tests/test_b100_busy.py -k "tc_b100_50 or at_b100_17"`
+- **Numeric pass threshold:**
+  - The 8 MiB-data S19 load (P12a-3: 2.38 s of parse) → before the end, the elapsed text changes at least 1 time and the glyph takes at least 5 distinct values (2 assertions).
+  - A synthetic worker action of 1.2 s → the same 2 assertions.
+- **Negative control:** executed P12a-2: `set_interval(` occurs 0 times in `app.py`, so no clock can repaint → RED.
+- **Priority:** medium
+- **Acceptance (black-box):** covered by AT-B100-17 (12a half), as HLR-176.
+
+### HLR-176b — The bar moves within a step that reports its progress
+- **Traceability:** US-166
+- **Ledger:** LED-2026-10-26-batch-100.95
+- **Statement (EARS event):** When a running step reports how much of its work is done, the system shall advance the progress bar within that step.
+- **Decomposition:** LLR-176.1b, LLR-176.1c, LLR-176.1d.
+- **Rationale (informative):** the operator's condition, "asumiendo que la barra de progreso realmente hace su trabajo" (UX-30, R-PD). At 12a no shipped action reports a done-of-total amount; the seam carries it, and the first shipped reporter is the A2L parse callback at Inc 12b (LLR-176.4). The old HLR named "bytes copied, read or parsed"; copy and read have no callback inside the 12a+12b files (ruling Q5).
+- **Validation:** `test`
+- **Executed verification:** `pytest tests/test_b100_busy.py -k tc_b100_50`
+- **Numeric pass threshold:** a synthetic worker action of 2 steps whose step 2 reports 1, 2, 3 and 4 MiB of 4 MiB → the bar reads 50, 62, 75, 87 within step 2, rising 4 times, never falling (4 of 4).
+- **Negative control:** executed P12a-1: every bar value at `8947666` is a constant (0, 10, 15, 50, 55, 100), and no call carries a done-of-total amount → RED. A mutation that sets the bar from the step index only → the 4 within-step values stay at 50 → RED.
+- **Priority:** medium
+- **Acceptance (black-box):** none at 12a; the AT arm "the bar rises at least 2 times during the A2L parse" is AT-B100-17's 12b half.
+
+### HLR-176c — The end of a long action removes the indicator and shows the outcome
+- **Traceability:** US-166
+- **Ledger:** LED-2026-10-26-batch-100.95
+- **Statement (EARS event):** When a long action ends, by success, failure or exception, the system shall replace its progress indicator with the action's outcome.
+- **Decomposition:** LLR-176.1i, LLR-176.1j, LLR-176.1k, LLR-176.1l, LLR-176.1m, LLR-176.1o, LLR-176.1s, LLR-176.2c, LLR-176.2d.
+- **Rationale (informative):** the old text said "never left at a stale `100%`" and "one final writer … paint[s], in this order, the outcome, then the project and file line, then the file state". `#status_text` is one row, so three paints in order leave only the last; that contradicted HLR-176's own threshold and LLR-178.2 (the project and file line stays). The order is replaced by a precedence (LLR-176.1j, ruling Q4).
+- **Validation:** `test`
+- **Executed verification:** `pytest tests/test_b100_busy.py -k "tc_b100_50 or tc_b100_51 or at_b100_17"`
+- **Numeric pass threshold:** each of the 7 long actions, on its success exit and on its failure exit (14 arms) → after the end, `#status_text` holds no glyph, the bar is cleared, the status log's last line is the outcome, and 0 timers run.
+- **Negative control:** executed P12a-2: after a successful load the bar stays at 100 → RED.
+- **Priority:** medium
+- **Acceptance (black-box):** covered by AT-B100-17 (12a half): at the end the status log names the file loaded and the bar is empty.
+
+### HLR-176d — `#status_text` has one owner while a long action runs
+- **Traceability:** US-166
+- **Ledger:** LED-2026-10-26-batch-100.95
+- **Statement (EARS state):** While a long action runs, the system shall keep `#status_text` for the progress line.
+- **Decomposition:** LLR-176.1h, LLR-176.1j.
+- **Rationale (informative):** UX-29 / B-11. P12a-2 shows the file state painted over the status line while the action still runs (bar at 50).
+- **Validation:** `test`
+- **Executed verification:** `pytest tests/test_b100_busy.py -k tc_b100_50`
+- **Numeric pass threshold:** a worker file load whose install writes the file state before the end → every `#status_text` value between the begin and the end is a progress line (0 other values), and after the end `#status_text` holds the file state (`Loaded <name> (S19 only)`, 1 equality).
+- **Negative control:** executed P12a-2: `Loaded firmware.s19 (S19 only)` is painted while the bar is at 50, before the load's last progress call → RED.
+- **Priority:** medium
+- **Acceptance (black-box):** covered by AT-B100-17 (12a half).
 
 ### HLR-177 — Project load, Save project and the A2L parse run off the main thread
 - **Traceability:** US-167
@@ -2350,6 +2413,27 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 - **Negative control:** the E4 integration state (`workspace.py` `a3342ed048ebe157`): `['a.s19.', 'c.s19']` and `['b.s19 ', 'c.s19']` → RED (`evidence/inc-9a/red-02-corrective.txt`); a mutation removing the skip → 1 extra row in each arm (2 in all) → RED (`evidence/inc-9a/mut-c-SEC9-1.txt`).
 - **Boundary catalog:** ☒ invalid ☒ boundary — a trailing dot; a trailing space.
 
+### LLR-172.4e — A project folder ending in a dot or a space is not listed on any platform (CR9-9 addendum)
+- **Traceability:** HLR-172b · trace: `list_projects` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95
+- **Statement (EARS unwanted):** If a folder in the work area has a name that ends in a dot or a space, then the system shall leave it out of the project list on every operating system.
+- **Rationale (informative):** the lister skip (LLR-172.4d) has no platform gate; the project-list skip has `os.name == "nt"`. Removing the gate makes both rules the same (backlog disposition B7: prefer removal over a new helper in `workspace.py`).
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-37 — `pytest tests/test_b100_recents.py -k tc_b100_37_project_list_skips_a_trailing_dot_on_every_platform`
+- **Numeric pass threshold:** `fw-v1.` and `fw-v2 ` (both holding `project.json` and a data file) beside `P` → the project list is `[P]` (1 row) on Windows (folders made through `\\?\`) and on the Linux CI (plain names) (2 platform arms).
+- **Negative control:** executed P12a-4: the `os.name == "nt"` gate is present in `list_projects` → the Linux arm lists 3 projects → RED on the Linux CI.
+- **Boundary catalog:** ☒ invalid ☒ boundary — a trailing dot; a trailing space.
+
+### LLR-172.4f — The Workarea Files list holds only loadable files (C7)
+- **Traceability:** HLR-172b · trace: `refresh_files`; the loadable-suffix predicate shared with `_load_dialog_rows` (Inc 9b, LLR-173.4b) (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95
+- **Statement (EARS unwanted):** If a file in the work-area temp folder does not have a loadable suffix, then the system shall leave it out of the Workarea Files list.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-37 — `pytest tests/test_b100_recents.py -k tc_b100_37_files_list_shows_loadable_suffixes_only`
+- **Numeric pass threshold:** temp holds `a.s19`, `b.hex`, `c.mac`, `d.a2l`, `d.a2l.json` and `e.txt` → 4 rows (`a.s19`, `b.hex`, `c.mac`, `d.a2l`), 0 rows for `d.a2l.json` or `e.txt` (1 list equality); an AST check → 1 loadable-suffix predicate, read by `refresh_files` and by the Load dialog's files section (1 assertion).
+- **Negative control:** code read on `8947666`: `refresh_files` paints every regular file the lister returns (C7) → 6 rows → RED.
+- **Boundary catalog:** ☒ invalid — a sidecar dump; an unrelated suffix; an upper-case suffix `F.S19` (listed).
+
 ### LLR-172.5 — A typed project folder path loads the project (L-2)
 - **Traceability:** HLR-172a · trace: `_load_path_from_user_input`, `_route_load_project`, `_handle_load_project`, `_project_folder_refusal` (`app.py`); `resolve_input_path` (`workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83, LED-2026-10-26-batch-100.84
@@ -2440,6 +2524,36 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 - **Negative control:** code read on `4fef292` (`_load_path_from_user_input`): a folder gives `Unsupported file type: ` (an empty suffix), neither token → RED; a mutation sending a relative folder to the project route → `.s19tool/workarea/ab` loads `ab` and the `alias` arm loads `ab` through the junction → RED; a mutation testing `os.path.isabs` (true for `\x` on Python 3.12, E3 S9-6) → the root-relative arm routes as a project → RED.
 - **Boundary catalog:** ☒ invalid — a relative folder; a relative junction; a root-relative folder.
 
+### LLR-172.5i — A typed path the operating system refuses is refused (CR9-8)
+- **Traceability:** HLR-172a · trace: `_typed_load_route`, `_load_path_from_user_input`; `_load_dialog_verdict` (Inc 9b) (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95
+- **Statement (EARS unwanted):** If the text typed into Load holds a character that the operating system's path calls refuse, such as NUL, or names a path whose existence check the operating system refuses, then the system shall load nothing and paint the `not found` and `check the path` tokens.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-38 — `pytest tests/test_b100_recents.py -k tc_b100_38_nul_in_typed_path_is_refused`
+- **Numeric pass threshold:** a typed text whose `Path.exists` is monkeypatched to raise `PermissionError` (EACCES) and one to raise `OSError(ENAMETOOLONG)`, each through the status-line route and through the Load dialog's `#load_reason` (4 arms) → 0 exceptions, 0 loads, the token pair painted (4 of 4). Regression arms, GREEN on the post-9b base: the relative and absolute NUL texts (4 arms) → the same token pair, 0 exceptions.
+- **Negative control:** on base `_typed_load_route` catches only `ValueError` / `RuntimeError` around its one `resolve_input_path` call, so the monkeypatched `PermissionError` leaves `_typed_load_route` and stops the app → RED. The `_typed_load_route` catch is widened to `(OSError, ValueError, RuntimeError)` (S12a-01).
+- **Boundary catalog:** ☒ invalid ☒ error — a NUL in a relative and in an absolute text; EACCES and ENAMETOOLONG.
+
+### LLR-172.5j — A name is matched to the project list in one place (CR9-7, match)
+- **Traceability:** HLR-172a · trace: `_listed_project_name` (NEW); `_handle_load_project`, `_typed_load_route` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.96
+- **Statement (EARS ubiquitous):** The system shall decide whether a name matches a listed project in one function.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-38 — `pytest tests/test_b100_recents.py -k tc_b100_38_one_project_match` (AST), plus every TC-B100-38 arm kept green
+- **Numeric pass threshold:** an AST check → exactly 1 function compares a name against the `list_projects()` result (1 assertion); that function returns the exact listed name first, then the first case-insensitive (`normcase`) match — `["Proj", "proj"]` → `proj` → `proj`, `Proj` → `Proj`, `PROJ` → `Proj` on Windows (SE5-12a-3); the TC-B100-38 and TC-B100-40 arms → 0 failures.
+- **Negative control:** executed P12a-4: 2 functions hold the match (`_handle_load_project`, `_typed_load_route`) → RED; a mutation returning only the first `normcase` match → `proj` loads `Proj` when both are listed → RED (SE5-12a-3).
+- **Boundary catalog:** none — the census has no input classes.
+
+### LLR-172.5k — The shared project refusals are worded from one table (CR9-7, wording)
+- **Traceability:** HLR-172a · trace: `_TYPED_REFUSAL_TOKENS` (Inc 9b), `_load_path_from_user_input`, `_handle_load_project`, `_typed_load_route` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.96
+- **Statement (EARS ubiquitous):** The system shall word the `could not be read` and `not a project` project refusals of the status line and of the Load dialog from one table.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-38 (AST), plus TC-B100-63 kept green
+- **Numeric pass threshold:** an AST check → the two token pairs are defined once, and every painted Load refusal sentence reads one of the two pairs (0 string literals of either reason outside the table, docstrings excluded); no exact site count is asserted, because the count breaks on every future site (A12a-01) (2 assertions).
+- **Negative control:** executed P12a-4 (raw count, docstrings included): `could not be read` 8 occurrences and `not a project` 6 in `app.py`; E2 derives the painting sites (CR9-7: 3 copies) → RED.
+- **Boundary catalog:** none.
+
 ### LLR-172.6 — Workarea Files rows paint names literally (C8)
 - **Traceability:** HLR-172b · trace: `refresh_files` (`app.py`); `painted_names` (`project_gather_service.py:965`); `safe_text` (`utils.py:44`)
 - **Ledger:** LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
@@ -2459,6 +2573,26 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 - **Numeric pass threshold:** picking the `[bold]x.s19` row, the U+009B row, the U+202E row and the 130-character row (its label clipped) → `current_file.path.name` equals each on-disk name (4 of 4); the row's data is the on-disk name, never the painted label (`painted_names`, LLR-172.6).
 - **Negative control:** a mutation storing the painted text as the row's name → the U+009B pick loads nothing → RED. Declared: on `4fef292` the row holds `item.name`, so the mutation is the only RED.
 - **Boundary catalog:** ☒ invalid — a markup-shaped name; a control character.
+
+### LLR-172.6b — A Workarea Files pick that is no longer a regular file loads nothing (SEC9-2)
+- **Traceability:** HLR-172b · trace: `_load_workarea_file` (Inc 9b G1), `_load_from_item` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.96
+- **Statement (EARS unwanted):** If the picked work-area entry is not a regular file when it is picked, a link or another reparse point included, then the system shall load nothing and paint the `not a regular file` and `pick another file` tokens.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-39 — `pytest tests/test_b100_recents.py -k tc_b100_39_pick_rechecks_the_entry`
+- **Numeric pass threshold:** list `fw.s19`, then replace it before the pick with (a) a folder `fw.s19`, (b) a junction `fw.s19`, (c) a file symbolic link to a file outside the work area (3 arms; arm (c) needs the symbolic-link privilege and is reported not run, never passed, where the platform cannot make it) → 0 parses (spy on the parse), the token pair painted, the session digest unchanged; through the Workarea Files list and through the Load dialog's `workarea` choice (2 routes; 6 arms in all).
+- **Negative control:** code read on `8947666` (SEC9-2): `_load_from_item` tests `candidate.exists()`, which follows a link, then parses it → arm (c) loads the outside file → RED. E2 executes arms (a) and (b) on the baseline.
+- **Boundary catalog:** ☒ invalid ☒ error — a folder; a junction; a file link.
+
+### LLR-172.6c — A Workarea Files pick larger than the copy cap loads nothing (SEC9-2)
+- **Traceability:** HLR-172b · trace: `_load_workarea_file` (Inc 9b G1); `DEFAULT_COPY_SIZE_CAP_BYTES` (`workspace.py`, read only) (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.96
+- **Statement (EARS unwanted):** If the picked work-area file is larger than the work-area copy size cap when it is picked, then the system shall load nothing and paint the `too large to open` token with the file name and the `load a smaller file` token.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-39 — `pytest tests/test_b100_recents.py -k tc_b100_39_pick_over_cap_is_refused`
+- **Numeric pass threshold:** the cap read at call time, patched to 1 024 bytes → a 1 025-byte `big.s19` → 0 parses, the tokens painted; a 1 024-byte `edge.s19` → loaded (2 arms).
+- **Negative control:** code read on `8947666`: `_load_from_item` has no size check → the 1 025-byte arm parses → RED.
+- **Boundary catalog:** ☒ boundary — cap and cap + 1 bytes.
 
 ### LLR-173.1 — The dialog closes with one `LoadChoice`
 - **Traceability:** HLR-173 · trace: `LoadChoice` (NEW, B100-I8), the Load dialog class (NEW, `screens.py`)
@@ -2682,6 +2816,21 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 - **Numeric pass threshold:** a click and `enter` on `#load_cancel` → 2 dismisses with `None`, the session digest unchanged (2 of 2).
 - **Negative control:** a mutation that maps `#load_cancel` to the load action → the empty-Load tokens and 0 dismisses → RED.
 - **Boundary catalog:** ☒ boundary — click and key activation.
+
+### LLR-173.2m — The key bar and the palette name the two actions "Load" and "Projects"
+- **Traceability:** HLR-173 · trace: `BINDINGS`, `_build_palette_entries` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95
+- **Statement (EARS ubiquitous):** The system shall label the load-file action "Load" and the load-project action "Projects" in the key bar and in the command palette.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41_labels`; `pytest tests/test_b97_key_bar.py`; `pytest tests/test_tui_snapshot.py -m snapshot`
+- **Numeric pass threshold:** 6 assertions, the key-bar re-pins and the 29 snapshot rebaselines (29 of 29; 35 cells):
+  - The footer at 118 columns holds `^l Load` and 0 occurrences of `Load file` (2 assertions).
+  - The palette holds the entries "Load" and "Projects" and 0 entries "Load file" or "Load project" (4 assertions).
+  - `tests/test_b97_key_bar.py` `GLOBAL_TEXTS` re-pinned to `^l Load`; the 80×24 row-1 set `GLOBAL_TEXTS_80` re-measured with the shorter label (the drop of `q Quit` and `^p palette` was caused by the longer labels; the measured set is recorded in the packet).
+  - The 29 snapshot files rebaselined in the CI-matching environment and named one by one in the packet (29 of 29; 35 cells: 29 `Load file`, 6 `Load project`).
+- **Negative control:** code read on `8947666`: `Binding("ctrl+l", "load_file", "Load file", priority=True)` (`app.py:2122`), `Binding("l", "load_file", "Load file", …)` (`:2127`), `Binding("p", "load_project", "Load project", …)` (`:2135`) → RED.
+- **Boundary catalog:** ☒ boundary — the key bar at 80, 99 and 118 columns.
+- **Note (informative):** the Workspace button `Load project (p)` (`#ws_load_project_button`, `app.py:2892`) is not part of VS-PA-4 and keeps its text (ruling Q6). The help overlay lists binding descriptions, so it shows "Load" and "Projects" too.
 
 ### LLR-173.3 — Project rows are painted literally (C8)
 - **Traceability:** HLR-173 · trace: the dialog rows builder (NEW, `app.py`); `painted_names` (`project_gather_service.py`); `safe_text` (`utils.py`)
@@ -3064,12 +3213,12 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-173.7 — Painted text carries no internal decision id
 - **Traceability:** HLR-173
-- **Ledger:** LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.86, LED-2026-10-26-batch-100.89, LED-2026-10-26-batch-100.92
+- **Ledger:** LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.86, LED-2026-10-26-batch-100.89, LED-2026-10-26-batch-100.92, LED-2026-10-26-batch-100.95
 - **Statement (EARS ubiquitous):** No string painted by a surface this batch adds or changes — the Load dialog, the load question, the Save dialog, the busy indicator, the Load-result panel and the refusal tokens — shall carry an internal decision id (`D<n>`, `O-<n>`, `VS-…`, `LLR-…`, `HLR-…`).
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-66 — `pytest tests/test_b100_load_dialog.py -k tc_b100_66` (renders each surface at 118×54 and greps its painted text)
 - **Numeric pass threshold:** Written at Inc 9b: the Load dialog in 6 scenarios (each section highlighted, the empty Load, a refused path, a store problem), the Load-result panel and the refusal-token constants → 0 matches of `\bD\d+\b`, `\bO-\d+`, `VS-`, `LLR-`, `HLR-`.
-  - Extended at Inc 10 (the load question in 3 scenes — 1 item, 3 items, a project target — and the quit-parameter arm of LLR-174.2a), Inc 11 (the Save dialog in 6 scenarios — fresh, open project, merge, save as, a refusal, an empty Save → 0 decision ids) and Inc 12a (the busy indicator).
+  - Extended at Inc 10 (the load question in 3 scenes — 1 item, 3 items, a project target — and the quit-parameter arm of LLR-174.2a), Inc 11 (the Save dialog in 6 scenarios — fresh, open project, merge, save as, a refusal, an empty Save → 0 decision ids) and Inc 12a (the progress lines of the 7 long actions — labels and step names — and the two new token pairs).
 - **Negative control:** the prototypes paint "Browse is gone (D7)" and "D10: click loads OFF" (UX-18 captures; `pa_C` via `_pa_common._paint_d10`) → a surface copied from them → RED; the prototypes' decision-id strings (UX-18) copied into the question → RED.
 - **Boundary catalog:** none — the scan has no input classes; its set is every painted string of the surfaces written so far.
 
@@ -3924,25 +4073,269 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 - **Negative control:** mutation: the dialog side keeps its own copy of the rules without case-folding → `Reports` paints no pair in the dialog while the direct call refuses → RED.
 - **Boundary catalog:** ☒ invalid — every refusal arm.
 
-### LLR-176.1 — The busy seam owns `#status_text` and moves the bar within steps
-- **Traceability:** HLR-176
-- **Ledger:** LED-2026-10-26-batch-100.11, LED-2026-10-26-batch-100.19, LED-2026-10-26-batch-100.35, LED-2026-10-26-batch-100.39
-- **Statement:** `begin_busy(key, label, steps)`, `step_busy(key, text, done=None, total=None)` and `end_busy(key, outcome, final_lines)` (NEW, `app.py`) shall widen `set_progress` (`app.py:13615`). `begin_busy` takes ownership of `#status_text` (no other writer, `set_file_status` included, paints it until `end_busy`) and shows `#progress_bar` from 0; `step_busy` paints the step and sets the bar from `done/total` when the step reports bytes (copy, read, and the A2L parse through LLR-176.4's callback) and from the step index otherwise; one `set_interval` timer on the main thread drives the spinner and elapsed time; worker calls go through `call_from_thread`. `end_busy` runs on every exit, an exception included, paints in order the outcome, then the project and file line, then the file state, and clears the bar; when idle the bar is empty and keeps its row, so the log lines never move.
+### LLR-176.1 — The begin paints the first progress line
+- **Traceability:** HLR-176 · trace: `begin_busy` (NEW), `_busy_line` (NEW, guess) (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.11, LED-2026-10-26-batch-100.19, LED-2026-10-26-batch-100.35, LED-2026-10-26-batch-100.39, LED-2026-10-26-batch-100.95
+- **Statement (EARS event):** When a long action begins, the system shall paint in `#status_text` the progress line with the first glyph, the action's label, `step 1/<m>` with the first step's name, and `00:00`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-50 — `pytest tests/test_b100_busy.py -k tc_b100_50`
-- **Numeric pass threshold:** begin → 1 indicator in `#status_text`, the bar at 0 and shown; a byte-reporting step of 1 MiB in 4 chunks → the bar increases 4 times within the step; a `set_file_status` call during the action → 0 changes to `#status_text`; end → the 3 final lines in order, the bar cleared; a raising action → 0 indicators left, the bar cleared; idle → the bar's row height equal to its busy height and `#log_line_1` at the same `y` (1 assertion).
-- **Negative control:** a mutation dropping `end_busy` on the exception path → 1 indicator left → RED; a mutation setting the bar from the step index only → the within-step arm RED.
-- **Boundary catalog:** ☒ boundary ☒ error — an action shorter than a tick; an exception; an indivisible step.
+- **Numeric pass threshold:** a begin with label `Loading x.s19` and steps `Copy into the work area`, `Parse`, `Install` → `#status_text` equals `⠋ Loading x.s19  ·  step 1/3 Copy into the work area  ·  00:00` (1 equality), read in the same frame as the begin.
+- **Negative control:** executed P12a-2: no progress line is ever painted at `8947666` → RED.
+- **Boundary catalog:** ☒ boundary — 1 step (`step 1/1`); a label of 200 characters (clipped by the `#status_text` ellipsis, never wrapped).
 
-### LLR-176.2 — Every progress caller maps to one action (C-31)
-- **Traceability:** HLR-176
-- **Ledger:** LED-2026-10-26-batch-100.11, LED-2026-10-26-batch-100.19
-- **Statement:** A table of actions (NEW, keyed, in `app.py`) shall list, for each action, its begin site, its step sites and its end sites on success, failure and exception; every `set_progress` site at `1d677ba` (P-29: 24 calls in 12 functions) shall map to exactly one action's begin, step or end.
+### LLR-176.1a — The begin shows the bar from 0
+- **Traceability:** HLR-176 · trace: `begin_busy`, `set_progress` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95
+- **Statement (EARS event):** When a long action begins, the system shall set `#progress_bar` to 0 of 100.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-50
+- **Numeric pass threshold:** the bar at 40 before a begin (set by a prior call) → 0 of 100 after it (1 equality).
+- **Negative control:** a mutation that leaves the bar untouched at begin → 40 → RED. Declared: at `8947666` the file load begins with `set_progress(10, …)`, so the base starts at 10, not 0 (P12a-1) → RED.
+- **Boundary catalog:** none — the begin has no input classes.
+
+### LLR-176.1b — A step without an amount sets the bar from its index
+- **Traceability:** HLR-176b · trace: `step_busy` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95
+- **Statement (EARS event):** When a running action reaches step `n` of `m` without reporting an amount, the system shall paint `step n/m` with that step's name and set the bar to `floor(100 × (n − 1) / m)`.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-50
+- **Numeric pass threshold:** 4 steps reached in order → `step 1/4` … `step 4/4` painted and the bar at 0, 25, 50, 75 (4 of 4).
+- **Negative control:** a mutation that paints the step but leaves the bar → 0, 0, 0, 0 → RED.
+- **Boundary catalog:** ☒ boundary — `m = 1`; the last step (`n = m`).
+
+### LLR-176.1c — A step with an amount moves the bar within the step
+- **Traceability:** HLR-176b · trace: `step_busy` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95
+- **Statement (EARS event):** When a running action's step `n` of `m` reports `done` of `total`, the system shall set the bar to `floor(100 × (n − 1 + done / total) / m)`.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-50
+- **Numeric pass threshold:** step 2 of 2 reporting 1, 2, 3, 4 MiB of 4 MiB → 62, 75, 87, 100 (4 of 4, strictly rising).
+- **Negative control:** a mutation that ignores `done` / `total` → 50, 50, 50, 50 → RED.
+- **Boundary catalog:** ☒ boundary — `done = 0`; `done = total`.
+
+### LLR-176.1d — Out-of-range step data is clamped
+- **Traceability:** HLR-176b · trace: `step_busy` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95
+- **Statement (EARS unwanted):** If a running action reports a step outside `1 … m`, a `total` of 0 or less, or a `done` outside `0 … total`, then the system shall clamp the step to `1 … m` and the fraction to `0 … 1` without raising.
 - **Validation:** `test (unit)`
-- **Executed verification:** TC-B100-51 — `pytest tests/test_b100_busy.py -k tc_b100_51` (an AST derivation over `app.py`)
-- **Numeric pass threshold:** the derivation maps 24 of 24 sites (≥ 24, derived) to exactly one action's begin, step or end (≥ 4 steps: `app.py:4951`, `:6210`, `:8769`, `:8841`); each action → ≥ 1 begin and an end on its success, failure and exception exits.
-- **Negative control:** a mutation removing one action's failure-path end → the census names that action → RED.
-- **Boundary catalog:** none — the census has no input classes; its set is derived from the code.
+- **Executed verification:** TC-B100-50
+- **Numeric pass threshold:** step 0, step `m + 1`, `total = 0`, `total = −1`, `done = −5`, `done = total + 1` (6 arms) → 0 exceptions, the painted step within `1 … m`, the bar within 0 … 100 and never below the previous value of the same step (6 of 6).
+- **Negative control:** a mutation dividing by `total` without the clamp → `ZeroDivisionError` on the `total = 0` arm → RED.
+- **Boundary catalog:** ☒ invalid ☒ boundary — the 6 arms.
+
+### LLR-176.1e — One timer advances the line while an action runs
+- **Traceability:** HLR-176a · trace: `begin_busy`, `_busy_tick` (NEW) (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.96
+- **Statement (EARS state):** While at least one long action runs, the system shall keep exactly one 0.1-second interval timer that advances the glyph by one frame and repaints the elapsed time.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-50
+- **Numeric pass threshold:** a synthetic worker action of 1.2 s → at least 5 distinct glyphs and the elapsed text `00:00` then `00:01` (2 assertions); 2 overlapping actions → 1 active timer (the app's timer count rises by 1, not 2).
+- **Negative control:** executed P12a-2: `set_interval(` occurs 0 times → RED. A mutation that starts one timer per begin → 2 timers in the overlap arm → RED.
+- **Boundary catalog:** ☒ boundary — an action that ends before the first tick (0 ticks, the line painted once and cleared).
+
+### LLR-176.1f — The timer stops when no action runs
+- **Traceability:** HLR-176a · trace: `end_busy` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.96
+- **Statement (EARS event):** When the last running long action ends, the system shall stop the progress timer.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-50
+- **Numeric pass threshold:** after the last end → 0 progress timers active, and 0.5 s later `#status_text` unchanged (2 assertions).
+- **Negative control:** a mutation that never stops the timer → the glyph-free final text is overwritten by a progress line on the next tick → RED.
+- **Boundary catalog:** ☒ boundary — the end inside the first tick.
+
+### LLR-176.1g — Elapsed time is minutes and seconds since the begin
+- **Traceability:** HLR-176, HLR-176a · trace: `_busy_line` (guess) (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95
+- **Statement (EARS ubiquitous):** The system shall paint the elapsed time of a progress line as `mm:ss` counted from that action's begin, with the minutes not capped at 59.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-50
+- **Numeric pass threshold:** a clock injected at 0, 59.9, 60, 3 599 and 4 503 s → `00:00`, `00:59`, `01:00`, `59:59`, `75:03` (5 of 5).
+- **Negative control:** a mutation using `%M:%S` of a time value → `75:03` becomes `15:03` → RED.
+- **Boundary catalog:** ☒ boundary — 59 / 60 s; over 60 minutes.
+
+### LLR-176.1h — The file state waits while an action runs
+- **Traceability:** HLR-176d · trace: `set_file_status` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95
+- **Statement (EARS state):** While a long action runs, the system shall store a file state written for `#status_text` as the one stored file-state line instead of painting it.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-50
+- **Numeric pass threshold:** 2 file-state writes during an action → 0 changes to `#status_text` before the end, and the second write kept as the stored file state (2 assertions).
+- **Negative control:** executed P12a-2: the file state is painted while the load runs (bar at 50) → RED.
+- **Boundary catalog:** ☒ boundary — a file-state write while no action runs (painted at once, as today).
+
+### LLR-176.1i — The end writes the outcome to the status log
+- **Traceability:** HLR-176c · trace: `end_busy`, `set_status` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95
+- **Statement (EARS event):** When a long action ends with a non-empty outcome, the system shall append that outcome as one status-log line.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-50
+- **Numeric pass threshold:** an end with outcome `Loaded x.s19` → the log's last line is `Loaded x.s19` and the line count rose by 1; an end with an empty outcome → the count unchanged (2 arms).
+- **Negative control:** a mutation that drops the outcome → the count unchanged in the first arm → RED.
+- **Boundary catalog:** ☒ empty — an empty outcome.
+
+### LLR-176.1j — The last end paints the stored file state
+- **Traceability:** HLR-176c, HLR-176d · trace: `end_busy`, `set_file_status` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95
+- **Statement (EARS event):** When the last running long action ends, the system shall set `#status_text` to the one stored file-state line (the last text a file-state write stored, `Ready.` until the first write).
+- **Rationale (informative):** A12a-06: one stored `file_state` replaces the three hand-back slots `restore` / `pending` / `final_line`.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-50; TC-B100-56 (Inc 12a extension, the project load's file state)
+- **Numeric pass threshold:** two file-state writes during a run → `#status_text` = the last one after the end (1 equality); no write during a run → `#status_text` = the prior stored value (`Ready.` from a fresh app) (1 equality). Result 2 of 2.
+- **Negative control:** a mutation that paints a `final_line` argument over `file_state` → the project-load arm of TC-B100-56 loses the project and file line → RED.
+- **Boundary catalog:** ☒ boundary — a run with and without a file-state write.
+
+### LLR-176.1k — The last end clears the bar
+- **Traceability:** HLR-176c · trace: `end_busy`, `set_progress` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.96
+- **Statement (EARS event):** When the last running long action ends, the system shall clear the progress bar.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-50; re-pinned `tests/test_report_progress.py::test_report_generation_drives_progress_bar_then_clears_it`
+- **Numeric pass threshold:** an action whose last step reported 100 → after the end, progress 0 of total 100 (1 equality); the rendered bar row equals the start-up idle render (1 string comparison).
+- **Negative control:** executed P12a-2: after a load the bar is at 100 → RED.
+- **Boundary catalog:** ☒ boundary — an end after a failure (bar never past 0).
+
+### LLR-176.1l — An exception still ends the indicator
+- **Traceability:** HLR-176c · trace: the 7 actions' bodies (try / finally), `end_busy` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95
+- **Statement (EARS unwanted):** If a long action raises before its end, then the system shall end that action's progress with a failure outcome before the exception leaves the action.
+- **Rationale (informative):** at 12a the app's survival of a raising worker is not claimed; LLR-177.2 (Inc 12b) keeps the app running (ruling Q8).
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-50
+- **Numeric pass threshold:** a forced raise inside each of the 7 actions (7 arms) → an end recorded by a spy before the exception is observed, its outcome non-empty, 0 progress timers after it (7 of 7).
+- **Negative control:** a mutation dropping the end on the exception path of the file load → 0 ends recorded → RED.
+- **Boundary catalog:** ☒ error — one forced raise per action.
+
+### LLR-176.1m — A step or an end from an unknown or replaced run leaves the indicator unchanged
+- **Traceability:** HLR-176c · trace: `step_busy`, `end_busy` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95
+- **Statement (EARS unwanted):** If a step or an end names a key that is not running, or comes from a run that a later begin of the same key replaced, then the system shall leave the progress line, the bar and the timer unchanged, while an end with a non-empty outcome still appends that outcome to the status log.
+- **Rationale (informative):** the load, report, diff-report and before/after workers are `exclusive=True` per group, so a second request replaces the first worker while the first thread can still post its end. The log is history, not indicator state (A12a-04).
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-50
+- **Numeric pass threshold:** an end for a key never begun (with a non-empty outcome); a step for it; an end posted by the first of two file-load runs while the second runs (3 arms) → 0 changes to `#status_text`, the bar and the timer count in all three, and the log gains the outcome in the first and third arms (the step arm writes nothing) (3 of 3).
+- **Negative control:** a mutation keyed only by the key name → the third arm clears the second run's indicator → RED.
+- **Boundary catalog:** ☒ invalid ☒ boundary — an unknown key; a replaced run.
+
+### LLR-176.1n — A second action begun while one runs is the one shown
+- **Traceability:** HLR-176 · trace: `begin_busy` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95
+- **Statement (EARS unwanted):** If a long action begins while another long action runs, then the system shall show the newer action's progress line and bar.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-50
+- **Numeric pass threshold:** a report running, then a file load begun → `#status_text` holds the load's progress line and the bar the load's value (2 assertions); the report's later steps change neither (1 assertion).
+- **Negative control:** a mutation keeping the first action shown → the report's line stays → RED.
+- **Boundary catalog:** ☒ boundary — 2 and 3 overlapping actions.
+
+### LLR-176.1o — When a shown action ends, the newest one still running is shown
+- **Traceability:** HLR-176c · trace: `end_busy` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95
+- **Statement (EARS event):** When a running long action ends while another long action still runs, the system shall show the progress line and bar of the most recently begun action still running.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-50
+- **Numeric pass threshold:** report begun, load begun, load ends → the report's progress line and bar shown, the load's outcome in the log, the timer still active (3 assertions); then the report ends → LLR-176.1j applies (1 assertion).
+- **Negative control:** a mutation that runs the last-end hand-back on any end → `#status_text` loses the report's line while it runs → RED.
+- **Boundary catalog:** ☒ boundary — the older action ends first (the newer stays shown).
+
+### LLR-176.1p — A begin under a running key restarts that key's line
+- **Traceability:** HLR-176 · trace: `begin_busy` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95
+- **Statement (EARS unwanted):** If a long action begins under the key of an action that is already running, then the system shall restart that key's progress line at `step 1/<m>` and `00:00`.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-50
+- **Numeric pass threshold:** a file load at `step 2/3`, `00:01`, then a second file load → `step 1/3` and `00:00`, 1 entry for the key (2 assertions).
+- **Negative control:** a mutation that keeps both entries → 2 entries → RED.
+- **Boundary catalog:** ☒ boundary — the replaced run then ends (LLR-176.1m).
+
+### LLR-176.1q — Progress widgets are written only on the main thread
+- **Traceability:** HLR-176a · trace: the seam; the 4 worker bodies (`call_from_thread`) (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95
+- **Statement (EARS ubiquitous):** The system shall write `#status_text` and `#progress_bar` only on the main thread.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-50
+- **Numeric pass threshold:** a thread-id probe on `#status_text` and `#progress_bar` updates during the 4 worker actions → 0 writes off the main thread (4 of 4).
+- **Negative control:** a mutation that calls the step function directly from the load worker → at least 1 off-main write → RED.
+- **Boundary catalog:** none — the probe covers every worker action.
+
+### LLR-176.1r — Names in a progress line are painted literally
+- **Traceability:** HLR-176 · trace: `_busy_begin_action`, `painted_names` (`project_gather_service.py`), `_paint_status_text` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.96
+- **Statement (EARS ubiquitous):** The system shall paint a file or project name inside a progress line, and write the end's outcome line, through the batch's one name scrub and the one `safe_text` choke point, with markup off.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-50
+- **Numeric pass threshold:** driven through `load_from_path` (the real entry): `[b]x.s19`, `fw` + U+202E + `gpj.s19`, a 130-character name, and `a` + ESC + `]0;x` + BEL + `.s19` → 0 markup spans, 0 U+202E characters, the long name clipped to 120 characters ending in `…`, and the painted line and the end's outcome log line hold no `\x1b` / `\x07` (4 of 4). AST: `begin_busy(` is called only inside `_busy_begin_action` (1 call site).
+- **Negative control:** a mutation inserting the raw name → U+202E present → RED; a site that calls `begin_busy` directly with a formatted label → the AST finds 2 → RED.
+- **Boundary catalog:** ☒ invalid — a markup-shaped name; a bidirectional control; a long name; an ESC-bearing name.
+
+### LLR-176.1s — The bar keeps its row when idle
+- **Traceability:** HLR-176c · trace: `compose` (`#progress_bar`), `styles.tcss` `#progress_bar`
+- **Ledger:** LED-2026-10-26-batch-100.95
+- **Statement (EARS ubiquitous):** The system shall keep the progress bar's row height and the status log's vertical position the same whether or not a long action runs.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-50
+- **Numeric pass threshold:** at 118×54 and 80×24, idle and during an action → `#progress_bar` region height equal and `#log_line_1` region `y` equal (2 sizes × 2 assertions).
+- **Negative control:** declared RED only as a mutation: executed P12a-2 shows the base already holds (height 1 / 1, `y` 47 / 47). A mutation hiding the bar when idle → `#log_line_1` moves up 2 rows → RED.
+- **Boundary catalog:** ☒ boundary — 80×24, the smallest supported size.
+
+### LLR-176.1t — Every status-log line goes through the one control-byte choke point (SE5-12a-1)
+- **Traceability:** HLR-176 · trace: `_append_log_line`, `safe_text` (`utils.py`) (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.96
+- **Statement (EARS ubiquitous):** The system shall write every status-log line through `safe_text(...).plain`, so no control code point reaches `log_lines` or the four painted log rows.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-50 — `pytest tests/test_b100_busy.py -k tc_b100_50_control_bytes_never_reach_the_status_log`
+- **Numeric pass threshold:** `_format_coexistence_status` patched to return `Loaded a` + ESC + `]0;x` + BEL + `.s19 (S19 only)`, then a real `load_from_path` → 0 C0/C1 code points in `app.log_lines`, `#log_line_1..4` and `#status_text`, and the scrubbed line `Loaded a]0;x.s19 (S19 only)` arrives; a direct `_append_log_line` of a text holding U+009B and NUL → `direct 2J line` (2 arms).
+- **Negative control:** on base `_append_log_line` does `message.strip()` with no scrub, so a raw append keeps ESC / BEL → RED.
+- **Boundary catalog:** ☒ invalid — a control byte in a file name; a direct append.
+
+### LLR-176.2 — Every progress-bar write maps to one action (C-31)
+- **Traceability:** HLR-176 · trace: the action table `_BUSY_ACTIONS` (NEW, data); the 12 functions of P-29 (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.11, LED-2026-10-26-batch-100.19, LED-2026-10-26-batch-100.95
+- **Statement (EARS ubiquitous):** Every site that set the progress bar at the Inc 12a baseline shall map to exactly one long action's begin, step or end in the action table.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-51 — `pytest tests/test_b100_busy.py -k tc_b100_51` (an AST derivation over the baseline's `app.py`, stored as a fixture list at E2)
+- **Numeric pass threshold:** the derivation maps 24 of 24 sites (P-29, re-derived at the E2 baseline after Inc 9b, 10 and 11; at least 24) to exactly one begin, step or end (24 of 24, 0 sites mapped twice).
+- **Negative control:** executed P12a-1: 24 sites in 12 functions, none mapped (no table exists) → RED. A mutation removing one row → the census names its site → RED.
+- **Boundary catalog:** none — the set is derived from the code.
+
+### LLR-176.2a — Only the seam sets the bar
+- **Traceability:** HLR-176 · trace: `set_progress`, the seam (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95
+- **Statement (EARS ubiquitous):** The system shall set the progress bar only from inside the progress seam.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-51 (AST over `app.py`)
+- **Numeric pass threshold:** calls of `set_progress` outside `begin_busy`, `step_busy` and `end_busy`, direct or through `call_from_thread` → 0; `#progress_bar` query sites outside `set_progress` and `compose` → 0 (2 assertions).
+- **Negative control:** executed P12a-1: 24 calls outside any seam → RED.
+- **Boundary catalog:** none — the census has no input classes.
+
+### LLR-176.2b — The action table names the seven long actions
+- **Traceability:** HLR-176 · trace: `_BUSY_ACTIONS` (NEW) (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.96
+- **Statement (EARS ubiquitous):** The action table shall hold one entry, with an English label and at least one named step, for each of file load, A2L load, project load, Save project, report, diff report and before/after.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-51
+- **Numeric pass threshold:** 7 keys, each with a non-empty label and at least 1 step name (7 of 7); TC-B100-66 finds 0 decision ids in the 7 labels and their step names.
+- **Negative control:** code read on `8947666`: no table → RED.
+- **Boundary catalog:** none.
+
+### LLR-176.2c — Each action ends on every success and failure exit
+- **Traceability:** HLR-176c · trace: the 7 actions' exits; `_handle_load_error`, `report_failed` (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.96
+- **Statement (EARS ubiquitous):** Each long action of the action table shall end its progress on every success exit and every failure exit.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-51
+- **Numeric pass threshold:** per action, 1 success and 1 forced failure (7 × 2 = 14 arms: for example a file that is not found, an A2L of an unsupported type, a project that cannot be read, a placement failure after the save begins, a report write that fails, a diff report on a missing file, a before/after on a missing file; E2 lists the reachable arm per action) → exactly 1 begin and 1 end per arm, 0 indicators left (14 of 14).
+- **Negative control:** a mutation dropping the end in `_handle_load_error` → the failure arm of the file load leaves 1 indicator → RED.
+- **Boundary catalog:** ☒ error — 1 failure per action.
+
+### LLR-176.2d — Save project reports its phases as steps (Inc 11 ruling Q2, the indicator half)
+- **Traceability:** HLR-176c · trace: `_handle_save_dialog`, `_prepare_project_save` (Inc 11) (`app.py`)
+- **Ledger:** LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.96
+- **Statement (EARS event):** When Save project runs, the system shall report each save phase named in the action table as one step of its progress line, in order.
+- **Rationale (informative):** Inc 11 ruling Q2 moved "the save runs on a worker with real progress" to 12a+12b. The indicator half is here: the Save project entry, its step reports and its end. Inc 12b moves the save onto a worker (HLR-177), and only then does the line show between the begin and the end. A refused save is refused in the dialog (Inc 11 ruling Q5), so it never begins.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-51
+- **Numeric pass threshold:** a Save project of the case_01 session → a step spy records the phases of the Save project entry in order, each once (at least 3, for example `Copy the files`, `Write project.json`, `Check the saved files`; E2 names them), then 1 end with the success outcome (1 sequence equality); a name refused in the dialog → 0 begins (1 assertion).
+- **Negative control:** executed P12a-1: no progress call sits in `_handle_save_dialog` at `8947666` → 0 steps → RED.
+- **Boundary catalog:** ☒ boundary ☒ error — a save of a session with no MAC and no A2L (the phases still reported once each); a placement failure after the begin (1 end with the failure outcome).
 
 ### LLR-176.3 — Main-thread steps paint before they work
 - **Traceability:** HLR-176
@@ -3996,7 +4389,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-178.2 — The summary line and the final `#status_text`
 - **Traceability:** HLR-178
-- **Ledger:** LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.16
+- **Ledger:** LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.16, LED-2026-10-26-batch-100.95
 - **Statement:** `_handle_load_project` shall write the announcement's summary line to the status log through `set_status` (opened variant, `k of n`, problem count, then "details: p"), and pass the project and opened-file line to `end_busy` as its final lines, so `#status_text` shows them once the progress line releases it; both render names through `safe_text`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-56 — `pytest tests/test_b100_announce.py -k tc_b100_56`
@@ -4555,7 +4948,7 @@ ATs drive through the ids the verdict fixed (P-30), with the Load dialog's focus
 | AT-B100-14 | US-163 | Inc 9b | — | Load → store → Load dialog; preview marks → install |
 | AT-B100-15 | US-164 | Inc 10 (the three key-reachable routes — Load, the Workarea Files pick, `v` — plus the question, keep, replace, items and after-save halves; the panel's `v` is TC-B100-72's forced-state arm, because by keys the panel opens only on an image just recorded as saved) | — | — |
 | AT-B100-16 | US-165 | Inc 11 (open, folder, clash, escape and empty halves; HLR-175, HLR-175b, HLR-175c, HLR-175d, HLR-175f) | — | — |
-| AT-B100-17 | US-166 | Inc 12a+12b (the bar rises ≥ 2 times during the A2L parse) | — | — |
+| AT-B100-17 | US-166 | Inc 12a (the 12a half: a worker file load of a generated S19 with 8 MiB of data — the line, the advancing elapsed time, the outcome and the cleared bar); Inc 12b (the 12b half: the bar rises at least 2 times during the case_06 A2L parse) | — | — |
 | AT-B100-18 | US-167 | Inc 12a+12b | — | — |
 | AT-B100-19 | US-168 | Inc 6 (panel, reasons) | Inc 7 (problems; the `derived_from` line, default-name arm), Inc 9b | save-back → `project.json` → Load |
 | AT-B100-20 | US-158 | Inc 6 | Inc 7 (`derived_from` carried), Inc 8a (`active_document` carried), Inc 9b | variant append / MAC / A2L sync → `project.json` → fresh Load and Execute scope |
@@ -4602,7 +4995,7 @@ ATs drive through the ids the verdict fixed (P-30), with the Load dialog's focus
 | TC-B100-48 (LLR-175.2, LLR-175.2a) | Inc 11 | — |
 | TC-B100-49 (LLR-175.3, LLR-175.3a, LLR-175.3b, LLR-175.3c, LLR-175.3d, LLR-175.3e, LLR-175.3f, LLR-175.3g, LLR-175.3h, LLR-175.3i, LLR-175.3j) | Inc 11: keys, focus, empty Save, Save during a refusal, the priority keys, the prefill, the labels, nothing loaded | — |
 | TC-B100-65 (LLR-175.4, LLR-175.4a, LLR-175.4b, LLR-175.4c, LLR-175.4d, LLR-175.4e, LLR-175.4f, LLR-175.4g, LLR-175.4h, LLR-175.4i, LLR-175.4j, LLR-175.4k, LLR-175.4l, LLR-175.4m, LLR-175.5, LLR-175.5a, LLR-175.5b) | Inc 11: rows = plan, executed = painted, the out-of-date summary, the image, pending, links and merge rows, literal names, layout, the plan accessor, the direct payload, the once-per-open cost, the 150 ms recompute, the first frame, the rebuilt session | — |
-| TC-B100-66 (LLR-173.7) | Inc 9b: the Load dialog, the Load-result panel and the refusal tokens (LED .86) | Inc 10: the question in 3 scenes and the quit-parameter arm (LED .89); Inc 11: the Save dialog in 6 scenarios (fresh, open project, merge, save as, a refusal, an empty Save) → 0 decision ids; Inc 12a: the busy indicator |
+| TC-B100-66 (LLR-173.7) | Inc 9b: the Load dialog, the Load-result panel and the refusal tokens (LED .86) | Inc 10: the question in 3 scenes and the quit-parameter arm (LED .89); Inc 11: the Save dialog in 6 scenarios (fresh, open project, merge, save as, a refusal, an empty Save) → 0 decision ids; Inc 12a: the progress lines of the 7 long actions (labels and step names) and the two new token pairs (LED .95) |
 | TC-B100-71 (LLR-168.4) | Inc 7 | — |
 | TC-B100-44 (LLR-174.1, LLR-174.1a, LLR-174.1b, LLR-174.1c) | Inc 10: the 24-cell table by kind, the saved / save-back / saved-then-patched boundaries, an attach keeps the patch, the public reader of the Patch Editor flag (LED .89) | — |
 | TC-B100-45 (LLR-174.2, LLR-174.2a, LLR-174.2b, LLR-174.2c, LLR-174.2d, LLR-174.2e, LLR-174.2f, LLR-174.2g, LLR-174.2h, LLR-174.2i, LLR-174.2j, LLR-174.2k, LLR-174.2l, LLR-174.2m, LLR-174.2n, LLR-174.2o, LLR-174.2p, LLR-174.2q, LLR-174.2r, LLR-174.2s, LLR-174.2t) | Inc 10: one modal with two buttons, the parameters (quit arm), the focus, `y`, `n` / `escape`, `enter`, clicks, other keys, the priority keys inert, literal names, the Patch Editor's own guard kept, the title, the three items, the target, the labels, two sentences, the buttons and body on screen, a second answer ignored, the change-file dropdown keeps the guard (LED .89) | Inc 12a+12b: the quit question built through the same modal |
@@ -4610,6 +5003,13 @@ ATs drive through the ids the verdict fixed (P-30), with the Load dialog's focus
 | TC-B100-72 (LLR-174.4, LLR-174.4a, LLR-174.4b, LLR-174.4c) | Inc 10: all four routes (the panel's `v` with a forced state), the seam census, one question per request, the kind of a typed or recent path (from the resolved path, CR10-01), the kind of a work-area file (LED .89) | Inc 12b: the worker refusal in the seam (LLR-177.1) |
 | TC-B100-55 (LLR-178.1) | Inc 6: the reasons and the counts | Inc 7: the "first variant by name" mutation arm and the `derived_from` lines (ARCH-PDR-3) |
 | TC-B100-73 (LLR-176.4) | Inc 12: the parse callback | — |
+| TC-B100-50 (LLR-176.1, LLR-176.1a, LLR-176.1b, LLR-176.1c, LLR-176.1d, LLR-176.1e, LLR-176.1f, LLR-176.1g, LLR-176.1h, LLR-176.1i, LLR-176.1j, LLR-176.1k, LLR-176.1l, LLR-176.1m, LLR-176.1n, LLR-176.1o, LLR-176.1p, LLR-176.1q, LLR-176.1r, LLR-176.1s, LLR-176.1t) | Inc 12a: the begin line and bar, steps by index and by amount, the clamp, one timer and its stop, `mm:ss`, the stored file state, the outcome line, the file-state hand-back, the cleared bar, the exception end, unknown and replaced runs (a replaced run's outcome is still logged), overlapping actions, main-thread writes, scrubbed names (ESC and C0 included), the status-log control-byte choke point (SE5-12a-1), the idle row (LED .95, .96) | Inc 12b: the three moved actions animate between begin and end |
+| TC-B100-51 (LLR-176.2, LLR-176.2a, LLR-176.2b, LLR-176.2c, LLR-176.2d) | Inc 12a: the site census, only the seam sets the bar, the 7-entry table, an end on every success and failure exit, the Save project phases (LED .95, .96) | Inc 12b: the worker exits of the three moved actions |
+| TC-B100-41 (LLR-173.2m) | Inc 12a: the "Load" / "Projects" labels in the key bar and the palette (LED .95) | — |
+| TC-B100-37 (LLR-172.4e, LLR-172.4f) | Inc 12a: the project-list skip on every platform; the Workarea Files list holds loadable suffixes only (LED .95) | — |
+| TC-B100-38 (LLR-172.5i, LLR-172.5j, LLR-172.5k) | Inc 12a: a path the OS refuses (EACCES / ENAMETOOLONG) refused, with the NUL arms as regression arms; one project match; one refusal wording table (LED .95, .96) | — |
+| TC-B100-39 (LLR-172.6b, LLR-172.6c) | Inc 12a: the pick re-checks the entry (folder, junction, link) and the copy cap (LED .95, .96) | — |
+| TC-B100-56 (LLR-178.2) | Inc 6: the summary line and the final `#status_text` | Inc 12a: the project and file line reaches `#status_text` as the project load's file state (LLR-176.1j) (LED .95) |
 
 ### 5.4 Reverse census (QA-15, trigger B1)
 
@@ -4635,8 +5035,11 @@ Executed at `1d677ba` with `grep -rl --include=*.py <symbol> tests` (35 test sou
 | `LoadFileScreen` / `#load_path` / `#load_ok` (Inc 9b) | 13 files / 60 references to `LoadFileScreen` | the ids survive in `pa_C`; class-name references re-pinned to the new dialog class |
 | `LoadProjectScreen` / `#project_list` / `#project_ok` (Inc 9b) | 17 files / 57 references to `LoadProjectScreen`; 17 files / 63 references to `#project_list` or `project_ok` | the dialog retires (VS-PA-3); project picks re-pinned to `#load_list` + `enter` |
 | `_handle_load_dialog(Path)` (Inc 9b) | `test_tui_app.py:1254`, `:1288` | unchanged: the handler keeps accepting a `Path` (LLR-173.1) |
-| `set_progress` / `#progress_bar` (Inc 12a+12b) | 5: `test_before_after_report.py`, `test_report_off_ui_thread.py`, `test_report_progress.py`, `test_tui_directionb.py`, `test_tui_report_attribution.py` | the bar keeps working (P-D A); value assertions re-pinned if the step mapping changes them |
-| snapshot cells (Inc 9b, 11, 12a) | 29 SVG cells carrying the status line or a dialog (QA-15 count) | rebaselined in the increment that changes them, each named in its packet |
+| `set_progress` / `#progress_bar` (Inc 12a; replaces the "Inc 12a+12b" row) | 5: `test_before_after_report.py` (`:228` spy), `test_report_off_ui_thread.py` (`:173`, `:259` spies), `test_report_progress.py` (`:49` AC-2/3 "leave the bar at 100", `:66` AC-4, `:126` direct call), `test_tui_directionb.py` (`:2048`, `:2206` direct call), `test_tui_report_attribution.py` (`:106` replaces `set_progress` with a one-argument lambda) | `set_progress(value, message=None)` keeps its signature and stays the seam's bar writer, so the spies and the lambda still see every value. `test_report_generation_drives_progress_bar_then_clears_it` (renamed from `test_report_generation_drives_progress_bar_to_100`, CR12a-3) is re-pinned: the bar moves while the report runs and is cleared at the end — a report never writes 100 (LLR-176.1k; the old pin encodes the stale-100 defect HLR-176c removes). The direct calls (`test_report_progress.py:126`, `test_tui_directionb.py:2206`) are allowed: LLR-176.2a counts sites in `app.py` only. |
+| `set_file_status` (Inc 12a) | E2 derives it (the `#status_text` consumers in the `busy_status_line` component list 25 test sources) | the stored file state is painted at the end, so a test that reads `#status_text` after an action ends sees the same text; a test that reads it while an action runs is re-pinned |
+| `list_projects` trailing-dot gate (Inc 12a) | E2 derives it | Windows unchanged; a Linux test that lists a dot-ending folder is re-pinned |
+| `refresh_files` rows (Inc 12a, C7) | E2 derives it (tests that count Workarea Files rows with a `.a2l.json` or another non-loadable file) | re-pinned to the loadable rows |
+| snapshot cells (Inc 12a; replaces the "Inc 9b, 11, 12a" row's 12a share) | the 29 pinned SVG files named in the increment packet | rebaselined in the CI-matching environment (`.github/workflows/snapshot-regen.yml`) after the merge, committing only those 29 files; pending until then |
 
 ---
 

@@ -1,0 +1,9 @@
+# green-06-merge-repin: MERGE-12a-1, the Inc 11 arm re-pinned to start the load through the 12a seam (gen); both layouts on the worktree. Re-pin: no RED owed (the pre-re-pin failure is the TypeError in green-03-merged.txt).
+# tree: C:/Users/jjgh8/Github/s19_app-b100-inc12a
+# head: 71376a3
+# date: 2026-11-01T01:32:26-06:00
+s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc12a\s19_app\__init__.py
+# cmd: pytest -p no:cacheprovider -q -rs --tb=short --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12a/bt/g06 tests/test_b100_save_dialog.py::test_tc_b100_65_a_load_landing_under_the_dialog_rebuilds_the_session
+..                                                                       [100%]
+2 passed in 21.24s
+# exit: 0

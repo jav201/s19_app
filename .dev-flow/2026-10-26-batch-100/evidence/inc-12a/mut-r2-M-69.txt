@@ -1,0 +1,20 @@
+mutant: M-69
+what: validation-error abort arm: end_busy -> set_status
+target: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\mutk\s19_app\tui\app.py
+sha256 before: 15ffc7bdbb599615
+old occurrences: 1
+sha256 mutated: 75682337ead94812
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\mutk\s19_app\__init__.py
+command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line --basetemp=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\bt\mk-M-69 tests/test_b100_busy.py::test_tc_b100_51_every_save_abort_return_ends_its_run_first tests/test_b100_busy.py::test_tc_b100_51_save_validation_abort_ends_with_its_own_line
+pytest tail:
+  FF                                                                       [100%]
+  ================================== FAILURES ===================================
+  C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\mutk\tests\test_b100_busy.py:2476: AssertionError: [(11336, False), (11361, True), (11442, True), (11468, True), (11502, True), (11688, True), ...]
+  C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\mutk\tests\test_b100_busy.py:2513: AssertionError: [namespace(key='save_project', gen=1, outcome='Saving project S5 failed', result=True, timers=0, status='Loaded firmware.s19 (S19 only)')]
+  =========================== short test summary info ===========================
+  FAILED tests/test_b100_busy.py::test_tc_b100_51_every_save_abort_return_ends_its_run_first
+  FAILED tests/test_b100_busy.py::test_tc_b100_51_save_validation_abort_ends_with_its_own_line
+  2 failed in 3.54s
+exit: 1
+verdict: KILLED
+restored: True

@@ -760,6 +760,12 @@ def test_tc081_4_no_binding_diff() -> None:
         # bindings already carry; key and action unchanged.
         '"ctrl+l", "load_file"',
         '"ctrl+s", "save_project"',
+        # batch-100 Inc 12a (LLR-173.2m, census B3, B12-05): the `l` and `p`
+        # descriptions become `Load` / `Projects`; key, action and
+        # `show=False` unchanged. The `l` marker does not match the `ctrl+l`
+        # line (`+l"` there, `"l"` here).
+        '"l", "load_file"',
+        '"p", "load_project"',
     )
     changed = [
         line

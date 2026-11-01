@@ -105,9 +105,15 @@ async def _drive_worker(
         app.set_status = lambda message: statuses.append(str(message))  # type: ignore[assignment]
         app.set_progress = lambda value: progress.append(int(value))  # type: ignore[assignment]
 
+        # Inc 12a re-pin (census A6 / A7; A12-76, interfaces S-m / Q-1): the
+        # worker reports through the progress seam, so a report run is begun
+        # first (as ``_trigger_generate_report`` does) and its generation is
+        # passed; the worker's result line reaches ``statuses`` through the
+        # run's end.
+        gen = app.begin_busy("report", "x", ("a", "b"))
         last = (project_dir, "active", REPORT_SOURCE_DEFAULT, [_result()])
         app._start_generate_report_worker(
-            project_dir, _variant_set(), context_bytes, last, [], (), None
+            project_dir, _variant_set(), context_bytes, last, [], (), None, gen=gen
         )
         await app.workers.wait_for_complete()
         await pilot.pause()

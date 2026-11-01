@@ -1,0 +1,12 @@
+mutant: M-105
+target: s19_app/tui/app.py
+old -> new:
+  old: if (st is None or not stat.S_ISREG(st.st_mode) or _is_reparse_point(candidate)):
+  new: if (st is None or not stat.S_ISREG(st.st_mode)):
+sha256 before: 2d1908b14236004f96b81886da635b979fa7767d4ccb0f28a32dfed44a535df1
+command: timeout 900 env -u NO_COLOR LOCALAPPDATA='C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut12a-lad' PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line "tests/test_b100_recents.py::test_tc_b100_39_pick_rechecks_the_entry" -k junction
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut12a
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut12a\s19_app\__init__.py
+pytest summary: 2 passed, 4 deselected in 6.73s
+verdict: SURVIVED
+restored = True

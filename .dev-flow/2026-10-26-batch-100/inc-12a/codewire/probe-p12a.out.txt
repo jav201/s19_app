@@ -1,0 +1,60 @@
+import C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc-12a-design\work\tree\s19_app\__init__.py
+== U1.1 file_load success progress=[10, 50, 100] end_bar=100 status_text='Loaded firmware.s19 (S19 only)' exc=None
+   log+ ['Copying into workarea temp...', 'Parsing firmware.s19...', 'Loaded firmware.s19 (S19 only)', 'Loaded firmware.s19']
+== U1.2 file_load failure (parse raises -> _handle_load_error) progress=[10, 50, 100] end_bar=100 status_text='Loaded firmware.s19 (S19 only)' exc=None
+   log+ ['Copying into workarea temp...', 'Parsing firmware.s19...', 'Load failed: synthetic parse failure', 'Load failed']
+== U1.3 file_load failure (copy refused) progress=[10, 0] end_bar=0 status_text='Loaded firmware.s19 (S19 only)' exc=None
+   log+ ['Copying into workarea temp...', 'Cannot load file: synthetic containment refusal']
+== U1.4 a2l_load success progress=[10, 50, 100] end_bar=100 status_text='Ready.' exc=None
+   log+ ['Copying A2L into workarea temp...', 'Parsing firmware.a2l...', 'Loaded firmware.a2l', 'A2L loaded: firmware.a2l']
+== U1.5 a2l_load failure (parse raises) progress=[10, 50] end_bar=50 status_text='Ready.' exc=RuntimeError
+   log+ ['Copying A2L into workarea temp...', 'Parsing firmware.a2l...']
+== U1.6 project_load success progress=[] end_bar=0.0 status_text="Loaded project 'P' -> firmware.s19" exc=None
+   log+ ['Loaded firmware.s19 (S19 only)', "Loaded project 'P' -> firmware.s19 - variant 1 of 1, 1 problem - details: p"]
+== U1.7 project_load failure (manifest only: no data or A2L) progress=[] end_bar=0.0 status_text="Loaded project 'P' -> firmware.s19" exc=None
+   log+ ["Project NOT loaded: 'Q' has no data or A2L file — load a file and Save project."]
+== U1.8 B9 wa-files seed problems [('no digests saved', 'project.json', None)]
+== U1.9 save_project success progress=[] end_bar=100 status_text='Loaded firmware.s19 (S19 only)' exc=None
+   log+ ['Project saved + manifest verified', 'Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c24']
+== U1.10 save_project failure (placement OSError after mkdir) progress=[] end_bar=100 status_text='Loaded firmware.s19 (S19 only)' exc=None
+   log+ ['Project NOT saved: could not save — [Errno 28] synthetic no space. check the folder.']
+   S2 exists after failure: False
+== U1.11 report success progress=[15, 55, 100] end_bar=100 status_text="Loaded project 'proj' -> a.s19" exc=None
+   log+ ['Report: no prior execution - running active scope...', "Executing variant 'a' (1 file(s))...", "Variant 'a': ok - 1 change, 0 check", 'Report: reports/20261031T234309Z-report.md']
+== U1.12 report failure (generator raises) progress=[15, 55, 0] end_bar=0 status_text="Loaded project 'proj' -> a.s19" exc=None
+   log+ ['Report: no prior execution - running active scope...', "Executing variant 'a' (1 file(s))...", "Variant 'a': ok - 1 change, 0 check", 'Report failed: RuntimeError: synthetic report failure']
+== U1.13 diff_report success progress=[15, 55, 100] end_bar=100 status_text='Ready.' exc=None
+   log+ []
+== U1.14 diff_report failure (markdown refused) progress=[15, 0] end_bar=0 status_text='Ready.' exc=None
+   log+ []
+== U1.15 before_after refused (nothing loaded) progress=[15, 0] end_bar=0 status_text='Ready.' exc=None
+   log+ ['Before/after report refused: No applied change summary - apply a change document and save ']
+== U1.16 before_after success (composer stubbed) progress=[15, 100] end_bar=100 status_text='Ready.' exc=None
+   log+ ['Before/after report written: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\']
+== U2.1 refresh_files rows ['a.s19', 'b.hex', 'c.mac', 'd.a2l', 'd.a2l.json', 'e.txt']
+== U2.2 pick folder fw.s19 -> parse calls ['fw.s19'] exc=None log+ ["Load failed: [Errno 13] Permission denied: 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\claude"]
+== U2.3 pick junction fw.s19 -> parse calls ['fw.s19'] exc=None log+ ["Load failed: [Errno 13] Permission denied: 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\claude"]
+== U2.4 pick file symlink fw.s19 -> parse calls ['fw.s19'] current_file=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc-12a-design\work\ptmp3\p12a_v7681mm1\.s19tool\workarea\temp\fw.s19
+== U2.5 cap 1024: picks edge.s19 (1024 B) big.s19 (1025 B) -> parse calls ['edge.s19', 'big.s19']
+== U2.6 _typed_load_route('fw\x00.s19') raises ValueError: stat: embedded null character in path
+== U2.7 _load_path_from_user_input('fw\x00.s19') raises ValueError
+== U2.6 _typed_load_route('C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\inc-12a-design\\work\\ptmp3\\p12a_v7681mm1\\fw\x00.s19') -> ('refuse', 'not found')
+== U2.7 _load_path_from_user_input('C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\inc-12a-design\\work\\ptmp3\\p12a_v7681mm1\\fw\x00.s19') -> returned
+== U2.8 list_projects with 'fw-v1.', 'fw-v2 ', 'P' on nt -> ['P']
+== U3.1 palette load entries [('Load file', 'load_file'), ('Load project', 'load_project')]
+== U3.2 bindings [('ctrl+l', 'load_file', 'Load file'), ('l', 'load_file', 'Load file'), ('p', 'load_project', 'Load project')]
+== U3.3 timers attribute WeakSet count 0
+== U3.4 status_line height 1 progress_bar Region(x=2, y=46, width=46, height=1) log_line_1 y 47
+== U4.1 refusal literal sites (docstrings excluded)
+   _abort_save [(9280, 'could not be ', ' could not be restored; its previous content is kept as ')]
+   _copy_project_subfolders [(12319, 'could not be ', ' could not be copied — check the folder.')]
+   _handle_load_project [(11722, 'could not be read', 'Project load refused (could not be read): %r'), (11722, 'could not be ', 'Project load refused (could not be read): %r'), (11762, 'could not be read', 'could not be read'), (11762, 'could not be ', 'could not be read'), (11694, 'could not be read', "' could not be read — check that the folder can be opened, t"), (11694, 'could not be ', "' could not be read — check that the folder can be opened, t"), (11735, 'not a project', "' is not a project — pick a project in the list."), (11735, 'is not a ', "' is not a project — pick a project in the list."), (11718, 'could not be read', "' could not be read — check that the folder can be opened, t"), (11718, 'could not be ', "' could not be read — check that the folder can be opened, t")]
+   _handle_save_dialog [(9796, 'could not be read', ' could not be read: '), (9796, 'could not be ', ' could not be read: '), (9828, 'could not be read', 'Project NOT saved: could not save — the free space of the wo'), (9828, 'could not be ', 'Project NOT saved: could not save — the free space of the wo'), (9660, 'could not be read', "' could not be read — check that the folder can be opened, t"), (9660, 'could not be ', "' could not be read — check that the folder can be opened, t"), (10265, 'could not be ', ' and its content could not be kept beside it in ')]
+   _load_path_from_user_input [(12948, 'is not a ', "' is not a supported file — check the path."), (12949, 'not a project', 'not a project'), (12950, 'not a project', "' is not a project — pick a project in the list."), (12950, 'is not a ', "' is not a project — pick a project in the list."), (12963, 'could not be read', "' could not be read — check that the folder can be opened, t"), (12963, 'could not be ', "' could not be read — check that the folder can be opened, t")]
+   _plan_project_save [(10819, 'could not be read', 'could not be read'), (10819, 'could not be ', 'could not be read')]
+   _restore_manifest [(9375, 'could not be ', ' could not be restored; its previous content is kept as '), (9381, 'could not be ', ' could not be restored and its previous content could not be')]
+   _typed_load_route [(12903, 'not a project', 'not a project'), (12867, 'not a project', 'not a project'), (12883, 'not a project', 'not a project')]
+   _unrecorded_document_lines [(11033, 'could not be read', 'the file could not be read'), (11033, 'could not be ', 'the file could not be read'), (11035, 'could not be ', "it could not be placed in the project's ")]
+   _write_editor_document [(11122, 'could not be ', ' was not saved into the project — the file could not be writ')]
+   load_a2l_from_path [(13111, 'could not be ', 'current_project set but project directory could not be resol')]
+   on_report_viewer_screen_filter_path_typed [(5395, 'is not a ', 'Filter path is not a file: ')]

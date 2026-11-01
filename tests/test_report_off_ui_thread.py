@@ -230,11 +230,15 @@ def test_ac4_diff_progress_never_sticks_mid_fill(
     already succeeded, so a careless implementation leaves the bar at the 55
     mid-value forever.
     """
+    # Inc 12a re-pin (census A5; LLR-176.1k, A12-58): the success arm still
+    # moves through the Markdown/HTML step (50) and never sticks mid-fill,
+    # but the end now CLEARS the bar to 0 instead of leaving it at 100.
     _ui, ok_progress, _seen = _drive_diff_report(
         tmp_path, monkeypatch, html_written=True
     )
-    assert ok_progress and ok_progress[-1] == 100, (
-        f"a fully written diff report must end at 100; sequence: {ok_progress}"
+    assert ok_progress and 50 in ok_progress and ok_progress[-1] == 0, (
+        f"a fully written diff report must pass its step and end cleared; "
+        f"sequence: {ok_progress}"
     )
 
     _ui2, refused_progress, _seen2 = _drive_diff_report(
