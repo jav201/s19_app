@@ -1,0 +1,15 @@
+mutant id: M-82
+target file: s19_app/tui/app.py
+old text:         if fresh.refused:
+            self._save_painted_preview = fresh
+            return fresh
+new text:         if fresh.refused:
+            self._save_painted_preview = fresh
+            return None
+sha256 before: 7fb2fa5f01e2311c5d39996a78346daabb4fc4afdf59a6070aaa543d5f92cc68
+command: cd C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut11 && timeout 900 env -u NO_COLOR LOCALAPPDATA='C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut11-lad' PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line "tests/test_b100_save_dialog.py::test_tc_b100_47_refusal_painted_in_the_dialog_before_save"
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut11
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut11\s19_app\__init__.py
+pytest summary: 1 failed, 14 passed in 107.63s (0:01:47)
+verdict: KILLED
+restored = True

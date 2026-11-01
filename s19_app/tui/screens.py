@@ -403,9 +403,10 @@ class LoadDialog(ModalScreen[Optional[LoadChoice]]):
             if row[2] is None:
                 lst.disable_option_at_index(i)
         lst.highlighted = self._initial_index()
-        self.query_one(
-            "#load_list" if self._mode == "list" else "#load_path"
-        ).focus()
+        if self._mode == "list":
+            self.query_one("#load_list").focus()
+        else:
+            self.query_one("#load_path").focus()
         self._apply_stack(self.app.size.width)
 
     def _initial_index(self) -> Optional[int]:
