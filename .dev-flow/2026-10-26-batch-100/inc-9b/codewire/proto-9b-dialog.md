@@ -251,7 +251,7 @@ examples: [S8-2] (HLR-173a negative control) a mutant that prefixes `● ` to ev
 examples: [S8-6] (LLR-173.3c, G-A share, probe p9b-ga K8) `show_preview([("[b]v.s19", True), ("[s]f", False), ("[i]m.mac", True), ("[u]c.a2l", True)])` → painted `● [b]v.s19\n[s]f\n● [i]m.mac\n● [u]c.a2l`, 0 spans (target (9b))
 examples: [S8-7] (LLR-173.3c negative control) a mutant using `Static(markup=True).update(body)` with a `str` → `[b]v.s19` painted bold, without the brackets → RED (target (9b))
 examples: [S8-8] (LLR-173.6k, G-A share) `show_preview([("could not be read", False), ("check that the folder can be opened, then load again", False)])` → painted `could not be read\ncheck that the folder can be opened, then load again`, 0 `●` (target (9b))
-examples: [S8-9] (S9b-8) `show_preview([("r"×300, False)])` → the preview line's region height is 1 (nowrap + ellipsis, C4) (target (9b))
+examples: [S8-9] (S9b-8) `show_preview([("r"×300, False)])` → the preview line's region height is 1 (nowrap + ellipsis, `#load_preview Static`, SR-1; corrected at close) (target (9b))
 
 LoadDialog.on_resize
 req: LLR-173.6m
@@ -307,7 +307,8 @@ func: new.
   - `#load_left { width: 1fr; height: 1fr; }`
   - `#load_list { height: 1fr; border: round $rule; background: $bg-base; text-wrap: nowrap; text-overflow: ellipsis; }`
   - `#load_list:focus { border: round $accent-calm; }`
-  - `#load_preview { width: 1fr; height: 1fr; border: round $rule; background: $bg-base; padding: 0 1; text-wrap: nowrap; text-overflow: ellipsis; }` (S9b-8: a preview line never wraps, so a continuation line can never start with `●`)
+  - `#load_preview { width: 1fr; height: 1fr; border: round $rule; background: $bg-base; padding: 0 1; }` (corrected at close, SR-1: the nowrap/ellipsis rule sits on `#load_preview Static`, not on the `VerticalScroll` — Textual 8.2.8 does not inherit the property)
+  - `#load_preview Static { text-wrap: nowrap; text-overflow: ellipsis; }` (S9b-8, SR-1: a preview line never wraps, so a continuation line can never start with `●`)
   - `#load_preview:focus { border: round $accent-calm; }`
   - `#load_reason { height: auto; padding: 0 1; text-style: bold; }`
   - `#load_buttons` carries the class `modal-buttons` and needs no rule of its own (the shared `.modal-buttons` docks at the bottom).
@@ -318,7 +319,7 @@ examples: [C4-1] (LLR-173.6n, probe p9b-ga K9) `ROWS_LONG` at 99, 100 and 118 ×
 examples: [C4-2] (LLR-173.6n negative control, probe p9b-ga K9) a mutant without `text-wrap: nowrap` → at 99×54 the 120-character rows are 2 lines high (heights `{1, 2}`) → RED (target (9b))
 examples: [C4-3] (LLR-173.2c) `#load_list` focused → border colour `$accent-calm`; `#load_preview` focused → `$accent-calm`; neither focused → `$rule` (target (9b))
 examples: [C4-4] (HLR-173d) after [S5-13], `#load_reason` region height 1 at 118×54, and the text `not found — check the path` is fully visible (not clipped) (target (9b))
-examples: [C4-5] (S9b-8) `#load_preview` holds a 300-character line at 45 columns → the line region height is 1 (nowrap + ellipsis, as `#load_list`'s K9 rule) (target (9b))
+examples: [C4-5] (S9b-8) `#load_preview` holds a 300-character line at 45 columns → the line region height is 1 (nowrap + ellipsis, `#load_preview Static`, SR-1; corrected at close) (target (9b))
 
 R1 `LoadFileScreen` (retired)
 req: VS-PA-3, Q9
