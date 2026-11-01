@@ -659,21 +659,28 @@ def test_at042a_read_os_clipboard_caps_huge_single_line_blob() -> None:
     assert result == blob[:CAP]
 
 
+@pytest.mark.parametrize("arm", ["over_field_limit", "fits_field_limit"])
 def test_at042b_ctrl_v_inserts_capped_value_via_real_read(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str
 ) -> None:
-    """AT-042b (B-1 fix, LLR-044.2/.3/.4): Ctrl+V inserts the capped value.
+    """AT-042b (B-1 fix, LLR-044.2/.3/.4), re-pinned to SEC9b-1 ruling B
+    (batch-100 Inc 9b): ``#load_path`` has ``max_length=4096``, and an
+    over-long paste is refused whole, never truncated.
+
+    over_field_limit: the clipboard holds CAP + 5 000 000 characters; the
+    real capped read returns CAP (65 536) characters, more than the field's
+    4096, so Ctrl+V leaves the field ``''``. fits_field_limit: a 4096
+    character blob is inserted whole.
 
     Injection is at ``_STRATEGIES`` (BELOW read_os_clipboard) so the real
     capped ``read_os_clipboard`` runs inside ``action_paste``. A wholesale
     ``read_os_clipboard`` monkeypatch would bypass the cap and let the full
-    blob reach ``splitlines()[0]`` — this test would then falsely red or
-    force a second, spec-forbidden cap in ``action_paste``.
+    blob reach ``splitlines()[0]``.
     """
     from s19_app.tui import os_clipboard_input as os_clip_mod
     from s19_app.tui.os_clipboard_input import _CLIPBOARD_READ_CAP_CHARS as CAP
 
-    blob = "A" * (CAP + 5_000_000)
+    blob = "A" * (CAP + 5_000_000) if arm == "over_field_limit" else "A" * 4096
     monkeypatch.setattr(os_clip_mod, "_STRATEGIES", (("fake", lambda: blob),))
 
     async def _drive() -> str:
@@ -689,8 +696,10 @@ def test_at042b_ctrl_v_inserts_capped_value_via_real_read(
             return input_widget.value
 
     value = asyncio.run(_drive())
-    assert len(value) <= CAP
-    assert value == blob[:CAP]
+    if arm == "over_field_limit":
+        assert value == ""
+    else:
+        assert value == blob
 
 
 def test_at042c_boundary_at_cap_is_unchanged() -> None:
@@ -904,9 +913,13 @@ def test_ac2_paste_reaches_project_name_input(
     The sibling `project_parent_path` input deliberately stays a stock Input
     (security mini-review scope condition), so only `#project_name` is
     asserted here.
+
+    Inc 11 re-pin (census A, S-b): the parent field is gone and the dialog
+    is built through its keyword constructor, fed by the inert fakes of
+    ``tests.support.b100_save_dialog``; the paste oracle is unchanged.
     """
     from s19_app.tui import os_clipboard_input as os_clip_mod
-    from s19_app.tui.screens import SaveProjectScreen
+    from tests.support.b100_save_dialog import bare_save_dialog
 
     pasted = "proyecto-ignis-31"
     monkeypatch.setattr(os_clip_mod, "_STRATEGIES", (("fake", lambda: pasted),))
@@ -915,7 +928,7 @@ def test_ac2_paste_reaches_project_name_input(
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(160, 48)) as pilot:
             await pilot.pause()
-            app.push_screen(SaveProjectScreen(default_parent=tmp_path))
+            app.push_screen(bare_save_dialog(tmp_path))
             for _ in range(6):
                 await pilot.pause()
             widget = app.screen.query_one("#project_name", Input)

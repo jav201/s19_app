@@ -61,6 +61,7 @@ import s19_app.tui.app as app_module
 from s19_app.tui.workspace import WORKAREA_DIRNAME, WORKAREA_SUBDIR, WORKAREA_TEMP
 
 from tests.support import b100_load_dialog as ld
+from tests.support import b100_save_dialog as sd
 from tests.support import b100_projects as projects
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -2960,7 +2961,9 @@ def test_at_b100_15_load_over_unsaved_work_asks_one_question_per_route(tmp_path:
         await pilot.press("ctrl+s")
         await ld.wait_for(pilot, lambda: isinstance(app.screen, SaveProjectScreen), "the Save project dialog")
         assert await pilot.click("#project_name")
-        await pilot.press(*"PA")
+        # Inc 11 re-pin (census D / F, LLR-175.3h / .4b): clear the prefilled
+        # name, type it, and wait for its painted summary before Save.
+        await sd.type_and_await_summary(pilot, app, "PA")
         assert await pilot.click("#save_ok")
         await ld.wait_for(pilot, lambda: "Saved project" in status(app), "the save")
         mark = spy.questions()

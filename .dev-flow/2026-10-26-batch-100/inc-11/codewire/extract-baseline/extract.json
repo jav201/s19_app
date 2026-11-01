@@ -1,0 +1,3133 @@
+{
+  "marks": [
+    {
+      "name": "_save_manifest_keys",
+      "reqs": [
+        "LLR-175.4"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 1493,
+      "def": {
+        "qualname": "_save_manifest_keys",
+        "line": 1494,
+        "params": [
+          {
+            "name": "declared_regions",
+            "type": "Sequence[DeclaredRegion]",
+            "default": null
+          },
+          {
+            "name": "derived",
+            "type": "bool",
+            "default": "False"
+          },
+          {
+            "name": "active_document",
+            "type": "bool",
+            "default": "False"
+          }
+        ],
+        "returns": "tuple[str, ...]"
+      }
+    },
+    {
+      "name": "_file_digest",
+      "reqs": [
+        "LLR-175.5",
+        "LLR-175.1l"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 1681,
+      "def": {
+        "qualname": "_file_digest",
+        "line": 1682,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "Tuple[str, int]"
+      }
+    },
+    {
+      "name": "_plan_row_mismatch",
+      "reqs": [
+        "HLR-175a",
+        "LLR-175.4a"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 1737,
+      "def": {
+        "qualname": "_plan_row_mismatch",
+        "line": 1738,
+        "params": [
+          {
+            "name": "row",
+            "type": "SavePlanRow",
+            "default": null
+          },
+          {
+            "name": "placed",
+            "type": "PlacementResult",
+            "default": null
+          }
+        ],
+        "returns": "Optional[str]"
+      }
+    },
+    {
+      "name": "_plan_without_document_key",
+      "reqs": [
+        "LLR-175.4"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 1826,
+      "def": {
+        "qualname": "_plan_without_document_key",
+        "line": 1827,
+        "params": [
+          {
+            "name": "plan",
+            "type": "SavePlan",
+            "default": null
+          }
+        ],
+        "returns": "SavePlan"
+      }
+    },
+    {
+      "name": "_save_clears_panel_flag",
+      "reqs": [
+        "HLR-175a"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 1980,
+      "def": {
+        "qualname": "_save_clears_panel_flag",
+        "line": 1981,
+        "params": [
+          {
+            "name": "document_written",
+            "type": "bool",
+            "default": null
+          },
+          {
+            "name": "paste_text",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "parsed_paste_text",
+            "type": "Optional[str]",
+            "default": null
+          }
+        ],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "S19TuiApp.action_save_project",
+      "reqs": [
+        "HLR-175f",
+        "LLR-175.3h",
+        "LLR-175.3j",
+        "LLR-175.5",
+        "LLR-175.5b"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 7360,
+      "def": {
+        "qualname": "S19TuiApp.action_save_project",
+        "line": 7361,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._assignment_candidate_files",
+      "reqs": [
+        "HLR-175f"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 7409,
+      "def": {
+        "qualname": "S19TuiApp._assignment_candidate_files",
+        "line": 7410,
+        "params": [],
+        "returns": "list[str]"
+      }
+    },
+    {
+      "name": "S19TuiApp._variant_display_options",
+      "reqs": [
+        "HLR-175f"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 7663,
+      "def": {
+        "qualname": "S19TuiApp._variant_display_options",
+        "line": 7664,
+        "params": [
+          {
+            "name": "variant_set",
+            "type": "ProjectVariantSet",
+            "default": null
+          }
+        ],
+        "returns": "list[tuple[str, str]]"
+      }
+    },
+    {
+      "name": "S19TuiApp.check_action",
+      "reqs": [
+        "LLR-175.3g"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 8042,
+      "def": {
+        "qualname": "S19TuiApp.check_action",
+        "line": 8043,
+        "params": [
+          {
+            "name": "action",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "parameters",
+            "type": "tuple",
+            "default": null
+          }
+        ],
+        "returns": "Optional[bool]"
+      }
+    },
+    {
+      "name": "S19TuiApp._abort_save",
+      "reqs": [
+        "HLR-175a"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 9171,
+      "def": {
+        "qualname": "S19TuiApp._abort_save",
+        "line": 9172,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "created_project_dir",
+            "type": "bool",
+            "default": null
+          },
+          {
+            "name": "placed_files",
+            "type": "Sequence[Path]",
+            "default": null
+          },
+          {
+            "name": "created_dirs",
+            "type": "Sequence[Path]",
+            "default": null
+          },
+          {
+            "name": "save_state",
+            "type": "Tuple",
+            "default": null
+          },
+          {
+            "name": "manifest_restores",
+            "type": "Sequence[Tuple[Path, bytes]]",
+            "default": "()"
+          },
+          {
+            "name": "kept_copies",
+            "type": "Sequence[Tuple[Path, bytes]]",
+            "default": "()"
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._handle_save_dialog",
+      "reqs": [
+        "HLR-175a",
+        "LLR-175.4a",
+        "LLR-175.4l",
+        "LLR-175.6",
+        "LLR-175.1a",
+        "LLR-175.1b",
+        "LLR-175.1c",
+        "LLR-175.1d",
+        "LLR-175.1e",
+        "LLR-175.1f",
+        "LLR-175.1g",
+        "LLR-175.1h",
+        "LLR-175.1i",
+        "LLR-175.1j",
+        "LLR-175.1k",
+        "LLR-175.1l",
+        "LLR-175.1m"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 9457,
+      "def": {
+        "qualname": "S19TuiApp._handle_save_dialog",
+        "line": 9458,
+        "params": [
+          {
+            "name": "payload",
+            "type": "Optional[SaveProjectPayload]",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._decide_project_image",
+      "reqs": [
+        "LLR-175.5",
+        "LLR-175.1m",
+        "LLR-175.1n"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 10618,
+      "def": {
+        "qualname": "S19TuiApp._decide_project_image",
+        "line": 10619,
+        "params": [],
+        "returns": "_ProjectImageStep"
+      }
+    },
+    {
+      "name": "S19TuiApp._plan_project_save",
+      "reqs": [
+        "LLR-175.4",
+        "LLR-175.5",
+        "LLR-175.1i",
+        "LLR-175.6"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 10727,
+      "def": {
+        "qualname": "S19TuiApp._plan_project_save",
+        "line": 10728,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "project_name",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "image_step",
+            "type": "_ProjectImageStep",
+            "default": null
+          },
+          {
+            "name": "derived",
+            "type": "bool",
+            "default": "False"
+          },
+          {
+            "name": "carried_active_document",
+            "type": "Optional[str]",
+            "default": "None"
+          },
+          {
+            "name": "source_reason",
+            "type": "Optional[str]",
+            "default": "None"
+          }
+        ],
+        "returns": "SavePlan"
+      }
+    },
+    {
+      "name": "S19TuiApp._unrecorded_document_lines",
+      "reqs": [
+        "HLR-175a"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 10972,
+      "def": {
+        "qualname": "S19TuiApp._unrecorded_document_lines",
+        "line": 10973,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "source",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "home",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "document_class",
+            "type": "Optional[str]",
+            "default": null
+          },
+          {
+            "name": "copied",
+            "type": "bool",
+            "default": null
+          },
+          {
+            "name": "carried",
+            "type": "Optional[str]",
+            "default": null
+          },
+          {
+            "name": "carried_line",
+            "type": "Optional[str]",
+            "default": null
+          }
+        ],
+        "returns": "list[str]"
+      }
+    },
+    {
+      "name": "S19TuiApp._document_home_contained",
+      "reqs": [
+        "LLR-175.4"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 11055,
+      "def": {
+        "qualname": "S19TuiApp._document_home_contained",
+        "line": 11056,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "home",
+            "type": "str",
+            "default": null
+          }
+        ],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "S19TuiApp._write_editor_document",
+      "reqs": [
+        "HLR-175a"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 11072,
+      "def": {
+        "qualname": "S19TuiApp._write_editor_document",
+        "line": 11073,
+        "params": [
+          {
+            "name": "row",
+            "type": "SavePlanRow",
+            "default": null
+          },
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "Tuple[Optional[PlacementResult], Optional[Path], Optional[str]]"
+      }
+    },
+    {
+      "name": "S19TuiApp._write_and_verify_manifest",
+      "reqs": [
+        "HLR-175a",
+        "LLR-175.4f"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 11163,
+      "def": {
+        "qualname": "S19TuiApp._write_and_verify_manifest",
+        "line": 11164,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "batch",
+            "type": "Sequence[str]",
+            "default": "()"
+          },
+          {
+            "name": "assignments",
+            "type": "Optional[Mapping[str, Sequence[str]]]",
+            "default": "None"
+          },
+          {
+            "name": "declared_regions",
+            "type": "Sequence[DeclaredRegion]",
+            "default": "()"
+          },
+          {
+            "name": "gathered",
+            "type": "Optional[Mapping[str, Sequence[str]]]",
+            "default": "None"
+          },
+          {
+            "name": "derived_from",
+            "type": "Optional[Mapping[str, DerivedFrom]]",
+            "default": "None"
+          },
+          {
+            "name": "active_document",
+            "type": "Optional[str]",
+            "default": "None"
+          },
+          {
+            "name": "on_written",
+            "type": "Optional[Callable[[Path], None]]",
+            "default": "None"
+          }
+        ],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "S19TuiApp.list_projects",
+      "reqs": [
+        "LLR-175.1c"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 12113,
+      "def": {
+        "qualname": "S19TuiApp.list_projects",
+        "line": 12114,
+        "params": [],
+        "returns": "List[str]"
+      }
+    },
+    {
+      "name": "S19TuiApp._manifest_is_link",
+      "reqs": [
+        "LLR-175.6"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 12151,
+      "def": {
+        "qualname": "S19TuiApp._manifest_is_link",
+        "line": 12153,
+        "params": [
+          {
+            "name": "folder",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "S19TuiApp._save_as_source_for",
+      "reqs": [
+        "LLR-175.6"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 12166,
+      "def": {
+        "qualname": "S19TuiApp._save_as_source_for",
+        "line": 12167,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "Optional[Path]"
+      }
+    },
+    {
+      "name": "S19TuiApp._project_folder_refusal",
+      "reqs": [
+        "LLR-175.1f",
+        "LLR-175.1g"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 12180,
+      "def": {
+        "qualname": "S19TuiApp._project_folder_refusal",
+        "line": 12181,
+        "params": [
+          {
+            "name": "folder",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "Optional[str]"
+      }
+    },
+    {
+      "name": "S19TuiApp._copy_project_subfolders",
+      "reqs": [
+        "HLR-175a"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 12229,
+      "def": {
+        "qualname": "S19TuiApp._copy_project_subfolders",
+        "line": 12230,
+        "params": [
+          {
+            "name": "source_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "copies",
+            "type": "Sequence[InventoryFile]",
+            "default": null
+          },
+          {
+            "name": "placed_files",
+            "type": "list[Path]",
+            "default": null
+          },
+          {
+            "name": "created_dirs",
+            "type": "list[Path]",
+            "default": null
+          },
+          {
+            "name": "carried",
+            "type": "Optional[Mapping[str, SavePlanRow]]",
+            "default": "None"
+          }
+        ],
+        "returns": "Optional[str]"
+      }
+    },
+    {
+      "name": "S19TuiApp._manifest_carry",
+      "reqs": [
+        "LLR-175.4f"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 12381,
+      "def": {
+        "qualname": "S19TuiApp._manifest_carry",
+        "line": 12382,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "manifest",
+            "type": "Optional[ProjectManifest]",
+            "default": null
+          }
+        ],
+        "returns": "dict"
+      }
+    },
+    {
+      "name": "S19TuiApp._derived_record",
+      "reqs": [
+        "LLR-175.6"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 12523,
+      "def": {
+        "qualname": "S19TuiApp._derived_record",
+        "line": 12524,
+        "params": [
+          {
+            "name": "base_path",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "derived_map",
+            "type": "Mapping[int, int]",
+            "default": null
+          }
+        ],
+        "returns": "Optional[DerivedFrom]"
+      }
+    },
+    {
+      "name": "SaveProjectScreen.__init__",
+      "reqs": [
+        "HLR-175f",
+        "LLR-175.3h",
+        "LLR-175.6"
+      ],
+      "file": "s19_app/tui/screens.py",
+      "line": 531,
+      "def": {
+        "qualname": "SaveProjectScreen.__init__",
+        "line": 532,
+        "params": [
+          {
+            "name": "default_parent",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "variants",
+            "type": "Optional[List[Tuple[str, str]]]",
+            "default": "None"
+          },
+          {
+            "name": "candidate_files",
+            "type": "Optional[List[str]]",
+            "default": "None"
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "SaveProjectScreen._assignment_rows_enabled",
+      "reqs": [
+        "HLR-175f",
+        "LLR-175.4i"
+      ],
+      "file": "s19_app/tui/screens.py",
+      "line": 543,
+      "def": {
+        "qualname": "SaveProjectScreen._assignment_rows_enabled",
+        "line": 545,
+        "params": [],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "SaveProjectScreen.compose",
+      "reqs": [
+        "HLR-175f",
+        "LLR-175.2",
+        "LLR-175.3i",
+        "LLR-175.4g",
+        "LLR-175.4h",
+        "LLR-175.4i"
+      ],
+      "file": "s19_app/tui/screens.py",
+      "line": 554,
+      "def": {
+        "qualname": "SaveProjectScreen.compose",
+        "line": 555,
+        "params": [],
+        "returns": "ComposeResult"
+      }
+    },
+    {
+      "name": "SaveProjectScreen.on_mount",
+      "reqs": [
+        "LLR-175.3h",
+        "LLR-175.5b"
+      ],
+      "file": "s19_app/tui/screens.py",
+      "line": 614,
+      "def": {
+        "qualname": "SaveProjectScreen.on_mount",
+        "line": 615,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "SaveProjectScreen._collect_composition",
+      "reqs": [
+        "HLR-175f"
+      ],
+      "file": "s19_app/tui/screens.py",
+      "line": 618,
+      "def": {
+        "qualname": "SaveProjectScreen._collect_composition",
+        "line": 619,
+        "params": [],
+        "returns": "Tuple[Tuple[str, ...], dict]"
+      }
+    },
+    {
+      "name": "SaveProjectScreen.on_button_pressed",
+      "reqs": [
+        "HLR-175c",
+        "HLR-175d",
+        "LLR-175.2a",
+        "LLR-175.3",
+        "LLR-175.3a",
+        "LLR-175.3b",
+        "LLR-175.3c",
+        "LLR-175.3f",
+        "LLR-175.4b"
+      ],
+      "file": "s19_app/tui/screens.py",
+      "line": 666,
+      "def": {
+        "qualname": "SaveProjectScreen.on_button_pressed",
+        "line": 667,
+        "params": [
+          {
+            "name": "event",
+            "type": "Button.Pressed",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "ChangeService.image_differs_from_source",
+      "reqs": [
+        "LLR-175.4c",
+        "LLR-175.4d"
+      ],
+      "file": "s19_app/tui/services/change_service.py",
+      "line": 2023,
+      "def": {
+        "qualname": "ChangeService.image_differs_from_source",
+        "line": 2024,
+        "params": [
+          {
+            "name": "mem_map",
+            "type": "Optional[Dict[int, int]]",
+            "default": null
+          }
+        ],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "ChangeService.differs_from_last_saved",
+      "reqs": [
+        "LLR-175.4d"
+      ],
+      "file": "s19_app/tui/services/change_service.py",
+      "line": 2099,
+      "def": {
+        "qualname": "ChangeService.differs_from_last_saved",
+        "line": 2100,
+        "params": [
+          {
+            "name": "mem_map",
+            "type": "Optional[Dict[int, int]]",
+            "default": null
+          }
+        ],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "classify_active_document",
+      "reqs": [
+        "LLR-175.4"
+      ],
+      "file": "s19_app/tui/services/project_gather_service.py",
+      "line": 286,
+      "def": {
+        "qualname": "classify_active_document",
+        "line": 287,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "source",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "home",
+            "type": "str",
+            "default": null
+          }
+        ],
+        "returns": "tuple[str, Optional[str]]"
+      }
+    },
+    {
+      "name": "painted_names",
+      "reqs": [
+        "LLR-175.4g"
+      ],
+      "file": "s19_app/tui/services/project_gather_service.py",
+      "line": 966,
+      "def": {
+        "qualname": "painted_names",
+        "line": 967,
+        "params": [
+          {
+            "name": "names",
+            "type": "Sequence[str]",
+            "default": null
+          },
+          {
+            "name": "limit",
+            "type": "int",
+            "default": "PAINTED_NAME_LIMIT"
+          },
+          {
+            "name": "clip",
+            "type": "int",
+            "default": "120"
+          }
+        ],
+        "returns": "str"
+      }
+    },
+    {
+      "name": "inventory_project_tree",
+      "reqs": [
+        "LLR-175.4",
+        "LLR-175.4e",
+        "LLR-175.5"
+      ],
+      "file": "s19_app/tui/services/project_gather_service.py",
+      "line": 1198,
+      "def": {
+        "qualname": "inventory_project_tree",
+        "line": 1199,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "ProjectInventory"
+      }
+    },
+    {
+      "name": "_plan_copies",
+      "reqs": [
+        "LLR-175.4a"
+      ],
+      "file": "s19_app/tui/services/project_gather_service.py",
+      "line": 1449,
+      "def": {
+        "qualname": "_plan_copies",
+        "line": 1450,
+        "params": [
+          {
+            "name": "inventory",
+            "type": "ProjectInventory",
+            "default": null
+          },
+          {
+            "name": "files",
+            "type": "Sequence[PlannedFile]",
+            "default": null
+          }
+        ],
+        "returns": "tuple[tuple[PlannedFolder, ...], tuple[InventoryFile, ...], set[str]]"
+      }
+    },
+    {
+      "name": "plan_project_save",
+      "reqs": [
+        "LLR-175.4",
+        "LLR-175.4a",
+        "LLR-175.1i"
+      ],
+      "file": "s19_app/tui/services/project_gather_service.py",
+      "line": 1519,
+      "def": {
+        "qualname": "plan_project_save",
+        "line": 1520,
+        "params": [
+          {
+            "name": "target",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "target_kind",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "files",
+            "type": "Sequence[PlannedFile]",
+            "default": null
+          },
+          {
+            "name": "image",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "manifest_keys",
+            "type": "Sequence[str]",
+            "default": null
+          },
+          {
+            "name": "refusal",
+            "type": "Optional[str]",
+            "default": "None"
+          },
+          {
+            "name": "inventory",
+            "type": "Optional[ProjectInventory]",
+            "default": "None"
+          },
+          {
+            "name": "size_cap",
+            "type": "Optional[int]",
+            "default": "None"
+          },
+          {
+            "name": "exempt",
+            "type": "frozenset[str]",
+            "default": "frozenset()"
+          }
+        ],
+        "returns": "SavePlan"
+      }
+    },
+    {
+      "name": "predict_placement",
+      "reqs": [
+        "LLR-175.4",
+        "LLR-175.4a"
+      ],
+      "file": "s19_app/tui/workspace.py",
+      "line": 1346,
+      "def": {
+        "qualname": "predict_placement",
+        "line": 1347,
+        "params": [
+          {
+            "name": "digest_or_bytes",
+            "type": "'str | bytes'",
+            "default": null
+          },
+          {
+            "name": "size",
+            "type": "int",
+            "default": null
+          },
+          {
+            "name": "destination",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "name",
+            "type": "str",
+            "default": null
+          }
+        ],
+        "returns": "PlacementResult"
+      }
+    },
+    {
+      "name": "is_windows_device_name",
+      "reqs": [
+        "LLR-175.1b"
+      ],
+      "file": "s19_app/tui/workspace.py",
+      "line": 1836,
+      "def": {
+        "qualname": "is_windows_device_name",
+        "line": 1837,
+        "params": [
+          {
+            "name": "name",
+            "type": "str",
+            "default": null
+          }
+        ],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "sanitize_project_name",
+      "reqs": [
+        "LLR-175.1",
+        "LLR-175.1h"
+      ],
+      "file": "s19_app/tui/workspace.py",
+      "line": 1870,
+      "def": {
+        "qualname": "sanitize_project_name",
+        "line": 1871,
+        "params": [
+          {
+            "name": "name",
+            "type": "str",
+            "default": null
+          }
+        ],
+        "returns": "Optional[str]"
+      }
+    },
+    {
+      "name": "resolve_input_path",
+      "reqs": [
+        "LLR-175.2a"
+      ],
+      "file": "s19_app/tui/workspace.py",
+      "line": 2025,
+      "def": {
+        "qualname": "resolve_input_path",
+        "line": 2026,
+        "params": [
+          {
+            "name": "raw_path",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "base_dir",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "Optional[Path]"
+      }
+    }
+  ],
+  "graph_nodes": [
+    {
+      "name": "SaveProjectScreen.__init__",
+      "reqs": [
+        "HLR-175f",
+        "LLR-175.3h",
+        "LLR-175.6"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "default_parent",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[list[tuple[str, str]]]",
+          "name": "variants",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[list[str]]",
+          "name": "candidate_files",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "SaveProjectScreen",
+        "names": [
+          "screen"
+        ],
+        "raw": "SaveProjectScreen screen"
+      },
+      "module": "s19_app/tui/screens.py",
+      "examples": [
+        "(probe p11b U7) signature `(self, default_parent: 'Path', variants=None, candidate_files=None)` (holds on base)",
+        "(test_tc305_screen_offers_only_in_project_candidate_files) a re-save of `proj` with `doc.json`, `extra.json` → `screen.candidate_files` lists them, never `project.json` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "keeps `default_parent` (the work area, from `action_save_project`), `variants` (`(variant_id, display)` pairs) and `candidate_files` (project-relative `.json` names) for the assignment rows (HLR-017, ruling Q4). No callable, no initial name, no plan. 11 changes: takes `preview`, `confirm`, `initial_name` (S-b) instead of `default_parent`; keeps `variants` / `candidate_files` and their attributes (`screen.variants`, `screen.candidate_files` are read by `test_tc304` / `test_tc305`).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "SaveProjectScreen._assignment_rows_enabled",
+      "reqs": [
+        "HLR-175f",
+        "LLR-175.4i"
+      ],
+      "in": [],
+      "out": {
+        "type": "bool",
+        "names": [
+          "enabled"
+        ],
+        "raw": "bool enabled"
+      },
+      "module": "s19_app/tui/screens.py",
+      "examples": [
+        "(code read) a fresh save (no variant set) → `False`; a re-save of a 2-variant project with 2 candidates → `True` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "property: `bool(variants) and bool(candidate_files)` (D-NEWPROJ). Gates the assignment rows in `compose` and the composition read in `_collect_composition`. Unchanged by Inc 11 (ruling Q4); the rows move between `#save_summary` and `#save_ok` in the focus order (§C.4 census row).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "SaveProjectScreen.compose",
+      "reqs": [
+        "HLR-175f",
+        "LLR-175.2",
+        "LLR-175.3i",
+        "LLR-175.4g",
+        "LLR-175.4h",
+        "LLR-175.4i"
+      ],
+      "in": [],
+      "out": {
+        "type": "ComposeResult",
+        "names": [
+          "widgets"
+        ],
+        "raw": "ComposeResult widgets"
+      },
+      "module": "s19_app/tui/screens.py",
+      "examples": [
+        "(P11-2) `widgets #project_parent_path: 1 #save_browse: 1 #save_summary: 0 #save_where: 0` (holds on base; RED side of LLR-175.2, HLR-175f)",
+        "(P11-2) `focused at open: OsClipboardInput project_parent_path` (holds on base; RED side of LLR-175.3d)",
+        "(probe p11b U7) `id=\"load_dialog\"` occurs 8 times in `screens.py`; this screen is one of them (holds on base; S-f)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "builds `Container#load_dialog.modal-dialog` with Label \"Save project folder under:\" (`.modal-title`), `OsClipboardInput#project_parent_path`, `Container#save_browse_row` holding `Button#save_browse` (\"Browse...\"), Label \"Project name (new folder name):\", `OsClipboardInput#project_name`, then (rows enabled) Label + `SelectionList#assign_batch.assign-list` and per variant Label \"Assign files to '<display>':\" (markup ON: the display label is parsed) + `SelectionList#assign_<i>`, then `Container#saveproject_buttons.modal-buttons` with `Button#save_ok.modal-confirm` (\"Save\") and `Button#save_cancel` (\"Cancel\"). No `#save_where`, no `#save_summary`, no BINDINGS, no AUTO_FOCUS. 11 changes: rewritten (S2): `#save_box` outer id, `#project_name`, `#save_where`, focusable `#save_summary`, assignment rows, `#save_ok` \"Save (alt+s)\", `#save_cancel` \"Cancel (esc)\"; no parent field, no Browse; markup off.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "SaveProjectScreen.on_mount",
+      "reqs": [
+        "LLR-175.3h",
+        "LLR-175.5b"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens.py",
+      "examples": [
+        "(code read; P11-2) after open the parent field holds the work area and `#project_name` is `\"\"` (holds on base; RED side of LLR-175.3h)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "one statement: `#project_parent_path.value = str(default_parent)`. The name field starts empty; nothing is computed. 11 changes: prefill `initial_name` selected (LLR-175.3h); after the first refresh start the first preview (LLR-175.5b).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "SaveProjectScreen._collect_composition",
+      "reqs": [
+        "HLR-175f"
+      ],
+      "in": [],
+      "out": {
+        "type": "Tuple[Tuple[str, ...], dict]",
+        "names": [
+          "composition"
+        ],
+        "raw": "Tuple[Tuple[str, ...], dict] composition"
+      },
+      "module": "s19_app/tui/screens.py",
+      "examples": [
+        "(test_tc304_screen_collects_per_variant_and_batch_assignment) batch `doc.json`, variant `b` → `extra.json` → payload `batch == (\"doc.json\",)`, `assignments == {\"b\": (\"extra.json\",)}` (holds on base)",
+        "(test_tc306_screen_no_selection_yields_empty_composition) nothing selected → `batch == ()`, `assignments == {}` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "rows disabled → `((), {})`; else `#assign_batch.selected` as `batch` and, per variant index, `#assign_<i>.selected` keyed by `variant_id` (D-KEY), empty selections omitted. Unchanged by Inc 11 (ruling Q4).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "SaveProjectScreen.on_button_pressed",
+      "reqs": [
+        "HLR-175c",
+        "HLR-175d",
+        "LLR-175.2a",
+        "LLR-175.3",
+        "LLR-175.3a",
+        "LLR-175.3b",
+        "LLR-175.3c",
+        "LLR-175.3f",
+        "LLR-175.4b"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Button.Pressed",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens.py",
+      "examples": [
+        "(P11-2, P-19) empty name, `#save_ok` clicked → stack `['Screen', 'SaveProjectScreen']`, `'name is empty'` not painted (holds on base; RED side of HLR-175d)",
+        "(P11-2, P-18) `escape` → stack still `['Screen', 'SaveProjectScreen']` (holds on base; RED side of HLR-175c)",
+        "(test_tc034_modals_behavior_methods_intact) `#save_cancel` → dismiss `None`; parent + `Demo_Project` + `#save_ok` → a `SaveProjectPayload` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "`#save_cancel` → `dismiss(None)`; `#save_browse` → a tkinter folder picker writes `#project_parent_path`; `#save_ok` → strip parent and name; either empty → return (no feedback, P-19); else `dismiss(SaveProjectPayload(parent, name, batch, assignments))`. No check before the dismiss: every refusal is the handler's, after the dialog closed. `enter` in `#project_name` posts `Input.Submitted`, which nothing reads; `escape` is not bound (P-18). 11 changes: Cancel stays; Browse removed; Save / `alt+s` / `enter` → empty → token pair, stay (LLR-175.3b); else `confirm(name, painted plan)` → `None` dismiss with the work area as parent (LLR-175.2a), else repaint and stay (LLR-175.3f, LLR-175.4b).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.action_save_project",
+      "reqs": [
+        "HLR-175f",
+        "LLR-175.3h",
+        "LLR-175.3j",
+        "LLR-175.5",
+        "LLR-175.5b"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(P11-2) nothing loaded, `ctrl+s` → stack `['Screen', 'SaveProjectScreen']` (holds on base; RED side of LLR-175.3j)",
+        "(P11-2) `ctrl+s` with the Save dialog on top → stack `['Screen', 'SaveProjectScreen', 'SaveProjectScreen']` (holds on base and post-10: the guard does not name this screen; RED side of LLR-175.3g)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the Save key (`ctrl+s` priority, shown; `s` hidden; palette entry \"Save project\" built 1:1 from `BINDINGS`). Logs what is loaded (nothing loaded is only a log line), builds `variants` / `candidate_files` when a variant set exists, and pushes `SaveProjectScreen(self.workarea, variants, candidate_files)` with `_handle_save_dialog` as the dismiss callback (read as an attribute at push time: `test_tui_manifest_save._capture_save_payload` replaces it with a one-argument lambda). Runs also while a modal is on top (priority binding). 11 changes: nothing loaded → status, no dialog (LLR-175.3j); push with the callables and the open project's name (LLR-175.3h); the session inputs after the first frame (LLR-175.5, .5b).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._assignment_candidate_files",
+      "reqs": [
+        "HLR-175f"
+      ],
+      "in": [],
+      "out": {
+        "type": "list[str]",
+        "names": [
+          "names"
+        ],
+        "raw": "list[str] names"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(test_tc305_screen_offers_only_in_project_candidate_files) a project holding `doc.json`, `extra.json`, `project.json` → `[\"doc.json\", \"extra.json\"]` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "`current_project_dir` absent → `[]`; else the sorted `*.json` regular files of the project folder, `project.json` excluded (D-SCOPING). Reads the folder on every dialog open. Unchanged by Inc 11.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._variant_display_options",
+      "reqs": [
+        "HLR-175f"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "ProjectVariantSet",
+          "name": "variant_set",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "list[tuple[str, str]]",
+        "names": [
+          "options"
+        ],
+        "raw": "list[tuple[str, str]] options"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(test_tc304_screen_collects_per_variant_and_batch_assignment) project `proj` with `a.s19`, `b.s19` → ids `[\"a\", \"b\"]` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "`(variant_id, display label)` pairs in set order, for the assignment rows and the variant picker. Unchanged by Inc 11.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.check_action",
+      "reqs": [
+        "LLR-175.3g"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "action",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "tuple",
+          "name": "parameters",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[bool]",
+        "names": [
+          "allowed"
+        ],
+        "raw": "bool? allowed"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(P11-2, P11-3; base) with the Save dialog open: `ctrl+l` → stack `['Screen', 'SaveProjectScreen', 'LoadFileScreen']`; `ctrl+s` → a second `SaveProjectScreen`; `ctrl+d` → density `['density-comfortable'] -> ['density-compact']` (holds on base; post-10 the same with `LoadDialog` for `ctrl+l`, because neither guard names the Save dialog; RED side of LLR-175.3g)",
+        "(proto-10-app C45, post-10) with `ConfirmQuestionScreen` on top: `ctrl+l` / `ctrl+s` / `ctrl+k` / `ctrl+d` → 0 actions (holds post-10, not on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "post-10 (from proto-9b-app.md G3 and proto-10-app.md; base :8034 has only the window gates). First test: `action in _LOAD_DIALOG_INERT_ACTIONS and any(isinstance(s, (LoadDialog, ConfirmQuestionScreen)) for s in self.screen_stack)` → `False`; `_LOAD_DIALOG_INERT_ACTIONS = frozenset({\"load_file\", \"save_project\", \"focus_palette\", \"cycle_density\"})`. Then `confirm_attention` only on Flow Execution, `page_*_context` only on A2L / MAC, `hex_page_*` only on Workspace, then `super().check_action`. Also read by the key bar (`window_help.py:1134`, `:1145`). 11 changes: `SaveProjectScreen` joins the tuple of the whole-stack test (S-e, ruling Q3).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._handle_save_dialog",
+      "reqs": [
+        "HLR-175a",
+        "LLR-175.4a",
+        "LLR-175.4l",
+        "LLR-175.6",
+        "LLR-175.1a",
+        "LLR-175.1b",
+        "LLR-175.1c",
+        "LLR-175.1d",
+        "LLR-175.1e",
+        "LLR-175.1f",
+        "LLR-175.1g",
+        "LLR-175.1h",
+        "LLR-175.1i",
+        "LLR-175.1j",
+        "LLR-175.1k",
+        "LLR-175.1l",
+        "LLR-175.1m"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[SaveProjectPayload]",
+          "name": "payload",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p11b U1) F-fresh `fresh1` → `['Project saved + manifest verified', \"Saved project to …\\\\fresh1 (variant 'firmware')\"]`, tree `['firmware.s19', 'project.json']`; per save `_save_as_source_for` 2, `_decide_project_image` 1, `_plan_project_save` 1, `_file_digest` 1, `_project_folder_refusal` 1; handler 26.2 ms (holds on base)",
+        "(probe p11b U6) with project `ab` saved: `''`, `'   '`, `'!!!'` → `name is empty — type a project name.`; `con.txt`, `CON` → `is a device name — choose another name.`; `Reports` → `is a reserved name`; 65 × `a` → `name too long (at most 64 characters) — shorten the name.`; `a b` → `'a b' is already a project as 'ab' — choose another name.`; `AB` → the same naming `AB`; 0 new folders (holds on base; each refusal reaches the engineer only after the dialog closed, RED side of HLR-175b)",
+        "(probe p11b U5, P11-2 for the dialog side) nothing loaded, direct call → `['Nothing to save: load a data file or A2L first.']`, no folder (holds on base)",
+        "(test_tc_b100_07_ast_census_every_post_creation_return_removes) every `return` after the first `mkdir` in this function follows an `_abort_save` call; exactly 1 `except OSError` after the `mkdir` (holds on base)",
+        "(test_tc_b100_31_document_with_an_identical_sibling_follows_its_landing, probe p11b U3) P records `patches/changes.json` beside an identical `patches/changes_1.json`, save as Q → the document is bound to `Q/patches/changes_1.json`, which exists (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "post-10 (one expression changed by Inc 10 at :10576, `panel._dirty` → `panel.is_dirty`; otherwise the base body). One method, `:9447`–`:10605` (1 159 lines). It has two halves, cut at `:9856` (the comment before `project_dir.mkdir`). **Guard-and-plan half, `:9447`–`:9855` (409 lines), writes no `self.` attribute, no file:**",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._decide_project_image",
+      "reqs": [
+        "LLR-175.5",
+        "LLR-175.1m",
+        "LLR-175.1n"
+      ],
+      "in": [],
+      "out": {
+        "type": "_ProjectImageStep",
+        "names": [
+          "step"
+        ],
+        "raw": "_ProjectImageStep step"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p11b U3) P with a 1-entry document `0x80000010`, save as Q → emit, the success line ends `— firmware.s19 + 1 change entry, 1 applied by this save` (holds on base)",
+        "(probe p11b U4 / U4b, LLR-175.1n reachability) a MAC-only session (`file_type` `mac`, `mem_map {0x80000000: 0}`, `ranges []`) plus 1 entry at `0x80000000` → the entry's disposition is `skipped-outside`, `emit False`, `refusal None`; the save completes as a copy with no line about the entry (holds on base; the `cannot be written` arm is not reached)",
+        "(P11-1) the case_06 A2L digest is 26.1 ms best of 5; (P11-4) a 4 MiB patched image renders in 1 215 ms (holds on the 9a tree, same `app.py`)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the emit decision on data (LLR-167.1). Fast path: a non-`change` document, or no entry on an image that does not differ from its source → `emit=False`. Else `rederive_for_save` onto a copy; any `blocked` entry → `refusal=\"Project NOT saved: N blocked entry/entries (0x…) — fix them in the Patch Editor.\"`; `rederived_differs_from_source` false → copy; else `render_patched_image(..., source_kind=file_type)`; `None` → `refusal=\"… a patched <kind> image cannot be written — only S19 and HEX images carry change entries.\"`; else `emit=True` with the payload, name, `carried`, `applied_by_save`. Refreshes `document.issues` (as an apply does); writes no byte and no save record. Reads `self.current_file` (requires an image). Name-independent: the same result for every typed name. 11 changes: called once per dialog open by `_save_session_inputs` (LLR-175.5), after the first frame (LLR-175.5b).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._plan_project_save",
+      "reqs": [
+        "LLR-175.4",
+        "LLR-175.5",
+        "LLR-175.1i",
+        "LLR-175.6"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "project_name",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "_ProjectImageStep",
+          "name": "image_step",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "derived",
+          "default": "False"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "carried_active_document",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "source_reason",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "SavePlan",
+        "names": [
+          "plan"
+        ],
+        "raw": "SavePlan plan"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p11b U2) P open (S19 + MAC + A2L), save `P` → `_file_digest` 3 calls, `_save_as_source_for` 2 calls; save as `Q2` → `_project_folder_refusal` 2 calls (target + source) (holds on base)",
+        "(probe p11b U8) the save-as inventory of a 2 000-file project costs 189.4 ms best of 5, on every call (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "target kind (`new` when nothing exists at the target; `open project` for the open project's name case-folded; else `merge`); `source_dir = _save_as_source_for(project_dir)` (the 2nd call per save, R2-2); refused source → token row 9; else for a save as `inventory_project_tree(source_dir)` (walks the open project, per call); the planned files: image (emit payload digest, or `_file_digest(image)`), MAC, A2L (`_file_digest` each), the document (pasted: serialised digest; file-backed: `classify_active_document` + `_file_digest(source)`); for an existing target the `exempt` MAC / A2L names (lstat + `_file_digest(target item)`); `plan_project_save(...)` with `_save_manifest_keys`. Raises `OSError` when a digested source cannot be read. 11 changes: takes the per-open session inputs (digests, image step) instead of digesting each call (LLR-175.5); called only inside `_prepare_project_save` (LLR-175.6).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._save_as_source_for",
+      "reqs": [
+        "LLR-175.6"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[Path]",
+        "names": [
+          "source"
+        ],
+        "raw": "Path? source"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p11b U1) `2` calls per save (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the open project's folder when the target does not exist (`os.path.lexists`) and that folder still exists; else `None`. A `PermissionError` counts as gone (backlog R2-1, unchanged by Inc 11). Called twice per save, by the handler and by the planner (backlog R2-2). 11 changes: evaluated once, in `_prepare_project_save` (Q10 closes R2-2).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._project_folder_refusal",
+      "reqs": [
+        "LLR-175.1f",
+        "LLR-175.1g"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "folder",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[str]",
+        "names": [
+          "reason"
+        ],
+        "raw": "str? reason"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(test_tc_b100_62_folder_check_permission_error_has_its_own_text[save target]) `lstat` of `W/P` raising `PermissionError` → 1 line `'P' could not be read — check that the folder can be opened, then save again` (holds on base)",
+        "(test_at_b100_11_junction_project_is_not_listed_and_save_refuses_it) `W/evil` a junction, Save `evil` → 1 line holding `link or junction` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the one folder check (HLR-171b): not one plain component of the work area → `outside`; `lstat` absent → `None`; other `OSError` → `unreadable`; a link or reparse point → `link`; resolves outside → `outside`. Unchanged by Inc 11.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._manifest_carry",
+      "reqs": [
+        "LLR-175.4f"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[ProjectManifest]",
+          "name": "manifest",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "dict",
+        "names": [
+          "carry"
+        ],
+        "raw": "dict carry"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read) a damaged manifest → not called (`target_carry = {}`) (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the carried records of a target or save-as source manifest (`derived_from`, `active_document`, `batch`, `assignments`, `gathered`), read once. Unchanged by Inc 11; LLR-175.4f's merge row reads the target's recorded active variant in the preparation, which this function does not return today (code read: no `active_variant` key in the carry).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._manifest_is_link",
+      "reqs": [
+        "LLR-175.6"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "folder",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "is_link"
+        ],
+        "raw": "bool is_link"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read) no `project.json` → `False` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "SEC8b-3: `folder/project.json` is a link or reparse point, or cannot be inspected → `True`. Static. Unchanged by Inc 11.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._derived_record",
+      "reqs": [
+        "LLR-175.6"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "base_path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Mapping[int, int]",
+          "name": "derived_map",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[DerivedFrom]",
+        "names": [
+          "record"
+        ],
+        "raw": "DerivedFrom? record"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read; probe p11b U3) an emitting save records one `derived_from` entry for the emitted image (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the `derived_from` record an emitted image writes (its base's digest), or `None` when the base cannot be read again. Unchanged by Inc 11.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._document_home_contained",
+      "reqs": [
+        "LLR-175.4"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "home",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "contained"
+        ],
+        "raw": "bool contained"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read) a home that is a junction → `False`, no document row (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "SEC8a-3: `_guarded_destination(project_dir / home, workarea)`; refused → `False` and a log line. Gates the document row in the plan. Unchanged by Inc 11.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._abort_save",
+      "reqs": [
+        "HLR-175a"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "created_project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[Path]",
+          "name": "placed_files",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[Path]",
+          "name": "created_dirs",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Tuple",
+          "name": "save_state",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[Tuple[Path, bytes]]",
+          "name": "manifest_restores",
+          "default": "()"
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[Tuple[Path, bytes]]",
+          "name": "kept_copies",
+          "default": "()"
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(test_tc_b100_07_ast_census_every_post_creation_return_removes) exactly one `_abort_save`; it holds `unlink`, `rmdir` and `_variant_set` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the one rollback (LED .52(b), .53): unlink exactly the placed files, remove the created folders, restore a replaced manifest, restore the app state. Commit half only. Unchanged by Inc 11.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._copy_project_subfolders",
+      "reqs": [
+        "HLR-175a"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "source_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[InventoryFile]",
+          "name": "copies",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "list[Path]",
+          "name": "placed_files",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "list[Path]",
+          "name": "created_dirs",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[str, SavePlanRow]]",
+          "name": "carried",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "Optional[str]",
+        "names": [
+          "failure"
+        ],
+        "raw": "str? failure"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p11b U3) save as Q copies `patches/changes_1.json` before the gather runs (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the save-as copy of `plan.copies` (sub-folder entries first, then top-level, each checked against its `carried` row); returns a failure line or `None`. Commit half only. Unchanged by Inc 11.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._write_editor_document",
+      "reqs": [
+        "HLR-175a"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "SavePlanRow",
+          "name": "row",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Tuple[Optional[PlacementResult], Optional[Path], Optional[str]]",
+        "names": [
+          "written"
+        ],
+        "raw": "Tuple[PlacementResult?, Path?, str?] written"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(test_b100_document.py:672) a pasted document lands as `patches/changes_1.json` beside an older `changes.json` and is recorded (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "writes the pasted change document as a new file in its home through one placement; returns the placement, a created home, or a failure line. Commit half only. Unchanged by Inc 11.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._write_and_verify_manifest",
+      "reqs": [
+        "HLR-175a",
+        "LLR-175.4f"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[str]",
+          "name": "batch",
+          "default": "()"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[str, Sequence[str]]]",
+          "name": "assignments",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[DeclaredRegion]",
+          "name": "declared_regions",
+          "default": "()"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[str, Sequence[str]]]",
+          "name": "gathered",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[str, DerivedFrom]]",
+          "name": "derived_from",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "active_document",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Callable[[Path], None]]",
+          "name": "on_written",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "ok"
+        ],
+        "raw": "bool ok"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p11b U1) `Project saved + manifest verified` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "writes and re-reads `project.json` (the active variant comes from `self._variant_set`, rebuilt from the saved files just before). Commit half only. Unchanged by Inc 11.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._unrecorded_document_lines",
+      "reqs": [
+        "HLR-175a"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "source",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "home",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "document_class",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "copied",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "carried",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "carried_line",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "list[str]",
+        "names": [
+          "lines"
+        ],
+        "raw": "list[str] lines"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read) a document recorded by the carried line → `[]` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the one true line about a file-backed change document the save does not record (E3 R3). Commit half only. Unchanged by Inc 11.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.list_projects",
+      "reqs": [
+        "LLR-175.1c"
+      ],
+      "in": [],
+      "out": {
+        "type": "List[str]",
+        "names": [
+          "projects"
+        ],
+        "raw": "List[str] projects"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p9b U2, base) `['[b]P', 'ab', 'c', 'E', 'j', 'n', 's']` with `E` empty and `n` holding `notes.txt` (holds on base; post-9b `E`, `n` are not listed)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "post-9b (proto-9b-app.md, ruling Q7): the sorted direct child folders of the work area that pass `_project_folder_refusal`, skip reserved homes case-folded, and hold the §1.3 content (a regular non-link `project.json`, or a data / MAC / A2L file, `_folder_holds_project`). Base: no content test. Not called by Save today (G10 enumerates by itself). 11 changes: none required; E1-scope §5 lets `_prepare_project_save` use it for the clash if that shrinks G10, with TC-B100-05's clash arms as the check.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_file_digest",
+      "reqs": [
+        "LLR-175.5",
+        "LLR-175.1l"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Tuple[str, int]",
+        "names": [
+          "digest"
+        ],
+        "raw": "Tuple[str, int] digest"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p11b U1 / U2) 1 call for an S19-only fresh save; 3 for S19 + MAC + A2L (holds on base)",
+        "(P11-1) case_06 `firmware.a2l` 37 742 888 bytes → 26.1 ms best of 5 (holds on the 9a tree)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "SHA-256 hex digest and size of a file, streamed. Raises `OSError`. Called by `_plan_project_save` per source per call.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_save_manifest_keys",
+      "reqs": [
+        "LLR-175.4"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Sequence[DeclaredRegion]",
+          "name": "declared_regions",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "derived",
+          "default": "False"
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "active_document",
+          "default": "False"
+        }
+      ],
+      "out": {
+        "type": "tuple[str, ...]",
+        "names": [
+          "keys"
+        ],
+        "raw": "tuple[str, ...] keys"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read) `active_document=True` → the keys include `active_document` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the `project.json` keys the writer writes (LED .45). Unchanged by Inc 11.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_plan_row_mismatch",
+      "reqs": [
+        "HLR-175a",
+        "LLR-175.4a"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "SavePlanRow",
+          "name": "row",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "PlacementResult",
+          "name": "placed",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[str]",
+        "names": [
+          "mismatch"
+        ],
+        "raw": "str? mismatch"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p11b U3) the plan's document row `changes.json new` and the landing `patches/changes_1.json` differ, and no mismatch line is painted (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "a landed placement against its plan row: a different path, or a reuse the plan did not predict (or the reverse) → a refusal line naming both. Checked for the image / MAC / A2L / pasted document rows only; a file-backed document row is skipped in the rows loop and placed by the gather, so it is never checked (probe p11b U3). Unchanged by Inc 11.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_plan_without_document_key",
+      "reqs": [
+        "LLR-175.4"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "SavePlan",
+          "name": "plan",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "SavePlan",
+        "names": [
+          "plan"
+        ],
+        "raw": "SavePlan plan"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read) rows unchanged, keys minus `active_document` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the same plan without `active_document` in its keys, when the document is known not to be recorded (commit half, `:10225`). After this, the executed plan is not the painted plan object (a `dataclasses.replace` copy, same rows). Unchanged by Inc 11.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_save_clears_panel_flag",
+      "reqs": [
+        "HLR-175a"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "document_written",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "paste_text",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "parsed_paste_text",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "clears"
+        ],
+        "raw": "bool clears"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read) `document_written=True`, empty paste → `True` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "LLR-167.8: the Patch Editor flag clears only when a file now holds every entry and no unparsed paste text is left. Commit half. Unchanged by Inc 11.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "plan_project_save",
+      "reqs": [
+        "LLR-175.4",
+        "LLR-175.4a",
+        "LLR-175.1i"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "target",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "target_kind",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[PlannedFile]",
+          "name": "files",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "image",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[str]",
+          "name": "manifest_keys",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "refusal",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[ProjectInventory]",
+          "name": "inventory",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[int]",
+          "name": "size_cap",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "frozenset[str]",
+          "name": "exempt",
+          "default": "frozenset()"
+        }
+      ],
+      "out": {
+        "type": "SavePlan",
+        "names": [
+          "plan"
+        ],
+        "raw": "SavePlan plan"
+      },
+      "module": "s19_app/tui/services/project_gather_service.py",
+      "examples": [
+        "(probe p11b U3) P records `patches/changes.json` + identical `patches/changes_1.json`, save as Q → rows `[('image', 'firmware.s19', 'new'), ('document', 'changes.json', 'new'), ('manifest', 'project.json', 'new')]`, copies `['patches/changes_1.json']`; Q then holds `patches/changes_1.json` and records it; the plan never names `changes_1.json` (holds on base; RED side of Q10 / HLR-175)",
+        "(BACKLOG-CODE F5 remainder, review-increment-016 F5 (a)) session image `fw_2.s19` and an identical `fw.s19` in P → the carried row says `new fw.s19`; the copy reuses `Q/fw_2.s19` and the save aborts with the \"remove the duplicate copy\" line (holds on base; code read + `test_e4_r11_a3r2_5_…`)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the pure planner (B100-I17): passed refusal; save as: walk refusals, `_plan_copies`, the 2 000 ceiling; the second MAC / A2L rule; the per-file cap; then one row per planned file predicted by `predict_placement` (owner document row against `target/home`; non-owner home rows against `inventory.root/home`), one `carried` row `new` per top-level copy at `target/name` (never predicted), and the `project.json` row. 11 changes (ruling Q10, F5 remainder): predict the carried and the document rows against the tree the copy will produce.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_plan_copies",
+      "reqs": [
+        "LLR-175.4a"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "ProjectInventory",
+          "name": "inventory",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[PlannedFile]",
+          "name": "files",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "tuple[tuple[PlannedFolder, ...], tuple[InventoryFile, ...], set[str]]",
+        "names": [
+          "copies"
+        ],
+        "raw": "tuple[tuple[PlannedFolder, ...], tuple[InventoryFile, ...], set[str]] copies"
+      },
+      "module": "s19_app/tui/services/project_gather_service.py",
+      "examples": [
+        "(probe p11b U3) owner `P/patches/changes.json` → `owned` holds it; copies `['patches/changes_1.json']` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the save-as copy list: top-level files minus the row names and, when a MAC / A2L row is planned, every MAC / A2L file; sub-folder files minus the file a document row owns (its key goes to `owned`). Never compares bytes, so an identical sibling of the owned file stays in the copy list. 11 changes (Q10): may return what the prediction needs about siblings.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "painted_names",
+      "reqs": [
+        "LLR-175.4g"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Sequence[str]",
+          "name": "names",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "limit",
+          "default": "PAINTED_NAME_LIMIT"
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "clip",
+          "default": "120"
+        }
+      ],
+      "out": {
+        "type": "str",
+        "names": [
+          "painted"
+        ],
+        "raw": "str painted"
+      },
+      "module": "s19_app/tui/services/project_gather_service.py",
+      "examples": [
+        "(docstring doctest) `[\"a\", \"b‮c\"]`, limit `1` → \"a, and 1 more\" (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the batch's one name scrub (Cc / Cf / Zl / Zp removed, surrogates → U+FFFD, each clipped to 120 with \"…\", at most 10 joined then \", and K more\"). Pure. Unchanged by Inc 11.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "classify_active_document",
+      "reqs": [
+        "LLR-175.4"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "source",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "home",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "tuple[str, Optional[str]]",
+        "names": [
+          "classified"
+        ],
+        "raw": "tuple[str, str?] classified"
+      },
+      "module": "s19_app/tui/services/project_gather_service.py",
+      "examples": [
+        "(probe p11b U3) save as Q of a document under `P/patches` → `outside` relative to Q, so a predicted row (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the one document classifier (E3 R11): `in_home` / `outside` / `inside_elsewhere` / `missing`, with the landing name. Unchanged by Inc 11.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "inventory_project_tree",
+      "reqs": [
+        "LLR-175.4",
+        "LLR-175.4e",
+        "LLR-175.5"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "ProjectInventory",
+        "names": [
+          "inventory"
+        ],
+        "raw": "ProjectInventory inventory"
+      },
+      "module": "s19_app/tui/services/project_gather_service.py",
+      "examples": [
+        "(probe p11b U8) 2 000 files in `flows/` + `reports/` → folders `[('flows', 1000), ('reports', 1000)]`, 189.4 ms best of 5 (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "one link-free walk of the open project (ceilings 2 000 files / 10 000 entries / depth 32). Writes and hashes nothing; never raises. Name-independent (it walks the open project, whatever the typed name). Unchanged by Inc 11.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "sanitize_project_name",
+      "reqs": [
+        "LLR-175.1",
+        "LLR-175.1h"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "name",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[str]",
+        "names": [
+          "cleaned"
+        ],
+        "raw": "str? cleaned"
+      },
+      "module": "s19_app/tui/workspace.py",
+      "examples": [
+        "(probe p11b U6) `a b` → `ab`; `!!!` → `None` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "`\"\".join(ch for ch in name.strip() if ch.isalnum() or ch in \"-_\")` or `None`. Unicode letters and digits pass (`isalnum`). Unchanged by Inc 11.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "is_windows_device_name",
+      "reqs": [
+        "LLR-175.1b"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "name",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "device"
+        ],
+        "raw": "bool device"
+      },
+      "module": "s19_app/tui/workspace.py",
+      "examples": [
+        "(probe p11b U6) `con.txt`, `CON` → refused as a device name (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the shared device-name predicate: stem before the first dot, trailing spaces and dots stripped, superscript digits mapped, case-folded. Unchanged by Inc 11.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "predict_placement",
+      "reqs": [
+        "LLR-175.4",
+        "LLR-175.4a"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str | bytes",
+          "name": "digest_or_bytes",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "size",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "destination",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "name",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "PlacementResult",
+        "names": [
+          "predicted"
+        ],
+        "raw": "PlacementResult predicted"
+      },
+      "module": "s19_app/tui/workspace.py",
+      "examples": [
+        "(test_b100_reuse TC-B100-68) the prediction walks the same candidates as `place_into_workarea` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the placement's own landing rule, without writing: the requested name and its `_<N>` names are the reuse candidates; an identical file is reused (`keep`), else the first free name (`new`). Unchanged by Inc 11 (Q10 changes what the planner passes it, not the function).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "resolve_input_path",
+      "reqs": [
+        "LLR-175.2a"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "raw_path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "base_dir",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[Path]",
+        "names": [
+          "resolved"
+        ],
+        "raw": "Path? resolved"
+      },
+      "module": "s19_app/tui/workspace.py",
+      "examples": [
+        "(probe p11b U1) parent `str(app.workarea)` → the work area (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "an existing candidate as typed, else under the base or repo folder, else `None`. Read by G2 for the payload's parent. Unchanged by Inc 11.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "ChangeService.differs_from_last_saved",
+      "reqs": [
+        "LLR-175.4d"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[dict[int, int]]",
+          "name": "mem_map",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "differs"
+        ],
+        "raw": "bool differs"
+      },
+      "module": "s19_app/tui/services/change_service.py",
+      "examples": [
+        "(probe p10b U2, Inc 10 baseline) a patch that writes the bytes already there → `False` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "B100-I18: the session image differs from the copy last loaded or saved. Inc 10's question is its first app caller; Inc 11's pending line is the second. Unchanged by Inc 11.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "ChangeService.image_differs_from_source",
+      "reqs": [
+        "LLR-175.4c",
+        "LLR-175.4d"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[dict[int, int]]",
+          "name": "mem_map",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "differs"
+        ],
+        "raw": "bool differs"
+      },
+      "module": "s19_app/tui/services/change_service.py",
+      "examples": [
+        "(probe p11b U4b) the MAC-only session after `add_entry` (no apply) → `False` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the journal's fast path: the session image differs from its source. Not the pending-line key (LLR-175.4d's negative control). Unchanged by Inc 11.",
+      "volatile": [],
+      "oracle": []
+    }
+  ],
+  "calls": [
+    {
+      "caller": "S19TuiApp._abort_save",
+      "callee": "painted_names",
+      "sites": [
+        "s19_app/tui/app.py:9276"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._copy_project_subfolders",
+      "callee": "_plan_row_mismatch",
+      "sites": [
+        "s19_app/tui/app.py:12346"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._copy_project_subfolders",
+      "callee": "painted_names",
+      "sites": [
+        "s19_app/tui/app.py:12299",
+        "s19_app/tui/app.py:12355",
+        "s19_app/tui/app.py:12356",
+        "s19_app/tui/app.py:12358",
+        "s19_app/tui/app.py:12366",
+        "s19_app/tui/app.py:12367"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._decide_project_image",
+      "callee": "ChangeService.image_differs_from_source",
+      "sites": [
+        "s19_app/tui/app.py:10662"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "ChangeService.image_differs_from_source",
+      "sites": [
+        "s19_app/tui/app.py:10454"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "S19TuiApp._abort_save",
+      "sites": [
+        "s19_app/tui/app.py:10041",
+        "s19_app/tui/app.py:10067",
+        "s19_app/tui/app.py:10101",
+        "s19_app/tui/app.py:10283",
+        "s19_app/tui/app.py:10351",
+        "s19_app/tui/app.py:10375",
+        "s19_app/tui/app.py:10388",
+        "s19_app/tui/app.py:10413",
+        "s19_app/tui/app.py:10427",
+        "s19_app/tui/app.py:9935",
+        "s19_app/tui/app.py:9960"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "S19TuiApp._copy_project_subfolders",
+      "sites": [
+        "s19_app/tui/app.py:10090",
+        "s19_app/tui/app.py:9954"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "S19TuiApp._decide_project_image",
+      "sites": [
+        "s19_app/tui/app.py:9717"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "S19TuiApp._derived_record",
+      "sites": [
+        "s19_app/tui/app.py:9790"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "S19TuiApp._manifest_carry",
+      "sites": [
+        "s19_app/tui/app.py:9743"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "S19TuiApp._manifest_is_link",
+      "sites": [
+        "s19_app/tui/app.py:9734"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "S19TuiApp._plan_project_save",
+      "sites": [
+        "s19_app/tui/app.py:9794"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "S19TuiApp._project_folder_refusal",
+      "sites": [
+        "s19_app/tui/app.py:9658",
+        "s19_app/tui/app.py:9705"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "S19TuiApp._save_as_source_for",
+      "sites": [
+        "s19_app/tui/app.py:9693"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "S19TuiApp._unrecorded_document_lines",
+      "sites": [
+        "s19_app/tui/app.py:10217"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "S19TuiApp._variant_display_options",
+      "sites": [
+        "s19_app/tui/app.py:17634"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "S19TuiApp._write_and_verify_manifest",
+      "sites": [
+        "s19_app/tui/app.py:10334"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "S19TuiApp._write_editor_document",
+      "sites": [
+        "s19_app/tui/app.py:9992"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "_plan_row_mismatch",
+      "sites": [
+        "s19_app/tui/app.py:10063"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "_plan_without_document_key",
+      "sites": [
+        "s19_app/tui/app.py:10236"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "_save_clears_panel_flag",
+      "sites": [
+        "s19_app/tui/app.py:10580"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "classify_active_document",
+      "sites": [
+        "s19_app/tui/app.py:9908",
+        "s19_app/tui/services/project_gather_service.py:675"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "is_windows_device_name",
+      "sites": [
+        "s19_app/tui/app.py:10503",
+        "s19_app/tui/app.py:9519",
+        "s19_app/tui/services/variant_execution_service.py:548"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "painted_names",
+      "sites": [
+        "s19_app/tui/app.py:10479",
+        "s19_app/tui/app.py:10491",
+        "s19_app/tui/app.py:10493",
+        "s19_app/tui/app.py:10510",
+        "s19_app/tui/app.py:7326",
+        "s19_app/tui/app.py:9671"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "resolve_input_path",
+      "sites": [
+        "s19_app/tui/app.py:9466"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "sanitize_project_name",
+      "sites": [
+        "s19_app/tui/app.py:9498"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._plan_project_save",
+      "callee": "S19TuiApp._document_home_contained",
+      "sites": [
+        "s19_app/tui/app.py:10885",
+        "s19_app/tui/app.py:10902"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._plan_project_save",
+      "callee": "S19TuiApp._save_as_source_for",
+      "sites": [
+        "s19_app/tui/app.py:10825"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._plan_project_save",
+      "callee": "_file_digest",
+      "sites": [
+        "s19_app/tui/app.py:10863",
+        "s19_app/tui/app.py:10870",
+        "s19_app/tui/app.py:10877",
+        "s19_app/tui/app.py:10906",
+        "s19_app/tui/app.py:10950"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._plan_project_save",
+      "callee": "_save_manifest_keys",
+      "sites": [
+        "s19_app/tui/app.py:10960"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._plan_project_save",
+      "callee": "classify_active_document",
+      "sites": [
+        "s19_app/tui/app.py:10896"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._plan_project_save",
+      "callee": "inventory_project_tree",
+      "sites": [
+        "s19_app/tui/app.py:10840"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._plan_project_save",
+      "callee": "is_windows_device_name",
+      "sites": [
+        "s19_app/tui/services/variant_execution_service.py:548"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._plan_project_save",
+      "callee": "painted_names",
+      "sites": [
+        "s19_app/tui/app.py:10836"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._plan_project_save",
+      "callee": "plan_project_save",
+      "sites": [
+        "s19_app/tui/app.py:10955"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._write_and_verify_manifest",
+      "callee": "is_windows_device_name",
+      "sites": [
+        "s19_app/tui/services/variant_execution_service.py:548"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.action_save_project",
+      "callee": "S19TuiApp._assignment_candidate_files",
+      "sites": [
+        "s19_app/tui/app.py:7403"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.action_save_project",
+      "callee": "S19TuiApp._variant_display_options",
+      "sites": [
+        "s19_app/tui/app.py:7402"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.action_save_project",
+      "callee": "SaveProjectScreen.__init__",
+      "sites": [
+        "s19_app/tui/app.py:7405"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.list_projects",
+      "callee": "S19TuiApp._project_folder_refusal",
+      "sites": [
+        "s19_app/tui/app.py:12145"
+      ]
+    },
+    {
+      "caller": "SaveProjectScreen.on_button_pressed",
+      "callee": "SaveProjectScreen._collect_composition",
+      "sites": [
+        "s19_app/tui/screens.py:691"
+      ]
+    },
+    {
+      "caller": "_save_manifest_keys",
+      "callee": "is_windows_device_name",
+      "sites": [
+        "s19_app/tui/services/variant_execution_service.py:548"
+      ]
+    },
+    {
+      "caller": "classify_active_document",
+      "callee": "is_windows_device_name",
+      "sites": [
+        "s19_app/tui/services/variant_execution_service.py:548"
+      ]
+    },
+    {
+      "caller": "plan_project_save",
+      "callee": "_plan_copies",
+      "sites": [
+        "s19_app/tui/services/project_gather_service.py:1619"
+      ]
+    },
+    {
+      "caller": "plan_project_save",
+      "callee": "classify_active_document",
+      "sites": [
+        "s19_app/tui/services/project_gather_service.py:1666"
+      ]
+    },
+    {
+      "caller": "plan_project_save",
+      "callee": "painted_names",
+      "sites": [
+        "s19_app/tui/services/project_gather_service.py:1390",
+        "s19_app/tui/services/project_gather_service.py:1392",
+        "s19_app/tui/services/project_gather_service.py:1416",
+        "s19_app/tui/services/project_gather_service.py:1438",
+        "s19_app/tui/services/project_gather_service.py:1623",
+        "s19_app/tui/services/project_gather_service.py:1644",
+        "s19_app/tui/services/project_gather_service.py:1651"
+      ]
+    },
+    {
+      "caller": "plan_project_save",
+      "callee": "predict_placement",
+      "sites": [
+        "s19_app/tui/services/project_gather_service.py:1684"
+      ]
+    }
+  ],
+  "top_level_sites": {
+    "S19TuiApp._derived_record": [
+      "s19_app/tui/app.py:4205"
+    ],
+    "resolve_input_path": [
+      "s19_app/tui/app.py:12822",
+      "s19_app/tui/app.py:12834",
+      "s19_app/tui/app.py:13057",
+      "s19_app/tui/app.py:13113",
+      "s19_app/tui/app.py:5390",
+      "s19_app/tui/app.py:6584",
+      "s19_app/tui/app.py:6585",
+      "s19_app/tui/changes/io.py:419",
+      "s19_app/tui/crc_designer_view.py:1307",
+      "s19_app/tui/operations/crc_config.py:361",
+      "s19_app/tui/operations/crc_designer_model.py:920",
+      "s19_app/tui/services/compare_service.py:528 (ref)",
+      "s19_app/tui/services/report_filter.py:360"
+    ],
+    "S19TuiApp.list_projects": [
+      "s19_app/tui/app.py:11731",
+      "s19_app/tui/app.py:12895",
+      "s19_app/tui/app.py:7448"
+    ],
+    "S19TuiApp._variant_display_options": [
+      "s19_app/tui/app.py:7546"
+    ],
+    "painted_names": [
+      "s19_app/tui/app.py:11703",
+      "s19_app/tui/app.py:11735",
+      "s19_app/tui/app.py:11752",
+      "s19_app/tui/app.py:11792",
+      "s19_app/tui/app.py:11793",
+      "s19_app/tui/app.py:11822",
+      "s19_app/tui/app.py:11827",
+      "s19_app/tui/app.py:12968"
+    ],
+    "S19TuiApp._project_folder_refusal": [
+      "s19_app/tui/app.py:11701"
+    ],
+    "S19TuiApp._write_and_verify_manifest": [
+      "s19_app/tui/app.py:12518"
+    ],
+    "S19TuiApp._manifest_carry": [
+      "s19_app/tui/app.py:12512"
+    ],
+    "sanitize_project_name": [
+      "s19_app/tui/crc_designer_view.py:1227",
+      "s19_app/tui/screens.py:798",
+      "s19_app/tui/services/flow_persistence_service.py:1019",
+      "s19_app/tui/services/flow_persistence_service.py:1495"
+    ],
+    "S19TuiApp.check_action": [
+      "s19_app/tui/window_help.py:1134",
+      "s19_app/tui/window_help.py:1145"
+    ],
+    "is_windows_device_name": [
+      "s19_app/tui/workspace.py:2241"
+    ]
+  },
+  "findings": [],
+  "parse_failures": []
+}

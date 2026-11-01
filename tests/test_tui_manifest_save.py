@@ -45,6 +45,7 @@ from textual.widgets import Button, Input, SelectionList
 import s19_app.tui.app as app_module
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.screens import SaveProjectScreen
+from tests.support import b100_save_dialog as sd
 from s19_app.tui.services.variant_execution_service import (
     PROJECT_MANIFEST_NAME,
     read_project_manifest,
@@ -751,6 +752,12 @@ def test_tc304_screen_collects_per_variant_and_batch_assignment(
             screen = app.screen
             assert isinstance(screen, SaveProjectScreen)
             screen.query_one("#project_name", Input).value = "proj"
+            # Inc 11 re-pin (census C, LLR-175.3h / .4b): the open
+            # project's name is prefilled and Save confirms only a painted
+            # summary, so wait for the summary of ``proj`` before Save.
+            await sd.wait_for(
+                pilot, lambda: "proj" in sd.where_text(screen), "the summary of proj"
+            )
             # Variant ids the screen was wired with (sourced from the set).
             variant_ids = [vid for vid, _display in screen.variants]
             # Drive: batch picks doc.json; variant 'b' picks extra.json.
@@ -759,7 +766,7 @@ def test_tc304_screen_collects_per_variant_and_batch_assignment(
             screen.query_one(
                 f"#assign_{b_index}", SelectionList
             ).select("extra.json")
-            await pilot.pause()
+            await sd.settle(pilot, 4)
             screen.query_one("#save_ok", Button).press()
             await _flush(pilot)
             return captured, variant_ids
@@ -860,6 +867,12 @@ def test_tc306_screen_no_selection_yields_empty_composition(
             screen = app.screen
             assert isinstance(screen, SaveProjectScreen)
             screen.query_one("#project_name", Input).value = "proj"
+            # Inc 11 re-pin (census C, LLR-175.3h / .4b): wait for the
+            # painted summary of ``proj`` before Save.
+            await sd.wait_for(
+                pilot, lambda: "proj" in sd.where_text(screen), "the summary of proj"
+            )
+            await sd.settle(pilot, 4)
             screen.query_one("#save_ok", Button).press()
             await _flush(pilot)
             return captured

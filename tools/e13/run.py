@@ -35,6 +35,11 @@ Scenarios:
                   load of P through ``_route_load_project("P")``: the replace
                   question (``ConfirmQuestionScreen``) stays open,
                   unanswered. ``--close`` does not apply.
+  sd-dialog       Load project P (the clean manifest, as pe-clean), then
+                  open the Save project dialog (``ctrl+s``) and replace the
+                  prefilled name with ``P2`` (a new folder): the dialog
+                  stays open painting the "new project" plan for P2.
+                  ``--close`` does not apply.
 
 ``--close`` dismisses the panel after it opens, so the capture shows the
 summary line and ``#status_text`` the load left behind.
@@ -57,7 +62,7 @@ CASE01 = ROOT / "examples" / "case_01_basic_valid" / "firmware.s19"
 CASE02 = ROOT / "examples" / "case_02_gaps_and_patch_targets" / "firmware.s19"
 SCENARIOS = ("pe-clean", "pe-saveback", "pe-problems", "pe-damaged", "pe-patched",
              "pe-unreadable", "pe-document", "pe-a2l-only", "wa-files", "ld-dialog",
-             "lq-question")
+             "lq-question", "sd-dialog")
 
 
 def seed(workarea: Path, scenario: str) -> None:
@@ -236,6 +241,41 @@ def build_app(base: Path, scenario: str, close: bool):
                             break
                         await asyncio.sleep(0.1)
                     await asyncio.sleep(0.5)
+                elif scenario == "sd-dialog":
+                    from textual.widgets import Input
+
+                    # 1. Load project P the way the tests do: the guarded
+                    # route runs the load and opens the Load-result panel.
+                    self._route_load_project("P")
+                    for _ in range(60):
+                        if type(self.screen).__name__ == "LoadResultScreen":
+                            break
+                        await asyncio.sleep(0.1)
+                    if type(self.screen).__name__ == "LoadResultScreen":
+                        # Let the panel finish mounting before dismissing it
+                        # (the same settle the ``--close`` drive uses).
+                        await asyncio.sleep(0.5)
+                        self.screen.dismiss(None)
+                    for _ in range(60):
+                        if self.current_project == "P":
+                            break
+                        await asyncio.sleep(0.1)
+                    await asyncio.sleep(0.3)
+                    # 2. Open the Save project dialog (key ctrl+s).
+                    self.action_save_project()
+                    for _ in range(60):
+                        if type(self.screen).__name__ == "SaveProjectScreen":
+                            break
+                        await asyncio.sleep(0.1)
+                    # 3. The first preview paints after the first frame and
+                    # its 150 ms debounce; wait for it, then replace the
+                    # prefilled name with P2 (a new folder) so the preview
+                    # recomputes, and leave the dialog open.
+                    await asyncio.sleep(1.0)
+                    field = self.screen.query_one("#project_name", Input)
+                    self.screen.set_focus(field)
+                    field.value = "P2"
+                    await asyncio.sleep(1.0)
                 else:
                     # The Load project dialog's own dismiss callback: the route
                     # that opens the Load-result panel (LLR-178.3).

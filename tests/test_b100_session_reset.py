@@ -41,6 +41,7 @@ import shutil
 from pathlib import Path
 
 import pytest
+from tests.support import b100_save_dialog as sd
 from textual.containers import Container
 from textual.widgets import DataTable, Label, Static, TextArea
 
@@ -100,7 +101,19 @@ def _source_census() -> set[str]:
 # the proof), so the list is declared EMPTY — the mechanism stays, and a
 # future Textual-internal assignment must land here with its reason rather
 # than breaking cold-vs-cold equality.
-SNAPSHOT_EXCLUSIONS: dict[str, str] = {}
+#
+# Inc 11 re-pin (census H, interfaces Q-1 / P-3, B11-01): the Save dialog's
+# per-open state is not session state — it exists only while one Save
+# dialog is open and the Save router drops it on every route out (S-d) —
+# so it is classified here, not snapshotted. ``_save_painted_preview`` is
+# the G-B graph's A11-08 memo (proto-11-app ``__init__``); the fixed
+# interface names the other two.
+_SAVE_DIALOG_STATE_REASON = "per-open Save dialog state; dropped when the Save router runs"
+SNAPSHOT_EXCLUSIONS: dict[str, str] = {
+    "_save_session": _SAVE_DIALOG_STATE_REASON,
+    "_save_confirmed": _SAVE_DIALOG_STATE_REASON,
+    "_save_painted_preview": _SAVE_DIALOG_STATE_REASON,
+}
 
 # The K1/K2 allow-list (ARQ §2.2): names a load-over may differ in BY
 # DESIGN — the monotonic counters (K1) and the kept view state: the log
@@ -787,7 +800,9 @@ async def _save_project_as(pilot, app: S19TuiApp, name: str) -> None:
         pilot, lambda: isinstance(app.screen, SaveProjectScreen), "the Save project dialog"
     )
     assert await pilot.click("#project_name"), "click missed #project_name"
-    await pilot.press(*name)
+    # Inc 11 re-pin (census D / F, LLR-175.3h / .4b): clear the prefilled
+    # name, type it, and wait for its painted summary before Save.
+    await sd.type_and_await_summary(pilot, app, name)
     assert await pilot.click("#save_ok"), "click missed #save_ok"
     await _wait_for(
         pilot,

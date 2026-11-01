@@ -64,6 +64,7 @@ from s19_app.tui.workspace import WORKAREA_SUBDIR
 from s19_app.tui.workspace import build_variant_set
 
 from tests.support import b100_links
+from tests.support import b100_save_dialog as sd
 from tests.support import b100_manifests as documents
 from tests.support import b100_projects as projects
 from tests.support.independent_reader import read_s19
@@ -2002,7 +2003,9 @@ async def _at_save_project_through_dialog(pilot, app, log, name: str) -> list:
         pilot, lambda: isinstance(app.screen, SaveProjectScreen), "the Save project dialog"
     )
     assert await pilot.click("#project_name"), "click missed #project_name"
-    await pilot.press(*name)
+    # Inc 11 re-pin (census D / F, LLR-175.3h / .4b): clear the prefilled
+    # name, type it, and wait for its painted summary before Save.
+    await sd.type_and_await_summary(pilot, app, name)
     assert await pilot.click("#save_ok"), "click missed #save_ok"
     await projects.wait_for(
         pilot,

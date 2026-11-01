@@ -49,6 +49,7 @@ from s19_app.tui.workspace import WORKAREA_SUBDIR
 
 from tests.support import b100_links
 from tests.support import b100_projects as projects
+from tests.support import b100_save_dialog as sd
 from tests.support.b100_projects import LOAD_RESULT_CLOSE
 
 AT_SIZES = [(118, 54), (220, 60)]
@@ -1480,9 +1481,17 @@ async def _at_listed_projects(pilot, app) -> list:
     return rows
 
 
-async def _at_save_through_dialog(pilot, app, log, name: str) -> list:
-    """``ctrl+s``, type ``name`` into the project name field, click Save;
-    wait for the outcome line."""
+async def _at_save_through_dialog(pilot, app, log, name: str, summary: list = None) -> list:
+    """``ctrl+s``, type ``name`` into the project name field, Save; wait for
+    the outcome line.
+
+    Inc 11 re-pin (census D / E / F; LLR-175.3h, .4b, ruling Q5): the open
+    project's name is prefilled and selected, so the field is cleared and
+    ``name`` typed; the summary of ``name`` is awaited before Save (copied
+    into ``summary`` when given) and Save is ``alt+s``. A refusal is now
+    painted IN the dialog: its ``#save_where`` line is returned as one more
+    message after ``alt+s`` keeps the dialog open, and ``escape`` closes
+    it."""
     from s19_app.tui.screens import SaveProjectScreen
 
     mark = len(log.messages)
@@ -1491,10 +1500,22 @@ async def _at_save_through_dialog(pilot, app, log, name: str) -> list:
         pilot, lambda: isinstance(app.screen, SaveProjectScreen), "the Save project dialog"
     )
     assert await pilot.click("#project_name"), "click missed #project_name"
-    await pilot.press("ctrl+a")
-    await pilot.press("delete")
-    await pilot.press(*name)
-    assert await pilot.click("#save_ok"), "click missed #save_ok"
+    where = await sd.type_and_await_summary(pilot, app, name)
+    if summary is not None:
+        summary.extend(sd.summary_rows(app.screen))
+    kinds = ("new folder", "updates the open project", "merges into an existing project",
+             "new project in an existing folder")
+    if not any(kind in where for kind in kinds):
+        await pilot.press("alt+s")
+        await sd.settle(pilot, 6)
+        assert isinstance(app.screen, SaveProjectScreen), "a refused Save closed the dialog"
+        refused = sd.where_text(app.screen)
+        await pilot.press("escape")
+        await projects.wait_for(
+            pilot, lambda: not isinstance(app.screen, SaveProjectScreen), "the dialog to close"
+        )
+        return log.since(mark) + [refused]
+    await pilot.press("alt+s")
     await _settle_outcome(pilot, log, mark)
     return log.since(mark)
 
@@ -1560,12 +1581,18 @@ def test_at_b100_09_save_as_copies_the_project_and_q_lists_its_flow(
             await pilot.pause()
             await _at_open_project(pilot, app, "P")
             await projects.wait_for(pilot, lambda: app.current_project == "P", "P open")
-            messages = await _at_save_through_dialog(pilot, app, log, "Q")
+            summary: list = []
+            messages = await _at_save_through_dialog(pilot, app, log, "Q", summary)
             (project_dir / "flows" / "f1.json").unlink()
             rows = await _at_flow_picker_rows(pilot, app)
-            return messages, app.current_project, rows
+            return messages, app.current_project, rows, summary
 
-    messages, current, rows = asyncio.run(_scene())
+    messages, current, rows, summary = asyncio.run(_scene())
+    # Inc 11 re-pin (AT index: "alt+s; the summary lists flows/, patches/,
+    # reports/ before Save"): one painted folder row each, 1 file each.
+    for folder in ("flows/", "patches/", "reports/"):
+        hits = [r for r in summary if folder in r and "1 file" in r]
+        assert len(hits) == 1, (folder, summary)
     assert _saved(messages), messages
     for relative, payload in projects.AT09_FILES.items():
         assert (target / relative).is_file(), (relative, _files_in(target))

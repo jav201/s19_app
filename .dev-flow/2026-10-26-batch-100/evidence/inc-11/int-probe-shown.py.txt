@@ -1,0 +1,25 @@
+from pathlib import Path
+from textual import events
+from tests import test_b100_save_dialog as t
+from tests.support import b100_save_dialog as sd
+from s19_app.tui import screens
+
+def test_probe(tmp_path: Path, monkeypatch):
+    base = tmp_path / "app"
+    log = []
+    orig_mark = screens.SaveProjectScreen._mark_shown
+    orig_save = screens.SaveProjectScreen.action_save
+    orig_paint = screens.SaveProjectScreen._paint
+    monkeypatch.setattr(screens.SaveProjectScreen, "_mark_shown", lambda self: (log.append("mark"), orig_mark(self)))
+    monkeypatch.setattr(screens.SaveProjectScreen, "action_save", lambda self: (log.append(("save", self._shown)), orig_save(self)))
+    monkeypatch.setattr(screens.SaveProjectScreen, "_paint", lambda self, p: (log.append("paint"), orig_paint(self, p)))
+    async def scenario(app, pilot, _log):
+        cb = []
+        fakes = t._Fakes(app.workarea, slow_first=0.3,
+                         post_on_first=lambda: (log.append("post"), app.post_message(events.Key("alt+s", "s"))))
+        screen = t._dialog(fakes, initial_name="fresh1")
+        app.push_screen(screen, cb.append)
+        await sd.wait_for(pilot, lambda: len(fakes.confirm_calls) >= 1, "first confirm", 4.0)
+        await sd.wait_recompute(pilot)
+        print("LOG", log, "CONFIRM", [(c[0], c[1] is not None) for c in fakes.confirm_calls], "CB", cb)
+    t._run(base, scenario)

@@ -74,6 +74,7 @@ from .services.report_service import (
 
 if TYPE_CHECKING:
     from .operations.crc_config import CrcConfig
+    from .services import project_gather_service
     from .services.variant_execution_service import LoadAnnouncement, LoadProblem
     from .operations.model import Operation
 
@@ -159,7 +160,7 @@ class SaveProjectPayload:
         identically to the prior active-variant-only save (LLR-017.1, F-Q-05).
 
     Args:
-        parent_folder (str): Destination parent directory, as entered or browsed.
+        parent_folder (str): The work area (the dialog sets it; LLR-175.2a).
         project_name (str): New project folder name (sanitized downstream).
         batch (tuple[str, ...]): Project-wide change/check files as
             project-relative path strings. Empty ⇒ no project-wide files.
@@ -167,6 +168,9 @@ class SaveProjectPayload:
             ``variant_id`` (the workspace stem, or full filename on a stem
             collision — D-KEY); each value is project-relative path strings.
             Empty ⇒ no per-variant assignments.
+        plan (Optional[project_gather_service.SavePlan]): The plan the Save
+            dialog painted and confirmed; ``None`` for a payload built without
+            the dialog (LLR-175.4l). Not part of equality.
 
     Data Flow:
         - Produced by ``SaveProjectScreen`` / a pilot and consumed by
@@ -180,6 +184,43 @@ class SaveProjectPayload:
     project_name: str
     batch: tuple[str, ...] = ()
     assignments: Mapping[str, tuple[str, ...]] = field(default_factory=dict)
+    plan: Optional[project_gather_service.SavePlan] = field(default=None, compare=False)
+
+
+WhereKind = Literal["info", "refusal"]
+WhereLine = tuple[str, WhereKind]
+
+
+@dataclass(frozen=True)
+class SavePreview:
+    """The app → dialog value for one typed name (HLR-175).
+
+    Summary:
+        Built only by the app (``_save_dialog_preview`` and the confirm
+        step); the dialog paints it and never builds one (SC-1, SC-2).
+        Frozen and equal by value, so the dialog holds the very object the
+        app returned and can compare it against a fresh one.
+
+    Args:
+        where (tuple[WhereLine, ...]): The ``#save_where`` lines, in order.
+            Each ``(text, kind)`` pair paints one plain line; ``kind`` is
+            ``"info"`` for the target line or ``"refusal"`` for a reason.
+        rows (tuple[str, ...]): The ``#save_summary`` lines, in order, one
+            line each, already composed by the app.
+        plan (Optional[project_gather_service.SavePlan]): The plan these rows
+            paint; ``None`` when nothing is planned (empty name, name
+            refusal).
+        refused (bool): ``True`` → Save keeps the dialog open (LLR-175.3f).
+
+    Data Flow:
+        - Produced by ``S19TuiApp._save_dialog_preview`` and the confirm
+          step; consumed by ``SaveProjectScreen._paint`` (the only reader).
+    """
+
+    where: tuple[WhereLine, ...]
+    rows: tuple[str, ...]
+    plan: Optional[project_gather_service.SavePlan]
+    refused: bool
 
 
 LoadKind = Literal["project", "workarea", "recent", "path"]
@@ -362,9 +403,10 @@ class LoadDialog(ModalScreen[Optional[LoadChoice]]):
             if row[2] is None:
                 lst.disable_option_at_index(i)
         lst.highlighted = self._initial_index()
-        self.query_one(
-            "#load_list" if self._mode == "list" else "#load_path"
-        ).focus()
+        if self._mode == "list":
+            self.query_one("#load_list").focus()
+        else:
+            self.query_one("#load_path").focus()
         self._apply_stack(self.app.size.width)
 
     def _initial_index(self) -> Optional[int]:
@@ -880,59 +922,96 @@ class VariantHelpScreen(ModalScreen[None]):
             self.dismiss(None)
 
 
+#: Debounce window for the save-plan recompute: one run 150 ms after the
+#: last keystroke (LLR-175.5a).
+SAVE_RECOMPUTE_S = 0.150
+
+
 class SaveProjectScreen(ModalScreen[Optional[SaveProjectPayload]]):
-    """Modal dialog for destination folder, project name, and per-variant assignments.
+    """Modal Save-project dialog: name, target line, summary, and assignments.
 
     Summary:
-        Collects the save destination (parent folder + project name) and,
-        when re-saving an existing multi-variant project, the per-variant
-        change/check assignments plus a project-wide batch list (HLR-017 /
-        LLR-017.3). The assignment rows offer ONLY project-relative ``.json``
-        documents enumerated from the project dir (workarea-restricted,
-        D-SCOPING); each per-variant key is sourced from the caller-supplied
-        ``variant_id`` (never recomputed as ``Path.stem`` — D-KEY), and every
-        selection resolves by the row's stored VALUE, never by parsing label
-        text. Re-skinned to the Calm Dark theme in batch-02 increment 8
-        (LLR-015.1): the dialog carries the shared ``.modal-dialog`` class.
+        The single Save entry point (HLR-175). It paints the plan the app
+        computes for the typed name — the target folder and its kind in
+        ``#save_where`` and the plan's rows in ``#save_summary`` — and asks
+        the app again on every Save request (``alt+s``, ``enter`` in the
+        field, or ``#save_ok``) before dismissing with the painted plan. The
+        dialog decides nothing about the save: the plan, the refusals and
+        every painted string come from the app through the ``preview`` /
+        ``confirm`` callables (LLR-175.6). The per-variant assignment rows
+        (HLR-017 / LLR-017.3) keep their ids, order and meaning (ruling Q4).
 
     Args:
-        default_parent (Path): Prefilled destination parent directory.
+        preview (Callable[[str], SavePreview]): Called once after the first
+            refresh and once per debounce window with the field text
+            verbatim; returns the plan to paint.
+        confirm (Callable[[str, Optional[SavePlan]], Optional[SavePreview]]):
+            Called on every Save request with the text verbatim and the
+            painted plan (or ``None``); ``None`` → dismiss, a preview → paint
+            it and stay open.
+        initial_name (Optional[str]): The open project's on-disk name,
+            prefilled and selected (LLR-175.3h).
         variants (Optional[List[Tuple[str, str]]]): ``(variant_id,
             display_label)`` pairs for the existing project's variants, in
             set order (the ``_variant_display_options`` contract). ``None`` /
-            empty ⇒ no assignment rows (D-NEWPROJ: a brand-new project save
-            has no variant set, so it writes empty ``batch`` / ``assignments``).
+            empty ⇒ no assignment rows.
         candidate_files (Optional[List[str]]): Project-relative ``.json``
-            change/check document names enumerated from the project dir
-            (``project.json`` excluded by the caller — D-SCOPING). ``None`` /
-            empty ⇒ no assignment rows offered.
+            change/check document names enumerated from the project dir.
+
+    Returns:
+        Optional[SaveProjectPayload]: the payload on Save, ``None`` on Cancel
+        (``ModalScreen[Optional[SaveProjectPayload]]``).
 
     Data Flow:
-        - ``compose`` renders a ``SelectionList`` per variant (id
-          ``#assign_<index>``) plus one for the project-wide batch
-          (``#assign_batch``) only when both ``variants`` and
-          ``candidate_files`` are non-empty.
-        - ``save_ok`` reads each ``SelectionList.selected`` (a list of the
-          candidate-filename VALUES) and builds ``batch`` (tuple) +
-          ``assignments`` (``{variant_id: tuple}``) keyed by INDEX into
-          ``self.variants`` — the writer's ``_reject_unsafe_entry`` remains
-          the sole path-safety authority (D-SEC).
+        - ``on_mount`` schedules ``_first_preview`` after the first refresh;
+          the first ``preview`` call runs there (LLR-175.5b).
+        - Each keystroke resets the 150 ms debounce timer
+          (``SAVE_RECOMPUTE_S``); ``_recompute`` calls ``preview`` and
+          ``_paint`` paints the result.
+        - ``action_save`` calls ``confirm``; ``None`` dismisses with the
+          painted plan, a preview repaints and keeps the dialog open.
+        - ``action_cancel`` / ``escape`` dismiss with ``None``.
 
     Dependencies:
+        Uses:
+            - ``Container`` / ``Label`` / ``Static`` / ``VerticalScroll`` /
+              ``SelectionList`` / ``Button`` / ``Binding`` /
+              ``OsClipboardInput``
+            - :class:`SavePreview`, :class:`SaveProjectPayload`,
+              :data:`SAVE_RECOMPUTE_S`
         Used by:
-            - s19_app.tui.app.S19TuiApp.action_save_project
+            - ``S19TuiApp.action_save_project``
     """
+
+    AUTO_FOCUS = "#project_name"
+
+    BINDINGS = [
+        Binding("escape", "cancel", show=False),
+        Binding("alt+s", "save", show=False, priority=True),
+    ]
 
     def __init__(
         self,
-        default_parent: Path,
+        *,
+        preview: Callable[[str], SavePreview],
+        confirm: Callable[
+            [str, Optional[project_gather_service.SavePlan]], Optional[SavePreview]
+        ],
+        initial_name: Optional[str] = None,
         variants: Optional[List[Tuple[str, str]]] = None,
         candidate_files: Optional[List[str]] = None,
     ) -> None:
         super().__init__()
-        self.default_parent = default_parent
+        self._preview_fn = preview
+        self._confirm_fn = confirm
+        self._initial_name = initial_name
         self.variants: List[Tuple[str, str]] = list(variants or [])
         self.candidate_files: List[str] = list(candidate_files or [])
+        self._plan: Optional[project_gather_service.SavePlan] = None
+        self._live = False
+        self._trailing = None
+        self._shown = False
+        self._dismissed = False
 
     @property
     def _assignment_rows_enabled(self) -> bool:
@@ -946,31 +1025,26 @@ class SaveProjectScreen(ModalScreen[Optional[SaveProjectPayload]]):
 
     def compose(self) -> ComposeResult:
         children: list = [
-            Label("Save project folder under:", classes="modal-title"),
+            Label("Project name", classes="modal-title"),
             OsClipboardInput(
-                placeholder="C:\\path\\to\\parent\\folder",
-                id="project_parent_path",
+                value=self._initial_name or "",
+                placeholder="letters, digits, - and _",
+                id="project_name",
             ),
-            Container(
-                Button("Browse...", id="save_browse"),
-                id="save_browse_row",
-            ),
-            Label("Project name (new folder name):", classes="modal-title"),
-            # batch-31 AC-2 (B-03): OS-clipboard paste via the bounded
-            # batch-29 funnel; the name still passes sanitize_project_name.
-            # `project_parent_path` above deliberately stays a stock Input
-            # (security mini-review scope condition — write-surface input).
-            OsClipboardInput(
-                placeholder="letters, numbers, - _", id="project_name"
-            ),
+            Static("", id="save_where", markup=False),
+            VerticalScroll(id="save_summary"),
         ]
         if self._assignment_rows_enabled:
             children.append(
-                Label("Project-wide batch files (.json):", classes="modal-title")
+                Label(
+                    "Project-wide batch files (.json):",
+                    classes="modal-title",
+                    markup=False,
+                )
             )
             children.append(
                 SelectionList[str](
-                    *[(name, name) for name in self.candidate_files],
+                    *[(Text(name), name) for name in self.candidate_files],
                     id="assign_batch",
                     classes="assign-list",
                 )
@@ -980,31 +1054,134 @@ class SaveProjectScreen(ModalScreen[Optional[SaveProjectPayload]]):
                     Label(
                         f"Assign files to '{display}':",
                         classes="modal-title",
+                        markup=False,
                     )
                 )
                 children.append(
                     SelectionList[str](
-                        *[(name, name) for name in self.candidate_files],
+                        *[(Text(name), name) for name in self.candidate_files],
                         id=f"assign_{index}",
                         classes="assign-list",
                     )
                 )
         children.append(
             Container(
-                Button("Save", id="save_ok", classes="modal-confirm"),
-                Button("Cancel", id="save_cancel"),
+                Button("Save (alt+s)", id="save_ok", classes="modal-confirm"),
+                Button("Cancel (esc)", id="save_cancel"),
                 id="saveproject_buttons",
                 classes="modal-buttons",
             )
         )
         yield Container(
             *children,
-            id="load_dialog",
+            id="save_box",
             classes="modal-dialog",
         )
 
     def on_mount(self) -> None:
-        self.query_one("#project_parent_path", Input).value = str(self.default_parent)
+        self.call_after_refresh(self._first_preview)
+
+    def _first_preview(self) -> None:
+        """Run the first preview once the first frame has laid out the dialog."""
+        if self._dismissed:
+            return
+        self._live = True
+        self._recompute()
+
+    def on_input_changed(self, event: Input.Changed) -> None:
+        """Reset the 150 ms debounce; one recompute runs after the last change."""
+        if event.input.id != "project_name" or not self._live or self._dismissed:
+            return
+        self._stop_trailing()
+        self._trailing = self.set_timer(SAVE_RECOMPUTE_S, self._recompute)
+
+    def _recompute(self) -> None:
+        """Run ``preview`` with the field text verbatim and paint the result."""
+        if self._dismissed:
+            return
+        self._stop_trailing()
+        self._paint(self._preview_fn(self.query_one("#project_name", Input).value))
+
+    def _stop_trailing(self) -> None:
+        """Stop the pending recompute timer, if one is running."""
+        if self._trailing is not None:
+            self._trailing.stop()
+            self._trailing = None
+
+    def _paint(self, p: SavePreview) -> None:
+        """Paint ``#save_where`` and the summary rows; the only ``_plan`` writer.
+
+        Data Flow:
+            - ``_plan`` is set to the preview's plan; ``_shown`` is cleared
+              and re-set by ``_mark_shown`` after the next refresh (S11-04).
+            - ``#save_where`` is one ``markup=False`` ``Static`` painted with
+              the where lines joined by newlines; the ``refusal`` class is
+              set when ``refused`` is true or any line has the ``refusal``
+              kind.
+            - The summary rows are one ``markup=False`` ``Static`` each, in
+              order, updated in place with only the difference mounted or
+              removed.
+        """
+        self._plan = p.plan
+        self._shown = False
+        self.call_after_refresh(self._mark_shown)
+        where = self.query_one("#save_where", Static)
+        where.update(Text("\n".join(text for text, _kind in p.where)))
+        where.set_class(
+            p.refused or any(kind == "refusal" for _text, kind in p.where),
+            "refusal",
+        )
+        box = self.query_one("#save_summary", VerticalScroll)
+        have = list(box.query(Static))
+        for w, row in zip(have, p.rows):
+            w.update(Text(row))
+        if len(p.rows) > len(have):
+            box.mount_all(
+                [Static(Text(row), markup=False) for row in p.rows[len(have):]]
+            )
+        for w in have[len(p.rows):]:
+            w.remove()
+
+    def _mark_shown(self) -> None:
+        """Mark the painted preview shown once the next refresh lands."""
+        if not self._dismissed:
+            self._shown = True
+
+    @property
+    def plan(self) -> Optional[project_gather_service.SavePlan]:
+        """The plan of the last painted preview, read-only (LLR-175.4k)."""
+        return self._plan
+
+    def action_save(self) -> None:
+        """Run ``confirm`` on the typed name; dismiss or repaint and stay open."""
+        if self._dismissed:
+            return
+        name = self.query_one("#project_name", Input).value
+        painted = self._plan if self._shown else None
+        again = self._confirm_fn(name, painted)
+        if again is not None:
+            self._stop_trailing()
+            self._paint(again)
+            return
+        if painted is None:
+            logger.warning("Save dialog: confirm accepted no painted plan; repainting")
+            self._recompute()
+            return
+        batch, assignments = self._collect_composition()
+        self._close(
+            SaveProjectPayload(
+                parent_folder=str(painted.target.parent),
+                project_name=name,
+                batch=batch,
+                assignments=assignments,
+                plan=painted,
+            )
+        )
+
+    def on_input_submitted(self, event: Input.Submitted) -> None:
+        if event.input.id == "project_name":
+            event.stop()
+            self.action_save()
 
     def _collect_composition(
         self,
@@ -1039,7 +1216,7 @@ class SaveProjectScreen(ModalScreen[Optional[SaveProjectPayload]]):
                 - self.variants (variant_id source, D-KEY)
                 - textual.widgets.SelectionList (queried by id)
             Used by:
-                - SaveProjectScreen.on_button_pressed (Save dismiss path)
+                - SaveProjectScreen.action_save
         """
         if not self._assignment_rows_enabled:
             return (), {}
@@ -1054,38 +1231,32 @@ class SaveProjectScreen(ModalScreen[Optional[SaveProjectPayload]]):
         return batch, assignments
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "save_cancel":
-            self.dismiss(None)
-            return
-        if event.button.id == "save_browse":
-            try:
-                import tkinter as tk
-                from tkinter import filedialog
-            except Exception as exc:
-                logger.warning("Folder browse unavailable: %s", exc)
-                return
-            root = tk.Tk()
-            root.withdraw()
-            root.attributes("-topmost", True)
-            picked = filedialog.askdirectory()
-            root.destroy()
-            if picked:
-                self.query_one("#project_parent_path", Input).value = picked
-            return
+        event.stop()
         if event.button.id == "save_ok":
-            parent = self.query_one("#project_parent_path", Input).value.strip()
-            name = self.query_one("#project_name", Input).value.strip()
-            if not parent or not name:
-                return
-            batch, assignments = self._collect_composition()
-            self.dismiss(
-                SaveProjectPayload(
-                    parent_folder=parent,
-                    project_name=name,
-                    batch=batch,
-                    assignments=assignments,
-                )
-            )
+            self.action_save()
+        elif event.button.id == "save_cancel":
+            self.action_cancel()
+
+    def action_cancel(self) -> None:
+        """Dismiss with ``None`` — ``escape`` and ``#save_cancel`` mirror here."""
+        self._close(None)
+
+    def _close(self, result: Optional[SaveProjectPayload]) -> None:
+        """Dismiss once; a second queued close / save returns at once.
+
+        Args:
+            result (Optional[SaveProjectPayload]): The payload to hand the
+                caller, or ``None`` for Cancel / Escape.
+
+        Data Flow:
+            - ``_dismissed`` is set before ``dismiss`` runs; the pending
+              recompute timer is stopped so it cannot fire after the dismiss.
+        """
+        if self._dismissed:
+            return
+        self._dismissed = True
+        self._stop_trailing()
+        self.dismiss(result)
 
 
 class SaveFlowScreen(ModalScreen[Optional[str]]):

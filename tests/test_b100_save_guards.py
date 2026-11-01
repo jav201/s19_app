@@ -94,6 +94,7 @@ from s19_app.tui.workspace import WORKAREA_SUBDIR
 from s19_app.tui.workspace import is_windows_device_name
 
 from tests.support import b100_links
+from tests.support import b100_save_dialog as sd
 from tests.support.timing import timing_bound
 from tests.support.b100_load_dialog import highlight_row, is_load_dialog
 
@@ -763,12 +764,20 @@ def _app_module_ast() -> ast.Module:
     return ast.parse(source)
 
 
-def _save_handler_ast(tree: ast.Module) -> ast.FunctionDef:
+#: Inc 11 re-pin (census H, interfaces S-c "Split", B11-66): the commit half
+#: of Save project (``mkdir``, placements, manifest, rollback) moved out of
+#: the one-argument router ``_handle_save_dialog`` into
+#: ``_commit_project_save``; the census reads the function that creates the
+#: folder.
+_SAVE_COMMIT_FUNCTION = "_commit_project_save"
+
+
+def _save_handler_ast(tree: ast.Module, name: str = _SAVE_COMMIT_FUNCTION) -> ast.FunctionDef:
     return next(
         node
         for node in ast.walk(tree)
         if isinstance(node, ast.FunctionDef)
-        and node.name == "_handle_save_dialog"
+        and node.name == name
     )
 
 
@@ -825,6 +834,17 @@ def test_tc_b100_07_ast_census_every_post_creation_return_removes(
     ]
     assert mkdir_lines, "the handler must create the project folder"
     first_mkdir = min(mkdir_lines)
+    router = _save_handler_ast(tree, "_handle_save_dialog")
+    router_mkdirs = [
+        node.lineno
+        for node in ast.walk(router)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr == "mkdir"
+    ]
+    assert router_mkdirs == [], (
+        f"the Save router must create no folder itself (B11-66): {router_mkdirs}"
+    )
 
     post_creation_returns = [
         node
@@ -2257,21 +2277,43 @@ async def _load_file_through_dialog(pilot, app: S19TuiApp, src: Path) -> None:
 
 async def _save_project_as(pilot, app: S19TuiApp, name: str) -> None:
     """Open the Save project dialog (``ctrl+s``), type the name and press
-    Save; wait for the dialog to close and the status to repaint."""
+    Save; wait for the dialog to close and the status to repaint.
+
+    Inc 11 re-pin (LLR-175.2, .3h, .4b): the dialog offers no parent field
+    and no Browse button; the prefilled name is cleared before typing; the
+    summary of the name is awaited, then Save is ``alt+s``."""
     await pilot.press("ctrl+s")
     await _wait_for(
         pilot,
         lambda: isinstance(app.screen, SaveProjectScreen),
         "the Save project dialog",
     )
+    assert len(app.screen.query("#project_parent_path")) == 0, "a parent-folder field is offered"
+    assert len(app.screen.query("#save_browse")) == 0, "a Browse button is offered"
     assert await pilot.click("#project_name"), "click missed #project_name"
-    await pilot.press(*name)
-    assert await pilot.click("#save_ok"), "click missed #save_ok"
+    await sd.type_and_await_summary(pilot, app, name)
+    await pilot.press("alt+s")
     await _wait_for(
         pilot,
         lambda: not isinstance(app.screen, SaveProjectScreen),
         "the Save project dialog to close",
     )
+
+
+async def _refused_in_dialog(pilot, app: S19TuiApp, name: str, *tokens: str) -> str:
+    """Inc 11 re-pin (ruling Q5, HLR-175b): the refusal of ``name`` is read in
+    ``#save_where`` with the dialog open; ``alt+s`` keeps the dialog open;
+    ``escape`` closes it. Returns the painted refusal."""
+    await pilot.press("ctrl+s")
+    await _wait_for(
+        pilot,
+        lambda: isinstance(app.screen, SaveProjectScreen),
+        "the Save project dialog",
+    )
+    assert len(app.screen.query("#project_parent_path")) == 0, "a parent-folder field is offered"
+    assert len(app.screen.query("#save_browse")) == 0, "a Browse button is offered"
+    assert await pilot.click("#project_name"), "click missed #project_name"
+    return await sd.refuse_in_open_dialog(pilot, app, name, *tokens)
 
 
 async def _open_project_through_dialog(pilot, app: S19TuiApp, name: str) -> None:
@@ -2304,7 +2346,13 @@ async def _open_project_through_dialog(pilot, app: S19TuiApp, name: str) -> None
 def test_at_b100_02_name_refusals_through_the_save_dialog(
     tmp_path: Path, size: tuple
 ) -> None:
-    """Through the shipped dialog by keys: ``Reports`` → ``reserved name`` /
+    """Inc 11 re-pin (ruling Q5, HLR-175b, HLR-175e; AT index: "alt+s; no
+    parent field; the refusals read in #save_where with the dialog open"):
+    each refusal below is read in ``#save_where`` while the dialog is open,
+    ``alt+s`` keeps the dialog open, and the dialog offers no parent field
+    and no Browse button; the saves of ``prg`` and ``ab`` use ``alt+s``.
+
+    Through the shipped dialog by keys: ``Reports`` → ``reserved name`` /
     ``choose another name`` and no folder; ``CON`` → ``device name``;
     a 300-character name → ``name too long`` and the app keeps running;
     then HLR-164's acceptance scene (LED .52(c)): projects ``prg`` (P2)
@@ -2321,35 +2369,18 @@ def test_at_b100_02_name_refusals_through_the_save_dialog(
             await pilot.pause()
             await _load_file_through_dialog(pilot, app, src)
             # 1. a reserved home, mixed case.
-            await _save_project_as(pilot, app, "Reports")
-            await _wait_for(
-                pilot,
-                lambda: "reserved name" in _status_text(app)
-                and "choose another name" in _status_text(app),
-                "the reserved-name refusal tokens",
-            )
+            await _refused_in_dialog(pilot, app, "Reports", "reserved name", "choose another name")
             assert not (app.workarea / "Reports").exists(), (
                 "a reserved-name refusal created a folder"
             )
             # 2. a Windows device name.
-            await _save_project_as(pilot, app, "CON")
-            await _wait_for(
-                pilot,
-                lambda: "device name" in _status_text(app)
-                and "choose another name" in _status_text(app),
-                "the device-name refusal tokens",
-            )
+            await _refused_in_dialog(pilot, app, "CON", "device name", "choose another name")
             assert not (app.workarea / "CON").exists(), (
                 "a device-name refusal created a folder"
             )
             # 3. a 300-character name: refused, the app keeps running.
-            await _save_project_as(pilot, app, "x" * 300)
-            await _wait_for(
-                pilot,
-                lambda: "name too long" in _status_text(app)
-                and "shorten the name" in _status_text(app),
-                "the name-too-long refusal tokens",
-            )
+            await _refused_in_dialog(pilot, app, "x" * 300, "name too long", "shorten the name")
+            assert app.is_running
             assert not any(
                 len(item.name) > 64 for item in app.workarea.iterdir()
             ), "a too-long name created a folder"
@@ -2377,14 +2408,7 @@ def test_at_b100_02_name_refusals_through_the_save_dialog(
             )
             ab_dir = app.workarea / "ab"
             ab_digest_before = _digest_manifest(ab_dir)
-            await _save_project_as(pilot, app, "a b")
-            await _wait_for(
-                pilot,
-                lambda: "already a project" in _status_text(app)
-                and "'ab'" in _status_text(app)
-                and "choose another name" in _status_text(app),
-                "the disguised-clash refusal naming ab",
-            )
+            await _refused_in_dialog(pilot, app, "a b", "already a project", "'ab'", "choose another name")
             ab_digest_after = _digest_manifest(ab_dir)
         return ab_digest_before, ab_digest_after
 

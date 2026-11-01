@@ -81,6 +81,7 @@ from s19_app.tui.workspace import WORKAREA_DIRNAME
 from s19_app.tui.workspace import WORKAREA_SUBDIR
 
 from tests.support import b100_projects as projects
+from tests.support import b100_save_dialog as sd
 from tests.support.b100_load_dialog import highlight_row
 from tests.support.b100_load_dialog import is_load_dialog
 from tests.support.b100_load_dialog import load_choice_cls
@@ -1051,7 +1052,9 @@ async def _save_project_through_dialog(pilot, app: S19TuiApp, name: str) -> None
         pilot, lambda: isinstance(app.screen, SaveProjectScreen), "the Save project dialog"
     )
     assert await pilot.click("#project_name"), "click missed #project_name"
-    await pilot.press(*name)
+    # Inc 11 re-pin (census D / F, LLR-175.3h / .4b): clear the prefilled
+    # name, type it, and wait for its painted summary before Save.
+    await sd.type_and_await_summary(pilot, app, name)
     assert await pilot.click("#save_ok"), "click missed #save_ok"
     await _wait_for(
         pilot,

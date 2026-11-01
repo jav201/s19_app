@@ -1,0 +1,9 @@
+== head: 17474791bde5dfea48f379883c91fd69c34853c7 (worktree with uncommitted Inc 11 changes)
+== s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc11\s19_app\__init__.py
+== command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<scratchpad>/int11/lad/dx C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider --basetemp=<scratchpad>/int11/bt/dx -q --no-header -s -p no:randomly --tb=short --rootdir=. C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int11/probe/test_probe_strasse.py
+DIRECT 'strasse' None open project
+FIELD 'straße'
+WHERE 'strasse — updates the open project'
+.
+1 passed in 100.12s (0:01:40)
+== exit: 0

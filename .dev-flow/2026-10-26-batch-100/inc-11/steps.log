@@ -1,0 +1,22 @@
+2026-10-31 14:32  E1 start (Opus, parallel with 9a close and 9b design-fix on DeepSeek)
+2026-10-31 14:54  E1 end (Opus) — 52 requirements
+2026-10-31 14:55  E1 rulings Q1-Q11 (orchestrator; Q10 accepted: project_gather_service.py 4th file)
+2026-10-31 17:06  E2 baseline end (Opus) — 42 nodes
+2026-10-31 17:07  E2 baseline rulings + interfaces-11.md fixed (orchestrator); prototypes G-A, G-B start (Opus)
+2026-10-31 17:26  E2 prototype G-B end (Opus) — 16 nodes / 81 examples
+2026-10-31 17:28  E2 prototype G-A end (Opus) — 16 nodes / 69 examples
+2026-10-31 17:30  E2 prototypes done (G-A 16/69, G-B 16/81); proposals ruled; E3 PDR r1 start (Opus architect ∥ security)
+2026-10-31 17:46  E3 r1: arch FAIL (6 MAJOR), sec PWN (1 MAJOR S11-01 samefile); rulings written; design-fix r1 start (DeepSeek)
+2026-10-31 18:04  E3 r1 design-fix end (DeepSeek v4 Pro)
+2026-10-31 18:10  E3 r2: arch FAIL (3 new MAJOR from fixes), sec PWN; r2 rulings written; design-fix r2 start (DeepSeek)
+2026-10-31 18:18  E3 r2 design-fix end (DeepSeek v4 Pro)
+2026-10-31 18:20  E3 r3: arch PWN (R3-01 MINOR, R3-02 NIT); E3 closed; addenda written; E4 waits for the post-10 tree
+2026-10-31 19:33  design copied to worktree b100-inc11 (from 1747479 = 9b corrected + Inc 10 integrated); E4 start: G-A+G-B DeepSeek, tester Opus
+2026-10-31 21:23  E4 tester end (Opus, 154 new ids RED 154/154; 24 re-pins); integration start (Opus)
+2026-10-31 23:18 E4 integration GREEN (Opus software-dev): 154/154 new, 35/35 repins, 249+4skip guards; SR-11-1..3 ruled
+2026-10-31 23:20 main merged (051f586; conflict test_id_registry bound 233 resolved); E5 start: mutants 80 rows (DeepSeek v4 Pro via pi, copy mut11) || code-reviewer (Opus) || security-reviewer (Opus)
+2026-10-31 23:29 E5 reviews: code FAIL (1 MAJOR CR11-F1), security FAIL (1 HIGH SE5-11-1); rulings written; corrective start (Opus software-dev)
+2026-11-01 00:00 E5 mutants done (DeepSeek v4 Pro, 35 min): 80 rows, 62 killed / 18 survived / 0 invalid; 7 survivors routed to corrective, 10 accepted equivalent, M-47 removal-or-accept
+2026-11-01 00:31 E5 corrective done (Opus software-dev): SE5-11-1, CR11-F1..F3, CI9b-1/2, name-cap, 7 MUT11 kills, M-47 guard removed; green-05 68 passed; app 1a3ed1e9ed0976eb, screens dc988721ae7b6a87; O-1 → 12b, O-3 accepted
+2026-11-01 00:35 E5 round-2 re-review: code PASS, security PASS-WITH-NOTES (SE5-11-3 MINOR = O-3 → 12b backlog)
+2026-11-01 00:40 E13 sd-dialog (DeepSeek v4 Pro): 3 PNG, failures=0, OBS none; 118 PNG checked by orchestrator (Opus)

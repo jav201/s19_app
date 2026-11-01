@@ -2584,10 +2584,14 @@ def test_tc037_workspace_empty_state_clears_when_file_loads(
 # dialogs retired into the one ``LoadDialog``; it is checked in both of its
 # open modes (``path`` for the old Load file entry, ``list`` with two project
 # rows for the old Load project entry), so the property is still asserted
-# for every way the app shows a Load modal.
+# for every way the app shows a Load modal. Inc 11 re-pin (census A, S-b):
+# ``SaveProjectScreen`` has no positional ``default_parent`` any more; it is
+# built through its keyword constructor, fed by the inert fakes of
+# ``tests.support.b100_save_dialog`` (the work area stands where the parent
+# folder stood).
 _MODAL_SPECS = [
     ("LoadDialog(path)", ()),
-    ("SaveProjectScreen", ("_default_parent_",)),
+    ("SaveProjectScreen", ()),
     ("LoadDialog(list)", (["proj_a", "proj_b"],)),
 ]
 
@@ -2629,9 +2633,10 @@ def _modal_css_block() -> str:
 
 def _build_modal(name: str, args: tuple, default_parent: Path):
     """Construct one of the three re-skinned modals by name (the Load dialog
-    through its fixed constructor, fed by inert callables)."""
-    from s19_app.tui.screens import SaveProjectScreen
+    and, from Inc 11, the Save dialog through their fixed keyword
+    constructors, fed by inert callables)."""
     from tests.support.b100_load_dialog import bare_path_dialog, load_choice_cls
+    from tests.support.b100_save_dialog import bare_save_dialog
 
     if name == "LoadDialog(path)":
         return bare_path_dialog()
@@ -2641,10 +2646,7 @@ def _build_modal(name: str, args: tuple, default_parent: Path):
             ("projects", project, LoadChoice("project", project)) for project in args[0]
         ]
         return bare_path_dialog(mode="list", rows=lambda: rows)
-    resolved = tuple(
-        default_parent if a == "_default_parent_" else a for a in args
-    )
-    return SaveProjectScreen(*resolved)
+    return bare_save_dialog(default_parent)
 
 
 # ---------------------------------------------------------------------------
@@ -3065,10 +3067,18 @@ def test_tc034_modals_behavior_methods_intact(tmp_path: Path) -> None:
     Intent: a re-skin that broke a button id or the ``compose`` tree would
     fail to dismiss; exercising the real button widgets proves the wiring
     survived the class / id additions made for theming.
+
+    Inc 11 re-pin (census A, S-b, LLR-175.2 / .2a): the dialog is built
+    through its keyword constructor (inert fakes of the app callables); the
+    parent field is gone, so the payload's parent is the folder that holds
+    the painted plan's target (this work area, here ``tmp_path``); the name
+    is typed, the summary for it is painted (the 150 ms recompute), and
+    then Save is pressed — what it proves is unchanged.
     """
     from textual.widgets import Button, Input
 
-    from s19_app.tui.screens import SaveProjectPayload, SaveProjectScreen
+    from s19_app.tui.screens import SaveProjectPayload
+    from tests.support.b100_save_dialog import RECOMPUTE_WAIT, bare_save_dialog
 
     async def _drive() -> tuple[object, object]:
         app = S19TuiApp(base_dir=tmp_path)
@@ -3077,7 +3087,7 @@ def test_tc034_modals_behavior_methods_intact(tmp_path: Path) -> None:
 
             # Cancel path — dismiss with None.
             cancel_result: list = []
-            modal_cancel = SaveProjectScreen(tmp_path)
+            modal_cancel = bare_save_dialog(tmp_path)
             app.push_screen(modal_cancel, cancel_result.append)
             await pilot.pause()
             cancel_btn = modal_cancel.query_one("#save_cancel", Button)
@@ -3086,13 +3096,13 @@ def test_tc034_modals_behavior_methods_intact(tmp_path: Path) -> None:
 
             # Confirm path — dismiss with a SaveProjectPayload.
             ok_result: list = []
-            modal_ok = SaveProjectScreen(tmp_path)
+            modal_ok = bare_save_dialog(tmp_path)
             app.push_screen(modal_ok, ok_result.append)
             await pilot.pause()
-            modal_ok.query_one("#project_parent_path", Input).value = str(
-                tmp_path
-            )
             modal_ok.query_one("#project_name", Input).value = "Demo_Project"
+            await pilot.pause(RECOMPUTE_WAIT)
+            for _ in range(6):
+                await pilot.pause()
             ok_btn = modal_ok.query_one("#save_ok", Button)
             modal_ok.on_button_pressed(Button.Pressed(ok_btn))
             await pilot.pause()

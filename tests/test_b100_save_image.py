@@ -72,6 +72,7 @@ from s19_app.tui.workspace import WORKAREA_SUBDIR
 
 from tests import b97_fixtures
 from tests.support import b100_links
+from tests.support import b100_save_dialog as sd
 from tests.support import b100_projects as projects
 from tests.support.b100_load_dialog import highlight_row, is_load_dialog
 from tests.support import b100_projects
@@ -2130,7 +2131,9 @@ def test_at_b100_05_save_project_saves_the_patched_image(
                 "the Save project dialog",
             )
             assert await pilot.click("#project_name"), "click missed #project_name"
-            await pilot.press(*"P1")
+            # Inc 11 re-pin (census D / F, LLR-175.3h / .4b): clear the prefilled
+            # name, type it, and wait for its painted summary before Save.
+            await sd.type_and_await_summary(pilot, app, "P1")
             assert await pilot.click("#save_ok"), "click missed #save_ok"
             await _wait_for(
                 pilot,
