@@ -1,0 +1,15 @@
+2026-10-31 14:55  E1 start (Opus, parallel with 9b E3)
+2026-10-31 15:16  E1 end (Opus) — 38 requirements
+2026-10-31 15:17  E1 rulings Q1-Q10 + backlog (orchestrator, all as recommended)
+2026-10-31 19:15  E2 baseline end (Opus) — 35 nodes
+2026-10-31 19:16  E2 baseline rulings + interfaces-12a.md fixed (orchestrator); prototypes G-A, G-B start (Opus)
+2026-10-31 19:31  E2 prototype G-B end (Opus) — 8 nodes / 37 examples
+2026-10-31 19:36  E2 prototype G-A end (Opus) — 28 nodes / 75 examples
+2026-10-31 19:37  E2 prototypes done (G-A 28/75, G-B 8/37); proposals ruled; E3 PDR r1 start (Opus architect ∥ security)
+2026-10-31 19:52  E3 r1: arch PWN (0 MAJOR), sec PWN (2 MAJOR); rulings written; design-fix r1 start (DeepSeek)
+2026-10-31 20:09  E3 r1 design-fix end (DeepSeek v4 Pro)
+2026-10-31 20:12  E3 r2: sec PWN (4 NIT); E3 closed; addenda written; E4 waits for the post-11 tree
+2026-10-31 23:19 E4 start: implementer G-A+G-B (DeepSeek v4 Pro via pi) || tester (Opus); base 051f586
+2026-10-31 23:37 E4 implementer G-A+G-B done (DeepSeek v4 Pro): 3 deviations declared; app 96613abc4e324376, tcss f7b4f75911b296a4
+2026-11-01 00:08 E4 tester done (Opus): 67 fn/112 items new + 15 fn/23 items re-pinned; RED 125/135 on 051f586; D-1..D-8 ruled; integration start (Opus software-dev)
+2026-11-01 00:58 E4 integration done (Opus software-dev): new 112 passed/1 skip, repins 22 passed, guards 295 passed/1 failed (F-8 inherited, fixed on b100-inc11); app ed0ee69584332172; SR-12a-1..3 accepted

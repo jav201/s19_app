@@ -1,0 +1,43 @@
+# batch-100 Inc 12a — E4 integration — diagB
+# head: 051f58613efa8fab6c9d477babfbe19a06f59f67 (branch b100-inc12a), working tree with the Inc 12a edits
+# s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc12a\s19_app\__init__.py
+# interpreter: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe (3.11.15 textual 8.2.8)
+# env: NO_COLOR unset, PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int12a/lad
+# app.py sha256[:16]: cc89cbcaa2c066cd  styles.tcss sha256[:16]: f7b4f75911b296a4
+# started: 2026-11-01T00:11:38-06:00
+# command: python -m pytest -p no:cacheprovider --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int12a/bt/diagB --tb=short -rfEs -q tests/test_b100_busy.py -k tc_b100_51 or at_b100_17
+
+F................F....F..                                                [100%]
+================================== FAILURES ===================================
+__________ test_tc_b100_51_action_table_names_the_seven_long_actions __________
+tests\test_b100_busy.py:1484: in test_tc_b100_51_action_table_names_the_seven_long_actions
+    assert sum(len(row.steps) for row in table.values()) == 18
+E   assert 19 == 18
+E    +  where 19 = sum(<generator object test_tc_b100_51_action_table_names_the_seven_long_actions.<locals>.<genexpr> at 0x00000132E7785460>)
+_ test_tc_b100_51_diff_report_ends_once_and_logs_its_outcome[written-written-written-bar0-Diff report written: {md}  |  {html}] _
+tests\test_b100_busy.py:2088: in test_tc_b100_51_diff_report_ends_once_and_logs_its_outcome
+    assert added and added[-1] == expected.strip()[: max(50, width)], (added, expected)
+E   AssertionError: (['Diff report written: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-1...8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\int12a\\bt\\diagB\\test_tc_b100_51_diff_report_en0\\diff_out\\r.html')
+E   assert (['Diff report written: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-12...8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\int12a\\bt\\diagB\\test_tc_b100_51_diff_report_en0\\diff_out\\r.html'] and 'Diff report ...f_out\\r.html' == 'Diff report ...-122b894659b2'
+E     
+E     Skipping 107 identical leading characters in diff, use -v to show
+E     - 22b894659b2
+E     + 22b894659b2\scratchpad\int12a\bt\diagB\test_tc_b100_51_diff_report_en0\diff_out\r.md  |  C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int12a\bt\diagB\test_tc_b100_51_diff_report_en0\diff_out\r.html)
+____ test_tc_b100_51_before_after_ends_once_and_logs_its_outcome[written] _____
+tests\test_b100_busy.py:2146: in test_tc_b100_51_before_after_ends_once_and_logs_its_outcome
+    assert added[-1] == ends[0].outcome.strip()[: max(50, width)], (added, ends[0].outcome)
+E   AssertionError: (['Before/after report written: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4cc...8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\int12a\\bt\\diagB\\test_tc_b100_51_before_after_e0\\ba.html')
+E   assert 'Before/after...r_e0\\ba.html' == 'Before/after...ccb-86cf-122b'
+E     
+E     Skipping 107 identical leading characters in diff, use -v to show
+E     - b-86cf-122b
+E     + b-86cf-122b894659b2\scratchpad\int12a\bt\diagB\test_tc_b100_51_before_after_e0\ba.md | C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int12a\bt\diagB\test_tc_b100_51_before_after_e0\ba.html
+=========================== short test summary info ===========================
+FAILED tests/test_b100_busy.py::test_tc_b100_51_action_table_names_the_seven_long_actions
+FAILED tests/test_b100_busy.py::test_tc_b100_51_diff_report_ends_once_and_logs_its_outcome[written-written-written-bar0-Diff report written: {md}  |  {html}]
+FAILED tests/test_b100_busy.py::test_tc_b100_51_before_after_ends_once_and_logs_its_outcome[written]
+3 failed, 22 passed, 56 deselected in 174.62s (0:02:54)
+
+# pytest exit code: 0
+# finished: 2026-11-01T00:14:39-06:00
+# real %LOCALAPPDATA%\s19_app exists: no

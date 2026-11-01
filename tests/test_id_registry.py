@@ -159,8 +159,12 @@ from tools.id_registry import (
 # batch-100 Inc-7: 222 -> 224 (tests/test_b100_project_check.py, tests/support/b100_manifests.py).
 # batch-100 Inc-8a: 224 -> 225 (tests/test_b100_document.py).
 # batch-100 Inc 11: 231 -> 233 (tests/test_b100_save_dialog.py, tests/support/b100_save_dialog.py).
-EXPECTED_SCANNED_TEST_FILES = 233
+# batch-100 Inc 12a: 233 -> 234 (tests/test_b100_busy.py).
+EXPECTED_SCANNED_TEST_FILES = 234
 """Test modules scanned, including this one.
+
+batch-100 Inc 12a: 233 -> 234. ``tests/test_b100_busy.py`` (TC-B100-50, -51
+and AT-B100-17, HLR-176) was added. MEASURED: the guard reports 234.
 
 batch-100 Inc 11: 231 -> 233. ``tests/test_b100_save_dialog.py``
 (TC-B100-47, -48, -49, -65 and AT-B100-16, -21, HLR-175) and

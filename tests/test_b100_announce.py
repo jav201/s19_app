@@ -487,6 +487,64 @@ def test_tc_b100_56_long_names_keep_the_details_key_inside_118_columns() -> None
     assert len(line) <= 118 and line.endswith("variant 1 of 1, 0 problems - details: p"), line
 
 
+def test_tc_b100_56_project_line_is_the_file_state_painted_at_the_last_end(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-178.2 (Inc 12a extension through LLR-176.1j; A12-42, A12-70,
+    A12a-06): the project load is a long action whose end writes the
+    summary line to the status log, and the project and file line reaches
+    ``#status_text`` as the stored file state:
+    - alone: exactly 1 effective ``project_load`` end, whose outcome is the
+      ``details: p`` summary, and ``#status_text`` then reads
+      ``Loaded project 'P' -> firmware_1.s19``;
+    - while a report run is held open: the project load's end is not the
+      last end, so ``#status_text`` keeps the report's progress line; when
+      the report ends, ``#status_text`` reads the project and file line
+      (not the image install's ``Loaded firmware_1.s19 (S19 only)``).
+
+    Why: the line naming the open project must survive a long action that
+    overlaps it (finding F-4).
+    Negative control: a ``final_line`` painted over the stored file state →
+    the overlap arm loses the project line. RED (base): no progress seam."""
+    base = tmp_path / "app"
+    _seed_two_variants(_workarea(base))
+    ends: list = []
+    original_end = S19TuiApp.end_busy
+
+    def _end(app, key, gen, outcome):
+        result = original_end(app, key, gen, outcome)
+        ends.append((key, outcome, result))
+        return result
+
+    monkeypatch.setattr(S19TuiApp, "end_busy", _end)
+    project_line = "Loaded project 'P' -> firmware_1.s19"
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=base)
+        async with app.run_test(size=(118, 54)) as pilot:
+            await pilot.pause()
+            app._handle_load_project("P")
+            await _flush(pilot)
+            alone = str(app.query_one("#status_text", Label).render())
+            gen = app.begin_busy(
+                "report", "Generating the project report", ("Prepare the results", "Write the report")
+            )
+            app._handle_load_project("P")
+            await _flush(pilot)
+            held = str(app.query_one("#status_text", Label).render())
+            app.end_busy("report", gen, "Report: reports/r.md")
+            await _flush(pilot)
+            return alone, held, str(app.query_one("#status_text", Label).render())
+
+    alone, held, after = asyncio.run(_drive())
+    project_ends = [(outcome, result) for key, outcome, result in ends if key == "project_load"]
+    assert len(project_ends) == 2 and all(result is True for _o, result in project_ends), ends
+    assert project_ends[0][0].startswith(project_line) and project_ends[0][0].endswith("details: p"), project_ends
+    assert alone == project_line, alone
+    assert "Generating the project report" in held and "step 1/2" in held, held
+    assert after == project_line, after
+
+
 # ---------------------------------------------------------------------------
 # TC-B100-67 — LLR-178.3: the panel, reachable by keyboard
 # ---------------------------------------------------------------------------

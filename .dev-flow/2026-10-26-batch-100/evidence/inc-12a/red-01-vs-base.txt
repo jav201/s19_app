@@ -1,0 +1,282 @@
+# batch-100 Inc 12a — E4 tester — RED capture against the base revision
+# base sha: 051f58613efa8fab6c9d477babfbe19a06f59f67  (051f586 Merge branch 'main' into b100-inc11)
+# base tree: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/base12a (detached scratch worktree; tests copied from the Inc 12a worktree, source untouched)
+# git status (tests only modified/added): 
+#    M tests/test_b100_announce.py
+#    M tests/test_b100_load_dialog.py
+#    M tests/test_b100_recents.py
+#    M tests/test_b100_session_reset.py
+#    M tests/test_b97_key_bar.py
+#    M tests/test_before_after_report.py
+#    M tests/test_report_off_ui_thread.py
+#    M tests/test_report_progress.py
+#    M tests/test_tui_app.py
+#    M tests/test_tui_diff_screen.py
+#    M tests/test_tui_patch_history_strip.py
+#    M tests/test_tui_report_attribution.py
+#   ?? tests/test_b100_busy.py
+# s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\s19_app\__init__.py
+# interpreter: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe (3.11.15 textual 8.2.8)
+# env: NO_COLOR unset, PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/t12a/lad
+# started: 2026-10-31T23:56:23-06:00
+# command: python -m pytest -p no:cacheprovider --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/t12a/bt-red --tb=line -rfEs -q <node ids below>
+
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFsFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF [ 53%]
+FFFFFFFFFFFFFFFFFF....FFFFFFFFFFFFFFF.F.FFFFFFFFFFFF..FFFFFFFF.          [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:277: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:304: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:327: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:346: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:381: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:430: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:430: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:430: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:430: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:430: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:430: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:466: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:512: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:533: AttributeError: type object 'S19TuiApp' has no attribute '_busy_tick'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:566: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:599: AttributeError: module 's19_app.tui.app' has no attribute '_BusyRun'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:599: AttributeError: module 's19_app.tui.app' has no attribute '_BusyRun'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:599: AttributeError: module 's19_app.tui.app' has no attribute '_BusyRun'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:599: AttributeError: module 's19_app.tui.app' has no attribute '_BusyRun'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:599: AttributeError: module 's19_app.tui.app' has no attribute '_BusyRun'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:616: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:644: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:672: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:699: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:734: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:734: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:731: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:770: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:803: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:842: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:982: AssertionError: ['Loaded firmware.s19 (S19 only)']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:982: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:982: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:982: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1024: AssertionError: ['Loaded firmware.s19 (S19 only)']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1024: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1024: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1024: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1080: AssertionError: ['Loaded [b]x.s19 (S19 only)']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1080: AssertionError: ['Loaded fw\u202egpj.s19 (S19 only)']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1080: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1141: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1158: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1158: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1181: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1220: AssertionError: ['Loaded firmware.s19 (S19 only)']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1242: AttributeError: 'S19TuiApp' object has no attribute '_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1298: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1376: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1376: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1376: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1376: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1399: AssertionError: [10, 50]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1424: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1457: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1479: AttributeError: module 's19_app.tui.app' has no attribute '_BUSY_ACTIONS'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1553: AssertionError: [('action_before_after_report', 'begin', 'before_after', None, '0/1'), ('_start_before_after_worker', 'end', 'before_a...t_generate_report_worker', 'step', 'report', 2, '0/1'), ('_finish_generate_report', 'end', 'report', None, '0/1'), ...]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1581: AssertionError: [('action_before_after_report', 5091), ('_start_before_after_worker', 5186), ('_start_before_after_worker', 5174), ('_start_before_after_worker', 5160), ('_trigger_generate_report', 5781), ('_start_generate_report_worker', 5927), ...]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1603: AssertionError: ('_start_load_worker', ['self', 'path', 'a2l_files'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1648: AssertionError: [10, 50, 100]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1690: AssertionError: ([10, 50, 100], ['Load failed: synthetic parse failure', 'Load failed'], 'Ready.', 0)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1718: AssertionError: [10, 0]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1749: AssertionError: [10, 50, 100]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1779: AssertionError: [10, 0]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1804: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1833: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1890: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1932: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1972: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2007: AssertionError: [15, 55, 100]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2043: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2043: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2085: AssertionError: [15, 55, 100]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2085: AssertionError: [15, 0]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2085: AssertionError: [15, 55, 0]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2085: AssertionError: [15, 55, 0]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2099: AssertionError: the progress seam does not exist
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2136: AssertionError: [15, 100]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2136: AssertionError: [15, 0]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2202: AssertionError: ['Ready.', 'Ready.', 'Ready.', 'Ready.', 'Ready.', 'Ready.', ...]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_load_dialog.py:1736: AssertionError: [['^k Palette', '^d Density', '^l Load file', '^s Save project', 'x Operations', '? Help', ...], ['Workspace', '/ Find', 'g Go-to', ', Hex-', '. Hex+', 'k Legend', ...]]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_load_dialog.py:3726: AttributeError: module 's19_app.tui.app' has no attribute '_BUSY_ACTIONS'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_load_dialog.py:3771: AssertionError: ["Load failed: [Errno 13] Permission denied: 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-j...\\\\scratchpad\\\\t12a\\\\bt-red\\\\test_tc_b100_66_pick_refusal_t0\\\\app\\\\.s19tool\\\\workarea\\\\temp\\\\fw.s19'"]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_announce.py:512: AttributeError: type object 'S19TuiApp' has no attribute 'end_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3315: AssertionError: ['fw-v1', 'fw-v1.', 'fw-v2', 'fw-v2 ', 'P']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3359: AssertionError: ['a.s19', 'b.hex', 'c.mac', 'd.a2l', 'd.a2l.json', 'e.txt']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3359: AssertionError: ['F.S19', 'g.srec', 'h.ihex', 'notes', 'x.a2l.json']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3359: AssertionError: ['d.a2l.json']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3372: AssertionError: refresh_files
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3479: AssertionError: ("PermissionError(13, 'injected: access denied')", [])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3479: AssertionError: ("OSError(38, 'injected: name too long')", [])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3447: PermissionError: [Errno 13] injected: access denied: 'fw_eacces.s19'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3447: OSError: [Errno 38] injected: name too long: 'fw_toolong.s19'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3501: AssertionError: ['_handle_load_project', '_typed_load_route']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3522: AttributeError: 'S19TuiApp' object has no attribute '_listed_project_name'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3592: AssertionError: [('_handle_load_project', "Project NOT loaded: '{}' could not be read — check that the folder can be opened, then load...d_project', "Project NOT loaded: '{}' could not be read — check that the folder can be opened, then load again."), ...]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3699: AssertionError: ['fw.s19']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3699: AssertionError: ['fw.s19']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3699: AssertionError: ['fw.s19']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3699: AssertionError: ['fw.s19']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3699: AssertionError: ['fw.s19']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3699: AssertionError: ['fw.s19']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3747: AssertionError: ['fw.s19']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3807: AssertionError: (['x.s19'], LoadedFile(path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4c...76, sample_count=64, entropy=6.0, band='medium', low_confidence=False)], out_of_order_count=0, entry_point=2147483648))
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3858: AssertionError: (['big.s19'], [])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3858: AssertionError: ([], ['c.a2l'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:2598: AssertionError: ['ab', 'fw-v1', 'fw-v1.']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_report_progress.py:78: AssertionError: LLR-176.1k: a completed report must leave the bar cleared; got 100/100
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_report_progress.py:147: AssertionError: AC-1: kickoff must paint the progress line, got "Loaded project 'proj' -> a.s19"
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_report_progress.py:165: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_before_after_report.py:276: AssertionError: a successfully written before/after report must begin the bar at 0 and leave it cleared, not mid-fill. Sequence: [15, 100]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_report_off_ui_thread.py:239: AssertionError: a fully written diff report must pass its step and end cleared; sequence: [15, 55, 100]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_tui_report_attribution.py:113: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_tui_report_attribution.py:113: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_tui_report_attribution.py:113: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_tui_report_attribution.py:113: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_tui_report_attribution.py:113: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b97_key_bar.py:408: AssertionError: ('workspace', 'rail', ['^k Palette', '^d Density', '^l Load file', '^s Save project', 'x Operations', '? Help', ...])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b97_key_bar.py:408: AssertionError: ('workspace', 'rail', ['^k Palette', '^d Density', '^l Load file', '^s Save project', 'x Operations', '? Help', ...])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b97_key_bar.py:431: AssertionError: ('workspace', ['^k Palette', '^d Density', '^l Load file', '^s Save project', 'x Operations', '? Help'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b97_key_bar.py:1413: AssertionError: ((118, 54), 'workspace', ' ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help  q Quit  ^p palette                    ')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b97_key_bar.py:1123: AssertionError: ('workspace', ['^l Load file'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b97_key_bar.py:1123: AssertionError: ('workspace', ['^l Load file'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b97_key_bar.py:1123: AssertionError: ('workspace', ['^l Load file'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_tui_diff_screen.py:3916: AssertionError: the App BINDINGS block must be byte-for-byte the committed set. Added: [('c', 'confirm_attention', 'Confirm', False), ('ctrl+l', 'load_file', 'Load file', True), ('d', 'a2l_describe_tag', 'Describe tag', False), ('l', 'load_file', 'Load file', False), ('p', 'load_project', 'Load project', False)]; removed: [('ctrl+l', 'load_file', 'Load', True), ('l', 'load_file', 'Load', False), ('p', 'load_project', 'Projects', False)]
+=========================== short test summary info ===========================
+FAILED tests/test_b100_busy.py::test_tc_b100_50_begin_paints_the_first_progress_line
+FAILED tests/test_b100_busy.py::test_tc_b100_50_long_label_stays_on_one_row
+FAILED tests/test_b100_busy.py::test_tc_b100_50_begin_sets_the_bar_to_zero - ...
+FAILED tests/test_b100_busy.py::test_tc_b100_50_steps_by_index_set_the_bar - ...
+FAILED tests/test_b100_busy.py::test_tc_b100_50_step_amount_moves_the_bar_within_the_step
+FAILED tests/test_b100_busy.py::test_tc_b100_50_out_of_range_step_data_is_clamped[step 0-call0-step 1/3 a-0]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_out_of_range_step_data_is_clamped[step m + 1-call1-step 3/3 c-66]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_out_of_range_step_data_is_clamped[total 0-call2-step 2/3 b-50]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_out_of_range_step_data_is_clamped[total -1-call3-step 2/3 b-50]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_out_of_range_step_data_is_clamped[done -5-call4-step 2/3 b-50]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_out_of_range_step_data_is_clamped[done total + 1-call5-step 2/3 b-66]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_spinner_and_elapsed_advance_while_a_worker_runs
+FAILED tests/test_b100_busy.py::test_tc_b100_50_overlapping_runs_share_one_timer
+FAILED tests/test_b100_busy.py::test_tc_b100_50_action_shorter_than_a_tick - ...
+FAILED tests/test_b100_busy.py::test_tc_b100_50_last_end_stops_the_timer - At...
+FAILED tests/test_b100_busy.py::test_tc_b100_50_elapsed_is_minutes_and_seconds[0-00:00]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_elapsed_is_minutes_and_seconds[59.9-00:59]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_elapsed_is_minutes_and_seconds[60-01:00]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_elapsed_is_minutes_and_seconds[3599-59:59]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_elapsed_is_minutes_and_seconds[4503-75:03]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_file_state_waits_while_a_run_is_shown
+FAILED tests/test_b100_busy.py::test_tc_b100_50_end_writes_the_outcome_to_the_status_log
+FAILED tests/test_b100_busy.py::test_tc_b100_50_last_end_paints_the_stored_file_state
+FAILED tests/test_b100_busy.py::test_tc_b100_50_last_end_clears_the_bar - Att...
+FAILED tests/test_b100_busy.py::test_tc_b100_50_unknown_or_replaced_run_leaves_the_indicator[end of an unknown key]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_unknown_or_replaced_run_leaves_the_indicator[step of an unknown key]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_unknown_or_replaced_run_leaves_the_indicator[end of a replaced run]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_a_newer_action_is_the_one_shown
+FAILED tests/test_b100_busy.py::test_tc_b100_50_the_newest_running_action_is_shown_after_an_end
+FAILED tests/test_b100_busy.py::test_tc_b100_50_a_begin_under_a_running_key_restarts_it
+FAILED tests/test_b100_busy.py::test_tc_b100_50_each_worker_action_begins_with_a_progress_line[file_load]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_each_worker_action_begins_with_a_progress_line[report]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_each_worker_action_begins_with_a_progress_line[diff_report]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_each_worker_action_begins_with_a_progress_line[before_after]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_progress_widgets_are_written_on_the_main_thread[file_load]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_progress_widgets_are_written_on_the_main_thread[report]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_progress_widgets_are_written_on_the_main_thread[diff_report]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_progress_widgets_are_written_on_the_main_thread[before_after]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_names_paint_literally_through_load_from_path[markup]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_names_paint_literally_through_load_from_path[bidi override]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_names_paint_literally_through_load_from_path[130 characters]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_begin_busy_is_called_only_from_the_one_label_helper
+FAILED tests/test_b100_busy.py::test_tc_b100_50_the_bar_keeps_its_row_when_idle[size0-47]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_the_bar_keeps_its_row_when_idle[size1-17]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_running_line_paints_in_the_accent
+FAILED tests/test_b100_busy.py::test_tc_b100_50_status_line_has_one_owner_during_a_worker_load
+FAILED tests/test_b100_busy.py::test_tc_b100_50_image_pick_file_state_waits_for_a_running_report
+FAILED tests/test_b100_busy.py::test_tc_b100_50_kickoff_raise_ends_the_file_load_first
+FAILED tests/test_b100_busy.py::test_tc_b100_50_worker_raise_ends_the_action_first[file_load]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_worker_raise_ends_the_action_first[report]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_worker_raise_ends_the_action_first[diff_report]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_worker_raise_ends_the_action_first[before_after]
+FAILED tests/test_b100_busy.py::test_tc_b100_50_a2l_raise_ends_the_action_first
+FAILED tests/test_b100_busy.py::test_tc_b100_50_project_raise_ends_the_action_first
+FAILED tests/test_b100_busy.py::test_tc_b100_50_save_raise_ends_the_action_first
+FAILED tests/test_b100_busy.py::test_tc_b100_51_action_table_names_the_seven_long_actions
+FAILED tests/test_b100_busy.py::test_tc_b100_51_every_baseline_bar_site_maps_to_a_seam_event
+FAILED tests/test_b100_busy.py::test_tc_b100_51_only_the_seam_sets_the_bar - ...
+FAILED tests/test_b100_busy.py::test_tc_b100_51_workers_take_the_run_generation
+FAILED tests/test_b100_busy.py::test_tc_b100_51_file_load_ends_once_on_success
+FAILED tests/test_b100_busy.py::test_tc_b100_51_file_load_ends_once_on_a_parse_failure
+FAILED tests/test_b100_busy.py::test_tc_b100_51_file_load_ends_once_on_a_containment_refusal
+FAILED tests/test_b100_busy.py::test_tc_b100_51_a2l_load_ends_once_on_success
+FAILED tests/test_b100_busy.py::test_tc_b100_51_a2l_load_ends_once_on_a_containment_refusal
+FAILED tests/test_b100_busy.py::test_tc_b100_51_project_load_ends_once_on_success
+FAILED tests/test_b100_busy.py::test_tc_b100_51_project_load_without_an_a2l_skips_its_step
+FAILED tests/test_b100_busy.py::test_tc_b100_51_project_load_ends_once_on_a_failure_after_the_begin
+FAILED tests/test_b100_busy.py::test_tc_b100_51_save_project_reports_its_phases_as_steps
+FAILED tests/test_b100_busy.py::test_tc_b100_51_save_project_ends_once_on_a_placement_failure
+FAILED tests/test_b100_busy.py::test_tc_b100_51_report_ends_once_on_success
+FAILED tests/test_b100_busy.py::test_tc_b100_51_report_ends_once_on_a_failure[generator raises]
+FAILED tests/test_b100_busy.py::test_tc_b100_51_report_ends_once_on_a_failure[rejected input]
+FAILED tests/test_b100_busy.py::test_tc_b100_51_diff_report_ends_once_and_logs_its_outcome[written-written-written-bar0-Diff report written: {md}  |  {html}]
+FAILED tests/test_b100_busy.py::test_tc_b100_51_diff_report_ends_once_and_logs_its_outcome[markdown refused-refused-written-bar1-Report refused: synthetic]
+FAILED tests/test_b100_busy.py::test_tc_b100_51_diff_report_ends_once_and_logs_its_outcome[html raises-written-raise-bar2-Diff report failed: RuntimeError: x]
+FAILED tests/test_b100_busy.py::test_tc_b100_51_diff_report_ends_once_and_logs_its_outcome[html refused-written-refused-bar3-HTML report refused: y]
+FAILED tests/test_b100_busy.py::test_tc_b100_51_diff_report_without_a_comparison_begins_nothing
+FAILED tests/test_b100_busy.py::test_tc_b100_51_before_after_ends_once_and_logs_its_outcome[written]
+FAILED tests/test_b100_busy.py::test_tc_b100_51_before_after_ends_once_and_logs_its_outcome[refused]
+FAILED tests/test_b100_busy.py::test_at_b100_17_worker_load_of_an_8_mib_s19_by_keys
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_labels_key_bar_and_palette_say_load_and_projects
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_66_progress_lines_carry_no_decision_id
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_66_pick_refusal_tokens_carry_no_decision_id
+FAILED tests/test_b100_announce.py::test_tc_b100_56_project_line_is_the_file_state_painted_at_the_last_end
+FAILED tests/test_b100_recents.py::test_tc_b100_37_project_list_skips_a_trailing_dot_on_every_platform
+FAILED tests/test_b100_recents.py::test_tc_b100_37_files_list_shows_loadable_suffixes_only[mixed]
+FAILED tests/test_b100_recents.py::test_tc_b100_37_files_list_shows_loadable_suffixes_only[suffix boundaries]
+FAILED tests/test_b100_recents.py::test_tc_b100_37_files_list_shows_loadable_suffixes_only[only a sidecar]
+FAILED tests/test_b100_recents.py::test_tc_b100_37_files_list_shows_loadable_suffixes_only_through_one_predicate
+FAILED tests/test_b100_recents.py::test_tc_b100_38_nul_in_typed_path_is_refused[EACCES-status]
+FAILED tests/test_b100_recents.py::test_tc_b100_38_nul_in_typed_path_is_refused[ENAMETOOLONG-status]
+FAILED tests/test_b100_recents.py::test_tc_b100_38_nul_in_typed_path_is_refused[EACCES-dialog]
+FAILED tests/test_b100_recents.py::test_tc_b100_38_nul_in_typed_path_is_refused[ENAMETOOLONG-dialog]
+FAILED tests/test_b100_recents.py::test_tc_b100_38_one_project_match - Assert...
+FAILED tests/test_b100_recents.py::test_tc_b100_38_one_project_match_returns_the_listed_spelling
+FAILED tests/test_b100_recents.py::test_tc_b100_38_one_wording_table - Assert...
+FAILED tests/test_b100_recents.py::test_tc_b100_39_pick_rechecks_the_entry[folder-files list]
+FAILED tests/test_b100_recents.py::test_tc_b100_39_pick_rechecks_the_entry[folder-load dialog]
+FAILED tests/test_b100_recents.py::test_tc_b100_39_pick_rechecks_the_entry[junction-files list]
+FAILED tests/test_b100_recents.py::test_tc_b100_39_pick_rechecks_the_entry[junction-load dialog]
+FAILED tests/test_b100_recents.py::test_tc_b100_39_pick_rechecks_the_entry[file link-files list]
+FAILED tests/test_b100_recents.py::test_tc_b100_39_pick_rechecks_the_entry[file link-load dialog]
+FAILED tests/test_b100_recents.py::test_tc_b100_39_pick_rechecks_the_entry_after_the_question
+FAILED tests/test_b100_recents.py::test_tc_b100_39_pick_rechecks_the_entry_and_fails_closed[lstat refused]
+FAILED tests/test_b100_recents.py::test_tc_b100_39_pick_over_cap_is_refused[over the cap]
+FAILED tests/test_b100_recents.py::test_tc_b100_39_pick_over_cap_is_refused[A2L over the cap]
+FAILED tests/test_b100_recents.py::test_tc_b100_38_project_list_leaves_a_trailing_dot_name_out_off_windows
+FAILED tests/test_report_progress.py::test_report_generation_drives_progress_bar_to_100
+FAILED tests/test_report_progress.py::test_kickoff_sets_bar_in_progress_before_worker
+FAILED tests/test_report_progress.py::test_finish_generate_report_completes_bar
+FAILED tests/test_before_after_report.py::test_at_038a_saveback_trigger_report_pair_reread_from_surfaced_path
+FAILED tests/test_report_off_ui_thread.py::test_ac4_diff_progress_never_sticks_mid_fill
+FAILED tests/test_tui_report_attribution.py::test_at260_a_valueerror_from_the_generator_is_the_tools_failure
+FAILED tests/test_tui_report_attribution.py::test_at261_out_of_domain_operator_input_is_still_a_rejection
+FAILED tests/test_tui_report_attribution.py::test_at262_pin_neither_path_leaves_a_report_behind
+FAILED tests/test_tui_report_attribution.py::test_tc571_the_failure_path_logs_a_failure_not_a_rejection
+FAILED tests/test_tui_report_attribution.py::test_at263_pin_progress_resets_to_zero_on_both_branches
+FAILED tests/test_b97_key_bar.py::test_tc_b97_67_row_one_is_the_eight_globals_whatever_the_focus[118x54]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_67_row_one_is_the_eight_globals_whatever_the_focus[220x60]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_67_row_one_at_80x24_drops_palette_whole
+FAILED tests/test_b97_key_bar.py::test_at_b97_25_two_rows_on_every_window_and_clicks
+FAILED tests/test_b97_key_bar.py::test_tc_b97_70_every_painted_row_is_whole_tokens[118x54]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_70_every_painted_row_is_whole_tokens[220x60]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_70_every_painted_row_is_whole_tokens[80x24]
+FAILED tests/test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched
+SKIPPED [1] tests\test_b100_busy.py:1029: not run on Windows (the name cannot be created), never passed
+125 failed, 9 passed, 1 skipped in 595.18s (0:09:55)
+
+# pytest exit code: 1
+# finished: 2026-11-01T00:06:21-06:00

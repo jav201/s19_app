@@ -263,15 +263,21 @@ def test_at_038a_saveback_trigger_report_pair_reread_from_surfaced_path(
     assert _HTML_NAME.match(html_new[0]), html_new[0]
 
     # --- surfaced path equals the dir-diff file (Q-M1) ----------------------
-    # batch-68 AC-3 (success arm): the bar must REACH 100 on a written report.
+    # batch-68 AC-3 (success arm): the bar must never stick mid-fill on a
+    # written report (Inc 12a: it ends cleared, see the re-pin below).
     # Asserted here rather than in tests/test_report_off_ui_thread.py because
     # this is the only place with a real save-back that makes the composer
     # succeed; the standalone AC-3 test can only reach the refusal arm.
+    # Inc 12a re-pin (census A4; LLR-176.1k, A12-63): the written report
+    # still never leaves the bar mid-fill, but the end now CLEARS it — the
+    # 1-step before/after run begins at 0 and ends at 0 (the old pin, 100,
+    # encoded the stale-100 defect HLR-176c removes).
     progress = outcomes["progress"]
-    assert progress and progress[-1] == 100, (
-        f"a successfully written before/after report must leave the progress "
-        f"bar at 100, not mid-fill. Sequence: {progress}"
+    assert progress and progress[0] == 0 and progress[-1] == 0, (
+        f"a successfully written before/after report must begin the bar at 0 "
+        f"and leave it cleared, not mid-fill. Sequence: {progress}"
     )
+    assert all(value in (0, 100) for value in progress), progress
 
     written = [s for s in outcomes["statuses"] if "Before/after report written" in s]
     assert len(written) == 1, (

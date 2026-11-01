@@ -576,6 +576,14 @@ DataTable > .datatable--odd-row {
     text-overflow: ellipsis;
 }
 
+/* Inc 12a (S-g, ruling Q9): the one busy rule — while a progress run owns
+ * `#status_text`, tint the whole line in the accent and keep it on one row
+ * so `text-overflow: ellipsis` clips a long label instead of wrapping. */
+#workspace_status_bar #status_text.-busy {
+    color: $accent-calm;
+    text-wrap: nowrap;
+}
+
 /* Right-aligned so the context reads as ambient state rather than competing
  * with the status message at the left edge.
  *

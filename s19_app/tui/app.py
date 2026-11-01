@@ -16,6 +16,7 @@ from textual import events, work
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Horizontal, ScrollableContainer
+from textual.timer import Timer
 from textual.reactive import reactive
 from textual.widget import Widget
 from textual.widgets import (
@@ -331,6 +332,92 @@ QuestionKind = Literal["image", "attach", "project"]
 #: Inc 10 (S-e): one unsaved item — ``(kind, raw unscrubbed name)``; the
 #: ``document`` kind carries an empty name (the Patch Editor holds no file).
 UnsavedItem = tuple[Literal["image", "document", "flow"], str]
+
+#: Inc 12a (G-A, S-b/S-c/S-f): the progress-indicator seam. ``BusyKey`` is the
+#: closed set of long actions that drive the ``#status_text`` spinner line and
+#: the ``#progress_bar``; ``_BUSY_ACTIONS`` is the one table of labels and step
+#: names (LLR-176.2b), and ``_BusyRun`` / ``_BusyState`` hold the whole run
+#: state in ONE app attribute (``self._busy``, main thread only).
+BusyKey = Literal[
+    "file_load",
+    "a2l_load",
+    "project_load",
+    "save_project",
+    "report",
+    "diff_report",
+    "before_after",
+]
+
+
+@dataclass(frozen=True)
+class _BusyAction:
+    """S-c: one row of the busy action table — a label template + step names."""
+
+    label: str
+    steps: tuple[str, ...]
+
+
+_BUSY_FRAMES = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+_BUSY_TICK_SECONDS = 0.1
+
+_BUSY_ACTIONS: Mapping[BusyKey, _BusyAction] = {
+    "file_load": _BusyAction(
+        "Loading {name}",
+        ("Copy into the work area", "Parse", "Install"),
+    ),
+    "a2l_load": _BusyAction(
+        "Loading {name}",
+        ("Copy into the work area", "Parse", "Build the tag table"),
+    ),
+    "project_load": _BusyAction(
+        "Loading project {name}",
+        ("Check the files", "Parse the A2L", "Parse the image", "Install"),
+    ),
+    "save_project": _BusyAction(
+        "Saving project {name}",
+        (
+            "Create the folder",
+            "Place the files",
+            "Gather the project files",
+            "Write project.json",
+        ),
+    ),
+    "report": _BusyAction(
+        "Generating the project report",
+        ("Prepare the results", "Write the report"),
+    ),
+    "diff_report": _BusyAction(
+        "Writing the diff report",
+        ("Write Markdown", "Write HTML"),
+    ),
+    "before_after": _BusyAction(
+        "Writing the before/after report",
+        ("Compose the report",),
+    ),
+}
+
+
+@dataclass
+class _BusyRun:
+    """S-b: one running action (mutable, main thread only)."""
+
+    gen: int
+    label: str
+    steps: tuple[str, ...]
+    n: int
+    fraction: float
+    started: float
+
+
+@dataclass
+class _BusyState:
+    """S-b: the whole run state — ONE app attribute (``self._busy``)."""
+
+    runs: dict[BusyKey, _BusyRun] = field(default_factory=dict)
+    last_gen: int = 0
+    file_state: str = "Ready."
+    timer: Optional[Timer] = None
+    frame: int = 0
 
 #: The Patch Editor's routable action set (LLR-003.2) — the eight v2
 #: actions of increment E3a extended by ``execute_scope`` at E6 (the stated
@@ -2324,12 +2411,12 @@ class S19TuiApp(App):
     BINDINGS = [
         Binding("ctrl+k", "focus_palette", "Palette", priority=True),
         Binding("ctrl+d", "cycle_density", "Density", priority=True),
-        Binding("ctrl+l", "load_file", "Load file", priority=True),
+        Binding("ctrl+l", "load_file", "Load", priority=True),
         Binding("ctrl+s", "save_project", "Save project", priority=True),
         ("slash", "focus_find", "Find"),
         ("g", "focus_goto", "Go-to"),
         ("q", "quit", "Quit"),
-        Binding("l", "load_file", "Load file", show=False),
+        Binding("l", "load_file", "Load", show=False),
         # Unload-all teardown; per-artifact unload is driven by the Inc-2
         # Workspace "Loaded" panel calling `_apply_unload`. `show=False` keeps
         # the 80-col footer uncrowded (C-13).
@@ -2337,7 +2424,7 @@ class S19TuiApp(App):
         Binding("r", "refresh_files", "Refresh workarea", show=False),
         Binding("o", "open_workarea", "Open workarea", show=False),
         Binding("s", "save_project", "Save project", show=False),
-        Binding("p", "load_project", "Load project", show=False),
+        Binding("p", "load_project", "Projects", show=False),
         Binding("v", "select_variant", "Select variant", show=False),
         Binding("j", "dump_a2l_json", "Dump A2L JSON", show=False),
         # E9 (batch-96): describe the selected A2L tag (CURVE/MAP point
@@ -2446,6 +2533,9 @@ class S19TuiApp(App):
         self.workarea = ensure_workarea(self.base_dir)
         self.load_path = load_path
         self.log_lines = deque(maxlen=4)
+        #: Inc 12a (S-b): the progress indicator's whole run state — one
+        #: attribute, main thread only (see ``_BusyState``).
+        self._busy = _BusyState()
         # N1: the active rail screen, so the Legend modal can scope its rows to
         # what THIS screen paints (updated by ``action_show_screen``).
         self._active_screen_key: str = "workspace"
@@ -5088,12 +5178,16 @@ class S19TuiApp(App):
         # whole duration, so a slow report was indistinguishable from a hang.
         # Validation above stays on the UI thread (it is cheap and it owns the
         # early-return status writes); only the composition is dispatched.
-        self.set_progress(15)
+        # F-10: the active-project dir is resolved BEFORE the begin, so nothing
+        # that can raise sits between the begin and the dispatch.
+        project_dir = self._active_project_dir()
+        gen = self._busy_begin_action("before_after")
         self._start_before_after_worker(
             loaded.path if loaded is not None else None,
-            self._active_project_dir(),
+            project_dir,
             report_filter,
             loaded.path.name if loaded is not None else "-",
+            gen=gen,
         )
 
     @work(thread=True, exclusive=True, group="before_after_report")
@@ -5103,6 +5197,8 @@ class S19TuiApp(App):
         project_dir: Optional[Path],
         report_filter: Optional[ReportFilterMatcher],
         source_name: str,
+        *,
+        gen: int,
     ) -> None:
         """
         Summary:
@@ -5124,6 +5220,8 @@ class S19TuiApp(App):
             source_name (str): Display name for the log line — resolved on the
                 UI thread by the caller, because reading ``self.current_file``
                 from a worker would race a concurrent load.
+            gen (int): The busy run's generation from ``_busy_begin_action``
+                (keyword-only; Inc 12a S-m), passed to every ``end_busy``.
 
         Returns:
             None: Effects only — the written report pair, a log line, the
@@ -5141,53 +5239,60 @@ class S19TuiApp(App):
                 - ``action_before_after_report`` (key binding ``b``)
         """
         try:
-            result = compose_before_after_report(
-                self._change_service.last_summary,
-                loaded_path,
-                project_dir=project_dir,
-                workarea=self.workarea,
-                report_filter=report_filter,
-            )
-        except Exception as exc:
-            self.logger.exception("Before/after report failed: %s", exc)
+            try:
+                result = compose_before_after_report(
+                    self._change_service.last_summary,
+                    loaded_path,
+                    project_dir=project_dir,
+                    workarea=self.workarea,
+                    report_filter=report_filter,
+                )
+            except Exception as exc:
+                self.logger.exception("Before/after report failed: %s", exc)
+                self._log_report_event(
+                    "before-after",
+                    source_name,
+                    "-",
+                    f"failed: {type(exc).__name__}",
+                    ok=False,
+                )
+                self.call_from_thread(
+                    self.end_busy,
+                    "before_after",
+                    gen,
+                    f"Before/after report failed: {type(exc).__name__}: {exc}",
+                )
+                return
+            if result.written:
+                self._log_report_event(
+                    "before-after",
+                    source_name,
+                    f"{result.md_path}|{result.html_path}",
+                    "ok",
+                    ok=True,
+                )
+                self.call_from_thread(
+                    self.end_busy,
+                    "before_after",
+                    gen,
+                    f"Before/after report written: {result.md_path} "
+                    f"| {result.html_path}",
+                )
+                return
             self._log_report_event(
-                "before-after",
-                source_name,
-                "-",
-                f"failed: {type(exc).__name__}",
-                ok=False,
+                "before-after", source_name, "-", "refused", ok=False
             )
-            self.call_from_thread(self.set_progress, 0)
+            # Refused is a legitimate outcome, not a crash — but the bar
+            # must still come back down rather than sit at the kickoff value.
             self.call_from_thread(
-                self.set_status,
-                f"Before/after report failed: {type(exc).__name__}: {exc}",
+                self.end_busy,
+                "before_after",
+                gen,
+                "Before/after report refused: " + " ".join(result.diagnostics),
             )
-            return
-        if result.written:
-            self._log_report_event(
-                "before-after",
-                source_name,
-                f"{result.md_path}|{result.html_path}",
-                "ok",
-                ok=True,
-            )
-            self.call_from_thread(self.set_progress, 100)
-            self.call_from_thread(
-                self.set_status,
-                f"Before/after report written: {result.md_path} "
-                f"| {result.html_path}",
-            )
-            return
-        self._log_report_event(
-            "before-after", source_name, "-", "refused", ok=False
-        )
-        # Refused is a legitimate outcome, not a crash — but the bar must
-        # still come back down rather than sit at the kickoff value.
-        self.call_from_thread(self.set_progress, 0)
-        self.call_from_thread(
-            self.set_status,
-            "Before/after report refused: " + " ".join(result.diagnostics),
-        )
+        except BaseException:
+            self.call_from_thread(self._busy_fail, "before_after", gen)
+            raise
 
     @staticmethod
     def _verify_mismatch_summary(verify: VerifyResult) -> str:
@@ -5778,7 +5883,7 @@ class S19TuiApp(App):
         # N5: drive the persistent #progress_bar so report generation shows
         # visible activity (the worker is off-thread and otherwise silent on the
         # bar). Kickoff → in-progress; worker mid → 55; success → 100; failure → 0.
-        self.set_progress(15)
+        gen = self._busy_begin_action("report")
         self._start_generate_report_worker(
             project_dir,
             variant_set,
@@ -5787,6 +5892,7 @@ class S19TuiApp(App):
             fallback_batch,
             tuple(declared_regions),
             report_filter,
+            gen=gen,
         )
 
     @work(thread=True, exclusive=True, group="generate_report")
@@ -5799,6 +5905,8 @@ class S19TuiApp(App):
         fallback_batch: list[Path],
         declared_regions: Sequence[DeclaredRegion] = (),
         report_filter: Optional[ReportFilterMatcher] = None,
+        *,
+        gen: int,
     ) -> None:
         """
         Summary:
@@ -5824,6 +5932,8 @@ class S19TuiApp(App):
                 an immutable explicit argument — the worker reads NO
                 app-level selection state (F-04 thread contract: no
                 stale/torn read). ``None`` = full report.
+            gen (int): The busy run's generation from ``_busy_begin_action``
+                (keyword-only; Inc 12a S-m), passed to ``step_busy`` and the end.
 
         Returns:
             None
@@ -5864,78 +5974,86 @@ class S19TuiApp(App):
                 ok=False,
             )
             # N5: reset the bar on a crashed report — never leave it mid-fill.
-            self.call_from_thread(self.set_progress, 0)
             self.call_from_thread(
-                self.set_status, f"Report failed: {type(exc).__name__}: {exc}"
+                self.end_busy,
+                "report",
+                gen,
+                f"Report failed: {type(exc).__name__}: {exc}",
             )
 
         try:
-            if last is None:
-                scope = SCOPE_ACTIVE
-                assignment_source = (
-                    REPORT_SOURCE_MANIFEST
-                    if read_project_manifest(project_dir) is not None
-                    else REPORT_SOURCE_DEFAULT
+            try:
+                if last is None:
+                    scope = SCOPE_ACTIVE
+                    assignment_source = (
+                        REPORT_SOURCE_MANIFEST
+                        if read_project_manifest(project_dir) is not None
+                        else REPORT_SOURCE_DEFAULT
+                    )
+                    results, _manifest_issues = execute_project_variants(
+                        project_dir,
+                        variant_set,
+                        scope=scope,
+                        fallback_batch=fallback_batch,
+                        capture_mem_maps=True,
+                        status_callback=lambda message: self.call_from_thread(
+                            self.set_status, message
+                        ),
+                    )
+                else:
+                    _last_dir, scope, assignment_source, results = last
+                options = ReportOptions(
+                    context_bytes=context_bytes,
+                    execution_mode=EXECUTION_SCOPE_TO_REPORT_MODE[scope],
+                    assignment_source=assignment_source,
+                    declared_regions=tuple(declared_regions),
+                    report_filter=report_filter,
                 )
-                results, _manifest_issues = execute_project_variants(
-                    project_dir,
-                    variant_set,
-                    scope=scope,
-                    fallback_batch=fallback_batch,
-                    capture_mem_maps=True,
-                    status_callback=lambda message: self.call_from_thread(
-                        self.set_status, message
-                    ),
+            except ValueError as exc:
+                self._log_report_event(
+                    "project", project_dir.name, "-", f"rejected: {exc}", ok=False
                 )
-            else:
-                _last_dir, scope, assignment_source, results = last
-            options = ReportOptions(
-                context_bytes=context_bytes,
-                execution_mode=EXECUTION_SCOPE_TO_REPORT_MODE[scope],
-                assignment_source=assignment_source,
-                declared_regions=tuple(declared_regions),
-                report_filter=report_filter,
-            )
-        except ValueError as exc:
+                # N5: reset the bar on a rejected report — never leave it
+                # mid-fill.
+                self.call_from_thread(
+                    self.end_busy, "report", gen, f"Report rejected: {exc}"
+                )
+                return
+            except Exception as exc:
+                report_failed(exc)
+                return
+            # LLR-110.1 — generation sits OUTSIDE the operator-input span.
+            #
+            # It used to sit INSIDE the block above, so a ``ValueError`` raised
+            # anywhere in the generator — an internal accounting slip, a formatter
+            # that could not render a value — surfaced to the operator as
+            # "Report rejected: ...", i.e. as though THEY had typed something
+            # invalid. The operator-input span is the options construction and the
+            # scope guard; those are the only places a ``ValueError`` legitimately
+            # means "your input was out of domain" (P-11). Everything the tool does
+            # after that is the tool's own failure and is attributed to the tool.
+            #
+            # This re-routes by CALL SITE, not by cause (non-claim (g)): a
+            # ``ValueError`` is not intrinsically an operator error, so no analysis
+            # of the exception could have made this decision — only its position.
+            #
+            # N5: mid-progress before the heavy assembly (thread-safe via
+            # call_from_thread — step_busy touches the UI widget).
+            self.call_from_thread(self.step_busy, "report", gen, 2)
+            try:
+                report_path = generate_project_report(
+                    project_dir, results, options, variant_set=variant_set
+                )
+            except Exception as exc:
+                report_failed(exc)
+                return
             self._log_report_event(
-                "project", project_dir.name, "-", f"rejected: {exc}", ok=False
+                "project", project_dir.name, str(report_path), "ok", ok=True
             )
-            # N5: reset the bar on a rejected report — never leave it mid-fill.
-            self.call_from_thread(self.set_progress, 0)
-            self.call_from_thread(self.set_status, f"Report rejected: {exc}")
-            return
-        except Exception as exc:
-            report_failed(exc)
-            return
-        # LLR-110.1 — generation sits OUTSIDE the operator-input span.
-        #
-        # It used to sit INSIDE the block above, so a ``ValueError`` raised
-        # anywhere in the generator — an internal accounting slip, a formatter
-        # that could not render a value — surfaced to the operator as
-        # "Report rejected: ...", i.e. as though THEY had typed something
-        # invalid. The operator-input span is the options construction and the
-        # scope guard; those are the only places a ``ValueError`` legitimately
-        # means "your input was out of domain" (P-11). Everything the tool does
-        # after that is the tool's own failure and is attributed to the tool.
-        #
-        # This re-routes by CALL SITE, not by cause (non-claim (g)): a
-        # ``ValueError`` is not intrinsically an operator error, so no analysis
-        # of the exception could have made this decision — only its position.
-        #
-        # N5: mid-progress before the heavy assembly (thread-safe via
-        # call_from_thread — set_progress touches the UI widget).
-        self.call_from_thread(self.set_progress, 55)
-        try:
-            report_path = generate_project_report(
-                project_dir, results, options, variant_set=variant_set
-            )
-        except Exception as exc:
-            report_failed(exc)
-            return
-        self._log_report_event(
-            "project", project_dir.name, str(report_path), "ok", ok=True
-        )
-        self.call_from_thread(self._finish_generate_report, report_path)
+            self.call_from_thread(self._finish_generate_report, report_path, gen)
+        except BaseException:
+            self.call_from_thread(self._busy_fail, "report", gen)
+            raise
 
     def _log_report_event(
         self,
@@ -5986,7 +6104,7 @@ class S19TuiApp(App):
         else:
             self.logger.warning(line)
 
-    def _finish_generate_report(self, report_path: Path) -> None:
+    def _finish_generate_report(self, report_path: Path, gen: int) -> None:
         """
         Summary:
             UI-thread close of a successful generation: DROP the retained
@@ -5997,6 +6115,7 @@ class S19TuiApp(App):
 
         Args:
             report_path (Path): The written report file.
+            gen (int): The ``report`` run's generation (Inc 12a S-m).
 
         Returns:
             None
@@ -6008,9 +6127,8 @@ class S19TuiApp(App):
                 - ``_start_generate_report_worker`` (via ``call_from_thread``)
         """
         self._last_execution = None
-        self.set_progress(100)  # N5: report complete — bar reaches 100.
-        self.set_status(
-            f"Report: {report_path.parent.name}/{report_path.name}"
+        self.end_busy(
+            "report", gen, f"Report: {report_path.parent.name}/{report_path.name}"
         )
 
     def _compose_screen_diff(self) -> Container:
@@ -7142,8 +7260,8 @@ class S19TuiApp(App):
         # loop, back to back — the diff path was the worst freeze in the app
         # because it pays the cost twice. Everything above stays on the UI
         # thread (widget reads + the "no comparison yet" early return).
-        self.set_progress(15)
-        self._start_diff_report_worker(panel, result, kwargs, diff_source)
+        gen = self._busy_begin_action("diff_report")
+        self._start_diff_report_worker(panel, result, kwargs, diff_source, gen=gen)
 
     @work(thread=True, exclusive=True, group="diff_report")
     def _start_diff_report_worker(
@@ -7152,6 +7270,8 @@ class S19TuiApp(App):
         result: object,
         kwargs: dict,
         diff_source: str,
+        *,
+        gen: int,
     ) -> None:
         """
         Summary:
@@ -7174,6 +7294,8 @@ class S19TuiApp(App):
             kwargs (dict): The shared generator arguments assembled on the UI
                 thread (mem maps, destination, A2L/MAC records).
             diff_source (str): Display name for the log line.
+            gen (int): The busy run's generation from ``_busy_begin_action``
+                (keyword-only; Inc 12a S-m), passed to ``step_busy`` and the end.
 
         Returns:
             None: Effects only — the written pair, a log line, the panel status
@@ -7191,52 +7313,47 @@ class S19TuiApp(App):
                 - ``on_ab_diff_panel_report_requested``
         """
         try:
-            md = generate_diff_report(result, **kwargs)
-            if not md.written:
+            try:
+                md = generate_diff_report(result, **kwargs)
+                if not md.written:
+                    text = "Report refused: " + "; ".join(md.diagnostics)
+                    self._log_report_event(
+                        "diff", diff_source, "-", "refused", ok=False
+                    )
+                    self.call_from_thread(
+                        self.end_busy, "diff_report", gen, text
+                    )
+                    self.call_from_thread(panel.set_status, text, "sev-error")
+                    return
+                self.call_from_thread(self.step_busy, "diff_report", gen, 2)
+                html = generate_diff_report_html(result, **kwargs)
+            except Exception as exc:
+                self.logger.exception("Diff report failed: %s", exc)
                 self._log_report_event(
-                    "diff", diff_source, "-", "refused", ok=False
+                    "diff", diff_source, "-", f"failed: {type(exc).__name__}",
+                    ok=False,
                 )
-                self.call_from_thread(self.set_progress, 0)
-                self.call_from_thread(
-                    panel.set_status,
-                    "Report refused: " + "; ".join(md.diagnostics),
-                    "sev-error",
-                )
+                text = f"Diff report failed: {type(exc).__name__}: {exc}"
+                self.call_from_thread(self.end_busy, "diff_report", gen, text)
+                self.call_from_thread(panel.set_status, text, "sev-error")
                 return
-            self.call_from_thread(self.set_progress, 55)
-            html = generate_diff_report_html(result, **kwargs)
-        except Exception as exc:
-            self.logger.exception("Diff report failed: %s", exc)
+            if not html.written:
+                text = "HTML report refused: " + "; ".join(html.diagnostics)
+                self._log_report_event(
+                    "diff", diff_source, "-", "refused (html)", ok=False
+                )
+                self.call_from_thread(self.end_busy, "diff_report", gen, text)
+                self.call_from_thread(panel.set_status, text, "sev-error")
+                return
             self._log_report_event(
-                "diff", diff_source, "-", f"failed: {type(exc).__name__}", ok=False
+                "diff", diff_source, f"{md.path}|{html.path}", "ok", ok=True
             )
-            self.call_from_thread(self.set_progress, 0)
-            self.call_from_thread(
-                panel.set_status,
-                f"Diff report failed: {type(exc).__name__}: {exc}",
-                "sev-error",
-            )
-            return
-        if not html.written:
-            self._log_report_event(
-                "diff", diff_source, "-", "refused (html)", ok=False
-            )
-            self.call_from_thread(self.set_progress, 0)
-            self.call_from_thread(
-                panel.set_status,
-                "HTML report refused: " + "; ".join(html.diagnostics),
-                "sev-error",
-            )
-            return
-        self._log_report_event(
-            "diff", diff_source, f"{md.path}|{html.path}", "ok", ok=True
-        )
-        self.call_from_thread(self.set_progress, 100)
-        self.call_from_thread(
-            panel.set_status,
-            f"Diff report written: {md.path}  |  {html.path}",
-            "sev-ok",
-        )
+            text = f"Diff report written: {md.path}  |  {html.path}"
+            self.call_from_thread(self.end_busy, "diff_report", gen, text)
+            self.call_from_thread(panel.set_status, text, "sev-ok")
+        except BaseException:
+            self.call_from_thread(self._busy_fail, "diff_report", gen)
+            raise
 
     def _compose_screen_a2l(self) -> Container:
         """
@@ -7549,11 +7666,15 @@ class S19TuiApp(App):
         and Zp removed, an unpaired surrogate as U+FFFD, clipped to 120
         characters) with markup off through ``safe_text`` (LLR-172.6, E3 R4);
         ``item.data`` keeps the on-disk name, which ``_load_from_item`` reads
-        (LLR-172.6a, C5).
+        (LLR-172.6a, C5). Only names whose suffix a loader accepts are listed
+        (``recent_kind``, the predicate the Load dialog's files section reads;
+        LLR-172.4f), so a sidecar dump such as ``x.a2l.json`` is not offered.
         """
         list_view = self.query_one("#files_list", ListView)
         list_view.clear()
-        files = list_workarea_files(self.workarea)
+        files = [
+            p for p in list_workarea_files(self.workarea) if recent_kind(p) is not None
+        ]
         for path in files:
             entry = ListItem(Label(safe_text(painted_names([path.name]))))
             entry.data = path.name
@@ -11042,99 +11163,77 @@ class S19TuiApp(App):
             prepared.emitted_record,
             prepared.plan,
         )
-        # Review findings F6(a)/S-F5: remember whether THIS call creates the
-        # folder, so a later failure can remove exactly what it created — a
-        # pre-existing project folder is never touched. The ownership
-        # decision comes from mkdir itself (exist_ok=False + FileExistsError),
-        # not a racy ``not exists()`` probe: a folder that appears between
-        # the probe and the mkdir would wrongly be claimed as ours and
-        # destroyed on a later failure.
+        gen = self._busy_begin_action("save_project", prepared.cleaned)
         try:
-            project_dir.mkdir(parents=True, exist_ok=False)
-        except FileExistsError:
-            created_project_dir = False
-        else:
-            created_project_dir = True
-        # LED .52(b) / review finding F1: snapshot the app state the save
-        # body is about to mutate — every failure exit below restores it.
-        save_state = (
-            self._variant_set,
-            self.current_file.variant_id if self.current_file else None,
-            self._report_filter_path,
-            self.current_project,
-            self.current_project_dir,
-        )
-        placed_files = _PlacedFiles()
-        created_dirs: list[Path] = []
-        # SEC2-9 (security round 4): at most one (manifest path, previous
-        # bytes) pair — armed the moment a merge's manifest write returns,
-        # consumed by the one ``_abort_save`` rollback.
-        manifest_restores: list[Tuple[Path, bytes]] = []
-        kept_copies: list[Tuple[Path, bytes]] = []
-        # R2-3: initialized before the try — the committed block below the
-        # excepts reads them once the save has succeeded.
-        saved_variant_id: Optional[str] = None
-        saved_primary_name: Optional[str] = None
-        # HLR-170 / LLR-170.2: the Patch Editor's document. A pasted one
-        # (no source_path, at least 1 entry) is written by the app; a
-        # file-backed one is recorded as on disk (in its home) or copied by
-        # the gather, and never written by the app (E3 R1). The status
-        # lines about it are painted after the success line (E3 R15).
-        document = self._change_service.document
-        document_home = document_home_for_kind(document.kind)
-        document_class = (
-            classify_active_document(project_dir, document.source_path, document_home)[0]
-            if document.source_path is not None
-            else None
-        )
-        document_row = next(
-            (row for row in plan.rows if row.role == PLAN_ROLE_DOCUMENT), None
-        )
-        pasted_placed: Optional[PlacementResult] = None
-        document_write_failure: Optional[str] = None
-        recorded_document: Optional[str] = None
-        document_lines: list[str] = []
-        # LLR-164.2: the merge carries the target's gathered rows.
-        target_gathered: Mapping[str, Sequence[str]] = target_carry.get("gathered", {})
-        # LLR-164.4: from the folder's creation on, EVERY statement of this
-        # body runs under one OSError handler — it reports the error with
-        # the ``could not save`` tokens and rolls the failed save back
-        # through the one ``_abort_save`` helper; every early return after
-        # the creation does the same.
-        try:
-            # LED .53: NO pre-save tree snapshot — the rollback removes
-            # exactly what THIS save creates, recorded per placement and
-            # per gather copy below, never "what the snapshot lacks"
-            # (SEC2-5's unreadable folder, SEC2-6's concurrent writer).
-            _data_files, _a2l_files, error = validate_project_files(project_dir)
-            if error:
-                self.set_status(error)
-                self.logger.warning("Project validation failed: %s", error)
-                self._abort_save(
-                    project_dir,
-                    created_project_dir,
-                    placed_files,
-                    created_dirs,
-                    save_state,
-                    manifest_restores,
-                )
-                return
-            # LED .66 / LLR-167.6c/d: the single-MAC and single-A2L
-            # refusals are decided by the plan, before any folder exists.
-            # R2 / R11: the sub-folder entries of the copy list land right
-            # after the folder is created, before the rows loop and the
-            # gather, so a home row lands where the plan predicted it.
-            subfolder_copies = [entry for entry in plan.copies if "/" in entry.relative]
-            top_level_copies = [
-                entry for entry in plan.copies if "/" not in entry.relative
-            ]
-            if subfolder_copies:
-                copy_failure = self._copy_project_subfolders(
-                    save_as_source, project_dir, subfolder_copies,
-                    placed_files, created_dirs,
-                )
-                if copy_failure is not None:
-                    self.set_status(safe_text(copy_failure).plain)
+            # Review findings F6(a)/S-F5: remember whether THIS call creates the
+            # folder, so a later failure can remove exactly what it created — a
+            # pre-existing project folder is never touched. The ownership
+            # decision comes from mkdir itself (exist_ok=False + FileExistsError),
+            # not a racy ``not exists()`` probe: a folder that appears between
+            # the probe and the mkdir would wrongly be claimed as ours and
+            # destroyed on a later failure.
+            try:
+                project_dir.mkdir(parents=True, exist_ok=False)
+            except FileExistsError:
+                created_project_dir = False
+            else:
+                created_project_dir = True
+            # LED .52(b) / review finding F1: snapshot the app state the save
+            # body is about to mutate — every failure exit below restores it.
+            save_state = (
+                self._variant_set,
+                self.current_file.variant_id if self.current_file else None,
+                self._report_filter_path,
+                self.current_project,
+                self.current_project_dir,
+            )
+            placed_files = _PlacedFiles()
+            created_dirs: list[Path] = []
+            # SEC2-9 (security round 4): at most one (manifest path, previous
+            # bytes) pair — armed the moment a merge's manifest write returns,
+            # consumed by the one ``_abort_save`` rollback.
+            manifest_restores: list[Tuple[Path, bytes]] = []
+            kept_copies: list[Tuple[Path, bytes]] = []
+            # R2-3: initialized before the try — the committed block below the
+            # excepts reads them once the save has succeeded.
+            saved_variant_id: Optional[str] = None
+            saved_primary_name: Optional[str] = None
+            # HLR-170 / LLR-170.2: the Patch Editor's document. A pasted one
+            # (no source_path, at least 1 entry) is written by the app; a
+            # file-backed one is recorded as on disk (in its home) or copied by
+            # the gather, and never written by the app (E3 R1). The status
+            # lines about it are painted after the success line (E3 R15).
+            document = self._change_service.document
+            document_home = document_home_for_kind(document.kind)
+            document_class = (
+                classify_active_document(project_dir, document.source_path, document_home)[0]
+                if document.source_path is not None
+                else None
+            )
+            document_row = next(
+                (row for row in plan.rows if row.role == PLAN_ROLE_DOCUMENT), None
+            )
+            pasted_placed: Optional[PlacementResult] = None
+            document_write_failure: Optional[str] = None
+            recorded_document: Optional[str] = None
+            document_lines: list[str] = []
+            # LLR-164.2: the merge carries the target's gathered rows.
+            target_gathered: Mapping[str, Sequence[str]] = target_carry.get("gathered", {})
+            # LLR-164.4: from the folder's creation on, EVERY statement of this
+            # body runs under one OSError handler — it reports the error with
+            # the ``could not save`` tokens and rolls the failed save back
+            # through the one ``_abort_save`` helper; every early return after
+            # the creation does the same.
+            try:
+                # LED .53: NO pre-save tree snapshot — the rollback removes
+                # exactly what THIS save creates, recorded per placement and
+                # per gather copy below, never "what the snapshot lacks"
+                # (SEC2-5's unreadable folder, SEC2-6's concurrent writer).
+                self.step_busy("save_project", gen, 2)
+                _data_files, _a2l_files, error = validate_project_files(project_dir)
+                if error:
+                    self.end_busy("save_project", gen, error)
+                    self.logger.warning("Project validation failed: %s", error)
                     self._abort_save(
                         project_dir,
                         created_project_dir,
@@ -11144,78 +11243,22 @@ class S19TuiApp(App):
                         manifest_restores,
                     )
                     return
-            # LLR-168.4 / B100-I7: the target's readable derived_from
-            # records are carried; an emit below adds its own (both decided
-            # before the plan, F3).
-            derived_from: dict[str, DerivedFrom] = dict(carried_derived)
-            # LLR-167.2 / LLR-167.6 (R-PC): execute exactly the plan's file
-            # rows. LED .53: each placement reports its reuse flag — a
-            # byte-identical file the placement REUSED is never recorded,
-            # so the rollback removes exactly what THIS save created. Every
-            # landed placement is checked against its row.
-            for row in plan.rows:
-                if row.role in (PLAN_ROLE_MANIFEST, PLAN_ROLE_CARRIED):
-                    # A carried row is placed by the top-level copy below
-                    # (R11), never a second time here.
-                    continue
-                if row.role == PLAN_ROLE_DOCUMENT:
-                    if row.source is not None:
-                        # A file-backed document: recorded as on disk or
-                        # copied by the gather below (E3 R1, R11).
-                        continue
-                    # A pasted document: written as a NEW file (E3 R1). A
-                    # failed write does not abort the save (LLR-170.2); the
-                    # home it created joins the rollback either way (A3R2-8).
-                    written_document, created_home, failure = (
-                        self._write_editor_document(row, project_dir)
+                # LED .66 / LLR-167.6c/d: the single-MAC and single-A2L
+                # refusals are decided by the plan, before any folder exists.
+                # R2 / R11: the sub-folder entries of the copy list land right
+                # after the folder is created, before the rows loop and the
+                # gather, so a home row lands where the plan predicted it.
+                subfolder_copies = [entry for entry in plan.copies if "/" in entry.relative]
+                top_level_copies = [
+                    entry for entry in plan.copies if "/" not in entry.relative
+                ]
+                if subfolder_copies:
+                    copy_failure = self._copy_project_subfolders(
+                        save_as_source, project_dir, subfolder_copies,
+                        placed_files, created_dirs,
                     )
-                    if created_home is not None:
-                        created_dirs.append(created_home)
-                    if written_document is None:
-                        document_write_failure = failure
-                        continue
-                    if not written_document.reused:
-                        placed_files.append(written_document.path)
-                    placed = written_document
-                    pasted_placed = written_document
-                elif row.role == "image" and image_step.emit:
-                    landed: list[PlacementResult] = []
-
-                    def _emit_landed(placed: PlacementResult) -> None:
-                        # SEC-7 / review F1: the emitted image joins the
-                        # rollback list the moment it lands — the verify
-                        # re-read that follows inside the emit can raise.
-                        landed.append(placed)
-                        if not placed.reused:
-                            placed_files.append(placed.path)
-
-                    # PDR-UX-C6: the emit's verify line names the entries
-                    # from this split — recorded where the emit runs, not
-                    # while deciding (review F7).
-                    self._change_service.record_save_entries()
-                    emit_result = self._change_service.emit_and_verify(
-                        image_step.derived,
-                        self.current_file.ranges,
-                        project_dir,
-                        row.landing.name,
-                        source_kind=self.current_file.file_type,
-                        bytes_per_line=32,
-                        s0_header=self.current_file.source_s0_header,
-                        source_image_path=self.current_file.path,
-                        summary=image_step.summary,
-                        workarea_root=self.workarea,
-                        on_placed=_emit_landed,
-                    )
-                    if not emit_result.ok or not landed:
-                        detail = "; ".join(
-                            issue.message for issue in emit_result.issues
-                        ) or emit_result.message
-                        message = (
-                            "Project NOT saved: could not save — the patched "
-                            f"image was not written: {detail}"
-                        )
-                        self.set_status(message)
-                        self.logger.warning("Project save emit failed: %s", detail)
+                    if copy_failure is not None:
+                        self.end_busy("save_project", gen, safe_text(copy_failure).plain)
                         self._abort_save(
                             project_dir,
                             created_project_dir,
@@ -11225,239 +11268,392 @@ class S19TuiApp(App):
                             manifest_restores,
                         )
                         return
-                    placed = landed[0]
-                    # LLR-168.4: the emitted image records its base, the
-                    # session's source image (which need not be in the
-                    # project).
-                    if emitted_record is not None:
-                        derived_from[placed.path.name] = emitted_record
+                # LLR-168.4 / B100-I7: the target's readable derived_from
+                # records are carried; an emit below adds its own (both decided
+                # before the plan, F3).
+                derived_from: dict[str, DerivedFrom] = dict(carried_derived)
+                # LLR-167.2 / LLR-167.6 (R-PC): execute exactly the plan's file
+                # rows. LED .53: each placement reports its reuse flag — a
+                # byte-identical file the placement REUSED is never recorded,
+                # so the rollback removes exactly what THIS save created. Every
+                # landed placement is checked against its row.
+                for row in plan.rows:
+                    if row.role in (PLAN_ROLE_MANIFEST, PLAN_ROLE_CARRIED):
+                        # A carried row is placed by the top-level copy below
+                        # (R11), never a second time here.
+                        continue
+                    if row.role == PLAN_ROLE_DOCUMENT:
+                        if row.source is not None:
+                            # A file-backed document: recorded as on disk or
+                            # copied by the gather below (E3 R1, R11).
+                            continue
+                        # A pasted document: written as a NEW file (E3 R1). A
+                        # failed write does not abort the save (LLR-170.2); the
+                        # home it created joins the rollback either way (A3R2-8).
+                        written_document, created_home, failure = (
+                            self._write_editor_document(row, project_dir)
+                        )
+                        if created_home is not None:
+                            created_dirs.append(created_home)
+                        if written_document is None:
+                            document_write_failure = failure
+                            continue
+                        if not written_document.reused:
+                            placed_files.append(written_document.path)
+                        placed = written_document
+                        pasted_placed = written_document
+                    elif row.role == "image" and image_step.emit:
+                        landed: list[PlacementResult] = []
+
+                        def _emit_landed(placed: PlacementResult) -> None:
+                            # SEC-7 / review F1: the emitted image joins the
+                            # rollback list the moment it lands — the verify
+                            # re-read that follows inside the emit can raise.
+                            landed.append(placed)
+                            if not placed.reused:
+                                placed_files.append(placed.path)
+
+                        # PDR-UX-C6: the emit's verify line names the entries
+                        # from this split — recorded where the emit runs, not
+                        # while deciding (review F7).
+                        self._change_service.record_save_entries()
+                        emit_result = self._change_service.emit_and_verify(
+                            image_step.derived,
+                            self.current_file.ranges,
+                            project_dir,
+                            row.landing.name,
+                            source_kind=self.current_file.file_type,
+                            bytes_per_line=32,
+                            s0_header=self.current_file.source_s0_header,
+                            source_image_path=self.current_file.path,
+                            summary=image_step.summary,
+                            workarea_root=self.workarea,
+                            on_placed=_emit_landed,
+                        )
+                        if not emit_result.ok or not landed:
+                            detail = "; ".join(
+                                issue.message for issue in emit_result.issues
+                            ) or emit_result.message
+                            message = (
+                                "Project NOT saved: could not save — the patched "
+                                f"image was not written: {detail}"
+                            )
+                            self.end_busy("save_project", gen, message)
+                            self.logger.warning("Project save emit failed: %s", detail)
+                            self._abort_save(
+                                project_dir,
+                                created_project_dir,
+                                placed_files,
+                                created_dirs,
+                                save_state,
+                                manifest_restores,
+                            )
+                            return
+                        placed = landed[0]
+                        # LLR-168.4: the emitted image records its base, the
+                        # session's source image (which need not be in the
+                        # project).
+                        if emitted_record is not None:
+                            derived_from[placed.path.name] = emitted_record
+                    else:
+                        placed = place_into_workarea(
+                            row.source, project_dir,
+                            workarea_root=self.workarea,
+                        )
+                        if not placed.reused:
+                            placed_files.append(placed.path)
+                    mismatch = _plan_row_mismatch(row, placed)
+                    if mismatch is not None:
+                        self.end_busy("save_project", gen, mismatch)
+                        self.logger.warning("Save project plan mismatch: %s", mismatch)
+                        self._abort_save(
+                            project_dir,
+                            created_project_dir,
+                            placed_files,
+                            created_dirs,
+                            save_state,
+                            manifest_restores,
+                        )
+                        return
+                    self.logger.info(
+                        "Project saved %s. name=%s file=%s", row.role, cleaned, placed.path
+                    )
+                    if (
+                        row.role == "image"
+                        and placed.path.suffix.lower() in PROJECT_PRIMARY_DATA_EXTENSIONS
+                    ):
+                        saved_primary_name = placed.path.name
+                # R11 / R3: the source's other top-level files land after the
+                # rows loop (an identical copy can never be reused by the image
+                # row) and before the variant rebuild, so the rebuilt variant
+                # set and the manifest include them; each landing is checked
+                # against its "carried" row.
+                if top_level_copies:
+                    copy_failure = self._copy_project_subfolders(
+                        save_as_source, project_dir, top_level_copies,
+                        placed_files, created_dirs,
+                        carried={
+                            row.landing.name: row
+                            for row in plan.rows
+                            if row.role == PLAN_ROLE_CARRIED
+                        },
+                    )
+                    if copy_failure is not None:
+                        self.end_busy("save_project", gen, safe_text(copy_failure).plain)
+                        self._abort_save(
+                            project_dir,
+                            created_project_dir,
+                            placed_files,
+                            created_dirs,
+                            save_state,
+                            manifest_restores,
+                        )
+                        return
+                # F-09 (LLR-056.3): project CREATE/SAVE swaps the active project
+                # without reloading a file (no ``_apply_prepared_load`` pass), so
+                # the sticky report-filter selection resets here.
+                self._report_filter_path = None
+                # Rebuild the variant inventory from the on-disk project so the saved
+                # image becomes the active variant (multi-variant model, E5b). The id
+                # is resolved AFTER the build by filename match because a stem
+                # collision makes the id the full filename (E6 duplicate-id rule).
+                saved_data_files, _saved_a2l_files, variant_error = validate_project_files(project_dir)
+                if variant_error is None:
+                    self._variant_set = build_variant_set(cleaned, saved_data_files)
+                    if saved_primary_name:
+                        saved_variant_id = next(
+                            (
+                                variant.variant_id
+                                for variant in self._variant_set.variants
+                                if variant.path.name == saved_primary_name
+                            ),
+                            None,
+                        )
+                    if saved_variant_id:
+                        self._variant_set.active_id = saved_variant_id
+                        if self.current_file:
+                            self.current_file.variant_id = saved_variant_id
                 else:
-                    placed = place_into_workarea(
-                        row.source, project_dir,
-                        workarea_root=self.workarea,
+                    self._variant_set = None
+                    self.logger.warning(
+                        "Variant set not built after save: %s", variant_error
                     )
-                    if not placed.reused:
-                        placed_files.append(placed.path)
-                mismatch = _plan_row_mismatch(row, placed)
-                if mismatch is not None:
-                    self.set_status(mismatch)
-                    self.logger.warning("Save project plan mismatch: %s", mismatch)
-                    self._abort_save(
-                        project_dir,
-                        created_project_dir,
-                        placed_files,
-                        created_dirs,
-                        save_state,
-                        manifest_restores,
-                    )
-                    return
-                self.logger.info(
-                    "Project saved %s. name=%s file=%s", row.role, cleaned, placed.path
+                # Change 1 (HLR-138 / LLR-138.1..138.3): the save-gather — COPY the
+                # JSON artifacts the project USES (the recorded predicate lives in
+                # ``project_gather_service``) into their per-artifact project homes,
+                # leaving the COMMON originals untouched. The gather is best-effort:
+                # its per-artifact findings are logged, never save-blocking.
+                # R4 / LLR-171.6 / .6a: for every target, batch and assignments
+                # are the dialog's selection when it selected any, otherwise the
+                # carried records; the gather list is the resolved batch plus
+                # the names in the resolved assignments (LLR-171.6b, LLR-138.1).
+                batch = (
+                    tuple(payload.batch)
+                    if payload.batch
+                    else tuple(target_carry.get("batch", ()))
                 )
-                if (
-                    row.role == "image"
-                    and placed.path.suffix.lower() in PROJECT_PRIMARY_DATA_EXTENSIONS
-                ):
-                    saved_primary_name = placed.path.name
-            # R11 / R3: the source's other top-level files land after the
-            # rows loop (an identical copy can never be reused by the image
-            # row) and before the variant rebuild, so the rebuilt variant
-            # set and the manifest include them; each landing is checked
-            # against its "carried" row.
-            if top_level_copies:
-                copy_failure = self._copy_project_subfolders(
-                    save_as_source, project_dir, top_level_copies,
-                    placed_files, created_dirs,
-                    carried={
-                        row.landing.name: row
-                        for row in plan.rows
-                        if row.role == PLAN_ROLE_CARRIED
-                    },
+                assignments = (
+                    dict(payload.assignments)
+                    if any(payload.assignments.values())
+                    else dict(target_carry.get("assignments", {}))
                 )
-                if copy_failure is not None:
-                    self.set_status(safe_text(copy_failure).plain)
-                    self._abort_save(
-                        project_dir,
-                        created_project_dir,
-                        placed_files,
-                        created_dirs,
-                        save_state,
-                        manifest_restores,
+                composition_names = list(batch) + [
+                    name
+                    for entries in assignments.values()
+                    for name in entries
+                ]
+                # HLR-170 / LLR-170.2: the gather gets the pasted document's
+                # landing (unresolved, built from the home, so it is ``in_home``
+                # and named, never copied) or the file-backed document the plan
+                # placed; a document with no plan row is not placed (E3 R3).
+                if pasted_placed is not None:
+                    gather_document: Optional[Path] = (
+                        project_dir / document_home / pasted_placed.path.name
                     )
-                    return
-            # F-09 (LLR-056.3): project CREATE/SAVE swaps the active project
-            # without reloading a file (no ``_apply_prepared_load`` pass), so
-            # the sticky report-filter selection resets here.
-            self._report_filter_path = None
-            # Rebuild the variant inventory from the on-disk project so the saved
-            # image becomes the active variant (multi-variant model, E5b). The id
-            # is resolved AFTER the build by filename match because a stem
-            # collision makes the id the full filename (E6 duplicate-id rule).
-            saved_data_files, _saved_a2l_files, variant_error = validate_project_files(project_dir)
-            if variant_error is None:
-                self._variant_set = build_variant_set(cleaned, saved_data_files)
-                if saved_primary_name:
-                    saved_variant_id = next(
+                elif document_row is not None:
+                    gather_document = document_row.source
+                else:
+                    gather_document = None
+                self.step_busy("save_project", gen, 3)
+                gather_outcome = gather_project_artifacts(
+                    project_dir,
+                    composition_names=composition_names,
+                    active_document=gather_document,
+                    active_document_kind=document.kind,
+                    active_template=self._last_template_path,
+                    common_patches_dir=self.workarea / WORKAREA_PATCHES,
+                    common_templates_dir=self.base_dir / WORKAREA_DIRNAME / WORKAREA_TEMPLATES,
+                    workarea_root=self.workarea,
+                )
+                for issue in gather_outcome.issues:
+                    self.logger.warning("Project gather: %s", issue.message)
+                # LED .53: the gather reports exactly what IT created — the
+                # files it wrote and the homes it created on demand — so the
+                # rollback removes those and never a reused byte-identical
+                # file or a pre-existing home.
+                placed_files.extend(gather_outcome.written)
+                created_dirs.extend(gather_outcome.created_homes)
+                # HLR-170 / pre-ruling 2: the session document's landing is
+                # recorded only when the gather named it in the form; a session
+                # document not placed counts as none, so the target's carried
+                # value is recorded instead (E3 R3), with one line about it.
+                landed_document = (
+                    gather_outcome.active_document if gather_document is not None else None
+                )
+                if landed_document is not None and is_active_document_form(landed_document):
+                    recorded_document = landed_document
+                elif document_write_failure is not None:
+                    document_lines.append(document_write_failure)
+                elif document.source_path is None:
+                    if document.entries and document_row is None:
+                        # SEC8a-3: the plan gave no row (the home failed the
+                        # guarded write's containment check), so nothing was
+                        # written; the line names the file the save would write.
+                        document_lines.append(
+                            "Change document changes.json was not saved into the "
+                            f"project — the project's {document_home} folder is a "
+                            "link or is outside the work area; its entries stay in "
+                            "the Patch Editor"
+                        )
+                else:
+                    document_lines.extend(
+                        self._unrecorded_document_lines(
+                            project_dir,
+                            document.source_path,
+                            document_home,
+                            document_class,
+                            copied=document_row is not None
+                            and any(
+                                issue.code == GATHER_DOCUMENT_NOT_RECORDED
+                                for issue in gather_outcome.issues
+                            ),
+                            carried=carried_active_document,
+                            carried_line=carried_document_line,
+                        )
+                    )
+                if recorded_document is None:
+                    recorded_document = carried_active_document
+                    if carried_document_line is not None:
+                        document_lines.append(carried_document_line)
+                if recorded_document is None and _KEY_ACTIVE_DOCUMENT in plan.manifest_keys:
+                    plan = _plan_without_document_key(plan)
+                # LLR-164.2 / E3 R13: a merge keeps the target's gathered rows
+                # and adds this save's; an open-project save records this
+                # save's rows only. LLR-171.1h: a save as keeps the source's
+                # rows (their files were copied) and adds this save's.
+                gathered = gather_outcome.gathered
+                if plan.target_kind == PLAN_TARGET_MERGE or save_as_source is not None:
+                    gathered = {}
+                    for home in dict.fromkeys(
+                        (*PROJECT_HOME_NAMES, *target_gathered, *gather_outcome.gathered)
+                    ):
+                        rows = set(target_gathered.get(home, ())) | set(
+                            gather_outcome.gathered.get(home, ())
+                        )
+                        if rows:
+                            gathered[home] = sorted(rows)
+                # SEC2-8 / SEC2-9 (security round 4): the manifest write is the
+                # last post-creation stage. Keep the previous project.json
+                # bytes BEFORE the write — when no manifest existed, the write
+                # CREATES it and the new file joins the placed list the moment
+                # the write returns (a failure after that point, such as the
+                # verify re-read raising, leaves no folder behind); when a
+                # merge REPLACES a pre-existing manifest, the rollback puts
+                # the kept bytes back atomically.
+                manifest_path = project_dir / PROJECT_MANIFEST_NAME
+                self.step_busy("save_project", gen, 4)
+                manifest_previous: Optional[bytes] = None
+                if manifest_path.is_file():
+                    manifest_previous = manifest_path.read_bytes()
+                # SEC7-3: Save project rebuilds project.json from the session;
+                # one it cannot carry whole (damaged, another schema_version,
+                # unknown keys) is first kept beside it, and the status names
+                # the copy. When no copy can be kept, nothing is overwritten.
+                kept_note: Optional[str] = None
+                keep_reason = (
+                    manifest_keep_reason(existing) if existing is not None else None
+                )
+                if manifest_previous is not None and keep_reason is not None:
+                    kept = self._keep_previous_manifest(manifest_path, manifest_previous)
+                    if kept is None:
+                        self.end_busy(
+                            "save_project",
+                            gen,
+                            f"Project NOT saved: {PROJECT_MANIFEST_NAME} {keep_reason} "
+                            f"and its content could not be kept beside it in {project_dir}",
+                        )
+                        self.logger.warning(
+                            "Save project refused: previous manifest not kept: %s",
+                            manifest_path,
+                        )
+                        self._abort_save(
+                            project_dir,
+                            created_project_dir,
+                            placed_files,
+                            created_dirs,
+                            save_state,
+                            manifest_restores,
+                        )
+                        return
+                    kept_copies.append((kept, manifest_previous))
+                    kept_note = (
+                        f"{PROJECT_MANIFEST_NAME} {keep_reason}: its previous content "
+                        f"is kept as {kept.name} in {project_dir}"
+                    )
+                    # E3 R5 / S3R2-7: a refused active_document is a skipped
+                    # entry — named through the reader's clipped mark.
+                    refused_document = next(
                         (
-                            variant.variant_id
-                            for variant in self._variant_set.variants
-                            if variant.path.name == saved_primary_name
+                            issue.details.get(_ISSUE_ENTRY, "")
+                            for issue in existing.issues
+                            if issue.details.get(_ISSUE_KEY) == _KEY_ACTIVE_DOCUMENT
                         ),
                         None,
                     )
-                if saved_variant_id:
-                    self._variant_set.active_id = saved_variant_id
-                    if self.current_file:
-                        self.current_file.variant_id = saved_variant_id
-            else:
-                self._variant_set = None
-                self.logger.warning(
-                    "Variant set not built after save: %s", variant_error
+                    if refused_document is not None:
+                        document_lines.append(
+                            f"Change document record {refused_document} was "
+                            f"dropped from {PROJECT_MANIFEST_NAME} — its previous "
+                            f"content is kept as {kept.name}"
+                        )
+
+                def _manifest_written(written: Path) -> None:
+                    # Invoked by ``_write_and_verify_manifest`` the moment the
+                    # manifest write returns, before the verify can raise.
+                    if manifest_previous is None:
+                        placed_files.append(written)
+                    else:
+                        manifest_restores.append((written, manifest_previous))
+
+                if save_as_source is not None:
+                    # LLR-171.1h / A3-8: a save as keeps the source's
+                    # derived_from records only for a top-level data file the
+                    # copy holds — the image row's landing or a top-level copy.
+                    held_names = {
+                        row.landing.name for row in plan.rows if row.role == "image"
+                    } | {entry.relative for entry in top_level_copies}
+                    derived_from = {
+                        key: record
+                        for key, record in derived_from.items()
+                        if key in held_names
+                    }
+                manifest_ok = self._write_and_verify_manifest(
+                    project_dir,
+                    batch=batch,
+                    assignments=assignments,
+                    declared_regions=self._declared_regions,
+                    gathered=gathered,
+                    derived_from=derived_from,
+                    active_document=recorded_document,
+                    on_written=_manifest_written,
                 )
-            # Change 1 (HLR-138 / LLR-138.1..138.3): the save-gather — COPY the
-            # JSON artifacts the project USES (the recorded predicate lives in
-            # ``project_gather_service``) into their per-artifact project homes,
-            # leaving the COMMON originals untouched. The gather is best-effort:
-            # its per-artifact findings are logged, never save-blocking.
-            # R4 / LLR-171.6 / .6a: for every target, batch and assignments
-            # are the dialog's selection when it selected any, otherwise the
-            # carried records; the gather list is the resolved batch plus
-            # the names in the resolved assignments (LLR-171.6b, LLR-138.1).
-            batch = (
-                tuple(payload.batch)
-                if payload.batch
-                else tuple(target_carry.get("batch", ()))
-            )
-            assignments = (
-                dict(payload.assignments)
-                if any(payload.assignments.values())
-                else dict(target_carry.get("assignments", {}))
-            )
-            composition_names = list(batch) + [
-                name
-                for entries in assignments.values()
-                for name in entries
-            ]
-            # HLR-170 / LLR-170.2: the gather gets the pasted document's
-            # landing (unresolved, built from the home, so it is ``in_home``
-            # and named, never copied) or the file-backed document the plan
-            # placed; a document with no plan row is not placed (E3 R3).
-            if pasted_placed is not None:
-                gather_document: Optional[Path] = (
-                    project_dir / document_home / pasted_placed.path.name
-                )
-            elif document_row is not None:
-                gather_document = document_row.source
-            else:
-                gather_document = None
-            gather_outcome = gather_project_artifacts(
-                project_dir,
-                composition_names=composition_names,
-                active_document=gather_document,
-                active_document_kind=document.kind,
-                active_template=self._last_template_path,
-                common_patches_dir=self.workarea / WORKAREA_PATCHES,
-                common_templates_dir=self.base_dir / WORKAREA_DIRNAME / WORKAREA_TEMPLATES,
-                workarea_root=self.workarea,
-            )
-            for issue in gather_outcome.issues:
-                self.logger.warning("Project gather: %s", issue.message)
-            # LED .53: the gather reports exactly what IT created — the
-            # files it wrote and the homes it created on demand — so the
-            # rollback removes those and never a reused byte-identical
-            # file or a pre-existing home.
-            placed_files.extend(gather_outcome.written)
-            created_dirs.extend(gather_outcome.created_homes)
-            # HLR-170 / pre-ruling 2: the session document's landing is
-            # recorded only when the gather named it in the form; a session
-            # document not placed counts as none, so the target's carried
-            # value is recorded instead (E3 R3), with one line about it.
-            landed_document = (
-                gather_outcome.active_document if gather_document is not None else None
-            )
-            if landed_document is not None and is_active_document_form(landed_document):
-                recorded_document = landed_document
-            elif document_write_failure is not None:
-                document_lines.append(document_write_failure)
-            elif document.source_path is None:
-                if document.entries and document_row is None:
-                    # SEC8a-3: the plan gave no row (the home failed the
-                    # guarded write's containment check), so nothing was
-                    # written; the line names the file the save would write.
-                    document_lines.append(
-                        "Change document changes.json was not saved into the "
-                        f"project — the project's {document_home} folder is a "
-                        "link or is outside the work area; its entries stay in "
-                        "the Patch Editor"
+                if not manifest_ok:
+                    message = (
+                        "Project NOT saved: could not save — project.json was "
+                        "not written. check the folder."
                     )
-            else:
-                document_lines.extend(
-                    self._unrecorded_document_lines(
-                        project_dir,
-                        document.source_path,
-                        document_home,
-                        document_class,
-                        copied=document_row is not None
-                        and any(
-                            issue.code == GATHER_DOCUMENT_NOT_RECORDED
-                            for issue in gather_outcome.issues
-                        ),
-                        carried=carried_active_document,
-                        carried_line=carried_document_line,
-                    )
-                )
-            if recorded_document is None:
-                recorded_document = carried_active_document
-                if carried_document_line is not None:
-                    document_lines.append(carried_document_line)
-            if recorded_document is None and _KEY_ACTIVE_DOCUMENT in plan.manifest_keys:
-                plan = _plan_without_document_key(plan)
-            # LLR-164.2 / E3 R13: a merge keeps the target's gathered rows
-            # and adds this save's; an open-project save records this
-            # save's rows only. LLR-171.1h: a save as keeps the source's
-            # rows (their files were copied) and adds this save's.
-            gathered = gather_outcome.gathered
-            if plan.target_kind == PLAN_TARGET_MERGE or save_as_source is not None:
-                gathered = {}
-                for home in dict.fromkeys(
-                    (*PROJECT_HOME_NAMES, *target_gathered, *gather_outcome.gathered)
-                ):
-                    rows = set(target_gathered.get(home, ())) | set(
-                        gather_outcome.gathered.get(home, ())
-                    )
-                    if rows:
-                        gathered[home] = sorted(rows)
-            # SEC2-8 / SEC2-9 (security round 4): the manifest write is the
-            # last post-creation stage. Keep the previous project.json
-            # bytes BEFORE the write — when no manifest existed, the write
-            # CREATES it and the new file joins the placed list the moment
-            # the write returns (a failure after that point, such as the
-            # verify re-read raising, leaves no folder behind); when a
-            # merge REPLACES a pre-existing manifest, the rollback puts
-            # the kept bytes back atomically.
-            manifest_path = project_dir / PROJECT_MANIFEST_NAME
-            manifest_previous: Optional[bytes] = None
-            if manifest_path.is_file():
-                manifest_previous = manifest_path.read_bytes()
-            # SEC7-3: Save project rebuilds project.json from the session;
-            # one it cannot carry whole (damaged, another schema_version,
-            # unknown keys) is first kept beside it, and the status names
-            # the copy. When no copy can be kept, nothing is overwritten.
-            kept_note: Optional[str] = None
-            keep_reason = (
-                manifest_keep_reason(existing) if existing is not None else None
-            )
-            if manifest_previous is not None and keep_reason is not None:
-                kept = self._keep_previous_manifest(manifest_path, manifest_previous)
-                if kept is None:
-                    self.set_status(
-                        f"Project NOT saved: {PROJECT_MANIFEST_NAME} {keep_reason} "
-                        f"and its content could not be kept beside it in {project_dir}"
-                    )
-                    self.logger.warning(
-                        "Save project refused: previous manifest not kept: %s",
-                        manifest_path,
-                    )
+                    self.end_busy("save_project", gen, message)
+                    self.logger.warning("Project save failed at the manifest write.")
                     self._abort_save(
                         project_dir,
                         created_project_dir,
@@ -11465,67 +11661,23 @@ class S19TuiApp(App):
                         created_dirs,
                         save_state,
                         manifest_restores,
+                        kept_copies,
                     )
                     return
-                kept_copies.append((kept, manifest_previous))
-                kept_note = (
-                    f"{PROJECT_MANIFEST_NAME} {keep_reason}: its previous content "
-                    f"is kept as {kept.name} in {project_dir}"
+            except WorkareaPlacementError as exc:
+                # HLR-155: the locked-target refusal. The exception text already
+                # leads with the outcome and names the file, the cause and the
+                # next step (UX-C4/UX-C5); it is painted at failure severity and
+                # the app keeps running.
+                self.end_busy("save_project", gen, str(exc))
+                self.notify(
+                    str(exc),
+                    title="Project not saved",
+                    severity="error",
+                    timeout=10.0,
+                    markup=False,
                 )
-                # E3 R5 / S3R2-7: a refused active_document is a skipped
-                # entry — named through the reader's clipped mark.
-                refused_document = next(
-                    (
-                        issue.details.get(_ISSUE_ENTRY, "")
-                        for issue in existing.issues
-                        if issue.details.get(_ISSUE_KEY) == _KEY_ACTIVE_DOCUMENT
-                    ),
-                    None,
-                )
-                if refused_document is not None:
-                    document_lines.append(
-                        f"Change document record {refused_document} was "
-                        f"dropped from {PROJECT_MANIFEST_NAME} — its previous "
-                        f"content is kept as {kept.name}"
-                    )
-
-            def _manifest_written(written: Path) -> None:
-                # Invoked by ``_write_and_verify_manifest`` the moment the
-                # manifest write returns, before the verify can raise.
-                if manifest_previous is None:
-                    placed_files.append(written)
-                else:
-                    manifest_restores.append((written, manifest_previous))
-
-            if save_as_source is not None:
-                # LLR-171.1h / A3-8: a save as keeps the source's
-                # derived_from records only for a top-level data file the
-                # copy holds — the image row's landing or a top-level copy.
-                held_names = {
-                    row.landing.name for row in plan.rows if row.role == "image"
-                } | {entry.relative for entry in top_level_copies}
-                derived_from = {
-                    key: record
-                    for key, record in derived_from.items()
-                    if key in held_names
-                }
-            manifest_ok = self._write_and_verify_manifest(
-                project_dir,
-                batch=batch,
-                assignments=assignments,
-                declared_regions=self._declared_regions,
-                gathered=gathered,
-                derived_from=derived_from,
-                active_document=recorded_document,
-                on_written=_manifest_written,
-            )
-            if not manifest_ok:
-                message = (
-                    "Project NOT saved: could not save — project.json was "
-                    "not written. check the folder."
-                )
-                self.set_status(message)
-                self.logger.warning("Project save failed at the manifest write.")
+                self.logger.warning("Project save placement failed: %s", exc)
                 self._abort_save(
                     project_dir,
                     created_project_dir,
@@ -11536,275 +11688,256 @@ class S19TuiApp(App):
                     kept_copies,
                 )
                 return
-        except WorkareaPlacementError as exc:
-            # HLR-155: the locked-target refusal. The exception text already
-            # leads with the outcome and names the file, the cause and the
-            # next step (UX-C4/UX-C5); it is painted at failure severity and
-            # the app keeps running.
-            self.set_status(str(exc))
-            self.notify(
-                str(exc),
-                title="Project not saved",
-                severity="error",
-                timeout=10.0,
-                markup=False,
-            )
-            self.logger.warning("Project save placement failed: %s", exc)
-            self._abort_save(
-                project_dir,
-                created_project_dir,
-                placed_files,
-                created_dirs,
-                save_state,
-                manifest_restores,
-                kept_copies,
-            )
-            return
-        except WorkareaContainmentError as exc:
-            self.set_status(f"Cannot save project: {exc}")
-            self.logger.warning("Project save rejected by workarea guard: %s", exc)
-            self._abort_save(
-                project_dir,
-                created_project_dir,
-                placed_files,
-                created_dirs,
-                save_state,
-                manifest_restores,
-                kept_copies,
-            )
-            return
-        except OSError as exc:
-            # LLR-164.4: any operating-system error after the folder was
-            # created reports the ``could not save`` tokens and rolls the
-            # failed save back — the placed files, the created folder and
-            # the in-memory state — so the app keeps running as it was.
-            message = f"Project NOT saved: could not save — {exc}. check the folder."
-            self.set_status(message)
-            self.notify(
-                message,
-                title="Project not saved",
-                severity="error",
-                timeout=10.0,
-                markup=False,
-            )
-            self.logger.warning("Project save failed with an OS error: %s", exc)
-            self._abort_save(
-                project_dir,
-                created_project_dir,
-                placed_files,
-                created_dirs,
-                save_state,
-                manifest_restores,
-                kept_copies,
-            )
-            return
-        except Exception:
-            # SEC-7: any other error after the folder's creation is a
-            # defect — roll the failed save back first, then let it surface.
-            self.logger.exception("Project save failed with an unexpected error.")
-            self._abort_save(
-                project_dir,
-                created_project_dir,
-                placed_files,
-                created_dirs,
-                save_state,
-                manifest_restores,
-                kept_copies,
-            )
-            raise
-        # R2-3: the save is COMMITTED — the statements below run OUTSIDE
-        # the rollback try: once ``project.json`` is on disk, an error
-        # here must never roll the save back (the rollback would unlink
-        # a variant the manifest now lists).
-        # LLR-167.2: the emitted image is now on disk — the session view
-        # takes the re-derived image in place, so it equals what was saved,
-        # and the verify outcome is painted (its line names the entries
-        # through ``save_back_status_suffix``).
-        mem_map = self.current_file.mem_map if self.current_file else None
-        if image_step.emit:
-            self._change_service.adopt_rederived(
-                mem_map, image_step.derived, image_step.summary
-            )
-            self._surface_verify_result()
-        # LLR-167.5: record the saved image state — only when the session
-        # image equals what was written (an emit, or a copy of a session
-        # that does not differ from its source).
-        if image_step.emit or not self._change_service.image_differs_from_source(
-            mem_map
-        ):
-            self._change_service.mark_saved(mem_map)
-        # F1: the success line paints only after the manifest is on
-        # disk — a save that is about to fail must not have said
-        # "Saved". LLR-167.3: an emitting save names the entries the image
-        # carries and how many this save applied.
-        image_clause = f" — {plan.image}" if image_step.emit else ""
-        if saved_variant_id:
-            self.set_status(
-                f"Saved project to {project_dir} (variant '{saved_variant_id}')"
-                f"{image_clause}"
-            )
-        else:
-            self.set_status(f"Saved project to {project_dir}{image_clause}")
-        if kept_note is not None:
-            self.set_status(safe_text(kept_note).plain)
-        # LLR-171.1c / LLR-171.7a: one line names the links the save as did
-        # not follow; every name from the source tree goes through
-        # painted_names (R6).
-        if plan.skipped_links:
-            self.set_status(
-                safe_text(
-                    "Save as: links or junctions not copied: "
-                    f"{painted_names(plan.skipped_links)} — copy those files into "
-                    "the project if it needs them."
-                ).plain
-            )
-            self.logger.info(
-                "Save as skipped %d links: %r",
-                len(plan.skipped_links),
-                list(plan.skipped_links[:100]),
-            )
-        if source_gone is not None:
-            self.set_status(
-                safe_text(
-                    f"The open project folder '{painted_names([source_gone])}' was "
-                    "not found — its other files were not copied; copy them into "
-                    f"'{painted_names([cleaned])}' if you still have them."
-                ).plain
-            )
-        # LLR-171.5 / LLR-171.7a: one line per gathered file project.json
-        # cannot record, at most 10, then one line with the rest's count.
-        unrecorded = gather_outcome.unrecorded
-        for relative in unrecorded[:PAINTED_NAME_LIMIT]:
-            why = (
-                "Windows reserves that name"
-                if any(
-                    is_windows_device_name(part)
-                    for part in PurePosixPath(relative).parts
+            except WorkareaContainmentError as exc:
+                self.end_busy("save_project", gen, f"Cannot save project: {exc}")
+                self.logger.warning("Project save rejected by workarea guard: %s", exc)
+                self._abort_save(
+                    project_dir,
+                    created_project_dir,
+                    placed_files,
+                    created_dirs,
+                    save_state,
+                    manifest_restores,
+                    kept_copies,
                 )
-                else "the name is not one project.json records"
-            )
-            self.set_status(
-                safe_text(
-                    f"{painted_names([relative])} was copied but not recorded in "
-                    f"{PROJECT_MANIFEST_NAME} ({why}) — rename it in the common "
-                    "folder, select the new name, then Save project."
-                ).plain
-            )
-        if len(unrecorded) > PAINTED_NAME_LIMIT:
-            self.set_status(
-                f"and {len(unrecorded) - PAINTED_NAME_LIMIT} more files not "
-                f"recorded in {PROJECT_MANIFEST_NAME}"
-            )
-        # LED .72 Q1 / E3 R12: the pasted document is bound to its landing,
-        # spelled unresolved from the home (never PlacementResult.path), so
-        # the next save's in-home test sees the same spelling; from now on
-        # it is file-backed and never rewritten (E3 R1).
-        if pasted_placed is not None:
-            document.source_path = project_dir / document_home / pasted_placed.path.name
-        elif save_as_source is not None and document.source_path is not None:
-            # R9 / LLR-171.1m: a document whose file is inside the source
-            # follows its copy. Textual relative_to on the unnormalised
-            # spellings; a ".." or absolute part keeps the binding, and the
-            # new path is built from the plan entry, never from the source
-            # text and never after a probe (S3R2-5).
-            try:
-                document_relative: Optional[str] = (
-                    document.source_path.absolute()
-                    .relative_to(save_as_source.absolute())
-                    .as_posix()
+                return
+            except OSError as exc:
+                # LLR-164.4: any operating-system error after the folder was
+                # created reports the ``could not save`` tokens and rolls the
+                # failed save back — the placed files, the created folder and
+                # the in-memory state — so the app keeps running as it was.
+                message = f"Project NOT saved: could not save — {exc}. check the folder."
+                self.end_busy("save_project", gen, message)
+                self.notify(
+                    message,
+                    title="Project not saved",
+                    severity="error",
+                    timeout=10.0,
+                    markup=False,
                 )
-            except ValueError:
-                document_relative = None
-            plan_entries = {entry.relative for entry in plan.copies}
-            row_relative: Optional[str] = None
-            if document_row is not None:
-                try:
-                    row_relative = document_row.landing.relative_to(
-                        project_dir.resolve()
-                    ).as_posix()
-                except (ValueError, OSError):
-                    pass
-                else:
-                    plan_entries.add(row_relative)
-            # Q10 (d) / A11-03: a file-backed document row whose source is
-            # the session document follows the row's predicted landing; the
-            # document arm now predicts it with ``workspace._match_identical``
-            # against the copied tree, so the F5 (b) substitution below keeps
-            # only its defence role.
-            if (
-                document_row is not None
-                and document_row.source is not None
-                and row_relative is not None
-                and os.path.normcase(os.path.abspath(document_row.source))
-                == os.path.normcase(os.path.abspath(document.source_path))
+                self.logger.warning("Project save failed with an OS error: %s", exc)
+                self._abort_save(
+                    project_dir,
+                    created_project_dir,
+                    placed_files,
+                    created_dirs,
+                    save_state,
+                    manifest_restores,
+                    kept_copies,
+                )
+                return
+            except Exception:
+                # SEC-7: any other error after the folder's creation is a
+                # defect — roll the failed save back first, then let it surface.
+                self.logger.exception("Project save failed with an unexpected error.")
+                self._abort_save(
+                    project_dir,
+                    created_project_dir,
+                    placed_files,
+                    created_dirs,
+                    save_state,
+                    manifest_restores,
+                    kept_copies,
+                )
+                raise
+            # R2-3: the save is COMMITTED — the statements below run OUTSIDE
+            # the rollback try: once ``project.json`` is on disk, an error
+            # here must never roll the save back (the rollback would unlink
+            # a variant the manifest now lists).
+            # LLR-167.2: the emitted image is now on disk — the session view
+            # takes the re-derived image in place, so it equals what was saved,
+            # and the verify outcome is painted (its line names the entries
+            # through ``save_back_status_suffix``).
+            mem_map = self.current_file.mem_map if self.current_file else None
+            if image_step.emit:
+                self._change_service.adopt_rederived(
+                    mem_map, image_step.derived, image_step.summary
+                )
+                self._surface_verify_result()
+            # LLR-167.5: record the saved image state — only when the session
+            # image equals what was written (an emit, or a copy of a session
+            # that does not differ from its source).
+            if image_step.emit or not self._change_service.image_differs_from_source(
+                mem_map
             ):
-                document_relative = row_relative
-            if (
-                document_relative is not None
-                and ".." not in PurePosixPath(document_relative).parts
-                and not PurePosixPath(document_relative).is_absolute()
-                and document_relative in plan_entries
-            ):
-                # F5 (b): the document row's file lands where the gather
-                # placed it — a byte-identical sibling it reused
-                # (``changes_1.json``) is the copy, not the planned name.
-                if (
-                    document_relative == row_relative
-                    and landed_document is not None
-                    and recorded_document == landed_document
-                ):
-                    document_relative = landed_document
-                document.source_path = project_dir.joinpath(
-                    *PurePosixPath(document_relative).parts
+                self._change_service.mark_saved(mem_map)
+            # F1: the success line paints only after the manifest is on
+            # disk — a save that is about to fail must not have said
+            # "Saved". LLR-167.3: an emitting save names the entries the image
+            # carries and how many this save applied.
+            image_clause = f" — {plan.image}" if image_step.emit else ""
+            if saved_variant_id:
+                tail: list[str] = [
+                    f"Saved project to {project_dir} (variant '{saved_variant_id}')"
+                    f"{image_clause}"
+                ]
+            else:
+                tail: list[str] = [f"Saved project to {project_dir}{image_clause}"]
+            if kept_note is not None:
+                tail.append(safe_text(kept_note).plain)
+            # LLR-171.1c / LLR-171.7a: one line names the links the save as did
+            # not follow; every name from the source tree goes through
+            # painted_names (R6).
+            if plan.skipped_links:
+                tail.append(
+                    safe_text(
+                        "Save as: links or junctions not copied: "
+                        f"{painted_names(plan.skipped_links)} — copy those files into "
+                        "the project if it needs them."
+                    ).plain
                 )
-        try:
-            panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
-            paste_text = self.query_one("#patch_paste_text", TextArea).text
-        except Exception:
-            # Not mounted (headless unit tests): the bind above holds.
-            panel = None
-        if panel is not None:
+                self.logger.info(
+                    "Save as skipped %d links: %r",
+                    len(plan.skipped_links),
+                    list(plan.skipped_links[:100]),
+                )
+            if source_gone is not None:
+                tail.append(
+                    safe_text(
+                        f"The open project folder '{painted_names([source_gone])}' was "
+                        "not found — its other files were not copied; copy them into "
+                        f"'{painted_names([cleaned])}' if you still have them."
+                    ).plain
+                )
+            # LLR-171.5 / LLR-171.7a: one line per gathered file project.json
+            # cannot record, at most 10, then one line with the rest's count.
+            unrecorded = gather_outcome.unrecorded
+            for relative in unrecorded[:PAINTED_NAME_LIMIT]:
+                why = (
+                    "Windows reserves that name"
+                    if any(
+                        is_windows_device_name(part)
+                        for part in PurePosixPath(relative).parts
+                    )
+                    else "the name is not one project.json records"
+                )
+                tail.append(
+                    safe_text(
+                        f"{painted_names([relative])} was copied but not recorded in "
+                        f"{PROJECT_MANIFEST_NAME} ({why}) — rename it in the common "
+                        "folder, select the new name, then Save project."
+                    ).plain
+                )
+            if len(unrecorded) > PAINTED_NAME_LIMIT:
+                tail.append(
+                    f"and {len(unrecorded) - PAINTED_NAME_LIMIT} more files not "
+                    f"recorded in {PROJECT_MANIFEST_NAME}"
+                )
+            # LED .72 Q1 / E3 R12: the pasted document is bound to its landing,
+            # spelled unresolved from the home (never PlacementResult.path), so
+            # the next save's in-home test sees the same spelling; from now on
+            # it is file-backed and never rewritten (E3 R1).
             if pasted_placed is not None:
-                self._patch_editor_load_tail(panel)
-            # LLR-167.8: the dirty flag clears only when a file now holds
-            # every entry and no unparsed paste text is left (LED .72 Q2).
-            if _save_clears_panel_flag(
-                pasted_placed is not None, paste_text, self._parsed_paste_text
+                document.source_path = project_dir / document_home / pasted_placed.path.name
+            elif save_as_source is not None and document.source_path is not None:
+                # R9 / LLR-171.1m: a document whose file is inside the source
+                # follows its copy. Textual relative_to on the unnormalised
+                # spellings; a ".." or absolute part keeps the binding, and the
+                # new path is built from the plan entry, never from the source
+                # text and never after a probe (S3R2-5).
+                try:
+                    document_relative: Optional[str] = (
+                        document.source_path.absolute()
+                        .relative_to(save_as_source.absolute())
+                        .as_posix()
+                    )
+                except ValueError:
+                    document_relative = None
+                plan_entries = {entry.relative for entry in plan.copies}
+                row_relative: Optional[str] = None
+                if document_row is not None:
+                    try:
+                        row_relative = document_row.landing.relative_to(
+                            project_dir.resolve()
+                        ).as_posix()
+                    except (ValueError, OSError):
+                        pass
+                    else:
+                        plan_entries.add(row_relative)
+                # Q10 (d) / A11-03: a file-backed document row whose source is
+                # the session document follows the row's predicted landing; the
+                # document arm now predicts it with ``workspace._match_identical``
+                # against the copied tree, so the F5 (b) substitution below keeps
+                # only its defence role.
+                if (
+                    document_row is not None
+                    and document_row.source is not None
+                    and row_relative is not None
+                    and os.path.normcase(os.path.abspath(document_row.source))
+                    == os.path.normcase(os.path.abspath(document.source_path))
+                ):
+                    document_relative = row_relative
+                if (
+                    document_relative is not None
+                    and ".." not in PurePosixPath(document_relative).parts
+                    and not PurePosixPath(document_relative).is_absolute()
+                    and document_relative in plan_entries
+                ):
+                    # F5 (b): the document row's file lands where the gather
+                    # placed it — a byte-identical sibling it reused
+                    # (``changes_1.json``) is the copy, not the planned name.
+                    if (
+                        document_relative == row_relative
+                        and landed_document is not None
+                        and recorded_document == landed_document
+                    ):
+                        document_relative = landed_document
+                    document.source_path = project_dir.joinpath(
+                        *PurePosixPath(document_relative).parts
+                    )
+            try:
+                panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+                paste_text = self.query_one("#patch_paste_text", TextArea).text
+            except Exception:
+                # Not mounted (headless unit tests): the bind above holds.
+                panel = None
+            if panel is not None:
+                if pasted_placed is not None:
+                    self._patch_editor_load_tail(panel)
+                # LLR-167.8: the dirty flag clears only when a file now holds
+                # every entry and no unparsed paste text is left (LED .72 Q2).
+                if _save_clears_panel_flag(
+                    pasted_placed is not None, paste_text, self._parsed_paste_text
+                ):
+                    panel.mark_saved()
+                elif (
+                    document_class == _DOCUMENT_IN_HOME
+                    and recorded_document is not None
+                    and panel.is_dirty
+                ):
+                    # E3 R1: recorded as on disk; the panel's edits are in no
+                    # file.
+                    document_lines.append(
+                        f"Change document {document.source_path.name} has unsaved "
+                        "edits — the project records the file as it is on disk; "
+                        "save it from the Patch Editor to keep them"
+                    )
+            # HLR-170 / E3 R6: every line about the document is in user terms
+            # and goes through safe_text; painted before the MISMATCH re-paint.
+            for line in document_lines:
+                tail.append(safe_text(line).plain)
+            # R2-5: a manifest verify MISMATCH (LLR-004.2 — reported, not a
+            # failure) stays the NEWEST status line: the drift report is
+            # re-painted after the success line, never buried beneath it.
+            verify_result = self._last_manifest_verify_result
+            if (
+                verify_result is not None
+                and verify_result.status != MANIFEST_VERIFIED
             ):
-                panel.mark_saved()
-            elif (
-                document_class == _DOCUMENT_IN_HOME
-                and recorded_document is not None
-                and panel.is_dirty
-            ):
-                # E3 R1: recorded as on disk; the panel's edits are in no
-                # file.
-                document_lines.append(
-                    f"Change document {document.source_path.name} has unsaved "
-                    "edits — the project records the file as it is on disk; "
-                    "save it from the Patch Editor to keep them"
-                )
-        # HLR-170 / E3 R6: every line about the document is in user terms
-        # and goes through safe_text; painted before the MISMATCH re-paint.
-        for line in document_lines:
-            self.set_status(safe_text(line).plain)
-        # R2-5: a manifest verify MISMATCH (LLR-004.2 — reported, not a
-        # failure) stays the NEWEST status line: the drift report is
-        # re-painted after the success line, never buried beneath it.
-        verify_result = self._last_manifest_verify_result
-        if (
-            verify_result is not None
-            and verify_result.status != MANIFEST_VERIFIED
-        ):
-            self.set_status("Manifest verify MISMATCH")
-        self.current_project = cleaned
-        self.current_project_dir = project_dir
-        self.update_project_labels()
-        self.refresh_files()
-        if save_as_source is not None:
-            # R9 / LLR-171.1l: the Flow panels' session folder follows the
-            # copy.
-            self._publish_flow_session_dir()
+                tail.append("Manifest verify MISMATCH")
+            for line in tail[:-1]:
+                self.set_status(line)
+            self.end_busy("save_project", gen, tail[-1])
+            self.current_project = cleaned
+            self.current_project_dir = project_dir
+            self.update_project_labels()
+            self.refresh_files()
+            if save_as_source is not None:
+                # R9 / LLR-171.1l: the Flow panels' session folder follows the
+                # copy.
+                self._publish_flow_session_dir()
+        finally:
+            self._busy_fail("save_project", gen)
 
     def _decide_project_image(self) -> _ProjectImageStep:
         """
@@ -12934,10 +13067,8 @@ class S19TuiApp(App):
                     "pick a project in the list."
                 )
             elif folder_reason == "unreadable":
-                message = (
-                    f"Project NOT loaded: '{painted}' could not be read — check "
-                    "that the folder can be opened, then load again."
-                )
+                reason, step = _TYPED_REFUSAL_TOKENS["unreadable"]
+                message = f"Project NOT loaded: '{painted}' {reason} — {step}."
             else:
                 message = (
                     f"Project NOT loaded: '{painted}' is outside the work area — "
@@ -12955,29 +13086,21 @@ class S19TuiApp(App):
         # reset, so a reserved home, a stream/8.3/trailing-dot spelling and a
         # case-different name all stop here; a match loads the on-disk name.
         try:
-            listed = self.list_projects()
+            match = self._listed_project_name(name)
         except OSError:
+            reason, step = _TYPED_REFUSAL_TOKENS["unreadable"]
             self.set_status(
                 safe_text(
-                    f"Project NOT loaded: '{painted_names([name])}' could not be "
-                    "read — check that the folder can be opened, then load again."
+                    f"Project NOT loaded: '{painted_names([name])}' {reason} — {step}."
                 ).plain
             )
             self.logger.warning("Project load refused (could not be read): %r", name)
             return
-        match = next(
-            (
-                entry
-                for entry in listed
-                if os.path.normcase(entry) == os.path.normcase(name)
-            ),
-            None,
-        )
         if match is None:
+            reason, step = _TYPED_REFUSAL_TOKENS["not a project"]
             self.set_status(
                 safe_text(
-                    f"Project NOT loaded: '{painted_names([name])}' is not a "
-                    "project — pick a project in the list."
+                    f"Project NOT loaded: '{painted_names([name])}' is {reason} — {step}."
                 ).plain
             )
             self.logger.warning("Project load refused (not listed): %r", name)
@@ -12991,10 +13114,10 @@ class S19TuiApp(App):
         try:
             data_files, a2l_files, error = self._list_project_files(project_dir)
         except OSError:
+            reason, step = _TYPED_REFUSAL_TOKENS["unreadable"]
             self.set_status(
                 safe_text(
-                    f"Project NOT loaded: '{painted_names([name])}' could not be "
-                    "read — check that the folder can be opened, then load again."
+                    f"Project NOT loaded: '{painted_names([name])}' {reason} — {step}."
                 ).plain
             )
             self.logger.warning("Project load refused (could not be read): %r", name)
@@ -13073,10 +13196,10 @@ class S19TuiApp(App):
         except FileNotFoundError:
             manifest_stat = None
         except OSError:
+            reason, step = _TYPED_REFUSAL_TOKENS["unreadable"]
             self.set_status(
                 safe_text(
-                    f"Project NOT loaded: '{painted_names([name])}' could not be "
-                    "read — check that the folder can be opened, then load again."
+                    f"Project NOT loaded: '{painted_names([name])}' {reason} — {step}."
                 ).plain
             )
             self.logger.warning("Project load refused (manifest unreadable): %r", name)
@@ -13085,10 +13208,10 @@ class S19TuiApp(App):
         if manifest_stat is not None and (
             not stat.S_ISREG(manifest_stat.st_mode) or _is_reparse_point(manifest_path)
         ):
+            reason, step = _TYPED_REFUSAL_TOKENS["unreadable"]
             self.set_status(
                 safe_text(
-                    f"Project NOT loaded: '{painted_names([name])}' could not be "
-                    "read — check that the folder can be opened, then load again."
+                    f"Project NOT loaded: '{painted_names([name])}' {reason} — {step}."
                 ).plain
             )
             self.logger.warning(
@@ -13100,138 +13223,153 @@ class S19TuiApp(App):
         # opens when it is a valid variant; otherwise the next valid one in
         # the deterministic ``(name.lower(), name)`` order of
         # ``build_variant_set`` (``choose_install_set``).
-        variant_set = build_variant_set(name, data_files)
-        manifest = read_project_manifest(project_dir)
-        # LLR-169.5: the manifest and disk problems; the internal codes go
-        # to the log only (HLR-169).
-        problems = check_project_files(project_dir, manifest)
-        for problem in problems:
-            self.logger.warning(
-                "Project %s: %s %s (%s)", name, problem.kind, problem.file, problem.code
-            )
-        if a2l_problem is not None:
-            problems.append(a2l_problem)
-        recorded = (
-            manifest.active_variant
-            if manifest is not None and not manifest_is_damaged(manifest)
-            else None
-        )
-        # F1 (LLR-169.9): the project's A2L is read on its own, before any
-        # image, so an A2L that cannot be read is a problem on the A2L file
-        # and the images still open without it — never "not readable" on a
-        # valid image. The parsed payload is kept as the change document's
-        # A2L context (LLR-170.3, C4): ``current_a2l_data`` is set only when
-        # an image install attaches the A2L. The read and the install check
-        # below run BEFORE the reset (S10-01), so a refusal after ``y``
-        # keeps the outgoing work (LLR-174.3c).
-        a2l_context: Optional[dict] = None
-        if a2l_files:
-            try:
-                a2l_context = self._load_a2l_data_with_cache(a2l_files[0])
-            except Exception as exc:  # noqa: BLE001 - an untrusted A2L file
+        gen = self._busy_begin_action("project_load", name)
+        try:
+            variant_set = build_variant_set(name, data_files)
+            manifest = read_project_manifest(project_dir)
+            # LLR-169.5: the manifest and disk problems; the internal codes go
+            # to the log only (HLR-169).
+            problems = check_project_files(project_dir, manifest)
+            for problem in problems:
                 self.logger.warning(
-                    "Project A2L not readable: %s (%s)", a2l_files[0], type(exc).__name__
+                    "Project %s: %s %s (%s)", name, problem.kind, problem.file, problem.code
                 )
-                problems.append(
-                    ProjectFileProblem(
-                        PROBLEM_NOT_READABLE, a2l_files[0].name, "the file cannot be read"
-                    )
-                )
-                a2l_files = []
-        install = choose_install_set(variant_set, recorded, data_files, a2l_files)
-        if install.variant is None and install.mac is None and install.a2l is None:
-            self.set_status(f"No supported files in project: {painted_names([name])}")
-            self.logger.warning("No loadable data file in project: %s", name)
-            return
-        # HLR-165 / LLR-165.1: the ONE reset seam — after the project
-        # validates and the install set is chosen, before the first install —
-        # so the primary parse's MAC merge and the A2L fallbacks see an empty
-        # session. Every refusal above runs BEFORE the reset (LLR-174.3c).
-        self._reset_project_session()
-        # LLR-028.1 — adopt the manifest's declared regions as app state so the
-        # next Reports dialog seeds from them (HLR-028 capture); reset to empty
-        # for a legacy/no-key project so a prior project's regions do not leak.
-        # A write, so it stays after the reset (S10-01).
-        self._declared_regions = (
-            tuple(manifest.declared_regions) if manifest is not None else ()
-        )
-        if install.variant is None and install.mac is None:
-            # HLR-171a / LLR-171.2: an A2L-only project attaches its own A2L
-            # in place — never a work-area temp copy (no load_a2l_from_path).
-            self.current_a2l_path = install.a2l
-            self.current_a2l_data = a2l_context
-            self.update_a2l_view()
-            self._refresh_loaded_panel()
-            self._apply_empty_state()
-        # HLR-170 / LLR-170.3 (C4): reopen the recorded change document
-        # after the A2L parse and before the install — the install and the
-        # deferred load steps never reset the document. One problem per
-        # file: ``missing`` stays ``check_project_files``'s.
-        document_problem = self._reopen_active_document(
-            project_dir, manifest, a2l_context
-        )
-        if document_problem is not None:
-            problems.append(document_problem)
-        self.current_project = name
-        # LED .50 / security finding SEC-1: stored UNRESOLVED — the path
-        # under this app's work area, never the resolved form — so any
-        # junction under the work area stays visible to every placement
-        # guard downstream.
-        self.current_project_dir = project_dir
-        self._variant_set = variant_set
-        # LLR-169.6 / LLR-169.9 (OQ-7a): an image that does not parse or
-        # holds no data is ``not readable``; the next valid variant is tried.
-        # Record-level errors alone keep the image open and shown as before.
-        unreadable: list[VariantDescriptor] = []
-        while install.variant is not None:
-            reason = self._install_project_image(install.variant, a2l_files)
-            if reason is None:
-                break
-            unreadable.append(install.variant)
-            problems.append(
-                ProjectFileProblem(PROBLEM_NOT_READABLE, install.variant.path.name, reason)
-            )
-            install = choose_install_set(
-                variant_set,
-                recorded,
-                data_files,
-                a2l_files,
-                [variant.variant_id for variant in unreadable],
-            )
-        opened = install.variant
-        variant_set.active_id = opened.variant_id if opened is not None else None
-        if install.mac is not None:
-            self.load_selected_file(install.mac, a2l_files)
-        loaded = self.current_file
-        announcement = compose_load_announcement(
-            name,
-            variant_set,
-            manifest,
-            mac_name=(
-                loaded.mac_path.name
-                if loaded is not None and loaded.mac_path is not None
+            if a2l_problem is not None:
+                problems.append(a2l_problem)
+            recorded = (
+                manifest.active_variant
+                if manifest is not None and not manifest_is_damaged(manifest)
                 else None
-            ),
-            a2l_name=(
-                self.current_a2l_path.name if self.current_a2l_path else None
-            ),
-            problems=problems,
-            unreadable=[variant.path.name for variant in unreadable],
-        )
-        self._last_load_announcement = announcement
-        # LLR-178.2: one summary line (opened file, k of n, problem count,
-        # "details: p") and the project + opened-file line as the last
-        # writer of #status_text; names render through safe_text.
-        self.set_status(safe_text(announcement.summary_line()).plain)
-        self.set_file_status(safe_text(announcement.status_line()))
-        self.logger.info(
-            "Project loaded. name=%s file=%s mac=%s",
-            name,
-            opened.path if opened is not None else None,
-            install.mac,
-        )
-        self.update_project_labels()
-        self._publish_flow_session_dir()
+            )
+            # F1 (LLR-169.9): the project's A2L is read on its own, before any
+            # image, so an A2L that cannot be read is a problem on the A2L file
+            # and the images still open without it — never "not readable" on a
+            # valid image. The parsed payload is kept as the change document's
+            # A2L context (LLR-170.3, C4): ``current_a2l_data`` is set only when
+            # an image install attaches the A2L. The read and the install check
+            # below run BEFORE the reset (S10-01), so a refusal after ``y``
+            # keeps the outgoing work (LLR-174.3c).
+            a2l_context: Optional[dict] = None
+            if a2l_files:
+                self.step_busy("project_load", gen, 2)
+                try:
+                    a2l_context = self._load_a2l_data_with_cache(a2l_files[0])
+                except Exception as exc:  # noqa: BLE001 - an untrusted A2L file
+                    self.logger.warning(
+                        "Project A2L not readable: %s (%s)", a2l_files[0], type(exc).__name__
+                    )
+                    problems.append(
+                        ProjectFileProblem(
+                            PROBLEM_NOT_READABLE, a2l_files[0].name, "the file cannot be read"
+                        )
+                    )
+                    a2l_files = []
+            install = choose_install_set(variant_set, recorded, data_files, a2l_files)
+            if install.variant is None and install.mac is None and install.a2l is None:
+                self.end_busy(
+                    "project_load",
+                    gen,
+                    f"No supported files in project: {painted_names([name])}",
+                )
+                self.logger.warning("No loadable data file in project: %s", name)
+                return
+            # HLR-165 / LLR-165.1: the ONE reset seam — after the project
+            # validates and the install set is chosen, before the first install —
+            # so the primary parse's MAC merge and the A2L fallbacks see an empty
+            # session. Every refusal above runs BEFORE the reset (LLR-174.3c).
+            self._reset_project_session()
+            # LLR-028.1 — adopt the manifest's declared regions as app state so the
+            # next Reports dialog seeds from them (HLR-028 capture); reset to empty
+            # for a legacy/no-key project so a prior project's regions do not leak.
+            # A write, so it stays after the reset (S10-01).
+            self._declared_regions = (
+                tuple(manifest.declared_regions) if manifest is not None else ()
+            )
+            if install.variant is None and install.mac is None:
+                # HLR-171a / LLR-171.2: an A2L-only project attaches its own A2L
+                # in place — never a work-area temp copy (no load_a2l_from_path).
+                self.current_a2l_path = install.a2l
+                self.current_a2l_data = a2l_context
+                self.update_a2l_view()
+                self._refresh_loaded_panel()
+                self._apply_empty_state()
+            # HLR-170 / LLR-170.3 (C4): reopen the recorded change document
+            # after the A2L parse and before the install — the install and the
+            # deferred load steps never reset the document. One problem per
+            # file: ``missing`` stays ``check_project_files``'s.
+            document_problem = self._reopen_active_document(
+                project_dir, manifest, a2l_context
+            )
+            if document_problem is not None:
+                problems.append(document_problem)
+            self.current_project = name
+            # LED .50 / security finding SEC-1: stored UNRESOLVED — the path
+            # under this app's work area, never the resolved form — so any
+            # junction under the work area stays visible to every placement
+            # guard downstream.
+            self.current_project_dir = project_dir
+            self._variant_set = variant_set
+            # LLR-169.6 / LLR-169.9 (OQ-7a): an image that does not parse or
+            # holds no data is ``not readable``; the next valid variant is tried.
+            # Record-level errors alone keep the image open and shown as before.
+            unreadable: list[VariantDescriptor] = []
+            self.step_busy("project_load", gen, 3)
+            while install.variant is not None:
+                reason = self._install_project_image(install.variant, a2l_files)
+                if reason is None:
+                    break
+                unreadable.append(install.variant)
+                problems.append(
+                    ProjectFileProblem(PROBLEM_NOT_READABLE, install.variant.path.name, reason)
+                )
+                install = choose_install_set(
+                    variant_set,
+                    recorded,
+                    data_files,
+                    a2l_files,
+                    [variant.variant_id for variant in unreadable],
+                )
+            opened = install.variant
+            variant_set.active_id = opened.variant_id if opened is not None else None
+            self.step_busy("project_load", gen, 4)
+            if install.mac is not None:
+                self.load_selected_file(install.mac, a2l_files)
+            loaded = self.current_file
+            announcement = compose_load_announcement(
+                name,
+                variant_set,
+                manifest,
+                mac_name=(
+                    loaded.mac_path.name
+                    if loaded is not None and loaded.mac_path is not None
+                    else None
+                ),
+                a2l_name=(
+                    self.current_a2l_path.name if self.current_a2l_path else None
+                ),
+                problems=problems,
+                unreadable=[variant.path.name for variant in unreadable],
+            )
+            self._last_load_announcement = announcement
+            # LLR-178.2: one summary line (opened file, k of n, problem count,
+            # "details: p") and the project + opened-file line as the last
+            # writer of #status_text; names render through safe_text.
+            self.set_file_status(safe_text(announcement.status_line()).plain)
+            self.end_busy(
+                "project_load",
+                gen,
+                safe_text(announcement.summary_line()).plain,
+            )
+            self.logger.info(
+                "Project loaded. name=%s file=%s mac=%s",
+                name,
+                opened.path if opened is not None else None,
+                install.mac,
+            )
+            self.update_project_labels()
+            self._publish_flow_session_dir()
+        finally:
+            self._busy_fail("project_load", gen)
 
     def _reopen_active_document(
         self,
@@ -13399,10 +13537,11 @@ class S19TuiApp(App):
         for item in sorted(self.workarea.iterdir()):
             if item.name.casefold() in reserved_folded:
                 continue
-            # E3 R14: Win32 opens ``temp.`` / ``ab `` as ``temp`` / ``ab``,
-            # so a name ending in a dot or a space would load another folder.
-            # Other platforms open the name as written (CR9-9).
-            if os.name == "nt" and item.name.endswith((".", " ")):
+            # E3 R14 / LLR-172.4e: Win32 opens ``temp.`` / ``ab `` as
+            # ``temp`` / ``ab``, so a name ending in a dot or a space would
+            # load another folder; it is left out on every platform, as the
+            # lister skips it (LLR-172.4d).
+            if item.name.endswith((".", " ")):
                 continue
             if self._project_folder_refusal(item) is not None:
                 continue
@@ -13417,6 +13556,35 @@ class S19TuiApp(App):
                 continue
             projects.append(item.name)
         return projects
+
+    def _listed_project_name(self, name: str) -> Optional[str]:
+        """
+        Summary:
+            The one comparison of a name against the project list
+            (LLR-172.5j, S-k): the on-disk spelling of the listed match, or
+            ``None``.
+
+        Args:
+            name (str): The typed or picked folder name.
+
+        Returns:
+            Optional[str]: The listed spelling, or ``None``.
+
+        Raises:
+            OSError: Propagates from ``list_projects``; each caller maps it.
+
+        Dependencies:
+            Uses: list_projects / os.path.normcase
+            Used by: _handle_load_project / _typed_load_route
+        """
+        return next(
+            (
+                entry
+                for entry in self.list_projects()
+                if os.path.normcase(entry) == os.path.normcase(name)
+            ),
+            None,
+        )
 
     @staticmethod
     def _manifest_is_link(folder: Path) -> bool:
@@ -14208,9 +14376,9 @@ class S19TuiApp(App):
             Classify one user-typed Load path into an action and a reason
             word, reading only metadata (HLR-172a, LLR-172.5): a project,
             a data file, an A2L file, or a refusal. It never paints, never
-            writes, and never raises — every ``OSError`` becomes a reason,
-            and so does a ``ValueError`` / ``RuntimeError`` from
-            ``resolve_input_path`` (SEC9b-1).
+            writes, and never raises: every ``OSError``, and the ``OSError`` /
+            ``ValueError`` / ``RuntimeError`` of a text the path calls refuse
+            (a NUL, EACCES, ENAMETOOLONG), becomes a reason.
 
         Args:
             path (Path): The path typed into the Load dialog (or the
@@ -14247,9 +14415,10 @@ class S19TuiApp(App):
         text = str(path).strip().strip('"')
         try:
             normalized = resolve_input_path(path, self.base_dir)
-        except (ValueError, RuntimeError):
-            # SEC9b-1: a path too long for the OS (``ValueError``) or a POSIX
-            # ``~user`` with no home (``RuntimeError``) is refused, never raised.
+        except (OSError, ValueError, RuntimeError):
+            # S12a-01 / SEC9b-1: a path too long for the OS (``ValueError``), a
+            # POSIX ``~user`` with no home (``RuntimeError``), or an OS error
+            # (EACCES / ENAMETOOLONG) is refused, never raised.
             return ("refuse", "not found")
         if normalized is None:
             return ("refuse", "not found")
@@ -14333,17 +14502,9 @@ class S19TuiApp(App):
         typed_name = folder_parts[0]
 
         try:
-            listed = self.list_projects()
+            name = self._listed_project_name(typed_name)
         except OSError:
             return ("refuse", "unreadable")
-        name = next(
-            (
-                entry
-                for entry in listed
-                if os.path.normcase(entry) == os.path.normcase(typed_name)
-            ),
-            None,
-        )
         if name is None:
             return ("refuse", "not a project")
 
@@ -14429,7 +14590,8 @@ class S19TuiApp(App):
         elif value == "not a supported file":
             line = f"File NOT loaded: '{t}' is not a supported file — check the path."
         elif value == "not a project":
-            line = f"Project NOT loaded: '{t}' is not a project — pick a project in the list."
+            reason, step = _TYPED_REFUSAL_TOKENS["not a project"]
+            line = f"Project NOT loaded: '{t}' is {reason} — {step}."
         elif value == "outside":
             line = (
                 f"Project NOT loaded: '{t}' is outside the work area — copy "
@@ -14446,10 +14608,8 @@ class S19TuiApp(App):
                 "file it points to."
             )
         else:
-            line = (
-                f"Project NOT loaded: '{t}' could not be read — check that "
-                "the folder can be opened, then load again."
-            )
+            reason, step = _TYPED_REFUSAL_TOKENS["unreadable"]
+            line = f"Project NOT loaded: '{t}' {reason} — {step}."
         self.set_status(safe_text(line).plain)
         self.logger.warning("Typed load refused (%s): %r", value, str(path))
 
@@ -14546,60 +14706,73 @@ class S19TuiApp(App):
             self.logger.warning("Unsupported file type: %s", normalized.suffix)
             return
         temp_dir = self.workarea / WORKAREA_TEMP
-        self.set_progress(10, "Copying into workarea temp...")
-        self.logger.info("Load phase boundary: copy_started path=%s", normalized)
-        self._flush_logger()
-        copy_started = time.perf_counter()
+        gen = self._busy_begin_action("file_load", normalized.name)
         try:
-            copied = copy_into_workarea(normalized, temp_dir, workarea_root=self.workarea)
-        except WorkareaContainmentError as exc:
-            self._pending_variant_id = None
-            self.set_progress(0, "")
-            self.set_status(f"Cannot load file: {exc}")
-            self.logger.warning("Load rejected by workarea guard: %s", exc)
-            return
-        copy_elapsed = time.perf_counter() - copy_started
-        self.logger.info(
-            "Load phase boundary: copy_done path=%s elapsed=%.3fs",
-            copied.name,
-            copy_elapsed,
-        )
-        self._flush_logger()
-        # LLR-172.1n (CR9-1): a source found only through the relative
-        # fallback is not recorded (the fallback's ``resolve()`` follows a
-        # link, against LLR-172.1a). ``via_fallback`` is pure — no filesystem
-        # call — because ``resolve_input_path`` returns the typed candidate
-        # unchanged when it exists, so the result is relative exactly when the
-        # typed text is relative.
-        typed = Path(str(path).strip().strip('"')).expanduser()
-        via_fallback = normalized.is_absolute() and not typed.is_absolute()
-        if not contained_in_workarea(normalized, self.workarea) and not via_fallback:
-            if not record_recent_source(normalized):
-                self.logger.warning("Recent sources not updated: %r", str(normalized))
-        elif not contained_in_workarea(normalized, self.workarea):
+            self.logger.info("Load phase boundary: copy_started path=%s", normalized)
+            self._flush_logger()
+            copy_started = time.perf_counter()
+            try:
+                copied = copy_into_workarea(
+                    normalized, temp_dir, workarea_root=self.workarea
+                )
+            except WorkareaContainmentError as exc:
+                self._pending_variant_id = None
+                self.end_busy("file_load", gen, f"Cannot load file: {exc}")
+                self.logger.warning("Load rejected by workarea guard: %s", exc)
+                return
+            copy_elapsed = time.perf_counter() - copy_started
             self.logger.info(
-                "Recent source not recorded (found through the fallback): %r",
-                str(normalized),
-            )
-        self.set_progress(50, f"Parsing {copied.name}...")
-        # Kick the worker off before anything else so the modal-dismiss callback yields
-        # control back to the event loop promptly. Workarea refresh + diagnostic log are
-        # dispatched via ``call_later`` so they run on the next idle frame.
-        self._start_load_worker(copied)
-        copied_size = copied.stat().st_size
-
-        def _post_worker_launch() -> None:
-            self.refresh_files()
-            self.logger.info(
-                "File copied to temp: path=%s size_bytes=%d copy_seconds=%.3f",
-                copied,
-                copied_size,
+                "Load phase boundary: copy_done path=%s elapsed=%.3fs",
+                copied.name,
                 copy_elapsed,
             )
-            self.logger.info("Load phase boundary: worker_spawned path=%s", copied.name)
             self._flush_logger()
+            # LLR-172.1n (CR9-1): a source found only through the relative
+            # fallback is not recorded (the fallback's ``resolve()`` follows a
+            # link, against LLR-172.1a). ``via_fallback`` is pure — no
+            # filesystem call — because ``resolve_input_path`` returns the
+            # typed candidate unchanged when it exists, so the result is
+            # relative exactly when the typed text is relative.
+            typed = Path(str(path).strip().strip('"')).expanduser()
+            via_fallback = normalized.is_absolute() and not typed.is_absolute()
+            if (
+                not contained_in_workarea(normalized, self.workarea)
+                and not via_fallback
+            ):
+                if not record_recent_source(normalized):
+                    self.logger.warning(
+                        "Recent sources not updated: %r", str(normalized)
+                    )
+            elif not contained_in_workarea(normalized, self.workarea):
+                self.logger.info(
+                    "Recent source not recorded (found through the fallback): %r",
+                    str(normalized),
+                )
+            self.step_busy("file_load", gen, 2)
+            # Kick the worker off before anything else so the modal-dismiss
+            # callback yields control back to the event loop promptly.
+            # Workarea refresh + diagnostic log are dispatched via
+            # ``call_later`` so they run on the next idle frame.
+            copied_size = copied.stat().st_size
+            self._start_load_worker(copied, gen=gen)
 
-        self.call_later(_post_worker_launch)
+            def _post_worker_launch() -> None:
+                self.refresh_files()
+                self.logger.info(
+                    "File copied to temp: path=%s size_bytes=%d copy_seconds=%.3f",
+                    copied,
+                    copied_size,
+                    copy_elapsed,
+                )
+                self.logger.info(
+                    "Load phase boundary: worker_spawned path=%s", copied.name
+                )
+                self._flush_logger()
+
+            self.call_later(_post_worker_launch)
+        except BaseException:
+            self._busy_fail("file_load", gen)
+            raise
 
     def load_a2l_from_path(self, path: Path) -> None:
         """Load A2L file into temp, parse it, and update view."""
@@ -14635,74 +14808,92 @@ class S19TuiApp(App):
                 source_size,
                 self.large_a2l_warn_bytes,
             )
-        self.set_progress(10, "Copying A2L into workarea temp...")
-        copy_started = time.perf_counter()
+        gen = self._busy_begin_action("a2l_load", normalized.name)
         try:
-            copied = copy_into_workarea(normalized, temp_dir, workarea_root=self.workarea)
-        except WorkareaContainmentError as exc:
-            self.set_progress(0, "")
-            self.set_status(f"Cannot load A2L: {exc}")
-            self.logger.warning("A2L load rejected by workarea guard: %s", exc)
-            return
-        copy_elapsed = time.perf_counter() - copy_started
-        # LLR-172.1n (CR9-1): the same condition as ``load_from_path`` — a
-        # source found only through the relative fallback is not recorded.
-        typed = Path(str(path).strip().strip('"')).expanduser()
-        via_fallback = normalized.is_absolute() and not typed.is_absolute()
-        if not contained_in_workarea(normalized, self.workarea) and not via_fallback:
-            if not record_recent_source(normalized):
-                self.logger.warning("Recent sources not updated: %r", str(normalized))
-        elif not contained_in_workarea(normalized, self.workarea):
+            copy_started = time.perf_counter()
+            try:
+                copied = copy_into_workarea(
+                    normalized, temp_dir, workarea_root=self.workarea
+                )
+            except WorkareaContainmentError as exc:
+                self.end_busy("a2l_load", gen, f"Cannot load A2L: {exc}")
+                self.logger.warning("A2L load rejected by workarea guard: %s", exc)
+                return
+            copy_elapsed = time.perf_counter() - copy_started
+            # LLR-172.1n (CR9-1): the same condition as ``load_from_path`` — a
+            # source found only through the relative fallback is not recorded.
+            typed = Path(str(path).strip().strip('"')).expanduser()
+            via_fallback = normalized.is_absolute() and not typed.is_absolute()
+            if (
+                not contained_in_workarea(normalized, self.workarea)
+                and not via_fallback
+            ):
+                if not record_recent_source(normalized):
+                    self.logger.warning(
+                        "Recent sources not updated: %r", str(normalized)
+                    )
+            elif not contained_in_workarea(normalized, self.workarea):
+                self.logger.info(
+                    "Recent source not recorded (found through the fallback): %r",
+                    str(normalized),
+                )
+            self.refresh_files()
+            copied_size = copied.stat().st_size
             self.logger.info(
-                "Recent source not recorded (found through the fallback): %r",
-                str(normalized),
-            )
-        self.refresh_files()
-        copied_size = copied.stat().st_size
-        self.logger.info(
-            "A2L copy complete: path=%s size_bytes=%d copy_seconds=%.3f",
-            copied,
-            copied_size,
-            copy_elapsed,
-        )
-        self.set_progress(50, f"Parsing {copied.name}...")
-        self.current_a2l_path = copied
-        parse_started = time.perf_counter()
-        self.current_a2l_data = self._load_a2l_data_with_cache(copied)
-        parse_elapsed = time.perf_counter() - parse_started
-        self._log_a2l_parse_summary(copied, self.current_a2l_data, parse_elapsed)
-        if self.current_file:
-            self.current_file.a2l_path = copied
-            self.current_file.a2l_data = self.current_a2l_data
-        view_started = time.perf_counter()
-        self.update_a2l_view()
-        view_elapsed = time.perf_counter() - view_started
-        if view_elapsed > self.slow_parse_warn_seconds:
-            self.logger.warning(
-                "A2L view refresh was slow: path=%s elapsed_seconds=%.3f threshold_seconds=%.3f",
+                "A2L copy complete: path=%s size_bytes=%d copy_seconds=%.3f",
                 copied,
-                view_elapsed,
-                self.slow_parse_warn_seconds,
+                copied_size,
+                copy_elapsed,
             )
-        else:
-            self.logger.info("A2L view refresh complete: path=%s elapsed_seconds=%.3f", copied, view_elapsed)
-        self.update_project_labels()
-        # N7: the standalone A2L load path mutates current_file.a2l_path but,
-        # unlike the merge path (_apply_loaded_file), never redrew the top
-        # "Loaded" panel — so the A2L filename only appeared after a screen
-        # switch. Refresh it here (C-15.1: the only orphaned load site).
-        self._refresh_loaded_panel()
-        self.set_progress(100, f"Loaded {copied.name}")
-        # S9b-5: the name is painted through ``painted_names`` (the one
-        # category scrub), the same scrub as the dialog.
-        self.set_status(safe_text(f"A2L loaded: {painted_names([copied.name])}").plain)
-        # LLR-166.2: the A2L load tail re-homes the focus by the same rule
-        # as the image load tail.
-        self._rehome_focus_after_load()
-        self.logger.info("A2L loaded: %s", copied)
+            self.step_busy("a2l_load", gen, 2)
+            self.current_a2l_path = copied
+            parse_started = time.perf_counter()
+            self.current_a2l_data = self._load_a2l_data_with_cache(copied)
+            parse_elapsed = time.perf_counter() - parse_started
+            self._log_a2l_parse_summary(copied, self.current_a2l_data, parse_elapsed)
+            if self.current_file:
+                self.current_file.a2l_path = copied
+                self.current_file.a2l_data = self.current_a2l_data
+            self.step_busy("a2l_load", gen, 3)
+            view_started = time.perf_counter()
+            self.update_a2l_view()
+            view_elapsed = time.perf_counter() - view_started
+            if view_elapsed > self.slow_parse_warn_seconds:
+                self.logger.warning(
+                    "A2L view refresh was slow: path=%s elapsed_seconds=%.3f threshold_seconds=%.3f",
+                    copied,
+                    view_elapsed,
+                    self.slow_parse_warn_seconds,
+                )
+            else:
+                self.logger.info(
+                    "A2L view refresh complete: path=%s elapsed_seconds=%.3f",
+                    copied,
+                    view_elapsed,
+                )
+            self.update_project_labels()
+            # N7: the standalone A2L load path mutates current_file.a2l_path
+            # but, unlike the merge path (_apply_loaded_file), never redrew the
+            # top "Loaded" panel — so the A2L filename only appeared after a
+            # screen switch. Refresh it here (C-15.1: the only orphaned load
+            # site).
+            self._refresh_loaded_panel()
+            # S9b-5 / A12a-03: the name is painted through ``painted_names``
+            # (the one category scrub), the same scrub as the dialog.
+            self.end_busy(
+                "a2l_load",
+                gen,
+                safe_text(f"A2L loaded: {painted_names([copied.name])}").plain,
+            )
+            # LLR-166.2: the A2L load tail re-homes the focus by the same
+            # rule as the image load tail.
+            self._rehome_focus_after_load()
+            self.logger.info("A2L loaded: %s", copied)
 
-        if self.current_project:
-            self._sync_loaded_a2l_to_project()
+            if self.current_project:
+                self._sync_loaded_a2l_to_project()
+        finally:
+            self._busy_fail("a2l_load", gen)
 
     def on_list_view_selected(self, event: ListView.Selected) -> None:
         if event.list_view.id == "files_list":
@@ -14874,9 +15065,13 @@ class S19TuiApp(App):
 
         Data Flow:
             - ``candidate = self.workarea / WORKAREA_TEMP / name``.
-            - A deleted file loads nothing, silently (F-11, the 9a list
-              pick's behaviour); the ``exists()`` check stays before the
-              seam, so a vanished file asks nothing (F-6).
+            - Before the question a vanish probe runs ``os.lstat`` and a
+              deleted file loads nothing, silently (F-11 / 9b B88); an
+              ``OSError`` there falls through to ``go`` (S12a-R2-1).
+            - ``go`` re-checks the entry with one ``os.lstat`` immediately
+              before the open (S-i, S12a-03): a non-regular file, a
+              reparse point, or an over-cap size paints one refusal line
+              and loads nothing (LLR-172.6b/.6c).
             - ``kind`` is ``attach`` for a MAC or A2L suffix (case-folded,
               LLR-174.4c), else ``image``; the seam runs before the load.
 
@@ -14888,8 +15083,12 @@ class S19TuiApp(App):
                 - ``_load_from_item`` / ``_handle_load_dialog``
         """
         candidate = self.workarea / WORKAREA_TEMP / name
-        if not candidate.exists():
+        try:
+            os.lstat(candidate)
+        except FileNotFoundError:
             return
+        except OSError:
+            pass
         kind = (
             "attach"
             if candidate.suffix.lower() in (MAC_EXTENSIONS | A2L_EXTENSIONS)
@@ -14897,6 +15096,38 @@ class S19TuiApp(App):
         )
 
         def go() -> None:
+            try:
+                st = os.lstat(candidate)
+            except FileNotFoundError:
+                return
+            except OSError:
+                st = None
+            if (
+                st is None
+                or not stat.S_ISREG(st.st_mode)
+                or _is_reparse_point(candidate)
+            ):
+                self.set_status(
+                    safe_text(
+                        f"File NOT loaded: '{painted_names([name])}' is not a "
+                        "regular file — pick another file."
+                    ).plain
+                )
+                self.logger.warning(
+                    "Workarea pick refused (not a regular file): %r", name
+                )
+                return
+            if st.st_size > workspace.DEFAULT_COPY_SIZE_CAP_BYTES:
+                self.set_status(
+                    safe_text(
+                        f"File NOT loaded: '{painted_names([name])}' is too "
+                        "large to open — load a smaller file."
+                    ).plain
+                )
+                self.logger.warning(
+                    "Workarea pick refused (too large): %r", name
+                )
+                return
             self.logger.info("Loading from workarea selection: %s", candidate)
             if candidate.suffix.lower() in A2L_EXTENSIONS:
                 self.load_a2l_from_path(candidate)
@@ -17276,7 +17507,11 @@ class S19TuiApp(App):
 
     @work(thread=True, exclusive=True, group="load")
     def _start_load_worker(
-        self, path: Path, a2l_files: Optional[list[Path]] = None
+        self,
+        path: Path,
+        a2l_files: Optional[list[Path]] = None,
+        *,
+        gen: int,
     ) -> None:
         """
         Summary:
@@ -17286,6 +17521,8 @@ class S19TuiApp(App):
         Args:
             path (Path): Already-copied workarea file to parse.
             a2l_files (Optional[list[Path]]): Optional A2L paths from project load.
+            gen (int): The busy run's generation from ``_busy_begin_action``
+                (keyword-only; Inc 12a S-m), passed to ``step_busy`` and the end.
 
         Returns:
             None
@@ -17307,53 +17544,67 @@ class S19TuiApp(App):
             Used by:
                 - ``load_from_path`` (load dialog and startup path)
         """
-        load_started = time.perf_counter()
-        self.logger.info("Load phase boundary: worker_parse_start path=%s", path.name)
-        self._flush_logger()
         try:
-            loaded = self._parse_loaded_file(path, a2l_files)
-        except Exception as exc:
-            self.call_from_thread(self._handle_load_error, path, exc)
-            return
-        if loaded is None:
-            suffix = path.suffix.lower()
-            self.call_from_thread(
-                self._handle_load_error,
-                path,
-                ValueError(f"Unsupported file type: {suffix}"),
+            load_started = time.perf_counter()
+            self.logger.info(
+                "Load phase boundary: worker_parse_start path=%s", path.name
             )
-            return
-        self.logger.info(
-            "Load phase boundary: worker_parse_done path=%s elapsed=%.3fs",
-            path.name,
-            time.perf_counter() - load_started,
-        )
-        self._flush_logger()
-        prepare_started = time.perf_counter()
-        try:
-            prepared = self._prepare_load_payload(loaded)
-        except Exception as exc:
-            # Fall back to the slow-path install so users still see the file.
-            self.logger.exception("Prepare load payload failed; falling back: %s", exc)
-            prepared = PreparedLoad(loaded=loaded)
-        self.logger.info(
-            "Load phase boundary: worker_compute_done path=%s precomputed=%s elapsed=%.3fs",
-            path.name,
-            prepared.precomputed,
-            time.perf_counter() - prepare_started,
-        )
-        self._flush_logger()
-        self.logger.info(
-            "Load phase boundary: call_from_thread_apply_dispatched path=%s",
-            path.name,
-        )
-        self._flush_logger()
-        self.call_from_thread(self._apply_prepared_load, prepared, path, load_started)
-        self.call_from_thread(self.set_progress, 100, f"Loaded {path.name}")
-        if self.current_project:
-            self.call_from_thread(self._sync_loaded_file_to_project)
+            self._flush_logger()
+            try:
+                loaded = self._parse_loaded_file(path, a2l_files)
+            except Exception as exc:
+                self.call_from_thread(self._handle_load_error, path, exc, gen)
+                return
+            if loaded is None:
+                suffix = path.suffix.lower()
+                self.call_from_thread(
+                    self._handle_load_error,
+                    path,
+                    ValueError(f"Unsupported file type: {suffix}"),
+                    gen,
+                )
+                return
+            self.logger.info(
+                "Load phase boundary: worker_parse_done path=%s elapsed=%.3fs",
+                path.name,
+                time.perf_counter() - load_started,
+            )
+            self._flush_logger()
+            prepare_started = time.perf_counter()
+            try:
+                prepared = self._prepare_load_payload(loaded)
+            except Exception as exc:
+                # Fall back to the slow-path install so users still see the file.
+                self.logger.exception(
+                    "Prepare load payload failed; falling back: %s", exc
+                )
+                prepared = PreparedLoad(loaded=loaded)
+            self.logger.info(
+                "Load phase boundary: worker_compute_done path=%s precomputed=%s elapsed=%.3fs",
+                path.name,
+                prepared.precomputed,
+                time.perf_counter() - prepare_started,
+            )
+            self._flush_logger()
+            self.logger.info(
+                "Load phase boundary: call_from_thread_apply_dispatched path=%s",
+                path.name,
+            )
+            self._flush_logger()
+            self.call_from_thread(self.step_busy, "file_load", gen, 3)
+            self.call_from_thread(
+                self._apply_prepared_load, prepared, path, load_started
+            )
+            if self.current_project:
+                self.call_from_thread(self._sync_loaded_file_to_project)
+            self.call_from_thread(
+                self.end_busy, "file_load", gen, f"Loaded {path.name}"
+            )
+        except BaseException:
+            self.call_from_thread(self._busy_fail, "file_load", gen)
+            raise
 
-    def _handle_load_error(self, path: Path, exc: Exception) -> None:
+    def _handle_load_error(self, path: Path, exc: Exception, gen: int) -> None:
         """
         Summary:
             UI-thread handler for load-worker failures: update status/progress and log.
@@ -17361,6 +17612,7 @@ class S19TuiApp(App):
         Args:
             path (Path): Source path that failed to load.
             exc (Exception): Exception raised during parsing.
+            gen (int): The ``file_load`` run's generation (Inc 12a S-m).
 
         Returns:
             None
@@ -17382,7 +17634,7 @@ class S19TuiApp(App):
             exc,
         )
         self.set_status(f"Load failed: {exc}")
-        self.set_progress(100, "Load failed")
+        self.end_busy("file_load", gen, "Load failed")
 
     def _load_a2l_data_with_cache(self, path: Optional[Path]) -> Optional[dict[str, Any]]:
         """
@@ -19482,9 +19734,28 @@ class S19TuiApp(App):
         self._append_log_line(message)
 
     def set_file_status(self, message: str) -> None:
-        """Update the first status line reserved for file state."""
-        status_text = self.query_one("#status_text", Label)
-        status_text.update(message)
+        """Store the one file-state line; paint it only when no run is shown.
+
+        Summary:
+            Inc 12a S-d (A12a-06): the one stored file-state line is
+            ``self._busy.file_state``, always written, and painted only when
+            ``self._busy.runs`` is empty — while a progress line is shown it
+            owns ``#status_text`` (HLR-176d). The last ``end_busy`` paints
+            the stored line.
+
+        Args:
+            message (str): The file-state line (file-derived; scrubbed here).
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``safe_text(str(message)).plain`` is the one scrub choke point
+              shared with the seam's ``_paint_status_text`` (S12a-02).
+        """
+        self._busy.file_state = safe_text(str(message)).plain
+        if not self._busy.runs:
+            self._paint_status_text(self._busy.file_state)
 
     def _append_log_line(self, message: str) -> None:
         trimmed = message.strip()
@@ -19514,6 +19785,215 @@ class S19TuiApp(App):
         bar.update(total=100, progress=max(0, min(100, value)))
         if message:
             self.set_status(message)
+
+    def _paint_status_text(self, text: str) -> None:
+        """The seam's one painter of ``#status_text`` (P-1, S12a-02).
+
+        Summary:
+            Scrub ``text`` through ``safe_text(...).plain`` and update
+            ``#status_text`` — the single choke point so ESC and C0 control
+            bytes never reach the terminal (LLR-176.1r, S12a-02).
+
+        Args:
+            text (str): The line to paint (file-derived names included).
+
+        Returns:
+            None
+
+        Dependencies:
+            Used by:
+                - begin_busy / step_busy / end_busy / _busy_tick
+                - set_file_status
+        """
+        self.query_one("#status_text", Label).update(safe_text(text).plain)
+
+    def begin_busy(self, key: BusyKey, label: str, steps: Sequence[str]) -> int:
+        """S-a: start (or restart) one busy run and paint its first frame.
+
+        Summary:
+            Inc 12a progress seam (LLR-176.1): bump the generation, replace
+            any run under ``key`` (a restart moves it last, so it is the
+            shown run), paint step 1 at ``00:00``, set the bar to 0, add the
+            ``-busy`` class and start the one 0.1 s timer (LLR-176.1e).
+
+        Args:
+            key (BusyKey): The action key.
+            label (str): The already-painted label (no ``{name}`` left).
+            steps (Sequence[str]): The step names, at least one, in order.
+
+        Returns:
+            int: The new generation, unique per begin.
+
+        Dependencies:
+            Uses: _paint_status_text / _busy_line / set_progress
+            Used by: _busy_begin_action (and synthetic test begins)
+        """
+        b = self._busy
+        b.last_gen += 1
+        gen = b.last_gen
+        if not b.runs:
+            b.frame = 0
+        b.runs.pop(key, None)
+        run = _BusyRun(gen, label, tuple(steps), 1, 0.0, time.monotonic())
+        b.runs[key] = run
+        self._paint_status_text(self._busy_line(run))
+        self.set_progress(0)
+        self.query_one("#status_text", Label).add_class("-busy")
+        if b.timer is None:
+            b.timer = self.set_interval(_BUSY_TICK_SECONDS, self._busy_tick)
+        return gen
+
+    def step_busy(
+        self,
+        key: BusyKey,
+        gen: int,
+        n: int,
+        done: Optional[int] = None,
+        total: Optional[int] = None,
+    ) -> None:
+        """S-a: advance one busy run to step ``n`` (and a within-step fraction).
+
+        Summary:
+            Inc 12a progress seam (LLR-176.1b/.1c/.1d/.1m): a stale or
+            replaced generation is ignored. ``n`` is clamped to
+            ``1 .. len(steps)``; with ``done`` / ``total`` the fraction is
+            ``done / total`` clamped to ``0.0 .. 1.0`` and never falls within
+            the same step; the bar is ``floor(100 * (n - 1 + fraction) / m)``
+            only for the shown (last) run.
+
+        Args:
+            key (BusyKey): The action key.
+            gen (int): The run's generation from ``begin_busy``.
+            n (int): The step number (1-based).
+            done (Optional[int]): Bytes/units done within the step.
+            total (Optional[int]): The step's total; ignored without ``done``.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses: _paint_status_text / _busy_line / set_progress
+            Used by: the 7 action bodies (main thread and via call_from_thread)
+        """
+        run = self._busy.runs.get(key)
+        if run is None or run.gen != gen:
+            return
+        m = len(run.steps)
+        n = min(max(n, 1), m)
+        if done is not None and total is not None:
+            fraction = 0.0 if total <= 0 else min(max(done / total, 0.0), 1.0)
+        else:
+            fraction = 0.0
+        if n == run.n:
+            fraction = max(run.fraction, fraction)
+        run.n = n
+        run.fraction = fraction
+        shown = next(reversed(self._busy.runs.values()))
+        if shown is run:
+            self._paint_status_text(self._busy_line(run))
+            self.set_progress(int(100 * (n - 1 + fraction) / m))
+
+    def end_busy(self, key: BusyKey, gen: int, outcome: str) -> bool:
+        """S-a: end one busy run; the last end hands the bar and text back.
+
+        Summary:
+            Inc 12a progress seam (LLR-176.1f/.1i/.1j/.1k/.1m/.1o, A12a-04):
+            a non-empty outcome is one status-log line, written even for a
+            replaced generation (the log is history). A stale generation is
+            then a no-op returning ``False``. On the last end the timer is
+            stopped, ``-busy`` removed, the bar set to 0 and the stored
+            ``file_state`` painted.
+
+        Args:
+            key (BusyKey): The action key.
+            gen (int): The run's generation.
+            outcome (str): The action's final status line.
+
+        Returns:
+            bool: ``True`` only for an effective end.
+
+        Dependencies:
+            Uses: set_status / _paint_status_text / _busy_line / set_progress
+            Used by: the 7 action bodies and _busy_fail
+        """
+        if outcome.strip():
+            self.set_status(safe_text(outcome).plain)
+        run = self._busy.runs.get(key)
+        if run is None or run.gen != gen:
+            return False
+        del self._busy.runs[key]
+        if self._busy.runs:
+            shown = next(reversed(self._busy.runs.values()))
+            self._paint_status_text(self._busy_line(shown))
+            self.set_progress(
+                int(100 * (shown.n - 1 + shown.fraction) / len(shown.steps))
+            )
+        else:
+            b = self._busy
+            b.timer.stop()
+            b.timer = None
+            self.query_one("#status_text", Label).remove_class("-busy")
+            self.set_progress(0)
+            self._paint_status_text(b.file_state)
+        return True
+
+    def _busy_tick(self) -> None:
+        """S-f: the 0.1 s interval callback — advance the spinner frame."""
+        if not self._busy.runs:
+            return
+        # SR-12a-2: a run can still be open when the app exits (a worker
+        # running at quit); the timer can tick after the status bar is
+        # removed, so a tick with no ``#status_text`` paints nothing.
+        if self.query_one_optional("#status_text", Label) is None:
+            return
+        self._busy.frame = (self._busy.frame + 1) % 10
+        self._paint_status_text(
+            self._busy_line(next(reversed(self._busy.runs.values())))
+        )
+
+    def _busy_line(self, run: _BusyRun) -> str:
+        """S-f: the pd_A line — glyph, painted label, step and mm:ss elapsed."""
+        elapsed = int(time.monotonic() - run.started)
+        n = run.n
+        return (
+            f"{_BUSY_FRAMES[self._busy.frame]} {run.label}  ·  step {n}/"
+            f"{len(run.steps)} {run.steps[n - 1]}  ·  "
+            f"{elapsed // 60:02d}:{elapsed % 60:02d}"
+        )
+
+    def _busy_begin_action(self, key: BusyKey, name: Optional[str] = None) -> int:
+        """S-c helper: format the table row, scrub ``name`` once, begin the run.
+
+        Summary:
+            The one ``painted_names`` call site for progress labels
+            (LLR-176.1r, Q-2): a row whose label holds ``{name}`` is formatted
+            with the scrubbed name; a row without it is used verbatim.
+
+        Args:
+            key (BusyKey): The action key.
+            name (Optional[str]): The file/project name for ``{name}`` rows.
+
+        Returns:
+            int: The generation from ``begin_busy``.
+
+        Dependencies:
+            Uses: _BUSY_ACTIONS / begin_busy
+            Used by: the 7 action bodies
+        """
+        row = _BUSY_ACTIONS[key]
+        label = (
+            row.label.format(name=painted_names([name]))
+            if "{name}" in row.label
+            else row.label
+        )
+        return self.begin_busy(key, label, row.steps)
+
+    def _busy_fail(self, key: BusyKey, gen: int) -> bool:
+        """S-e failure arm: end the run with ``<label> failed`` (P-1)."""
+        run = self._busy.runs.get(key)
+        if run is None or run.gen != gen:
+            return False
+        return self.end_busy(key, gen, f"{run.label} failed")
 
 
 def main() -> None:

@@ -1,0 +1,11 @@
+# batch-100 Inc 12a E4 — base check of the address-census guard
+# base tree: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/base12a at 051f58613efa8fab6c9d477babfbe19a06f59f67 (s19_app untouched)
+# s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\s19_app\__init__.py
+# command: python -m pytest -p no:cacheprovider --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int12a/b/base -q --tb=line tests/test_address_census.py::test_at_b83_08_tree_holds_no_assembled_selectors
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_address_census.py:309: AssertionError: address arguments outside {literal, name, fstring} appeared: s19_app/tui/screens.py:407 other:IfExp
+=========================== short test summary info ===========================
+FAILED tests/test_address_census.py::test_at_b83_08_tree_holds_no_assembled_selectors
+1 failed in 7.37s
+# pytest exit code: 1

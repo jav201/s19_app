@@ -65,24 +65,36 @@ def test_save_project_writes_under_workarea(tmp_path: Path, monkeypatch: pytest.
     src.write_text("A=0x10\n", encoding="utf-8")
     parent = ensure
     app = S19TuiApp(base_dir=tmp_path)
-    app.workarea = ensure
-    monkeypatch.setattr(app, "set_status", lambda _m: None)
-    monkeypatch.setattr(app, "update_project_labels", lambda: None)
-    monkeypatch.setattr(app, "refresh_files", lambda: None)
-    app.current_file = LoadedFile(
-        path=src,
-        file_type="mac",
-        mem_map={16: 0},
-        row_bases=[0],
-        ranges=[],
-        range_validity=[],
-        errors=[],
-        a2l_path=None,
-        a2l_data=None,
-        mac_records=[],
-    )
-    app.current_a2l_path = None
-    app._handle_save_dialog(SaveProjectPayload(parent_folder=str(parent), project_name="P1"))
+
+    # Inc 12a re-pin (census A9, E2 ruling G-A P-5, finding F-9): Save
+    # project is a long action whose begin paints ``#status_text``, so the
+    # save runs inside a running app; what the test proves is unchanged.
+    async def _drive() -> None:
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app.workarea = ensure
+            monkeypatch.setattr(app, "set_status", lambda _m: None)
+            monkeypatch.setattr(app, "update_project_labels", lambda: None)
+            monkeypatch.setattr(app, "refresh_files", lambda: None)
+            app.current_file = LoadedFile(
+                path=src,
+                file_type="mac",
+                mem_map={16: 0},
+                row_bases=[0],
+                ranges=[],
+                range_validity=[],
+                errors=[],
+                a2l_path=None,
+                a2l_data=None,
+                mac_records=[],
+            )
+            app.current_a2l_path = None
+            app._handle_save_dialog(SaveProjectPayload(parent_folder=str(parent), project_name="P1"))
+            await pilot.pause()
+
+    import asyncio
+
+    asyncio.run(_drive())
     assert (parent / "P1" / "data.mac").exists()
     assert app.current_project == "P1"
     assert app.current_project_dir == (parent / "P1").resolve()
