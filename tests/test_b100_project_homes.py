@@ -2077,14 +2077,19 @@ def test_e4_llr_171_1m_document_inside_p_follows_its_copy(tmp_path: Path) -> Non
     assert Path(rebound).read_bytes() == p_bytes
 
 
-@pytest.mark.parametrize("arm", ["skipped junction", "dot-dot"])
+@pytest.mark.parametrize("arm", ["skipped junction", "dot-dot", "outside P"])
 def test_e4_llr_171_1m_rebind_only_to_a_plan_entry(tmp_path: Path, arm: str) -> None:
     """LLR-171.1m (S3R2-5): a document whose ``source_path`` is under P only
     through a skipped junction (``P/linked/x.json``) or through a ``..``
-    part (``P/../elsewhere/x.json``) keeps its binding after a save as.
+    part (``P/../elsewhere/x.json``), or lies outside P (the work area's
+    common ``patches/x.json``), keeps its binding after a save as.
 
     Mutant M80: a rebind by text, without the plan-entry / ``..`` checks →
-    ``source_path`` moves under Q → RED."""
+    ``source_path`` moves under Q → RED.
+    Fix round 1 (CI11-1): the save-as tail rebound the ``dot-dot`` and
+    ``outside P`` documents to the copied ``Q/patches/x.json`` because the
+    document-row match compares ``abspath`` texts, which collapse ``..``.
+    RED on base 760f885 on Windows and on the Linux runner alike."""
     base = tmp_path / "app"
     project_dir = projects.build_save_as_project(base, sub_files={})
     if arm == "skipped junction":
@@ -2093,6 +2098,11 @@ def test_e4_llr_171_1m_rebind_only_to_a_plan_entry(tmp_path: Path, arm: str) -> 
         (outside / "x.json").write_bytes(projects.change_document_bytes())
         projects.add_junctions(project_dir, outside, ["linked"])
         planted = project_dir / "linked" / "x.json"
+    elif arm == "outside P":
+        common = _workarea(base) / "patches"
+        common.mkdir(parents=True, exist_ok=True)
+        (common / "x.json").write_bytes(projects.change_document_bytes())
+        planted = common / "x.json"
     else:
         elsewhere = _workarea(base) / "elsewhere"
         elsewhere.mkdir(parents=True)

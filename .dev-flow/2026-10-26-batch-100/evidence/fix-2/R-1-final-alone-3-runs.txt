@@ -1,0 +1,21 @@
+variant-append: trigger -> outcome 0.432 s; ['Project saved + manifest verified']
+.mac-sync: trigger -> outcome 0.508 s; ['Project saved + manifest verified']
+.a2l-sync: trigger -> outcome 0.558 s; ['Project saved + manifest verified']
+.save-back: trigger -> outcome 0.395 s; ['Project saved + manifest verified']
+.save-project: trigger -> outcome 0.754 s; ['Project saved + manifest verified']
+.Save project request -> commit end 0.565 s
+6 passed in 19.64s
+variant-append: trigger -> outcome 0.464 s; ['Project saved + manifest verified']
+.mac-sync: trigger -> outcome 0.533 s; ['Project saved + manifest verified']
+.a2l-sync: trigger -> outcome 0.441 s; ['Project saved + manifest verified']
+.save-back: trigger -> outcome 0.403 s; ['Project saved + manifest verified']
+.save-project: trigger -> outcome 0.991 s; ['Project saved + manifest verified']
+.Save project request -> commit end 0.343 s
+6 passed in 20.15s
+variant-append: trigger -> outcome 0.457 s; ['Project saved + manifest verified']
+.mac-sync: trigger -> outcome 0.591 s; ['Project saved + manifest verified']
+.a2l-sync: trigger -> outcome 0.453 s; ['Project saved + manifest verified']
+.save-back: trigger -> outcome 0.398 s; ['Project saved + manifest verified']
+.save-project: trigger -> outcome 0.823 s; ['Project saved + manifest verified']
+.Save project request -> commit end 0.393 s
+6 passed in 20.11s

@@ -1,0 +1,703 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+___ test_tc_b100_54_file_load_sync_refuses_when_the_project_folder_is_gone ____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/s19f2/bt/test_tc_b100_54_file_load_sync0')
+
+    def test_tc_b100_54_file_load_sync_refuses_when_the_project_folder_is_gone(tmp_path: Path) -> None:
+        """SE5-12b-2 tail (fix round 2), LLR-176.2c / the CR12b-2 refusal
+        pattern: ``P2`` is open, then its folder is removed outside the app and
+        a regular file named ``P2`` takes its place; a data file load then
+        syncs into the open project (``_sync_loaded_file_to_project``, posted
+        by the file-load worker) -> the load still ends ``Loaded other.s19``,
+        1 line ``Project sync NOT done: project 'P2' could not be read — check
+        that the folder can be opened, then load again.``, the app running and
+        no run left.
+    
+        Why: the sync's raise goes back to the worker -> ``_busy_fail`` ->
+        ``WorkerFailed`` -> the app exits and the unsaved session is lost.
+        Negative control (dee0d96): ``mkdir`` raises ``FileExistsError`` out of
+        the sync -> the app exits -> RED."""
+        base = tmp_path / "app"
+        # The image alone: an attached MAC or A2L inside the folder would be
+        # re-read by the load itself and fail it before the sync is reached.
+        trio(W(base) / "P2", names=("firmware.s19",))
+        src = tmp_path / "src" / "other.s19"
+        src.parent.mkdir(parents=True)
+        shutil.copyfile(projects.CASE02_DIR / "firmware.s19", src)
+    
+        async def scenario(app, pilot, log):
+            await open_trio_project(app, pilot, "P2")
+            shutil.rmtree(W(base) / "P2")
+            (W(base) / "P2").write_bytes(b"")
+            mark = len(log.messages)
+            app.load_from_path(src)
+            exited = await ended_or_exited(app, "file_load")
+            return exited, log.since(mark), list(app._busy.runs)
+    
+>       exited, lines, runs = run(base, scenario)
+                              ^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_workers.py:3222: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_workers.py:337: in run
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_workers.py:333: in _drive
+    async with app.run_test(size=size, notifications=notifications) as pilot:
+..\..\anaconda3\envs\s19env\Lib\contextlib.py:217: in __aexit__
+    await anext(self.gen)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+
+    @asynccontextmanager
+    async def run_test(
+        self,
+        *,
+        headless: bool = True,
+        size: tuple[int, int] | None = (80, 24),
+        tooltips: bool = False,
+        notifications: bool = False,
+        message_hook: Callable[[Message], None] | None = None,
+    ) -> AsyncGenerator[Pilot[ReturnType], None]:
+        """An asynchronous context manager for testing apps.
+    
+        !!! tip
+    
+            See the guide for [testing](/guide/testing) Textual apps.
+    
+        Use this to run your app in "headless" mode (no output) and drive the app via a [Pilot][textual.pilot.Pilot] object.
+    
+        Example:
+    
+            ```python
+            async with app.run_test() as pilot:
+                await pilot.click("#Button.ok")
+                assert ...
+            ```
+    
+        Args:
+            headless: Run in headless mode (no output or input).
+            size: Force terminal size to `(WIDTH, HEIGHT)`,
+                or None to auto-detect.
+            tooltips: Enable tooltips when testing.
+            notifications: Enable notifications when testing.
+            message_hook: An optional callback that will be called each time any message arrives at any
+                message pump in the app.
+        """
+        from textual.pilot import Pilot
+    
+        app = self
+        app._disable_tooltips = not tooltips
+        app._disable_notifications = not notifications
+        app_ready_event = asyncio.Event()
+    
+        def on_app_ready() -> None:
+            """Called when app is ready to process events."""
+            app_ready_event.set()
+    
+        async def run_app(app: App[ReturnType]) -> None:
+            """Run the apps message loop.
+    
+            Args:
+                app: App to run.
+            """
+    
+            with app._context():
+                try:
+                    if message_hook is not None:
+                        message_hook_context_var.set(message_hook)
+                    app._loop = asyncio.get_running_loop()
+                    app._thread_id = threading.get_ident()
+                    await app._process_messages(
+                        ready_callback=on_app_ready,
+                        headless=headless,
+                        terminal_size=size,
+                    )
+                finally:
+                    app_ready_event.set()
+    
+        # Launch the app in the "background"
+    
+        self._task = app_task = create_task(run_app(app), name=f"run_test {app}")
+    
+        # Wait until the app has performed all startup routines.
+        await app_ready_event.wait()
+        with app._context():
+            # Context manager returns pilot object to manipulate the app
+            try:
+                pilot = Pilot(app)
+                await pilot._wait_for_screen()
+                yield pilot
+            finally:
+                await asyncio.sleep(0)
+                # Shutdown the app cleanly
+                await app._shutdown()
+                await app_task
+                # Re-raise the exception which caused panic so test frameworks are aware
+                if self._exception:
+>                   raise self._exception
+E                   textual.worker.WorkerFailed: Worker raised exception: FileExistsError(17, 'Cannot create a file when that file already exists')
+
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: WorkerFailed
+---------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────
+│ C:\Users\jjgh8\Github\s19_app-b100-fix1\s19_app\tui\app.py:14610 in          
+│ _sync_loaded_file_to_project                                                 
+│                                                                              
+│   14607 │   │   project_dir = self._active_project_dir()                     
+│   14608 │   │   if not project_dir:                                          
+│   14609 │   │   │   return                                                   
+│ ❱ 14610 │   │   project_dir.mkdir(parents=True, exist_ok=True)               
+│   14611 │   │   data_files, a2l_files, error = validate_project_files(projec 
+│   14612 │   │   if error:                                                    
+│   14613 │   │   │   self.logger.warning("Project validation failed during sy 
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/s19f2/bt/t… │ 
+│ │        self = S19TuiApp(                                                 │ 
+│ │               │   title='Hex Edit Tool',                                 │ 
+│ │               │   classes={'-dark-mode'},                                │ 
+│ │               │   pseudo_classes={'dark', 'focus'}                       │ 
+│ │               )                                                          │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1116 in mkdir            
+│                                                                              
+│   1113 │   │   Create a new directory at this given path.                    
+│   1114 │   │   """                                                           
+│   1115 │   │   try:                                                          
+│ ❱ 1116 │   │   │   os.mkdir(self, mode)                                      
+│   1117 │   │   except FileNotFoundError:                                     
+│   1118 │   │   │   if not parents or self.parent == self:                    
+│   1119 │   │   │   │   raise                                                 
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ exist_ok = True                                                          │ 
+│ │     mode = 511                                                           │ 
+│ │  parents = True                                                          │ 
+│ │     self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/s19f2/bt/test… │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+╰──────────────────────────────────────────────────────────────────────────────
+FileExistsError: [WinError 183] Cannot create a file when that file already 
+exists: 
+'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\s19f2\\bt\\test_tc_b100_54_file_load_s
+nc0\\app\\.s19tool\\workarea\\P2'
+__ test_tc_b100_54_a2l_sync_refuses_when_the_project_folder_turns_unreadable __
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/s19f2/bt/test_tc_b100_54_a2l_sync_refus0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000186B92F19D0>
+
+    def test_tc_b100_54_a2l_sync_refuses_when_the_project_folder_turns_unreadable(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """SE5-12b-2 tail (fix round 2), the CR12b-2 refusal pattern: ``P2``
+        (no A2L) is open; an A2L attach passes its request-time project guard,
+        then the project folder cannot be read when the install syncs the A2L
+        into it (``_sync_loaded_a2l_to_project``; ``validate_project_files``
+        raises ``PermissionError`` there only) -> the attach still ends ``A2L
+        loaded: firmware.a2l``, 1 line ``A2L sync NOT done: project 'P2' could
+        not be read — check that the folder can be opened, then load again.``,
+        the app running and no run left.
+    
+        Why: the install runs on the main thread from the A2L worker's post, so
+        the raise goes back to the worker -> ``WorkerFailed`` -> the app exits.
+        Negative control (dee0d96): the ``PermissionError`` leaves the sync ->
+        the app exits -> RED."""
+        base = tmp_path / "app"
+        trio(W(base) / "P2", names=("firmware.s19", "firmware.mac"))
+        a2l = tmp_path / "src" / "firmware.a2l"
+        a2l.parent.mkdir(parents=True)
+        shutil.copyfile(CASE01 / "firmware.a2l", a2l)
+        real_validate = app_module.validate_project_files
+    
+        def _validate(project_dir):
+            if sys._getframe(1).f_code.co_name == "_sync_loaded_a2l_to_project":
+                raise PermissionError(13, "synthetic: the folder cannot be read")
+            return real_validate(project_dir)
+    
+        monkeypatch.setattr(app_module, "validate_project_files", _validate)
+    
+        async def scenario(app, pilot, log):
+            await open_trio_project(app, pilot, "P2")
+            mark = len(log.messages)
+            app.load_a2l_from_path(a2l)
+            exited = await ended_or_exited(app, "a2l_load")
+            return exited, log.since(mark), list(app._busy.runs)
+    
+>       exited, lines, runs = run(base, scenario)
+                              ^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_workers.py:3266: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_workers.py:337: in run
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_workers.py:333: in _drive
+    async with app.run_test(size=size, notifications=notifications) as pilot:
+..\..\anaconda3\envs\s19env\Lib\contextlib.py:217: in __aexit__
+    await anext(self.gen)
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: in run_test
+    raise self._exception
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:689: in _process_messages_loop
+    await invoke(method, event)
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:58: in _invoke
+    result = await result
+             ^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\screen.py:1186: in _on_idle
+    await self._invoke_and_clear_callbacks()
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\screen.py:1272: in _invoke_and_clear_callbacks
+    await invoke(callback)
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:56: in _invoke
+    result = callback(*params[:parameter_count])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\app.py:15317: in _install_attached_a2l
+    self._sync_loaded_a2l_to_project()
+s19_app\tui\app.py:14719: in _sync_loaded_a2l_to_project
+    data_files, a2l_files, error = validate_project_files(project_dir)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/s19f2/bt/test_tc_b100_54_a2l_sync_refus0/app/.s19tool/workarea/P2')
+
+    def _validate(project_dir):
+        if sys._getframe(1).f_code.co_name == "_sync_loaded_a2l_to_project":
+>           raise PermissionError(13, "synthetic: the folder cannot be read")
+E           PermissionError: [Errno 13] synthetic: the folder cannot be read
+
+tests\test_b100_workers.py:3254: PermissionError
+---------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────
+│ C:\Users\jjgh8\Github\s19_app-b100-fix1\s19_app\tui\app.py:15317 in          
+│ _install_attached_a2l                                                        
+│                                                                              
+│   15314 │   │   │   self._rehome_focus_after_load()                          
+│   15315 │   │   │   self.logger.info("A2L loaded: %s", copied)               
+│   15316 │   │   │   if self.current_project:                                 
+│ ❱ 15317 │   │   │   │   self._sync_loaded_a2l_to_project()                   
+│   15318 │   │   │   self.end_busy(                                           
+│   15319 │   │   │   │   "a2l_load",                                          
+│   15320 │   │   │   │   gen,                                                 
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │       copied = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/s19f2/bt/… │ 
+│ │          gen = 2                                                         │ 
+│ │          req = A2LAttachRequest(                                         │ 
+│ │                │                                                         │ 
+│ │                source=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/s1… │ 
+│ │                │   copy=True,                                            │ 
+│ │                │                                                         │ 
+│ │                temp_dir=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │                │                                                         │ 
+│ │                workarea=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │                │   record_recent=True,                                   │ 
+│ │                │   a2l_cache=None,                                       │ 
+│ │                │   gen=2                                                 │ 
+│ │                )                                                         │ 
+│ │       result = A2LAttachResult(                                          │ 
+│ │                │   request=A2LAttachRequest(                             │ 
+│ │                │   │                                                     │ 
+│ │                source=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/s1… │ 
+│ │                │   │   copy=True,                                        │ 
+│ │                │   │                                                     │ 
+│ │                temp_dir=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │                │   │                                                     │ 
+│ │                workarea=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │                │   │   record_recent=True,                               │ 
+│ │                │   │   a2l_cache=None,                                   │ 
+│ │                │   │   gen=2                                             │ 
+│ │                │   ),                                                    │ 
+│ │                │                                                         │ 
+│ │                path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/s19f… │ 
+│ │                │   entry=(                                               │ 
+│ │                │   │   (                                                 │ 
+│ │                │   │   │                                                 │ 
+│ │                'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\s19f2\\bt\\test… │ 
+│ │                │   │   │   1793553568595061500,                          │ 
+│ │                │   │   │   1444                                          │ 
+│ │                │   │   ),                                                │ 
+│ │                │   │   {                                                 │ 
+│ │                │   │   │   'path':                                       │ 
+│ │                'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\s19f2\\bt\\test… │ 
+│ │                │   │   │   'sections': [                                 │ 
+│ │                │   │   │   │   {                                         │ 
+│ │                │   │   │   │   │   'name': 'PROJECT',                    │ 
+│ │                │   │   │   │   │   'meta': 'CASE01 "Synthetic project    │ 
+│ │                for S19Tool stress testing"',                             │ 
+│ │                │   │   │   │   │   'start_line': 1,                      │ 
+│ │                │   │   │   │   │   'lines': [''],                        │ 
+│ │                │   │   │   │   │   'children': [                         │ 
+│ │                │   │   │   │   │   │   {                                 │ 
+│ │                │   │   │   │   │   │   │   'name': 'HEADER',             │ 
+│ │                │   │   │   │   │   │   │   'meta': '',                   │ 
+│ │                │   │   │   │   │   │   │   'start_line': 2,              │ 
+│ │                │   │   │   │   │   │   │   'lines': [                    │ 
+│ │                │   │   │   │   │   │   │   │   '    VERSION "1.0"',      │ 
+│ │                │   │   │   │   │   │   │   │   '    PROJECT_NO 1'        │ 
+│ │                │   │   │   │   │   │   │   ],                            │ 
+│ │                │   │   │   │   │   │   │   'children': [],               │ 
+│ │                │   │   │   │   │   │   │   'end_line': 5                 │ 
+│ │                │   │   │   │   │   │   },                                │ 
+│ │                │   │   │   │   │   │   {                                 │ 
+│ │                │   │   │   │   │   │   │   'name': 'MODULE',             │ 
+│ │                │   │   │   │   │   │   │   'meta': 'BASIC "Synthetic ECU │ 
+│ │                module"',                                                 │ 
+│ │                │   │   │   │   │   │   │   'start_line': 7,              │ 
+│ │                │   │   │   │   │   │   │   'lines': [                    │ 
+│ │                │   │   │   │   │   │   │   │   '',                       │ 
+│ │                │   │   │   │   │   │   │   │   '',                       │ 
+│ │                │   │   │   │   │   │   │   │   '',                       │ 
+│ │                │   │   │   │   │   │   │   │   '',                       │ 
+│ │                │   │   │   │   │   │   │   │   '',                       │ 
+│ │                │   │   │   │   │   │   │   │   ''                        │ 
+│ │                │   │   │   │   │   │   │   ],                            │ 
+│ │                │   │   │   │   │   │   │   'children': [                 │ 
+│ │                │   │   │   │   │   │   │   │   {                         │ 
+│ │                │   │   │   │   │   │   │   │   │   'name': 'MOD_COMMON', │ 
+│ │                │   │   │   │   │   │   │   │   │   'meta': '""',         │ 
+│ │                │   │   │   │   │   │   │   │   │   'start_line': 8,      │ 
+│ │                │   │   │   │   │   │   │   │   │   'lines': [            │ 
+│ │                │   │   │   │   │   │   │   │   │   │   '      BYTE_ORDER │ 
+│ │                MSB_FIRST',                                               │ 
+│ │                │   │   │   │   │   │   │   │   │   │   '                 │ 
+│ │                ALIGNMENT_BYTE 1',                                        │ 
+│ │                │   │   │   │   │   │   │   │   │   │   '                 │ 
+│ │                ALIGNMENT_WORD 2',                                        │ 
+│ │                │   │   │   │   │   │   │   │   │   │   '                 │ 
+│ │                ALIGNMENT_LONG 4',                                        │ 
+│ │                │   │   │   │   │   │   │   │   │   │   '                 │ 
+│ │                ALIGNMENT_FLOAT32_IEEE 4'                                 │ 
+│ │                │   │   │   │   │   │   │   │   │   ],                    │ 
+│ │                │   │   │   │   │   │   │   │   │   'children': [],       │ 
+│ │                │   │   │   │   │   │   │   │   │   'end_line': 14        │ 
+│ │                │   │   │   │   │   │   │   │   },                        │ 
+│ │                │   │   │   │   │   │   │   │   {                         │ 
+│ │                │   │   │   │   │   │   │   │   │   'name': 'MOD_PAR',    │ 
+│ │                │   │   │   │   │   │   │   │   │   'meta': '""',         │ 
+│ │                │   │   │   │   │   │   │   │   │   'start_line': 16,     │ 
+│ │                │   │   │   │   │   │   │   │   │   'lines': [            │ 
+│ │                │   │   │   │   │   │   │   │   │   │   '      EPK        │ 
+│ │                "S19TOOL_SYNTH"'                                          │ 
+│ │                │   │   │   │   │   │   │   │   │   ],                    │ 
+│ │                │   │   │   │   │   │   │   │   │   'children': [],       │ 
+│ │                │   │   │   │   │   │   │   │   │   'end_line': 18        │ 
+│ │                │   │   │   │   │   │   │   │   },                        │ 
+│ │                │   │   │   │   │   │   │   │   {                         │ 
+│ │                │   │   │   │   │   │   │   │   │   'name':               │ 
+│ │                'RECORD_LAYOUT',                                          │ 
+│ │                │   │   │   │   │   │   │   │   │   'meta': 'RL_U8',      │ 
+│ │                │   │   │   │   │   │   │   │   │   'start_line': 20,     │ 
+│ │                │   │   │   │   │   │   │   │   │   'lines': [            │ 
+│ │                │   │   │   │   │   │   │   │   │   │   '      FNC_VALUES │ 
+│ │                1 UBYTE COLUMN_DIR DIRECT'                                │ 
+│ │                │   │   │   │   │   │   │   │   │   ],                    │ 
+│ │                │   │   │   │   │   │   │   │   │   'children': [],       │ 
+│ │                │   │   │   │   │   │   │   │   │   'end_line': 22        │ 
+│ │                │   │   │   │   │   │   │   │   },                        │ 
+│ │                │   │   │   │   │   │   │   │   {                         │ 
+│ │                │   │   │   │   │   │   │   │   │   'name':               │ 
+│ │                'RECORD_LAYOUT',                                          │ 
+│ │                │   │   │   │   │   │   │   │   │   'meta': 'RL_U16',     │ 
+│ │                │   │   │   │   │   │   │   │   │   'start_line': 24,     │ 
+│ │                │   │   │   │   │   │   │   │   │   'lines': [            │ 
+│ │                │   │   │   │   │   │   │   │   │   │   '      FNC_VALUES │ 
+│ │                1 UWORD COLUMN_DIR DIRECT'                                │ 
+│ │                │   │   │   │   │   │   │   │   │   ],                    │ 
+│ │                │   │   │   │   │   │   │   │   │   'children': [],       │ 
+│ │                │   │   │   │   │   │   │   │   │   'end_line': 26        │ 
+│ │                │   │   │   │   │   │   │   │   },                        │ 
+│ │                │   │   │   │   │   │   │   │   {                         │ 
+│ │                │   │   │   │   │   │   │   │   │   'name':               │ 
+│ │                'RECORD_LAYOUT',                                          │ 
+│ │                │   │   │   │   │   │   │   │   │   'meta': 'RL_U32',     │ 
+│ │                │   │   │   │   │   │   │   │   │   'start_line': 28,     │ 
+│ │                │   │   │   │   │   │   │   │   │   'lines': [            │ 
+│ │                │   │   │   │   │   │   │   │   │   │   '      FNC_VALUES │ 
+│ │                1 ULONG COLUMN_DIR DIRECT'                                │ 
+│ │                │   │   │   │   │   │   │   │   │   ],                    │ 
+│ │                │   │   │   │   │   │   │   │   │   'children': [],       │ 
+│ │                │   │   │   │   │   │   │   │   │   'end_line': 30        │ 
+│ │                │   │   │   │   │   │   │   │   },                        │ 
+│ │                │   │   │   │   │   │   │   │   {                         │ 
+│ │                │   │   │   │   │   │   │   │   │   'name':               │ 
+│ │                'COMPU_METHOD',                                           │ 
+│ │                │   │   │   │   │   │   │   │   │   'meta': 'CM_IDENT     │ 
+│ │                "%6.2" IDENTICAL "%6.2" ""',                              │ 
+│ │                │   │   │   │   │   │   │   │   │   'start_line': 32,     │ 
+│ │                │   │   │   │   │   │   │   │   │   'lines': [            │ 
+│ │                │   │   │   │   │   │   │   │   │   │   '      COEFFS 0 1 │ 
+│ │                0 0 0 1'                                                  │ 
+│ │                │   │   │   │   │   │   │   │   │   ],                    │ 
+│ │                │   │   │   │   │   │   │   │   │   'children': [],       │ 
+│ │                │   │   │   │   │   │   │   │   │   'end_line': 34        │ 
+│ │                │   │   │   │   │   │   │   │   },                        │ 
+│ │                │   │   │   │   │   │   │   │   {                         │ 
+│ │                │   │   │   │   │   │   │   │   │   'name':               │ 
+│ │                'CHARACTERISTIC',                                         │ 
+│ │                │   │   │   │   │   │   │   │   │   'meta': 'CAL_BLOCK_A  │ 
+│ │                "CAL_BLOCK_A synthetic characteristic"',                  │ 
+│ │                │   │   │   │   │   │   │   │   │   'start_line': 36,     │ 
+│ │                │   │   │   │   │   │   │   │   │   'lines': [            │ 
+│ │                │   │   │   │   │   │   │   │   │   │   '  VALUE          │ 
+│ │                0x80000010 RL_U8 0 CM_IDENT 0 255'                        │ 
+│ │                │   │   │   │   │   │   │   │   │   ],                    │ 
+│ │                │   │   │   │   │   │   │   │   │   'children': [],       │ 
+│ │                │   │   │   │   │   │   │   │   │   'end_line': 38        │ 
+│ │                │   │   │   │   │   │   │   │   },                        │ 
+│ │                │   │   │   │   │   │   │   │   {                         │ 
+│ │                │   │   │   │   │   │   │   │   │   'name':               │ 
+│ │                'CHARACTERISTIC',                                         │ 
+│ │                │   │   │   │   │   │   │   │   │   'meta': 'CAL_BLOCK_B  │ 
+│ │                "CAL_BLOCK_B synthetic characteristic"',                  │ 
+│ │                │   │   │   │   │   │   │   │   │   'start_line': 39,     │ 
+│ │                │   │   │   │   │   │   │   │   │   'lines': [            │ 
+│ │                │   │   │   │   │   │   │   │   │   │   '  VALUE          │ 
+│ │                0x80000040 RL_U8 0 CM_IDENT 0 255'                        │ 
+│ │                │   │   │   │   │   │   │   │   │   ],                    │ 
+│ │                │   │   │   │   │   │   │   │   │   'children': [],       │ 
+│ │                │   │   │   │   │   │   │   │   │   'end_line': 41        │ 
+│ │                │   │   │   │   │   │   │   │   },                        │ 
+│ │                │   │   │   │   │   │   │   │   {                         │ 
+│ │                │   │   │   │   │   │   │   │   │   'name':               │ 
+│ │                'MEASUREMENT',                                            │ 
+│ │                │   │   │   │   │   │   │   │   │   'meta': 'MEAS_STATUS  │ 
+│ │                "MEAS_STATUS synthetic measurement"',                     │ 
+│ │                │   │   │   │   │   │   │   │   │   'start_line': 42,     │ 
+│ │                │   │   │   │   │   │   │   │   │   'lines': [            │ 
+│ │                │   │   │   │   │   │   │   │   │   │   '  UBYTE CM_IDENT │ 
+│ │                0 0 0 255',                                               │ 
+│ │                │   │   │   │   │   │   │   │   │   │   '  ECU_ADDRESS    │ 
+│ │                0x80000000'                                               │ 
+│ │                │   │   │   │   │   │   │   │   │   ],                    │ 
+│ │                │   │   │   │   │   │   │   │   │   'children': [],       │ 
+│ │                │   │   │   │   │   │   │   │   │   'end_line': 45        │ 
+│ │                │   │   │   │   │   │   │   │   },                        │ 
+│ │                │   │   │   │   │   │   │   │   {                         │ 
+│ │                │   │   │   │   │   │   │   │   │   'name': 'GROUP',      │ 
+│ │                │   │   │   │   │   │   │   │   │   'meta': 'GRP_BASIC    │ 
+│ │                "GRP_BASIC group"',                                       │ 
+│ │                │   │   │   │   │   │   │   │   │   'start_line': 46,     │ 
+│ │                │   │   │   │   │   │   │   │   │   'lines': [],          │ 
+│ │                │   │   │   │   │   │   │   │   │   'children': [         │ 
+│ │                │   │   │   │   │   │   │   │   │   │   {                 │ 
+│ │                │   │   │   │   │   │   │   │   │   │   │   'name':       │ 
+│ │                'REF_CHARACTERISTIC',                                     │ 
+│ │                │   │   │   │   │   │   │   │   │   │   │   'meta': '',   │ 
+│ │                │   │   │   │   │   │   │   │   │   │   │   'start_line': │ 
+│ │                47,                                                       │ 
+│ │                │   │   │   │   │   │   │   │   │   │   │   'lines': [    │ 
+│ │                │   │   │   │   │   │   │   │   │   │   │   │   '         │ 
+│ │                CAL_BLOCK_A',                                             │ 
+│ │                │   │   │   │   │   │   │   │   │   │   │   │   '         │ 
+│ │                CAL_BLOCK_B'                                              │ 
+│ │                │   │   │   │   │   │   │   │   │   │   │   ],            │ 
+│ │                │   │   │   │   │   │   │   │   │   │   │   'children':   │ 
+│ │                [],                                                       │ 
+│ │                │   │   │   │   │   │   │   │   │   │   │   'end_line':   │ 
+│ │                50                                                        │ 
+│ │                │   │   │   │   │   │   │   │   │   │   }                 │ 
+│ │                │   │   │   │   │   │   │   │   │   ],                    │ 
+│ │                │   │   │   │   │   │   │   │   │   'end_line': 51        │ 
+│ │                │   │   │   │   │   │   │   │   }                         │ 
+│ │                │   │   │   │   │   │   │   ],                            │ 
+│ │                │   │   │   │   │   │   │   'end_line': 52                │ 
+│ │                │   │   │   │   │   │   }                                 │ 
+│ │                │   │   │   │   │   ],                                    │ 
+│ │                │   │   │   │   │   'end_line': 53                        │ 
+│ │                │   │   │   │   }                                         │ 
+│ │                │   │   │   ],                                            │ 
+│ │                │   │   │   'errors': [],                                 │ 
+│ │                │   │   │   'tags': [                                     │ 
+│ │                │   │   │   │   {                                         │ 
+│ │                │   │   │   │   │   'section': 'CHARACTERISTIC',          │ 
+│ │                │   │   │   │   │   'name': 'CAL_BLOCK_A',                │ 
+│ │                │   │   │   │   │   'description': 'CAL_BLOCK_A synthetic │ 
+│ │                characteristic',                                          │ 
+│ │                │   │   │   │   │   'address': 2147483664,                │ 
+│ │                │   │   │   │   │   'length': 1,                          │ 
+│ │                │   │   │   │   │   'source': 'formula',                  │ 
+│ │                │   │   │   │   │   'unit': None,                         │ 
+│ │                │   │   │   │   │   'lower_limit': '0',                   │ 
+│ │                │   │   │   │   │   'upper_limit': '255',                 │ 
+│ │                │   │   │   │   │   'bit_org': None,                      │ 
+│ │                │   │   │   │   │   ... +18                               │ 
+│ │                │   │   │   │   },                                        │ 
+│ │                │   │   │   │   {                                         │ 
+│ │                │   │   │   │   │   'section': 'CHARACTERISTIC',          │ 
+│ │                │   │   │   │   │   'name': 'CAL_BLOCK_B',                │ 
+│ │                │   │   │   │   │   'description': 'CAL_BLOCK_B synthetic │ 
+│ │                characteristic',                                          │ 
+│ │                │   │   │   │   │   'address': 2147483712,                │ 
+│ │                │   │   │   │   │   'length': 1,                          │ 
+│ │                │   │   │   │   │   'source': 'formula',                  │ 
+│ │                │   │   │   │   │   'unit': None,                         │ 
+│ │                │   │   │   │   │   'lower_limit': '0',                   │ 
+│ │                │   │   │   │   │   'upper_limit': '255',                 │ 
+│ │                │   │   │   │   │   'bit_org': None,                      │ 
+│ │                │   │   │   │   │   ... +18                               │ 
+│ │                │   │   │   │   },                                        │ 
+│ │                │   │   │   │   {                                         │ 
+│ │                │   │   │   │   │   'section': 'MEASUREMENT',             │ 
+│ │                │   │   │   │   │   'name': 'MEAS_STATUS',                │ 
+│ │                │   │   │   │   │   'description': 'MEAS_STATUS synthetic │ 
+│ │                measurement',                                             │ 
+│ │                │   │   │   │   │   'address': 2147483648,                │ 
+│ │                │   │   │   │   │   'length': 1,                          │ 
+│ │                │   │   │   │   │   'source': 'formula',                  │ 
+│ │                │   │   │   │   │   'unit': None,                         │ 
+│ │                │   │   │   │   │   'lower_limit': '0',                   │ 
+│ │                │   │   │   │   │   'upper_limit': '255',                 │ 
+│ │                │   │   │   │   │   'bit_org': None,                      │ 
+│ │                │   │   │   │   │   ... +18                               │ 
+│ │                │   │   │   │   }                                         │ 
+│ │                │   │   │   ],                                            │ 
+│ │                │   │   │   'record_layouts_by_name': {                   │ 
+│ │                │   │   │   │   'RL_U8': {                                │ 
+│ │                │   │   │   │   │   'name': 'RL_U8',                      │ 
+│ │                │   │   │   │   │   'tokens': [                           │ 
+│ │                │   │   │   │   │   │   'FNC_VALUES',                     │ 
+│ │                │   │   │   │   │   │   '1',                              │ 
+│ │                │   │   │   │   │   │   'UBYTE',                          │ 
+│ │                │   │   │   │   │   │   'COLUMN_DIR',                     │ 
+│ │                │   │   │   │   │   │   'DIRECT'                          │ 
+│ │                │   │   │   │   │   ],                                    │ 
+│ │                │   │   │   │   │   'lines': [                            │ 
+│ │                │   │   │   │   │   │   '      FNC_VALUES 1 UBYTE         │ 
+│ │                COLUMN_DIR DIRECT'                                        │ 
+│ │                │   │   │   │   │   ],                                    │ 
+│ │                │   │   │   │   │   'byte_order': None                    │ 
+│ │                │   │   │   │   },                                        │ 
+│ │                │   │   │   │   'RL_U16': {                               │ 
+│ │                │   │   │   │   │   'name': 'RL_U16',                     │ 
+│ │                │   │   │   │   │   'tokens': [                           │ 
+│ │                │   │   │   │   │   │   'FNC_VALUES',                     │ 
+│ │                │   │   │   │   │   │   '1',                              │ 
+│ │                │   │   │   │   │   │   'UWORD',                          │ 
+│ │                │   │   │   │   │   │   'COLUMN_DIR',                     │ 
+│ │                │   │   │   │   │   │   'DIRECT'                          │ 
+│ │                │   │   │   │   │   ],                                    │ 
+│ │                │   │   │   │   │   'lines': [                            │ 
+│ │                │   │   │   │   │   │   '      FNC_VALUES 1 UWORD         │ 
+│ │                COLUMN_DIR DIRECT'                                        │ 
+│ │                │   │   │   │   │   ],                                    │ 
+│ │                │   │   │   │   │   'byte_order': None                    │ 
+│ │                │   │   │   │   },                                        │ 
+│ │                │   │   │   │   'RL_U32': {                               │ 
+│ │                │   │   │   │   │   'name': 'RL_U32',                     │ 
+│ │                │   │   │   │   │   'tokens': [                           │ 
+│ │                │   │   │   │   │   │   'FNC_VALUES',                     │ 
+│ │                │   │   │   │   │   │   '1',                              │ 
+│ │                │   │   │   │   │   │   'ULONG',                          │ 
+│ │                │   │   │   │   │   │   'COLUMN_DIR',                     │ 
+│ │                │   │   │   │   │   │   'DIRECT'                          │ 
+│ │                │   │   │   │   │   ],                                    │ 
+│ │                │   │   │   │   │   'lines': [                            │ 
+│ │                │   │   │   │   │   │   '      FNC_VALUES 1 ULONG         │ 
+│ │                COLUMN_DIR DIRECT'                                        │ 
+│ │                │   │   │   │   │   ],                                    │ 
+│ │                │   │   │   │   │   'byte_order': None                    │ 
+│ │                │   │   │   │   }                                         │ 
+│ │                │   │   │   },                                            │ 
+│ │                │   │   │   'compu_methods_by_name': {                    │ 
+│ │                │   │   │   │   'CM_IDENT': {                             │ 
+│ │                │   │   │   │   │   'name': 'CM_IDENT',                   │ 
+│ │                │   │   │   │   │   'long_identifier': '%6.2',            │ 
+│ │                │   │   │   │   │   'conversion_type': 'IDENTICAL',       │ 
+│ │                │   │   │   │   │   'format': '%6.2',                     │ 
+│ │                │   │   │   │   │   'unit': '%6.2',                       │ 
+│ │                │   │   │   │   │   'coeffs_linear': None,                │ 
+│ │                │   │   │   │   │   'coeffs': [                           │ 
+│ │                │   │   │   │   │   │   0.0,                              │ 
+│ │                │   │   │   │   │   │   1.0,                              │ 
+│ │                │   │   │   │   │   │   0.0,                              │ 
+│ │                │   │   │   │   │   │   0.0,                              │ 
+│ │                │   │   │   │   │   │   0.0,                              │ 
+│ │                │   │   │   │   │   │   1.0                               │ 
+│ │                │   │   │   │   │   ],                                    │ 
+│ │                │   │   │   │   │   'compu_tab_ref': None,                │ 
+│ │                │   │   │   │   │   'formula': None,                      │ 
+│ │                │   │   │   │   │   'lines': [                            │ 
+│ │                │   │   │   │   │   │   '      COEFFS 0 1 0 0 0 1'        │ 
+│ │                │   │   │   │   │   ]                                     │ 
+│ │                │   │   │   │   }                                         │ 
+│ │                │   │   │   },                                            │ 
+│ │                │   │   │   'compu_tabs_by_name': {}                      │ 
+│ │                │   │   }                                                 │ 
+│ │                │   ),                                                    │ 
+│ │                │   parse_seconds=0.0011074000503867865                   │ 
+│ │                )                                                         │ 
+│ │         self = S19TuiApp(                                                │ 
+│ │                │   title='Hex Edit Tool',                                │ 
+│ │                │   classes={'-dark-mode'},                               │ 
+│ │                │   pseudo_classes={'dark', 'focus'}                      │ 
+│ │                )                                                         │ 
+│ │ view_elapsed = 0.01100830000359565                                       │ 
+│ │ view_started = 635076.9637964                                            │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app-b100-fix1\s19_app\tui\app.py:14719 in          
+│ _sync_loaded_a2l_to_project                                                  
+│                                                                              
+│   14716 │   │   if not project_dir:                                          
+│   14717 │   │   │   return                                                   
+│   14718 │   │   project_dir.mkdir(parents=True, exist_ok=True)               
+│ ❱ 14719 │   │   data_files, a2l_files, error = validate_project_files(projec 
+│   14720 │   │   if error:                                                    
+│   14721 │   │   │   self.logger.warning("Project validation failed during A2 
+│   14722 │   │   │   return                                                   
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/s19f2/bt/t… │ 
+│ │        self = S19TuiApp(                                                 │ 
+│ │               │   title='Hex Edit Tool',                                 │ 
+│ │               │   classes={'-dark-mode'},                                │ 
+│ │               │   pseudo_classes={'dark', 'focus'}                       │ 
+│ │               )                                                          │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app-b100-fix1\tests\test_b100_workers.py:3254 in   
+│ _validate                                                                    
+│                                                                              
+│   3251 │                                                                     
+│   3252 │   def _validate(project_dir):                                       
+│   3253 │   │   if sys._getframe(1).f_code.co_name == "_sync_loaded_a2l_to_pr 
+│ ❱ 3254 │   │   │   raise PermissionError(13, "synthetic: the folder cannot b 
+│   3255 │   │   return real_validate(project_dir)                             
+│   3256 │                                                                     
+│   3257 │   monkeypatch.setattr(app_module, "validate_project_files", _valida 
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/s19f2/bt/t… │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+╰──────────────────────────────────────────────────────────────────────────────
+PermissionError: [Errno 13] synthetic: the folder cannot be read
+=========================== short test summary info ===========================
+FAILED tests/test_b100_workers.py::test_tc_b100_54_file_load_sync_refuses_when_the_project_folder_is_gone
+FAILED tests/test_b100_workers.py::test_tc_b100_54_a2l_sync_refuses_when_the_project_folder_turns_unreadable
+2 failed, 67 deselected in 8.46s
+exit=1

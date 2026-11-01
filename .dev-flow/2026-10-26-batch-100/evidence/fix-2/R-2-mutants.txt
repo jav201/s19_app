@@ -1,0 +1,5 @@
+M1 early rule byte (first 'height: 1;' -> 'height: 2;'): KILLED | 1 failed in 0.74s | ['E       AssertionError: every rule shipped at b514b07 is byte-equal; Inc-6 only appends']
+M2 #variant_list border: KILLED | 1 failed in 0.75s | ['E       AssertionError: every rule shipped at b514b07 is byte-equal; Inc-6 only appends']
+M3 .modal-dialog regains #load_dialog: KILLED | 1 failed in 0.75s | ['E       AssertionError: every rule shipped at b514b07 is byte-equal; Inc-6 only appends']
+M4 rule after busy insert (Right-aligned comment text): KILLED | 1 failed in 0.75s | ['E       AssertionError: every rule shipped at b514b07 is byte-equal; Inc-6 only appends']
+restored sha256 equal: True

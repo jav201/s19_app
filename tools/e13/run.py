@@ -192,13 +192,14 @@ def build_app(base: Path, scenario: str, close: bool):
             self.title = f"E13-{scenario}" + ("-closed" if close else "")
             self.e13_ready = asyncio.Event()
 
-        def _parse_loaded_file(self, path, a2l_files=None):
+        def _parse_loaded_file(self, path, a2l_files=None, **kwargs):
             # bz-busy: slow the file-load worker's parse step (~60 s) so the
             # capture can stop on the progress line with the load running.
             # The sleep lives HERE (run.py only) — s19_app/ is never edited.
+            # OBS-12b-1: keyword arguments (``a2l_cache_out``) pass through.
             if scenario == "bz-busy":
                 time.sleep(60)
-            return super()._parse_loaded_file(path, a2l_files)
+            return super()._parse_loaded_file(path, a2l_files, **kwargs)
 
         def on_mount(self) -> None:
             super().on_mount()

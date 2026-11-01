@@ -440,10 +440,14 @@ _QUIT_YES, _QUIT_NO = "Quit (y)", "Stay (n)"
 
 
 class _QuitQuestionScreen(ConfirmQuestionScreen):
-    """The quit question (HLR-177b); a subclass only so ``action_quit`` can
-    recognise it on the stack (Q-c2). No body: it inherits ``AUTO_FOCUS =
+    """The quit question (HLR-177b); a subclass so ``action_quit`` can
+    recognise it on the stack (Q-c2). It inherits ``AUTO_FOCUS =
     "#confirm_no"``, the ``y`` / ``n`` / ``escape`` bindings, the ``Text``
-    labels and the ``_dismissed`` guard (Inc 10)."""
+    labels and the ``_dismissed`` guard (Inc 10). OBS-12b-2 (ruling: the
+    safe default carries the emphasis): ``Stay (n)`` is the primary button,
+    ``Quit (y)`` the plain one."""
+
+    PRIMARY_BUTTON = "confirm_no"
 
 
 @dataclass(frozen=True)
@@ -12113,8 +12117,13 @@ class S19TuiApp(App):
                     pass
                 else:
                     plan_entries.add(row_relative)
+            # LLR-171.1m: only a document whose unresolved path lies inside P
+            # follows the row; one outside P, or inside it only through a
+            # ``..`` part, keeps its binding (abspath below collapses ``..``).
             if (
-                document_row is not None
+                document_relative is not None
+                and ".." not in PurePosixPath(document_relative).parts
+                and document_row is not None
                 and document_row.source is not None
                 and row_relative is not None
                 and os.path.normcase(os.path.abspath(document_row.source))
@@ -14602,8 +14611,23 @@ class S19TuiApp(App):
         project_dir = self._active_project_dir()
         if not project_dir:
             return
-        project_dir.mkdir(parents=True, exist_ok=True)
-        data_files, a2l_files, error = validate_project_files(project_dir)
+        try:  # SE5-12b-2: the open project's folder can vanish outside the app
+            project_dir.mkdir(parents=True, exist_ok=True)
+            data_files, a2l_files, error = validate_project_files(project_dir)
+        except OSError:
+            reason, step = _TYPED_REFUSAL_TOKENS["unreadable"]
+            self.set_status(
+                safe_text(
+                    f"Project sync NOT done: project "
+                    f"'{painted_names([self.current_project or project_dir.name])}' "
+                    f"{reason} — {step}."
+                ).plain
+            )
+            self.logger.warning(
+                "Project sync refused (project folder could not be read): %r",
+                project_dir,
+            )
+            return
         if error:
             self.logger.warning("Project validation failed during sync: %s", error)
             return
@@ -14710,8 +14734,23 @@ class S19TuiApp(App):
         project_dir = self._active_project_dir()
         if not project_dir:
             return
-        project_dir.mkdir(parents=True, exist_ok=True)
-        data_files, a2l_files, error = validate_project_files(project_dir)
+        try:  # SE5-12b-2: the open project's folder can vanish outside the app
+            project_dir.mkdir(parents=True, exist_ok=True)
+            data_files, a2l_files, error = validate_project_files(project_dir)
+        except OSError:
+            reason, step = _TYPED_REFUSAL_TOKENS["unreadable"]
+            self.set_status(
+                safe_text(
+                    f"A2L sync NOT done: project "
+                    f"'{painted_names([self.current_project or project_dir.name])}' "
+                    f"{reason} — {step}."
+                ).plain
+            )
+            self.logger.warning(
+                "A2L sync refused (project folder could not be read): %r",
+                project_dir,
+            )
+            return
         if error:
             self.logger.warning("Project validation failed during A2L sync: %s", error)
             return

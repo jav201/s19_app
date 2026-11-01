@@ -1,0 +1,13 @@
+C:\Users/jjgh8/Github/s19_app-b100-fix1\s19_app\__init__.py
+sleepy  {'handler_return': 0.136, 'worker_start': 0.155, 'worker_end': 0.822, 'commit_start': 0.823, 'status': 0.823, 'commit_end': 0.833, 'noticed': 0.895}
+C:\Users/jjgh8/Github/s19_app-b100-fix1\s19_app\__init__.py
+noprog sleepy  {'handler_return': 0.131, 'worker_start': 0.155, 'worker_end': 0.809, 'commit_start': 0.809, 'status': 0.809, 'commit_end': 0.819, 'noticed': 0.859}
+C:\Users/jjgh8/Github/s19_app-b100-fix1\s19_app\__init__.py
+sleepy  {'handler_return': 0.136, 'worker_start': 0.154, 'worker_end': 0.949, 'commit_start': 0.95, 'status': 0.95, 'commit_end': 0.96, 'noticed': 1.007}
+C:\Users/jjgh8/Github/s19_app-b100-fix1\s19_app\__init__.py
+noprog sleepy  {'handler_return': 0.139, 'worker_start': 0.155, 'worker_end': 0.788, 'commit_start': 0.789, 'status': 0.789, 'commit_end': 0.799, 'noticed': 0.839}
+C:\Users/jjgh8/Github/s19_app-b100-fix1\s19_app\__init__.py
+sleepy  {'handler_return': 0.135, 'worker_start': 0.158, 'worker_end': 1.043, 'commit_start': 1.044, 'status': 1.044, 'commit_end': 1.054, 'noticed': 1.113}
+C:\Users/jjgh8/Github/s19_app-b100-fix1\s19_app\__init__.py
+noprog sleepy  {'handler_return': 0.144, 'worker_start': 0.154, 'worker_end': 1.039, 'commit_start': 1.039, 'status': 1.039, 'commit_end': 1.05, 'noticed': 1.172}
+exit=0

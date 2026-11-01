@@ -37,6 +37,7 @@ from __future__ import annotations
 
 import asyncio
 import shutil
+import time
 from pathlib import Path
 
 from textual.widgets import Label, ListItem, ListView
@@ -59,11 +60,6 @@ def _status_text(app: S19TuiApp) -> str:
     return str(app.query_one("#log_line_4", Label).render())
 
 
-def _line3_text(app: S19TuiApp) -> str:
-    """The second-newest painted status line (the ``#log_line_3`` label)."""
-    return str(app.query_one("#log_line_3", Label).render())
-
-
 def _file_status_text(app: S19TuiApp) -> str:
     """The painted durable file-state line (the ``#status_text`` label)."""
     return str(app.query_one("#status_text", Label).render())
@@ -82,12 +78,20 @@ def _project_list_names(app: S19TuiApp) -> list:
     return section_prompts(app.screen, "Projects")
 
 
-async def _wait_for(pilot, predicate, description: str, attempts: int = 100):
-    for _ in range(attempts):
+async def _wait_for(pilot, predicate, description: str, timeout: float = 60.0):
+    """Wait until ``predicate()`` holds, bounded by the wall clock.
+
+    Fix round 2 R-3 (the CI12a-1 / SR12b-7 pattern): the file load runs on a
+    worker since Inc 12a; a count of bare ``pilot.pause()`` calls is not a
+    time bound and starves it, so each check yields with ``asyncio.sleep``."""
+    deadline = time.monotonic() + timeout
+    while True:
         await pilot.pause()
         if predicate():
             return
-    raise AssertionError(f"did not settle: {description}")
+        if time.monotonic() > deadline:
+            raise AssertionError(f"did not settle: {description}")
+        await asyncio.sleep(0.05)
 
 
 async def _load_file_through_dialog(pilot, app: S19TuiApp, src: Path) -> None:
@@ -118,18 +122,37 @@ async def _pick_files_item_and_wait_load(pilot, app: S19TuiApp, name: str) -> No
     """Click the named Workarea Files item and wait for the RE-load.
 
     The picked file is already the loaded one, so the painted ``#log_line_4``
-    text repeats; a fresh load is observable as that same line being PUSHED
-    into ``#log_line_3`` (``set_status`` rotates the log).
+    text repeats; a fresh load is observable as the lines painted SINCE the
+    click: the ``file_load`` run has ended and its end line ``Loaded <name>``
+    is among them.
+
+    Fix round 2 R-3 (oracle re-pin, the CI12a-1 ruling): since Inc 12a the
+    load runs on a worker and paints ``Loaded <name> (S19 only)`` and then
+    the end line ``Loaded <name>`` last, so a re-load leaves ``#log_line_3``
+    holding the ``(S19 only)`` line, never the previous newest line; the old
+    oracle (``#log_line_3`` == previous ``#log_line_4``) could not settle.
     """
     previous = _status_text(app)
     assert f"Loaded {name}" in previous, previous
-    item = _pick_files_item(app, name)
-    await pilot.click(item)
-    await _wait_for(
-        pilot,
-        lambda: _line3_text(app) == previous,
-        f"the list pick re-loads {name}",
-    )
+    painted: list = []
+    real_append = app._append_log_line
+
+    def _record(message) -> None:
+        painted.append(str(message))
+        real_append(message)
+
+    app._append_log_line = _record
+    try:
+        item = _pick_files_item(app, name)
+        await pilot.click(item)
+        await _wait_for(
+            pilot,
+            lambda: "file_load" not in app._busy.runs
+            and f"Loaded {name}" in painted,
+            f"the list pick re-loads {name}",
+        )
+    finally:
+        del app._append_log_line
     assert f"Loaded {name}" in _file_status_text(app), _file_status_text(app)
 
 

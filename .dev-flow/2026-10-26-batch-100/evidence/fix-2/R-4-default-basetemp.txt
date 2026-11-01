@@ -1,0 +1,6 @@
+.                                                                        [100%]
+=================================== PASSES ====================================
+=========================== short test summary info ===========================
+PASSED tests/test_tui_snapshot.py::test_tc016s_snapshot_setup_loads_only_public_fixtures
+1 passed in 0.47s
+exit=0

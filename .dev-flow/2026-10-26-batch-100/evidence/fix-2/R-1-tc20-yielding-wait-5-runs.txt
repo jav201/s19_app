@@ -1,0 +1,10 @@
+save-project: trigger -> outcome 0.961 s; ['Project saved + manifest verified']
+1 passed in 4.30s
+save-project: trigger -> outcome 0.981 s; ['Project saved + manifest verified']
+1 passed in 4.24s
+save-project: trigger -> outcome 0.952 s; ['Project saved + manifest verified']
+1 passed in 4.13s
+save-project: trigger -> outcome 0.996 s; ['Project saved + manifest verified']
+1 passed in 4.21s
+save-project: trigger -> outcome 0.999 s; ['Project saved + manifest verified']
+1 passed in 4.26s

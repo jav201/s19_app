@@ -2040,6 +2040,55 @@ def test_tc_b100_51_save_project_reports_its_phases_as_steps(tmp_path: Path, mon
     assert any("name is empty" in m for m in refusals) and any("reserved name" in m for m in refusals), refusals
 
 
+def test_tc_b100_51_save_project_mismatch_tail_ends_with_the_mismatch(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """A12-51 / P1-72 (LLR-176.2c tail outcome, R2-5 / LLR-004.2): a Save
+    whose manifest verify reports a mismatch (``verify_written_manifest``
+    forced to ``mismatch``) → 1 effective end whose outcome is
+    ``Manifest verify MISMATCH``, the newest painted log row is that line
+    and the row above it is ``Saved project to …S4 (variant 'firmware')``;
+    the mismatch notice is raised once.
+
+    Why: the end of the run must report the worst news of the save, so a
+    mismatch is never buried under the success line. The tail-ordering
+    mutant M-70 (end with ``tail[0]``) ends with the success line → RED.
+    Fix round 2 (batch-end battery): the arm Inc 12a left unwritten."""
+    from s19_app.tui.screens import SaveProjectPayload
+    from s19_app.tui.services.manifest_writer import MANIFEST_MISMATCH, ManifestVerifyResult
+
+    seam = Seam(monkeypatch)
+    monkeypatch.setattr(
+        app_module,
+        "verify_written_manifest",
+        lambda *a, **k: ManifestVerifyResult(status=MANIFEST_MISMATCH, drift=["active_variant"]),
+    )
+    titles: list = []
+
+    async def scenario(app, pilot, log):
+        await _load_case01_image(app, pilot)
+        real_notify = app.notify
+
+        def _notify(message, *args, **kwargs):
+            titles.append(kwargs.get("title"))
+            return real_notify(message, *args, **kwargs)
+
+        app.notify = _notify
+        mark = len(log.messages)
+        app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name="S4"))
+        await _drain(app, pilot)
+        return _log_widgets(app), log.since(mark)
+
+    rows, messages = _run(tmp_path / "app", scenario)
+    ends = seam.effective("save_project")
+    assert [e.outcome for e in ends] == ["Manifest verify MISMATCH"], seam.ends
+    # The painted rows are cut at the panel width, so the full success line
+    # is read from the status messages; the end paints the outcome last.
+    assert rows[-1] == "Manifest verify MISMATCH", rows
+    assert rows[-2].startswith("Saved project to "), rows
+    assert messages[-1] == "Manifest verify MISMATCH", messages
+    assert messages[-2].startswith("Saved project to ") and messages[-2].endswith("S4 (variant 'firmware')"), messages
+    assert titles.count("Manifest verify mismatch - project.json may be wrong") == 1, titles
+
+
 def test_tc_b100_51_save_project_ends_once_on_a_placement_failure(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """LLR-176.2c failure after the begin (A12-48): ``place_into_workarea``
     raising ``OSError(28)`` → 1 effective end whose outcome is the log's

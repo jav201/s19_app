@@ -1,0 +1,133 @@
+s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-fix1\s19_app\__init__.py
+...............FF.......................                                 [100%]
+================================== FAILURES ===================================
+______________________ test_tc_b100_31_depth_ceiling[32] ______________________
+
+self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratch...c_b100_31_depth_ceiling_0/app/.s19tool/workarea/P/reports/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a')
+mode = 511, parents = True, exist_ok = True
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [WinError 206] The filename or extension is too long: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\fix1\\bt\\g_homes\\test_tc_b100_31_depth_ceiling_0\\app\\.s19tool\\workarea\\P\\reports\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a'
+
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1116: FileNotFoundError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/fix1/bt/g_homes/test_tc_b100_31_depth_ceiling_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000019142B96790>
+components = 32
+
+    @pytest.mark.parametrize("components", [32, 33])
+    def test_tc_b100_31_depth_ceiling(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, components: int
+    ) -> None:
+        """LLR-171.1j depth (R1): a file at 32 path components → saved and in
+        Q at the same path; at 33 components → 1 status message holding
+        "nested too deep", 0 ``mkdir`` calls at or below Q, Q absent.
+    
+        RED (base): the 33 arm saves (no depth check); the 32 arm's file is not
+        copied. Negative control: the depth check removed → 33 saves."""
+        base = tmp_path / "app"
+        project_dir = projects.build_save_as_project(base, sub_files={})
+>       relative = projects.deep_file(project_dir, components)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_project_homes.py:709: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\support\b100_projects.py:828: in deep_file
+    target.parent.mkdir(parents=True, exist_ok=True)
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1121: in mkdir
+    self.mkdir(mode, parents=False, exist_ok=exist_ok)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratch...c_b100_31_depth_ceiling_0/app/.s19tool/workarea/P/reports/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a')
+mode = 511, parents = False, exist_ok = True
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [WinError 206] The filename or extension is too long: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\fix1\\bt\\g_homes\\test_tc_b100_31_depth_ceiling_0\\app\\.s19tool\\workarea\\P\\reports\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a'
+
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1116: FileNotFoundError
+______________________ test_tc_b100_31_depth_ceiling[33] ______________________
+
+self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratch...b100_31_depth_ceiling_1/app/.s19tool/workarea/P/reports/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a')
+mode = 511, parents = True, exist_ok = True
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [WinError 206] The filename or extension is too long: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\fix1\\bt\\g_homes\\test_tc_b100_31_depth_ceiling_1\\app\\.s19tool\\workarea\\P\\reports\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a'
+
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1116: FileNotFoundError
+
+During handling of the above exception, another exception occurred:
+
+self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratch...c_b100_31_depth_ceiling_1/app/.s19tool/workarea/P/reports/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a')
+mode = 511, parents = True, exist_ok = True
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [WinError 206] The filename or extension is too long: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\fix1\\bt\\g_homes\\test_tc_b100_31_depth_ceiling_1\\app\\.s19tool\\workarea\\P\\reports\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a'
+
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1116: FileNotFoundError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/fix1/bt/g_homes/test_tc_b100_31_depth_ceiling_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000019140D678D0>
+components = 33
+
+    @pytest.mark.parametrize("components", [32, 33])
+    def test_tc_b100_31_depth_ceiling(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, components: int
+    ) -> None:
+        """LLR-171.1j depth (R1): a file at 32 path components → saved and in
+        Q at the same path; at 33 components → 1 status message holding
+        "nested too deep", 0 ``mkdir`` calls at or below Q, Q absent.
+    
+        RED (base): the 33 arm saves (no depth check); the 32 arm's file is not
+        copied. Negative control: the depth check removed → 33 saves."""
+        base = tmp_path / "app"
+        project_dir = projects.build_save_as_project(base, sub_files={})
+>       relative = projects.deep_file(project_dir, components)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_project_homes.py:709: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\support\b100_projects.py:828: in deep_file
+    target.parent.mkdir(parents=True, exist_ok=True)
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1120: in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1121: in mkdir
+    self.mkdir(mode, parents=False, exist_ok=exist_ok)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratch...c_b100_31_depth_ceiling_1/app/.s19tool/workarea/P/reports/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a')
+mode = 511, parents = False, exist_ok = True
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [WinError 206] The filename or extension is too long: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\fix1\\bt\\g_homes\\test_tc_b100_31_depth_ceiling_1\\app\\.s19tool\\workarea\\P\\reports\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a'
+
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1116: FileNotFoundError
+2 failed, 38 passed, 51 deselected in 315.89s (0:05:15)

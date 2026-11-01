@@ -1,0 +1,4 @@
+s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-fix1\s19_app\__init__.py
+probe: WIN forced False for tests/test_b100_load_dialog.py::test_tc_b100_43_no_filesystem_call_touches_a_recent_before_load
+.
+1 passed in 3.11s

@@ -2377,13 +2377,22 @@ def test_tc_b100_43_no_filesystem_call_touches_a_recent_before_load(
     Why: a recent on a network or removable drive must not hang or wake
     the drive before the engineer asks to load it (S-07).
     Negative control: a preview that adds the recent's size → 1 call per
-    highlight → RED. RED (base): no list to highlight."""
+    highlight → RED. RED (base): no list to highlight.
+
+    Fix round 1 (CI9b-3): the store keeps only drive-rooted entries on
+    every host (LLR-172.2e), so a posix ``/tmp`` recent is dropped and the
+    Linux runner listed 1 row. On posix the 3 recents are drive-rooted
+    texts that name no file there; the present-file arm needs a drive-rooted
+    file, so it is exercised on Windows only."""
     lad = _lad(tmp_path, monkeypatch)
     _store_on_any_host(lad, monkeypatch)
     src = tmp_path / "src"
     src.mkdir()
     (src / "here.s19").write_bytes(_s19())
-    recents = [str(src / "here.s19"), str(tmp_path / "missing" / "gone.s19"), "Q:\\nowhere\\fw.s19"]
+    if WIN:
+        recents = [str(src / "here.s19"), str(tmp_path / "missing" / "gone.s19"), "Q:\\nowhere\\fw.s19"]
+    else:
+        recents = ["C:\\src\\here.s19", "C:\\missing\\gone.s19", "Q:\\nowhere\\fw.s19"]
     _seed_store(lad, recents)
     keys = {os.path.normcase(p) for p in recents}
     hits: list = []
@@ -2557,13 +2566,23 @@ def test_tc_b100_63_typed_path_not_found_is_explained(tmp_path: Path, arm: str) 
     _assert_refused(_refusal_scene(base, text), text, "not found", "check the path")
 
 
-@pytest.mark.parametrize("arm", ["unsupported suffix", "trailing dot", "relative folder"])
+TRAILING_DOT_ARM = pytest.mark.skipif(
+    not WIN,
+    reason="Windows strips a trailing dot from a file name, so fw.s19. opens fw.s19; "
+    "on posix fw.s19. is a distinct, missing name (fix round 1, CI9b-4)",
+)
+
+
+@pytest.mark.parametrize(
+    "arm", ["unsupported suffix", pytest.param("trailing dot", marks=TRAILING_DOT_ARM), "relative folder"]
+)
 def test_tc_b100_63_typed_unsupported_file_is_explained(tmp_path: Path, arm: str) -> None:
     """LLR-173.5a (B49, 3 of 3): ``<tmp>/notes.txt``, ``<tmp>/fw.s19.``
     (trailing dot, CR9-3) and the relative ``.s19tool/workarea/ab`` → ``not
     a supported file`` / ``check the path``, 0 dismisses, the text
     unchanged.
 
+    The trailing-dot arm is Windows-only (ruling, fix round 1 CI9b-4).
     RED (base): the base dismisses and refuses on the status line."""
     base = tmp_path / "app"
     _project(base, "ab", {"a.s19": _s19()})

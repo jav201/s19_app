@@ -105,6 +105,23 @@ async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> 
     raise AssertionError(f"timed out waiting for {description}")
 
 
+async def _wait_yielding(pilot, predicate, description: str, timeout: float = 60.0) -> None:
+    """Wait until ``predicate()`` holds, bounded by the wall clock, yielding
+    the event loop between checks (``asyncio.sleep``).
+
+    Fix round 2 R-1 (the SR12b-7 / CI12a-1 pattern): a tight loop of bare
+    ``pilot.pause()`` calls keeps the main thread busy, so a worker's
+    ``call_from_thread`` round trips (its progress steps and its outcome)
+    queue behind the poll and the timed interval grows by the test's own
+    load, which an idle app does not have."""
+    deadline = time.monotonic() + timeout
+    while not predicate():
+        if time.monotonic() > deadline:
+            raise AssertionError(f"timed out waiting for {description}")
+        await asyncio.sleep(0.05)
+        await pilot.pause()
+
+
 def _status_text(app: S19TuiApp) -> str:
     return str(app.query_one("#log_line_4", Label).render())
 
@@ -642,7 +659,14 @@ def test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second(
     trigger.
 
     RED (cp1 tree): append 6.89 s, MAC sync 7.12 s, A2L sync 6.44 s,
-    save-back 6.42 s (one fresh walk per entry in the serializer)."""
+    save-back 6.42 s (one fresh walk per entry in the serializer).
+
+    Fix round 2 R-1 (measurement re-pin, the Inc 12b F-23 rule): the loads
+    (Inc 12a) and Save project (Inc 12b) run on workers, so the polling
+    loop saw the outcome line some time after the app painted it. The clock
+    now stops when ``set_status`` receives the outcome line (the bound's end
+    point: the line is painted by the main-thread commit), not when the
+    settle loop notices it."""
     from s19_app.tui.app import SaveProjectPayload
 
     base = tmp_path / "app"
@@ -663,6 +687,7 @@ def test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second(
         folder, name = sources[writer]
         src = projects.copy_sources(tmp_path / "src", folder, name) / name
     statuses: list = []
+    painted_at: list = []
 
     async def _drive() -> float:
         app = S19TuiApp(base_dir=base)
@@ -670,6 +695,8 @@ def test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second(
 
         def _capture(message, *args, **kwargs):
             statuses.append(str(message))
+            if not painted_at and any(o in str(message) for o in WRITER_OUTCOMES):
+                painted_at.append(time.perf_counter())
             return real_set_status(message, *args, **kwargs)
 
         app.set_status = _capture
@@ -677,6 +704,7 @@ def test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second(
             await pilot.pause()
             await _open_seeded_project(pilot, app)
             statuses.clear()
+            painted_at.clear()
             started = time.perf_counter()
             if writer == "save-back":
                 _apply_patch(app)
@@ -696,13 +724,12 @@ def test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second(
                         assignments={"firmware": tuple(names)},
                     )
                 )
-            await _wait_for(
+            await _wait_yielding(
                 pilot,
                 lambda: any(o in s for s in statuses for o in WRITER_OUTCOMES),
                 f"the {writer}'s manifest outcome",
-                attempts=4000,
             )
-            return time.perf_counter() - started
+            return painted_at[0] - started
 
     took = asyncio.run(_drive())
     outcomes = [s for s in statuses if any(o in s for o in WRITER_OUTCOMES)]
