@@ -1,0 +1,12 @@
+mutant: M-37
+target: s19_app/tui/app.py
+old -> new:
+  old: if self.query_one_optional("#status_text", Label) is None: return  (SR-12a-2 guard in _busy_tick)
+  new: (removed)
+sha256 before: 2d1908b14236004f96b81886da635b979fa7767d4ccb0f28a32dfed44a535df1
+command: timeout 900 env -u NO_COLOR LOCALAPPDATA='C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut12a-lad' PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line "tests/test_report_progress.py::test_kickoff_sets_bar_in_progress_before_worker"
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut12a
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut12a\s19_app\__init__.py
+pytest summary: mutant fails intermittently with NoMatches '#status_text' from _busy_tick (5 runs: 2-3 failed). Unmutated: 3/3 passed.
+verdict: KILLED (race at teardown; unmutated stable)
+restored = True

@@ -13,3 +13,7 @@
 2026-10-31 23:37 E4 implementer G-A+G-B done (DeepSeek v4 Pro): 3 deviations declared; app 96613abc4e324376, tcss f7b4f75911b296a4
 2026-11-01 00:08 E4 tester done (Opus): 67 fn/112 items new + 15 fn/23 items re-pinned; RED 125/135 on 051f586; D-1..D-8 ruled; integration start (Opus software-dev)
 2026-11-01 00:58 E4 integration done (Opus software-dev): new 112 passed/1 skip, repins 22 passed, guards 295 passed/1 failed (F-8 inherited, fixed on b100-inc11); app ed0ee69584332172; SR-12a-1..3 accepted
+2026-11-01 01:00 merged b100-inc11 7ac9674 (71376a3, clean); E5 start: mutants 108 rows (DeepSeek v4 Pro via pi, copy mut12a) || code-reviewer (Opus) || security-reviewer (Opus); merged smoke green-03-merged running
+2026-11-01 01:10 E5 reviews: code PWN (CR12a-1..3), security PWN (SE5-12a-1 MAJOR..4); rulings written; corrective start (Opus software-dev)
+2026-11-01 01:32 green-03-merged (merged with b100-inc11): 254 passed / 2 failed (Inc 11 arm calls _start_load_worker without gen) → MERGE-12a-1 to corrective
+2026-11-01 01:33 E5 corrective done (Opus software-dev): SE5-12a-1..3, CR12a-3, MERGE-12a-1; green-05 busy file 81 passed/1 skip; app 15ffc7bdbb599615

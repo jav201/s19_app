@@ -100,6 +100,15 @@ def _status(app) -> str:
     return str(app.query_one("#status_text").render())
 
 
+#: A C0 or C1 control code point (what ``safe_text`` removes).
+CONTROL = re.compile(r"[\x00-\x1f\x7f-\x9f]")
+
+
+def _log_widgets(app) -> list:
+    """The four painted status-log rows ``#log_line_1..4``."""
+    return [str(app.query_one(f"#log_line_{i}").render()) for i in range(1, 5)]
+
+
 def _bar(app) -> tuple:
     from textual.widgets import ProgressBar
 
@@ -1036,10 +1045,12 @@ def test_tc_b100_50_names_paint_literally_through_load_from_path(
     """LLR-176.1r (A12-24, S12a-02, S12a-04), driven through
     ``load_from_path`` (the real entry):
     ``[b]x.s19`` → painted verbatim with 0 markup spans;
-    ``fw`` + U+202E + ``gpj.s19`` → 0 U+202E characters;
+    ``fw`` + U+202E + ``gpj.s19`` → 0 U+202E characters in the progress line,
+    and the outcome is ``Loaded fwgpj.s19`` (SE5-12a-2);
     a 130-character name → the label is ``Loading `` + 119 characters + ``…``;
     ``a`` + ESC + ``]0;x`` + BEL + ``.s19`` → no ``\\x1b`` / ``\\x07`` in the
-    painted line or in the end's outcome log line.
+    painted line, and no C0/C1 code point in any stored or painted status-log
+    line (SE5-12a-1).
 
     The ESC/BEL arm is declared "not run on Windows (the name cannot be
     created), never passed" (S12a-R2-3); it runs on the Linux CI. The
@@ -1073,9 +1084,10 @@ def test_tc_b100_50_names_paint_literally_through_load_from_path(
         await _drain(app, pilot)
         label = app.query_one("#status_text")
         spans = list(getattr(label.render(), "spans", []))
-        return painted.values, log.since(mark), raised, spans
+        shown = list(app.log_lines) + _log_widgets(app)
+        return painted.values, log.since(mark), raised, spans, shown
 
-    values, added, raised, spans = _run(tmp_path / "app", scenario)
+    values, added, raised, spans, shown = _run(tmp_path / "app", scenario)
     progress = [v for v in values if _is_progress(v)]
     assert progress, values
     first = progress[0]
@@ -1086,11 +1098,13 @@ def test_tc_b100_50_names_paint_literally_through_load_from_path(
     elif arm == "bidi override":
         assert raised is None, raised
         assert first == _line(FRAMES[0], "Loading fwgpj.s19", 1, 3, "Copy into the work area"), first
-        # E4 integration: LLR-176.1r / A12-24 bound the PROGRESS line. The
-        # file-state line (`Loaded <name> (S19 only)`) and the outcome
-        # `Loaded <name>` keep their base text (Q-3, `safe_text` only), so
-        # they are not part of this arm (observation O-12a-1).
         assert all("‮" not in v for v in progress), [ascii(v) for v in progress]
+        # SE5-12a-2 (O-12a-1): the outcome names the file as the progress
+        # line did (``painted_names``, as A12a-03 does for the A2L). The
+        # file-state line ``Loaded <name> (S19 only)`` keeps its base text
+        # (BACKLOG-CODE), so it is not part of this arm.
+        outcome = [m for m in added if m.startswith("Loaded ") and "(" not in m]
+        assert outcome == ["Loaded fwgpj.s19"], [ascii(m) for m in added]
     elif arm == "130 characters":
         label = LINE_RE.match(first).group(2)
         assert label == "Loading " + "n" * 119 + "…", label
@@ -1099,7 +1113,49 @@ def test_tc_b100_50_names_paint_literally_through_load_from_path(
         assert all("\x1b" not in v and "\x07" not in v for v in values), [ascii(v) for v in values]
         outcome = [m for m in added if m.startswith("Loaded ") and "(" not in m]
         assert outcome, added
-        assert all("\x1b" not in m and "\x07" not in m for m in added), [ascii(m) for m in added]
+        # SE5-12a-1: the status log as stored and as painted, not only the
+        # ``set_status`` calls — the coexistence line is appended directly.
+        assert [line for line in shown if CONTROL.search(line)] == [], [ascii(x) for x in shown]
+
+
+def test_tc_b100_50_control_bytes_never_reach_the_status_log(
+    tmp_path: Path, tmp_path_factory: pytest.TempPathFactory, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-176.1r / S12a-02 (SE5-12a-1), the arm that runs on Windows: the
+    file-load install appends its coexistence line straight to the status
+    log. With the formatter returning what a POSIX name ``a`` + ESC +
+    ``]0;x`` + BEL + ``.s19`` gives (NTFS refuses that name), no ESC, BEL or
+    other C0/C1 code point is stored in ``app.log_lines`` or painted in
+    ``#log_line_1..4``, and the line itself still arrives (scrubbed). A
+    direct ``_append_log_line`` with a C1 CSI and a NUL is scrubbed too.
+
+    Why: ``#log_line_*`` are ``markup=False`` Labels and Textual drops only
+    BEL/BS/VT/FF/CR, so an ESC reaches the terminal (title change, screen
+    clear, clipboard write).
+    Negative control / RED (71376a3): the raw ``\\x1b`` is stored and painted
+    on the third log row (rev12a-security/probe_esc_log.py arm B)."""
+    src = tmp_path_factory.mktemp("esc")
+    good = src / "good.s19"
+    good.write_bytes((CASE01 / "firmware.s19").read_bytes())
+    monkeypatch.setattr(
+        S19TuiApp,
+        "_format_coexistence_status",
+        lambda self, loaded, path: "Loaded a\x1b]0;x\x07.s19 (S19 only)",
+    )
+
+    async def scenario(app, pilot, log):
+        app.load_from_path(good)
+        await _drain(app, pilot)
+        after_load = list(app.log_lines) + _log_widgets(app) + [_status(app)]
+        app._append_log_line("direct \x9b2J\x00 line")
+        await _settle(pilot, 2)
+        return after_load, list(app.log_lines), _log_widgets(app)
+
+    after_load, lines, widgets = _run(tmp_path / "app", scenario)
+    assert "Loaded a]0;x.s19 (S19 only)" in after_load, [ascii(x) for x in after_load]
+    assert [x for x in after_load if CONTROL.search(x)] == [], [ascii(x) for x in after_load]
+    assert lines[-1] == "direct 2J line", [ascii(x) for x in lines]
+    assert [x for x in lines + widgets if CONTROL.search(x)] == [], [ascii(x) for x in lines + widgets]
 
 
 def _class_methods(tree: ast.Module, cls: str = "S19TuiApp") -> dict:

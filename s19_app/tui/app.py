@@ -13662,7 +13662,9 @@ class S19TuiApp(App):
         Summary:
             The one comparison of a name against the project list
             (LLR-172.5j, S-k): the on-disk spelling of the listed match, or
-            ``None``.
+            ``None``. An exact listed name wins over a ``normcase`` match
+            (SE5-12a-3: a case-sensitive folder can list ``Proj`` and
+            ``proj``; picking ``proj`` opens ``proj``).
 
         Args:
             name (str): The typed or picked folder name.
@@ -13677,12 +13679,11 @@ class S19TuiApp(App):
             Uses: list_projects / os.path.normcase
             Used by: _handle_load_project / _typed_load_route
         """
+        listed = self.list_projects()
+        if name in listed:
+            return name
         return next(
-            (
-                entry
-                for entry in self.list_projects()
-                if os.path.normcase(entry) == os.path.normcase(name)
-            ),
+            (entry for entry in listed if os.path.normcase(entry) == os.path.normcase(name)),
             None,
         )
 
@@ -17698,7 +17699,7 @@ class S19TuiApp(App):
             if self.current_project:
                 self.call_from_thread(self._sync_loaded_file_to_project)
             self.call_from_thread(
-                self.end_busy, "file_load", gen, f"Loaded {path.name}"
+                self.end_busy, "file_load", gen, f"Loaded {painted_names([path.name])}"
             )
         except BaseException:
             self.call_from_thread(self._busy_fail, "file_load", gen)
@@ -19858,7 +19859,9 @@ class S19TuiApp(App):
             self._paint_status_text(self._busy.file_state)
 
     def _append_log_line(self, message: str) -> None:
-        trimmed = message.strip()
+        # SE5-12a-1: the status log is the one control-byte choke point, so a
+        # direct caller (the file-load coexistence line) cannot paint ESC/C0/C1.
+        trimmed = safe_text(message).plain.strip()
         if not trimmed:
             return
         # N2: cap width-aware so long `.s19tool/workarea/…` paths are readable at

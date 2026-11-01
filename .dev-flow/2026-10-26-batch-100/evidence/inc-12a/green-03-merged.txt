@@ -1,0 +1,320 @@
+# green-03-merged: tree 71376a3 (b100-inc12a + b100-inc11 7ac9674)
+s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc12a\s19_app\__init__.py
+.........................................s.............................. [ 28%]
+........................................................................ [ 56%]
+........................................................................ [ 84%]
+.....................FF..................                                [100%]
+================================== FAILURES ===================================
+_ test_tc_b100_65_a_load_landing_under_the_dialog_rebuilds_the_session[same_ranges] _
+tests\test_b100_save_dialog.py:3793: in scenario
+    await sd.wait_for(
+tests\support\b100_save_dialog.py:128: in wait_for
+    raise AssertionError(f"timed out waiting for {description}")
+E   AssertionError: timed out waiting for the load of other.s19 under the dialog
+
+During handling of the above exception, another exception occurred:
+tests\test_b100_save_dialog.py:3819: in test_tc_b100_65_a_load_landing_under_the_dialog_rebuilds_the_session
+    out = _run(base, scenario, size=(220, 60))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_b100_save_dialog.py:141: in _run
+    return sd.run(base, scenario, size=size, notifications=notifications)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\support\b100_save_dialog.py:311: in run
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\support\b100_save_dialog.py:307: in _drive
+    async with app.run_test(size=size, notifications=notifications) as pilot:
+..\..\anaconda3\envs\s19env\Lib\contextlib.py:231: in __aexit__
+    await self.gen.athrow(typ, value, traceback)
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: in run_test
+    raise self._exception
+E   textual.worker.WorkerFailed: Worker raised exception: TypeError("S19TuiApp._start_load_worker() missing 1 required keyword-only argument: 'gen'")
+---------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────
+│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:370 
+│ in _run                                                                      
+│                                                                              
+│   367 │   │   │   self.state = WorkerState.RUNNING                           
+│   368 │   │   │   app.log.worker(self)                                       
+│   369 │   │   │   try:                                                       
+│ ❱ 370 │   │   │   │   self._result = await self.run()                        
+│   371 │   │   │   except asyncio.CancelledError as error:                    
+│   372 │   │   │   │   self.state = WorkerState.CANCELLED                     
+│   373 │   │   │   │   self._error = error                                    
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │           app = S19TuiApp(                                               │ 
+│ │                 │   title='Hex Edit Tool',                               │ 
+│ │                 │   classes={'-dark-mode'},                              │ 
+│ │                 │   pseudo_classes={'focus', 'dark'}                     │ 
+│ │                 )                                                        │ 
+│ │         error = TypeError("S19TuiApp._start_load_worker() missing 1      │ 
+│ │                 required keyword-only argument: 'gen'")                  │ 
+│ │          self = <Worker                                                  │ 
+│ │                 │   ERROR                                                │ 
+│ │                 │   name='_start_load_worker'                            │ 
+│ │                 │   group='load'                                         │ 
+│ │                 │                                                        │ 
+│ │                 description="_start_load_worker(WindowsPath('C:/Users/j… │ 
+│ │                 >                                                        │ 
+│ │ worker_failed = WorkerFailed('Worker raised exception:                   │ 
+│ │                 TypeError("S19TuiApp._start_load_worker() missing 1      │ 
+│ │                 required keyword-only argument: \'gen\'")')              │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:354 
+│ in run                                                                       
+│                                                                              
+│   351 │   │   Returns:                                                       
+│   352 │   │   │   Return value of the work.                                  
+│   353 │   │   """                                                            
+│ ❱ 354 │   │   return await (                                                 
+│   355 │   │   │   self._run_threaded() if self._thread_worker else self._run 
+│   356 │   │   )                                                              
+│   357                                                                        
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ self = <Worker                                                           │ 
+│ │        │   ERROR                                                         │ 
+│ │        │   name='_start_load_worker'                                     │ 
+│ │        │   group='load'                                                  │ 
+│ │        │                                                                 │ 
+│ │        description="_start_load_worker(WindowsPath('C:/Users/jjgh8/AppD… │ 
+│ │        >                                                                 │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:326 
+│ in _run_threaded                                                             
+│                                                                              
+│   323 │   │                                                                  
+│   324 │   │   loop = asyncio.get_running_loop()                              
+│   325 │   │   assert loop is not None                                        
+│ ❱ 326 │   │   return await loop.run_in_executor(None, runner, self._work)    
+│   327 │                                                                      
+│   328 │   async def _run_async(self) -> ResultType:                          
+│   329 │   │   """Run an async worker.                                        
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ loop = <ProactorEventLoop running=True closed=False debug=False>         │ 
+│ │ self = <Worker                                                           │ 
+│ │        │   ERROR                                                         │ 
+│ │        │   name='_start_load_worker'                                     │ 
+│ │        │   group='load'                                                  │ 
+│ │        │                                                                 │ 
+│ │        description="_start_load_worker(WindowsPath('C:/Users/jjgh8/AppD… │ 
+│ │        >                                                                 │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\concurrent\futures\thread.py:58 in  
+│ run                                                                          
+│                                                                              
+│    55 │   │   │   return                                                     
+│    56 │   │                                                                  
+│    57 │   │   try:                                                           
+│ ❱  58 │   │   │   result = self.fn(*self.args, **self.kwargs)                
+│    59 │   │   except BaseException as exc:                                   
+│    60 │   │   │   self.future.set_exception(exc)                             
+│    61 │   │   │   # Break a reference cycle with the exception 'exc'         
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │  exc = TypeError("S19TuiApp._start_load_worker() missing 1 required      │ 
+│ │        keyword-only argument: 'gen'")                                    │ 
+│ │ self = <concurrent.futures.thread._WorkItem object at                    │ 
+│ │        0x0000020D9948EC50>                                               │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:309 
+│ in run_callable                                                              
+│                                                                              
+│   306 │   │   def run_callable(work: Callable[[], ResultType]) -> ResultType 
+│   307 │   │   │   """Set the active worker, and call the callable."""        
+│   308 │   │   │   active_worker.set(self)                                    
+│ ❱ 309 │   │   │   return work()                                              
+│   310 │   │                                                                  
+│   311 │   │   if (                                                           
+│   312 │   │   │   inspect.iscoroutinefunction(self._work)                    
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ self = <Worker                                                           │ 
+│ │        │   ERROR                                                         │ 
+│ │        │   name='_start_load_worker'                                     │ 
+│ │        │   group='load'                                                  │ 
+│ │        │                                                                 │ 
+│ │        description="_start_load_worker(WindowsPath('C:/Users/jjgh8/AppD… │ 
+│ │        >                                                                 │ 
+│ │ work = functools.partial(<function S19TuiApp._start_load_worker at       │ 
+│ │        0x0000020D997F1EE0>, S19TuiApp(title='Hex Edit Tool',             │ 
+│ │        classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}),        │ 
+│ │        WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-j… │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+╰──────────────────────────────────────────────────────────────────────────────
+TypeError: S19TuiApp._start_load_worker() missing 1 required keyword-only 
+argument: 'gen'
+_ test_tc_b100_65_a_load_landing_under_the_dialog_rebuilds_the_session[other_ranges] _
+tests\test_b100_save_dialog.py:3793: in scenario
+    await sd.wait_for(
+tests\support\b100_save_dialog.py:128: in wait_for
+    raise AssertionError(f"timed out waiting for {description}")
+E   AssertionError: timed out waiting for the load of other.s19 under the dialog
+
+During handling of the above exception, another exception occurred:
+tests\test_b100_save_dialog.py:3819: in test_tc_b100_65_a_load_landing_under_the_dialog_rebuilds_the_session
+    out = _run(base, scenario, size=(220, 60))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_b100_save_dialog.py:141: in _run
+    return sd.run(base, scenario, size=size, notifications=notifications)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\support\b100_save_dialog.py:311: in run
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\support\b100_save_dialog.py:307: in _drive
+    async with app.run_test(size=size, notifications=notifications) as pilot:
+..\..\anaconda3\envs\s19env\Lib\contextlib.py:231: in __aexit__
+    await self.gen.athrow(typ, value, traceback)
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: in run_test
+    raise self._exception
+E   textual.worker.WorkerFailed: Worker raised exception: TypeError("S19TuiApp._start_load_worker() missing 1 required keyword-only argument: 'gen'")
+---------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────
+│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:370 
+│ in _run                                                                      
+│                                                                              
+│   367 │   │   │   self.state = WorkerState.RUNNING                           
+│   368 │   │   │   app.log.worker(self)                                       
+│   369 │   │   │   try:                                                       
+│ ❱ 370 │   │   │   │   self._result = await self.run()                        
+│   371 │   │   │   except asyncio.CancelledError as error:                    
+│   372 │   │   │   │   self.state = WorkerState.CANCELLED                     
+│   373 │   │   │   │   self._error = error                                    
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │           app = S19TuiApp(                                               │ 
+│ │                 │   title='Hex Edit Tool',                               │ 
+│ │                 │   classes={'-dark-mode'},                              │ 
+│ │                 │   pseudo_classes={'focus', 'dark'}                     │ 
+│ │                 )                                                        │ 
+│ │         error = TypeError("S19TuiApp._start_load_worker() missing 1      │ 
+│ │                 required keyword-only argument: 'gen'")                  │ 
+│ │          self = <Worker                                                  │ 
+│ │                 │   ERROR                                                │ 
+│ │                 │   name='_start_load_worker'                            │ 
+│ │                 │   group='load'                                         │ 
+│ │                 │                                                        │ 
+│ │                 description="_start_load_worker(WindowsPath('C:/Users/j… │ 
+│ │                 >                                                        │ 
+│ │ worker_failed = WorkerFailed('Worker raised exception:                   │ 
+│ │                 TypeError("S19TuiApp._start_load_worker() missing 1      │ 
+│ │                 required keyword-only argument: \'gen\'")')              │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:354 
+│ in run                                                                       
+│                                                                              
+│   351 │   │   Returns:                                                       
+│   352 │   │   │   Return value of the work.                                  
+│   353 │   │   """                                                            
+│ ❱ 354 │   │   return await (                                                 
+│   355 │   │   │   self._run_threaded() if self._thread_worker else self._run 
+│   356 │   │   )                                                              
+│   357                                                                        
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ self = <Worker                                                           │ 
+│ │        │   ERROR                                                         │ 
+│ │        │   name='_start_load_worker'                                     │ 
+│ │        │   group='load'                                                  │ 
+│ │        │                                                                 │ 
+│ │        description="_start_load_worker(WindowsPath('C:/Users/jjgh8/AppD… │ 
+│ │        >                                                                 │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:326 
+│ in _run_threaded                                                             
+│                                                                              
+│   323 │   │                                                                  
+│   324 │   │   loop = asyncio.get_running_loop()                              
+│   325 │   │   assert loop is not None                                        
+│ ❱ 326 │   │   return await loop.run_in_executor(None, runner, self._work)    
+│   327 │                                                                      
+│   328 │   async def _run_async(self) -> ResultType:                          
+│   329 │   │   """Run an async worker.                                        
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ loop = <ProactorEventLoop running=True closed=False debug=False>         │ 
+│ │ self = <Worker                                                           │ 
+│ │        │   ERROR                                                         │ 
+│ │        │   name='_start_load_worker'                                     │ 
+│ │        │   group='load'                                                  │ 
+│ │        │                                                                 │ 
+│ │        description="_start_load_worker(WindowsPath('C:/Users/jjgh8/AppD… │ 
+│ │        >                                                                 │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\concurrent\futures\thread.py:58 in  
+│ run                                                                          
+│                                                                              
+│    55 │   │   │   return                                                     
+│    56 │   │                                                                  
+│    57 │   │   try:                                                           
+│ ❱  58 │   │   │   result = self.fn(*self.args, **self.kwargs)                
+│    59 │   │   except BaseException as exc:                                   
+│    60 │   │   │   self.future.set_exception(exc)                             
+│    61 │   │   │   # Break a reference cycle with the exception 'exc'         
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │  exc = TypeError("S19TuiApp._start_load_worker() missing 1 required      │ 
+│ │        keyword-only argument: 'gen'")                                    │ 
+│ │ self = <concurrent.futures.thread._WorkItem object at                    │ 
+│ │        0x0000020D99D17490>                                               │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:309 
+│ in run_callable                                                              
+│                                                                              
+│   306 │   │   def run_callable(work: Callable[[], ResultType]) -> ResultType 
+│   307 │   │   │   """Set the active worker, and call the callable."""        
+│   308 │   │   │   active_worker.set(self)                                    
+│ ❱ 309 │   │   │   return work()                                              
+│   310 │   │                                                                  
+│   311 │   │   if (                                                           
+│   312 │   │   │   inspect.iscoroutinefunction(self._work)                    
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ self = <Worker                                                           │ 
+│ │        │   ERROR                                                         │ 
+│ │        │   name='_start_load_worker'                                     │ 
+│ │        │   group='load'                                                  │ 
+│ │        │                                                                 │ 
+│ │        description="_start_load_worker(WindowsPath('C:/Users/jjgh8/AppD… │ 
+│ │        >                                                                 │ 
+│ │ work = functools.partial(<function S19TuiApp._start_load_worker at       │ 
+│ │        0x0000020D997F1EE0>, S19TuiApp(title='Hex Edit Tool',             │ 
+│ │        classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}),        │ 
+│ │        WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-j… │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+╰──────────────────────────────────────────────────────────────────────────────
+TypeError: S19TuiApp._start_load_worker() missing 1 required keyword-only 
+argument: 'gen'
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_a_load_landing_under_the_dialog_rebuilds_the_session[same_ranges]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_a_load_landing_under_the_dialog_rebuilds_the_session[other_ranges]
+2 failed, 254 passed, 1 skipped in 1958.49s (0:32:38)
+exit=1

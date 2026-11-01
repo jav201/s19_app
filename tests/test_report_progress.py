@@ -46,13 +46,15 @@ async def _load_project(app: S19TuiApp, pilot) -> None:
 # AC-2 / AC-3 — a real report drives the bar to 100
 # ---------------------------------------------------------------------------
 
-def test_report_generation_drives_progress_bar_to_100(tmp_path: Path, monkeypatch) -> None:
+def test_report_generation_drives_progress_bar_then_clears_it(tmp_path: Path, monkeypatch) -> None:
     """Inc 12a re-pin (census A1; LLR-176.1k, A12-53 / A12-77): a real
     report still DRIVES the bar — it moves off 0 while the report runs (the
     ``Write the report`` step, 50) — and the end now CLEARS it: progress 0
     of 100 and the report named on the last status-log line. The old pin
-    (the bar left at 100) encoded the stale-100 defect HLR-176c removes; the
-    test id is kept for traceability."""
+    (the bar left at 100) encoded the stale-100 defect HLR-176c removes.
+
+    History: named ``test_report_generation_drives_progress_bar_to_100``
+    until Inc 12a E5 (CR12a-3); TC-644 is re-bound to this name."""
     seen: list = []
     original = S19TuiApp.set_progress
 
@@ -152,11 +154,14 @@ def test_kickoff_sets_bar_in_progress_before_worker(tmp_path: Path) -> None:
 # AC-3 (unit) — _finish_generate_report completes the bar
 # ---------------------------------------------------------------------------
 
-def test_finish_generate_report_completes_bar(tmp_path: Path) -> None:
+def test_finish_generate_report_clears_bar(tmp_path: Path) -> None:
     """Inc 12a re-pin (census A3; A12-77, interfaces S-m / Q-1): the finish
     handler now ends the report run whose generation it is given — a run is
     begun first (as the kickoff does), the bar set mid-way, and the finish
-    clears the bar (LLR-176.1k) and names the report on the last log line."""
+    clears the bar (LLR-176.1k) and names the report on the last log line.
+
+    History: named ``test_finish_generate_report_completes_bar`` until
+    Inc 12a E5 (CR12a-3); TC-644 is re-bound to this name."""
 
     async def _drive() -> tuple:
         app = S19TuiApp(base_dir=tmp_path)

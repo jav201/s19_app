@@ -3534,6 +3534,57 @@ def test_tc_b100_38_one_project_match_returns_the_listed_spelling(
     assert raised == "PermissionError", raised
 
 
+def test_tc_b100_38_one_project_match_prefers_the_exact_listed_name(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-172.5j (SE5-12a-3): with ``Proj`` and ``proj`` both listed (a
+    case-sensitive folder), ``_listed_project_name`` maps ``proj`` → ``proj``
+    and ``Proj`` → ``Proj``; ``PROJ`` → the first ``normcase`` match
+    ``Proj`` on Windows, ``None`` elsewhere.
+
+    Why: the picked row carries the exact on-disk name; the first
+    case-insensitive hit would open a different project from the one picked.
+    The listing is injected so the arm runs on a case-insensitive volume.
+    RED (71376a3, Windows): ``proj`` → ``Proj``."""
+    base = tmp_path / "app"
+
+    async def _scenario(app, pilot, log):
+        monkeypatch.setattr(app, "list_projects", lambda: ["Proj", "proj"])
+        return {text: app._listed_project_name(text) for text in ("proj", "Proj", "PROJ")}
+
+    out = projects.run_app(base, _scenario)
+    assert out == {"proj": "proj", "Proj": "Proj", "PROJ": "Proj" if WIN else None}, out
+
+
+def test_tc_b100_38_picking_proj_loads_proj_when_proj_differs_by_case(tmp_path: Path) -> None:
+    """LLR-172.5j (SE5-12a-3), on disk: folders ``Proj`` and ``proj`` both
+    hold a data file; picking ``proj`` → ``current_project == "proj"``.
+
+    Skipped (reported not run) when the volume is case-insensitive and
+    cannot hold both folders — the default on NTFS.
+    RED (71376a3, a case-sensitive Windows folder): ``Proj`` is loaded."""
+    base = tmp_path / "app"
+    workarea = _workarea(base)
+    upper = workarea / "Proj"
+    upper.mkdir(parents=True)
+    lower = workarea / "proj"
+    try:
+        lower.mkdir()
+    except FileExistsError:
+        pytest.skip("the volume is case-insensitive: Proj and proj cannot both exist (not run)")
+    if os.path.samefile(upper, lower):
+        pytest.skip("the volume is case-insensitive: Proj and proj are one folder (not run)")
+    for folder in (upper, lower):
+        (folder / "firmware.s19").write_bytes((projects.CASE01_DIR / "firmware.s19").read_bytes())
+
+    async def _scenario(app, pilot, log):
+        messages = await _project_load(pilot, app, log, "proj")
+        return messages, app.current_project
+
+    messages, project = projects.run_app(base, _scenario)
+    assert project == "proj", (project, messages)
+
+
 def _literal_texts(function) -> list:
     """Every ``str`` literal text in ``function`` (docstring excluded); an
     f-string reads with its placeholders written ``{}``."""
