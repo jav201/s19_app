@@ -2318,9 +2318,6 @@ def test_at_b100_17_worker_load_of_an_8_mib_s19_by_keys(tmp_path: Path) -> None:
 # inc-12b E1 draft §C.2; codewire/proto-12b-load-save P1-13, P1-17, P1-18,
 # P1-57, P1-61, X-13; codewire/proto-12b-a2l-refusal C12b-40, C12b-43,
 # C12b-52, X12b-14. The implementation was never read.
-# ====================================================================
-
-
 # ===========================================================================
 
 
@@ -2578,7 +2575,6 @@ def test_tc_b100_51_twelve_b_seam_sites_sit_in_the_workers_and_handlers() -> Non
         if node is None or (event, key, step) not in _seam_events(node):
             missing.append((function, event, key, step))
     assert missing == [], missing
-=======
 # Inc 12a E5 corrective, round 2 — arms that kill the surviving mutants
 # (evidence/inc-12a/mutation-summary.md; ids MUT12a-M-NN in E5-rulings.md)
 # ===========================================================================
