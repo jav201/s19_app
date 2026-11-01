@@ -161,6 +161,8 @@ Orchestrator-owned captures, real Windows Terminal: scenario `ld-dialog` (key `p
 | 19:23 | — | E5 | 1 x Opus (reviews + corrective) + 1 x DeepSeek v4 Pro (mutants) | code-review PWN (1 MAJOR test-only), security PWN (0 MAJOR); 70/96 → 91 killed + 5 equivalent; no re-review (nothing blocking) |
 | 19:33 | — | E13 | 1 x DeepSeek v4 Pro | `ld-dialog` 3 PNGs, failures=0, OBS-9b-1; close records start |
 
+Note (corrected at close): times in this log are local (UTC−6), not UTC; see 05-postmortem.md Record corrections.
+
 First step start to the last logged step: 13:41:04Z to 19:33Z = about 5 h 52 min wall. Raw facts for the operator's comparison: **E3 (design, no code) caught 6 MAJOR in round 1 (A9b-01 … A9b-06), 2 MAJOR in round 1 (S9b-1, S9b-2), 1 new MAJOR in round 2 (A9b-R2-1), 0 in round 3; E5 (code) caught 0 HIGH and 1 MAJOR (CR9b-01, test-only); 1 corrective pass; 0 full-census launches.** The conclusion stays with the operator.
 
 ### Evidence files — bytes at a declared home, verbatim, hash-verified (C-59)

@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Batch | `2026-10-26-batch-100` |
-| Increment | `015` — hotfix "3b" of Increment 003, out of sequence: numbered after the 14 planned units so no planned packet number moves; delivered between Increments 004 and 005 |
+| Increment | `015` — hotfix "3b" of Increment 003, out of sequence: numbered after the 14 planned units so no planned packet number moves; delivered between Increments 004 and 005 (corrected at close: 8b took 016, so 9a–12b moved to 017–022) |
 | Lane | `main` · `s19_app/tui/app.py`, `s19_app/tui/screens_directionb.py` (2 SOURCE files) |
 | Requirement(s) | `LLR-165.1 · LLR-165.3` · LED-2026-10-26-batch-100.55 (b) (outcome unchanged) · LED-2026-10-26-batch-100.60 (this hotfix) |
 | Acceptance | `AT-B100-03` (re-run) · white-box `TC-B100-10` (new arm) · regression pins: batch-97 `AT-B97-14[patch]`, `AT-B97-15` ×2, `AT-B97-16`, `AT-B97-24` |

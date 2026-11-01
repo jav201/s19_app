@@ -152,6 +152,8 @@ Orchestrator-owned captures, real Windows Terminal: scenario `lq-question` (seed
 | 20:52 | — | E5 | 1 x Opus (reviews + corrective) + 1 x DeepSeek v4 Pro (mutants) | code-review PWN (1 MINOR), security PWN (1 MINOR, same defect); 69/83 → 82 killed + 1 equivalent; no re-review (nothing blocking) |
 | 21:11 | — | E13 | 1 x DeepSeek v4 Pro | `lq-question` 3 PNGs, failures=0, no OBS; close records start |
 
+Note (corrected at close): times in this log are local (UTC−6), not UTC; see 05-postmortem.md Record corrections.
+
 First step start to the last logged step: 14:32Z to 21:11Z = about 6 h 39 min wall. Raw facts for the operator's comparison: **E3 (design, no code) caught 3 MAJOR in round 1 (A10-01, S10-01, S10-02) and 0 in round 2; E5 (code) caught 0 HIGH and 1 MINOR (CR10-01 = SEC10-01, found independently by both reviewers); 1 corrective pass; 0 full-census launches.** The conclusion stays with the operator.
 
 ### Evidence files — bytes at a declared home, verbatim, hash-verified (C-59)

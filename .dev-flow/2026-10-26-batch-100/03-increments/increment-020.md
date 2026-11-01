@@ -155,6 +155,8 @@ Orchestrator-owned captures, real Windows Terminal: scenario `sd-dialog` (loads 
 | 23:20 | 00:31 | E5 | 1 x DeepSeek v4 Pro (mutants, 35 min) + 1 x Opus (code + security reviews, then corrective) | reviews FAIL (1 MAJOR + 1 HIGH); 80 mutants 62/18/0; corrective pass done; green-05 68 passed |
 | 00:35 | 00:40 | E5 round 2 + E13 | 1 x Opus (round-2 re-reviews) + 1 x DeepSeek v4 Pro (E13) | code PASS, security PASS-WITH-NOTES (SE5-11-3 MINOR); `sd-dialog` 3 PNGs, failures=0 |
 
+Note (corrected at close): times in this log are local (UTC−6), not UTC; see 05-postmortem.md Record corrections.
+
 First step start to the last logged step: 14:32Z to 00:40Z = about 10 h 8 min wall. Raw facts for the operator's comparison: **E3 (design, no code) caught 7 MAJOR in round 1 (A11-*, S11-01/S11-02) and 3 new MAJOR in round 2; E5 (code) caught 1 HIGH (SE5-11-1) and 1 MAJOR (CR11-F1); 1 corrective pass; 0 full-census launches.** The conclusion stays with the operator.
 
 ### Evidence files — bytes at a declared home, verbatim, hash-verified (C-59)

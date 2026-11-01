@@ -14,6 +14,7 @@
 | Requirement(s) | `HLR-164 / LLR-164.1–164.4` |
 | Acceptance | `AT-B100-02` · white-box `TC-B100-04 · TC-B100-05 · TC-B100-06 · TC-B100-07` · A-09 guard `test_save_second_s19_into_project_appends_variant` (unchanged, green) |
 | Agent | `software-dev` |
+| Implementer | Kimi (corrected at close) |
 | Date | `2026-10-26` |
 
 ---

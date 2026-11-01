@@ -1,3 +1,4 @@
+Note (corrected at close): times in this log are local (UTC−6), not UTC; see 05-postmortem.md Record corrections.
 # <UTC start> <UTC end> <step> <agents> <outcome>
 2026-10-31T07:42:48Z - setup worktree b100-inc9a + base9a at 4fef292 (orchestrator)
 2026-10-31T07:43:34Z - E1 start (1xOpus) || E2-baseline start (1xOpus)

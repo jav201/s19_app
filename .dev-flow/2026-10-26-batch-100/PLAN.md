@@ -21,7 +21,7 @@ orchestrator presents the full plan in-conversation at each phase gate.
 | Project | s19_app |
 | Batch | 2026-10-26-batch-100 |
 | Objective | The Load + projects batch: one Load dialog that offers what is already loaded and opens projects, and a project that restores what was saved or says what it could not. Scope: the project round-trip findings of INVESTIGATION-project-roundtrip-2026-10-23 still open (PH-1 Save project drops a pending patch, PH-2 load over a project leaks its A2L/MAC/patches, PH-4 save-back opens the unpatched original, PH-5 manifest problems ignored; M-1..M-7, L-2..L-4), the Load dialog requests (a picker of work-area files and recent sources, Load opens projects, Enter-to-load D10), the G-005 save naming (byte-identical reuse, tests re-pinned), the Code-Wire UI items CW-U-2, CW-U-5, CW-U-12, CW-U-13, the reserved project name, and the progress indicator for long actions (N5 reopened). UI changes go through a prototype round with the operator's verdict before implementation. |
-| Last updated | P3 · 2026-10-29 |
+| Last updated | P5 · 2026-11-01 |
 | Standing authorization | Asked at the kickoff, 2026-10-26; the operator chose, quoted from the answers: autonomy "Igual que b99" (autonomous with exceptions: stop on a HIGH finding or an operator decision; the orchestrator plans and Kimi K2.8 implements in an isolated worktree; commit and push to main at each close; max 4 source files per increment; the prototype round waits for the operator's verdict before implementation); merge "Push directo a main" (each increment lands on main after independent review, no PR); G-005 "Reusar + re-pinear tests"; the 13 local `b99-*` branches "Borrarlas" (done, after checking their content is on main). Carried batch rules from the operator's standing instructions: chat in Spanish, records in English; no operator name in the repo; region extraction described only as memory-region extraction; do not commit `prototypes/`. Every decision the orchestrator takes instead of asking is recorded in this plan's decision log, `state.json.decisions_log` and the post-mortem, and reaches the vault at sync. |
 | First gate | `devflow-validate.py --brief .` at P0 open → exit 0, `0 block · 609 notice · 43 not applicable`; `V7` reports the bundle identical to its manifest at `2026-10-12-rev102`. |
 | Premises / RC-1 | RC-1 (a): `git fetch origin`; `origin/main` = `HEAD` = merge-base = `1d677ba39d2c6aaf09f1ca7e623197065f0b8958`, so `base_ref` is that commit. RC-2: `git ls-remote --exit-code --heads origin main` answered `1d677ba…`. RC-1 (b): every finding in scope is re-executed at `1d677ba` before it becomes a story (`evidence/p0-premises/`), because batch-99 closed some neighbours (PH-3, L-1, CW-U-1, CW-U-3). |
@@ -35,7 +35,7 @@ The trigger evaluation `state.json`'s `triggers.record` points at: one row per t
 | A1 | not fired | judged — the Load picker, the confirmations and the progress indicator are planned as screens/widgets inside the existing `screens.py` / `app.py`; no module is created and no boundary moves. Re-evaluated at ARQ if the recent-sources store needs a module |
 | A2 | fired | judged — the increments touch `app.py`, `workspace.py`, `screens.py`, `services/change_service.py`, `services/manifest_writer.py`, `services/variant_execution_service.py`: ≥2 modules |
 | A3 | fired | probe `grep -rln "project.json\|read_project_manifest" s19_app` → `app.py`, `screens.py`, `flow_persistence_service.py`, `manifest_writer.py`, `report_addendum.py`, `report_service.py`, `variant_execution_service.py`. D3 (per-file digests), D2 (active variant after save-back) and D4 (active document) add `project.json` keys that these readers consume |
-| A4 | not fired | judged — increments are planned sequential, one worktree each, merged in order (batch-99 lesson: parallel lanes conflicted on the test-id registry) |
+| A4 | fired | judged — increments were planned sequential, one worktree each, but from Inc 10 on the worktrees were stacked on sibling branches that had not merged yet (`b100-inc10` branched from `741cc07` and merged the corrected 9b `1747479`; `b100-inc11` branched from `1747479`; `b100-inc12a` merged `b100-inc11` `71376a3`; `b100-inc12b` merged `b100-inc12a` `e3b8ec2`). The batch-99 lesson repeated: conflicts on the `test_id_registry` bound (`051f586`) and on `test_b100_busy.py` (union fix `ef0cdb8`), plus the semantic merge defect MERGE-12a-1 |
 | B1 | fired | probe `grep -rl "LoadFileScreen\|SaveProjectScreen\|LoadProjectScreen\|copy_into_workarea\|_handle_load_project\|_handle_save_dialog" tests` → 116 files; G-005 re-pins `test_unified_write::test_tc018…` and `test_tui_patch_editor_v2::test_at031b…`, owned by older batches |
 | B2 | not fired | judged — no file changes location; D7 narrows where a project may be saved, it moves nothing |
 | B3 | not fired | probe `grep -rl <source> tests/goldens` for `workspace.py`, `manifest_writer`, `variant_execution_service`, `screens.py`, `app.py`, `change_service` → 0 files each (snapshot SVG cells are named in B1/D1, not goldens) |
@@ -45,7 +45,7 @@ The trigger evaluation `state.json`'s `triggers.record` points at: one row per t
 | C8 | fired | judged — file and project names from disk are rendered in Textual widgets (markup injection in the picker and the result notice) |
 | D1 | fired | judged — the Load dialog, Save project dialog, confirmations, focus and progress change what the user sees and touches |
 | D2 | not fired | judged — the prototype round runs in the real Textual app (copy of the tree), the target technology |
-| E1 | fired | judged — 12 planned increments |
+| E1 | fired | judged — 16 increments shipped (15 planned + hotfix 3b): 1–7, hotfix 3b, 8a, 8b, 9a, 9b, 10, 11, 12a, 12b |
 | E2 | fired | judged — the defects lose or contaminate saved work silently (PH-1, PH-2, PH-4, PH-5) |
 | E3 | not fired | judged — internal tool, not a client deliverable |
 | F1 | not fired | `V7`: bundle identical to its manifest at `2026-10-12-rev102` |
@@ -53,14 +53,7 @@ The trigger evaluation `state.json`'s `triggers.record` points at: one row per t
 
 ## Where we are
 
-ARQ (2026-10-26). P0 closed on the operator's verdict (`design/veredicto-b100.json`). D1–D7 all took the recommended option. The D2 note, "the switch to the latest saved image must be announced", became prototype surface P-E.
-
-ARQ (`design/ARQ-batch-100.md`, the batch-100 rows in `docs/architecture.md`) is approved with conditions:
-- Increments 8, 9 and 12 are split, which gives 15 increments, run sequentially.
-- P-E is in the round.
-- The orchestrator ruled on O-1..O-11 (ARQ §10.1).
-
-The prototype round (P-A..P-E) is being built in `prototypes/load_projects/`, which is not committed. Owed next: P1 requirements. The UI stories stay REFINE until the round's verdict.
+All increments (1–7, 8a, 8b, 9a, 9b, 10, 11, 12a, 12b) are merged on `main`; the batch-end battery and fix rounds 1–2 are merged (`66d1ea9` / `570b4b5`). The batch is now at P4/P5/P6 close.
 
 ## Objective
 
@@ -75,12 +68,12 @@ A project restores exactly what was saved, or names what it could not. Load offe
 | P1 | done | `01-requirements.md` (3060d66): US-153..168, HLR-163..178, 58 LLR, 56 TC, 19 AT; Q-1..Q-7 ruled (decisions_log) |
 | P2 | done | approved after a bounded round 3 (02-review.md); 0 HIGH open |
 | PDR | approved with conditions | `design/PDR-2026-10-26-batch-100.md`; a2l.py named crossing (operator) |
-| P3 | in progress | Inc 1 → Kimi K2.8 |
+| P3 | done | all 15 increments + hotfix 3b merged on `main`; batch-end battery + fix rounds 1–2 merged (`66d1ea9` / `570b4b5`). Implementers: Inc 1–4 Kimi K2.8; Inc 5–7 + hotfix 3b Claude `software-dev`; 8a–12b the design-first pipeline (each packet and steps.log names the model) |
 | Prototype round | done | verdict P-A C, P-B A, P-C B, P-D A, P-E B (`design/veredicto-load-projects.json`) |
 
 ## Roadmap + increment plan
 
-Sequential, one Kimi K2.8 worktree per increment, ≤4 SOURCE files each (ARQ §8). The hard order is ARQ §8: 1→6, 2→11, 3→8a/10, 5→10→11, 6→7→8a, 9a→9b, 12a→12b. Inc 6 and Inc 7's display wait for the P-E verdict.
+Sequential, ≤4 SOURCE files each (ARQ §8). Implementers: Inc 1–4 Kimi K2.8; Inc 5–7 + hotfix 3b Claude `software-dev`; 8a–12b the design-first pipeline (each packet and steps.log names the model). The hard order is ARQ §8: 1→6, 2→11, 3→8a/10, 5→10→11, 6→7→8a, 9a→9b, 12a→12b. Inc 6 and Inc 7's display wait for the P-E verdict.
 
 | Inc | What | Findings | Source files | Gate |
 |---|---|---|---|---|
@@ -141,4 +134,4 @@ Sequential, one Kimi K2.8 worktree per increment, ≤4 SOURCE files each (ARQ §
 
 | Suite / command | Last run | Result |
 |---|---|---|
-| <command> | <date> | <result> |
+| see 04-validation.md | see 04-validation.md | see 04-validation.md |

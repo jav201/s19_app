@@ -3,13 +3,13 @@
 | Field | Value |
 |---|---|
 | Batch | `2026-10-26-batch-100` |
-| Increment | `013` |
-| Lane | `main` · 2 SOURCE files (`app.py`, `a2l.py`), at the 4-file cap |
+| Increment | `012b` (corrected at close) |
+| Lane | `main` · 2 SOURCE files (`app.py`, `a2l.py`), of the 4-file cap (corrected at close) |
 | Requirement(s) | `HLR-177` · `HLR-177a` · `HLR-177b` · `HLR-177c` · `LLR-177.1`–`LLR-177.1k` · `LLR-177.2`–`LLR-177.2c` · `LLR-177.3`–`LLR-177.3i` · `LLR-177.4`–`LLR-177.4e` · `LLR-177.5` · `LLR-177.5a` · `LLR-176.3` · `LLR-176.4` · `LLR-176.4a` · `LLR-176.4b` · extended earlier ids `LLR-165.1` · `LLR-164.4` · `LLR-165.2` · `LLR-174.4` · `LLR-176.1l` · `LLR-176.1q` · `LLR-176.2` · `LLR-176.2c` · `LLR-176.2d` · `LLR-178.3` · `LLR-173.7` |
 | Acceptance | `AT-B100-18` (four halves: worker, refusal, quit, quit-confirm) · `AT-B100-17` (parse half) · `TC-B100-53` (LLR-177.1 … LLR-177.5a) · `TC-B100-54` (LLR-177.2 … LLR-177.2b) · `TC-B100-52` (LLR-176.3) · `TC-B100-73` (LLR-176.4/.4a/.4b) · extensions `TC-B100-07` (LLR-164.4 worker arm) · `TC-B100-08` (LLR-165.1) · `TC-B100-09` (LLR-165.2) · `TC-B100-50` (LLR-176.1l/.1q) · `TC-B100-51` (LLR-176.2/.2c/.2d) · `TC-B100-72` (LLR-174.4, LLR-177.3a) · `TC-B100-66` (LLR-173.7) — in `tests/test_b100_workers.py` (NEW, 44 functions / 52 items), `tests/test_b100_a2l_progress.py` (NEW, 8 functions / 9 items), `tests/support/b100_workers.py` (NEW), and the extended / re-pinned files below |
 | Interfaces | consumes `begin_busy` / `step_busy` / `end_busy` / `_busy_fail` / `_busy_begin_action` / `_running_session_action` / `painted_names` / `safe_text` / `parse_a2l_cached` / `write_change_document` / `_confirm_then_load` / `_handle_load_project` / `_commit_project_save` / `_start_load_worker`; adds the three 12b workers (`_project_load_worker`, `_save_project_worker`, `_a2l_attach_worker`) with their frozen request/result dataclasses and main-thread install/failure handlers, the `_refuse_if_busy` check on the 16 entry points and the 4 continuations, `action_quit` / `_answer_quit` / `_exit_if_quit_pending`, `_QuitQuestionScreen`, `_progress_forwarder`, the `parse_a2l_file` progress callback and the `show_eta=False` on `#progress_bar`; `styles.tcss` unchanged |
 | Agent | design-first experiment (`dev-flow-v3-beta` pipeline): E1 requirements · E2 baseline + prototypes (P-1 G-A/G-B, P-2 G-C/G-D) · E3 code-free design review (2 rounds: architect + security) · E4 parallel build (2 DeepSeek implementers for app.py and a2l.py + 1 Opus tester + 1 Opus integration) · E5 validation (115 mutants on DeepSeek v4 Pro via pi, code + security review on Opus, one corrective pass on Opus, then a round-2 mutant kill pass) · E13 capture. Models per stage in the step table below |
-| Date | `2026-10-31`–`2026-11-01` (E1 start 14:55Z through E5 round 2 02:14Z, all UTC) |
+| Date | `2026-10-31`–`2026-11-01` (E1 start 14:55Z through E5 round 2 08:25Z, all UTC) (corrected at close) |
 | Base | `71376a3` (Inc 12a integrated, pre-corrective); `b100-inc12b` branches from `71376a3`, merges `b100-inc12a` at `e3b8ec2` (one conflict in `test_b100_busy.py`, resolved as a union at `ef0cdb8`), then merges `main` after Inc 12a closed (`81ac4c0`). Corrective pass round 1 at `c026bd2`, mutation run at `d4d9c1a`, round 2 + R2-F1 + E13 at `ce3a305` |
 | Import proof | `s19_app.__file__` printed in every transcript header (the worktree's `s19_app/__init__.py` for GREEN/guards runs, a scratch copy's for RED/mutant runs) |
 
@@ -166,6 +166,8 @@ Orchestrator-owned captures, real Windows Terminal: scenario `qz-quit` (loads pr
 | 07:22 | 07:26 | E5 re-review | 1 x Opus (code-reviewer) | PASS-WITH-NOTES on `c026bd2` (CR12b-1 discharged; CR12b-5 NIT declared) |
 | 07:39 | 07:40 | E13 | 1 x DeepSeek v4 Pro + 1 x Opus (visual check) | `qz-quit` 3 PNGs, failures=0; OBS-12b-1 … 3 |
 | 08:15 | 08:25 | E5 round 2 | 1 x Opus (tester, tests only) + orchestrator (R2-F1 fix) | 22 killed / 7 equivalent / 1 blocked by R2-F1; R2-F1 fixed, green-08 8 passed; 046 equivalent post-fix |
+
+Note (corrected at close): times in this log are local (UTC−6), not UTC; see 05-postmortem.md Record corrections.
 
 First step start to the last logged step: 14:55Z (2026-10-31) to 08:25Z (2026-11-01) = about 17 h 30 min wall. Raw facts for the operator's comparison: **E3 (design, no code) caught 1 MAJOR in each round-1 review (A12b-01 census, S12b-01 quit-hides-failure); E5 (code) caught 1 MAJOR (SE5-12b-1) and blocked on 1 MAJOR (CR12b-1); 1 corrective pass + 1 mutant-kill round + 1 orchestrator fix (R2-F1); 0 full-census launches.** The conclusion stays with the operator.
 

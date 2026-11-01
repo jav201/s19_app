@@ -14,6 +14,7 @@
 | Requirement(s) | `HLR-166 / LLR-166.1 · LLR-166.2` |
 | Acceptance | `AT-B100-04` · white-box `TC-B100-12 · TC-B100-13` |
 | Agent | `software-dev` |
+| Implementer | Kimi (corrected at close) |
 | Date | `2026-10-27` |
 
 ---
