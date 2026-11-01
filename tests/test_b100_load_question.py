@@ -910,11 +910,17 @@ def test_tc_b100_45_modal_builds_from_its_parameters(tmp_path: Path) -> None:
     with the quit strings, the modal paints exactly ``Quit?``,
     ``A save is running.``, ``Quit (y)``, ``Stay (n)`` and 0 ``Replace``;
     ``y`` → True and ``n`` → False; the screen's ``title`` reactive is not
-    set; hostile strings paint literally with 0 markup spans.
+    set; hostile strings paint literally with 0 markup spans; the box is
+    ``#confirm_box`` holding ``#confirm_title``, ``#confirm_body`` and
+    ``#confirm_buttons`` (the fixed ids of interfaces S-g).
 
     Why: Inc 12 builds its quit question from the same modal, so nothing in
     it may be hard-coded to the load question, and a name holding ``[``
-    must never be read as markup.
+    must never be read as markup. Inc 12 and these tests address the modal
+    by its fixed ids; the box must not carry the Load dialog's
+    ``#load_dialog`` id (orchestrator ruling, interfaces "Outer id").
+    Negative control (E5, mutant M15): the box id renamed to
+    ``load_dialog`` → 0 children under ``#confirm_box`` → RED.
     Negative control: a hard-coded ``Replace (y)`` → the quit arm paints it
     → RED; a ``str`` button label → ``[b]Quit (y)`` paints as ``Quit (y)``
     with 1 span → RED. RED (base): no ``ConfirmQuestionScreen``."""
@@ -922,6 +928,7 @@ def test_tc_b100_45_modal_builds_from_its_parameters(tmp_path: Path) -> None:
     async def scenario(app, pilot, log):
         screen, answers = await _modal_alone(pilot, app, QUITQ)
         painted = [q_title(app), q_body(app)] + [label for _, label in q_buttons(app)]
+        box = [w.id for w in app.screen.query("#confirm_box > *")]
         title_reactive = screen.title
         await _answer(pilot, app, "y")
         _, answers_n = await _modal_alone(pilot, app, QUITQ)
@@ -936,10 +943,11 @@ def test_tc_b100_45_modal_builds_from_its_parameters(tmp_path: Path) -> None:
             len(app.screen.query_one("#confirm_yes", Button).label.spans),
         )
         await _answer(pilot, app, "n")
-        return painted, title_reactive, answers, answers_n, hostile
+        return painted, box, title_reactive, answers, answers_n, hostile
 
-    painted, title_reactive, answers_y, answers_n, hostile = _run(tmp_path / "app", scenario)
+    painted, box, title_reactive, answers_y, answers_n, hostile = _run(tmp_path / "app", scenario)
     assert painted == ["Quit?", "A save is running.", "Quit (y)", "Stay (n)"], painted
+    assert box == ["confirm_title", "confirm_body", "confirm_buttons"], box
     assert sum(text.count("Replace") for text in painted) == 0
     assert answers_y == [True] and answers_n == [False], (answers_y, answers_n)
     assert title_reactive != "Quit?", "the question title was written to Screen.title"
@@ -1065,13 +1073,28 @@ def test_tc_b100_45_enter_answers_with_the_focused_button(tmp_path: Path) -> Non
     ], out
 
 
-def test_tc_b100_45_click_answers_with_the_clicked_button(tmp_path: Path) -> None:
+def test_tc_b100_45_click_answers_with_the_clicked_button(tmp_path: Path, monkeypatch) -> None:
     """LLR-174.2f (Q3-1): a click on ``#confirm_yes`` → True, a click on
-    ``#confirm_no`` → False, the question closed each time (2 of 2).
+    ``#confirm_no`` → False, the question closed each time (2 of 2); the
+    app's own ``on_button_pressed`` sees 0 of the two presses.
 
-    Why: the mouse is a shipped way to answer.
+    Why: the mouse is a shipped way to answer. The app dispatches every
+    bubbled press by button id, so a press that escapes the modal could act
+    a second time behind the question.
+    Declared spy: the app class's ``on_button_pressed`` is wrapped to record
+    the ids it receives (Textual looks the handler up on the class).
     Negative control: ``Button.Pressed`` ignored → the click leaves the
-    question open → RED. RED (base): no ``ConfirmQuestionScreen``."""
+    question open → RED; ``event.stop()`` removed (E5, mutant M16) → the
+    app records ``confirm_yes`` / ``confirm_no`` → RED. RED (base): no
+    ``ConfirmQuestionScreen``."""
+    bubbled: list = []
+    real = app_module.S19TuiApp.on_button_pressed
+
+    def observer(self, event):
+        bubbled.append(event.button.id)
+        return real(self, event)
+
+    monkeypatch.setattr(app_module.S19TuiApp, "on_button_pressed", observer)
 
     async def scenario(app, pilot, log):
         out = []
@@ -1084,6 +1107,7 @@ def test_tc_b100_45_click_answers_with_the_clicked_button(tmp_path: Path) -> Non
 
     out = _run(tmp_path / "app", scenario)
     assert out == [("#confirm_yes", [True]), ("#confirm_no", [False])], out
+    assert [b for b in bubbled if b in ("confirm_yes", "confirm_no")] == [], bubbled
 
 
 def test_tc_b100_45_other_keys_leave_the_question_open(tmp_path: Path) -> None:
@@ -1198,15 +1222,17 @@ def test_tc_b100_45_names_paint_literally(tmp_path: Path) -> None:
     """LLR-174.2i, HLR-174d (C26, Q2-3, Q2-4): an image ``[b]x.s19`` →
     title ``Replace [b]x.s19?`` and the body names ``[b]x.s19``; an image
     whose name holds U+202E → ``painted_names`` of it, 0 U+202E; project
-    ``[i]P`` open and as the target with a flow ``[red]f`` → title
-    ``Replace [i]P?``, body ``flow [red]f`` and ``Load project [i]P
-    anyway?``; a 130-character flow name → clipped to 120 ending ``…``;
-    every title and body with 0 markup spans (5 of 5).
+    ``[i]`` + U+202E + ``P`` open and as the target with a flow ``[red]f``
+    → title ``Replace [i]P?``, body ``flow [red]f`` and ``Load project
+    [i]P anyway?``; a 130-character flow name → clipped to 120 ending
+    ``…``; every title and body with 0 markup spans (5 of 5).
 
     Why: names come from disk and from the engineer; a bracket must never
     style the question, and a bidirectional control must never reverse it.
     Negative control: markup on → ``[b]x.s19`` paints as ``x.s19`` → RED;
-    a raw name → U+202E survives → RED. RED (base): no question."""
+    a raw name → U+202E survives → RED; a raw project name in the title
+    (mutant M50; E5: the project name carries U+202E so the scrub is
+    visible) → RED. RED (base): no question."""
     from s19_app.tui.services.project_gather_service import painted_names
 
     scene = _scene(tmp_path)
@@ -1214,7 +1240,8 @@ def test_tc_b100_45_names_paint_literally(tmp_path: Path) -> None:
     (scene.src / "[b]x.s19").write_bytes(s19)
     bidi = "a‮b.s19"
     (scene.src / bidi).write_bytes(s19)
-    _project(scene.wa, "[i]P", {"firmware.s19": s19})
+    project = "[i]‮P"
+    _project(scene.wa, project, {"firmware.s19": s19})
     long_flow = "n" * 130
 
     async def scenario(app, pilot, log):
@@ -1236,12 +1263,12 @@ def test_tc_b100_45_names_paint_literally(tmp_path: Path) -> None:
         await _patch(pilot, app)
         app._handle_load_dialog(LC("path", str(scene.src / "b.s19")))
         out["bidi image"] = await read()
-        await _open_project(pilot, app, "[i]P")
+        await _open_project(pilot, app, project)
         await _set_f(pilot, app, "[red]f")
-        app._handle_load_dialog(LC("project", "[i]P"))
+        app._handle_load_dialog(LC("project", project))
         out["markup project"] = await read()
         await _set_f(pilot, app, long_flow)
-        app._handle_load_dialog(LC("project", "[i]P"))
+        app._handle_load_dialog(LC("project", project))
         out["long flow"] = await read()
         return out
 
@@ -1257,6 +1284,74 @@ def test_tc_b100_45_names_paint_literally(tmp_path: Path) -> None:
     clipped = painted_names([long_flow])
     assert len(clipped) == 120 and clipped.endswith("…")
     assert f"flow {clipped}" in out["long flow"][1], out["long flow"]
+
+
+def test_tc_b100_45_refusal_lines_paint_names_literally(tmp_path: Path) -> None:
+    """LLR-174.2i, HLR-174d (C60, S10-04, E5 ruling SR-2): the three
+    refusal lines the seam functions paint scrub the name through
+    ``painted_names`` and paint it with markup off:
+    ``_handle_select_variant`` of an id ``[b]v`` + U+00AD + ``X`` + U+202E
+    with no descriptor → ``Variant not found: [b]vX``; a descriptor whose
+    ``path`` name is ``a`` + U+202E + ``[red]b.s19`` and does not exist →
+    ``Variant file missing: a[red]b.s19``; ``_handle_load_project`` of
+    ``A`` + U+202E + ``[i]B`` (an A2L-only project whose A2L read raises)
+    → ``No supported files in project: A[i]B``. Each line is the recorded
+    message AND the painted ``#log_line_4`` text, with 0 markup spans (3 of
+    3).
+
+    Why: these names come from ``project.json`` and from disk; a
+    bidirectional control must never reverse a status line, and a bracket
+    must never style it.
+    Declared private calls: the ghost descriptor is added to
+    ``_variant_set``, and ``_load_a2l_data_with_cache`` is replaced by one
+    that raises (the untrusted-A2L arm, cross-platform).
+    Negative control: a raw name in any line (mutants M63, M64, M70) →
+    U+202E / U+00AD survive → RED. RED (pre-Inc 10 base e4bfd6a): the raw
+    names."""
+    from dataclasses import replace as dc_replace
+
+    from s19_app.tui.models import VariantDescriptor
+
+    scene = _scene(tmp_path)
+    hostile_project = "A\u202e[i]B"
+    _project(scene.wa, hostile_project, {"cal.a2l": (CASE01 / "firmware.a2l").read_bytes()})
+    ghost = scene.src / "a\u202e[red]b.s19"
+
+    async def scenario(app, pilot, log):
+        out = {}
+
+        def painted():
+            label = app.query_one("#log_line_4")
+            return (log.messages[-1], _plain(label), len(_spans(label)))
+
+        await _open_project(pilot, app, "PV")
+        app._handle_select_variant("[b]v\u00adX\u202e")
+        await _settle(pilot, 4)
+        out["variant not found"] = painted()
+        app._variant_set = dc_replace(
+            app._variant_set,
+            variants=app._variant_set.variants + (VariantDescriptor("ghost", ghost, "s19"),),
+        )
+        app._handle_select_variant("ghost")
+        await _settle(pilot, 4)
+        out["variant file missing"] = painted()
+
+        def unreadable(path):
+            raise ValueError("unreadable A2L")
+
+        app._load_a2l_data_with_cache = unreadable
+        app._handle_load_project(hostile_project)
+        await _settle(pilot, 4)
+        out["no supported files"] = painted()
+        return out
+
+    out = _run(scene.base, scenario)
+    expected = {
+        "variant not found": "Variant not found: [b]vX",
+        "variant file missing": "Variant file missing: a[red]b.s19",
+        "no supported files": "No supported files in project: A[i]B",
+    }
+    assert out == {arm: (line, line, 0) for arm, line in expected.items()}, out
 
 
 def test_tc_b100_45_patch_editor_load_keeps_its_own_guard(tmp_path: Path) -> None:
@@ -1599,14 +1694,21 @@ def test_tc_b100_45_change_file_dropdown_keeps_the_guard(tmp_path: Path) -> None
     ``second.json`` in ``#patch_doc_file_select`` → 1 ``LoadGuardScreen``, 0
     loads, the entry count and the flag unchanged; cancel → the same, and
     the dropdown is blank again, so a pick of the same file fires the guard
-    again; a clean panel → the same pick loads with 0 guards (the document
-    becomes the file's 1 entry, the flag clear).
+    again; each cancel paints exactly the Load button's cancel line
+    ``Patch Editor: load cancelled — changes kept.``; a clean panel → the
+    same pick loads with 0 guards (the document becomes the file's 1 entry,
+    the flag clear); dirty again, a pick → the guard → Accept → the file
+    loads (1 entry, the flag clear).
 
     Why: the dropdown is a second way into the Patch Editor's document
-    load; without the guard it replaces unsaved entries silently.
+    load; without the guard it replaces unsaved entries silently. The
+    guard is the Load button's guard, so its cancel says the same line and
+    its accept still loads (proto-10-app.md, the dropdown node).
     Negative control: no ``is_dirty`` read → the dirty pick replaces the
     entries with 0 guards → RED (the base). A cancel that leaves the
-    dropdown on ``second.json`` → the second pick fires nothing → RED."""
+    dropdown on ``second.json`` → the second pick fires nothing → RED. E5:
+    the cancel line removed (mutant M29) → 0 lines → RED; the accept arm's
+    load removed (mutant M30) → the entries stay → RED."""
     from textual.widgets import Select
 
     from s19_app.tui.screens_directionb import LoadGuardScreen
@@ -1640,6 +1742,7 @@ def test_tc_b100_45_change_file_dropdown_keeps_the_guard(tmp_path: Path) -> None
             await _settle(pilot, 8)
             guarded = isinstance(app.screen, LoadGuardScreen)
             out[attempt] = (guarded, list(loads), len(app._change_service.document.entries), _panel(app)._dirty)
+            mark = len(log.messages)
             if guarded:
                 await pilot.press("escape")
                 await ld.wait_for(pilot, lambda: not isinstance(app.screen, LoadGuardScreen), "the guard closed")
@@ -1648,6 +1751,7 @@ def test_tc_b100_45_change_file_dropdown_keeps_the_guard(tmp_path: Path) -> None
                 select.is_blank(),
                 len(app._change_service.document.entries),
                 _panel(app)._dirty,
+                log.since(mark),
             )
         guards_dirty = spy.names.count("LoadGuardScreen")
         _panel(app).mark_saved()
@@ -1659,14 +1763,28 @@ def test_tc_b100_45_change_file_dropdown_keeps_the_guard(tmp_path: Path) -> None
             len(app._change_service.document.entries),
             _panel(app)._dirty,
         )
+        # E5 (mutant M30): the accept arm. Dirty again, pick, accept.
+        await _set_w(pilot, app)
+        select.value = Select.NULL
+        await _settle(pilot, 4)
+        select.value = "second.json"
+        await ld.wait_for(pilot, lambda: isinstance(app.screen, LoadGuardScreen), "the guard (accept arm)")
+        await _settle(pilot, 4)
+        assert await pilot.click("#load_guard_accept"), "click missed #load_guard_accept"
+        await ld.wait_for(pilot, lambda: not isinstance(app.screen, LoadGuardScreen), "the guard closed (accept)")
+        await _settle(pilot, 10)
+        out["accept"] = (list(loads), len(app._change_service.document.entries), _panel(app)._dirty)
         return out, guards_dirty
 
     out, guards_dirty = _run(scene.base, scenario)
+    cancelled = ["Patch Editor: load cancelled — changes kept."]
     assert out["first"] == (True, [], 2, True), out
-    assert out["first after cancel"] == (True, 2, True), out
+    assert out["first after cancel"] == (True, 2, True, cancelled), out
     assert out["again"] == (True, [], 2, True), out
+    assert out["again after cancel"] == (True, 2, True, cancelled), out
     assert guards_dirty == 2, out
     assert out["clean"] == (False, ["second.json"], 1, False), out
+    assert out["accept"] == (["second.json", "second.json"], 1, False), out
 
 
 def test_tc_b100_45_modal_imports_nothing_from_the_app() -> None:
@@ -1975,6 +2093,91 @@ def test_tc_b100_46_cancelled_variant_switch_keeps_the_pending_selection(tmp_pat
     cancelled, after = _run(scene.base, scenario)
     assert cancelled == (None, [], "firmware_a"), cancelled
     assert after == (None, "firmware_a"), after
+
+
+def test_tc_b100_46_go_runs_at_once_when_clean_and_after_the_question_on_replace(tmp_path: Path) -> None:
+    """LLR-174.3, LLR-174.2c (interfaces S-b, E3 placement ruling; E5
+    mutants M32, M33): with nothing unsaved, ``_confirm_then_load`` runs
+    its ``go`` before it returns (0 questions); with D, ``y`` runs ``go``
+    after the answer callback has returned, with the question off the
+    stack (2 of 2).
+
+    Why: a clean load keeps the base timing of every route (the variant
+    stamp, then the load, inside the same callback). After Replace the load
+    must start once the question has closed, so its own screens and status
+    lines land on the main screen and not inside the modal's dismissal.
+    Declared spy: ``push_screen`` wraps the question's answer callback to
+    flag when ``go`` runs inside it.
+    Negative control: the clean ``go`` deferred (M32) → 0 runs at return →
+    RED; the Replace ``go`` called inside the answer callback (M33) → the
+    flag is set → RED. RED (base): no ``_confirm_then_load``."""
+    scene = _scene(tmp_path)
+
+    async def scenario(app, pilot, log):
+        await _load(pilot, app, scene.src / "fw.s19")
+        inside = {"answer": False}
+        ran: list = []
+        pushes = PushSpy(app)
+        app._confirm_then_load("image", "b.s19", lambda: ran.append("clean"))
+        clean = (list(ran), pushes.questions())
+        await _patch(pilot, app)
+        real_push = app.push_screen
+
+        def push(screen, callback=None, *args, **kwargs):
+            if is_question(screen) and callback is not None:
+                answer = callback
+
+                def callback(result):
+                    inside["answer"] = True
+                    try:
+                        return answer(result)
+                    finally:
+                        inside["answer"] = False
+
+            return real_push(screen, callback, *args, **kwargs)
+
+        app.push_screen = push
+        app._confirm_then_load(
+            "image",
+            "b.s19",
+            lambda: ran.append(("replace", inside["answer"], is_question(app.screen))),
+        )
+        await _wait_question(pilot, app)
+        await pilot.press("y")
+        await ld.wait_for(pilot, lambda: len(ran) == 2, "the deferred go")
+        await _settle(pilot, 4)
+        return clean, ran[1:]
+
+    clean, replaced = _run(scene.base, scenario)
+    assert clean == (["clean"], 0), clean
+    assert replaced == [("replace", False, False)], replaced
+
+
+def test_tc_b100_46_project_load_adopts_declared_regions_after_the_reset(tmp_path: Path) -> None:
+    """LLR-174.3, S10-01 (E5 mutant M71): ``fw.s19`` patched (D); a project
+    load of ``DR``, whose ``project.json`` declares ``cal_block``
+    0x80000040-0x8000007F → 1 question → ``y`` → ``_declared_regions`` is
+    exactly that region (1 of 1).
+
+    Why: S10-01 moved the reads before the reset and kept the one write,
+    the declared regions, after it; written before the reset, the reset
+    empties it and the next report loses the project's regions.
+    Negative control: the write before the reset (M71) → ``()`` → RED.
+    RED (base): no question."""
+    scene = _scene(tmp_path)
+    projects.seed_project_with_every_key(scene.wa, "DR")
+
+    async def scenario(app, pilot, log):
+        await _load(pilot, app, scene.src / "fw.s19")
+        await _patch(pilot, app)
+        await _ask(pilot, app, lambda: app._handle_load_dialog(LC("project", "DR")))
+        await pilot.press("y")
+        await ld.wait_for(pilot, lambda: app.current_project == "DR", "the project load of DR")
+        await _settle(pilot, 6)
+        return [(r.name, r.start, r.end) for r in app._declared_regions]
+
+    regions = _run(scene.base, scenario)
+    assert regions == [("cal_block", 0x80000040, 0x8000007F)], regions
 
 
 # ---------------------------------------------------------------------------
@@ -2351,17 +2554,90 @@ def _mac_name(app):
     return Path(cur.mac_path).name
 
 
+@pytest.mark.parametrize("arm", ["link", "plain"])
+def test_tc_b100_72_relative_mac_takes_its_kind_from_the_resolved_path(tmp_path: Path, arm: str) -> None:
+    """LLR-174.4b, HLR-174 (E5 ruling CR10-01 = SEC10-01): with an unsaved
+    patch on ``fw.s19`` (D), a relative path typed through the dialog that
+    the working folder does not hold, so ``resolve_input_path`` falls back
+    to the base folder and ``resolve()``s it:
+    (a) ``link``: ``<base>/cal.mac`` is a symlink to ``b.s19`` → 1 question
+    ``There are unsaved changes in fw.s19. Load b.s19 anyway?`` (the target
+    named from the resolved path); ``n`` → the session digest unchanged and
+    D still true (3 of 3);
+    (b) ``plain``: ``<base>/plain.mac`` is a real MAC file → 0 questions,
+    the MAC attached, the patched byte kept, D still true (4 of 4).
+    Live-guard control in each session: a typed ``b.s19`` asks 1 question.
+
+    Why: the loader reads the resolved path, so the kind must too; a
+    ``.mac`` link to an image would otherwise replace the patched image
+    with no question.
+    Negative control: the kind from the typed suffix (the 1747479 rule) →
+    arm (a) asks nothing and installs ``b.s19`` → RED; every relative
+    fallback path an image → arm (b) asks → RED. RED (base 1747479): arm
+    (a). Arm (a) is skipped where ``os.symlink`` raises."""
+    scene = _scene(tmp_path)
+    typed_name = "cal.mac" if arm == "link" else "plain.mac"
+    target = scene.base / typed_name
+    if arm == "link":
+        try:
+            os.symlink(scene.src / "b.s19", target)
+        except (OSError, NotImplementedError) as exc:
+            pytest.skip(f"os.symlink raises here: {exc!r}")
+    else:
+        target.write_bytes((CASE01 / "firmware.mac").read_bytes())
+    assert not (Path.cwd() / typed_name).exists(), "setup: the working folder holds the typed name"
+
+    async def scenario(app, pilot, log):
+        await _load(pilot, app, scene.src / "fw.s19")
+        address = await _patch(pilot, app)
+        byte = app.current_file.mem_map[address]
+        spy = PushSpy(app)
+        await _ask(pilot, app, lambda: app._handle_load_dialog(LC("path", str(scene.src / "b.s19"))))
+        control = spy.questions()
+        await _answer(pilot, app, "n")
+        before = _digest(app)
+        mark = spy.questions()
+        app._handle_load_dialog(LC("path", typed_name))
+        if arm == "link":
+            landed = lambda: Path(app.current_file.path).name == "b.s19"  # noqa: E731
+        else:
+            landed = lambda: _mac_name(app) == "plain.mac"  # noqa: E731
+        await ld.wait_for(pilot, lambda: is_question(app.screen) or landed(), f"the {arm} load")
+        await _settle(pilot, 6)
+        asked = spy.questions() - mark
+        body = q_body(app) if is_question(app.screen) else None
+        if is_question(app.screen):
+            await _answer(pilot, app, "n")
+            await _settle(pilot, 4)
+        if arm == "link":
+            result = (asked, body, _digest(app) == before, _D(app))
+        else:
+            result = (asked, _mac_name(app), app.current_file.mem_map.get(address) == byte, _D(app))
+        return result, control
+
+    result, control = _run(scene.base, scenario)
+    if arm == "link":
+        assert result == (1, "There are unsaved changes in fw.s19. Load b.s19 anyway?", True, True), result
+    else:
+        assert result == (0, "plain.mac", True, True), result
+    assert control == 1, control
+
+
 def test_tc_b100_72_workarea_file_takes_its_kind_from_its_suffix(tmp_path: Path) -> None:
     """LLR-174.4c (C38): with D, ``x.mac``, ``U.MAC``, ``c.a2l``, ``x.s19``
     and ``x.hex``, from the Load dialog's work-area rows and from the
     Workarea Files list → 0, 0, 0, 1 and 1 questions on each surface (10 of
-    10).
+    10); a pick of ``ghost.s19``, not in the work area → 0 questions and
+    the session unchanged (11 of 11).
 
     Why: a MAC or A2L pick attaches and keeps the image; any other file
-    replaces it.
+    replaces it. A pick of a file that is not there has nothing to load, so
+    a question about it asks for nothing (the ``exists()`` test runs before
+    the seam, interfaces S-d).
     Negative control: a suffix-blind rule (every pick an image) → the MAC
-    and A2L arms ask → RED. RED (base): the ``.s19`` / ``.hex`` arms ask
-    nothing."""
+    and A2L arms ask → RED. E5 (mutant M79): the ``exists()`` test moved
+    into ``go`` → the missing pick asks 1 question → RED. RED (base): the
+    ``.s19`` / ``.hex`` arms ask nothing."""
     scene = _scene(tmp_path)
 
     async def scenario(app, pilot, log):
@@ -2389,6 +2665,10 @@ def test_tc_b100_72_workarea_file_takes_its_kind_from_its_suffix(tmp_path: Path)
                 out[(surface, name)] = spy.questions() - mark
                 if is_question(app.screen):
                     await _answer(pilot, app, "n")
+        mark, before = spy.questions(), _digest(app)
+        app._load_from_item(types.SimpleNamespace(data="ghost.s19"))
+        await _settle(pilot, 8)
+        out["missing"] = (spy.questions() - mark, is_question(app.screen), _digest(app) == before)
         return out
 
     out = _run(scene.base, scenario)
@@ -2396,6 +2676,7 @@ def test_tc_b100_72_workarea_file_takes_its_kind_from_its_suffix(tmp_path: Path)
     for surface in ("dialog", "list"):
         expected.update({(surface, "x.mac"): 0, (surface, "U.MAC"): 0, (surface, "c.a2l"): 0,
                          (surface, "x.s19"): 1, (surface, "x.hex"): 1})
+    expected["missing"] = (0, False, True)
     assert out == expected, out
 
 

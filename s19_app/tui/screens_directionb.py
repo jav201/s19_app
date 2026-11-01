@@ -4810,7 +4810,9 @@ class PatchEditorPanel(ScrollableContainer):
         #: by a successful save or load. Readers in this module: the Load guard,
         #: the ledger's border subtitle and the JSON stamp (batch-97 D4).
         #: Outside this module it is read only through ``is_dirty``
-        #: (LLR-174.1c): the app's load guard and ``_handle_save_dialog``.
+        #: (LLR-174.1c), by three readers: the app's load guard,
+        #: ``_handle_save_dialog`` and the change-file dropdown guard
+        #: (LLR-174.2t).
         #: Writer census (C-15.1, five sites): w1 ``request_action`` (entry
         #: edit) · w2 ``on_text_area_changed`` (paste typing) · w3
         #: ``mark_saved`` · w4 ``mark_loaded`` · w5 ``mark_pasted`` (Parse
@@ -5867,8 +5869,9 @@ class PatchEditorPanel(ScrollableContainer):
         """Whether either editor region holds unsaved edits (LLR-174.1c).
 
         The one reader of ``_dirty`` outside this module: the app's load
-        guard and ``_handle_save_dialog`` read it here, never the private
-        attribute. No setter: only the five writers change the flag.
+        guard, ``_handle_save_dialog`` and the change-file dropdown guard
+        (LLR-174.2t) read it here, never the private attribute. No setter:
+        only the five writers change the flag.
         """
         return self._dirty
 

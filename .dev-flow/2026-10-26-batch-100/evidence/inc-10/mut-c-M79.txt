@@ -1,0 +1,37 @@
+mutant id: M79
+target file: s19_app/tui/app.py
+old text:         candidate = self.workarea / WORKAREA_TEMP / name
+        if not candidate.exists():
+            return
+        kind = (
+            "attach"
+            if candidate.suffix.lower() in (MAC_EXTENSIONS | A2L_EXTENSIONS)
+            else "image"
+        )
+
+        def go() -> None:
+            self.logger.info("Loading from workarea selection: %s", candidate)
+new text:         candidate = self.workarea / WORKAREA_TEMP / name
+        kind = (
+            "attach"
+            if candidate.suffix.lower() in (MAC_EXTENSIONS | A2L_EXTENSIONS)
+            else "image"
+        )
+
+        def go() -> None:
+            if not candidate.exists():
+                return
+            self.logger.info("Loading from workarea selection: %s", candidate)
+sha256 before: 5a9550c493ab6ad161b4a4d5e79f41681a3a964d4a2310751f81ff8441e925b7
+occurrences of old text: 1
+command: pytest -q --tb=line -p no:cacheprovider --basetemp=<scratch>/c10/btm tests/test_b100_load_question.py::test_tc_b100_72_workarea_file_takes_its_kind_from_its_suffix
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\c10\mutc
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\c10\mutc\s19_app\__init__.py
+pytest exit code: 1
+pytest summary: 1 failed in 10.91s
+verdict: KILLED
+restored = True
+
+--- pytest output (failure lines) ---
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\c10\mutc\tests\test_b100_load_question.py:2680: AssertionError: {('dialog', 'x.mac'): 0, ('dialog', 'U.MAC'): 0, ('dialog', 'c.a2l'): 0, ('dialog', 'x.s19'): 1, ...}
+FAILED tests/test_b100_load_question.py::test_tc_b100_72_workarea_file_takes_its_kind_from_its_suffix
