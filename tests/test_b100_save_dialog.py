@@ -537,7 +537,10 @@ def test_tc_b100_47_target_line_open_project_in_another_case(tmp_path: Path) -> 
     assert "merges into an existing project" not in text, text
 
 
-def test_tc_b100_47_target_line_merge_and_existing_folder_kinds(tmp_path: Path) -> None:
+@pytest.mark.parametrize("debounce", ["shipped", "slow 0.6 s"])
+def test_tc_b100_47_target_line_merge_and_existing_folder_kinds(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, debounce: str
+) -> None:
     """LLR-175.1 (F-merge, A11-17, R2-08): project ``ab`` saved and not open
     → ``ab`` → ``merges into an existing project``; an empty folder ``ef``
     and a folder ``nt`` holding only ``notes.txt`` → ``new project in an
@@ -546,7 +549,15 @@ def test_tc_b100_47_target_line_merge_and_existing_folder_kinds(tmp_path: Path) 
     Why: a merge adds a variant to a project the engineer may not mean to
     touch; a plain folder becomes a project. Negative control: the kind
     painted ``merges into an existing project`` for a folder that is not a
-    project (the base word) → RED; base paints no target line → RED."""
+    project (the base word) → RED; base paints no target line → RED.
+
+    Fix round 1 (CI11-2): the Linux runner read ``ef``'s line after typing
+    ``nt`` — the wait matched the kind already painted for ``ef`` and the
+    150 ms debounce had not fired. The ``slow 0.6 s`` arm stretches the
+    debounce so a wait on the kind alone reads the stale line on any host
+    (executed RED in fix round 1); the wait names the folder."""
+    if debounce != "shipped":
+        monkeypatch.setattr("s19_app.tui.screens.SAVE_RECOMPUTE_S", 0.6)
     base = tmp_path / "app"
     projects.save_case01_project(base, "ab", files=("firmware.s19",))
     (_wa(base) / "ef").mkdir()
@@ -4024,7 +4035,13 @@ def test_tc_b100_65_document_free_name_walk_folds_case(tmp_path: Path) -> None:
     ``Changes.json``, so the plan must walk to the free name the save uses.
     Negative control: the free-name walk compares names without case
     folding → the plan says ``changes.json`` while the save writes
-    ``changes_1.json`` → RED."""
+    ``changes_1.json`` → RED.
+
+    Fix round 1 (CI11-3, ruling): the fold follows the host file system
+    (``os.path.normcase``). On posix ``Changes.json`` and ``changes.json``
+    are distinct names, so the plan, the painted row and the written tree
+    all keep ``patches/changes.json``; the Windows arm is unchanged."""
+    folds = os.path.normcase("Changes.json") == os.path.normcase("changes.json")
     base = tmp_path / "app"
     _wa(base).mkdir(parents=True, exist_ok=True)
     project = projects.seed_document_project(
@@ -4051,9 +4068,14 @@ def test_tc_b100_65_document_free_name_walk_folds_case(tmp_path: Path) -> None:
 
     rows, plan_doc, patches = _run(base, scenario, size=(220, 60))
     doc_rows = [r for r in rows if r.startswith("document")]
-    assert doc_rows == ["document changes.json → patches/changes_1.json — new"], rows
-    assert plan_doc == [("changes_1.json", "new")], plan_doc
-    assert patches == {"Changes.json": sibling, "changes_1.json": document_bytes}, sorted(patches)
+    if folds:
+        assert doc_rows == ["document changes.json → patches/changes_1.json — new"], rows
+        assert plan_doc == [("changes_1.json", "new")], plan_doc
+        assert patches == {"Changes.json": sibling, "changes_1.json": document_bytes}, sorted(patches)
+    else:
+        assert doc_rows == ["document patches/changes.json — new"], rows
+        assert plan_doc == [("changes.json", "new")], plan_doc
+        assert patches == {"Changes.json": sibling, "changes.json": document_bytes}, sorted(patches)
 
 
 # ---------------------------------------------------------------------------

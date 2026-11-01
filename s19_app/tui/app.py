@@ -12113,8 +12113,13 @@ class S19TuiApp(App):
                     pass
                 else:
                     plan_entries.add(row_relative)
+            # LLR-171.1m: only a document whose unresolved path lies inside P
+            # follows the row; one outside P, or inside it only through a
+            # ``..`` part, keeps its binding (abspath below collapses ``..``).
             if (
-                document_row is not None
+                document_relative is not None
+                and ".." not in PurePosixPath(document_relative).parts
+                and document_row is not None
                 and document_row.source is not None
                 and row_relative is not None
                 and os.path.normcase(os.path.abspath(document_row.source))

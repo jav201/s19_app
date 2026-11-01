@@ -1399,8 +1399,17 @@ def test_tc_b100_59_pending_patch_in_the_open_project(
 def test_tc_b100_59_refused_plan_writes_nothing(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """A blocked document → the plan carries the refusal and no row;
-    0 files written."""
+    """LLR-167.6 (the refused scenario → 0 files): a blocked document → the
+    save is refused naming the entry, 0 files written.
+
+    Fix round 1 (CI11-4) re-pin: since Inc 11 the blocked-entry refusal is
+    part of the per-open session (LLR-175.5, ``_save_session_inputs``) and
+    refuses before any plan is computed, so 0 plans exist; the old
+    ``plans[-1]`` raised IndexError on every host (RED on Windows at 4dfb5a1
+    and 760f885, not only on the Linux runner).
+    Negative control: the session's early refusal dropped → the plan is
+    computed (carrying the refusal) → ``plans == []`` RED (executed in fix
+    round 1)."""
     plans = _capture_plans(monkeypatch)
     before: dict = {}
 
@@ -1408,9 +1417,10 @@ def test_tc_b100_59_refused_plan_writes_nothing(
         app._change_service.load_text(_one_blocked_document_text())
         before.update(_tree_digests(app.workarea))
 
-    _, project, _ = _save_session(tmp_path, scenario)
-    plan = plans[-1]
-    assert plan.rows == () and "1 blocked entry" in (plan.refusal or "")
+    lines, project, _ = _save_session(tmp_path, scenario)
+    assert "Project NOT saved: 1 blocked entry (0x8000007C)" in lines[-1], lines
+    assert plans == [], plans
+    assert not project.exists(), "a refused save created the project folder"
     assert _tree_digests(project.parent) == before
 
 
