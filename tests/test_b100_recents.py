@@ -3908,3 +3908,150 @@ def test_tc_b100_39_pick_over_cap_is_refused(tmp_path: Path, monkeypatch: pytest
     else:
         assert parses == [] and a2l_loads == [], (parses, a2l_loads)
         assert messages.count(refusal) == 1, messages
+
+# ---------------------------------------------------------------------------
+# Inc 12a E5 corrective, round 2 — arms that kill the surviving mutants
+# (evidence/inc-12a/mutation-summary.md; ids MUT12a-M-NN in E5-rulings.md)
+# ---------------------------------------------------------------------------
+
+
+def test_tc_b100_39_pick_of_a_vanished_entry_asks_nothing(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """F-11 / 9b B88, LLR-172.6b (MUT12a-M-101): with an unsaved patched
+    byte (the Inc 10 question's trigger), ``fw.s19`` is listed and then
+    deleted before it is picked → the pick opens no question, writes 0
+    status lines and parses nothing; ``x.s19`` stays loaded.
+
+    Why: the pre-question look exists so a file that is already gone does
+    not ask the user to give up unsaved work for nothing.
+    Negative control (M-101, the vanished look falls through): the question
+    opens for a file that does not exist."""
+    from textual.widgets import ListView
+
+    from tests.test_b100_load_question import _patch, is_question
+
+    base = tmp_path / "app"
+    temp = _workarea(base) / "temp"
+    temp.mkdir(parents=True)
+    (temp / "fw.s19").write_bytes((projects.CASE01_DIR / "firmware.s19").read_bytes())
+    (temp / "x.s19").write_bytes((projects.CASE01_DIR / "firmware.s19").read_bytes())
+    parses = _parse_spy(monkeypatch)
+
+    async def _scenario(app, pilot, log):
+        await projects.load_image(pilot, app, temp / "x.s19")
+        for _ in range(4):
+            await pilot.pause()
+        await _patch(pilot, app)
+        app.refresh_files()
+        await pilot.pause()
+        rows = {getattr(r, "data", None): r for r in app.query_one("#files_list", ListView).children}
+        parses.clear()
+        (temp / "fw.s19").unlink()
+        mark = len(log.messages)
+        app._load_from_item(rows["fw.s19"])
+        asked = False
+        for _ in range(12):
+            await pilot.pause()
+            asked = asked or is_question(app.screen)
+        return asked, log.since(mark), Path(app.current_file.path).name
+
+    asked, messages, current = projects.run_app(base, _scenario, size=(118, 54))
+    assert asked is False, "a question opened for a vanished file"
+    assert messages == [], messages
+    assert "fw.s19" not in parses and current == "x.s19", (parses, current)
+
+
+def test_tc_b100_39_pick_survives_an_error_at_the_first_look(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """S12a-R2-1 (MUT12a-M-102): ``os.lstat`` raising ``PermissionError``
+    for ``x.s19`` only at its FIRST call (the pre-question look) → the pick
+    goes on; the re-check inside the continuation reads the file and it is
+    loaded (``current_file`` is ``x.s19``, 0 refusal lines).
+
+    Why: an error at the look is not a verdict — the re-check at use decides
+    (it refuses an entry it cannot read, see the ``lstat refused`` arm).
+    Negative control (M-102, the look returns on ``OSError``): nothing is
+    loaded and nothing is said."""
+    from textual.widgets import ListView
+
+    base = tmp_path / "app"
+    temp = _workarea(base) / "temp"
+    temp.mkdir(parents=True)
+    (temp / "x.s19").write_bytes((projects.CASE01_DIR / "firmware.s19").read_bytes())
+    key = os.path.normcase(str(temp / "x.s19"))
+    real_lstat = os.lstat
+    seen: list = []
+
+    def _lstat(path, *args, **kwargs):
+        if not isinstance(path, int) and os.path.normcase(os.fspath(path)) == key:
+            seen.append(1)
+            if len(seen) == 1:
+                raise PermissionError(13, "injected: access denied", os.fspath(path))
+        return real_lstat(path, *args, **kwargs)
+
+    async def _scenario(app, pilot, log):
+        app.refresh_files()
+        await pilot.pause()
+        rows = list(app.query_one("#files_list", ListView).children)
+        mark = len(log.messages)
+        with monkeypatch.context() as patch:
+            patch.setattr(app_module.os, "lstat", _lstat)
+            app._load_from_item(rows[0])
+            for _ in range(40):
+                if app.current_file is not None:
+                    break
+                await pilot.pause()
+        for _ in range(6):
+            await pilot.pause()
+        current = None if app.current_file is None else Path(app.current_file.path).name
+        return len(seen), log.since(mark), current
+
+    calls, messages, current = projects.run_app(base, _scenario, size=(118, 54))
+    assert calls >= 2, calls
+    assert current == "x.s19", (current, messages)
+    assert NOT_REGULAR.format(name="x.s19") not in messages, messages
+
+
+def test_tc_b100_39_pick_of_a_reparse_point_file_is_refused(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-172.6b (MUT12a-M-105): ``x.s19`` is a regular file that
+    ``_is_reparse_point`` reports as a reparse point (a symlink-like file
+    entry a junction test cannot reach, since a junction is a folder) → 1
+    ``not a regular file`` line, 0 parses, nothing loaded.
+
+    Why: a reparse point that ``lstat`` sees as a regular file can still
+    redirect the open; the re-check refuses it on that test alone.
+    Negative control (M-105, the reparse test dropped): ``x.s19`` loads."""
+    from textual.widgets import ListView
+
+    base = tmp_path / "app"
+    temp = _workarea(base) / "temp"
+    temp.mkdir(parents=True)
+    (temp / "x.s19").write_bytes((projects.CASE01_DIR / "firmware.s19").read_bytes())
+    parses = _parse_spy(monkeypatch)
+    key = os.path.normcase(str(temp / "x.s19"))
+    real_reparse = app_module._is_reparse_point
+
+    def _reparse(path, *args, **kwargs):
+        if os.path.normcase(os.fspath(path)) == key:
+            return True
+        return real_reparse(path, *args, **kwargs)
+
+    monkeypatch.setattr(app_module, "_is_reparse_point", _reparse)
+
+    async def _scenario(app, pilot, log):
+        app.refresh_files()
+        await pilot.pause()
+        rows = list(app.query_one("#files_list", ListView).children)
+        mark = len(log.messages)
+        app._load_from_item(rows[0])
+        for _ in range(12):
+            await pilot.pause()
+        return log.since(mark), app.current_file
+
+    messages, current = projects.run_app(base, _scenario, size=(118, 54))
+    assert "x.s19" not in parses and current is None, (parses, current)
+    assert messages == [NOT_REGULAR.format(name="x.s19")], messages

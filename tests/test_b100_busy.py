@@ -2273,3 +2273,312 @@ def test_at_b100_17_worker_load_of_an_8_mib_s19_by_keys(tmp_path: Path) -> None:
     assert final == "Loaded big8.s19 (S19 only)", final
     assert row == idle_row, (row, idle_row)
     assert timers == 0, timers
+
+
+# ===========================================================================
+# Inc 12a E5 corrective, round 2 — arms that kill the surviving mutants
+# (evidence/inc-12a/mutation-summary.md; ids MUT12a-M-NN in E5-rulings.md)
+# ===========================================================================
+
+
+def test_tc_b100_50_a_restarted_key_becomes_the_newest_run(tmp_path: Path) -> None:
+    """LLR-176.1p / LLR-176.1o (A12-22, MUT12a-M-09): begin ``report`` A,
+    begin ``file_load`` B, restart ``report`` → the restarted report is the
+    shown run: its step 2 paints (``step 2/2 b``, bar 50) and B's step 2
+    paints nothing; ending the report shows B again.
+
+    Why: a restart is the newest action the user started, so it owns the
+    line; it must not drop back behind an older run.
+    Negative control (M-09, the restart keeps its old position): the
+    report's step is hidden behind B."""
+
+    async def scenario(app, pilot, log):
+        app.begin_busy("report", "A", ("a", "b"))
+        gb = app.begin_busy("file_load", "B", FILE_STEPS)
+        ga2 = app.begin_busy("report", "A2", ("a", "b"))
+        app.step_busy("report", ga2, 2)
+        restarted = (_status(app), _bar(app)[0])
+        app.step_busy("file_load", gb, 2)
+        hidden = _status(app)
+        app.end_busy("report", ga2, "")
+        handed = _status(app)
+        app.end_busy("file_load", gb, "")
+        return restarted, hidden, handed
+
+    restarted, hidden, handed = _run(tmp_path / "app", scenario)
+    assert restarted[0].endswith(f" A2{DOT}step 2/2 b{DOT}00:00"), restarted
+    assert restarted[1] == 50, restarted
+    assert hidden == restarted[0], (hidden, restarted)
+    assert f" B{DOT}step 2/3 Parse{DOT}" in handed, handed
+
+
+def test_tc_b100_50_a_falling_amount_never_lowers_the_bar(tmp_path: Path) -> None:
+    """LLR-176.1c (``never falls within the same step``, MUT12a-M-20): one
+    step; 50 of 100 → bar 50; then 20 of 100 on the same step → bar still
+    50; then 80 of 100 → 80.
+
+    Why: a bar that moves backwards reads as a restart or a fault.
+    Negative control (M-20, the never-falls rule removed): 50, 20, 80."""
+
+    async def scenario(app, pilot, log):
+        g = app.begin_busy("report", "L", ("a",))
+        values = []
+        for done in (50, 20, 80):
+            app.step_busy("report", g, 1, done, 100)
+            values.append(_bar(app)[0])
+        app.end_busy("report", g, "")
+        return values
+
+    assert _run(tmp_path / "app", scenario) == [50, 50, 80]
+
+
+def test_tc_b100_50_ending_a_middle_run_shows_the_newest_remaining(tmp_path: Path) -> None:
+    """LLR-176.1o (A12-21, MUT12a-M-28): three runs begun in the order
+    report, diff report, file load (the file load at step 2); the diff
+    report (the middle one) ends → the file load, the newest remaining run,
+    is shown at ``step 2/3 Parse`` with bar 33.
+
+    Why: the hand-back after an end must pick the newest run, not the
+    oldest; with two runs left the choice is visible.
+    Negative control (M-28, the oldest remaining is shown): the report."""
+
+    async def scenario(app, pilot, log):
+        gr = app.begin_busy("report", "R", REPORT_STEPS)
+        gd = app.begin_busy("diff_report", "D", DIFF_STEPS)
+        gl = app.begin_busy("file_load", "F", FILE_STEPS)
+        app.step_busy("file_load", gl, 2)
+        app.end_busy("diff_report", gd, "")
+        shown = (_status(app), _bar(app)[0])
+        app.end_busy("file_load", gl, "")
+        app.end_busy("report", gr, "")
+        return shown
+
+    text, bar = _run(tmp_path / "app", scenario)
+    assert f" F{DOT}step 2/3 Parse{DOT}" in text, text
+    assert bar == 33, bar
+
+
+def test_tc_b100_50_a_begin_after_the_last_end_starts_one_timer(tmp_path: Path) -> None:
+    """LLR-176.1e / LLR-176.1f (MUT12a-M-31): begin, end (the last end),
+    then two overlapping begins → exactly 1 running 0.1 s timer, and the
+    spinner advances off its first frame within 3 s.
+
+    Why: the second action of a session must animate like the first; a
+    stopped timer kept as "the timer" leaves the line frozen.
+    Negative control (M-31, the stopped timer is not cleared): 0 running
+    timers and the glyph never moves."""
+
+    async def scenario(app, pilot, log):
+        g0 = app.begin_busy("report", "R", REPORT_STEPS)
+        app.end_busy("report", g0, "")
+        await _settle(pilot, 3)
+        ga = app.begin_busy("report", "R", REPORT_STEPS)
+        gb = app.begin_busy("file_load", "F", FILE_STEPS)
+        await _settle(pilot, 2)
+        timers = len(_busy_timers(app))
+        moved = False
+        for _ in range(60):
+            if not _status(app).startswith(FRAMES[0]):
+                moved = True
+                break
+            await pilot.pause(0.05)
+        app.end_busy("file_load", gb, "")
+        app.end_busy("report", ga, "")
+        return timers, moved
+
+    timers, moved = _run(tmp_path / "app", scenario)
+    assert timers == 1, timers
+    assert moved, "the spinner never left its first frame"
+
+
+def test_tc_b100_50_a_stale_failure_logs_nothing(tmp_path: Path) -> None:
+    """S-e / A12a-04 (MUT12a-M-44): a file load begun as ``a.s19`` is
+    restarted as ``b.s19``; the replaced run's failure arrives late
+    (``_busy_fail`` with the first generation) → returns ``False``, logs no
+    line, and the ``b.s19`` line stays shown.
+
+    Why: a replaced worker that raises must not write ``Loading b.s19
+    failed`` for an action that is still running.
+    Negative control (M-44, no generation check): ``Loading b.s19 failed``
+    is logged."""
+
+    async def scenario(app, pilot, log):
+        g1 = app.begin_busy("file_load", "Loading a.s19", FILE_STEPS)
+        g2 = app.begin_busy("file_load", "Loading b.s19", FILE_STEPS)
+        before = _status(app)
+        mark = len(log.messages)
+        result = app._busy_fail("file_load", g1)
+        out = (result, log.since(mark), _status(app) == before)
+        app.end_busy("file_load", g2, "")
+        return out
+
+    result, added, unchanged = _run(tmp_path / "app", scenario)
+    assert result is False, result
+    assert added == [], added
+    assert unchanged, "the running line changed"
+
+
+def _commit_save_body_returns(function) -> list:
+    """For each ``return`` after the ``_busy_begin_action`` begin in
+    ``function`` (nested functions skipped): ``(line, has_end)``, where
+    ``has_end`` says an earlier statement of the same block is an
+    ``end_busy("save_project", …)`` call."""
+    begin_line = None
+    for node in ast.walk(function):
+        if isinstance(node, ast.Call) and _callee(node.func) == "_busy_begin_action":
+            begin_line = node.lineno
+            break
+    assert begin_line is not None, "no _busy_begin_action call in _commit_project_save"
+
+    def _is_end(stmt) -> bool:
+        return (
+            isinstance(stmt, ast.Expr)
+            and isinstance(stmt.value, ast.Call)
+            and _callee(stmt.value.func) == "end_busy"
+            and bool(stmt.value.args)
+            and isinstance(stmt.value.args[0], ast.Constant)
+            and stmt.value.args[0].value == "save_project"
+        )
+
+    found: list = []
+
+    def _walk_block(stmts) -> None:
+        for index, stmt in enumerate(stmts):
+            if isinstance(stmt, ast.Return) and stmt.lineno > begin_line:
+                found.append((stmt.lineno, any(_is_end(s) for s in stmts[:index])))
+            if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                continue
+            for field in ("body", "orelse", "finalbody"):
+                inner = getattr(stmt, field, None)
+                if isinstance(inner, list):
+                    _walk_block(inner)
+            for handler in getattr(stmt, "handlers", None) or []:
+                _walk_block(handler.body)
+
+    _walk_block(function.body)
+    return found
+
+
+def test_tc_b100_51_every_save_abort_return_ends_its_run_first() -> None:
+    """LLR-176.2c (CR12a-2, MUT12a-M-69): in ``_commit_project_save``, every
+    ``return`` after the busy begin is preceded, in its own block, by an
+    ``end_busy("save_project", …)`` call — 10 abort exits today.
+
+    Why: an abort arm that paints with ``set_status`` instead leaves the run
+    open until the ``finally``, so the log ends with a stray
+    ``Saving project <name> failed`` after the rollback note, and the arm's
+    own text is no longer the outcome.
+    Negative control (M-69, one arm's ``end_busy`` → ``set_status``): that
+    return is listed without an end."""
+    tree = ast.parse(APP_SOURCE.read_text(encoding="utf-8"))
+    found = _commit_save_body_returns(_class_methods(tree)["_commit_project_save"])
+    assert len(found) >= 10, found
+    assert [line for line, has_end in found if not has_end] == [], found
+
+
+def test_tc_b100_51_save_validation_abort_ends_with_its_own_line(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-176.2c (CR12a-2, MUT12a-M-69), one abort exit driven:
+    ``validate_project_files`` returning an error inside
+    ``_commit_project_save`` → 1 effective end whose outcome is that error,
+    the error is the last log line, no ``… failed`` line, bar ``[0, 25, 0]``,
+    0 timers.
+
+    Why: the abort arm's own text is what the user must read last.
+    Negative control (M-69): the error is painted, then the ``finally``
+    logs ``Saving project S5 failed`` after it."""
+    from s19_app.tui.screens import SaveProjectPayload
+
+    seam = Seam(monkeypatch)
+    real_validate = app_module.validate_project_files
+
+    def _validate(folder, *args, **kwargs):
+        if sys._getframe(1).f_code.co_name == "_commit_project_save":
+            return [], [], "synthetic validation error"
+        return real_validate(folder, *args, **kwargs)
+
+    monkeypatch.setattr(app_module, "validate_project_files", _validate)
+
+    async def scenario(app, pilot, log):
+        await _load_case01_image(app, pilot)
+        seam.bar.clear()
+        mark = len(log.messages)
+        app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name="S5"))
+        await _settle(pilot, 6)
+        return log.since(mark), len(_busy_timers(app))
+
+    added, timers = _run(tmp_path / "app", scenario)
+    ends = seam.effective("save_project")
+    assert [e.outcome for e in ends] == ["synthetic validation error"], seam.ends
+    assert added[-1] == "synthetic validation error", added
+    assert not [m for m in added if m.endswith(" failed")], added
+    assert seam.bar == [0, 25, 0], seam.bar
+    assert timers == 0, timers
+
+
+def test_tc_b100_51_file_load_reads_the_copy_size_before_the_worker() -> None:
+    """A12a-08 (MUT12a-M-82; tester notes §5): in ``load_from_path`` the
+    ``copied.stat()`` call sits on an earlier line than the
+    ``_start_load_worker(`` call.
+
+    Why: a ``stat`` that raises must end the load through the kickoff's own
+    failure arm while the kickoff still owns the run; after the dispatch
+    the worker owns it and the run would end twice or not at all.
+    Negative control (M-82, the ``stat`` after the dispatch): RED."""
+    tree = ast.parse(APP_SOURCE.read_text(encoding="utf-8"))
+    function = _class_methods(tree)["load_from_path"]
+    stats = [
+        node.lineno
+        for node in ast.walk(function)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr == "stat"
+        and isinstance(node.func.value, ast.Name)
+        and node.func.value.id == "copied"
+    ]
+    starts = [
+        node.lineno
+        for node in ast.walk(function)
+        if isinstance(node, ast.Call) and _callee(node.func) == "_start_load_worker"
+    ]
+    assert len(stats) == 1 and len(starts) == 1, (stats, starts)
+    assert stats[0] < starts[0], (stats, starts)
+
+
+def test_tc_b100_51_file_load_into_an_open_project_ends_after_the_sync(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A12a-05 (MUT12a-M-89): project ``P`` open; a worker load of a
+    different image ``other.s19`` → the sync into the project writes its
+    line, and the outcome ``Loaded other.s19`` is the last log line, after
+    every sync line; 1 effective end.
+
+    Why: the outcome closes the action; a project line logged after it would
+    make the log say the load ended before its sync.
+    Negative control (M-89, the end before the sync): the sync's line comes
+    after ``Loaded other.s19``."""
+    base = tmp_path / "app"
+    _project_p(base, a2l=False)
+    src = tmp_path / "src"
+    src.mkdir()
+    other = src / "other.s19"
+    other.write_bytes((CASE01 / "firmware.s19").read_bytes())
+    projects.flip_data_byte(other)
+    seam = Seam(monkeypatch)
+
+    async def scenario(app, pilot, log):
+        app._handle_load_project("P")
+        await _settle(pilot, 8)
+        opened = app.current_project
+        mark = len(log.messages)
+        app.load_from_path(other)
+        await _drain(app, pilot)
+        return opened, log.since(mark)
+
+    opened, added = _run(base, scenario)
+    assert opened == "P", opened
+    ends = seam.effective("file_load")
+    assert [e.outcome for e in ends] == ["Loaded other.s19"], seam.ends
+    assert added[-1] == "Loaded other.s19", added
+    assert len(added) >= 2 and any("other" in m for m in added[:-1]), added

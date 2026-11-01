@@ -1,6 +1,6 @@
 # Inc 12a — E5 corrective notes
 
-One corrective pass on `b100-inc12a` (base `71376a3`), implementing the rows `E5-rulings.md` marks **corrective**: SE5-12a-1, SE5-12a-2, SE5-12a-3, CR12a-3. Not done here: SE5-12a-4 and CR12a-1 (routed to Inc 12b integration); CR12a-2 (only if a Save abort-exit mutant survives; no survivor was sent to this pass).
+One corrective pass on `b100-inc12a` (base `71376a3`), implementing the rows `E5-rulings.md` marks **corrective**: SE5-12a-1, SE5-12a-2, SE5-12a-3, CR12a-3. Not done here: SE5-12a-4 and CR12a-1 (routed to Inc 12b integration); CR12a-2 was conditional at round 1. It became active in round 2 (M-69 and M-70 survived), see §Round 2.
 
 Source edits: `s19_app/tui/app.py` only (3 hunks). `styles.tcss` unchanged. Test edits: `tests/test_b100_busy.py`, `tests/test_b100_recents.py`, `tests/test_report_progress.py`, `tests/test_b100_save_dialog.py` (MERGE-12a-1). Registry: `AT-TC-REGISTRY.jsonl` (TC-644 re-bound to the 2 renamed nodes). Backlog: `.dev-flow/BACKLOG-CODE.md` (1 row, SE5-12a-2 file-state line). CRLF kept in every CRLF file; the registry stays LF.
 
@@ -40,6 +40,32 @@ Source edits: `s19_app/tui/app.py` only (3 hunks). `styles.tcss` unchanged. Test
 - **Re-pin (test only):** `tests/test_b100_save_dialog.py:3792`–`:3797`: `gen = app._busy_begin_action("file_load", loaded.name)`, then `app._start_load_worker(loaded, gen=gen)`. That is the hand-off `load_from_path` makes (`app.py:14857`–`:14858`). The arm still skips the copy step, which it never ran, and the open Save dialog does not trigger the Inc 10 question. What it proves is unchanged: a load landing under the dialog rebuilds the session; with the same ranges the image is derived from the new file, and with other ranges the app stays up.
 - **RED:** none owed for a re-pin. The pre-re-pin failure is the `TypeError` in `green-03-merged.txt`. **GREEN:** `green-06-merge-repin.txt` has 2 passed, both layouts, in 21 s.
 
+## Round 2 — mutation survivors (on 2712137 = 4cedb23 + merge of main + E13 tools; tests only, source unchanged)
+
+Input: `evidence/inc-12a/mutation-summary.md` (86 killed / 22 survived) and the orchestrator's rulings. Every kill was proved the same way. The mutant was applied to the scratch copy `scratchpad/corr12a/mutk` (a copy of the worktree's `s19_app`, `tests`, `examples` and `pyproject.toml`; never the worktree). The killing node(s) were run there, and the file was restored and checked by sha. The driver is `scratchpad/corr12a/mutk_driver.py`. Each transcript prints the mutated `s19_app.__file__` (the mutk copy) and the pytest tail: `evidence/inc-12a/mut-r2-M-NN.txt`.
+
+| Id | Ruling | Arm (file:line) | Mutant on mutk → result |
+|---|---|---|---|
+| CR12a-2 (M-69) | AST rule + one behavioural abort arm | `test_b100_busy.py:2462` `test_tc_b100_51_every_save_abort_return_ends_its_run_first` (helper `_commit_save_body_returns` `:2421`); `:2479` `test_tc_b100_51_save_validation_abort_ends_with_its_own_line` | M-69b (the validation exit's `end_busy` line removed): AST rule FAILED `[(11335, False), …]`. M-69 (`end_busy` → `set_status`): both FAILED; the effective end is `Saving project S5 failed` |
+| M-70 (CR12a-2 trigger) | — | existing `test_b100_save_guards.py::test_tc_b100_07_manifest_mismatch_is_the_newest_status_line` | KILLED: `messages[-1]` is the `Saved project to …` line, not `Manifest verify MISMATCH`. The mutation run never ran this node |
+| M-09 | kill | `:2284` `test_tc_b100_50_a_restarted_key_becomes_the_newest_run` | KILLED: the restarted run's step stays hidden (`step 1/2 a`, bar 0) |
+| M-20 | kill | `:2315` `test_tc_b100_50_a_falling_amount_never_lowers_the_bar` | KILLED: `[50, 20, 80]` |
+| M-28 | kill | `:2335` `test_tc_b100_50_ending_a_middle_run_shows_the_newest_remaining` | KILLED: the oldest run `R` is shown |
+| M-31 | kill | `:2361` `test_tc_b100_50_a_begin_after_the_last_end_starts_one_timer` | KILLED: 0 running timers |
+| M-44 | kill if observable | `:2394` `test_tc_b100_50_a_stale_failure_logs_nothing` | observable, KILLED: the stale `_busy_fail` logs `Loading b.s19 failed` |
+| M-79 | kill | existing `test_b100_busy.py::test_tc_b100_51_file_load_ends_once_on_success` (it loads `x.txt`) | KILLED: `refused_begins == 1`. No new arm needed; the mutation run had named only the containment-refusal node. The listed-row half of LLR-172.4f is M-94 (already KILLED) |
+| M-82 | AST check | `:2520` `test_tc_b100_51_file_load_reads_the_copy_size_before_the_worker` | KILLED: the `stat` line is after the dispatch |
+| M-89 | kill, project open | `:2549` `test_tc_b100_51_file_load_into_an_open_project_ends_after_the_sync` | KILLED: `['Loaded other.s19', 'Project saved + manifest verified', "Project 'P' now opens other.s19 …"]` |
+| M-101 | kill | `test_b100_recents.py:3918` `test_tc_b100_39_pick_of_a_vanished_entry_asks_nothing` | KILLED: a question opens for the vanished file |
+| M-102 | kill | `:3965` `test_tc_b100_39_pick_survives_an_error_at_the_first_look` | KILLED: the first-look error returns and nothing loads |
+| M-105 | kill | `:4017` `test_tc_b100_39_pick_of_a_reparse_point_file_is_refused` | KILLED: `x.s19` is parsed and loaded |
+
+Deviation, declared: M-101's ruling text says "vanishes after the question → refused line, not silent". The mutant is the *pre-question* look, and the ruled behaviour (F-11 / 9b B88, the `_load_workarea_file` docstring) is that a vanished entry loads nothing *silently*. The arm therefore pins "no question, 0 status lines, 0 parses". Adding a refusal line would change source behaviour that no ruling changed; I left it as it is.
+
+Accepted as equivalent (orchestrator): M-08, M-17, M-19, M-36, M-58, M-77, M-86, for the reasons in mutation-summary.md. Not-run here and accepted: M-25 and M-48, the `ESC and BEL` arm, which runs only on Linux CI (S12a-R2-3).
+
+Final run: `green-07-final.txt` (worktree, final source): **147 passed, 3 skipped** in 542 s. The skips: the Windows ESC arm; the 130-character picked-row arm (this host refuses the long temp path; not caused by this pass); the on-disk `Proj`/`proj` arm (case-insensitive default basetemp; it was executed RED and GREEN on a case-sensitive folder in round 1). The run covers the green-04 set (23 busy + 18 recents + the 3 guard modules), the 12 round-2 arms, the round-1 corrective arms, the 2 renamed report nodes, the MERGE-12a-1 re-pin and the M-70 killer.
+
 ## Evidence (all under `.dev-flow/2026-10-26-batch-100/evidence/inc-12a/`; each transcript prints `s19_app.__file__`)
 
 | File | Tree | Result |
@@ -48,13 +74,14 @@ Source edits: `s19_app/tui/app.py` only (3 hunks). `styles.tcss` unchanged. Test
 | `green-03-corrective.txt` | worktree | run 1: **9 passed, 2 skipped** (same 2 skips); run 2 (case-sensitive folder): **1 passed** |
 | `green-04-new-and-guards.txt` | worktree | **130 passed, 2 skipped**: 23 `test_b100_busy.py` nodes on the changed code, 18 `test_b100_recents.py` project-match and pick nodes, plus `test_id_registry.py`, `test_b99_staging.py`, `test_engine_unchanged.py`. The skips are the Windows ESC arm and the 130-character picked-row arm (the host refuses the long temp path; pre-existing) |
 | `green-06-merge-repin.txt` | worktree | MERGE-12a-1: **2 passed** (`same_ranges`, `other_ranges`) |
+| `green-07-final.txt` | worktree (final source, round 2) | **147 passed, 3 skipped** |
 | `green-05-busy-file.txt` | worktree | the whole `tests/test_b100_busy.py` once: **81 passed, 1 skipped** (the ESC arm) in 338 s |
 
 Env for every run: `env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=.`, `LOCALAPPDATA` and `--basetemp` under the scratchpad `corr12a/`, s19env Python. No timing arm failed, so no re-run was needed. Whole touched modules and the full suite were not run (operator override).
 
 ## Source sha256[:16]
 
-| File | Before (71376a3, CRLF working copy) | After |
+| File | Before (71376a3, CRLF working copy) | After (round 1 = final; round 2 changed tests only) |
 |---|---|---|
 | `s19_app/tui/app.py` | `2d1908b14236004f` | `15ffc7bdbb599615` |
 | `s19_app/tui/styles.tcss` | `f7b4f75911b296a4` | `f7b4f75911b296a4` (unchanged) |
@@ -62,5 +89,5 @@ Env for every run: `env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHO
 ## Not done / open
 
 - The `ESC and BEL` arm (Linux CI only) is changed but **not-run** here; it first runs in CI.
-- CR12a-2: no mutant survivor reached this pass, so no AST rule was added.
+- CR12a-2: done in round 2 (AST rule plus one behavioural abort arm).
 - The case-sensitive scratch folder `…/scratchpad/corr12a/bt/csparent` is scratch only. Nothing in the repo depends on it.
