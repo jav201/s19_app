@@ -298,6 +298,9 @@ _TYPED_REFUSAL_TOKENS: dict[str, tuple[str, str]] = {
     "not a project": ("not a project", "pick a project in the list"),
     "outside": ("outside the work area", "copy the folder into the work area"),
     "link": ("link or junction", "pick a project in the list"),
+    # CR9b-03: a typed data or A2L path in the work area that is, or passes
+    # through, a link — a file, so the step is not the project list.
+    "link file": ("is a link or junction", "open the file it points to"),
     "unreadable": (
         "could not be read",
         "check that the folder can be opened, then load again",
@@ -7712,7 +7715,12 @@ class S19TuiApp(App):
                 manifest_stat = os.lstat(manifest_path)
             except FileNotFoundError:
                 manifest_stat = None
-            if manifest_stat is not None and not stat.S_ISREG(manifest_stat.st_mode):
+            # SEC9b-2: the ``_folder_holds_project`` test (regular and not a
+            # reparse point), so a placeholder is refused before any open.
+            if manifest_stat is not None and (
+                not stat.S_ISREG(manifest_stat.st_mode)
+                or _is_reparse_point(manifest_path)
+            ):
                 return [
                     (
                         "could not be read — check that the folder can be opened, then load again",
@@ -12205,7 +12213,10 @@ class S19TuiApp(App):
             )
             self.logger.warning("Project load refused (manifest unreadable): %r", name)
             return
-        if manifest_stat is not None and not stat.S_ISREG(manifest_stat.st_mode):
+        # SEC9b-2: the same test as ``_folder_holds_project`` and the preview.
+        if manifest_stat is not None and (
+            not stat.S_ISREG(manifest_stat.st_mode) or _is_reparse_point(manifest_path)
+        ):
             self.set_status(
                 safe_text(
                     f"Project NOT loaded: '{painted_names([name])}' could not be "
@@ -12704,13 +12715,15 @@ class S19TuiApp(App):
 
         Data Flow:
             - One ``os.scandir(folder)`` with ``follow_symlinks=False``.
-            - ``entry.is_file(follow_symlinks=False)`` is the no-follow test
-              (a symlink is not a file); metadata only, writes nothing.
+            - ``entry.is_file(follow_symlinks=False)`` and not
+              ``_is_reparse_point`` is the no-follow test (a symlink or any
+              other reparse point is not a file); one ``lstat`` per entry,
+              metadata only, writes nothing.
 
         Dependencies:
             Uses:
                 - ``PROJECT_DATA_EXTENSIONS`` / ``MAC_EXTENSIONS`` /
-                  ``A2L_EXTENSIONS``
+                  ``A2L_EXTENSIONS`` / ``_is_reparse_point``
             Used by:
                 - ``_folder_holds_project`` / ``_load_dialog_preview`` /
                   ``_handle_load_project``
@@ -12720,9 +12733,12 @@ class S19TuiApp(App):
         a2l_files: list[Path] = []
         with os.scandir(folder) as entries:
             for entry in entries:
-                if not entry.is_file(follow_symlinks=False):
-                    continue
                 item = Path(entry.path)
+                # SEC9b-3: ``is_file(follow_symlinks=False)`` is False only for
+                # a symlink; ``_is_reparse_point`` also catches every other
+                # reparse point (a WSL link, a cloud placeholder).
+                if not entry.is_file(follow_symlinks=False) or _is_reparse_point(item):
+                    continue
                 suffix = item.suffix.lower()
                 if suffix in PROJECT_DATA_EXTENSIONS:
                     data_files.append(item)
@@ -13333,7 +13349,9 @@ class S19TuiApp(App):
             Classify one user-typed Load path into an action and a reason
             word, reading only metadata (HLR-172a, LLR-172.5): a project,
             a data file, an A2L file, or a refusal. It never paints, never
-            writes, and never raises — every ``OSError`` becomes a reason.
+            writes, and never raises — every ``OSError`` becomes a reason,
+            and so does a ``ValueError`` / ``RuntimeError`` from
+            ``resolve_input_path`` (SEC9b-1).
 
         Args:
             path (Path): The path typed into the Load dialog (or the
@@ -13344,7 +13362,7 @@ class S19TuiApp(App):
                 name of a listed project; ``("data", "")``; ``("a2l", "")``;
                 or ``("refuse", reason)`` with ``reason`` one of
                 ``not found``, ``not a supported file``, ``not a project``,
-                ``outside``, ``link``, ``unreadable``.
+                ``outside``, ``link``, ``link file``, ``unreadable``.
 
         Data Flow:
             - A relative typed path keeps the file route only (step 0): a
@@ -13356,6 +13374,9 @@ class S19TuiApp(App):
               for links/junctions, matched by ``normcase`` against
               ``list_projects`` (the on-disk spelling is routed, E3 R3), then
               tested for project content (§1.3).
+            - A link on the walk refuses ``link``; when the typed path names
+              a data or A2L file (not ``project.json``) it refuses
+              ``link file`` instead (CR9b-03).
 
         Dependencies:
             Uses:
@@ -13365,10 +13386,15 @@ class S19TuiApp(App):
                 - ``_load_path_from_user_input`` / ``_load_dialog_verdict``
         """
         text = str(path).strip().strip('"')
-        if not Path(text).is_absolute():
+        try:
             normalized = resolve_input_path(path, self.base_dir)
-            if normalized is None:
-                return ("refuse", "not found")
+        except (ValueError, RuntimeError):
+            # SEC9b-1: a path too long for the OS (``ValueError``) or a POSIX
+            # ``~user`` with no home (``RuntimeError``) is refused, never raised.
+            return ("refuse", "not found")
+        if normalized is None:
+            return ("refuse", "not found")
+        if not Path(text).is_absolute():
             if os.path.isdir(normalized):
                 return ("refuse", "not a supported file")
             suffix = normalized.suffix.lower()
@@ -13378,9 +13404,6 @@ class S19TuiApp(App):
                 return ("data", "")
             return ("refuse", "not a supported file")
 
-        normalized = resolve_input_path(path, self.base_dir)
-        if normalized is None:
-            return ("refuse", "not found")
         typed = os.path.abspath(normalized)
         w = os.path.abspath(self.workarea)
         ntyped = os.path.normcase(typed)
@@ -13419,6 +13442,10 @@ class S19TuiApp(App):
             except OSError:
                 return ("refuse", "unreadable")
             if stat.S_ISLNK(st_info.st_mode) or _is_reparse_point(Path(prefix)):
+                if not is_manifest and (
+                    suffix in A2L_EXTENSIONS or suffix in SUPPORTED_EXTENSIONS
+                ):
+                    return ("refuse", "link file")
                 return ("refuse", "link")
             last_stat = st_info
 
@@ -13526,6 +13553,11 @@ class S19TuiApp(App):
             line = (
                 f"Project NOT loaded: '{t}' passes through a link or junction — "
                 "pick a project in the list."
+            )
+        elif value == "link file":
+            line = (
+                f"File NOT loaded: '{t}' is a link or junction — open the "
+                "file it points to."
             )
         else:
             line = (

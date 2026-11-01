@@ -1,0 +1,11 @@
+mutant: M11
+file: s19_app/tui/screens.py
+old -> new: '            "#load_list" if self._mode == "list" else "#load_path"' -> '            "#load_path" if self._mode == "list" else "#load_list"'
+sha256 before: a7d9ed25e09de3ef56e9d1f9c6ffd624ffe1eca8408d04d5170a857696111424
+command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_load_dialog.py::test_tc_b100_41_l_and_ctrl_l_open_the_dialog_on_the_path_field tests/test_b100_load_dialog.py::test_tc_b100_41_p_and_the_button_open_the_dialog_on_the_list
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b\s19_app\__init__.py
+---
+pytest: 2 failed in 7.94s
+verdict: KILLED
+restored = True

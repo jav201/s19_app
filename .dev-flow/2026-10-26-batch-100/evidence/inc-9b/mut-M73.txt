@@ -1,0 +1,11 @@
+mutant: M73
+file: s19_app/tui/app.py
+old -> new: '        if action in _LOAD_DIALOG_INERT_ACTIONS and any(\n            isinstance(s, LoadDialog) for s in self.screen_stack\n        ):\n            return False' -> '        if action in _LOAD_DIALOG_INERT_ACTIONS and isinstance(\n            self.screen, LoadDialog\n        ):\n            return False'
+sha256 before: ae3d1cd924c42a2a9e7a920cd95aab8b21f4d9b324afdfb627be86fdf36df9ab
+command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_load_dialog.py::test_tc_b100_41_priority_keys_are_inert_while_the_dialog_is_open
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b\s19_app\__init__.py
+---
+pytest: 1 failed in 6.07s
+verdict: KILLED
+restored = True

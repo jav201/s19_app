@@ -1,0 +1,11 @@
+mutant: M43
+file: s19_app/tui/styles.tcss
+old -> new: '#load_list {\n    height: 1fr;\n    border: round $rule;\n    background: $bg-base;\n    text-wrap: nowrap;\n    text-overflow: ellipsis;\n}' -> '#load_list {\n    height: 1fr;\n    border: round $rule;\n    background: $bg-base;\n    text-overflow: ellipsis;\n}'
+sha256 before: 5093edc072e0309128d37bdd1ba65c92e311262c660d4c684a30686f02756b80
+command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_load_dialog.py::test_tc_b100_64_list_rows_never_wrap
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b\s19_app\__init__.py
+---
+pytest: 2 failed, 1 passed in 6.61s
+verdict: KILLED
+restored = True

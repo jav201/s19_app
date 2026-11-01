@@ -323,6 +323,7 @@ class LoadDialog(ModalScreen[Optional[LoadChoice]]):
                         placeholder=r"C:\path\to\file.s19, .hex, .mac, .a2l, or a project folder",
                         id="load_path",
                         restrict=r"[^\x00-\x1f\x7f]*",
+                        max_length=4096,
                     ),
                     OptionList(id="load_list", markup=False),
                     id="load_left",
@@ -367,12 +368,26 @@ class LoadDialog(ModalScreen[Optional[LoadChoice]]):
         self._apply_stack(self.app.size.width)
 
     def _initial_index(self) -> Optional[int]:
-        """Return the row to highlight on open (same rule in both modes).
+        """
+        Summary:
+            Return the row to highlight on open. The same rule holds in both
+            modes, so a ``mode="path"`` dialog still has a row ready when
+            the engineer tabs to the list.
+
+        Returns:
+            Optional[int]: The ``#load_list`` index, or ``None`` when no row
+            holds a choice.
 
         Data Flow:
             First match of: a project row whose value equals ``_highlight``;
             else the first project row; else the first row with a choice;
             else ``None``.
+
+        Dependencies:
+            Uses:
+                - ``self._rows`` / ``self._highlight``
+            Used by:
+                - ``LoadDialog.on_mount``
         """
         for i, (_s, _label, choice) in enumerate(self._rows):
             if (
@@ -390,7 +405,15 @@ class LoadDialog(ModalScreen[Optional[LoadChoice]]):
         return None
 
     def on_key(self, event: events.Key) -> None:
-        """Intercept keys before the non-priority bindings see them.
+        """
+        Summary:
+            Intercept keys before the non-priority bindings see them.
+            ``escape`` is tested before ``enter`` (A9b-06), so an Escape
+            queued ahead of an Enter cancels and the Enter finds the dialog
+            already dismissed.
+
+        Args:
+            event (events.Key): The key event that reached the dialog.
 
         Data Flow:
             - ``escape`` cancels from any focus, at the same hop as ``enter``.
@@ -401,6 +424,12 @@ class LoadDialog(ModalScreen[Optional[LoadChoice]]):
               ``"path"`` at once, and the preview clears.
             - All other keys (``up`` / ``down`` / ``home`` / ``end`` /
               ``pageup`` / ``pagedown`` / ``tab``) keep their bindings.
+
+        Dependencies:
+            Uses:
+                - ``action_cancel`` / ``action_load`` / ``_schedule_preview``
+            Used by:
+                - Textual key dispatch (every key the dialog receives)
         """
         f = self.focused
         if f is None:
@@ -440,7 +469,12 @@ class LoadDialog(ModalScreen[Optional[LoadChoice]]):
             self.action_cancel()
 
     def action_load(self) -> None:
-        """Resolve the source, run ``verdict``, then dismiss or paint a reason.
+        """
+        Summary:
+            Resolve the source, run ``verdict``, then dismiss or paint a
+            reason. The last-focused source decides the choice (S-f), not
+            the widget that holds focus now; a second request after the
+            dismiss returns at once (A9b-02).
 
         Data Flow:
             - The source decides the choice: the highlighted row's ``LoadChoice``
@@ -450,6 +484,14 @@ class LoadDialog(ModalScreen[Optional[LoadChoice]]):
               paints ``LOAD_NOTHING_SELECTED`` and returns.
             - A non-``None`` ``verdict`` pair is painted and the dialog stays
               open with the field untouched; only ``None`` dismisses.
+
+        Dependencies:
+            Uses:
+                - ``_row_choice`` / ``_path_choice`` / ``_verdict`` /
+                  ``_say`` / ``_close``
+            Used by:
+                - ``on_key`` / ``on_input_submitted`` / ``on_button_pressed``
+                  / the ``alt+l`` binding
         """
         if self._dismissed:
             return
@@ -486,19 +528,50 @@ class LoadDialog(ModalScreen[Optional[LoadChoice]]):
         self.query_one("#load_reason", Static).update(f"{reason} — {step}")
 
     def _close(self, result: Optional[LoadChoice]) -> None:
-        """Dismiss once; a second queued close / load request returns at once."""
+        """
+        Summary:
+            Dismiss once; a second queued close / load request returns at
+            once, so two Enters (or Escape then Enter) give one dismiss
+            (A9b-02, R2-6).
+
+        Args:
+            result (Optional[LoadChoice]): The choice to hand the caller, or
+                ``None`` for Cancel / Escape.
+
+        Data Flow:
+            - ``_dismissed`` is set before ``dismiss`` runs.
+
+        Dependencies:
+            Uses:
+                - ``ModalScreen.dismiss``
+            Used by:
+                - ``action_load`` / ``action_cancel``
+        """
         if self._dismissed:
             return
         self._dismissed = True
         self.dismiss(result)
 
     def on_descendant_focus(self, event: events.DescendantFocus) -> None:
-        """Track the last-focused source widget (``#load_list`` vs ``#load_path``).
+        """
+        Summary:
+            Track the last-focused source widget (``#load_list`` vs
+            ``#load_path``). Focus on the preview or a button keeps the
+            source, so ``#load_ok`` loads what the engineer last chose (S-f).
+
+        Args:
+            event (events.DescendantFocus): The focus event of a child widget.
 
         Data Flow:
             - Focus on the preview or a button changes nothing.
             - A source change updates ``_source`` and asks for the new source's
               preview (the row's choice for the list, none for the path field).
+
+        Dependencies:
+            Uses:
+                - ``_row_choice`` / ``_schedule_preview``
+            Used by:
+                - Textual focus dispatch
         """
         if event.widget.id in ("load_list", "load_path"):
             src = "list" if event.widget.id == "load_list" else "path"

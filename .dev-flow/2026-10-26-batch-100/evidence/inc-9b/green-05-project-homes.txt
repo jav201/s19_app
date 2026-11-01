@@ -1,0 +1,129 @@
+# green-05-project-homes — the whole tests/test_b100_project_homes.py, run ONCE (targeted exception to the override, ruling (1)).
+# Result: 3 failed, 87 passed. Dispositions (see green-05b below and E5-corrective-notes.md):
+#  - test_e4_llr_171_2g_linked_a2l_beside_a_mac_is_never_parsed: a second 9a link-following arm on the project-load route -> re-pinned to LLR-173.4n, re-run GREEN in Part 2.
+#  - test_tc_b100_31_depth_ceiling[32]/[33]: WinError 206 (path too long) from the long scratch --basetemp; fails identically on 741cc07 (Part 3) -> environment, not 9b; reported blocked.
+# tree: C:/Users/jjgh8/Github/s19_app-b100-inc9b
+# git: 741cc07
+# date: 2026-10-31T19:09:34-06:00
+# cmd: pytest tests/test_b100_project_homes.py -rfEs --tb=short --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr9b/bt-green5
+s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc9b\s19_app\__init__.py
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: C:\Users\jjgh8\Github\s19_app-b100-inc9b
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collected 90 items
+
+tests\test_b100_project_homes.py ...............FF...................... [ 43%]
+........................F..........................                      [100%]
+
+================================== FAILURES ===================================
+______________________ test_tc_b100_31_depth_ceiling[32] ______________________
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1116: in mkdir
+    os.mkdir(self, mode)
+E   FileNotFoundError: [WinError 206] The filename or extension is too long: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\corr9b\\bt-green5\\test_tc_b100_31_depth_ceiling_0\\app\\.s19tool\\workarea\\P\\reports\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a'
+
+During handling of the above exception, another exception occurred:
+tests\test_b100_project_homes.py:708: in test_tc_b100_31_depth_ceiling
+    relative = projects.deep_file(project_dir, components)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\support\b100_projects.py:813: in deep_file
+    target.parent.mkdir(parents=True, exist_ok=True)
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1121: in mkdir
+    self.mkdir(mode, parents=False, exist_ok=exist_ok)
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1116: in mkdir
+    os.mkdir(self, mode)
+E   FileNotFoundError: [WinError 206] The filename or extension is too long: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\corr9b\\bt-green5\\test_tc_b100_31_depth_ceiling_0\\app\\.s19tool\\workarea\\P\\reports\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a'
+______________________ test_tc_b100_31_depth_ceiling[33] ______________________
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1116: in mkdir
+    os.mkdir(self, mode)
+E   FileNotFoundError: [WinError 206] The filename or extension is too long: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\corr9b\\bt-green5\\test_tc_b100_31_depth_ceiling_1\\app\\.s19tool\\workarea\\P\\reports\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a'
+
+During handling of the above exception, another exception occurred:
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1116: in mkdir
+    os.mkdir(self, mode)
+E   FileNotFoundError: [WinError 206] The filename or extension is too long: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\corr9b\\bt-green5\\test_tc_b100_31_depth_ceiling_1\\app\\.s19tool\\workarea\\P\\reports\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a'
+
+During handling of the above exception, another exception occurred:
+tests\test_b100_project_homes.py:708: in test_tc_b100_31_depth_ceiling
+    relative = projects.deep_file(project_dir, components)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\support\b100_projects.py:813: in deep_file
+    target.parent.mkdir(parents=True, exist_ok=True)
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1120: in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1121: in mkdir
+    self.mkdir(mode, parents=False, exist_ok=exist_ok)
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1116: in mkdir
+    os.mkdir(self, mode)
+E   FileNotFoundError: [WinError 206] The filename or extension is too long: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\corr9b\\bt-green5\\test_tc_b100_31_depth_ceiling_1\\app\\.s19tool\\workarea\\P\\reports\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a'
+_________ test_e4_llr_171_2g_linked_a2l_beside_a_mac_is_never_parsed __________
+tests\test_b100_project_homes.py:2006: in test_e4_llr_171_2g_linked_a2l_beside_a_mac_is_never_parsed
+    assert "not readable" in flat and "firmware.a2l" in flat and "link or junction" in flat, panel
+E   AssertionError: Project P opened
+E     Opened    (no image)
+E               the first variant by name (the manifest records no active variant)
+E     Variants  0 in the project
+E     MAC       firmware.mac
+E     A2L       (none)
+E     No problems found.
+E   assert ('not readable' in 'Project P opened Opened (no image) the first variant by name (the manifest records no active variant) Variants 0 in the project MAC firmware.mac A2L (none) No problems found.')
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_depth_ceiling[32] - ...
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_depth_ceiling[33] - ...
+FAILED tests/test_b100_project_homes.py::test_e4_llr_171_2g_linked_a2l_beside_a_mac_is_never_parsed
+================== 3 failed, 87 passed in 598.90s (0:09:58) ===================
+# exit: 1
+
+# =======================================================================
+# Part 2: green-05b — the re-pinned arm and the depth arms, worktree
+# tree: C:/Users/jjgh8/Github/s19_app-b100-inc9b
+# git: 741cc07
+# date: 2026-10-31T19:20:21-06:00
+# cmd: pytest tests/test_b100_project_homes.py::test_e4_llr_171_2g_linked_a2l_beside_a_mac_is_never_parsed tests/test_b100_project_homes.py::test_tc_b100_31_depth_ceiling -v -rfEs --tb=line --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr9b/bt-green5b
+s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc9b\s19_app\__init__.py
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+rootdir: C:\Users\jjgh8\Github\s19_app-b100-inc9b
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 3 items
+
+tests/test_b100_project_homes.py::test_e4_llr_171_2g_linked_a2l_beside_a_mac_is_never_parsed PASSED [ 33%]
+tests/test_b100_project_homes.py::test_tc_b100_31_depth_ceiling[32] FAILED [ 66%]
+tests/test_b100_project_homes.py::test_tc_b100_31_depth_ceiling[33] FAILED [100%]
+
+================================== FAILURES ===================================
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1116: FileNotFoundError: [WinError 206] The filename or extension is too long: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\corr9b\\bt-green5b\\test_tc_b100_31_depth_ceiling_0\\app\\.s19tool\\workarea\\P\\reports\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a'
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1116: FileNotFoundError: [WinError 206] The filename or extension is too long: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\corr9b\\bt-green5b\\test_tc_b100_31_depth_ceiling_1\\app\\.s19tool\\workarea\\P\\reports\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a'
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_depth_ceiling[32] - ...
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_depth_ceiling[33] - ...
+========================= 2 failed, 1 passed in 9.14s =========================
+# exit: 1
+
+# =======================================================================
+# Part 3: the depth arms on 741cc07 (scratch base10), same basetemp length
+# tree: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/base10
+# git: 741cc07
+# date: 2026-10-31T19:20:32-06:00
+# cmd: pytest tests/test_b100_project_homes.py::test_tc_b100_31_depth_ceiling -v -rfEs --tb=line --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr9b/bt-green5b
+s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\s19_app\__init__.py
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+rootdir: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 2 items
+
+tests/test_b100_project_homes.py::test_tc_b100_31_depth_ceiling[32] FAILED [ 50%]
+tests/test_b100_project_homes.py::test_tc_b100_31_depth_ceiling[33] FAILED [100%]
+
+================================== FAILURES ===================================
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1116: FileNotFoundError: [WinError 206] The filename or extension is too long: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\corr9b\\bt-green5b\\test_tc_b100_31_depth_ceiling_0\\app\\.s19tool\\workarea\\P\\reports\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a'
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1116: FileNotFoundError: [WinError 206] The filename or extension is too long: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\corr9b\\bt-green5b\\test_tc_b100_31_depth_ceiling_1\\app\\.s19tool\\workarea\\P\\reports\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a'
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_depth_ceiling[32] - ...
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_depth_ceiling[33] - ...
+============================== 2 failed in 4.44s ==============================
+# exit: 1

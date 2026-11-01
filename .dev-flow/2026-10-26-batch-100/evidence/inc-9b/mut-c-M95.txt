@@ -1,0 +1,17 @@
+mutant: M95
+file: s19_app/tui/app.py
+edits (old -> new):
+  '        self.set_status(safe_text(f"A2L loaded: {painted_names([copied.name])}").plain)'
+    -> '        self.set_status(safe_text(f"A2L loaded: {copied.name}").plain)'
+sha256 before: d0cfd46e22c3f60ef85829bf5903d689b7e849d770fe428e65d4b1000d75b509
+sha256 after restore: d0cfd46e22c3f60ef85829bf5903d689b7e849d770fe428e65d4b1000d75b509
+restored = True
+command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE --basetemp=C:/Users/jjgh8/Github/s19_app-b100-inc9b/.dev-flow/2026-10-26-batch-100/evidence\bt-mutc-M95 tests/test_b100_load_dialog.py::test_tc_b100_40_a2l_status_line_paints_the_name_scrubbed
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr9b/mut
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr9b\mut\s19_app\__init__.py
+---
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr9b\mut\tests\test_b100_load_dialog.py:692: AssertionError: ["'A2L loaded: c\\u202ex.a2l'"]
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_40_a2l_status_line_paints_the_name_scrubbed
+pytest: 1 failed in 2.86s
+exit code: 1
+verdict: KILLED

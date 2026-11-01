@@ -1,0 +1,11 @@
+mutant: M39
+file: s19_app/tui/screens.py
+old -> new: '        self.query_one("#load_preview Static", Static).update("")\n        if choice is None:\n            return' -> '        if choice is None:\n            return'
+sha256 before: a7d9ed25e09de3ef56e9d1f9c6ffd624ffe1eca8408d04d5170a857696111424
+command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_load_dialog.py::test_tc_b100_41_preview_follows_the_load_target
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b\s19_app\__init__.py
+---
+pytest: 1 passed in 5.75s
+verdict: SURVIVED
+restored = True

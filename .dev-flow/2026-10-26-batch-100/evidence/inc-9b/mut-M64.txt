@@ -1,0 +1,11 @@
+mutant: M64
+file: s19_app/tui/app.py
+old -> new: '            a2l_ok = bool(a2l_files) and self._a2l_admission(a2l_files[0]) is None' -> '            a2l_ok = bool(a2l_files)'
+sha256 before: ae3d1cd924c42a2a9e7a920cd95aab8b21f4d9b324afdfb627be86fdf36df9ab
+command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_load_dialog.py::test_tc_b100_64_project_preview_marks_equal_the_install
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b\s19_app\__init__.py
+---
+pytest: 4 passed in 15.50s
+verdict: SURVIVED
+restored = True

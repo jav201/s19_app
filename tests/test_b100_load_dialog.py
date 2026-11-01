@@ -664,6 +664,35 @@ def test_tc_b100_40_workarea_a2l_choice_equals_the_files_list_pick(tmp_path: Pat
     assert dialog[2] == dialog[3], (dialog[2], dialog[3])
 
 
+def test_tc_b100_40_a2l_status_line_paints_the_name_scrubbed(tmp_path: Path) -> None:
+    """LLR-173.1b A2L arm, S9b-5 (E5, M95): a work-area A2L named
+    ``c<U+202E>x.a2l`` (a bidi override in the name) picked from the dialog
+    → the attach status line reads ``A2L loaded: cx.a2l``, with no U+202E.
+
+    Why: a format character in a file name reorders or hides the painted
+    text; every painted name goes through ``painted_names``.
+    Negative control: the status line painting ``copied.name`` raw → the
+    U+202E is painted → RED (M95)."""
+    name = "c‮x.a2l"
+    base = tmp_path / "app"
+    temp = _temp(base)
+    try:
+        (temp / name).write_bytes(_a2l())
+    except OSError as exc:
+        pytest.skip(f"not run: the volume refuses the name ({exc})")
+
+    async def scenario(app, pilot, log):
+        mark = len(log.messages)
+        app._handle_load_dialog(LC("workarea", name))
+        await ld.wait_for(pilot, lambda: app.current_a2l_path is not None, "the A2L attach")
+        await _settle(pilot)
+        return [m for m in log.since(mark) if "A2L loaded:" in m]
+
+    lines = _run(base, scenario)
+    assert len(lines) == 1 and "A2L loaded: cx.a2l" in lines[0], [ascii(m) for m in lines]
+    assert "‮" not in lines[0], ascii(lines[0])
+
+
 def test_tc_b100_40_path_choice_takes_the_typed_route(tmp_path: Path) -> None:
     """LLR-173.1c (B11, 3 of 3): typed ``<tmp>/a.s19`` → 1 data load;
     ``<tmp>/b.a2l`` → 1 A2L attach (``A2L loaded: b.a2l``); the absolute
@@ -753,8 +782,9 @@ def test_tc_b100_40_recent_choice_loads_the_recorded_text_unchanged(
     Why: a recent row must reopen exactly the recorded file, never a file
     of the same name elsewhere.
     Negative control: the recent loaded by its file name relative to the
-    base → the ``gone`` arm loads ``<base>\\fw.s19`` → RED. RED (base): no
-    ``LoadChoice``."""
+    base → the ``gone`` arm loads ``<base>\\fw.s19`` → RED; a recent load
+    that skips ``record_recent_source`` leaves ``fw`` (seeded last) last →
+    RED (CR9b-02). RED (base): no ``LoadChoice``."""
     lad = _lad(tmp_path, monkeypatch)
     src = tmp_path / "src"
     src.mkdir()
@@ -764,7 +794,13 @@ def test_tc_b100_40_recent_choice_loads_the_recorded_text_unchanged(
     base.mkdir()
     (base / "fw.s19").write_bytes(_s19_other())
     gone = str(tmp_path / "gone" / "fw.s19")
-    store = _seed_store(lad, [str(src / "fw.s19"), str(src / "cal.a2l"), gone])
+    # CR9b-02: ``fw`` is seeded LAST, so only a fresh record of the ``fw``
+    # load can make it the first entry (read before the ``cal`` load).
+    store = _seed_store(lad, [gone, str(src / "cal.a2l"), str(src / "fw.s19")])
+
+    def store_paths() -> list:
+        doc = json.loads(store.read_text(encoding="utf-8"))
+        return [e["path"] for e in doc["sources"]]
 
     async def scenario(app, pilot, log):
         mark = len(log.messages)
@@ -773,19 +809,19 @@ def test_tc_b100_40_recent_choice_loads_the_recorded_text_unchanged(
         after_gone = app.current_file
         app._handle_load_dialog(LC("recent", str(src / "fw.s19")))
         await ld.wait_for(pilot, lambda: app.current_file is not None, "the recent data load")
+        await _settle(pilot)
+        after_fw = store_paths()
         copy = Path(app.current_file.path)
         app._handle_load_dialog(LC("recent", str(src / "cal.a2l")))
         await ld.wait_for(pilot, lambda: app.current_a2l_path is not None, "the recent A2L attach")
         await _settle(pilot)
-        return after_gone, copy.read_bytes(), log.since(mark)
+        return after_gone, copy.read_bytes(), log.since(mark), after_fw
 
-    after_gone, copied, messages = _run(base, scenario)
+    after_gone, copied, messages, after_fw = _run(base, scenario)
     assert after_gone is None, "the missing recent loaded a file (the base-folder fallback ran)"
     assert copied == _s19()
     assert any("A2L loaded: cal.a2l" in m for m in messages), messages
-    doc = json.loads(store.read_text(encoding="utf-8"))
-    paths = [e["path"] for e in doc["sources"]]
-    assert str(src / "fw.s19") in paths[:2], paths
+    assert after_fw[0] == str(src / "fw.s19"), after_fw
 
 
 def test_tc_b100_40_unreadable_picked_project_paints_one_status_line(
@@ -1081,7 +1117,11 @@ def _density(app) -> tuple:
 def test_tc_b100_41_priority_keys_are_inert_while_the_dialog_is_open(tmp_path: Path) -> None:
     """LLR-173.2e (B90, S9b-1; 6 of 6): with the dialog open, ``ctrl+l`` →
     stack depth 2, 0 second dialogs; ``ctrl+s`` → depth 2, 0 Save dialogs;
-    ``ctrl+k`` → the focus stays inside the dialog; ``ctrl+d`` → the density
+    ``ctrl+k`` → the focus stays inside the dialog AND the main screen under
+    it is untouched (its focused widget unchanged, its command-bar palette
+    still closed — CR9b-01: ``action_focus_palette`` opens the palette on
+    the main screen, under the modal, so the dialog's own focus cannot show
+    it); ``ctrl+d`` → the density
     unchanged; ``ctrl+p`` over the dialog (the command palette opens over
     it), then ``ctrl+s`` → 0 Save pushes, then ``ctrl+l`` → 0 second
     dialogs (the guard reads the whole screen stack). Also B91 (no
@@ -1092,9 +1132,10 @@ def test_tc_b100_41_priority_keys_are_inert_while_the_dialog_is_open(tmp_path: P
     a Save or a second Load stacked under the dialog would act on a session
     the engineer is about to replace.
     Negative control (executed S9b-1 probe): a guard that reads only the top
-    screen stacks ``Save`` after ``ctrl+p``, ``ctrl+s`` → RED. RED (base):
-    the base dialog is not the Load dialog (and ``ctrl+l`` stacks a second
-    one)."""
+    screen stacks ``Save`` after ``ctrl+p``, ``ctrl+s`` → RED; a guard
+    without ``focus_palette`` opens the main screen's palette on ``ctrl+k``
+    → RED (CR9b-01 mutant, executed). RED (base): the base dialog is not the
+    Load dialog (and ``ctrl+l`` stacks a second one)."""
     base = tmp_path / "app"
 
     async def scenario(app, pilot, log):
@@ -1111,10 +1152,16 @@ def test_tc_b100_41_priority_keys_are_inert_while_the_dialog_is_open(tmp_path: P
         await pilot.press("ctrl+s")
         await _settle(pilot)
         out["ctrl+s"] = [type(s).__name__ for s in app.screen_stack]
+        from s19_app.tui.command_bar import CommandBar
+
+        main = app.screen_stack[0]
+        main_focus0 = main.focused
         await pilot.press("ctrl+k")
         await _settle(pilot)
         focused = app.focused
         out["ctrl+k"] = focused is not None and ld.is_load_dialog(focused.screen)
+        out["ctrl+k main focus kept"] = main.focused is main_focus0
+        out["ctrl+k palette open"] = main.query_one(CommandBar).palette_is_open
         density1 = _density(app)
         await pilot.press("ctrl+d")
         await _settle(pilot)
@@ -1135,6 +1182,8 @@ def test_tc_b100_41_priority_keys_are_inert_while_the_dialog_is_open(tmp_path: P
     assert len(out["ctrl+l"]) == 2 and out["ctrl+l"][-1] == dialog, out
     assert len(out["ctrl+s"]) == 2 and "SaveProjectScreen" not in out["ctrl+s"], out
     assert out["ctrl+k"] is True, out
+    assert out["ctrl+k main focus kept"] is True, out
+    assert out["ctrl+k palette open"] is False, out
     assert out["ctrl+d"] is True, out
     assert out["palette"][-1] == "CommandPalette", out
     assert "SaveProjectScreen" not in out["after palette"], out
@@ -1193,14 +1242,21 @@ def test_tc_b100_41_text_in_the_field_then_tab_into_the_list_loads_the_row(tmp_p
     assert dialog_scene(tmp_path, scenario, mode="path") == [LC("project", "ab")]
 
 
+@pytest.mark.parametrize("mode", ["path", "list"])
 @pytest.mark.parametrize("trigger", ["enter", "alt+l", "load_ok"])
-def test_tc_b100_41_load_with_the_path_last_takes_the_typed_text(tmp_path: Path, trigger: str) -> None:
-    """LLR-173.2g, HLR-173c (S5-1 … S5-3, 3 of 3): path mode with row ``ab``
-    highlighted, ``C:\\t\\a.s19`` typed → each trigger dismisses
-    ``LoadChoice("path", "C:\\t\\a.s19")``, never the row.
+def test_tc_b100_41_load_with_the_path_last_takes_the_typed_text(
+    tmp_path: Path, trigger: str, mode: str
+) -> None:
+    """LLR-173.2g, HLR-173c (S5-1 … S5-3, 3 of 3): row ``ab`` highlighted,
+    ``C:\\t\\a.s19`` typed → each trigger dismisses ``LoadChoice("path",
+    "C:\\t\\a.s19")``, never the row. Run in path mode, and in list mode
+    (E5, M35), where the click into the field moves the source from the
+    list to the field.
 
     Negative control: a dialog that always takes the highlighted row →
-    ``LoadChoice("project", "ab")`` → RED. RED (base): no ``LoadDialog``."""
+    ``LoadChoice("project", "ab")`` → RED; a source tracker that ignores
+    focus on ``#load_path`` → the list-mode arms take the row → RED (M35).
+    RED (base): no ``LoadDialog``."""
 
     async def scenario(app, pilot, results, fakes):
         await ld.type_into_path(pilot, app, "C:\\t\\a.s19")
@@ -1213,9 +1269,125 @@ def test_tc_b100_41_load_with_the_path_last_takes_the_typed_text(tmp_path: Path,
         await _settle(pilot)
         return list(results), len(app.screen_stack)
 
-    results, depth = dialog_scene(tmp_path, scenario, mode="path")
+    results, depth = dialog_scene(tmp_path, scenario, mode=mode)
     assert results == [LC("path", "C:\\t\\a.s19")], results
     assert depth == 1
+
+
+def test_tc_b100_41_enter_on_the_preview_loads_the_highlighted_row(tmp_path: Path) -> None:
+    """LLR-173.2d (S4-2; E5, M17): list mode, ``tab`` to ``#load_preview``,
+    ``enter`` → ``LoadChoice("project", "ab")``: Enter on the preview loads
+    the row it previews.
+
+    Negative control: the enter arm limited to ``#load_list`` → Enter on the
+    preview does nothing, 0 dismisses → RED (M17)."""
+
+    async def scenario(app, pilot, results, fakes):
+        await pilot.press("tab")
+        await pilot.pause()
+        where = focused_id(app)
+        await pilot.press("enter")
+        await _settle(pilot)
+        return where, list(results)
+
+    where, results = dialog_scene(tmp_path, scenario)
+    assert where == "load_preview", where
+    assert results == [LC("project", "ab")], results
+
+
+def test_tc_b100_41_headings_cannot_be_reached_by_keys(tmp_path: Path) -> None:
+    """LLR-173.2c (E5, M09): list mode on ``ab`` (the first loadable row,
+    under the ``Projects`` heading) → ``up``, then ``home`` → the highlighted
+    row is a loadable row each time, never a heading.
+
+    Why: a heading holds no choice; landing on it turns Enter into
+    ``nothing selected`` for a row the engineer can see.
+    Negative control: the rows with no choice left enabled → ``up`` lands on
+    the ``Projects`` heading → RED (M09)."""
+    from textual.widgets import OptionList
+
+    async def scenario(app, pilot, results, fakes):
+        lst = app.screen.query_one("#load_list", OptionList)
+        out = [lst.highlighted]
+        for key in ("up", "home"):
+            await pilot.press(key)
+            await pilot.pause()
+            out.append(lst.highlighted)
+        return out
+
+    rows = ROWS_A()
+    out = dialog_scene(tmp_path, scenario)
+    assert out[0] == 1, out
+    for index in out:
+        assert index is not None and rows[index][2] is not None, (out, [r[1] for r in rows])
+
+
+def test_tc_b100_41_typed_text_reaches_the_verdict_verbatim(tmp_path: Path) -> None:
+    """LLR-173.2g (S-a; E5, M32): ``  C:\\t\\a.s19 `` (leading and trailing
+    spaces) in ``#load_path``, ``enter`` → the verdict and the dismiss both
+    receive ``LoadChoice("path", "  C:\\t\\a.s19 ")``, byte for byte.
+
+    Why: the app's classifier owns the trimming; a dialog that trims first
+    would route a different text than the one the router logs and the
+    status line quotes.
+    Negative control: the dialog strips the text → ``C:\\t\\a.s19`` → RED
+    (M32)."""
+    from textual.widgets import Input
+
+    text = "  C:\\t\\a.s19 "
+
+    async def scenario(app, pilot, results, fakes):
+        inp = app.screen.query_one("#load_path", Input)
+        inp.focus()
+        await pilot.pause()
+        inp.value = text
+        await pilot.pause()
+        await pilot.press("enter")
+        await _settle(pilot)
+        return list(fakes.verdicts), list(results)
+
+    verdicts, results = dialog_scene(tmp_path, scenario, mode="path")
+    assert verdicts == [LC("path", text)], verdicts
+    assert results == [LC("path", text)], results
+
+
+def test_tc_b100_41_path_mode_opens_with_an_empty_preview(tmp_path: Path) -> None:
+    """LLR-173.6 / S-f (E5, M38): path mode with row ``ab`` highlighted on
+    open → the preview is empty and ``preview`` was called 0 times: the
+    path field is the source, so the highlighted row is not the load target.
+
+    Negative control: the highlight handler that ignores the source → the
+    open-time highlight paints ``ab``'s preview → RED (M38)."""
+
+    async def scenario(app, pilot, results, fakes):
+        await _settle(pilot)
+        return preview_lines(app.screen), list(fakes.previews), focused_id(app)
+
+    lines, previews, focus = dialog_scene(tmp_path, scenario, mode="path")
+    assert focus == "load_path", focus
+    assert [line for line in lines if line.strip()] == [], lines
+    assert previews == [], previews
+
+
+def test_tc_b100_41_moving_to_the_path_field_clears_the_list_preview(tmp_path: Path) -> None:
+    """LLR-173.6 / S-f (E5, M39): list mode → ``ab``'s preview is painted;
+    a click into ``#load_path`` → the preview is empty (no ``●`` of the row
+    stays beside a typed path).
+
+    Negative control: ``_schedule_preview`` without its clear → the row's
+    preview stays → RED (M39)."""
+
+    async def scenario(app, pilot, results, fakes):
+        await _settle(pilot)
+        before = preview_lines(app.screen)
+        assert await pilot.click("#load_path"), "click missed #load_path"
+        await _settle(pilot)
+        return before, preview_lines(app.screen), focused_id(app)
+
+    before, after, focus = dialog_scene(tmp_path, scenario)
+    assert any("project:ab" in line for line in before), before
+    assert focus == "load_path", focus
+    assert [line for line in after if line.strip()] == [], after
 
 
 def test_tc_b100_41_alt_l_with_the_focus_on_the_path_field_loads_and_types_nothing(tmp_path: Path) -> None:
@@ -1405,26 +1577,33 @@ def test_tc_b100_41_cancel_closes_with_no_result(tmp_path: Path) -> None:
     assert dialog_scene(tmp_path / "click", by_click, mode="path") == [None]
 
 
-def test_tc_b100_41_double_enter_dismisses_once(tmp_path: Path) -> None:
-    """A9b-02 (S6-8): two ``enter`` keys queued back to back on the list →
+@pytest.mark.parametrize("second", ["enter", "escape"])
+def test_tc_b100_41_double_enter_dismisses_once(tmp_path: Path, second: str) -> None:
+    """A9b-02 (S6-8; the ``escape`` arm added at E5, M34): ``enter`` and a
+    second ``enter`` (or an ``escape``) queued back to back on the list →
     exactly 1 dismiss (``LoadChoice("project", "ab")``), 0 exceptions (the
     app keeps running), the stack back to the main screen.
 
-    Why: a second queued load must never dismiss a dismissed dialog (a
-    second ``dismiss`` pops the main screen or raises).
-    Negative control: ``_close`` without the early ``_dismissed`` return → 2
-    callbacks or a ``ScreenStackError`` → RED. RED (base): no
-    ``LoadDialog``."""
+    Why: a second queued load or cancel must never dismiss a dismissed
+    dialog (a second ``dismiss`` pops the main screen or raises).
+    Negative control: ``_close`` without the early ``_dismissed`` return →
+    the queued ``escape`` dismisses again (``action_cancel`` has no guard of
+    its own) → a ``ScreenStackError`` or the main screen popped → RED (M34);
+    ``action_load`` without its early return → the second ``enter`` runs the
+    verdict again on the dismissed dialog (2 verdict calls) → RED (M26).
+    RED (base): no ``LoadDialog``."""
 
     async def scenario(app, pilot, results, fakes):
         _post(app, "enter")
-        _post(app, "enter")
+        _post(app, second)
         await _settle(pilot, 10)
-        return list(results), len(app.screen_stack)
+        return list(results), len(app.screen_stack), app.is_running, list(fakes.verdicts)
 
-    results, depth = dialog_scene(tmp_path, scenario)
+    results, depth, running, verdicts = dialog_scene(tmp_path, scenario)
     assert results == [LC("project", "ab")], results
-    assert depth == 1
+    assert depth == 1 and running, (depth, running)
+    # E5, M26: the queued second request returns before it asks the verdict.
+    assert verdicts == [LC("project", "ab")], verdicts
 
 
 def test_tc_b100_41_type_ahead_c_then_enter_loads_the_typed_text(tmp_path: Path) -> None:
@@ -1816,6 +1995,40 @@ def test_tc_b100_43_a_folder_that_is_not_a_project_is_not_listed(
     assert _run(base, scenario) == (["f1"] if listed else [])
 
 
+def test_tc_b100_43_a_reparse_project_json_alone_is_not_a_project(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-173.4a, S9b-2 (E5, M81): folder ``f1`` holding only a
+    ``project.json`` that ``lstat`` reports as a regular file but
+    ``_is_reparse_point`` reports as a reparse point (a cloud placeholder),
+    and folder ``f2`` holding only a plain ``project.json`` → the Projects
+    section lists ``f2`` only.
+
+    Why: a placeholder manifest is not read (S9b-2), so on its own it does
+    not make a folder a project; listing it offers a load that can only be
+    refused.
+    Negative control: the content test without ``_is_reparse_point`` →
+    ``f1`` listed → RED (M81)."""
+    base = tmp_path / "app"
+    for name in ("f1", "f2"):
+        folder = _wa(base) / name
+        folder.mkdir(parents=True)
+        (folder / "project.json").write_text('{"schema_version": 1}', encoding="utf-8")
+    real = app_module._is_reparse_point
+    f1_manifest = os.path.normcase(str(_wa(base) / "f1" / "project.json"))
+    monkeypatch.setattr(
+        app_module,
+        "_is_reparse_point",
+        lambda path: os.path.normcase(os.fspath(path)) == f1_manifest or real(path),
+    )
+
+    async def scenario(app, pilot, log):
+        await _open(pilot, app, "l")
+        return ld.section_prompts(app.screen, "Projects")
+
+    assert _run(base, scenario) == ["f2"]
+
+
 def test_tc_b100_43_files_section_is_the_one_lister_filtered_to_loadable_files(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -2074,18 +2287,23 @@ def test_tc_b100_43_recent_row_shows_the_file_name_and_kind_only(
 def test_tc_b100_43_recent_preview_shows_the_store_facts_only(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """LLR-173.4i (B58; 3 of 3): recents ``C:\\cal\\v2\\fw.s19``,
-    ``C:\\cal\\c.a2l`` and ``C:\\cal\\m.mac`` highlighted in turn → each
-    preview holds the full recorded path, its kind and ``checked when
-    loaded``, with 0 ``●``.
+    """LLR-173.4i (B58; 3 of 3, plus E5 M61): recents ``C:\\cal\\v2\\fw.s19``,
+    ``C:\\cal\\c.a2l``, ``C:\\cal\\m.mac`` and a 200-character
+    ``C:\\cal\\ddd…\\long.s19`` highlighted in turn → each preview holds the
+    full recorded path (the long one not clipped), its kind and ``checked
+    when loaded``, with 0 ``●``.
 
     Why: nothing is read before Enter, so the preview cannot claim what a
-    load installs; it says when the check happens.
+    load installs; it says when the check happens. The row label is
+    clipped, so the preview is the one place the whole path is shown.
     Negative control: a preview that reads the file (size, "same bytes")
-    → RED here and on LLR-173.4j. RED (base): no preview."""
+    → RED here and on LLR-173.4j; the path clipped at 120 → the long path is
+    not in the preview → RED (M61). RED (base): no preview."""
     lad = _lad(tmp_path, monkeypatch)
     _store_on_any_host(lad, monkeypatch)
-    paths = ["C:\\cal\\v2\\fw.s19", "C:\\cal\\c.a2l", "C:\\cal\\m.mac"]
+    long_path = "C:\\cal\\" + "d" * 184 + "\\long.s19"
+    assert len(long_path) == 200
+    paths = ["C:\\cal\\v2\\fw.s19", "C:\\cal\\c.a2l", "C:\\cal\\m.mac", long_path]
     _seed_store(lad, paths)
 
     async def scenario(app, pilot, log):
@@ -2093,7 +2311,7 @@ def test_tc_b100_43_recent_preview_shows_the_store_facts_only(
         await pilot.press("tab")
         await pilot.pause()
         out = []
-        for position in range(3):
+        for position in range(len(paths)):
             await _highlight_index(pilot, app, _section_index(app.screen, "Recent", position))
             await _settle(pilot)
             out.append(preview_lines(app.screen))
@@ -2277,7 +2495,8 @@ def _refusal_scene(base: Path, text: str, patch=None):
 def _assert_refused(result, text: str, reason: str, step: str) -> None:
     painted, field, open_, status, project, current = result
     assert open_, f"the dialog closed on a refused path: {status}"
-    assert reason in painted and step in painted, painted
+    # E5 (M33, M59): the exact painted line — reason first, U+2014 between.
+    assert painted == f"{reason} {DASH} {step}", painted
     assert field == text, (field, text)
     assert status == [], status
     assert project is None and current is None
@@ -2377,18 +2596,21 @@ def test_tc_b100_63_typed_path_through_a_junction_is_explained(tmp_path: Path, a
     _assert_refused(_refusal_scene(base, text), text, "link or junction", "pick a project in the list")
 
 
-@pytest.mark.parametrize("arm", ["walk lstat", "list_projects"])
+@pytest.mark.parametrize("arm", ["walk lstat", "list_projects", "content listing"])
 def test_tc_b100_63_typed_folder_that_cannot_be_read_is_explained(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str
 ) -> None:
-    """LLR-173.5e (B53, 2 of 2): ``PermissionError`` injected into
-    ``os.lstat`` of the walk prefix ``<workarea>/ab``, and separately into
-    ``list_projects`` → ``could not be read`` / ``check that the folder can
-    be opened, then load again``, 0 dismisses, 0 raises (the app keeps
-    running).
+    """LLR-173.5e (B53, 2 of 2, plus E5 M89): ``PermissionError`` injected
+    into ``os.lstat`` of the walk prefix ``<workarea>/ab``, separately into
+    ``list_projects``, and separately into the project content listing
+    (``_list_project_files``: ``ab`` stays listed fail-open, so the typed
+    route reaches the content test, which cannot read it) → ``could not be
+    read`` / ``check that the folder can be opened, then load again``, 0
+    dismisses, 0 raises (the app keeps running).
 
     Negative control: the classifier's ``OSError`` catch removed → the error
-    leaves the dialog's key handler → the app stops → RED. RED (base): the
+    leaves the dialog's key handler → the app stops → RED; an unreadable
+    content test refused ``not a project`` → RED (M89). RED (base): the
     base dismisses and refuses on the status line."""
     base = tmp_path / "app"
     _project(base, "ab", {"a.s19": _s19()})
@@ -2404,11 +2626,16 @@ def test_tc_b100_63_typed_folder_that_cannot_be_read_is_explained(
     def boom(self):
         raise PermissionError(13, "injected: access denied", "workarea")
 
+    def listing_boom(self, folder):
+        raise PermissionError(13, "injected: access denied", str(folder))
+
     def patch():
         if arm == "walk lstat":
             monkeypatch.setattr(app_module.os, "lstat", lstat)
-        else:
+        elif arm == "list_projects":
             monkeypatch.setattr(app_module.S19TuiApp, "list_projects", boom)
+        else:
+            monkeypatch.setattr(app_module.S19TuiApp, "_list_project_files", listing_boom)
 
     result = _refusal_scene(base, str(target), patch=patch)
     monkeypatch.undo()
@@ -2449,10 +2676,13 @@ def test_tc_b100_63_pasted_nul_is_not_inserted(tmp_path: Path, monkeypatch: pyte
     Why: a NUL in a typed path crashes the path functions later or splits
     the name the engineer sees from the one opened.
     Negative control: ``#load_path`` without ``restrict=`` → the field holds
-    ``a\\x00.s19`` → RED. RED (base): no ``LoadDialog``."""
+    ``a\\x00.s19`` → RED; a ``restrict=`` that drops U+007F → the second
+    paste, ``b\\x7f.s19``, is inserted → RED (M04). RED (base): no
+    ``LoadDialog``."""
     from s19_app.tui import os_clipboard_input as os_clip_mod
 
-    monkeypatch.setattr(os_clip_mod, "read_os_clipboard", lambda: "a\x00.s19")
+    clip = {"text": "a\x00.s19"}
+    monkeypatch.setattr(os_clip_mod, "read_os_clipboard", lambda: clip["text"])
 
     async def scenario(app, pilot, log):
         app.push_screen(ld.bare_path_dialog())
@@ -2460,11 +2690,153 @@ def test_tc_b100_63_pasted_nul_is_not_inserted(tmp_path: Path, monkeypatch: pyte
         await _settle(pilot, 4)
         await pilot.press("ctrl+v")
         await _settle(pilot)
-        return path_value(app.screen)
+        after_nul = path_value(app.screen)
+        clip["text"] = "b\x7f.s19"
+        await pilot.press("ctrl+v")
+        await _settle(pilot)
+        return after_nul, path_value(app.screen)
 
-    value = _run(tmp_path / "app", scenario)
-    assert "\x00" not in value, ascii(value)
+    after_nul, value = _run(tmp_path / "app", scenario)
+    assert "\x00" not in after_nul, ascii(after_nul)
+    assert "\x7f" not in value, ascii(value)
     assert all(ord(ch) >= 0x20 and ord(ch) != 0x7F for ch in value), ascii(value)
+
+
+LINK_FILE = ("is a link or junction", "open the file it points to")
+
+
+@pytest.mark.parametrize(
+    "arm", ["linked s19", pytest.param("a2l through a junction", marks=JUNCTION_ARM)]
+)
+def test_tc_b100_63_typed_linked_file_is_explained_as_a_file(tmp_path: Path, arm: str) -> None:
+    """CR9b-03 (S9b-7 follow-up): a typed ``<workarea>/temp/fw.s19`` that is
+    a symbolic link to a real S19, and a typed ``<workarea>/jx/c.a2l`` where
+    ``jx`` is a junction to project ``ab`` → ``is a link or junction`` /
+    ``open the file it points to`` in ``#load_reason``, the dialog open, the
+    text unchanged, 0 loads; routed with no dialog (the start-up path) → 1
+    status line ``File NOT loaded: … is a link or junction — open the file
+    it points to.`` that does not say ``Project``.
+
+    Why: the engineer typed a file, so the project wording (``pick a project
+    in the list``) points at the wrong remedy.
+    Negative control: the classifier returning ``link`` for a file → the
+    project tokens and a ``Project NOT loaded`` line → RED. RED (base): the
+    base paints ``link or junction`` / ``pick a project in the list``."""
+    base = tmp_path / "app"
+    _project(base, "ab", {"a.s19": _s19(), "c.a2l": _a2l()})
+    if arm == "linked s19":
+        real = tmp_path / "real" / "fw.s19"
+        real.parent.mkdir()
+        real.write_bytes(_s19())
+        _symlink_or_skip(_temp(base) / "fw.s19", real)
+        text = str(_wa(base) / WORKAREA_TEMP / "fw.s19")
+    else:
+        b100_links.create_junction(_wa(base) / "jx", _wa(base) / "ab")
+        text = str(_wa(base) / "jx" / "c.a2l")
+
+    result = _refusal_scene(base, text)
+    _assert_refused(result, text, *LINK_FILE)
+    assert "pick a project" not in result[0], result[0]
+
+    async def routed(app, pilot, log):
+        mark = len(log.messages)
+        app._load_path_from_user_input(Path(text))
+        await _settle(pilot, 10)
+        return [m for m in log.since(mark) if "NOT loaded" in m], app.current_file, app.current_a2l_path
+
+    status, current, a2l = _run(base, routed)
+    assert len(status) == 1, status
+    assert status[0].startswith("File NOT loaded:"), status
+    assert f"{LINK_FILE[0]} {DASH} {LINK_FILE[1]}" in status[0], status
+    assert "Project" not in status[0], status
+    assert current is None and a2l is None, (current, a2l)
+
+
+def test_tc_b100_63_over_long_paste_is_refused_and_the_app_stays_up(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """SEC9b-1, ruling B (refuse, not truncate): ``#load_path`` holds at most
+    4096 characters. A 40 000-character one-line clipboard (a base64 blob)
+    pasted with ``ctrl+v`` → the edit is refused, so the field is unchanged
+    (empty), the dialog stays open and the app keeps running; a paste of
+    exactly 4096 characters → accepted whole (the limit is 4096, not less).
+
+    Why: a path longer than the OS accepts made ``resolve_input_path`` raise
+    inside the dialog's key handler, so the app exited and unsaved patch
+    edits were lost.
+    Negative control: ``#load_path`` without ``max_length`` → the field holds
+    40 000 characters → RED. RED (base): no ``max_length``."""
+    from s19_app.tui import os_clipboard_input as os_clip_mod
+
+    long_text = "A" * 40000
+    at_limit = "C:\\" + "a" * 4093
+    clip = {"text": long_text}
+    monkeypatch.setattr(os_clip_mod, "read_os_clipboard", lambda: clip["text"])
+
+    async def scenario(app, pilot, log):
+        await _open(pilot, app, "l")
+        await pilot.press("ctrl+v")
+        await _settle(pilot)
+        after_long = path_value(app.screen)
+        clip["text"] = at_limit
+        await pilot.press("ctrl+v")
+        await _settle(pilot)
+        return after_long, path_value(app.screen), ld.is_load_dialog(app.screen), app.is_running
+
+    after_long, after_limit, open_, running = _run(tmp_path / "app", scenario)
+    assert after_long == "", len(after_long)
+    assert after_limit == at_limit, len(after_limit)
+    assert open_ and running, (open_, running)
+
+
+@pytest.mark.parametrize(
+    "error, typed",
+    [("ValueError", "relative"), ("ValueError", "absolute"), ("RuntimeError", "relative")],
+)
+def test_tc_b100_63_resolve_error_is_refused_not_raised(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, error: str, typed: str
+) -> None:
+    """SEC9b-1: ``resolve_input_path`` raising ``ValueError`` (a path too long
+    for Windows) or ``RuntimeError`` (a POSIX ``~user`` with no home) for a
+    typed relative or absolute path, then ``enter`` → ``not found`` /
+    ``check the path`` in ``#load_reason``, the dialog open, the text
+    unchanged, 0 status lines, 0 loads, and the app keeps running.
+
+    Why: R-5 rests on "the classifier never raises"; an exception in the
+    dialog's key handler stops the app.
+    Negative control: no catch around ``resolve_input_path`` → the error
+    leaves the key handler, the app stops → RED. RED (base): no catch."""
+    base = tmp_path / "app"
+    _wa(base).mkdir(parents=True)
+    text = "fw.s19" if typed == "relative" else str(tmp_path / "fw.s19")
+    exc_type = {"ValueError": ValueError, "RuntimeError": RuntimeError}[error]
+
+    def boom(path, base_dir):
+        raise exc_type("injected: stat: path too long for Windows")
+
+    async def scenario(app, pilot, log):
+        monkeypatch.setattr(app_module, "resolve_input_path", boom)
+        await _open(pilot, app, "l")
+        await ld.type_into_path(pilot, app, text)
+        mark = len(log.messages)
+        await pilot.press("enter")
+        await _settle(pilot, 10)
+        running = app.is_running
+        open_ = ld.is_load_dialog(app.screen)
+        result = (
+            reason_text(app.screen) if open_ else None,
+            path_value(app.screen) if open_ else None,
+            open_,
+            [m for m in log.since(mark) if "NOT loaded" in m],
+            app.current_project,
+            app.current_file,
+        )
+        monkeypatch.undo()
+        return running, result
+
+    running, result = _run(base, scenario)
+    assert running, "the app stopped on a resolve error"
+    _assert_refused(result, text, "not found", "check the path")
 
 
 # ===========================================================================
@@ -2541,6 +2913,36 @@ def test_tc_b100_64_project_preview_marks_equal_the_install(tmp_path: Path, case
     assert names == expected, (names, lines)
 
 
+def test_tc_b100_64_preview_does_not_mark_an_a2l_the_install_refuses(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-173.6, A9b-R2-6 (E5, M64): project ``P`` with ``a.s19`` and
+    ``c.a2l``, the copy cap lowered between the two sizes (the A2L over it)
+    → the preview marks ``a.s19`` only; after ``enter`` the Loaded panel
+    names ``a.s19`` only (the install left the A2L out).
+
+    Why: the mark promises what Enter installs; an A2L the admission refuses
+    must not carry a ``●``.
+    Negative control: the preview skips the admission → ``● … c.a2l`` while
+    the panel has no A2L → RED (M64)."""
+    import s19_app.tui.workspace as workspace_module
+
+    base = tmp_path / "app"
+    _project(base, "P", {"a.s19": _s19(), "c.a2l": _a2l()}, manifest={"schema_version": 1})
+    a2l_size, s19_size = len(_a2l()), len(_s19())
+    assert s19_size < a2l_size - 1, "fixture: the cap must sit between the two sizes"
+    monkeypatch.setattr(workspace_module, "DEFAULT_COPY_SIZE_CAP_BYTES", a2l_size - 1)
+
+    async def scenario(app, pilot, log):
+        lines = await _preview_of_project(pilot, app, "P")
+        _, names = await _enter_and_read_panel(pilot, app)
+        return lines, names
+
+    lines, names = _run(base, scenario)
+    assert marked_names(lines) == ["a.s19"], lines
+    assert names == ["a.s19"], (names, lines)
+
+
 def test_tc_b100_64_a_load_that_installs_another_variant_names_it(tmp_path: Path) -> None:
     """LLR-173.6a (B68, 2 of 2): project ``z0`` whose recorded active
     ``b.s19`` is a 0-byte file beside ``a.s19`` → the preview marks
@@ -2570,6 +2972,8 @@ FILE_CASES = {
     "A2L loaded, S19 row": (["cal.a2l"], "a.s19", ["a.s19", "cal.a2l"]),
     "S19 + MAC loaded, HEX row": (["f.s19", "m.mac"], "b.hex", ["b.hex", "m.mac"]),
     "S19 loaded, A2L row": (["f.s19"], "c.a2l", ["c.a2l", "f.s19"]),
+    # E5, M71: a MAC row keeps the loaded image, and the preview must say so.
+    "S19 loaded, MAC row": (["f.s19"], "d.mac", ["d.mac", "f.s19"]),
 }
 
 
@@ -2579,10 +2983,11 @@ def test_tc_b100_64_file_row_preview_marks_what_the_session_keeps(tmp_path: Path
     ``enter`` → the ``●`` names equal the Loaded panel's names: nothing
     loaded + S19 row → 1 ``●``; an A2L loaded + S19 row → 2; an S19 and a
     MAC loaded + HEX row → the HEX and the kept MAC; an S19 loaded + A2L row
-    → 2.
+    → 2; an S19 loaded + MAC row → the MAC and the kept image (E5, M71).
 
     Negative control: only the highlighted file marked → the A2L-kept arm
-    has 1 ``●`` against 2 panel slots → RED. RED (base): no preview."""
+    has 1 ``●`` against 2 panel slots → RED; a MAC row that omits the image
+    line → 1 ``●`` against 2 → RED (M71). RED (base): no preview."""
     preload, row, expected = FILE_CASES[case]
     base = tmp_path / "app"
     src = tmp_path / "src"
@@ -2594,6 +2999,7 @@ def test_tc_b100_64_file_row_preview_marks_what_the_session_keeps(tmp_path: Path
     (temp / "a.s19").write_bytes(_s19())
     (temp / "b.hex").write_bytes(_hex())
     (temp / "c.a2l").write_bytes(_a2l())
+    (temp / "d.mac").write_bytes(_mac())
 
     async def scenario(app, pilot, log):
         for name in preload:
@@ -3003,7 +3409,9 @@ def test_tc_b100_64_project_json_that_is_not_a_regular_file_is_refused(
     Why: a link or a FIFO named ``project.json`` can block the event loop or
     read a file outside the project before the engineer chose to load.
     Negative control: the manifest read with no regular-file check → the
-    target is opened → RED. RED (base): no preview."""
+    target is opened → RED; the gate moved after the session reset → the
+    preloaded image is dropped, the digest changes → RED (E5, M78). RED
+    (base): no preview."""
     base = tmp_path / "app"
     folder = _project(base, "L", {"a.s19": _s19()})
     target = _manifest_link_or_skip(folder, tmp_path)
@@ -3016,7 +3424,13 @@ def test_tc_b100_64_project_json_that_is_not_a_regular_file_is_refused(
             opened.append(os.fspath(file))
         return real_open(file, *a, **k)
 
+    preload = tmp_path / "src" / "fw.s19"
+    preload.parent.mkdir()
+    preload.write_bytes(_s19())
+
     async def scenario(app, pilot, log):
+        # E5, M78: a loaded image, so a reset before the refusal shows.
+        await projects.load_image(pilot, app, preload)
         monkeypatch.setattr(builtins, "open", spy_open)
         lines = await _preview_of_project(pilot, app, "L")
         preview_opens = list(opened)
@@ -3037,18 +3451,128 @@ def test_tc_b100_64_project_json_that_is_not_a_regular_file_is_refused(
     assert after == before
 
 
-def test_tc_b100_64_more_than_one_mac_marks_nothing(tmp_path: Path) -> None:
-    """A9b-R2-3, A9b-R3-5 (B78): project ``mm`` with ``a.s19``, ``m1.mac``
-    and ``m2.mac`` → the preview marks nothing (0 ``●``); after ``enter`` a
-    status line names the refusal, no Load-result panel opens, and the
-    session is unchanged.
+def _reparse_names(monkeypatch: pytest.MonkeyPatch, *names: str) -> None:
+    """Make ``_is_reparse_point`` report True for files called ``names``
+    (a stand-in for a reparse point that ``lstat`` reports as a regular
+    file, such as a cloud placeholder, which a test host cannot create)."""
+    real = app_module._is_reparse_point
+    folded = {name.casefold() for name in names}
 
-    Why: the install refuses a project with two MAC files; a mark would
-    promise an install that will not happen.
-    Negative control: marks computed without the cardinality rule → ``●
-    a.s19`` / ``● m1.mac`` → RED. RED (base): no preview."""
+    def fake(path) -> bool:
+        return Path(path).name.casefold() in folded or real(path)
+
+    monkeypatch.setattr(app_module, "_is_reparse_point", fake)
+
+
+def test_tc_b100_64_project_json_that_is_a_reparse_point_is_refused(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """SEC9b-2: a listed project whose ``project.json`` is a regular file to
+    ``lstat`` but a reparse point to ``_is_reparse_point`` (a cloud
+    placeholder) → the preview paints ``could not be read`` with 0 marks and
+    0 opens of ``project.json``; ``enter`` → 1 status line holding ``could
+    not be read``, 0 opens, the session unchanged.
+
+    Why: opening a placeholder hydrates it over the network on the event
+    loop; the gate must use the same test as ``_folder_holds_project``.
+    Negative control: a gate on ``S_ISREG`` alone → the manifest is opened
+    → RED. RED (base): the base gate tests ``S_ISREG`` only."""
     base = tmp_path / "app"
-    _project(base, "mm", {"a.s19": _s19(), "m1.mac": _mac(), "m2.mac": _mac()})
+    folder = _project(
+        base, "L", {"a.s19": _s19()}, manifest={"schema_version": 1, "active_variant": "a"}
+    )
+    key = os.path.normcase(str(folder / "project.json"))
+    opened: list = []
+    real_open = builtins.open
+
+    def spy_open(file, *a, **k):
+        if not isinstance(file, int) and os.path.normcase(os.path.realpath(os.fspath(file))) == key:
+            opened.append(os.fspath(file))
+        return real_open(file, *a, **k)
+
+    preload = tmp_path / "src" / "fw.s19"
+    preload.parent.mkdir()
+    preload.write_bytes(_s19())
+
+    async def scenario(app, pilot, log):
+        await projects.load_image(pilot, app, preload)
+        _reparse_names(monkeypatch, "project.json")
+        monkeypatch.setattr(builtins, "open", spy_open)
+        lines = await _preview_of_project(pilot, app, "L")
+        preview_opens = list(opened)
+        before = _digest(app)
+        mark = len(log.messages)
+        await pilot.press("enter")
+        await ld.wait_for_dialog_closed(pilot, app)
+        await ld.wait_for(pilot, lambda: _status_lines(log, mark, "could not be read"), "the refusal line")
+        await _settle(pilot, 10)
+        monkeypatch.undo()
+        return lines, preview_opens, list(opened), before, _digest(app), _status_lines(log, mark, "could not be read")
+
+    lines, preview_opens, opens, before, after, status = _run(base, scenario)
+    assert "could not be read" in _flat(" ".join(lines)), lines
+    assert marked(lines) == [], lines
+    assert preview_opens == [] and opens == [], (preview_opens, opens)
+    assert len(status) == 1, status
+    assert after == before
+
+
+def test_tc_b100_64_reparse_file_in_a_project_is_neither_listed_nor_installed(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """SEC9b-3 (LLR-173.4n covers every reparse point): project ``P``
+    holding ``a.s19`` and ``b.s19``, where ``b.s19`` is a regular file to
+    ``DirEntry.is_file(follow_symlinks=False)`` but a reparse point to
+    ``_is_reparse_point`` (a WSL link or a cloud placeholder), with
+    ``active_variant`` ``b`` → the preview lists 1 variant (``a.s19``) with
+    1 ``●``; after ``enter`` the image installed is ``a.s19``.
+
+    Why: on Windows ``is_file(follow_symlinks=False)`` is False only for a
+    true symlink; any other reparse file would be listed, marked and opened
+    at Enter.
+    Negative control: the lister without the ``_is_reparse_point`` test → 2
+    variant rows, ``b.s19`` marked → RED. RED (base): 2 variant rows."""
+    base = tmp_path / "app"
+    _project(
+        base,
+        "P",
+        {"a.s19": _s19(), "b.s19": _s19_other()},
+        manifest={"schema_version": 1, "active_variant": "b"},
+    )
+
+    async def scenario(app, pilot, log):
+        _reparse_names(monkeypatch, "b.s19")
+        lines = await _preview_of_project(pilot, app, "P")
+        _, names = await _enter_and_read_panel(pilot, app)
+        monkeypatch.undo()
+        return lines, names, Path(app.current_file.path).name if app.current_file else None
+
+    lines, names, image = _run(base, scenario)
+    variants = [line for line in lines if ".s19" in line]
+    assert len(variants) == 1 and "a.s19" in variants[0], lines
+    assert marked_names(lines) == ["a.s19"], lines
+    assert image == "a.s19", (image, names)
+
+
+@pytest.mark.parametrize("kind", ["MAC", "A2L"])
+def test_tc_b100_64_more_than_one_mac_marks_nothing(tmp_path: Path, kind: str) -> None:
+    """A9b-R2-3, A9b-R3-5 (B78; the A2L arm added at E5, M85): project
+    ``mm`` with ``a.s19`` and two MAC files (``m1.mac``, ``m2.mac``), or
+    two A2L files (``c1.a2l``, ``c2.a2l``) → the preview marks nothing (0
+    ``●``); after ``enter`` a status line names the refusal (``MAC`` /
+    ``A2L``), no Load-result panel opens, and the session is unchanged.
+
+    Why: the install refuses a project with two MAC or two A2L files; a mark
+    would promise an install that will not happen.
+    Negative control: marks computed without the cardinality rule → ``●
+    a.s19`` / ``● m1.mac`` → RED; the more-than-one-A2L arm deleted → ``●
+    a.s19`` / ``● c1.a2l`` → RED (M85). RED (base): no preview."""
+    base = tmp_path / "app"
+    if kind == "MAC":
+        files = {"a.s19": _s19(), "m1.mac": _mac(), "m2.mac": _mac()}
+    else:
+        files = {"a.s19": _s19(), "c1.a2l": _a2l(), "c2.a2l": _a2l()}
+    _project(base, "mm", files)
 
     async def scenario(app, pilot, log):
         lines = await _preview_of_project(pilot, app, "mm")
@@ -3063,7 +3587,7 @@ def test_tc_b100_64_more_than_one_mac_marks_nothing(tmp_path: Path) -> None:
 
     lines, before, after, messages, panel = _run(base, scenario)
     assert marked(lines) == [], lines
-    assert any("MAC" in m for m in messages), messages
+    assert any(kind in m for m in messages), messages
     assert panel == 0, messages
     assert after == before
 

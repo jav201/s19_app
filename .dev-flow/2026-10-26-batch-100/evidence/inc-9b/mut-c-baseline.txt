@@ -1,0 +1,54 @@
+# mut-c baseline: every mutant's target node on the CLEAN scratch copy of the corrected tree (no mutation)
+# cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr9b/mut
+# s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr9b\mut\s19_app\__init__.py
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -v --tb=short -rfEs --basetemp=C:/Users/jjgh8/Github/s19_app-b100-inc9b/.dev-flow/2026-10-26-batch-100/evidence/inc-9b\bt-mutc-baseline tests/test_b100_load_dialog.py::test_tc_b100_63_pasted_nul_is_not_inserted tests/test_b100_load_dialog.py::test_tc_b100_41_headings_cannot_be_reached_by_keys tests/test_b100_load_dialog.py::test_tc_b100_41_typed_text_reaches_the_verdict_verbatim tests/test_b100_load_dialog.py::test_tc_b100_41_path_mode_opens_with_an_empty_preview tests/test_b100_load_dialog.py::test_tc_b100_41_moving_to_the_path_field_clears_the_list_preview tests/test_b100_load_dialog.py::test_tc_b100_43_recent_preview_shows_the_store_facts_only tests/test_b100_load_dialog.py::test_tc_b100_64_preview_does_not_mark_an_a2l_the_install_refuses tests/test_b100_load_dialog.py::test_tc_b100_64_file_row_preview_marks_what_the_session_keeps[S19 loaded, MAC row] tests/test_b100_load_dialog.py::test_tc_b100_64_project_json_that_is_not_a_regular_file_is_refused tests/test_b100_load_dialog.py::test_tc_b100_64_project_json_that_is_a_reparse_point_is_refused tests/test_b100_load_dialog.py::test_tc_b100_43_a_reparse_project_json_alone_is_not_a_project tests/test_b100_load_dialog.py::test_tc_b100_64_more_than_one_mac_marks_nothing[A2L] tests/test_b100_load_dialog.py::test_tc_b100_40_a2l_status_line_paints_the_name_scrubbed tests/test_b100_load_dialog.py::test_tc_b100_41_enter_on_the_preview_loads_the_highlighted_row tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_path_last_takes_the_typed_text tests/test_b100_load_dialog.py::test_tc_b100_64_file_row_preview_marks_what_the_session_keeps[nothing loaded, S19 row] tests/test_b100_load_dialog.py::test_tc_b100_63_typed_folder_that_cannot_be_read_is_explained[content listing] tests/test_b100_project_homes.py::test_tc_b100_32_a2l_admission_refuses_any_reparse_point[reparse point] tests/test_b100_load_dialog.py::test_tc_b100_63_typed_path_not_found_is_explained tests/test_b100_load_dialog.py::test_tc_b100_63_typed_folder_outside_the_work_area_is_explained tests/test_b100_load_dialog.py::test_tc_b100_64_project_preview_marks_equal_the_install tests/test_b100_load_dialog.py::test_tc_b100_40_path_choice_takes_the_typed_route tests/test_b100_load_dialog.py::test_tc_b100_41_list_opens_on_the_open_project
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+rootdir: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr9b\mut
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 33 items
+
+tests/test_b100_load_dialog.py::test_tc_b100_63_pasted_nul_is_not_inserted PASSED [  3%]
+tests/test_b100_load_dialog.py::test_tc_b100_41_headings_cannot_be_reached_by_keys PASSED [  6%]
+tests/test_b100_load_dialog.py::test_tc_b100_41_typed_text_reaches_the_verdict_verbatim PASSED [  9%]
+tests/test_b100_load_dialog.py::test_tc_b100_41_path_mode_opens_with_an_empty_preview PASSED [ 12%]
+tests/test_b100_load_dialog.py::test_tc_b100_41_moving_to_the_path_field_clears_the_list_preview PASSED [ 15%]
+tests/test_b100_load_dialog.py::test_tc_b100_43_recent_preview_shows_the_store_facts_only PASSED [ 18%]
+tests/test_b100_load_dialog.py::test_tc_b100_64_preview_does_not_mark_an_a2l_the_install_refuses PASSED [ 21%]
+tests/test_b100_load_dialog.py::test_tc_b100_64_file_row_preview_marks_what_the_session_keeps[S19 loaded, MAC row] PASSED [ 24%]
+tests/test_b100_load_dialog.py::test_tc_b100_64_project_json_that_is_not_a_regular_file_is_refused PASSED [ 27%]
+tests/test_b100_load_dialog.py::test_tc_b100_64_project_json_that_is_a_reparse_point_is_refused PASSED [ 30%]
+tests/test_b100_load_dialog.py::test_tc_b100_43_a_reparse_project_json_alone_is_not_a_project PASSED [ 33%]
+tests/test_b100_load_dialog.py::test_tc_b100_64_more_than_one_mac_marks_nothing[A2L] PASSED [ 36%]
+tests/test_b100_load_dialog.py::test_tc_b100_40_a2l_status_line_paints_the_name_scrubbed PASSED [ 39%]
+tests/test_b100_load_dialog.py::test_tc_b100_41_enter_on_the_preview_loads_the_highlighted_row PASSED [ 42%]
+tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_path_last_takes_the_typed_text[enter-path] PASSED [ 45%]
+tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_path_last_takes_the_typed_text[enter-list] PASSED [ 48%]
+tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_path_last_takes_the_typed_text[alt+l-path] PASSED [ 51%]
+tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_path_last_takes_the_typed_text[alt+l-list] PASSED [ 54%]
+tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_path_last_takes_the_typed_text[load_ok-path] PASSED [ 57%]
+tests/test_b100_load_dialog.py::test_tc_b100_41_load_with_the_path_last_takes_the_typed_text[load_ok-list] PASSED [ 60%]
+tests/test_b100_load_dialog.py::test_tc_b100_64_file_row_preview_marks_what_the_session_keeps[nothing loaded, S19 row] PASSED [ 63%]
+tests/test_b100_load_dialog.py::test_tc_b100_63_typed_folder_that_cannot_be_read_is_explained[content listing] PASSED [ 66%]
+tests/test_b100_project_homes.py::test_tc_b100_32_a2l_admission_refuses_any_reparse_point[reparse point] PASSED [ 69%]
+tests/test_b100_load_dialog.py::test_tc_b100_63_typed_path_not_found_is_explained[missing file] PASSED [ 72%]
+tests/test_b100_load_dialog.py::test_tc_b100_63_typed_path_not_found_is_explained[missing folder] PASSED [ 75%]
+tests/test_b100_load_dialog.py::test_tc_b100_63_typed_folder_outside_the_work_area_is_explained[folder] PASSED [ 78%]
+tests/test_b100_load_dialog.py::test_tc_b100_63_typed_folder_outside_the_work_area_is_explained[manifest] PASSED [ 81%]
+tests/test_b100_load_dialog.py::test_tc_b100_64_project_preview_marks_equal_the_install[clean] PASSED [ 84%]
+tests/test_b100_load_dialog.py::test_tc_b100_64_project_preview_marks_equal_the_install[save-back] PASSED [ 87%]
+tests/test_b100_load_dialog.py::test_tc_b100_64_project_preview_marks_equal_the_install[recorded active missing] PASSED [ 90%]
+tests/test_b100_load_dialog.py::test_tc_b100_64_project_preview_marks_equal_the_install[A2L-only] PASSED [ 93%]
+tests/test_b100_load_dialog.py::test_tc_b100_40_path_choice_takes_the_typed_route PASSED [ 96%]
+tests/test_b100_load_dialog.py::test_tc_b100_41_list_opens_on_the_open_project PASSED [100%]
+
+======================= 33 passed in 160.95s (0:02:40) ========================
+
+# exit: 0
+
+# =======================================================================
+# Baseline 2 (after the M26/M34 arms were added): the clean copy, test file sha256[:16] 676a89c15223e7be
+# cmd: pytest tests/test_b100_load_dialog.py::test_tc_b100_41_double_enter_dismisses_once (cwd scratchpad/corr9b/mut)
+..                                                                       [100%]
+2 passed in 5.82s
