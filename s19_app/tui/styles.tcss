@@ -1850,6 +1850,54 @@ ModalScreen {
     margin-bottom: 1;
 }
 
+/* --- Save project dialog (batch-100 increment 11, HLR-175) ---------------
+ * The Save dialog lays its name field, target line (#save_where) and
+ * summary (#save_summary) above the docked buttons. The box is 80% wide,
+ * capped at 130 columns, and capped at 90% height so the docked buttons
+ * stay on screen even under a 300-row summary. The summary is sized by its
+ * rows up to half the screen height, then scrolls; its rows never wrap
+ * (nowrap + ellipsis on the row widgets themselves). Colors resolve through
+ * the shared Calm Dark tokens — no hard-coded hex, no second accent
+ * (TC-033). */
+#save_box {
+    width: 80%;
+    max-width: 130;
+    max-height: 90%;
+}
+
+/* The target line and any refusal wrap, so a long reason with addresses
+ * stays readable; only the summary rows are one line. The refusal class is
+ * bold (no colour — the single accent rule). */
+#save_where {
+    height: auto;
+    padding: 0 1;
+    margin-bottom: 1;
+}
+
+#save_where.refusal {
+    text-style: bold;
+}
+
+#save_summary {
+    height: auto;
+    max-height: 50vh;
+    border: round $rule;
+    background: $bg-base;
+    padding: 0 1;
+}
+
+#save_summary:focus {
+    border: round $accent-calm;
+}
+
+/* text-wrap / text-overflow are not inherited in Textual 8.2.8, so the
+ * row widgets need their own nowrap + ellipsis rule (S9b-8 pattern). */
+#save_summary Static {
+    height: 1;
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
+}
+
 /* --- Report viewer modal (batch-07 E8, LLR-008.1/008.5) --------------------
  * Listing strip on top, scrollable Markdown render area filling the rest,
  * generation row (context-bytes input + buttons) docked at the bottom via

@@ -144,6 +144,7 @@ from s19_app.tui.workspace import WorkareaContainmentError, copy_into_workarea
 
 from tests.support import independent_reader
 from tests.support.b100_projects import dismiss_load_result_panel
+from tests.support import b100_save_dialog as sd
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -1145,26 +1146,30 @@ def test_tc_b99_14_save_project_missing_source(tmp_path: Path) -> None:
             await pilot.press("s")
             for _ in range(6):
                 await pilot.pause()
-            assert await pilot.click("#project_parent_path"), (
-                "click missed #project_parent_path"
-            )
-            await pilot.press("ctrl+shift+a")
-            await pilot.press(*str(tmp_path / ".s19tool" / "workarea"))
+            # Inc 11 re-pin (census B / E, ruling Q5, LLR-175.1k): no parent
+            # field; the missing source is refused IN the dialog, painted
+            # in ``#save_where`` with the dialog open, and Save keeps it.
             assert await pilot.click("#project_name"), "click missed #project_name"
             await pilot.press(*"proj")
-            assert await pilot.click("#save_ok"), "click missed #save_ok"
-            await _poll(
-                pilot, lambda: "Project NOT saved" in _painted_status(app)
+            await sd.wait_for(
+                pilot,
+                lambda: "source file missing" in sd.where_text(app.screen),
+                "the missing-source refusal in #save_where",
             )
-            outcomes["status"] = _painted_status(app)
+            assert await pilot.click("#save_ok"), "click missed #save_ok"
+            for _ in range(8):
+                await pilot.pause()
+            outcomes["status"] = sd.where_text(app.screen)
+            outcomes["dialog_open"] = sd.is_save_dialog(app.screen)
             outcomes["app_running"] = bool(app.query_one("#status_text", Label).render())
         return outcomes
 
     outcomes = asyncio.run(_drive())
 
     status = outcomes["status"]
-    assert status.startswith("Project NOT saved") and "firmware.s19" in status, status
-    assert status.index("NOT saved") < 50, status
+    assert outcomes["dialog_open"] is True, "a refused Save closed the dialog"
+    assert status.startswith("source file missing") and "firmware.s19" in status, status
+    assert "reload it or remove it from the project" in status, status
     # the painted status line carries the notice text verbatim (this app
     # mounts no ToastRack, so ``notify`` has no toast overlay to paint)
     assert not (tmp_path / ".s19tool" / "workarea" / "proj").exists(), "no empty project folder"
@@ -1208,13 +1213,15 @@ def test_tc_b99_14_placement_failure_removes_created_folder(
             await pilot.press("s")
             for _ in range(6):
                 await pilot.pause()
-            assert await pilot.click("#project_parent_path"), (
-                "click missed #project_parent_path"
-            )
-            await pilot.press("ctrl+shift+a")
-            await pilot.press(*str(tmp_path / ".s19tool" / "workarea"))
+            # Inc 11 re-pin (census B, LLR-175.2 / .4b): no parent field;
+            # the summary of ``proj`` is painted before Save.
             assert await pilot.click("#project_name"), "click missed #project_name"
             await pilot.press(*"proj")
+            await sd.wait_for(
+                pilot, lambda: "proj" in sd.where_text(app.screen), "the summary of proj"
+            )
+            for _ in range(4):
+                await pilot.pause()
             monkeypatch.setattr(os, "replace", _always_locked)
             assert await pilot.click("#save_ok"), "click missed #save_ok"
             await _poll(pilot, lambda: _painted_status(app).startswith("Not saved"))
@@ -1275,13 +1282,15 @@ def test_tc_b99_14_preexisting_folder_survives_placement_failure(
             await pilot.press("s")
             for _ in range(6):
                 await pilot.pause()
-            assert await pilot.click("#project_parent_path"), (
-                "click missed #project_parent_path"
-            )
-            await pilot.press("ctrl+shift+a")
-            await pilot.press(*str(tmp_path / ".s19tool" / "workarea"))
+            # Inc 11 re-pin (census B, LLR-175.2 / .4b): no parent field;
+            # the summary of ``proj`` is painted before Save.
             assert await pilot.click("#project_name"), "click missed #project_name"
             await pilot.press(*"proj")
+            await sd.wait_for(
+                pilot, lambda: "proj" in sd.where_text(app.screen), "the summary of proj"
+            )
+            for _ in range(4):
+                await pilot.pause()
             monkeypatch.setattr(os, "replace", _always_locked)
             assert await pilot.click("#save_ok"), "click missed #save_ok"
             await _poll(pilot, lambda: _painted_status(app).startswith("Not saved"))
@@ -1396,13 +1405,15 @@ def test_at_b99_05_save_project_after_same_name_save_back(tmp_path: Path) -> Non
             await pilot.press("s")
             for _ in range(6):
                 await pilot.pause()
-            assert await pilot.click("#project_parent_path"), (
-                "click missed #project_parent_path"
-            )
-            await pilot.press("ctrl+shift+a")
-            await pilot.press(*str(tmp_path / ".s19tool" / "workarea"))
+            # Inc 11 re-pin (census B, LLR-175.2 / .4b): no parent field;
+            # the summary of ``proj`` is painted before Save.
             assert await pilot.click("#project_name"), "click missed #project_name"
             await pilot.press(*"proj")
+            await sd.wait_for(
+                pilot, lambda: "proj" in sd.where_text(app.screen), "the summary of proj"
+            )
+            for _ in range(4):
+                await pilot.pause()
             assert await pilot.click("#save_ok"), "click missed #save_ok"
             # the manifest line paints FIRST and the save's success —
             # "Saved project to … (variant 'firmware')" — is the NEWEST
@@ -1661,7 +1672,15 @@ def test_at_b99_04_duplicate_refused_distinct_parallel_markers(tmp_path: Path) -
 def test_tc_b99_ux_c10_save_project_filename_renders_literally(tmp_path: Path) -> None:
     """The Save project file name is a new file-derived sink: a hostile
     source file name must render literally (0 markup spans) in the painted
-    status and in the error notice."""
+    refusal and in the error notice.
+
+    Inc 11 re-pin (A11-11, ruling Q5 / Q-6): through the dialog the
+    missing-source refusal is painted in ``#save_where`` with the dialog
+    open — the hostile name literal, 0 markup spans — and the dialog path
+    raises no toast; the error notice (and its literal name) is the direct
+    path's, so it is read from a direct ``_handle_save_dialog`` call."""
+    from s19_app.tui.screens import SaveProjectPayload
+
     hostile = f"{HOSTILE_NAME}.s19"
     image = _image(tmp_path, hostile, 0x11)
 
@@ -1678,12 +1697,31 @@ def test_tc_b99_ux_c10_save_project_filename_renders_literally(tmp_path: Path) -
             assert work_copy.is_file()
             work_copy.unlink()
             app.action_save_project()
-            await pilot.pause()
-            app.screen.query_one("#project_parent_path").value = str(
-                tmp_path / ".s19tool" / "workarea"
+            # E4 integration: wait for the composed field, not only the push.
+            await sd.wait_for(
+                pilot,
+                lambda: sd.is_save_dialog(app.screen) and bool(app.screen.query("#project_name")),
+                "the Save dialog",
             )
             app.screen.query_one("#project_name").value = "proj"
+            await sd.wait_for(
+                pilot,
+                lambda: "source file missing" in sd.where_text(app.screen),
+                "the missing-source refusal in #save_where",
+            )
+            outcomes["where"] = sd.where_text(app.screen)
+            outcomes["where_spans"] = sd.spans(sd.where_widget(app.screen))
             app.screen.query_one("#save_ok").press()
+            for _ in range(6):
+                await pilot.pause()
+            outcomes["dialog_notices"] = [n for n in notices if n[2] == "error"]
+            if sd.is_save_dialog(app.screen):
+                await pilot.press("escape")
+            for _ in range(6):
+                await pilot.pause()
+            app._handle_save_dialog(
+                SaveProjectPayload(parent_folder=str(app.workarea), project_name="proj")
+            )
             await pilot.pause()
             outcomes["statuses"] = list(statuses)
             outcomes["notices"] = list(notices)
@@ -1691,6 +1729,8 @@ def test_tc_b99_ux_c10_save_project_filename_renders_literally(tmp_path: Path) -
         return outcomes
 
     outcomes = asyncio.run(_drive())
+    assert HOSTILE_NAME in outcomes["where"] and outcomes["where_spans"] == 0, outcomes["where"]
+    assert outcomes["dialog_notices"] == [], outcomes["dialog_notices"]
     painted = "\n".join(outcomes["statuses"] + outcomes["log_lines"])
     assert HOSTILE_NAME in painted, (
         f"the hostile file name must render literally (0 markup spans): {painted!r}"
@@ -1727,13 +1767,26 @@ def test_tc_b99_ux_c10_placement_error_path_renders_literally(
             await _poll(pilot, lambda: app.current_file is not None)
             monkeypatch.setattr(os, "replace", _always_locked)
             app.action_save_project()
-            await pilot.pause()
-            app.screen.query_one("#project_parent_path").value = str(
-                tmp_path / ".s19tool" / "workarea"
+            # E4 integration: wait for the composed field, not only the push.
+            await sd.wait_for(
+                pilot,
+                lambda: sd.is_save_dialog(app.screen) and bool(app.screen.query("#project_name")),
+                "the Save dialog",
             )
+            # Inc 11 re-pin (census B, LLR-175.2 / .4b): no parent field;
+            # the summary of ``proj`` is painted before Save.
             app.screen.query_one("#project_name").value = "proj"
+            await sd.wait_for(
+                pilot, lambda: "proj" in sd.where_text(app.screen), "the summary of proj"
+            )
+            for _ in range(4):
+                await pilot.pause()
             app.screen.query_one("#save_ok").press()
-            await pilot.pause()
+            await sd.wait_for(
+                pilot, lambda: not sd.is_save_dialog(app.screen), "the Save dialog to close"
+            )
+            for _ in range(4):
+                await pilot.pause()
             outcomes["statuses"] = list(statuses)
             outcomes["notices"] = list(notices)
             outcomes["log_lines"] = list(app.log_lines)

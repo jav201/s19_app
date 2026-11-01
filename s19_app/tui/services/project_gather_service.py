@@ -68,7 +68,7 @@ import os
 import stat
 import unicodedata
 from dataclasses import dataclass, field
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Optional, Sequence
 
 from ...validation.model import ValidationIssue, ValidationSeverity
@@ -80,7 +80,9 @@ from ..workspace import (
     _find_workarea_root,
     _guarded_destination,
     _is_reparse_point,
+    _match_identical,
     _path_traverses_reparse_point,
+    _placed_name_candidates,
     place_into_workarea,
     predict_placement,
     validate_project_files,
@@ -1531,8 +1533,10 @@ def plan_project_save(
         name predicted by :func:`predict_placement` — the placement's own
         rule — with its action word, one ``carried`` row per top-level copy
         of a save as, and the ``project.json`` row. A pure function of its
-        inputs and the target's listing: no byte is written and no payload
-        is hashed (the digests are inputs).
+        inputs and the target's listing: no byte is written and no planned
+        file is hashed; a document-row candidate's bytes are read only when
+        a same-size occupant must be compared (the rule ``_match_identical``
+        applies to candidates).
 
     Args:
         target (Path): The project folder (it may not exist yet).
@@ -1573,6 +1577,11 @@ def plan_project_save(
           is classified first (:func:`classify_active_document`):
           ``in_home`` → ``keep``; ``outside`` → predicted;
           ``inside_elsewhere`` / ``missing`` → no row.
+        - A file-backed document row whose source the copy list owns
+          (under ``copying``) is predicted against the copied files in its
+          home — ``_workspace._match_identical`` over those occupants, then
+          the same free-name walk the commit uses (``_placed_name_candidates``,
+          ``normcase``) — so the painted landing is what the commit writes.
         - Save as with an inventory: a home row that does not own a
           sub-folder file is predicted against ``inventory.root / home``
           (the folder the sub-folder copy mirrors into the target before
@@ -1670,6 +1679,49 @@ def plan_project_save(
                 )
                 continue
             if kind != DOCUMENT_OUTSIDE:
+                continue
+            # Q10 / A11-03: a file-backed document whose source the copy
+            # list owns is predicted against the tree the copy produces —
+            # the copied files in its home — not the empty target home, so
+            # a byte-identical sibling it will reuse is painted ``keep`` at
+            # its real landing (the one byte-identity rule, on real files).
+            if copying and _source_key(planned.source) in owned:
+                occupants = {
+                    PurePosixPath(entry.relative).name: (
+                        entry.size, inventory.root / entry.relative
+                    )
+                    for entry in copies
+                    if os.path.normcase(
+                        PurePosixPath(entry.relative).parent.as_posix()
+                    )
+                    == os.path.normcase(planned.home)
+                }
+                listing = list(occupants)
+                identical = _workspace._match_identical(
+                    listing, inventory.root / planned.home, name,
+                    planned.size, planned.digest,
+                )
+                if identical is not None:
+                    name_landed = identical.name
+                    reused = True
+                else:
+                    folded = {os.path.normcase(entry) for entry in listing}
+                    name_landed = next(
+                        candidate
+                        for candidate in _placed_name_candidates(name)
+                        if os.path.normcase(candidate) not in folded
+                    )
+                    reused = False
+                rows.append(
+                    SavePlanRow(
+                        planned.role,
+                        planned.source,
+                        Path(target).resolve() / planned.home / name_landed,
+                        PLAN_ACTION_KEEP if reused else PLAN_ACTION_NEW,
+                    )
+                )
+                if not reused:
+                    total += _rounded_up(planned.size)
                 continue
         predict_dir = landing_dir
         if copying and planned.home is not None:

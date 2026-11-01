@@ -1,0 +1,16 @@
+2026-10-31 14:32  E1 start (Opus, parallel with 9a close and 9b design-fix on DeepSeek)
+2026-10-31 14:54  E1 end (Opus) — 52 requirements
+2026-10-31 14:55  E1 rulings Q1-Q11 (orchestrator; Q10 accepted: project_gather_service.py 4th file)
+2026-10-31 17:06  E2 baseline end (Opus) — 42 nodes
+2026-10-31 17:07  E2 baseline rulings + interfaces-11.md fixed (orchestrator); prototypes G-A, G-B start (Opus)
+2026-10-31 17:26  E2 prototype G-B end (Opus) — 16 nodes / 81 examples
+2026-10-31 17:28  E2 prototype G-A end (Opus) — 16 nodes / 69 examples
+2026-10-31 17:30  E2 prototypes done (G-A 16/69, G-B 16/81); proposals ruled; E3 PDR r1 start (Opus architect ∥ security)
+2026-10-31 17:46  E3 r1: arch FAIL (6 MAJOR), sec PWN (1 MAJOR S11-01 samefile); rulings written; design-fix r1 start (DeepSeek)
+2026-10-31 18:04  E3 r1 design-fix end (DeepSeek v4 Pro)
+2026-10-31 18:10  E3 r2: arch FAIL (3 new MAJOR from fixes), sec PWN; r2 rulings written; design-fix r2 start (DeepSeek)
+2026-10-31 18:18  E3 r2 design-fix end (DeepSeek v4 Pro)
+2026-10-31 18:20  E3 r3: arch PWN (R3-01 MINOR, R3-02 NIT); E3 closed; addenda written; E4 waits for the post-10 tree
+2026-10-31 19:33  design copied to worktree b100-inc11 (from 1747479 = 9b corrected + Inc 10 integrated); E4 start: G-A+G-B DeepSeek, tester Opus
+2026-10-31 21:23  E4 tester end (Opus, 154 new ids RED 154/154; 24 re-pins); integration start (Opus)
+2026-10-31 23:18 E4 integration GREEN (Opus software-dev): 154/154 new, 35/35 repins, 249+4skip guards; SR-11-1..3 ruled

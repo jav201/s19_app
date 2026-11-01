@@ -543,10 +543,13 @@ def test_tc_b100_57_export_holds_no_byte_identity_rule() -> None:
                     and isinstance(sub.left.func, ast.Attribute)
                     and sub.left.func.attr == "read_bytes"
                 )
-                hashes_file = (
-                    isinstance(sub, ast.Call)
-                    and isinstance(sub.func, ast.Name)
-                    and sub.func.id == "_hash_file"
+                # Inc 11 re-pin (A11-03): the Q10 document arm reaches the
+                # one rule through ``workspace._match_identical``; a module
+                # attribute call (``x._hash_file(...)``) is a byte-identity
+                # rule too, so the census catches it as well as a bare name.
+                hashes_file = isinstance(sub, ast.Call) and (
+                    (isinstance(sub.func, ast.Name) and sub.func.id == "_hash_file")
+                    or (isinstance(sub.func, ast.Attribute) and sub.func.attr == "_hash_file")
                 )
                 if compares_bytes or hashes_file:
                     found.add((rel, node.name))

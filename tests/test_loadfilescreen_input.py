@@ -904,9 +904,13 @@ def test_ac2_paste_reaches_project_name_input(
     The sibling `project_parent_path` input deliberately stays a stock Input
     (security mini-review scope condition), so only `#project_name` is
     asserted here.
+
+    Inc 11 re-pin (census A, S-b): the parent field is gone and the dialog
+    is built through its keyword constructor, fed by the inert fakes of
+    ``tests.support.b100_save_dialog``; the paste oracle is unchanged.
     """
     from s19_app.tui import os_clipboard_input as os_clip_mod
-    from s19_app.tui.screens import SaveProjectScreen
+    from tests.support.b100_save_dialog import bare_save_dialog
 
     pasted = "proyecto-ignis-31"
     monkeypatch.setattr(os_clip_mod, "_STRATEGIES", (("fake", lambda: pasted),))
@@ -915,7 +919,7 @@ def test_ac2_paste_reaches_project_name_input(
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(160, 48)) as pilot:
             await pilot.pause()
-            app.push_screen(SaveProjectScreen(default_parent=tmp_path))
+            app.push_screen(bare_save_dialog(tmp_path))
             for _ in range(6):
                 await pilot.pause()
             widget = app.screen.query_one("#project_name", Input)

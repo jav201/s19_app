@@ -1,0 +1,18 @@
+from pathlib import Path
+from tests import test_b100_save_dialog as t
+from tests.support import b100_save_dialog as sd
+
+def test_probe(tmp_path: Path):
+    base = tmp_path / "app"
+    ctx = t._prep_strasse(tmp_path, base)
+    async def scenario(app, pilot, log):
+        await t._setup_open_strasse(app, pilot, ctx)
+        p = app._prepare_project_save("stra\u00dfe")
+        print("DIRECT", repr(p.cleaned), repr(p.refusal), p.plan and p.plan.target_kind)
+        await sd.open_save_dialog(pilot, app)
+        await sd.set_name(pilot, app, "stra\u00dfe")
+        await pilot.pause(0.5)
+        print("FIELD", repr(sd.name_input(app.screen).value))
+        print("WHERE", repr(sd.where_text(app.screen)))
+        return None
+    t._run(base, scenario)

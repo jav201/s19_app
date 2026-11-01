@@ -1,0 +1,322 @@
+# Inc 11 E4 — RED-01: tests/test_b100_save_dialog.py on BASE (independent tester)
+# base: detached scratch worktree at 1747479 (17474791bde5dfea48f379883c91fd69c34853c7) = main + Inc 9b corrected + Inc 10 integrated
+# the tests under run were copied into the base worktree's tests/ (no base source edited); s19_app.__file__ is printed below
+# command (cwd = base worktree):
+#   env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<scratchpad>/t11/lad #   C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider --basetemp=<scratchpad>/t11/bt tests/test_b100_save_dialog.py -q --no-header -rfEs -p no:randomly --tb=line
+# one complete run; its own summary line is the last line
+== base sha: 17474791bde5dfea48f379883c91fd69c34853c7
+== s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\s19_app\__init__.py
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF [ 46%]
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF [ 93%]
+FFFFFFFFFF                                                               [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('new folder',) (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('new folder',) (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('updates the open project',) (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('updates the open project',) (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('merges into an existing project',) (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('reserved name', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('device name', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('already a project', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('name too long', 'shorten the name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('path too long', 'shorten the name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('link or junction', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('could not be read', 'check that the folder can be opened, then save again') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('name is empty', 'type a project name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('already a project', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('already has a MAC file', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('not enough free space', 'free disk space or remove files from the project') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('source file missing', 'reload it or remove it from the project') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('could not be read', 'check that the file can be opened, then save again') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('blocked entr', 'fix them in the Patch Editor') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('could not be read', 'check that the folder can be opened, then save again') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('reserved name', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('reserved name', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('reserved name', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('reserved name', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('reserved name', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('device name', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('device name', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('device name', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('device name', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('device name', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('device name', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('already a project', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('new folder',) (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('new folder',) (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('link or junction', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('name is empty', 'type a project name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('already has a MAC file', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('new folder',) (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('source file missing', 'reload it or remove it from the project') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('source file missing', 'reload it or remove it from the project') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('source file missing', 'reload it or remove it from the project') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('could not be read', 'check that the file can be opened, then save again') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('could not be read', 'check that the file can be opened, then save again') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('blocked entr', 'fix them in the Patch Editor') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('blocked entr', 'fix them in the Patch Editor') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('already a project', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:1309: AssertionError: no _prepare_project_save (the one preparation)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('reserved name', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('device name', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('already a project', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('name too long', 'shorten the name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('path too long', 'shorten the name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('link or junction', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('could not be read', 'check that the folder can be opened, then save again') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('name is empty', 'type a project name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('already a project', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('already has a MAC file', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('not enough free space', 'free disk space or remove files from the project') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('source file missing', 'reload it or remove it from the project') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('could not be read', 'check that the file can be opened, then save again') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('blocked entr', 'fix them in the Patch Editor') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('could not be read', 'check that the folder can be opened, then save again') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('new folder',) (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:1460: AssertionError: {'project_parent_path': 1, 'save_browse': 1, 'save_browse_row': 1}
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:1460: AssertionError: {'project_parent_path': 1, 'save_browse': 1, 'save_browse_row': 1}
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('fresh1', 'new folder') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('fresh1', 'new folder') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('fresh1', 'new folder') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('fresh1', 'new folder') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('fresh1', 'new folder') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('reserved name', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('fresh1', 'new folder') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('fresh1', 'new folder') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:1641: AssertionError:
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:1641: AssertionError:
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:1641: AssertionError:
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:1641: AssertionError:
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:1641: AssertionError:
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:1641: AssertionError:
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('fresh1', 'new folder') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('fresh1', 'new folder') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('fresh1', 'new folder') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('fresh1', 'new folder') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:1714: AssertionError: assert (2, 'project_parent_path') == (2, 'project_name')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:1714: AssertionError: assert (2, 'project_parent_path') == (2, 'project_name')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:1739: AssertionError:
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('already a project', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:1856: AssertionError: {'after palette': ['Screen', 'SaveProjectScreen', 'LoadDialog', 'CommandPalette'], 'closed': ['Screen', 'SaveProjectScreen'], 'ctrl+d same': True, 'ctrl+k inside': False, ...}
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('updates the open project',) (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('fresh1', 'new folder') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:1961: AssertionError: 2
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:1961: AssertionError: 2
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('a2only', 'new folder') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:2121: AssertionError: ['self', 'default_parent', 'variants', 'candidate_files']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:2075: TypeError: SaveProjectScreen.__init__() got an unexpected keyword argument 'preview'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:2075: TypeError: SaveProjectScreen.__init__() got an unexpected keyword argument 'preview'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:2075: TypeError: SaveProjectScreen.__init__() got an unexpected keyword argument 'preview'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:2324: TypeError: SaveProjectScreen.__init__() got an unexpected keyword argument 'preview'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:2075: TypeError: SaveProjectScreen.__init__() got an unexpected keyword argument 'preview'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:2075: TypeError: SaveProjectScreen.__init__() got an unexpected keyword argument 'preview'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:2075: TypeError: SaveProjectScreen.__init__() got an unexpected keyword argument 'preview'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:2075: TypeError: SaveProjectScreen.__init__() got an unexpected keyword argument 'preview'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('fresh1', 'new folder', 'project.json') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('updates the open project', 'project.json', 'unsaved changes') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('already has a MAC file', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('updates the open project', 'project.json') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('doc1', 'new folder', 'project.json') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('merges into an existing project', 'project.json') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('Q', 'new folder', 'project.json') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:2692: AssertionError: _save_dialog_preview is missing
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:339: AttributeError: 'S19TuiApp' object has no attribute '_commit_project_save'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:339: AttributeError: 'S19TuiApp' object has no attribute '_commit_project_save'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:339: AttributeError: 'S19TuiApp' object has no attribute '_commit_project_save'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:339: AttributeError: 'S19TuiApp' object has no attribute '_commit_project_save'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:339: AttributeError: 'S19TuiApp' object has no attribute '_commit_project_save'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:339: AttributeError: 'S19TuiApp' object has no attribute '_commit_project_save'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:339: AttributeError: 'S19TuiApp' object has no attribute '_commit_project_save'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('Q', 'new folder', 'project.json') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:2813: AttributeError: 'SaveProjectScreen' object has no attribute 'plan'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('merges into an existing project', 'project.json') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('updates the open project', 'project.json', 'unsaved changes') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('doc1', 'new folder', 'project.json') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('fresh1', 'new folder', 'project.json') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('updates the open project', 'project.json') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('Q', 'new folder', 'links or junctions not copied') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('Q', 'new folder', 'links or junctions not copied') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('merges into an existing project', 'project.json') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('merges into an existing project', 'active variant') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('ab', 'project.json') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('reda', 'new folder', 'project.json') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('Q', 'new folder', 'project.json') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('Q', 'new folder', 'project.json') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('Q', 'new folder', 'project.json') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the target line naming 'fresh1' (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the first summary
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:339: AttributeError: 'S19TuiApp' object has no attribute '_save_dialog_preview'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('new folder', 'project.json') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:3518: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('updates the open project',) (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:3610: AssertionError: (('missing', 'missing'), ('missing', 'missing'))
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:339: AttributeError: 'S19TuiApp' object has no attribute '_save_dialog_preview'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('fresh1', 'new folder', 'project.json') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('new folder',) (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('new folder',) (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('fresh1', 'new folder', 'project.json') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('updates the open project', 'project.json', 'unsaved changes') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('already has a MAC file', 'choose another name') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('updates the open project', 'project.json') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('doc1', 'new folder', 'project.json') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('merges into an existing project', 'project.json') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('Q', 'new folder', 'project.json') (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\test_b100_save_dialog.py:3848: ImportError: cannot import name 'SavePreview' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('more than one MAC file',) (painted: '')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base11\tests\support\b100_save_dialog.py:128: AssertionError: timed out waiting for the dialog to paint ('merges into an existing project', 'active variant') (painted: '')
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_target_line_names_the_sanitised_folder_new[a b-ab]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_target_line_names_the_sanitised_folder_new[../evil-evil]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_target_line_open_project_kind
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_target_line_open_project_in_another_case
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_target_line_merge_and_existing_folder_kinds
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_refusal_painted_in_the_dialog_before_save[reserved]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_refusal_painted_in_the_dialog_before_save[device]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_refusal_painted_in_the_dialog_before_save[clash]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_refusal_painted_in_the_dialog_before_save[over64]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_refusal_painted_in_the_dialog_before_save[path]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_refusal_painted_in_the_dialog_before_save[link]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_refusal_painted_in_the_dialog_before_save[unreadable_target]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_refusal_painted_in_the_dialog_before_save[no_char]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_refusal_painted_in_the_dialog_before_save[casefold]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_refusal_painted_in_the_dialog_before_save[plan]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_refusal_painted_in_the_dialog_before_save[space]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_refusal_painted_in_the_dialog_before_save[missing]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_refusal_painted_in_the_dialog_before_save[unreadable_source]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_refusal_painted_in_the_dialog_before_save[blocked]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_refusal_painted_in_the_dialog_before_save[workarea]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_reserved_names_in_mixed_case[reports]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_reserved_names_in_mixed_case[CRC]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_reserved_names_in_mixed_case[Splits]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_reserved_names_in_mixed_case[FLOWS]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_reserved_names_in_mixed_case[Temp]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_device_names_raw_component_and_sanitised[nul]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_device_names_raw_component_and_sanitised[CON]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_device_names_raw_component_and_sanitised[com1]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_device_names_raw_component_and_sanitised[LPT\xb9]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_device_names_raw_component_and_sanitised[con.txt]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_device_names_raw_component_and_sanitised[C O N]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_disguised_clash_names_both_and_exact_name_merges
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_name_cap_64_65_300 - A...
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_path_limit_met_and_exceeded
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_junction_target_writes_nothing_through_it
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_no_usable_character_painted_live
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_plan_refusals_replace_the_rows
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_free_space_short_by_one_and_exact
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_missing_source_painted_at_open[firmware.s19]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_missing_source_painted_at_open[firmware.mac]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_missing_source_painted_at_open[firmware.a2l]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_unreadable_source_painted_and_app_runs[digest]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_unreadable_source_painted_and_app_runs[exists]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_blocked_entries_painted_with_addresses[1]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_blocked_entries_painted_with_addresses[3]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_strasse_open_strasse_eszett_present_is_a_clash
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_one_preparation_ast_census
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_dialog_line_equals_the_direct_status_line[reserved]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_dialog_line_equals_the_direct_status_line[device]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_dialog_line_equals_the_direct_status_line[clash]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_dialog_line_equals_the_direct_status_line[over64]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_dialog_line_equals_the_direct_status_line[path]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_dialog_line_equals_the_direct_status_line[link]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_dialog_line_equals_the_direct_status_line[unreadable_target]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_dialog_line_equals_the_direct_status_line[no_char]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_dialog_line_equals_the_direct_status_line[casefold]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_dialog_line_equals_the_direct_status_line[plan]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_dialog_line_equals_the_direct_status_line[space]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_dialog_line_equals_the_direct_status_line[missing]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_dialog_line_equals_the_direct_status_line[unreadable_source]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_dialog_line_equals_the_direct_status_line[blocked]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_dialog_line_equals_the_direct_status_line[workarea]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_dialog_line_equals_the_direct_status_line[valid]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_48_no_parent_field_and_no_browse[size0]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_48_no_parent_field_and_no_browse[size1]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_48_payload_parent_is_the_work_area_under_a_long_base
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_escape_from_each_focus_position[project_name]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_escape_from_each_focus_position[save_summary]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_escape_from_each_focus_position[save_ok]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_escape_from_each_focus_position[save_cancel]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_escape_after_a_refusal_closes
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_cancel_closes_with_no_result[click]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_cancel_closes_with_no_result[enter]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_empty_save_keeps_the_dialog_and_says_why[alt+s-]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_empty_save_keeps_the_dialog_and_says_why[alt+s-   ]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_empty_save_keeps_the_dialog_and_says_why[save_ok-]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_empty_save_keeps_the_dialog_and_says_why[save_ok-   ]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_empty_save_keeps_the_dialog_and_says_why[enter-]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_empty_save_keeps_the_dialog_and_says_why[enter-   ]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_confirming_save_closes_and_saves[alt+s]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_confirming_save_closes_and_saves[save_ok]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_confirming_save_closes_and_saves[enter]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_confirming_save_closes_and_saves[posted_alt_s]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_dialog_opens_with_the_focus_in_the_name_field[ctrl+s]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_dialog_opens_with_the_focus_in_the_name_field[palette]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_plain_letters_stay_in_the_name_field
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_save_during_a_refusal_keeps_the_dialog_and_save_focusable
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_priority_keys_are_inert_while_the_dialog_is_open
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_open_project_name_is_offered_selected
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_buttons_show_their_keys_and_the_keys_work
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_nothing_loaded_opens_no_dialog[ctrl+s]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_nothing_loaded_opens_no_dialog[palette]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_an_a2l_alone_opens_the_dialog
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_constructor_is_keyword_only_and_computes_nothing
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_plan_is_read_only - Ty...
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_paint_rows_verbatim_in_order_and_refusal_empties
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_is_a_150ms_debounce
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_first_preview_after_the_first_frame_and_once_while_idle
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_save_before_the_preview_is_shown_repaints
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_out_of_date_save_repaints_and_stops_the_timer
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_49_escape_with_a_recompute_pending_and_double_close
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_assignment_rows_literal_and_in_the_tab_order
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_summary_rows_equal_the_plan[fresh]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_summary_rows_equal_the_plan[pending]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_summary_rows_equal_the_plan[refused]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_summary_rows_equal_the_plan[files]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_summary_rows_equal_the_plan[document]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_summary_rows_equal_the_plan[merge]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_summary_rows_equal_the_plan[saveas]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_the_preview_and_the_dialog_list_nothing_themselves
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_save_executes_the_painted_plan[fresh]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_save_executes_the_painted_plan[pending]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_save_executes_the_painted_plan[refused]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_save_executes_the_painted_plan[files]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_save_executes_the_painted_plan[document]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_save_executes_the_painted_plan[merge]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_save_executes_the_painted_plan[saveas]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_document_keep_row_is_what_the_save_writes
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_summary_out_of_date_at_save_is_repainted_arm_1
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_summary_out_of_date_at_save_is_repainted_arm_2
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_image_line_says_emit_or_copy[pending-firmware.s19 + 1 change entry, 0 applied by this save]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_image_line_says_emit_or_copy[document-firmware.s19 + 1 change entry, 1 applied by this save]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_image_line_says_emit_or_copy[fresh-firmware.s19 unchanged copy]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_pending_line_marks_unsaved_changes
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_skipped_links_get_one_row[1]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_skipped_links_get_one_row[12]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_merge_names_the_active_variant_it_sets
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_active_variant_change_counts_as_out_of_date
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_manifest_backup_gets_its_own_row
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_names_are_painted_literally
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_buttons_stay_visible_and_rows_never_wrap[size0]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_buttons_stay_visible_and_rows_never_wrap[size1]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_last_row_reachable_by_keyboard
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_a_direct_payload_saves_the_same_tree
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_session_decided_once_per_open_case06
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_at_most_three_of_twenty_keystrokes
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_emitting_4mib_image_recomputes_fast
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_first_frame_before_the_image_decision
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_save_as_inventory_walked_once_per_open
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_save_as_then_patch_then_direct_save_plans_fresh
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_document_digest_is_taken_in_each_preparation
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_66_save_dialog_paints_no_decision_id
+FAILED tests/test_b100_save_dialog.py::test_at_b100_16_save_dialog_open_folder_clash_empty_escape[size0]
+FAILED tests/test_b100_save_dialog.py::test_at_b100_16_save_dialog_open_folder_clash_empty_escape[size1]
+FAILED tests/test_b100_save_dialog.py::test_at_b100_21_painted_plan_is_the_saved_tree[fresh]
+FAILED tests/test_b100_save_dialog.py::test_at_b100_21_painted_plan_is_the_saved_tree[pending]
+FAILED tests/test_b100_save_dialog.py::test_at_b100_21_painted_plan_is_the_saved_tree[refused]
+FAILED tests/test_b100_save_dialog.py::test_at_b100_21_painted_plan_is_the_saved_tree[files]
+FAILED tests/test_b100_save_dialog.py::test_at_b100_21_painted_plan_is_the_saved_tree[document]
+FAILED tests/test_b100_save_dialog.py::test_at_b100_21_painted_plan_is_the_saved_tree[merge]
+FAILED tests/test_b100_save_dialog.py::test_at_b100_21_painted_plan_is_the_saved_tree[saveas]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_payload_plan_field_and_preview_value_types
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_target_with_two_mac_files_refused_in_the_dialog
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_active_variant_stem_collision_is_predicted_exactly
+154 failed in 1974.10s (0:32:54)

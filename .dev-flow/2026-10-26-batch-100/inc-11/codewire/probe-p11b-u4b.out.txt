@@ -1,0 +1,5 @@
+== U4b differs_from_source False
+== U4b dispositions [('0x80000000', 'skipped-outside')]
+== U4b derived {'0x80000000': 0}
+== U4b rederived_differs False
+== U4b apply result ChangeSummary(source_path=None, kind='change', encoding='utf-8', value_mode='text', timestamp_utc='2026-10-31T22:47:30.067903+00:00', variant_id=None, counts={'applied': 0, 'skipped-partial': 0, 'skipped-outside': 1, 'skipped-no-image': 0, 'blocked': 0}, entries=[ChangeSummaryEntry(entry_type='bytes', address_start=2147483648, address_end=2147483649, before_bytes=None, after_bytes=(90,), disposition='skipped-outside', linkage='mac-linked', linkage_symbol='BLOCK_A', symbol=None)], issues=[], saved_path=None, verify_result=None, source_image_path=None)
