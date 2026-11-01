@@ -1,0 +1,20 @@
+{
+ "scenario": "load-l",
+ "size": "118x54",
+ "focused": "load_path",
+ "load_reason": "",
+ "preview": "",
+ "highlighted": 1,
+ "rows": [
+  "Projects",
+  "P",
+  "Q",
+  "Work area",
+  "cal.a2l",
+  "fw.s19",
+  "Recent",
+  "firmware.s19 (s19)"
+ ],
+ "stacked": false,
+ "screen": "LoadDialog"
+}

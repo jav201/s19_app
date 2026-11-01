@@ -1,0 +1,11 @@
+{
+ "scenario": "panel-problems",
+ "size": "80x30",
+ "focused": "result_body",
+ "title": "Project P opened with 31 problems",
+ "body_region": "Region(x=15, y=6, width=50, height=15)",
+ "last_region": "Region(x=15, y=19, width=48, height=2)",
+ "scroll_y": 86,
+ "max_scroll_y": 86,
+ "screen": "LoadResultScreen"
+}

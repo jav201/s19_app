@@ -1,0 +1,19 @@
+{
+ "scenario": "save-empty",
+ "size": "118x54",
+ "prefill": "P",
+ "prefill_summary": [
+  "firmware.s19 unchanged copy",
+  "image firmware.s19 — keep",
+  "project.json — rewrite"
+ ],
+ "prefill_where": "P — updates the open project",
+ "focused_on_open": "project_name",
+ "save_where": "name is empty — type a project name.",
+ "summary_rows": [],
+ "focused": "project_name",
+ "titles": [
+  "Project name"
+ ],
+ "screen": "SaveProjectScreen"
+}

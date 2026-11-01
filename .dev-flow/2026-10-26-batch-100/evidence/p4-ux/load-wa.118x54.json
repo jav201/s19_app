@@ -1,0 +1,20 @@
+{
+ "scenario": "load-wa",
+ "size": "118x54",
+ "focused": "load_list",
+ "load_reason": "",
+ "preview": "● image fw.s19",
+ "highlighted": 5,
+ "rows": [
+  "Projects",
+  "P",
+  "Q",
+  "Work area",
+  "cal.a2l",
+  "fw.s19",
+  "Recent",
+  "firmware.s19 (s19)"
+ ],
+ "stacked": false,
+ "screen": "LoadDialog"
+}
