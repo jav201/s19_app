@@ -241,6 +241,11 @@
       "station": "P3",
       "date": "2026-11-01",
       "decision": "P3 increment 020 (Inc 11, the Save project dialog shows exactly what the save will do) approved under the batch's standing authorization; E5 two review rounds (code PASS, security PASS-WITH-NOTES); Inc 12a is next."
+    },
+    {
+      "station": "P3",
+      "date": "2026-11-01",
+      "decision": "P3 increment 021 (Inc 12a, the progress indicator, the labels Load / Projects and the backlog sweep) approved under the batch's standing authorization; E5 reviews PASS-WITH-NOTES, corrective pass in 2 rounds; Inc 12b is next."
     }
   ],
   "obsidian_synced": false,
