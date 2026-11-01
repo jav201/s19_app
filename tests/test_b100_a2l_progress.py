@@ -351,3 +351,36 @@ def test_tc_b100_52_project_install_step_is_painted_before_the_install(
     text, flags = got[0]
     assert re.match(r"^[" + FRAMES + r"] Loading project P  ·  step 4/4 Install  ·  \d\d:\d\d$", text), text
     assert flags == {"install": False}, flags
+
+
+def test_tc_b100_73_no_fstat_without_a_callback(monkeypatch: pytest.MonkeyPatch) -> None:
+    """CR12b-4 (behaviour-neutral, LLR-176.4a): with no callback the read
+    makes 0 ``os.fstat`` calls, so a failing ``fstat`` cannot change the
+    callback-free parse: ``parse_a2l_file(case_01)`` returns the same
+    result as before the stand-in was installed. With a callback the same
+    stand-in is called exactly once (the size the reports carry) — the
+    positive control that the stand-in sits on the read's path.
+
+    Why: the callback-free parse is the one every caller outside the app
+    uses; it must stay the base parse. Negative control (81ac4c0): ``fstat``
+    runs with no callback -> the raise is logged and re-raised -> RED."""
+    import os as real_os
+
+    expected = a2l_module.parse_a2l_file(CASE01_A2L)
+    calls: list = []
+
+    class _Os:
+        def __getattr__(self, name):
+            return getattr(real_os, name)
+
+        @staticmethod
+        def fstat(fd):
+            calls.append(fd)
+            raise OSError(5, "synthetic fstat failure")
+
+    monkeypatch.setattr(a2l_module, "os", _Os())
+    assert a2l_module.parse_a2l_file(CASE01_A2L) == expected
+    assert calls == [], calls
+    with pytest.raises(OSError):
+        a2l_module.build_section_tree(CASE01_A2L, lambda done, total: None)
+    assert len(calls) == 1, calls

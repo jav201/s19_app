@@ -6039,7 +6039,9 @@ class S19TuiApp(App):
             Used by:
                 - ``ReportViewerScreen`` (bubbled message)
         """
-        self._declared_regions = tuple(message.declared_regions)
+        # CR12b-3: a running project load or Save owns the session's regions.
+        if self._running_session_action() is None:
+            self._declared_regions = tuple(message.declared_regions)
         self._trigger_generate_report(
             message.context_bytes, message.declared_regions
         )
@@ -11659,6 +11661,11 @@ class S19TuiApp(App):
                         "the project — the file could not be written; its "
                         "entries stay in the Patch Editor"
                     )
+                    # CR12b-1 (base A3R2-8): recorded either way, because the
+                    # placement mkdirs the home before a copy that can fail;
+                    # the rollback removes it only while it is empty.
+                    if created_home is not None:
+                        created_dirs.append(created_home)
                     try:
                         written, issues = write_change_document(
                             request.document_snapshot,
@@ -11684,8 +11691,6 @@ class S19TuiApp(App):
                         )
                         document_write_failure = failure
                         continue
-                    if created_home is not None:
-                        created_dirs.append(created_home)
                     placed = landed_doc[0]
                     pasted_placed = placed
                 elif row.role == "image" and prepared.image_step.emit:
@@ -12236,6 +12241,9 @@ class S19TuiApp(App):
                 )
             for line in outcome.document_lines:
                 tail.append(safe_text(line).plain)
+            # SE5-12b-1: work held only in memory was not saved, so a
+            # confirmed quit is withdrawn and the line stays on screen.
+            unsaved_work_left = bool(outcome.document_lines)
             document = self._change_service.document
             if outcome.document_source_path is not None:
                 document.source_path = outcome.document_source_path
@@ -12261,6 +12269,7 @@ class S19TuiApp(App):
                         "edits — the project records the file as it is on disk; "
                         "save it from the Patch Editor to keep them"
                     )
+                    unsaved_work_left = True
             if (
                 outcome.verify_result is not None
                 and outcome.verify_result.status != MANIFEST_VERIFIED
@@ -12275,6 +12284,8 @@ class S19TuiApp(App):
             self.refresh_files()
             if prepared.save_as_source is not None:
                 self._publish_flow_session_dir()
+            if unsaved_work_left:
+                self._quit_pending = False
             self.end_busy("save_project", gen, tail[-1])
         except BaseException:
             run = self._busy.runs.get("save_project")
@@ -15150,7 +15161,21 @@ class S19TuiApp(App):
         if self.current_project:
             project_dir = self._active_project_dir()
             if project_dir:
-                _, a2l_files, error = validate_project_files(project_dir)
+                try:  # CR12b-2: the open project's folder can vanish outside the app
+                    _, a2l_files, error = validate_project_files(project_dir)
+                except OSError:
+                    reason, step = _TYPED_REFUSAL_TOKENS["unreadable"]
+                    self.set_status(
+                        safe_text(
+                            f"A2L NOT loaded: project "
+                            f"'{painted_names([self.current_project])}' {reason} — {step}."
+                        ).plain
+                    )
+                    self.logger.warning(
+                        "A2L load refused (project folder could not be read): %r",
+                        project_dir,
+                    )
+                    return
                 if error:
                     self.set_status(error)
                     self.logger.warning("Project validation failed: %s", error)
@@ -15161,7 +15186,12 @@ class S19TuiApp(App):
                     return
             else:
                 self.logger.warning("current_project set but project directory could not be resolved; skipping project guard.")
-        source_size = normalized.stat().st_size
+        try:  # CR12b-2: never a size of 0, so the over-cap rule is not bypassed
+            source_size = normalized.stat().st_size
+        except OSError:
+            self.set_status(f"A2L file not found: {path}")
+            self.logger.warning("A2L file not found: %s", path)
+            return
         if source_size >= self.large_a2l_warn_bytes:
             self.logger.warning(
                 "Large A2L detected before copy: path=%s size_bytes=%d threshold_bytes=%d",

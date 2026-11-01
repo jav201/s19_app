@@ -3078,3 +3078,239 @@ def test_at_b100_17_parse_half_case06_a2l_by_keys(tmp_path: Path) -> None:
     values = [v for v, _e in samples]
     assert increases(values) >= 2, f"bar values sampled in step 2: {values}"
     assert len({e for _v, e in samples}) >= 2, f"elapsed texts in step 2: {sorted({e for _v, e in samples})}"
+
+
+
+# ===========================================================================
+# Inc 12b E5 corrective arms (CR12b-2, CR12b-3, SE5-12b-1)
+# ===========================================================================
+
+
+async def ended_or_exited(app, key: str, timeout: float = 90.0) -> bool:
+    """Wait by the wall clock (never through the pilot, which needs a
+    running app) until the run ``key`` is gone or the app has exited;
+    then let a few frames pass. Returns ``True`` when the app exited."""
+    deadline = time.monotonic() + timeout
+    while app.return_code is None and key in app._busy.runs:
+        if time.monotonic() > deadline:
+            raise AssertionError(f"the {key} run never ended")
+        await asyncio.sleep(0.02)
+    for _ in range(25):
+        if app.return_code is not None:
+            break
+        await asyncio.sleep(0.02)
+    return app.return_code is not None
+
+
+async def confirm_quit(app, pilot) -> bool:
+    """``quit`` (the palette entry, so no focus question), then ``y``.
+    Returns whether the quit question was asked."""
+    await app.run_action("quit")
+    await wait(pilot, lambda: is_quit_question(app.screen) or not running(app), "the quit question", 10)
+    asked = is_quit_question(app.screen)
+    await pilot.press("y")
+    for _ in range(4):
+        await pilot.pause()
+    return asked
+
+
+@pytest.mark.parametrize("gone", ["project_folder", "a2l_size"])
+def test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, gone: str
+) -> None:
+    """CR12b-2 / SE5-12b-2 (ruling E5, split by subject): before any busy
+    run begins, ``load_a2l_from_path`` reads the open project's folder
+    (``validate_project_files``) and the A2L's size (``stat``).
+    - ``project_folder``: the open project ``gone`` was removed outside the
+      app -> 1 line ``A2L NOT loaded: project 'gone' could not be read —
+      check that the folder can be opened, then load again.``;
+    - ``a2l_size``: the size ``stat`` raises ``OSError`` -> 1 line ``A2L
+      file not found: <typed>``.
+    Both: nothing raised out of the request, 0 begins, no run left, the app
+    running.
+
+    Why: from the Load dialog or a deferred callback the raise ends the app
+    and the unsaved session is lost; a size read as 0 would skip the
+    over-cap rule. Negative control (81ac4c0): both calls are unguarded ->
+    ``FileNotFoundError`` / ``OSError`` leaves the request -> RED."""
+    base = tmp_path / "app"
+    a2l = tmp_path / "src" / "firmware.a2l"
+    a2l.parent.mkdir(parents=True)
+    shutil.copyfile(CASE01 / "firmware.a2l", a2l)
+    begins = Spy(monkeypatch, S19TuiApp, "_busy_begin_action")
+    if gone == "a2l_size":
+        real_stat = pathlib.Path.stat
+
+        def _stat(self, *args, **kwargs):
+            if sys._getframe(1).f_code.co_name == "load_a2l_from_path":
+                raise OSError(5, "synthetic size read failure")
+            return real_stat(self, *args, **kwargs)
+
+        monkeypatch.setattr(pathlib.Path, "stat", _stat)
+
+    async def scenario(app, pilot, log):
+        if gone == "project_folder":
+            app.current_project = "gone"
+            app.current_project_dir = app.workarea / "gone"
+        mark = len(log.messages)
+        try:
+            app.load_a2l_from_path(a2l)
+            raised = None
+        except BaseException as exc:  # noqa: BLE001 — the RED shape
+            raised = type(exc).__name__
+        for _ in range(3):
+            await pilot.pause()
+        return raised, log.since(mark), list(app._busy.runs), running(app)
+
+    raised, lines, runs, alive = run(base, scenario)
+    expected = (
+        "A2L NOT loaded: project 'gone' could not be read — check that the folder "
+        "can be opened, then load again."
+        if gone == "project_folder"
+        else f"A2L file not found: {a2l}"
+    )
+    assert raised is None, f"{raised} left load_a2l_from_path"
+    assert lines == [expected], lines
+    assert (len(begins.calls), runs, alive) == (0, [], True), (len(begins.calls), runs, alive)
+
+
+def test_tc_b100_53_report_generate_keeps_the_regions_of_a_running_save(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """CR12b-3: during a held Save of ``P1`` the report viewer's Generate
+    (regions R) still asks for the report (reports overlap, Q2), but leaves
+    the session's ``_declared_regions`` as it was; once idle, the same
+    Generate stores R.
+
+    Why: Save records the regions in ``project.json`` and a project load
+    replaces them, so regions written mid-run are lost or saved apart from
+    the session without a line. Negative control (81ac4c0): Generate stores
+    R while the Save runs -> RED."""
+    from s19_app.tui.screens import ReportViewerScreen
+    from s19_app.tui.services.report_addendum import DeclaredRegion
+
+    base, hold = held_save_scene(tmp_path, monkeypatch)
+    asked: list = []
+    monkeypatch.setattr(
+        S19TuiApp, "_trigger_generate_report",
+        lambda self, context_bytes, declared_regions=(): asked.append(tuple(declared_regions)),
+    )
+    regions = (DeclaredRegion(name="R", start=0x100, end=0x1FF),)
+
+    async def scenario(app, pilot, log):
+        try:
+            await start_held_save(app, pilot, hold)
+            before = app._declared_regions
+            app.on_report_viewer_screen_generate_requested(
+                ReportViewerScreen.GenerateRequested(16, regions)
+            )
+            during = app._declared_regions
+        finally:
+            hold.release.set()
+        await settle_workers(pilot)
+        await wait(pilot, lambda: "save_project" not in app._busy.runs, "the save to end")
+        app.on_report_viewer_screen_generate_requested(
+            ReportViewerScreen.GenerateRequested(16, regions)
+        )
+        return before, during, app._declared_regions
+
+    before, during, idle = run(base, scenario)
+    assert during == before, f"Generate wrote the regions during the Save: {during!r}"
+    assert asked == [regions, regions], asked
+    assert idle == regions, idle
+
+
+def test_tc_b100_53_confirmed_quit_is_withdrawn_when_pasted_entries_were_not_saved(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """SE5-12b-1 scenario B: a pasted entry is in the Patch Editor; ``quit``
+    then ``y`` while Save project ``P1`` is held; the document write fails
+    (``OSError(28)`` placing into ``P1/patches``) and the save commits
+    without it -> the app KEEPS running, the last line is ``Change document
+    changes.json was not saved into the project — the file could not be
+    written; its entries stay in the Patch Editor``, the entry is kept and
+    the quit is no longer pending.
+
+    Why: the entries live only in memory; exiting in the same callback that
+    paints the line loses them unseen. Negative control (81ac4c0): the
+    committed arm keeps the pending quit -> the app exits -> RED."""
+    base = tmp_path / "app"
+    trio(W(base) / "P2")
+    real_place = app_module.place_into_workarea
+
+    def _patches_full(source, destination, *args, **kwargs):
+        if Path(destination).name == "patches":
+            raise OSError(28, "synthetic no space")
+        return real_place(source, destination, *args, **kwargs)
+
+    async def scenario(app, pilot, log):
+        await open_trio_project(app, pilot, "P2")
+        await patch_one_byte(app, pilot)
+        monkeypatch.setattr(app_module, "place_into_workarea", _patches_full)
+        hold = Hold(monkeypatch, S19TuiApp, "_write_manifest_for_save")
+        save(app, "P1")
+        try:
+            await reached(pilot, hold, "Save project P1")
+            asked = await confirm_quit(app, pilot)
+        finally:
+            hold.release.set()
+        exited = await ended_or_exited(app, "save_project")
+        if exited:
+            return asked, True, None, None, None
+        return (asked, False, log.messages[-1], len(entries(app)),
+                getattr(app, "_quit_pending", None))
+
+    asked, exited, last, kept, pending = run(base, scenario)
+    assert asked is True
+    assert exited is False, "the app exited over a save that left the pasted entries unsaved"
+    assert last == (
+        "Change document changes.json was not saved into the project — the file "
+        "could not be written; its entries stay in the Patch Editor"
+    ), last
+    assert (kept, pending) == (1, False), (kept, pending)
+    assert (W(base) / "P1" / "project.json").is_file(), "the save did not commit"
+
+
+def test_tc_b100_53_confirmed_quit_is_withdrawn_when_editor_edits_stay_unsaved(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """SE5-12b-1 scenario A: the editor document is bound to
+    ``P/patches/changes.json`` by a first Save project; a second entry is
+    added through the Patch Editor (unsaved edits); ``quit`` then ``y``
+    while the second Save of ``P`` is held -> the save commits, the last
+    line names the unsaved edits and the Patch Editor save, the app KEEPS
+    running, the panel is still dirty, both entries are kept and the quit
+    is no longer pending.
+
+    Why: the project records the file as it is on disk; the second entry
+    lives only in the editor, and an exit loses it unseen. Negative control
+    (81ac4c0): the committed arm keeps the pending quit -> exit -> RED."""
+    from tests.test_b100_document import _add_through_the_panel, _panel
+
+    base = tmp_path / "app"
+    src = projects.copy_sources(tmp_path / "sources", projects.CASE01_DIR, "firmware.s19") / "firmware.s19"
+
+    async def scenario(app, pilot, log):
+        await projects.load_image(pilot, app, src)
+        await _add_through_the_panel(pilot, app, "0x8000007C", "DE AD BE EF", entries_after=1)
+        await projects.save_project(pilot, app, log, "P")
+        await _add_through_the_panel(pilot, app, "0x80000060", "AA", entries_after=2)
+        hold = Hold(monkeypatch, S19TuiApp, "_write_manifest_for_save")
+        save(app, "P")
+        try:
+            await reached(pilot, hold, "Save project P")
+            asked = await confirm_quit(app, pilot)
+        finally:
+            hold.release.set()
+        exited = await ended_or_exited(app, "save_project")
+        if exited:
+            return asked, True, None, None, None, None
+        return (asked, False, log.messages[-1], _panel(app)._dirty, len(entries(app)),
+                getattr(app, "_quit_pending", None))
+
+    asked, exited, last, dirty, kept, pending = run(base, scenario, size=(220, 60))
+    assert asked is True
+    assert exited is False, "the app exited over a save that left editor edits unsaved"
+    assert last.startswith("Change document changes.json has unsaved edits") and last.endswith(
+        "save it from the Patch Editor to keep them"), last
+    assert (dirty, kept, pending) == (True, 2, False), (dirty, kept, pending)

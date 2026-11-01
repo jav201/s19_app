@@ -15,3 +15,6 @@
 2026-11-01 02:25 E4 tester done (Opus + 1 sub-agent): 82 new items (80 RED), large census re-pin; RED run 108 failed/195 passed on 71376a3; A-1..A-10 ruled
 2026-11-01 02:27 merged b100-inc12a 9012835 (e3b8ec2; conflict test_b100_busy.py, fixed as union in ef0cdb8, 68 fns); integration start (Opus software-dev) with routed items SE5-12a-4, CR12a-1, SE5-11-3, O-1, MERGE-12a-1, OBS-12a-1
 2026-11-01 E4 integration: Opus (agent ad9981585326163cf), 325 tool uses, ~4h09m; app.py 1 source fix set (F-1, F-13, SE5-12a-4, CR12a-1, OBS-12a-1); orchestrator rulings appended (Opus)
+2026-11-01 E5 launched on 81ac4c0: mutants DeepSeek v4 Pro (pi, 115 rows); code-reviewer Opus; security-reviewer Opus; merged smoke (orchestrator)
+2026-11-01 E5 reviews done: code-reviewer Opus FAIL (BLOCK-UNTIL CR12b-1) 0H/1M/2m/1N; security-reviewer Opus PASS-WITH-NOTES 0H/1M/1m/2N; rulings (Opus); corrective pass round 1 launched (Opus)
+2026-11-01 E5 corrective round 1 done (Opus): 6 rows + CI12a-1; app.py 46f7ee6aa8a0fbfb, a2l.py 73c3820fe0d6ecd2; red-03 8 failed / green-03 8 passed / green-04 162 passed / green-06 busy 109 passed

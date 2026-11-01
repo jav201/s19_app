@@ -191,7 +191,7 @@ def build_section_tree(path: Path, progress: Optional[A2LProgress] = None) -> tu
 
     try:
         with path.open("r", encoding="utf-8", errors="replace") as handle:
-            total = os.fstat(handle.fileno()).st_size
+            total = os.fstat(handle.fileno()).st_size if progress is not None else 0
             for line_number, raw in enumerate(handle, 1):
                 if progress is not None and line_number % _PROGRESS_LINES == 0:
                     progress(handle.buffer.tell(), total)

@@ -2106,6 +2106,62 @@ def test_tc_b100_07_gather_home_created_then_copy_fails_no_folder_left(
     )
 
 
+@pytest.mark.parametrize("raised", ["no-space", "placement-refused"])
+def test_tc_b100_07_pasted_document_home_created_then_write_fails_no_folder_left(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, raised: str
+) -> None:
+    """CR12b-1 (base A3R2-8, the R5-1 shape for the pasted document): a
+    pasted 1-entry document; its placement mkdirs ``freshd/patches`` and
+    then the copy fails (``OSError(28)`` no space, or a refused
+    placement); the manifest is refused, so the save fails. The home the
+    document write created must join the rollback either way, so no
+    ``freshd`` folder is left. At 81ac4c0 the home joined the rollback only
+    after a successful write: ``freshd/patches`` stayed, ``freshd`` could
+    not be removed, and this arm is RED there."""
+    from s19_app.tui.workspace import WorkareaPlacementError
+
+    real_place = app_module.place_into_workarea
+    made: list = []
+
+    def _mkdir_home_then_raise(source, destination, *args, **kwargs):
+        if Path(destination).name == "patches":
+            Path(destination).mkdir(parents=True, exist_ok=True)
+            made.append(Path(destination))
+            if raised == "no-space":
+                raise OSError(28, "No space left on device")
+            raise WorkareaPlacementError("forced: the placement was refused")
+        return real_place(source, destination, *args, **kwargs)
+
+    base = tmp_path / "app"
+    src = _copy_source(tmp_path)
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=base)
+        probe = _StatusProbe(app)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app.load_selected_file(src)
+            await _flush(pilot)
+            app._change_service.add_entry("0x8000007C", "", "DE AD BE EF")
+            monkeypatch.setattr(app_module, "place_into_workarea", _mkdir_home_then_raise)
+            _force_stage(monkeypatch, "manifest-refused")
+            app._handle_save_dialog(_payload(app, "freshd"))
+            await _flush(pilot)
+            folders = sorted(
+                item.name for item in app.workarea.iterdir() if item.is_dir()
+            )
+            entries = len(app._change_service.document.entries)
+        return probe.last, folders, entries
+
+    status, folders, entries = asyncio.run(_drive())
+    assert [p.parent.name for p in made] == ["freshd"], made  # vacuity: the home was made
+    assert "Project NOT saved" in status and "check the folder" in status, status
+    assert folders == ["patches", "temp"], (
+        f"the failed save left the home its document write created behind: {folders}"
+    )
+    assert entries == 1, "the pasted entry left the Patch Editor"
+
+
 def test_tc_b100_07_empty_preexisting_home_survives_failed_save(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

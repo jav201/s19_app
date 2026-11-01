@@ -1,0 +1,56 @@
+== Guards re-run alone: the green-04 session-teardown error came from a debug script (outside pytest's guard) that wrote the recent store under the shared scratch LOCALAPPDATA at 13:19:46Z during that session; stray file removed first
+tree: C:/Users/jjgh8/Github/s19_app-b100-inc12b  (git HEAD 81ac4c0)
+date: 2026-11-01T13:24:45Z
+s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc12b\s19_app\__init__.py
+source sha256[:16]: app.py 46f7ee6aa8a0fbfb  a2l.py 73c3820fe0d6ecd2  styles.tcss f7b4f75911b296a4
+env: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12b/la
+cmd: pytest -p no:cacheprovider --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12b/bt/green04b -rA tests/test_id_registry.py tests/test_b99_staging.py
+............................................                             [100%]
+=================================== PASSES ====================================
+=========================== short test summary info ===========================
+PASSED tests/test_id_registry.py::test_tc600_g1_every_named_node_id_is_registered
+PASSED tests/test_id_registry.py::test_tc601_g2_live_entries_name_existing_nodes
+PASSED tests/test_id_registry.py::test_tc602_g3_every_citation_is_registered
+PASSED tests/test_id_registry.py::test_tc603_g4_requirements_citations_are_live
+PASSED tests/test_id_registry.py::test_tc604_g5_grammar_holds_or_is_registered_legacy
+PASSED tests/test_id_registry.py::test_tc605_g6_normalized_keys_are_unique
+PASSED tests/test_id_registry.py::test_tc606_g7_no_stem_exceeds_the_high_water_mark
+PASSED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+PASSED tests/test_id_registry.py::test_tc608_tokenizer_and_normalizer_edge_cases
+PASSED tests/test_id_registry.py::test_tc609_registry_file_is_well_formed
+PASSED tests/test_id_registry.py::test_tc610_reservations_are_recorded_and_respected
+PASSED tests/test_id_registry.py::test_at280_registry_and_repository_agree_in_both_directions
+PASSED tests/test_id_registry.py::test_at281_every_guard_rule_can_fail
+PASSED tests/test_b99_staging.py::test_tc_b99_11_same_name_save_back_keeps_work_copy
+PASSED tests/test_b99_staging.py::test_tc_b99_11_junction_at_staging_temp_is_refused
+PASSED tests/test_b99_staging.py::test_tc_b99_11_dangling_junction_at_staging_temp_is_refused
+PASSED tests/test_b99_staging.py::test_tc_b99_12_eight_writers_one_name_zero_mismatches
+PASSED tests/test_b99_staging.py::test_tc_b99_12_forced_permission_error_refuses_cleanly
+PASSED tests/test_b99_staging.py::test_tc_b99_12_directory_squatting_requested_name_takes_next_free
+PASSED tests/test_b99_staging.py::test_tc_b99_12_forced_oserror_in_replace_raises_placement_error
+PASSED tests/test_b99_staging.py::test_tc_b99_12_dangling_symlink_at_requested_name_takes_next_free
+PASSED tests/test_b99_staging.py::test_tc_b99_12_source_vanishes_mid_copy_is_wrapped
+PASSED tests/test_b99_staging.py::test_tc_b99_12_source_bytes_and_mtime_unchanged
+PASSED tests/test_b99_staging.py::test_tc_b99_13_concurrent_placements_one_name_own_bytes_returned
+PASSED tests/test_b99_staging.py::test_tc_b99_13_zero_byte_target_is_never_reused
+PASSED tests/test_b99_staging.py::test_tc_b99_13_symlink_target_is_never_reused
+PASSED tests/test_b99_staging.py::test_tc_b99_39_delete_calls_delete_only_owned_staging
+PASSED tests/test_b99_staging.py::test_tc_b99_44_change_document_stages_in_private_home
+PASSED tests/test_b99_staging.py::test_tc_b99_44_junction_at_staging_temp_is_refused
+PASSED tests/test_b99_staging.py::test_tc_b99_14_save_project_missing_source
+PASSED tests/test_b99_staging.py::test_tc_b99_14_placement_failure_removes_created_folder
+PASSED tests/test_b99_staging.py::test_tc_b99_14_preexisting_folder_survives_placement_failure
+PASSED tests/test_b99_staging.py::test_at_b99_05_save_project_after_same_name_save_back
+PASSED tests/test_b99_staging.py::test_at_b99_04_duplicate_refused_distinct_parallel_markers
+PASSED tests/test_b99_staging.py::test_tc_b99_ux_c10_save_project_filename_renders_literally
+PASSED tests/test_b99_staging.py::test_tc_b99_ux_c10_placement_error_path_renders_literally
+PASSED tests/test_b99_staging.py::test_tc_b99_15_duplicate_write_out_names_refused
+PASSED tests/test_b99_staging.py::test_tc_b99_15_distinct_names_run
+PASSED tests/test_b99_staging.py::test_tc_b99_16_corrupted_write_out_is_error_naming_address
+PASSED tests/test_b99_staging.py::test_tc_b99_16_intact_write_out_is_ok
+PASSED tests/test_b99_staging.py::test_tc_b99_13_gather_drift_places_next_free_name
+PASSED tests/test_b99_staging.py::test_tc_b99_13_unchanged_resave_after_drift_adds_no_duplicate
+PASSED tests/test_b99_staging.py::test_tc_b99_13_no_final_name_replace_outside_placement
+PASSED tests/test_b99_staging.py::test_tc_b99_ux_c10_d7_lane_name_renders_literally
+44 passed in 94.51s (0:01:34)
+exit: 0
