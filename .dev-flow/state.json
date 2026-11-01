@@ -251,6 +251,11 @@
       "station": "P3",
       "date": "2026-11-01",
       "decision": "P3 increment 022 (Inc 12b: workers for project load / Save project / A2L parse, busy refusal, quit question, a2l.py progress) approved under the batch's standing authorization; code review FAIL then PASS-WITH-NOTES on re-review, security PASS-WITH-NOTES, mutants 115 rows (round 2: 0 open); batch-end battery is next."
+    },
+    {
+      "station": "P3",
+      "date": "2026-11-01",
+      "decision": "batch-100 batch-end fix rounds 1 and 2 merged on main (b100-fix1 at 677435e): battery failures CI11-1 (product), tc_b100_59, R-1..R-3 fixed or re-pinned; SE5-12b-2 guards, OBS-12b-1/2, A12-51 closed; R1-P1, SR12b-7, OBS-F2-1, R2-CI routed to BACKLOG-CODE; full suite deferred to CI."
     }
   ],
   "obsidian_synced": false,
