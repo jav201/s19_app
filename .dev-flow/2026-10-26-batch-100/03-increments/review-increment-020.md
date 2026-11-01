@@ -62,3 +62,31 @@ Confirm **keep**, with F3's NIT: correct the type annotation, or reconsider when
 | F2, F3 | planned (recommendations) |
 | SR-11-1 / SR-11-3 judgement | executed (by reading) |
 | Full suite, touched modules | not-run (brief: single nodes only; operator override) |
+
+## Round 2 (narrow re-review of the corrective pass, `24f779f`)
+
+**Verdict: PASS.** `BLOCK-UNTIL: F1` is discharged. I re-read the code at `24f779f` and re-ran the F1 probe against it. Counts: HIGH 0 · MAJOR 0 · MINOR 0 · NIT 0 (no new finding).
+
+Scope, as the coordinator asked: CR11-F1, CR11-F2, CR11-F3 and the MUT11-M-47 guard removal only. Inputs: `inc-11/E5-rulings.md` (the rows and "Done"), `inc-11/E5-corrective-notes.md`, and `git diff 051f586..24f779f -- s19_app/tui/app.py`. Nothing else was re-reviewed.
+
+### Findings
+
+None.
+
+### Checked and fine
+
+| Id | Check | Evidence | State |
+|---|---|---|---|
+| CR11-F1 | `_plan_project_save` declares `walked: Optional[ProjectInventory] = None` (`app.py:12140`). Only the walk branch sets it: `elif source_dir is not None and refusal is None` → `inventory if inventory is not None else inventory_project_tree(source_dir)` (`:12152`–`:12159`). `plan_project_save` receives `inventory=walked` (`:12307`). No other read of the `inventory` parameter remains in the function (`awk` over `:12005`–`:12310`). The caller passes `inventory=session.inventory if save_as_source is not None else None`, the one occurrence. A non-save-as target therefore cannot receive a cached inventory, by two independent gates. | **Probe re-run, executed** (`scratchpad/rev11-code/probe_stale_inventory.py`, new tmp `t2`): `session_inventory_filled: True` · `R_save_as_source: None` · `R_source_gone: P` · `R_copies: []` · `R_folders: []` · `commit: returned` (round 1: `AttributeError … 'joinpath'`) · `R_exists_after: False`. The commit then refuses and rolls back because the loaded image moved with `P`: O-1, ruled BACKLOG-CODE (Inc 12b), not this finding. Arm `test_tc_b100_65_vanished_source_after_a_save_as_preview_copies_nothing`, read: it drives the dialog (`Q` previewed, precondition that `session.inventory` is filled, `P` renamed, `R` typed, recompute awaited). It asserts the vanished folder's row, 0 `folder` / `reports/` rows, that the dialog closes on Save, `app.is_running`, no `R/reports`, and that the moved tree is unchanged. Each assertion holds against the fix and fails on 051f586, where the round-1 paint and crash occur (RED recorded in `red-03-corrective.txt`). The arm encodes why: painted equals executed, and the app stays up. | executed (probe); approved (by reading) |
+| CR11-F2 | Every requirement-tagged comment the move deleted is back above the statement it explains. `git diff main..24f779f -- s19_app/tui/app.py` shows one removed tagged comment, `LED .52(a)` at its old indentation, now at the `open_spelling` capture. Grep finds each tag in the tree: SEC-1 (`app.py:10555`, directly above `project_dir = self.workarea / cleaned`), LLR-164.1, LLR-164.2 (Q-2), LLR-164.2 / HLR-164(f) / LLR-171.4g, HLR-164, F8, SEC2-1, LLR-155.4, LLR-171.1 / S3-6, LLR-171.1n (F1), HLR-167 / LLR-167.1, LLR-164.4 / review F2, LLR-168.4 / LLR-167.6 (F3), LLR-171.1h, LLR-164.2 / pre-ruling 7, LLR-171.1e / R7, and LLR-171.3 / LLR-171.3a (router). | By reading plus grep. | approved |
+| CR11-F3 | `_SaveSession.digests: dict[Path, Tuple[str, int]]` (`app.py:1831`), with the docstring saying why. The planner parameter `digests: Optional[dict[…]]` (`:12018`) and the local `session_digests: dict[…]` match. At the sentinel write (`:12248`–`:12250`) a two-line comment says why the key cannot collide. Widening the annotation to the parameter and the local follows the ruling's intent, since that is where the write happens. | By reading. | approved |
+| MUT11-M-47 | The `not typed_name.strip()` guard is removed, and `if not cleaned:` (`app.py:10431`) now covers blank names. Equivalence: `sanitize_project_name` (`workspace.py:1870`) first applies `name.strip()`, the same whitespace set as the removed guard, then keeps only alphanumerics, `-` and `_`. It returns `None` for an empty result, so `""`, whitespace-only and no-usable-character names all give the same text, `Project NOT saved: name is empty — type a project name.`, before any other rule, as before. The only difference is the one the notes declare: a blank name's refused `_PreparedSave.cleaned` is now `None`. No reader is affected: the router reads only `refusal` / `toast`, and `_compose_save_preview`'s refused branch reads `refusal` / `plan`. The comment above the check says it covers blank names. Cover: the empty-name arms in `green-05-final.txt`. | By reading. | approved |
+
+### Evidence states (round 2)
+
+| Item | State |
+|---|---|
+| F1 probe re-run on `24f779f` | executed (defect gone) |
+| F1, F2, F3 fixes | approved (applied, and verified on the diff by this reviewer) |
+| M-47 removal | approved (by reading) |
+| Test runs | not-run by me (the corrective pass's transcripts `green-03` / `green-05` were read, not re-run) |

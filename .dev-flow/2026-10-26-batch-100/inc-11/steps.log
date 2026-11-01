@@ -18,3 +18,5 @@
 2026-10-31 23:29 E5 reviews: code FAIL (1 MAJOR CR11-F1), security FAIL (1 HIGH SE5-11-1); rulings written; corrective start (Opus software-dev)
 2026-11-01 00:00 E5 mutants done (DeepSeek v4 Pro, 35 min): 80 rows, 62 killed / 18 survived / 0 invalid; 7 survivors routed to corrective, 10 accepted equivalent, M-47 removal-or-accept
 2026-11-01 00:31 E5 corrective done (Opus software-dev): SE5-11-1, CR11-F1..F3, CI9b-1/2, name-cap, 7 MUT11 kills, M-47 guard removed; green-05 68 passed; app 1a3ed1e9ed0976eb, screens dc988721ae7b6a87; O-1 → 12b, O-3 accepted
+2026-11-01 00:35 E5 round-2 re-review: code PASS, security PASS-WITH-NOTES (SE5-11-3 MINOR = O-3 → 12b backlog)
+2026-11-01 00:40 E13 sd-dialog (DeepSeek v4 Pro): 3 PNG, failures=0, OBS none; 118 PNG checked by orchestrator (Opus)
