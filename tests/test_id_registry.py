@@ -158,7 +158,8 @@ from tools.id_registry import (
 # tests/support/b100_projects.py).
 # batch-100 Inc-7: 222 -> 224 (tests/test_b100_project_check.py, tests/support/b100_manifests.py).
 # batch-100 Inc-8a: 224 -> 225 (tests/test_b100_document.py).
-EXPECTED_SCANNED_TEST_FILES = 230
+# batch-100 Inc 10: 230 -> 231 (tests/test_b100_load_question.py).
+EXPECTED_SCANNED_TEST_FILES = 231
 """Test modules scanned, including this one.
 
 batch-100 Inc 9b: 228 -> 230. ``tests/test_b100_load_dialog.py`` (TC-B100-40,

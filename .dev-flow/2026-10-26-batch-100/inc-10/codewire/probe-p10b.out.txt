@@ -1,0 +1,30 @@
+import C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc-10-design\work\tree\s19_app
+U0 Button.BINDINGS keys: ['enter']
+U0 PatchEditorPanel.is_dirty exists: False
+U0 painted_names: '[b]x.s19' 'ab.s19' 120 …
+U0 Path suffixes: '' '.mac'
+U1 flow default: 'flow' is_dirty False
+U2 same-byte patch: D = False
+U2 real patch: D = True | entries 2 | W = False
+U3 _typed_load_route(typed.mac) = ('data', '') | typed2.MAC = ('data', '') | other.s19 = ('data', '')
+U3 typed .mac over patch: stack ['Screen'] | file firmware.s19 | mac typed.mac | byte kept True | D = True
+U4 WORKAREA pick over patch: stack ['Screen'] | file prg.s19 | D = False | entries kept 2
+U5 LOAD DIALOG router over patch: stack ['Screen'] | file other.s19
+U6 project PV over 4 entries: stack ['Screen', 'LoadResultScreen'] | reset returns [4] | D after = False | W after = False | current_project PV
+U6 status log interim lines: ['Closed the Patch Editor document (4 entries); unsaved changes were not kept']
+U7 D right after project load = False (the panel's v meets D = False by keys)
+U7 panel v route: stack ['Screen', 'SelectVariantScreen']
+U8 _handle_select_variant('firmware_b'): load_from_path calls [('firmware_b.s19', 'firmware_b')] (pending id set before the load)
+U8 VARIANT switch over patch: stack ['Screen'] | active firmware_b | D = False
+U9 project M2 (2 MAC) over D+W: stack ['Screen'] | resets [] | D = True | W = True | session same True
+U10 FLOW dirty across project load: is_dirty True | name flow
+U11 LoadGuardScreen focus: load_guard_cancel
+U11 after y a l p s q: stack ['Screen', 'LoadGuardScreen'] | answers []
+U11 ctrl+l under LoadGuardScreen: ran ['load_file'] | stack ['Screen', 'LoadGuardScreen', 'LoadFileScreen']
+U11 ctrl+s under LoadGuardScreen: ran ['load_file', 'save_project'] | stack ['Screen', 'LoadGuardScreen', 'SaveProjectScreen']
+U11 ctrl+k, ctrl+d: ran ['load_file', 'save_project', 'focus_palette', 'cycle_density'] | stack ['Screen', 'LoadGuardScreen'] | density [] -> []
+U11 escape -> answers [False] | stack ['Screen']
+U11 immediate enter on LoadGuardScreen -> answers [False, False] | stack ['Screen']
+U12 ConfirmDiscardScreen focus: flow_discard_ok | buttons ['Discard', 'Cancel']
+U12 escape, n -> stack ['Screen', 'ConfirmDiscardScreen'] | answers []
+U13 Patch Editor Load while dirty: stack ['Screen', 'LoadGuardScreen']

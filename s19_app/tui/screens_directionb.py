@@ -4807,11 +4807,14 @@ class PatchEditorPanel(ScrollableContainer):
         self._saveback_width: int = self.SAVEBACK_WIDTHS[0]
         #: The dirty flag (batch-94, LLR-005.1). Set while unsaved edits exist
         #: in EITHER editor region (the entries or the paste buffer); cleared
-        #: by a successful save or load. Readers: the Load guard, the ledger's
-        #: border subtitle and the JSON stamp (batch-97 D4). Writer census
-        #: (C-15.1, exactly four sites): w1 ``request_action`` (entry edit) ·
-        #: w2 ``on_text_area_changed`` (paste typing) · w3 ``mark_saved`` ·
-        #: w4 ``mark_loaded``.
+        #: by a successful save or load. Readers in this module: the Load guard,
+        #: the ledger's border subtitle and the JSON stamp (batch-97 D4).
+        #: Outside this module it is read only through ``is_dirty``
+        #: (LLR-174.1c): the app's load guard and ``_handle_save_dialog``.
+        #: Writer census (C-15.1, five sites): w1 ``request_action`` (entry
+        #: edit) · w2 ``on_text_area_changed`` (paste typing) · w3
+        #: ``mark_saved`` · w4 ``mark_loaded`` · w5 ``mark_pasted`` (Parse
+        #: pasted, batch-97 Inc-4).
         self._dirty: bool = False
         #: The loaded image's sparse memory map, RETAINED from
         #: ``refresh_entries``' parameter for the before/after strip
@@ -5858,6 +5861,16 @@ class PatchEditorPanel(ScrollableContainer):
         """
         self._dirty = True
         self._refresh_dirty_indicator()
+
+    @property
+    def is_dirty(self) -> bool:
+        """Whether either editor region holds unsaved edits (LLR-174.1c).
+
+        The one reader of ``_dirty`` outside this module: the app's load
+        guard and ``_handle_save_dialog`` read it here, never the private
+        attribute. No setter: only the five writers change the flag.
+        """
+        return self._dirty
 
     def _refresh_dirty_indicator(self) -> None:
         """Repaint the SCRIPT window's dirty marker (LLR-005.1 reader).

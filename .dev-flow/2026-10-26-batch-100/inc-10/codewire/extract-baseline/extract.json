@@ -1,0 +1,1961 @@
+{
+  "marks": [
+    {
+      "name": "S19TuiApp.on_patch_editor_panel_dirty_load_requested",
+      "reqs": [
+        "LLR-174.2j"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 6232,
+      "def": {
+        "qualname": "S19TuiApp.on_patch_editor_panel_dirty_load_requested",
+        "line": 6233,
+        "params": [
+          {
+            "name": "event",
+            "type": "PatchEditorPanel.DirtyLoadRequested",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.on_mount",
+      "reqs": [
+        "LLR-174.4"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 7192,
+      "def": {
+        "qualname": "S19TuiApp.on_mount",
+        "line": 7193,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.action_load_file",
+      "reqs": [
+        "HLR-174",
+        "LLR-174.2h"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 7331,
+      "def": {
+        "qualname": "S19TuiApp.action_load_file",
+        "line": 7332,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._route_load_project",
+      "reqs": [
+        "LLR-174.1b",
+        "LLR-174.3",
+        "LLR-174.3a",
+        "LLR-174.4",
+        "LLR-174.4a"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 7452,
+      "def": {
+        "qualname": "S19TuiApp._route_load_project",
+        "line": 7453,
+        "params": [
+          {
+            "name": "name",
+            "type": "Optional[str]",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._handle_load_result",
+      "reqs": [
+        "HLR-174",
+        "LLR-174.4"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 7488,
+      "def": {
+        "qualname": "S19TuiApp._handle_load_result",
+        "line": 7489,
+        "params": [
+          {
+            "name": "choice",
+            "type": "Optional[str]",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.action_select_variant",
+      "reqs": [
+        "HLR-174",
+        "LLR-174.4"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 7514,
+      "def": {
+        "qualname": "S19TuiApp.action_select_variant",
+        "line": 7515,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._handle_select_variant",
+      "reqs": [
+        "HLR-174",
+        "LLR-174.1",
+        "LLR-174.2o",
+        "LLR-174.4"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 7564,
+      "def": {
+        "qualname": "S19TuiApp._handle_select_variant",
+        "line": 7565,
+        "params": [
+          {
+            "name": "variant_id",
+            "type": "Optional[str]",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.check_action",
+      "reqs": [
+        "LLR-174.2h"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 8041,
+      "def": {
+        "qualname": "S19TuiApp.check_action",
+        "line": 8042,
+        "params": [
+          {
+            "name": "action",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "parameters",
+            "type": "tuple",
+            "default": null
+          }
+        ],
+        "returns": "Optional[bool]"
+      }
+    },
+    {
+      "name": "S19TuiApp._rehome_focus_after_load",
+      "reqs": [
+        "LLR-166.1"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 8498,
+      "def": {
+        "qualname": "S19TuiApp._rehome_focus_after_load",
+        "line": 8499,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._handle_save_dialog",
+      "reqs": [
+        "LLR-174.1c",
+        "LLR-167.8"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 9456,
+      "def": {
+        "qualname": "S19TuiApp._handle_save_dialog",
+        "line": 9457,
+        "params": [
+          {
+            "name": "payload",
+            "type": "Optional[SaveProjectPayload]",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._reset_project_session",
+      "reqs": [
+        "LLR-165.3",
+        "LLR-174.3",
+        "LLR-174.3a"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 11395,
+      "def": {
+        "qualname": "S19TuiApp._reset_project_session",
+        "line": 11396,
+        "params": [],
+        "returns": "int"
+      }
+    },
+    {
+      "name": "S19TuiApp._handle_load_project",
+      "reqs": [
+        "LLR-174.3b",
+        "LLR-174.3c",
+        "LLR-165.3"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 11686,
+      "def": {
+        "qualname": "S19TuiApp._handle_load_project",
+        "line": 11687,
+        "params": [
+          {
+            "name": "name",
+            "type": "Optional[str]",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._typed_load_route",
+      "reqs": [
+        "LLR-174.4b"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 12771,
+      "def": {
+        "qualname": "S19TuiApp._typed_load_route",
+        "line": 12772,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "Tuple[str, str]"
+      }
+    },
+    {
+      "name": "S19TuiApp._load_path_from_user_input",
+      "reqs": [
+        "LLR-174.4",
+        "LLR-174.4a",
+        "LLR-174.4b"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 12918,
+      "def": {
+        "qualname": "S19TuiApp._load_path_from_user_input",
+        "line": 12919,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._handle_load_dialog",
+      "reqs": [
+        "HLR-174",
+        "LLR-174.4",
+        "LLR-174.4a",
+        "LLR-174.4b"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 12983,
+      "def": {
+        "qualname": "S19TuiApp._handle_load_dialog",
+        "line": 12984,
+        "params": [
+          {
+            "name": "path",
+            "type": "Optional[Path]",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.load_from_path",
+      "reqs": [
+        "LLR-174.4"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 13020,
+      "def": {
+        "qualname": "S19TuiApp.load_from_path",
+        "line": 13021,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.load_a2l_from_path",
+      "reqs": [
+        "LLR-174.1a",
+        "LLR-174.4b",
+        "LLR-174.4c"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 13103,
+      "def": {
+        "qualname": "S19TuiApp.load_a2l_from_path",
+        "line": 13104,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.on_list_view_selected",
+      "reqs": [
+        "LLR-174.4c"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 13196,
+      "def": {
+        "qualname": "S19TuiApp.on_list_view_selected",
+        "line": 13197,
+        "params": [
+          {
+            "name": "event",
+            "type": "ListView.Selected",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._load_from_item",
+      "reqs": [
+        "LLR-174.4",
+        "LLR-174.4c"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 13343,
+      "def": {
+        "qualname": "S19TuiApp._load_from_item",
+        "line": 13344,
+        "params": [
+          {
+            "name": "item",
+            "type": "ListItem",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.load_selected_file",
+      "reqs": [
+        "LLR-174.4c"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 15066,
+      "def": {
+        "qualname": "S19TuiApp.load_selected_file",
+        "line": 15067,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "a2l_files",
+            "type": "Optional[list[Path]]",
+            "default": "None"
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "FlowBuilderPanel.current_flow",
+      "reqs": [
+        "LLR-174.2n"
+      ],
+      "file": "s19_app/tui/flow_screens.py",
+      "line": 1344,
+      "def": {
+        "qualname": "FlowBuilderPanel.current_flow",
+        "line": 1346,
+        "params": [],
+        "returns": "Flow"
+      }
+    },
+    {
+      "name": "FlowBuilderPanel.is_dirty",
+      "reqs": [
+        "LLR-174.1b",
+        "LLR-174.2n"
+      ],
+      "file": "s19_app/tui/flow_screens.py",
+      "line": 1354,
+      "def": {
+        "qualname": "FlowBuilderPanel.is_dirty",
+        "line": 1356,
+        "params": [],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "ConfirmDiscardScreen.__init__",
+      "reqs": [
+        "LLR-174.2a",
+        "LLR-174.2p"
+      ],
+      "file": "s19_app/tui/screens.py",
+      "line": 921,
+      "def": {
+        "qualname": "ConfirmDiscardScreen.__init__",
+        "line": 922,
+        "params": [
+          {
+            "name": "target",
+            "type": "str",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "ConfirmDiscardScreen.compose",
+      "reqs": [
+        "LLR-174.2",
+        "LLR-174.2b",
+        "LLR-174.2d",
+        "LLR-174.2p"
+      ],
+      "file": "s19_app/tui/screens.py",
+      "line": 926,
+      "def": {
+        "qualname": "ConfirmDiscardScreen.compose",
+        "line": 927,
+        "params": [],
+        "returns": "ComposeResult"
+      }
+    },
+    {
+      "name": "LoadGuardScreen.compose",
+      "reqs": [
+        "LLR-174.2j",
+        "LLR-174.2b"
+      ],
+      "file": "s19_app/tui/screens_directionb.py",
+      "line": 4324,
+      "def": {
+        "qualname": "LoadGuardScreen.compose",
+        "line": 4325,
+        "params": [],
+        "returns": "ComposeResult"
+      }
+    },
+    {
+      "name": "LoadGuardScreen.on_button_pressed",
+      "reqs": [
+        "LLR-174.2j"
+      ],
+      "file": "s19_app/tui/screens_directionb.py",
+      "line": 4352,
+      "def": {
+        "qualname": "LoadGuardScreen.on_button_pressed",
+        "line": 4353,
+        "params": [
+          {
+            "name": "event",
+            "type": "Button.Pressed",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "PatchEditorPanel.on_text_area_changed",
+      "reqs": [
+        "LLR-174.1c",
+        "LLR-174.2m"
+      ],
+      "file": "s19_app/tui/screens_directionb.py",
+      "line": 5524,
+      "def": {
+        "qualname": "PatchEditorPanel.on_text_area_changed",
+        "line": 5525,
+        "params": [
+          {
+            "name": "event",
+            "type": "TextArea.Changed",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "PatchEditorPanel.request_action",
+      "reqs": [
+        "LLR-174.1c"
+      ],
+      "file": "s19_app/tui/screens_directionb.py",
+      "line": 5610,
+      "def": {
+        "qualname": "PatchEditorPanel.request_action",
+        "line": 5611,
+        "params": [
+          {
+            "name": "action",
+            "type": "str",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "PatchEditorPanel.on_button_pressed",
+      "reqs": [
+        "LLR-174.2j"
+      ],
+      "file": "s19_app/tui/screens_directionb.py",
+      "line": 5659,
+      "def": {
+        "qualname": "PatchEditorPanel.on_button_pressed",
+        "line": 5660,
+        "params": [
+          {
+            "name": "event",
+            "type": "Button.Pressed",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "PatchEditorPanel.mark_saved",
+      "reqs": [
+        "LLR-174.1c",
+        "LLR-167.8"
+      ],
+      "file": "s19_app/tui/screens_directionb.py",
+      "line": 5818,
+      "def": {
+        "qualname": "PatchEditorPanel.mark_saved",
+        "line": 5819,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "PatchEditorPanel.mark_loaded",
+      "reqs": [
+        "LLR-174.1c"
+      ],
+      "file": "s19_app/tui/screens_directionb.py",
+      "line": 5829,
+      "def": {
+        "qualname": "PatchEditorPanel.mark_loaded",
+        "line": 5830,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "PatchEditorPanel.mark_pasted",
+      "reqs": [
+        "LLR-174.1c",
+        "LLR-174.2m"
+      ],
+      "file": "s19_app/tui/screens_directionb.py",
+      "line": 5857,
+      "def": {
+        "qualname": "PatchEditorPanel.mark_pasted",
+        "line": 5858,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "ChangeService.mark_saved",
+      "reqs": [
+        "LLR-174.1",
+        "HLR-174a"
+      ],
+      "file": "s19_app/tui/services/change_service.py",
+      "line": 2061,
+      "def": {
+        "qualname": "ChangeService.mark_saved",
+        "line": 2062,
+        "params": [
+          {
+            "name": "mem_map",
+            "type": "Optional[Dict[int, int]]",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "ChangeService.differs_from_last_saved",
+      "reqs": [
+        "LLR-174.1",
+        "LLR-174.1a",
+        "LLR-174.1b",
+        "HLR-174a"
+      ],
+      "file": "s19_app/tui/services/change_service.py",
+      "line": 2099,
+      "def": {
+        "qualname": "ChangeService.differs_from_last_saved",
+        "line": 2100,
+        "params": [
+          {
+            "name": "mem_map",
+            "type": "Optional[Dict[int, int]]",
+            "default": null
+          }
+        ],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "painted_names",
+      "reqs": [
+        "LLR-174.2i",
+        "LLR-174.2k",
+        "LLR-174.2l",
+        "LLR-174.2n",
+        "LLR-174.2o"
+      ],
+      "file": "s19_app/tui/services/project_gather_service.py",
+      "line": 965,
+      "def": {
+        "qualname": "painted_names",
+        "line": 966,
+        "params": [
+          {
+            "name": "names",
+            "type": "Sequence[str]",
+            "default": null
+          },
+          {
+            "name": "limit",
+            "type": "int",
+            "default": "PAINTED_NAME_LIMIT"
+          },
+          {
+            "name": "clip",
+            "type": "int",
+            "default": "120"
+          }
+        ],
+        "returns": "str"
+      }
+    }
+  ],
+  "graph_nodes": [
+    {
+      "name": "ConfirmDiscardScreen.__init__",
+      "reqs": [
+        "LLR-174.2a",
+        "LLR-174.2p"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "target",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "ConfirmDiscardScreen",
+        "names": [
+          "screen"
+        ],
+        "raw": "ConfirmDiscardScreen screen"
+      },
+      "module": "s19_app/tui/screens.py",
+      "examples": [
+        "(code read, `screens.py:921`) `ConfirmDiscardScreen(\"t\")` → `target == \"t\"`; title, body and labels are literals in `compose` (holds on base; RED side of LLR-174.2a's \"parameters\")"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the Flow Builder's own discard question (OQ-3 / LLR-003.6): keeps the flow stem it will name. Its texts are fixed in `compose`, not parameters. Unchanged by Inc 10 (it stays the Flow Builder's guard); it is the closest existing `ModalScreen[bool]` and the pattern LLR-174.2a / .2p must not copy.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "ConfirmDiscardScreen.compose",
+      "reqs": [
+        "LLR-174.2",
+        "LLR-174.2b",
+        "LLR-174.2d",
+        "LLR-174.2p"
+      ],
+      "in": [],
+      "out": {
+        "type": "ComposeResult",
+        "names": [
+          "widgets"
+        ],
+        "raw": "ComposeResult widgets"
+      },
+      "module": "s19_app/tui/screens.py",
+      "examples": [
+        "(probe p10b U12) pushed → `focused.id == \"flow_discard_ok\"`, buttons `['Discard', 'Cancel']` (holds on base; the RED side of LLR-174.2b and of LLR-174.2p's labels)",
+        "(probe p10b U12, P-18 shape) `escape`, then `n` → the stack still ends in `ConfirmDiscardScreen`, `0` answers (holds on base; RED side of LLR-174.2d)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "`Container#load_dialog.modal-dialog` with a `Label` title \"Discard unsaved flow edits?\", a `markup=False` hint naming the target, and `Container#flowdiscard_buttons.modal-buttons` holding `Button#flow_discard_ok` (\"Discard\", `.modal-confirm`) and `Button#flow_discard_cancel` (\"Cancel\"). No `AUTO_FOCUS`, no `BINDINGS`: the focus lands on the first button (Discard), and `escape` / `n` do nothing. `on_button_pressed` dismisses `True` / `False`. Unchanged by Inc 10.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "LoadGuardScreen.compose",
+      "reqs": [
+        "LLR-174.2j",
+        "LLR-174.2b"
+      ],
+      "in": [],
+      "out": {
+        "type": "ComposeResult",
+        "names": [
+          "widgets"
+        ],
+        "raw": "ComposeResult widgets"
+      },
+      "module": "s19_app/tui/screens_directionb.py",
+      "examples": [
+        "(probe p10b U11) pushed → `focused.id == \"load_guard_cancel\"`; `y`, `a`, `l`, `p`, `s`, `q` → stack still `['Screen', 'LoadGuardScreen']`, `0` answers (holds on base: a modal blocks the non-priority app keys `l` / `p`)",
+        "(probe p10b U11) an immediate `enter` → answer `False` (the focused Cancel), stack `['Screen']`; `escape` → answer `False` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the Patch Editor's own dirty-load warning (batch-94, LLR-005.2): `Vertical.modal-dialog` with `Label#load_guard_title` \"Unsaved changes will be lost\", a `markup=False` `Static#load_guard_body`, and `Horizontal#load_guard_buttons` with `Button#load_guard_accept` \"Accept loss and load\" / `Button#load_guard_cancel` \"Cancel\". `AUTO_FOCUS = \"#load_guard_cancel\"`; `BINDINGS = [escape → cancel]`. No `y` / `n` keys. Unchanged by Inc 10 (LLR-174.2j keeps it); its focus and escape shape is the one the new question follows.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "LoadGuardScreen.on_button_pressed",
+      "reqs": [
+        "LLR-174.2j"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Button.Pressed",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb.py",
+      "examples": [
+        "(test_at_b94_07_dirty_load_cancel_keeps) Cancel → the document and the dirty flag kept (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "`#load_guard_accept` → `dismiss(True)`; `#load_guard_cancel` → `dismiss(False)`; both `event.stop()`. Unchanged by Inc 10.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "PatchEditorPanel.request_action",
+      "reqs": [
+        "LLR-174.1c"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "action",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb.py",
+      "examples": [
+        "(code read, `screens_directionb.py:5633-5634`) `request_action(\"add_entry\")` → `_dirty is True` (holds on base)",
+        "(probe p10b U2) an entry added through `ChangeService.add_entry` (not the panel) → `_dirty is False`: W follows the panel's inputs only, never the service document (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "posts the panel's `ActionRequested`; for an entries-table edit (Add / Edit / Remove) it sets `self._dirty = True` first (writer w1, `:5634`) and repaints the marker. Unchanged by Inc 10; one of the five writers LLR-174.1c's reader must follow.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "PatchEditorPanel.on_text_area_changed",
+      "reqs": [
+        "LLR-174.1c",
+        "LLR-174.2m"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "TextArea.Changed",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb.py",
+      "examples": [
+        "(code read, `:5552-5560`) typing one character in `#patch_paste_text` → `_dirty is True` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "for `#patch_paste_text`, writer w2 (`:5558`): any edit in the paste buffer sets `_dirty = True`, then repaints the marker and the gauge. `clear_paste_buffer` prevents this message, so the reset's clear never sets the flag. Unchanged by Inc 10.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "PatchEditorPanel.on_button_pressed",
+      "reqs": [
+        "LLR-174.2j"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Button.Pressed",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb.py",
+      "examples": [
+        "(probe p10b U13) `_dirty = True`, `#patch_doc_load_button` pressed → stack `['Screen', 'LoadGuardScreen']` (holds on base; LLR-174.2j's kept route)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the panel's button router; `#patch_doc_load_button` reads the private flag: `_dirty` → post `DirtyLoadRequested(path_text)` (the app pushes `LoadGuardScreen`); clean → `request_action(\"load_doc\")`. Inside the panel's own module, so LLR-174.1c's census (outside `screens_directionb.py`) does not count it. Unchanged by Inc 10.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "PatchEditorPanel.mark_saved",
+      "reqs": [
+        "LLR-174.1c",
+        "LLR-167.8"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb.py",
+      "examples": [
+        "(code read, `:5813-5821`) `_dirty = True`, `mark_saved()` → `_dirty is False` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "writer w3: `_dirty = False`, repaint. Called by `app.py` after a clean document save and after Save project when the files hold every entry (`_handle_save_dialog` `:10572`, `_save_clears_panel_flag`). Unchanged by Inc 10.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "PatchEditorPanel.mark_loaded",
+      "reqs": [
+        "LLR-174.1c"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb.py",
+      "examples": [
+        "(probe p10b U6) a project load `PV` that reaches the reset → `W after = False` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "writer w4: `_dirty = False`, repaint. Called after a document load, and by `_reset_project_session` (`app.py:11535`) right after `clear_paste_buffer` (LED .55(b)): every project load that reaches the reset leaves W false. Unchanged by Inc 10.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "PatchEditorPanel.mark_pasted",
+      "reqs": [
+        "LLR-174.1c",
+        "LLR-174.2m"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb.py",
+      "examples": [
+        "(code read, `:5850-5860`; caller `app.py:3982`) Parse pasted succeeds → `mark_pasted()` → `_dirty is True` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the fifth writer (batch-97 Inc-4): `_dirty = True` after Parse pasted replaces the document. The attribute docstring at `:4808-4815` still says \"exactly four sites\" (w1–w4) and omits it (E1 §5). Unchanged by Inc 10 in behaviour; the docstring is in the file Inc 10 touches (S-c).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "FlowBuilderPanel.is_dirty",
+      "reqs": [
+        "LLR-174.1b",
+        "LLR-174.2n"
+      ],
+      "in": [],
+      "out": {
+        "type": "bool",
+        "names": [
+          "dirty"
+        ],
+        "raw": "bool dirty"
+      },
+      "module": "s19_app/tui/flow_screens.py",
+      "examples": [
+        "(probe p10b U1) a fresh app → `False`",
+        "(probe p10b U10; E1 probe p10) `_mark_dirty()`, then a project load `PV` → `is_dirty` still `True` (holds on base; ruling Q1: the question says the flow \"has unsaved changes\", not that it is lost)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "read-only property over `self._dirty`, set by `_mark_dirty` (a chain edit), cleared by `mark_saved` / `set_blocks`. The public reader pattern LLR-174.1c copies for the Patch Editor. A project load neither clears nor reads it (ruling Q1). Unchanged by Inc 10.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "FlowBuilderPanel.current_flow",
+      "reqs": [
+        "LLR-174.2n"
+      ],
+      "in": [],
+      "out": {
+        "type": "Flow",
+        "names": [
+          "flow"
+        ],
+        "raw": "Flow flow"
+      },
+      "module": "s19_app/tui/flow_screens.py",
+      "examples": [
+        "(probe p10b U1) a fresh app → `current_flow.name == \"flow\"` (holds on base; LLR-174.2n's default-name arm `flow flow`)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "property: `Flow(name=self._flow_name, blocks=…, funnel=…)`. The name is the display name; a never-named flow is `\"flow\"`. Unchanged by Inc 10; the composer reads `.name` for the `flow <name>` item.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "ChangeService.differs_from_last_saved",
+      "reqs": [
+        "LLR-174.1",
+        "LLR-174.1a",
+        "LLR-174.1b",
+        "HLR-174a"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[dict[int, int]]",
+          "name": "mem_map",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "differs"
+        ],
+        "raw": "bool differs"
+      },
+      "module": "s19_app/tui/services/change_service.py",
+      "examples": [
+        "(probe p10b U2) a clean load, then a patch writing the byte already there → `False` (holds on base; HLR-174a boundary)",
+        "(probe p10b U2) a clean load, then a patch changing one byte → `True` (holds on base)",
+        "(probe p10b U4) after a Workarea pick replaced the patched image → `False` (the new image is clean; the 2 document entries stay) (holds on base)",
+        "(test_tc_b100_58_mac_attach_keeps_an_unsaved_patch_unsaved; probe p10b U3) an unsaved patch, then a MAC attach → still `True` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the unsaved-image predicate D (B100-I18, LLR-167.5): `False` for `None`; any recorded address of the dict last recorded now holding another byte, or any journaled unrecorded address no longer holding its source byte → `True`. Its docstring names \"the Inc 10 load question (no app caller before it)\". Unchanged by Inc 10; the guard is its first app caller.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "ChangeService.mark_saved",
+      "reqs": [
+        "LLR-174.1",
+        "HLR-174a"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[dict[int, int]]",
+          "name": "mem_map",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/services/change_service.py",
+      "examples": [
+        "(test_tc_b100_58_save_project_records_the_saved_state) patch, Save project → `differs_from_last_saved(...)` is `False` (holds on base; HLR-174a \"patched → Save project → data load\")",
+        "(probe p10b U7; E1 probe p10) right after a project load → D `False`, so the Load-result panel's `v` meets no unsaved image by keys (holds on base; ruling Q5)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "records the image as saved: `_saved_map = mem_map` and the recorded bytes. Called by the load install (`app.py:15352`, the copy last loaded), the save-back (`:4187`) and Save project (`:10446`). Unchanged by Inc 10.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "painted_names",
+      "reqs": [
+        "LLR-174.2i",
+        "LLR-174.2k",
+        "LLR-174.2l",
+        "LLR-174.2n",
+        "LLR-174.2o"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Sequence[str]",
+          "name": "names",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "limit",
+          "default": "PAINTED_NAME_LIMIT"
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "clip",
+          "default": "120"
+        }
+      ],
+      "out": {
+        "type": "str",
+        "names": [
+          "painted"
+        ],
+        "raw": "str painted"
+      },
+      "module": "s19_app/tui/services/project_gather_service.py",
+      "examples": [
+        "(probe p10b U0) `[\"[b]x.s19\"]` → `\"[b]x.s19\"`; `[\"a\\u202eb.s19\"]` → `\"ab.s19\"`; `[\"n\" * 130]` → 120 characters ending in `…` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the batch's one name scrub: removes Cc, Cf, Zl, Zp, turns an unpaired surrogate into U+FFFD, clips each name to `clip` characters (`…`), joins at most `limit` names. Pure; markup is not parsed (the caller paints with markup off). Unchanged by Inc 10; the question composer calls it once per name.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.action_load_file",
+      "reqs": [
+        "HLR-174",
+        "LLR-174.2h"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p10b U11, LLR-174.2h executed on base with a stand-in `ModalScreen[bool]`) `LoadGuardScreen` open, `ctrl+l` → `load_file` runs, stack `['Screen', 'LoadGuardScreen', 'LoadFileScreen']` (holds on base; the RED side of LLR-174.2h, whose E1 control was `planned`)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the Load key (`ctrl+l` priority, `l`): pushes `LoadFileScreen()` with `_handle_load_dialog` as its dismiss callback. Runs under any modal through its priority binding. post-9b: pushes `LoadDialog(mode=\"path\", …)` → `_handle_load_dialog`, and `check_action` makes it inert while a `LoadDialog` is anywhere on the stack. Inc 10 changes: none in body; LLR-174.2h makes it inert while the question is on the stack too (through `check_action`).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.check_action",
+      "reqs": [
+        "LLR-174.2h"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "action",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "tuple",
+          "name": "parameters",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[bool]",
+        "names": [
+          "allowed"
+        ],
+        "raw": "bool? allowed"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p10b U11) under `LoadGuardScreen`: `ctrl+l` → `load_file` ran; `ctrl+s` → `save_project` ran, stack `['Screen', 'LoadGuardScreen', 'SaveProjectScreen']`; `ctrl+k` → `focus_palette` ran; `ctrl+d` → `cycle_density` ran (4 of 4 run; holds on base; RED side of LLR-174.2h)",
+        "(post-9b, from proto-9b-app B90) with a `LoadDialog` open the 4 keys run no app action; a screen type other than `LoadDialog` is not in the test, so a question pushed over the main screen still lets them run (the RED side Inc 10 closes)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "gates actions by window only: `confirm_attention` on Flow Execution, `page_*_context` on A2L / MAC, `hex_page_*` on Workspace, else `App.check_action`. No modal test on base. post-9b (G3, S9b-1): first test `action in _LOAD_DIALOG_INERT_ACTIONS and any(isinstance(s, LoadDialog) for s in self.screen_stack)` → `False`. Inc 10 changes: the same test also for the question's screen type (S-f, ruling Q4).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._handle_load_dialog",
+      "reqs": [
+        "HLR-174",
+        "LLR-174.4",
+        "LLR-174.4a",
+        "LLR-174.4b"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[Path]",
+          "name": "path",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p10b U5; E1 probe p10) a patched image, `_handle_load_dialog(<tmp>/other.s19)` → stack `['Screen']`, `current_file.path.name == \"other.s19\"`: the patch is replaced with no question (holds on base; RED side of HLR-174 / LLR-174.4)",
+        "(test_handle_load_dialog_defers_load_until_after_modal_dismiss) a `Path` → `_load_path_from_user_input` scheduled with `call_after_refresh`, not run inside the dismiss (holds on base; the same deferral S-b asks of `go`)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "base: `LoadFileScreen`'s dismiss callback: `None` → return; else log `modal_dismiss_scheduled`, flush, `call_after_refresh(self._load_path_from_user_input, path)`. post-9b (the one router, `Optional[LoadChoice]`): `None` → `_rehome_focus_after_load()`; else log and defer through `call_after_refresh`: `project` → `_route_load_project(value)`, `workarea` → `_load_workarea_file(value)`, `path` / `recent` → `_load_path_from_user_input(Path(value))`. 9b's own note: \"Inc 10 inserts the load question at this seam\". Inc 10 changes: placement decision S-d — with the seam in the leaves, the router itself stays as 9b writes it (no seam here), so a typed project folder is asked once (LLR-174.4a).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._route_load_project",
+      "reqs": [
+        "LLR-174.1b",
+        "LLR-174.3",
+        "LLR-174.3a",
+        "LLR-174.4",
+        "LLR-174.4a"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "name",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p10b U6) a patched image with `4` document entries, `_route_load_project(\"PV\")` → stack `['Screen', 'LoadResultScreen']`, `current_project == \"PV\"`, no question (holds on base; RED side of LLR-174.1b)",
+        "(probe p10b U9) `M2` (1 data + 2 MAC files) with D and W → refused before the reset: `0` reset calls, D still `True`, W still `True`, session unchanged, no `LoadResultScreen` (holds on base; LLR-174.3c's outcome already holds for the body `go` will run)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "runs `_handle_load_project(name)`, then pushes `LoadResultScreen(announcement)` (dismiss → `_handle_load_result`) when `_last_load_announcement` holds a new object. Callers: base — the `LoadProjectScreen` dismiss and `_load_path_from_user_input` (`project`); post-9b — `_handle_load_dialog` (`project`) and `_load_path_from_user_input`. Its docstring: \"A direct `_handle_load_project` call (tests, fixtures) meets no modal.\" Inc 10 changes: the seam with kind `project` before `_handle_load_project` (S-d), so the guard reads D / F / W before the reset and `go` is the existing body.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._handle_load_result",
+      "reqs": [
+        "HLR-174",
+        "LLR-174.4"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "choice",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p10b U7) `_handle_load_result(\"select_variant\")` → stack `['Screen', 'SelectVariantScreen']` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the Load-result panel's dismiss callback: `LOAD_RESULT_SELECT_VARIANT` (`v` / `#result_variant`) → `action_select_variant()`. Unchanged by Inc 10: the panel's `v` reaches the seam through `_handle_select_variant` (A8).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.action_select_variant",
+      "reqs": [
+        "HLR-174",
+        "LLR-174.4"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p10b U7) after project `PV` → `SelectVariantScreen` pushed (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the `v` key (and palette, and the panel's `v`): no variant set → status \"No project variants to select.\"; else pushes `SelectVariantScreen(project, options, active_index)` with `_handle_select_variant` as dismiss callback. Unchanged by Inc 10.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._handle_select_variant",
+      "reqs": [
+        "HLR-174",
+        "LLR-174.1",
+        "LLR-174.2o",
+        "LLR-174.4"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "variant_id",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p10b U8; E1 probe p10) project `PV`, patched, `_handle_select_variant(\"firmware_b\")` → stack `['Screen']`, active `firmware_b`, D `False`: the patch is replaced with no question (holds on base; RED side of HLR-174)",
+        "(probe p10b U8) `load_from_path` spied → `1` call `('firmware_b.s19', 'firmware_b')`: `_pending_variant_id` is already set when the load runs (holds on base; the target name of LLR-174.2o is `descriptor.path.name`)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "`None` → log, return; descriptor lookup (\"Variant not found: …\"); missing file (\"Variant file missing: …\"); then `self._pending_variant_id = variant_id` and `load_from_path(descriptor.path)`. Inc 10 changes: the seam with kind `image` after the descriptor checks; the `_pending_variant_id` stamp must move inside `go` (on base it is set before the load, so a stamp before a cancelled question would leak into the next install).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._load_path_from_user_input",
+      "reqs": [
+        "LLR-174.4",
+        "LLR-174.4a",
+        "LLR-174.4b"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p10b U3) a patched image, `_load_path_from_user_input(<tmp>/typed.mac)` → stack `['Screen']`, image `firmware.s19` kept, MAC `typed.mac` attached, the patched byte kept, D `True` (holds on base; an attach loses nothing, LLR-174.1a / .4b)",
+        "(test via 9a probe, baseline-9b) `<workarea>/E` (empty) → status \"Project NOT loaded: … is not a project — pick a project in the list.\" (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the typed-path router: `_typed_load_route(path)` → `project` → `_route_load_project(value)`; `a2l` → `load_a2l_from_path(path)`; `data` → `load_from_path(path)`; `refuse` → one status line. Callers: `on_mount` (start-up `load_path`) and the Load router. Inc 10 changes: `data` → kind `attach` when the suffix is `.mac`, else `image`; `a2l` → `attach` (no question); `project` unchanged (the seam is in `_route_load_project`); `refuse` unchanged (LLR-174.4b).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._typed_load_route",
+      "reqs": [
+        "LLR-174.4b"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "tuple[str, str]",
+        "names": [
+          "action",
+          "value"
+        ],
+        "raw": "tuple(str action, str value)"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p10b U3) `<tmp>/typed.mac` → `(\"data\", \"\")`; `<tmp>/typed2.MAC` → `(\"data\", \"\")`; `<tmp>/other.s19` → `(\"data\", \"\")` (holds on base; the kind must come from the suffix, LLR-174.4b)",
+        "(probe p10b U0) `Path(\"x.mac.\").suffix == \"\"` while the route's `abspath` form drops the trailing dot (CR9-3) → a suffix read from the raw typed `Path` and one read from the normalized path can differ (holds on base; interface question Q-4)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "classifies one typed path from metadata only: `(\"project\", name)`, `(\"a2l\", \"\")`, `(\"data\", \"\")` or `(\"refuse\", reason)`. `data` covers every `SUPPORTED_EXTENSIONS` suffix, MAC included: the action does not tell an image from an attach. Unchanged by Inc 10 (a 9a / 9b function; changing its return set re-pins TC-B100-3x).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.load_from_path",
+      "reqs": [
+        "LLR-174.4"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p10b U3) a typed `.mac` → the current image kept, MAC attached (holds on base)",
+        "(probe p10b U5) a typed `.s19` → the image replaced (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the data / MAC load: resolve, suffix check, `copy_into_workarea` into `temp/`, record when outside, `_start_load_worker(copied)`; the worker's parse merges a MAC onto the current image (`_merge_mac_with_existing_primary`). Unchanged by Inc 10; inside every `go` of a data route.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.load_a2l_from_path",
+      "reqs": [
+        "LLR-174.1a",
+        "LLR-174.4b",
+        "LLR-174.4c"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read; HLR-174a scene list) an unsaved patch, then an A2L load → the image map untouched, D unchanged (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the synchronous A2L attach: resolve, suffix, open-project guard, copy, record, parse, views, \"A2L loaded: …\". Leaves the image and the change document alone. Unchanged by Inc 10.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.load_selected_file",
+      "reqs": [
+        "LLR-174.4c"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[list[Path]]",
+          "name": "a2l_files",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(E1 probe p10) a patched image, `load_selected_file(<temp>/firmware.mac)` → stack `['Screen']`, the patched byte kept, D `True` (holds on base; a work-area MAC is an attach, LLR-174.4c)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the in-place synchronous load of a file already in the work area (parse through `_parse_loaded_file`, install). A `.mac` merges onto the current image. Unchanged by Inc 10.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._load_from_item",
+      "reqs": [
+        "LLR-174.4",
+        "LLR-174.4c"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "ListItem",
+          "name": "item",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p10b U4; E1 probe p10) a patched image, pick `prg.s19` → stack `['Screen']`, `current_file.path.name == \"prg.s19\"`, the 2 document entries kept (holds on base; RED side of HLR-174, P-42)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "base: the Workarea Files pick: `item.data` → `workarea/temp/<name>`; exists → `.a2l` → `load_a2l_from_path`, else `load_selected_file`. post-9b: a 3-line wrapper over `_load_workarea_file(item.data)`. Inc 10 changes: none (the seam is in `_load_workarea_file`, which both surfaces share).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.on_list_view_selected",
+      "reqs": [
+        "LLR-174.4c"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "ListView.Selected",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(test_tc_b100_12_workarea_files_pick_rehomes_focus) a `#files_list` pick → that file loads and the focus is re-homed (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "routes `ListView.Selected` by list id; `files_list` → `_load_from_item(event.item)`. Unchanged by Inc 10.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.on_mount",
+      "reqs": [
+        "LLR-174.4"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read, `app.py:7226-7228`) `load_path` given → one typed-route call before any edit, D `False` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "start-up; a command-line `load_path` → `_load_path_from_user_input(load_path)`. LLR-174.4's census exempts it: nothing is unsaved at mount, so the guard cannot ask there. Unchanged by Inc 10.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._handle_load_project",
+      "reqs": [
+        "LLR-174.3b",
+        "LLR-174.3c",
+        "LLR-165.3"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "name",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p10b U6) 4 document entries, project `PV` → status `Closed the Patch Editor document (4 entries); unsaved changes were not kept`, while W was `False` before the load (the entries came from the service, not the panel) (holds on base; the line is false for a document with no unsaved panel edits, ruling Q2)",
+        "(test_tc_b100_10_interim_discard_notice, test_tc_b100_10_notice_names_every_discarded_entry) the interim line pinned (holds on base; RED after Inc 10, re-pinned to 0 lines)",
+        "(probe p10b U9) `M2` with 2 MAC files → refused before the reset, `0` resets (holds on base)"
+      ],
+      "modify": [
+        "[Data: S19TuiApp.current_project]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "the project load: refusals (folder, not listed, `validate_project_files` error, A2L, no data) all before the reset; then `discarded_unsaved = self._reset_project_session()` (`:11873`), the installs, the announcement, and the interim line `Closed the Patch Editor document (N entries); unsaved changes were not kept` when N > 0 (`:11943-11953`). Pushes no screen. post-9b: the `_list_project_files` listing, the `project.json` gate and an `OSError` catch (9b). Inc 10 changes: delete the interim block (LLR-165.3, ruling Q2); still no push and no seam inside (LLR-174.3b).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._reset_project_session",
+      "reqs": [
+        "LLR-165.3",
+        "LLR-174.3",
+        "LLR-174.3a"
+      ],
+      "in": [],
+      "out": {
+        "type": "int",
+        "names": [
+          "discarded"
+        ],
+        "raw": "int discarded"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p10b U6) 4 outgoing entries → returns `4` (holds on base)",
+        "(probe p10b U6) after it, D `False` and W `False` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "resets S1–S13, rebinds `ChangeService()`, clears the paste buffer and calls `panel.mark_loaded()`; returns the outgoing document's entry count, read only by the interim line. Inc 10 changes: its return loses its only reader (E1 A10; keep or drop is G-B's, 2 tests monkeypatch it and pass the value through).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._handle_save_dialog",
+      "reqs": [
+        "LLR-174.1c",
+        "LLR-167.8"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[SaveProjectPayload]",
+          "name": "payload",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(E1 probe p10) `private reads of panel._dirty in app.py: 1 [10576]` (holds on base; RED side of LLR-174.1c)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "Save project; on success with a mounted panel: `_save_clears_panel_flag(...)` → `panel.mark_saved()`; elif the document is recorded in the project home and `panel._dirty` (`:10576`, the one private read of the flag outside `screens_directionb.py`) → a status line that the panel's edits are in no file. Inc 10 changes: `panel._dirty` → `panel.is_dirty` (LLR-174.1c, ruling Q6).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._rehome_focus_after_load",
+      "reqs": [
+        "LLR-166.1"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(test_tc_b100_12_stale_text_input_in_a_content_window_is_rehomed) a stale text `Input` focus → moved to the window's target (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "when `default_screen.focused` fails `_focus_needs_rehome` (or is `None`), focus the displayed window's target through `Screen.set_focus`; a healthy focus is left alone; never moves a focus inside an open modal. post-9b: also run by the router on a `None` result (A9b-03). Inc 10 changes: none in body; run once on a cancelled question (LLR-166.1's Inc 10 arm, E1 A13).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.on_patch_editor_panel_dirty_load_requested",
+      "reqs": [
+        "LLR-174.2j"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "PatchEditorPanel.DirtyLoadRequested",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(test_at_b94_06_dirty_load_accept_loss) Accept → the typed document loads (holds on base)",
+        "(probe p10b U13) a dirty panel's Load → `LoadGuardScreen` pushed (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "pushes `LoadGuardScreen()` with a local `_answer(accepted)` closure: `False` → status \"Patch Editor: load cancelled — changes kept.\"; `True` → `_patch_editor_load(panel, path_text)`. The closure-continuation shape `_confirm_then_load` can follow. Unchanged by Inc 10 (LLR-174.2j).",
+      "volatile": [],
+      "oracle": []
+    }
+  ],
+  "calls": [
+    {
+      "caller": "PatchEditorPanel.on_button_pressed",
+      "callee": "PatchEditorPanel.request_action",
+      "sites": [
+        "s19_app/tui/screens_directionb.py:5800",
+        "s19_app/tui/screens_directionb.py:5816"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_load_project",
+      "callee": "ChangeService.mark_saved",
+      "sites": [
+        "s19_app/tui/app.py:15372"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_load_project",
+      "callee": "PatchEditorPanel.mark_loaded",
+      "sites": [
+        "s19_app/tui/app.py:12052"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_load_project",
+      "callee": "PatchEditorPanel.mark_saved",
+      "sites": [
+        "s19_app/tui/app.py:15372"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_load_project",
+      "callee": "S19TuiApp._reset_project_session",
+      "sites": [
+        "s19_app/tui/app.py:11833"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_load_project",
+      "callee": "S19TuiApp.load_selected_file",
+      "sites": [
+        "s19_app/tui/app.py:11932"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_load_project",
+      "callee": "painted_names",
+      "sites": [
+        "s19_app/tui/app.py:11698",
+        "s19_app/tui/app.py:11730",
+        "s19_app/tui/app.py:11747",
+        "s19_app/tui/app.py:11787",
+        "s19_app/tui/app.py:11788",
+        "s19_app/tui/app.py:11817",
+        "s19_app/tui/app.py:11822"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_load_result",
+      "callee": "S19TuiApp.action_select_variant",
+      "sites": [
+        "s19_app/tui/app.py:7512"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "ChangeService.mark_saved",
+      "sites": [
+        "s19_app/tui/app.py:10456",
+        "s19_app/tui/app.py:10582"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "PatchEditorPanel.mark_saved",
+      "sites": [
+        "s19_app/tui/app.py:10456",
+        "s19_app/tui/app.py:10582"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "painted_names",
+      "sites": [
+        "s19_app/tui/app.py:10478",
+        "s19_app/tui/app.py:10490",
+        "s19_app/tui/app.py:10492",
+        "s19_app/tui/app.py:10509",
+        "s19_app/tui/app.py:10833",
+        "s19_app/tui/app.py:12289",
+        "s19_app/tui/app.py:12345",
+        "s19_app/tui/app.py:12346",
+        "s19_app/tui/app.py:12348",
+        "s19_app/tui/app.py:12356",
+        "s19_app/tui/app.py:12357",
+        "s19_app/tui/app.py:7323",
+        "s19_app/tui/app.py:9275",
+        "s19_app/tui/app.py:9670",
+        "s19_app/tui/services/project_gather_service.py:1388",
+        "s19_app/tui/services/project_gather_service.py:1390",
+        "s19_app/tui/services/project_gather_service.py:1414",
+        "s19_app/tui/services/project_gather_service.py:1436",
+        "s19_app/tui/services/project_gather_service.py:1619",
+        "s19_app/tui/services/project_gather_service.py:1640",
+        "s19_app/tui/services/project_gather_service.py:1647"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_select_variant",
+      "callee": "S19TuiApp.load_from_path",
+      "sites": [
+        "s19_app/tui/app.py:7618"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._load_from_item",
+      "callee": "S19TuiApp.load_a2l_from_path",
+      "sites": [
+        "s19_app/tui/app.py:13352"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._load_from_item",
+      "callee": "S19TuiApp.load_selected_file",
+      "sites": [
+        "s19_app/tui/app.py:13354"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._load_path_from_user_input",
+      "callee": "S19TuiApp._route_load_project",
+      "sites": [
+        "s19_app/tui/app.py:12950"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._load_path_from_user_input",
+      "callee": "S19TuiApp._typed_load_route",
+      "sites": [
+        "s19_app/tui/app.py:12948"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._load_path_from_user_input",
+      "callee": "S19TuiApp.load_a2l_from_path",
+      "sites": [
+        "s19_app/tui/app.py:12953"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._load_path_from_user_input",
+      "callee": "S19TuiApp.load_from_path",
+      "sites": [
+        "s19_app/tui/app.py:12956"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._load_path_from_user_input",
+      "callee": "painted_names",
+      "sites": [
+        "s19_app/tui/app.py:12958"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._reset_project_session",
+      "callee": "PatchEditorPanel.mark_loaded",
+      "sites": [
+        "s19_app/tui/app.py:11546"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._route_load_project",
+      "callee": "S19TuiApp._handle_load_project",
+      "sites": [
+        "s19_app/tui/app.py:7482"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.load_a2l_from_path",
+      "callee": "S19TuiApp._rehome_focus_after_load",
+      "sites": [
+        "s19_app/tui/app.py:13190"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.load_a2l_from_path",
+      "callee": "painted_names",
+      "sites": [
+        "s19_app/tui/app.py:7323"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.load_selected_file",
+      "callee": "ChangeService.mark_saved",
+      "sites": [
+        "s19_app/tui/app.py:15372"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.load_selected_file",
+      "callee": "PatchEditorPanel.mark_saved",
+      "sites": [
+        "s19_app/tui/app.py:15372"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.load_selected_file",
+      "callee": "S19TuiApp._rehome_focus_after_load",
+      "sites": [
+        "s19_app/tui/app.py:15541"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.on_list_view_selected",
+      "callee": "S19TuiApp._load_from_item",
+      "sites": [
+        "s19_app/tui/app.py:13201"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.on_mount",
+      "callee": "S19TuiApp._load_path_from_user_input",
+      "sites": [
+        "s19_app/tui/app.py:7230"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.on_mount",
+      "callee": "painted_names",
+      "sites": [
+        "s19_app/tui/app.py:7323"
+      ]
+    }
+  ],
+  "top_level_sites": {
+    "PatchEditorPanel.mark_saved": [
+      "s19_app/tui/app.py:3401",
+      "s19_app/tui/app.py:3724",
+      "s19_app/tui/app.py:4036",
+      "s19_app/tui/app.py:4187"
+    ],
+    "ChangeService.mark_saved": [
+      "s19_app/tui/app.py:3401",
+      "s19_app/tui/app.py:3724",
+      "s19_app/tui/app.py:4036",
+      "s19_app/tui/app.py:4187"
+    ],
+    "ConfirmDiscardScreen.__init__": [
+      "s19_app/tui/app.py:3449"
+    ],
+    "PatchEditorPanel.mark_pasted": [
+      "s19_app/tui/app.py:3982"
+    ],
+    "PatchEditorPanel.mark_loaded": [
+      "s19_app/tui/app.py:6177"
+    ],
+    "S19TuiApp.check_action": [
+      "s19_app/tui/window_help.py:1134",
+      "s19_app/tui/window_help.py:1145"
+    ]
+  },
+  "findings": [],
+  "parse_failures": []
+}

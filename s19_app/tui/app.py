@@ -10,7 +10,7 @@ import shutil
 import stat
 import time
 from datetime import datetime, timezone
-from typing import Any, Callable, List, Mapping, Optional, Sequence, Tuple
+from typing import Any, Callable, List, Literal, Mapping, Optional, Sequence, Tuple
 
 from textual import events, work
 from textual.app import App, ComposeResult
@@ -28,6 +28,7 @@ from textual.widgets import (
     ListItem,
     ListView,
     ProgressBar,
+    Select,
     Static,
     TextArea,
 )
@@ -75,6 +76,7 @@ from .rail import Rail, RailEntry, RailItem, RAIL_ENTRIES
 from .screens import (
     ChangeSetJsonScreen,
     ConfirmDiscardScreen,
+    ConfirmQuestionScreen,
     EntryJsonScreen,
     LegendScreen,
     LOAD_RESULT_SELECT_VARIANT,
@@ -317,6 +319,13 @@ _RECENT_PROBLEM_STEPS: dict[str, str] = {
 _LOAD_DIALOG_INERT_ACTIONS: frozenset[str] = frozenset(
     {"load_file", "save_project", "focus_palette", "cycle_density"}
 )
+
+#: Inc 10 (LLR-174.4): the three question kinds the load seam takes; the
+#: literal set is closed and checked by an AST census (C01).
+QuestionKind = Literal["image", "attach", "project"]
+#: Inc 10 (S-e): one unsaved item — ``(kind, raw unscrubbed name)``; the
+#: ``document`` kind carries an empty name (the Patch Editor holds no file).
+UnsavedItem = tuple[Literal["image", "document", "flow"], str]
 
 #: The Patch Editor's routable action set (LLR-003.2) — the eight v2
 #: actions of increment E3a extended by ``execute_scope`` at E6 (the stated
@@ -6168,6 +6177,12 @@ class S19TuiApp(App):
               is a symlink or does not lie inside ``patches_dir.resolve()`` —
               closing the read-path asymmetry (``resolve_input_path`` has only a
               size cap, no containment/symlink guard).
+            - **Dropdown guard (LLR-174.2t, S10-02):** when the panel holds
+              unsaved entries, push the same ``LoadGuardScreen`` the Load
+              button uses — accept loads ``str(candidate)``, cancel keeps
+              the document and resets ``#patch_doc_file_select`` to
+              ``Select.NULL`` (A10-R2-3) so the same pick fires again.
+              A clean panel loads at once.
             - Otherwise call ``ChangeService.load`` on the resolved absolute
               path and surface the result (``_report_change_result``); refresh
               the entries table from the new document.
@@ -6175,6 +6190,7 @@ class S19TuiApp(App):
         Dependencies:
             Uses:
                 - ``_patches_dir`` / ``ChangeService.load``
+                - ``_patch_editor_load`` / ``LoadGuardScreen``
                 - ``_report_change_result`` / ``PatchEditorPanel.refresh_entries``
             Used by:
                 - Textual message dispatch (the panel's ``ChangeFileSelected``)
@@ -6189,6 +6205,19 @@ class S19TuiApp(App):
             )
             return
         panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+        if panel.is_dirty:
+
+            def _answer(accepted: bool) -> None:
+                if not accepted:
+                    self.set_status("Patch Editor: load cancelled — changes kept.")
+                    self.query_one(
+                        "#patch_doc_file_select", Select
+                    ).value = Select.NULL
+                    return
+                self._patch_editor_load(panel, str(candidate))
+
+            self.push_screen(LoadGuardScreen(), _answer)
+            return
         self._patch_editor_load(panel, str(candidate))
 
     def _patch_editor_load(self, panel: PatchEditorPanel, path_text: str) -> None:
@@ -7494,21 +7523,219 @@ class S19TuiApp(App):
             self._handle_load_dialog,
         )
 
-    def _route_load_project(self, name: Optional[str]) -> None:
-        """
+    def _confirm_then_load(
+        self, kind: QuestionKind, target: str, go: Callable[[], None]
+    ) -> None:
+        """Ask one replace question before unsaved work is replaced, or load.
+
         Summary:
-            The Load project dialog's router (LLR-178.3): run the project
-            load, then open the Load-result panel when this load composed
-            an announcement. A direct ``_handle_load_project`` call (tests,
-            fixtures) meets no modal.
+            The one load seam (B100-I20, LLR-174.1 … LLR-174.4): ask the
+            replace/cancel question when :meth:`_load_would_lose` reports
+            unsaved work for ``kind``, else run ``go`` at once. Every route
+            that may replace the loaded image — a project load, a typed or
+            recent data/A2L load, a work-area pick and a variant switch —
+            passes its continuation through here, so a load over unsaved
+            work is never silent.
 
         Args:
-            name (Optional[str]): The picked project, or ``None`` on cancel.
+            kind (QuestionKind): What the route may lose — ``image`` (the
+                image only), ``attach`` (nothing) or ``project`` (image,
+                document and flow).
+            target (str): The raw on-disk name the route loads; the
+                composer paints it (Q-2).
+            go (Callable[[], None]): The load continuation; run at once
+                when nothing is lost, else after a ``Replace`` answer on the
+                next refresh (the question has popped by then).
 
         Returns:
             None
 
         Data Flow:
+            - ``items = self._load_would_lose(kind)``; an empty list runs
+              ``go()`` synchronously — no question, no log, no refresh
+              deferral (the base timing of every route).
+            - Otherwise compose ``(title, body)`` through
+              ``_load_question_text`` and push ``ConfirmQuestionScreen``
+              with the ``answer`` closure: ``True`` (Replace) defers ``go``
+              through ``call_after_refresh``; ``False`` / ``None`` (Cancel,
+              escape, enter on ``#confirm_no``) re-homes the focus through
+              ``_rehome_focus_after_load`` and paints nothing.
+            - The seam never reads ``_dirty`` directly (LLR-174.1c) and
+              holds no ``try/except``.
+
+        Dependencies:
+            Uses:
+                - ``_load_would_lose`` / ``_load_question_text``
+                - ``ConfirmQuestionScreen`` / ``push_screen``
+                - ``_rehome_focus_after_load`` / ``call_after_refresh``
+            Used by:
+                - ``_route_load_project`` / ``_load_path_from_user_input``
+                - ``_load_workarea_file`` / ``_handle_select_variant``
+        """
+        items = self._load_would_lose(kind)
+        if not items:
+            go()
+            return
+
+        def answer(replace: bool) -> None:
+            self.logger.info(
+                "Load question answered: replace=%s kind=%s", bool(replace), kind
+            )
+            if replace:
+                self.call_after_refresh(go)
+            else:
+                self._rehome_focus_after_load()
+
+        title, body = self._load_question_text(kind, target, items)
+        self.push_screen(
+            ConfirmQuestionScreen(title, body, "Replace (y)", "Cancel (n)"), answer
+        )
+
+    def _load_would_lose(self, kind: QuestionKind) -> list[UnsavedItem]:
+        """Enumerate the unsaved items a load of ``kind`` would replace.
+
+        Summary:
+            The load guard (E1 A2, LLR-174.1 … LLR-174.1c): read the three
+            unsaved flags — D (the image differs from the last saved image),
+            W (the Patch Editor holds unsaved entries) and F (the Flow
+            Builder holds unsaved blocks) — and return the items a route of
+            ``kind`` may lose, in the fixed order image, document, flow.
+            The predicate reads state only and writes nothing.
+
+        Args:
+            kind (QuestionKind): What the route may lose.
+
+        Returns:
+            list[UnsavedItem]: The unsaved items in the fixed order; an
+                ``attach`` route always returns ``[]`` (nothing is lost —
+                the MAC/A2L attach keeps the image, the document and the
+                flow, LLR-174.1a).
+
+        Data Flow:
+            - ``kind == "attach"`` returns ``[]`` without reading D, W or F.
+            - ``cur = self.current_file``; D is
+              ``differs_from_last_saved(cur.mem_map if cur is not None else
+              None)`` — ``None`` yields ``False``, so the image item is
+              appended only with a loaded image (LLR-174.1b).
+            - ``kind == "project"`` additionally reads
+              ``PatchEditorPanel.is_dirty`` (W) and
+              ``FlowBuilderPanel.is_dirty`` / ``current_flow.name`` (F).
+            - The order is image, document, flow; an ``image`` kind returns
+              at most the image item.
+
+        Dependencies:
+            Uses:
+                - ``ChangeService.differs_from_last_saved``
+                - ``PatchEditorPanel.is_dirty`` / ``FlowBuilderPanel.is_dirty``
+            Used by:
+                - ``_confirm_then_load`` only
+        """
+        if kind == "attach":
+            return []
+        items: list[UnsavedItem] = []
+        cur = self.current_file
+        if self._change_service.differs_from_last_saved(
+            cur.mem_map if cur is not None else None
+        ):
+            items.append(("image", cur.path.name))
+        if kind == "project":
+            panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+            if panel.is_dirty:
+                items.append(("document", ""))
+            flow = self.query_one("#flow_panel", FlowBuilderPanel)
+            if flow.is_dirty:
+                items.append(("flow", flow.current_flow.name))
+        return items
+
+    def _load_question_text(
+        self, kind: QuestionKind, target: str, items: list[UnsavedItem]
+    ) -> tuple[str, str]:
+        """Compose the question's title and body (LLR-174.2i … LLR-174.2q).
+
+        Summary:
+            The composer (E1 A3, ruling Q-3): build the ``Replace <current>?``
+            title and the two-sentence body from the unsaved items and the
+            target, with every name passed through ``painted_names`` exactly
+            once (Q-2 — the one scrub place). Pure over ``current_project``,
+            ``current_file`` and the arguments; writes nothing.
+
+        Args:
+            kind (QuestionKind): What the route may lose; a ``project`` kind
+                prefixes the painted target with ``project ``.
+            target (str): The raw on-disk name the route loads.
+            items (list[UnsavedItem]): The unsaved items to name, in order.
+
+        Returns:
+            tuple[str, str]: ``(title, body)`` — both plain painted ``str``
+                (the screen paints them with markup off).
+
+        Data Flow:
+            - ``current`` is ``painted_names([current_project])``, else
+              ``painted_names([current_file.path.name])``, else the literal
+              ``the current session``; ``title = f"Replace {current}?"``.
+            - Each item paints as ``image`` → the painted name,
+              ``document`` → ``Patch Editor entries``, ``flow`` →
+              ``flow <painted name>``.
+            - ``joined`` is the single name, ``A and B`` for two, or
+              ``A, B and C`` for three.
+            - ``shown_target`` is ``project <painted target>`` for a project
+              load, else the painted target.
+            - ``body = f"There are unsaved changes in {joined}. Load
+              {shown_target} anyway?"`` — the token ``unsaved changes`` once
+              and two sentence ends outside names (LLR-174.2q).
+
+        Dependencies:
+            Uses:
+                - ``painted_names``
+            Used by:
+                - ``_confirm_then_load`` only
+        """
+        if self.current_project:
+            current = painted_names([self.current_project])
+        elif self.current_file is not None:
+            current = painted_names([self.current_file.path.name])
+        else:
+            current = "the current session"
+        title = f"Replace {current}?"
+        names: list[str] = []
+        for item_kind, name in items:
+            if item_kind == "image":
+                names.append(painted_names([name]))
+            elif item_kind == "document":
+                names.append("Patch Editor entries")
+            else:
+                names.append(f"flow {painted_names([name])}")
+        if len(names) == 1:
+            joined = names[0]
+        else:
+            joined = ", ".join(names[:-1]) + " and " + names[-1]
+        shown_target = (
+            f"project {painted_names([target])}"
+            if kind == "project"
+            else painted_names([target])
+        )
+        body = f"There are unsaved changes in {joined}. Load {shown_target} anyway?"
+        return title, body
+
+    def _route_load_project(self, name: str) -> None:
+        """
+        Summary:
+            The Load project dialog's router (LLR-178.3): ask the replace
+            question when the project load would lose unsaved work, then run
+            the project load and open the Load-result panel when this load
+            composed an announcement. A direct ``_handle_load_project`` call
+            (tests, fixtures) meets no question and no modal.
+
+        Args:
+            name (str): The picked project's on-disk name.
+
+        Returns:
+            None
+
+        Data Flow:
+            - The seam is here (S-d): ``go`` is the load body below, passed
+              to ``_confirm_then_load`` so ``_handle_load_project`` asks
+              nothing and runs only after a ``Replace`` answer.
             - ``_handle_load_project`` stores the load's announcement in
               ``_last_load_announcement``.
             - The panel opens only when that field now holds a NEW object
@@ -7518,16 +7745,24 @@ class S19TuiApp(App):
 
         Dependencies:
             Uses:
-                - ``_handle_load_project`` / ``LoadResultScreen``
+                - ``_confirm_then_load`` / ``_handle_load_project``
+                - ``LoadResultScreen``
             Used by:
-                - ``_handle_load_dialog`` (the ``project`` kind)
+                - ``_handle_load_dialog`` (the ``project`` kind) and
+                  ``_load_path_from_user_input`` (the project arm)
         """
-        before = self._last_load_announcement
-        self._handle_load_project(name)
-        announcement = self._last_load_announcement
-        if announcement is None or announcement is before:
-            return
-        self.push_screen(LoadResultScreen(announcement), self._handle_load_result)
+
+        def go() -> None:
+            before = self._last_load_announcement
+            self._handle_load_project(name)
+            announcement = self._last_load_announcement
+            if announcement is None or announcement is before:
+                return
+            self.push_screen(
+                LoadResultScreen(announcement), self._handle_load_result
+            )
+
+        self._confirm_then_load("project", name, go)
 
     def _load_dialog_rows(self) -> list[tuple[str, str, Optional[LoadChoice]]]:
         """
@@ -7930,13 +8165,17 @@ class S19TuiApp(App):
         Data Flow:
             - Resolve the descriptor in the current variant set (first match
               when duplicate ids exist — E6 decides duplicate-id policy).
-            - Stamp ``_pending_variant_id`` on the main thread, then dispatch
-              ``load_from_path`` so parsing runs on the load worker thread and
+            - The two refusal lines paint their name through
+              ``painted_names`` (S10-04).
+            - Stamp ``_pending_variant_id`` on the main thread inside the
+              confirmed continuation, then dispatch ``load_from_path`` so
+              parsing runs on the load worker thread and
               ``_apply_prepared_load`` installs + stamps on the main thread.
 
         Dependencies:
             Uses:
-                - ``load_from_path`` (existing load pipeline)
+                - ``_confirm_then_load`` / ``load_from_path``
+                - ``painted_names``
             Used by:
                 - ``action_select_variant`` (modal dismiss callback)
         """
@@ -7955,20 +8194,26 @@ class S19TuiApp(App):
             None,
         )
         if descriptor is None:
-            self.set_status(f"Variant not found: {variant_id}")
+            self.set_status(f"Variant not found: {painted_names([variant_id])}")
             self.logger.warning("Variant not found in set: %s", variant_id)
             return
         if not descriptor.path.exists():
-            self.set_status(f"Variant file missing: {descriptor.path.name}")
+            self.set_status(
+                f"Variant file missing: {painted_names([descriptor.path.name])}"
+            )
             self.logger.warning("Variant file missing on disk: %s", descriptor.path)
             return
-        self.logger.info(
-            "Activating variant '%s' via load pipeline: %s",
-            variant_id,
-            descriptor.path,
-        )
-        self._pending_variant_id = variant_id
-        self.load_from_path(descriptor.path)
+
+        def go() -> None:
+            self.logger.info(
+                "Activating variant '%s' via load pipeline: %s",
+                variant_id,
+                descriptor.path,
+            )
+            self._pending_variant_id = variant_id
+            self.load_from_path(descriptor.path)
+
+        self._confirm_then_load("image", descriptor.path.name, go)
 
     def action_operations_view(self) -> None:
         """
@@ -8392,8 +8637,9 @@ class S19TuiApp(App):
         self.refresh_bindings()
 
     def check_action(self, action: str, parameters: tuple) -> Optional[bool]:
-        """Gate app actions by the active window (batch-97 I-11, D10) and
-        by the Load dialog (Inc 9b, LLR-173.2e).
+        """Gate app actions by the active window (batch-97 I-11, D10),
+        by the Load dialog (Inc 9b, LLR-173.2e) and by the replace
+        question (Inc 10, LLR-174.2h).
 
         Summary:
             ``confirm_attention`` (the ``c`` key and its ^K palette entry)
@@ -8401,10 +8647,11 @@ class S19TuiApp(App):
             key does nothing and the binding is not active. Inc-8 (D28):
             ``+`` / ``-`` page only on A2L and MAC, and ``,`` / ``.`` only
             on Workspace — elsewhere they would page a hidden view. Inc 9b
-            (G3): the four ``priority=True`` actions in
+            (G3) / Inc 10 (S-f): the four ``priority=True`` actions in
             ``_LOAD_DIALOG_INERT_ACTIONS`` are inert while any screen on the
-            stack is a ``LoadDialog`` (the whole-stack guard, S9b-1). Every
-            other action falls through to Textual's own check.
+            stack is a ``LoadDialog`` or a ``ConfirmQuestionScreen`` (the
+            whole-stack guard, S9b-1). Every other action falls through to
+            Textual's own check.
 
         Args:
             action (str): The action name.
@@ -8415,7 +8662,8 @@ class S19TuiApp(App):
             what ``App.check_action`` returns.
         """
         if action in _LOAD_DIALOG_INERT_ACTIONS and any(
-            isinstance(s, LoadDialog) for s in self.screen_stack
+            isinstance(s, (LoadDialog, ConfirmQuestionScreen))
+            for s in self.screen_stack
         ):
             return False
         if action == "confirm_attention":
@@ -10941,10 +11189,10 @@ class S19TuiApp(App):
             elif (
                 document_class == _DOCUMENT_IN_HOME
                 and recorded_document is not None
-                and panel._dirty
+                and panel.is_dirty
             ):
                 # E3 R1: recorded as on disk; the panel's edits are in no
-                # file. Inc 10 adds the panel's public dirty reader.
+                # file.
                 document_lines.append(
                     f"Change document {document.source_path.name} has unsaved "
                     "edits — the project records the file as it is on disk; "
@@ -11750,7 +11998,7 @@ class S19TuiApp(App):
                 continue
             panel.set_session_dir(value)
 
-    def _reset_project_session(self) -> int:
+    def _reset_project_session(self) -> None:
         """
         Summary:
             Reset every piece of session state a project load must not
@@ -11775,15 +12023,9 @@ class S19TuiApp(App):
             None
 
         Returns:
-            int: How many entries the outgoing Patch Editor document
-                held. The caller paints the interim closed-document
-                notice with it (LED-2026-10-26-batch-100.55(a)) so the
-                rebind's discard is never silent until Inc 10's question
-                replaces the notice.
+            None
 
         Data Flow:
-            - Read the outgoing document's entry count BEFORE the rebind
-              discards it.
             - Reset S1-S13 in place (S4 last but for the rebind, S13
               through ``_invalidate_mac_view_cache`` plus the four probe
               names the invalidator does not own).
@@ -11811,7 +12053,6 @@ class S19TuiApp(App):
             Used by:
                 - ``_handle_load_project`` — the ONE caller (LLR-165.1).
         """
-        discarded_unsaved = len(self._change_service.document.entries)
         # S1: the loaded image (carries mac_path / mac_records / a2l_* /
         # mem_map). ``None`` before the first install, so the primary
         # parse's MAC merge sees no existing file (P-2's ``LEAK
@@ -11902,7 +12143,6 @@ class S19TuiApp(App):
             panel.clear_paste_buffer()
             panel.mark_loaded()
             self.refresh_bindings()
-        return discarded_unsaved
 
     def _session_snapshot(self) -> dict:
         """
@@ -12216,12 +12456,6 @@ class S19TuiApp(App):
                 "Project load refused (manifest not a regular file): %r", name
             )
             return
-        # HLR-165 / LLR-165.1: the ONE reset seam — after the project
-        # validates, before the first install — so the primary parse's
-        # MAC merge and the A2L fallbacks see an empty session. The
-        # outgoing document's entry count returns for the interim
-        # closed-document notice below (LED .55(a)).
-        discarded_unsaved = self._reset_project_session()
         # Multi-variant model (LLR-005.6, completed at E6) with HLR-169's
         # fallback (LLR-169.6): the manifest's recorded ``active_variant``
         # opens when it is a valid variant; otherwise the next valid one in
@@ -12229,12 +12463,6 @@ class S19TuiApp(App):
         # ``build_variant_set`` (``choose_install_set``).
         variant_set = build_variant_set(name, data_files)
         manifest = read_project_manifest(project_dir)
-        # LLR-028.1 — adopt the manifest's declared regions as app state so the
-        # next Reports dialog seeds from them (HLR-028 capture); reset to empty
-        # for a legacy/no-key project so a prior project's regions do not leak.
-        self._declared_regions = (
-            tuple(manifest.declared_regions) if manifest is not None else ()
-        )
         # LLR-169.5: the manifest and disk problems; the internal codes go
         # to the log only (HLR-169).
         problems = check_project_files(project_dir, manifest)
@@ -12254,7 +12482,9 @@ class S19TuiApp(App):
         # and the images still open without it — never "not readable" on a
         # valid image. The parsed payload is kept as the change document's
         # A2L context (LLR-170.3, C4): ``current_a2l_data`` is set only when
-        # an image install attaches the A2L.
+        # an image install attaches the A2L. The read and the install check
+        # below run BEFORE the reset (S10-01), so a refusal after ``y``
+        # keeps the outgoing work (LLR-174.3c).
         a2l_context: Optional[dict] = None
         if a2l_files:
             try:
@@ -12271,9 +12501,21 @@ class S19TuiApp(App):
                 a2l_files = []
         install = choose_install_set(variant_set, recorded, data_files, a2l_files)
         if install.variant is None and install.mac is None and install.a2l is None:
-            self.set_status(f"No supported files in project: {name}")
+            self.set_status(f"No supported files in project: {painted_names([name])}")
             self.logger.warning("No loadable data file in project: %s", name)
             return
+        # HLR-165 / LLR-165.1: the ONE reset seam — after the project
+        # validates and the install set is chosen, before the first install —
+        # so the primary parse's MAC merge and the A2L fallbacks see an empty
+        # session. Every refusal above runs BEFORE the reset (LLR-174.3c).
+        self._reset_project_session()
+        # LLR-028.1 — adopt the manifest's declared regions as app state so the
+        # next Reports dialog seeds from them (HLR-028 capture); reset to empty
+        # for a legacy/no-key project so a prior project's regions do not leak.
+        # A write, so it stays after the reset (S10-01).
+        self._declared_regions = (
+            tuple(manifest.declared_regions) if manifest is not None else ()
+        )
         if install.variant is None and install.mac is None:
             # HLR-171a / LLR-171.2: an A2L-only project attaches its own A2L
             # in place — never a work-area temp copy (no load_a2l_from_path).
@@ -12343,17 +12585,6 @@ class S19TuiApp(App):
         # writer of #status_text; names render through safe_text.
         self.set_status(safe_text(announcement.summary_line()).plain)
         self.set_file_status(safe_text(announcement.status_line()))
-        if discarded_unsaved:
-            # LED-2026-10-26-batch-100.55(a): until Inc 10 lands the load
-            # question (LLR-174.x), the closed Patch Editor document is
-            # named here — never closed silently. Inc 3 cannot read the
-            # panel's dirty flag (its public reader arrives at Inc 10), so
-            # the line states only what is known: the outgoing document
-            # held N entries and unsaved changes were not kept.
-            self.set_status(
-                f"Closed the Patch Editor document ({discarded_unsaved} entries); "
-                "unsaved changes were not kept"
-            )
         self.logger.info(
             "Project loaded. name=%s file=%s mac=%s",
             name,
@@ -13487,28 +13718,40 @@ class S19TuiApp(App):
         Data Flow:
             - ``_typed_load_route`` reads only metadata and returns
               ``(action, value)``.
-            - ``project`` -> ``_route_load_project`` (the Load-result panel
-              opens as for a picked project, Q3); ``a2l`` / ``data`` -> the
-              existing load functions with the raw ``path``.
+            - ``typed = Path(str(path).strip().strip('"'))`` — the same
+              strip the classifier and ``resolve_input_path`` apply (F-1,
+              P-1) — decides the MAC test and the question's target name;
+              the loaders still receive the raw ``path``.
+            - ``project`` -> ``_route_load_project`` (asked there, LLR-174.4a).
+            - ``a2l`` / ``data`` -> ``_confirm_then_load`` with ``attach``
+              (an A2L or MAC attach keeps the image) or ``image``.
             - ``refuse`` -> one status line from the six reason words, the
-              typed text through ``painted_names`` with markup off.
+              typed text through ``painted_names`` with markup off; no
+              question (LLR-174.4b race arm).
 
         Dependencies:
             Uses:
                 - ``_typed_load_route`` / ``_route_load_project``
+                - ``_confirm_then_load``
                 - ``load_a2l_from_path`` / ``load_from_path``
             Used by:
                 - ``on_mount`` / ``_handle_load_dialog``
         """
         action, value = self._typed_load_route(path)
+        typed = Path(str(path).strip().strip('"'))
         if action == "project":
             self._route_load_project(value)
             return
         if action == "a2l":
-            self.load_a2l_from_path(path)
+            self._confirm_then_load(
+                "attach", typed.name, lambda: self.load_a2l_from_path(path)
+            )
             return
         if action == "data":
-            self.load_from_path(path)
+            kind = "attach" if typed.suffix.lower() in MAC_EXTENSIONS else "image"
+            self._confirm_then_load(
+                kind, typed.name, lambda: self.load_from_path(path)
+            )
             return
         t = painted_names([str(path)])
         if value == "not found":
@@ -13957,21 +14200,35 @@ class S19TuiApp(App):
         Data Flow:
             - ``candidate = self.workarea / WORKAREA_TEMP / name``.
             - A deleted file loads nothing, silently (F-11, the 9a list
-              pick's behaviour).
+              pick's behaviour); the ``exists()`` check stays before the
+              seam, so a vanished file asks nothing (F-6).
+            - ``kind`` is ``attach`` for a MAC or A2L suffix (case-folded,
+              LLR-174.4c), else ``image``; the seam runs before the load.
 
         Dependencies:
             Uses:
+                - ``_confirm_then_load``
                 - ``load_a2l_from_path`` / ``load_selected_file``
             Used by:
                 - ``_load_from_item`` / ``_handle_load_dialog``
         """
         candidate = self.workarea / WORKAREA_TEMP / name
-        if candidate.exists():
+        if not candidate.exists():
+            return
+        kind = (
+            "attach"
+            if candidate.suffix.lower() in (MAC_EXTENSIONS | A2L_EXTENSIONS)
+            else "image"
+        )
+
+        def go() -> None:
             self.logger.info("Loading from workarea selection: %s", candidate)
             if candidate.suffix.lower() in A2L_EXTENSIONS:
                 self.load_a2l_from_path(candidate)
             else:
                 self.load_selected_file(candidate)
+
+        self._confirm_then_load(kind, name, go)
 
     def _jump_to_section(self, item: ListItem) -> None:
         section_range = getattr(item, "data", None)

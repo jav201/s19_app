@@ -1,0 +1,3 @@
+Q4 PureWindowsPath('x.mac.').suffix = '' | recent_kind = None
+Q4 exists(typed 'x.mac.') = True | route = ('refuse', 'not a supported file')
+Q4 after typed 'x.mac.': file firmware.s19 | mac None | last status ["File NOT loaded: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\p10q4_a2lyqzbg\\x.mac.' is not a supported file — check the path."]

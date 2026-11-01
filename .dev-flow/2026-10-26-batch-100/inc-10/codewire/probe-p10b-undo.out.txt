@@ -1,0 +1,3 @@
+UNDO applied: byte 0xaa D = True
+UNDO after undo (no re-apply): entries 0 byte 0xaa D = True
+UNDO after undo + apply: byte 0x11 D = False
