@@ -1,0 +1,11 @@
+mutant: M20
+file: s19_app/tui/screens.py
+old -> new: '        if f.id == "load_list" and event.is_printable:\n            event.stop()\n            event.prevent_default()\n            inp = self.query_one("#load_path", Input)\n            inp.value = inp.value + event.character\n            inp.cursor_position = len(inp.value)\n            self._source = "path"\n            self._schedule_preview(None)\n            inp.focus()\n' -> ''
+sha256 before: a7d9ed25e09de3ef56e9d1f9c6ffd624ffe1eca8408d04d5170a857696111424
+command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_load_dialog.py::test_tc_b100_41_printable_key_in_the_list_types_into_the_path_field
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b\s19_app\__init__.py
+---
+pytest: 6 failed in 13.80s
+verdict: KILLED
+restored = True

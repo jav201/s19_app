@@ -1,0 +1,17 @@
+mutant: M85
+file: s19_app/tui/app.py
+edits (old -> new):
+  '        if len(a2l_files) > 1:\n            return data_files, a2l_files, "Project already has more than one A2L file."\n'
+    -> ''
+sha256 before: d0cfd46e22c3f60ef85829bf5903d689b7e849d770fe428e65d4b1000d75b509
+sha256 after restore: d0cfd46e22c3f60ef85829bf5903d689b7e849d770fe428e65d4b1000d75b509
+restored = True
+command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE --basetemp=C:/Users/jjgh8/Github/s19_app-b100-inc9b/.dev-flow/2026-10-26-batch-100/evidence\bt-mutc-M85 tests/test_b100_load_dialog.py::test_tc_b100_64_more_than_one_mac_marks_nothing[A2L]
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr9b/mut
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr9b\mut\s19_app\__init__.py
+---
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr9b\mut\tests\test_b100_load_dialog.py:3582: AssertionError: ['● variant a.s19', '● A2L c1.a2l', 'project file: no project.json']
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_more_than_one_mac_marks_nothing[A2L]
+pytest: 1 failed in 4.45s
+exit code: 1
+verdict: KILLED

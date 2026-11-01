@@ -1,0 +1,17 @@
+mutant: M87
+file: s19_app/tui/app.py
+edits (old -> new):
+  '        if not stat.S_ISREG(a2l_stat.st_mode) or _is_reparse_point(a2l_path):'
+    -> '        if not stat.S_ISREG(a2l_stat.st_mode):'
+sha256 before: d0cfd46e22c3f60ef85829bf5903d689b7e849d770fe428e65d4b1000d75b509
+sha256 after restore: d0cfd46e22c3f60ef85829bf5903d689b7e849d770fe428e65d4b1000d75b509
+restored = True
+command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE --basetemp=C:/Users/jjgh8/Github/s19_app-b100-inc9b/.dev-flow/2026-10-26-batch-100/evidence\bt-mutc-M87 tests/test_b100_project_homes.py::test_tc_b100_32_a2l_admission_refuses_any_reparse_point[reparse point]
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr9b/mut
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr9b\mut\s19_app\__init__.py
+---
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr9b\mut\tests\test_b100_project_homes.py:1150: AssertionError: None
+FAILED tests/test_b100_project_homes.py::test_tc_b100_32_a2l_admission_refuses_any_reparse_point[reparse point]
+pytest: 1 failed in 1.93s
+exit code: 1
+verdict: KILLED

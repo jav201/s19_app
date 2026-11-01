@@ -1,0 +1,16 @@
+mutant: M87
+file: s19_app/tui/app.py
+old -> new: '        if not stat.S_ISREG(a2l_stat.st_mode) or _is_reparse_point(a2l_path):' -> '        if not stat.S_ISREG(a2l_stat.st_mode):'
+sha256 before: ae3d1cd924c42a2a9e7a920cd95aab8b21f4d9b324afdfb6bc1b54b7a1739c4a
+command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_project_homes.py::test_tc_b100_32_a2l_guard_of_an_a2l_only_folder[link]
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b\s19_app\__init__.py
+---
+pytest (mutant applied): 1 failed in 2.37s
+pytest (clean tree, no mutation): 1 failed in ~4.36s  ->  "Project NOT loaded: 'P' has no data or A2L file — load a file and Save project."
+NOTE: the named killer is a PRE-EXISTING failure on the clean tree (the deferred
+test_b100_project_homes module still tests 9a's link-following validate_project_files
+path; Inc 9b's link-safe _list_project_files skips the file symlink before _a2l_admission
+is ever reached), so the mutant is not what turns it red.
+verdict: SURVIVED
+restored = True

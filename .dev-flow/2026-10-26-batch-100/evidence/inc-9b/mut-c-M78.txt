@@ -1,0 +1,21 @@
+mutant: M78
+file: s19_app/tui/app.py
+edits (old -> new):
+  '        discarded_unsaved = self._reset_project_session()\n'
+    -> ''
+  '        # S9b-2: the lstat regular-file gate on ``project.json`` runs before\n'
+    -> '        discarded_unsaved = self._reset_project_session()\n        # S9b-2: the lstat regular-file gate on ``project.json`` runs before\n'
+sha256 before: d0cfd46e22c3f60ef85829bf5903d689b7e849d770fe428e65d4b1000d75b509
+sha256 after restore: d0cfd46e22c3f60ef85829bf5903d689b7e849d770fe428e65d4b1000d75b509
+restored = True
+command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE --basetemp=C:/Users/jjgh8/Github/s19_app-b100-inc9b/.dev-flow/2026-10-26-batch-100/evidence\bt-mutc-M78 tests/test_b100_load_dialog.py::test_tc_b100_64_project_json_that_is_not_a_regular_file_is_refused tests/test_b100_load_dialog.py::test_tc_b100_64_project_json_that_is_a_reparse_point_is_refused
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr9b/mut
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr9b\mut\s19_app\__init__.py
+---
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr9b\mut\tests\test_b100_load_dialog.py:3444: AssertionError: assert (None, None, None, None, None) == ('C:\\Users\\...e, None, None)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr9b\mut\tests\test_b100_load_dialog.py:3510: AssertionError: assert (None, None, None, None, None) == ('C:\\Users\\...e, None, None)
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_project_json_that_is_not_a_regular_file_is_refused
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_64_project_json_that_is_a_reparse_point_is_refused
+pytest: 2 failed in 8.47s
+exit code: 1
+verdict: KILLED

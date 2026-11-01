@@ -306,7 +306,7 @@ keyboard binding.
 **R-A2L-004**: The tool must allow loading an A2L file and show its parsed
 content in the A2L view.
 
-- Code: `s19_app/tui/screens.py` (`LoadFileScreen`),
+- Code: `s19_app/tui/screens.py` (the Load dialog (`LoadDialog`)),
   `s19_app/tui/app.py` (`_load_path_from_user_input`, `load_a2l_from_path`,
   `update_a2l_view`)
 - Validation: `Automated` via `tests/test_loadfilescreen_input.py` (initial
@@ -911,7 +911,7 @@ state (LLR-042.11); the batch diffs no engine-frozen path (LLR-042.12).
     snapshot cells ride `_batch47_workspace_drift_marks` (`xfail(strict=False)`)
     until the canonical-CI regen. Frozen-engine diff = 0.
 
-**R-TUI-043**: The Load-file modal (`LoadFileScreen`) must (a) land initial
+**R-TUI-043**: The Load dialog (`LoadDialog`), opened for a file, must (a) land initial
 keyboard focus on its path `Input` (`#load_path`) — never on the primary
 `Load` button — so single-key `S19TuiApp.BINDINGS` (`s`, `e`, `r`, `l`, `p`,
 `j`, `g`, `q`, `b`, `t`, `x`, `k`, `v`, `o`, `1..8`, `slash`, `comma`,
@@ -957,7 +957,8 @@ PowerShell layer; `TclError` on tk; Win32 handle-null returns on
 ctypes. Total-failure logging is `logger.warning` (not `.info`) so
 default log levels catch the event.
 
-- Code: `s19_app/tui/screens.py` (`LoadFileScreen.AUTO_FOCUS`, use of
+- Code: `s19_app/tui/screens.py` (the Load dialog (`LoadDialog`): the
+  `on_mount` focus in path mode, use of
   `OsClipboardInput` for `#load_path`), `s19_app/tui/os_clipboard_input.py`
   (`OsClipboardInput`, `read_os_clipboard`)
 - Validation: `Automated` via `tests/test_loadfilescreen_input.py`
@@ -1258,7 +1259,7 @@ workarea subfolder named by a sanitized project name.
 **R-TUI-013**: Loading a project must list all project folders in the
 workarea except for the temp folder and load the selected project file.
 
-- Code: `s19_app/tui/app.py` (`LoadProjectScreen`, `list_projects`,
+- Code: `s19_app/tui/app.py` (the Load dialog (`LoadDialog`, `screens.py`), `list_projects`,
   `action_load_project`, `_handle_load_project`)
 - Validation: `Partial` via `tests/test_tui_helpers.py`
   (`test_list_projects_ignores_temp`) and `tests/test_tui_app.py`
@@ -6474,7 +6475,7 @@ should see, and there are 21 of those, where a bulk import would have buried the
 | LLR-150.5 | Each row of the key bar shall paint whole tokens: when its tokens are wider than the row, the row shall first reserve the width of its mandatory parts — ? Help on row 1; the tag and the ? more tail on row 2 — and then keep the longest display-order prefix of the other tokens that fits in what is left (a prefix, never a greedy skip: no token shows while an earlier one is hidden), mandatory tokens keeping their display position; the second row then ends with ? more, the ? binding labelled more; no token shall be cut. The . key shall display as . (key_display="." on the period binding, NEW), never as period. | 2026-10-19-batch-97 | active |
 | LLR-150.6 | The S19TuiApp shall mount the key bar (NEW, I-11) docked at the bottom with a height of 2 rows in place of the shipped Footer (app.py:2077), so that each window's container is exactly one row shorter than on main and nothing else in the shell moves; the four batch-97 screens shall keep LLR-149.3, LLR-149.5 and LLR-149.6 with the key bar mounted. | 2026-10-19-batch-97 | active |
 | LLR-150.7 | When the engineer clicks an enabled token of either row, the key bar shall run that token's binding action in the binding's own namespace, never by simulating the key: for an entry with no owner, app.run_action(action) in the app's namespace, which honours S19TuiApp.check_action (textual/app.py:4223-4248); for an entry with an owner selector, the action run on the widget that selector resolves inside the active window (widget.run_action(action)). Whatever holds the focus — a text input, a tab chip, a button — shall neither receive the key nor change. A click on ? Help (or ? more) shall run the app binding show_help_panel, the stock help panel listing every binding, whatever the focus; pressing ? keeps its focus-dependent meaning (inside a WindowSection, that window's help, window_help.py:449). A click on a dimmed token shall ring the bell and run nothing, and a click on the tag, a separator or the padding shall run nothing. | 2026-10-19-batch-97 | active |
-| LLR-151.1 | On Load, LoadProjectScreen shall dismiss with the entry of its project list at the ListView's highlighted index, and shall not dismiss when no entry is highlighted. | 2026-10-19-batch-97 | active |
+| LLR-151.1 | On Load, LoadProjectScreen (retired; now the Load dialog (`LoadDialog`)) shall dismiss with the entry of its project list at the ListView's highlighted index, and shall not dismiss when no entry is highlighted. | 2026-10-19-batch-97 | superseded by batch-100 HLR-173 (Inc 9b) |
 | HLR-152 | When the corpus generator runs, the system shall write a deterministic set of S19, Intel HEX, MAC and A2L fixture files together with a manifest that records, for each file, its SHA-256, its expected data bytes (address → byte) and its expected load verdict. When run in check mode, the generator shall exit non-zero, naming the file, if any committed file differs from what it generates or if the independent reader's bytes for any file differ from the manifest. | 2026-10-25-batch-99 | active |
 | HLR-153 | When an S19 file is loaded, the system shall build the image, its ranges, its record lookup, its overlap map, its validity map and every count derived from them from S1, S2 and S3 records only. When an image loaded from an S19 is written as S19, the system shall emit its S0 header as a header record; written as S19 or Intel HEX, it shall emit no data at any address the source did not declare in a data record. | 2026-10-25-batch-99 | active |
 | HLR-154 | When an S19 file has no terminator, an S5 or S6 count different from its number of data records, or any record after its terminator, the system shall attach a load notice naming the defect. When an Intel HEX file has no EOF record, or any record after its first EOF, it shall attach a load notice naming the defect. Before the terminator or EOF, a record is a line starting with S (S19) or : (HEX); after it, every non-empty line counts as a trailing record, is never parsed, and never enters the image, and the notice states how many there were. When such a file is loaded interactively, the status line shall lead with the defect (e.g. Loaded firmware.s19 with integrity notices: S19-NO-TERMINATOR), never a plain Loaded <name>. While a flow's SOURCE image carries such a notice, the flow shall end the SOURCE step with status error and write no file. | 2026-10-25-batch-99 | active |

@@ -1,0 +1,17 @@
+mutant: M34
+file: s19_app/tui/screens.py
+edits (old -> new):
+  '        if self._dismissed:\n            return\n        self._dismissed = True'
+    -> '        self._dismissed = True'
+sha256 before: 120d39b9697fab0f8f9882d000ac9ff9e3f212c8bbc9e3f90d79c1b2347d71a2
+sha256 after restore: 120d39b9697fab0f8f9882d000ac9ff9e3f212c8bbc9e3f90d79c1b2347d71a2
+restored = True
+command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE --basetemp=C:/Users/jjgh8/Github/s19_app-b100-inc9b/.dev-flow/2026-10-26-batch-100/evidence\bt-mutc-M34 tests/test_b100_load_dialog.py::test_tc_b100_41_double_enter_dismisses_once
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr9b/mut
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr9b\mut\s19_app\__init__.py
+---
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:3105: textual.app.ScreenStackError: Can't pop screen; there must be at least one screen on the stack
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_double_enter_dismisses_once[escape]
+pytest: 1 failed, 1 passed in 5.95s
+exit code: 1
+verdict: KILLED

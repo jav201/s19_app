@@ -1,0 +1,11 @@
+mutant: M34
+file: s19_app/tui/screens.py
+old -> new: '        if self._dismissed:\n            return\n        self._dismissed = True' -> '        self._dismissed = True'
+sha256 before: a7d9ed25e09de3ef56e9d1f9c6ffd624ffe1eca8408d04d5170a857696111424
+command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_load_dialog.py::test_tc_b100_41_double_enter_dismisses_once
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b\s19_app\__init__.py
+---
+pytest: 1 passed in 3.27s
+verdict: SURVIVED
+restored = True
