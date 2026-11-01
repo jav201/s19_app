@@ -1,0 +1,502 @@
+== RED on the pre-corrective source (base12bc at 81ac4c0, test files copied in)
+tree: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/base12bc  (git HEAD 81ac4c0)
+date: 2026-11-01T12:57:11Z
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12bc\s19_app\__init__.py
+source sha256[:16]: app.py 6ada85782fdd80de  a2l.py d70b17982f1cee30  styles.tcss f7b4f75911b296a4
+env: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12b/la
+cmd: pytest -p no:cacheprovider --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12b/bt/red03 -rA tests/test_b100_save_guards.py::test_tc_b100_07_pasted_document_home_created_then_write_fails_no_folder_left tests/test_b100_a2l_progress.py::test_tc_b100_73_no_fstat_without_a_callback tests/test_b100_workers.py::test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished tests/test_b100_workers.py::test_tc_b100_53_report_generate_keeps_the_regions_of_a_running_save tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_is_withdrawn_when_pasted_entries_were_not_saved tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_is_withdrawn_when_editor_edits_stay_unsaved
+FFFFFFFF                                                                 [100%]
+================================== FAILURES ===================================
+_ test_tc_b100_07_pasted_document_home_created_then_write_fails_no_folder_left[no-space] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12b/bt/red03/test_tc_b100_07_pasted_documen0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002A26D5B4B90>
+raised = 'no-space'
+
+    @pytest.mark.parametrize("raised", ["no-space", "placement-refused"])
+    def test_tc_b100_07_pasted_document_home_created_then_write_fails_no_folder_left(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, raised: str
+    ) -> None:
+        """CR12b-1 (base A3R2-8, the R5-1 shape for the pasted document): a
+        pasted 1-entry document; its placement mkdirs ``freshd/patches`` and
+        then the copy fails (``OSError(28)`` no space, or a refused
+        placement); the manifest is refused, so the save fails. The home the
+        document write created must join the rollback either way, so no
+        ``freshd`` folder is left. At 81ac4c0 the home joined the rollback only
+        after a successful write: ``freshd/patches`` stayed, ``freshd`` could
+        not be removed, and this arm is RED there."""
+        from s19_app.tui.workspace import WorkareaPlacementError
+    
+        real_place = app_module.place_into_workarea
+        made: list = []
+    
+        def _mkdir_home_then_raise(source, destination, *args, **kwargs):
+            if Path(destination).name == "patches":
+                Path(destination).mkdir(parents=True, exist_ok=True)
+                made.append(Path(destination))
+                if raised == "no-space":
+                    raise OSError(28, "No space left on device")
+                raise WorkareaPlacementError("forced: the placement was refused")
+            return real_place(source, destination, *args, **kwargs)
+    
+        base = tmp_path / "app"
+        src = _copy_source(tmp_path)
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            probe = _StatusProbe(app)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(src)
+                await _flush(pilot)
+                app._change_service.add_entry("0x8000007C", "", "DE AD BE EF")
+                monkeypatch.setattr(app_module, "place_into_workarea", _mkdir_home_then_raise)
+                _force_stage(monkeypatch, "manifest-refused")
+                app._handle_save_dialog(_payload(app, "freshd"))
+                await _flush(pilot)
+                folders = sorted(
+                    item.name for item in app.workarea.iterdir() if item.is_dir()
+                )
+                entries = len(app._change_service.document.entries)
+            return probe.last, folders, entries
+    
+        status, folders, entries = asyncio.run(_drive())
+        assert [p.parent.name for p in made] == ["freshd"], made  # vacuity: the home was made
+        assert "Project NOT saved" in status and "check the folder" in status, status
+>       assert folders == ["patches", "temp"], (
+            f"the failed save left the home its document write created behind: {folders}"
+        )
+E       AssertionError: the failed save left the home its document write created behind: ['freshd', 'patches', 'temp']
+E       assert ['freshd', 'patches', 'temp'] == ['patches', 'temp']
+E         
+E         At index 0 diff: 'freshd' != 'patches'
+E         Left contains one more item: 'temp'
+E         Use -v to get more diff
+
+tests\test_b100_save_guards.py:2159: AssertionError
+_ test_tc_b100_07_pasted_document_home_created_then_write_fails_no_folder_left[placement-refused] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12b/bt/red03/test_tc_b100_07_pasted_documen1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002A26E83F890>
+raised = 'placement-refused'
+
+    @pytest.mark.parametrize("raised", ["no-space", "placement-refused"])
+    def test_tc_b100_07_pasted_document_home_created_then_write_fails_no_folder_left(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, raised: str
+    ) -> None:
+        """CR12b-1 (base A3R2-8, the R5-1 shape for the pasted document): a
+        pasted 1-entry document; its placement mkdirs ``freshd/patches`` and
+        then the copy fails (``OSError(28)`` no space, or a refused
+        placement); the manifest is refused, so the save fails. The home the
+        document write created must join the rollback either way, so no
+        ``freshd`` folder is left. At 81ac4c0 the home joined the rollback only
+        after a successful write: ``freshd/patches`` stayed, ``freshd`` could
+        not be removed, and this arm is RED there."""
+        from s19_app.tui.workspace import WorkareaPlacementError
+    
+        real_place = app_module.place_into_workarea
+        made: list = []
+    
+        def _mkdir_home_then_raise(source, destination, *args, **kwargs):
+            if Path(destination).name == "patches":
+                Path(destination).mkdir(parents=True, exist_ok=True)
+                made.append(Path(destination))
+                if raised == "no-space":
+                    raise OSError(28, "No space left on device")
+                raise WorkareaPlacementError("forced: the placement was refused")
+            return real_place(source, destination, *args, **kwargs)
+    
+        base = tmp_path / "app"
+        src = _copy_source(tmp_path)
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            probe = _StatusProbe(app)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(src)
+                await _flush(pilot)
+                app._change_service.add_entry("0x8000007C", "", "DE AD BE EF")
+                monkeypatch.setattr(app_module, "place_into_workarea", _mkdir_home_then_raise)
+                _force_stage(monkeypatch, "manifest-refused")
+                app._handle_save_dialog(_payload(app, "freshd"))
+                await _flush(pilot)
+                folders = sorted(
+                    item.name for item in app.workarea.iterdir() if item.is_dir()
+                )
+                entries = len(app._change_service.document.entries)
+            return probe.last, folders, entries
+    
+        status, folders, entries = asyncio.run(_drive())
+        assert [p.parent.name for p in made] == ["freshd"], made  # vacuity: the home was made
+        assert "Project NOT saved" in status and "check the folder" in status, status
+>       assert folders == ["patches", "temp"], (
+            f"the failed save left the home its document write created behind: {folders}"
+        )
+E       AssertionError: the failed save left the home its document write created behind: ['freshd', 'patches', 'temp']
+E       assert ['freshd', 'patches', 'temp'] == ['patches', 'temp']
+E         
+E         At index 0 diff: 'freshd' != 'patches'
+E         Left contains one more item: 'temp'
+E         Use -v to get more diff
+
+tests\test_b100_save_guards.py:2159: AssertionError
+_________________ test_tc_b100_73_no_fstat_without_a_callback _________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002A26D701A10>
+
+    def test_tc_b100_73_no_fstat_without_a_callback(monkeypatch: pytest.MonkeyPatch) -> None:
+        """CR12b-4 (behaviour-neutral, LLR-176.4a): with no callback the read
+        makes 0 ``os.fstat`` calls, so a failing ``fstat`` cannot change the
+        callback-free parse: ``parse_a2l_file(case_01)`` returns the same
+        result as before the stand-in was installed. With a callback the same
+        stand-in is called exactly once (the size the reports carry) — the
+        positive control that the stand-in sits on the read's path.
+    
+        Why: the callback-free parse is the one every caller outside the app
+        uses; it must stay the base parse. Negative control (81ac4c0): ``fstat``
+        runs with no callback -> the raise is logged and re-raised -> RED."""
+        import os as real_os
+    
+        expected = a2l_module.parse_a2l_file(CASE01_A2L)
+        calls: list = []
+    
+        class _Os:
+            def __getattr__(self, name):
+                return getattr(real_os, name)
+    
+            @staticmethod
+            def fstat(fd):
+                calls.append(fd)
+                raise OSError(5, "synthetic fstat failure")
+    
+        monkeypatch.setattr(a2l_module, "os", _Os())
+>       assert a2l_module.parse_a2l_file(CASE01_A2L) == expected
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_a2l_progress.py:382: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+s19_app\tui\a2l.py:2681: in parse_a2l_file
+    sections, errors = build_section_tree(path, progress)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\a2l.py:194: in build_section_tree
+    total = os.fstat(handle.fileno()).st_size
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+fd = 12
+
+    @staticmethod
+    def fstat(fd):
+        calls.append(fd)
+>       raise OSError(5, "synthetic fstat failure")
+E       OSError: [Errno 5] synthetic fstat failure
+
+tests\test_b100_a2l_progress.py:379: OSError
+------------------------------ Captured log call ------------------------------
+ERROR    s19_app.tui.a2l:a2l.py:235 A2L section parse failed: path=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12bc\examples\case_01_basic_valid\firmware.a2l reason=os_error
+Traceback (most recent call last):
+  File "C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12bc\s19_app\tui\a2l.py", line 194, in build_section_tree
+    total = os.fstat(handle.fileno()).st_size
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12bc\tests\test_b100_a2l_progress.py", line 379, in fstat
+    raise OSError(5, "synthetic fstat failure")
+OSError: [Errno 5] synthetic fstat failure
+_ test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished[project_folder] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12b/bt/red03/test_tc_b100_54_a2l_attach_ref0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002A270FA7C10>
+gone = 'project_folder'
+
+    @pytest.mark.parametrize("gone", ["project_folder", "a2l_size"])
+    def test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, gone: str
+    ) -> None:
+        """CR12b-2 / SE5-12b-2 (ruling E5, split by subject): before any busy
+        run begins, ``load_a2l_from_path`` reads the open project's folder
+        (``validate_project_files``) and the A2L's size (``stat``).
+        - ``project_folder``: the open project ``gone`` was removed outside the
+          app -> 1 line ``A2L NOT loaded: project 'gone' could not be read —
+          check that the folder can be opened, then load again.``;
+        - ``a2l_size``: the size ``stat`` raises ``OSError`` -> 1 line ``A2L
+          file not found: <typed>``.
+        Both: nothing raised out of the request, 0 begins, no run left, the app
+        running.
+    
+        Why: from the Load dialog or a deferred callback the raise ends the app
+        and the unsaved session is lost; a size read as 0 would skip the
+        over-cap rule. Negative control (81ac4c0): both calls are unguarded ->
+        ``FileNotFoundError`` / ``OSError`` leaves the request -> RED."""
+        base = tmp_path / "app"
+        a2l = tmp_path / "src" / "firmware.a2l"
+        a2l.parent.mkdir(parents=True)
+        shutil.copyfile(CASE01 / "firmware.a2l", a2l)
+        begins = Spy(monkeypatch, S19TuiApp, "_busy_begin_action")
+        if gone == "a2l_size":
+            real_stat = pathlib.Path.stat
+    
+            def _stat(self, *args, **kwargs):
+                if sys._getframe(1).f_code.co_name == "load_a2l_from_path":
+                    raise OSError(5, "synthetic size read failure")
+                return real_stat(self, *args, **kwargs)
+    
+            monkeypatch.setattr(pathlib.Path, "stat", _stat)
+    
+        async def scenario(app, pilot, log):
+            if gone == "project_folder":
+                app.current_project = "gone"
+                app.current_project_dir = app.workarea / "gone"
+            mark = len(log.messages)
+            try:
+                app.load_a2l_from_path(a2l)
+                raised = None
+            except BaseException as exc:  # noqa: BLE001 — the RED shape
+                raised = type(exc).__name__
+            for _ in range(3):
+                await pilot.pause()
+            return raised, log.since(mark), list(app._busy.runs), running(app)
+    
+        raised, lines, runs, alive = run(base, scenario)
+        expected = (
+            "A2L NOT loaded: project 'gone' could not be read — check that the folder "
+            "can be opened, then load again."
+            if gone == "project_folder"
+            else f"A2L file not found: {a2l}"
+        )
+>       assert raised is None, f"{raised} left load_a2l_from_path"
+E       AssertionError: FileNotFoundError left load_a2l_from_path
+E       assert 'FileNotFoundError' is None
+
+tests\test_b100_workers.py:3172: AssertionError
+_ test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished[a2l_size] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12b/bt/red03/test_tc_b100_54_a2l_attach_ref1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002A26E97C710>
+gone = 'a2l_size'
+
+    @pytest.mark.parametrize("gone", ["project_folder", "a2l_size"])
+    def test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, gone: str
+    ) -> None:
+        """CR12b-2 / SE5-12b-2 (ruling E5, split by subject): before any busy
+        run begins, ``load_a2l_from_path`` reads the open project's folder
+        (``validate_project_files``) and the A2L's size (``stat``).
+        - ``project_folder``: the open project ``gone`` was removed outside the
+          app -> 1 line ``A2L NOT loaded: project 'gone' could not be read —
+          check that the folder can be opened, then load again.``;
+        - ``a2l_size``: the size ``stat`` raises ``OSError`` -> 1 line ``A2L
+          file not found: <typed>``.
+        Both: nothing raised out of the request, 0 begins, no run left, the app
+        running.
+    
+        Why: from the Load dialog or a deferred callback the raise ends the app
+        and the unsaved session is lost; a size read as 0 would skip the
+        over-cap rule. Negative control (81ac4c0): both calls are unguarded ->
+        ``FileNotFoundError`` / ``OSError`` leaves the request -> RED."""
+        base = tmp_path / "app"
+        a2l = tmp_path / "src" / "firmware.a2l"
+        a2l.parent.mkdir(parents=True)
+        shutil.copyfile(CASE01 / "firmware.a2l", a2l)
+        begins = Spy(monkeypatch, S19TuiApp, "_busy_begin_action")
+        if gone == "a2l_size":
+            real_stat = pathlib.Path.stat
+    
+            def _stat(self, *args, **kwargs):
+                if sys._getframe(1).f_code.co_name == "load_a2l_from_path":
+                    raise OSError(5, "synthetic size read failure")
+                return real_stat(self, *args, **kwargs)
+    
+            monkeypatch.setattr(pathlib.Path, "stat", _stat)
+    
+        async def scenario(app, pilot, log):
+            if gone == "project_folder":
+                app.current_project = "gone"
+                app.current_project_dir = app.workarea / "gone"
+            mark = len(log.messages)
+            try:
+                app.load_a2l_from_path(a2l)
+                raised = None
+            except BaseException as exc:  # noqa: BLE001 — the RED shape
+                raised = type(exc).__name__
+            for _ in range(3):
+                await pilot.pause()
+            return raised, log.since(mark), list(app._busy.runs), running(app)
+    
+        raised, lines, runs, alive = run(base, scenario)
+        expected = (
+            "A2L NOT loaded: project 'gone' could not be read — check that the folder "
+            "can be opened, then load again."
+            if gone == "project_folder"
+            else f"A2L file not found: {a2l}"
+        )
+>       assert raised is None, f"{raised} left load_a2l_from_path"
+E       AssertionError: OSError left load_a2l_from_path
+E       assert 'OSError' is None
+
+tests\test_b100_workers.py:3172: AssertionError
+_____ test_tc_b100_53_report_generate_keeps_the_regions_of_a_running_save _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12b/bt/red03/test_tc_b100_53_report_generat0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002A27027F510>
+
+    def test_tc_b100_53_report_generate_keeps_the_regions_of_a_running_save(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """CR12b-3: during a held Save of ``P1`` the report viewer's Generate
+        (regions R) still asks for the report (reports overlap, Q2), but leaves
+        the session's ``_declared_regions`` as it was; once idle, the same
+        Generate stores R.
+    
+        Why: Save records the regions in ``project.json`` and a project load
+        replaces them, so regions written mid-run are lost or saved apart from
+        the session without a line. Negative control (81ac4c0): Generate stores
+        R while the Save runs -> RED."""
+        from s19_app.tui.screens import ReportViewerScreen
+        from s19_app.tui.services.report_addendum import DeclaredRegion
+    
+        base, hold = held_save_scene(tmp_path, monkeypatch)
+        asked: list = []
+        monkeypatch.setattr(
+            S19TuiApp, "_trigger_generate_report",
+            lambda self, context_bytes, declared_regions=(): asked.append(tuple(declared_regions)),
+        )
+        regions = (DeclaredRegion(name="R", start=0x100, end=0x1FF),)
+    
+        async def scenario(app, pilot, log):
+            try:
+                await start_held_save(app, pilot, hold)
+                before = app._declared_regions
+                app.on_report_viewer_screen_generate_requested(
+                    ReportViewerScreen.GenerateRequested(16, regions)
+                )
+                during = app._declared_regions
+            finally:
+                hold.release.set()
+            await settle_workers(pilot)
+            await wait(pilot, lambda: "save_project" not in app._busy.runs, "the save to end")
+            app.on_report_viewer_screen_generate_requested(
+                ReportViewerScreen.GenerateRequested(16, regions)
+            )
+            return before, during, app._declared_regions
+    
+        before, during, idle = run(base, scenario)
+>       assert during == before, f"Generate wrote the regions during the Save: {during!r}"
+E       AssertionError: Generate wrote the regions during the Save: (DeclaredRegion(name='R', start=256, end=511),)
+E       assert (DeclaredRegi...56, end=511),) == ()
+E         
+E         Left contains one more item: DeclaredRegion(name='R', start=256, end=511)
+E         Use -v to get more diff
+
+tests\test_b100_workers.py:3218: AssertionError
+_ test_tc_b100_53_confirmed_quit_is_withdrawn_when_pasted_entries_were_not_saved _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12b/bt/red03/test_tc_b100_53_confirmed_quit0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002A27210AF10>
+
+    def test_tc_b100_53_confirmed_quit_is_withdrawn_when_pasted_entries_were_not_saved(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """SE5-12b-1 scenario B: a pasted entry is in the Patch Editor; ``quit``
+        then ``y`` while Save project ``P1`` is held; the document write fails
+        (``OSError(28)`` placing into ``P1/patches``) and the save commits
+        without it -> the app KEEPS running, the last line is ``Change document
+        changes.json was not saved into the project — the file could not be
+        written; its entries stay in the Patch Editor``, the entry is kept and
+        the quit is no longer pending.
+    
+        Why: the entries live only in memory; exiting in the same callback that
+        paints the line loses them unseen. Negative control (81ac4c0): the
+        committed arm keeps the pending quit -> the app exits -> RED."""
+        base = tmp_path / "app"
+        trio(W(base) / "P2")
+        real_place = app_module.place_into_workarea
+    
+        def _patches_full(source, destination, *args, **kwargs):
+            if Path(destination).name == "patches":
+                raise OSError(28, "synthetic no space")
+            return real_place(source, destination, *args, **kwargs)
+    
+        async def scenario(app, pilot, log):
+            await open_trio_project(app, pilot, "P2")
+            await patch_one_byte(app, pilot)
+            monkeypatch.setattr(app_module, "place_into_workarea", _patches_full)
+            hold = Hold(monkeypatch, S19TuiApp, "_write_manifest_for_save")
+            save(app, "P1")
+            try:
+                await reached(pilot, hold, "Save project P1")
+                asked = await confirm_quit(app, pilot)
+            finally:
+                hold.release.set()
+            exited = await ended_or_exited(app, "save_project")
+            if exited:
+                return asked, True, None, None, None
+            return (asked, False, log.messages[-1], len(entries(app)),
+                    getattr(app, "_quit_pending", None))
+    
+        asked, exited, last, kept, pending = run(base, scenario)
+        assert asked is True
+>       assert exited is False, "the app exited over a save that left the pasted entries unsaved"
+E       AssertionError: the app exited over a save that left the pasted entries unsaved
+E       assert True is False
+
+tests\test_b100_workers.py:3265: AssertionError
+_ test_tc_b100_53_confirmed_quit_is_withdrawn_when_editor_edits_stay_unsaved __
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12b/bt/red03/test_tc_b100_53_confirmed_quit1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002A27151D5D0>
+
+    def test_tc_b100_53_confirmed_quit_is_withdrawn_when_editor_edits_stay_unsaved(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """SE5-12b-1 scenario A: the editor document is bound to
+        ``P/patches/changes.json`` by a first Save project; a second entry is
+        added through the Patch Editor (unsaved edits); ``quit`` then ``y``
+        while the second Save of ``P`` is held -> the save commits, the last
+        line names the unsaved edits and the Patch Editor save, the app KEEPS
+        running, the panel is still dirty, both entries are kept and the quit
+        is no longer pending.
+    
+        Why: the project records the file as it is on disk; the second entry
+        lives only in the editor, and an exit loses it unseen. Negative control
+        (81ac4c0): the committed arm keeps the pending quit -> exit -> RED."""
+        from tests.test_b100_document import _add_through_the_panel, _panel
+    
+        base = tmp_path / "app"
+        src = projects.copy_sources(tmp_path / "sources", projects.CASE01_DIR, "firmware.s19") / "firmware.s19"
+    
+        async def scenario(app, pilot, log):
+            await projects.load_image(pilot, app, src)
+            await _add_through_the_panel(pilot, app, "0x8000007C", "DE AD BE EF", entries_after=1)
+            await projects.save_project(pilot, app, log, "P")
+            await _add_through_the_panel(pilot, app, "0x80000060", "AA", entries_after=2)
+            hold = Hold(monkeypatch, S19TuiApp, "_write_manifest_for_save")
+            save(app, "P")
+            try:
+                await reached(pilot, hold, "Save project P")
+                asked = await confirm_quit(app, pilot)
+            finally:
+                hold.release.set()
+            exited = await ended_or_exited(app, "save_project")
+            if exited:
+                return asked, True, None, None, None, None
+            return (asked, False, log.messages[-1], _panel(app)._dirty, len(entries(app)),
+                    getattr(app, "_quit_pending", None))
+    
+        asked, exited, last, dirty, kept, pending = run(base, scenario, size=(220, 60))
+        assert asked is True
+>       assert exited is False, "the app exited over a save that left editor edits unsaved"
+E       AssertionError: the app exited over a save that left editor edits unsaved
+E       assert True is False
+
+tests\test_b100_workers.py:3313: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_pasted_document_home_created_then_write_fails_no_folder_left[no-space]
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_pasted_document_home_created_then_write_fails_no_folder_left[placement-refused]
+FAILED tests/test_b100_a2l_progress.py::test_tc_b100_73_no_fstat_without_a_callback
+FAILED tests/test_b100_workers.py::test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished[project_folder]
+FAILED tests/test_b100_workers.py::test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished[a2l_size]
+FAILED tests/test_b100_workers.py::test_tc_b100_53_report_generate_keeps_the_regions_of_a_running_save
+FAILED tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_is_withdrawn_when_pasted_entries_were_not_saved
+FAILED tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_is_withdrawn_when_editor_edits_stay_unsaved
+8 failed in 38.11s
+exit: 1

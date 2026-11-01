@@ -1,0 +1,28 @@
+mutant id: 072 (E5 round 2)
+target file: s19_app/tui/app.py
+description: _save_project_files: prepared.target_carry.get('batch', ()) -> () (F-1 site)
+old -> new: 'else tuple(prepared.target_carry.get("batch", ()))' -> 'else tuple(())'
+sha256 before: 46f7ee6aa8a0fbfbc6571b095bbf7d4c4661de5bd3f1ecf96e9b1347c424210d
+command: timeout 900 env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\lad C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=short --basetemp=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\bt\mut-072 "tests/test_b100_project_homes.py::test_tc_b100_31_gather_takes_names_from_the_recorded_batch_and_assignments"
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mutc12b
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mutc12b\s19_app\__init__.py
+pytest summary: 1 failed in 5.72s
+elapsed: 6.9s
+verdict: KILLED
+sha256 after: 46f7ee6aa8a0fbfbc6571b095bbf7d4c4661de5bd3f1ecf96e9b1347c424210d
+restored = True
+
+----- pytest output -----
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ test_tc_b100_31_gather_takes_names_from_the_recorded_batch_and_assignments __
+tests\test_b100_project_homes.py:644: in test_tc_b100_31_gather_takes_names_from_the_recorded_batch_and_assignments
+    assert {"a.json", "c.json"} <= {Path(n).name for n in names_seen[-1]}, names_seen
+E   AssertionError: [('c.json',)]
+E   assert {'a.json', 'c.json'} <= {'c.json'}
+E     
+E     Extra items in the left set:
+E     'a.json'
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_homes.py::test_tc_b100_31_gather_takes_names_from_the_recorded_batch_and_assignments
+1 failed in 5.72s

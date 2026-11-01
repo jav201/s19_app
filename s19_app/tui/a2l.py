@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import logging
 import math
+import os
 from pathlib import Path
 import struct
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 from ..validation.rules import validate_a2l_structure
 from ..validation.model import ValidationIssue
 
@@ -137,14 +138,28 @@ MEASUREMENT_BODY_KEYWORDS = frozenset(
 
 logger = logging.getLogger(__name__)
 
+# Optional progress callback of the A2L parse entry point: ``(bytes_consumed,
+# total_bytes)``, reported as the section-tree read consumes its input
+# (LLR-176.4). ``None`` disables reporting, leaving the parse result identical
+# to the base parser (LLR-176.4a).
+A2LProgress = Callable[[int, int], None]
 
-def build_section_tree(path: Path) -> tuple[list[dict], list[str]]:
+# The buffer position is checked every 4 096 lines (ruling Q-f1), plus a final
+# report after the loop, so a file shorter than one chunk still reports once and
+# the last report equals the file size. A per-line ``tell()`` would cost ~+0.59 s
+# on the 37.7 MB case_06 fixture (baseline U3).
+_PROGRESS_LINES = 4096
+
+
+def build_section_tree(path: Path, progress: Optional[A2LProgress] = None) -> tuple[list[dict], list[str]]:
     """
     Summary:
         Parse an A2L file into nested ``/begin``/``/end`` sections while collecting structural errors.
 
     Args:
         path (Path): File path to A2L text input (UTF-8 with replacement for invalid bytes).
+        progress (Optional[A2LProgress]): Optional callback reporting ``(bytes_consumed, total_bytes)``
+            as the read consumes its input; ``None`` disables reporting.
 
     Returns:
         tuple[list[dict], list[str]]: Section tree list and parser error messages.
@@ -157,10 +172,12 @@ def build_section_tree(path: Path) -> tuple[list[dict], list[str]]:
         - Push/pop section nodes on a stack to preserve hierarchy.
         - Attach raw non-marker lines to current open section.
         - Record structural mismatches and unclosed blocks as soft errors.
+        - Report ``(bytes consumed, total)`` every 4 096 lines and once at the end of the read.
 
     Dependencies:
         Uses:
             - ``Path.open``
+            - ``os.fstat``
             - parser stack state in local lists
         Used by:
             - ``parse_a2l_file``
@@ -174,7 +191,10 @@ def build_section_tree(path: Path) -> tuple[list[dict], list[str]]:
 
     try:
         with path.open("r", encoding="utf-8", errors="replace") as handle:
+            total = os.fstat(handle.fileno()).st_size if progress is not None else 0
             for line_number, raw in enumerate(handle, 1):
+                if progress is not None and line_number % _PROGRESS_LINES == 0:
+                    progress(handle.buffer.tell(), total)
                 line_count += 1
                 line = raw.rstrip()
                 stripped = line.strip()
@@ -206,6 +226,8 @@ def build_section_tree(path: Path) -> tuple[list[dict], list[str]]:
                     continue
                 if stack:
                     stack[-1]["lines"].append(line)
+            if progress is not None:
+                progress(total, total)
     except FileNotFoundError:
         errors.append("File not found.")
         logger.warning("A2L section parse failed: path=%s reason=file_not_found", path)
@@ -2624,13 +2646,15 @@ def extract_a2l_tags(
     return tags
 
 
-def parse_a2l_file(path: Path) -> dict:
+def parse_a2l_file(path: Path, progress: Optional[A2LProgress] = None) -> dict:
     """
     Summary:
         Parse an A2L file into section tree, extracted tags, and parse diagnostics.
 
     Args:
         path (Path): Path to A2L file on disk.
+        progress (Optional[A2LProgress]): Optional callback reporting ``(bytes_consumed, total_bytes)``
+            during the section-tree read; ``None`` disables reporting.
 
     Returns:
         dict: Payload with ``path``, ``sections``, ``errors``, and ``tags`` keys.
@@ -2654,7 +2678,7 @@ def parse_a2l_file(path: Path) -> dict:
             - tests in ``tests/test_tui_a2l.py``
     """
     parse_started = time.perf_counter()
-    sections, errors = build_section_tree(path)
+    sections, errors = build_section_tree(path, progress)
     tag_started = time.perf_counter()
     record_layouts_by_name = extract_record_layouts(sections)
     compu_methods_by_name = extract_compu_methods(sections)

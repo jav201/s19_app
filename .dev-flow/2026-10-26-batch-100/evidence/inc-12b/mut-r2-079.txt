@@ -1,0 +1,28 @@
+mutant id: 079 (E5 round 2)
+target file: s19_app/tui/app.py
+description: _on_project_saved: failure end_busy moved before the lines
+old -> new: '            self._quit_pending = False\n            for line in outcome.lines:\n' -> '            self._quit_pending = False\n            self.end_busy("save_project", gen, safe_text(outcome.outcome).plain)\n            for line in outcome.lines:\n' ; '            self.end_busy("save_project", gen, safe_text(outcome.outcome).plain)\n            return\n        image_clause' -> '            return\n        image_clause'
+sha256 before: 46f7ee6aa8a0fbfbc6571b095bbf7d4c4661de5bd3f1ecf96e9b1347c424210d
+command: timeout 900 env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\lad C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=short --basetemp=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\bt\mut-079 "tests/test_b100_busy.py::test_tc_b100_51_save_failure_paints_its_lines_then_its_outcome"
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mutc12b
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mutc12b\s19_app\__init__.py
+pytest summary: 1 failed in 3.53s
+elapsed: 4.6s
+verdict: KILLED
+sha256 after: 46f7ee6aa8a0fbfbc6571b095bbf7d4c4661de5bd3f1ecf96e9b1347c424210d
+restored = True
+
+----- pytest output -----
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______ test_tc_b100_51_save_failure_paints_its_lines_then_its_outcome ________
+tests\test_b100_busy.py:3199: in test_tc_b100_51_save_failure_paints_its_lines_then_its_outcome
+    assert added[-2:] == ["synthetic validation error", "synthetic rollback note"], added
+E   AssertionError: ['synthetic rollback note', 'synthetic validation error']
+E   assert ['synthetic r...dation error'] == ['synthetic v...ollback note']
+E     
+E     At index 0 diff: 'synthetic rollback note' != 'synthetic validation error'
+E     Use -v to get more diff
+=========================== short test summary info ===========================
+FAILED tests/test_b100_busy.py::test_tc_b100_51_save_failure_paints_its_lines_then_its_outcome
+1 failed in 3.53s

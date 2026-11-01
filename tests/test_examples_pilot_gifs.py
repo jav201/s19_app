@@ -32,6 +32,7 @@ import pytest
 # These imports are kept at module scope because they are cheap and let pytest
 # parametrize ids correctly even when the test happens to skip.
 from s19_app.tui.app import S19TuiApp
+from tests.support.b100_workers import settle_workers
 
 EXAMPLES_ROOT = Path(__file__).resolve().parent.parent / "examples"
 ARTIFACTS_ROOT = Path(__file__).resolve().parent / "_artifacts"
@@ -227,7 +228,9 @@ def test_case_pilot_capture_and_gif(case_id: str, case_dir: Path, tmp_path: Path
                 png_path = png_dir / f"frame_{idx:02d}.png"
                 _render_frame_png(png_path, case_id, label, summary)
                 png_paths.append(png_path)
-            # Clean shutdown
+            # Clean shutdown. Inc 12b (R-7, census C14): no session worker may
+            # still run at this frame, or ``q`` asks instead of exiting.
+            await settle_workers(pilot)
             await pilot.press("q")
 
     asyncio.run(_drive())

@@ -29,6 +29,7 @@ import hashlib
 import os
 import shutil
 import sys
+import time
 from pathlib import Path
 
 import pytest
@@ -56,6 +57,7 @@ from tests.support import b100_links
 from tests.support.independent_reader import read_s19
 from tests.support.b100_projects import dismiss_load_result_panel
 from tests.support.b100_load_dialog import highlight_row, is_load_dialog
+from tests.support.b100_workers import settle_workers
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE01 = ROOT / "examples" / "case_01_basic_valid" / "firmware.s19"
@@ -96,12 +98,20 @@ def _snapshot_tree(root: Path) -> dict:
     }
 
 
-async def _wait_for(pilot, predicate, description: str, attempts: int = 150) -> None:
-    for _ in range(attempts):
+async def _wait_for(pilot, predicate, description: str, timeout: float = 60.0) -> None:
+    """Wait until ``predicate()`` holds, bounded by the wall clock.
+
+    CI12a-1 (the F-17 / SR12b-7 pattern): a bare ``pilot.pause()`` loop
+    starves the load / save workers and its bound is a count, not time; the
+    ``asyncio.sleep`` between checks yields to the worker threads."""
+    deadline = time.monotonic() + timeout
+    while True:
         await pilot.pause()
         if predicate():
             return
-    raise AssertionError(f"did not settle: {description}")
+        if time.monotonic() > deadline:
+            raise AssertionError(f"did not settle: {description}")
+        await asyncio.sleep(0.05)
 
 
 def _status_text(app: S19TuiApp) -> str:
@@ -389,8 +399,9 @@ def test_tc_b100_03_reused_variant_is_named_not_added(tmp_path: Path) -> None:
         async with app.run_test(size=(120, 40)) as pilot:
             await pilot.pause()
             app._handle_load_project("proj")
-            for _ in range(12):
-                await pilot.pause()
+            # Inc 12b (Q6; census miss, A9 pattern): a direct ``load_from_path``
+            # is refused while the project worker runs; wait for the install.
+            await settle_workers(pilot)
             app.load_from_path(CASE02)
             await app.workers.wait_for_complete()
             for _ in range(12):
@@ -819,10 +830,32 @@ def test_tc_b100_01_app_placements_name_the_workarea_root() -> None:
         and node.func.id in placements
     ]
     assert len(copier_calls) == 1, [call.lineno for call in copier_calls]
-    document_writer = next(
+    # Inc 12b re-pin (E3 S12b-05): ``_write_editor_document`` is retired; the
+    # Save worker's ``_save_project_files`` hands the pasted document to the
+    # unchanged ``write_change_document`` with a ``copy_fn`` closure, and that
+    # closure is the document's ONE placement in ``app.py`` (it names the root).
+    files_worker = next(
         node
         for node in ast.walk(tree)
-        if isinstance(node, ast.FunctionDef) and node.name == "_write_editor_document"
+        if isinstance(node, ast.FunctionDef) and node.name == "_save_project_files"
+    )
+    document_writes = [
+        node
+        for node in ast.walk(files_worker)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "write_change_document"
+    ]
+    assert len(document_writes) == 1, [call.lineno for call in document_writes]
+    copy_fn = next(
+        keyword.value.id
+        for keyword in document_writes[0].keywords
+        if keyword.arg == "copy_fn" and isinstance(keyword.value, ast.Name)
+    )
+    document_writer = next(
+        node
+        for node in ast.walk(files_worker)
+        if isinstance(node, ast.FunctionDef) and node.name == copy_fn
     )
     document_calls = [
         node
@@ -833,12 +866,17 @@ def test_tc_b100_01_app_placements_name_the_workarea_root() -> None:
     ]
     assert len(document_calls) == 1, [call.lineno for call in document_calls]
     assert any(keyword.arg == "workarea_root" for keyword in document_calls[0].keywords)
+    # Inc 12b re-pin (census P1-C7, Q-b2): the Save emit is now the direct
+    # ``save_patched_image(...)`` call on the worker; the save-back keeps the
+    # service's ``save_patched``. 2 emit calls, each naming the root.
     emit_calls = [
         node
         for node in ast.walk(tree)
         if isinstance(node, ast.Call)
-        and isinstance(node.func, ast.Attribute)
-        and node.func.attr in ("save_patched", "emit_and_verify")
+        and (
+            (isinstance(node.func, ast.Attribute) and node.func.attr == "save_patched")
+            or (isinstance(node.func, ast.Name) and node.func.id == "save_patched_image")
+        )
     ]
     assert len(emit_calls) == 2, (
         f"expected the 2 app.py emit calls (LED .56), found {len(emit_calls)}"
@@ -1343,7 +1381,10 @@ def test_at_b100_01_repeated_loads_reuse_and_name_existing_variant(
     """Five loads through the shipped surface — case_01, case_02, then each
     again: the work area holds two image files, the project folder holds two
     data files, and every repeated load's painted status names the existing
-    variant instead of reporting an add."""
+    variant instead of reporting an add. CI12a-1 (oracle re-pin, coordinator
+    ruling): since Inc 12a the load's end line ``Loaded <name>`` paints
+    after the project-sync line, so the oracle reads every line the load
+    painted, not only the newest one."""
     base = tmp_path / "app"
     source_copies = tmp_path / "sources"
     # The variant id is the file's stem, so both sources keep the
@@ -1365,39 +1406,53 @@ def test_at_b100_01_repeated_loads_reuse_and_name_existing_variant(
             ROOT / "examples" / "case_01_basic_valid" / "firmware.mac",
             project_dir / "firmware.mac",
         )
+        # CI12a-1: every line the loads paint, in order (``log_lines`` keeps
+        # only the newest 4).
+        painted: list = []
+        real_append = app._append_log_line
+
+        def _record(message) -> None:
+            painted.append(str(message))
+            real_append(message)
+
+        app._append_log_line = _record
+
+        async def _load_and_read(src: Path, expected: str, what: str) -> list:
+            """Load ``src`` and wait (load run ended) for ``expected`` among
+            the lines this load painted; return those lines."""
+            mark = len(painted)
+            await _load_file_through_dialog(pilot, app, src)
+            await _wait_for(
+                pilot,
+                lambda: "file_load" not in app._busy.runs
+                and any(expected in line for line in painted[mark:]),
+                what,
+            )
+            return painted[mark:]
+
         async with app.run_test(size=size, notifications=True) as pilot:
             await pilot.pause()
             await _open_project(pilot, app, "P")
-            await _load_file_through_dialog(pilot, app, src01)
-            await _wait_for(
-                pilot,
-                lambda: "Added variant 'firmware' to project 'P'" in _status_text(app),
+            await _load_and_read(
+                src01, "Added variant 'firmware' to project 'P'",
                 "the first load's added-variant status",
             )
-            await _load_file_through_dialog(pilot, app, src02)
-            await _wait_for(
-                pilot,
-                lambda: "Added variant 'firmware_1' to project 'P'" in _status_text(app),
+            await _load_and_read(
+                src02, "Added variant 'firmware_1' to project 'P'",
                 "the second load's added-variant status",
             )
             # The repeated loads: the painted status names the existing
             # variant and never reports an add.
-            await _load_file_through_dialog(pilot, app, src01)
-            await _wait_for(
-                pilot,
-                lambda: "Variant 'firmware' already in project 'P'" in _status_text(app),
+            repeated_01 = await _load_and_read(
+                src01, "Variant 'firmware' already in project 'P'",
                 "the repeated case_01 load naming the existing variant",
             )
-            repeated_01 = _status_text(app)
-            assert "Added variant" not in repeated_01, repeated_01
-            await _load_file_through_dialog(pilot, app, src02)
-            await _wait_for(
-                pilot,
-                lambda: "Variant 'firmware_1' already in project 'P'" in _status_text(app),
+            assert not any("Added variant" in line for line in repeated_01), repeated_01
+            repeated_02 = await _load_and_read(
+                src02, "Variant 'firmware_1' already in project 'P'",
                 "the repeated case_02 load naming the existing variant",
             )
-            repeated_02 = _status_text(app)
-            assert "Added variant" not in repeated_02, repeated_02
+            assert not any("Added variant" in line for line in repeated_02), repeated_02
             temp_files = sorted(
                 p.name for p in (app.workarea / "temp").iterdir() if p.is_file()
             )

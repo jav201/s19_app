@@ -1,0 +1,7 @@
+# timing arms on the BASE 71376a3 (scratch base12b, tester's test copies), alone
+# s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12b\s19_app\__init__.py
+.load [0.3028556000208482] s; panel painted 0.77 s; rows 103
+.SEC6-5 timings (s): {'read': 0.165, 'load': 0.2, 'painted': 0.835, 'appended': 0.69}
+.SEC6-5 timings (s): {'read': 0.047, 'load': 0.096, 'painted': 0.698, 'appended': 0.363}
+.
+4 passed in 15.14s

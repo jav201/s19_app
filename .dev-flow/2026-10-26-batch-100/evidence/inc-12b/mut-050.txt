@@ -1,0 +1,10 @@
+mutant id: 050
+target file: s19_app/tui/app.py
+old -> new: parse_a2l_cached: cached[0] == key -> True (stale hit)
+sha256 before: 6ada85782fdd80def599ece5447f6eb0779ca077af84ee7c3c6fba3964388a4b
+command: timeout 900 env -u NO_COLOR LOCALAPPDATA='C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut12b-lad' PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line "tests/test_tui_app.py::test_a2l_cache_reuses_parse_for_unchanged_file"
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut12b
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut12b\s19_app\__init__.py
+pytest summary: 1 passed in 0.64s (test has no changed-file arm)
+verdict: SURVIVED
+restored = True

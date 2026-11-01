@@ -58,6 +58,7 @@ from s19_app.tui.screens import (
 from s19_app.tui.screens_directionb import MemoryMapPanel, RegionRow
 from s19_app.tui.workspace import WORKAREA_DIRNAME, WORKAREA_SUBDIR, WORKAREA_TEMP
 from tests.support.b100_load_dialog import highlight_row, is_load_dialog
+from tests.support.b100_workers import settle_workers
 
 EXAMPLES_DIR = Path(__file__).resolve().parent.parent / "examples"
 CASE01_DIR = EXAMPLES_DIR / "case_01_basic_valid"
@@ -80,6 +81,7 @@ async def _wait_for(pilot, predicate, description: str, attempts: int = 150) -> 
 async def _flush(pilot, count: int = 12) -> None:
     for _ in range(count):
         await pilot.pause()
+    await settle_workers(pilot)  # Inc 12b ruling Q6 / A12b-01: wait for the workers' installs
 
 
 def _status_text(app: S19TuiApp) -> str:
@@ -361,6 +363,7 @@ def test_tc_b100_12_workarea_files_pick_rehomes_focus(tmp_path: Path) -> None:
                 if getattr(list_item, "data", None) == "firmware.s19"
             )
             app._load_from_item(item)
+            await settle_workers(pilot)  # Inc 12b R-5: the data pick is a worker
             await _wait_for(
                 pilot,
                 lambda: _file_status_text(app).startswith("Loaded "),

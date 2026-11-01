@@ -145,6 +145,7 @@ from s19_app.tui.workspace import WorkareaContainmentError, copy_into_workarea
 from tests.support import independent_reader
 from tests.support.b100_projects import dismiss_load_result_panel
 from tests.support import b100_save_dialog as sd
+from tests.support.b100_workers import settle_workers
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -1722,7 +1723,7 @@ def test_tc_b99_ux_c10_save_project_filename_renders_literally(tmp_path: Path) -
             app._handle_save_dialog(
                 SaveProjectPayload(parent_folder=str(app.workarea), project_name="proj")
             )
-            await pilot.pause()
+            await settle_workers(pilot)  # Inc 12b Q6 (census miss): the Save runs on a worker
             outcomes["statuses"] = list(statuses)
             outcomes["notices"] = list(notices)
             outcomes["log_lines"] = list(app.log_lines)
@@ -1765,6 +1766,7 @@ def test_tc_b99_ux_c10_placement_error_path_renders_literally(
             statuses = _statuses(app)
             app.load_from_path(image)
             await _poll(pilot, lambda: app.current_file is not None)
+            await settle_workers(pilot)  # E4 integration re-pin: the load's run ends first
             monkeypatch.setattr(os, "replace", _always_locked)
             app.action_save_project()
             # E4 integration: wait for the composed field, not only the push.
@@ -1785,6 +1787,9 @@ def test_tc_b99_ux_c10_placement_error_path_renders_literally(
             await sd.wait_for(
                 pilot, lambda: not sd.is_save_dialog(app.screen), "the Save dialog to close"
             )
+            # E4 integration re-pin (A-10): the save fails on its worker; its
+            # failure line and toast land after the dialog closes.
+            await settle_workers(pilot)
             for _ in range(4):
                 await pilot.pause()
             outcomes["statuses"] = list(statuses)
@@ -2320,7 +2325,7 @@ def test_tc_b99_ux_c10_d7_lane_name_renders_literally(tmp_path: Path) -> None:
         async with app.run_test(size=(260, 90)) as pilot:
             await settle(pilot)
             make_project(app, "proj")
-            project_dir = load_project(app, "proj")
+            project_dir = await load_project(app, "proj")
             (project_dir / "base_a.s19").write_text(_emit(0x41), "ascii")
             (project_dir / "base_b.s19").write_text(_emit(0x42), "ascii")
             write_flow(

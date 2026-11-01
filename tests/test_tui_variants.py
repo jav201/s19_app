@@ -49,6 +49,7 @@ import s19_app.tui.app as app_module
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.screens import SelectVariantScreen
 from s19_app.tui.screens_directionb import LoadedArtifactsPanel
+from tests.support.b100_workers import settle_workers
 
 # Minimal valid S19 images (checksums verified against s19_app.core.S19File).
 S19_A = "S107100001020304DE\nS9030000FC\n"
@@ -71,6 +72,7 @@ async def _flush(pilot, count: int = 12) -> None:
     """Pump the event loop so the deferred ``call_later`` apply chain runs."""
     for _ in range(count):
         await pilot.pause()
+    await settle_workers(pilot)  # Inc 12b ruling Q6 / A12b-01: wait for the workers' installs
 
 
 def _project_label(app: S19TuiApp) -> str:
@@ -204,7 +206,7 @@ def test_no_new_parse_loaded_file_call_sites() -> None:
     """
     source = Path(app_module.__file__).read_text(encoding="utf-8")
     tree = ast.parse(source)
-    call_sites: list[str] = []
+    call_sites: dict[str, list[str]] = {"_parse_loaded_file": [], "_parse_data_file": []}
 
     def _walk(node: ast.AST, enclosing: str) -> None:
         for child in ast.iter_child_nodes(node):
@@ -214,23 +216,35 @@ def test_no_new_parse_loaded_file_call_sites() -> None:
             if (
                 isinstance(child, ast.Call)
                 and isinstance(child.func, ast.Attribute)
-                and child.func.attr == "_parse_loaded_file"
+                and child.func.attr in call_sites
             ):
-                call_sites.append(enclosing)
+                call_sites[child.func.attr].append(enclosing)
             _walk(child, scope)
 
     _walk(tree, "<module>")
     # batch-100 Inc 7 (LLR-169.6 / LLR-169.9): a project variant is parsed
     # before it is applied, so an image that does not parse or holds no data
     # is reported ``not readable`` and never reaches the views.
-    assert sorted(call_sites) == [
-        "_install_project_image",
+    # Inc 12b re-pin (P1-39, census C5 / P1-C1): ``_install_project_image`` is
+    # retired; the project worker parses through the explicit-input core
+    # ``_parse_data_file`` (``_prepare_project_load``), and
+    # ``_parse_loaded_file`` is its session-reading wrapper. A third caller of
+    # either (for example an install handler that parses on the UI thread)
+    # fails here.
+    assert sorted(call_sites["_parse_loaded_file"]) == [
         "_start_load_worker",
         "load_selected_file",
     ], (
-        f"unexpected _parse_loaded_file call sites: {sorted(call_sites)} "
+        f"unexpected _parse_loaded_file call sites: {sorted(call_sites['_parse_loaded_file'])} "
         "(LLR-005.4 allows only the pre-existing worker + sync-path sites)"
     )
+    # E4 integration re-pin: the call sites are compared as enclosing
+    # functions; ``_prepare_project_load`` calls the core twice (the image,
+    # step 8, and the MAC merged onto it, step 10 of the proto).
+    assert sorted(set(call_sites["_parse_data_file"])) == [
+        "_parse_loaded_file",
+        "_prepare_project_load",
+    ], f"unexpected _parse_data_file call sites: {sorted(call_sites['_parse_data_file'])}"
 
 
 # ---------------------------------------------------------------------------

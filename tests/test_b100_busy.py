@@ -1302,7 +1302,7 @@ def test_tc_b100_50_image_pick_file_state_waits_for_a_running_report(tmp_path: P
         runs_before = dict(app._busy.runs)
         app._load_workarea_file("x.s19")
         await _wait(pilot, lambda: app.current_file is not None, "the pick of x.s19")
-        await _settle(pilot, 4)
+        await _drain(app, pilot)  # Inc 12b re-pin (R-2): the pick runs on the file-load worker
         idle = (_status(app), dict(app._busy.runs))
         gen = app.begin_busy("report", "Generating the project report", REPORT_STEPS)
         app._load_workarea_file("y.s19")
@@ -1311,7 +1311,7 @@ def test_tc_b100_50_image_pick_file_state_waits_for_a_running_report(tmp_path: P
             lambda: app.current_file is not None and Path(app.current_file.path).name == "y.s19",
             "the pick of y.s19",
         )
-        await _settle(pilot, 4)
+        await _drain(app, pilot)  # Inc 12b re-pin (R-2)
         held = _status(app)
         app.end_busy("report", gen, "Report: reports/r.md")
         return runs_before, idle, held, _status(app)
@@ -1439,51 +1439,64 @@ def test_tc_b100_50_worker_raise_ends_the_action_first(
 
 
 def test_tc_b100_50_a2l_raise_ends_the_action_first(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """LLR-176.1l (A12-40): ``_load_a2l_data_with_cache`` raising → one
-    effective end ``("a2l_load", g, "Loading firmware.a2l failed")``, then
-    the ``RuntimeError`` leaves ``load_a2l_from_path``; bar ``[0, 33, 0]``;
-    0 timers; ``#status_text`` reads ``Ready.``.
+    """LLR-176.1l (A12-40), re-pinned at Inc 12b to LLR-177.2b (C12b-37,
+    P-2 re-pin R-1): the A2L parse raising (``app_module.parse_a2l_file``,
+    which the A2L worker reaches through ``parse_a2l_cached``; the 12a
+    target ``_load_a2l_data_with_cache`` is retired, E3 DF-7) → nothing
+    leaves ``load_a2l_from_path``; one effective end whose outcome is
+    ``File NOT loaded: 'firmware.a2l' could not be read — check that the
+    file can be opened, then load again.`` (the log's last line); bar
+    ``[0, 33, 0]``; 0 timers; ``#status_text`` reads ``Ready.``.
 
-    Why: a parse crash must not leave the bar mid-fill (p12a U1.5).
-    RED (base, U1.5): bar ``[10, 50]`` left at 50, no end."""
+    Why: a parse crash must not leave the bar mid-fill (p12a U1.5), and on
+    a worker it must not end the app (P12b-2).
+    RED (base): the ``RuntimeError`` leaves ``load_a2l_from_path``."""
     seam = Seam(monkeypatch)
-    monkeypatch.setattr(S19TuiApp, "_load_a2l_data_with_cache", _boom)
+    monkeypatch.setattr(app_module, "parse_a2l_file", _boom)
+    line = ("File NOT loaded: 'firmware.a2l' could not be read — check that the file can be "
+            "opened, then load again.")
 
     async def scenario(app, pilot, log):
-        with pytest.raises(RuntimeError):
+        raised = None
+        try:
             app.load_a2l_from_path(CASE01 / "firmware.a2l")
-        await _settle(pilot, 3)
-        return _status(app), len(_busy_timers(app))
+        except Exception as exc:  # noqa: BLE001 — recorded: the base raises here
+            raised = repr(exc)
+        await _drain(app, pilot)
+        return raised, _status(app), len(_busy_timers(app)), list(app.log_lines)[-1]
 
-    final, timers = _run(tmp_path / "app", scenario)
+    raised, final, timers, last = _run(tmp_path / "app", scenario)
+    assert raised is None, raised
     assert seam.bar == [0, 33, 0], seam.bar
-    assert [e.outcome for e in seam.effective("a2l_load")] == ["Loading firmware.a2l failed"], seam.ends
+    assert [e.outcome for e in seam.effective("a2l_load")] == [line], seam.ends
+    assert last == line, last
     assert (final, timers) == ("Ready.", 0), (final, timers)
 
 
 def test_tc_b100_50_project_raise_ends_the_action_first(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """LLR-176.1l (A12-45): ``_install_project_image`` raising → one
-    effective end ``("project_load", g, "Loading project P failed")``, then
-    the ``RuntimeError`` leaves ``_handle_load_project``; bar
-    ``[0, 25, 50, 0]``; 0 timers.
+    """LLR-176.1l (A12-45), re-pinned at Inc 12b (P1-34, census P1-C9: the
+    12a target ``_install_project_image`` is retired): ``_apply_loaded_file``
+    — the main-thread install — raising → one effective end
+    ``("project_load", g, "Loading project P failed")`` with 0 timers left
+    at that end, and the ``RuntimeError`` still surfaces (loud, as the same
+    defect is on the base inside a synchronous load).
 
     Why: a project load that crashes must not leave the indicator up.
-    RED (base): no end is recorded."""
+    Negative control: the install's guard removed → the run stays open with
+    its timer → RED."""
     base = tmp_path / "app"
     _project_p(base)
     seam = Seam(monkeypatch)
-    monkeypatch.setattr(S19TuiApp, "_install_project_image", _boom)
+    monkeypatch.setattr(S19TuiApp, "_apply_loaded_file", _boom)
 
-    async def scenario(app, pilot, log):
-        with pytest.raises(RuntimeError):
-            app._handle_load_project("P")
-        await _settle(pilot, 3)
-        return len(_busy_timers(app))
+    async def start(app, pilot):
+        app._handle_load_project("P")
 
-    timers = _run(base, scenario)
-    assert seam.bar == [0, 25, 50, 0], seam.bar
-    assert [e.outcome for e in seam.effective("project_load")] == ["Loading project P failed"], seam.ends
-    assert timers == 0, timers
+    surfaced = _worker_raise_scene(tmp_path, seam, start, "project_load")
+    ends = seam.effective("project_load")
+    assert [e.outcome for e in ends] == ["Loading project P failed"], seam.ends
+    assert ends[0].timers == 0, ends[0].timers
+    assert surfaced is not None, "the install's exception was swallowed"
 
 
 async def _load_case01_image(app, pilot) -> None:
@@ -1492,30 +1505,39 @@ async def _load_case01_image(app, pilot) -> None:
 
 
 def test_tc_b100_50_save_raise_ends_the_action_first(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """LLR-176.1l, SEC-7 (A12-49): ``gather_project_artifacts`` raising in
-    the app module → the rollback runs, one effective end
-    ``("save_project", g, "Saving project S3 failed")``, then the
-    ``RuntimeError`` leaves ``_handle_save_dialog``; bar ``[0, 25, 50, 0]``;
-    ``S3`` removed; 0 timers.
+    """LLR-176.1l (A12-49), re-pinned at Inc 12b to LLR-177.2a / ruling Q4
+    (P1-64): ``gather_project_artifacts`` raising in the app module (on the
+    Save worker) → the rollback runs and nothing leaves
+    ``_handle_save_dialog``; one effective end whose outcome is ``Project
+    NOT saved: could not save — an unexpected error stopped the save. check
+    the folder.``; bar ``[0, 25, 50, 50, 0]`` (step 2, the one placement,
+    step 3, the end); ``S3`` removed; 0 timers.
 
     Why: a save that crashes must not leave the indicator up nor a
-    half-written project. RED (base): no end is recorded."""
+    half-written project, and on a worker it must not end the app (P12b-2;
+    SEC-7's re-raise is re-pinned to a report).
+    RED (base): the ``RuntimeError`` leaves ``_handle_save_dialog``."""
     from s19_app.tui.screens import SaveProjectPayload
 
     seam = Seam(monkeypatch)
     monkeypatch.setattr(app_module, "gather_project_artifacts", _boom)
+    line = "Project NOT saved: could not save — an unexpected error stopped the save. check the folder."
 
     async def scenario(app, pilot, log):
         await _load_case01_image(app, pilot)
         seam.bar.clear()
-        with pytest.raises(RuntimeError):
+        raised = None
+        try:
             app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name="S3"))
-        await _settle(pilot, 3)
-        return (app.workarea / "S3").exists(), len(_busy_timers(app))
+        except Exception as exc:  # noqa: BLE001 — recorded: the base re-raises here
+            raised = repr(exc)
+        await _drain(app, pilot)
+        return raised, (app.workarea / "S3").exists(), len(_busy_timers(app))
 
-    exists, timers = _run(tmp_path / "app", scenario)
-    assert seam.bar == [0, 25, 50, 0], seam.bar
-    assert [e.outcome for e in seam.effective("save_project")] == ["Saving project S3 failed"], seam.ends
+    raised, exists, timers = _run(tmp_path / "app", scenario)
+    assert raised is None, raised
+    assert seam.bar == [0, 25, 50, 50, 0], seam.bar
+    assert [e.outcome for e in seam.effective("save_project")] == [line], seam.ends
     assert exists is False and timers == 0, (exists, timers)
 
 
@@ -1561,8 +1583,11 @@ CENSUS = [
     ("load_from_path", "end", "file_load", None, 1),
     ("load_from_path", "step", "file_load", 2, 1),
     ("load_a2l_from_path", "begin", "a2l_load", None, 1),
-    ("load_a2l_from_path", "end", "a2l_load", None, 2),
-    ("load_a2l_from_path", "step", "a2l_load", 2, 1),
+    # Inc 12b re-key (X12b-14, C12b-51): the A2L ends move to the main-thread
+    # handlers and the parse step to the worker (posted through call_from_thread).
+    ("_install_attached_a2l", "end", "a2l_load", None, 1),
+    ("_on_a2l_attach_failed", "end", "a2l_load", None, 1),
+    ("_a2l_attach_worker", "step", "a2l_load", 2, 1),
     ("_start_load_worker", "end", "file_load", None, 1),
     ("_handle_load_error", "end", "file_load", None, 1),
 ]
@@ -1798,7 +1823,7 @@ def test_tc_b100_51_a2l_load_ends_once_on_success(tmp_path: Path, monkeypatch: p
     async def scenario(app, pilot, log):
         mark = len(log.messages)
         app.load_a2l_from_path(CASE01 / "firmware.a2l")
-        await _settle(pilot, 4)
+        await _drain(app, pilot)  # Inc 12b re-pin: the attach runs on a worker
         out = (list(seam.bar), log.since(mark), _status(app), len(_busy_timers(app)), list(seam.begins))
         begins = len(seam.begins)
         app.load_a2l_from_path(tmp_path / "missing.a2l")
@@ -1807,7 +1832,12 @@ def test_tc_b100_51_a2l_load_ends_once_on_success(tmp_path: Path, monkeypatch: p
         return out, len(seam.begins) - begins
 
     (bar, added, final, timers, begins), refused = _run(tmp_path / "app", scenario)
-    assert bar == [0, 33, 66, 0], bar
+    # Inc 12b (C12b-30): step 2 after the copy, the parser's one byte report
+    # (1444, 1444) at the end of step 2, step 3, the end.
+    assert bar == [0, 33, 66, 66, 0], bar
+    assert [(n, d, t) for _k, _g, n, d, t in seam.steps if _k == "a2l_load"] == [
+        (2, None, None), (2, 1444, 1444), (3, None, None)
+    ], seam.steps
     assert [b[:3] for b in begins] == [("a2l_load", "Loading firmware.a2l", A2L_STEPS)], begins
     assert added == ["A2L loaded: firmware.a2l"], added
     assert (final, timers) == ("Ready.", 0), (final, timers)
@@ -1833,7 +1863,7 @@ def test_tc_b100_51_a2l_load_ends_once_on_a_containment_refusal(tmp_path: Path, 
     async def scenario(app, pilot, log):
         mark = len(log.messages)
         app.load_a2l_from_path(CASE01 / "firmware.a2l")
-        await _settle(pilot, 3)
+        await _drain(app, pilot)  # Inc 12b re-pin: the copy runs on the A2L worker
         return log.since(mark)
 
     added = _run(tmp_path / "app", scenario)
@@ -1858,13 +1888,15 @@ def test_tc_b100_51_project_load_ends_once_on_success(tmp_path: Path, monkeypatc
     async def scenario(app, pilot, log):
         mark = len(log.messages)
         app._handle_load_project("P")
-        await _settle(pilot, 8)
+        await _drain(app, pilot)  # Inc 12b re-pin: the project load runs on a worker
         return log.since(mark), _status(app), len(_busy_timers(app))
 
     added, final, timers = _run(base, scenario)
-    assert seam.bar == [0, 25, 50, 75, 0], seam.bar
+    # Inc 12b (P1-21): the A2L parse's final byte report (1444, 1444) fills
+    # step 2 before step 3.
+    assert seam.bar == [0, 25, 50, 50, 75, 0], seam.bar
     assert [b[:3] for b in seam.begins] == [("project_load", "Loading project P", PROJECT_STEPS)], seam.begins
-    assert seam.step_numbers("project_load") == [2, 3, 4], seam.steps
+    assert [n for _k, _g, n, d, _t in seam.steps if _k == "project_load" and d is None] == [2, 3, 4], seam.steps
     ends = seam.effective("project_load")
     assert len(ends) == 1, seam.ends
     assert ends[0].outcome.startswith("Loaded project 'P' -> firmware.s19"), ends[0].outcome
@@ -1887,7 +1919,7 @@ def test_tc_b100_51_project_load_without_an_a2l_skips_its_step(tmp_path: Path, m
 
     async def scenario(app, pilot, log):
         app._handle_load_project("P")
-        await _settle(pilot, 8)
+        await _drain(app, pilot)  # Inc 12b re-pin: the project load runs on a worker
         return None
 
     _run(base, scenario)
@@ -1931,10 +1963,12 @@ def test_tc_b100_51_project_load_ends_once_on_a_failure_after_the_begin(
 
     async def scenario(app, pilot, log):
         with monkeypatch.context() as patch:
-            patch.setattr(S19TuiApp, "_load_a2l_data_with_cache", _bad_a2l)
+            # Inc 12b re-pin (E3 DF-7): ``_load_a2l_data_with_cache`` is
+            # retired; the worker reaches the parse through the app module.
+            patch.setattr(app_module, "parse_a2l_file", _bad_a2l)
             mark = len(log.messages)
             app._handle_load_project("A2LONLY")
-            await _settle(pilot, 6)
+            await _drain(app, pilot)
             failed = (list(seam.bar), log.since(mark), _status(app), len(_busy_timers(app)))
         begins = len(seam.begins)
         seam.bar.clear()
@@ -1980,7 +2014,7 @@ def test_tc_b100_51_save_project_reports_its_phases_as_steps(tmp_path: Path, mon
         before = _status(app)
         mark = len(log.messages)
         app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name="S1"))
-        await _settle(pilot, 6)
+        await _drain(app, pilot)  # Inc 12b re-pin: the save runs on a worker
         saved = (log.since(mark), _status(app), before, len(_busy_timers(app)))
         begins = len(seam.begins)
         mark = len(log.messages)
@@ -1990,9 +2024,11 @@ def test_tc_b100_51_save_project_reports_its_phases_as_steps(tmp_path: Path, mon
         return saved, len(seam.begins) - begins, log.since(mark)
 
     (added, final, before, timers), refused_begins, refusals = _run(tmp_path / "app", scenario)
-    assert seam.bar == [0, 25, 50, 75, 0], seam.bar
+    # Inc 12b (LLR-177.5a, P1-63 boundary): the one placement (1, 1) fills
+    # step 2 before step 3.
+    assert seam.bar == [0, 25, 50, 50, 75, 0], seam.bar
     assert [b[:3] for b in seam.begins] == [("save_project", "Saving project S1", SAVE_STEPS)], seam.begins
-    assert seam.step_numbers("save_project") == [2, 3, 4], seam.steps
+    assert [n for _k, _g, n, d, _t in seam.steps if _k == "save_project" and d is None] == [2, 3, 4], seam.steps
     ends = seam.effective("save_project")
     assert len(ends) == 1, seam.ends
     assert ends[0].outcome.startswith("Saved project to ") and ends[0].outcome.endswith(
@@ -2026,7 +2062,7 @@ def test_tc_b100_51_save_project_ends_once_on_a_placement_failure(tmp_path: Path
         seam.bar.clear()
         mark = len(log.messages)
         app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name="S2"))
-        await _settle(pilot, 6)
+        await _drain(app, pilot)  # Inc 12b re-pin: the save runs on a worker
         return log.since(mark), (app.workarea / "S2").exists()
 
     added, exists = _run(tmp_path / "app", scenario)
@@ -2276,6 +2312,275 @@ def test_at_b100_17_worker_load_of_an_8_mib_s19_by_keys(tmp_path: Path) -> None:
 
 
 # ===========================================================================
+# Inc 12b extensions (E4 tester) — TC-B100-50 (LLR-176.1l, LLR-176.1q over
+# the three new worker bodies) and TC-B100-51 (LLR-176.2, LLR-176.2c,
+# LLR-176.2d re-derived over the workers and their handlers). Oracles:
+# inc-12b E1 draft §C.2; codewire/proto-12b-load-save P1-13, P1-17, P1-18,
+# P1-57, P1-61, X-13; codewire/proto-12b-a2l-refusal C12b-40, C12b-43,
+# C12b-52, X12b-14. The implementation was never read.
+# ===========================================================================
+
+
+def _trio_project(base: Path, name: str = "P") -> Path:
+    """Project ``name``: case_01's image, MAC and A2L, no ``project.json``."""
+    return _copy_case01(_workarea(base) / name, "firmware.s19", "firmware.mac", "firmware.a2l")
+
+
+@pytest.mark.parametrize("action", ["project_load", "save_project", "a2l_load"])
+def test_tc_b100_50_twelve_b_kickoff_raise_ends_the_run_first(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, action: str
+) -> None:
+    """LLR-176.1l over the 12b kickoffs (P1-13, P1-57): the worker start
+    raising ``RuntimeError`` at call time (``_project_load_worker`` /
+    ``_save_project_worker`` / ``_a2l_attach_worker``) → one effective end
+    ``Loading project P failed`` / ``Saving project S3 failed`` / ``Loading
+    firmware.a2l failed`` with 0 timers left, then the ``RuntimeError``
+    leaves the request; the run state is empty; ``S3`` was never created.
+    (E5 round 2: the ``a2l_load`` arm, proto-12b-a2l-refusal (5), kills
+    mutant 091.)
+
+    Why: the run now outlives the kickoff function, so 12a's ``finally``
+    becomes an ``except BaseException`` guard (S-d); a kickoff that raises
+    must still end its run. Negative control: the guard removed → the run
+    stays with 1 timer → RED; base: no worker start exists → no failed end
+    → RED."""
+    from s19_app.tui.screens import SaveProjectPayload
+
+    base = tmp_path / "app"
+    _trio_project(base)
+    seam = Seam(monkeypatch)
+    worker = {"project_load": "_project_load_worker", "save_project": "_save_project_worker",
+              "a2l_load": "_a2l_attach_worker"}[action]
+    monkeypatch.setattr(S19TuiApp, worker, _boom, raising=False)
+
+    async def scenario(app, pilot, log):
+        if action == "save_project":
+            await _load_case01_image(app, pilot)
+        raised = None
+        try:
+            if action == "project_load":
+                app._handle_load_project("P")
+            elif action == "a2l_load":
+                app.load_a2l_from_path(CASE01 / "firmware.a2l")
+            else:
+                app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name="S3"))
+        except RuntimeError as exc:
+            raised = str(exc)
+        await _settle(pilot, 3)
+        return raised, dict(app._busy.runs), (app.workarea / "S3").exists()
+
+    raised, runs, s3 = _run(base, scenario)
+    outcome = {"project_load": "Loading project P failed", "save_project": "Saving project S3 failed",
+               "a2l_load": "Loading firmware.a2l failed"}[action]
+    ends = seam.effective(action)
+    assert [e.outcome for e in ends] == [outcome], seam.ends
+    assert ends[0].timers == 0, ends[0].timers
+    assert (raised, runs, s3) == ("forced", {}, False), (raised, runs, s3)
+
+
+@pytest.mark.parametrize("action", ["project_load", "save_project", "a2l_load"])
+def test_tc_b100_50_twelve_b_handler_raise_ends_the_run_first(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, action: str
+) -> None:
+    """LLR-176.1l over the 12b worker bodies, S12a-06 (P1-17, P1-61,
+    C12b-40 a): the main-thread handler the worker posts to
+    (``_on_project_loaded`` / ``_on_project_saved`` / ``_on_a2l_attached``)
+    raising → the worker's outer guard posts the failure end: one effective
+    end ``<label> failed`` with 0 timers left, then the exception surfaces
+    (``exit_on_error=True``, Q-d1 loud).
+
+    Why: a defect in a main-thread handler must still end the run, and stay
+    loud. Negative control: the outer guard removed → 0 ends → RED; base:
+    no such handler → RED."""
+    from s19_app.tui.screens import SaveProjectPayload
+
+    base = tmp_path
+    _trio_project(base / "app")
+    seam = Seam(monkeypatch)
+    handler = {"project_load": "_on_project_loaded", "save_project": "_on_project_saved",
+               "a2l_load": "_on_a2l_attached"}[action]
+    monkeypatch.setattr(S19TuiApp, handler, _boom, raising=False)
+
+    async def start(app, pilot):
+        if action == "project_load":
+            app._handle_load_project("P")
+        elif action == "save_project":
+            await _load_case01_image(app, pilot)
+            app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name="S3"))
+        else:
+            app.load_a2l_from_path(CASE01 / "firmware.a2l")
+
+    surfaced = _worker_raise_scene(base, seam, start, action)
+    outcome = {"project_load": "Loading project P failed", "save_project": "Saving project S3 failed",
+               "a2l_load": "Loading firmware.a2l failed"}[action]
+    ends = seam.effective(action)
+    assert [e.outcome for e in ends] == [outcome], seam.ends
+    assert ends[0].timers == 0, ends[0].timers
+    assert surfaced is not None, "the handler's exception was swallowed"
+
+
+def test_tc_b100_50_a2l_success_posts_no_failure_end(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """S12a-06 over the A2L worker (C12b-40 b): a successful attach of
+    case_01's A2L → ``_busy_fail`` is never called and exactly one
+    effective end is recorded (``A2L loaded: firmware.a2l``).
+
+    Why: an unconditional ``finally`` end after success is a second,
+    stale end on every success path. Negative control: a ``finally``
+    guard → 1 ``_busy_fail`` call → RED; base: the 12a kickoff ends with a
+    ``finally`` → RED."""
+    seam = Seam(monkeypatch)
+    fails: list = []
+    real_fail = S19TuiApp._busy_fail
+
+    def _fail(app, key, gen):
+        fails.append((key, gen))
+        return real_fail(app, key, gen)
+
+    monkeypatch.setattr(S19TuiApp, "_busy_fail", _fail)
+
+    async def scenario(app, pilot, log):
+        app.load_a2l_from_path(CASE01 / "firmware.a2l")
+        await _drain(app, pilot)
+        return None
+
+    _run(tmp_path / "app", scenario)
+    assert fails == [], fails
+    assert [e.outcome for e in seam.effective("a2l_load")] == ["A2L loaded: firmware.a2l"], seam.ends
+
+
+def test_tc_b100_50_a2l_deferred_install_raise_ends_the_run(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """LLR-176.1l, the deferred A2L install (C12b-52): ``update_a2l_view``
+    raising during a case_01 attach → nothing leaves the request (the
+    install runs later, from ``call_after_refresh``), one effective end
+    ``Loading firmware.a2l failed`` with 0 timers left, then the exception
+    surfaces.
+
+    Why: the deferred install is outside the worker's ``call_from_thread``,
+    so it needs its own guard. Negative control: the guard removed → the
+    run and its timer are left → RED; base: the tag-table build runs in the
+    request frame, so the exception leaves the request → RED."""
+    seam = Seam(monkeypatch)
+    monkeypatch.setattr(S19TuiApp, "update_a2l_view", _boom)
+    in_frame: list = []
+
+    async def start(app, pilot):
+        try:
+            app.load_a2l_from_path(CASE01 / "firmware.a2l")
+        except RuntimeError as exc:
+            in_frame.append(str(exc))
+
+    surfaced = _worker_raise_scene(tmp_path, seam, start, "a2l_load")
+    assert in_frame == [], f"the tag-table build ran in the request frame: {in_frame}"
+    ends = seam.effective("a2l_load")
+    assert [e.outcome for e in ends] == ["Loading firmware.a2l failed"], seam.ends
+    assert ends[0].timers == 0, ends[0].timers
+    assert surfaced is not None
+
+
+@pytest.mark.parametrize("action", ["project_load", "save_project", "a2l_load"])
+def test_tc_b100_50_twelve_b_progress_reaches_the_widgets_from_workers_on_main(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, action: str
+) -> None:
+    """LLR-176.1q widened from 4 worker actions to 7 (P1-18, C12b-43): a
+    project load of ``P`` (image, MAC, A2L), a Save project of case_01's
+    image and an A2L attach → at least one ``step_busy`` reaches the app
+    from a worker thread through ``call_from_thread``, and every
+    ``#status_text`` and ``#progress_bar`` write runs on the main thread.
+
+    Why: Textual widgets are not thread-safe; the worker must post, never
+    paint. Negative control: a worker that calls ``step_busy`` directly →
+    an off-main widget write → RED; base: the three actions run on the main
+    thread and post nothing → RED."""
+    from textual.widgets import ProgressBar
+
+    from s19_app.tui.screens import SaveProjectPayload
+
+    base = tmp_path / "app"
+    _trio_project(base)
+    bar_threads: list = []
+    original_update = ProgressBar.update
+
+    def _bar_update(self, *args, **kwargs):
+        if self.id == "progress_bar":
+            bar_threads.append(threading.get_ident())
+        return original_update(self, *args, **kwargs)
+
+    monkeypatch.setattr(ProgressBar, "update", _bar_update)
+
+    async def scenario(app, pilot, log):
+        main = threading.get_ident()
+        if action == "save_project":
+            await _load_case01_image(app, pilot)
+        posts: list = []
+        real_post = app.call_from_thread
+
+        def _post(callback, *args, **kwargs):
+            posts.append((getattr(callback, "__name__", repr(callback)), threading.get_ident()))
+            return real_post(callback, *args, **kwargs)
+
+        app.call_from_thread = _post
+        painted = Painted(app)
+        bar_threads.clear()
+        if action == "project_load":
+            app._handle_load_project("P")
+        elif action == "save_project":
+            app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name="S1"))
+        else:
+            app.load_a2l_from_path(CASE01 / "firmware.a2l")
+        await _drain(app, pilot)
+        return main, posts, painted.threads, list(bar_threads)
+
+    main, posts, threads, bars = _run(base, scenario)
+    step_posts = [t for name, t in posts if name == "step_busy"]
+    assert step_posts and all(t != main for t in step_posts), posts
+    assert threads and [t for t in threads if t != main] == [], "off-main #status_text write"
+    assert bars and [t for t in bars if t != main] == [], "off-main #progress_bar write"
+
+
+#: X-13 / X12b-14: where the 12b seam calls sit, as (function, event, key,
+#: step); each must appear at least once.
+TWELVE_B_SITES = [
+    ("_handle_load_project", "begin", "project_load", None),
+    ("_prepare_project_load", "step", "project_load", 2),
+    ("_prepare_project_load", "step", "project_load", 3),
+    ("_on_project_loaded", "step", "project_load", 4),
+    ("_on_project_loaded", "end", "project_load", None),
+    ("_install_prepared_project", "end", "project_load", None),
+    ("_on_project_load_failed", "end", "project_load", None),
+    ("_commit_project_save", "begin", "save_project", None),
+    ("_save_project_files", "step", "save_project", 2),
+    ("_save_project_files", "step", "save_project", 3),
+    ("_save_project_files", "step", "save_project", 4),
+    ("_on_project_saved", "end", "save_project", None),
+    ("load_a2l_from_path", "begin", "a2l_load", None),
+    ("_a2l_attach_worker", "step", "a2l_load", 2),
+    ("_on_a2l_attached", "step", "a2l_load", 3),
+    ("_install_attached_a2l", "end", "a2l_load", None),
+    ("_on_a2l_attach_failed", "end", "a2l_load", None),
+]
+
+
+def test_tc_b100_51_twelve_b_seam_sites_sit_in_the_workers_and_handlers() -> None:
+    """LLR-176.2, LLR-176.2c, LLR-176.2d re-derived (X-13, X12b-14,
+    C12b-51): an AST walk of ``app.py`` finds each 12b seam call where the
+    design puts it — the three begins in the kickoffs; the project load's
+    steps 2 and 3 posted from the worker step and step 4 in
+    ``_on_project_loaded``; the Save's steps 2, 3, 4 posted from
+    ``_save_project_files``; the A2L parse step posted from the worker and
+    step 3 in ``_on_a2l_attached``; every end in a main-thread handler
+    (success, refusal and failure arms) (17 of 17).
+
+    Why: an end left out of one failure handler leaves a spinner running
+    forever after that failure. Negative control: the end removed from
+    ``_on_a2l_attach_failed`` → the census names it → RED; base: none of
+    these functions exist → RED."""
+    methods = _class_methods(ast.parse(APP_SOURCE.read_text(encoding="utf-8")))
+    missing = []
+    for function, event, key, step in TWELVE_B_SITES:
+        node = methods.get(function)
+        if node is None or (event, key, step) not in _seam_events(node):
+            missing.append((function, event, key, step))
+    assert missing == [], missing
 # Inc 12a E5 corrective, round 2 — arms that kill the surviving mutants
 # (evidence/inc-12a/mutation-summary.md; ids MUT12a-M-NN in E5-rulings.md)
 # ===========================================================================
@@ -2470,10 +2775,48 @@ def test_tc_b100_51_every_save_abort_return_ends_its_run_first() -> None:
     own text is no longer the outcome.
     Negative control (M-69, one arm's ``end_busy`` → ``set_status``): that
     return is listed without an end."""
-    tree = ast.parse(APP_SOURCE.read_text(encoding="utf-8"))
-    found = _commit_save_body_returns(_class_methods(tree)["_commit_project_save"])
-    assert len(found) >= 10, found
-    assert [line for line, has_end in found if not has_end] == [], found
+    # E4 integration re-pin (Inc 12b merge, MERGE-12b-2): the abort exits
+    # moved onto the Save worker step ``_save_project_files`` (proto P1-66 /
+    # ``_save_failure_outcome``: "11 abort exits"); each returns its own text
+    # as the outcome, and the main-thread handler ``_on_project_saved`` ends
+    # the run with that outcome before its failure arm returns.
+    methods = _class_methods(ast.parse(APP_SOURCE.read_text(encoding="utf-8")))
+    worker = methods["_save_project_files"]
+    mkdir_line = min(
+        n.lineno for n in ast.walk(worker)
+        if isinstance(n, ast.Call) and _callee(n.func) == "mkdir"
+    )
+    nested = {
+        id(sub)
+        for fn in ast.walk(worker)
+        if isinstance(fn, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)) and fn is not worker
+        for sub in ast.walk(fn)
+    }
+    returns = sorted(
+        (n for n in ast.walk(worker)
+         if isinstance(n, ast.Return) and n.lineno > mkdir_line and id(n) not in nested),
+        key=lambda n: n.lineno,
+    )
+    aborts = returns[:-1]
+    assert len(aborts) >= 10, [n.lineno for n in returns]
+    not_outcome = [
+        n.lineno for n in aborts
+        if not (isinstance(n.value, ast.Call) and _callee(n.value.func) == "_save_failure_outcome")
+    ]
+    assert not_outcome == [], not_outcome
+    handler = methods["_on_project_saved"]
+    failure_arm = next(
+        n for n in ast.walk(handler)
+        if isinstance(n, ast.If) and any(isinstance(s, ast.Return) for s in n.body)
+    )
+    ends = [
+        s for s in failure_arm.body
+        if isinstance(s, ast.Expr) and isinstance(s.value, ast.Call)
+        and _callee(s.value.func) == "end_busy"
+        and isinstance(s.value.args[0], ast.Constant) and s.value.args[0].value == "save_project"
+    ]
+    assert len(ends) == 1 and isinstance(failure_arm.body[-1], ast.Return), ast.dump(failure_arm)[:300]
+    assert failure_arm.body.index(ends[0]) == len(failure_arm.body) - 2, "the end must be the arm's last call"
 
 
 def test_tc_b100_51_save_validation_abort_ends_with_its_own_line(
@@ -2494,7 +2837,9 @@ def test_tc_b100_51_save_validation_abort_ends_with_its_own_line(
     real_validate = app_module.validate_project_files
 
     def _validate(folder, *args, **kwargs):
-        if sys._getframe(1).f_code.co_name == "_commit_project_save":
+        # E4 integration re-pin (MERGE-12b-2): the check runs in the Save
+        # worker step ``_save_project_files``.
+        if sys._getframe(1).f_code.co_name == "_save_project_files":
             return [], [], "synthetic validation error"
         return real_validate(folder, *args, **kwargs)
 
@@ -2505,7 +2850,7 @@ def test_tc_b100_51_save_validation_abort_ends_with_its_own_line(
         seam.bar.clear()
         mark = len(log.messages)
         app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name="S5"))
-        await _settle(pilot, 6)
+        await _drain(app, pilot)  # E4 integration re-pin: the save runs on its worker
         return log.since(mark), len(_busy_timers(app))
 
     added, timers = _run(tmp_path / "app", scenario)
@@ -2569,7 +2914,7 @@ def test_tc_b100_51_file_load_into_an_open_project_ends_after_the_sync(
 
     async def scenario(app, pilot, log):
         app._handle_load_project("P")
-        await _settle(pilot, 8)
+        await _drain(app, pilot)  # E4 integration re-pin (MERGE-12b-3): the project load is a worker
         opened = app.current_project
         mark = len(log.messages)
         app.load_from_path(other)
@@ -2582,3 +2927,402 @@ def test_tc_b100_51_file_load_into_an_open_project_ends_after_the_sync(
     assert [e.outcome for e in ends] == ["Loaded other.s19"], seam.ends
     assert added[-1] == "Loaded other.s19", added
     assert len(added) >= 2 and any("other" in m for m in added[:-1]), added
+
+
+
+# ===========================================================================
+# Inc 12b E4 integration — routed arms (SE5-12a-4, CR12a-1, OBS-12a-1)
+# ===========================================================================
+
+
+@pytest.mark.parametrize(
+    "exc",
+    [PermissionError(13, "injected: access denied"), ValueError("injected"), RuntimeError("injected")],
+    ids=["OSError", "ValueError", "RuntimeError"],
+)
+@pytest.mark.parametrize("loader", ["load_from_path", "load_a2l_from_path"])
+def test_tc_b100_53_use_time_resolve_error_refuses_and_keeps_the_app(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, loader: str, exc: BaseException
+) -> None:
+    """SE5-12a-4 (routed from Inc 12a; LLR-177.2): the loader's use-time
+    ``resolve_input_path`` raising an OS error, a too-long-path
+    ``ValueError`` or a no-home ``RuntimeError`` → nothing leaves the
+    loader; exactly one not-found line (``File not found: gone.s19`` /
+    ``A2L file not found: gone.a2l``); no busy run is begun; the app keeps
+    running (2 × 3).
+
+    Why: the loaders run as the deferred ``go`` of the Inc 10 question, which
+    can stay open for minutes; a share that goes stale meanwhile must refuse
+    the load, not exit the app from a callback.
+    Negative control (ef0cdb8): the raise leaves the loader → RED."""
+    typed = Path("gone.s19" if loader == "load_from_path" else "gone.a2l")
+
+    def _raise(path, base_dir):
+        raise exc
+
+    monkeypatch.setattr(app_module, "resolve_input_path", _raise)
+    seam = Seam(monkeypatch)
+
+    async def scenario(app, pilot, log):
+        mark = len(log.messages)
+        raised = None
+        try:
+            getattr(app, loader)(typed)
+        except BaseException as err:  # noqa: BLE001 — the threshold counts raises
+            raised = repr(err)
+        await _settle(pilot, 3)
+        return raised, log.since(mark), dict(app._busy.runs), app.is_running
+
+    raised, lines, runs, alive = _run(tmp_path / "app", scenario)
+    expected = (
+        f"File not found: {typed}" if loader == "load_from_path" else f"A2L file not found: {typed}"
+    )
+    assert raised is None, raised
+    assert lines == [expected], lines
+    assert seam.begins == [] and runs == {}, (seam.begins, runs)
+    assert alive
+
+
+def test_tc_b100_53_path_gone_under_the_load_question_keeps_the_app(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """SE5-12a-4, the user's route: an image with one unsaved patched byte;
+    the typed path of another image opens the Inc 10 question; while it is
+    open the path turns unreadable (``resolve_input_path`` raises
+    ``PermissionError``); ``y`` → the deferred load refuses with ``File not
+    found: <typed>`` as the last line, the app keeps running, no run is left
+    and the open image is unchanged.
+
+    Why: this is the security reviewer's scenario (a stale share or changed
+    permissions while the question waits).
+    Negative control (ef0cdb8): the deferred callback raises and the app
+    exits → RED."""
+    import shutil
+
+    from s19_app.tui.screens import ConfirmQuestionScreen
+
+    src = tmp_path / "src"
+    src.mkdir()
+    target = src / "fw.s19"
+    shutil.copyfile(CASE01 / "firmware.s19", target)
+    real = app_module.resolve_input_path
+    armed: list = []
+
+    def _resolve(path, base_dir):
+        if armed:
+            raise PermissionError(13, "injected: access denied", str(path))
+        return real(path, base_dir)
+
+    monkeypatch.setattr(app_module, "resolve_input_path", _resolve)
+
+    async def scenario(app, pilot, log):
+        await _load_case01_image(app, pilot)
+        cur = app.current_file
+        address = sorted(cur.mem_map)[0]
+        app._change_service.add_entry(f"0x{address:08X}", "", f"{(cur.mem_map[address] + 1) & 0xFF:02X}")
+        app._change_service.apply(cur.mem_map, cur.ranges, cur.mac_records, None)
+        await _settle(pilot, 4)
+        app._load_path_from_user_input(target)
+        await _wait(pilot, lambda: isinstance(app.screen, ConfirmQuestionScreen), "the load question")
+        armed.append(True)
+        mark = len(log.messages)
+        await pilot.press("y")
+        await _settle(pilot, 8)
+        return (
+            log.since(mark), app.is_running, dict(app._busy.runs),
+            app.current_file.path.name, isinstance(app.screen, ConfirmQuestionScreen),
+        )
+
+    lines, alive, runs, open_name, asking = _run(tmp_path / "app", scenario)
+    assert lines and lines[-1] == f"File not found: {target}", lines
+    assert (alive, runs, asking) == (True, {}, False), (alive, runs, asking)
+    assert open_name == "firmware.s19", open_name
+
+
+def test_tc_b100_51_raise_after_the_commit_keeps_the_saved_line(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """CR12a-1 (routed from Inc 12a; S12b-03): a save of the open image as
+    ``S3`` commits (``project.json`` on disk); a main-thread raise in the
+    committed arm of ``_on_project_saved`` (``_surface_manifest_verify_result``
+    forced to raise) → the one effective end is the committed ``Saved project
+    to …S3…`` line, ``Saving project S3 failed`` is never logged, the
+    manifest stays on disk, and the exception still surfaces (Q-d1 loud).
+
+    Why: the files are saved; a status log that then says the save failed
+    tells the user to redo work that is done.
+    Negative control (ef0cdb8): the worker's outer guard posts
+    ``_busy_fail`` → the end is ``Saving project S3 failed`` → RED."""
+    from s19_app.tui.screens import SaveProjectPayload
+
+    base = tmp_path / "app"
+    seam = Seam(monkeypatch)
+    monkeypatch.setattr(S19TuiApp, "_surface_manifest_verify_result", _boom)
+    captured: dict = {}
+
+    async def scenario(app, pilot, log):
+        await _load_case01_image(app, pilot)
+        captured["log"] = log
+        app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name="S3"))
+        try:
+            for _ in range(600):
+                if seam.effective("save_project"):
+                    break
+                await pilot.pause()
+        except Exception:  # noqa: BLE001 — the app may already be exiting
+            pass
+        return None
+
+    surfaced = None
+    try:
+        _run(base, scenario)
+    except BaseException as exc:  # noqa: BLE001 — WorkerFailed is the expected exit
+        surfaced = exc
+    target = _workarea(base) / "S3"
+    ends = [e.outcome for e in seam.effective("save_project")]
+    messages = captured["log"].messages
+    assert len(ends) == 1 and ends[0].startswith(f"Saved project to {target}"), seam.ends
+    assert "Saving project S3 failed" not in messages, messages
+    assert (target / "project.json").is_file()
+    assert surfaced is not None, "the handler's exception was swallowed"
+
+
+def test_tc_b100_50_progress_bar_paints_no_eta(tmp_path: Path) -> None:
+    """OBS-12a-1: ``#progress_bar`` holds no Textual ETA (no ``#eta``
+    child), idle and during a run; its painted row shows no clock
+    (``--:--:--`` or ``h:mm:ss``) beside the percentage; the seam's elapsed
+    ``mm:ss`` is painted in ``#status_text`` only (4 assertions).
+
+    Why: two clocks side by side (an ETA countdown and the elapsed time)
+    read as two different actions.
+    Negative control (ef0cdb8): the default ``show_eta=True`` paints
+    ``--:--:--`` → RED."""
+    clock = re.compile(r"--:--:--|\d+:\d{2}:\d{2}")
+
+    async def scenario(app, pilot, log):
+        from textual.widgets import ProgressBar
+
+        bar = app.query_one("#progress_bar", ProgressBar)
+        idle = (len(bar.query("#eta")), _bar_row(app))
+        gen = app.begin_busy("report", "R", ("a", "b"))
+        app.step_busy("report", gen, 2)
+        await _settle(pilot, 2)
+        during = (len(bar.query("#eta")), _bar_row(app), _status(app))
+        app.end_busy("report", gen, "")
+        return idle, during
+
+    idle, during = _run(tmp_path / "app", scenario)
+    assert (idle[0], during[0]) == (0, 0), (idle, during)
+    assert not any(clock.search(row) for row in idle[1] + during[1]), (idle[1], during[1])
+    assert any("50%" in row for row in during[1]), during[1]
+    assert re.search(r"step 2/2 b  ·  \d{2}:\d{2}$", during[2]), during[2]
+
+
+# ===========================================================================
+# E5 round 2 — mutant survivors (Inc 12b corrective pass, tests only).
+# ===========================================================================
+
+
+def test_tc_b100_50_project_deferred_install_raise_ends_the_run(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-176.1l, interfaces S-g / S-d (the deferred project install,
+    mutant 047): ``compose_load_announcement`` (called only inside the
+    install) raising during a load of project ``P`` → nothing leaves the
+    request (the install runs later, from ``call_after_refresh``), one
+    effective end ``Loading project P failed`` with 0 timers left, then the
+    exception surfaces.
+
+    Why: the deferred install is outside the worker's ``call_from_thread``
+    guard; without its own guard a defect there leaves the spinner running
+    and every later session action refused as busy. Negative control: the
+    install's guard removed → 0 effective ends, the run and its timer
+    left → RED."""
+    seam = Seam(monkeypatch)
+    _trio_project(tmp_path / "app")
+    monkeypatch.setattr(app_module, "compose_load_announcement", _boom)
+    in_frame: list = []
+
+    async def start(app, pilot):
+        try:
+            app._handle_load_project("P")
+        except RuntimeError as exc:
+            in_frame.append(str(exc))
+
+    surfaced = _worker_raise_scene(tmp_path, seam, start, "project_load")
+    assert in_frame == [], f"the install ran in the request frame: {in_frame}"
+    ends = seam.effective("project_load")
+    assert [e.outcome for e in ends] == ["Loading project P failed"], seam.ends
+    assert ends[0].timers == 0, ends[0].timers
+    assert surfaced is not None, "the install's exception was swallowed"
+
+
+def test_tc_b100_51_save_failure_paints_its_lines_then_its_outcome(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-176.2c, E3 S12b-03 / DF-6 ("``lines[-1]`` is the outcome, the
+    rest are the lines before it"; mutant 079): a Save whose worker aborts
+    on a validation error and whose rollback leaves one note → the lines the
+    save adds read, in order, ``synthetic validation error`` then
+    ``synthetic rollback note``; the note — the outcome — is the last line
+    and the one effective end; no ``… failed`` line.
+
+    Why: the rollback note is what the engineer must act on, and it reads
+    as a consequence of the failure only when it follows it. Negative
+    control: the failure end painted before the lines → the note comes
+    first and the validation error last → RED."""
+    from s19_app.tui.screens import SaveProjectPayload
+
+    seam = Seam(monkeypatch)
+    real_validate = app_module.validate_project_files
+    real_abort = S19TuiApp._abort_save
+
+    def _validate(folder, *args, **kwargs):
+        if sys._getframe(1).f_code.co_name == "_save_project_files":
+            return [], [], "synthetic validation error"
+        return real_validate(folder, *args, **kwargs)
+
+    def _abort(app, *args, **kwargs):
+        return [*real_abort(app, *args, **kwargs), "synthetic rollback note"]
+
+    monkeypatch.setattr(app_module, "validate_project_files", _validate)
+    monkeypatch.setattr(S19TuiApp, "_abort_save", _abort)
+
+    async def scenario(app, pilot, log):
+        await _load_case01_image(app, pilot)
+        mark = len(log.messages)
+        app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name="S5"))
+        await _drain(app, pilot)
+        return log.since(mark), len(_busy_timers(app)), (app.workarea / "S5").exists()
+
+    added, timers, s5 = _run(tmp_path / "app", scenario)
+    assert added[-2:] == ["synthetic validation error", "synthetic rollback note"], added
+    assert [e.outcome for e in seam.effective("save_project")] == ["synthetic rollback note"], seam.ends
+    assert not [m for m in added if m.endswith(" failed")], added
+    assert (timers, s5) == (0, False), (timers, s5)
+
+
+def test_tc_b100_51_raise_after_a_multi_line_tail_paints_the_saved_line_once(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """CR12a-1 (S12b-03), the multi-line tail (mutant 087): project ``P``
+    (case_01's trio) open with one pasted, applied entry, saved as ``S3``,
+    commits while its pasted document cannot be placed (``OSError(28)``
+    into ``S3/patches``), so the tail has two lines —
+    ``Saved project to …S3…`` then the change-document line; a main-thread
+    raise after the tail's leading lines are painted
+    (``update_project_labels`` forced to raise) → ``Saved project to
+    …S3…`` appears exactly once in the status log, ``Saving project S3
+    failed`` never, the manifest stays on disk, and the exception surfaces
+    (Q-d1 loud). (Precondition: the stand-in refused the placement into
+    ``S3/patches``, so the document line made the tail two lines long.)
+
+    Why: the saved line already painted must not be painted again by the
+    raise arm — a doubled "Saved project" line reads as two saves.
+    Negative control: the raise arm ignores that the tail was painted → the
+    saved line is painted a second time → 2 → RED."""
+    from s19_app.tui.screens import SaveProjectPayload
+
+    base = tmp_path / "app"
+    _trio_project(base)
+    seam = Seam(monkeypatch)
+    real_place = app_module.place_into_workarea
+
+    blocked: list = []
+
+    def _patches_full(source, destination, *args, **kwargs):
+        if Path(destination).name == "patches":
+            blocked.append(str(destination))
+            raise OSError(28, "synthetic no space")
+        return real_place(source, destination, *args, **kwargs)
+
+    captured: dict = {}
+
+    async def scenario(app, pilot, log):
+        app._handle_load_project("P")
+        await _wait(pilot, lambda: app.current_project == "P" and not app._busy.runs, "the load of P")
+        cur = app.current_file
+        address = sorted(cur.mem_map)[0]
+        app._change_service.add_entry(f"0x{address:08X}", "", f"{(cur.mem_map[address] + 1) & 0xFF:02X}")
+        app._change_service.apply(cur.mem_map, cur.ranges, cur.mac_records, None)
+        await _settle(pilot, 4)
+        monkeypatch.setattr(app_module, "place_into_workarea", _patches_full)
+        monkeypatch.setattr(S19TuiApp, "update_project_labels", _boom)
+        captured["log"] = log
+        app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name="S3"))
+        try:
+            for _ in range(600):
+                if not app._busy.runs and seam.effective("save_project"):
+                    break
+                await pilot.pause()
+        except Exception:  # noqa: BLE001 — the app may already be exiting
+            pass
+        return None
+
+    surfaced = None
+    try:
+        _run(base, scenario)
+    except BaseException as exc:  # noqa: BLE001 — the handler's raise is the expected exit
+        surfaced = exc
+    target = _workarea(base) / "S3"
+    messages = captured["log"].messages
+    saved = [m for m in messages if m.startswith(f"Saved project to {target}")]
+    assert blocked, "precondition: the pasted document's placement was never refused (one-line tail)"
+    assert len(saved) == 1, saved
+    assert "Saving project S3 failed" not in messages, messages
+    assert (target / "project.json").is_file()
+    assert surfaced is not None, "the handler's exception was swallowed"
+
+
+def test_tc_b100_53_path_refused_between_the_two_looks_keeps_the_app(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """SE5-12a-4, the data arm of ``_load_path_from_user_input`` (mutant
+    107): a typed image path that the classifier finds, then the data arm's
+    own look refuses (``resolve_input_path`` raises ``PermissionError`` only
+    when called from ``_load_path_from_user_input``) → nothing leaves the
+    request, the app keeps running, and the load still runs through the
+    loader's own look: ``fw.s19`` is the open image and ``Loaded fw.s19`` is
+    painted.
+
+    Why: the request runs from the Load dialog's callback; an exception
+    there ends the app and drops the session. Negative control: the data
+    arm's catch removed → ``PermissionError`` leaves
+    ``_load_path_from_user_input`` → RED."""
+    import shutil
+
+    src = tmp_path / "src"
+    src.mkdir()
+    target = src / "fw.s19"
+    shutil.copyfile(CASE01 / "firmware.s19", target)
+    real = app_module.resolve_input_path
+    refused: list = []
+
+    def _resolve(path, base_dir):
+        if sys._getframe(1).f_code.co_name == "_load_path_from_user_input":
+            refused.append(str(path))
+            raise PermissionError(13, "injected: access denied", str(path))
+        return real(path, base_dir)
+
+    monkeypatch.setattr(app_module, "resolve_input_path", _resolve)
+
+    async def scenario(app, pilot, log):
+        raised = None
+        try:
+            app._load_path_from_user_input(target)
+        except BaseException as exc:  # noqa: BLE001 — the RED shape
+            raised = type(exc).__name__
+        await _drain(app, pilot)
+        for _ in range(600):
+            if not app._busy.runs and app.current_file is not None:
+                break
+            await pilot.pause()
+        name = app.current_file.path.name if app.current_file is not None else None
+        return raised, app.is_running, dict(app._busy.runs), name, list(log.messages)
+
+    raised, alive, runs, name, messages = _run(tmp_path / "app", scenario)
+    assert refused, "precondition: the data arm's look was never refused"
+    assert raised is None, f"{raised} left _load_path_from_user_input"
+    assert (alive, runs) == (True, {}), (alive, runs)
+    assert name == "fw.s19", name
+    assert "Loaded fw.s19" in messages, messages

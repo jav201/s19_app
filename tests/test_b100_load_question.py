@@ -1337,11 +1337,21 @@ def test_tc_b100_45_refusal_lines_paint_names_literally(tmp_path: Path) -> None:
         await _settle(pilot, 4)
         out["variant file missing"] = painted()
 
-        def unreadable(path):
+        def unreadable(path, *args, **kwargs):
             raise ValueError("unreadable A2L")
 
-        app._load_a2l_data_with_cache = unreadable
-        app._handle_load_project(hostile_project)
+        # Inc 12b re-pin (E3 DF-7): ``_load_a2l_data_with_cache`` is retired;
+        # the project worker reaches the parse through the app module's
+        # ``parse_a2l_file``. The load now ends on a worker, so wait for it.
+        from tests.support.b100_workers import settle_workers
+
+        real_parse = app_module.parse_a2l_file
+        app_module.parse_a2l_file = unreadable
+        try:
+            app._handle_load_project(hostile_project)
+            await settle_workers(pilot)
+        finally:
+            app_module.parse_a2l_file = real_parse
         await _settle(pilot, 4)
         out["no supported files"] = painted()
         return out
@@ -3022,3 +3032,122 @@ def test_at_b100_15_load_over_unsaved_work_asks_one_question_per_route(tmp_path:
     assert out["v kept"] == ("firmware_a", "firmware_a.s19"), out["v kept"]
     asked, items_body = out["items question"]
     assert asked == 1 and "firmware_a.s19" in items_body and "flow flow" in items_body, out["items question"]
+
+
+# ---------------------------------------------------------------------------
+# Inc 12b extensions (E4 tester): TC-B100-72 (LLR-177.3a, the busy refusal
+# before the question) and TC-B100-66 (LLR-173.7: the busy line and the quit
+# question carry no decision id). Oracles: inc-12b E1 draft LLR-177.3a,
+# LLR-177.3f, LLR-177.4a; codewire/proto-12b-a2l-refusal C12b-07, C12b-50.
+# ---------------------------------------------------------------------------
+
+
+def _busy_line(label: str) -> str:
+    return f"busy: {label} is running — wait for it to finish."
+
+
+def test_tc_b100_72_the_load_guard_refuses_while_busy_before_it_asks(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-177.3a, LLR-174.4, HLR-177a (C12b-07): case_01's image with one
+    unsaved patched byte, project ``PV`` open, and an A2L attach of
+    ``cal.a2l`` (case_01's A2L) held in its worker at the parse: a
+    Workarea Files pick of ``x.s19`` and the variant selector's pick
+    (``_handle_select_variant``, the selector's dismiss callback) → 2 lines
+    ``busy: Loading cal.a2l is running — wait for it to finish.``, 0 load questions
+    pushed, the session digest unchanged and ``_pending_variant_id`` still
+    ``None`` (4 of 4).
+
+    Why: with unsaved work the guard would ask "Replace …?" — answering
+    it during a running attach would start a second session writer.
+    Negative control: the busy check after the question (inside ``go``
+    only) → 1 question pushed before the refusal → RED; base: no busy
+    state, the attach is synchronous (the held parse runs on the main
+    thread) → RED."""
+    import threading
+
+    from tests.support.b100_workers import settle_workers
+
+    scene = _scene(tmp_path)
+    main = threading.get_ident()
+    entered = threading.Event()
+    go = threading.Event()
+    on_main: list = []
+    real_parse = app_module.parse_a2l_file
+
+    def _held(path, *args, **kwargs):
+        if threading.get_ident() == main:
+            on_main.append(path)
+        elif not entered.is_set():
+            entered.set()
+            go.wait(120)
+        return real_parse(path, *args, **kwargs)
+
+    monkeypatch.setattr(app_module, "parse_a2l_file", _held)
+
+    async def scenario(app, pilot, log):
+        app._handle_load_project("PV")
+        await settle_workers(pilot)
+        await ld.wait_for(pilot, lambda: app.current_project == "PV", "the project load of PV")
+        if len(app.screen.query("#result_ok")) > 0:
+            await _close_result_panel(pilot, app)
+        await _patch(pilot, app)
+        spy = PushSpy(app)
+        try:
+            app.load_a2l_from_path(scene.src / "cal.a2l")
+            for _ in range(3000):
+                if entered.is_set() or on_main:
+                    break
+                await pilot.pause(0.01)
+            assert not on_main, "the A2L parse ran on the main thread (no worker)"
+            assert entered.is_set(), "the A2L attach never reached its parse"
+            before = (_digest(app), app._pending_variant_id)
+            out = {}
+            for name, trigger in (
+                ("pick x.s19", lambda: app._load_workarea_file("x.s19")),
+                ("variant", lambda: app._handle_select_variant("firmware_b")),
+            ):
+                mark = len(log.messages)
+                questions = spy.questions()
+                trigger()
+                await _settle(pilot, 4)
+                out[name] = (
+                    log.since(mark).count(_busy_line("Loading cal.a2l")),
+                    spy.questions() - questions,
+                    (_digest(app), app._pending_variant_id) == before,
+                )
+        finally:
+            go.set()
+        await settle_workers(pilot)
+        return out, app._pending_variant_id
+
+    out, pending = _run(scene.base, scenario)
+    assert out == {"pick x.s19": (1, 0, True), "variant": (1, 0, True)}, out
+    assert pending is None, pending
+
+
+def test_tc_b100_66_busy_line_and_quit_question_hold_no_decision_ids() -> None:
+    """LLR-173.7 extension, LLR-177.3f, LLR-177.4a (C12b-50): the five
+    12b text constants hold exactly the fixed texts — ``busy: {label} is
+    running — wait for it to finish.``, ``Quit?``, ``still working: {label}
+    — wait, or quit after it finishes``, ``Quit (y)``, ``Stay (n)`` (the
+    dash is U+2014) — and none of them, formatted with a label, matches a
+    decision-id pattern (``D<n>``, ``O-<n>``, ``VS-``, ``LLR-``, ``HLR-``,
+    ``US-``, ``TC-``, ``AT-``).
+
+    Why: painted text is for the engineer, not the design trail.
+    Negative control: a mutant ``busy (VS-PD-3): {label} …`` → 1 match →
+    RED; base: the constants do not exist → RED."""
+    ids = re.compile(r"\bD\d+\b|\bO-\d+|VS-|LLR-|HLR-|US-|TC-|AT-")
+    expected = {
+        "_BUSY_LINE": "busy: {label} is running — wait for it to finish.",
+        "_QUIT_TITLE": "Quit?",
+        "_QUIT_BODY": "still working: {label} — wait, or quit after it finishes",
+        "_QUIT_YES": "Quit (y)",
+        "_QUIT_NO": "Stay (n)",
+    }
+    got = {name: getattr(app_module, name, None) for name in expected}
+    assert got == expected, got
+    painted = [text.format(label="Saving project P1") for text in got.values()]
+    assert [t for t in painted if ids.search(t)] == [], painted
+    assert "—" in got["_BUSY_LINE"] and "—" in got["_QUIT_BODY"]

@@ -1,0 +1,25 @@
+mutant id: 107 (E5 round 2)
+target file: s19_app/tui/app.py
+description: _load_path_from_user_input data arm: remove the except
+old -> new: '            try:\n                resolved = resolve_input_path(path, self.base_dir)\n            except (OSError, ValueError, RuntimeError):\n                resolved = None\n            suffix = resolved.suffix.lower()' -> '            resolved = resolve_input_path(path, self.base_dir)\n            suffix = resolved.suffix.lower()'
+sha256 before: 46f7ee6aa8a0fbfbc6571b095bbf7d4c4661de5bd3f1ecf96e9b1347c424210d
+command: timeout 900 env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\lad C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=short --basetemp=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\bt\mut-107 "tests/test_b100_busy.py::test_tc_b100_53_path_refused_between_the_two_looks_keeps_the_app"
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mutc12b
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mutc12b\s19_app\__init__.py
+pytest summary: 1 failed in 39.05s
+elapsed: 39.9s
+verdict: KILLED
+sha256 after: 46f7ee6aa8a0fbfbc6571b095bbf7d4c4661de5bd3f1ecf96e9b1347c424210d
+restored = True
+
+----- pytest output -----
+F                                                                        [100%]
+================================== FAILURES ===================================
+______ test_tc_b100_53_path_refused_between_the_two_looks_keeps_the_app _______
+tests\test_b100_busy.py:3325: in test_tc_b100_53_path_refused_between_the_two_looks_keeps_the_app
+    assert raised is None, f"{raised} left _load_path_from_user_input"
+E   AssertionError: PermissionError left _load_path_from_user_input
+E   assert 'PermissionError' is None
+=========================== short test summary info ===========================
+FAILED tests/test_b100_busy.py::test_tc_b100_53_path_refused_between_the_two_looks_keeps_the_app
+1 failed in 39.05s

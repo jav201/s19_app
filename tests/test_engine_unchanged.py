@@ -130,7 +130,11 @@ _ENGINE_PATHS: list[str] = [
     # hardening (quoted MEMORY_SEGMENT names + the offset field) is an
     # explicit, contract-pinned edit to this module. Re-freeze after the
     # batch lands; the parsing layer beyond that function stays read-only.
-    # "s19_app/tui/a2l.py",
+    # UNFROZEN for batch-100 Inc 12b (the parser's byte callback, LLR-176.4);
+    # re-frozen by the same increment (LLR-176.4b). On the increment branch
+    # TC-027 compares against ``main``, where a2l.py differs until the merge,
+    # so its full run is owed after the merge.
+    "s19_app/tui/a2l.py",
     "s19_app/tui/mac.py",
 ]
 

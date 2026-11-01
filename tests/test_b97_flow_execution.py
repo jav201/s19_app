@@ -320,7 +320,7 @@ def run_fx(tmp_path: Path, size, body, *, stems=(), run: bool = False, evidence:
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=size) as pilot:
             await settle(pilot)
-            project_dir = fx_project(app) if project else None
+            project_dir = await fx_project(app) if project else None
             if evidence:
                 flash_evidence(project_dir)
             if stems:
@@ -1076,7 +1076,7 @@ def test_tc_b97_53_run_log_paints_at_most_eight_lines(tmp_path: Path) -> None:
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(118, 54)) as pilot:
             await settle(pilot)
-            project_dir = fx_project(app)
+            project_dir = await fx_project(app)
             for i in range(5):
                 blocks = patch_chain_demo()
                 blocks[3] = replace(blocks[3], output_name=f"cap_{i}.s19")
@@ -2108,7 +2108,7 @@ def test_at_b97_10_save_set_then_load_it_in_a_new_app(tmp_path: Path, size) -> N
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=size) as pilot:
             await settle(pilot)
-            load_project(app)
+            await load_project(app)
             panel = await open_flow_execution(app, pilot)
             empty = []
             await pilot.click("#fx_run")

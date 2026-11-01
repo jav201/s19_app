@@ -1,0 +1,40 @@
+# Inc 12b E4 integration — guards-01
+# sha: ef0cdb8d03d6481a06a80d6276b66a3a0871fd04 (+ working-tree edits); app.py sha256[:16]=6ada85782fdd80de a2l.py=d70b17982f1cee30 styles.tcss=f7b4f75911b296a4
+# s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc12b\s19_app\__init__.py
+# command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int12b/lad/guards-01 C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int12b/bt/guards-01 -q --no-header --tb=short -rfEXx <nodes>
+# nodes:
+#   tests/test_id_registry.py
+#   tests/test_b99_staging.py
+#   tests/test_engine_unchanged.py
+#   tests/test_address_census.py
+#   tests/test_b100_save_dialog.py
+#   tests/test_b100_load_dialog.py
+# started: 2026-11-01T05:04:20-06:00
+............................................F........................... [ 18%]
+.....s.......................s.................s........................ [ 37%]
+........................................................F............... [ 55%]
+........................................................................ [ 74%]
+...........s............................................................ [ 92%]
+...............sss...........                                            [100%]
+================================== FAILURES ===================================
+_________________ test_tc027_engine_modules_unchanged_vs_main _________________
+tests\test_engine_unchanged.py:171: in test_tc027_engine_modules_unchanged_vs_main
+    assert changed == [], (
+E   AssertionError: TUI-side batches must not edit the parsing / range / validation engine (read-only constraint) — git reports these changed vs main: ['s19_app/tui/a2l.py']
+E   assert ['s19_app/tui/a2l.py'] == []
+E     
+E     Left contains one more item: 's19_app/tui/a2l.py'
+E     Use -v to get more diff
+_______________ test_tc_b100_65_last_row_reachable_by_keyboard ________________
+tests\test_b100_save_dialog.py:3313: in test_tc_b100_65_last_row_reachable_by_keyboard
+    assert on_summary == "save_summary" and at_bottom and inside, (on_summary, at_bottom, inside)
+E   AssertionError: ('save_summary', False, False)
+E   assert ('save_summary' == 'save_summary'
+E     
+E       save_summary and False)
+=========================== short test summary info ===========================
+FAILED tests/test_engine_unchanged.py::test_tc027_engine_modules_unchanged_vs_main
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_last_row_reachable_by_keyboard
+2 failed, 380 passed, 7 skipped in 2704.35s (0:45:04)
+# exit: 1
+# finished: 2026-11-01T05:49:26-06:00

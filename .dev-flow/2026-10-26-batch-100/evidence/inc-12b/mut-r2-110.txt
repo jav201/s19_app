@@ -1,0 +1,25 @@
+mutant id: 110 (E5 round 2)
+target file: s19_app/tui/a2l.py
+description: build_section_tree: handle.buffer.tell() -> total
+old -> new: 'progress(handle.buffer.tell(), total)' -> 'progress(total, total)'
+sha256 before: 73c3820fe0d6ecd22d9b686ff6b9bd67ca92a34caad7af07c7fd06a0c93c5f0e
+command: timeout 900 env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\lad C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=short --basetemp=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\bt\mut-110 "tests/test_b100_a2l_progress.py::test_tc_b100_73_case06_reports_bytes_and_parses_the_same"
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mutc12b
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mutc12b\s19_app\__init__.py
+pytest summary: 1 failed in 12.23s
+elapsed: 20.2s
+verdict: KILLED
+sha256 after: 73c3820fe0d6ecd22d9b686ff6b9bd67ca92a34caad7af07c7fd06a0c93c5f0e
+restored = True
+
+----- pytest output -----
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________ test_tc_b100_73_case06_reports_bytes_and_parses_the_same ___________
+tests\test_b100_a2l_progress.py:100: in test_tc_b100_73_case06_reports_bytes_and_parses_the_same
+    assert 0 < seen[0][0] < size, seen[0]
+E   AssertionError: (37742888, 37742888)
+E   assert 37742888 < 37742888
+=========================== short test summary info ===========================
+FAILED tests/test_b100_a2l_progress.py::test_tc_b100_73_case06_reports_bytes_and_parses_the_same
+1 failed in 12.23s

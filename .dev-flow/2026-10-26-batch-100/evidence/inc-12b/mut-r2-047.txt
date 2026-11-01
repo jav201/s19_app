@@ -1,0 +1,1573 @@
+mutant id: 047 (E5 round 2)
+target file: s19_app/tui/app.py
+description: _install_prepared_project: remove the except BaseException _busy_fail guard
+old -> new: '                safe_text(announcement.summary_line()).plain,\n            )\n        except BaseException:\n            self._busy_fail("project_load", gen)\n            raise\n' -> '                safe_text(announcement.summary_line()).plain,\n            )\n        except BaseException:\n            raise\n'
+sha256 before: 46f7ee6aa8a0fbfbc6571b095bbf7d4c4661de5bd3f1ecf96e9b1347c424210d
+command: timeout 900 env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\lad C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=short --basetemp=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\bt\mut-047 "tests/test_b100_busy.py::test_tc_b100_50_project_deferred_install_raise_ends_the_run"
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mutc12b
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mutc12b\s19_app\__init__.py
+pytest summary: 1 failed in 39.52s
+elapsed: 40.5s
+verdict: KILLED
+sha256 after: 46f7ee6aa8a0fbfbc6571b095bbf7d4c4661de5bd3f1ecf96e9b1347c424210d
+restored = True
+
+----- pytest output -----
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________ test_tc_b100_50_project_deferred_install_raise_ends_the_run _________
+tests\test_b100_busy.py:3155: in test_tc_b100_50_project_deferred_install_raise_ends_the_run
+    assert [e.outcome for e in ends] == ["Loading project P failed"], seam.ends
+E   AssertionError: []
+E   assert [] == ['Loading project P failed']
+E     
+E     Right contains one more item: 'Loading project P failed'
+E     Use -v to get more diff
+---------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────
+│ C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4 
+│ ccb-86cf-122b894659b2\scratchpad\mutc12b\s19_app\tui\app.py:13684 in         
+│ _install_prepared_project                                                    
+│                                                                              
+│   13681 │   │   │   if prepared.mac is not None:                             
+│   13682 │   │   │   │   self._apply_loaded_file(prepared.mac, install.mac, t 
+│   13683 │   │   │   loaded = self.current_file                               
+│ ❱ 13684 │   │   │   announcement = compose_load_announcement(                
+│   13685 │   │   │   │   request.name,                                        
+│   13686 │   │   │   │   prepared.variant_set,                                
+│   13687 │   │   │   │   prepared.manifest,                                   
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │      gen = 1                                                             │ 
+│ │  install = InstallSet(                                                   │ 
+│ │            │   variant=VariantDescriptor(                                │ 
+│ │            │   │   variant_id='firmware',                                │ 
+│ │            │   │                                                         │ 
+│ │            path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C… │ 
+│ │            │   │   file_type='s19'                                       │ 
+│ │            │   ),                                                        │ 
+│ │            │                                                             │ 
+│ │            mac=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C-… │ 
+│ │            │                                                             │ 
+│ │            a2l=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C-… │ 
+│ │            )                                                             │ 
+│ │   loaded = LoadedFile(                                                   │ 
+│ │            │                                                             │ 
+│ │            path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C… │ 
+│ │            │   file_type='s19',                                          │ 
+│ │            │   mem_map={                                                 │ 
+│ │            │   │   2147483648: 83,                                       │ 
+│ │            │   │   2147483649: 49,                                       │ 
+│ │            │   │   2147483650: 57,                                       │ 
+│ │            │   │   2147483651: 84,                                       │ 
+│ │            │   │   2147483652: 79,                                       │ 
+│ │            │   │   2147483653: 79,                                       │ 
+│ │            │   │   2147483654: 76,                                       │ 
+│ │            │   │   2147483655: 95,                                       │ 
+│ │            │   │   2147483656: 66,                                       │ 
+│ │            │   │   2147483657: 65,                                       │ 
+│ │            │   │   ... +87                                               │ 
+│ │            │   },                                                        │ 
+│ │            │   row_bases=[                                               │ 
+│ │            │   │   2147483648,                                           │ 
+│ │            │   │   2147483664,                                           │ 
+│ │            │   │   2147483680,                                           │ 
+│ │            │   │   2147483712,                                           │ 
+│ │            │   │   2147483728,                                           │ 
+│ │            │   │   2147483744,                                           │ 
+│ │            │   │   2147483760                                            │ 
+│ │            │   ],                                                        │ 
+│ │            │   ranges=[                                                  │ 
+│ │            │   │   (2147483648, 2147483681),                             │ 
+│ │            │   │   (2147483712, 2147483776)                              │ 
+│ │            │   ],                                                        │ 
+│ │            │   range_validity=[True, True],                              │ 
+│ │            │   errors=[],                                                │ 
+│ │            │                                                             │ 
+│ │            a2l_path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/clau… │ 
+│ │            │   a2l_data={                                                │ 
+│ │            │   │   'path':                                               │ 
+│ │            'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
+│ │            │   │   'sections': [                                         │ 
+│ │            │   │   │   {                                                 │ 
+│ │            │   │   │   │   'name': 'PROJECT',                            │ 
+│ │            │   │   │   │   'meta': 'CASE01 "Synthetic project for        │ 
+│ │            S19Tool stress testing"',                                     │ 
+│ │            │   │   │   │   'start_line': 1,                              │ 
+│ │            │   │   │   │   'lines': [''],                                │ 
+│ │            │   │   │   │   'children': [                                 │ 
+│ │            │   │   │   │   │   {                                         │ 
+│ │            │   │   │   │   │   │   'name': 'HEADER',                     │ 
+│ │            │   │   │   │   │   │   'meta': '',                           │ 
+│ │            │   │   │   │   │   │   'start_line': 2,                      │ 
+│ │            │   │   │   │   │   │   'lines': [                            │ 
+│ │            │   │   │   │   │   │   │   '    VERSION "1.0"',              │ 
+│ │            │   │   │   │   │   │   │   '    PROJECT_NO 1'                │ 
+│ │            │   │   │   │   │   │   ],                                    │ 
+│ │            │   │   │   │   │   │   'children': [],                       │ 
+│ │            │   │   │   │   │   │   'end_line': 5                         │ 
+│ │            │   │   │   │   │   },                                        │ 
+│ │            │   │   │   │   │   {                                         │ 
+│ │            │   │   │   │   │   │   'name': 'MODULE',                     │ 
+│ │            │   │   │   │   │   │   'meta': 'BASIC "Synthetic ECU         │ 
+│ │            module"',                                                     │ 
+│ │            │   │   │   │   │   │   'start_line': 7,                      │ 
+│ │            │   │   │   │   │   │   'lines': ['', '', '', '', '', ''],    │ 
+│ │            │   │   │   │   │   │   'children': [                         │ 
+│ │            │   │   │   │   │   │   │   {                                 │ 
+│ │            │   │   │   │   │   │   │   │   'name': 'MOD_COMMON',         │ 
+│ │            │   │   │   │   │   │   │   │   'meta': '""',                 │ 
+│ │            │   │   │   │   │   │   │   │   'start_line': 8,              │ 
+│ │            │   │   │   │   │   │   │   │   'lines': [                    │ 
+│ │            │   │   │   │   │   │   │   │   │   '      BYTE_ORDER         │ 
+│ │            MSB_FIRST',                                                   │ 
+│ │            │   │   │   │   │   │   │   │   │   '      ALIGNMENT_BYTE 1', │ 
+│ │            │   │   │   │   │   │   │   │   │   '      ALIGNMENT_WORD 2', │ 
+│ │            │   │   │   │   │   │   │   │   │   '      ALIGNMENT_LONG 4', │ 
+│ │            │   │   │   │   │   │   │   │   │   '                         │ 
+│ │            ALIGNMENT_FLOAT32_IEEE 4'                                     │ 
+│ │            │   │   │   │   │   │   │   │   ],                            │ 
+│ │            │   │   │   │   │   │   │   │   'children': [],               │ 
+│ │            │   │   │   │   │   │   │   │   'end_line': 14                │ 
+│ │            │   │   │   │   │   │   │   },                                │ 
+│ │            │   │   │   │   │   │   │   {                                 │ 
+│ │            │   │   │   │   │   │   │   │   'name': 'MOD_PAR',            │ 
+│ │            │   │   │   │   │   │   │   │   'meta': '""',                 │ 
+│ │            │   │   │   │   │   │   │   │   'start_line': 16,             │ 
+│ │            │   │   │   │   │   │   │   │   'lines': [                    │ 
+│ │            │   │   │   │   │   │   │   │   │   '      EPK                │ 
+│ │            "S19TOOL_SYNTH"'                                              │ 
+│ │            │   │   │   │   │   │   │   │   ],                            │ 
+│ │            │   │   │   │   │   │   │   │   'children': [],               │ 
+│ │            │   │   │   │   │   │   │   │   'end_line': 18                │ 
+│ │            │   │   │   │   │   │   │   },                                │ 
+│ │            │   │   │   │   │   │   │   {                                 │ 
+│ │            │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT',      │ 
+│ │            │   │   │   │   │   │   │   │   'meta': 'RL_U8',              │ 
+│ │            │   │   │   │   │   │   │   │   'start_line': 20,             │ 
+│ │            │   │   │   │   │   │   │   │   'lines': [                    │ 
+│ │            │   │   │   │   │   │   │   │   │   '      FNC_VALUES 1 UBYTE │ 
+│ │            COLUMN_DIR DIRECT'                                            │ 
+│ │            │   │   │   │   │   │   │   │   ],                            │ 
+│ │            │   │   │   │   │   │   │   │   'children': [],               │ 
+│ │            │   │   │   │   │   │   │   │   'end_line': 22                │ 
+│ │            │   │   │   │   │   │   │   },                                │ 
+│ │            │   │   │   │   │   │   │   {                                 │ 
+│ │            │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT',      │ 
+│ │            │   │   │   │   │   │   │   │   'meta': 'RL_U16',             │ 
+│ │            │   │   │   │   │   │   │   │   'start_line': 24,             │ 
+│ │            │   │   │   │   │   │   │   │   'lines': [                    │ 
+│ │            │   │   │   │   │   │   │   │   │   '      FNC_VALUES 1 UWORD │ 
+│ │            COLUMN_DIR DIRECT'                                            │ 
+│ │            │   │   │   │   │   │   │   │   ],                            │ 
+│ │            │   │   │   │   │   │   │   │   'children': [],               │ 
+│ │            │   │   │   │   │   │   │   │   'end_line': 26                │ 
+│ │            │   │   │   │   │   │   │   },                                │ 
+│ │            │   │   │   │   │   │   │   {                                 │ 
+│ │            │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT',      │ 
+│ │            │   │   │   │   │   │   │   │   'meta': 'RL_U32',             │ 
+│ │            │   │   │   │   │   │   │   │   'start_line': 28,             │ 
+│ │            │   │   │   │   │   │   │   │   'lines': [                    │ 
+│ │            │   │   │   │   │   │   │   │   │   '      FNC_VALUES 1 ULONG │ 
+│ │            COLUMN_DIR DIRECT'                                            │ 
+│ │            │   │   │   │   │   │   │   │   ],                            │ 
+│ │            │   │   │   │   │   │   │   │   'children': [],               │ 
+│ │            │   │   │   │   │   │   │   │   'end_line': 30                │ 
+│ │            │   │   │   │   │   │   │   },                                │ 
+│ │            │   │   │   │   │   │   │   {                                 │ 
+│ │            │   │   │   │   │   │   │   │   'name': 'COMPU_METHOD',       │ 
+│ │            │   │   │   │   │   │   │   │   'meta': 'CM_IDENT "%6.2"      │ 
+│ │            IDENTICAL "%6.2" ""',                                         │ 
+│ │            │   │   │   │   │   │   │   │   'start_line': 32,             │ 
+│ │            │   │   │   │   │   │   │   │   'lines': [                    │ 
+│ │            │   │   │   │   │   │   │   │   │   '      COEFFS 0 1 0 0 0   │ 
+│ │            1'                                                            │ 
+│ │            │   │   │   │   │   │   │   │   ],                            │ 
+│ │            │   │   │   │   │   │   │   │   'children': [],               │ 
+│ │            │   │   │   │   │   │   │   │   'end_line': 34                │ 
+│ │            │   │   │   │   │   │   │   },                                │ 
+│ │            │   │   │   │   │   │   │   {                                 │ 
+│ │            │   │   │   │   │   │   │   │   'name': 'CHARACTERISTIC',     │ 
+│ │            │   │   │   │   │   │   │   │   'meta': 'CAL_BLOCK_A          │ 
+│ │            "CAL_BLOCK_A synthetic characteristic"',                      │ 
+│ │            │   │   │   │   │   │   │   │   'start_line': 36,             │ 
+│ │            │   │   │   │   │   │   │   │   'lines': [                    │ 
+│ │            │   │   │   │   │   │   │   │   │   '  VALUE 0x80000010 RL_U8 │ 
+│ │            0 CM_IDENT 0 255'                                             │ 
+│ │            │   │   │   │   │   │   │   │   ],                            │ 
+│ │            │   │   │   │   │   │   │   │   'children': [],               │ 
+│ │            │   │   │   │   │   │   │   │   'end_line': 38                │ 
+│ │            │   │   │   │   │   │   │   },                                │ 
+│ │            │   │   │   │   │   │   │   {                                 │ 
+│ │            │   │   │   │   │   │   │   │   'name': 'CHARACTERISTIC',     │ 
+│ │            │   │   │   │   │   │   │   │   'meta': 'CAL_BLOCK_B          │ 
+│ │            "CAL_BLOCK_B synthetic characteristic"',                      │ 
+│ │            │   │   │   │   │   │   │   │   'start_line': 39,             │ 
+│ │            │   │   │   │   │   │   │   │   'lines': [                    │ 
+│ │            │   │   │   │   │   │   │   │   │   '  VALUE 0x80000040 RL_U8 │ 
+│ │            0 CM_IDENT 0 255'                                             │ 
+│ │            │   │   │   │   │   │   │   │   ],                            │ 
+│ │            │   │   │   │   │   │   │   │   'children': [],               │ 
+│ │            │   │   │   │   │   │   │   │   'end_line': 41                │ 
+│ │            │   │   │   │   │   │   │   },                                │ 
+│ │            │   │   │   │   │   │   │   {                                 │ 
+│ │            │   │   │   │   │   │   │   │   'name': 'MEASUREMENT',        │ 
+│ │            │   │   │   │   │   │   │   │   'meta': 'MEAS_STATUS          │ 
+│ │            "MEAS_STATUS synthetic measurement"',                         │ 
+│ │            │   │   │   │   │   │   │   │   'start_line': 42,             │ 
+│ │            │   │   │   │   │   │   │   │   'lines': [                    │ 
+│ │            │   │   │   │   │   │   │   │   │   '  UBYTE CM_IDENT 0 0 0   │ 
+│ │            255',                                                         │ 
+│ │            │   │   │   │   │   │   │   │   │   '  ECU_ADDRESS            │ 
+│ │            0x80000000'                                                   │ 
+│ │            │   │   │   │   │   │   │   │   ],                            │ 
+│ │            │   │   │   │   │   │   │   │   'children': [],               │ 
+│ │            │   │   │   │   │   │   │   │   'end_line': 45                │ 
+│ │            │   │   │   │   │   │   │   },                                │ 
+│ │            │   │   │   │   │   │   │   {                                 │ 
+│ │            │   │   │   │   │   │   │   │   'name': 'GROUP',              │ 
+│ │            │   │   │   │   │   │   │   │   'meta': 'GRP_BASIC "GRP_BASIC │ 
+│ │            group"',                                                      │ 
+│ │            │   │   │   │   │   │   │   │   'start_line': 46,             │ 
+│ │            │   │   │   │   │   │   │   │   'lines': [],                  │ 
+│ │            │   │   │   │   │   │   │   │   'children': [                 │ 
+│ │            │   │   │   │   │   │   │   │   │   {                         │ 
+│ │            │   │   │   │   │   │   │   │   │   │   'name':               │ 
+│ │            'REF_CHARACTERISTIC',                                         │ 
+│ │            │   │   │   │   │   │   │   │   │   │   'meta': '',           │ 
+│ │            │   │   │   │   │   │   │   │   │   │   'start_line': 47,     │ 
+│ │            │   │   │   │   │   │   │   │   │   │   'lines': [            │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   '  CAL_BLOCK_A',  │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   '  CAL_BLOCK_B'   │ 
+│ │            │   │   │   │   │   │   │   │   │   │   ],                    │ 
+│ │            │   │   │   │   │   │   │   │   │   │   'children': [],       │ 
+│ │            │   │   │   │   │   │   │   │   │   │   'end_line': 50        │ 
+│ │            │   │   │   │   │   │   │   │   │   }                         │ 
+│ │            │   │   │   │   │   │   │   │   ],                            │ 
+│ │            │   │   │   │   │   │   │   │   'end_line': 51                │ 
+│ │            │   │   │   │   │   │   │   }                                 │ 
+│ │            │   │   │   │   │   │   ],                                    │ 
+│ │            │   │   │   │   │   │   'end_line': 52                        │ 
+│ │            │   │   │   │   │   }                                         │ 
+│ │            │   │   │   │   ],                                            │ 
+│ │            │   │   │   │   'end_line': 53                                │ 
+│ │            │   │   │   }                                                 │ 
+│ │            │   │   ],                                                    │ 
+│ │            │   │   'errors': [],                                         │ 
+│ │            │   │   'tags': [                                             │ 
+│ │            │   │   │   {                                                 │ 
+│ │            │   │   │   │   'section': 'CHARACTERISTIC',                  │ 
+│ │            │   │   │   │   'name': 'CAL_BLOCK_A',                        │ 
+│ │            │   │   │   │   'description': 'CAL_BLOCK_A synthetic         │ 
+│ │            characteristic',                                              │ 
+│ │            │   │   │   │   'address': 2147483664,                        │ 
+│ │            │   │   │   │   'length': 1,                                  │ 
+│ │            │   │   │   │   'source': 'formula',                          │ 
+│ │            │   │   │   │   'unit': None,                                 │ 
+│ │            │   │   │   │   'lower_limit': '0',                           │ 
+│ │            │   │   │   │   'upper_limit': '255',                         │ 
+│ │            │   │   │   │   'bit_org': None,                              │ 
+│ │            │   │   │   │   ... +18                                       │ 
+│ │            │   │   │   },                                                │ 
+│ │            │   │   │   {                                                 │ 
+│ │            │   │   │   │   'section': 'CHARACTERISTIC',                  │ 
+│ │            │   │   │   │   'name': 'CAL_BLOCK_B',                        │ 
+│ │            │   │   │   │   'description': 'CAL_BLOCK_B synthetic         │ 
+│ │            characteristic',                                              │ 
+│ │            │   │   │   │   'address': 2147483712,                        │ 
+│ │            │   │   │   │   'length': 1,                                  │ 
+│ │            │   │   │   │   'source': 'formula',                          │ 
+│ │            │   │   │   │   'unit': None,                                 │ 
+│ │            │   │   │   │   'lower_limit': '0',                           │ 
+│ │            │   │   │   │   'upper_limit': '255',                         │ 
+│ │            │   │   │   │   'bit_org': None,                              │ 
+│ │            │   │   │   │   ... +18                                       │ 
+│ │            │   │   │   },                                                │ 
+│ │            │   │   │   {                                                 │ 
+│ │            │   │   │   │   'section': 'MEASUREMENT',                     │ 
+│ │            │   │   │   │   'name': 'MEAS_STATUS',                        │ 
+│ │            │   │   │   │   'description': 'MEAS_STATUS synthetic         │ 
+│ │            measurement',                                                 │ 
+│ │            │   │   │   │   'address': 2147483648,                        │ 
+│ │            │   │   │   │   'length': 1,                                  │ 
+│ │            │   │   │   │   'source': 'formula',                          │ 
+│ │            │   │   │   │   'unit': None,                                 │ 
+│ │            │   │   │   │   'lower_limit': '0',                           │ 
+│ │            │   │   │   │   'upper_limit': '255',                         │ 
+│ │            │   │   │   │   'bit_org': None,                              │ 
+│ │            │   │   │   │   ... +18                                       │ 
+│ │            │   │   │   }                                                 │ 
+│ │            │   │   ],                                                    │ 
+│ │            │   │   'record_layouts_by_name': {                           │ 
+│ │            │   │   │   'RL_U8': {                                        │ 
+│ │            │   │   │   │   'name': 'RL_U8',                              │ 
+│ │            │   │   │   │   'tokens': [                                   │ 
+│ │            │   │   │   │   │   'FNC_VALUES',                             │ 
+│ │            │   │   │   │   │   '1',                                      │ 
+│ │            │   │   │   │   │   'UBYTE',                                  │ 
+│ │            │   │   │   │   │   'COLUMN_DIR',                             │ 
+│ │            │   │   │   │   │   'DIRECT'                                  │ 
+│ │            │   │   │   │   ],                                            │ 
+│ │            │   │   │   │   'lines': [                                    │ 
+│ │            │   │   │   │   │   '      FNC_VALUES 1 UBYTE COLUMN_DIR      │ 
+│ │            DIRECT'                                                       │ 
+│ │            │   │   │   │   ],                                            │ 
+│ │            │   │   │   │   'byte_order': None                            │ 
+│ │            │   │   │   },                                                │ 
+│ │            │   │   │   'RL_U16': {                                       │ 
+│ │            │   │   │   │   'name': 'RL_U16',                             │ 
+│ │            │   │   │   │   'tokens': [                                   │ 
+│ │            │   │   │   │   │   'FNC_VALUES',                             │ 
+│ │            │   │   │   │   │   '1',                                      │ 
+│ │            │   │   │   │   │   'UWORD',                                  │ 
+│ │            │   │   │   │   │   'COLUMN_DIR',                             │ 
+│ │            │   │   │   │   │   'DIRECT'                                  │ 
+│ │            │   │   │   │   ],                                            │ 
+│ │            │   │   │   │   'lines': [                                    │ 
+│ │            │   │   │   │   │   '      FNC_VALUES 1 UWORD COLUMN_DIR      │ 
+│ │            DIRECT'                                                       │ 
+│ │            │   │   │   │   ],                                            │ 
+│ │            │   │   │   │   'byte_order': None                            │ 
+│ │            │   │   │   },                                                │ 
+│ │            │   │   │   'RL_U32': {                                       │ 
+│ │            │   │   │   │   'name': 'RL_U32',                             │ 
+│ │            │   │   │   │   'tokens': [                                   │ 
+│ │            │   │   │   │   │   'FNC_VALUES',                             │ 
+│ │            │   │   │   │   │   '1',                                      │ 
+│ │            │   │   │   │   │   'ULONG',                                  │ 
+│ │            │   │   │   │   │   'COLUMN_DIR',                             │ 
+│ │            │   │   │   │   │   'DIRECT'                                  │ 
+│ │            │   │   │   │   ],                                            │ 
+│ │            │   │   │   │   'lines': [                                    │ 
+│ │            │   │   │   │   │   '      FNC_VALUES 1 ULONG COLUMN_DIR      │ 
+│ │            DIRECT'                                                       │ 
+│ │            │   │   │   │   ],                                            │ 
+│ │            │   │   │   │   'byte_order': None                            │ 
+│ │            │   │   │   }                                                 │ 
+│ │            │   │   },                                                    │ 
+│ │            │   │   'compu_methods_by_name': {                            │ 
+│ │            │   │   │   'CM_IDENT': {                                     │ 
+│ │            │   │   │   │   'name': 'CM_IDENT',                           │ 
+│ │            │   │   │   │   'long_identifier': '%6.2',                    │ 
+│ │            │   │   │   │   'conversion_type': 'IDENTICAL',               │ 
+│ │            │   │   │   │   'format': '%6.2',                             │ 
+│ │            │   │   │   │   'unit': '%6.2',                               │ 
+│ │            │   │   │   │   'coeffs_linear': None,                        │ 
+│ │            │   │   │   │   'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0],     │ 
+│ │            │   │   │   │   'compu_tab_ref': None,                        │ 
+│ │            │   │   │   │   'formula': None,                              │ 
+│ │            │   │   │   │   'lines': ['      COEFFS 0 1 0 0 0 1']         │ 
+│ │            │   │   │   }                                                 │ 
+│ │            │   │   },                                                    │ 
+│ │            │   │   'compu_tabs_by_name': {}                              │ 
+│ │            │   },                                                        │ 
+│ │            │                                                             │ 
+│ │            mac_path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/clau… │ 
+│ │            │   mac_records=[                                             │ 
+│ │            │   │   {                                                     │ 
+│ │            │   │   │   'line_number': 1,                                 │ 
+│ │            │   │   │   'raw': '; Synthetic MAC',                         │ 
+│ │            │   │   │   'name': None,                                     │ 
+│ │            │   │   │   'address': None,                                  │ 
+│ │            │   │   │   'parse_ok': False,                                │ 
+│ │            │   │   │   'parse_error': "expected one '=' separator"       │ 
+│ │            │   │   },                                                    │ 
+│ │            │   │   {                                                     │ 
+│ │            │   │   │   'line_number': 2,                                 │ 
+│ │            │   │   │   'raw': 'BLOCK_A=80000000',                        │ 
+│ │            │   │   │   'name': 'BLOCK_A',                                │ 
+│ │            │   │   │   'address': 2147483648,                            │ 
+│ │            │   │   │   'parse_ok': True,                                 │ 
+│ │            │   │   │   'parse_error': ''                                 │ 
+│ │            │   │   }                                                     │ 
+│ │            │   ],                                                        │ 
+│ │            │   mac_diagnostics=["Line 1: expected one '=' separator"],   │ 
+│ │            │   variant_id='firmware',                                    │ 
+│ │            │   source_s0_header=b'CASE01_BASIC',                         │ 
+│ │            │   entropy_windows=[                                         │ 
+│ │            │   │   EntropyWindow(                                        │ 
+│ │            │   │   │   start=2147483648,                                 │ 
+│ │            │   │   │   end=2147483681,                                   │ 
+│ │            │   │   │   sample_count=33,                                  │ 
+│ │            │   │   │   entropy=4.68075775572209,                         │ 
+│ │            │   │   │   band='low',                                       │ 
+│ │            │   │   │   low_confidence=True                               │ 
+│ │            │   │   ),                                                    │ 
+│ │            │   │   EntropyWindow(                                        │ 
+│ │            │   │   │   start=2147483712,                                 │ 
+│ │            │   │   │   end=2147483776,                                   │ 
+│ │            │   │   │   sample_count=64,                                  │ 
+│ │            │   │   │   entropy=6.0,                                      │ 
+│ │            │   │   │   band='medium',                                    │ 
+│ │            │   │   │   low_confidence=False                              │ 
+│ │            │   │   )                                                     │ 
+│ │            │   ],                                                        │ 
+│ │            │   out_of_order_count=0,                                     │ 
+│ │            │   entry_point=2147483648                                    │ 
+│ │            )                                                             │ 
+│ │ prepared = PreparedProjectLoad(                                          │ 
+│ │            │   request=ProjectLoadRequest(                               │ 
+│ │            │   │   name='P',                                             │ 
+│ │            │   │                                                         │ 
+│ │            project_dir=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/c… │ 
+│ │            │   │   data_files=(                                          │ 
+│ │            │   │   │                                                     │ 
+│ │            WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Use… │ 
+│ │            │   │   │                                                     │ 
+│ │            WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Use… │ 
+│ │            │   │   ),                                                    │ 
+│ │            │   │   a2l_files=(                                           │ 
+│ │            │   │   │                                                     │ 
+│ │            WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Use… │ 
+│ │            │   │   ),                                                    │ 
+│ │            │   │   a2l_problem=None,                                     │ 
+│ │            │   │   a2l_cache=None,                                       │ 
+│ │            │   │   gen=1,                                                │ 
+│ │            │   │   routed=False                                          │ 
+│ │            │   ),                                                        │ 
+│ │            │   refusal=None,                                             │ 
+│ │            │   variant_set=ProjectVariantSet(                            │ 
+│ │            │   │   project_name='P',                                     │ 
+│ │            │   │   variants=(                                            │ 
+│ │            │   │   │   VariantDescriptor(                                │ 
+│ │            │   │   │   │   variant_id='firmware',                        │ 
+│ │            │   │   │   │                                                 │ 
+│ │            path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C… │ 
+│ │            │   │   │   │   file_type='s19'                               │ 
+│ │            │   │   │   ),                                                │ 
+│ │            │   │   ),                                                    │ 
+│ │            │   │   active_id='firmware'                                  │ 
+│ │            │   ),                                                        │ 
+│ │            │   manifest=None,                                            │ 
+│ │            │   problems=(                                                │ 
+│ │            │   │   ProjectFileProblem(                                   │ 
+│ │            │   │   │   kind='no project.json',                           │ 
+│ │            │   │   │   file='project.json',                              │ 
+│ │            │   │   │   reason='',                                        │ 
+│ │            │   │   │   code=None,                                        │ 
+│ │            │   │   │   step=None                                         │ 
+│ │            │   │   ),                                                    │ 
+│ │            │   ),                                                        │ 
+│ │            │   a2l_cache=(                                               │ 
+│ │            │   │   (                                                     │ 
+│ │            │   │   │                                                     │ 
+│ │            'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
+│ │            │   │   │   1793542573730216300,                              │ 
+│ │            │   │   │   1444                                              │ 
+│ │            │   │   ),                                                    │ 
+│ │            │   │   {                                                     │ 
+│ │            │   │   │   'path':                                           │ 
+│ │            'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
+│ │            │   │   │   'sections': [                                     │ 
+│ │            │   │   │   │   {                                             │ 
+│ │            │   │   │   │   │   'name': 'PROJECT',                        │ 
+│ │            │   │   │   │   │   'meta': 'CASE01 "Synthetic project for    │ 
+│ │            S19Tool stress testing"',                                     │ 
+│ │            │   │   │   │   │   'start_line': 1,                          │ 
+│ │            │   │   │   │   │   'lines': [''],                            │ 
+│ │            │   │   │   │   │   'children': [                             │ 
+│ │            │   │   │   │   │   │   {                                     │ 
+│ │            │   │   │   │   │   │   │   'name': 'HEADER',                 │ 
+│ │            │   │   │   │   │   │   │   'meta': '',                       │ 
+│ │            │   │   │   │   │   │   │   'start_line': 2,                  │ 
+│ │            │   │   │   │   │   │   │   'lines': [                        │ 
+│ │            │   │   │   │   │   │   │   │   '    VERSION "1.0"',          │ 
+│ │            │   │   │   │   │   │   │   │   '    PROJECT_NO 1'            │ 
+│ │            │   │   │   │   │   │   │   ],                                │ 
+│ │            │   │   │   │   │   │   │   'children': [],                   │ 
+│ │            │   │   │   │   │   │   │   'end_line': 5                     │ 
+│ │            │   │   │   │   │   │   },                                    │ 
+│ │            │   │   │   │   │   │   {                                     │ 
+│ │            │   │   │   │   │   │   │   'name': 'MODULE',                 │ 
+│ │            │   │   │   │   │   │   │   'meta': 'BASIC "Synthetic ECU     │ 
+│ │            module"',                                                     │ 
+│ │            │   │   │   │   │   │   │   'start_line': 7,                  │ 
+│ │            │   │   │   │   │   │   │   'lines': [                        │ 
+│ │            │   │   │   │   │   │   │   │   '',                           │ 
+│ │            │   │   │   │   │   │   │   │   '',                           │ 
+│ │            │   │   │   │   │   │   │   │   '',                           │ 
+│ │            │   │   │   │   │   │   │   │   '',                           │ 
+│ │            │   │   │   │   │   │   │   │   '',                           │ 
+│ │            │   │   │   │   │   │   │   │   ''                            │ 
+│ │            │   │   │   │   │   │   │   ],                                │ 
+│ │            │   │   │   │   │   │   │   'children': [                     │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'MOD_COMMON',     │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': '""',             │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 8,          │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      BYTE_ORDER     │ 
+│ │            MSB_FIRST',                                                   │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      ALIGNMENT_BYTE │ 
+│ │            1',                                                           │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      ALIGNMENT_WORD │ 
+│ │            2',                                                           │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      ALIGNMENT_LONG │ 
+│ │            4',                                                           │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '                     │ 
+│ │            ALIGNMENT_FLOAT32_IEEE 4'                                     │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 14            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'MOD_PAR',        │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': '""',             │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 16,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      EPK            │ 
+│ │            "S19TOOL_SYNTH"'                                              │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 18            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT',  │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': 'RL_U8',          │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 20,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      FNC_VALUES 1   │ 
+│ │            UBYTE COLUMN_DIR DIRECT'                                      │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 22            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT',  │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': 'RL_U16',         │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 24,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      FNC_VALUES 1   │ 
+│ │            UWORD COLUMN_DIR DIRECT'                                      │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 26            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT',  │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': 'RL_U32',         │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 28,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      FNC_VALUES 1   │ 
+│ │            ULONG COLUMN_DIR DIRECT'                                      │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 30            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'COMPU_METHOD',   │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': 'CM_IDENT "%6.2"  │ 
+│ │            IDENTICAL "%6.2" ""',                                         │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 32,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      COEFFS 0 1 0 0 │ 
+│ │            0 1'                                                          │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 34            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'CHARACTERISTIC', │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': 'CAL_BLOCK_A      │ 
+│ │            "CAL_BLOCK_A synthetic characteristic"',                      │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 36,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '  VALUE 0x80000010   │ 
+│ │            RL_U8 0 CM_IDENT 0 255'                                       │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 38            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'CHARACTERISTIC', │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': 'CAL_BLOCK_B      │ 
+│ │            "CAL_BLOCK_B synthetic characteristic"',                      │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 39,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '  VALUE 0x80000040   │ 
+│ │            RL_U8 0 CM_IDENT 0 255'                                       │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 41            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'MEASUREMENT',    │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': 'MEAS_STATUS      │ 
+│ │            "MEAS_STATUS synthetic measurement"',                         │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 42,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '  UBYTE CM_IDENT 0 0 │ 
+│ │            0 255',                                                       │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '  ECU_ADDRESS        │ 
+│ │            0x80000000'                                                   │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 45            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'GROUP',          │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': 'GRP_BASIC        │ 
+│ │            "GRP_BASIC group"',                                           │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 46,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [],              │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [             │ 
+│ │            │   │   │   │   │   │   │   │   │   │   {                     │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   'name':           │ 
+│ │            'REF_CHARACTERISTIC',                                         │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   'meta': '',       │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   'start_line': 47, │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   'lines': [        │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   │   '             │ 
+│ │            CAL_BLOCK_A',                                                 │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   │   '             │ 
+│ │            CAL_BLOCK_B'                                                  │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   ],                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   'children': [],   │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   'end_line': 50    │ 
+│ │            │   │   │   │   │   │   │   │   │   │   }                     │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 51            │ 
+│ │            │   │   │   │   │   │   │   │   }                             │ 
+│ │            │   │   │   │   │   │   │   ],                                │ 
+│ │            │   │   │   │   │   │   │   'end_line': 52                    │ 
+│ │            │   │   │   │   │   │   }                                     │ 
+│ │            │   │   │   │   │   ],                                        │ 
+│ │            │   │   │   │   │   'end_line': 53                            │ 
+│ │            │   │   │   │   }                                             │ 
+│ │            │   │   │   ],                                                │ 
+│ │            │   │   │   'errors': [],                                     │ 
+│ │            │   │   │   'tags': [                                         │ 
+│ │            │   │   │   │   {                                             │ 
+│ │            │   │   │   │   │   'section': 'CHARACTERISTIC',              │ 
+│ │            │   │   │   │   │   'name': 'CAL_BLOCK_A',                    │ 
+│ │            │   │   │   │   │   'description': 'CAL_BLOCK_A synthetic     │ 
+│ │            characteristic',                                              │ 
+│ │            │   │   │   │   │   'address': 2147483664,                    │ 
+│ │            │   │   │   │   │   'length': 1,                              │ 
+│ │            │   │   │   │   │   'source': 'formula',                      │ 
+│ │            │   │   │   │   │   'unit': None,                             │ 
+│ │            │   │   │   │   │   'lower_limit': '0',                       │ 
+│ │            │   │   │   │   │   'upper_limit': '255',                     │ 
+│ │            │   │   │   │   │   'bit_org': None,                          │ 
+│ │            │   │   │   │   │   ... +18                                   │ 
+│ │            │   │   │   │   },                                            │ 
+│ │            │   │   │   │   {                                             │ 
+│ │            │   │   │   │   │   'section': 'CHARACTERISTIC',              │ 
+│ │            │   │   │   │   │   'name': 'CAL_BLOCK_B',                    │ 
+│ │            │   │   │   │   │   'description': 'CAL_BLOCK_B synthetic     │ 
+│ │            characteristic',                                              │ 
+│ │            │   │   │   │   │   'address': 2147483712,                    │ 
+│ │            │   │   │   │   │   'length': 1,                              │ 
+│ │            │   │   │   │   │   'source': 'formula',                      │ 
+│ │            │   │   │   │   │   'unit': None,                             │ 
+│ │            │   │   │   │   │   'lower_limit': '0',                       │ 
+│ │            │   │   │   │   │   'upper_limit': '255',                     │ 
+│ │            │   │   │   │   │   'bit_org': None,                          │ 
+│ │            │   │   │   │   │   ... +18                                   │ 
+│ │            │   │   │   │   },                                            │ 
+│ │            │   │   │   │   {                                             │ 
+│ │            │   │   │   │   │   'section': 'MEASUREMENT',                 │ 
+│ │            │   │   │   │   │   'name': 'MEAS_STATUS',                    │ 
+│ │            │   │   │   │   │   'description': 'MEAS_STATUS synthetic     │ 
+│ │            measurement',                                                 │ 
+│ │            │   │   │   │   │   'address': 2147483648,                    │ 
+│ │            │   │   │   │   │   'length': 1,                              │ 
+│ │            │   │   │   │   │   'source': 'formula',                      │ 
+│ │            │   │   │   │   │   'unit': None,                             │ 
+│ │            │   │   │   │   │   'lower_limit': '0',                       │ 
+│ │            │   │   │   │   │   'upper_limit': '255',                     │ 
+│ │            │   │   │   │   │   'bit_org': None,                          │ 
+│ │            │   │   │   │   │   ... +18                                   │ 
+│ │            │   │   │   │   }                                             │ 
+│ │            │   │   │   ],                                                │ 
+│ │            │   │   │   'record_layouts_by_name': {                       │ 
+│ │            │   │   │   │   'RL_U8': {                                    │ 
+│ │            │   │   │   │   │   'name': 'RL_U8',                          │ 
+│ │            │   │   │   │   │   'tokens': [                               │ 
+│ │            │   │   │   │   │   │   'FNC_VALUES',                         │ 
+│ │            │   │   │   │   │   │   '1',                                  │ 
+│ │            │   │   │   │   │   │   'UBYTE',                              │ 
+│ │            │   │   │   │   │   │   'COLUMN_DIR',                         │ 
+│ │            │   │   │   │   │   │   'DIRECT'                              │ 
+│ │            │   │   │   │   │   ],                                        │ 
+│ │            │   │   │   │   │   'lines': [                                │ 
+│ │            │   │   │   │   │   │   '      FNC_VALUES 1 UBYTE COLUMN_DIR  │ 
+│ │            DIRECT'                                                       │ 
+│ │            │   │   │   │   │   ],                                        │ 
+│ │            │   │   │   │   │   'byte_order': None                        │ 
+│ │            │   │   │   │   },                                            │ 
+│ │            │   │   │   │   'RL_U16': {                                   │ 
+│ │            │   │   │   │   │   'name': 'RL_U16',                         │ 
+│ │            │   │   │   │   │   'tokens': [                               │ 
+│ │            │   │   │   │   │   │   'FNC_VALUES',                         │ 
+│ │            │   │   │   │   │   │   '1',                                  │ 
+│ │            │   │   │   │   │   │   'UWORD',                              │ 
+│ │            │   │   │   │   │   │   'COLUMN_DIR',                         │ 
+│ │            │   │   │   │   │   │   'DIRECT'                              │ 
+│ │            │   │   │   │   │   ],                                        │ 
+│ │            │   │   │   │   │   'lines': [                                │ 
+│ │            │   │   │   │   │   │   '      FNC_VALUES 1 UWORD COLUMN_DIR  │ 
+│ │            DIRECT'                                                       │ 
+│ │            │   │   │   │   │   ],                                        │ 
+│ │            │   │   │   │   │   'byte_order': None                        │ 
+│ │            │   │   │   │   },                                            │ 
+│ │            │   │   │   │   'RL_U32': {                                   │ 
+│ │            │   │   │   │   │   'name': 'RL_U32',                         │ 
+│ │            │   │   │   │   │   'tokens': [                               │ 
+│ │            │   │   │   │   │   │   'FNC_VALUES',                         │ 
+│ │            │   │   │   │   │   │   '1',                                  │ 
+│ │            │   │   │   │   │   │   'ULONG',                              │ 
+│ │            │   │   │   │   │   │   'COLUMN_DIR',                         │ 
+│ │            │   │   │   │   │   │   'DIRECT'                              │ 
+│ │            │   │   │   │   │   ],                                        │ 
+│ │            │   │   │   │   │   'lines': [                                │ 
+│ │            │   │   │   │   │   │   '      FNC_VALUES 1 ULONG COLUMN_DIR  │ 
+│ │            DIRECT'                                                       │ 
+│ │            │   │   │   │   │   ],                                        │ 
+│ │            │   │   │   │   │   'byte_order': None                        │ 
+│ │            │   │   │   │   }                                             │ 
+│ │            │   │   │   },                                                │ 
+│ │            │   │   │   'compu_methods_by_name': {                        │ 
+│ │            │   │   │   │   'CM_IDENT': {                                 │ 
+│ │            │   │   │   │   │   'name': 'CM_IDENT',                       │ 
+│ │            │   │   │   │   │   'long_identifier': '%6.2',                │ 
+│ │            │   │   │   │   │   'conversion_type': 'IDENTICAL',           │ 
+│ │            │   │   │   │   │   'format': '%6.2',                         │ 
+│ │            │   │   │   │   │   'unit': '%6.2',                           │ 
+│ │            │   │   │   │   │   'coeffs_linear': None,                    │ 
+│ │            │   │   │   │   │   'coeffs': [                               │ 
+│ │            │   │   │   │   │   │   0.0,                                  │ 
+│ │            │   │   │   │   │   │   1.0,                                  │ 
+│ │            │   │   │   │   │   │   0.0,                                  │ 
+│ │            │   │   │   │   │   │   0.0,                                  │ 
+│ │            │   │   │   │   │   │   0.0,                                  │ 
+│ │            │   │   │   │   │   │   1.0                                   │ 
+│ │            │   │   │   │   │   ],                                        │ 
+│ │            │   │   │   │   │   'compu_tab_ref': None,                    │ 
+│ │            │   │   │   │   │   'formula': None,                          │ 
+│ │            │   │   │   │   │   'lines': ['      COEFFS 0 1 0 0 0 1']     │ 
+│ │            │   │   │   │   }                                             │ 
+│ │            │   │   │   },                                                │ 
+│ │            │   │   │   'compu_tabs_by_name': {}                          │ 
+│ │            │   │   }                                                     │ 
+│ │            │   ),                                                        │ 
+│ │            │   install=InstallSet(                                       │ 
+│ │            │   │   variant=VariantDescriptor(                            │ 
+│ │            │   │   │   variant_id='firmware',                            │ 
+│ │            │   │   │                                                     │ 
+│ │            path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C… │ 
+│ │            │   │   │   file_type='s19'                                   │ 
+│ │            │   │   ),                                                    │ 
+│ │            │   │                                                         │ 
+│ │            mac=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C-… │ 
+│ │            │   │                                                         │ 
+│ │            a2l=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C-… │ 
+│ │            │   ),                                                        │ 
+│ │            │   image=LoadedFile(                                         │ 
+│ │            │   │                                                         │ 
+│ │            path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C… │ 
+│ │            │   │   file_type='s19',                                      │ 
+│ │            │   │   mem_map={                                             │ 
+│ │            │   │   │   2147483648: 83,                                   │ 
+│ │            │   │   │   2147483649: 49,                                   │ 
+│ │            │   │   │   2147483650: 57,                                   │ 
+│ │            │   │   │   2147483651: 84,                                   │ 
+│ │            │   │   │   2147483652: 79,                                   │ 
+│ │            │   │   │   2147483653: 79,                                   │ 
+│ │            │   │   │   2147483654: 76,                                   │ 
+│ │            │   │   │   2147483655: 95,                                   │ 
+│ │            │   │   │   2147483656: 66,                                   │ 
+│ │            │   │   │   2147483657: 65,                                   │ 
+│ │            │   │   │   ... +87                                           │ 
+│ │            │   │   },                                                    │ 
+│ │            │   │   row_bases=[                                           │ 
+│ │            │   │   │   2147483648,                                       │ 
+│ │            │   │   │   2147483664,                                       │ 
+│ │            │   │   │   2147483680,                                       │ 
+│ │            │   │   │   2147483712,                                       │ 
+│ │            │   │   │   2147483728,                                       │ 
+│ │            │   │   │   2147483744,                                       │ 
+│ │            │   │   │   2147483760                                        │ 
+│ │            │   │   ],                                                    │ 
+│ │            │   │   ranges=[                                              │ 
+│ │            │   │   │   (2147483648, 2147483681),                         │ 
+│ │            │   │   │   (2147483712, 2147483776)                          │ 
+│ │            │   │   ],                                                    │ 
+│ │            │   │   range_validity=[True, True],                          │ 
+│ │            │   │   errors=[],                                            │ 
+│ │            │   │                                                         │ 
+│ │            a2l_path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/clau… │ 
+│ │            │   │   a2l_data={                                            │ 
+│ │            │   │   │   'path':                                           │ 
+│ │            'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
+│ │            │   │   │   'sections': [                                     │ 
+│ │            │   │   │   │   {                                             │ 
+│ │            │   │   │   │   │   'name': 'PROJECT',                        │ 
+│ │            │   │   │   │   │   'meta': 'CASE01 "Synthetic project for    │ 
+│ │            S19Tool stress testing"',                                     │ 
+│ │            │   │   │   │   │   'start_line': 1,                          │ 
+│ │            │   │   │   │   │   'lines': [''],                            │ 
+│ │            │   │   │   │   │   'children': [                             │ 
+│ │            │   │   │   │   │   │   {                                     │ 
+│ │            │   │   │   │   │   │   │   'name': 'HEADER',                 │ 
+│ │            │   │   │   │   │   │   │   'meta': '',                       │ 
+│ │            │   │   │   │   │   │   │   'start_line': 2,                  │ 
+│ │            │   │   │   │   │   │   │   'lines': [                        │ 
+│ │            │   │   │   │   │   │   │   │   '    VERSION "1.0"',          │ 
+│ │            │   │   │   │   │   │   │   │   '    PROJECT_NO 1'            │ 
+│ │            │   │   │   │   │   │   │   ],                                │ 
+│ │            │   │   │   │   │   │   │   'children': [],                   │ 
+│ │            │   │   │   │   │   │   │   'end_line': 5                     │ 
+│ │            │   │   │   │   │   │   },                                    │ 
+│ │            │   │   │   │   │   │   {                                     │ 
+│ │            │   │   │   │   │   │   │   'name': 'MODULE',                 │ 
+│ │            │   │   │   │   │   │   │   'meta': 'BASIC "Synthetic ECU     │ 
+│ │            module"',                                                     │ 
+│ │            │   │   │   │   │   │   │   'start_line': 7,                  │ 
+│ │            │   │   │   │   │   │   │   'lines': [                        │ 
+│ │            │   │   │   │   │   │   │   │   '',                           │ 
+│ │            │   │   │   │   │   │   │   │   '',                           │ 
+│ │            │   │   │   │   │   │   │   │   '',                           │ 
+│ │            │   │   │   │   │   │   │   │   '',                           │ 
+│ │            │   │   │   │   │   │   │   │   '',                           │ 
+│ │            │   │   │   │   │   │   │   │   ''                            │ 
+│ │            │   │   │   │   │   │   │   ],                                │ 
+│ │            │   │   │   │   │   │   │   'children': [                     │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'MOD_COMMON',     │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': '""',             │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 8,          │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      BYTE_ORDER     │ 
+│ │            MSB_FIRST',                                                   │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      ALIGNMENT_BYTE │ 
+│ │            1',                                                           │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      ALIGNMENT_WORD │ 
+│ │            2',                                                           │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      ALIGNMENT_LONG │ 
+│ │            4',                                                           │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '                     │ 
+│ │            ALIGNMENT_FLOAT32_IEEE 4'                                     │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 14            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'MOD_PAR',        │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': '""',             │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 16,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      EPK            │ 
+│ │            "S19TOOL_SYNTH"'                                              │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 18            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT',  │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': 'RL_U8',          │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 20,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      FNC_VALUES 1   │ 
+│ │            UBYTE COLUMN_DIR DIRECT'                                      │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 22            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT',  │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': 'RL_U16',         │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 24,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      FNC_VALUES 1   │ 
+│ │            UWORD COLUMN_DIR DIRECT'                                      │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 26            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT',  │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': 'RL_U32',         │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 28,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      FNC_VALUES 1   │ 
+│ │            ULONG COLUMN_DIR DIRECT'                                      │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 30            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'COMPU_METHOD',   │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': 'CM_IDENT "%6.2"  │ 
+│ │            IDENTICAL "%6.2" ""',                                         │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 32,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      COEFFS 0 1 0 0 │ 
+│ │            0 1'                                                          │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 34            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'CHARACTERISTIC', │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': 'CAL_BLOCK_A      │ 
+│ │            "CAL_BLOCK_A synthetic characteristic"',                      │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 36,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '  VALUE 0x80000010   │ 
+│ │            RL_U8 0 CM_IDENT 0 255'                                       │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 38            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'CHARACTERISTIC', │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': 'CAL_BLOCK_B      │ 
+│ │            "CAL_BLOCK_B synthetic characteristic"',                      │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 39,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '  VALUE 0x80000040   │ 
+│ │            RL_U8 0 CM_IDENT 0 255'                                       │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 41            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'MEASUREMENT',    │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': 'MEAS_STATUS      │ 
+│ │            "MEAS_STATUS synthetic measurement"',                         │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 42,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '  UBYTE CM_IDENT 0 0 │ 
+│ │            0 255',                                                       │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '  ECU_ADDRESS        │ 
+│ │            0x80000000'                                                   │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 45            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'GROUP',          │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': 'GRP_BASIC        │ 
+│ │            "GRP_BASIC group"',                                           │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 46,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [],              │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [             │ 
+│ │            │   │   │   │   │   │   │   │   │   │   {                     │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   'name':           │ 
+│ │            'REF_CHARACTERISTIC',                                         │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   'meta': '',       │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   'start_line': 47, │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   'lines': [        │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   │   '             │ 
+│ │            CAL_BLOCK_A',                                                 │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   │   '             │ 
+│ │            CAL_BLOCK_B'                                                  │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   ],                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   'children': [],   │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   'end_line': 50    │ 
+│ │            │   │   │   │   │   │   │   │   │   │   }                     │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 51            │ 
+│ │            │   │   │   │   │   │   │   │   }                             │ 
+│ │            │   │   │   │   │   │   │   ],                                │ 
+│ │            │   │   │   │   │   │   │   'end_line': 52                    │ 
+│ │            │   │   │   │   │   │   }                                     │ 
+│ │            │   │   │   │   │   ],                                        │ 
+│ │            │   │   │   │   │   'end_line': 53                            │ 
+│ │            │   │   │   │   }                                             │ 
+│ │            │   │   │   ],                                                │ 
+│ │            │   │   │   'errors': [],                                     │ 
+│ │            │   │   │   'tags': [                                         │ 
+│ │            │   │   │   │   {                                             │ 
+│ │            │   │   │   │   │   'section': 'CHARACTERISTIC',              │ 
+│ │            │   │   │   │   │   'name': 'CAL_BLOCK_A',                    │ 
+│ │            │   │   │   │   │   'description': 'CAL_BLOCK_A synthetic     │ 
+│ │            characteristic',                                              │ 
+│ │            │   │   │   │   │   'address': 2147483664,                    │ 
+│ │            │   │   │   │   │   'length': 1,                              │ 
+│ │            │   │   │   │   │   'source': 'formula',                      │ 
+│ │            │   │   │   │   │   'unit': None,                             │ 
+│ │            │   │   │   │   │   'lower_limit': '0',                       │ 
+│ │            │   │   │   │   │   'upper_limit': '255',                     │ 
+│ │            │   │   │   │   │   'bit_org': None,                          │ 
+│ │            │   │   │   │   │   ... +18                                   │ 
+│ │            │   │   │   │   },                                            │ 
+│ │            │   │   │   │   {                                             │ 
+│ │            │   │   │   │   │   'section': 'CHARACTERISTIC',              │ 
+│ │            │   │   │   │   │   'name': 'CAL_BLOCK_B',                    │ 
+│ │            │   │   │   │   │   'description': 'CAL_BLOCK_B synthetic     │ 
+│ │            characteristic',                                              │ 
+│ │            │   │   │   │   │   'address': 2147483712,                    │ 
+│ │            │   │   │   │   │   'length': 1,                              │ 
+│ │            │   │   │   │   │   'source': 'formula',                      │ 
+│ │            │   │   │   │   │   'unit': None,                             │ 
+│ │            │   │   │   │   │   'lower_limit': '0',                       │ 
+│ │            │   │   │   │   │   'upper_limit': '255',                     │ 
+│ │            │   │   │   │   │   'bit_org': None,                          │ 
+│ │            │   │   │   │   │   ... +18                                   │ 
+│ │            │   │   │   │   },                                            │ 
+│ │            │   │   │   │   {                                             │ 
+│ │            │   │   │   │   │   'section': 'MEASUREMENT',                 │ 
+│ │            │   │   │   │   │   'name': 'MEAS_STATUS',                    │ 
+│ │            │   │   │   │   │   'description': 'MEAS_STATUS synthetic     │ 
+│ │            measurement',                                                 │ 
+│ │            │   │   │   │   │   'address': 2147483648,                    │ 
+│ │            │   │   │   │   │   'length': 1,                              │ 
+│ │            │   │   │   │   │   'source': 'formula',                      │ 
+│ │            │   │   │   │   │   'unit': None,                             │ 
+│ │            │   │   │   │   │   'lower_limit': '0',                       │ 
+│ │            │   │   │   │   │   'upper_limit': '255',                     │ 
+│ │            │   │   │   │   │   'bit_org': None,                          │ 
+│ │            │   │   │   │   │   ... +18                                   │ 
+│ │            │   │   │   │   }                                             │ 
+│ │            │   │   │   ],                                                │ 
+│ │            │   │   │   'record_layouts_by_name': {                       │ 
+│ │            │   │   │   │   'RL_U8': {                                    │ 
+│ │            │   │   │   │   │   'name': 'RL_U8',                          │ 
+│ │            │   │   │   │   │   'tokens': [                               │ 
+│ │            │   │   │   │   │   │   'FNC_VALUES',                         │ 
+│ │            │   │   │   │   │   │   '1',                                  │ 
+│ │            │   │   │   │   │   │   'UBYTE',                              │ 
+│ │            │   │   │   │   │   │   'COLUMN_DIR',                         │ 
+│ │            │   │   │   │   │   │   'DIRECT'                              │ 
+│ │            │   │   │   │   │   ],                                        │ 
+│ │            │   │   │   │   │   'lines': [                                │ 
+│ │            │   │   │   │   │   │   '      FNC_VALUES 1 UBYTE COLUMN_DIR  │ 
+│ │            DIRECT'                                                       │ 
+│ │            │   │   │   │   │   ],                                        │ 
+│ │            │   │   │   │   │   'byte_order': None                        │ 
+│ │            │   │   │   │   },                                            │ 
+│ │            │   │   │   │   'RL_U16': {                                   │ 
+│ │            │   │   │   │   │   'name': 'RL_U16',                         │ 
+│ │            │   │   │   │   │   'tokens': [                               │ 
+│ │            │   │   │   │   │   │   'FNC_VALUES',                         │ 
+│ │            │   │   │   │   │   │   '1',                                  │ 
+│ │            │   │   │   │   │   │   'UWORD',                              │ 
+│ │            │   │   │   │   │   │   'COLUMN_DIR',                         │ 
+│ │            │   │   │   │   │   │   'DIRECT'                              │ 
+│ │            │   │   │   │   │   ],                                        │ 
+│ │            │   │   │   │   │   'lines': [                                │ 
+│ │            │   │   │   │   │   │   '      FNC_VALUES 1 UWORD COLUMN_DIR  │ 
+│ │            DIRECT'                                                       │ 
+│ │            │   │   │   │   │   ],                                        │ 
+│ │            │   │   │   │   │   'byte_order': None                        │ 
+│ │            │   │   │   │   },                                            │ 
+│ │            │   │   │   │   'RL_U32': {                                   │ 
+│ │            │   │   │   │   │   'name': 'RL_U32',                         │ 
+│ │            │   │   │   │   │   'tokens': [                               │ 
+│ │            │   │   │   │   │   │   'FNC_VALUES',                         │ 
+│ │            │   │   │   │   │   │   '1',                                  │ 
+│ │            │   │   │   │   │   │   'ULONG',                              │ 
+│ │            │   │   │   │   │   │   'COLUMN_DIR',                         │ 
+│ │            │   │   │   │   │   │   'DIRECT'                              │ 
+│ │            │   │   │   │   │   ],                                        │ 
+│ │            │   │   │   │   │   'lines': [                                │ 
+│ │            │   │   │   │   │   │   '      FNC_VALUES 1 ULONG COLUMN_DIR  │ 
+│ │            DIRECT'                                                       │ 
+│ │            │   │   │   │   │   ],                                        │ 
+│ │            │   │   │   │   │   'byte_order': None                        │ 
+│ │            │   │   │   │   }                                             │ 
+│ │            │   │   │   },                                                │ 
+│ │            │   │   │   'compu_methods_by_name': {                        │ 
+│ │            │   │   │   │   'CM_IDENT': {                                 │ 
+│ │            │   │   │   │   │   'name': 'CM_IDENT',                       │ 
+│ │            │   │   │   │   │   'long_identifier': '%6.2',                │ 
+│ │            │   │   │   │   │   'conversion_type': 'IDENTICAL',           │ 
+│ │            │   │   │   │   │   'format': '%6.2',                         │ 
+│ │            │   │   │   │   │   'unit': '%6.2',                           │ 
+│ │            │   │   │   │   │   'coeffs_linear': None,                    │ 
+│ │            │   │   │   │   │   'coeffs': [                               │ 
+│ │            │   │   │   │   │   │   0.0,                                  │ 
+│ │            │   │   │   │   │   │   1.0,                                  │ 
+│ │            │   │   │   │   │   │   0.0,                                  │ 
+│ │            │   │   │   │   │   │   0.0,                                  │ 
+│ │            │   │   │   │   │   │   0.0,                                  │ 
+│ │            │   │   │   │   │   │   1.0                                   │ 
+│ │            │   │   │   │   │   ],                                        │ 
+│ │            │   │   │   │   │   'compu_tab_ref': None,                    │ 
+│ │            │   │   │   │   │   'formula': None,                          │ 
+│ │            │   │   │   │   │   'lines': ['      COEFFS 0 1 0 0 0 1']     │ 
+│ │            │   │   │   │   }                                             │ 
+│ │            │   │   │   },                                                │ 
+│ │            │   │   │   'compu_tabs_by_name': {}                          │ 
+│ │            │   │   },                                                    │ 
+│ │            │   │   mac_path=None,                                        │ 
+│ │            │   │   mac_records=[],                                       │ 
+│ │            │   │   mac_diagnostics=[],                                   │ 
+│ │            │   │   variant_id='firmware',                                │ 
+│ │            │   │   source_s0_header=b'CASE01_BASIC',                     │ 
+│ │            │   │   entropy_windows=[                                     │ 
+│ │            │   │   │   EntropyWindow(                                    │ 
+│ │            │   │   │   │   start=2147483648,                             │ 
+│ │            │   │   │   │   end=2147483681,                               │ 
+│ │            │   │   │   │   sample_count=33,                              │ 
+│ │            │   │   │   │   entropy=4.68075775572209,                     │ 
+│ │            │   │   │   │   band='low',                                   │ 
+│ │            │   │   │   │   low_confidence=True                           │ 
+│ │            │   │   │   ),                                                │ 
+│ │            │   │   │   EntropyWindow(                                    │ 
+│ │            │   │   │   │   start=2147483712,                             │ 
+│ │            │   │   │   │   end=2147483776,                               │ 
+│ │            │   │   │   │   sample_count=64,                              │ 
+│ │            │   │   │   │   entropy=6.0,                                  │ 
+│ │            │   │   │   │   band='medium',                                │ 
+│ │            │   │   │   │   low_confidence=False                          │ 
+│ │            │   │   │   )                                                 │ 
+│ │            │   │   ],                                                    │ 
+│ │            │   │   out_of_order_count=0,                                 │ 
+│ │            │   │   entry_point=2147483648                                │ 
+│ │            │   ),                                                        │ 
+│ │            │   unreadable=(),                                            │ 
+│ │            │   mac=LoadedFile(                                           │ 
+│ │            │   │                                                         │ 
+│ │            path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C… │ 
+│ │            │   │   file_type='s19',                                      │ 
+│ │            │   │   mem_map={                                             │ 
+│ │            │   │   │   2147483648: 83,                                   │ 
+│ │            │   │   │   2147483649: 49,                                   │ 
+│ │            │   │   │   2147483650: 57,                                   │ 
+│ │            │   │   │   2147483651: 84,                                   │ 
+│ │            │   │   │   2147483652: 79,                                   │ 
+│ │            │   │   │   2147483653: 79,                                   │ 
+│ │            │   │   │   2147483654: 76,                                   │ 
+│ │            │   │   │   2147483655: 95,                                   │ 
+│ │            │   │   │   2147483656: 66,                                   │ 
+│ │            │   │   │   2147483657: 65,                                   │ 
+│ │            │   │   │   ... +87                                           │ 
+│ │            │   │   },                                                    │ 
+│ │            │   │   row_bases=[                                           │ 
+│ │            │   │   │   2147483648,                                       │ 
+│ │            │   │   │   2147483664,                                       │ 
+│ │            │   │   │   2147483680,                                       │ 
+│ │            │   │   │   2147483712,                                       │ 
+│ │            │   │   │   2147483728,                                       │ 
+│ │            │   │   │   2147483744,                                       │ 
+│ │            │   │   │   2147483760                                        │ 
+│ │            │   │   ],                                                    │ 
+│ │            │   │   ranges=[                                              │ 
+│ │            │   │   │   (2147483648, 2147483681),                         │ 
+│ │            │   │   │   (2147483712, 2147483776)                          │ 
+│ │            │   │   ],                                                    │ 
+│ │            │   │   range_validity=[True, True],                          │ 
+│ │            │   │   errors=[],                                            │ 
+│ │            │   │                                                         │ 
+│ │            a2l_path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/clau… │ 
+│ │            │   │   a2l_data={                                            │ 
+│ │            │   │   │   'path':                                           │ 
+│ │            'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
+│ │            │   │   │   'sections': [                                     │ 
+│ │            │   │   │   │   {                                             │ 
+│ │            │   │   │   │   │   'name': 'PROJECT',                        │ 
+│ │            │   │   │   │   │   'meta': 'CASE01 "Synthetic project for    │ 
+│ │            S19Tool stress testing"',                                     │ 
+│ │            │   │   │   │   │   'start_line': 1,                          │ 
+│ │            │   │   │   │   │   'lines': [''],                            │ 
+│ │            │   │   │   │   │   'children': [                             │ 
+│ │            │   │   │   │   │   │   {                                     │ 
+│ │            │   │   │   │   │   │   │   'name': 'HEADER',                 │ 
+│ │            │   │   │   │   │   │   │   'meta': '',                       │ 
+│ │            │   │   │   │   │   │   │   'start_line': 2,                  │ 
+│ │            │   │   │   │   │   │   │   'lines': [                        │ 
+│ │            │   │   │   │   │   │   │   │   '    VERSION "1.0"',          │ 
+│ │            │   │   │   │   │   │   │   │   '    PROJECT_NO 1'            │ 
+│ │            │   │   │   │   │   │   │   ],                                │ 
+│ │            │   │   │   │   │   │   │   'children': [],                   │ 
+│ │            │   │   │   │   │   │   │   'end_line': 5                     │ 
+│ │            │   │   │   │   │   │   },                                    │ 
+│ │            │   │   │   │   │   │   {                                     │ 
+│ │            │   │   │   │   │   │   │   'name': 'MODULE',                 │ 
+│ │            │   │   │   │   │   │   │   'meta': 'BASIC "Synthetic ECU     │ 
+│ │            module"',                                                     │ 
+│ │            │   │   │   │   │   │   │   'start_line': 7,                  │ 
+│ │            │   │   │   │   │   │   │   'lines': [                        │ 
+│ │            │   │   │   │   │   │   │   │   '',                           │ 
+│ │            │   │   │   │   │   │   │   │   '',                           │ 
+│ │            │   │   │   │   │   │   │   │   '',                           │ 
+│ │            │   │   │   │   │   │   │   │   '',                           │ 
+│ │            │   │   │   │   │   │   │   │   '',                           │ 
+│ │            │   │   │   │   │   │   │   │   ''                            │ 
+│ │            │   │   │   │   │   │   │   ],                                │ 
+│ │            │   │   │   │   │   │   │   'children': [                     │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'MOD_COMMON',     │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': '""',             │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 8,          │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      BYTE_ORDER     │ 
+│ │            MSB_FIRST',                                                   │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      ALIGNMENT_BYTE │ 
+│ │            1',                                                           │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      ALIGNMENT_WORD │ 
+│ │            2',                                                           │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      ALIGNMENT_LONG │ 
+│ │            4',                                                           │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '                     │ 
+│ │            ALIGNMENT_FLOAT32_IEEE 4'                                     │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 14            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'MOD_PAR',        │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': '""',             │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 16,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      EPK            │ 
+│ │            "S19TOOL_SYNTH"'                                              │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 18            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT',  │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': 'RL_U8',          │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 20,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      FNC_VALUES 1   │ 
+│ │            UBYTE COLUMN_DIR DIRECT'                                      │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 22            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT',  │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': 'RL_U16',         │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 24,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      FNC_VALUES 1   │ 
+│ │            UWORD COLUMN_DIR DIRECT'                                      │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 26            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'RECORD_LAYOUT',  │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': 'RL_U32',         │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 28,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      FNC_VALUES 1   │ 
+│ │            ULONG COLUMN_DIR DIRECT'                                      │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 30            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'COMPU_METHOD',   │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': 'CM_IDENT "%6.2"  │ 
+│ │            IDENTICAL "%6.2" ""',                                         │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 32,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '      COEFFS 0 1 0 0 │ 
+│ │            0 1'                                                          │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 34            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'CHARACTERISTIC', │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': 'CAL_BLOCK_A      │ 
+│ │            "CAL_BLOCK_A synthetic characteristic"',                      │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 36,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '  VALUE 0x80000010   │ 
+│ │            RL_U8 0 CM_IDENT 0 255'                                       │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 38            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'CHARACTERISTIC', │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': 'CAL_BLOCK_B      │ 
+│ │            "CAL_BLOCK_B synthetic characteristic"',                      │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 39,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '  VALUE 0x80000040   │ 
+│ │            RL_U8 0 CM_IDENT 0 255'                                       │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 41            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'MEASUREMENT',    │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': 'MEAS_STATUS      │ 
+│ │            "MEAS_STATUS synthetic measurement"',                         │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 42,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '  UBYTE CM_IDENT 0 0 │ 
+│ │            0 255',                                                       │ 
+│ │            │   │   │   │   │   │   │   │   │   │   '  ECU_ADDRESS        │ 
+│ │            0x80000000'                                                   │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [],           │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 45            │ 
+│ │            │   │   │   │   │   │   │   │   },                            │ 
+│ │            │   │   │   │   │   │   │   │   {                             │ 
+│ │            │   │   │   │   │   │   │   │   │   'name': 'GROUP',          │ 
+│ │            │   │   │   │   │   │   │   │   │   'meta': 'GRP_BASIC        │ 
+│ │            "GRP_BASIC group"',                                           │ 
+│ │            │   │   │   │   │   │   │   │   │   'start_line': 46,         │ 
+│ │            │   │   │   │   │   │   │   │   │   'lines': [],              │ 
+│ │            │   │   │   │   │   │   │   │   │   'children': [             │ 
+│ │            │   │   │   │   │   │   │   │   │   │   {                     │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   'name':           │ 
+│ │            'REF_CHARACTERISTIC',                                         │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   'meta': '',       │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   'start_line': 47, │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   'lines': [        │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   │   '             │ 
+│ │            CAL_BLOCK_A',                                                 │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   │   '             │ 
+│ │            CAL_BLOCK_B'                                                  │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   ],                │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   'children': [],   │ 
+│ │            │   │   │   │   │   │   │   │   │   │   │   'end_line': 50    │ 
+│ │            │   │   │   │   │   │   │   │   │   │   }                     │ 
+│ │            │   │   │   │   │   │   │   │   │   ],                        │ 
+│ │            │   │   │   │   │   │   │   │   │   'end_line': 51            │ 
+│ │            │   │   │   │   │   │   │   │   }                             │ 
+│ │            │   │   │   │   │   │   │   ],                                │ 
+│ │            │   │   │   │   │   │   │   'end_line': 52                    │ 
+│ │            │   │   │   │   │   │   }                                     │ 
+│ │            │   │   │   │   │   ],                                        │ 
+│ │            │   │   │   │   │   'end_line': 53                            │ 
+│ │            │   │   │   │   }                                             │ 
+│ │            │   │   │   ],                                                │ 
+│ │            │   │   │   'errors': [],                                     │ 
+│ │            │   │   │   'tags': [                                         │ 
+│ │            │   │   │   │   {                                             │ 
+│ │            │   │   │   │   │   'section': 'CHARACTERISTIC',              │ 
+│ │            │   │   │   │   │   'name': 'CAL_BLOCK_A',                    │ 
+│ │            │   │   │   │   │   'description': 'CAL_BLOCK_A synthetic     │ 
+│ │            characteristic',                                              │ 
+│ │            │   │   │   │   │   'address': 2147483664,                    │ 
+│ │            │   │   │   │   │   'length': 1,                              │ 
+│ │            │   │   │   │   │   'source': 'formula',                      │ 
+│ │            │   │   │   │   │   'unit': None,                             │ 
+│ │            │   │   │   │   │   'lower_limit': '0',                       │ 
+│ │            │   │   │   │   │   'upper_limit': '255',                     │ 
+│ │            │   │   │   │   │   'bit_org': None,                          │ 
+│ │            │   │   │   │   │   ... +18                                   │ 
+│ │            │   │   │   │   },                                            │ 
+│ │            │   │   │   │   {                                             │ 
+│ │            │   │   │   │   │   'section': 'CHARACTERISTIC',              │ 
+│ │            │   │   │   │   │   'name': 'CAL_BLOCK_B',                    │ 
+│ │            │   │   │   │   │   'description': 'CAL_BLOCK_B synthetic     │ 
+│ │            characteristic',                                              │ 
+│ │            │   │   │   │   │   'address': 2147483712,                    │ 
+│ │            │   │   │   │   │   'length': 1,                              │ 
+│ │            │   │   │   │   │   'source': 'formula',                      │ 
+│ │            │   │   │   │   │   'unit': None,                             │ 
+│ │            │   │   │   │   │   'lower_limit': '0',                       │ 
+│ │            │   │   │   │   │   'upper_limit': '255',                     │ 
+│ │            │   │   │   │   │   'bit_org': None,                          │ 
+│ │            │   │   │   │   │   ... +18                                   │ 
+│ │            │   │   │   │   },                                            │ 
+│ │            │   │   │   │   {                                             │ 
+│ │            │   │   │   │   │   'section': 'MEASUREMENT',                 │ 
+│ │            │   │   │   │   │   'name': 'MEAS_STATUS',                    │ 
+│ │            │   │   │   │   │   'description': 'MEAS_STATUS synthetic     │ 
+│ │            measurement',                                                 │ 
+│ │            │   │   │   │   │   'address': 2147483648,                    │ 
+│ │            │   │   │   │   │   'length': 1,                              │ 
+│ │            │   │   │   │   │   'source': 'formula',                      │ 
+│ │            │   │   │   │   │   'unit': None,                             │ 
+│ │            │   │   │   │   │   'lower_limit': '0',                       │ 
+│ │            │   │   │   │   │   'upper_limit': '255',                     │ 
+│ │            │   │   │   │   │   'bit_org': None,                          │ 
+│ │            │   │   │   │   │   ... +18                                   │ 
+│ │            │   │   │   │   }                                             │ 
+│ │            │   │   │   ],                                                │ 
+│ │            │   │   │   'record_layouts_by_name': {                       │ 
+│ │            │   │   │   │   'RL_U8': {                                    │ 
+│ │            │   │   │   │   │   'name': 'RL_U8',                          │ 
+│ │            │   │   │   │   │   'tokens': [                               │ 
+│ │            │   │   │   │   │   │   'FNC_VALUES',                         │ 
+│ │            │   │   │   │   │   │   '1',                                  │ 
+│ │            │   │   │   │   │   │   'UBYTE',                              │ 
+│ │            │   │   │   │   │   │   'COLUMN_DIR',                         │ 
+│ │            │   │   │   │   │   │   'DIRECT'                              │ 
+│ │            │   │   │   │   │   ],                                        │ 
+│ │            │   │   │   │   │   'lines': [                                │ 
+│ │            │   │   │   │   │   │   '      FNC_VALUES 1 UBYTE COLUMN_DIR  │ 
+│ │            DIRECT'                                                       │ 
+│ │            │   │   │   │   │   ],                                        │ 
+│ │            │   │   │   │   │   'byte_order': None                        │ 
+│ │            │   │   │   │   },                                            │ 
+│ │            │   │   │   │   'RL_U16': {                                   │ 
+│ │            │   │   │   │   │   'name': 'RL_U16',                         │ 
+│ │            │   │   │   │   │   'tokens': [                               │ 
+│ │            │   │   │   │   │   │   'FNC_VALUES',                         │ 
+│ │            │   │   │   │   │   │   '1',                                  │ 
+│ │            │   │   │   │   │   │   'UWORD',                              │ 
+│ │            │   │   │   │   │   │   'COLUMN_DIR',                         │ 
+│ │            │   │   │   │   │   │   'DIRECT'                              │ 
+│ │            │   │   │   │   │   ],                                        │ 
+│ │            │   │   │   │   │   'lines': [                                │ 
+│ │            │   │   │   │   │   │   '      FNC_VALUES 1 UWORD COLUMN_DIR  │ 
+│ │            DIRECT'                                                       │ 
+│ │            │   │   │   │   │   ],                                        │ 
+│ │            │   │   │   │   │   'byte_order': None                        │ 
+│ │            │   │   │   │   },                                            │ 
+│ │            │   │   │   │   'RL_U32': {                                   │ 
+│ │            │   │   │   │   │   'name': 'RL_U32',                         │ 
+│ │            │   │   │   │   │   'tokens': [                               │ 
+│ │            │   │   │   │   │   │   'FNC_VALUES',                         │ 
+│ │            │   │   │   │   │   │   '1',                                  │ 
+│ │            │   │   │   │   │   │   'ULONG',                              │ 
+│ │            │   │   │   │   │   │   'COLUMN_DIR',                         │ 
+│ │            │   │   │   │   │   │   'DIRECT'                              │ 
+│ │            │   │   │   │   │   ],                                        │ 
+│ │            │   │   │   │   │   'lines': [                                │ 
+│ │            │   │   │   │   │   │   '      FNC_VALUES 1 ULONG COLUMN_DIR  │ 
+│ │            DIRECT'                                                       │ 
+│ │            │   │   │   │   │   ],                                        │ 
+│ │            │   │   │   │   │   'byte_order': None                        │ 
+│ │            │   │   │   │   }                                             │ 
+│ │            │   │   │   },                                                │ 
+│ │            │   │   │   'compu_methods_by_name': {                        │ 
+│ │            │   │   │   │   'CM_IDENT': {                                 │ 
+│ │            │   │   │   │   │   'name': 'CM_IDENT',                       │ 
+│ │            │   │   │   │   │   'long_identifier': '%6.2',                │ 
+│ │            │   │   │   │   │   'conversion_type': 'IDENTICAL',           │ 
+│ │            │   │   │   │   │   'format': '%6.2',                         │ 
+│ │            │   │   │   │   │   'unit': '%6.2',                           │ 
+│ │            │   │   │   │   │   'coeffs_linear': None,                    │ 
+│ │            │   │   │   │   │   'coeffs': [                               │ 
+│ │            │   │   │   │   │   │   0.0,                                  │ 
+│ │            │   │   │   │   │   │   1.0,                                  │ 
+│ │            │   │   │   │   │   │   0.0,                                  │ 
+│ │            │   │   │   │   │   │   0.0,                                  │ 
+│ │            │   │   │   │   │   │   0.0,                                  │ 
+│ │            │   │   │   │   │   │   1.0                                   │ 
+│ │            │   │   │   │   │   ],                                        │ 
+│ │            │   │   │   │   │   'compu_tab_ref': None,                    │ 
+│ │            │   │   │   │   │   'formula': None,                          │ 
+│ │            │   │   │   │   │   'lines': ['      COEFFS 0 1 0 0 0 1']     │ 
+│ │            │   │   │   │   }                                             │ 
+│ │            │   │   │   },                                                │ 
+│ │            │   │   │   'compu_tabs_by_name': {}                          │ 
+│ │            │   │   },                                                    │ 
+│ │            │   │                                                         │ 
+│ │            mac_path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/clau… │ 
+│ │            │   │   mac_records=[                                         │ 
+│ │            │   │   │   {                                                 │ 
+│ │            │   │   │   │   'line_number': 1,                             │ 
+│ │            │   │   │   │   'raw': '; Synthetic MAC',                     │ 
+│ │            │   │   │   │   'name': None,                                 │ 
+│ │            │   │   │   │   'address': None,                              │ 
+│ │            │   │   │   │   'parse_ok': False,                            │ 
+│ │            │   │   │   │   'parse_error': "expected one '=' separator"   │ 
+│ │            │   │   │   },                                                │ 
+│ │            │   │   │   {                                                 │ 
+│ │            │   │   │   │   'line_number': 2,                             │ 
+│ │            │   │   │   │   'raw': 'BLOCK_A=80000000',                    │ 
+│ │            │   │   │   │   'name': 'BLOCK_A',                            │ 
+│ │            │   │   │   │   'address': 2147483648,                        │ 
+│ │            │   │   │   │   'parse_ok': True,                             │ 
+│ │            │   │   │   │   'parse_error': ''                             │ 
+│ │            │   │   │   }                                                 │ 
+│ │            │   │   ],                                                    │ 
+│ │            │   │   mac_diagnostics=[                                     │ 
+│ │            │   │   │   "Line 1: expected one '=' separator"              │ 
+│ │            │   │   ],                                                    │ 
+│ │            │   │   variant_id='firmware',                                │ 
+│ │            │   │   source_s0_header=b'CASE01_BASIC',                     │ 
+│ │            │   │   entropy_windows=[                                     │ 
+│ │            │   │   │   EntropyWindow(                                    │ 
+│ │            │   │   │   │   start=2147483648,                             │ 
+│ │            │   │   │   │   end=2147483681,                               │ 
+│ │            │   │   │   │   sample_count=33,                              │ 
+│ │            │   │   │   │   entropy=4.68075775572209,                     │ 
+│ │            │   │   │   │   band='low',                                   │ 
+│ │            │   │   │   │   low_confidence=True                           │ 
+│ │            │   │   │   ),                                                │ 
+│ │            │   │   │   EntropyWindow(                                    │ 
+│ │            │   │   │   │   start=2147483712,                             │ 
+│ │            │   │   │   │   end=2147483776,                               │ 
+│ │            │   │   │   │   sample_count=64,                              │ 
+│ │            │   │   │   │   entropy=6.0,                                  │ 
+│ │            │   │   │   │   band='medium',                                │ 
+│ │            │   │   │   │   low_confidence=False                          │ 
+│ │            │   │   │   )                                                 │ 
+│ │            │   │   ],                                                    │ 
+│ │            │   │   out_of_order_count=0,                                 │ 
+│ │            │   │   entry_point=2147483648                                │ 
+│ │            │   ),                                                        │ 
+│ │            │   document=None                                             │ 
+│ │            )                                                             │ 
+│ │  request = ProjectLoadRequest(                                           │ 
+│ │            │   name='P',                                                 │ 
+│ │            │                                                             │ 
+│ │            project_dir=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/c… │ 
+│ │            │   data_files=(                                              │ 
+│ │            │   │                                                         │ 
+│ │            WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Use… │ 
+│ │            │   │                                                         │ 
+│ │            WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Use… │ 
+│ │            │   ),                                                        │ 
+│ │            │   a2l_files=(                                               │ 
+│ │            │   │                                                         │ 
+│ │            WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Use… │ 
+│ │            │   ),                                                        │ 
+│ │            │   a2l_problem=None,                                         │ 
+│ │            │   a2l_cache=None,                                           │ 
+│ │            │   gen=1,                                                    │ 
+│ │            │   routed=False                                              │ 
+│ │            )                                                             │ 
+│ │     self = S19TuiApp(                                                    │ 
+│ │            │   title='Hex Edit Tool',                                    │ 
+│ │            │   classes={'-dark-mode'},                                   │ 
+│ │            │   pseudo_classes={'focus', 'dark'}                          │ 
+│ │            )                                                             │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4 
+│ ccb-86cf-122b894659b2\scratchpad\mutc12b\tests\test_b100_busy.py:1330 in     
+│ _boom                                                                        
+│                                                                              
+│   1327                                                                       
+│   1328                                                                       
+│   1329 def _boom(*_a, **_k):                                                 
+│ ❱ 1330 │   raise RuntimeError("forced")                                      
+│   1331                                                                       
+│   1332                                                                       
+│   1333 def test_tc_b100_50_kickoff_raise_ends_the_file_load_first(tmp_path:  
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ _a = (                                                                   │ 
+│ │      │   'P',                                                            │ 
+│ │      │   ProjectVariantSet(                                              │ 
+│ │      │   │   project_name='P',                                           │ 
+│ │      │   │   variants=(                                                  │ 
+│ │      │   │   │   VariantDescriptor(                                      │ 
+│ │      │   │   │   │   variant_id='firmware',                              │ 
+│ │      │   │   │   │                                                       │ 
+│ │      path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--User… │ 
+│ │      │   │   │   │   file_type='s19'                                     │ 
+│ │      │   │   │   ),                                                      │ 
+│ │      │   │   ),                                                          │ 
+│ │      │   │   active_id='firmware'                                        │ 
+│ │      │   ),                                                              │ 
+│ │      │   None                                                            │ 
+│ │      )                                                                   │ 
+│ │ _k = {                                                                   │ 
+│ │      │   'mac_name': 'firmware.mac',                                     │ 
+│ │      │   'a2l_name': 'firmware.a2l',                                     │ 
+│ │      │   'problems': [                                                   │ 
+│ │      │   │   ProjectFileProblem(                                         │ 
+│ │      │   │   │   kind='no project.json',                                 │ 
+│ │      │   │   │   file='project.json',                                    │ 
+│ │      │   │   │   reason='',                                              │ 
+│ │      │   │   │   code=None,                                              │ 
+│ │      │   │   │   step=None                                               │ 
+│ │      │   │   )                                                           │ 
+│ │      │   ],                                                              │ 
+│ │      │   'unreadable': []                                                │ 
+│ │      }                                                                   │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+╰──────────────────────────────────────────────────────────────────────────────
+RuntimeError: forced
+=========================== short test summary info ===========================
+FAILED tests/test_b100_busy.py::test_tc_b100_50_project_deferred_install_raise_ends_the_run
+1 failed in 39.52s

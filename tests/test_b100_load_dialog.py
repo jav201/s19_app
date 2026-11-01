@@ -68,6 +68,7 @@ from s19_app.tui.workspace import WORKAREA_DIRNAME, WORKAREA_SUBDIR, WORKAREA_TE
 from tests.support import b100_links
 from tests.support import b100_load_dialog as ld
 from tests.support import b100_projects as projects
+from tests.support.b100_workers import settle_workers
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE01_DIR = ROOT / "examples" / "case_01_basic_valid"
@@ -613,6 +614,7 @@ def test_tc_b100_40_workarea_data_choice_loads_in_place_with_no_copy(
 
     async def scenario(app, pilot, log):
         app._handle_load_dialog(LC("workarea", "x.s19"))
+        await settle_workers(pilot)  # Inc 12b R-5: the data pick is a worker
         await ld.wait_for(pilot, lambda: app.current_file is not None, "the work-area load")
         return Path(app.current_file.path)
 
@@ -645,6 +647,7 @@ def test_tc_b100_40_workarea_a2l_choice_equals_the_files_list_pick(tmp_path: Pat
                 app._handle_load_dialog(LC("workarea", "c.a2l"))
             else:
                 app._load_from_item(types.SimpleNamespace(data="c.a2l"))
+            await settle_workers(pilot)  # Inc 12b R-5: the A2L pick is a worker
             await ld.wait_for(pilot, lambda: app.current_a2l_path is not None, "the A2L attach")
             await _settle(pilot)
             digest = _digest(app)

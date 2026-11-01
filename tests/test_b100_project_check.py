@@ -71,6 +71,7 @@ from tests.support import b100_manifests as hostile
 from tests.support import b100_projects as projects
 from tests.support.b100_load_dialog import highlight_row, is_load_dialog
 from tests.support.timing import timing_bound
+from tests.support.b100_workers import settle_workers
 
 SIZES = [(118, 54), (220, 60)]
 INTERNAL_CODE = re.compile(r"MANIFEST-[A-Z-]+")
@@ -109,8 +110,7 @@ def _load_directly(base: Path, name: str = "P") -> S19TuiApp:
         async with app.run_test(size=(118, 54)) as pilot:
             await pilot.pause()
             app._handle_load_project(name)
-            for _ in range(12):
-                await pilot.pause()
+            await settle_workers(pilot)  # Inc 12b Q6 (census A5): wait for the project install
         return app
 
     return asyncio.run(_drive())
@@ -211,7 +211,7 @@ def test_tc_b100_22_seam_scope_is_top_level_data_and_a2l(tmp_path: Path) -> None
         async with app.run_test() as pilot:
             await pilot.pause()
             app._handle_load_project("P")
-            await pilot.pause()
+            await settle_workers(pilot)  # Inc 12b Q6 (census A3): wait for the project install
             assert app._write_and_verify_manifest(project_dir) is True
 
     asyncio.run(_drive())
@@ -262,7 +262,7 @@ def test_tc_b100_23_digest_changed_between_write_and_verify(
         async with app.run_test() as pilot:
             await pilot.pause()
             app._handle_load_project("P")
-            await pilot.pause()
+            await settle_workers(pilot)  # Inc 12b Q6 (census A4): wait for the project install
             app._write_and_verify_manifest(project_dir)
             return app._last_manifest_verify_result
 
@@ -701,7 +701,7 @@ def test_tc_b100_61_unreadable_a2l_is_its_own_problem_and_the_image_opens(
         },
     )
 
-    def _denied(path):
+    def _denied(path, *args, **kwargs):  # Inc 12b census C7: progress= may be passed
         raise PermissionError(13, "Permission denied", str(path))
 
     monkeypatch.setattr(app_module, "parse_a2l_file", _denied)
@@ -805,13 +805,23 @@ def test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second(
         real_load = app._handle_load_project
         timing: list = []
 
-        def _timed(name):
-            started = time.perf_counter()
-            real_load(name)
-            timing.append(time.perf_counter() - started)
+        def _timed(name, *args, **kwargs):  # Inc 12b X-6: the router passes routed=True
+            app._load_started_at = time.perf_counter()
+            real_load(name, *args, **kwargs)
+
+        # E4 integration re-pin (A-8): at 12b the handler only starts the
+        # worker, so the load is timed to the end of the one install callback
+        # (the work the base did inside the handler), and the panel's paint
+        # clock starts there, as it did at the base.
+        real_install = app._install_prepared_project
+
+        def _installed(prepared):
+            real_install(prepared)
+            timing.append(time.perf_counter() - app._load_started_at)
             app._load_returned_at = time.perf_counter()
 
         app._handle_load_project = _timed
+        app._install_prepared_project = _installed
         async with app.run_test(size=(118, 54)) as pilot:
             await pilot.pause()
             await _open_panel_through_the_dialog(pilot, app)
@@ -924,13 +934,23 @@ def _sec6_5_filesystem_scene(tmp_path: Path, payload: dict, setup=None) -> dict:
         real_load = app._handle_load_project
         timing: list = []
 
-        def _timed(name):
-            begun = time.perf_counter()
-            real_load(name)
-            timing.append(time.perf_counter() - begun)
+        def _timed(name, *args, **kwargs):  # Inc 12b X-6: the router passes routed=True
+            app._load_started_at = time.perf_counter()
+            real_load(name, *args, **kwargs)
+
+        # E4 integration re-pin (A-8): at 12b the handler only starts the
+        # worker, so the load is timed to the end of the one install callback
+        # (the work the base did inside the handler), and the panel's paint
+        # clock starts there, as it did at the base.
+        real_install = app._install_prepared_project
+
+        def _installed(prepared):
+            real_install(prepared)
+            timing.append(time.perf_counter() - app._load_started_at)
             app._load_returned_at = time.perf_counter()
 
         app._handle_load_project = _timed
+        app._install_prepared_project = _installed
         async with app.run_test(size=(118, 54)) as pilot:
             await pilot.pause()
             painted, rows, appended = await _timed_load_panel_and_append(
@@ -1291,13 +1311,23 @@ def test_tc_b100_61_files_at_the_cap_all_missing_are_bounded(tmp_path: Path) -> 
         real_load = app._handle_load_project
         timing: list = []
 
-        def _timed(name):
-            begun = time.perf_counter()
-            real_load(name)
-            timing.append(time.perf_counter() - begun)
+        def _timed(name, *args, **kwargs):  # Inc 12b X-6: the router passes routed=True
+            app._load_started_at = time.perf_counter()
+            real_load(name, *args, **kwargs)
+
+        # E4 integration re-pin (A-8): at 12b the handler only starts the
+        # worker, so the load is timed to the end of the one install callback
+        # (the work the base did inside the handler), and the panel's paint
+        # clock starts there, as it did at the base.
+        real_install = app._install_prepared_project
+
+        def _installed(prepared):
+            real_install(prepared)
+            timing.append(time.perf_counter() - app._load_started_at)
             app._load_returned_at = time.perf_counter()
 
         app._handle_load_project = _timed
+        app._install_prepared_project = _installed
         async with app.run_test(size=(118, 54)) as pilot:
             await pilot.pause()
             await _open_panel_through_the_dialog(pilot, app)

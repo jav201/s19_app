@@ -22,6 +22,7 @@ from textual.widgets import HelpPanel
 
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.screens_directionb import LoadedArtifactsPanel
+from tests.support.b100_workers import settle_workers
 
 _CASE_01 = Path(__file__).resolve().parent.parent / "examples" / "case_01_basic_valid"
 _CASE_01_S19 = _CASE_01 / "firmware.s19"
@@ -88,7 +89,7 @@ def test_a2l_load_refreshes_loaded_panel_without_screen_switch(tmp_path: Path) -
             await pilot.pause()
             before = _a2l_slot_text(app)
             app.load_a2l_from_path(_CASE_01_A2L)  # the orphaned load path
-            await pilot.pause()
+            await settle_workers(pilot)  # Inc 12b Q6 (census A7 / R-4): the attach is a worker
             after = _a2l_slot_text(app)
             return before, after
 

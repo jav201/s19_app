@@ -1,0 +1,3206 @@
+{
+  "marks": [
+    {
+      "name": "build_section_tree",
+      "reqs": [
+        "LLR-176.4"
+      ],
+      "file": "s19_app/tui/a2l.py",
+      "line": 141,
+      "def": {
+        "qualname": "build_section_tree",
+        "line": 142,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "tuple[list[dict], list[str]]"
+      }
+    },
+    {
+      "name": "parse_a2l_file",
+      "reqs": [
+        "LLR-176.4",
+        "LLR-176.4a",
+        "LLR-177.5"
+      ],
+      "file": "s19_app/tui/a2l.py",
+      "line": 2628,
+      "def": {
+        "qualname": "parse_a2l_file",
+        "line": 2629,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "dict"
+      }
+    },
+    {
+      "name": "choose_install_set",
+      "reqs": [
+        "LLR-177.1"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 1593,
+      "def": {
+        "qualname": "choose_install_set",
+        "line": 1594,
+        "params": [
+          {
+            "name": "variant_set",
+            "type": "ProjectVariantSet",
+            "default": null
+          },
+          {
+            "name": "recorded",
+            "type": "Optional[str]",
+            "default": null
+          },
+          {
+            "name": "data_files",
+            "type": "Sequence[Path]",
+            "default": null
+          },
+          {
+            "name": "a2l_files",
+            "type": "Sequence[Path]",
+            "default": null
+          },
+          {
+            "name": "unreadable",
+            "type": "Sequence[str]",
+            "default": "()"
+          }
+        ],
+        "returns": "InstallSet"
+      }
+    },
+    {
+      "name": "recorded_document_state",
+      "reqs": [
+        "LLR-177.1"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 1874,
+      "def": {
+        "qualname": "recorded_document_state",
+        "line": 1875,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "text",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "a2l_context",
+            "type": "Optional[dict]",
+            "default": "None"
+          }
+        ],
+        "returns": "RecordedDocumentState"
+      }
+    },
+    {
+      "name": "S19TuiApp.on_patch_editor_panel_action_requested",
+      "reqs": [
+        "LLR-177.3e"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 3888,
+      "def": {
+        "qualname": "S19TuiApp.on_patch_editor_panel_action_requested",
+        "line": 3889,
+        "params": [
+          {
+            "name": "event",
+            "type": "PatchEditorPanel.ActionRequested",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.on_patch_editor_panel_save_back_decision",
+      "reqs": [
+        "LLR-177.3e"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 4097,
+      "def": {
+        "qualname": "S19TuiApp.on_patch_editor_panel_save_back_decision",
+        "line": 4098,
+        "params": [
+          {
+            "name": "event",
+            "type": "PatchEditorPanel.SaveBackDecision",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.on_patch_editor_panel_undo_requested",
+      "reqs": [
+        "LLR-177.3e"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 4334,
+      "def": {
+        "qualname": "S19TuiApp.on_patch_editor_panel_undo_requested",
+        "line": 4335,
+        "params": [
+          {
+            "name": "event",
+            "type": "PatchEditorPanel.UndoRequested",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.on_patch_editor_panel_redo_requested",
+      "reqs": [
+        "LLR-177.3e"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 4363,
+      "def": {
+        "qualname": "S19TuiApp.on_patch_editor_panel_redo_requested",
+        "line": 4364,
+        "params": [
+          {
+            "name": "event",
+            "type": "PatchEditorPanel.RedoRequested",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.action_patch_undo",
+      "reqs": [
+        "LLR-177.3e"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 4419,
+      "def": {
+        "qualname": "S19TuiApp.action_patch_undo",
+        "line": 4420,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.action_patch_redo",
+      "reqs": [
+        "LLR-177.3e"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 4446,
+      "def": {
+        "qualname": "S19TuiApp.action_patch_redo",
+        "line": 4447,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.on_patch_editor_panel_edit_json_requested",
+      "reqs": [
+        "LLR-177.3e"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 4473,
+      "def": {
+        "qualname": "S19TuiApp.on_patch_editor_panel_edit_json_requested",
+        "line": 4474,
+        "params": [
+          {
+            "name": "event",
+            "type": "PatchEditorPanel.EditJsonRequested",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.on_patch_editor_panel_entry_edit_json_requested",
+      "reqs": [
+        "LLR-177.3e"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 4588,
+      "def": {
+        "qualname": "S19TuiApp.on_patch_editor_panel_entry_edit_json_requested",
+        "line": 4589,
+        "params": [
+          {
+            "name": "event",
+            "type": "PatchEditorPanel.EntryEditJsonRequested",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.on_patch_editor_panel_change_file_selected",
+      "reqs": [
+        "LLR-177.3e"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 6120,
+      "def": {
+        "qualname": "S19TuiApp.on_patch_editor_panel_change_file_selected",
+        "line": 6121,
+        "params": [
+          {
+            "name": "event",
+            "type": "PatchEditorPanel.ChangeFileSelected",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.on_patch_editor_panel_dirty_load_requested",
+      "reqs": [
+        "LLR-177.3e"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 6243,
+      "def": {
+        "qualname": "S19TuiApp.on_patch_editor_panel_dirty_load_requested",
+        "line": 6244,
+        "params": [
+          {
+            "name": "event",
+            "type": "PatchEditorPanel.DirtyLoadRequested",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.action_load_file",
+      "reqs": [
+        "LLR-177.3"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 7341,
+      "def": {
+        "qualname": "S19TuiApp.action_load_file",
+        "line": 7342,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.action_save_project",
+      "reqs": [
+        "LLR-177.3d"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 7368,
+      "def": {
+        "qualname": "S19TuiApp.action_save_project",
+        "line": 7369,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.action_load_project",
+      "reqs": [
+        "LLR-177.3"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 7453,
+      "def": {
+        "qualname": "S19TuiApp.action_load_project",
+        "line": 7454,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._route_load_project",
+      "reqs": [
+        "LLR-177.1h",
+        "LLR-178.3"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 7464,
+      "def": {
+        "qualname": "S19TuiApp._route_load_project",
+        "line": 7465,
+        "params": [
+          {
+            "name": "name",
+            "type": "Optional[str]",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.action_select_variant",
+      "reqs": [
+        "LLR-177.3b"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 7525,
+      "def": {
+        "qualname": "S19TuiApp.action_select_variant",
+        "line": 7526,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.check_action",
+      "reqs": [
+        "LLR-177.4",
+        "LLR-177.4d"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 8051,
+      "def": {
+        "qualname": "S19TuiApp.check_action",
+        "line": 8052,
+        "params": [
+          {
+            "name": "action",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "parameters",
+            "type": "tuple",
+            "default": null
+          }
+        ],
+        "returns": "Optional[bool]"
+      }
+    },
+    {
+      "name": "S19TuiApp._abort_save",
+      "reqs": [
+        "LLR-177.1d",
+        "LLR-177.2a",
+        "LLR-164.4"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 9180,
+      "def": {
+        "qualname": "S19TuiApp._abort_save",
+        "line": 9181,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "created_project_dir",
+            "type": "bool",
+            "default": null
+          },
+          {
+            "name": "placed_files",
+            "type": "Sequence[Path]",
+            "default": null
+          },
+          {
+            "name": "created_dirs",
+            "type": "Sequence[Path]",
+            "default": null
+          },
+          {
+            "name": "save_state",
+            "type": "Tuple",
+            "default": null
+          },
+          {
+            "name": "manifest_restores",
+            "type": "Sequence[Tuple[Path, bytes]]",
+            "default": "()"
+          },
+          {
+            "name": "kept_copies",
+            "type": "Sequence[Tuple[Path, bytes]]",
+            "default": "()"
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._handle_save_dialog",
+      "reqs": [
+        "LLR-177.1a",
+        "LLR-177.3d"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 9466,
+      "def": {
+        "qualname": "S19TuiApp._handle_save_dialog",
+        "line": 9467,
+        "params": [
+          {
+            "name": "payload",
+            "type": "Optional[SaveProjectPayload]",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._decide_project_image",
+      "reqs": [
+        "LLR-177.1i"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 10627,
+      "def": {
+        "qualname": "S19TuiApp._decide_project_image",
+        "line": 10628,
+        "params": [],
+        "returns": "_ProjectImageStep"
+      }
+    },
+    {
+      "name": "S19TuiApp._write_editor_document",
+      "reqs": [
+        "LLR-177.1e"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 11078,
+      "def": {
+        "qualname": "S19TuiApp._write_editor_document",
+        "line": 11079,
+        "params": [
+          {
+            "name": "row",
+            "type": "SavePlanRow",
+            "default": null
+          },
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "Tuple[Optional[PlacementResult], Optional[Path], Optional[str]]"
+      }
+    },
+    {
+      "name": "S19TuiApp._write_and_verify_manifest",
+      "reqs": [
+        "LLR-177.1d",
+        "LLR-177.1e"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 11169,
+      "def": {
+        "qualname": "S19TuiApp._write_and_verify_manifest",
+        "line": 11170,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "batch",
+            "type": "Sequence[str]",
+            "default": "()"
+          },
+          {
+            "name": "assignments",
+            "type": "Optional[Mapping[str, Sequence[str]]]",
+            "default": "None"
+          },
+          {
+            "name": "declared_regions",
+            "type": "Sequence[DeclaredRegion]",
+            "default": "()"
+          },
+          {
+            "name": "gathered",
+            "type": "Optional[Mapping[str, Sequence[str]]]",
+            "default": "None"
+          },
+          {
+            "name": "derived_from",
+            "type": "Optional[Mapping[str, DerivedFrom]]",
+            "default": "None"
+          },
+          {
+            "name": "active_document",
+            "type": "Optional[str]",
+            "default": "None"
+          },
+          {
+            "name": "on_written",
+            "type": "Optional[Callable[[Path], None]]",
+            "default": "None"
+          }
+        ],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "S19TuiApp._reset_project_session",
+      "reqs": [
+        "LLR-177.1g",
+        "LLR-165.1"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 11408,
+      "def": {
+        "qualname": "S19TuiApp._reset_project_session",
+        "line": 11409,
+        "params": [],
+        "returns": "int"
+      }
+    },
+    {
+      "name": "S19TuiApp._session_snapshot",
+      "reqs": [
+        "LLR-177.1f",
+        "LLR-165.2"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 11563,
+      "def": {
+        "qualname": "S19TuiApp._session_snapshot",
+        "line": 11564,
+        "params": [],
+        "returns": "dict"
+      }
+    },
+    {
+      "name": "S19TuiApp._handle_load_project",
+      "reqs": [
+        "HLR-177",
+        "LLR-177.1",
+        "LLR-177.1d",
+        "LLR-177.1e",
+        "LLR-177.1f",
+        "LLR-177.1g",
+        "LLR-177.2",
+        "LLR-176.3"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 11700,
+      "def": {
+        "qualname": "S19TuiApp._handle_load_project",
+        "line": 11701,
+        "params": [
+          {
+            "name": "name",
+            "type": "Optional[str]",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._reopen_active_document",
+      "reqs": [
+        "LLR-177.1",
+        "LLR-177.1d",
+        "LLR-177.1e"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 11989,
+      "def": {
+        "qualname": "S19TuiApp._reopen_active_document",
+        "line": 11990,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "manifest",
+            "type": "Optional[ProjectManifest]",
+            "default": null
+          },
+          {
+            "name": "a2l_context",
+            "type": "Optional[dict]",
+            "default": null
+          }
+        ],
+        "returns": "Optional[ProjectFileProblem]"
+      }
+    },
+    {
+      "name": "S19TuiApp._install_project_image",
+      "reqs": [
+        "LLR-177.1",
+        "LLR-177.1d",
+        "LLR-177.1e"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 12071,
+      "def": {
+        "qualname": "S19TuiApp._install_project_image",
+        "line": 12072,
+        "params": [
+          {
+            "name": "variant",
+            "type": "VariantDescriptor",
+            "default": null
+          },
+          {
+            "name": "a2l_files",
+            "type": "Sequence[Path]",
+            "default": null
+          }
+        ],
+        "returns": "Optional[str]"
+      }
+    },
+    {
+      "name": "S19TuiApp._copy_project_subfolders",
+      "reqs": [
+        "LLR-177.5a",
+        "LLR-177.1a"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 12236,
+      "def": {
+        "qualname": "S19TuiApp._copy_project_subfolders",
+        "line": 12237,
+        "params": [
+          {
+            "name": "source_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "copies",
+            "type": "Sequence[InventoryFile]",
+            "default": null
+          },
+          {
+            "name": "placed_files",
+            "type": "list[Path]",
+            "default": null
+          },
+          {
+            "name": "created_dirs",
+            "type": "list[Path]",
+            "default": null
+          },
+          {
+            "name": "carried",
+            "type": "Optional[Mapping[str, SavePlanRow]]",
+            "default": "None"
+          }
+        ],
+        "returns": "Optional[str]"
+      }
+    },
+    {
+      "name": "S19TuiApp._rewrite_project_manifest",
+      "reqs": [
+        "LLR-177.1d"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 12454,
+      "def": {
+        "qualname": "S19TuiApp._rewrite_project_manifest",
+        "line": 12455,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "placed",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "derived",
+            "type": "Optional[DerivedFrom]",
+            "default": "None"
+          }
+        ],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "S19TuiApp.load_from_path",
+      "reqs": [
+        "LLR-177.3a",
+        "HLR-177a"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 13035,
+      "def": {
+        "qualname": "S19TuiApp.load_from_path",
+        "line": 13036,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.load_a2l_from_path",
+      "reqs": [
+        "HLR-177",
+        "LLR-177.1b",
+        "LLR-177.1d",
+        "LLR-177.2b",
+        "LLR-177.5",
+        "LLR-176.3"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 13118,
+      "def": {
+        "qualname": "S19TuiApp.load_a2l_from_path",
+        "line": 13119,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._load_from_item",
+      "reqs": [
+        "LLR-177.1k"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 13357,
+      "def": {
+        "qualname": "S19TuiApp._load_from_item",
+        "line": 13358,
+        "params": [
+          {
+            "name": "item",
+            "type": "ListItem",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._load_mac_file",
+      "reqs": [
+        "LLR-177.1e"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 14173,
+      "def": {
+        "qualname": "S19TuiApp._load_mac_file",
+        "line": 14174,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "a2l_files",
+            "type": "Optional[list[Path]]",
+            "default": "None"
+          }
+        ],
+        "returns": "LoadedFile"
+      }
+    },
+    {
+      "name": "S19TuiApp._merge_mac_with_existing_primary",
+      "reqs": [
+        "LLR-177.1e",
+        "LLR-177.1f"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 14459,
+      "def": {
+        "qualname": "S19TuiApp._merge_mac_with_existing_primary",
+        "line": 14460,
+        "params": [
+          {
+            "name": "mac_loaded",
+            "type": "LoadedFile",
+            "default": null
+          }
+        ],
+        "returns": "LoadedFile"
+      }
+    },
+    {
+      "name": "S19TuiApp.on_loaded_artifacts_panel_unload_requested",
+      "reqs": [
+        "LLR-177.3c"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 14671,
+      "def": {
+        "qualname": "S19TuiApp.on_loaded_artifacts_panel_unload_requested",
+        "line": 14672,
+        "params": [
+          {
+            "name": "message",
+            "type": "'LoadedArtifactsPanel.UnloadRequested'",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.action_unload_all",
+      "reqs": [
+        "LLR-177.3c"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 14704,
+      "def": {
+        "qualname": "S19TuiApp.action_unload_all",
+        "line": 14705,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.load_selected_file",
+      "reqs": [
+        "LLR-177.1k",
+        "LLR-177.1"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 15084,
+      "def": {
+        "qualname": "S19TuiApp.load_selected_file",
+        "line": 15085,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "a2l_files",
+            "type": "Optional[list[Path]]",
+            "default": "None"
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._parse_loaded_file",
+      "reqs": [
+        "LLR-177.1e",
+        "LLR-177.1f",
+        "LLR-177.1d"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 15137,
+      "def": {
+        "qualname": "S19TuiApp._parse_loaded_file",
+        "line": 15138,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "a2l_files",
+            "type": "Optional[list[Path]]",
+            "default": "None"
+          }
+        ],
+        "returns": "Optional[LoadedFile]"
+      }
+    },
+    {
+      "name": "S19TuiApp._start_load_worker",
+      "reqs": [
+        "LLR-177.1k",
+        "LLR-177.4c"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 15745,
+      "def": {
+        "qualname": "S19TuiApp._start_load_worker",
+        "line": 15747,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "a2l_files",
+            "type": "Optional[list[Path]]",
+            "default": "None"
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._handle_load_error",
+      "reqs": [
+        "LLR-177.4c"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 15825,
+      "def": {
+        "qualname": "S19TuiApp._handle_load_error",
+        "line": 15826,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "exc",
+            "type": "Exception",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._load_a2l_data_with_cache",
+      "reqs": [
+        "LLR-177.1d",
+        "LLR-177.5"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 15857,
+      "def": {
+        "qualname": "S19TuiApp._load_a2l_data_with_cache",
+        "line": 15858,
+        "params": [
+          {
+            "name": "path",
+            "type": "Optional[Path]",
+            "default": null
+          }
+        ],
+        "returns": "Optional[dict[str, Any]]"
+      }
+    },
+    {
+      "name": "S19TuiApp.update_a2l_view",
+      "reqs": [
+        "LLR-176.3"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 16925,
+      "def": {
+        "qualname": "S19TuiApp.update_a2l_view",
+        "line": 16926,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "ChangeService.record_save_entries",
+      "reqs": [
+        "LLR-177.1d"
+      ],
+      "file": "s19_app/tui/services/change_service.py",
+      "line": 2181,
+      "def": {
+        "qualname": "ChangeService.record_save_entries",
+        "line": 2182,
+        "params": [],
+        "returns": "Tuple[Tuple[int, ...], Tuple[int, ...]]"
+      }
+    },
+    {
+      "name": "ChangeService.adopt_rederived",
+      "reqs": [
+        "LLR-177.1j"
+      ],
+      "file": "s19_app/tui/services/change_service.py",
+      "line": 2316,
+      "def": {
+        "qualname": "ChangeService.adopt_rederived",
+        "line": 2317,
+        "params": [
+          {
+            "name": "mem_map",
+            "type": "Dict[int, int]",
+            "default": null
+          },
+          {
+            "name": "derived",
+            "type": "Dict[int, int]",
+            "default": null
+          },
+          {
+            "name": "summary",
+            "type": "Optional[ChangeSummary]",
+            "default": "None"
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "ChangeService.emit_and_verify",
+      "reqs": [
+        "LLR-177.1a",
+        "LLR-177.1e"
+      ],
+      "file": "s19_app/tui/services/change_service.py",
+      "line": 2379,
+      "def": {
+        "qualname": "ChangeService.emit_and_verify",
+        "line": 2380,
+        "params": [
+          {
+            "name": "image",
+            "type": "Dict[int, int]",
+            "default": null
+          },
+          {
+            "name": "ranges",
+            "type": "Sequence[Tuple[int, int]]",
+            "default": null
+          },
+          {
+            "name": "dest_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "filename",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "source_kind",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "bytes_per_line",
+            "type": "int",
+            "default": "32"
+          },
+          {
+            "name": "s0_header",
+            "type": "bytes | None",
+            "default": "None"
+          },
+          {
+            "name": "source_image_path",
+            "type": "Optional[Path]",
+            "default": "None"
+          },
+          {
+            "name": "summary",
+            "type": "Optional[ChangeSummary]",
+            "default": "None"
+          },
+          {
+            "name": "workarea_root",
+            "type": "Optional[Path]",
+            "default": "None"
+          },
+          {
+            "name": "on_placed",
+            "type": "Optional[Callable[[PlacementResult], None]]",
+            "default": "None"
+          }
+        ],
+        "returns": "ChangeActionResult"
+      }
+    }
+  ],
+  "graph_nodes": [
+    {
+      "name": "S19TuiApp._handle_load_project",
+      "reqs": [
+        "HLR-177",
+        "LLR-177.1",
+        "LLR-177.1d",
+        "LLR-177.1e",
+        "LLR-177.1f",
+        "LLR-177.1g",
+        "LLR-177.2",
+        "LLR-176.3"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "name",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(E1 P12b-5) case_06 `firmware.s19` + `.mac` + `.a2l` as `P` → wall 5.81 s, 0 ticks of a 0.1 s timer during the call, ran on the main thread (holds on base; RED side of HLR-177 / LLR-177.1c)",
+        "(probe p12b U1, LLR-177.1f planned arm, executed) case_01 `firmware.s19` + `.mac` + `.a2l` as `P2`, cold → session digest `('P2\\firmware.s19', 'f254f33fe5405d40', 'P2', 'P2\\firmware.a2l', 'P2\\firmware.mac', 0)`; the same `P2` loaded over an open image `p1img.s19` → the identical digest, `_session_snapshot()` differing only in `_image_generation` and `log_lines` (holds on base: the reset runs before the parses)",
+        "(probe p12b U1) case_06 as `P6`, cold → digest `('P6\\firmware.s19', 'f917cd2dca22da9a', 'P6', 'P6\\firmware.a2l', 'P6\\firmware.mac', 0)`, wall 7.34 s on the loaded host (holds on base; the LLR-177.1f base digest for case_06)",
+        "(probe p12b U4) one base project load assigns 49 app attributes, among them `current_file`, `current_project`, `current_project_dir`, `current_a2l_path`, `current_a2l_data`, `_variant_set`, `_change_service`, `_declared_regions`, `_pending_variant_id`, `_last_load_announcement`, `_a2l_cache_key`, `_a2l_cache_data` (holds on base; the set a 12b worker must not write, LLR-177.1d)",
+        "(12a graph A12-44, post-12a) `Q` holding only `project.json` → `Project NOT loaded: 'Q' has no data or A2L file — load a file and Save project.`, 0 begins (a cheap refusal; stays in the request frame after 12b, LLR-177.1's \"4 of 4\")"
+      ],
+      "modify": [
+        "[Data: S19TuiApp.current_project]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "the whole project load, synchronous on the main thread (`:11675`–`:11961`). Base order: `None` → log, return; the folder check `_project_folder_refusal` (link / unreadable / outside lines); `exists()`; the listing match against `list_projects()` (`OSError` → `could not be read`; unlisted → `is not a project`); `validate_project_files` (cardinality error line); the A2L admission (lstat, regular, not a reparse point, under `DEFAULT_COPY_SIZE_CAP_BYTES`); the \"no data or A2L\" / \"no project.json\" refusal; then `_reset_project_session()` (`:11821`); `build_variant_set`, `read_project_manifest`, `_declared_regions` (a session write), `check_project_files` (the digest check), the recorded variant; the A2L parse `_load_a2l_data_with_cache` (raise → a `not readable` problem); `choose_install_set` and the all-`None` refusal; the A2L-only in-place attach (`current_a2l_path`, `current_a2l_data`, `update_a2l_view`); `_reopen_active_document`; `current_project`, `current_project_dir`, `_variant_set`; the image loop `_install_project_image` with the next-valid fallback; `active_id`; the MAC install `load_selected_file(install.mac, a2l_files)` (`:11920`), which merges the MAC into the image just installed; `compose_load_announcement`, `_last_load_announcement`, summary line, `set_file_status`, the interim discard line, log, labels, flow session folder. Post-9b: the listing uses `_list_project_files` (link-safe) and `_a2l_admission`, a `project.json` lstat gate, and a catch around the listing (9b graph). Post-10: the reset moves after every read and refusal (S10-01/S10-05: `build_variant_set`, the manifest read, `check_project_files`, the A2L read and the all-`None` refusal run before the reset; only `_declared_regions` stays after), `_reset_project_session()` returns `None`, the interim discard line is deleted, `No supported files in project:` paints through `painted_names` (10 graph C48–C58). Post-12a: `gen = _busy_begin_action(\"project_load\", name)` after the cheap refusals; `try / finally: _busy_fail`; `step_busy` 2 before the A2L read, 3 before the image loop, 4 before the MAC install; the all-`None` refusal and the success end through `end_busy` (success passes `final_line` = the project and file line) (12a graph A12-42 … A12-45). 12b changes: the cheap refusals stay in the request frame; the reads (variant set, manifest, digest check, A2L parse, image parses with the fallback, MAC parse merged with its own image, document read) move to a worker over an immutable request; the reset, the installs and the announcement move to a main-thread install handler; no install inline (E1 A1–A4).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._route_load_project",
+      "reqs": [
+        "LLR-177.1h",
+        "LLR-178.3"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "name",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(9b probe p9b U8, holds on base) name `[b]P` → one `LoadResultScreen` pushed after the synchronous load",
+        "(E1 LLR-177.1h negative control, code read `:7478`–`:7482`) a worker load returns before the announcement is composed → the identity test sees the previous object → 0 panels (RED for the base shape once the load is a worker)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "post-10 (from the 10 graph; base `:7449` has the same core): `go` = `before = self._last_load_announcement`; `_handle_load_project(name)`; push `LoadResultScreen(announcement)` with `_handle_load_result` only when `_last_load_announcement` now holds a new object (identity); then `_confirm_then_load(\"project\", name, go)`. Post-10 the parameter is `name: str` (A10-01 removed the `None` arm); `in:` gives the base signature. 12b changes: no identity check after the call (the install has not run when a worker load returns); the request carries `routed=True` and the install handler opens the panel (LLR-177.1h).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._reset_project_session",
+      "reqs": [
+        "LLR-177.1g",
+        "LLR-165.1"
+      ],
+      "in": [],
+      "out": {
+        "type": "int",
+        "names": [
+          "discarded_unsaved"
+        ],
+        "raw": "int discarded_unsaved"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(test `test_b100_session_reset.py::test_tc_b100_08_call_site_census`, :271) exactly 1 `_reset_project_session` call site in `s19_app/` (holds on base; re-pinned to the install handler at 12b)",
+        "(10 graph C58, post-10) an A2L-only project whose A2L does not read → refusal, 0 resets, the session unchanged (holds post-10; LLR-177.1g's failure arm keeps it)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the one project reset seam (`:11385`): rebinds the change service, clears the image, MAC, A2L, variant set, caches and panels (S1–S13). Base signature `-> int` (the outgoing entry count, `out:` above); post-10 `-> None` (10 graph C51). One call site, inside `_handle_load_project`. 12b changes: its caller moves to the project-load install handler, after the worker step succeeded and before the first install (LLR-177.1g; LLR-165.1's caller clause, E1 §C.1).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._install_project_image",
+      "reqs": [
+        "LLR-177.1",
+        "LLR-177.1d",
+        "LLR-177.1e"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "VariantDescriptor",
+          "name": "variant",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[Path]",
+          "name": "a2l_files",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[str]",
+        "names": [
+          "reason"
+        ],
+        "raw": "Optional[str] reason"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read `:12076`, `:12091`) `_pending_variant_id` is written before the parse and cleared on a rejected image (holds on base; a worker running this body writes the session off the main thread → RED for LLR-177.1d)",
+        "(test `test_tui_variants.py::test_no_new_parse_loaded_file_call_sites`, :196) the `_parse_loaded_file` call sites are exactly `_install_project_image`, `_start_load_worker`, `load_selected_file` (holds on base; a new pure parse caller breaks this pin)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`:12044`) sets `self._pending_variant_id` (a session write), parses with `_parse_loaded_file(variant.path, a2l_files)` (any exception → \"not an S19 or HEX file\"), rejects `None` / empty `mem_map`, else installs through `_apply_loaded_file`. One caller. 12b changes: the parse half moves to the project worker (pure, explicit inputs); the `_pending_variant_id` write and the apply half move to the install handler (E1 A6, may dissolve).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._reopen_active_document",
+      "reqs": [
+        "LLR-177.1",
+        "LLR-177.1d",
+        "LLR-177.1e"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[ProjectManifest]",
+          "name": "manifest",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[dict]",
+          "name": "a2l_context",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[ProjectFileProblem]",
+        "names": [
+          "problem"
+        ],
+        "raw": "Optional[ProjectFileProblem] problem"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read `:12033`) the reopened document is assigned to the live service (holds on base; on a worker it would be an off-main session write, LLR-177.1d)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`:11963`) no manifest / damaged / no `active_document` → `None`; one `recorded_document_state(project_dir, text, a2l_context)` read; `ok` → `document.source_path = …`, `self._change_service.document = document` (a session write), `panel.mark_loaded()`, `_patch_editor_load_tail(panel)`; other outcomes → one `not readable` problem. 12b changes: the read (`recorded_document_state`) moves to the worker; the service and panel install to the install handler (E1 A7).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "recorded_document_state",
+      "reqs": [
+        "LLR-177.1"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "text",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[dict]",
+          "name": "a2l_context",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "RecordedDocumentState",
+        "names": [
+          "state"
+        ],
+        "raw": "RecordedDocumentState state"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read) it takes only paths and the A2L payload, and reads no `self.` attribute (holds on base; worker-safe as is)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "module-level in `app.py` (`:1873`): one read of the recorded change document, outcome `ok` / `missing` / `link` / `too_large` / `unreadable` / `io_error` with the parsed document. Touches no app state, so it can run on a worker unchanged.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "choose_install_set",
+      "reqs": [
+        "LLR-177.1"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "ProjectVariantSet",
+          "name": "variant_set",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "recorded",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[Path]",
+          "name": "data_files",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[Path]",
+          "name": "a2l_files",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[str]",
+          "name": "unreadable",
+          "default": "()"
+        }
+      ],
+      "out": {
+        "type": "InstallSet",
+        "names": [
+          "install"
+        ],
+        "raw": "InstallSet install"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(9b graph, holds on base) a recorded variant that is unreadable → the next valid variant (LLR-169.6)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "module-level (`:1593`): the recorded variant when valid, else the next valid one in `(name.lower(), name)` order; the MAC and A2L to attach. Pure. Unchanged by 12b; the worker's image fallback calls it as the base loop does.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._parse_loaded_file",
+      "reqs": [
+        "LLR-177.1e",
+        "LLR-177.1f",
+        "LLR-177.1d"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[list[Path]]",
+          "name": "a2l_files",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "Optional[LoadedFile]",
+        "names": [
+          "loaded"
+        ],
+        "raw": "Optional[LoadedFile] loaded"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p12b U2, LLR-177.1e / .1f hazard, executed) no image open: `_parse_loaded_file(P2/firmware.mac)` → `file_type mac`, path `firmware.mac`; with `p1img.s19` open: the same call → `file_type s19`, path `p1img.s19`, MAC `firmware.mac` (the MAC merged into the previous image) (holds on base; the RED side of LLR-177.1f for a worker that runs before the reset)",
+        "(probe p12b U2) with `p1img.s19` open (no MAC), `_parse_loaded_file(P2/firmware.s19)` → no MAC carried (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`:15099`) suffix dispatch: S19 / HEX → `build_loaded_s19` / `build_loaded_hex` with `a2l_path = a2l_files[0] or self.current_a2l_path` and `a2l_data = self._load_a2l_data_with_cache(a2l_path) or self.current_a2l_data`, then `_merge_primary_with_existing_mac` (reads `self.current_file`); MAC → `_load_mac_file`, then `_merge_mac_with_existing_primary` (reads `self.current_file`); else `None`. Its log lines read `self.current_project`. Called by the file-load worker today, so it already runs off the main thread there. 12b changes: a pure sibling with explicit A2L data and the primary to merge with, and no `self.current_*` read (E1 A8, guess), for the project worker; the cache write leaves it (A9).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._merge_mac_with_existing_primary",
+      "reqs": [
+        "LLR-177.1e",
+        "LLR-177.1f"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "LoadedFile",
+          "name": "mac_loaded",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "LoadedFile",
+        "names": [
+          "merged"
+        ],
+        "raw": "LoadedFile merged"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p12b U2) see `_parse_loaded_file`: the merge target is whatever `current_file` holds at call time (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`:14425`) `existing = self.current_file`; no S19/HEX primary → the MAC as is; else a `LoadedFile` with the primary's image and the MAC's records. Its twin `_merge_primary_with_existing_mac` (`:14371`) carries an existing MAC onto a new primary. Both read the live session.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._load_mac_file",
+      "reqs": [
+        "LLR-177.1e"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[list[Path]]",
+          "name": "a2l_files",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "LoadedFile",
+        "names": [
+          "loaded"
+        ],
+        "raw": "LoadedFile loaded"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read `:14210`, `:14217`) the A2L fallback reads `current_a2l_path` / `current_a2l_data` (holds on base; on a worker the census of LLR-177.1e names it unless the request passes the A2L)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`:14140`) `parse_mac_file(path)`, a one-byte placeholder `mem_map` per address, `a2l_path = a2l_files[0] or self.current_a2l_path`, `a2l_data = _load_a2l_data_with_cache(a2l_path) or self.current_a2l_data`. Reads the session when `a2l_files` is empty.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._load_a2l_data_with_cache",
+      "reqs": [
+        "LLR-177.1d",
+        "LLR-177.5"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[Path]",
+          "name": "path",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[dict[str, Any]]",
+        "names": [
+          "a2l_data"
+        ],
+        "raw": "Optional[dict[str, Any]] a2l_data"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(test `test_tui_app.py::test_a2l_cache_reuses_parse_for_unchanged_file`, :398) two calls on an unchanged file → `parse_a2l_file` called 1 time, equal results (holds on base; the fake takes `(path)` only)",
+        "(E1 LLR-177.1d negative control, code read `:15851`–`:15852`) the file-load worker reaches the cache write (holds on base; RED for LLR-177.1d)"
+      ],
+      "modify": [
+        "[Data: S19TuiApp._a2l_cache_key] (replace), [Data: S19TuiApp._a2l_cache_data]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "(`:15816`) key = (resolved path, mtime, size); a hit returns `self._a2l_cache_data`; a miss calls `parse_a2l_file(path)` and assigns `_a2l_cache_key` / `_a2l_cache_data`. Reached from the file-load worker today (`_parse_loaded_file`), so the base already writes the cache off the main thread. 12b changes: a pure parse (with the byte callback) on the worker, the cache write on the main thread, for every caller (E1 A9).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.load_selected_file",
+      "reqs": [
+        "LLR-177.1k",
+        "LLR-177.1"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[list[Path]]",
+          "name": "a2l_files",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(12a P12a-3, executed) a generated S19 with 8 MiB of data parses in 2.38 s on the main thread (holds on base; RED side of LLR-177.1k)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`:15047`) synchronous parse (`_parse_loaded_file`) and install (`_apply_loaded_file` → `_apply_prepared_load`); a parse error → `Load failed: …`; `None` → `Unsupported file type: …`. Callers today: the project MAC install (`:11920`) and the work-area pick (`_load_from_item`, post-9b `_load_workarea_file`). 88 direct test calls (E1). 12b changes: no product caller remains on the 12b paths (the pick moves to the file-load worker, LLR-177.1k; the project MAC parse moves to the project worker); the function stays for its direct test calls.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._session_snapshot",
+      "reqs": [
+        "LLR-177.1f",
+        "LLR-165.2"
+      ],
+      "in": [],
+      "out": {
+        "type": "dict",
+        "names": [
+          "snapshot"
+        ],
+        "raw": "dict snapshot"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p12b U1) cold `P2` vs `P2` over `p1img.s19` → differing names `['_image_generation', 'log_lines']` (holds on base)",
+        "(test `test_b100_session_reset.py::test_tc_b100_09_domain_matches_the_live_source_census`) every `self.<name> =` in `S19TuiApp` is in the domain or the exclusions (holds on base; RED for each unclassified 12b attribute)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`:11539`) the normalised projection of every attribute `S19TuiApp`'s source assigns (the LLR-165.2 census domain), minus `SNAPSHOT_EXCLUSIONS` (`:2019`–`:2060`, which already list `_a2l_cache_key`, `_a2l_cache_data`, `_last_manifest_verify_result`). Read-only. Unchanged by 12b; every new attribute 12b adds needs a classification (TC-B100-09).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.action_save_project",
+      "reqs": [
+        "LLR-177.3d"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(E1 LLR-177.3d negative control, code read `:7355`) no state check exists (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "post-11 (from the 11 graph): nothing loaded → `Nothing to save: load a data file or A2L first.`, no push; else clears `_save_session` / `_save_confirmed` / `_save_painted_preview` and pushes `SaveProjectScreen(preview=…, confirm=…, initial_name=…, …)` with `_handle_save_dialog` as the callback. Base (`:7355`) pushes the old dialog unconditionally. Neither has a state check. 12b changes: the busy check first (LLR-177.3d).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._handle_save_dialog",
+      "reqs": [
+        "LLR-177.1a",
+        "LLR-177.3d"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[SaveProjectPayload]",
+          "name": "payload",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(E1 P12b-6) right after P12b-5, `_handle_save_dialog('Q')` → wall 0.12 s, 0 ticks during the call, ran on the main thread; `Q` = `firmware.a2l, firmware.mac, firmware.s19, project.json` (holds on base)",
+        "(11 graph B11-12, post-11) the 56 direct call lines and the call by reference run the router unchanged (holds post-11)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "post-11 (from the 11 graph): the one-argument router: clear the per-open state; `None` → log; G1–G3 payload checks; `prepared` = the confirmed `_PreparedSave` when `payload.plan is prepared.plan` and the names match, else `_prepare_project_save(payload.project_name, session)`; `prepared.refusal` → status (+ toast on the direct path), return; else `_commit_project_save(prepared, payload)`. Base (`:9447`) is the whole save in one body. 56 direct call lines + 1 by reference (11 graph). 12b changes: none to the router's refusals (they stay synchronous); the commit it calls becomes a request build + worker start (E1 B1).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._decide_project_image",
+      "reqs": [
+        "LLR-177.1i"
+      ],
+      "in": [],
+      "out": {
+        "type": "_ProjectImageStep",
+        "names": [
+          "step"
+        ],
+        "raw": "_ProjectImageStep step"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(tests `test_b100_save_image.py` :286, :402, :1496) `step = app._decide_project_image()` inside `run_test` returns the step the save uses (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`:10607`) reads `self.current_file` and `self._change_service`; no patch → `emit=False`; else `service.rederive_for_save(…)` then `render_patched_image(…)` → `emit=True` with `derived`, `summary` and the payload. Main thread. Unchanged by 12b (ruling Q1: re-derive before the worker).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._abort_save",
+      "reqs": [
+        "LLR-177.1d",
+        "LLR-177.2a",
+        "LLR-164.4"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "created_project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[Path]",
+          "name": "placed_files",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[Path]",
+          "name": "created_dirs",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Tuple",
+          "name": "save_state",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[Tuple[Path, bytes]]",
+          "name": "manifest_restores",
+          "default": "()"
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[Tuple[Path, bytes]]",
+          "name": "kept_copies",
+          "default": "()"
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(test `test_b100_save_guards.py::test_tc_b100_07_ast_census_every_post_creation_return_removes`, :888–:891) the AST pins `_abort_save` holding an `Attribute` `_variant_set` (\"must restore the pre-save app state\") (holds on base; RED once the restore half is removed)",
+        "(12a graph A12-48) the `OSError(28)` arm leaves `W/S2` absent (holds on base)"
+      ],
+      "modify": [
+        "[Data: S19TuiApp._variant_set] (replace), [Data: S19TuiApp.current_project]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "(`:9162`) restores the session from `save_state` (`_variant_set`, `_report_filter_path`, `current_file.variant_id`, `current_project`, `current_project_dir`), then the manifest restores (`_restore_manifest`), then unlinks exactly the placed files (link-safe, identity-checked) and removes the created folders deepest first; never raises. 11 callers inside the commit. 12b changes: the session-restore half goes (the worker never writes the session); the file rollback stays and runs on the worker (E1 B5).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._write_and_verify_manifest",
+      "reqs": [
+        "LLR-177.1d",
+        "LLR-177.1e"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[str]",
+          "name": "batch",
+          "default": "()"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[str, Sequence[str]]]",
+          "name": "assignments",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[DeclaredRegion]",
+          "name": "declared_regions",
+          "default": "()"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[str, Sequence[str]]]",
+          "name": "gathered",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[str, DerivedFrom]]",
+          "name": "derived_from",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "active_document",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Callable[[Path], None]]",
+          "name": "on_written",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "ok"
+        ],
+        "raw": "bool ok"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(test `test_b100_project_check.py::test_tc_b100_23_digest_changed_between_write_and_verify`, :264–:267) `app._write_and_verify_manifest(project_dir)` then `app._last_manifest_verify_result` read (holds on base; RED once the attribute is no longer assigned)",
+        "(test `test_b100_project_check.py` :1421) `ok = app._write_and_verify_manifest(project)` → `False` on a refused write (holds on base; the bool return is pinned)"
+      ],
+      "modify": [
+        "[Data: S19TuiApp._last_manifest_verify_result]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "(`:11147`) reads `self._variant_set` (`None` → `True`, nothing written) and `self.base_dir`; assigns `self._last_manifest_verify_result = None`, writes with `write_project_manifest`; refused → `Manifest write failed` + toast, `False`; `on_written(written)`; `verify_written_manifest`; assigns `self._last_manifest_verify_result = result`; `_surface_manifest_verify_result(result)` (status + toast); `True`. Callers: the Save commit and `_rewrite_project_manifest`. 12b changes: returns its verify result instead of assigning the attribute, takes the variant set as an argument, and leaves the painting to a main-thread caller (E1 B4).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._rewrite_project_manifest",
+      "reqs": [
+        "LLR-177.1d"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "placed",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[DerivedFrom]",
+          "name": "derived",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "ok"
+        ],
+        "raw": "bool ok"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read `:12497`) the caller reads the attribute the writer set (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`:12425`) the main-thread rewrite after a save-back, a variant append, a MAC / A2L sync: calls `_write_and_verify_manifest` and reads `self._last_manifest_verify_result` (`:12497`). Main thread, not on a 12b worker. 12b changes: assigns `_last_manifest_verify_result` from the returned result (E1 B4).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._copy_project_subfolders",
+      "reqs": [
+        "LLR-177.5a",
+        "LLR-177.1a"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "source_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[InventoryFile]",
+          "name": "copies",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "list[Path]",
+          "name": "placed_files",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "list[Path]",
+          "name": "created_dirs",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[str, SavePlanRow]]",
+          "name": "carried",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "Optional[str]",
+        "names": [
+          "failure"
+        ],
+        "raw": "Optional[str] failure"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(8b measurement cited by E1) a 2 000-file save-as takes 14.0 s, all inside these two calls (holds on base)"
+      ],
+      "modify": [
+        "[I/O: work area]"
+      ],
+      "assign": [
+        null
+      ],
+      "func": "(`:12208`) one `place_into_workarea` per plan copy entry, each destination guarded (`_guarded_destination`, `_path_traverses_reparse_point` with `self.workarea`), each landing recorded in `placed_files` / `created_dirs`; returns the first failure line or `None`. Called twice by a save-as (sub-folders, then top-level). It is the per-file loop of a 2 000-file save-as. 12b changes: runs on the Save worker and reports each file placed (LLR-177.5a).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._write_editor_document",
+      "reqs": [
+        "LLR-177.1e"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "SavePlanRow",
+          "name": "row",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "tuple[Optional[PlacementResult], Optional[Path], Optional[str]]",
+        "names": [
+          "placed",
+          "staged",
+          "failure"
+        ],
+        "raw": "tuple(Optional[PlacementResult] placed, Optional[Path] staged, Optional[str] failure)"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read `:11103`) `document = self._change_service.document` (holds on base; RED for LLR-177.1e's census on a worker)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`:11057`) writes a pasted change document as a new file under the project home; reads `self._change_service.document` (`:11103`) and `self.workarea`. 12b changes: on the worker it must take the document's serialised bytes from the request (LLR-177.1e census).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "ChangeService.record_save_entries",
+      "reqs": [
+        "LLR-177.1d"
+      ],
+      "in": [],
+      "out": {
+        "type": "tuple[tuple[int, ...], tuple[int, ...]]",
+        "names": [
+          "split"
+        ],
+        "raw": "tuple[tuple[int, ...], tuple[int, ...]] split"
+      },
+      "module": "s19_app/tui/services/change_service.py",
+      "examples": [
+        "(code read `:2203`–`:2205`) assigns two service attributes (holds on base; a state change, so off-main it is RED for LLR-177.1d)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`change_service.py:2181`) computes the applied / not-applied entry split and stores it in `self.last_save_applied`, `self.last_save_not_applied` (service state). Called by the Save commit just before the emit. 12b changes: called on the main thread before the worker starts (E1 B1).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "ChangeService.emit_and_verify",
+      "reqs": [
+        "LLR-177.1a",
+        "LLR-177.1e"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Dict[int, int]",
+          "name": "image",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[Tuple[int, int]]",
+          "name": "ranges",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "dest_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "filename",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "source_kind",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "bytes_per_line",
+          "default": "32"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[bytes]",
+          "name": "s0_header",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Path]",
+          "name": "source_image_path",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[ChangeSummary]",
+          "name": "summary",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Path]",
+          "name": "workarea_root",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Callable[[PlacementResult], None]]",
+          "name": "on_placed",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "ChangeActionResult",
+        "names": [
+          "result"
+        ],
+        "raw": "ChangeActionResult result"
+      },
+      "module": "s19_app/tui/services/change_service.py",
+      "examples": [
+        "(code read `:2445`, `:2471`–`:2473`) `stamped = summary if summary is not None else self.last_summary`; `stamped.verify_result = verify` (holds on base)"
+      ],
+      "modify": [
+        "[I/O: work area]"
+      ],
+      "assign": [
+        null
+      ],
+      "func": "(`change_service.py:2377`) `save_patched_image` places the image, `on_placed` fires, `verify_written_image` re-reads it; reads `self.last_summary` when `summary` is `None` and `self.last_save_applied` / `not_applied` for the message; writes `stamped.verify_result` on the summary object it was given. Assigns no service attribute. 12b changes: runs on the Save worker; its `self.*` reads and the summary write cross the thread (LLR-177.1e census; see baseline-notes Surprise 6).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "ChangeService.adopt_rederived",
+      "reqs": [
+        "LLR-177.1j"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Dict[int, int]",
+          "name": "mem_map",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Dict[int, int]",
+          "name": "derived",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[ChangeSummary]",
+          "name": "summary",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/services/change_service.py",
+      "examples": [
+        "(test `test_b100_save_image.py::test_tc_b100_17_failed_manifest_write_adopts_nothing`, :836) `_write_and_verify_manifest` patched to `False` → 0 adopts, the session map keeps the source bytes (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`change_service.py:2315`) the session view takes the re-derived image in place, so it equals what was saved (LLR-167.2). Called in the committed tail only when emitting, after `project.json` is on disk (review F4). 12b changes: called by the main-thread commit handler after the worker reports a committed save (LLR-177.1j).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.load_a2l_from_path",
+      "reqs": [
+        "HLR-177",
+        "LLR-177.1b",
+        "LLR-177.1d",
+        "LLR-177.2b",
+        "LLR-177.5",
+        "LLR-176.3"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(E1 P12b-4) the case_06 A2L → wall 8.76 s, 0 ticks during the call, ran on the main thread (holds on base)",
+        "(E1 P12b-7) `parse_a2l_file(case_06)` alone takes 5.01 s of those 8.76 s (holds on base; the worker share)",
+        "(probe p12b U4) one base A2L attach assigns `current_a2l_path`, `current_a2l_data`, `_a2l_cache_key`, `_a2l_cache_data` and 11 view caches (holds on base)",
+        "(9b probe p9b F7, holds on base) `_load_from_item('w.a2l')` → `copy_into_workarea` called once (onto itself), `A2L loaded: w.a2l`"
+      ],
+      "modify": [
+        "[I/O: workarea temp]"
+      ],
+      "assign": [
+        null
+      ],
+      "func": "(`:13087`) `resolve_input_path`; not found / unsupported suffix / project already has an A2L (`validate_project_files` of the open project) refusals; the size warning; `set_progress(10, …)`; `copy_into_workarea` (containment refusal → `Cannot load A2L: …`); recent record (post-9b: not when found through the fallback); `refresh_files`; `set_progress(50, …)`; `current_a2l_path = copied`; `current_a2l_data = _load_a2l_data_with_cache(copied)` (a raise leaves the function); `current_file.a2l_*`; `update_a2l_view()` (the tag-table build); labels, Loaded panel, `set_progress(100, …)`, `A2L loaded: <name>`, focus, `_sync_loaded_a2l_to_project`. Post-12a: begin `a2l_load` after the refusals, steps 2 and 3, ends through `end_busy`, `finally: _busy_fail` (12a graph A12-38 … A12-41). 12b changes: the main checks stay; a request, `begin_busy`, the A2L worker (copy unless in place, parse with the byte callback); the install / failure handler on the main thread paints step 3 before the tag-table build (E1 C1–C3).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._load_from_item",
+      "reqs": [
+        "LLR-177.1k"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "ListItem",
+          "name": "item",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(9b probe p9b F7) `w.s19` → 0 copies; `w.a2l` → 1 copy; `w.a2l.json` → `Unsupported file type: .json` (holds on base)",
+        "(tests) 3 direct calls: `test_b100_focus.py:364`, `test_b100_recents.py:944`, `test_b100_recents.py:2823` (holds on base; each pick then waits or reads at once, census)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "base (`:13325`): `filename = item.data`; `candidate.exists()` → log, then `load_a2l_from_path(candidate)` for an A2L suffix, else `load_selected_file(candidate)`. Post-9b: `self._load_workarea_file(filename)`. Called from `on_list_view_selected` (`#files_list`).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.update_a2l_view",
+      "reqs": [
+        "LLR-176.3"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(E1 P12b-4, P12b-7) 8.76 s − 5.01 s ≈ 3.75 s of the case_06 attach is outside the parse (copy + this build) (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`:16883`) rebuilds the A2L tag table, the enriched tags and the A2L panels from `current_a2l_data` and `current_file`. The main-thread share of an A2L attach (P12b-4 minus P12b-7: about 3.5 s for case_06), HLR-176's declared freeze. Unchanged by 12b; the install handler paints its step name before calling it (LLR-176.3).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.load_from_path",
+      "reqs": [
+        "LLR-177.3a",
+        "HLR-177a"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(12a graph A12-30, post-12a) `load_from_path(case_01/firmware.s19)` → 1 begin `Loading firmware.s19`, spy `[0, 33, 66, 0]`, outcome `Loaded firmware.s19`",
+        "(support `tests/support/b100_projects.py:383` `append_variant`) a project load, one pause, then `load_from_path` (holds on base; under 12b the project worker may still run when this call starts — see census)"
+      ],
+      "modify": [
+        "[I/O: workarea temp]"
+      ],
+      "assign": [
+        null
+      ],
+      "func": "(`:13005`) the typed / recent / variant file load: refusals, `set_progress(10)`, `copy_into_workarea` on the main thread, recent record, `set_progress(50)`, `_start_load_worker(copied)`. Post-9b: the fallback condition on the record. Post-12a: begin `file_load` after the refusals, `except BaseException: _busy_fail; raise`, step 2, `_start_load_worker(copied, gen=gen)` (12a graph A12-30 … A12-37). Its key `file_load` makes it a session action (ruling Q2). Unchanged by 12b in body (the copy stays on the main thread, ruling Q5).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._start_load_worker",
+      "reqs": [
+        "LLR-177.1k",
+        "LLR-177.4c"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[list[Path]]",
+          "name": "a2l_files",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(12a graph A12-33, post-12a) `_apply_prepared_load` raising → the `finally` ends the run, then `run_test` raises `WorkerFailed` (`exit_on_error`, E1 P12b-2)",
+        "(E1 P12b-1, executed on Textual 8.2.8) a second worker in the same exclusive group cancels the first `Worker` object, but its thread keeps running and its `call_from_thread` callback still lands (`landed: [('second', …), ('first', …)]`) (holds on base; why the busy refusal is a state check)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`:15706`) `@work(thread=True, exclusive=True, group=\"load\")`: `_parse_loaded_file` (raise → `call_from_thread(_handle_load_error, …)`; `None` → unsupported), `_prepare_load_payload`, `call_from_thread(_apply_prepared_load, …)`, `call_from_thread(set_progress, 100, …)`, then `_sync_loaded_file_to_project` when a project is open. Default `exit_on_error=True`. Post-12a: `gen` keyword-only and required (not in `in:`, which gives the base signature), `try / finally: call_from_thread(_busy_fail, \"file_load\", gen)`, step 3 before the install, the end through `end_busy` (12a graph). 12b changes: a second caller (`_load_workarea_file`'s data arm, in place); its end goes through the shared end tail so a confirmed quit can exit after it (E1 C9).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._handle_load_error",
+      "reqs": [
+        "LLR-177.4c"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Exception",
+          "name": "exc",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(12a graph A12-31, post-12a) a parse raise → log `['Load failed: synthetic parse failure', 'Load failed']`, 1 effective end"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`:15785`) clears `_pending_variant_id`, logs, `Load failed: <exc>`, `set_progress(100, \"Load failed\")`. Post-12a: takes `gen` (a third parameter), ends through `end_busy(\"file_load\", gen, \"Load failed\")`. 12b changes: the end goes through the shared end tail (E1 C9).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.action_load_file",
+      "reqs": [
+        "LLR-177.3"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(9b probe p9b F1) `l` → stack `['Screen', 'LoadFileScreen']` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "base (`:7329`): logs, pushes `LoadFileScreen()` → `_handle_load_dialog`. Post-9b: pushes `LoadDialog(mode=\"path\", …)` (9b graph). Keys `ctrl+l` (priority), `l`; palette `load_file`. No state check. 12b changes: the busy check first (LLR-177.3).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.action_load_project",
+      "reqs": [
+        "LLR-177.3"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(9b probe p9b U5) `p` with 7 listed folders → stack `['Screen', 'LoadProjectScreen']` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "base (`:7439`): `list_projects()`; none → `No saved projects found.`; else pushes `LoadProjectScreen(projects)` → `_route_load_project`. Post-9b: pushes `LoadDialog(mode=\"list\", highlight=…)` also with 0 projects. Keys `p`, `#ws_load_project_button`, palette `load_project`. 12b changes: the busy check first (LLR-177.3).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.action_select_variant",
+      "reqs": [
+        "LLR-177.3b"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(E1 LLR-177.3b negative control, code read `:7509`) no state check (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`:7509`) no variant set → a status line; else pushes `SelectVariantScreen` → `_handle_select_variant`. Key `v`, palette `select_variant`, the Load-result panel's `v` (through `_handle_load_result`). No state check. 12b changes: the busy check first.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.action_unload_all",
+      "reqs": [
+        "LLR-177.3c"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(E1 LLR-177.3c negative control, code read `:14668`) no state check (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`:14668`) `U`: unloads every artifact (image, MAC, A2L), clearing the session through the unload path. No state check. 12b changes: the busy check first.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.on_loaded_artifacts_panel_unload_requested",
+      "reqs": [
+        "LLR-177.3c"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "LoadedArtifactsPanel.UnloadRequested",
+          "name": "message",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read `:14636`) no state check (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`:14636`) the Loaded panel's `[u]` on one slot (image, MAC or A2L) → unloads that artifact. No state check. 12b changes: the busy check first.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.on_patch_editor_panel_action_requested",
+      "reqs": [
+        "LLR-177.3e"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "PatchEditorPanel.ActionRequested",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read `:3949`–`:4060`) 11 action arms behind one handler, none checks a running action (holds on base; `save_doc` and `execute_scope` are refused too by a top-of-handler guard — baseline-notes Surprise 4)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`:3886`) the Patch Editor dispatcher: reads `self._change_service`, `self.current_file`; actions `add_entry`, `edit_entry`, `remove_entry`, `load_doc`, `parse_paste`, `refresh_doc`, `validate_doc`, `apply_doc`, `save_doc`, `run_checks`, `execute_scope` (`PATCH_ACTIONS_V2`). No state check. 12b changes: one busy check at its top refuses every action (ruling Q3).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.on_patch_editor_panel_save_back_decision",
+      "reqs": [
+        "LLR-177.3e"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "PatchEditorPanel.SaveBackDecision",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(test `test_b100_active_variant.py` :682) `app.on_patch_editor_panel_save_back_decision(PatchEditorPanel.SaveBackDecision(\"firmware.s19\", 32))` writes a manifest (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`:4094`) the save-back of the patched image into the project (writes a variant, rewrites `project.json` through `_rewrite_project_manifest`). No state check. 12b changes: the busy check first.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.on_patch_editor_panel_undo_requested",
+      "reqs": [
+        "LLR-177.3e"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "PatchEditorPanel.UndoRequested",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read `:4330`) no state check beyond the history gate (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`:4330`) the panel's undo → `_change_service.undo()` when `_patch_history_action_allowed()`. No busy check. 12b changes: the busy check first.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.on_patch_editor_panel_redo_requested",
+      "reqs": [
+        "LLR-177.3e"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "PatchEditorPanel.RedoRequested",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read `:4358`) no state check beyond the history gate (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`:4358`) the panel's redo → `_change_service.redo()`. 12b changes: the busy check first.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.action_patch_undo",
+      "reqs": [
+        "LLR-177.3e"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read `:4436`) the service undo runs with no state check (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`:4413`) the undo key → `self._change_service.undo()` (`:4436`). 12b changes: the busy check first.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.action_patch_redo",
+      "reqs": [
+        "LLR-177.3e"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read `:4462`) the service redo runs with no state check (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`:4439`) the redo key → `self._change_service.redo()` (`:4462`). 12b changes: the busy check first.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.on_patch_editor_panel_edit_json_requested",
+      "reqs": [
+        "LLR-177.3e"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "PatchEditorPanel.EditJsonRequested",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read `:4465`) no state check (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`:4465`) opens the JSON editor on the document; its result replaces the document. 12b changes: the busy check first.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.on_patch_editor_panel_entry_edit_json_requested",
+      "reqs": [
+        "LLR-177.3e"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "PatchEditorPanel.EntryEditJsonRequested",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read `:4579`) no state check (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`:4579`) opens the JSON editor on one entry; its result replaces the entry. 12b changes: the busy check first.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.on_patch_editor_panel_change_file_selected",
+      "reqs": [
+        "LLR-177.3e"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "PatchEditorPanel.ChangeFileSelected",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(10 graph C59, post-10) a dirty panel → 1 `LoadGuardScreen`, 0 loads; a clean panel → the pick loads"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`:6110`) the `#patch_doc_file_select` pick: the containment guard, then `_patch_editor_load(panel, candidate)`. Post-10: reads `panel.is_dirty` and pushes `LoadGuardScreen` when dirty (10 graph C59). 12b changes: the busy check first.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.on_patch_editor_panel_dirty_load_requested",
+      "reqs": [
+        "LLR-177.3e"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "PatchEditorPanel.DirtyLoadRequested",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read `:6232`) no state check (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`:6232`) the dirty-load guard popup (`LoadGuardScreen`); its accept arm loads the document. 12b changes: the busy check first.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.check_action",
+      "reqs": [
+        "LLR-177.4",
+        "LLR-177.4d"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "action",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "tuple",
+          "name": "parameters",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[bool]",
+        "names": [
+          "allowed"
+        ],
+        "raw": "Optional[bool] allowed"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(11 graph B11-07, post-11) with the Save dialog open, `ctrl+l`, `ctrl+s`, `ctrl+k`, `ctrl+d` are inert (4 of 4)",
+        "(code read, Textual 8.2.8 `app.py:455`–`:462`, `:4460`–`:4462`) `ctrl+q` is a priority binding to `quit`; `App.action_quit` is `async` and calls `self.exit()` (holds on base; `S19TuiApp` defines no `action_quit`, `BINDINGS` holds `(\"q\", \"quit\", \"Quit\")` at `:2126`)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "base (`:8034`): window gates, then `super().check_action`. Post-9b / post-10 / post-11: first `action in _LOAD_DIALOG_INERT_ACTIONS and any(isinstance(s, (LoadDialog, ConfirmQuestionScreen, SaveProjectScreen)) for s in self.screen_stack)` → `False`, with `_LOAD_DIALOG_INERT_ACTIONS = {\"load_file\", \"save_project\", \"focus_palette\", \"cycle_density\"}`. `quit` is not in the set, so `ctrl+q` (Textual `App.BINDINGS`, `priority=True`) reaches `action_quit` under every modal. 12b: no change proposed by E1 (open question Q-c2 in the interfaces).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "parse_a2l_file",
+      "reqs": [
+        "LLR-176.4",
+        "LLR-176.4a",
+        "LLR-177.5"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "dict",
+        "names": [
+          "a2l_data"
+        ],
+        "raw": "dict a2l_data"
+      },
+      "module": "s19_app/tui/a2l.py",
+      "examples": [
+        "(E1 P12b-7) the case_06 A2L parses in 5.01 s (holds on base)",
+        "(code read `:2627`) the signature takes no callback (holds on base; RED side of LLR-176.4)",
+        "(tests) 3 monkeypatches replace it with a one-parameter fake: `test_tui_app.py:403` (`fake_parse(path)`), `test_b100_project_check.py:704` (`_denied(path)`), and `test_b100_project_homes.py:1936` (`_parse(path, *args, **kwargs)`, tolerant) (holds on base; see census)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`a2l.py:2627`) `build_section_tree(path)`, then record layouts, compu methods and tables, `extract_a2l_tags`, segment counts and logs; returns `path`, `sections`, `errors`, `tags`, `record_layouts_by_name`, `compu_methods_by_name`, `compu_tabs_by_name`. Pure (module logger only). Re-exported by `a2l_parse.py`; imported by name into `app.py` (`:40`), `change_service.py`, `flow_execution_service.py`, `variant_execution_service.py`. 12b changes: `parse_a2l_file(path, progress=None)`, the callback passed to the tree build; the result unchanged (LLR-176.4, .4a).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "build_section_tree",
+      "reqs": [
+        "LLR-176.4"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "tuple[list[dict], list[str]]",
+        "names": [
+          "sections",
+          "errors"
+        ],
+        "raw": "tuple(list[dict] sections, list[str] errors)"
+      },
+      "module": "s19_app/tui/a2l.py",
+      "examples": [
+        "(probe p12b U3) case_06 (37 742 888 bytes, CRLF): 1 039 926 lines; the text-mode line lengths sum to 36 702 962 bytes (short by 1 per line); `handle.buffer.tell()` read after each line takes 4 608 distinct values (one per 8 KiB refill), first 8 192, last 37 742 888 = the file size, non-decreasing (holds on base)",
+        "(probe p12b U3) case_01 (1 444 bytes) → 1 distinct position, equal to the size (holds on base; \"an A2L smaller than one progress chunk\")",
+        "(probe p12b U3) the read loop alone takes 0.073 s for case_06; with `buffer.tell()` after every line, 0.659 s (holds on base; a per-line probe costs about 12 % of the 5.01 s parse)",
+        "(test `test_a2l_enriched.py::test_build_section_tree_canape_ext_meta_numeric`, :143) `build_section_tree(a2l)` returns `(sections, errors)` (holds on base)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "(`a2l.py:141`) one text-mode read (`utf-8`, `errors=\"replace\"`), line by line, pushing / popping `/begin` / `/end` sections; `FileNotFoundError` → a soft error; other `OSError` re-raised. 12b changes: reports `(bytes_consumed, total_bytes)` from its read loop, bounded (E1 E2, seam S-f).",
+      "volatile": [],
+      "oracle": []
+    }
+  ],
+  "calls": [
+    {
+      "caller": "S19TuiApp._handle_load_project",
+      "callee": "S19TuiApp._install_project_image",
+      "sites": [
+        "s19_app/tui/app.py:11929"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_load_project",
+      "callee": "S19TuiApp._load_a2l_data_with_cache",
+      "sites": [
+        "s19_app/tui/app.py:11884"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_load_project",
+      "callee": "S19TuiApp._reopen_active_document",
+      "sites": [
+        "s19_app/tui/app.py:11912"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_load_project",
+      "callee": "S19TuiApp._reset_project_session",
+      "sites": [
+        "s19_app/tui/app.py:11847"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_load_project",
+      "callee": "S19TuiApp.load_selected_file",
+      "sites": [
+        "s19_app/tui/app.py:11946"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_load_project",
+      "callee": "S19TuiApp.update_a2l_view",
+      "sites": [
+        "s19_app/tui/app.py:11905"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_load_project",
+      "callee": "choose_install_set",
+      "sites": [
+        "s19_app/tui/app.py:11895",
+        "s19_app/tui/app.py:11936"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "ChangeService.adopt_rederived",
+      "sites": [
+        "s19_app/tui/app.py:10456"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "ChangeService.emit_and_verify",
+      "sites": [
+        "s19_app/tui/app.py:10027"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "ChangeService.record_save_entries",
+      "sites": [
+        "s19_app/tui/app.py:10026"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "S19TuiApp._abort_save",
+      "sites": [
+        "s19_app/tui/app.py:10050",
+        "s19_app/tui/app.py:10076",
+        "s19_app/tui/app.py:10110",
+        "s19_app/tui/app.py:10292",
+        "s19_app/tui/app.py:10360",
+        "s19_app/tui/app.py:10384",
+        "s19_app/tui/app.py:10397",
+        "s19_app/tui/app.py:10422",
+        "s19_app/tui/app.py:10436",
+        "s19_app/tui/app.py:9944",
+        "s19_app/tui/app.py:9969"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "S19TuiApp._copy_project_subfolders",
+      "sites": [
+        "s19_app/tui/app.py:10099",
+        "s19_app/tui/app.py:9963"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "S19TuiApp._decide_project_image",
+      "sites": [
+        "s19_app/tui/app.py:9726"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "S19TuiApp._write_and_verify_manifest",
+      "sites": [
+        "s19_app/tui/app.py:10343"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "S19TuiApp._write_editor_document",
+      "sites": [
+        "s19_app/tui/app.py:10001"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "recorded_document_state",
+      "sites": [
+        "s19_app/tui/app.py:9770"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._install_project_image",
+      "callee": "S19TuiApp._parse_loaded_file",
+      "sites": [
+        "s19_app/tui/app.py:12106"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._install_project_image",
+      "callee": "S19TuiApp.update_a2l_view",
+      "sites": [
+        "s19_app/tui/app.py:15544"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._load_a2l_data_with_cache",
+      "callee": "parse_a2l_file",
+      "sites": [
+        "s19_app/tui/app.py:15892"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._load_from_item",
+      "callee": "S19TuiApp.load_a2l_from_path",
+      "sites": [
+        "s19_app/tui/app.py:13366"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._load_from_item",
+      "callee": "S19TuiApp.load_selected_file",
+      "sites": [
+        "s19_app/tui/app.py:13368"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._load_mac_file",
+      "callee": "S19TuiApp._load_a2l_data_with_cache",
+      "sites": [
+        "s19_app/tui/app.py:14251"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._parse_loaded_file",
+      "callee": "S19TuiApp._load_a2l_data_with_cache",
+      "sites": [
+        "s19_app/tui/app.py:15190",
+        "s19_app/tui/app.py:15209"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._parse_loaded_file",
+      "callee": "S19TuiApp._load_mac_file",
+      "sites": [
+        "s19_app/tui/app.py:15226"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._parse_loaded_file",
+      "callee": "S19TuiApp._merge_mac_with_existing_primary",
+      "sites": [
+        "s19_app/tui/app.py:15236"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._reopen_active_document",
+      "callee": "recorded_document_state",
+      "sites": [
+        "s19_app/tui/app.py:12044"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._rewrite_project_manifest",
+      "callee": "S19TuiApp._write_and_verify_manifest",
+      "sites": [
+        "s19_app/tui/app.py:12525"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._route_load_project",
+      "callee": "S19TuiApp._handle_load_project",
+      "sites": [
+        "s19_app/tui/app.py:7494"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._start_load_worker",
+      "callee": "S19TuiApp._parse_loaded_file",
+      "sites": [
+        "s19_app/tui/app.py:15783"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.action_unload_all",
+      "callee": "S19TuiApp.update_a2l_view",
+      "sites": [
+        "s19_app/tui/app.py:14613"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.load_a2l_from_path",
+      "callee": "S19TuiApp._load_a2l_data_with_cache",
+      "sites": [
+        "s19_app/tui/app.py:13177"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.load_a2l_from_path",
+      "callee": "S19TuiApp._rewrite_project_manifest",
+      "sites": [
+        "s19_app/tui/app.py:12784"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.load_a2l_from_path",
+      "callee": "S19TuiApp.update_a2l_view",
+      "sites": [
+        "s19_app/tui/app.py:13184"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.load_from_path",
+      "callee": "S19TuiApp._start_load_worker",
+      "sites": [
+        "s19_app/tui/app.py:13102"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.load_selected_file",
+      "callee": "S19TuiApp._parse_loaded_file",
+      "sites": [
+        "s19_app/tui/app.py:15118"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.load_selected_file",
+      "callee": "S19TuiApp.update_a2l_view",
+      "sites": [
+        "s19_app/tui/app.py:15544"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.on_loaded_artifacts_panel_unload_requested",
+      "callee": "S19TuiApp.update_a2l_view",
+      "sites": [
+        "s19_app/tui/app.py:14613"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.on_patch_editor_panel_action_requested",
+      "callee": "parse_a2l_file",
+      "sites": [
+        "s19_app/tui/services/variant_execution_service.py:2662"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.on_patch_editor_panel_redo_requested",
+      "callee": "S19TuiApp.action_patch_redo",
+      "sites": [
+        "s19_app/tui/app.py:4387"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.on_patch_editor_panel_save_back_decision",
+      "callee": "S19TuiApp._rewrite_project_manifest",
+      "sites": [
+        "s19_app/tui/app.py:4201"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.on_patch_editor_panel_undo_requested",
+      "callee": "S19TuiApp.action_patch_undo",
+      "sites": [
+        "s19_app/tui/app.py:4361"
+      ]
+    },
+    {
+      "caller": "parse_a2l_file",
+      "callee": "build_section_tree",
+      "sites": [
+        "s19_app/tui/a2l.py:2659"
+      ]
+    }
+  ],
+  "top_level_sites": {
+    "S19TuiApp.action_select_variant": [
+      "s19_app/tui/app.py:7523"
+    ],
+    "S19TuiApp.load_from_path": [
+      "s19_app/tui/app.py:12972",
+      "s19_app/tui/app.py:7628"
+    ],
+    "S19TuiApp._rewrite_project_manifest": [
+      "s19_app/tui/app.py:12710",
+      "s19_app/tui/app.py:12754"
+    ],
+    "S19TuiApp.load_a2l_from_path": [
+      "s19_app/tui/app.py:12969"
+    ],
+    "S19TuiApp._route_load_project": [
+      "s19_app/tui/app.py:12966"
+    ],
+    "S19TuiApp._load_from_item": [
+      "s19_app/tui/app.py:13215"
+    ],
+    "S19TuiApp.action_load_project": [
+      "s19_app/tui/app.py:17678"
+    ],
+    "ChangeService.emit_and_verify": [
+      "s19_app/tui/services/change_service.py:2629"
+    ],
+    "ChangeService.adopt_rederived": [
+      "s19_app/tui/services/change_service.py:2594"
+    ],
+    "ChangeService.record_save_entries": [
+      "s19_app/tui/services/change_service.py:2586"
+    ],
+    "parse_a2l_file": [
+      "s19_app/tui/services/change_service.py:3228",
+      "s19_app/tui/services/flow_execution_service.py:358",
+      "s19_app/tui/services/flow_execution_service.py:461"
+    ],
+    "S19TuiApp.check_action": [
+      "s19_app/tui/window_help.py:1134",
+      "s19_app/tui/window_help.py:1145"
+    ]
+  },
+  "findings": [],
+  "parse_failures": []
+}

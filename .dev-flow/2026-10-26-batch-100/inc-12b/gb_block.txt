@@ -1,0 +1,894 @@
+    def _commit_project_save(
+        self, prepared: _PreparedSave, payload: SaveProjectPayload
+    ) -> None:
+        """The Save kickoff (12b): busy check, begin, request, worker.
+
+        Summary:
+            Inc 11 name and signature kept (fixed S-b). The re-derive stayed
+            on the main thread in ``_save_session_inputs`` /
+            ``_decide_project_image`` (ruling Q1, LLR-177.1i). Here: the
+            busy check (Q-a1), the 12a begin, the image input (only when the
+            rows loop will emit), the document facts and the request; the
+            worker is the only writer on the Save path.
+
+        Args:
+            prepared (_PreparedSave): The guard-and-plan half's result.
+            payload (SaveProjectPayload): The dismissed payload.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses: _refuse_if_busy / _busy_begin_action /
+                ChangeService.record_save_entries / classify_active_document /
+                document_home_for_kind / copy.deepcopy / SaveRequest /
+                _save_project_worker
+            Used by: _handle_save_dialog (router step 6)
+        """
+        if self._refuse_if_busy():
+            return
+        gen = self._busy_begin_action("save_project", prepared.cleaned)
+        try:
+            image_input: Optional[SaveImageInput] = None
+            if prepared.image_step.emit and any(
+                row.role == "image" for row in prepared.plan.rows
+            ):
+                applied, not_applied = self._change_service.record_save_entries()
+                image_input = SaveImageInput(
+                    prepared.image_step.derived,
+                    tuple(self.current_file.ranges),
+                    self.current_file.file_type,
+                    self.current_file.source_s0_header,
+                    self.current_file.path,
+                    prepared.image_step.summary,
+                    tuple(applied),
+                    tuple(not_applied),
+                )
+            document = self._change_service.document
+            document_class = (
+                classify_active_document(
+                    prepared.project_dir,
+                    document.source_path,
+                    document_home_for_kind(document.kind),
+                )[0]
+                if document.source_path is not None
+                else None
+            )
+            document_snapshot = (
+                copy.deepcopy(document)
+                if document.source_path is None and document.entries
+                else None
+            )
+            request = SaveRequest(
+                prepared,
+                payload,
+                image_input,
+                document.kind,
+                document.source_path,
+                document_class,
+                document_snapshot,
+                tuple(self._declared_regions),
+                self._last_template_path,
+                self.workarea,
+                self.base_dir,
+                gen,
+            )
+            self._save_project_worker(request)
+        except BaseException:
+            self._busy_fail("save_project", gen)
+            raise
+
+    @work(thread=True, group="save_project")
+    def _save_project_worker(self, request: SaveRequest) -> None:
+        """The Save worker (S-b / S-d): files only; reads only the request."""
+        try:
+            try:
+                outcome = self._save_project_files(request)
+            except Exception as exc:  # noqa: BLE001 - a failure before the rollback try
+                self.logger.exception("Project save failed outside the rollback.")
+                message = (
+                    "Project NOT saved: could not save — an unexpected error "
+                    "stopped the save. check the folder."
+                )
+                outcome = _save_failure_outcome(
+                    request, [message], ("Project not saved", message)
+                )
+            self.call_from_thread(self._on_project_saved, outcome)
+        except BaseException:
+            self.call_from_thread(self._busy_fail, "save_project", request.gen)
+            raise
+
+    def _save_project_files(self, request: SaveRequest) -> SaveOutcome:
+        """The Save worker step: the base commit C1–C4 plus the rollback."""
+        prepared = request.prepared
+        plan = prepared.plan
+        project_dir = prepared.project_dir
+        workarea = request.workarea
+        gen = request.gen
+
+        # E3 S12b-06: the progress total depends only on ``plan``, computed
+        # BEFORE ``mkdir`` so nothing fallible sits between the mkdir and the
+        # rollback ``try``.
+        total = len(plan.copies)
+        for row in plan.rows:
+            if row.role in (PLAN_ROLE_MANIFEST, PLAN_ROLE_CARRIED):
+                continue
+            if row.role == PLAN_ROLE_DOCUMENT and row.source is not None:
+                continue
+            total += 1
+        forward = self._progress_forwarder("save_project", gen, 2)
+        count = 0
+
+        def tick() -> None:
+            nonlocal count
+            count += 1
+            forward(count, total)
+
+        # C1: the folder's creation; ownership comes from mkdir itself.
+        try:
+            project_dir.mkdir(parents=True, exist_ok=False)
+        except FileExistsError:
+            created_project_dir = False
+        else:
+            created_project_dir = True
+
+        placed_files = _PlacedFiles()
+        created_dirs: list[Path] = []
+        manifest_restores: list[Tuple[Path, bytes]] = []
+        kept_copies: list[Tuple[Path, bytes]] = []
+        saved_variant_id: Optional[str] = None
+        saved_primary_name: Optional[str] = None
+        variant_set: Optional[ProjectVariantSet] = None
+        emit_verify: Optional[VerifyResult] = None
+        document_home = document_home_for_kind(request.document_kind)
+        document_row = next(
+            (row for row in plan.rows if row.role == PLAN_ROLE_DOCUMENT), None
+        )
+        pasted_placed: Optional[PlacementResult] = None
+        document_write_failure: Optional[str] = None
+        recorded_document: Optional[str] = None
+        document_lines: list[str] = []
+        target_gathered: Mapping[str, Sequence[str]] = prepared.target_carry.get(
+            "gathered", {}
+        )
+        try:
+            # S12b-07: every cross-thread call after the mkdir sits inside
+            # the rollback ``try``.
+            self.call_from_thread(self.step_busy, "save_project", gen, 2)
+            _data_files, _a2l_files, error = validate_project_files(project_dir)
+            if error:
+                self.logger.warning("Project validation failed: %s", error)
+                notes = self._abort_save(
+                    project_dir,
+                    created_project_dir,
+                    placed_files,
+                    created_dirs,
+                    workarea,
+                    manifest_restores,
+                )
+                return _save_failure_outcome(request, [error, *notes], None)
+            subfolder_copies = [entry for entry in plan.copies if "/" in entry.relative]
+            top_level_copies = [
+                entry for entry in plan.copies if "/" not in entry.relative
+            ]
+            if subfolder_copies:
+                copy_failure = self._copy_project_subfolders(
+                    prepared.save_as_source,
+                    project_dir,
+                    subfolder_copies,
+                    placed_files,
+                    created_dirs,
+                    workarea=workarea,
+                    on_placed=tick,
+                )
+                if copy_failure is not None:
+                    notes = self._abort_save(
+                        project_dir,
+                        created_project_dir,
+                        placed_files,
+                        created_dirs,
+                        workarea,
+                        manifest_restores,
+                    )
+                    return _save_failure_outcome(
+                        request, [copy_failure, *notes], None
+                    )
+            derived_from: dict[str, DerivedFrom] = dict(prepared.carried_derived)
+            for row in plan.rows:
+                if row.role in (PLAN_ROLE_MANIFEST, PLAN_ROLE_CARRIED):
+                    continue
+                if row.role == PLAN_ROLE_DOCUMENT:
+                    if row.source is not None:
+                        continue
+                    home_dir = project_dir / document_home
+                    created_home: Optional[Path] = None
+                    try:
+                        os.lstat(home_dir)
+                    except FileNotFoundError:
+                        created_home = home_dir
+                    except OSError:
+                        pass
+                    landed_doc: list[PlacementResult] = []
+
+                    def _place_doc(staged: Path, destination: Path) -> Path:
+                        placed = place_into_workarea(
+                            staged, destination, workarea_root=workarea
+                        )
+                        landed_doc.append(placed)
+                        if not placed.reused:
+                            placed_files.append(placed.path)
+                        tick()
+                        return placed.path
+
+                    failure = (
+                        f"Change document {row.landing.name} was not saved into "
+                        "the project — the file could not be written; its "
+                        "entries stay in the Patch Editor"
+                    )
+                    try:
+                        written, issues = write_change_document(
+                            request.document_snapshot,
+                            request.base_dir,
+                            file_name="changes.json",
+                            copy_fn=_place_doc,
+                            dest_dir=home_dir,
+                        )
+                    except (WorkareaContainmentError, OSError) as exc:
+                        self.logger.warning(
+                            "Change document not written: %s (%s)",
+                            home_dir, type(exc).__name__,
+                        )
+                        document_write_failure = failure
+                        continue
+                    if written is None or not landed_doc:
+                        self.logger.warning(
+                            "Change document not written: %s (%s)",
+                            home_dir,
+                            "; ".join(
+                                f"{issue.code}: {issue.message}" for issue in issues
+                            ),
+                        )
+                        document_write_failure = failure
+                        continue
+                    if created_home is not None:
+                        created_dirs.append(created_home)
+                    placed = landed_doc[0]
+                    pasted_placed = placed
+                elif row.role == "image" and prepared.image_step.emit:
+                    landed: list[PlacementResult] = []
+
+                    def _emit_landed(placed: PlacementResult) -> None:
+                        landed.append(placed)
+                        if not placed.reused:
+                            placed_files.append(placed.path)
+                        tick()
+
+                    path, issues = save_patched_image(
+                        request.image.derived,
+                        request.image.ranges,
+                        project_dir,
+                        row.landing.name,
+                        source_kind=request.image.file_type,
+                        bytes_per_line=32,
+                        s0_header=request.image.s0_header,
+                        workarea_root=workarea,
+                        on_placed=_emit_landed,
+                    )
+                    if path is not None:
+                        emit_verify = verify_written_image(
+                            path, request.image.derived, request.image.file_type
+                        )
+                    if path is None or not landed:
+                        detail = "; ".join(
+                            issue.message for issue in issues
+                        ) or (
+                            "Patched image not saved - see issues"
+                            if path is None
+                            else f"Patched image saved as {path.name}"
+                            f"{save_back_status_suffix(request.image.applied, request.image.not_applied)}"
+                        )
+                        message = (
+                            "Project NOT saved: could not save — the patched "
+                            f"image was not written: {detail}"
+                        )
+                        self.logger.warning("Project save emit failed: %s", detail)
+                        notes = self._abort_save(
+                            project_dir,
+                            created_project_dir,
+                            placed_files,
+                            created_dirs,
+                            workarea,
+                            manifest_restores,
+                        )
+                        return _save_failure_outcome(request, [message, *notes], None)
+                    placed = landed[0]
+                    if prepared.emitted_record is not None:
+                        derived_from[placed.path.name] = prepared.emitted_record
+                else:
+                    placed = place_into_workarea(
+                        row.source, project_dir, workarea_root=workarea
+                    )
+                    if not placed.reused:
+                        placed_files.append(placed.path)
+                    tick()
+                mismatch = _plan_row_mismatch(row, placed)
+                if mismatch is not None:
+                    self.logger.warning("Save project plan mismatch: %s", mismatch)
+                    notes = self._abort_save(
+                        project_dir,
+                        created_project_dir,
+                        placed_files,
+                        created_dirs,
+                        workarea,
+                        manifest_restores,
+                    )
+                    return _save_failure_outcome(request, [mismatch, *notes], None)
+                self.logger.info(
+                    "Project saved %s. name=%s file=%s",
+                    row.role, prepared.cleaned, placed.path,
+                )
+                if (
+                    row.role == "image"
+                    and placed.path.suffix.lower() in PROJECT_PRIMARY_DATA_EXTENSIONS
+                ):
+                    saved_primary_name = placed.path.name
+            if top_level_copies:
+                copy_failure = self._copy_project_subfolders(
+                    prepared.save_as_source,
+                    project_dir,
+                    top_level_copies,
+                    placed_files,
+                    created_dirs,
+                    carried={
+                        row.landing.name: row
+                        for row in plan.rows
+                        if row.role == PLAN_ROLE_CARRIED
+                    },
+                    workarea=workarea,
+                    on_placed=tick,
+                )
+                if copy_failure is not None:
+                    notes = self._abort_save(
+                        project_dir,
+                        created_project_dir,
+                        placed_files,
+                        created_dirs,
+                        workarea,
+                        manifest_restores,
+                    )
+                    return _save_failure_outcome(
+                        request, [copy_failure, *notes], None
+                    )
+            # The variant rebuild: a worker local, handed back for the handler.
+            saved_data_files, _saved_a2l_files, variant_error = validate_project_files(
+                project_dir
+            )
+            if variant_error is None:
+                variant_set = build_variant_set(prepared.cleaned, saved_data_files)
+                if saved_primary_name:
+                    saved_variant_id = next(
+                        (
+                            variant.variant_id
+                            for variant in variant_set.variants
+                            if variant.path.name == saved_primary_name
+                        ),
+                        None,
+                    )
+                if saved_variant_id:
+                    variant_set.active_id = saved_variant_id
+            else:
+                self.logger.warning(
+                    "Variant set not built after save: %s", variant_error
+                )
+            batch = (
+                tuple(request.payload.batch)
+                if request.payload.batch
+                else tuple(target_carry.get("batch", ()))
+            )
+            assignments = (
+                dict(request.payload.assignments)
+                if any(request.payload.assignments.values())
+                else dict(target_carry.get("assignments", {}))
+            )
+            composition_names = list(batch) + [
+                name for entries in assignments.values() for name in entries
+            ]
+            if pasted_placed is not None:
+                gather_document: Optional[Path] = (
+                    project_dir / document_home / pasted_placed.path.name
+                )
+            elif document_row is not None:
+                gather_document = document_row.source
+            else:
+                gather_document = None
+            self.call_from_thread(self.step_busy, "save_project", gen, 3)
+            gather_outcome = gather_project_artifacts(
+                project_dir,
+                composition_names=composition_names,
+                active_document=gather_document,
+                active_document_kind=request.document_kind,
+                active_template=request.active_template,
+                common_patches_dir=workarea / WORKAREA_PATCHES,
+                common_templates_dir=request.base_dir
+                / WORKAREA_DIRNAME
+                / WORKAREA_TEMPLATES,
+                workarea_root=workarea,
+            )
+            for issue in gather_outcome.issues:
+                self.logger.warning("Project gather: %s", issue.message)
+            placed_files.extend(gather_outcome.written)
+            created_dirs.extend(gather_outcome.created_homes)
+            landed_document = (
+                gather_outcome.active_document if gather_document is not None else None
+            )
+            if landed_document is not None and is_active_document_form(landed_document):
+                recorded_document = landed_document
+            elif document_write_failure is not None:
+                document_lines.append(document_write_failure)
+            elif request.document_source_path is None:
+                if request.document_snapshot is not None and document_row is None:
+                    document_lines.append(
+                        "Change document changes.json was not saved into the "
+                        f"project — the project's {document_home} folder is a "
+                        "link or is outside the work area; its entries stay in "
+                        "the Patch Editor"
+                    )
+            else:
+                document_lines.extend(
+                    self._unrecorded_document_lines(
+                        project_dir,
+                        request.document_source_path,
+                        document_home,
+                        request.document_class,
+                        copied=document_row is not None
+                        and any(
+                            issue.code == GATHER_DOCUMENT_NOT_RECORDED
+                            for issue in gather_outcome.issues
+                        ),
+                        carried=prepared.carried_active_document,
+                        carried_line=prepared.carried_document_line,
+                    )
+                )
+            if recorded_document is None:
+                recorded_document = prepared.carried_active_document
+                if prepared.carried_document_line is not None:
+                    document_lines.append(prepared.carried_document_line)
+            if recorded_document is None and _KEY_ACTIVE_DOCUMENT in plan.manifest_keys:
+                plan = _plan_without_document_key(plan)
+            gathered = gather_outcome.gathered
+            if plan.target_kind == PLAN_TARGET_MERGE or prepared.save_as_source is not None:
+                gathered = {}
+                for home in dict.fromkeys(
+                    (*PROJECT_HOME_NAMES, *target_gathered, *gather_outcome.gathered)
+                ):
+                    rows = set(target_gathered.get(home, ())) | set(
+                        gather_outcome.gathered.get(home, ())
+                    )
+                    if rows:
+                        gathered[home] = sorted(rows)
+            manifest_path = project_dir / PROJECT_MANIFEST_NAME
+            self.call_from_thread(self.step_busy, "save_project", gen, 4)
+            manifest_previous: Optional[bytes] = None
+            if manifest_path.is_file():
+                manifest_previous = manifest_path.read_bytes()
+            kept_note: Optional[str] = None
+            keep_reason = (
+                manifest_keep_reason(prepared.existing)
+                if prepared.existing is not None
+                else None
+            )
+            if manifest_previous is not None and keep_reason is not None:
+                kept = self._keep_previous_manifest(
+                    manifest_path, manifest_previous, workarea
+                )
+                if kept is None:
+                    text = (
+                        f"Project NOT saved: {PROJECT_MANIFEST_NAME} {keep_reason} "
+                        f"and its content could not be kept beside it in {project_dir}"
+                    )
+                    self.logger.warning(
+                        "Save project refused: previous manifest not kept: %s",
+                        manifest_path,
+                    )
+                    notes = self._abort_save(
+                        project_dir,
+                        created_project_dir,
+                        placed_files,
+                        created_dirs,
+                        workarea,
+                        manifest_restores,
+                    )
+                    return _save_failure_outcome(request, [text, *notes], None)
+                kept_copies.append((kept, manifest_previous))
+                kept_note = (
+                    f"{PROJECT_MANIFEST_NAME} {keep_reason}: its previous content "
+                    f"is kept as {kept.name} in {project_dir}"
+                )
+                refused_document = next(
+                    (
+                        issue.details.get(_ISSUE_ENTRY, "")
+                        for issue in prepared.existing.issues
+                        if issue.details.get(_ISSUE_KEY) == _KEY_ACTIVE_DOCUMENT
+                    ),
+                    None,
+                )
+                if refused_document is not None:
+                    document_lines.append(
+                        f"Change document record {refused_document} was "
+                        f"dropped from {PROJECT_MANIFEST_NAME} — its previous "
+                        f"content is kept as {kept.name}"
+                    )
+
+            def _manifest_written(written: Path) -> None:
+                if manifest_previous is None:
+                    placed_files.append(written)
+                else:
+                    manifest_restores.append((written, manifest_previous))
+
+            if prepared.save_as_source is not None:
+                held_names = {
+                    row.landing.name for row in plan.rows if row.role == "image"
+                } | {entry.relative for entry in top_level_copies}
+                derived_from = {
+                    key: record
+                    for key, record in derived_from.items()
+                    if key in held_names
+                }
+            result, refusal = self._write_manifest_for_save(
+                project_dir,
+                variant_set,
+                request.base_dir,
+                batch=batch,
+                assignments=assignments,
+                declared_regions=request.declared_regions,
+                gathered=gathered,
+                derived_from=derived_from,
+                active_document=recorded_document,
+                on_written=_manifest_written,
+            )
+            if refusal is not None:
+                lines = [
+                    "Manifest write failed",
+                    "Project NOT saved: could not save — project.json was "
+                    "not written. check the folder.",
+                ]
+                notes = self._abort_save(
+                    project_dir,
+                    created_project_dir,
+                    placed_files,
+                    created_dirs,
+                    workarea,
+                    manifest_restores,
+                    kept_copies,
+                )
+                return _save_failure_outcome(
+                    request,
+                    [*lines, *notes],
+                    ("Manifest write failed - project.json not written", refusal),
+                )
+        except WorkareaPlacementError as exc:
+            self.logger.warning("Project save placement failed: %s", exc)
+            notes = self._abort_save(
+                project_dir,
+                created_project_dir,
+                placed_files,
+                created_dirs,
+                workarea,
+                manifest_restores,
+                kept_copies,
+            )
+            return _save_failure_outcome(
+                request, [str(exc), *notes], ("Project not saved", str(exc))
+            )
+        except WorkareaContainmentError as exc:
+            self.logger.warning("Project save rejected by workarea guard: %s", exc)
+            notes = self._abort_save(
+                project_dir,
+                created_project_dir,
+                placed_files,
+                created_dirs,
+                workarea,
+                manifest_restores,
+                kept_copies,
+            )
+            return _save_failure_outcome(
+                request, [f"Cannot save project: {exc}", *notes], None
+            )
+        except OSError as exc:
+            message = f"Project NOT saved: could not save — {exc}. check the folder."
+            self.logger.warning("Project save failed with an OS error: %s", exc)
+            notes = self._abort_save(
+                project_dir,
+                created_project_dir,
+                placed_files,
+                created_dirs,
+                workarea,
+                manifest_restores,
+                kept_copies,
+            )
+            return _save_failure_outcome(
+                request, [message, *notes], ("Project not saved", message)
+            )
+        except Exception:
+            self.logger.exception("Project save failed with an unexpected error.")
+            message = (
+                "Project NOT saved: could not save — an unexpected error "
+                "stopped the save. check the folder."
+            )
+            notes = self._abort_save(
+                project_dir,
+                created_project_dir,
+                placed_files,
+                created_dirs,
+                workarea,
+                manifest_restores,
+                kept_copies,
+            )
+            return _save_failure_outcome(
+                request, [message, *notes], ("Project not saved", message)
+            )
+        # C5 (the worker part): committed facts only (E3 S12b-03) — no text
+        # composition beyond the raw facts the handler paints.
+        skipped_links: Optional[str] = None
+        if plan.skipped_links:
+            skipped_links = (
+                "Save as: links or junctions not copied: "
+                f"{painted_names(plan.skipped_links)} — copy those files into "
+                "the project if it needs them."
+            )
+            self.logger.info(
+                "Save as skipped %d links: %r",
+                len(plan.skipped_links),
+                list(plan.skipped_links[:100]),
+            )
+        source_gone: Optional[str] = None
+        if prepared.source_gone is not None:
+            source_gone = (
+                f"The open project folder '{painted_names([prepared.source_gone])}' "
+                "was not found — its other files were not copied; copy them into "
+                f"'{painted_names([prepared.cleaned])}' if you still have them."
+            )
+        unrecorded_names = tuple(gather_outcome.unrecorded)
+        document_source_path: Optional[Path] = None
+        if pasted_placed is not None:
+            document_source_path = (
+                project_dir / document_home / pasted_placed.path.name
+            )
+        elif prepared.save_as_source is not None and request.document_source_path is not None:
+            try:
+                document_relative: Optional[str] = (
+                    request.document_source_path.absolute()
+                    .relative_to(prepared.save_as_source.absolute())
+                    .as_posix()
+                )
+            except ValueError:
+                document_relative = None
+            plan_entries = {entry.relative for entry in plan.copies}
+            row_relative: Optional[str] = None
+            if document_row is not None:
+                try:
+                    row_relative = document_row.landing.relative_to(
+                        project_dir.resolve()
+                    ).as_posix()
+                except (ValueError, OSError):
+                    pass
+                else:
+                    plan_entries.add(row_relative)
+            if (
+                document_row is not None
+                and document_row.source is not None
+                and row_relative is not None
+                and os.path.normcase(os.path.abspath(document_row.source))
+                == os.path.normcase(os.path.abspath(request.document_source_path))
+            ):
+                document_relative = row_relative
+            if (
+                document_relative is not None
+                and ".." not in PurePosixPath(document_relative).parts
+                and not PurePosixPath(document_relative).is_absolute()
+                and document_relative in plan_entries
+            ):
+                if (
+                    document_relative == row_relative
+                    and landed_document is not None
+                    and recorded_document == landed_document
+                ):
+                    document_relative = landed_document
+                document_source_path = project_dir.joinpath(
+                    *PurePosixPath(document_relative).parts
+                )
+        return SaveOutcome(
+            request,
+            True,
+            (),
+            "",
+            None,
+            variant_set,
+            saved_variant_id,
+            result,
+            emit_verify,
+            document_source_path,
+            pasted_placed is not None,
+            recorded_document,
+            kept_note,
+            skipped_links,
+            source_gone,
+            unrecorded_names,
+            tuple(document_lines),
+        )
+
+    def _on_project_saved(self, outcome: SaveOutcome) -> None:
+        """Main thread: the Save session writes, the tail, the end tail last."""
+        request = outcome.request
+        prepared = request.prepared
+        gen = request.gen
+        if not outcome.committed:
+            self._quit_pending = False
+            for line in outcome.lines:
+                self.set_status(safe_text(line).plain)
+            if outcome.toast is not None:
+                title, text = outcome.toast
+                self.notify(
+                    safe_text(text).plain,
+                    title=safe_text(title).plain,
+                    severity="error",
+                    timeout=10.0,
+                    markup=False,
+                )
+            self.end_busy("save_project", gen, safe_text(outcome.outcome).plain)
+            return
+        self._report_filter_path = None
+        self._variant_set = outcome.variant_set
+        if outcome.saved_variant_id and self.current_file:
+            self.current_file.variant_id = outcome.saved_variant_id
+        self._last_manifest_verify_result = outcome.verify_result
+        if outcome.verify_result is not None:
+            self._surface_manifest_verify_result(outcome.verify_result)
+        mem_map = self.current_file.mem_map if self.current_file else None
+        if request.image is not None:
+            summary = request.image.summary
+            if summary is not None and outcome.emit_verify is not None:
+                summary.saved_path = outcome.emit_verify.written_path
+                summary.source_image_path = request.image.source_path
+                summary.verify_result = outcome.emit_verify
+            self._change_service.adopt_rederived(
+                mem_map, request.image.derived, summary
+            )
+            self._surface_verify_result()
+        if request.image is not None or not self._change_service.image_differs_from_source(
+            mem_map
+        ):
+            self._change_service.mark_saved(mem_map)
+        image_clause = f" — {prepared.plan.image}" if request.image is not None else ""
+        if outcome.saved_variant_id:
+            tail: list[str] = [
+                f"Saved project to {prepared.project_dir} "
+                f"(variant '{outcome.saved_variant_id}'){image_clause}"
+            ]
+        else:
+            tail = [f"Saved project to {prepared.project_dir}{image_clause}"]
+        if outcome.kept_note is not None:
+            tail.append(safe_text(outcome.kept_note).plain)
+        if outcome.skipped_links is not None:
+            tail.append(safe_text(outcome.skipped_links).plain)
+        if outcome.source_gone is not None:
+            tail.append(safe_text(outcome.source_gone).plain)
+        for relative in outcome.unrecorded_names[:PAINTED_NAME_LIMIT]:
+            why = (
+                "Windows reserves that name"
+                if any(
+                    is_windows_device_name(part)
+                    for part in PurePosixPath(relative).parts
+                )
+                else "the name is not one project.json records"
+            )
+            tail.append(
+                safe_text(
+                    f"{painted_names([relative])} was copied but not recorded in "
+                    f"{PROJECT_MANIFEST_NAME} ({why}) — rename it in the common "
+                    "folder, select the new name, then Save project."
+                ).plain
+            )
+        if len(outcome.unrecorded_names) > PAINTED_NAME_LIMIT:
+            tail.append(
+                f"and {len(outcome.unrecorded_names) - PAINTED_NAME_LIMIT} more "
+                f"files not recorded in {PROJECT_MANIFEST_NAME}"
+            )
+        for line in outcome.document_lines:
+            tail.append(safe_text(line).plain)
+        document = self._change_service.document
+        if outcome.document_source_path is not None:
+            document.source_path = outcome.document_source_path
+        try:
+            panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+            paste_text = self.query_one("#patch_paste_text", TextArea).text
+        except Exception:
+            panel = None
+        if panel is not None:
+            if outcome.pasted_placed:
+                self._patch_editor_load_tail(panel)
+            if _save_clears_panel_flag(
+                outcome.pasted_placed, paste_text, self._parsed_paste_text
+            ):
+                panel.mark_saved()
+            elif (
+                request.document_class == _DOCUMENT_IN_HOME
+                and outcome.recorded_document is not None
+                and panel.is_dirty
+            ):
+                tail.append(
+                    f"Change document {document.source_path.name} has unsaved "
+                    "edits — the project records the file as it is on disk; "
+                    "save it from the Patch Editor to keep them"
+                )
+        if (
+            outcome.verify_result is not None
+            and outcome.verify_result.status != MANIFEST_VERIFIED
+        ):
+            tail.append("Manifest verify MISMATCH")
+        for line in tail[:-1]:
+            self.set_status(line)
+        self.current_project = prepared.cleaned
+        self.current_project_dir = prepared.project_dir
+        self.update_project_labels()
+        self.refresh_files()
+        if prepared.save_as_source is not None:
+            self._publish_flow_session_dir()
+        self.end_busy("save_project", gen, tail[-1])
+
+    def _write_manifest_for_save(
+        self,
+        project_dir: Path,
+        variant_set: Optional[ProjectVariantSet],
+        base_dir: Path,
+        *,
+        batch: Sequence[str] = (),
+        assignments: Optional[Mapping[str, Sequence[str]]] = None,
+        declared_regions: Sequence[DeclaredRegion] = (),
+        gathered: Optional[Mapping[str, Sequence[str]]] = None,
+        derived_from: Optional[Mapping[str, DerivedFrom]] = None,
+        active_document: Optional[str] = None,
+        on_written: Optional[Callable[[Path], None]] = None,
+    ) -> tuple[Optional[ManifestVerifyResult], Optional[str]]:
+        """The worker-side manifest core (Q-b1): no painting, no attribute write."""
+        if variant_set is None:
+            return (None, None)
+        files = project_file_records(project_dir, active_document=active_document)
+        written, issues = write_project_manifest(
+            variant_set,
+            project_dir,
+            base_dir,
+            batch=batch,
+            assignments=assignments,
+            declared_regions=declared_regions,
+            gathered=gathered,
+            files=files,
+            derived_from=derived_from,
+            active_document=active_document,
+        )
+        if written is None:
+            detail = "; ".join(issue.message for issue in issues) or "unknown error"
+            causes = "; ".join(
+                getattr(issue, "details", {})["exception"]
+                for issue in issues
+                if "exception" in getattr(issue, "details", {})
+            )
+            self.logger.warning(
+                "Manifest write refused: %s%s", detail, f" ({causes})" if causes else ""
+            )
+            return (None, detail)
+        if on_written is not None:
+            on_written(written)
+        result = verify_written_manifest(
+            project_dir,
+            variant_set,
+            project_dir,
+            batch=batch,
+            assignments=assignments,
+            files=files,
+            derived_from=derived_from,
+            active_document=active_document,
+        )
+        return (result, None)
+
+    def _decide_project_image(self) -> _ProjectImageStep:

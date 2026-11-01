@@ -1,0 +1,25 @@
+mutant id: 082 (E5 round 2)
+target file: s19_app/tui/app.py
+description: _on_project_saved: summary.verify_result not set
+old -> new: '                    summary.verify_result = outcome.emit_verify\n' -> ''
+sha256 before: 46f7ee6aa8a0fbfbc6571b095bbf7d4c4661de5bd3f1ecf96e9b1347c424210d
+command: timeout 900 env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\lad C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=short --basetemp=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\bt\mut-082 "tests/test_b100_save_image.py::test_tc_b100_58_save_project_surfaces_the_emit_verify"
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mutc12b
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mutc12b\s19_app\__init__.py
+pytest summary: 1 failed in 2.61s
+elapsed: 3.7s
+verdict: KILLED
+sha256 after: 46f7ee6aa8a0fbfbc6571b095bbf7d4c4661de5bd3f1ecf96e9b1347c424210d
+restored = True
+
+----- pytest output -----
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_tc_b100_58_save_project_surfaces_the_emit_verify ____________
+tests\test_b100_save_image.py:2727: in test_tc_b100_58_save_project_surfaces_the_emit_verify
+    assert verified and saved and verified[-1] < saved[-1], statuses
+E   AssertionError: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8..._project_s0\\app\\.s19tool\\workarea\\P1 (variant 'firmware') — firmware.s19 + 1 change entry, 0 applied by this save"]
+E   assert ([])
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_image.py::test_tc_b100_58_save_project_surfaces_the_emit_verify
+1 failed in 2.61s

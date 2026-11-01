@@ -276,7 +276,7 @@ def test_at066d_merge_preserves_facts(tmp_path: Path, size: tuple[int, int]) -> 
                 mac_records=[{"tag": "T", "address": 0x1000, "parse_ok": True}],
                 mac_diagnostics=[],
             )
-            merged = app._merge_mac_with_existing_primary(mac_loaded)
+            merged = app._merge_mac_with_existing_primary(mac_loaded, app.current_file)  # Inc 12b P1-C3
             _install_and_render(app, merged)
             await pilot.pause()
             return _stats_plain(app)

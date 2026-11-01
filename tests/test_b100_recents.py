@@ -64,6 +64,7 @@ from s19_app.tui.workspace import WORKAREA_SUBDIR
 from tests.support import b100_links
 from tests.support import b100_projects as projects
 from tests.support.b100_projects import LOAD_RESULT_CLOSE
+from tests.support.b100_workers import settle_workers
 
 AT_SIZES = [(118, 54), (220, 60)]
 WIN = sys.platform == "win32"
@@ -850,6 +851,7 @@ def test_tc_b100_34_load_failing_before_its_copy_records_nothing(
         app.load_a2l_from_path(other_a2l)
         for _ in range(20):
             await pilot.pause()
+        await settle_workers(pilot)  # Inc 12b R-4: the A2L attach is a worker
         after["project has an A2L"] = (_sha(store), _with(log.since(mark), "Project already has an A2L file."))
         app.load_from_path(good)
         await _wait_image(pilot, app, good.name)
@@ -930,6 +932,9 @@ def test_tc_b100_34_source_inside_the_work_area_is_not_recorded(
         variant_ids = [v.variant_id for v in app._variant_set.variants if v.path.name == "other.s19"]
         app._handle_select_variant(variant_ids[0])
         await _wait_image(pilot, app, "other.s19")
+        # E4 integration re-pin (A-10): the switch's file load ends after its
+        # project sync; the typed load below is refused while it runs.
+        await settle_workers(pilot)
         counts["variant switch"] = len(_entries(store))
         app._load_path_from_user_input(workarea / "ab" / "firmware.s19")
         await projects.wait_for(
@@ -943,6 +948,7 @@ def test_tc_b100_34_source_inside_the_work_area_is_not_recorded(
         await pilot.pause()
         row = next(i for i in app.query_one("#files_list", ListView).children if i.data == "work.a2l")
         app._load_from_item(row)
+        await settle_workers(pilot)  # Inc 12b R-5: the A2L pick is a worker
         await _wait_a2l(pilot, app)
         counts["a2l work copy pick"] = len(_entries(store))
         app._load_path_from_user_input(outside)
@@ -2830,6 +2836,7 @@ def test_tc_b100_39_picked_row_loads_the_file_as_named(tmp_path: Path, label: st
         await pilot.pause()
         rows = list(app.query_one("#files_list", ListView).children)
         app._load_from_item(rows[0])
+        await settle_workers(pilot)  # Inc 12b R-5: the data pick is a worker
         for _ in range(300):
             if app.current_file is not None:
                 break
@@ -3792,6 +3799,7 @@ def test_tc_b100_39_pick_rechecks_the_entry_after_the_question(
         await pilot.press("y")
         for _ in range(12):
             await pilot.pause()
+        await settle_workers(pilot)  # Inc 12b R-5: the data pick is a worker
         return log.since(mark), Path(app.current_file.path).name
 
     messages, current = projects.run_app(base, _scenario, size=(118, 54))
@@ -3898,6 +3906,7 @@ def test_tc_b100_39_pick_over_cap_is_refused(tmp_path: Path, monkeypatch: pytest
         app._load_from_item(rows[0])
         for _ in range(12):
             await pilot.pause()
+        await settle_workers(pilot)  # Inc 12b R-5: the data pick is a worker
         return log.since(mark)
 
     messages = projects.run_app(base, _scenario, size=(118, 54))

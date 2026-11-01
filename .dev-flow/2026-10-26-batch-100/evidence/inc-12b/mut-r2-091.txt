@@ -1,0 +1,28 @@
+mutant id: 091 (E5 round 2)
+target file: s19_app/tui/app.py
+description: load_a2l_from_path: remove the kickoff _busy_fail guard
+old -> new: '            self._a2l_attach_worker(request)\n        except BaseException:\n            self._busy_fail("a2l_load", gen)\n            raise\n' -> '            self._a2l_attach_worker(request)\n        except BaseException:\n            raise\n'
+sha256 before: 46f7ee6aa8a0fbfbc6571b095bbf7d4c4661de5bd3f1ecf96e9b1347c424210d
+command: timeout 900 env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\lad C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=short --basetemp=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\bt\mut-091 "tests/test_b100_busy.py::test_tc_b100_50_twelve_b_kickoff_raise_ends_the_run_first[a2l_load]"
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mutc12b
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mutc12b\s19_app\__init__.py
+pytest summary: 1 failed in 2.45s
+elapsed: 3.3s
+verdict: KILLED
+sha256 after: 46f7ee6aa8a0fbfbc6571b095bbf7d4c4661de5bd3f1ecf96e9b1347c424210d
+restored = True
+
+----- pytest output -----
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____ test_tc_b100_50_twelve_b_kickoff_raise_ends_the_run_first[a2l_load] _____
+tests\test_b100_busy.py:2376: in test_tc_b100_50_twelve_b_kickoff_raise_ends_the_run_first
+    assert [e.outcome for e in ends] == [outcome], seam.ends
+E   AssertionError: []
+E   assert [] == ['Loading fir...e.a2l failed']
+E     
+E     Right contains one more item: 'Loading firmware.a2l failed'
+E     Use -v to get more diff
+=========================== short test summary info ===========================
+FAILED tests/test_b100_busy.py::test_tc_b100_50_twelve_b_kickoff_raise_ends_the_run_first[a2l_load]
+1 failed in 2.45s

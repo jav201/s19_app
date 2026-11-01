@@ -78,6 +78,7 @@ from tests.support.b100_load_dialog import highlight_row, is_load_dialog
 from tests.support import b100_projects
 from tests.support.independent_reader import read_hex
 from tests.support.independent_reader import read_s19
+from tests.support.b100_workers import settle_workers
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE01_DIR = ROOT / "examples" / "case_01_basic_valid"
@@ -221,7 +222,7 @@ async def _save_back(pilot, app: S19TuiApp, filename: str) -> None:
 
 async def _save(pilot, app: S19TuiApp, name: str) -> None:
     app._handle_save_dialog(_payload(app, name))
-    await pilot.pause()
+    await settle_workers(pilot)  # Inc 12b Q6 (census A6): the Save commits from a worker
 
 
 class _TrapDict(dict):
@@ -751,7 +752,8 @@ def test_tc_b100_17_emit_refusal_writes_no_manifest(
             )
         ]
 
-    monkeypatch.setattr(change_service_module, "save_patched_image", _refuse)
+    # Inc 12b census P1-C5 (Q-b2): the Save worker calls the app module's name.
+    monkeypatch.setattr(app_module, "save_patched_image", _refuse)
 
     async def scenario(app, pilot) -> None:
         _add(app, PATCH_ADDRESS, PATCH_BYTES)
@@ -777,9 +779,8 @@ def test_tc_b100_17_verify_reread_failure_rolls_the_emit_back(
         assert Path(path).is_file(), "the emit has not landed yet"
         raise PermissionError(13, "re-read refused", str(path))
 
-    monkeypatch.setattr(
-        change_service_module, "verify_written_image", _refuse_reread
-    )
+    # Inc 12b census P1-C5 (Q-b2): the Save worker calls the app module's name.
+    monkeypatch.setattr(app_module, "verify_written_image", _refuse_reread)
     before: dict = {}
 
     async def scenario(app, pilot) -> None:
@@ -798,12 +799,18 @@ def test_tc_b100_17_non_os_error_after_the_emit_rolls_back_then_surfaces(
 ) -> None:
     """Review F1 / SEC-7 (LLR-167.4): an error that is not an ``OSError``
     after the emit landed still rolls the save back — no folder, no
-    image — and then surfaces (it is a defect, never swallowed)."""
+    image — and then surfaces (it is a defect, never swallowed).
+
+    Inc 12b re-pin (P1-64, LLR-177.2a, ruling Q4; census A10 / P1-C5): the
+    Save runs on a worker, so nothing raises out of the handler. The defect
+    surfaces as the ``could not save`` outcome line (no exception text,
+    E3 S12b-02), the app keeps running, and the rollback still leaves no
+    folder. The patch moves to the app module's name (Q-b2)."""
 
     def _defect(path, image, kind):
         raise ValueError("forced defect after the emit")
 
-    monkeypatch.setattr(change_service_module, "verify_written_image", _defect)
+    monkeypatch.setattr(app_module, "verify_written_image", _defect)
     src = _copy_case01(tmp_path) / "firmware.s19"
 
     async def _drive() -> tuple:
@@ -814,11 +821,22 @@ def test_tc_b100_17_non_os_error_after_the_emit_rolls_back_then_surfaces(
             _add(app, PATCH_ADDRESS, PATCH_BYTES)
             _apply(app)
             before = _tree_digests(app.workarea)
-            with pytest.raises(ValueError, match="forced defect"):
-                app._handle_save_dialog(_payload(app, "P1"))
-            return before, _tree_digests(app.workarea), app.workarea / "P1"
+            app._handle_save_dialog(_payload(app, "P1"))
+            await settle_workers(pilot)
+            return (
+                before,
+                _tree_digests(app.workarea),
+                app.workarea / "P1",
+                list(app.log_lines),
+                app.is_running,
+            )
 
-    before, after, project = asyncio.run(_drive())
+    before, after, project, lines, running = asyncio.run(_drive())
+    assert lines and lines[-1] == (
+        "Project NOT saved: could not save — an unexpected error stopped the save. "
+        "check the folder."
+    ), lines[-3:]
+    assert running, "the defect ended the app"
     assert not project.exists(), sorted(project.rglob("*"))
     assert after == before
 
@@ -832,8 +850,12 @@ def test_tc_b100_17_failed_manifest_write_adopts_nothing(
     the source bytes at the entry and no summary carries a saved path.
     Adopting before ``project.json`` is on disk would show the operator a
     patched image that no file holds."""
+    # Inc 12b re-pin (P1-69, census C9 / P1-C6): the Save worker writes the
+    # manifest through ``_write_manifest_for_save`` (verify result, reason).
     monkeypatch.setattr(
-        S19TuiApp, "_write_and_verify_manifest", lambda self, *a, **k: False
+        S19TuiApp,
+        "_write_manifest_for_save",
+        lambda self, *a, **k: (None, "forced refusal"),
     )
     seen: dict = {}
 
@@ -2633,3 +2655,73 @@ def test_tc_b100_59_plan_cap_refusal_names_the_file(
     else:
         assert plan.refusal is None, plan.refusal
         assert {f.name: f.file_count for f in plan.folders} == {"splits": 1}
+
+
+# ---------------------------------------------------------------------------
+# E5 round 2 — mutant survivors (Inc 12b corrective pass, tests only)
+# ---------------------------------------------------------------------------
+
+
+def test_tc_b100_17_emit_that_reports_no_placement_is_refused(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """TC-B100-17 (LED .53, the emit must land through the placement claim;
+    mutant 071): the emit returns a path but never reports its placement
+    (the real ``save_patched_image`` called without ``on_placed``) → the
+    save is refused with ``Project NOT saved: could not save — the patched
+    image was not written: Patched image saved as firmware.s19…`` as the
+    last line, never the generic ``an unexpected error stopped the save``,
+    and no ``project.json`` is written.
+
+    Why: a landed file the save cannot account for cannot be rolled back
+    or recorded; the refusal must name the image as the thing not written.
+    Negative control: the check reads only ``path is None`` → the missing
+    placement record reaches ``landed[0]`` → the generic unexpected-error
+    line → RED."""
+    real_emit = app_module.save_patched_image
+
+    def _emit_unreported(*args, **kwargs):
+        kwargs.pop("on_placed", None)
+        return real_emit(*args, **kwargs)
+
+    monkeypatch.setattr(app_module, "save_patched_image", _emit_unreported)
+
+    async def scenario(app, pilot) -> None:
+        _add(app, PATCH_ADDRESS, PATCH_BYTES)
+        _apply(app)
+
+    statuses: list = []
+    _lines, project, _ = _save_session(tmp_path, scenario, statuses=statuses)
+    refused = [m for m in statuses if m.startswith("Project NOT saved")]
+    assert refused and refused[-1].startswith(
+        "Project NOT saved: could not save — the patched image was not written: "
+        "Patched image saved as firmware.s19"
+    ), statuses
+    assert not any("an unexpected error stopped the save" in m for m in statuses), statuses
+    assert not (project / "project.json").exists()
+
+
+def test_tc_b100_58_save_project_surfaces_the_emit_verify(tmp_path: Path) -> None:
+    """LLR-167.4 / HLR-004 (verify-on-save), interfaces S-b ("the handler
+    … when committed and emitting, ``adopt_rederived`` and
+    ``_surface_verify_result``"; mutant 082): a patched image saved as
+    ``P1`` → the status log holds ``Saved + verified: firmware.s19`` (the
+    emitted image re-read and found equal to the derived image) before the
+    ``Saved project to …P1…`` line.
+
+    Why: the verify is the engineer's proof that the image on disk is the
+    image the editor derived; a Save project that emits without surfacing
+    it says nothing about the written bytes. Negative control: the
+    emit's verify result not handed to the save summary → no ``Saved +
+    verified`` line → RED."""
+
+    async def scenario(app, pilot) -> None:
+        _add(app, PATCH_ADDRESS, PATCH_BYTES)
+        _apply(app)
+
+    statuses: list = []
+    _lines, project, _ = _save_session(tmp_path, scenario, statuses=statuses)
+    verified = [i for i, m in enumerate(statuses) if m.startswith("Saved + verified: firmware.s19")]
+    saved = [i for i, m in enumerate(statuses) if m.startswith("Saved project to")]
+    assert (project / "project.json").is_file(), statuses
+    assert verified and saved and verified[-1] < saved[-1], statuses

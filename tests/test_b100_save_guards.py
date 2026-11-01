@@ -97,6 +97,7 @@ from tests.support import b100_links
 from tests.support import b100_save_dialog as sd
 from tests.support.timing import timing_bound
 from tests.support.b100_load_dialog import highlight_row, is_load_dialog
+from tests.support.b100_workers import settle_workers
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE01 = ROOT / "examples" / "case_01_basic_valid" / "firmware.s19"
@@ -160,6 +161,7 @@ async def _flush(pilot, count: int = 12) -> None:
     """Pump the event loop so the deferred apply chain runs."""
     for _ in range(count):
         await pilot.pause()
+    await settle_workers(pilot)  # Inc 12b ruling Q6 / A12b-01: wait for the workers' installs
 
 
 async def _wait_for(pilot, predicate, description: str, attempts: int = 150) -> None:
@@ -806,108 +808,8 @@ def _contains_folder_removal(node: ast.AST) -> bool:
     )
 
 
-def test_tc_b100_07_ast_census_every_post_creation_return_removes(
-    tmp_path: Path,
-) -> None:
-    """The census: every ``return`` after the folder's creation sits in a
-    block that first calls the one ``_abort_save`` rollback (a bare
-    folder-removal exit does NOT count — R2-4); exactly one ``except
-    OSError`` handler exists AFTER the folder's creation and it rolls
-    back too (the pre-creation clash scan keeps its own skip-handler,
-    SEC2-1); the one ``_abort_save`` helper removes exactly the files and
-    folders the save created (LED .53 — ``unlink`` on the placed list,
-    ``rmdir`` on the created folders) and restores the pre-save app
-    state."""
-    tree = _app_module_ast()
-    handler = _save_handler_ast(tree)
-    parent_of: dict = {}
-    for node in ast.walk(handler):
-        for child in ast.iter_child_nodes(node):
-            parent_of[child] = node
-
-    mkdir_lines = [
-        node.lineno
-        for node in ast.walk(handler)
-        if isinstance(node, ast.Call)
-        and isinstance(node.func, ast.Attribute)
-        and node.func.attr == "mkdir"
-    ]
-    assert mkdir_lines, "the handler must create the project folder"
-    first_mkdir = min(mkdir_lines)
-    router = _save_handler_ast(tree, "_handle_save_dialog")
-    router_mkdirs = [
-        node.lineno
-        for node in ast.walk(router)
-        if isinstance(node, ast.Call)
-        and isinstance(node.func, ast.Attribute)
-        and node.func.attr == "mkdir"
-    ]
-    assert router_mkdirs == [], (
-        f"the Save router must create no folder itself (B11-66): {router_mkdirs}"
-    )
-
-    post_creation_returns = [
-        node
-        for node in ast.walk(handler)
-        if isinstance(node, ast.Return) and node.lineno > first_mkdir
-    ]
-    assert len(post_creation_returns) >= 3, (
-        f"expected at least 3 post-creation returns, "
-        f"found {len(post_creation_returns)}"
-    )
-    for node in post_creation_returns:
-        block = parent_of.get(node)
-        siblings = getattr(block, "body", None)
-        assert siblings is not None, node.lineno
-        index = next(
-            i for i, stmt in enumerate(siblings) if stmt is node
-        )
-        assert any(
-            _contains_abort_call(stmt) for stmt in siblings[:index]
-        ), (
-            f"return at line {node.lineno} leaves without rolling back "
-            f"the failed save"
-        )
-
-    # The pre-mkdir clash scan holds its own ``except OSError`` (SEC2-1:
-    # an unreadable folder is skipped, it never rolls a save back); the
-    # LLR-164.4 census scopes to the handlers AFTER the folder's creation.
-    oSError_handlers = [
-        node
-        for node in ast.walk(handler)
-        if isinstance(node, ast.ExceptHandler)
-        and node.type is not None
-        and getattr(node.type, "id", "") == "OSError"
-        and node.lineno > first_mkdir
-    ]
-    assert len(oSError_handlers) == 1, (
-        f"exactly one post-creation OSError handler, "
-        f"found {len(oSError_handlers)}"
-    )
-    assert _contains_abort_call(oSError_handlers[0]), (
-        "the post-creation OSError handler must roll the failed save back"
-    )
-
-    helpers = [
-        node
-        for node in ast.walk(tree)
-        if isinstance(node, ast.FunctionDef) and node.name == "_abort_save"
-    ]
-    assert len(helpers) == 1, (
-        f"exactly one _abort_save helper, found {len(helpers)}"
-    )
-    helper = helpers[0]
-    assert _contains_folder_removal(helper), (
-        "_abort_save must remove the folders the save created (LED .53)"
-    )
-    assert any(
-        isinstance(sub, ast.Attribute) and sub.attr == "unlink"
-        for sub in ast.walk(helper)
-    ), "_abort_save must unlink the files the save placed"
-    assert any(
-        isinstance(sub, ast.Attribute) and sub.attr == "_variant_set"
-        for sub in ast.walk(helper)
-    ), "_abort_save must restore the pre-save app state"
+# (Inc 12b: re-pinned below as test_tc_b100_07_ast_census_every_post_creation_return_removes,
+# over the Save worker step; census C1, P1-66, P1-77.)
 
 
 def _snapshot_app_state(app: S19TuiApp) -> tuple:
@@ -1919,7 +1821,8 @@ def test_tc_b100_07_previous_copy_never_lands_outside_the_work_area(tmp_path: Pa
     project = app.workarea / "P"
     b100_links.create_junction(project, outside)
     try:
-        kept = app._keep_previous_manifest(project / "project.json", b"previous")
+        # Inc 12b census P1-C4: the work-area root is an explicit argument.
+        kept = app._keep_previous_manifest(project / "project.json", b"previous", app.workarea)
         landed = sorted(item.name for item in outside.iterdir())
     finally:
         os.rmdir(project)
@@ -1948,7 +1851,8 @@ def test_tc_b100_07_taken_previous_names_move_to_the_next_candidate(
     b100_links.create_junction(project / stem, outside)
     (project / f"{stem}-1").mkdir()
     try:
-        kept = app._keep_previous_manifest(project / "project.json", b"previous")
+        # Inc 12b census P1-C4: the work-area root is an explicit argument.
+        kept = app._keep_previous_manifest(project / "project.json", b"previous", app.workarea)
         landed = sorted(item.name for item in outside.iterdir())
     finally:
         os.rmdir(project / stem)
@@ -2033,7 +1937,9 @@ def test_tc_b100_07_save_project_refuses_when_no_previous_copy_can_be_kept(
     RED (Inc 7 pre-corrective tree): the manifest was overwritten and the
     image left in P. Mutant: the refusal branch disabled."""
     base = tmp_path / "app"
-    monkeypatch.setattr(S19TuiApp, "_keep_previous_manifest", lambda self, path, data: None)
+    monkeypatch.setattr(
+        S19TuiApp, "_keep_previous_manifest", lambda self, path, data, *args, **kwargs: None
+    )  # Inc 12b census P1-C4: ``workarea`` joined the parameters
 
     async def _drive() -> tuple:
         app = S19TuiApp(base_dir=base)
@@ -2087,9 +1993,9 @@ def test_tc_b100_07_rollback_keeps_the_previous_copy_unless_restored(
     keeps: list = []
     real_keep = S19TuiApp._keep_previous_manifest
 
-    def _keep(self, path, data):
+    def _keep(self, path, data, *args, **kwargs):  # Inc 12b census P1-C4: ``workarea``
         keeps.append(path)
-        return real_keep(self, path, data) if len(keeps) == 1 else None
+        return real_keep(self, path, data, *args, **kwargs) if len(keeps) == 1 else None
 
     def _raise(project_dir, *args, **kwargs):
         if block == "held":
@@ -2198,6 +2104,62 @@ def test_tc_b100_07_gather_home_created_then_copy_fails_no_folder_left(
     assert folders == ["patches", "temp"], (
         f"the failed save left the folder its gather created behind: {folders}"
     )
+
+
+@pytest.mark.parametrize("raised", ["no-space", "placement-refused"])
+def test_tc_b100_07_pasted_document_home_created_then_write_fails_no_folder_left(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, raised: str
+) -> None:
+    """CR12b-1 (base A3R2-8, the R5-1 shape for the pasted document): a
+    pasted 1-entry document; its placement mkdirs ``freshd/patches`` and
+    then the copy fails (``OSError(28)`` no space, or a refused
+    placement); the manifest is refused, so the save fails. The home the
+    document write created must join the rollback either way, so no
+    ``freshd`` folder is left. At 81ac4c0 the home joined the rollback only
+    after a successful write: ``freshd/patches`` stayed, ``freshd`` could
+    not be removed, and this arm is RED there."""
+    from s19_app.tui.workspace import WorkareaPlacementError
+
+    real_place = app_module.place_into_workarea
+    made: list = []
+
+    def _mkdir_home_then_raise(source, destination, *args, **kwargs):
+        if Path(destination).name == "patches":
+            Path(destination).mkdir(parents=True, exist_ok=True)
+            made.append(Path(destination))
+            if raised == "no-space":
+                raise OSError(28, "No space left on device")
+            raise WorkareaPlacementError("forced: the placement was refused")
+        return real_place(source, destination, *args, **kwargs)
+
+    base = tmp_path / "app"
+    src = _copy_source(tmp_path)
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=base)
+        probe = _StatusProbe(app)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app.load_selected_file(src)
+            await _flush(pilot)
+            app._change_service.add_entry("0x8000007C", "", "DE AD BE EF")
+            monkeypatch.setattr(app_module, "place_into_workarea", _mkdir_home_then_raise)
+            _force_stage(monkeypatch, "manifest-refused")
+            app._handle_save_dialog(_payload(app, "freshd"))
+            await _flush(pilot)
+            folders = sorted(
+                item.name for item in app.workarea.iterdir() if item.is_dir()
+            )
+            entries = len(app._change_service.document.entries)
+        return probe.last, folders, entries
+
+    status, folders, entries = asyncio.run(_drive())
+    assert [p.parent.name for p in made] == ["freshd"], made  # vacuity: the home was made
+    assert "Project NOT saved" in status and "check the folder" in status, status
+    assert folders == ["patches", "temp"], (
+        f"the failed save left the home its document write created behind: {folders}"
+    )
+    assert entries == 1, "the pasted entry left the Patch Editor"
 
 
 def test_tc_b100_07_empty_preexisting_home_survives_failed_save(
@@ -2726,3 +2688,224 @@ def test_tc_b100_05_r13_open_project_save_does_not_carry_gathered(tmp_path: Path
     written = json.loads((project_dir / "project.json").read_text(encoding="utf-8"))
     assert written.get("active_document") == "patches/boost.json", written
     assert "patches/boost.json" not in written.get("gathered", {}).get("patches", []), written
+
+
+# ---------------------------------------------------------------------------
+# Inc 12b extensions (E4 tester): TC-B100-07 worker arms (LLR-164.4 on the
+# Save worker; LLR-177.2a). Oracles: inc-12b E1 draft §C.2; codewire/
+# proto-12b-load-save P1-60, P1-65, P1-66, P1-77. Never the implementation.
+# ---------------------------------------------------------------------------
+
+_SAVE_FAILED_UNEXPECTED_12B = (
+    "Project NOT saved: could not save — an unexpected error stopped the save. check the folder."
+)
+
+
+def _trio_project_12b(workarea: Path, name: str) -> Path:
+    from tests.support.b100_projects import CASE01_DIR, copy_sources
+
+    return copy_sources(workarea / name, CASE01_DIR, "firmware.s19", "firmware.mac", "firmware.a2l")
+
+
+def _run_12b(base: Path, scenario):
+    """``await scenario(app, pilot, log)`` in a fresh app with toasts kept."""
+    import asyncio
+
+    from tests.support.b100_projects import StatusLog
+
+    async def _drive():
+        app = S19TuiApp(base_dir=base)
+        log = StatusLog(app)
+        async with app.run_test(size=(118, 54), notifications=True) as pilot:
+            await pilot.pause()
+            return await scenario(app, pilot, log)
+
+    return asyncio.run(_drive())
+
+
+@pytest.mark.parametrize("stage", ["mkdir", "subfolder_copy", "placement", "gather", "manifest_write"])
+def test_tc_b100_07_each_save_stage_failure_on_the_worker_rolls_back(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, stage: str
+) -> None:
+    """LLR-164.4 worker arms, LLR-177.2a (P1-60, P1-65): the trio project
+    ``S`` (plus ``flows/f1.json``) open and saved as ``S2``, with a failure
+    forced into each of the 5 stages — the folder creation
+    (``PermissionError``), the sub-folder copy, a row placement, the gather
+    and the manifest write (``OSError(28)``) — → the failing call runs on the
+    Save worker (not the main thread), nothing raises out of the request,
+    the last log line holds ``could not save`` and ``check the folder``
+    (the folder-creation arm reads exactly ``Project NOT saved: could not
+    save — an unexpected error stopped the save. check the folder.`` with a
+    toast titled ``Project not saved``; the placement arm reads exactly
+    ``Project NOT saved: could not save — [Errno 28] synthetic no space.
+    check the folder.``), ``W/S2`` does not exist (0 folders left), the app
+    runs and the indicator has ended (5 of 5).
+
+    Why: on a worker an escaping exception ends the app (P12b-2), and a
+    failed save must leave no partial project.
+    Negative control: a stage whose failure is not caught → ``WorkerFailed``
+    → RED; base: the stage runs on the main thread → RED (the
+    folder-creation arm also raises out of the request on the base)."""
+    import threading
+
+    from tests.support.b100_projects import SUBFOLDER_FILES, write_tree
+    from tests.support.b100_workers import settle_workers
+
+    base = tmp_path / "app"
+    workarea = base / ".s19tool" / "workarea"
+    source = _trio_project_12b(workarea, "S")
+    write_tree(source, {"flows/f1.json": SUBFOLDER_FILES["flows/f1.json"]})
+    target = workarea / "S2"
+    threads: list = []
+
+    def _fail_with(exc):
+        def _raise(*_a, **_k):
+            threads.append(threading.get_ident())
+            raise exc
+        return _raise
+
+    no_space = OSError(28, "synthetic no space")
+    if stage == "mkdir":
+        real_mkdir = Path.mkdir
+
+        def _mkdir(self, *args, **kwargs):
+            if os.path.normcase(str(self)) == os.path.normcase(str(target)):
+                threads.append(threading.get_ident())
+                raise PermissionError("synthetic")
+            return real_mkdir(self, *args, **kwargs)
+
+        monkeypatch.setattr(Path, "mkdir", _mkdir)
+    elif stage == "subfolder_copy":
+        monkeypatch.setattr(S19TuiApp, "_copy_project_subfolders", _fail_with(no_space))
+    elif stage == "placement":
+        # E4 integration re-pin: a ROW placement fails. The save-as copies
+        # ``flows/f1.json`` first through the same function, and that copy
+        # reports its own line (``… could not be copied …``, base parity), so
+        # only the row sources raise here.
+        real_place = app_module.place_into_workarea
+        fail_place = _fail_with(no_space)
+
+        def _place(source, *args, **kwargs):
+            if Path(source).name.startswith("firmware."):
+                return fail_place(source, *args, **kwargs)
+            return real_place(source, *args, **kwargs)
+
+        monkeypatch.setattr(app_module, "place_into_workarea", _place)
+    elif stage == "gather":
+        monkeypatch.setattr(app_module, "gather_project_artifacts", _fail_with(no_space))
+    else:
+        monkeypatch.setattr(app_module, "write_project_manifest", _fail_with(no_space))
+
+    async def scenario(app, pilot, log):
+        from s19_app.tui.screens import SaveProjectPayload
+
+        main = threading.get_ident()
+        app._handle_load_project("S")
+        await settle_workers(pilot)
+        for _ in range(400):
+            if app.current_project == "S":
+                break
+            await pilot.pause()
+        threads.clear()
+        raised = None
+        try:
+            app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name="S2"))
+        except Exception as exc:  # noqa: BLE001 — recorded: the base raises the mkdir error here
+            raised = type(exc).__name__
+        await settle_workers(pilot)
+        notes = [(n.title, n.message) for n in getattr(app, "_notifications", [])]
+        return main, raised, list(app.log_lines)[-1], notes, app.is_running, dict(app._busy.runs)
+
+    main, raised, last, notes, alive, runs = _run_12b(base, scenario)
+    assert threads, f"the {stage} stage was never reached"
+    assert main not in threads, f"the {stage} stage ran on the main thread (no Save worker)"
+    assert raised is None, f"{raised} left the request"
+    assert "could not save" in last and "check the folder" in last, last
+    if stage == "mkdir":
+        assert last == _SAVE_FAILED_UNEXPECTED_12B, last
+        assert any(title == "Project not saved" for title, _m in notes), notes
+    if stage == "placement":
+        assert last == "Project NOT saved: could not save — [Errno 28] synthetic no space. check the folder.", last
+        assert ("Project not saved", last) in notes, notes
+    assert not target.exists(), sorted(p.name for p in workarea.iterdir())
+    assert (alive, runs) == (True, {}), (alive, runs)
+
+
+def test_tc_b100_07_ast_census_every_post_creation_return_removes() -> None:
+    """LLR-164.4 worker census, E1 B5 (P1-66, P1-77, census C1 re-pin): in
+    ``_save_project_files`` (the Save worker step) — no ``raise`` after the
+    folder's creation; exactly one ``except OSError`` after it, and it
+    rolls back; every ``return`` after the creation except the last (the
+    committed outcome) follows an ``_abort_save`` call in the same block.
+    ``_abort_save`` restores no app state any more (no ``_variant_set``,
+    ``_report_filter_path``, ``current_project``, ``current_project_dir``
+    or ``current_file`` attribute) and still unlinks the placed files and
+    removes the created folders.
+
+    Why: a post-creation exit that skips the rollback leaves a partial
+    project; a ``raise`` on the worker ends the app (P12b-2); the worker
+    never wrote the session, so a rollback that restores it would write the
+    session off the main thread (LLR-177.1d).
+    Negative control: SEC-7's ``raise`` kept → the no-raise arm RED; base:
+    no ``_save_project_files`` and ``_abort_save`` restores ``_variant_set``
+    → RED."""
+    tree = _app_module_ast()
+    worker = next(
+        (n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef) and n.name == "_save_project_files"),
+        None,
+    )
+    assert worker is not None, "the Save worker step _save_project_files is not in app.py"
+    parent_of: dict = {}
+    for node in ast.walk(worker):
+        for child in ast.iter_child_nodes(node):
+            parent_of[child] = node
+    mkdirs = [
+        n.lineno for n in ast.walk(worker)
+        if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and n.func.attr == "mkdir"
+    ]
+    assert mkdirs, "the worker step must create the project folder"
+    for name in ("_handle_save_dialog", "_commit_project_save"):
+        main_side = _save_handler_ast(tree, name)
+        made = [n.lineno for n in ast.walk(main_side)
+                if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and n.func.attr == "mkdir"]
+        assert made == [], f"{name} (main thread) must create no folder (B11-66, LLR-177.1a): {made}"
+    first = min(mkdirs)
+    raises = [n.lineno for n in ast.walk(worker) if isinstance(n, ast.Raise) and n.lineno > first]
+    assert raises == [], f"raise after the folder's creation: lines {raises}"
+    handlers = [
+        n for n in ast.walk(worker)
+        if isinstance(n, ast.ExceptHandler) and n.type is not None
+        and getattr(n.type, "id", "") == "OSError" and n.lineno > first
+    ]
+    assert len(handlers) == 1 and _contains_abort_call(handlers[0]), len(handlers)
+    # E4 integration re-pin: the returns of the worker step itself; a nested
+    # closure's ``return`` (the document's ``copy_fn``, which the graph
+    # requires to return the placed path) is not an exit of the step.
+    nested = {
+        id(sub)
+        for fn in ast.walk(worker)
+        if isinstance(fn, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)) and fn is not worker
+        for sub in ast.walk(fn)
+    }
+    returns = sorted(
+        (n for n in ast.walk(worker)
+         if isinstance(n, ast.Return) and n.lineno > first and id(n) not in nested),
+        key=lambda n: n.lineno,
+    )
+    assert len(returns) >= 3, len(returns)
+    for node in returns[:-1]:
+        block = parent_of.get(node)
+        siblings = getattr(block, "body", None) or []
+        index = next((i for i, stmt in enumerate(siblings) if stmt is node), None)
+        assert index is not None and any(_contains_abort_call(s) for s in siblings[:index]), (
+            f"return at line {node.lineno} leaves without rolling back the failed save"
+        )
+    helper = next(n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef) and n.name == "_abort_save")
+    restored = sorted({
+        n.attr for n in ast.walk(helper)
+        if isinstance(n, ast.Attribute)
+        and n.attr in ("_variant_set", "_report_filter_path", "current_project", "current_project_dir", "current_file")
+    })
+    assert restored == [], f"_abort_save still touches app state: {restored}"
+    assert _contains_folder_removal(helper)
+    assert any(isinstance(n, ast.Attribute) and n.attr == "unlink" for n in ast.walk(helper))

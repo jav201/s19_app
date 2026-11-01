@@ -1,0 +1,28 @@
+2026-10-31 14:55  E1 start (Opus, parallel with 9b E3)
+2026-10-31 15:30  E1 end (Opus) — 39 requirements
+2026-10-31 15:31  E1 rulings Q1-Q7 (orchestrator, all as recommended)
+2026-10-31 20:03  E2 baseline end (Opus) — 58 nodes
+2026-10-31 20:05  E2 baseline rulings + interfaces-12b.md fixed (orchestrator); prototypes P-1 (G-A+G-B), P-2 (G-C+G-D) start (Opus)
+2026-10-31 20:27  E2 prototype P-2 (G-C+G-D) end (Opus) — 27 nodes / 62 examples
+2026-10-31 20:35  E2 prototype G-A+G-B end (Opus) — 39 nodes / 84 examples
+2026-10-31 20:36  E2 prototypes done (P-1 39/84, P-2 27/62); proposals ruled; E3 PDR r1 start (Opus architect ∥ security)
+2026-10-31 20:57  E3 r1: arch PWN (1 MAJOR census), sec PWN (1 MAJOR quit-hides-failure); rulings + DF-1..13 written; design-fix r1 start (DeepSeek)
+2026-10-31 21:14  E3 r1 design-fix end (DeepSeek v4 Pro)
+2026-10-31 21:19  E3 r2: arch PWN (0 MAJOR), sec PWN (0 MAJOR); E3 closed; addenda written; E4 waits for the post-12a tree
+2026-11-01 01:01 E4 start: app.py G-C1/G-A/G-B/G-C2 (DeepSeek v4 Pro via pi) || a2l.py G-D (DeepSeek v4 Pro via pi) || tester (Opus); base 71376a3 (12a integrated, pre-corrective)
+2026-11-01 01:05 E4 a2l.py G-D done (DeepSeek v4 Pro): tui/a2l.py d70b17982f1cee30; 2 deviations (path is tui/a2l.py; _ENGINE_PATHS test edit owed by tester/integration)
+2026-11-01 01:24 E4 app.py G-C1/G-A/G-B/G-C2 done (DeepSeek v4 Pro): app 89b2d043c60f3a2f; 3 deviations declared; +1577/-1224 (w)
+2026-11-01 02:25 E4 tester done (Opus + 1 sub-agent): 82 new items (80 RED), large census re-pin; RED run 108 failed/195 passed on 71376a3; A-1..A-10 ruled
+2026-11-01 02:27 merged b100-inc12a 9012835 (e3b8ec2; conflict test_b100_busy.py, fixed as union in ef0cdb8, 68 fns); integration start (Opus software-dev) with routed items SE5-12a-4, CR12a-1, SE5-11-3, O-1, MERGE-12a-1, OBS-12a-1
+2026-11-01 E4 integration: Opus (agent ad9981585326163cf), 325 tool uses, ~4h09m; app.py 1 source fix set (F-1, F-13, SE5-12a-4, CR12a-1, OBS-12a-1); orchestrator rulings appended (Opus)
+2026-11-01 E5 launched on 81ac4c0: mutants DeepSeek v4 Pro (pi, 115 rows); code-reviewer Opus; security-reviewer Opus; merged smoke (orchestrator)
+2026-11-01 E5 reviews done: code-reviewer Opus FAIL (BLOCK-UNTIL CR12b-1) 0H/1M/2m/1N; security-reviewer Opus PASS-WITH-NOTES 0H/1M/1m/2N; rulings (Opus); corrective pass round 1 launched (Opus)
+2026-11-01 E5 corrective round 1 done (Opus): 6 rows + CI12a-1; app.py 46f7ee6aa8a0fbfb, a2l.py 73c3820fe0d6ecd2; red-03 8 failed / green-03 8 passed / green-04 162 passed / green-06 busy 109 passed
+2026-11-01 E5 re-review (Opus code-reviewer) on c026bd2: PASS-WITH-NOTES, CR12b-1 block lifted, CR12b-5 NIT declared
+2026-11-01 E13 launched (DeepSeek v4 Pro via pi): qz-quit capture (held Save + quit question)
+2026-11-01 E5 mutants done (DeepSeek v4 Pro): 115 rows, 85 killed / 30 survived / 0 invalid (8 equivalent, 8 weak test, 14 wrong target)
+2026-11-01 E5 corrective round 2 launched (Opus tester): 30 survivors, tests only
+2026-11-01 E13 done (DeepSeek v4 Pro): qz-quit 3 PNGs DONE failures=0; PNGs viewed by orchestrator (Opus): OBS-12b-1..3
+2026-11-01 E5 corrective round 2 done (Opus tester): 22 killed / 7 equivalent / 1 blocked by R2-F1; R2-F1 fixed by orchestrator (Opus), green-08 8 passed; 046 equivalent post-fix
+2026-11-01 close records launched (DeepSeek v4 Pro via pi): increment-022, LED .98-.100, contract merge
+2026-11-01 close records done (DeepSeek v4 Pro: run 1 exit 127 part-way, continuation run completed); orchestrator (Opus) carried R2-F1 in LLR-177.4c, digests, merge

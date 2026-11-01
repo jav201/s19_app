@@ -78,6 +78,7 @@ from s19_app.tui.workspace import WORKAREA_DIRNAME, WORKAREA_SUBDIR
 from tests.support import b100_load_dialog as ld
 from tests.support import b100_projects as projects
 from tests.support import b100_save_dialog as sd
+from tests.support.b100_workers import settle_workers
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE01_DIR = ROOT / "examples" / "case_01_basic_valid"
@@ -560,7 +561,10 @@ def test_tc_b100_47_target_line_merge_and_existing_folder_kinds(tmp_path: Path) 
         await _type_and_wait(pilot, app, "ab", "merges into an existing project")
         out["ab"] = sd.where_text(app.screen)
         for name in ("ef", "nt"):
-            await _type_and_wait(pilot, app, name, "new project in an existing folder")
+            # E4 integration fix (fails on the base 71376a3 too): after ``ef``
+            # the kind text is already painted, so wait for the line that
+            # names THIS folder, not only the kind.
+            await _type_and_wait(pilot, app, name, f"{name} — new project in an existing folder")
             out[name] = sd.where_text(app.screen)
         return out
 
@@ -1418,6 +1422,7 @@ def test_tc_b100_47_dialog_line_equals_the_direct_status_line(
                 if side == "dir":
                     mark = len(log.messages)
                     app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name=name))
+                    await settle_workers(pilot)  # Inc 12b re-pin: the save ends on its worker
                     await _settle(pilot, 10)
                     msgs = log.since(mark)
                     return _status_refusal(msgs), any(m.startswith("Saved project to") for m in msgs)
@@ -2945,6 +2950,7 @@ def test_tc_b100_65_pending_line_marks_unsaved_changes(tmp_path: Path) -> None:
         await _settle(pilot, 6)
         await sd.save_through_dialog(pilot, app, "P", confirm="alt+s")
         await sd.wait_for(pilot, lambda: not sd.is_save_dialog(app.screen), "the save")
+        await settle_workers(pilot)  # Inc 12b re-pin: the save ends on its worker
         await _settle(pilot, 10)
         await sd.open_save_dialog(pilot, app)
         await sd.wait_painted(pilot, app, "updates the open project", "project.json")
@@ -3630,14 +3636,22 @@ def test_tc_b100_65_save_as_then_patch_then_direct_save_plans_fresh(tmp_path: Pa
         await _open_project_direct(pilot, app, "P")
         decisions = _spy_method(app, "_decide_project_image")
         app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name="Q"))
+        # E4 integration re-pin: wait on the worker first; a 10 ms
+        # ``pilot.pause`` poll keeps the event loop hot and starves it.
+        await settle_workers(pilot)
         await sd.wait_for(pilot, lambda: (app.workarea / "Q" / "project.json").is_file(), "the save as Q", 10.0)
+        await settle_workers(pilot)  # Inc 12b re-pin: the save ends on its worker
         await _settle(pilot, 6)
         state_q = (getattr(app, "_save_session", "missing"), getattr(app, "_save_confirmed", "missing"))
         before = len(decisions)
         _add_direct(app, 0x8000007C, (0xDE, 0xAD, 0xBE, 0xEF))
         _apply_direct(app)
         app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name="R"))
+        # E4 integration re-pin: wait on the worker first; a 10 ms
+        # ``pilot.pause`` poll keeps the event loop hot and starves it.
+        await settle_workers(pilot)
         await sd.wait_for(pilot, lambda: (app.workarea / "R" / "project.json").is_file(), "the save of R", 10.0)
+        await settle_workers(pilot)  # Inc 12b re-pin: the save ends on its worker
         await _settle(pilot, 6)
         state_r = (getattr(app, "_save_session", "missing"), getattr(app, "_save_confirmed", "missing"))
         images = sorted((app.workarea / "R").glob("*.s19"))
@@ -3941,13 +3955,21 @@ def test_tc_b100_65_dialog_save_as_leaves_no_session_for_the_next_direct_save(tm
     async def scenario(app, pilot, log):
         await _open_project_direct(pilot, app, "P")
         await sd.save_through_dialog(pilot, app, "Q", confirm="alt+s")
+        # E4 integration re-pin: wait on the worker first; a 10 ms
+        # ``pilot.pause`` poll keeps the event loop hot and starves it.
+        await settle_workers(pilot)
         await sd.wait_for(pilot, lambda: (app.workarea / "Q" / "project.json").is_file(), "the save as Q", 10.0)
+        await settle_workers(pilot)  # Inc 12b re-pin: the save ends on its worker
         await _settle(pilot, 6)
         state_q = (app._save_session, app._save_confirmed)
         _add_direct(app, 0x8000007C, (0xDE, 0xAD, 0xBE, 0xEF))
         _apply_direct(app)
         app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name="R"))
+        # E4 integration re-pin: wait on the worker first; a 10 ms
+        # ``pilot.pause`` poll keeps the event loop hot and starves it.
+        await settle_workers(pilot)
         await sd.wait_for(pilot, lambda: (app.workarea / "R" / "project.json").is_file(), "the save of R", 10.0)
+        await settle_workers(pilot)  # Inc 12b re-pin: the save ends on its worker
         await _settle(pilot, 6)
         return state_q, sorted((app.workarea / "R").glob("*.s19"))
 
@@ -3980,6 +4002,7 @@ def test_tc_b100_65_confirm_is_not_reused_for_another_typed_name(tmp_path: Path)
         app._handle_save_dialog(
             SaveProjectPayload(parent_folder=str(app.workarea), project_name="B", plan=painted.plan)
         )
+        await settle_workers(pilot)  # Inc 12b re-pin: the save ends on its worker
         await _settle(pilot, 8)
         return verdict, held, (app.workarea / "A").exists(), (app.workarea / "B" / "project.json").is_file()
 
@@ -4140,7 +4163,11 @@ def test_at_b100_16_save_dialog_open_folder_clash_empty_escape(tmp_path: Path, s
         await _settle(pilot, 8)
         out["escape"] = (len(app.screen_stack), (app.workarea / "ab").exists())
         await sd.save_through_dialog(pilot, app, "ab", confirm="alt+s")
+        # E4 integration re-pin: wait on the worker first; a 10 ms
+        # ``pilot.pause`` poll keeps the event loop hot and starves it.
+        await settle_workers(pilot)
         await sd.wait_for(pilot, lambda: (app.workarea / "ab" / "project.json").is_file(), "ab saved")
+        await settle_workers(pilot)  # Inc 12b re-pin: the save ends on its worker
         await sd.save_through_dialog(pilot, app, "P2", confirm="alt+s")
         await sd.wait_for(pilot, lambda: (app.workarea / "P2" / "project.json").is_file(), "P2 saved")
         await _settle(pilot, 6)

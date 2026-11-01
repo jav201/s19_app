@@ -1,0 +1,171 @@
+    def load_a2l_from_path(self, path: Path, *, copy: bool = True) -> None:
+        """The A2L-attach kickoff (12b): refusals, begin, request, worker."""
+        if self._refuse_if_busy():
+            return
+        normalized = resolve_input_path(path, self.base_dir)
+        if not normalized:
+            self.set_status(f"A2L file not found: {path}")
+            self.logger.warning("A2L file not found: %s", path)
+            return
+        if normalized.suffix.lower() not in A2L_EXTENSIONS:
+            self.set_status(f"Unsupported A2L type: {normalized.suffix}")
+            self.logger.warning("Unsupported A2L type: %s", normalized.suffix)
+            return
+        if self.current_project:
+            project_dir = self._active_project_dir()
+            if project_dir:
+                _, a2l_files, error = validate_project_files(project_dir)
+                if error:
+                    self.set_status(error)
+                    self.logger.warning("Project validation failed: %s", error)
+                    return
+                if a2l_files:
+                    self.set_status("Project already has an A2L file.")
+                    self.logger.warning("Project already has A2L file: %s", project_dir)
+                    return
+            else:
+                self.logger.warning("current_project set but project directory could not be resolved; skipping project guard.")
+        source_size = normalized.stat().st_size
+        if source_size >= self.large_a2l_warn_bytes:
+            self.logger.warning(
+                "Large A2L detected before copy: path=%s size_bytes=%d threshold_bytes=%d",
+                normalized,
+                source_size,
+                self.large_a2l_warn_bytes,
+            )
+        # The recent decision, on the main thread (post-9b rule); the store
+        # itself moves to the install handler (P2-9 / F-5).
+        typed = Path(str(path).strip().strip('"')).expanduser()
+        via_fallback = normalized.is_absolute() and not typed.is_absolute()
+        outside = not contained_in_workarea(normalized, self.workarea)
+        record = outside and not via_fallback
+        if outside and via_fallback:
+            self.logger.info(
+                "Recent source not recorded (found through the fallback): %r",
+                str(normalized),
+            )
+        gen = self._busy_begin_action("a2l_load", normalized.name)
+        try:
+            request = A2LAttachRequest(
+                source=normalized,
+                copy=copy,
+                temp_dir=self.workarea / WORKAREA_TEMP,
+                workarea=self.workarea,
+                record_recent=record,
+                a2l_cache=self._a2l_cache_entry(),
+                gen=gen,
+            )
+            if not copy:
+                self.step_busy("a2l_load", gen, 2)
+            self._a2l_attach_worker(request)
+        except BaseException:
+            self._busy_fail("a2l_load", gen)
+            raise
+
+    @work(thread=True, group="a2l_load")
+    def _a2l_attach_worker(self, request: A2LAttachRequest) -> None:
+        """The A2L attach worker (S-b / S-d): copy (unless in place) + parse."""
+        try:
+            try:
+                started = time.perf_counter()
+                if request.copy:
+                    path = copy_into_workarea(
+                        request.source, request.temp_dir, workarea_root=request.workarea
+                    )
+                    copy_seconds = time.perf_counter() - started
+                    self.logger.info(
+                        "A2L copy complete: path=%s size_bytes=%d copy_seconds=%.3f",
+                        path, path.stat().st_size, copy_seconds,
+                    )
+                    self.call_from_thread(self.step_busy, "a2l_load", request.gen, 2)
+                else:
+                    path = request.source
+                parse_started = time.perf_counter()
+                entry = parse_a2l_cached(
+                    path,
+                    request.a2l_cache,
+                    progress=self._progress_forwarder("a2l_load", request.gen, 2),
+                )
+                result = A2LAttachResult(
+                    request, path, entry, time.perf_counter() - parse_started
+                )
+            except Exception as exc:  # noqa: BLE001 - worker-step failures
+                if not isinstance(exc, WorkareaContainmentError):
+                    self.logger.exception("A2L attach failed: %s", request.source)
+                self.call_from_thread(self._on_a2l_attach_failed, request, exc)
+                return
+            self.call_from_thread(self._on_a2l_attached, result)
+        except BaseException:
+            self.call_from_thread(self._busy_fail, "a2l_load", request.gen)
+            raise
+
+    def _on_a2l_attached(self, result: A2LAttachResult) -> None:
+        """Main thread: paint step 3, defer the tag-table build (LLR-176.3)."""
+        self.step_busy("a2l_load", result.request.gen, 3)
+        self.call_after_refresh(self._install_attached_a2l, result)
+
+    def _install_attached_a2l(self, result: A2LAttachResult) -> None:
+        """Main thread: the one attach install, end tail last (S-b)."""
+        req = result.request
+        copied = result.path
+        gen = req.gen
+        try:
+            if req.record_recent and not record_recent_source(req.source):
+                self.logger.warning("Recent sources not updated: %r", str(req.source))
+            self.refresh_files()
+            self._store_a2l_cache(result.entry)
+            self.current_a2l_path = copied
+            self.current_a2l_data = result.entry[1]
+            self._log_a2l_parse_summary(copied, self.current_a2l_data, result.parse_seconds)
+            if self.current_file:
+                self.current_file.a2l_path = copied
+                self.current_file.a2l_data = self.current_a2l_data
+            view_started = time.perf_counter()
+            self.update_a2l_view()
+            view_elapsed = time.perf_counter() - view_started
+            if view_elapsed > self.slow_parse_warn_seconds:
+                self.logger.warning(
+                    "A2L view refresh was slow: path=%s elapsed_seconds=%.3f threshold_seconds=%.3f",
+                    copied,
+                    view_elapsed,
+                    self.slow_parse_warn_seconds,
+                )
+            else:
+                self.logger.info(
+                    "A2L view refresh complete: path=%s elapsed_seconds=%.3f",
+                    copied,
+                    view_elapsed,
+                )
+            self.update_project_labels()
+            self._refresh_loaded_panel()
+            self._rehome_focus_after_load()
+            self.logger.info("A2L loaded: %s", copied)
+            if self.current_project:
+                self._sync_loaded_a2l_to_project()
+            self.end_busy(
+                "a2l_load",
+                gen,
+                safe_text(f"A2L loaded: {painted_names([copied.name])}").plain,
+            )
+        except BaseException:
+            self._busy_fail("a2l_load", gen)
+            raise
+
+    def _on_a2l_attach_failed(
+        self, request: A2LAttachRequest, exc: BaseException
+    ) -> None:
+        """Main thread: the containment arm or the ``could not be read`` end."""
+        if isinstance(exc, WorkareaContainmentError):
+            self.logger.warning("A2L load rejected by workarea guard: %s", exc)
+            self._quit_pending = False
+            self.end_busy("a2l_load", request.gen, f"Cannot load A2L: {exc}")
+            return
+        if request.copy:
+            self.refresh_files()
+        self._quit_pending = False
+        self.end_busy(
+            "a2l_load",
+            request.gen,
+            f"File NOT loaded: '{painted_names([request.source.name])}' could not "
+            "be read — check that the file can be opened, then load again.",
+        )
