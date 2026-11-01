@@ -16,6 +16,7 @@ import re
 import shutil
 import sys
 from pathlib import Path
+from tests.support.b100_workers import settle_workers
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 EXAMPLES_DIR = REPO_ROOT / "examples" / "case_00_public"
@@ -159,13 +160,20 @@ def make_project(app, name: str = "proj1") -> Path:
     return project_dir
 
 
-def load_project(app, name: str = "proj1") -> Path:
+async def load_project(app, name: str = "proj1") -> Path:
     """Open the project through the app's own load path (``app.py:8200``).
 
     Returns the directory the app now holds as the trust anchor, never one set
     by hand. Fails loud when the load did not take.
+
+    Inc 12b (ruling Q6, census B1): the project install lands from a worker,
+    so the helper is ``async`` and waits through the one Q6 helper before it
+    reads the session.
     """
+    from textual.pilot import Pilot
+
     app._handle_load_project(name)
+    await settle_workers(Pilot(app))
     held = app.active_project_dir()
     assert held is not None and app.current_project == name, (
         f"the project load did not take: {list(app.log_lines)}"
@@ -404,7 +412,7 @@ async def open_check_editor(app, pilot, *, a2l=DEMO_A2L, cover_image: bool = Fal
     await settle(pilot)
     if a2l is not None:
         app.load_a2l_from_path(Path(a2l))
-        await settle(pilot)
+        await settle_workers(pilot)  # Inc 12b Q6 (census A8): the A2L attach is a worker
         tags = app._compute_a2l_enriched_tags()
         assert tags, f"the A2L did not load: {list(app.log_lines)[-3:]}"
         if cover_image:
@@ -641,12 +649,12 @@ def hostile_flow_demo(project_dir: Path) -> list:
     return blocks
 
 
-def flow_project(app, name: str = "proj1") -> Path:
+async def flow_project(app, name: str = "proj1") -> Path:
     """A project opened through the app's own load (P-58) holding ``prg.s19``,
     ``calib_hotfix.json``, ``baseline.chk.json``, ``crc.json`` and the saved
     flows ``patch_chain``, ``flash_chain`` and ``crc_chain``."""
     make_project(app, name)
-    project_dir = load_project(app, name)
+    project_dir = await load_project(app, name)
     calib_hotfix(project_dir)
     baseline_check(project_dir)
     # batch-99 Inc-5 (HLR-159): the fixture CRC config covers bytes prg.s19
@@ -834,14 +842,14 @@ def flip_one_data_byte(source: Path, dest: Path, avoid: tuple = ()) -> int:
     raise AssertionError("no data record to flip")
 
 
-def fx_project(app, name: str = "proj1") -> Path:
+async def fx_project(app, name: str = "proj1") -> Path:
     """A project opened through the app's own load (P-58) holding every
     Flow Execution fixture of A.5: ``patch_chain``, ``flash_chain``,
     ``err_chain``, ``crc_wait_chain``, ``six_ok_a``, ``six_ok_b``,
     ``six_wait``, ``flash2_chain``, ``patch_chain_b`` and ``prg_v2.s19``."""
     from dataclasses import replace
 
-    project_dir = flow_project(app, name)
+    project_dir = await flow_project(app, name)
     write_flow(project_dir, "err_chain", err_chain_demo())
     write_flow(project_dir, "crc_wait_chain", crc_wait_chain_demo(project_dir))
     write_flow(project_dir, "six_ok_a", six_ok_demo("six_a.s19"))

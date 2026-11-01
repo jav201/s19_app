@@ -807,13 +807,15 @@ def test_tc_b100_29_failure_after_the_write_removes_the_document(
     RED."""
     landed_before_manifest: list = []
 
-    def _fail_after_landing(self, project_dir, *args, **kwargs) -> bool:
+    # Inc 12b re-pin (P1-69, census C9 / P1-C6): the Save worker writes the
+    # manifest through ``_write_manifest_for_save`` -> (verify result, refusal).
+    def _fail_after_landing(self, project_dir, *args, **kwargs):
         landed_before_manifest.append(
             (Path(project_dir) / "patches" / "changes.json").is_file()
         )
-        return False
+        return None, "forced refusal"
 
-    monkeypatch.setattr(app_module.S19TuiApp, "_write_and_verify_manifest", _fail_after_landing)
+    monkeypatch.setattr(app_module.S19TuiApp, "_write_manifest_for_save", _fail_after_landing)
     messages, project_dir, _ = _pasted_save(tmp_path)
     assert landed_before_manifest == [True], (landed_before_manifest, messages)
     assert not (project_dir / "patches" / "changes.json").exists()

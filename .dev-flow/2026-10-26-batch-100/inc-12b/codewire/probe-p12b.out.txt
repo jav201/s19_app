@@ -1,0 +1,16 @@
+import: C:\Users\jjgh8\Github\s19_app\s19_app\__init__.py
+== U3 case_01 size 1444 lines 53 text-mode bytes 1391 (short by 53) buffer.tell distinct 1 first 1444 last 1444 non-decreasing True
+== U3 case_01 loop plain 0.000 s, with tell per line 0.000 s
+== U3 case_06 size 37742888 lines 1039926 text-mode bytes 36702962 (short by 1039926) buffer.tell distinct 4608 first 8192 last 37742888 non-decreasing True
+== U3 case_06 loop plain 0.073 s, with tell per line 0.659 s
+== U2 no image open: _parse_loaded_file(P2/firmware.mac) -> file_type=mac path=firmware.mac mac=firmware.mac
+== U2 P1 image open: _parse_loaded_file(P2/firmware.mac) -> file_type=s19 path=p1img.s19 parent=u2 mac=firmware.mac
+== U2 P1 image open: _parse_loaded_file(P2/firmware.s19) -> mac carried=None
+== U1 case_01 cold P2 digest ('P2\\firmware.s19', 'f254f33fe5405d40', 'P2', 'P2\\firmware.a2l', 'P2\\firmware.mac', 0)
+== U1 case_01 P1 before: ('C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\inc-12b-design\\work\\p12b\\u1-case_01-over\\p1img.s19', 'f254f33fe5405d40', None, None, None, 0)
+== U1 case_01 P2-over-P1 digest ('P2\\firmware.s19', 'f254f33fe5405d40', 'P2', 'P2\\firmware.a2l', 'P2\\firmware.mac', 0) equal_to_cold=True snapshot names differing ['_image_generation', 'log_lines']
+== U1 case_06 cold P6 digest ('P6\\firmware.s19', 'f917cd2dca22da9a', 'P6', 'P6\\firmware.a2l', 'P6\\firmware.mac', 0) wall 7.34 s
+(first run stopped at U4 with a StylesheetError: the recording subclass lived outside the package, so CSS_PATH resolved next to the probe; fixed with an absolute CSS_PATH and U4 re-run alone:)
+== U4 project load assigns ['_a2l_cache_data', '_a2l_cache_key', '_a2l_enriched_key', '_a2l_enriched_tags', '_a2l_filtered_tags', '_a2l_row_key_to_tag', '_a2l_summary_lines', '_a2l_summary_start', '_a2l_tag_find_last_index', '_a2l_tag_find_query', '_a2l_tag_hex_highlight', '_a2l_window_start', '_alt_goto_focus_address', '_change_service', '_declared_regions', '_diff_check_spec', '_diff_check_spec_name', '_diff_last_result', '_goto_focus_address', '_image_generation', '_last_execution', '_last_flow_run', '_last_load_announcement', '_last_template_path', '_mac_goto_focus_address', '_mac_row_key_to_address', '_mac_view_cache_cell_rows', '_mac_view_cache_cell_styles', '_mac_view_cache_coverage_line', '_mac_view_cache_key', '_mac_view_cache_meta', '_mac_view_cache_rows', '_mac_view_cache_summary', '_mac_view_cache_widths', '_mac_window_start', '_parsed_paste_text', '_pending_variant_id', '_report_filter_path', '_validation_issues', '_validation_issues_window_start', '_validation_report', '_variant_set', '_variant_set_value', 'current_a2l_data', 'current_a2l_path', 'current_file', 'current_project', 'current_project_dir', 'cursor_position']
+== U4 save assigns ['_last_manifest_verify_result', '_report_filter_path', '_variant_set', '_variant_set_value', 'current_project', 'current_project_dir']
+== U4 A2L attach assigns ['_a2l_cache_data', '_a2l_cache_key', '_a2l_enriched_key', '_a2l_enriched_tags', '_a2l_filtered_tags', '_a2l_row_key_to_tag', '_a2l_summary_lines', '_a2l_summary_start', '_a2l_window_start', '_mac_row_key_to_address', '_validation_issues', '_validation_report', 'a2l_tags_filter_text', 'current_a2l_data', 'current_a2l_path']

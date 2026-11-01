@@ -122,7 +122,7 @@ def test_tc_b97_27_missing_flows_created_inside_project_then_opened(
         make_project(app)
         async with app.run_test(size=CHIP_TEST_SIZE) as pilot:
             await settle(pilot)
-            project_dir = load_project(app)
+            project_dir = await load_project(app)
             chip = await mount_chip(app, pilot, "flows")
             dimmed_before = chip.has_class("-dimmed")
             chip.press()
@@ -185,7 +185,7 @@ def test_tc_b97_28_session_never_creates_a_removed_project_dir(
         make_project(app)
         async with app.run_test(size=CHIP_TEST_SIZE) as pilot:
             await settle(pilot)
-            project_dir = load_project(app)
+            project_dir = await load_project(app)
             chip = await mount_chip(app, pilot, "session")
             enabled_before = not chip.disabled
             shutil.rmtree(project_dir)
@@ -272,7 +272,7 @@ def test_tc_b97_29_no_project_chips_disabled_with_their_own_reason(
                 disabled = chip.disabled
                 chip.press()
                 await settle(pilot)
-                load_project(app)
+                await load_project(app)
                 await settle(pilot)
                 seen = len(statuses)
                 unload_project(app)
@@ -359,7 +359,7 @@ def test_tc_b97_30_check_editor_chip_unique_and_opens_checks_home(
         make_project(app)
         async with app.run_test(size=CHIP_TEST_SIZE) as pilot:
             await settle(pilot)
-            project_dir = load_project(app)
+            project_dir = await load_project(app)
             (project_dir / PROJECT_CHECKS_DIR).mkdir()
             ids = collections.Counter(w.id for w in app.query(OpenFolderChip))
             presses = []
@@ -469,7 +469,7 @@ def test_tc_b97_57_chip_press_guarded_in_a_loaded_project(
         make_project(app)
         async with app.run_test(size=CHIP_TEST_SIZE) as pilot:
             await settle(pilot)
-            project_dir = load_project(app)
+            project_dir = await load_project(app)
             folder = project_dir / subdir
             if case == "file":
                 folder.write_text("not a folder", encoding="utf-8")
@@ -611,7 +611,7 @@ def test_tc_b97_65_shipped_chips_labelled_with_folder_and_status_path(
         observed = {}
         async with app.run_test(size=CHIP_TEST_SIZE) as pilot:
             await settle(pilot)
-            project_dir = load_project(app)
+            project_dir = await load_project(app)
             for family, screen in (("patch", "patch"), ("checks", "checks"), ("templates", "crc_designer")):
                 app.action_show_screen(screen)
                 await settle(pilot)
@@ -662,7 +662,7 @@ def test_tc_b97_65_no_project_checks_chip_names_the_folder_it_opens(
             no_project_label = chip_label(chip)
             chip.press()
             await settle(pilot)
-            load_project(app)
+            await load_project(app)
             await settle(pilot)
             return no_project_label, chip_label(chip), list(spy.calls)
 
@@ -702,7 +702,7 @@ def test_tc_b97_65_no_project_session_chip_disabled_with_exact_reason(
             state = (chip_label(session), session.disabled)
             session.press()
             await settle(pilot)
-            load_project(app)
+            await load_project(app)
             await settle(pilot)
             seen = len(statuses)
             unload_project(app)
@@ -745,7 +745,7 @@ def test_tc_b97_31_check_editor_header_carries_both_chips(
         make_project(app)
         async with app.run_test(size=CHIP_TEST_SIZE) as pilot:
             await settle(pilot)
-            project_dir = load_project(app)
+            project_dir = await load_project(app)
             (project_dir / PROJECT_CHECKS_DIR).mkdir()
             app.action_show_screen("check_editor")
             await settle(pilot)
@@ -1273,7 +1273,7 @@ def test_tc_b97_31_flow_builder_header_carries_both_chips(
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=CHIP_TEST_SIZE) as pilot:
             await settle(pilot)
-            project_dir = flow_project(app)
+            project_dir = await flow_project(app)
             app.action_show_screen("flow")
             await _poll(pilot, lambda: app.query_one("#flow_panel").region.height > 0)
             screen = app.query_one("#screen_flow")
@@ -1345,7 +1345,7 @@ def test_tc_b97_32_flow_help_names_every_label(tmp_path: Path) -> None:
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(118, 54)) as pilot:
             await settle(pilot)
-            flow_project(app)
+            await flow_project(app)
             app.action_show_screen("flow")
             panel = app.query_one("#flow_panel")
             await _poll(pilot, lambda: panel.region.height > 0)
@@ -1430,7 +1430,7 @@ def test_tc_b97_33_flow_glyphs_closed_and_in_the_legend(tmp_path: Path, arm: str
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=size) as pilot:
             await settle(pilot)
-            project_dir = flow_project(app)
+            project_dir = await flow_project(app)
             stem = "patch_chain"
             if arm == "report_block":
                 stem = "with_report"
@@ -1498,7 +1498,7 @@ def test_tc_b97_58_flow_builder_region_states(tmp_path: Path, arm: str) -> None:
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(118, 54)) as pilot:
             await settle(pilot)
-            project_dir = flow_project(app) if arm != "ribbon_no_session" else None
+            project_dir = await flow_project(app) if arm != "ribbon_no_session" else None
             app.action_show_screen("flow")
             panel = app.query_one("#flow_panel")
             await _poll(pilot, lambda: panel.region.height > 0)
@@ -1594,7 +1594,7 @@ def test_tc_b97_30_every_chip_id_unique_with_the_reports_modal_open(
         make_project(app)
         async with app.run_test(size=CHIP_TEST_SIZE) as pilot:
             await settle(pilot)
-            load_project(app)
+            await load_project(app)
             app.push_screen(ReportViewerScreen("proj1", []))
             await settle(pilot)
             composed = collections.Counter(w.id for w in app.query(OpenFolderChip))
@@ -1626,7 +1626,7 @@ def test_tc_b97_31_flow_execution_header_carries_both_chips(
         make_project(app)
         async with app.run_test(size=CHIP_TEST_SIZE) as pilot:
             await settle(pilot)
-            project_dir = load_project(app)
+            project_dir = await load_project(app)
             app.action_show_screen("flow_execution")
             await _poll(pilot, lambda: app.query_one("#fx_panel").region.height > 0)
             screen = app.query_one("#screen_flow_execution")
@@ -1690,7 +1690,7 @@ def test_tc_b97_32_flow_execution_help_names_every_label(tmp_path: Path) -> None
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(118, 54)) as pilot:
             await settle(pilot)
-            project_dir = fx_project(app)
+            project_dir = await fx_project(app)
             flash_evidence(project_dir)
             app.action_show_screen("flow_execution")
             panel = app.query_one("#fx_panel")
@@ -1762,7 +1762,7 @@ def test_tc_b97_33_flow_execution_glyphs_closed_and_in_the_legend(tmp_path: Path
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(118, 54)) as pilot:
             await settle(pilot)
-            fx_project(app)
+            await fx_project(app)
             panel = await import_lanes(app, pilot, *FX_THREE)
             await run_lanes(app, pilot, panel, key=True)
             await settle(pilot, 4)
@@ -1837,7 +1837,7 @@ def test_tc_b97_58_flow_execution_region_states(tmp_path: Path, monkeypatch: pyt
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(118, 54)) as pilot:
             await settle(pilot)
-            project_dir = fx_project(app)
+            project_dir = await fx_project(app)
             nul_flow(project_dir)
             nul_set(project_dir)
             stems = () if arm in ("lanes_empty", "log_empty") else ("patch_chain",)
@@ -1921,7 +1921,7 @@ def test_tc_b97_65_seven_chips_labelled_and_the_four_screen_chips_open_their_fol
         make_project(app)
         async with app.run_test(size=CHIP_TEST_SIZE) as pilot:
             await settle(pilot)
-            project_dir = load_project(app)
+            project_dir = await load_project(app)
             for folder in (PROJECT_PATCHES_DIR, PROJECT_CHECKS_DIR, FLOWS_SUBDIR):
                 (project_dir / folder).mkdir(exist_ok=True)
             labels = {w.id: chip_label(w) for w in app.query(OpenFolderChip)}
@@ -1985,7 +1985,7 @@ def test_tc_b97_65_session_header_chip_names_its_reason_after_a_drop(
             if not chips:
                 return None
             chip = chips[0]
-            load_project(app)
+            await load_project(app)
             await _poll(pilot, lambda: not chip.disabled)
             enabled = not chip.disabled
             seen = len(statuses)
@@ -2047,7 +2047,7 @@ def test_at_b97_12_four_chips_open_their_folder_or_refuse(
         make_project(app)
         async with app.run_test(size=CHIP_TEST_SIZE) as pilot:
             await settle(pilot)
-            project_dir = load_project(app)
+            project_dir = await load_project(app)
             for folder in (PROJECT_PATCHES_DIR, PROJECT_CHECKS_DIR):
                 (project_dir / folder).mkdir(exist_ok=True)
             flows = project_dir / FLOWS_SUBDIR
@@ -2129,7 +2129,7 @@ def test_at_b97_13_no_project_flow_chips_disabled_and_name_their_folder(
                     chips[0].press()
                     await settle(pilot)
             at_start = [line for line in statuses if NO_PROJECT_TAIL in line]
-            load_project(app)
+            await load_project(app)
             await settle(pilot, 3)
             seen = len(statuses)
             unload_project(app)
@@ -2231,7 +2231,7 @@ def test_at_b97_14_help_chip_opens_a_body_covering_the_screen(tmp_path: Path, sc
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(118, 54)) as pilot:
             await settle(pilot)
-            fx_project(app)
+            await fx_project(app)
             screen = app.query_one(f"#{screen_ids[screen_key]}")
             labels = {}
 
@@ -2346,7 +2346,7 @@ def test_at_b97_23_each_failed_region_says_so_in_one_line(tmp_path: Path, arm: s
                 finally:
                     if blocker.is_file():
                         os.chmod(blocker, 0o666)
-            project_dir = fx_project(app)
+            project_dir = await fx_project(app)
             nul_flow(project_dir)
             if arm == "flow_refused":
                 panel = await open_flow_builder(app, pilot)

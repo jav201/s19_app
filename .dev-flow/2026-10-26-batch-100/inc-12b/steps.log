@@ -1,0 +1,15 @@
+2026-10-31 14:55  E1 start (Opus, parallel with 9b E3)
+2026-10-31 15:30  E1 end (Opus) — 39 requirements
+2026-10-31 15:31  E1 rulings Q1-Q7 (orchestrator, all as recommended)
+2026-10-31 20:03  E2 baseline end (Opus) — 58 nodes
+2026-10-31 20:05  E2 baseline rulings + interfaces-12b.md fixed (orchestrator); prototypes P-1 (G-A+G-B), P-2 (G-C+G-D) start (Opus)
+2026-10-31 20:27  E2 prototype P-2 (G-C+G-D) end (Opus) — 27 nodes / 62 examples
+2026-10-31 20:35  E2 prototype G-A+G-B end (Opus) — 39 nodes / 84 examples
+2026-10-31 20:36  E2 prototypes done (P-1 39/84, P-2 27/62); proposals ruled; E3 PDR r1 start (Opus architect ∥ security)
+2026-10-31 20:57  E3 r1: arch PWN (1 MAJOR census), sec PWN (1 MAJOR quit-hides-failure); rulings + DF-1..13 written; design-fix r1 start (DeepSeek)
+2026-10-31 21:14  E3 r1 design-fix end (DeepSeek v4 Pro)
+2026-10-31 21:19  E3 r2: arch PWN (0 MAJOR), sec PWN (0 MAJOR); E3 closed; addenda written; E4 waits for the post-12a tree
+2026-11-01 01:01 E4 start: app.py G-C1/G-A/G-B/G-C2 (DeepSeek v4 Pro via pi) || a2l.py G-D (DeepSeek v4 Pro via pi) || tester (Opus); base 71376a3 (12a integrated, pre-corrective)
+2026-11-01 01:05 E4 a2l.py G-D done (DeepSeek v4 Pro): tui/a2l.py d70b17982f1cee30; 2 deviations (path is tui/a2l.py; _ENGINE_PATHS test edit owed by tester/integration)
+2026-11-01 01:24 E4 app.py G-C1/G-A/G-B/G-C2 done (DeepSeek v4 Pro): app 89b2d043c60f3a2f; 3 deviations declared; +1577/-1224 (w)
+2026-11-01 02:25 E4 tester done (Opus + 1 sub-agent): 82 new items (80 RED), large census re-pin; RED run 108 failed/195 passed on 71376a3; A-1..A-10 ruled

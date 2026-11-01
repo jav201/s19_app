@@ -33,6 +33,7 @@ import shutil
 import subprocess
 from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Iterable, Optional
+from tests.support.b100_workers import settle_workers
 
 ROOT = Path(__file__).resolve().parents[2]
 CASE01_DIR = ROOT / "examples" / "case_01_basic_valid"
@@ -381,7 +382,9 @@ def append_variant(base: Path, source: Path, name: str = "P") -> None:
         async with app.run_test(size=(160, 50)) as pilot:
             await pilot.pause()
             app._handle_load_project(name)
-            await pilot.pause()
+            # Inc 12b (census A9 / R-6, Q-a1): a direct ``load_from_path`` is
+            # refused while the project worker runs; wait for the install.
+            await settle_workers(pilot)
             app.load_from_path(source)
             for _ in range(400):
                 if any("manifest verified" in line for line in statuses):
@@ -605,18 +608,25 @@ async def load_image(pilot, app, path: Path) -> None:
 
 
 async def load_project(pilot, app, name: str = "P") -> float:
-    """Open project ``name`` through the shipped handler; returns the
-    handler's wall time in seconds (the reopen runs inside it)."""
+    """Open project ``name`` through the shipped handler; returns the time
+    in seconds from the request to the end of the install.
+
+    Inc 12b (E2 ruling "Vacuous timing", census C11): the handler returns
+    at once and the reopen runs on a worker, so the handler's own wall time
+    bounds nothing. The clock runs from the call until the polled condition
+    holds (``current_project`` and the image are set in the one install
+    callback), as ``test_b100_active_variant.py``'s TC-B100-20 measures."""
     import time
 
     start = time.perf_counter()
     app._handle_load_project(name)
-    elapsed = time.perf_counter() - start
     await wait_for(
         pilot,
         lambda: app.current_project == name and app.current_file is not None,
         f"the project load of {name}",
     )
+    elapsed = time.perf_counter() - start
+    await settle_workers(pilot)
     for _ in range(6):
         await pilot.pause()
     return elapsed

@@ -48,6 +48,7 @@ from textual.widgets import DataTable, Label, Static, TextArea
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.screens_directionb import PatchEditorPanel
 from s19_app.tui.workspace import WORKAREA_DIRNAME, WORKAREA_SUBDIR
+from tests.support.b100_workers import settle_workers
 
 EXAMPLES_DIR = Path(__file__).resolve().parent.parent / "examples"
 CASE01_DIR = EXAMPLES_DIR / "case_01_basic_valid"
@@ -118,6 +119,8 @@ SNAPSHOT_EXCLUSIONS: dict[str, str] = {
     "_save_confirmed": _SAVE_DIALOG_STATE_REASON,
     "_save_painted_preview": _SAVE_DIALOG_STATE_REASON,
     "_busy": "progress indicator run state; main-thread UI state, not session state (Inc 12a)",
+    # Inc 12b (interfaces S-c, C12b-49): the one new app attribute.
+    "_quit_pending": "quit confirmed while a session action runs; UI control state, not session state (Inc 12b)",
 }
 
 # The K1/K2 allow-list (ARQ §2.2): names a load-over may differ in BY
@@ -149,6 +152,7 @@ async def _wait_for(pilot, predicate, description: str, attempts: int = 150) -> 
 async def _flush(pilot, count: int = 12) -> None:
     for _ in range(count):
         await pilot.pause()
+    await settle_workers(pilot)  # Inc 12b ruling Q6 / A12b-01: wait for the workers' installs
 
 
 def _status_text(app: S19TuiApp) -> str:
@@ -999,7 +1003,7 @@ def test_tc_b100_10_reset_leaves_the_patch_editor_clean_for_the_next_load(
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(118, 54)) as pilot:
             await settle(pilot)
-            fx_project(app)  # the app's own project load -> the reset
+            await fx_project(app)  # the app's own project load -> the reset
             panel = await open_patch_editor(app, pilot)
             buffer = app.query_one("#patch_paste_text", TextArea)
             assert buffer.text == "", repr(buffer.text)
@@ -1018,3 +1022,136 @@ def test_tc_b100_10_reset_leaves_the_patch_editor_clean_for_the_next_load(
             assert "6 entries" in subtitle and "●" not in subtitle, subtitle
 
     asyncio.run(_drive())
+
+
+# ---------------------------------------------------------------------------
+# Inc 12b extensions (E4 tester): TC-B100-08 (LLR-165.1 §C.1, the one call
+# site moves to the project-load install handler) and TC-B100-09 (LLR-165.2:
+# the one new app attribute, ``_quit_pending``). Oracles: inc-12b E1 draft
+# §C.1 / §C.2; codewire/proto-12b-load-save P1-14, P1-30, P1-83;
+# codewire/proto-12b-a2l-refusal C12b-49.
+# ---------------------------------------------------------------------------
+
+#: The live source census at the Inc 12b base (71376a3: main + Inc 11 +
+#: Inc 12a), frozen by the E4 tester with :func:`_source_census`'s rule.
+#: Inc 12b may add exactly one name to it (P1-83, C12b-49).
+_CENSUS_AT_12B_BASE = frozenset({
+    '_a2l_cache_data',
+    '_a2l_cache_key',
+    '_a2l_enriched_key',
+    '_a2l_enriched_tags',
+    '_a2l_filter_debounce_token',
+    '_a2l_filtered_tags',
+    '_a2l_row_key_to_tag',
+    '_a2l_summary_lines',
+    '_a2l_summary_start',
+    '_a2l_tag_find_last_index',
+    '_a2l_tag_find_query',
+    '_a2l_tag_hex_highlight',
+    '_a2l_window_start',
+    '_active_screen_key',
+    '_alt_first_visible_address',
+    '_alt_goto_focus_address',
+    '_busy',
+    '_change_service',
+    '_declared_regions',
+    '_diff_check_spec',
+    '_diff_check_spec_name',
+    '_diff_compare_generation',
+    '_diff_last_result',
+    '_goto_focus_address',
+    '_hex_window_start',
+    '_image_generation',
+    '_last_execution',
+    '_last_flow_run',
+    '_last_load_announcement',
+    '_last_manifest_verify_result',
+    '_last_template_path',
+    '_mac_first_visible_address',
+    '_mac_goto_focus_address',
+    '_mac_row_key_to_address',
+    '_mac_view_cache_cell_rows',
+    '_mac_view_cache_cell_styles',
+    '_mac_view_cache_coverage_line',
+    '_mac_view_cache_key',
+    '_mac_view_cache_meta',
+    '_mac_view_cache_rows',
+    '_mac_view_cache_summary',
+    '_mac_view_cache_widths',
+    '_mac_window_start',
+    '_parsed_paste_text',
+    '_pending_variant_id',
+    '_report_filter_path',
+    '_save_confirmed',
+    '_save_painted_preview',
+    '_save_session',
+    '_split_join_return_screen',
+    '_validation_issues',
+    '_validation_issues_window_start',
+    '_validation_report',
+    '_variant_set',
+    '_variant_set_value',
+    'a2l_tags_filter_field',
+    'a2l_tags_filter_mode',
+    'a2l_tags_filter_text',
+    'a2l_tags_page_size',
+    'base_dir',
+    'current_a2l_data',
+    'current_a2l_path',
+    'current_file',
+    'current_project',
+    'current_project_dir',
+    'hex_rows_page_size',
+    'last_search_address',
+    'last_search_text',
+    'load_path',
+    'log_lines',
+    'logger',
+    'mac_records_page_size',
+    'validation_issue_filter_mode',
+    'workarea',
+})
+
+
+def test_tc_b100_08_the_one_reset_call_sits_in_the_install_handler() -> None:
+    """LLR-165.1 §C.1, LLR-177.1g (P1-14): an AST walk of ``s19_app/`` finds
+    exactly one call of ``_reset_project_session``, inside
+    ``_install_prepared_project`` (the project load's main-thread install
+    step); ``_handle_load_project`` holds none.
+
+    Why: the reset must run after the worker read and before the first
+    install; a reset in the request frame empties the session when the
+    worker then fails (LLR-177.2).
+    Negative control (base): the one call sits in ``_handle_load_project``
+    → RED."""
+    root = Path(__file__).resolve().parents[1] / "s19_app"
+    owners = []
+    for source in root.rglob("*.py"):
+        tree = ast.parse(source.read_text(encoding="utf-8"))
+        for func in ast.walk(tree):
+            if not isinstance(func, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+            for node in ast.walk(func):
+                if (
+                    isinstance(node, ast.Call)
+                    and isinstance(node.func, ast.Attribute)
+                    and node.func.attr == "_reset_project_session"
+                ):
+                    owners.append(func.name)
+    assert owners == ["_install_prepared_project"], owners
+
+
+def test_tc_b100_09_twelve_b_adds_exactly_the_quit_flag(tmp_path: Path) -> None:
+    """LLR-165.2 extension (P1-83, C12b-49): over the Inc 12b base's
+    census, the live source census adds exactly one name,
+    ``_quit_pending``, which the exclusion list classifies with a reason
+    (requests and results are never stored on the app).
+
+    Why: an unclassified new attribute is session state the snapshot does
+    not see; a stored request would outlive its worker.
+    Negative control: a design that stores the request on the app
+    (``self._project_load_request = request``) → 2 new names → RED; base:
+    0 new names → RED."""
+    census = _source_census()
+    assert census - _CENSUS_AT_12B_BASE == {"_quit_pending"}, sorted(census - _CENSUS_AT_12B_BASE)
+    assert SNAPSHOT_EXCLUSIONS.get("_quit_pending", "").strip(), "the quit flag needs its exclusion reason"

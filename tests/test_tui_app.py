@@ -14,6 +14,7 @@ from s19_app.tui.models import LoadedFile
 from s19_app.tui.screens import SaveProjectPayload
 from s19_app.tui.workspace import WORKAREA_TEMP
 from s19_app.validation import ValidationIssue, ValidationSeverity
+from tests.support.b100_workers import settle_workers
 
 
 def test_default_tag_and_mac_page_sizes(tmp_path: Path):
@@ -90,7 +91,7 @@ def test_save_project_writes_under_workarea(tmp_path: Path, monkeypatch: pytest.
             )
             app.current_a2l_path = None
             app._handle_save_dialog(SaveProjectPayload(parent_folder=str(parent), project_name="P1"))
-            await pilot.pause()
+            await settle_workers(pilot)  # Inc 12b Q6 (census A11): the Save commits from a worker
 
     import asyncio
 
@@ -235,7 +236,8 @@ def test_load_selected_file_attaches_mac_to_loaded_binary(tmp_path: Path, monkey
         mac_diagnostics=[],
     )
 
-    monkeypatch.setattr(app, "_load_mac_file", lambda path, a2l_files=None: mac_loaded)
+    # Inc 12b census P1-C2: ``_load_mac_file`` takes its A2L inputs explicitly.
+    monkeypatch.setattr(app, "_load_mac_file", lambda path, *args, **kwargs: mac_loaded)
     monkeypatch.setattr(app, "update_sections", lambda: None)
     monkeypatch.setattr(app, "update_hex_view", lambda focus_address=None: None)
     monkeypatch.setattr(app, "update_alt_hex_view", lambda focus_address=None: None)
@@ -283,7 +285,8 @@ def test_merge_primary_with_existing_mac_keeps_mac_payload(tmp_path: Path):
         a2l_data=None,
     )
 
-    merged = app._merge_primary_with_existing_mac(primary_loaded)
+    # Inc 12b census P1-C3: ``existing`` is an explicit argument.
+    merged = app._merge_primary_with_existing_mac(primary_loaded, app.current_file)
 
     assert merged.file_type == "hex"
     assert merged.mem_map == {0x3000: 0x11}
@@ -413,8 +416,14 @@ def test_filter_a2l_tags_supports_in_memory_and_boolean_fields(tmp_path: Path):
 
 
 def test_a2l_cache_reuses_parse_for_unchanged_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
-    app = S19TuiApp(base_dir=tmp_path)
-    a2l_path = tmp_path / "sample.a2l"
+    """Inc 12b re-pin (P1-07, E3 DF-7; census C6): ``_load_a2l_data_with_cache``
+    is retired; the cache is the pure module function ``parse_a2l_cached``.
+    The second call on the unchanged file, given the first entry, reuses it:
+    1 parse, equal results. The fake keeps ONE parameter, so a cache path that
+    always passes ``progress=`` fails here (Q-f2)."""
+    import s19_app.tui.app as app_module
+
+    a2l_path = tmp_path / "firmware.a2l"
     a2l_path.write_text("/begin PROJECT Demo\n/end PROJECT\n", encoding="utf-8")
     calls = {"count": 0}
 
@@ -422,10 +431,10 @@ def test_a2l_cache_reuses_parse_for_unchanged_file(tmp_path: Path, monkeypatch: 
         calls["count"] += 1
         return {"path": str(path), "sections": [], "errors": [], "tags": []}
 
-    monkeypatch.setattr("s19_app.tui.app.parse_a2l_file", fake_parse)
+    monkeypatch.setattr(app_module, "parse_a2l_file", fake_parse)
 
-    first = app._load_a2l_data_with_cache(a2l_path)
-    second = app._load_a2l_data_with_cache(a2l_path)
+    first = app_module.parse_a2l_cached(a2l_path, None)
+    second = app_module.parse_a2l_cached(a2l_path, first)
 
     assert calls["count"] == 1
     assert first == second
@@ -650,7 +659,8 @@ def test_parse_loaded_file_mac_after_s19_preserves_both(tmp_path: Path, monkeypa
         mac_diagnostics=[],
     )
 
-    monkeypatch.setattr(app, "_load_mac_file", lambda path, a2l_files=None: mac_loaded)
+    # Inc 12b census P1-C2: ``_load_mac_file`` takes its A2L inputs explicitly.
+    monkeypatch.setattr(app, "_load_mac_file", lambda path, *args, **kwargs: mac_loaded)
 
     merged = app._parse_loaded_file(tmp_path / "tags.mac")
 

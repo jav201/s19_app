@@ -56,6 +56,7 @@ from tests.support import b100_links
 from tests.support.independent_reader import read_s19
 from tests.support.b100_projects import dismiss_load_result_panel
 from tests.support.b100_load_dialog import highlight_row, is_load_dialog
+from tests.support.b100_workers import settle_workers
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE01 = ROOT / "examples" / "case_01_basic_valid" / "firmware.s19"
@@ -389,8 +390,9 @@ def test_tc_b100_03_reused_variant_is_named_not_added(tmp_path: Path) -> None:
         async with app.run_test(size=(120, 40)) as pilot:
             await pilot.pause()
             app._handle_load_project("proj")
-            for _ in range(12):
-                await pilot.pause()
+            # Inc 12b (Q6; census miss, A9 pattern): a direct ``load_from_path``
+            # is refused while the project worker runs; wait for the install.
+            await settle_workers(pilot)
             app.load_from_path(CASE02)
             await app.workers.wait_for_complete()
             for _ in range(12):
@@ -819,10 +821,32 @@ def test_tc_b100_01_app_placements_name_the_workarea_root() -> None:
         and node.func.id in placements
     ]
     assert len(copier_calls) == 1, [call.lineno for call in copier_calls]
-    document_writer = next(
+    # Inc 12b re-pin (E3 S12b-05): ``_write_editor_document`` is retired; the
+    # Save worker's ``_save_project_files`` hands the pasted document to the
+    # unchanged ``write_change_document`` with a ``copy_fn`` closure, and that
+    # closure is the document's ONE placement in ``app.py`` (it names the root).
+    files_worker = next(
         node
         for node in ast.walk(tree)
-        if isinstance(node, ast.FunctionDef) and node.name == "_write_editor_document"
+        if isinstance(node, ast.FunctionDef) and node.name == "_save_project_files"
+    )
+    document_writes = [
+        node
+        for node in ast.walk(files_worker)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "write_change_document"
+    ]
+    assert len(document_writes) == 1, [call.lineno for call in document_writes]
+    copy_fn = next(
+        keyword.value.id
+        for keyword in document_writes[0].keywords
+        if keyword.arg == "copy_fn" and isinstance(keyword.value, ast.Name)
+    )
+    document_writer = next(
+        node
+        for node in ast.walk(files_worker)
+        if isinstance(node, ast.FunctionDef) and node.name == copy_fn
     )
     document_calls = [
         node
@@ -833,12 +857,17 @@ def test_tc_b100_01_app_placements_name_the_workarea_root() -> None:
     ]
     assert len(document_calls) == 1, [call.lineno for call in document_calls]
     assert any(keyword.arg == "workarea_root" for keyword in document_calls[0].keywords)
+    # Inc 12b re-pin (census P1-C7, Q-b2): the Save emit is now the direct
+    # ``save_patched_image(...)`` call on the worker; the save-back keeps the
+    # service's ``save_patched``. 2 emit calls, each naming the root.
     emit_calls = [
         node
         for node in ast.walk(tree)
         if isinstance(node, ast.Call)
-        and isinstance(node.func, ast.Attribute)
-        and node.func.attr in ("save_patched", "emit_and_verify")
+        and (
+            (isinstance(node.func, ast.Attribute) and node.func.attr == "save_patched")
+            or (isinstance(node.func, ast.Name) and node.func.id == "save_patched_image")
+        )
     ]
     assert len(emit_calls) == 2, (
         f"expected the 2 app.py emit calls (LED .56), found {len(emit_calls)}"

@@ -67,6 +67,7 @@ from tests.conftest import canonical_report_bytes
 # re-implementing it. A second copy of the scope predicate is a second place
 # for the "no notice" / "no scope" confusion to reappear (spec §3 US-B64-2).
 from tests.test_report_addendum_bound import _addendum_notices, _cap
+from tests.support.b100_workers import settle_workers
 
 # Two minimal valid S19 images (checksums verified against
 # s19_app.core.S19File) — a 2-variant project per the spec, so the seam is
@@ -135,6 +136,7 @@ async def _flush(pilot, count: int = 12) -> None:
     """Pump the event loop so deferred screen/message/apply work runs."""
     for _ in range(count):
         await pilot.pause()
+    await settle_workers(pilot)  # Inc 12b ruling Q6 / A12b-01: wait for the workers' installs
 
 
 def _notices(app: S19TuiApp) -> list[tuple[str, str]]:

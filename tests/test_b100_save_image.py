@@ -78,6 +78,7 @@ from tests.support.b100_load_dialog import highlight_row, is_load_dialog
 from tests.support import b100_projects
 from tests.support.independent_reader import read_hex
 from tests.support.independent_reader import read_s19
+from tests.support.b100_workers import settle_workers
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE01_DIR = ROOT / "examples" / "case_01_basic_valid"
@@ -221,7 +222,7 @@ async def _save_back(pilot, app: S19TuiApp, filename: str) -> None:
 
 async def _save(pilot, app: S19TuiApp, name: str) -> None:
     app._handle_save_dialog(_payload(app, name))
-    await pilot.pause()
+    await settle_workers(pilot)  # Inc 12b Q6 (census A6): the Save commits from a worker
 
 
 class _TrapDict(dict):
@@ -751,7 +752,8 @@ def test_tc_b100_17_emit_refusal_writes_no_manifest(
             )
         ]
 
-    monkeypatch.setattr(change_service_module, "save_patched_image", _refuse)
+    # Inc 12b census P1-C5 (Q-b2): the Save worker calls the app module's name.
+    monkeypatch.setattr(app_module, "save_patched_image", _refuse)
 
     async def scenario(app, pilot) -> None:
         _add(app, PATCH_ADDRESS, PATCH_BYTES)
@@ -777,9 +779,8 @@ def test_tc_b100_17_verify_reread_failure_rolls_the_emit_back(
         assert Path(path).is_file(), "the emit has not landed yet"
         raise PermissionError(13, "re-read refused", str(path))
 
-    monkeypatch.setattr(
-        change_service_module, "verify_written_image", _refuse_reread
-    )
+    # Inc 12b census P1-C5 (Q-b2): the Save worker calls the app module's name.
+    monkeypatch.setattr(app_module, "verify_written_image", _refuse_reread)
     before: dict = {}
 
     async def scenario(app, pilot) -> None:
@@ -798,12 +799,18 @@ def test_tc_b100_17_non_os_error_after_the_emit_rolls_back_then_surfaces(
 ) -> None:
     """Review F1 / SEC-7 (LLR-167.4): an error that is not an ``OSError``
     after the emit landed still rolls the save back — no folder, no
-    image — and then surfaces (it is a defect, never swallowed)."""
+    image — and then surfaces (it is a defect, never swallowed).
+
+    Inc 12b re-pin (P1-64, LLR-177.2a, ruling Q4; census A10 / P1-C5): the
+    Save runs on a worker, so nothing raises out of the handler. The defect
+    surfaces as the ``could not save`` outcome line (no exception text,
+    E3 S12b-02), the app keeps running, and the rollback still leaves no
+    folder. The patch moves to the app module's name (Q-b2)."""
 
     def _defect(path, image, kind):
         raise ValueError("forced defect after the emit")
 
-    monkeypatch.setattr(change_service_module, "verify_written_image", _defect)
+    monkeypatch.setattr(app_module, "verify_written_image", _defect)
     src = _copy_case01(tmp_path) / "firmware.s19"
 
     async def _drive() -> tuple:
@@ -814,11 +821,22 @@ def test_tc_b100_17_non_os_error_after_the_emit_rolls_back_then_surfaces(
             _add(app, PATCH_ADDRESS, PATCH_BYTES)
             _apply(app)
             before = _tree_digests(app.workarea)
-            with pytest.raises(ValueError, match="forced defect"):
-                app._handle_save_dialog(_payload(app, "P1"))
-            return before, _tree_digests(app.workarea), app.workarea / "P1"
+            app._handle_save_dialog(_payload(app, "P1"))
+            await settle_workers(pilot)
+            return (
+                before,
+                _tree_digests(app.workarea),
+                app.workarea / "P1",
+                list(app.log_lines),
+                app.is_running,
+            )
 
-    before, after, project = asyncio.run(_drive())
+    before, after, project, lines, running = asyncio.run(_drive())
+    assert lines and lines[-1] == (
+        "Project NOT saved: could not save — an unexpected error stopped the save. "
+        "check the folder."
+    ), lines[-3:]
+    assert running, "the defect ended the app"
     assert not project.exists(), sorted(project.rglob("*"))
     assert after == before
 
@@ -832,8 +850,12 @@ def test_tc_b100_17_failed_manifest_write_adopts_nothing(
     the source bytes at the entry and no summary carries a saved path.
     Adopting before ``project.json`` is on disk would show the operator a
     patched image that no file holds."""
+    # Inc 12b re-pin (P1-69, census C9 / P1-C6): the Save worker writes the
+    # manifest through ``_write_manifest_for_save`` (verify result, reason).
     monkeypatch.setattr(
-        S19TuiApp, "_write_and_verify_manifest", lambda self, *a, **k: False
+        S19TuiApp,
+        "_write_manifest_for_save",
+        lambda self, *a, **k: (None, "forced refusal"),
     )
     seen: dict = {}
 

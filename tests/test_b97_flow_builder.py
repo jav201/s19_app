@@ -453,7 +453,7 @@ def run_builder(tmp_path: Path, size, body, *, project: bool = True):
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=size) as pilot:
             await settle(pilot)
-            project_dir = flow_project(app) if project else None
+            project_dir = await flow_project(app) if project else None
             panel = await open_flow_builder(app, pilot)
             return await body(app, pilot, panel, project_dir)
 

@@ -68,7 +68,7 @@ def test_merge_primary_with_existing_mac_carries_entropy_and_s0(tmp_path: Path) 
     primary = _s19_image(tmp_path)
     assert primary.entropy_windows, "sanity: a non-empty image has entropy windows"
 
-    merged = app._merge_primary_with_existing_mac(primary)
+    merged = app._merge_primary_with_existing_mac(primary, app.current_file)  # Inc 12b P1-C3
 
     assert merged.mac_path == tmp_path / "tags.mac"           # MAC still overlaid
     assert merged.entropy_windows == primary.entropy_windows  # AC-1 (was [])
@@ -82,7 +82,7 @@ def test_merge_mac_with_existing_primary_carries_entropy_and_s0(tmp_path: Path) 
     app.current_file = _s19_image(tmp_path)
     assert app.current_file.entropy_windows
 
-    merged = app._merge_mac_with_existing_primary(_mac_only(tmp_path))
+    merged = app._merge_mac_with_existing_primary(_mac_only(tmp_path), app.current_file)  # Inc 12b P1-C3
 
     assert merged.mac_records                                             # MAC attached
     assert merged.entropy_windows == app.current_file.entropy_windows     # AC-1
@@ -98,7 +98,9 @@ def test_memory_map_renders_when_s19_and_mac_coexist(tmp_path: Path) -> None:
         async with app.run_test() as pilot:
             await pilot.pause()
             app.current_file = _mac_only(tmp_path)
-            app.current_file = app._merge_primary_with_existing_mac(_s19_image(tmp_path))
+            app.current_file = app._merge_primary_with_existing_mac(
+                _s19_image(tmp_path), app.current_file
+            )  # Inc 12b P1-C3
             app.update_memory_map()
             await pilot.pause()
             return app.query_one("#memory_map_panel", MemoryMapPanel).rendered_text

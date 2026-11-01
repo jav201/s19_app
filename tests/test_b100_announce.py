@@ -85,6 +85,7 @@ from tests.test_b100_active_variant import _add_and_apply_through_the_panel
 from tests.test_b100_active_variant import _load_file_through_dialog
 from tests.test_b100_active_variant import _save_back_through_the_prompt
 from tests.test_b100_active_variant import _save_project_through_dialog
+from tests.support.b100_workers import settle_workers
 
 SIZES = [(118, 54), (220, 60)]
 EXCEPTION_NAME = re.compile(r"\b[A-Z][A-Za-z]*(Error|Exception)\b")
@@ -106,6 +107,7 @@ async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> 
 async def _flush(pilot, count: int = 12) -> None:
     for _ in range(count):
         await pilot.pause()
+    await settle_workers(pilot)  # Inc 12b ruling Q6 / A12b-01: wait for the workers' installs
 
 
 def _status_text(app: S19TuiApp) -> str:

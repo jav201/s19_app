@@ -778,7 +778,7 @@ def run_flow_builder(tmp_path: Path, size, body, *, ext: bool = True, wide: bool
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=size) as pilot:
             await settle(pilot)
-            project_dir = flow_project(app)
+            project_dir = await flow_project(app)
             stem = "patch_chain"
             if wide:
                 from tests.b97_fixtures import patch_chain_demo, write_flow
@@ -1173,7 +1173,7 @@ def run_flow_execution(tmp_path: Path, size, body, *, stems=FX_THREE, run: bool 
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=size) as pilot:
             await settle(pilot)
-            project_dir = fx_project(app)
+            project_dir = await fx_project(app)
             names = list(stems)
             if wide:
                 import shutil
@@ -1483,7 +1483,7 @@ assert len(WIDE_SET_NAME) == 40
 async def _at_session(app, pilot, tmp_path: Path, *, run_lanes_too: bool = True) -> None:
     """Load the widest values into all four screens of one running app."""
     await settle(pilot)
-    project_dir = fx_project(app)
+    project_dir = await fx_project(app)
     shutil.copyfile(project_dir / "calib_hotfix.json", project_dir / WIDE_REF)
     blocks = patch_chain_demo()
     blocks[1] = type(blocks[1])(WIDE_REF)

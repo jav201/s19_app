@@ -50,6 +50,7 @@ from s19_app.tui.services.variant_execution_service import (
     PROJECT_MANIFEST_NAME,
     read_project_manifest,
 )
+from tests.support.b100_workers import settle_workers
 
 # Minimal valid S19 image (checksum verified against s19_app.core.S19File).
 S19_A = "S107100001020304DE\nS9030000FC\n"
@@ -60,6 +61,7 @@ async def _flush(pilot, count: int = 12) -> None:
     """Pump the event loop so the deferred apply chain runs."""
     for _ in range(count):
         await pilot.pause()
+    await settle_workers(pilot)  # Inc 12b ruling Q6 / A12b-01: wait for the workers' installs
 
 
 def _notices(app: S19TuiApp) -> list[tuple[str, str]]:

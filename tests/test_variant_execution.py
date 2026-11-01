@@ -61,6 +61,7 @@ from s19_app.tui.services.variant_execution_service import (
 )
 from s19_app.tui.workspace import build_variant_set, validate_project_files
 from s19_app.validation.model import ValidationSeverity
+from tests.support.b100_workers import settle_workers
 
 # Minimal valid S19 images (checksums verified against s19_app.core.S19File).
 S19_A = "S107100001020304DE\nS9030000FC\n"  # 4 bytes at 0x1000
@@ -192,8 +193,7 @@ def test_load_project_honors_manifest_active_variant(tmp_path: Path) -> None:
         async with app.run_test() as pilot:
             await pilot.pause()
             app._handle_load_project("proj")
-            for _ in range(12):
-                await pilot.pause()
+            await settle_workers(pilot)  # Inc 12b Q6: the project install lands from a worker
             return (
                 app._variant_set.active_id,
                 app.current_file.variant_id if app.current_file else None,
@@ -229,8 +229,7 @@ def test_load_project_unknown_active_variant_falls_back(tmp_path: Path) -> None:
         async with app.run_test() as pilot:
             await pilot.pause()
             app._handle_load_project("proj")
-            for _ in range(12):
-                await pilot.pause()
+            await settle_workers(pilot)  # Inc 12b Q6: the project install lands from a worker
             problems = app._last_load_announcement.problems
             # Inc 7 corrective F7: the exact count, never the plural alone
             # (the seed has no ``files``: ``missing: ghost`` and ``no

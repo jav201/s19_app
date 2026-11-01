@@ -1741,7 +1741,10 @@ def test_e4_r2_r11_call_order_of_a_save_as(tmp_path: Path, monkeypatch: pytest.M
     events: list = []
     cls = app_module.S19TuiApp
     original_copy = cls._copy_project_subfolders
-    original_write = cls._write_editor_document
+    # Inc 12b re-pin (E3 S12b-05, P1-82): ``_write_editor_document`` is
+    # retired; the Save worker's document row calls the unchanged
+    # ``write_change_document`` through the app module's name.
+    original_write = app_module.write_change_document
     original_gather = app_module.gather_project_artifacts
     original_manifest = app_module.write_project_manifest
 
@@ -1750,9 +1753,9 @@ def test_e4_r2_r11_call_order_of_a_save_as(tmp_path: Path, monkeypatch: pytest.M
         events.append(f"copy:{part}:{len(copies)}")
         return original_copy(self, source_dir, project_dir, copies, *args, **kwargs)
 
-    def _write(self, *args, **kwargs):
+    def _write(*args, **kwargs):
         events.append("document")
-        return original_write(self, *args, **kwargs)
+        return original_write(*args, **kwargs)
 
     def _gather(*args, **kwargs):
         events.append("gather")
@@ -1763,7 +1766,7 @@ def test_e4_r2_r11_call_order_of_a_save_as(tmp_path: Path, monkeypatch: pytest.M
         return original_manifest(*args, **kwargs)
 
     monkeypatch.setattr(cls, "_copy_project_subfolders", _copy)
-    monkeypatch.setattr(cls, "_write_editor_document", _write)
+    monkeypatch.setattr(app_module, "write_change_document", _write)
     monkeypatch.setattr(app_module, "gather_project_artifacts", _gather)
     monkeypatch.setattr(app_module, "write_project_manifest", _manifest)
 
@@ -2006,21 +2009,24 @@ def test_e4_llr_171_2g_linked_a2l_beside_a_mac_is_never_parsed(
     except OSError as exc:
         pytest.skip(f"not run: a file symbolic link could not be created here ({exc})")
     parsed: list = []
-    cls = app_module.S19TuiApp
-    original_cache = cls._load_a2l_data_with_cache
+    # Inc 12b re-pin (census C8 / P1-C8, E3 DF-7): ``_load_a2l_data_with_cache``
+    # is retired; the project worker reads the A2L through the module-level
+    # ``parse_a2l_cached``, so the cache spy sits there (a spy on a name no
+    # code calls would pass vacuously).
+    original_cache = app_module.parse_a2l_cached
     original_parse = app_module.parse_a2l_file
 
-    def _cache(self, path, *args, **kwargs):
+    def _cache(path, *args, **kwargs):
         if path is not None and Path(path).name == "firmware.a2l":
             parsed.append(("cache", str(path)))
-        return original_cache(self, path, *args, **kwargs)
+        return original_cache(path, *args, **kwargs)
 
     def _parse(path, *args, **kwargs):
         if Path(path).name == "firmware.a2l":
             parsed.append(("parse", str(path)))
         return original_parse(path, *args, **kwargs)
 
-    monkeypatch.setattr(cls, "_load_a2l_data_with_cache", _cache)
+    monkeypatch.setattr(app_module, "parse_a2l_cached", _cache)
     monkeypatch.setattr(app_module, "parse_a2l_file", _parse)
 
     async def _scenario(app, pilot, log):

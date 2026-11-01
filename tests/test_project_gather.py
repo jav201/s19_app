@@ -94,6 +94,7 @@ from s19_app.tui.workspace import (
     ensure_template_lib,
     sanitize_project_name,
 )
+from tests.support.b100_workers import settle_workers
 
 #: Minimal valid S19 image (checksum verified against s19_app.core.S19File) —
 #: the loadable payload of the save flow, copied from
@@ -140,6 +141,7 @@ async def _flush(pilot, count: int = 12) -> None:
     """Pump the event loop so the deferred apply chain runs."""
     for _ in range(count):
         await pilot.pause()
+    await settle_workers(pilot)  # Inc 12b ruling Q6 / A12b-01: wait for the workers' installs
 
 
 def _save_project(app: S19TuiApp, payload) -> None:
