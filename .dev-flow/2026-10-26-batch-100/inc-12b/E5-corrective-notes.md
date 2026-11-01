@@ -90,3 +90,56 @@ CI on main `4dfb5a1` (Linux) failed `tests/test_b100_reuse.py::test_at_b100_01_r
 - Full `tests/test_b100_busy.py`, run once at the end after the targeted runs were green: **109 passed, 2 skipped in 357.52s** (`evidence/inc-12b/green-06-busy-full.txt`). One skip is Windows-only (the name cannot be created). The `WorkerFailed` traces in the transcript are captured output of passing raise arms.
 - No pytest of mine left running. The two pytest processes seen at the end belong to other agents (mut12b and an unrelated repo).
 - `base12bc` still holds my copies of the four test files (`test_b100_save_guards.py`, `test_b100_workers.py`, `test_b100_a2l_progress.py`, `test_b100_reuse.py`). Its source is untouched (`git diff HEAD -- s19_app` is empty).
+
+## Round 2 — mutant survivors (tester, tests only)
+
+Scope: the 30 SURVIVED rows of `evidence/inc-12b/mutation-summary.md` (run on 81ac4c0), re-read against the round-1 code (d4d9c1a; `app.py` sha256[:16] `46f7ee6aa8a0fbfb`, `a2l.py` `73c3820fe0d6ecd2`). No file under `s19_app/` was edited. Mutants were applied only to the scratch copy `scratchpad/mutc12b` (detached at d4d9c1a, the round-2 test files copied in); every record shows `s19_app.__file__` inside that copy and `restored = True` (sha256 equal before and after). Driver: `scratchpad/corr12b-r2/mut_r2.py` (exact old -> new text per row is in each record).
+
+Counts: **killed 22** (20 by a new or strengthened test, 2 by a test that already existed: the run named the wrong killer) / **equivalent 7** / **not killed, blocked by a product defect 1** (046) / **target removed 0**.
+
+| Row | Disposition | Evidence |
+|---|---|---|
+| 002 | equivalent: at most one session-key run exists (each of the 4 session starts calls `_refuse_if_busy` first, and `begin_busy` on the same key replaces); with one candidate, newest == oldest | — |
+| 003 | killed by W `test_tc_b100_53_a_running_file_load_refuses_a_project_load_and_asks_before_quitting` (mutant: the project load ran beside the file load, 0 busy lines) | `mut-r2-003.txt` |
+| 021 | equivalent: the clause only adds a report at `done >= total` whose percent equals the last forwarded one; that report has fraction 1.0 (or 0 for `total <= 0`) and the same step, so `step_busy` paints the same bar; only the round-trip count changes | — |
+| 022 | equivalent: with `total <= 0`, `done >= total` forwards every report whatever `pct` is; `pct` only feeds the de-duplication and `step_busy` uses fraction 0 for `total <= 0` | — |
+| 039 | killed by W `test_tc_b100_53_confirmed_quit_is_withdrawn_when_the_load_fails[project_refused]` | `mut-r2-039.txt` |
+| 042 | killed by W `test_tc_b100_53_a_project_reload_reuses_the_a2l_parse` (2 parses) | `mut-r2-042.txt` |
+| 046 | **not killed — blocked by defect R2-F1**: the only observable difference is under a confirmed quit during a routed load, and there the code itself fails (`NoMatches('#result_body')` from `LoadResultScreen.on_mount` after `end_busy` exits). The mutant fails the same way. Arm on disk as `xfail(strict=True)`: W `test_tc_b100_53_confirmed_quit_during_a_routed_project_load_exits_cleanly`. Outside that path the order of push and end is not observable | `mut-r2-046.txt` (1 xfailed = SURVIVED) |
+| 047 | killed by B `test_tc_b100_50_project_deferred_install_raise_ends_the_run` (0 ends) | `mut-r2-047.txt` |
+| 048 | killed by W `test_tc_b100_53_confirmed_quit_is_withdrawn_when_the_load_fails[project_fails]` | `mut-r2-048.txt` |
+| 050 | killed by `test_tui_app.py::test_a2l_cache_reuses_parse_for_unchanged_file` (new changed-file arm) | `mut-r2-050.txt` |
+| 052 | equivalent: `_a2l_cache_key` / `_a2l_cache_data` are written only together (both `None` at init; `_store_a2l_cache` unpacks one `(key, data)` entry whose data is the parser's dict) | — |
+| 054 | killed by `test_tui_app.py::test_a2l_cache_synchronous_load_stores_its_entry` (2 parses). Note: `load_selected_file` has no caller left in `s19_app/` | `mut-r2-054.txt` |
+| 057 | killed by W `test_tc_b100_53_confirmed_quit_is_withdrawn_when_the_load_fails[file_load_fails]` | `mut-r2-057.txt` |
+| 060 | equivalent: the worker only serializes the snapshot (`write_change_document` → `serialize_change_document`, no write to the document); it could differ from the live document only through a main-thread editor, and every document writer is refused while `save_project` runs (rows 004, 005, 104 killed) | — |
+| 065 | killed by W `test_tc_b100_53_save_reports_the_change_document_as_one_placed_file[file_backed]` (`[(1, 2)]` vs `[(1, 1)]`) | `mut-r2-065.txt` |
+| 067 | killed by W `test_tc_b100_53_save_reports_the_change_document_as_one_placed_file[pasted]` (last forward `(3, 4)`) | `mut-r2-067.txt` |
+| 071 | killed by `test_b100_save_image.py::test_tc_b100_17_emit_that_reports_no_placement_is_refused` (generic unexpected-error line) | `mut-r2-071.txt` |
+| 072 | killed by an existing test, `test_b100_project_homes.py::test_tc_b100_31_gather_takes_names_from_the_recorded_batch_and_assignments` (the run named the wrong killer) | `mut-r2-072.txt` |
+| 079 | killed by B `test_tc_b100_51_save_failure_paints_its_lines_then_its_outcome` (note painted before the error) | `mut-r2-079.txt` |
+| 082 | killed by `test_b100_save_image.py::test_tc_b100_58_save_project_surfaces_the_emit_verify` (no `Saved + verified` line) | `mut-r2-082.txt` |
+| 084 | equivalent: in the raise arm the `save_project` run is either this handler's own (same `gen`) or gone; nothing in `_on_project_saved` begins a run, and a second Save begin is refused while one runs | — |
+| 087 | killed by B `test_tc_b100_51_raise_after_a_multi_line_tail_paints_the_saved_line_once` (saved line painted twice) | `mut-r2-087.txt` |
+| 090 | killed by W `test_tc_b100_53_in_place_a2l_pick_starts_at_the_parse_step` (`step 1/3 Copy into the work area`) | `mut-r2-090.txt` |
+| 091 | killed by B `test_tc_b100_50_twelve_b_kickoff_raise_ends_the_run_first[a2l_load]` (new arm, 0 ends) | `mut-r2-091.txt` |
+| 093 | killed by W `test_tc_b100_54_a2l_worker_failure_keeps_the_session[containment]` (strengthened: the log file holds no ERROR record, per C12b-39) | `mut-r2-093.txt` |
+| 099 | refuted (round 1 said equivalent): an extra `refresh_files` rebuilds `#files_list` and drops its cursor (index `None`). Killed by W `test_tc_b100_54_failed_in_place_a2l_pick_keeps_the_files_list_cursor` | `mut-r2-099.txt` |
+| 103 | equivalent: `_load_would_lose` only reads state (it writes nothing); the refusal still comes before any question or `go()`, so the user sees the same busy line and nothing else | — |
+| 107 | killed by B `test_tc_b100_53_path_refused_between_the_two_looks_keeps_the_app` (`PermissionError` leaves the request) | `mut-r2-107.txt` |
+| 110 | refuted (round 1 said equivalent): killed by P `test_tc_b100_73_case06_reports_bytes_and_parses_the_same` (strengthened: first report `0 < done < size`) | `mut-r2-110.txt` |
+| 113 | re-checked on the round-1 line `a2l.py:194`: killed by the round-1 test P `test_tc_b100_73_no_fstat_without_a_callback` (`DID NOT RAISE`). On a regular file the size is the same; the kill comes from that test pinning `fstat` as the size source | `mut-r2-113.txt` |
+
+GREEN: `evidence/inc-12b/green-07-mutant-arms.txt` — every new or changed node (the changed functions with all their parameters) plus the 072 killer, in the worktree (`s19_app.__file__` = the worktree): **26 passed, 1 xfailed in 86.57s** (the xfail is R2-F1).
+
+Findings for `software-dev` (production code, not fixed here):
+- **R2-F1** (defect): `q`, `y` during a routed project load (`_handle_load_project(name, routed=True)`, the Load dialog route) → the install pushes `LoadResultScreen` and then `end_busy` exits. The screen's `on_mount` then raises `NoMatches('#result_body')` and the app ends with that exception instead of a clean exit. Reproduction: the xfail test above.
+- **R2-F2** (observation, low): in the committed arm of `_on_project_saved`, a raise after `for line in tail[:-1]` ends the run with `""` when `saved_painted`. So the last tail line (here the `Change document … entries stay in the Patch Editor` line) is never painted. This happens only on a handler defect. Seen while writing the 087 arm.
+
+## Round 2 follow-up — R2-F1 fixed (orchestrator, Opus, 2026-11-01)
+- R2-F1: `_install_prepared_project` (app.py, routed arm) pushes `LoadResultScreen` only when no quit is confirmed (`if request.routed and not self._quit_pending:`); a confirmed quit exits in the `end_busy` that follows, so no panel mounts over a closing app. Sessions never overlap, so `end_busy` here is always the effective end.
+- Test: the `xfail(strict=True)` mark on `test_tc_b100_53_confirmed_quit_during_a_routed_project_load_exits_cleanly` is removed (its RED is the strict xfail in green-07 on d4d9c1a's code); docstring notes the fix.
+- GREEN: evidence/inc-12b/green-08-r2f1.txt — the R2-F1 arm, the two load-result-panel arms, quit_boundaries and confirmed_quit_waits_for_the_end[*]: 8 passed.
+- Mutant 046 (end_busy before the push): under the fix it is equivalent — with a confirmed quit the push is skipped either way; without one, the panel opens either way and no requirement orders the end line against the panel. Final round-2 tally: 22 killed, 8 equivalent (002 021 022 052 060 084 103 046), 0 open.
+- R2-F2 (a raise after the tail's leading lines leaves the last tail line unpainted; reachable only through a handler defect): BACKLOG-CODE at close.
+- Source: app.py sha256[:16] after this fix is recorded at close.

@@ -420,7 +420,12 @@ def test_a2l_cache_reuses_parse_for_unchanged_file(tmp_path: Path, monkeypatch: 
     is retired; the cache is the pure module function ``parse_a2l_cached``.
     The second call on the unchanged file, given the first entry, reuses it:
     1 parse, equal results. The fake keeps ONE parameter, so a cache path that
-    always passes ``progress=`` fails here (Q-f2)."""
+    always passes ``progress=`` fails here (Q-f2). E5 round 2 (mutant 050,
+    LLR-177.1d "parse once per UNCHANGED file"): the file then changes (new
+    content, new size) → the call given the old entry parses again (2
+    parses) and returns the new file's payload, not the stale entry.
+    Negative control: a key check that always hits → 1 parse and the stale
+    payload → RED."""
     import s19_app.tui.app as app_module
 
     a2l_path = tmp_path / "firmware.a2l"
@@ -438,6 +443,59 @@ def test_a2l_cache_reuses_parse_for_unchanged_file(tmp_path: Path, monkeypatch: 
 
     assert calls["count"] == 1
     assert first == second
+
+    a2l_path.write_text("/begin PROJECT Changed\n/begin MODULE M\n/end MODULE\n/end PROJECT\n", encoding="utf-8")
+    third = app_module.parse_a2l_cached(a2l_path, first)
+    assert calls["count"] == 2, "a changed A2L was served from the cache"
+    assert third is not first and third[0] != first[0], (first[0], third[0])
+    assert third[0][2] == a2l_path.stat().st_size, third[0]
+
+
+def test_a2l_cache_synchronous_load_stores_its_entry(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    """E5 round 2 (mutant 054), LLR-177.1d / S-h (the one main-thread cache
+    writer): two synchronous loads of the same image with the same,
+    unchanged A2L through ``load_selected_file`` → the A2L is parsed once;
+    the second load reuses the entry the first one stored, and both leave
+    the A2L attached.
+
+    Why: ``load_selected_file`` is the synchronous pipeline the app's tests
+    drive; a parse that is never stored is paid again on every load.
+    Negative control: the store after the parse removed → 2 parses → RED.
+    Note: no ``s19_app/`` caller of ``load_selected_file`` is left after
+    Inc 12b (the work-area pick and the project MAC moved to workers)."""
+    import asyncio
+
+    import s19_app.tui.app as app_module
+
+    examples = Path(__file__).resolve().parents[1] / "examples" / "case_01_basic_valid"
+    s19 = tmp_path / "firmware.s19"
+    a2l = tmp_path / "firmware.a2l"
+    s19.write_bytes((examples / "firmware.s19").read_bytes())
+    a2l.write_bytes((examples / "firmware.a2l").read_bytes())
+    real = app_module.parse_a2l_file
+    calls = {"count": 0}
+
+    def counting_parse(path, *args, **kwargs):
+        calls["count"] += 1
+        return real(path, *args, **kwargs)
+
+    monkeypatch.setattr(app_module, "parse_a2l_file", counting_parse)
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path / "app")
+        async with app.run_test(size=(160, 50)) as pilot:
+            await pilot.pause()
+            app.load_selected_file(s19, [a2l])
+            first = (calls["count"], app.current_file is not None and app.current_file.a2l_path)
+            app.load_selected_file(s19, [a2l])
+            await pilot.pause()
+            second = (calls["count"], app.current_file is not None and app.current_file.a2l_path)
+        return first, second
+
+    first, second = asyncio.run(_drive())
+    assert first[0] == 1 and first[1], first
+    assert second[0] == 1, f"the unchanged A2L was parsed {second[0]} times over two loads"
+    assert second[1] == first[1], (first, second)
 
 
 def test_window_bounds_and_shift_logic(tmp_path: Path):

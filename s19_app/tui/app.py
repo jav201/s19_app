@@ -13706,7 +13706,9 @@ class S19TuiApp(App):
             )
             self.update_project_labels()
             self._publish_flow_session_dir()
-            if request.routed:
+            # R2-F1: a confirmed quit exits in ``end_busy`` below; a result
+            # screen pushed now would mount over a closing app.
+            if request.routed and not self._quit_pending:
                 self.push_screen(LoadResultScreen(announcement), self._handle_load_result)
             self.end_busy(
                 "project_load",

@@ -1,0 +1,28 @@
+mutant id: 003 (E5 round 2)
+target file: s19_app/tui/app.py
+description: SESSION_ACTION_KEYS: drop "file_load"
+old -> new: '{"file_load", "a2l_load", "project_load", "save_project"}' -> '{"a2l_load", "project_load", "save_project"}'
+sha256 before: 46f7ee6aa8a0fbfbc6571b095bbf7d4c4661de5bd3f1ecf96e9b1347c424210d
+command: timeout 900 env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\lad C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=short --basetemp=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\bt\mut-003 "tests/test_b100_workers.py::test_tc_b100_53_a_running_file_load_refuses_a_project_load_and_asks_before_quitting"
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mutc12b
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mutc12b\s19_app\__init__.py
+pytest summary: 1 failed in 3.21s
+elapsed: 4.2s
+verdict: KILLED
+sha256 after: 46f7ee6aa8a0fbfbc6571b095bbf7d4c4661de5bd3f1ecf96e9b1347c424210d
+restored = True
+
+----- pytest output -----
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ test_tc_b100_53_a_running_file_load_refuses_a_project_load_and_asks_before_quitting _
+tests\test_b100_workers.py:3384: in test_tc_b100_53_a_running_file_load_refuses_a_project_load_and_asks_before_quitting
+    assert refused == (1, ["file_load"], None), refused
+E   AssertionError: (0, ['file_load'], 'P')
+E   assert (0, ['file_load'], 'P') == (1, ['file_load'], None)
+E     
+E     At index 0 diff: 0 != 1
+E     Use -v to get more diff
+=========================== short test summary info ===========================
+FAILED tests/test_b100_workers.py::test_tc_b100_53_a_running_file_load_refuses_a_project_load_and_asks_before_quitting
+1 failed in 3.21s

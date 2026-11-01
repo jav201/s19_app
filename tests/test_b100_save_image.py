@@ -2655,3 +2655,73 @@ def test_tc_b100_59_plan_cap_refusal_names_the_file(
     else:
         assert plan.refusal is None, plan.refusal
         assert {f.name: f.file_count for f in plan.folders} == {"splits": 1}
+
+
+# ---------------------------------------------------------------------------
+# E5 round 2 — mutant survivors (Inc 12b corrective pass, tests only)
+# ---------------------------------------------------------------------------
+
+
+def test_tc_b100_17_emit_that_reports_no_placement_is_refused(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """TC-B100-17 (LED .53, the emit must land through the placement claim;
+    mutant 071): the emit returns a path but never reports its placement
+    (the real ``save_patched_image`` called without ``on_placed``) → the
+    save is refused with ``Project NOT saved: could not save — the patched
+    image was not written: Patched image saved as firmware.s19…`` as the
+    last line, never the generic ``an unexpected error stopped the save``,
+    and no ``project.json`` is written.
+
+    Why: a landed file the save cannot account for cannot be rolled back
+    or recorded; the refusal must name the image as the thing not written.
+    Negative control: the check reads only ``path is None`` → the missing
+    placement record reaches ``landed[0]`` → the generic unexpected-error
+    line → RED."""
+    real_emit = app_module.save_patched_image
+
+    def _emit_unreported(*args, **kwargs):
+        kwargs.pop("on_placed", None)
+        return real_emit(*args, **kwargs)
+
+    monkeypatch.setattr(app_module, "save_patched_image", _emit_unreported)
+
+    async def scenario(app, pilot) -> None:
+        _add(app, PATCH_ADDRESS, PATCH_BYTES)
+        _apply(app)
+
+    statuses: list = []
+    _lines, project, _ = _save_session(tmp_path, scenario, statuses=statuses)
+    refused = [m for m in statuses if m.startswith("Project NOT saved")]
+    assert refused and refused[-1].startswith(
+        "Project NOT saved: could not save — the patched image was not written: "
+        "Patched image saved as firmware.s19"
+    ), statuses
+    assert not any("an unexpected error stopped the save" in m for m in statuses), statuses
+    assert not (project / "project.json").exists()
+
+
+def test_tc_b100_58_save_project_surfaces_the_emit_verify(tmp_path: Path) -> None:
+    """LLR-167.4 / HLR-004 (verify-on-save), interfaces S-b ("the handler
+    … when committed and emitting, ``adopt_rederived`` and
+    ``_surface_verify_result``"; mutant 082): a patched image saved as
+    ``P1`` → the status log holds ``Saved + verified: firmware.s19`` (the
+    emitted image re-read and found equal to the derived image) before the
+    ``Saved project to …P1…`` line.
+
+    Why: the verify is the engineer's proof that the image on disk is the
+    image the editor derived; a Save project that emits without surfacing
+    it says nothing about the written bytes. Negative control: the
+    emit's verify result not handed to the save summary → no ``Saved +
+    verified`` line → RED."""
+
+    async def scenario(app, pilot) -> None:
+        _add(app, PATCH_ADDRESS, PATCH_BYTES)
+        _apply(app)
+
+    statuses: list = []
+    _lines, project, _ = _save_session(tmp_path, scenario, statuses=statuses)
+    verified = [i for i, m in enumerate(statuses) if m.startswith("Saved + verified: firmware.s19")]
+    saved = [i for i, m in enumerate(statuses) if m.startswith("Saved project to")]
+    assert (project / "project.json").is_file(), statuses
+    assert verified and saved and verified[-1] < saved[-1], statuses

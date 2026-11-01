@@ -1,0 +1,28 @@
+mutant id: 065 (E5 round 2)
+target file: s19_app/tui/app.py
+description: _save_project_files: file-backed document row counted in total (remove the skip)
+old -> new: '            if row.role == PLAN_ROLE_DOCUMENT and row.source is not None:\n                continue\n            total += 1' -> '            total += 1'
+sha256 before: 46f7ee6aa8a0fbfbc6571b095bbf7d4c4661de5bd3f1ecf96e9b1347c424210d
+command: timeout 900 env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\lad C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=short --basetemp=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\bt\mut-065 "tests/test_b100_workers.py::test_tc_b100_53_save_reports_the_change_document_as_one_placed_file[file_backed]"
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mutc12b
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mutc12b\s19_app\__init__.py
+pytest summary: 1 failed in 4.05s
+elapsed: 5.1s
+verdict: KILLED
+sha256 after: 46f7ee6aa8a0fbfbc6571b095bbf7d4c4661de5bd3f1ecf96e9b1347c424210d
+restored = True
+
+----- pytest output -----
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ test_tc_b100_53_save_reports_the_change_document_as_one_placed_file[file_backed] _
+tests\test_b100_workers.py:3553: in test_tc_b100_53_save_reports_the_change_document_as_one_placed_file
+    assert progress.forwards("save_project", 2) == [(i, n) for i in range(1, n + 1)], (
+E   AssertionError: ([(1, 2)], ['firmware.s19'])
+E   assert [(1, 2)] == [(1, 1)]
+E     
+E     At index 0 diff: (1, 2) != (1, 1)
+E     Use -v to get more diff
+=========================== short test summary info ===========================
+FAILED tests/test_b100_workers.py::test_tc_b100_53_save_reports_the_change_document_as_one_placed_file[file_backed]
+1 failed in 4.05s

@@ -75,7 +75,9 @@ def test_tc_b100_73_case06_reports_bytes_and_parses_the_same(tmp_path: Path) -> 
     """LLR-176.4, LLR-176.4a (D12b-01, D12b-04): the case_06 A2L (37 742 888
     bytes, 1 039 926 lines) parsed with a recording callback → at least 2
     calls, every ``total`` equal to the file size, the consumed values
-    non-decreasing, the last report ``(size, size)``, and no more reports
+    non-decreasing, the first report strictly inside the file
+    (``0 < done < size``: it counts what the read has consumed, not the
+    size), the last report ``(size, size)``, and no more reports
     than one per 4 096 lines plus the final one (ruling Q-f1); the result
     equals the result of the same parse with no callback (tag count and
     every parsed field).
@@ -85,7 +87,8 @@ def test_tc_b100_73_case06_reports_bytes_and_parses_the_same(tmp_path: Path) -> 
     Negative control (code read, base): ``parse_a2l_file(path)`` takes no
     callback → RED; a mutant that reports only once at the end → 1 call →
     RED; a mutant that adds a field when a callback is given → unequal →
-    RED."""
+    RED; E5 round 2 (mutant 110): a mutant that reports the size as the
+    consumed bytes → the first report reads ``(size, size)`` → RED."""
     size = CASE06_A2L.stat().st_size
     seen, progress = _recorder()
     with_cb = _parse_with(CASE06_A2L, progress)
@@ -94,6 +97,7 @@ def test_tc_b100_73_case06_reports_bytes_and_parses_the_same(tmp_path: Path) -> 
     assert all(total == size for _done, total in seen), {t for _d, t in seen}
     dones = [d for d, _t in seen]
     assert dones == sorted(dones), "consumed bytes went down"
+    assert 0 < seen[0][0] < size, seen[0]
     assert seen[-1] == (size, size), seen[-1]
     lines = sum(1 for _ in CASE06_A2L.open("rb"))
     assert len(seen) <= lines // 4096 + 1, (len(seen), lines)

@@ -116,3 +116,30 @@ All by reading unless marked as a probe or a census.
 - [✓] Reuse and duplication checked: one cache seam, one failure builder, the retired helpers have no callers.
 - [✗] Tests reviewed for intent: sampled only. Gap found: no arm pins the pasted-document home rollback (CR12b-1).
 - [✓] Verdict explicit: FAIL, BLOCK-UNTIL CR12b-1 (applied and verified on the diff).
+
+## Re-review (c026bd2)
+
+**Final verdict: PASS-WITH-NOTES.** BLOCK-UNTIL CR12b-1 is discharged: I re-read the fix on the diff. The corrective hunks bring in no new defect that blocks. One new NIT (CR12b-5) does not block.
+
+Scope: `git diff 81ac4c0..c026bd2 -- s19_app tests`. HEAD is `c026bd2` and `s19_app/` matches it, so the working tree is clean there. Source: `app.py` +40/-2 and `a2l.py` 1 line. Tests: the new regression arms in `test_b100_save_guards.py`, `test_b100_workers.py` and `test_b100_a2l_progress.py`. Evidence read: `red-03-corrective.txt`, `green-03-corrective.txt`, and `E5-rulings.md`. I did not re-run anything, because a mutation run is still on the host.
+
+| Id | Status | Re-read |
+|---|---|---|
+| CR12b-1 | **closed (`approved`)** | `app.py:11664`–`:11668`: `created_dirs.append(created_home)` now sits before `write_change_document`, and the append after the success was removed. The rollback removes folders only while they are empty, so recording the home early is harmless on success. P1-66 is unchanged, with no new `except OSError`. The regression arm `test_tc_b100_07_pasted_document_home_created_then_write_fails_no_folder_left[no-space, placement-refused]` is my probe's shape. It has a vacuity check (the home was made, under `freshd`), the status is checked, `folders == ['patches', 'temp']`, and the pasted entry stays in the Patch Editor. It is RED on the base copy (`red-03`: `['freshd', 'patches', 'temp']`, `s19_app.__file__` = the base copy) and GREEN on `c026bd2` (`green-03`: 2 passed). The `no-space` arm raises a bare `OSError(28)`, which reaches the `except OSError` in `write_change_document`, so both failure classes are covered. |
+| CR12b-2 | closed | `load_a2l_from_path`: `validate_project_files` is in `try/except OSError`, with the existing `unreadable` tokens and the project name passed through `painted_names` and `safe_text`. `normalized.stat()` is in `try/except OSError` → `A2L file not found: <typed>`. It never falls back to a size of 0, so the size rule cannot be bypassed. Both refusals come before the begin, so no run is open and no end is owed. Arms `test_tc_b100_54_…vanished[project_folder, a2l_size]` are RED, then GREEN. |
+| CR12b-3 | closed | The regions are captured only when `_running_session_action() is None`. The report is still generated with `message.declared_regions`, so the report itself keeps the regions the user typed and only the session field is protected. Arm `…report_generate_keeps_the_regions_of_a_running_save` is GREEN. |
+| CR12b-4 | closed | `total = … if progress is not None else 0`. Without a callback, `total` is never read. Arm `test_tc_b100_73_no_fstat_without_a_callback` (fstat patched to raise) is RED, then GREEN. |
+| SE5-12b-1 (security review) | applied; one NIT below | `_on_project_saved` sets `_quit_pending = False` before the final `end_busy` when `outcome.document_lines` is not empty or the "has unsaved edits" line was added. The placement is correct: the withdrawal comes before the end, whose quit check then reads it. The CR12a-1 `except` arm does not withdraw, and that path re-raises loudly anyway. Arms for scenario A and scenario B are GREEN. |
+
+### New finding
+
+| Id | Sev | Tag | Where | Defect | Evidence | Fix |
+|---|---|---|---|---|---|---|
+| CR12b-5 | NIT | design-gap | `app.py:12244`–`:12246` (`unsaved_work_left = bool(outcome.document_lines)`); `E5-rulings.md` SE5-12b-1 | **The trigger is wider than the ruling's "in-memory work unsaved".** `document_lines` also carries lines about records on disk, where no in-memory work is lost: `prepared.carried_document_line` (a damaged recorded document dropped from the manifest, or an `io_error` record that "stays recorded", built at `app.py:11025`–`:11041`), the kept-manifest "record … was dropped … kept as …" line, and `_unrecorded_document_lines` for a file-backed document that is already on disk. Scenario: the user confirms the quit during a merge Save into a project whose recorded document is damaged. The Save succeeds and its only document line is the drop note, yet the app stays open and the user has to quit again. Nothing is lost; the cost is one extra keypress. | By reading | Leave it as a conservative choice and record it at close. Or narrow the trigger: set the flag only where a memory-held entry was not written (`document_write_failure`, the "link or outside the work area" line, and the "has unsaved edits" line), for example by having the worker report a `memory_work_unsaved: bool` fact in `SaveOutcome`. |
+
+### Re-review evidence checklist
+
+- [✓] Corrective diff read in full for the source (`app.py` 6 hunks, `a2l.py` 1 hunk).
+- [✓] CR12b-1 fix applied, and verified on the diff and by its RED → GREEN arm.
+- [✓] No new HIGH or MAJOR in the corrective hunks.
+- [✓] Verdict explicit: PASS-WITH-NOTES. Open notes: CR12b-5 (NIT); SR12b-6 is residual risk, as ruled.

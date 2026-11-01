@@ -1,0 +1,28 @@
+mutant id: 099 (E5 round 2)
+target file: s19_app/tui/app.py
+description: _on_a2l_attach_failed: if request.copy refresh_files -> always
+old -> new: '        if request.copy:\n            self.refresh_files()\n        self._quit_pending = False' -> '        if True:\n            self.refresh_files()\n        self._quit_pending = False'
+sha256 before: 46f7ee6aa8a0fbfbc6571b095bbf7d4c4661de5bd3f1ecf96e9b1347c424210d
+command: timeout 900 env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\lad C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=short --basetemp=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\bt\mut-099 "tests/test_b100_workers.py::test_tc_b100_54_failed_in_place_a2l_pick_keeps_the_files_list_cursor"
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mutc12b
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mutc12b\s19_app\__init__.py
+pytest summary: 1 failed in 3.24s
+elapsed: 4.1s
+verdict: KILLED
+sha256 after: 46f7ee6aa8a0fbfbc6571b095bbf7d4c4661de5bd3f1ecf96e9b1347c424210d
+restored = True
+
+----- pytest output -----
+F                                                                        [100%]
+================================== FAILURES ===================================
+____ test_tc_b100_54_failed_in_place_a2l_pick_keeps_the_files_list_cursor _____
+tests\test_b100_workers.py:3699: in test_tc_b100_54_failed_in_place_a2l_pick_keeps_the_files_list_cursor
+    assert after == before, (before, after)
+E   AssertionError: ((['a.s19', 'firmware.a2l'], 1, 'firmware.a2l'), (['a.s19', 'firmware.a2l'], None, None))
+E   assert (['a.s19', 'f...], None, None) == (['a.s19', 'f...firmware.a2l')
+E     
+E     At index 1 diff: None != 1
+E     Use -v to get more diff
+=========================== short test summary info ===========================
+FAILED tests/test_b100_workers.py::test_tc_b100_54_failed_in_place_a2l_pick_keeps_the_files_list_cursor
+1 failed in 3.24s

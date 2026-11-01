@@ -1,0 +1,25 @@
+mutant id: 054 (E5 round 2)
+target file: s19_app/tui/app.py
+description: load_selected_file: remove 'if out: _store_a2l_cache(out[0])'
+old -> new: '        if out:\n            self._store_a2l_cache(out[0])\n        self._apply_loaded_file(loaded, path, load_started)' -> '        self._apply_loaded_file(loaded, path, load_started)'
+sha256 before: 46f7ee6aa8a0fbfbc6571b095bbf7d4c4661de5bd3f1ecf96e9b1347c424210d
+command: timeout 900 env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\lad C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=short --basetemp=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\bt\mut-054 "tests/test_tui_app.py::test_a2l_cache_synchronous_load_stores_its_entry"
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mutc12b
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mutc12b\s19_app\__init__.py
+pytest summary: 1 failed in 2.42s
+elapsed: 3.3s
+verdict: KILLED
+sha256 after: 46f7ee6aa8a0fbfbc6571b095bbf7d4c4661de5bd3f1ecf96e9b1347c424210d
+restored = True
+
+----- pytest output -----
+F                                                                        [100%]
+================================== FAILURES ===================================
+______________ test_a2l_cache_synchronous_load_stores_its_entry _______________
+tests\test_tui_app.py:497: in test_a2l_cache_synchronous_load_stores_its_entry
+    assert second[0] == 1, f"the unchanged A2L was parsed {second[0]} times over two loads"
+E   AssertionError: the unchanged A2L was parsed 2 times over two loads
+E   assert 2 == 1
+=========================== short test summary info ===========================
+FAILED tests/test_tui_app.py::test_a2l_cache_synchronous_load_stores_its_entry
+1 failed in 2.42s

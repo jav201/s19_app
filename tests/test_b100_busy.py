@@ -2326,16 +2326,18 @@ def _trio_project(base: Path, name: str = "P") -> Path:
     return _copy_case01(_workarea(base) / name, "firmware.s19", "firmware.mac", "firmware.a2l")
 
 
-@pytest.mark.parametrize("action", ["project_load", "save_project"])
+@pytest.mark.parametrize("action", ["project_load", "save_project", "a2l_load"])
 def test_tc_b100_50_twelve_b_kickoff_raise_ends_the_run_first(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, action: str
 ) -> None:
     """LLR-176.1l over the 12b kickoffs (P1-13, P1-57): the worker start
     raising ``RuntimeError`` at call time (``_project_load_worker`` /
-    ``_save_project_worker``) → one effective end ``Loading project P
-    failed`` / ``Saving project S3 failed`` with 0 timers left, then the
-    ``RuntimeError`` leaves the request; the run state is empty; ``S3`` was
-    never created.
+    ``_save_project_worker`` / ``_a2l_attach_worker``) → one effective end
+    ``Loading project P failed`` / ``Saving project S3 failed`` / ``Loading
+    firmware.a2l failed`` with 0 timers left, then the ``RuntimeError``
+    leaves the request; the run state is empty; ``S3`` was never created.
+    (E5 round 2: the ``a2l_load`` arm, proto-12b-a2l-refusal (5), kills
+    mutant 091.)
 
     Why: the run now outlives the kickoff function, so 12a's ``finally``
     becomes an ``except BaseException`` guard (S-d); a kickoff that raises
@@ -2347,7 +2349,8 @@ def test_tc_b100_50_twelve_b_kickoff_raise_ends_the_run_first(
     base = tmp_path / "app"
     _trio_project(base)
     seam = Seam(monkeypatch)
-    worker = "_project_load_worker" if action == "project_load" else "_save_project_worker"
+    worker = {"project_load": "_project_load_worker", "save_project": "_save_project_worker",
+              "a2l_load": "_a2l_attach_worker"}[action]
     monkeypatch.setattr(S19TuiApp, worker, _boom, raising=False)
 
     async def scenario(app, pilot, log):
@@ -2357,6 +2360,8 @@ def test_tc_b100_50_twelve_b_kickoff_raise_ends_the_run_first(
         try:
             if action == "project_load":
                 app._handle_load_project("P")
+            elif action == "a2l_load":
+                app.load_a2l_from_path(CASE01 / "firmware.a2l")
             else:
                 app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name="S3"))
         except RuntimeError as exc:
@@ -2365,7 +2370,8 @@ def test_tc_b100_50_twelve_b_kickoff_raise_ends_the_run_first(
         return raised, dict(app._busy.runs), (app.workarea / "S3").exists()
 
     raised, runs, s3 = _run(base, scenario)
-    outcome = "Loading project P failed" if action == "project_load" else "Saving project S3 failed"
+    outcome = {"project_load": "Loading project P failed", "save_project": "Saving project S3 failed",
+               "a2l_load": "Loading firmware.a2l failed"}[action]
     ends = seam.effective(action)
     assert [e.outcome for e in ends] == [outcome], seam.ends
     assert ends[0].timers == 0, ends[0].timers
@@ -3110,3 +3116,213 @@ def test_tc_b100_50_progress_bar_paints_no_eta(tmp_path: Path) -> None:
     assert not any(clock.search(row) for row in idle[1] + during[1]), (idle[1], during[1])
     assert any("50%" in row for row in during[1]), during[1]
     assert re.search(r"step 2/2 b  ·  \d{2}:\d{2}$", during[2]), during[2]
+
+
+# ===========================================================================
+# E5 round 2 — mutant survivors (Inc 12b corrective pass, tests only).
+# ===========================================================================
+
+
+def test_tc_b100_50_project_deferred_install_raise_ends_the_run(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-176.1l, interfaces S-g / S-d (the deferred project install,
+    mutant 047): ``compose_load_announcement`` (called only inside the
+    install) raising during a load of project ``P`` → nothing leaves the
+    request (the install runs later, from ``call_after_refresh``), one
+    effective end ``Loading project P failed`` with 0 timers left, then the
+    exception surfaces.
+
+    Why: the deferred install is outside the worker's ``call_from_thread``
+    guard; without its own guard a defect there leaves the spinner running
+    and every later session action refused as busy. Negative control: the
+    install's guard removed → 0 effective ends, the run and its timer
+    left → RED."""
+    seam = Seam(monkeypatch)
+    _trio_project(tmp_path / "app")
+    monkeypatch.setattr(app_module, "compose_load_announcement", _boom)
+    in_frame: list = []
+
+    async def start(app, pilot):
+        try:
+            app._handle_load_project("P")
+        except RuntimeError as exc:
+            in_frame.append(str(exc))
+
+    surfaced = _worker_raise_scene(tmp_path, seam, start, "project_load")
+    assert in_frame == [], f"the install ran in the request frame: {in_frame}"
+    ends = seam.effective("project_load")
+    assert [e.outcome for e in ends] == ["Loading project P failed"], seam.ends
+    assert ends[0].timers == 0, ends[0].timers
+    assert surfaced is not None, "the install's exception was swallowed"
+
+
+def test_tc_b100_51_save_failure_paints_its_lines_then_its_outcome(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-176.2c, E3 S12b-03 / DF-6 ("``lines[-1]`` is the outcome, the
+    rest are the lines before it"; mutant 079): a Save whose worker aborts
+    on a validation error and whose rollback leaves one note → the lines the
+    save adds read, in order, ``synthetic validation error`` then
+    ``synthetic rollback note``; the note — the outcome — is the last line
+    and the one effective end; no ``… failed`` line.
+
+    Why: the rollback note is what the engineer must act on, and it reads
+    as a consequence of the failure only when it follows it. Negative
+    control: the failure end painted before the lines → the note comes
+    first and the validation error last → RED."""
+    from s19_app.tui.screens import SaveProjectPayload
+
+    seam = Seam(monkeypatch)
+    real_validate = app_module.validate_project_files
+    real_abort = S19TuiApp._abort_save
+
+    def _validate(folder, *args, **kwargs):
+        if sys._getframe(1).f_code.co_name == "_save_project_files":
+            return [], [], "synthetic validation error"
+        return real_validate(folder, *args, **kwargs)
+
+    def _abort(app, *args, **kwargs):
+        return [*real_abort(app, *args, **kwargs), "synthetic rollback note"]
+
+    monkeypatch.setattr(app_module, "validate_project_files", _validate)
+    monkeypatch.setattr(S19TuiApp, "_abort_save", _abort)
+
+    async def scenario(app, pilot, log):
+        await _load_case01_image(app, pilot)
+        mark = len(log.messages)
+        app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name="S5"))
+        await _drain(app, pilot)
+        return log.since(mark), len(_busy_timers(app)), (app.workarea / "S5").exists()
+
+    added, timers, s5 = _run(tmp_path / "app", scenario)
+    assert added[-2:] == ["synthetic validation error", "synthetic rollback note"], added
+    assert [e.outcome for e in seam.effective("save_project")] == ["synthetic rollback note"], seam.ends
+    assert not [m for m in added if m.endswith(" failed")], added
+    assert (timers, s5) == (0, False), (timers, s5)
+
+
+def test_tc_b100_51_raise_after_a_multi_line_tail_paints_the_saved_line_once(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """CR12a-1 (S12b-03), the multi-line tail (mutant 087): project ``P``
+    (case_01's trio) open with one pasted, applied entry, saved as ``S3``,
+    commits while its pasted document cannot be placed (``OSError(28)``
+    into ``S3/patches``), so the tail has two lines —
+    ``Saved project to …S3…`` then the change-document line; a main-thread
+    raise after the tail's leading lines are painted
+    (``update_project_labels`` forced to raise) → ``Saved project to
+    …S3…`` appears exactly once in the status log, ``Saving project S3
+    failed`` never, the manifest stays on disk, and the exception surfaces
+    (Q-d1 loud). (Precondition: the stand-in refused the placement into
+    ``S3/patches``, so the document line made the tail two lines long.)
+
+    Why: the saved line already painted must not be painted again by the
+    raise arm — a doubled "Saved project" line reads as two saves.
+    Negative control: the raise arm ignores that the tail was painted → the
+    saved line is painted a second time → 2 → RED."""
+    from s19_app.tui.screens import SaveProjectPayload
+
+    base = tmp_path / "app"
+    _trio_project(base)
+    seam = Seam(monkeypatch)
+    real_place = app_module.place_into_workarea
+
+    blocked: list = []
+
+    def _patches_full(source, destination, *args, **kwargs):
+        if Path(destination).name == "patches":
+            blocked.append(str(destination))
+            raise OSError(28, "synthetic no space")
+        return real_place(source, destination, *args, **kwargs)
+
+    captured: dict = {}
+
+    async def scenario(app, pilot, log):
+        app._handle_load_project("P")
+        await _wait(pilot, lambda: app.current_project == "P" and not app._busy.runs, "the load of P")
+        cur = app.current_file
+        address = sorted(cur.mem_map)[0]
+        app._change_service.add_entry(f"0x{address:08X}", "", f"{(cur.mem_map[address] + 1) & 0xFF:02X}")
+        app._change_service.apply(cur.mem_map, cur.ranges, cur.mac_records, None)
+        await _settle(pilot, 4)
+        monkeypatch.setattr(app_module, "place_into_workarea", _patches_full)
+        monkeypatch.setattr(S19TuiApp, "update_project_labels", _boom)
+        captured["log"] = log
+        app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name="S3"))
+        try:
+            for _ in range(600):
+                if not app._busy.runs and seam.effective("save_project"):
+                    break
+                await pilot.pause()
+        except Exception:  # noqa: BLE001 — the app may already be exiting
+            pass
+        return None
+
+    surfaced = None
+    try:
+        _run(base, scenario)
+    except BaseException as exc:  # noqa: BLE001 — the handler's raise is the expected exit
+        surfaced = exc
+    target = _workarea(base) / "S3"
+    messages = captured["log"].messages
+    saved = [m for m in messages if m.startswith(f"Saved project to {target}")]
+    assert blocked, "precondition: the pasted document's placement was never refused (one-line tail)"
+    assert len(saved) == 1, saved
+    assert "Saving project S3 failed" not in messages, messages
+    assert (target / "project.json").is_file()
+    assert surfaced is not None, "the handler's exception was swallowed"
+
+
+def test_tc_b100_53_path_refused_between_the_two_looks_keeps_the_app(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """SE5-12a-4, the data arm of ``_load_path_from_user_input`` (mutant
+    107): a typed image path that the classifier finds, then the data arm's
+    own look refuses (``resolve_input_path`` raises ``PermissionError`` only
+    when called from ``_load_path_from_user_input``) → nothing leaves the
+    request, the app keeps running, and the load still runs through the
+    loader's own look: ``fw.s19`` is the open image and ``Loaded fw.s19`` is
+    painted.
+
+    Why: the request runs from the Load dialog's callback; an exception
+    there ends the app and drops the session. Negative control: the data
+    arm's catch removed → ``PermissionError`` leaves
+    ``_load_path_from_user_input`` → RED."""
+    import shutil
+
+    src = tmp_path / "src"
+    src.mkdir()
+    target = src / "fw.s19"
+    shutil.copyfile(CASE01 / "firmware.s19", target)
+    real = app_module.resolve_input_path
+    refused: list = []
+
+    def _resolve(path, base_dir):
+        if sys._getframe(1).f_code.co_name == "_load_path_from_user_input":
+            refused.append(str(path))
+            raise PermissionError(13, "injected: access denied", str(path))
+        return real(path, base_dir)
+
+    monkeypatch.setattr(app_module, "resolve_input_path", _resolve)
+
+    async def scenario(app, pilot, log):
+        raised = None
+        try:
+            app._load_path_from_user_input(target)
+        except BaseException as exc:  # noqa: BLE001 — the RED shape
+            raised = type(exc).__name__
+        await _drain(app, pilot)
+        for _ in range(600):
+            if not app._busy.runs and app.current_file is not None:
+                break
+            await pilot.pause()
+        name = app.current_file.path.name if app.current_file is not None else None
+        return raised, app.is_running, dict(app._busy.runs), name, list(log.messages)
+
+    raised, alive, runs, name, messages = _run(tmp_path / "app", scenario)
+    assert refused, "precondition: the data arm's look was never refused"
+    assert raised is None, f"{raised} left _load_path_from_user_input"
+    assert (alive, runs) == (True, {}), (alive, runs)
+    assert name == "fw.s19", name
+    assert "Loaded fw.s19" in messages, messages

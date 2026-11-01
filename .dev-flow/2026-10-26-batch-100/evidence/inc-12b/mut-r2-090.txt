@@ -1,0 +1,28 @@
+mutant id: 090 (E5 round 2)
+target file: s19_app/tui/app.py
+description: load_a2l_from_path: remove 'if not copy: step 2'
+old -> new: '            if not copy:\n                self.step_busy("a2l_load", gen, 2)\n' -> ''
+sha256 before: 46f7ee6aa8a0fbfbc6571b095bbf7d4c4661de5bd3f1ecf96e9b1347c424210d
+command: timeout 900 env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\lad C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=short --basetemp=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\bt\mut-090 "tests/test_b100_workers.py::test_tc_b100_53_in_place_a2l_pick_starts_at_the_parse_step"
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mutc12b
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mutc12b\s19_app\__init__.py
+pytest summary: 1 failed in 2.92s
+elapsed: 3.7s
+verdict: KILLED
+sha256 after: 46f7ee6aa8a0fbfbc6571b095bbf7d4c4661de5bd3f1ecf96e9b1347c424210d
+restored = True
+
+----- pytest output -----
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________ test_tc_b100_53_in_place_a2l_pick_starts_at_the_parse_step __________
+tests\test_b100_workers.py:3595: in test_tc_b100_53_in_place_a2l_pick_starts_at_the_parse_step
+    assert (m.group(3), m.group(4), m.group(5)) == ("2", "3", "Parse"), line
+E   AssertionError: ⠼ Loading firmware.a2l  ·  step 1/3 Copy into the work area  ·  00:00
+E   assert ('1', '3', 'C...he work area') == ('2', '3', 'Parse')
+E     
+E     At index 0 diff: '1' != '2'
+E     Use -v to get more diff
+=========================== short test summary info ===========================
+FAILED tests/test_b100_workers.py::test_tc_b100_53_in_place_a2l_pick_starts_at_the_parse_step
+1 failed in 2.92s

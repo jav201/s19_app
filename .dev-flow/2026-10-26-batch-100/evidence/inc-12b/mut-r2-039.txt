@@ -1,0 +1,25 @@
+mutant id: 039 (E5 round 2)
+target file: s19_app/tui/app.py
+description: _on_project_loaded refusal arm: remove _quit_pending = False
+old -> new: '        if prepared.refusal is not None:\n            self._quit_pending = False\n' -> '        if prepared.refusal is not None:\n'
+sha256 before: 46f7ee6aa8a0fbfbc6571b095bbf7d4c4661de5bd3f1ecf96e9b1347c424210d
+command: timeout 900 env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\lad C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=short --basetemp=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\bt\mut-039 "tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_is_withdrawn_when_the_load_fails[project_refused]"
+cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mutc12b
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mutc12b\s19_app\__init__.py
+pytest summary: 1 failed in 3.07s
+elapsed: 3.9s
+verdict: KILLED
+sha256 after: 46f7ee6aa8a0fbfbc6571b095bbf7d4c4661de5bd3f1ecf96e9b1347c424210d
+restored = True
+
+----- pytest output -----
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ test_tc_b100_53_confirmed_quit_is_withdrawn_when_the_load_fails[project_refused] _
+tests\test_b100_workers.py:3450: in test_tc_b100_53_confirmed_quit_is_withdrawn_when_the_load_fails
+    assert exited is False, f"{arm}: the app exited over a failed load (its line was never shown)"
+E   AssertionError: project_refused: the app exited over a failed load (its line was never shown)
+E   assert True is False
+=========================== short test summary info ===========================
+FAILED tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_is_withdrawn_when_the_load_fails[project_refused]
+1 failed in 3.07s

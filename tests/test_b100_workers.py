@@ -2806,7 +2806,11 @@ def test_tc_b100_54_a2l_worker_failure_keeps_the_session(
     ``current_a2l_data`` still those of ``p0.a2l`` (identity), the app
     running, nothing raised out of the request; a containment refusal of
     the copy keeps its own line ``Cannot load A2L: …`` and paints no
-    ``could not be read``.
+    ``could not be read``. E5 round 2 (mutant 093; C12b-39 "0 ERROR records
+    (a WARNING ``A2L load rejected by workarea guard: …``)"): in the
+    containment arm the app's log file holds that WARNING and no ERROR
+    record — a refusal by the work-area guard is not a defect, so it carries
+    no traceback.
 
     Why: a failed attach must not drop the A2L the engineer already had.
     Negative control (P12b-2): an escaping exception ends the app → RED;
@@ -2852,9 +2856,16 @@ def test_tc_b100_54_a2l_worker_failure_keeps_the_session(
     raised, last, same_path, same_data, alive, runs, messages = run(base, scenario)
     assert raised is None, f"{raised} left the request"
     if stage == "containment":
+        from s19_app.tui.workspace import LOG_FILENAME, LOGS_SUBDIR
+
         assert copy_threads and main not in copy_threads, "the A2L copy ran on the main thread (no worker)"
         assert last == "Cannot load A2L: synthetic containment refusal", last
         assert not any("could not be read" in m for m in messages), messages
+        log_text = (base / WORKAREA_DIRNAME / LOGS_SUBDIR / LOG_FILENAME).read_text(encoding="utf-8")
+        assert ("] WARNING s19tui: A2L load rejected by workarea guard: synthetic containment refusal"
+                in log_text), log_text[-2000:]
+        errors = [line for line in log_text.splitlines() if "] ERROR s19tui:" in line]
+        assert errors == [], errors
     else:
         assert last == ("File NOT loaded: 'firmware.a2l' could not be read — check that the file can "
                         "be opened, then load again."), last
@@ -3314,3 +3325,372 @@ def test_tc_b100_53_confirmed_quit_is_withdrawn_when_editor_edits_stay_unsaved(
     assert last.startswith("Change document changes.json has unsaved edits") and last.endswith(
         "save it from the Patch Editor to keep them"), last
     assert (dirty, kept, pending) == (True, 2, False), (dirty, kept, pending)
+
+
+# ===========================================================================
+# E5 round 2 — mutant survivors (Inc 12b corrective pass, tests only). Each
+# test names the requirement it observes and the mutant row it kills
+# (evidence/inc-12b/mut-r2-NNN.txt).
+# ===========================================================================
+
+
+def test_tc_b100_53_a_running_file_load_refuses_a_project_load_and_asks_before_quitting(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """HLR-177a, HLR-177b, ruling Q2 (the four session actions include the
+    file load; mutant 003): while a load of case_01's ``firmware.s19`` is
+    held at its parse on the file-load worker, ``_handle_load_project("P")``
+    paints exactly one ``busy: Loading firmware.s19 is running — wait for it
+    to finish.``, the run state still holds only ``file_load`` and
+    ``current_project`` stays ``None``; then ``q`` opens the quit question
+    naming that load (``still working: Loading firmware.s19 — …``) and the
+    app keeps running.
+
+    Why: the file load installs a whole image into the session; a project
+    load started beside it is a second session writer, and quitting while
+    it runs drops the load half done. Negative control: ``file_load``
+    dropped from the session keys → the project load begins beside it (two
+    runs) and ``q`` exits at once → RED."""
+    base = tmp_path / "app"
+    trio(W(base) / "P")
+    hold = Hold(monkeypatch, S19TuiApp, "_parse_data_file")
+    label = "Loading firmware.s19"
+
+    async def scenario(app, pilot, log):
+        try:
+            app.load_from_path(CASE01 / "firmware.s19")
+            await reached(pilot, hold, "the file load of firmware.s19")
+            mark = len(log.messages)
+            app._handle_load_project("P")
+            for _ in range(3):
+                await pilot.pause()
+            refused = (busy_count(log, label, mark), list(app._busy.runs), app.current_project)
+            neutral_focus(app)
+            await pilot.press("q")
+            await wait(pilot, lambda: is_quit_question(app.screen) or not running(app), "the quit question", 10)
+            asked = is_quit_question(app.screen)
+            body = quit_texts(app)[1] if asked else None
+            alive = running(app)
+            if asked:
+                await pilot.press("n")
+                await wait(pilot, lambda: not is_quit_question(app.screen), "the question to close", 10)
+        finally:
+            hold.release.set()
+        if running(app):
+            await settle_workers(pilot)
+        return refused, (asked, body, alive)
+
+    refused, quit_ = run(base, scenario)
+    assert refused == (1, ["file_load"], None), refused
+    assert quit_ == (True, quit_body(label), True), quit_
+
+
+@pytest.mark.parametrize("arm", ["file_load_fails", "project_fails", "project_refused"])
+def test_tc_b100_53_confirmed_quit_is_withdrawn_when_the_load_fails(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str
+) -> None:
+    """E3 S12b-01 / S12b-R2-4 ("a failed load keeps the app running"),
+    LLR-177.4c, LLR-177.2 (mutants 057, 048, 039): ``quit`` then ``y``
+    while a load is held on its worker; released, the load fails:
+    - ``file_load_fails``: the parse of ``firmware.s19`` raises
+      ``ValueError`` → last line ``Load failed``;
+    - ``project_fails``: ``read_project_manifest`` of ``P2`` raises
+      ``PermissionError`` → last line ``Project NOT loaded: 'P2' could not
+      be read — check that the folder can be opened, then load again.``;
+    - ``project_refused``: project ``PA`` holds only an A2L whose parse
+      raises ``ValueError`` → nothing is left to install → last line ``No
+      supported files in project: PA``.
+    Each arm: the question was asked, the app ran while held, and after the
+    failure the app KEEPS running with the quit no longer pending.
+
+    Why: the failure line is the only place the engineer learns the load did
+    not happen; exiting in the same callback that paints it hides it, and
+    the confirmed quit was given for a load that would finish. Negative
+    control: the handler keeps the pending quit → ``end_busy`` exits the
+    app → RED."""
+    base = tmp_path / "app"
+    if arm == "file_load_fails":
+        hold = Hold(monkeypatch, S19TuiApp, "_parse_data_file",
+                    raise_on_release=ValueError("synthetic parse failure"))
+        key, expected = "file_load", "Load failed"
+    elif arm == "project_fails":
+        trio(W(base) / "P2")
+        hold = Hold(monkeypatch, app_module, "read_project_manifest",
+                    raise_on_release=PermissionError(13, "synthetic denied"))
+        key = "project_load"
+        expected = ("Project NOT loaded: 'P2' could not be read — check that the folder can be "
+                    "opened, then load again.")
+    else:
+        trio(W(base) / "PA", names=("firmware.a2l",))
+        hold = Hold(monkeypatch, app_module, "parse_a2l_file",
+                    raise_on_release=ValueError("synthetic A2L parse failure"))
+        key, expected = "project_load", "No supported files in project: PA"
+
+    async def scenario(app, pilot, log):
+        if arm == "file_load_fails":
+            app.load_from_path(CASE01 / "firmware.s19")
+        elif arm == "project_fails":
+            app._handle_load_project("P2")
+        else:
+            app._handle_load_project("PA")
+        try:
+            await reached(pilot, hold, f"the {arm} load")
+            asked = await confirm_quit(app, pilot)
+            held_alive = running(app)
+        finally:
+            hold.release.set()
+        exited = await ended_or_exited(app, key)
+        if exited:
+            return asked, held_alive, True, None, None
+        await settle_workers(pilot)
+        return asked, held_alive, False, log.messages[-1], getattr(app, "_quit_pending", None)
+
+    asked, held_alive, exited, last, pending = run(base, scenario)
+    assert (asked, held_alive) == (True, True), (asked, held_alive)
+    assert exited is False, f"{arm}: the app exited over a failed load (its line was never shown)"
+    assert last == expected, last
+    assert pending is False, pending
+
+
+def test_tc_b100_53_a_project_reload_reuses_the_a2l_parse(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-177.1d, LLR-177.1e (S-h, the A2L cache; mutant 042): the trio
+    ``P2`` loaded twice through the shipped handler, its A2L unchanged →
+    ``parse_a2l_file`` runs once in total; after each load the A2L is
+    attached and its data equals the first parse.
+
+    Why: the A2L parse is the long step of a project load (5 s for
+    case_06); the install stores what the worker parsed so the next load of
+    the same, unchanged file costs nothing. Negative control: the install
+    drops the worker's cache entry → the second load parses again → 2
+    parses → RED."""
+    base = tmp_path / "app"
+    trio(W(base) / "P2")
+    parses = Spy(monkeypatch, app_module, "parse_a2l_file")
+
+    async def load(app, pilot) -> None:
+        app._handle_load_project("P2")
+        await settle_workers(pilot)
+        await wait(pilot, lambda: "project_load" not in app._busy.runs, "the project load of P2")
+
+    async def scenario(app, pilot, log):
+        await load(app, pilot)
+        first = (len(parses.calls), app.current_a2l_path, app.current_a2l_data)
+        await load(app, pilot)
+        second = (len(parses.calls), app.current_a2l_path, app.current_a2l_data)
+        return first, second, app.current_project
+
+    first, second, project = run(base, scenario)
+    assert project == "P2", project
+    assert first[0] == 1 and first[1] is not None and first[2], first[:2]
+    assert second[0] == 1, f"the unchanged A2L was parsed {second[0]} times over two loads"
+    assert second[1] == first[1] and second[2] == first[2], (first[1], second[1])
+
+
+def _files_under(folder: Path) -> list:
+    return sorted(p.relative_to(folder).as_posix() for p in folder.rglob("*") if p.is_file())
+
+
+@pytest.mark.parametrize("document", ["pasted", "file_backed"])
+def test_tc_b100_53_save_reports_the_change_document_as_one_placed_file(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, document: str
+) -> None:
+    """LLR-177.5a, LLR-176.2d (P1-62; mutants 067, 065): a save as ``Q`` →
+    the step-2 (``Place the files``) forwards are exactly ``(1, n) … (n,
+    n)``, where ``n`` is the number of files step 2 placed in ``Q``, read
+    from the disk:
+    - ``pasted``: the trio ``P2`` with one pasted, applied entry → the
+      pasted document is written by step 2 as ``Q/patches/changes.json``,
+      so ``n`` = every file under ``Q`` except ``project.json``;
+    - ``file_backed``: project ``P`` whose change document is
+      ``P/patches/changes.json`` (bound by a first save), saved as ``Q`` →
+      the bound document is carried by the gather (step 3, ``Gather the
+      project files``), so ``n`` = every file under ``Q`` except
+      ``project.json`` and ``patches/changes.json``.
+
+    Why: the placement step's bar must end full exactly when its last file
+    lands; a placed document that is never reported, or a document counted
+    in step 2 that step 3 places, leaves the bar short of the step's end.
+    Negative controls: the pasted placement reports nothing → the last
+    forward is ``(n - 1, n)`` → RED; the file-backed row counted in step 2's
+    total → every forward reads ``(i, n + 1)`` → RED."""
+    base = tmp_path / "app"
+    wa = W(base)
+    progress = Progress(monkeypatch)
+
+    async def scenario(app, pilot, log):
+        if document == "pasted":
+            trio(wa / "P2")
+            await open_trio_project(app, pilot, "P2")
+            await patch_one_byte(app, pilot)
+            bound = app._change_service.document.source_path
+        else:
+            await projects.load_image(pilot, app, CASE01 / "firmware.s19")
+            await patch_one_byte(app, pilot)
+            await projects.save_project(pilot, app, log, "P")
+            await settle_workers(pilot)
+            bound = app._change_service.document.source_path
+        progress.clear()
+        save(app, "Q")
+        await settle_workers(pilot)
+        await wait(pilot, lambda: (wa / "Q" / "project.json").exists() and "save_project" not in app._busy.runs,
+                   "the save of Q")
+        return bound, list(progress.events)
+
+    bound, events = run(base, scenario)
+    if document == "pasted":
+        assert bound is None, f"precondition: the document is not pasted ({bound})"
+    else:
+        assert bound is not None and Path(bound) == wa / "P" / "patches" / "changes.json", (
+            f"precondition: the document is not bound to P/patches/changes.json ({bound})")
+    on_disk = [name for name in _files_under(wa / "Q") if name != "project.json"]
+    assert "patches/changes.json" in on_disk, on_disk
+    placed = on_disk if document == "pasted" else [n for n in on_disk if n != "patches/changes.json"]
+    assert placed, on_disk
+    progress.events[:] = events
+    n = len(placed)
+    assert progress.forwards("save_project", 2) == [(i, n) for i in range(1, n + 1)], (
+        progress.forwards("save_project", 2), placed)
+
+
+def test_tc_b100_53_in_place_a2l_pick_starts_at_the_parse_step(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-177.1b, interfaces S-e / proto-12b-a2l-refusal (5) ("when ``not
+    copy``: step 2 — no copy step"; mutant 090): a Workarea Files pick of
+    ``W/temp/firmware.a2l`` attaches in place; held at its parse on the A2L
+    worker, ``#status_text`` reads ``<glyph> Loading firmware.a2l  ·  step
+    2/3 Parse  ·  mm:ss`` and the bar reads 33; released, the attach lands
+    on that same file with 0 copies.
+
+    Why: the in-place route copies nothing; a line that says ``step 1/3
+    Copy into the work area`` for the whole parse tells the engineer the
+    wrong thing about what is running. Negative control: the in-place step
+    2 removed → ``step 1/3 Copy into the work area`` and a bar of 0 while
+    the parse runs → RED."""
+    base = tmp_path / "app"
+    temp = W(base) / WORKAREA_TEMP
+    temp.mkdir(parents=True)
+    shutil.copyfile(CASE01 / "firmware.a2l", temp / "firmware.a2l")
+    hold = Hold(monkeypatch, app_module, "parse_a2l_file")
+    copies = Spy(monkeypatch, app_module, "copy_into_workarea")
+
+    async def scenario(app, pilot, log):
+        try:
+            app._load_workarea_file("firmware.a2l")
+            await reached(pilot, hold, "the in-place A2L attach")
+            for _ in range(3):
+                await pilot.pause()
+            line, value = status(app), bar(app)
+        finally:
+            hold.release.set()
+        await settle_workers(pilot)
+        await wait(pilot, lambda: "a2l_load" not in app._busy.runs, "the attach to end")
+        return line, value, app.current_a2l_path, len(copies.calls)
+
+    line, value, path, n_copies = run(base, scenario)
+    m = LINE_RE.match(line)
+    assert m and m.group(2) == "Loading firmware.a2l", line
+    assert (m.group(3), m.group(4), m.group(5)) == ("2", "3", "Parse"), line
+    assert value == 33, value
+    assert Path(path) == temp / "firmware.a2l" and n_copies == 0, (path, n_copies)
+
+
+def test_tc_b100_53_confirmed_quit_during_a_routed_project_load_exits_cleanly(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-177.4c, HLR-177c (E5 round 2; found while writing the arm for
+    mutant 046): ``q`` then ``y`` while a ROUTED load of ``P2`` (the Load
+    dialog's route, ``routed=True``, which opens the Load result panel at
+    the end of the install) is held at its worker step; released → the app
+    exits after the install (``current_project == "P2"`` at exit) and the
+    exit is clean: nothing is raised out of the app.
+
+    Why: "quit after it finishes" must end the program, not crash it while
+    the result panel mounts on an app that is shutting down. Observed on
+    d4d9c1a: the install pushes ``LoadResultScreen`` and then ``end_busy``
+    exits; the screen's ``on_mount`` then raises
+    ``NoMatches('#result_body')`` and ``run_test`` re-raises it. The mutant
+    that ends before the push (046) fails the same way, so 046 cannot be
+    told apart from the code until this is fixed. Fixed in the E5
+    round 2 follow-up: the routed install skips the result panel when a
+    quit is confirmed (it exits in ``end_busy``)."""
+    base = tmp_path / "app"
+    trio(W(base) / "P2")
+    at_exit: list = []
+    real_exit = S19TuiApp.exit
+
+    def _exit(self, *args, **kwargs):
+        at_exit.append(self.current_project)
+        return real_exit(self, *args, **kwargs)
+
+    monkeypatch.setattr(S19TuiApp, "exit", _exit)
+    hold = Hold(monkeypatch, app_module, "read_project_manifest")
+
+    async def scenario(app, pilot, log):
+        app._handle_load_project("P2", routed=True)
+        try:
+            await reached(pilot, hold, "the routed project load of P2")
+            asked = await confirm_quit(app, pilot)
+        finally:
+            hold.release.set()
+        return asked, await wait_exit(app, 60)
+
+    asked, exited = run(base, scenario)
+    assert (asked, exited) == (True, True), (asked, exited)
+    assert at_exit and at_exit[-1] == "P2", at_exit
+
+
+def test_tc_b100_54_failed_in_place_a2l_pick_keeps_the_files_list_cursor(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """LLR-177.2b, proto-12b-a2l-refusal ``_on_a2l_attach_failed`` (2) ("``if
+    request.copy: self.refresh_files()`` — a copy may have landed in
+    ``W/temp``"; mutant 099): the Workarea Files list holds ``a.s19`` and
+    ``firmware.a2l`` with the cursor on ``firmware.a2l``; the in-place pick
+    of ``firmware.a2l`` fails at its parse (``ValueError``) → the line
+    ``File NOT loaded: 'firmware.a2l' could not be read — …`` is painted,
+    and the list still holds the same two rows with the cursor still on
+    ``firmware.a2l``.
+
+    Why: the in-place pick copied nothing, so there is nothing new to list;
+    rebuilding the list anyway drops the engineer's place in it right after
+    a failure they may want to retry. Negative control: the list refreshed
+    on every failure → the rows are rebuilt and the cursor is gone (index
+    ``None``) → RED."""
+    base = tmp_path / "app"
+    temp = W(base) / WORKAREA_TEMP
+    temp.mkdir(parents=True)
+    shutil.copyfile(CASE01 / "firmware.a2l", temp / "firmware.a2l")
+    shutil.copyfile(CASE01 / "firmware.s19", temp / "a.s19")
+
+    def _parse_fail(path, *a, **k):
+        raise ValueError("synthetic parse")
+
+    async def scenario(app, pilot, log):
+        app.refresh_files()
+        for _ in range(3):
+            await pilot.pause()
+        files = app.query_one("#files_list")
+        names = [item.data for item in files.children]
+        files.index = names.index("firmware.a2l")
+        app.set_focus(files)
+        for _ in range(3):
+            await pilot.pause()
+        before = (names, files.index, getattr(files.highlighted_child, "data", None))
+        monkeypatch.setattr(app_module, "parse_a2l_file", _parse_fail)
+        app._load_workarea_file("firmware.a2l")
+        await settle_workers(pilot)
+        await wait(pilot, lambda: "a2l_load" not in app._busy.runs, "the failed attach to end")
+        for _ in range(5):
+            await pilot.pause()
+        after = ([item.data for item in files.children], files.index,
+                 getattr(files.highlighted_child, "data", None))
+        return before, after, log_tail(app)[0]
+
+    before, after, last = run(base, scenario)
+    assert before == (["a.s19", "firmware.a2l"], 1, "firmware.a2l"), before
+    assert last == ("File NOT loaded: 'firmware.a2l' could not be read — check that the file can "
+                    "be opened, then load again."), last
+    assert after == before, (before, after)

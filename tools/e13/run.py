@@ -45,6 +45,12 @@ Scenarios:
                   capture stops at the ``step 2/3 Parse`` progress line
                   while the load is still running, so the glyph and the
                   elapsed time keep advancing. ``--close`` does not apply.
+  qz-quit         Load project P (the clean manifest, as sd-dialog), make
+                  the Save worker slow (patched in run.py only: the first
+                  ``place_into_workarea`` sleeps ~60 s), start a Save of a
+                  new project P1, then press ``q`` with the focus on
+                  ``#files_list``: the quit question (``Quit?``) stays open
+                  with the Save still running. ``--close`` does not apply.
 
 ``--close`` dismisses the panel after it opens, so the capture shows the
 summary line and ``#status_text`` the load left behind.
@@ -69,7 +75,7 @@ CASE01 = ROOT / "examples" / "case_01_basic_valid" / "firmware.s19"
 CASE02 = ROOT / "examples" / "case_02_gaps_and_patch_targets" / "firmware.s19"
 SCENARIOS = ("pe-clean", "pe-saveback", "pe-problems", "pe-damaged", "pe-patched",
              "pe-unreadable", "pe-document", "pe-a2l-only", "wa-files", "ld-dialog",
-             "lq-question", "sd-dialog", "bz-busy")
+             "lq-question", "sd-dialog", "bz-busy", "qz-quit")
 
 
 def seed(workarea: Path, scenario: str) -> None:
@@ -276,6 +282,62 @@ def build_app(base: Path, scenario: str, close: bool):
                             break
                         await asyncio.sleep(0.1)
                     await asyncio.sleep(2.5)
+                elif scenario == "qz-quit":
+                    from s19_app.tui.screens import SaveProjectPayload
+
+                    # 1. Load project P the way sd-dialog does; wait until
+                    # the load has finished (current_project == "P").
+                    self._route_load_project("P")
+                    for _ in range(60):
+                        if type(self.screen).__name__ == "LoadResultScreen":
+                            break
+                        await asyncio.sleep(0.1)
+                    if type(self.screen).__name__ == "LoadResultScreen":
+                        await asyncio.sleep(0.5)
+                        self.screen.dismiss(None)
+                    for _ in range(60):
+                        if self.current_project == "P":
+                            break
+                        await asyncio.sleep(0.1)
+                    await asyncio.sleep(0.3)
+                    # 2. Make the Save worker slow: patch, inside run.py
+                    # only, the app module's place_into_workarea with a
+                    # wrapper that sleeps ~60 s then calls the original
+                    # (s19_app/ is never edited). The Save worker reaches
+                    # this name through s19_app.tui.app's module global.
+                    import s19_app.tui.app as app_module
+
+                    real_place = app_module.place_into_workarea
+
+                    def _slow_place(*args, **kwargs):
+                        time.sleep(60)
+                        return real_place(*args, **kwargs)
+
+                    app_module.place_into_workarea = _slow_place
+                    # 3. Start a Save of a new project P1 with the same
+                    # call the test helper ``save`` uses.
+                    self._handle_save_dialog(
+                        SaveProjectPayload(
+                            parent_folder=str(self.workarea), project_name="P1"
+                        )
+                    )
+                    # 4. Wait until #status_text paints the Save progress
+                    # line (contains ``step ``), put the focus on
+                    # #files_list, press q and wait for the quit question;
+                    # then let it sit open ~2.5 s more with the Save still
+                    # running (the worker is asleep in _slow_place).
+                    for _ in range(600):
+                        text = str(self.query_one("#status_text").render())
+                        if "step " in text:
+                            break
+                        await asyncio.sleep(0.1)
+                    self.set_focus(self.query_one("#files_list"))
+                    self.action_quit()
+                    for _ in range(60):
+                        if type(self.screen).__name__ == "_QuitQuestionScreen":
+                            break
+                        await asyncio.sleep(0.1)
+                    await asyncio.sleep(2.5)
                 elif scenario == "sd-dialog":
                     from textual.widgets import Input
 
@@ -335,6 +397,8 @@ def main() -> None:
     parser.add_argument("--base", required=True, type=Path)
     parser.add_argument("--close", action="store_true")
     parser.add_argument("--selftest", action="store_true")
+    parser.add_argument("--selftest-cols", type=int, default=118)
+    parser.add_argument("--selftest-rows", type=int, default=54)
     args = parser.parse_args()
     base = args.base.resolve()
     base.mkdir(parents=True, exist_ok=True)
@@ -346,22 +410,45 @@ def main() -> None:
     import s19_app
 
     async def _once() -> None:
-        async with app.run_test(size=(118, 54)) as pilot:
+        async with app.run_test(size=(args.selftest_cols, args.selftest_rows)) as pilot:
             await app.e13_ready.wait()
             await pilot.pause()
             print("s19_app:", s19_app.__file__)
             print("screen:", type(app.screen).__name__)
             print("status:", list(app.log_lines)[-2:])
             print("status_text:", str(app.query_one("#status_text").render()))
+            if type(app.screen).__name__ == "_QuitQuestionScreen":
+                def _plain(widget_id):
+                    w = app.screen.query_one(widget_id)
+                    visual = getattr(w, "visual", None) or w.render()
+                    text = getattr(w, "label", None)
+                    if text is not None:
+                        return getattr(text, "plain", str(text))
+                    return str(getattr(visual, "plain", visual))
+
+                print("confirm_title:", _plain("#confirm_title"))
+                print("confirm_body:", _plain("#confirm_body"))
+                print("confirm_yes:", _plain("#confirm_yes"))
+                print("confirm_no:", _plain("#confirm_no"))
+                print("focused:", getattr(app.focused, "id", None))
+            from textual.widgets import ProgressBar
+
+            print(
+                "progress_bar:",
+                app.query_one("#progress_bar", ProgressBar).progress,
+            )
+            print("log_tail:", list(app.log_lines)[-4:])
+        if args.scenario in ("bz-busy", "qz-quit"):
+            # The slowed worker is still sleeping (~60 s) on its worker
+            # thread. End the process explicitly BEFORE asyncio.run's
+            # default-executor shutdown joins it (and before the
+            # interpreter's non-daemon-thread wait), so the selftest ends
+            # as soon as the surface is reported instead of ~60 s later.
+            sys.stdout.flush()
+            os._exit(0)
 
     asyncio.run(_once())
     print(f"SELFTEST OK scenario={args.scenario} close={args.close}", flush=True)
-    if args.scenario == "bz-busy":
-        # The slowed load worker is still sleeping (~60 s) on its worker
-        # thread; end the process explicitly so the selftest does not wait
-        # for the non-daemon worker at interpreter shutdown.
-        sys.stdout.flush()
-        os._exit(0)
 
 
 if __name__ == "__main__":

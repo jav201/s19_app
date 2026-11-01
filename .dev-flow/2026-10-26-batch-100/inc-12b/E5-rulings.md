@@ -29,3 +29,14 @@
 - CR12b-3 — Done: `app.py:6042`–`:6044`. Arm `test_b100_workers.py::test_tc_b100_53_report_generate_keeps_the_regions_of_a_running_save` — RED, GREEN.
 - CR12b-4 — Done: `a2l.py:194`. Arm `test_b100_a2l_progress.py::test_tc_b100_73_no_fstat_without_a_callback` (0 `fstat` without a callback, result equal; 1 with) — RED, GREEN.
 - SE5-12b-1 — Done: `app.py:12244`–`:12246`, `:12272`, `:12287`–`:12288`. Arms `test_b100_workers.py::test_tc_b100_53_confirmed_quit_is_withdrawn_when_pasted_entries_were_not_saved` (scenario B) and `::test_tc_b100_53_confirmed_quit_is_withdrawn_when_editor_edits_stay_unsaved` (scenario A) — RED, GREEN.
+
+## Re-review (code-reviewer, c026bd2): PASS-WITH-NOTES; BLOCK-UNTIL CR12b-1 lifted
+| Id | Sev | Ruling | Route |
+|---|---|---|---|
+| CR12b-5 | NIT | Accepted as a cautious choice: any change-document line withdraws a confirmed quit, also lines about records already on disk (nothing lost; the user quits again). Fail-safe direction; not narrowed. | Close records (declared). |
+
+## Round 2 (mutant survivors)
+| Id | Sev | Ruling | Route |
+|---|---|---|---|
+| R2-F1 | MAJOR | Accepted and fixed by the orchestrator: no result panel on a routed install when a quit is confirmed. | Done (green-08). |
+| R2-F2 | MINOR | Residual (handler-defect only). | BACKLOG-CODE at close. |

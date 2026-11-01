@@ -163,3 +163,9 @@ Wrong target (named killer does not touch the mutated arm at all):
 - **107** — `_load_path_from_user_input` data-arm `except` removed: the classifier's own guarded look runs first; a raise needs the path to change between two looks in one call.
 
 Note: rows **035**, **043** and **101** were reported KILLED via a *more relevant* test than the named killer (the named killer passed because it drives a different branch); the actual killing test is noted in the per-mutant transcript.
+
+## Round 2
+
+The 30 survivors re-read against the round-1 code (d4d9c1a). New and strengthened arms were written (tests only). Each non-equivalent row was re-run on the scratch copy `scratchpad/mutc12b` with the mutant applied to the current code, and each record is `mut-r2-NNN.txt`. Every record shows `restored = True`, and the sha256 of `app.py` (`46f7ee6aa8a0fbfb…`) and `a2l.py` (`73c3820fe0d6ecd2…`) is equal before and after.
+
+Counts: **KILLED 22** (003 039 042 047 048 050 054 057 065 067 071 072 079 082 087 090 091 093 099 107 110 113; 072 and 113 by tests that already existed) / **EQUIVALENT 7** (002 021 022 052 060 084 103) / **NOT KILLED 1** (046: blocked by product defect R2-F1; its arm is `xfail(strict=True)`, and the record shows `1 xfailed` = SURVIVED) / **TARGET REMOVED 0**. Rows 099 and 110, called equivalent in round 1, are refuted. Rows 084 and 103 (weak test / wrong target in round 1) are equivalent on reading. Each disposition and its reason: `inc-12b/E5-corrective-notes.md` § "Round 2 — mutant survivors". GREEN: `green-07-mutant-arms.txt` (26 passed, 1 xfailed).
