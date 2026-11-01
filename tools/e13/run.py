@@ -24,6 +24,11 @@ Scenarios:
   pe-a2l-only     Load project P holding only firmware.a2l (with its files
                   record) -> the panel's A2L slot names it with its tag
                   count, no image (D-5, AT-B100-10, Inc 8b)
+  ld-dialog       Load project P via ``action_load_project`` (key ``p``): the
+                  Load dialog stays open with P highlighted and its
+                  ``firmware`` variant marked, beside Q, two work-area files
+                  and one recorded recent source (CASE02). ``--close`` does
+                  not apply.
 
 ``--close`` dismisses the panel after it opens, so the capture shows the
 summary line and ``#status_text`` the load left behind.
@@ -45,7 +50,7 @@ ROOT = Path(__file__).resolve().parents[2]
 CASE01 = ROOT / "examples" / "case_01_basic_valid" / "firmware.s19"
 CASE02 = ROOT / "examples" / "case_02_gaps_and_patch_targets" / "firmware.s19"
 SCENARIOS = ("pe-clean", "pe-saveback", "pe-problems", "pe-damaged", "pe-patched",
-             "pe-unreadable", "pe-document", "pe-a2l-only", "wa-files")
+             "pe-unreadable", "pe-document", "pe-a2l-only", "wa-files", "ld-dialog")
 
 
 def seed(workarea: Path, scenario: str) -> None:
@@ -101,6 +106,16 @@ def seed(workarea: Path, scenario: str) -> None:
             # The long-path prefix keeps the 134-character name and the
             # trailing dot or space that Win32 would otherwise strip.
             shutil.copy2(CASE01, "\\\\?\\" + str(temp / name))
+    if scenario == "ld-dialog":
+        # Load dialog (key p): P is the clean manifest (as pe-clean), Q a
+        # copy of P, and the temp folder carries fw.s19 / cal.a2l as
+        # work-area files. The recent-sources store is written through
+        # record_recent_source in build_app.
+        shutil.copytree(project, workarea / "Q")
+        temp = workarea / "temp"
+        temp.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(CASE01, temp / "fw.s19")
+        shutil.copy2(CASE01.with_name("firmware.a2l"), temp / "cal.a2l")
     text = json.dumps(manifest, indent=2)
     if scenario == "pe-damaged":
         text = '{"schema_version": 1, "active_variant": '
@@ -109,9 +124,20 @@ def seed(workarea: Path, scenario: str) -> None:
 
 def build_app(base: Path, scenario: str, close: bool):
     from s19_app.tui.app import S19TuiApp
-    from s19_app.tui.workspace import WORKAREA_DIRNAME, WORKAREA_SUBDIR
+    from s19_app.tui.workspace import (
+        WORKAREA_DIRNAME,
+        WORKAREA_SUBDIR,
+        record_recent_source,
+    )
 
     seed(base / WORKAREA_DIRNAME / WORKAREA_SUBDIR, scenario)
+    if scenario == "ld-dialog":
+        # The recent-sources store lives under %LOCALAPPDATA%; point it at a
+        # scratch folder under --base so the real one is never touched
+        # (capture.ps1 does not set LOCALAPPDATA).
+        lad = base / "lad"
+        lad.mkdir(parents=True, exist_ok=True)
+        os.environ["LOCALAPPDATA"] = str(lad)
 
     class E13App(S19TuiApp):
         # Textual resolves a relative CSS_PATH against the subclass's own
@@ -130,17 +156,29 @@ def build_app(base: Path, scenario: str, close: bool):
         async def _e13_drive(self) -> None:
             try:
                 await asyncio.sleep(0.5)
-                # The Load project dialog's own dismiss callback: the route
-                # that opens the Load-result panel (LLR-178.3).
-                self._route_load_project("P")
-                for _ in range(60):
-                    if type(self.screen).__name__ == "LoadResultScreen":
-                        break
-                    await asyncio.sleep(0.1)
-                if close and type(self.screen).__name__ == "LoadResultScreen":
+                if scenario == "ld-dialog":
+                    # Record one recent source through the app's own store
+                    # API (LLR-172.1a), then open the Load dialog the way
+                    # key ``p`` does, and leave it open with P highlighted.
+                    record_recent_source(CASE02)
+                    self.action_load_project()
+                    for _ in range(60):
+                        if type(self.screen).__name__ == "LoadDialog":
+                            break
+                        await asyncio.sleep(0.1)
                     await asyncio.sleep(0.5)
-                    self.screen.dismiss(None)
-                await asyncio.sleep(0.5)
+                else:
+                    # The Load project dialog's own dismiss callback: the route
+                    # that opens the Load-result panel (LLR-178.3).
+                    self._route_load_project("P")
+                    for _ in range(60):
+                        if type(self.screen).__name__ == "LoadResultScreen":
+                            break
+                        await asyncio.sleep(0.1)
+                    if close and type(self.screen).__name__ == "LoadResultScreen":
+                        await asyncio.sleep(0.5)
+                        self.screen.dismiss(None)
+                    await asyncio.sleep(0.5)
             finally:
                 self.e13_ready.set()
 
