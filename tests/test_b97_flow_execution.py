@@ -2003,6 +2003,38 @@ def test_tc_b97_flow_execution_css_section_is_scoped() -> None:
     map_new = re.search(r" \* remaining height; the scrollbar renders.*?min-height: 1;\n\}", sheet, re.S)
     assert map_old and map_new, "the .map-region-scroll block is located in both sheets"
     old = old.replace(map_old.group(0), map_new.group(0))
+
+    # batch-100 named supersessions (fix round 2, R-2): three later
+    # increments edit the b514b07 sheet mid-file. Each edit is applied to
+    # `old` and located exactly once, so every other b514b07 byte stays
+    # guarded. The product CSS is untouched.
+    def supersede(text: str, before: str, after: str, why: str) -> str:
+        assert text.count(before) == 1, why
+        return text.replace(before, after)
+
+    def inserted(head: str, last_rule: str, why: str) -> str:
+        found = re.findall(re.escape(head) + r".*?" + re.escape(last_rule) + r" \{[^}]*\}\n\n", sheet, re.S)
+        assert len(found) == 1, why
+        return found[0]
+
+    # 741cc07 (batch-100 Inc 9b, HLR-173, ruling Q9 — the unified Load
+    # dialog retires the Load-project screen): `#load_dialog` leaves the
+    # shared `.modal-dialog` rule, `#project_list` leaves the list rule, and
+    # two Load-dialog blocks are inserted.
+    old = supersede(old, ".modal-dialog,\n#load_dialog {", ".modal-dialog {", "741cc07 .modal-dialog")
+    old = supersede(old, "#project_list, #variant_list {", "#variant_list {", "741cc07 #variant_list")
+    box = inserted("/* Load dialog (batch-100 increment 9b, HLR-173)", "#load_box", "741cc07 #load_box block")
+    old = supersede(old, "\n.modal-title {", "\n" + box + ".modal-title {", "741cc07 #load_box anchor")
+    panes = inserted("/* --- Load dialog panes / list / preview (batch-100 increment 9b)", "#load_reason", "741cc07 panes block")
+    old = supersede(old, "/* --- Save-project per-variant", panes + "/* --- Save-project per-variant", "741cc07 panes anchor")
+    # 53d08d5 (batch-100 Inc 11, HLR-175): the Save project dialog block is
+    # inserted before the report viewer section.
+    save = inserted("/* --- Save project dialog (batch-100 increment 11, HLR-175)", "#save_summary Static", "53d08d5 save block")
+    old = supersede(old, "/* --- Report viewer modal", save + "/* --- Report viewer modal", "53d08d5 save anchor")
+    # d7b427d (batch-100 Inc 12a, LLR-176.1, ruling Q9 — at most one busy
+    # rule): the `#status_text.-busy` tint is inserted in the status bar.
+    busy = inserted("/* Inc 12a (S-g, ruling Q9)", "#workspace_status_bar #status_text.-busy", "d7b427d busy block")
+    old = supersede(old, "/* Right-aligned so the context reads", busy + "/* Right-aligned so the context reads", "d7b427d busy anchor")
     assert sheet.startswith(old.rstrip()), "every rule shipped at b514b07 is byte-equal; Inc-6 only appends"
     for head in (".flow-name-strip {", ".modal-hint", ".patch-docked-row, .patch-docked-group", ".sev-ok", ".sev-warning", ".sev-error", ".sev-neutral"):
         assert block(sheet, head) == block(old, head), head

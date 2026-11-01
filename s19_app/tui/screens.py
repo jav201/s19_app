@@ -1497,6 +1497,8 @@ class ConfirmQuestionScreen(ModalScreen[bool]):
     """
 
     AUTO_FOCUS = "#confirm_no"
+    #: The button painted with the primary ``modal-confirm`` style.
+    PRIMARY_BUTTON = "confirm_yes"
     BINDINGS = [
         Binding("y", "answer(True)", show=False),
         Binding("n", "answer(False)", show=False),
@@ -1530,9 +1532,13 @@ class ConfirmQuestionScreen(ModalScreen[bool]):
                 Button(
                     Text(self._yes_label),
                     id="confirm_yes",
-                    classes="modal-confirm",
+                    classes="modal-confirm" if self.PRIMARY_BUTTON == "confirm_yes" else "",
                 ),
-                Button(Text(self._no_label), id="confirm_no"),
+                Button(
+                    Text(self._no_label),
+                    id="confirm_no",
+                    classes="modal-confirm" if self.PRIMARY_BUTTON == "confirm_no" else "",
+                ),
                 id="confirm_buttons",
                 classes="modal-buttons",
             ),

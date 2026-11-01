@@ -2397,7 +2397,13 @@ def _merge_into_ab(tmp_path: Path, *, body=b"", active_document=None, extra=None
     """Seed ``ab`` (not open) recording ``patches/boost.json`` (``body`` as
     in ``seed_document_project``), load case_01's S19 in a fresh app,
     optionally paste a 1-entry document, run ``before_save(app, ab)`` and
-    Save project ``ab``. Returns (messages, ab folder, save seconds)."""
+    Save project ``ab``. Returns (messages, ab folder, save seconds).
+
+    Fix round 2 R-1 (measurement re-pin, the Inc 12b F-23 rule): Save
+    project runs on a worker since Inc 12b, so the save seconds run from the
+    request to the end of the main-thread commit ``_on_project_saved``
+    (``None`` when the save never reached it), not to the end of the
+    outcome poll and its six settle pauses."""
     from tests.support import b100_projects as docs
 
     base = tmp_path / "app"
@@ -2413,9 +2419,17 @@ def _merge_into_ab(tmp_path: Path, *, body=b"", active_document=None, extra=None
             app._change_service.add_entry("0x8000007C", "", "DE AD BE EF")
         if before_save is not None:
             before_save(app, ab)
+        committed: list = []
+        real_on_saved = app._on_project_saved
+
+        def _on_saved(outcome) -> None:
+            real_on_saved(outcome)
+            committed.append(time.perf_counter())
+
+        app._on_project_saved = _on_saved
         start = time.perf_counter()
         messages = await docs.save_project(pilot, app, log, "ab")
-        return messages, time.perf_counter() - start
+        return messages, (committed[0] - start if committed else None)
 
     messages, elapsed = docs.run_app(base, scenario)
     return messages, ab, elapsed
@@ -2508,6 +2522,8 @@ def test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second(tmp_path: 
     written = json.loads((ab / "project.json").read_text(encoding="utf-8"))
     assert written.get("active_document") == "patches/boost.json", written
     assert _doc_lines(messages) == [], messages
+    assert elapsed is not None, "the save never reached its commit"
+    print(f"Save project request -> commit end {elapsed:.3f} s")
     assert elapsed < timing_bound(1.0), f"Save project took {elapsed:.3f} s"
 
 

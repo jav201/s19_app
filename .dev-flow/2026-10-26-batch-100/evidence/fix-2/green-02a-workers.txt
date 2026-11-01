@@ -1,0 +1,5 @@
+................................x.....................................   [100%]
+=========================== short test summary info ===========================
+XFAIL tests/test_b100_workers.py::test_tc_b100_53_a_source_that_vanished_under_the_dialog_is_refused_by_the_save_worker - design silent: Inc 11 O-1
+69 passed, 1 xfailed in 826.27s (0:13:46)
+exit=0

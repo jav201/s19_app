@@ -3789,9 +3789,12 @@ def test_tc_b100_65_a_load_landing_under_the_dialog_rebuilds_the_session(tmp_pat
 
     Why: the per-open session caches the image decision; a load under the
     modal makes it stale. A stale decision writes a patched copy of the
-    previous file as the project's active variant and installs it into
-    memory (same ranges), or renders it over the new file's ranges and
-    ends the app with a ``KeyError`` (other ranges). Negative control
+    previous file as the project's active variant while memory holds the
+    new file with the entry, so the file on disk and the image in memory
+    disagree and the session is marked saved against the wrong file (same
+    ranges; the security round-2 correction of the SE5-11-1 scenario), or
+    renders it over the new file's ranges and ends the app with a
+    ``KeyError`` (other ranges). Negative control
     (051f586): base ``firmware.s19`` → RED; other_ranges → the commit's
     ``KeyError`` → RED."""
     from tests.support.independent_reader import read_s19

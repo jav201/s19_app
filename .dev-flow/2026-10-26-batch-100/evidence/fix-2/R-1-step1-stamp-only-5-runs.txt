@@ -1,0 +1,27 @@
+save-project: trigger -> outcome 0.974 s; ['Project saved + manifest verified']
+.Save project request -> commit end 0.466 s
+2 passed in 6.35s
+save-project: trigger -> outcome 1.088 s; ['Project saved + manifest verified']
+FSave project request -> commit end 0.298 s
+        print(f"{writer}: trigger -> outcome {took:.3f} s; {outcomes[:1]}")
+E       AssertionError: 1.0876652000006288
+tests\test_b100_active_variant.py:722: AssertionError
+1 failed, 1 passed in 6.78s
+save-project: trigger -> outcome 1.024 s; ['Project saved + manifest verified']
+FSave project request -> commit end 0.349 s
+        print(f"{writer}: trigger -> outcome {took:.3f} s; {outcomes[:1]}")
+E       AssertionError: 1.024085900047794
+tests\test_b100_active_variant.py:722: AssertionError
+1 failed, 1 passed in 6.87s
+save-project: trigger -> outcome 1.075 s; ['Project saved + manifest verified']
+FSave project request -> commit end 0.407 s
+        print(f"{writer}: trigger -> outcome {took:.3f} s; {outcomes[:1]}")
+E       AssertionError: 1.0751065000658855
+tests\test_b100_active_variant.py:722: AssertionError
+1 failed, 1 passed in 7.38s
+save-project: trigger -> outcome 1.071 s; ['Project saved + manifest verified']
+FSave project request -> commit end 0.344 s
+        print(f"{writer}: trigger -> outcome {took:.3f} s; {outcomes[:1]}")
+E       AssertionError: 1.071489299996756
+tests\test_b100_active_variant.py:722: AssertionError
+1 failed, 1 passed in 6.99s

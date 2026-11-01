@@ -2416,6 +2416,61 @@ def test_tc_b100_53_quit_asks_only_while_a_session_action_runs(
     assert still_running is True
 
 
+def test_tc_b100_53_quit_question_emphasises_the_safe_answer(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """OBS-12b-2 (fix round 2, orchestrator ruling: the safe default carries
+    the emphasis), HLR-177b / LLR-177.4: during a held Save the quit
+    question paints ``Stay (n)`` with the primary ``modal-confirm`` style
+    and ``Quit (y)`` plain; the focus stays on ``#confirm_no`` and ``n``
+    still answers Stay. The load question (``ConfirmQuestionScreen``) keeps
+    its primary style on ``#confirm_yes``.
+
+    Why: the eye lands on the filled button; with the destructive answer
+    filled while Enter picks Stay, the look and the default disagree.
+    Negative control (dee0d96): ``Quit (y)`` carries ``modal-confirm`` ->
+    RED."""
+    from s19_app.tui.screens import ConfirmQuestionScreen
+
+    base, hold = held_save_scene(tmp_path, monkeypatch)
+
+    def styled(app) -> dict:
+        return {
+            button: "modal-confirm" in app.screen.query_one(f"#{button}").classes
+            for button in ("confirm_yes", "confirm_no")
+        }
+
+    async def scenario(app, pilot, log):
+        try:
+            await start_held_save(app, pilot, hold)
+            neutral_focus(app)
+            await app.run_action("quit")
+            await wait(pilot, lambda: is_quit_question(app.screen), "the quit question", 10)
+            quit_styles = styled(app)
+            focused = getattr(app.focused, "id", None)
+            await pilot.press("n")
+            await wait(pilot, lambda: not is_quit_question(app.screen), "the question to close", 10)
+            stayed = running(app)
+        finally:
+            hold.release.set()
+        await settle_workers(pilot)
+        app.push_screen(ConfirmQuestionScreen("Replace?", "body", "Replace (y)", "Cancel (n)"))
+        await wait(
+            pilot,
+            lambda: isinstance(app.screen, ConfirmQuestionScreen) and len(app.screen.query("#confirm_no")) > 0,
+            "the load question",
+            10,
+        )
+        load_styles = styled(app)
+        await pilot.press("n")
+        return quit_styles, focused, stayed, load_styles
+
+    quit_styles, focused, stayed, load_styles = run(base, scenario)
+    assert quit_styles == {"confirm_yes": False, "confirm_no": True}, quit_styles
+    assert (focused, stayed) == ("confirm_no", True), (focused, stayed)
+    assert load_styles == {"confirm_yes": True, "confirm_no": False}, load_styles
+
+
 def _idle_scene(key: str):
     async def scenario(app, pilot, log):
         neutral_focus(app)
@@ -3183,6 +3238,91 @@ def test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished(
     assert raised is None, f"{raised} left load_a2l_from_path"
     assert lines == [expected], lines
     assert (len(begins.calls), runs, alive) == (0, [], True), (len(begins.calls), runs, alive)
+
+
+SYNC_UNREADABLE_STEP = "could not be read — check that the folder can be opened, then load again."
+
+
+def test_tc_b100_54_file_load_sync_refuses_when_the_project_folder_is_gone(tmp_path: Path) -> None:
+    """SE5-12b-2 tail (fix round 2), LLR-176.2c / the CR12b-2 refusal
+    pattern: ``P2`` is open, then its folder is removed outside the app and
+    a regular file named ``P2`` takes its place; a data file load then
+    syncs into the open project (``_sync_loaded_file_to_project``, posted
+    by the file-load worker) -> the load still ends ``Loaded other.s19``,
+    1 line ``Project sync NOT done: project 'P2' could not be read — check
+    that the folder can be opened, then load again.``, the app running and
+    no run left.
+
+    Why: the sync's raise goes back to the worker -> ``_busy_fail`` ->
+    ``WorkerFailed`` -> the app exits and the unsaved session is lost.
+    Negative control (dee0d96): ``mkdir`` raises ``FileExistsError`` out of
+    the sync -> the app exits -> RED."""
+    base = tmp_path / "app"
+    # The image alone: an attached MAC or A2L inside the folder would be
+    # re-read by the load itself and fail it before the sync is reached.
+    trio(W(base) / "P2", names=("firmware.s19",))
+    src = tmp_path / "src" / "other.s19"
+    src.parent.mkdir(parents=True)
+    shutil.copyfile(projects.CASE02_DIR / "firmware.s19", src)
+
+    async def scenario(app, pilot, log):
+        await open_trio_project(app, pilot, "P2")
+        shutil.rmtree(W(base) / "P2")
+        (W(base) / "P2").write_bytes(b"")
+        mark = len(log.messages)
+        app.load_from_path(src)
+        exited = await ended_or_exited(app, "file_load")
+        return exited, log.since(mark), list(app._busy.runs)
+
+    exited, lines, runs = run(base, scenario)
+    assert not exited, lines
+    assert lines.count(f"Project sync NOT done: project 'P2' {SYNC_UNREADABLE_STEP}") == 1, lines
+    assert lines[-1] == "Loaded other.s19", lines
+    assert runs == [], runs
+
+
+def test_tc_b100_54_a2l_sync_refuses_when_the_project_folder_turns_unreadable(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """SE5-12b-2 tail (fix round 2), the CR12b-2 refusal pattern: ``P2``
+    (no A2L) is open; an A2L attach passes its request-time project guard,
+    then the project folder cannot be read when the install syncs the A2L
+    into it (``_sync_loaded_a2l_to_project``; ``validate_project_files``
+    raises ``PermissionError`` there only) -> the attach still ends ``A2L
+    loaded: firmware.a2l``, 1 line ``A2L sync NOT done: project 'P2' could
+    not be read — check that the folder can be opened, then load again.``,
+    the app running and no run left.
+
+    Why: the install runs on the main thread from the A2L worker's post, so
+    the raise goes back to the worker -> ``WorkerFailed`` -> the app exits.
+    Negative control (dee0d96): the ``PermissionError`` leaves the sync ->
+    the app exits -> RED."""
+    base = tmp_path / "app"
+    trio(W(base) / "P2", names=("firmware.s19", "firmware.mac"))
+    a2l = tmp_path / "src" / "firmware.a2l"
+    a2l.parent.mkdir(parents=True)
+    shutil.copyfile(CASE01 / "firmware.a2l", a2l)
+    real_validate = app_module.validate_project_files
+
+    def _validate(project_dir):
+        if sys._getframe(1).f_code.co_name == "_sync_loaded_a2l_to_project":
+            raise PermissionError(13, "synthetic: the folder cannot be read")
+        return real_validate(project_dir)
+
+    monkeypatch.setattr(app_module, "validate_project_files", _validate)
+
+    async def scenario(app, pilot, log):
+        await open_trio_project(app, pilot, "P2")
+        mark = len(log.messages)
+        app.load_a2l_from_path(a2l)
+        exited = await ended_or_exited(app, "a2l_load")
+        return exited, log.since(mark), list(app._busy.runs)
+
+    exited, lines, runs = run(base, scenario)
+    assert not exited, lines
+    assert lines.count(f"A2L sync NOT done: project 'P2' {SYNC_UNREADABLE_STEP}") == 1, lines
+    assert lines[-1] == "A2L loaded: firmware.a2l", lines
+    assert runs == [], runs
 
 
 def test_tc_b100_53_report_generate_keeps_the_regions_of_a_running_save(

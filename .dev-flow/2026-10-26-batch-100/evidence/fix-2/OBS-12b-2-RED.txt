@@ -1,0 +1,71 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________ test_tc_b100_53_quit_question_emphasises_the_safe_answer ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/s19f2/bt/test_tc_b100_53_quit_question_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000021BDF5579D0>
+
+    def test_tc_b100_53_quit_question_emphasises_the_safe_answer(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """OBS-12b-2 (fix round 2, orchestrator ruling: the safe default carries
+        the emphasis), HLR-177b / LLR-177.4: during a held Save the quit
+        question paints ``Stay (n)`` with the primary ``modal-confirm`` style
+        and ``Quit (y)`` plain; the focus stays on ``#confirm_no`` and ``n``
+        still answers Stay. The load question (``ConfirmQuestionScreen``) keeps
+        its primary style on ``#confirm_yes``.
+    
+        Why: the eye lands on the filled button; with the destructive answer
+        filled while Enter picks Stay, the look and the default disagree.
+        Negative control (dee0d96): ``Quit (y)`` carries ``modal-confirm`` ->
+        RED."""
+        from s19_app.tui.screens import ConfirmQuestionScreen
+    
+        base, hold = held_save_scene(tmp_path, monkeypatch)
+    
+        def styled(app) -> dict:
+            return {
+                button: "modal-confirm" in app.screen.query_one(f"#{button}").classes
+                for button in ("confirm_yes", "confirm_no")
+            }
+    
+        async def scenario(app, pilot, log):
+            try:
+                await start_held_save(app, pilot, hold)
+                neutral_focus(app)
+                await app.run_action("quit")
+                await wait(pilot, lambda: is_quit_question(app.screen), "the quit question", 10)
+                quit_styles = styled(app)
+                focused = getattr(app.focused, "id", None)
+                await pilot.press("n")
+                await wait(pilot, lambda: not is_quit_question(app.screen), "the question to close", 10)
+                stayed = running(app)
+            finally:
+                hold.release.set()
+            await settle_workers(pilot)
+            app.push_screen(ConfirmQuestionScreen("Replace?", "body", "Replace (y)", "Cancel (n)"))
+            await wait(
+                pilot,
+                lambda: isinstance(app.screen, ConfirmQuestionScreen) and len(app.screen.query("#confirm_no")) > 0,
+                "the load question",
+                10,
+            )
+            load_styles = styled(app)
+            await pilot.press("n")
+            return quit_styles, focused, stayed, load_styles
+    
+        quit_styles, focused, stayed, load_styles = run(base, scenario)
+>       assert quit_styles == {"confirm_yes": False, "confirm_no": True}, quit_styles
+E       AssertionError: {'confirm_no': False, 'confirm_yes': True}
+E       assert {'confirm_no'...rm_yes': True} == {'confirm_no'...m_yes': False}
+E         
+E         Differing items:
+E         {'confirm_no': False} != {'confirm_no': True}
+E         {'confirm_yes': True} != {'confirm_yes': False}
+E         Use -v to get more diff
+
+tests\test_b100_workers.py:2469: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_workers.py::test_tc_b100_53_quit_question_emphasises_the_safe_answer
+1 failed in 3.64s
+exit=1

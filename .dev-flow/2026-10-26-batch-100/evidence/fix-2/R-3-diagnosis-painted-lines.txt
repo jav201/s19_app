@@ -1,0 +1,7 @@
+after first load: [(633646.59, 'Loaded a.s19 (S19 only)'), (633646.64, 'Loaded a.s19')]
+status4: Loaded a.s19 | line3: Loaded a.s19 (S19 only)
+after pick: [(633647.05, 'Loaded a.s19 (S19 only)'), (633647.19, 'Loaded a.s19')]
+busy runs: {}
+status4: Loaded a.s19 | line3: Loaded a.s19 (S19 only)
+screen: Screen focused: ListView(id='files_list')
+exit=0
