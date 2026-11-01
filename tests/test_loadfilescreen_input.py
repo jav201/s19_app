@@ -1,4 +1,4 @@
-"""Regression tests for ``LoadFileScreen`` keyboard input handling.
+"""Regression tests for the Load dialog's ``#load_path`` keyboard input handling.
 
 These tests exist because two user-visible bugs in the Load dialog Input
 survived the entire test suite:
@@ -26,8 +26,14 @@ Both bugs shipped for months because the requirement set treated the
 Load dialog as `Validation: Manual` and no automated coverage existed for
 its keyboard behavior. These tests are the trip-wire.
 
-Covers R-TUI-043 (initial focus + input handling of ``LoadFileScreen``)
-and lifts R-A2L-004 to `Automated`.
+Covers R-TUI-043 (initial focus + input handling of the Load dialog's path
+field) and lifts R-A2L-004 to `Automated`.
+
+Inc 9b re-pin (ruling Q9): the Load file screen is retired into the one
+``LoadDialog``. Each test pushes that dialog in path mode (the old Load file
+entry) with inert callables (``tests/support/b100_load_dialog.bare_path_dialog``),
+so it still exercises the ``#load_path`` field alone; ``#load_path`` stays an
+``OsClipboardInput`` (R-GA-7).
 """
 
 from __future__ import annotations
@@ -41,7 +47,7 @@ from textual.widgets import Button, Input
 
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.os_clipboard_input import OsClipboardInput
-from s19_app.tui.screens import LoadFileScreen
+from tests.support.b100_load_dialog import bare_path_dialog, is_load_dialog
 
 # A realistic Windows path chosen to hit every single-key App binding
 # that would silently steal a keystroke if the focus were on the primary
@@ -92,7 +98,7 @@ def test_loadfilescreen_auto_focus_lands_on_input(tmp_path: Path) -> None:
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(160, 48)) as pilot:
             await pilot.pause()
-            app.push_screen(LoadFileScreen())
+            app.push_screen(bare_path_dialog())
             for _ in range(8):
                 await pilot.pause()
             focused = app.focused
@@ -100,7 +106,7 @@ def test_loadfilescreen_auto_focus_lands_on_input(tmp_path: Path) -> None:
 
     focused_repr = asyncio.run(_drive())
     assert focused_repr == "OsClipboardInput:load_path", (
-        f"LoadFileScreen must auto-focus #load_path; focus went to {focused_repr}. "
+        f"The Load dialog (path mode) must auto-focus #load_path; focus went to {focused_repr}. "
         "Without this, keystrokes fire App bindings instead of typing."
     )
 
@@ -120,7 +126,7 @@ def test_loadfilescreen_typing_a_realistic_path_is_not_truncated(
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(160, 48)) as pilot:
             await pilot.pause()
-            app.push_screen(LoadFileScreen())
+            app.push_screen(bare_path_dialog())
             for _ in range(6):
                 await pilot.pause()
             input_widget = app.screen.query_one("#load_path", Input)
@@ -152,7 +158,7 @@ def test_loadfilescreen_typing_after_focus_stolen_by_button_reproduces_bug(
         lost = 0
         async with app.run_test(size=(160, 48)) as pilot:
             await pilot.pause()
-            app.push_screen(LoadFileScreen())
+            app.push_screen(bare_path_dialog())
             for _ in range(6):
                 await pilot.pause()
             # Manually steal focus (simulate the pre-fix default).
@@ -165,7 +171,7 @@ def test_loadfilescreen_typing_after_focus_stolen_by_button_reproduces_bug(
                 if _key_for(ch) == "q":
                     lost += 1
                     continue
-                if not isinstance(app.screen, LoadFileScreen):
+                if not is_load_dialog(app.screen):
                     # Some binding pushed a new screen — that is ALSO a
                     # symptom of the bug. Count remaining as lost.
                     lost += len(_COLLIDING_PATH) - _COLLIDING_PATH.index(ch)
@@ -194,7 +200,7 @@ def test_loadfilescreen_uses_os_clipboard_widget(tmp_path: Path) -> None:
     """R-TUI-043-c: the Load dialog Input must be the OS-clipboard variant.
 
     Fails if someone replaces ``OsClipboardInput`` with a stock ``Input``
-    in ``LoadFileScreen.compose``, restoring the OS-clipboard-blind
+    in the Load dialog's ``compose``, restoring the OS-clipboard-blind
     ``action_paste`` behavior.
     """
 
@@ -202,7 +208,7 @@ def test_loadfilescreen_uses_os_clipboard_widget(tmp_path: Path) -> None:
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(160, 48)) as pilot:
             await pilot.pause()
-            app.push_screen(LoadFileScreen())
+            app.push_screen(bare_path_dialog())
             for _ in range(6):
                 await pilot.pause()
             widget = app.screen.query_one("#load_path", Input)
@@ -210,7 +216,7 @@ def test_loadfilescreen_uses_os_clipboard_widget(tmp_path: Path) -> None:
 
     widget_type = asyncio.run(_drive())
     assert widget_type == "OsClipboardInput", (
-        f"LoadFileScreen must use OsClipboardInput for #load_path so Ctrl+V "
+        f"The Load dialog must use OsClipboardInput for #load_path so Ctrl+V "
         f"pastes from the OS clipboard; got {widget_type}."
     )
 
@@ -234,7 +240,7 @@ def test_loadfilescreen_ctrl_v_reads_from_os_clipboard(
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(160, 48)) as pilot:
             await pilot.pause()
-            app.push_screen(LoadFileScreen())
+            app.push_screen(bare_path_dialog())
             for _ in range(6):
                 await pilot.pause()
             input_widget = app.screen.query_one("#load_path", Input)
@@ -266,7 +272,7 @@ def test_loadfilescreen_ctrl_v_falls_back_to_internal_clipboard(
         app._clipboard = "PATH_FROM_INTERNAL_FALLBACK"
         async with app.run_test(size=(160, 48)) as pilot:
             await pilot.pause()
-            app.push_screen(LoadFileScreen())
+            app.push_screen(bare_path_dialog())
             for _ in range(6):
                 await pilot.pause()
             input_widget = app.screen.query_one("#load_path", Input)
@@ -421,7 +427,7 @@ def test_ctrl_v_notifies_user_when_every_clipboard_source_is_empty(
         app._clipboard = ""  # internal clipboard also empty
         async with app.run_test(size=(160, 48)) as pilot:
             await pilot.pause()
-            app.push_screen(LoadFileScreen())
+            app.push_screen(bare_path_dialog())
             for _ in range(6):
                 await pilot.pause()
             # Patch notify to record the call instead of routing to the
@@ -563,7 +569,7 @@ def test_ctrl_v_preserves_unicode_from_clipboard(
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(160, 48)) as pilot:
             await pilot.pause()
-            app.push_screen(LoadFileScreen())
+            app.push_screen(bare_path_dialog())
             for _ in range(6):
                 await pilot.pause()
             input_widget = app.screen.query_one("#load_path", Input)
@@ -674,7 +680,7 @@ def test_at042b_ctrl_v_inserts_capped_value_via_real_read(
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(160, 48)) as pilot:
             await pilot.pause()
-            app.push_screen(LoadFileScreen())
+            app.push_screen(bare_path_dialog())
             for _ in range(6):
                 await pilot.pause()
             input_widget = app.screen.query_one("#load_path", Input)
@@ -731,7 +737,7 @@ def test_at042e_real_path_passes_through_untouched(
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(160, 48)) as pilot:
             await pilot.pause()
-            app.push_screen(LoadFileScreen())
+            app.push_screen(bare_path_dialog())
             for _ in range(6):
                 await pilot.pause()
             input_widget = app.screen.query_one("#load_path", Input)
@@ -759,7 +765,7 @@ def test_at042f_multiline_clipboard_inserts_only_first_line(
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(160, 48)) as pilot:
             await pilot.pause()
-            app.push_screen(LoadFileScreen())
+            app.push_screen(bare_path_dialog())
             for _ in range(6):
                 await pilot.pause()
             input_widget = app.screen.query_one("#load_path", Input)

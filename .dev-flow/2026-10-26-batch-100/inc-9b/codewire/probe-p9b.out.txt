@@ -1,0 +1,30 @@
+== import C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc-9b-design\work\tree\s19_app\__init__.py
+== U1 p with 0 projects -> stack ['Screen'] status ['No saved projects found.']
+== U2 list_projects ['[b]P', 'ab', 'c', 'E', 'j', 'n', 's']
+== U3 _handle_load_project('E') -> ["Project NOT loaded: 'E' has no project.json — load a file and Save project."] project= None
+== U3 _handle_load_project('n') -> ["Project NOT loaded: 'n' has no project.json — load a file and Save project."] project= None
+== U3 _handle_load_project('j') -> ["Project NOT loaded: 'j' has no data or A2L file — load a file and Save project."] project= None
+== U4 typed <workarea>/E -> ["Project NOT loaded: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\p9b_9afbc38u\\.s19tool\\workarea\\E' is not a project — pick a project in the list."]
+== U5 p -> stack ['Screen', 'LoadProjectScreen'] focused project_list index 0 rows 7
+== U5 painted labels ['P', 'ab', 'c', 'E', 'j', 'n', 's']
+== U5 '[b]P' label renders 'P' type Content spans [(0, 1, 'b')]
+== U6 escape on LoadProjectScreen -> stack ['Screen', 'LoadProjectScreen']
+== U6 down -> index 1 focused project_list
+== U7 enter on list -> stack ['Screen', 'LoadProjectScreen'] status [] project= None
+== U8 project_ok on index 0 -> stack ['Screen', 'LoadResultScreen'] status ["Loaded project '[b]P' -> firmware.s19 - variant 1 of 1, 1 problem - details: p"] project= [b]P
+== F1 l -> stack ['Screen', 'LoadFileScreen'] focused load_path
+== F2 escape on LoadFileScreen -> stack ['Screen', 'LoadFileScreen']
+== F3 empty Load click -> stack ['Screen', 'LoadFileScreen'] status []
+== F4 Enter with a typed path -> stack ['Screen', 'LoadFileScreen'] current_file None
+== F5 ctrl+l under LoadFileScreen -> actions run ['load_file'] stack ['Screen', 'LoadFileScreen', 'LoadFileScreen'] (before ['Screen', 'LoadFileScreen'] ) focused OsClipboardInput load_path
+== F5 ctrl+s under LoadFileScreen -> actions run ['save_project'] stack ['Screen', 'LoadFileScreen', 'SaveProjectScreen'] (before ['Screen', 'LoadFileScreen'] ) focused OsClipboardInput project_parent_path
+== F5 ctrl+k under LoadFileScreen -> actions run ['focus_palette'] stack ['Screen', 'LoadFileScreen'] (before ['Screen', 'LoadFileScreen'] ) focused OsClipboardInput load_path
+== F5 ctrl+d under LoadFileScreen -> actions run ['cycle_density'] stack ['Screen', 'LoadFileScreen'] (before ['Screen', 'LoadFileScreen'] ) focused OsClipboardInput load_path
+== F5 density classes before/after ['density-comfortable'] ['density-compact']
+== F6 typed relative R\x.s19 (cwd elsewhere) -> status ['Loaded x.s19']
+== F6 store [('<base>\\R\\x.s19', 's19')] None
+== F7 _load_from_item('w.s19') -> copy_into_workarea calls [] status []
+== F7 _load_from_item('w.a2l') -> copy_into_workarea calls ['w.a2l'] status ['A2L loaded: w.a2l']
+== F7 _load_from_item('w.a2l.json') -> copy_into_workarea calls [] status ['Unsupported file type: .json']
+== F8 list_workarea_files ['w.a2l', 'w.a2l.json', 'w.s19', 'x.s19']
+== F9 store after picks 1

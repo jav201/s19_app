@@ -13,6 +13,12 @@ Load+projects prototype round.)
 These tests drive the real dialog end to end: pick ``proj_b``, which is not the
 first entry (so a fallback to the first entry cannot pass), and check the
 app's project state.
+
+Inc 9b re-pin (ruling Q9): the separate Load project dialog and its list
+and OK ids are retired. ``action_load_project`` (key ``p``) now opens
+the one Load dialog with the focus on ``#load_list``; the arrow keys move the
+highlight to ``proj_b`` (the second project row, so a fallback to the first
+row still cannot pass) and ``#load_ok`` loads it.
 """
 
 from __future__ import annotations
@@ -21,10 +27,8 @@ import asyncio
 import shutil
 from pathlib import Path
 
-from textual.widgets import ListView
-
 from s19_app.tui.app import S19TuiApp
-from s19_app.tui.screens import LoadProjectScreen
+from tests.support.b100_load_dialog import highlight_row, is_load_dialog
 
 _FIRMWARE = Path(__file__).resolve().parents[1] / "examples" / "case_01_basic_valid" / "firmware.s19"
 
@@ -43,12 +47,10 @@ async def _pick_second_project(tmp_path: Path) -> "tuple[str | None, str, str]":
         await pilot.pause()
         app.action_load_project()
         await pilot.pause()
-        assert isinstance(app.screen, LoadProjectScreen), "p must open the project list"
-        list_view = app.screen.query_one("#project_list", ListView)
-        list_view.focus()
-        list_view.index = app.screen.projects.index("proj_b")
+        assert is_load_dialog(app.screen), "p must open the Load dialog"
+        await highlight_row(pilot, app, "proj_b")
         await pilot.pause()
-        await pilot.click("#project_ok")
+        await pilot.click("#load_ok")
         for _ in range(40):
             await pilot.pause(0.05)
             if app.current_project is not None:
@@ -60,4 +62,4 @@ async def _pick_second_project(tmp_path: Path) -> "tuple[str | None, str, str]":
 def test_load_project_button_loads_the_picked_project(tmp_path: Path) -> None:
     project, screen, status = asyncio.run(_pick_second_project(tmp_path))
     assert project == "proj_b", f"Load must open the highlighted project; got {project!r} (status: {status!r})"
-    assert screen != "LoadProjectScreen", "the dialog must close after Load"
+    assert screen != "LoadDialog", "the dialog must close after Load"

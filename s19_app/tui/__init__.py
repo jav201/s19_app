@@ -29,7 +29,7 @@ from ..render.hexview import (
     render_hex_view_text,
 )
 from .models import LoadedFile, ProjectVariantSet, VariantDescriptor
-from .screens import LoadFileScreen, LoadProjectScreen, SaveProjectPayload, SaveProjectScreen
+from .screens import LoadChoice, LoadDialog, SaveProjectPayload, SaveProjectScreen
 from .workspace import (
     A2L_EXTENSIONS,
     HEX_EXTENSIONS,
@@ -58,8 +58,8 @@ __all__ = [
     "HEX_WIDTH",
     "LOG_FILENAME",
     "LOGS_SUBDIR",
-    "LoadFileScreen",
-    "LoadProjectScreen",
+    "LoadChoice",
+    "LoadDialog",
     "LoadedFile",
     "MAX_HEX_BYTES",
     "MAX_HEX_ROWS",

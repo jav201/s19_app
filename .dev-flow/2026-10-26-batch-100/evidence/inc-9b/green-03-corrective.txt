@@ -1,0 +1,38 @@
+# green-03-corrective — batch-100 Inc 9b E5 corrective pass: the same 10 arms GREEN in the worktree (fixed source).
+# tree: C:/Users/jjgh8/Github/s19_app-b100-inc9b
+# git: 741cc07
+# date: 2026-10-31T18:23:58-06:00
+# cmd: pytest tests/test_b100_load_dialog.py -k priority_keys_are_inert or recent_choice_loads_the_recorded or linked_file_is_explained_as_a_file or over_long_paste or resolve_error_is_refused or project_json_that_is_a_reparse_point or reparse_file_in_a_project -v -rA --tb=short --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr9b/bt-green3
+s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc9b\s19_app\__init__.py
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+rootdir: C:\Users\jjgh8\Github\s19_app-b100-inc9b
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 141 items / 131 deselected / 10 selected
+
+tests/test_b100_load_dialog.py::test_tc_b100_40_recent_choice_loads_the_recorded_text_unchanged PASSED [ 10%]
+tests/test_b100_load_dialog.py::test_tc_b100_41_priority_keys_are_inert_while_the_dialog_is_open PASSED [ 20%]
+tests/test_b100_load_dialog.py::test_tc_b100_63_typed_linked_file_is_explained_as_a_file[linked s19] PASSED [ 30%]
+tests/test_b100_load_dialog.py::test_tc_b100_63_typed_linked_file_is_explained_as_a_file[a2l through a junction] PASSED [ 40%]
+tests/test_b100_load_dialog.py::test_tc_b100_63_over_long_paste_is_refused_and_the_app_stays_up PASSED [ 50%]
+tests/test_b100_load_dialog.py::test_tc_b100_63_resolve_error_is_refused_not_raised[ValueError-relative] PASSED [ 60%]
+tests/test_b100_load_dialog.py::test_tc_b100_63_resolve_error_is_refused_not_raised[ValueError-absolute] PASSED [ 70%]
+tests/test_b100_load_dialog.py::test_tc_b100_63_resolve_error_is_refused_not_raised[RuntimeError-relative] PASSED [ 80%]
+tests/test_b100_load_dialog.py::test_tc_b100_64_project_json_that_is_a_reparse_point_is_refused PASSED [ 90%]
+tests/test_b100_load_dialog.py::test_tc_b100_64_reparse_file_in_a_project_is_neither_listed_nor_installed PASSED [100%]
+
+=================================== PASSES ====================================
+=========================== short test summary info ===========================
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_40_recent_choice_loads_the_recorded_text_unchanged
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_41_priority_keys_are_inert_while_the_dialog_is_open
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_linked_file_is_explained_as_a_file[linked s19]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_linked_file_is_explained_as_a_file[a2l through a junction]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_over_long_paste_is_refused_and_the_app_stays_up
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_resolve_error_is_refused_not_raised[ValueError-relative]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_resolve_error_is_refused_not_raised[ValueError-absolute]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_63_resolve_error_is_refused_not_raised[RuntimeError-relative]
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_project_json_that_is_a_reparse_point_is_refused
+PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_reparse_file_in_a_project_is_neither_listed_nor_installed
+================ 10 passed, 131 deselected in 70.71s (0:01:10) ================
+# exit: 0

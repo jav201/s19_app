@@ -1,0 +1,2413 @@
+{
+  "marks": [
+    {
+      "name": "choose_install_set",
+      "reqs": [
+        "LLR-173.6",
+        "LLR-173.6a"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 1593,
+      "def": {
+        "qualname": "choose_install_set",
+        "line": 1594,
+        "params": [
+          {
+            "name": "variant_set",
+            "type": "ProjectVariantSet",
+            "default": null
+          },
+          {
+            "name": "recorded",
+            "type": "Optional[str]",
+            "default": null
+          },
+          {
+            "name": "data_files",
+            "type": "Sequence[Path]",
+            "default": null
+          },
+          {
+            "name": "a2l_files",
+            "type": "Sequence[Path]",
+            "default": null
+          },
+          {
+            "name": "unreadable",
+            "type": "Sequence[str]",
+            "default": "()"
+          }
+        ],
+        "returns": "InstallSet"
+      }
+    },
+    {
+      "name": "S19TuiApp.on_mount",
+      "reqs": [
+        "LLR-173.1c"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 7192,
+      "def": {
+        "qualname": "S19TuiApp.on_mount",
+        "line": 7193,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.refresh_files",
+      "reqs": [
+        "LLR-173.3a",
+        "LLR-173.4b"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 7304,
+      "def": {
+        "qualname": "S19TuiApp.refresh_files",
+        "line": 7305,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.action_load_file",
+      "reqs": [
+        "LLR-173.2",
+        "LLR-173.1e"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 7332,
+      "def": {
+        "qualname": "S19TuiApp.action_load_file",
+        "line": 7333,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.action_load_project",
+      "reqs": [
+        "LLR-173.2a",
+        "LLR-173.2b",
+        "LLR-173.1e",
+        "LLR-173.4d"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 7443,
+      "def": {
+        "qualname": "S19TuiApp.action_load_project",
+        "line": 7444,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._route_load_project",
+      "reqs": [
+        "LLR-173.1a",
+        "LLR-178.3"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 7454,
+      "def": {
+        "qualname": "S19TuiApp._route_load_project",
+        "line": 7455,
+        "params": [
+          {
+            "name": "name",
+            "type": "Optional[str]",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._handle_select_variant",
+      "reqs": [
+        "LLR-172.1n"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 7564,
+      "def": {
+        "qualname": "S19TuiApp._handle_select_variant",
+        "line": 7565,
+        "params": [
+          {
+            "name": "variant_id",
+            "type": "Optional[str]",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._build_palette_entries",
+      "reqs": [
+        "LLR-173.2m"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 7918,
+      "def": {
+        "qualname": "S19TuiApp._build_palette_entries",
+        "line": 7919,
+        "params": [],
+        "returns": "tuple[PaletteEntry, ...]"
+      }
+    },
+    {
+      "name": "S19TuiApp.check_action",
+      "reqs": [
+        "LLR-173.2e"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 8042,
+      "def": {
+        "qualname": "S19TuiApp.check_action",
+        "line": 8043,
+        "params": [
+          {
+            "name": "action",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "parameters",
+            "type": "tuple",
+            "default": null
+          }
+        ],
+        "returns": "Optional[bool]"
+      }
+    },
+    {
+      "name": "S19TuiApp._handle_load_project",
+      "reqs": [
+        "LLR-173.1a",
+        "LLR-173.4a",
+        "LLR-173.6",
+        "LLR-173.6a"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 11684,
+      "def": {
+        "qualname": "S19TuiApp._handle_load_project",
+        "line": 11685,
+        "params": [
+          {
+            "name": "name",
+            "type": "Optional[str]",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.list_projects",
+      "reqs": [
+        "LLR-173.4",
+        "LLR-173.4a",
+        "LLR-173.2b"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 12106,
+      "def": {
+        "qualname": "S19TuiApp.list_projects",
+        "line": 12107,
+        "params": [],
+        "returns": "List[str]"
+      }
+    },
+    {
+      "name": "S19TuiApp._project_folder_refusal",
+      "reqs": [
+        "LLR-173.4",
+        "LLR-173.5d"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 12171,
+      "def": {
+        "qualname": "S19TuiApp._project_folder_refusal",
+        "line": 12172,
+        "params": [
+          {
+            "name": "folder",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "Optional[str]"
+      }
+    },
+    {
+      "name": "S19TuiApp._typed_load_route",
+      "reqs": [
+        "LLR-173.5",
+        "LLR-173.5a",
+        "LLR-173.5b",
+        "LLR-173.5c",
+        "LLR-173.5d",
+        "LLR-173.5e",
+        "LLR-173.4k"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 12771,
+      "def": {
+        "qualname": "S19TuiApp._typed_load_route",
+        "line": 12772,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "Tuple[str, str]"
+      }
+    },
+    {
+      "name": "S19TuiApp._load_path_from_user_input",
+      "reqs": [
+        "LLR-173.1c",
+        "LLR-173.1f",
+        "LLR-173.5",
+        "LLR-172.1n"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 12918,
+      "def": {
+        "qualname": "S19TuiApp._load_path_from_user_input",
+        "line": 12919,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._handle_load_dialog",
+      "reqs": [
+        "LLR-173.1",
+        "LLR-173.1c",
+        "LLR-173.1d",
+        "LLR-173.1e"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 12983,
+      "def": {
+        "qualname": "S19TuiApp._handle_load_dialog",
+        "line": 12984,
+        "params": [
+          {
+            "name": "path",
+            "type": "Optional[Path]",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.load_from_path",
+      "reqs": [
+        "LLR-172.1n",
+        "LLR-173.1b",
+        "LLR-173.1c",
+        "LLR-173.1f"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 13020,
+      "def": {
+        "qualname": "S19TuiApp.load_from_path",
+        "line": 13021,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.load_a2l_from_path",
+      "reqs": [
+        "LLR-172.1n",
+        "LLR-173.1b"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 13103,
+      "def": {
+        "qualname": "S19TuiApp.load_a2l_from_path",
+        "line": 13104,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.on_list_view_selected",
+      "reqs": [
+        "LLR-173.2j"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 13196,
+      "def": {
+        "qualname": "S19TuiApp.on_list_view_selected",
+        "line": 13197,
+        "params": [
+          {
+            "name": "event",
+            "type": "ListView.Selected",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._load_from_item",
+      "reqs": [
+        "LLR-173.1b"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 13343,
+      "def": {
+        "qualname": "S19TuiApp._load_from_item",
+        "line": 13344,
+        "params": [
+          {
+            "name": "item",
+            "type": "ListItem",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._parse_loaded_file",
+      "reqs": [
+        "LLR-173.6b"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 15118,
+      "def": {
+        "qualname": "S19TuiApp._parse_loaded_file",
+        "line": 15119,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "a2l_files",
+            "type": "Optional[list[Path]]",
+            "default": "None"
+          }
+        ],
+        "returns": "Optional[LoadedFile]"
+      }
+    },
+    {
+      "name": "S19TuiApp.on_button_pressed",
+      "reqs": [
+        "LLR-173.2a"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 17646,
+      "def": {
+        "qualname": "S19TuiApp.on_button_pressed",
+        "line": 17647,
+        "params": [
+          {
+            "name": "event",
+            "type": "Button.Pressed",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "LoadFileScreen.compose",
+      "reqs": [
+        "HLR-173",
+        "LLR-173.2",
+        "LLR-173.2c"
+      ],
+      "file": "s19_app/tui/screens.py",
+      "line": 199,
+      "def": {
+        "qualname": "LoadFileScreen.compose",
+        "line": 200,
+        "params": [],
+        "returns": "ComposeResult"
+      }
+    },
+    {
+      "name": "LoadFileScreen.on_button_pressed",
+      "reqs": [
+        "HLR-173c",
+        "HLR-173d",
+        "LLR-173.1",
+        "LLR-173.2h",
+        "LLR-173.2l"
+      ],
+      "file": "s19_app/tui/screens.py",
+      "line": 217,
+      "def": {
+        "qualname": "LoadFileScreen.on_button_pressed",
+        "line": 218,
+        "params": [
+          {
+            "name": "event",
+            "type": "Button.Pressed",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "LoadProjectScreen.__init__",
+      "reqs": [
+        "LLR-173.2a",
+        "LLR-173.4"
+      ],
+      "file": "s19_app/tui/screens.py",
+      "line": 706,
+      "def": {
+        "qualname": "LoadProjectScreen.__init__",
+        "line": 707,
+        "params": [
+          {
+            "name": "projects",
+            "type": "List[str]",
+            "default": null
+          }
+        ],
+        "returns": null
+      }
+    },
+    {
+      "name": "LoadProjectScreen.compose",
+      "reqs": [
+        "LLR-173.3",
+        "LLR-173.2b",
+        "LLR-173.4l"
+      ],
+      "file": "s19_app/tui/screens.py",
+      "line": 711,
+      "def": {
+        "qualname": "LoadProjectScreen.compose",
+        "line": 712,
+        "params": [],
+        "returns": "ComposeResult"
+      }
+    },
+    {
+      "name": "LoadProjectScreen.on_button_pressed",
+      "reqs": [
+        "LLR-173.1",
+        "LLR-173.1a",
+        "LLR-173.2j"
+      ],
+      "file": "s19_app/tui/screens.py",
+      "line": 729,
+      "def": {
+        "qualname": "LoadProjectScreen.on_button_pressed",
+        "line": 730,
+        "params": [
+          {
+            "name": "event",
+            "type": "Button.Pressed",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "painted_names",
+      "reqs": [
+        "LLR-173.3",
+        "LLR-173.3a",
+        "LLR-173.3b",
+        "LLR-173.3c"
+      ],
+      "file": "s19_app/tui/services/project_gather_service.py",
+      "line": 965,
+      "def": {
+        "qualname": "painted_names",
+        "line": 966,
+        "params": [
+          {
+            "name": "names",
+            "type": "Sequence[str]",
+            "default": null
+          },
+          {
+            "name": "limit",
+            "type": "int",
+            "default": "PAINTED_NAME_LIMIT"
+          },
+          {
+            "name": "clip",
+            "type": "int",
+            "default": "120"
+          }
+        ],
+        "returns": "str"
+      }
+    },
+    {
+      "name": "validate_project_files",
+      "reqs": [
+        "LLR-173.4a",
+        "LLR-173.6"
+      ],
+      "file": "s19_app/tui/workspace.py",
+      "line": 1874,
+      "def": {
+        "qualname": "validate_project_files",
+        "line": 1875,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "tuple[list[Path], list[Path], Optional[str]]"
+      }
+    },
+    {
+      "name": "resolve_input_path",
+      "reqs": [
+        "LLR-172.1n",
+        "LLR-173.1f"
+      ],
+      "file": "s19_app/tui/workspace.py",
+      "line": 2023,
+      "def": {
+        "qualname": "resolve_input_path",
+        "line": 2024,
+        "params": [
+          {
+            "name": "raw_path",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "base_dir",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "Optional[Path]"
+      }
+    },
+    {
+      "name": "recent_kind",
+      "reqs": [
+        "LLR-173.4b",
+        "LLR-173.4h"
+      ],
+      "file": "s19_app/tui/workspace.py",
+      "line": 2141,
+      "def": {
+        "qualname": "recent_kind",
+        "line": 2142,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "Optional[str]"
+      }
+    },
+    {
+      "name": "read_recent_sources",
+      "reqs": [
+        "LLR-173.4c",
+        "LLR-173.4f",
+        "LLR-173.4g"
+      ],
+      "file": "s19_app/tui/workspace.py",
+      "line": 2248,
+      "def": {
+        "qualname": "read_recent_sources",
+        "line": 2249,
+        "params": [],
+        "returns": "RecentSources"
+      }
+    },
+    {
+      "name": "record_recent_source",
+      "reqs": [
+        "LLR-172.1n",
+        "HLR-173b"
+      ],
+      "file": "s19_app/tui/workspace.py",
+      "line": 2401,
+      "def": {
+        "qualname": "record_recent_source",
+        "line": 2402,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "list_workarea_files",
+      "reqs": [
+        "LLR-173.4b"
+      ],
+      "file": "s19_app/tui/workspace.py",
+      "line": 2543,
+      "def": {
+        "qualname": "list_workarea_files",
+        "line": 2544,
+        "params": [
+          {
+            "name": "workarea",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "list[Path]"
+      }
+    },
+    {
+      "name": "safe_text",
+      "reqs": [
+        "LLR-173.3"
+      ],
+      "file": "s19_app/utils.py",
+      "line": 44,
+      "def": {
+        "qualname": "safe_text",
+        "line": 45,
+        "params": [
+          {
+            "name": "value",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "style",
+            "type": "str",
+            "default": "''"
+          }
+        ],
+        "returns": "Text"
+      }
+    }
+  ],
+  "graph_nodes": [
+    {
+      "name": "LoadFileScreen.compose",
+      "reqs": [
+        "HLR-173",
+        "LLR-173.2",
+        "LLR-173.2c"
+      ],
+      "in": [],
+      "out": {
+        "type": "ComposeResult",
+        "names": [
+          "widgets"
+        ],
+        "raw": "ComposeResult widgets"
+      },
+      "module": "s19_app/tui/screens.py",
+      "examples": [
+        "(probe p9b F1) `l` → stack `LoadFileScreen` on top, focus on `load_path` (holds on 9a tree)",
+        "(P-20, code read) the dialog holds `0` list widgets and names no work-area file or recent source (holds on 9a tree; RED side of HLR-173)",
+        "(probe p9b F2, P-18) `escape` on the dialog → the stack still ends in `LoadFileScreen` (holds on 9a tree; RED side of HLR-173e)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "builds `Container#load_dialog.modal-dialog` with a title Label, `OsClipboardInput#load_path`, and `Container#loadfile_buttons` holding `Button#load_ok` (\"Load\") and `Button#load_cancel`. `AUTO_FOCUS = \"#load_path\"`. No list, no preview, no reason line, no BINDINGS (no `escape`). 9b changes: retired; replaced by `LoadDialog.compose` (VS-PA-3, Q9).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "LoadFileScreen.on_button_pressed",
+      "reqs": [
+        "HLR-173c",
+        "HLR-173d",
+        "LLR-173.1",
+        "LLR-173.2h",
+        "LLR-173.2l"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Button.Pressed",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens.py",
+      "examples": [
+        "(probe p9b F3, P-19) empty `#load_path`, `#load_ok` clicked → stack unchanged, `0` status lines (holds on 9a tree; RED side of HLR-173d)",
+        "(probe p9b F4, P-19) `#load_path` = the path of `firmware.s19`, `enter` → stack unchanged, `current_file` `None` (holds on 9a tree; RED side of HLR-173c)",
+        "(test_loadfilescreen_typing_a_realistic_path_is_not_truncated) a realistic path typed → `#load_ok` dismisses with a `Path` of the whole text (holds on 9a tree)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "`#load_cancel` → `dismiss(None)`; `#load_ok` → `dismiss(Path(value))` with the stripped `#load_path` text; an empty value returns with no dismiss and no feedback. No validation in the dialog: every typed-path decision is the app's, after the dialog closed. Enter in `#load_path` posts `Input.Submitted`, which no handler on this screen reads. 9b changes: retired; `LoadDialog.action_load` / `action_cancel` (dismiss a `LoadChoice` only after `verdict` returned `None`).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "LoadProjectScreen.__init__",
+      "reqs": [
+        "LLR-173.2a",
+        "LLR-173.4"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "list[str]",
+          "name": "projects",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "LoadProjectScreen",
+        "names": [
+          "screen"
+        ],
+        "raw": "LoadProjectScreen screen"
+      },
+      "module": "s19_app/tui/screens.py",
+      "examples": [
+        "(probe p9b U5) projects `['[b]P', 'ab', 'c', 'E', 'j', 'n', 's']` → `7` rows (holds on 9a tree)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "keeps the project names given by `action_load_project` (already `list_projects()` output). 9b changes: retired; `LoadDialog.__init__` takes callables (`rows`, `verdict`, `preview`) and `mode` / `highlight` instead of a list.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "LoadProjectScreen.compose",
+      "reqs": [
+        "LLR-173.3",
+        "LLR-173.2b",
+        "LLR-173.4l"
+      ],
+      "in": [],
+      "out": {
+        "type": "ComposeResult",
+        "names": [
+          "widgets"
+        ],
+        "raw": "ComposeResult widgets"
+      },
+      "module": "s19_app/tui/screens.py",
+      "examples": [
+        "(probe p9b U5, LLR-173.3 negative control) a project folder named `[b]P` → its row renders `\"P\"` with `1` span styled `b` (holds on 9a tree; RED side of LLR-173.3)",
+        "(probe p9b U5) `p` → focus on `project_list`, index `0` (the first listed name, not the open project) (holds on 9a tree)",
+        "(probe p9b U6, P-18) `escape` → the stack still ends in `LoadProjectScreen` (holds on 9a tree)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "builds `Container#load_dialog.modal-dialog` with a title Label, `ListView#project_list` of `ListItem(Label(name))` for each project (markup ON, no scrub: the LLR-173.3 sink, `screens.py:712`), and `Container#loadproject_buttons` with `Button#project_ok` / `Button#project_cancel`. No highlight of the open project: the ListView starts at index `0`. No BINDINGS (no `escape`). 9b changes: retired; rows come painted from `app.py` (`painted_names`, markup off) into one `OptionList#load_list`.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "LoadProjectScreen.on_button_pressed",
+      "reqs": [
+        "LLR-173.1",
+        "LLR-173.1a",
+        "LLR-173.2j"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Button.Pressed",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens.py",
+      "examples": [
+        "(probe p9b U8) index `0` (`[b]P`), `#project_ok` clicked → stack `LoadResultScreen`, status \"Loaded project '[b]P' -> firmware.s19 - variant 1 of 1, 1 problem - details: p\", `current_project` \"[b]P\" (holds on 9a tree)",
+        "(probe p9b U7) `down` then `enter` on `#project_list` → stack unchanged, `0` status lines, `current_project` `None` (holds on 9a tree)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "`#project_cancel` → `dismiss(None)`; `#project_ok` → `dismiss(self.projects[index])` for the ListView's index (by index, never the label: CW-U-1); no index → returns. `enter` on the list posts `ListView.Selected`, which neither this screen nor the app reads for `project_list`: Enter in the list loads nothing. 9b changes: retired; Enter / `#load_ok` act on the list or the path field by focus recency (LLR-173.2f / .2g), and `Selected` never loads (LLR-173.2j).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.action_load_file",
+      "reqs": [
+        "LLR-173.2",
+        "LLR-173.1e"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p9b F1) `l` → stack `['Screen', 'LoadFileScreen']` (holds on 9a tree)",
+        "(probe p9b F5, LLR-173.2e) `ctrl+l` while `LoadFileScreen` is open → action `load_file` runs, stack `['Screen', 'LoadFileScreen', 'LoadFileScreen']` (holds on 9a tree; RED side of LLR-173.2e)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the Load key (`ctrl+l` priority, `l`; palette entry \"Load file\"): pushes `LoadFileScreen()` with `_handle_load_dialog` as its dismiss callback. Runs also while a modal is on top (priority binding). 9b changes: push `LoadDialog(mode=\"path\", …)` → `_handle_load_dialog`.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.action_load_project",
+      "reqs": [
+        "LLR-173.2a",
+        "LLR-173.2b",
+        "LLR-173.1e",
+        "LLR-173.4d"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p9b U1, LLR-173.2a / .4d negative control) `p` in a fresh work area → stack `['Screen']`, status \"No saved projects found.\" (holds on 9a tree)",
+        "(probe p9b U5) `p` with 7 listed folders → stack `['Screen', 'LoadProjectScreen']` (holds on 9a tree)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the Projects key (`p`; `#ws_load_project_button`; palette entry \"Load project\"): `projects = self.list_projects()`; none → status \"No saved projects found.\" and no dialog; else pushes `LoadProjectScreen(projects)` with `_route_load_project` as its dismiss callback. 9b changes: push `LoadDialog(mode=\"list\", highlight=<open project>)` → `_handle_load_dialog`, also with 0 projects (the section paints `no projects`).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._route_load_project",
+      "reqs": [
+        "LLR-173.1a",
+        "LLR-178.3"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "name",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p9b U8) name \"[b]P\" → one `LoadResultScreen` pushed (holds on 9a tree)",
+        "(code read) name `None` (cancel) → `_handle_load_project(None)` returns at once, no announcement, no panel (holds on 9a tree)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the Load project dialog's dismiss callback and the typed router's project branch: runs `_handle_load_project(name)`, then pushes `LoadResultScreen(announcement)` only when `_last_load_announcement` now holds a new object (identity). Unchanged by 9b: `_handle_load_dialog` routes a `project` choice here (LLR-173.1a).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._handle_load_dialog",
+      "reqs": [
+        "LLR-173.1",
+        "LLR-173.1c",
+        "LLR-173.1d",
+        "LLR-173.1e"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[Path]",
+          "name": "path",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(test_handle_load_dialog_defers_load_until_after_modal_dismiss, LLR-173.1d) a `Path` → `_load_path_from_user_input` scheduled with `call_after_refresh`, not run inside the dismiss (holds on 9a tree)",
+        "(test_handle_load_dialog_none_path_skips_scheduling) `None` → `0` scheduled calls (holds on 9a tree)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "`LoadFileScreen`'s dismiss callback: `None` → return; else logs `modal_dismiss_scheduled`, flushes the log, and defers `_load_path_from_user_input(path)` with `call_after_refresh`. One of two dialog callbacks today (`_route_load_project` is the other). 9b changes: the one router for `Optional[LoadChoice]` or a bare `Path` → project / workarea / recent / path (LLR-173.1a … .1f).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._load_path_from_user_input",
+      "reqs": [
+        "LLR-173.1c",
+        "LLR-173.1f",
+        "LLR-173.5",
+        "LLR-172.1n"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p9b U4) `<workarea>/E` (an empty folder) → status \"Project NOT loaded: '<workarea>\\E' is not a project — pick a project in the list.\" (holds on 9a tree)",
+        "(probe p9b F6, CR9-1) `R\\x.s19` typed, working directory elsewhere, `R\\x.s19` under the base folder → status \"Loaded x.s19\" (holds on 9a tree)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the typed-path router: `_typed_load_route(path)` → `project` → `_route_load_project(name)`; `a2l` → `load_a2l_from_path(path)`; `data` → `load_from_path(path)`; `refuse` → one status line from the six reason words, the typed text through `painted_names`, then `safe_text(...).plain`. The refusal is painted after the dialog closed (status line). Unchanged by 9b in body; the dialog's `verdict` (N2) runs `_typed_load_route` once more before dismiss (E1 §5 observation 1).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._typed_load_route",
+      "reqs": [
+        "LLR-173.5",
+        "LLR-173.5a",
+        "LLR-173.5b",
+        "LLR-173.5c",
+        "LLR-173.5d",
+        "LLR-173.5e",
+        "LLR-173.4k"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "tuple[str, str]",
+        "names": [
+          "action",
+          "value"
+        ],
+        "raw": "tuple(str action, str value)"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p9b U4) `<workarea>/E`, `E` empty → `(\"refuse\", \"not a project\")` (via the content tail today; via the list match after Q7) (holds on 9a tree)",
+        "(probe p9a U3 re-read, code read) a relative folder → `(\"refuse\", \"not a supported file\")` (LLR-172.5h) (holds on 9a tree)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "classifies one typed path from metadata only, never raises: relative → `resolve_input_path`; `None` → `(\"refuse\", \"not found\")`; a folder → `\"not a supported file\"`; else by suffix. Absolute → lexical match against the work area (`abspath`, `normcase`), outside: manifest or folder → `\"outside\"`, file by suffix; inside: `lstat` walk (`\"link\"`, `\"unreadable\"`, `\"not found\"`), one component, matched by `normcase` against `list_projects()` (`\"not a project\"` when unlisted), then the §1.3 content tail (regular non-link `project.json`, or `validate_project_files` finds data / A2L / an error) → `(\"project\", on-disk name)`. Unchanged by 9b; after Q7 its `list_projects` match already applies §1.3, so the tail becomes a second line of defence.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.list_projects",
+      "reqs": [
+        "LLR-173.4",
+        "LLR-173.4a",
+        "LLR-173.2b"
+      ],
+      "in": [],
+      "out": {
+        "type": "list[str]",
+        "names": [
+          "projects"
+        ],
+        "raw": "list[str] projects"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p9b U2, LLR-173.4a negative control) folders `ab` (manifest + s19), `E` (empty), `n` (`notes.txt`), `j` (manifest only), `s` (`x.s19`), `c` (`c.a2l`), `[b]P` → `['[b]P', 'ab', 'c', 'E', 'j', 'n', 's']` (holds on 9a tree; `E` and `n` are the RED side)",
+        "(probe p9a U1) `ab` + empty `E` → `['ab', 'E']` (holds on 9a tree)",
+        "(test_tc_b100_04_list_projects_omits_reserved_homes_casefolded) reserved homes in any letter case → `0` of them listed (holds on 9a tree)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "`sorted(self.workarea.iterdir())` (Windows path order: case-insensitive), skipping reserved homes (case-folded), on Windows a name ending in \".\" or \" \", any folder `_project_folder_refusal` refuses, and anything not `is_dir()`. No content check: an empty folder, or one holding only `notes.txt`, is listed. Raises `OSError` when the work area cannot be listed (callers catch it). 9b changes: apply the §1.3 content test here (Q7, LLR-173.4a).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._project_folder_refusal",
+      "reqs": [
+        "LLR-173.4",
+        "LLR-173.5d"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "folder",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[str]",
+        "names": [
+          "reason"
+        ],
+        "raw": "str? reason"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read, LLR-171.4c) a junction `workarea/evil` → \"link\"; `list_projects` leaves it out (holds on 9a tree)",
+        "(code read) a plain empty folder `workarea/E` → `None` (no content test) (holds on 9a tree)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the one \"is this folder a project here\" folder check (HLR-171b): not one plain component of the work area → \"outside\"; `lstat` absent → `None`; other `OSError` → \"unreadable\"; a link or reparse point → \"link\"; not contained → \"outside\"; else `None`. Reads no content. Unchanged by 9b.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._handle_load_project",
+      "reqs": [
+        "LLR-173.1a",
+        "LLR-173.4a",
+        "LLR-173.6",
+        "LLR-173.6a"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "name",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p9b U3, probe p9a U6) `E` (empty) → \"Project NOT loaded: 'E' has no project.json — load a file and Save project.\", `current_project` `None` (holds on 9a tree; after Q7: \"is not a project — pick a project in the list.\")",
+        "(probe p9b U3) `n` (`notes.txt` only) → \"… 'n' has no project.json — load a file and Save project.\" (holds on 9a tree; after Q7: \"is not a project\")",
+        "(probe p9b U3) `j` (`project.json` only) → \"Project NOT loaded: 'j' has no data or A2L file — load a file and Save project.\" (holds on 9a tree and after Q7: `j` stays listed)"
+      ],
+      "modify": [
+        "[Data: S19TuiApp.current_project]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "the project load: `None` → return; a missing folder → \"Project not found: …\"; a name `list_projects()` does not list (by `normcase`) → \"Project NOT loaded: '<name>' is not a project — pick a project in the list.\"; `validate_project_files` error → that status; A2L checks; no data and no A2L → \"has no data or A2L file\" (manifest present) or \"has no project.json\" (absent) — both before the reset; then the reset, `build_variant_set`, `read_project_manifest`, `choose_install_set`, the install and the announcement (Load-result panel via `_route_load_project`). Unchanged by 9b in body; after Q7 the empty-folder arm moves from \"has no project.json\" to the \"not a project\" list match.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.load_from_path",
+      "reqs": [
+        "LLR-172.1n",
+        "LLR-173.1b",
+        "LLR-173.1c",
+        "LLR-173.1f"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p9b F6, CR9-1 executed) `R\\x.s19` typed, working directory elsewhere, file under the base folder → store `[('<base>\\R\\x.s19', 's19')]` (holds on 9a tree; RED side of LLR-172.1n)",
+        "(code read, LLR-172.1 9a) a source inside the work area (`_handle_select_variant`) → `0` store writes (holds on 9a tree)"
+      ],
+      "modify": [
+        "[I/O: recent store]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "the data load: `normalized = resolve_input_path(path, base_dir)` (working directory, then base folder, then repository root); `None` → \"File not found: …\"; unsupported suffix → \"Unsupported file type: …\"; `copy_into_workarea(normalized, workarea/temp)`; when `normalized` is not inside the work area → `record_recent_source(normalized)` (the resolved path, whichever fallback found it: CR9-1); then `_start_load_worker(copied)` and `refresh_files` on the next idle frame. 9b changes: no record when the source was found only through the relative fallback (LLR-172.1n, Q1).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.load_a2l_from_path",
+      "reqs": [
+        "LLR-172.1n",
+        "LLR-173.1b"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p9b F7) `_load_from_item` with `w.a2l` in `temp/` → `1` `copy_into_workarea` call (`w.a2l`), status \"A2L loaded: w.a2l\", `0` new store entries (probe p9b F9) (holds on 9a tree)"
+      ],
+      "modify": [
+        "[I/O: recent store]",
+        "[Data: S19TuiApp.current_a2l_path]"
+      ],
+      "assign": [
+        "replace",
+        "replace"
+      ],
+      "func": "the A2L load, synchronous: `resolve_input_path`; suffix check; the open-project guard (\"Project already has an A2L file.\"); `copy_into_workarea` into `workarea/temp` (for a path already in `temp/` this is a self-copy through the byte-identical reuse); record when outside the work area (resolved path, CR9-1); `refresh_files`; parse; `current_a2l_path` = the temp copy; views; \"A2L loaded: …\"; project sync. 9b changes: same record rule as `load_from_path` (LLR-172.1n).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._load_from_item",
+      "reqs": [
+        "LLR-173.1b"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "ListItem",
+          "name": "item",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p9b F7) `w.s19` → `0` `copy_into_workarea` calls (holds on 9a tree)",
+        "(probe p9b F7) `w.a2l` → `1` call (holds on 9a tree)",
+        "(probe p9b F7, 9a C7) `w.a2l.json` → `0` calls, status \"Unsupported file type: .json\" (holds on 9a tree)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the Workarea Files pick: `item.data` (the on-disk name) → `workarea/temp/<name>`; when it exists: an A2L suffix → `load_a2l_from_path(candidate)` (one self-copy); anything else → `load_selected_file(candidate)` in place (no copy; an unsupported suffix gives \"Unsupported file type: …\"). Reads `item.data`, never the label. 9b changes: its body is shared with the dialog's `workarea` choice (guess node G1); see baseline-notes \"Surprises\" 2 for the A2L copy against LLR-173.1b's \"0 `copy_into_workarea` calls\".",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.check_action",
+      "reqs": [
+        "LLR-173.2e"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "action",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "tuple",
+          "name": "parameters",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[bool]",
+        "names": [
+          "allowed"
+        ],
+        "raw": "bool? allowed"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p9b F5, LLR-173.2e executed) under `LoadFileScreen`: `ctrl+l` → `load_file` runs (stack depth `3`); `ctrl+s` → `save_project` runs (`SaveProjectScreen` on top); `ctrl+k` → `focus_palette` runs; `ctrl+d` → `cycle_density` runs, density `density-comfortable` → `density-compact` (4 of 4 run; holds on 9a tree; RED side of LLR-173.2e)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "gates app actions by the active window: `confirm_attention` only on Flow Execution; `page_next_context` / `page_prev_context` only on A2L / MAC; `hex_page_prev` / `hex_page_next` only on Workspace; everything else → `App.check_action`. No modal-screen test: `load_file`, `save_project`, `focus_palette`, `cycle_density` are allowed while a modal is on top. 9b changes: return `False` for those four while `isinstance(self.screen, LoadDialog)` (S-g).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._build_palette_entries",
+      "reqs": [
+        "LLR-173.2m"
+      ],
+      "in": [],
+      "out": {
+        "type": "tuple[PaletteEntry, ...]",
+        "names": [
+          "entries"
+        ],
+        "raw": "tuple[PaletteEntry, ...] entries"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read) `load_file` → entry \"Load file\" (from the `ctrl+l` binding); `load_project` → entry \"Load project\" (holds on 9a tree)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "one palette entry per action from `BINDINGS`, first binding of an action wins (its description), then `EXTRA_PALETTE_ENTRIES`. Unchanged by 9b (LLR-173.2m and the labels \"Load\" / \"Projects\" are deferred to Inc 12a, Q8).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.refresh_files",
+      "reqs": [
+        "LLR-173.3a",
+        "LLR-173.4b"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(probe p9b F8, 9a C7) `temp/` holding `w.a2l`, `w.a2l.json`, `w.s19`, `x.s19` → `4` rows, `w.a2l.json` included (holds on 9a tree)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the main Workarea Files list: clears `#files_list`, `list_workarea_files(self.workarea)`, each row `ListItem(Label(safe_text(painted_names([path.name]))))` with `entry.data = path.name`. The pattern the dialog's file rows follow (painted label, on-disk value). Unchanged by 9b (C7 stays for `#files_list`).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._parse_loaded_file",
+      "reqs": [
+        "LLR-173.6b"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[list[Path]]",
+          "name": "a2l_files",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "Optional[LoadedFile]",
+        "names": [
+          "loaded"
+        ],
+        "raw": "LoadedFile? loaded"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read, LLR-173.6b) MAC `m.mac` loaded, then data file `f.s19` → installed `LoadedFile` with `path` f.s19 and `mac_path` m.mac (holds on 9a tree)",
+        "(code read) no current file, `f.s19` → no MAC, no carried A2L (holds on 9a tree)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the parse used by the worker and by `load_selected_file`: S19 / HEX → parse, then `_merge_primary_with_existing_mac` (the current file's `mac_path`, `mac_records`, `mac_diagnostics` are kept; A2L = the new primary's or else the current one); MAC → `_merge_mac_with_existing_primary` (overlays the MAC on the current S19/HEX, keeps its A2L when the MAC has none). Reads `self.current_file` at parse time (worker thread). This is the \"MAC as the install keeps it\" of LLR-173.6b, not `_apply_prepared_load`, which only installs the merged `LoadedFile`. Unchanged by 9b.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.on_mount",
+      "reqs": [
+        "LLR-173.1c"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read, E1 §3 \"callers checked\") startup `load_path` = a missing file → status \"File NOT loaded: '…' not found — check the path.\" (holds on 9a tree)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "startup; when a command-line `load_path` was given → `_load_path_from_user_input(load_path)`. The second caller of the typed router: the dialog's verdict is not on this path, so startup refusals stay on the status line. Unchanged by 9b.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.on_button_pressed",
+      "reqs": [
+        "LLR-173.2a"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Button.Pressed",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read) `#ws_load_project_button` with 0 projects → status \"No saved projects found.\" (holds on 9a tree; same path as probe p9b U1)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the main screen's button router; `#ws_load_project_button` (\"Load project (p)\") → `action_load_project()`. Unchanged by 9b.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp.on_list_view_selected",
+      "reqs": [
+        "LLR-173.2j"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "ListView.Selected",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(TC-B99-34) the `#files_list` item with data \"a b.s19\" selected → that file loads (holds on 9a tree)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "routes `ListView.Selected` by list id: `files_list` → `_load_from_item(event.item)`; `sections_list`, the A2L filter menu, the settings menu. No `project_list` arm, so Enter in the Load project dialog's list does nothing (probe p9b U7). Textual posts `Selected` for a click and for `enter` alike. Unchanged by 9b; the dialog's `#load_list` is an `OptionList` whose `OptionSelected` must not load (LLR-173.2j).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "S19TuiApp._handle_select_variant",
+      "reqs": [
+        "LLR-172.1n"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "variant_id",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read, LLR-172.1 9a) the open project's second variant → `0` store writes (holds on 9a tree)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the variant switch: `load_from_path(descriptor.path)` with a path inside the open project folder; the record in `load_from_path` skips it (inside the work area). Unchanged by 9b.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "choose_install_set",
+      "reqs": [
+        "LLR-173.6",
+        "LLR-173.6a"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "ProjectVariantSet",
+          "name": "variant_set",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "recorded",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[Path]",
+          "name": "data_files",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[Path]",
+          "name": "a2l_files",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[str]",
+          "name": "unreadable",
+          "default": "()"
+        }
+      ],
+      "out": {
+        "type": "InstallSet",
+        "names": [
+          "install"
+        ],
+        "raw": "InstallSet install"
+      },
+      "module": "s19_app/tui/app.py",
+      "examples": [
+        "(code read, LLR-173.6) recorded \"v2\" in variants v1, v2 → variant v2 (holds on 9a tree)",
+        "(code read, LLR-173.6a) recorded \"v2\", `unreadable` (\"v2\",) → variant v1 (holds on 9a tree)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "pure fallback rule of a project load (LLR-169.6): start at the recorded active variant when it is one of the set, else the first; the first variant not in `unreadable` wins (wrapping once); MAC = the first data file with a MAC suffix; A2L = the first A2L. Called by `_handle_load_project`; its docstring already names \"the Load dialog preview (Inc 9b)\" as a user. Unchanged by 9b.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "resolve_input_path",
+      "reqs": [
+        "LLR-172.1n",
+        "LLR-173.1f"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "raw_path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "base_dir",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[Path]",
+        "names": [
+          "resolved"
+        ],
+        "raw": "Path? resolved"
+      },
+      "module": "s19_app/tui/workspace.py",
+      "examples": [
+        "(probe p9b F6, CR9-1) `R\\x.s19`, working directory without `R`, base folder holding `R\\x.s19` → `<base>\\R\\x.s19` (resolved) (holds on 9a tree)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "strips spaces and quotes, `expanduser`; the candidate as typed when it exists (relative to the working directory, not resolved); else for a relative path `(base_dir / candidate).resolve()`, then `(repo_root / candidate).resolve()`; else `None`. The fallback hits return a resolved (link-followed) absolute path; the first hit returns the path as typed. Unchanged by 9b (`workspace.py` is outside the cap).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "record_recent_source",
+      "reqs": [
+        "LLR-172.1n",
+        "HLR-173b"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "replaced"
+        ],
+        "raw": "bool replaced"
+      },
+      "module": "s19_app/tui/workspace.py",
+      "examples": [
+        "(probe p9b F6) `<base>\\R\\x.s19` → `True`; store `[('<base>\\R\\x.s19', 's19')]` (holds on 9a tree)"
+      ],
+      "modify": [
+        "[I/O: recent store]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "records `os.path.abspath(str(path))` first in the per-user store (`%LOCALAPPDATA%\\s19_app\\recent_sources.json`), de-duplicated by `normcase(abspath)`, capped at 20, atomic replace; never raises; `False` on any skip. Takes no \"how was it found\" input, so LLR-172.1n's test lives in the caller. Unchanged by 9b.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "read_recent_sources",
+      "reqs": [
+        "LLR-173.4c",
+        "LLR-173.4f",
+        "LLR-173.4g"
+      ],
+      "in": [],
+      "out": {
+        "type": "RecentSources",
+        "names": [
+          "sources"
+        ],
+        "raw": "RecentSources sources"
+      },
+      "module": "s19_app/tui/workspace.py",
+      "examples": [
+        "(probe p9b F6/F9) after one outside load and three work-area picks → `1` entry, problem `None` (holds on 9a tree)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the bounded store read: entries (`RecentEntry(path, kind)`, newest first, at most 20) and `problem` (`None`, \"too large\", \"could not be read\"; a problem means 0 entries). Never raises; reads no source file. Unchanged by 9b; the dialog's recents section reads it (N1).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "recent_kind",
+      "reqs": [
+        "LLR-173.4b",
+        "LLR-173.4h"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[str]",
+        "names": [
+          "kind"
+        ],
+        "raw": "str? kind"
+      },
+      "module": "s19_app/tui/workspace.py",
+      "examples": [
+        "(code read) `w.a2l.json` → `None`; `w.A2L` → \"a2l\" (holds on 9a tree)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "pure suffix map with Windows suffix rules: `.s19`/`.srec` → \"s19\", `.hex`/`.ihex` → \"hex\", `.mac` → \"mac\", `.a2l` → \"a2l\", else `None`. The loadable-suffix filter LLR-173.4b names. Unchanged by 9b.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "list_workarea_files",
+      "reqs": [
+        "LLR-173.4b"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "workarea",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "list[Path]",
+        "names": [
+          "files"
+        ],
+        "raw": "list[Path] files"
+      },
+      "module": "s19_app/tui/workspace.py",
+      "examples": [
+        "(probe p9b F8) `temp/` with `w.a2l`, `w.a2l.json`, `w.s19`, `x.s19` → all `4` (holds on 9a tree; the filter is the RED side of LLR-173.4b)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the one enumeration of `workarea/temp`: regular, non-link direct children, names ending in \".\" or \" \" skipped, sorted by `(casefold, name)`; any `OSError` → `[]`. No suffix filter. Unchanged by 9b; the dialog's files section filters its output by `recent_kind`.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "validate_project_files",
+      "reqs": [
+        "LLR-173.4a",
+        "LLR-173.6"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "tuple[list[Path], list[Path], Optional[str]]",
+        "names": [
+          "data_files",
+          "a2l_files",
+          "error"
+        ],
+        "raw": "tuple(list[Path] data_files, list[Path] a2l_files, str? error)"
+      },
+      "module": "s19_app/tui/workspace.py",
+      "examples": [
+        "(probe p9b U2 setup) `n` holding `notes.txt` → `([], [], None)` (holds on 9a tree)",
+        "(probe p9a U2) `temp` holding `firmware.s19` → data `['firmware.s19']` (holds on 9a tree)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "scans direct children that are files (`is_file()` follows links): S19 / HEX / MAC → data (sorted `(lower, name)`), A2L → a2l; more than one MAC or A2L → an error text. Raises `OSError` when the folder cannot be listed. With a regular `project.json`, the §1.3 content test of `_typed_load_route`'s tail. Unchanged by 9b.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "painted_names",
+      "reqs": [
+        "LLR-173.3",
+        "LLR-173.3a",
+        "LLR-173.3b",
+        "LLR-173.3c"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Sequence[str]",
+          "name": "names",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "limit",
+          "default": "PAINTED_NAME_LIMIT"
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "clip",
+          "default": "120"
+        }
+      ],
+      "out": {
+        "type": "str",
+        "names": [
+          "painted"
+        ],
+        "raw": "str painted"
+      },
+      "module": "s19_app/tui/services/project_gather_service.py",
+      "examples": [
+        "(docstring doctest) `[\"a\", \"b‮c\"]`, limit `1` → \"a, and 1 more\" (holds on 9a tree)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "the batch's one name scrub: removes Cc, Cf, Zl, Zp characters, turns an unpaired surrogate into U+FFFD, clips each name to `clip` characters (\"…\"), joins at most `limit` names with \", \" then \", and K more\". Pure; markup is not parsed (the caller wraps it with `safe_text` or a markup-off widget). Unchanged by 9b.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "safe_text",
+      "reqs": [
+        "LLR-173.3"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "value",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "style",
+          "default": "\"\""
+        }
+      ],
+      "out": {
+        "type": "Text",
+        "names": [
+          "text"
+        ],
+        "raw": "Text text"
+      },
+      "module": "s19_app/utils.py",
+      "examples": [
+        "(code read) `\"[b]P\"` → `Text` with plain \"[b]P\" and `0` spans (holds on 9a tree)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "deletes C0 / C1 control code points and wraps the rest as a Rich `Text` (markup never parsed). Keeps U+202E and surrogates, which is why LLR-173.3 cites `painted_names` and not `safe_text` alone. Unchanged by 9b.",
+      "volatile": [],
+      "oracle": []
+    }
+  ],
+  "calls": [
+    {
+      "caller": "S19TuiApp._handle_load_project",
+      "callee": "S19TuiApp._parse_loaded_file",
+      "sites": [
+        "s19_app/tui/app.py:12088",
+        "s19_app/tui/app.py:15099"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_load_project",
+      "callee": "S19TuiApp._project_folder_refusal",
+      "sites": [
+        "s19_app/tui/app.py:11694"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_load_project",
+      "callee": "S19TuiApp.list_projects",
+      "sites": [
+        "s19_app/tui/app.py:11724"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_load_project",
+      "callee": "choose_install_set",
+      "sites": [
+        "s19_app/tui/app.py:11879",
+        "s19_app/tui/app.py:11920"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_load_project",
+      "callee": "painted_names",
+      "sites": [
+        "s19_app/tui/app.py:11696",
+        "s19_app/tui/app.py:11728",
+        "s19_app/tui/app.py:11745",
+        "s19_app/tui/app.py:11785",
+        "s19_app/tui/app.py:11786",
+        "s19_app/tui/app.py:11815",
+        "s19_app/tui/app.py:11820"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_load_project",
+      "callee": "safe_text",
+      "sites": [
+        "s19_app/tui/app.py:11712",
+        "s19_app/tui/app.py:11727",
+        "s19_app/tui/app.py:11744",
+        "s19_app/tui/app.py:11784",
+        "s19_app/tui/app.py:11823",
+        "s19_app/tui/app.py:11951",
+        "s19_app/tui/app.py:11952",
+        "s19_app/tui/app.py:17124",
+        "s19_app/tui/app.py:17125",
+        "s19_app/tui/app.py:17126",
+        "s19_app/tui/app.py:17127",
+        "s19_app/tui/app.py:17128",
+        "s19_app/tui/app.py:17129",
+        "s19_app/tui/app.py:17130",
+        "s19_app/tui/app.py:17131",
+        "s19_app/tui/app.py:17132",
+        "s19_app/tui/app.py:17133",
+        "s19_app/tui/app.py:17134",
+        "s19_app/tui/app.py:17135",
+        "s19_app/tui/app.py:17136",
+        "s19_app/tui/app.py:17137",
+        "s19_app/tui/app.py:17138",
+        "s19_app/tui/app.py:17139",
+        "s19_app/tui/app.py:17422"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_load_project",
+      "callee": "validate_project_files",
+      "sites": [
+        "s19_app/tui/app.py:11753"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._handle_select_variant",
+      "callee": "S19TuiApp.load_from_path",
+      "sites": [
+        "s19_app/tui/app.py:7618"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._load_from_item",
+      "callee": "S19TuiApp._parse_loaded_file",
+      "sites": [
+        "s19_app/tui/app.py:15099"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._load_from_item",
+      "callee": "S19TuiApp.load_a2l_from_path",
+      "sites": [
+        "s19_app/tui/app.py:13352"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._load_path_from_user_input",
+      "callee": "S19TuiApp._route_load_project",
+      "sites": [
+        "s19_app/tui/app.py:12950"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._load_path_from_user_input",
+      "callee": "S19TuiApp._typed_load_route",
+      "sites": [
+        "s19_app/tui/app.py:12948"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._load_path_from_user_input",
+      "callee": "S19TuiApp.load_a2l_from_path",
+      "sites": [
+        "s19_app/tui/app.py:12953"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._load_path_from_user_input",
+      "callee": "S19TuiApp.load_from_path",
+      "sites": [
+        "s19_app/tui/app.py:12956"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._load_path_from_user_input",
+      "callee": "painted_names",
+      "sites": [
+        "s19_app/tui/app.py:12958"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._load_path_from_user_input",
+      "callee": "safe_text",
+      "sites": [
+        "s19_app/tui/app.py:12980"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._route_load_project",
+      "callee": "S19TuiApp._handle_load_project",
+      "sites": [
+        "s19_app/tui/app.py:7484"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._typed_load_route",
+      "callee": "S19TuiApp.list_projects",
+      "sites": [
+        "s19_app/tui/app.py:12884"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._typed_load_route",
+      "callee": "resolve_input_path",
+      "sites": [
+        "s19_app/tui/app.py:12811",
+        "s19_app/tui/app.py:12823"
+      ]
+    },
+    {
+      "caller": "S19TuiApp._typed_load_route",
+      "callee": "validate_project_files",
+      "sites": [
+        "s19_app/tui/app.py:12911"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.action_load_project",
+      "callee": "LoadProjectScreen.__init__",
+      "sites": [
+        "s19_app/tui/app.py:7452"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.action_load_project",
+      "callee": "S19TuiApp.list_projects",
+      "sites": [
+        "s19_app/tui/app.py:7446"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.list_projects",
+      "callee": "S19TuiApp._project_folder_refusal",
+      "sites": [
+        "s19_app/tui/app.py:12138"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.load_a2l_from_path",
+      "callee": "S19TuiApp.refresh_files",
+      "sites": [
+        "s19_app/tui/app.py:13151"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.load_a2l_from_path",
+      "callee": "record_recent_source",
+      "sites": [
+        "s19_app/tui/app.py:13149"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.load_a2l_from_path",
+      "callee": "resolve_input_path",
+      "sites": [
+        "s19_app/tui/app.py:13106"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.load_a2l_from_path",
+      "callee": "safe_text",
+      "sites": [
+        "s19_app/tui/app.py:12491",
+        "s19_app/tui/app.py:17124",
+        "s19_app/tui/app.py:17125",
+        "s19_app/tui/app.py:17126",
+        "s19_app/tui/app.py:17127",
+        "s19_app/tui/app.py:17128",
+        "s19_app/tui/app.py:17129",
+        "s19_app/tui/app.py:17130",
+        "s19_app/tui/app.py:17131",
+        "s19_app/tui/app.py:17132",
+        "s19_app/tui/app.py:17133",
+        "s19_app/tui/app.py:17134",
+        "s19_app/tui/app.py:17135",
+        "s19_app/tui/app.py:17136",
+        "s19_app/tui/app.py:17137",
+        "s19_app/tui/app.py:17138",
+        "s19_app/tui/app.py:17139",
+        "s19_app/tui/app.py:17422"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.load_a2l_from_path",
+      "callee": "validate_project_files",
+      "sites": [
+        "s19_app/tui/app.py:12754",
+        "s19_app/tui/app.py:13118"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.load_from_path",
+      "callee": "S19TuiApp._parse_loaded_file",
+      "sites": [
+        "s19_app/tui/app.py:15763"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.load_from_path",
+      "callee": "S19TuiApp.refresh_files",
+      "sites": [
+        "s19_app/tui/app.py:13091"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.load_from_path",
+      "callee": "record_recent_source",
+      "sites": [
+        "s19_app/tui/app.py:13081"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.load_from_path",
+      "callee": "resolve_input_path",
+      "sites": [
+        "s19_app/tui/app.py:13049"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.on_button_pressed",
+      "callee": "S19TuiApp.action_load_project",
+      "sites": [
+        "s19_app/tui/app.py:17656"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.on_button_pressed",
+      "callee": "safe_text",
+      "sites": [
+        "s19_app/tui/app.py:17124",
+        "s19_app/tui/app.py:17125",
+        "s19_app/tui/app.py:17126",
+        "s19_app/tui/app.py:17127",
+        "s19_app/tui/app.py:17128",
+        "s19_app/tui/app.py:17129",
+        "s19_app/tui/app.py:17130",
+        "s19_app/tui/app.py:17131",
+        "s19_app/tui/app.py:17132",
+        "s19_app/tui/app.py:17133",
+        "s19_app/tui/app.py:17134",
+        "s19_app/tui/app.py:17135",
+        "s19_app/tui/app.py:17136",
+        "s19_app/tui/app.py:17137",
+        "s19_app/tui/app.py:17138",
+        "s19_app/tui/app.py:17139"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.on_list_view_selected",
+      "callee": "S19TuiApp._load_from_item",
+      "sites": [
+        "s19_app/tui/app.py:13201"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.on_list_view_selected",
+      "callee": "safe_text",
+      "sites": [
+        "s19_app/tui/app.py:17124",
+        "s19_app/tui/app.py:17125",
+        "s19_app/tui/app.py:17126",
+        "s19_app/tui/app.py:17127",
+        "s19_app/tui/app.py:17128",
+        "s19_app/tui/app.py:17129",
+        "s19_app/tui/app.py:17130",
+        "s19_app/tui/app.py:17131",
+        "s19_app/tui/app.py:17132",
+        "s19_app/tui/app.py:17133",
+        "s19_app/tui/app.py:17134",
+        "s19_app/tui/app.py:17135",
+        "s19_app/tui/app.py:17136",
+        "s19_app/tui/app.py:17137",
+        "s19_app/tui/app.py:17138",
+        "s19_app/tui/app.py:17139"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.on_mount",
+      "callee": "S19TuiApp._load_path_from_user_input",
+      "sites": [
+        "s19_app/tui/app.py:7230"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.on_mount",
+      "callee": "S19TuiApp.refresh_files",
+      "sites": [
+        "s19_app/tui/app.py:7197"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.refresh_files",
+      "callee": "list_workarea_files",
+      "sites": [
+        "s19_app/tui/app.py:7322"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.refresh_files",
+      "callee": "painted_names",
+      "sites": [
+        "s19_app/tui/app.py:7324"
+      ]
+    },
+    {
+      "caller": "S19TuiApp.refresh_files",
+      "callee": "safe_text",
+      "sites": [
+        "s19_app/tui/app.py:7324"
+      ]
+    },
+    {
+      "caller": "read_recent_sources",
+      "callee": "recent_kind",
+      "sites": [
+        "s19_app/tui/workspace.py:2242"
+      ]
+    },
+    {
+      "caller": "record_recent_source",
+      "callee": "read_recent_sources",
+      "sites": [
+        "s19_app/tui/workspace.py:2491"
+      ]
+    },
+    {
+      "caller": "record_recent_source",
+      "callee": "recent_kind",
+      "sites": [
+        "s19_app/tui/workspace.py:2242",
+        "s19_app/tui/workspace.py:2461"
+      ]
+    }
+  ],
+  "top_level_sites": {
+    "S19TuiApp._build_palette_entries": [
+      "s19_app/tui/app.py:2768"
+    ],
+    "resolve_input_path": [
+      "s19_app/tui/app.py:5386",
+      "s19_app/tui/app.py:6580",
+      "s19_app/tui/app.py:6581",
+      "s19_app/tui/app.py:9464",
+      "s19_app/tui/changes/io.py:419",
+      "s19_app/tui/crc_designer_view.py:1307",
+      "s19_app/tui/operations/crc_config.py:361",
+      "s19_app/tui/operations/crc_designer_model.py:920",
+      "s19_app/tui/services/compare_service.py:528 (ref)",
+      "s19_app/tui/services/report_filter.py:360"
+    ],
+    "S19TuiApp.refresh_files": [
+      "s19_app/tui/app.py:10610",
+      "s19_app/tui/app.py:7330"
+    ],
+    "safe_text": [
+      "s19_app/tui/app.py:10098",
+      "s19_app/tui/app.py:10469",
+      "s19_app/tui/app.py:10475",
+      "s19_app/tui/app.py:10488",
+      "s19_app/tui/app.py:10507",
+      "s19_app/tui/app.py:10597",
+      "s19_app/tui/app.py:16242",
+      "s19_app/tui/app.py:16252",
+      "s19_app/tui/app.py:16262",
+      "s19_app/tui/app.py:9273",
+      "s19_app/tui/app.py:9288",
+      "s19_app/tui/app.py:9393",
+      "s19_app/tui/app.py:9668",
+      "s19_app/tui/app.py:9957",
+      "s19_app/tui/checks_view.py:181",
+      "s19_app/tui/checks_view.py:250",
+      "s19_app/tui/checks_view.py:255",
+      "s19_app/tui/checks_view.py:354",
+      "s19_app/tui/checks_view.py:382",
+      "s19_app/tui/checks_view.py:409",
+      "s19_app/tui/flow_screens.py:1201",
+      "s19_app/tui/flow_screens.py:1203",
+      "s19_app/tui/flow_screens.py:1396",
+      "s19_app/tui/flow_screens.py:1423",
+      "s19_app/tui/flow_screens.py:1430",
+      "s19_app/tui/flow_screens.py:1442",
+      "s19_app/tui/flow_screens.py:1467",
+      "s19_app/tui/flow_screens.py:1537",
+      "s19_app/tui/flow_screens.py:1619",
+      "s19_app/tui/flow_screens.py:1701",
+      "s19_app/tui/flow_screens.py:1705",
+      "s19_app/tui/flow_screens.py:1743",
+      "s19_app/tui/flow_screens.py:1750",
+      "s19_app/tui/flow_screens.py:1760",
+      "s19_app/tui/flow_screens.py:1765",
+      "s19_app/tui/flow_screens.py:1766",
+      "s19_app/tui/flow_screens.py:1810",
+      "s19_app/tui/flow_screens.py:1901",
+      "s19_app/tui/flow_screens.py:2190",
+      "s19_app/tui/flow_screens.py:2198",
+      "s19_app/tui/flow_screens.py:2206",
+      "s19_app/tui/flow_screens.py:2263",
+      "s19_app/tui/flow_screens.py:2271",
+      "s19_app/tui/flow_screens.py:2329",
+      "s19_app/tui/flow_screens.py:2338",
+      "s19_app/tui/flow_screens.py:2348",
+      "s19_app/tui/flow_screens.py:2360",
+      "s19_app/tui/flow_screens.py:2368",
+      "s19_app/tui/flow_screens.py:2517",
+      "s19_app/tui/flow_screens.py:2609",
+      "s19_app/tui/flow_screens.py:3083",
+      "s19_app/tui/flow_screens.py:3092",
+      "s19_app/tui/flow_screens.py:3095",
+      "s19_app/tui/flow_screens.py:3109",
+      "s19_app/tui/flow_screens.py:3114",
+      "s19_app/tui/flow_screens.py:3257",
+      "s19_app/tui/flow_screens.py:3296",
+      "s19_app/tui/flow_screens.py:3309",
+      "s19_app/tui/flow_screens.py:3314",
+      "s19_app/tui/flow_screens.py:3325",
+      "s19_app/tui/flow_screens.py:3349",
+      "s19_app/tui/flow_screens.py:3433",
+      "s19_app/tui/flow_screens.py:3442",
+      "s19_app/tui/flow_screens.py:3492",
+      "s19_app/tui/flow_screens.py:3530",
+      "s19_app/tui/flow_screens.py:3532",
+      "s19_app/tui/flow_screens.py:3540",
+      "s19_app/tui/flow_screens.py:3553",
+      "s19_app/tui/flow_screens.py:3562",
+      "s19_app/tui/flow_screens.py:3596",
+      "s19_app/tui/flow_screens.py:3662",
+      "s19_app/tui/flow_screens.py:3742",
+      "s19_app/tui/flow_screens.py:3801",
+      "s19_app/tui/flow_screens.py:731",
+      "s19_app/tui/flow_screens.py:889",
+      "s19_app/tui/flow_screens.py:899",
+      "s19_app/tui/issues_view.py:409",
+      "s19_app/tui/issues_view.py:487",
+      "s19_app/tui/issues_view.py:490",
+      "s19_app/tui/issues_view.py:492",
+      "s19_app/tui/issues_view.py:644",
+      "s19_app/tui/issues_view.py:668",
+      "s19_app/tui/issues_view.py:680",
+      "s19_app/tui/screens.py:1109",
+      "s19_app/tui/screens.py:1134",
+      "s19_app/tui/screens.py:1144",
+      "s19_app/tui/screens.py:1147",
+      "s19_app/tui/screens.py:1154",
+      "s19_app/tui/screens.py:1160",
+      "s19_app/tui/screens.py:1161",
+      "s19_app/tui/screens.py:1162",
+      "s19_app/tui/screens_directionb.py:1225",
+      "s19_app/tui/screens_directionb.py:1743",
+      "s19_app/tui/screens_directionb.py:1786",
+      "s19_app/tui/screens_directionb.py:2015",
+      "s19_app/tui/screens_directionb.py:2128",
+      "s19_app/tui/screens_directionb.py:2131",
+      "s19_app/tui/screens_directionb.py:2141",
+      "s19_app/tui/screens_directionb.py:2176",
+      "s19_app/tui/screens_directionb.py:2633",
+      "s19_app/tui/screens_directionb.py:2869",
+      "s19_app/tui/screens_directionb.py:2953",
+      "s19_app/tui/screens_directionb.py:3084",
+      "s19_app/tui/screens_directionb.py:3091",
+      "s19_app/tui/screens_directionb.py:3257",
+      "s19_app/tui/screens_directionb.py:3258",
+      "s19_app/tui/screens_directionb.py:3259",
+      "s19_app/tui/screens_directionb.py:3262",
+      "s19_app/tui/screens_directionb.py:3263",
+      "s19_app/tui/screens_directionb.py:3264",
+      "s19_app/tui/screens_directionb.py:3265",
+      "s19_app/tui/screens_directionb.py:3325",
+      "s19_app/tui/screens_directionb.py:3383",
+      "s19_app/tui/screens_directionb.py:3590",
+      "s19_app/tui/screens_directionb.py:3595",
+      "s19_app/tui/screens_directionb.py:3597",
+      "s19_app/tui/screens_directionb.py:3805",
+      "s19_app/tui/screens_directionb.py:3905",
+      "s19_app/tui/screens_directionb.py:4886",
+      "s19_app/tui/screens_directionb.py:5321",
+      "s19_app/tui/screens_directionb.py:5322",
+      "s19_app/tui/screens_directionb.py:5323",
+      "s19_app/tui/screens_directionb.py:5324",
+      "s19_app/tui/screens_directionb.py:5426",
+      "s19_app/tui/screens_directionb.py:6179",
+      "s19_app/tui/screens_directionb.py:6182",
+      "s19_app/tui/screens_directionb.py:7061",
+      "s19_app/tui/screens_directionb.py:7142",
+      "s19_app/tui/screens_directionb.py:7145",
+      "s19_app/tui/screens_directionb.py:7146",
+      "s19_app/tui/screens_directionb.py:7147",
+      "s19_app/tui/screens_directionb.py:7169",
+      "s19_app/tui/screens_directionb.py:7172",
+      "s19_app/tui/screens_directionb.py:7174",
+      "s19_app/tui/screens_directionb.py:7244",
+      "s19_app/tui/screens_directionb.py:7282",
+      "s19_app/tui/screens_directionb.py:7284",
+      "s19_app/tui/screens_directionb.py:7292",
+      "s19_app/tui/screens_directionb.py:7339",
+      "s19_app/tui/screens_directionb.py:8381",
+      "s19_app/tui/screens_directionb.py:8383",
+      "s19_app/tui/screens_directionb.py:8414",
+      "s19_app/tui/screens_directionb.py:8417",
+      "s19_app/tui/segment_split_view.py:2101",
+      "s19_app/tui/segment_split_view.py:2114",
+      "s19_app/tui/segment_split_view.py:668",
+      "s19_app/tui/segment_split_view.py:910",
+      "s19_app/tui/segment_split_view.py:911"
+    ],
+    "painted_names": [
+      "s19_app/tui/app.py:10477",
+      "s19_app/tui/app.py:10489",
+      "s19_app/tui/app.py:10491",
+      "s19_app/tui/app.py:10508",
+      "s19_app/tui/app.py:10832",
+      "s19_app/tui/app.py:12289",
+      "s19_app/tui/app.py:12345",
+      "s19_app/tui/app.py:12346",
+      "s19_app/tui/app.py:12348",
+      "s19_app/tui/app.py:12356",
+      "s19_app/tui/app.py:12357",
+      "s19_app/tui/app.py:9275",
+      "s19_app/tui/app.py:9669",
+      "s19_app/tui/services/project_gather_service.py:1388",
+      "s19_app/tui/services/project_gather_service.py:1390",
+      "s19_app/tui/services/project_gather_service.py:1414",
+      "s19_app/tui/services/project_gather_service.py:1436",
+      "s19_app/tui/services/project_gather_service.py:1619",
+      "s19_app/tui/services/project_gather_service.py:1640",
+      "s19_app/tui/services/project_gather_service.py:1647"
+    ],
+    "validate_project_files": [
+      "s19_app/tui/app.py:10116",
+      "s19_app/tui/app.py:10917",
+      "s19_app/tui/app.py:12581",
+      "s19_app/tui/app.py:12646",
+      "s19_app/tui/app.py:9929",
+      "s19_app/tui/services/project_gather_service.py:1627",
+      "s19_app/tui/services/variant_execution_service.py:2743"
+    ],
+    "S19TuiApp._project_folder_refusal": [
+      "s19_app/tui/app.py:9656",
+      "s19_app/tui/app.py:9703"
+    ],
+    "S19TuiApp.check_action": [
+      "s19_app/tui/window_help.py:1134",
+      "s19_app/tui/window_help.py:1145"
+    ]
+  },
+  "findings": [],
+  "parse_failures": []
+}

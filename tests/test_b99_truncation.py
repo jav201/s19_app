@@ -68,6 +68,7 @@ from s19_app.tui.services.flow_model import (
 from s19_app.tui.services.load_service import build_loaded_s19
 from tests.support.independent_reader import read_hex, read_s19
 from tests.support.b100_projects import dismiss_load_result_panel
+from tests.support.b100_load_dialog import click_row, highlight_row, is_load_dialog
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests" / "fixtures" / "synth"
@@ -531,7 +532,7 @@ def test_at_b99_03_status_leads_defect_flow_source_fails(tmp_path):
     from textual.widgets import Label
     from textual.widgets import Static
 
-    from s19_app.tui.screens import LoadFlowScreen, LoadProjectScreen
+    from s19_app.tui.screens import LoadFlowScreen
 
     from tests.b97_fixtures import write_flow
 
@@ -584,19 +585,14 @@ def test_at_b99_03_status_leads_defect_flow_source_fails(tmp_path):
             await pilot.press("p")
             await _wait_for(
                 pilot,
-                lambda: isinstance(app.screen, LoadProjectScreen),
-                "the Load project dialog",
+                lambda: is_load_dialog(app.screen),
+                "the Load dialog",
             )
             # The row pick is a CLICK on the painted row (the flow-picker
             # idiom below), never an assignment to ``listing.index``.
-            row = next(
-                row
-                for row in app.screen.query("#project_list ListItem")
-                if "proj1" in str(row.query_one(Label).render())
-            )
-            await pilot.click(row)
+            assert await click_row(pilot, app, "proj1"), "click missed the proj1 row"
             await pilot.pause()
-            assert await pilot.click("#project_ok"), "click missed #project_ok"
+            assert await pilot.click("#load_ok"), "click missed #load_ok"
             # Inc 6 (HLR-178): the dialog route opens the Load-result panel;
             # dismiss it first with its shown key ``esc``.
             await dismiss_load_result_panel(pilot, app)

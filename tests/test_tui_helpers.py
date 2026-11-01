@@ -135,6 +135,9 @@ def test_list_projects_ignores_temp(tmp_path):
     temp_dir.mkdir(parents=True)
     (workarea / "ProjectA").mkdir()
     (workarea / "ProjectB").mkdir()
+    # Inc 9b re-pin (Q7, LLR-173.4a): a listed project holds project content.
+    for name in ("ProjectA", "ProjectB"):
+        (workarea / name / "project.json").write_text('{"schema_version": 1}', encoding="utf-8")
     app = S19TuiApp(base_dir=tmp_path)
     app.workarea = workarea
 

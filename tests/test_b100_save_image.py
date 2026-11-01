@@ -61,8 +61,6 @@ from s19_app.tui.app import S19TuiApp
 from s19_app.tui.changes.io import emit_s19_from_mem_map
 from s19_app.tui.changes.model import DISPOSITION_APPLIED
 from s19_app.tui.changes.model import DISPOSITION_BLOCKED
-from s19_app.tui.screens import LoadFileScreen
-from s19_app.tui.screens import LoadProjectScreen
 from s19_app.tui.screens import SaveProjectScreen
 from s19_app.tui.screens_directionb import PatchEditorPanel
 from s19_app.tui.services import project_gather_service as gather_module
@@ -75,6 +73,7 @@ from s19_app.tui.workspace import WORKAREA_SUBDIR
 from tests import b97_fixtures
 from tests.support import b100_links
 from tests.support import b100_projects as projects
+from tests.support.b100_load_dialog import highlight_row, is_load_dialog
 from tests.support import b100_projects
 from tests.support.independent_reader import read_hex
 from tests.support.independent_reader import read_s19
@@ -2053,7 +2052,7 @@ def test_tc_b100_70_unparsed_paste_text_keeps_the_flag(tmp_path: Path) -> None:
 async def _load_file_through_dialog(pilot, app: S19TuiApp, src: Path) -> None:
     await pilot.press("l")
     await _wait_for(
-        pilot, lambda: isinstance(app.screen, LoadFileScreen), "the Load file dialog"
+        pilot, lambda: is_load_dialog(app.screen), "the Load dialog"
     )
     assert await pilot.click("#load_path"), "click missed #load_path"
     await pilot.press("ctrl+a")
@@ -2062,7 +2061,7 @@ async def _load_file_through_dialog(pilot, app: S19TuiApp, src: Path) -> None:
     assert await pilot.click("#load_ok"), "click missed #load_ok"
     await _wait_for(
         pilot,
-        lambda: not isinstance(app.screen, LoadFileScreen)
+        lambda: not is_load_dialog(app.screen)
         and str(app.query_one("#status_text", Label).render()).startswith("Loaded "),
         f"the durable load line after loading {src.name}",
     )
@@ -2074,20 +2073,14 @@ async def _open_project_through_dialog(pilot, app: S19TuiApp, name: str) -> None
         await pilot.pause()
     await pilot.press("p")
     await _wait_for(
-        pilot, lambda: isinstance(app.screen, LoadProjectScreen), "the Load project dialog"
+        pilot, lambda: is_load_dialog(app.screen), "the Load dialog"
     )
-    row = next(
-        item
-        for item in app.screen.query("#project_list ListItem")
-        if str(item.query_one(Label).render()) == name
-    )
-    await pilot.click(row)
-    await pilot.pause()
-    assert await pilot.click("#project_ok"), "click missed #project_ok"
+    await highlight_row(pilot, app, name)
+    assert await pilot.click("#load_ok"), "click missed #load_ok"
     await _wait_for(
         pilot,
-        lambda: not isinstance(app.screen, LoadProjectScreen),
-        f"the Load project dialog to close after loading {name}",
+        lambda: not is_load_dialog(app.screen),
+        f"the Load dialog to close after loading {name}",
     )
 
 

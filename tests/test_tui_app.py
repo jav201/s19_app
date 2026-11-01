@@ -365,10 +365,15 @@ def test_collect_mac_out_of_range_addresses_uses_ranges(tmp_path: Path):
 
 
 def test_list_projects_skips_files_and_sorts_names(tmp_path: Path):
+    # Inc 9b re-pin (Q7, LLR-173.4a): a listed project must hold project
+    # content, so each folder gets a ``project.json``; the test still proves
+    # that files are skipped and the names come back sorted.
     workarea = tmp_path / "workarea"
     workarea.mkdir()
     (workarea / "Zulu").mkdir()
     (workarea / "Alpha").mkdir()
+    for name in ("Zulu", "Alpha"):
+        (workarea / name / "project.json").write_text('{"schema_version": 1}', encoding="utf-8")
     (workarea / WORKAREA_TEMP).mkdir()
     (workarea / "notes.txt").write_text("ignore me", encoding="utf-8")
     app = S19TuiApp(base_dir=tmp_path)
@@ -1271,8 +1276,12 @@ def test_handle_load_dialog_defers_load_until_after_modal_dismiss(
         lambda callback, *args, **kwargs: scheduled.append((callback, args, kwargs)),
     )
 
+    from s19_app.tui.screens import LoadChoice
+
     target = tmp_path / "sample.s19"
-    app._handle_load_dialog(target)
+    # Inc 9b re-pin (A9b-08, LLR-173.1d retired): the router takes a
+    # ``LoadChoice``; a ``path`` choice still defers the typed-path load.
+    app._handle_load_dialog(LoadChoice("path", str(target)))
 
     assert load_calls == [], "load must not run synchronously before modal pops"
     assert len(scheduled) == 1, "a single deferred load must be queued"

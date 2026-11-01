@@ -2579,12 +2579,16 @@ def test_tc037_workspace_empty_state_clears_when_file_loads(
 #           workarea containment, path resolution, path traversal)
 # ===========================================================================
 
-# The three Direction B modal classes under test (the only ``ModalScreen``
-# subclasses in the app). They share one accent and one backdrop tone.
+# The three Direction B modals under test. They share one accent and one
+# backdrop tone. Inc 9b re-pin (ruling Q9): the Load file and Load project
+# dialogs retired into the one ``LoadDialog``; it is checked in both of its
+# open modes (``path`` for the old Load file entry, ``list`` with two project
+# rows for the old Load project entry), so the property is still asserted
+# for every way the app shows a Load modal.
 _MODAL_SPECS = [
-    ("LoadFileScreen", ()),
+    ("LoadDialog(path)", ()),
     ("SaveProjectScreen", ("_default_parent_",)),
-    ("LoadProjectScreen", (["proj_a", "proj_b"],)),
+    ("LoadDialog(list)", (["proj_a", "proj_b"],)),
 ]
 
 # The five Calm Dark token variable names (styles.tcss). The modal re-skin
@@ -2624,22 +2628,23 @@ def _modal_css_block() -> str:
 
 
 def _build_modal(name: str, args: tuple, default_parent: Path):
-    """Construct one of the three re-skinned modals by name."""
-    from s19_app.tui.screens import (
-        LoadFileScreen,
-        LoadProjectScreen,
-        SaveProjectScreen,
-    )
+    """Construct one of the three re-skinned modals by name (the Load dialog
+    through its fixed constructor, fed by inert callables)."""
+    from s19_app.tui.screens import SaveProjectScreen
+    from tests.support.b100_load_dialog import bare_path_dialog, load_choice_cls
 
-    by_name = {
-        "LoadFileScreen": LoadFileScreen,
-        "SaveProjectScreen": SaveProjectScreen,
-        "LoadProjectScreen": LoadProjectScreen,
-    }
+    if name == "LoadDialog(path)":
+        return bare_path_dialog()
+    if name == "LoadDialog(list)":
+        LoadChoice = load_choice_cls()
+        rows = [("projects", "Projects", None)] + [
+            ("projects", project, LoadChoice("project", project)) for project in args[0]
+        ]
+        return bare_path_dialog(mode="list", rows=lambda: rows)
     resolved = tuple(
         default_parent if a == "_default_parent_" else a for a in args
     )
-    return by_name[name](*resolved)
+    return SaveProjectScreen(*resolved)
 
 
 # ---------------------------------------------------------------------------
@@ -2670,13 +2675,10 @@ def test_tc033_modals_use_only_calm_dark_tokens_no_hardcoded_color() -> None:
     # would not resolve outside the app stylesheet — see the screens.py
     # module note). Check the class's OWN __dict__, not the inherited
     # Textual ``Screen.DEFAULT_CSS``.
-    from s19_app.tui.screens import (
-        LoadFileScreen,
-        LoadProjectScreen,
-        SaveProjectScreen,
-    )
+    from s19_app.tui.screens import SaveProjectScreen
+    from tests.support.b100_load_dialog import load_dialog_cls
 
-    for cls in (LoadFileScreen, SaveProjectScreen, LoadProjectScreen):
+    for cls in (load_dialog_cls(), SaveProjectScreen):
         own_css = cls.__dict__.get("DEFAULT_CSS", "") or ""
         assert own_css.strip() == "", (
             f"{cls.__name__} must not declare its own DEFAULT_CSS — the "
@@ -2798,9 +2800,9 @@ def test_tc033_modals_render_with_calm_dark_tokens(tmp_path: Path) -> None:
 
     rendered = asyncio.run(_drive())
     assert set(rendered) == {
-        "LoadFileScreen",
+        "LoadDialog(path)",
         "SaveProjectScreen",
-        "LoadProjectScreen",
+        "LoadDialog(list)",
     }, "all three modals must mount and render"
     for name, styles in rendered.items():
         assert styles["border_style"] == "round", (
@@ -9071,17 +9073,24 @@ def test_ac3_issues_pgdn_pgup_page_the_grouped_panel(tmp_path: Path) -> None:
 
 def test_ac7_workspace_load_project_button(tmp_path: Path) -> None:
     """AC-7 / B-20: the Workspace shows a "Load project" button that opens
-    the same `LoadProjectScreen` as key `p` (RED-first: no such button).
+    the same Load dialog as key `p` (RED-first: no such button).
 
     Intent: the load-project flow existed only behind the undiscoverable `p`
     key. A visible button in the Workspace left pane must push the modal
     project list when at least one saved project exists.
+
+    Inc 9b re-pin (Q9, Q7): the project list is the one ``LoadDialog``; the
+    saved project holds a ``project.json`` so it is still a listed project
+    (LLR-173.4a).
     """
-    from s19_app.tui.screens import LoadProjectScreen
+    from tests.support.b100_load_dialog import is_load_dialog
 
     async def _drive() -> "tuple[bool, bool]":
         app = S19TuiApp(base_dir=tmp_path)
         (app.workarea / "demo_project").mkdir(parents=True, exist_ok=True)
+        (app.workarea / "demo_project" / "project.json").write_text(
+            '{"schema_version": 1}', encoding="utf-8"
+        )
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
             _install_case_02_loaded_file(app)
@@ -9090,13 +9099,21 @@ def test_ac7_workspace_load_project_button(tmp_path: Path) -> None:
             button = app.query_one("#ws_load_project_button")
             visible = button.display and not button.has_class("hidden")
             button.press()
-            await pilot.pause()
-            pushed = isinstance(app.screen, LoadProjectScreen)
+            # Inc 9b E4: wait (bounded) until the dialog is mounted and holds
+            # its list focus; one pause did not always deliver the Pressed
+            # message, and leaving the app mid-mount raised in on_mount.
+            for _ in range(200):
+                await pilot.pause()
+                if is_load_dialog(app.screen) and getattr(
+                    app.screen.focused, "id", None
+                ) == "load_list":
+                    break
+            pushed = is_load_dialog(app.screen)
             return bool(visible), pushed
 
     visible, pushed = asyncio.run(_drive())
     assert visible, "#ws_load_project_button must be visible on the Workspace"
-    assert pushed, "pressing the button must push LoadProjectScreen (same as key 'p')"
+    assert pushed, "pressing the button must push the Load dialog (same as key 'p')"
 
 
 # ---------------------------------------------------------------------------

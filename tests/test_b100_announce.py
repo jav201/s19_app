@@ -67,7 +67,6 @@ from textual.widgets import Label
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.insight_style import GREEN
 from s19_app.tui.insight_style import YELLOW
-from s19_app.tui.screens import LoadProjectScreen
 from s19_app.tui.screens import SelectVariantScreen
 from s19_app.tui.services.variant_execution_service import MANIFEST_BAD_STRUCTURE
 from s19_app.tui.services.variant_execution_service import MANIFEST_JSON_PARSE
@@ -81,6 +80,7 @@ from s19_app.validation.model import ValidationSeverity
 
 from tests.support import b100_links
 from tests.support import b100_projects as projects
+from tests.support.b100_load_dialog import highlight_row, is_load_dialog
 from tests.test_b100_active_variant import _add_and_apply_through_the_panel
 from tests.test_b100_active_variant import _load_file_through_dialog
 from tests.test_b100_active_variant import _save_back_through_the_prompt
@@ -513,16 +513,10 @@ def _seed_problem_project(workarea: Path, problems: int) -> Path:
 async def _open_panel(pilot, app: S19TuiApp, name: str = "P") -> None:
     await pilot.press("p")
     await _wait_for(
-        pilot, lambda: isinstance(app.screen, LoadProjectScreen), "the Load project dialog"
+        pilot, lambda: is_load_dialog(app.screen), "the Load dialog"
     )
-    row = next(
-        item
-        for item in app.screen.query("#project_list ListItem")
-        if str(item.query_one(Label).render()) == name
-    )
-    await pilot.click(row)
-    await pilot.pause()
-    assert await pilot.click("#project_ok"), "click missed #project_ok"
+    await highlight_row(pilot, app, name)
+    assert await pilot.click("#load_ok"), "click missed #load_ok"
     await _wait_for(
         pilot,
         lambda: _panel_open(app) and app.focused is not None,

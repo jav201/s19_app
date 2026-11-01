@@ -1,0 +1,136 @@
+# red-02-corrective — batch-100 Inc 9b E5 corrective pass, RED evidence
+# Part 1: the new and changed arms run on 741cc07's SOURCE (scratch tree base10, test file copied as tests/test_corr9b_load_dialog.py; source not edited).
+#   Expected: 8 RED (CR9b-03, SEC9b-1, SEC9b-2, SEC9b-3 arms). CR9b-01 and CR9b-02 are test-only fixes of correct code, so they are GREEN on base; their RED is shown by the mutant runs in Part 2.
+
+# tree: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/base10
+# git: 741cc07
+# date: 2026-10-31T18:21:31-06:00
+# cmd: pytest tests/test_corr9b_load_dialog.py -k priority_keys_are_inert or recent_choice_loads_the_recorded or linked_file_is_explained_as_a_file or over_long_paste or resolve_error_is_refused or project_json_that_is_a_reparse_point or reparse_file_in_a_project -v -rA --tb=line --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr9b/bt-red
+s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\s19_app\__init__.py
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+rootdir: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 141 items / 131 deselected / 10 selected
+
+tests/test_corr9b_load_dialog.py::test_tc_b100_40_recent_choice_loads_the_recorded_text_unchanged PASSED [ 10%]
+tests/test_corr9b_load_dialog.py::test_tc_b100_41_priority_keys_are_inert_while_the_dialog_is_open PASSED [ 20%]
+tests/test_corr9b_load_dialog.py::test_tc_b100_63_typed_linked_file_is_explained_as_a_file[linked s19] FAILED [ 30%]
+tests/test_corr9b_load_dialog.py::test_tc_b100_63_typed_linked_file_is_explained_as_a_file[a2l through a junction] FAILED [ 40%]
+tests/test_corr9b_load_dialog.py::test_tc_b100_63_over_long_paste_is_refused_and_the_app_stays_up FAILED [ 50%]
+tests/test_corr9b_load_dialog.py::test_tc_b100_63_resolve_error_is_refused_not_raised[ValueError-relative] FAILED [ 60%]
+tests/test_corr9b_load_dialog.py::test_tc_b100_63_resolve_error_is_refused_not_raised[ValueError-absolute] FAILED [ 70%]
+tests/test_corr9b_load_dialog.py::test_tc_b100_63_resolve_error_is_refused_not_raised[RuntimeError-relative] FAILED [ 80%]
+tests/test_corr9b_load_dialog.py::test_tc_b100_64_project_json_that_is_a_reparse_point_is_refused FAILED [ 90%]
+tests/test_corr9b_load_dialog.py::test_tc_b100_64_reparse_file_in_a_project_is_neither_listed_nor_installed FAILED [100%]
+
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_corr9b_load_dialog.py:2300: AssertionError: link or junction — pick a project in the list
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_corr9b_load_dialog.py:2300: AssertionError: link or junction — pick a project in the list
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_corr9b_load_dialog.py:2572: AssertionError: 40000
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_corr9b_load_dialog.py:2600: ValueError: injected: stat: path too long for Windows
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_corr9b_load_dialog.py:2600: ValueError: injected: stat: path too long for Windows
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_corr9b_load_dialog.py:2600: RuntimeError: injected: stat: path too long for Windows
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the refusal line
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_corr9b_load_dialog.py:3290: AssertionError: ['variant a.s19', '● variant b.s19', 'project file: ok']
+=================================== PASSES ====================================
+=========================== short test summary info ===========================
+PASSED tests/test_corr9b_load_dialog.py::test_tc_b100_40_recent_choice_loads_the_recorded_text_unchanged
+PASSED tests/test_corr9b_load_dialog.py::test_tc_b100_41_priority_keys_are_inert_while_the_dialog_is_open
+FAILED tests/test_corr9b_load_dialog.py::test_tc_b100_63_typed_linked_file_is_explained_as_a_file[linked s19]
+FAILED tests/test_corr9b_load_dialog.py::test_tc_b100_63_typed_linked_file_is_explained_as_a_file[a2l through a junction]
+FAILED tests/test_corr9b_load_dialog.py::test_tc_b100_63_over_long_paste_is_refused_and_the_app_stays_up
+FAILED tests/test_corr9b_load_dialog.py::test_tc_b100_63_resolve_error_is_refused_not_raised[ValueError-relative]
+FAILED tests/test_corr9b_load_dialog.py::test_tc_b100_63_resolve_error_is_refused_not_raised[ValueError-absolute]
+FAILED tests/test_corr9b_load_dialog.py::test_tc_b100_63_resolve_error_is_refused_not_raised[RuntimeError-relative]
+FAILED tests/test_corr9b_load_dialog.py::test_tc_b100_64_project_json_that_is_a_reparse_point_is_refused
+FAILED tests/test_corr9b_load_dialog.py::test_tc_b100_64_reparse_file_in_a_project_is_neither_listed_nor_installed
+=========== 8 failed, 2 passed, 131 deselected in 80.46s (0:01:20) ============
+# exit: 1
+
+# =======================================================================
+# Part 2a: CR9b-01 one-off mutant — _LOAD_DIALOG_INERT_ACTIONS without focus_palette (pytest plugin, worktree source unedited). Expected RED.
+# tree: C:/Users/jjgh8/Github/s19_app-b100-inc9b
+# git: 741cc07
+# date: 2026-10-31T18:23:36-06:00
+# cmd: pytest tests/test_b100_load_dialog.py -k priority_keys_are_inert -v -s -p corr9b_mutant --tb=short --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr9b/bt-mut-drop_focus_palette
+s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc9b\s19_app\__init__.py
+MUTANT ACTIVE: drop_focus_palette ['cycle_density', 'load_file', 'save_project']
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+rootdir: C:\Users\jjgh8\Github\s19_app-b100-inc9b
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 141 items / 140 deselected / 1 selected
+
+tests/test_b100_load_dialog.py::test_tc_b100_41_priority_keys_are_inert_while_the_dialog_is_open FAILED
+
+================================== FAILURES ===================================
+______ test_tc_b100_41_priority_keys_are_inert_while_the_dialog_is_open _______
+tests\test_b100_load_dialog.py:1156: in test_tc_b100_41_priority_keys_are_inert_while_the_dialog_is_open
+    assert out["ctrl+k main focus kept"] is True, out
+E   AssertionError: {'after palette': ['Screen', 'LoadDialog', 'CommandPalette'], 'ctrl+d': True, 'ctrl+k': True, 'ctrl+k main focus kept': False, ...}
+E   assert False is True
+=========================== short test summary info ===========================
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_priority_keys_are_inert_while_the_dialog_is_open
+====================== 1 failed, 140 deselected in 5.89s ======================
+# exit: 1
+
+# =======================================================================
+# Part 2b: CR9b-02 one-off mutant — record_recent_source a no-op (pytest plugin, worktree source unedited). Expected RED.
+# tree: C:/Users/jjgh8/Github/s19_app-b100-inc9b
+# git: 741cc07
+# date: 2026-10-31T18:23:43-06:00
+# cmd: pytest tests/test_b100_load_dialog.py -k recent_choice_loads_the_recorded -v -s -p corr9b_mutant --tb=short --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr9b/bt-mut-skip_recent_record
+s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc9b\s19_app\__init__.py
+MUTANT ACTIVE: skip_recent_record
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+rootdir: C:\Users\jjgh8\Github\s19_app-b100-inc9b
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 141 items / 140 deselected / 1 selected
+
+tests/test_b100_load_dialog.py::test_tc_b100_40_recent_choice_loads_the_recorded_text_unchanged FAILED
+
+================================== FAILURES ===================================
+_______ test_tc_b100_40_recent_choice_loads_the_recorded_text_unchanged _______
+tests\test_b100_load_dialog.py:795: in test_tc_b100_40_recent_choice_loads_the_recorded_text_unchanged
+    assert after_fw[0] == str(src / "fw.s19"), after_fw
+E   AssertionError: ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\corr9b\\bt-mut-skip_recent_record\\test_tc_b100_40_recent_choice_0\\gone\\fw.s19', 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\corr9b\\bt-mut-skip_recent_record\\test_tc_b100_40_recent_choice_0\\src\\cal.a2l', 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\corr9b\\bt-mut-skip_recent_record\\test_tc_b100_40_recent_choice_0\\src\\fw.s19']
+E   assert 'C:\\Users\\j...\gone\\fw.s19' == 'C:\\Users\\j...\\src\\fw.s19'
+E     
+E     - C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr9b\bt-mut-skip_recent_record\test_tc_b100_40_recent_choice_0\src\fw.s19
+E     ?                                                                                                                                                                               ^^^
+E     + C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr9b\bt-mut-skip_recent_record\test_tc_b100_40_recent_choice_0\gone\fw.s19
+E     ?                       ...
+E     
+E     ...Full output truncated (1 line hidden), use '-vv' to show
+=========================== short test summary info ===========================
+FAILED tests/test_b100_load_dialog.py::test_tc_b100_40_recent_choice_loads_the_recorded_text_unchanged
+====================== 1 failed, 140 deselected in 4.90s ======================
+# exit: 1
+
+# =======================================================================
+# Mutant plugin source (scratchpad/corr9b/plugins/corr9b_mutant.py):
+"""One-off mutant plugin for the Inc 9b corrective pass (no source edit).
+
+CORR9B_MUTANT=drop_focus_palette  -> _LOAD_DIALOG_INERT_ACTIONS without focus_palette (CR9b-01)
+CORR9B_MUTANT=skip_recent_record  -> record_recent_source is a no-op returning True (CR9b-02)
+"""
+import os
+
+
+def pytest_configure(config):
+    import s19_app.tui.app as app_module
+
+    which = os.environ.get("CORR9B_MUTANT", "")
+    if which == "drop_focus_palette":
+        app_module._LOAD_DIALOG_INERT_ACTIONS = app_module._LOAD_DIALOG_INERT_ACTIONS - {"focus_palette"}
+        print("MUTANT ACTIVE:", which, sorted(app_module._LOAD_DIALOG_INERT_ACTIONS))
+    elif which == "skip_recent_record":
+        app_module.record_recent_source = lambda path: True
+        print("MUTANT ACTIVE:", which)
+    else:
+        raise SystemExit(f"unknown CORR9B_MUTANT {which!r}")

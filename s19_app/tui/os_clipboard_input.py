@@ -467,7 +467,7 @@ class OsClipboardInput(Input):
             - ``self.app.clipboard`` (fallback)
             - ``self.app.notify`` (UX signal on total failure)
         Used by:
-            - :class:`s19_app.tui.screens.LoadFileScreen`
+            - :class:`s19_app.tui.screens.LoadDialog` (``#load_path``)
     """
 
     async def action_paste(self) -> None:

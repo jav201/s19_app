@@ -1941,11 +1941,11 @@ def _at_script_border(app) -> str:
 
 
 async def _at_load_file_through_dialog(pilot, app, src: Path) -> None:
-    from s19_app.tui.screens import LoadFileScreen
+    from tests.support.b100_load_dialog import highlight_row, is_load_dialog
 
     await pilot.press("l")
     await projects.wait_for(
-        pilot, lambda: isinstance(app.screen, LoadFileScreen), "the Load file dialog"
+        pilot, lambda: is_load_dialog(app.screen), "the Load dialog"
     )
     assert await pilot.click("#load_path"), "click missed #load_path"
     await pilot.press("ctrl+a")
@@ -1954,7 +1954,7 @@ async def _at_load_file_through_dialog(pilot, app, src: Path) -> None:
     assert await pilot.click("#load_ok"), "click missed #load_ok"
     await projects.wait_for(
         pilot,
-        lambda: not isinstance(app.screen, LoadFileScreen)
+        lambda: not is_load_dialog(app.screen)
         and _at_status(app).startswith("Loaded "),
         f"the durable load line after loading {src.name}",
     )
@@ -2021,23 +2021,17 @@ async def _at_open_project_through_dialog(pilot, app, name: str) -> str:
     click OK; read the Load-result panel it opens, close it with ``esc``."""
     from textual.widgets import Label
 
-    from s19_app.tui.screens import LoadProjectScreen
+    from tests.support.b100_load_dialog import highlight_row, is_load_dialog
 
     await pilot.press("1")
     for _ in range(4):
         await pilot.pause()
     await pilot.press("p")
     await projects.wait_for(
-        pilot, lambda: isinstance(app.screen, LoadProjectScreen), "the Load project dialog"
+        pilot, lambda: is_load_dialog(app.screen), "the Load dialog"
     )
-    row = next(
-        item
-        for item in app.screen.query("#project_list ListItem")
-        if str(item.query_one(Label).render()) == name
-    )
-    await pilot.click(row)
-    await pilot.pause()
-    assert await pilot.click("#project_ok"), "click missed #project_ok"
+    await highlight_row(pilot, app, name)
+    assert await pilot.click("#load_ok"), "click missed #load_ok"
     await projects.wait_for(
         pilot, lambda: len(app.screen.query("#result_ok")) > 0, "the Load-result panel"
     )

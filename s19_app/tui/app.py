@@ -5,7 +5,7 @@ from dataclasses import dataclass, field, replace
 import hashlib
 import json
 import os
-from pathlib import Path, PurePath, PurePosixPath
+from pathlib import Path, PurePath, PurePosixPath, PureWindowsPath
 import shutil
 import stat
 import time
@@ -78,9 +78,9 @@ from .screens import (
     EntryJsonScreen,
     LegendScreen,
     LOAD_RESULT_SELECT_VARIANT,
-    LoadFileScreen,
+    LoadChoice,
+    LoadDialog,
     LoadFlowScreen,
-    LoadProjectScreen,
     LoadResultScreen,
     OperationsScreen,
     ReportViewerScreen,
@@ -276,11 +276,49 @@ from .workspace import (
     is_windows_device_name,
     list_workarea_files,
     place_into_workarea,
+    RECENT_PROBLEM_TOO_LARGE,
+    RECENT_PROBLEM_UNREADABLE,
     record_recent_source,
+    read_recent_sources,
+    recent_kind,
     resolve_input_path,
     sanitize_project_name,
     setup_logging,
     validate_project_files,
+)
+
+#: Inc 9b (G2): the refusal reason word ``_typed_load_route`` returns mapped
+#: to the ``(reason_token, step_token)`` pair the Load dialog paints in
+#: ``#load_reason`` (LLR-173.5 … LLR-173.5e). Every ``("refuse", <literal>)``
+#: the classifier can return is a key here (B57); a new reason with no key
+#: raises ``KeyError`` at verdict time.
+_TYPED_REFUSAL_TOKENS: dict[str, tuple[str, str]] = {
+    "not found": ("not found", "check the path"),
+    "not a supported file": ("not a supported file", "check the path"),
+    "not a project": ("not a project", "pick a project in the list"),
+    "outside": ("outside the work area", "copy the folder into the work area"),
+    "link": ("link or junction", "pick a project in the list"),
+    # CR9b-03: a typed data or A2L path in the work area that is, or passes
+    # through, a link — a file, so the step is not the project list.
+    "link file": ("is a link or junction", "open the file it points to"),
+    "unreadable": (
+        "could not be read",
+        "check that the folder can be opened, then load again",
+    ),
+}
+
+#: Inc 9b (Q5): the next-step token painted after a recent-sources store
+#: problem word in the Load dialog's recents section (LLR-173.4g).
+_RECENT_PROBLEM_STEPS: dict[str, str] = {
+    RECENT_PROBLEM_TOO_LARGE: "the next load starts a new list",
+    RECENT_PROBLEM_UNREADABLE: "check that the recent-sources file can be opened",
+}
+
+#: Inc 9b (G3): the ``priority=True`` app actions that must run no app action
+#: while the Load dialog is open (LLR-173.2e). The guard reads the whole
+#: ``screen_stack`` (S9b-1), so these stay inert even under the palette.
+_LOAD_DIALOG_INERT_ACTIONS: frozenset[str] = frozenset(
+    {"load_file", "save_project", "focus_palette", "cycle_density"}
 )
 
 #: The Patch Editor's routable action set (LLR-003.2) — the eight v2
@@ -7327,9 +7365,18 @@ class S19TuiApp(App):
         self.refresh_files()
 
     def action_load_file(self) -> None:
-        """Open path dialog for S19/HEX/MAC/A2L."""
+        """Open the Load dialog on the typed-path field (``l`` / ``ctrl+l``)."""
         self.logger.info("Load file action triggered.")
-        self.push_screen(LoadFileScreen(), self._handle_load_dialog)
+        self.push_screen(
+            LoadDialog(
+                mode="path",
+                highlight=self.current_project,
+                rows=self._load_dialog_rows,
+                verdict=self._load_dialog_verdict,
+                preview=self._load_dialog_preview,
+            ),
+            self._handle_load_dialog,
+        )
 
     def action_open_workarea(self) -> None:
         """Open the workarea directory in the platform's file manager.
@@ -7437,14 +7484,18 @@ class S19TuiApp(App):
         return sorted(names)
 
     def action_load_project(self) -> None:
-        """Prompt to load an existing project."""
-        projects = self.list_projects()
-        if not projects:
-            self.set_status("No saved projects found.")
-            self.logger.info("No projects found in workarea.")
-            return
-        self.logger.info("Load project action triggered. projects=%s", projects)
-        self.push_screen(LoadProjectScreen(projects), self._route_load_project)
+        """Open the Load dialog on the project list (``p``)."""
+        self.logger.info("Load project action triggered.")
+        self.push_screen(
+            LoadDialog(
+                mode="list",
+                highlight=self.current_project,
+                rows=self._load_dialog_rows,
+                verdict=self._load_dialog_verdict,
+                preview=self._load_dialog_preview,
+            ),
+            self._handle_load_dialog,
+        )
 
     def _route_load_project(self, name: Optional[str]) -> None:
         """
@@ -7472,7 +7523,7 @@ class S19TuiApp(App):
             Uses:
                 - ``_handle_load_project`` / ``LoadResultScreen``
             Used by:
-                - ``action_load_project`` (the dialog's dismiss callback)
+                - ``_handle_load_dialog`` (the ``project`` kind)
         """
         before = self._last_load_announcement
         self._handle_load_project(name)
@@ -7480,6 +7531,323 @@ class S19TuiApp(App):
         if announcement is None or announcement is before:
             return
         self.push_screen(LoadResultScreen(announcement), self._handle_load_result)
+
+    def _load_dialog_rows(self) -> list[tuple[str, str, Optional[LoadChoice]]]:
+        """
+        Summary:
+            The Load dialog's ``rows`` callable (S-c): build every
+            ``(section_id, painted plain label, choice)`` triple in list
+            order — the projects section, then work-area files, then recent
+            sources (LLR-173.4l). Each section starts with a heading row
+            (``choice None``) and holds either loadable rows or one token
+            line (``choice None``).
+
+        Returns:
+            list[tuple[str, str, Optional[LoadChoice]]]: The rows; a ``None``
+            choice marks a heading or token line (the dialog disables it).
+
+        Data Flow:
+            - Projects: ``list_projects()``; an ``OSError`` paints the
+              ``could not be read`` token line (LLR-173.4m), ``0`` names
+              paint ``no projects — ctrl+s saves a project``, else one row
+              per on-disk name with ``LoadChoice("project", name)``.
+            - Work area: ``list_workarea_files`` filtered by ``recent_kind``
+              (the one lister, CR9-11); ``0`` files paint
+              ``no work-area files — l loads a file``.
+            - Recents: ``read_recent_sources`` (never raises); a ``problem``
+              paints ``<problem> — <next step>`` (LLR-173.4g), ``0`` entries
+              paint ``no recent sources``, else one row per entry with the
+              file name and kind (LLR-173.4h) and ``LoadChoice("recent",
+              path)``. Every label goes through ``painted_names``.
+
+        Dependencies:
+            Uses:
+                - ``list_projects`` / ``list_workarea_files`` / ``recent_kind``
+                - ``read_recent_sources`` / ``_RECENT_PROBLEM_STEPS``
+                - ``painted_names`` / ``PureWindowsPath``
+            Used by:
+                - ``LoadDialog`` on mount (through ``action_load_file`` /
+                  ``action_load_project``)
+        """
+        rows: list[tuple[str, str, Optional[LoadChoice]]] = []
+        rows.append(("projects", "Projects", None))
+        try:
+            names = self.list_projects()
+        except OSError:
+            rows.append(
+                (
+                    "projects",
+                    "could not be read — check that the folder can be opened, then load again",
+                    None,
+                )
+            )
+        else:
+            if names:
+                for name in names:
+                    rows.append(
+                        ("projects", painted_names([name]), LoadChoice("project", name))
+                    )
+            else:
+                rows.append(("projects", "no projects — ctrl+s saves a project", None))
+        rows.append(("workarea", "Work area", None))
+        files = [
+            p for p in list_workarea_files(self.workarea) if recent_kind(p) is not None
+        ]
+        if files:
+            for path in files:
+                rows.append(
+                    ("workarea", painted_names([path.name]), LoadChoice("workarea", path.name))
+                )
+        else:
+            rows.append(("workarea", "no work-area files — l loads a file", None))
+        rows.append(("recent", "Recent", None))
+        store = read_recent_sources()
+        if store.problem is not None:
+            rows.append(
+                (
+                    "recent",
+                    f"{store.problem} — {_RECENT_PROBLEM_STEPS[store.problem]}",
+                    None,
+                )
+            )
+        elif not store.entries:
+            rows.append(("recent", "no recent sources", None))
+        else:
+            for entry in store.entries:
+                label = f"{painted_names([PureWindowsPath(entry.path).name])} ({entry.kind})"
+                rows.append(("recent", label, LoadChoice("recent", entry.path)))
+        return rows
+
+    def _load_dialog_verdict(self, choice: LoadChoice) -> Optional[tuple[str, str]]:
+        """
+        Summary:
+            The Load dialog's ``verdict`` callable (S-b): ``None`` means
+            "go"; otherwise the ``(reason_token, step_token)`` pair the
+            dialog paints in ``#load_reason`` and stays open. It reads
+            metadata only (S-e), paints nothing and writes nothing.
+
+        Args:
+            choice (LoadChoice): The loadable row's choice, or the typed
+                ``path`` choice built by the dialog (S-a).
+
+        Returns:
+            Optional[tuple[str, str]]: ``None`` to dismiss, else the
+            refusal-token pair from ``_TYPED_REFUSAL_TOKENS``.
+
+        Data Flow:
+            - ``project`` / ``workarea`` -> ``None`` (a project pick is
+              refused, if it must be, by ``_handle_load_project``).
+            - ``path`` / ``recent`` -> ``_typed_load_route(Path(value))``;
+              a non-``refuse`` action -> ``None``, else the mapped tokens.
+              A recent goes through the same classifier (LLR-173.4k).
+            - No ``try/except`` (R-5): ``_typed_load_route`` maps every
+              ``OSError`` itself.
+
+        Dependencies:
+            Uses:
+                - ``_typed_load_route`` / ``_TYPED_REFUSAL_TOKENS``
+            Used by:
+                - ``LoadDialog`` load request (``enter``, ``alt+l``,
+                  ``#load_ok``)
+        """
+        if choice.kind in ("project", "workarea"):
+            return None
+        action, reason = self._typed_load_route(Path(choice.value))
+        if action != "refuse":
+            return None
+        return _TYPED_REFUSAL_TOKENS[reason]
+
+    def _load_dialog_preview(self, choice: LoadChoice) -> list[tuple[str, bool]]:
+        """
+        Summary:
+            The Load dialog's ``preview`` callable (S-b): build the
+            ``(painted plain text, marked)`` lines for one choice, returned
+            synchronously for every kind (Q2 / A9b-04).
+
+        Args:
+            choice (LoadChoice): The highlighted row's choice (never a typed
+                ``path`` — A9b-07 removed the typed-file arm).
+
+        Returns:
+            list[tuple[str, bool]]: The lines; the dialog prefixes ``● ``
+            only where ``marked`` is true.
+
+        Data Flow:
+            - ``recent`` -> the full recorded path, its kind and
+              ``checked when loaded``, 0 marks and 0 filesystem calls
+              (LLR-173.4i / LLR-173.4j).
+            - ``workarea`` -> ``_file_preview_marks`` over session state
+              and the file name, no filesystem call.
+            - ``path`` -> ``[]`` (no typed-file preview).
+            - ``project`` -> a synchronous build from the link-safe scan
+              (R2-N2), the ``project.json`` lstat regular-file gate (S9b-2),
+              ``read_project_manifest`` / ``build_variant_set`` /
+              ``choose_install_set`` and ``_a2l_admission`` (A9b-R2-6); an
+              ``OSError`` paints the ``could not be read`` token line
+              (LLR-173.6k).
+
+        Dependencies:
+            Uses:
+                - ``_list_project_files`` / ``_a2l_admission``
+                - ``read_project_manifest`` / ``manifest_is_damaged``
+                - ``build_variant_set`` / ``choose_install_set``
+                - ``_file_preview_marks`` / ``recent_kind`` / ``painted_names``
+            Used by:
+                - ``LoadDialog`` on a highlight
+        """
+        if choice.kind == "recent":
+            value = choice.value
+            return [
+                (painted_names([value], clip=len(value)), False),
+                (f"kind {recent_kind(Path(value))}", False),
+                ("checked when loaded", False),
+            ]
+        if choice.kind == "workarea":
+            return self._file_preview_marks(self.workarea / WORKAREA_TEMP / choice.value)
+        if choice.kind == "path":
+            return []
+        # project
+        folder = self.workarea / choice.value
+        try:
+            data_files, a2l_files, cardinality_error = self._list_project_files(folder)
+            manifest_path = folder / PROJECT_MANIFEST_NAME
+            try:
+                manifest_stat = os.lstat(manifest_path)
+            except FileNotFoundError:
+                manifest_stat = None
+            # SEC9b-2: the ``_folder_holds_project`` test (regular and not a
+            # reparse point), so a placeholder is refused before any open.
+            if manifest_stat is not None and (
+                not stat.S_ISREG(manifest_stat.st_mode)
+                or _is_reparse_point(manifest_path)
+            ):
+                return [
+                    (
+                        "could not be read — check that the folder can be opened, then load again",
+                        False,
+                    )
+                ]
+            manifest = (
+                read_project_manifest(folder) if manifest_stat is not None else None
+            )
+            variant_set = build_variant_set(choice.value, data_files)
+            recorded = (
+                manifest.active_variant
+                if manifest is not None and not manifest_is_damaged(manifest)
+                else None
+            )
+            a2l_ok = bool(a2l_files) and self._a2l_admission(a2l_files[0]) is None
+            install_a2l = a2l_files[0] if a2l_ok else None
+            install = choose_install_set(
+                variant_set,
+                recorded,
+                data_files,
+                [install_a2l] if install_a2l is not None else [],
+            )
+            if cardinality_error is not None:
+                # A9b-R2-3 / R2-N1: more than one MAC or A2L refuses the
+                # install, so every mark is ``False`` (0 ``●``).
+                install = InstallSet(None, None, None)
+            lines: list[tuple[str, bool]] = []
+            marked_variant_id = (
+                install.variant.variant_id if install.variant is not None else None
+            )
+            for variant in variant_set.variants:
+                lines.append(
+                    (
+                        f"variant {painted_names([variant.path.name])}",
+                        variant.variant_id == marked_variant_id,
+                    )
+                )
+            for mac in (
+                item for item in data_files if item.suffix.lower() in MAC_EXTENSIONS
+            ):
+                lines.append((f"MAC {painted_names([mac.name])}", mac == install.mac))
+            if a2l_files:
+                lines.append(
+                    (
+                        f"A2L {painted_names([a2l_files[0].name])}",
+                        a2l_ok and install.a2l is not None,
+                    )
+                )
+            if manifest is None:
+                state = "no project.json"
+            elif manifest_is_damaged(manifest):
+                state = "manifest damaged"
+            else:
+                state = "ok"
+            lines.append((f"project file: {state}", False))
+            return lines
+        except OSError:
+            return [
+                (
+                    "could not be read — check that the folder can be opened, then load again",
+                    False,
+                )
+            ]
+
+    def _file_preview_marks(self, path: Path) -> list[tuple[str, bool]]:
+        """
+        Summary:
+            The work-area file row's preview marks (LLR-173.6b / LLR-173.6c):
+            pure over session state and the file name, run on the event loop
+            with no filesystem call. It encodes the install rule the Load
+            session keeps (image, MAC and A2L).
+
+        Args:
+            path (Path): The work-area file's full path.
+
+        Returns:
+            list[tuple[str, bool]]: The marked / unmarked lines.
+
+        Data Flow:
+            - S19/HEX: ``● image``; the kept MAC and A2L; a project-open
+              note ``becomes the active variant of project <name>``
+              (LLR-173.6c).
+            - MAC: the kept image (an overlay keeps the image), ``● MAC``
+              and the kept A2L; no project note.
+            - A2L: the kept image and MAC, ``● A2L``; no note.
+
+        Dependencies:
+            Uses:
+                - ``painted_names`` / ``PROJECT_PRIMARY_DATA_EXTENSIONS``
+                - ``MAC_EXTENSIONS`` (an A2L suffix is the fallback arm)
+            Used by:
+                - ``_load_dialog_preview`` (the ``workarea`` kind)
+        """
+        cur = self.current_file
+        kept_a2l = self.current_a2l_path or (cur.a2l_path if cur else None)
+        suffix = path.suffix.lower()
+        lines: list[tuple[str, bool]] = []
+        if suffix in PROJECT_PRIMARY_DATA_EXTENSIONS:
+            lines.append((f"image {painted_names([path.name])}", True))
+            if cur and cur.mac_path:
+                lines.append((f"MAC {painted_names([cur.mac_path.name])}", True))
+            if kept_a2l:
+                lines.append((f"A2L {painted_names([kept_a2l.name])}", True))
+            if self.current_project:
+                lines.append(
+                    (
+                        f"becomes the active variant of project "
+                        f"{painted_names([self.current_project])}",
+                        False,
+                    )
+                )
+            return lines
+        if suffix in MAC_EXTENSIONS:
+            if cur and cur.file_type in {"s19", "hex"}:
+                lines.append((f"image {painted_names([cur.path.name])}", True))
+            lines.append((f"MAC {painted_names([path.name])}", True))
+            if kept_a2l:
+                lines.append((f"A2L {painted_names([kept_a2l.name])}", True))
+            return lines
+        # A2L
+        if cur and cur.file_type in {"s19", "hex"}:
+            lines.append((f"image {painted_names([cur.path.name])}", True))
+        if cur and cur.mac_path:
+            lines.append((f"MAC {painted_names([cur.mac_path.name])}", True))
+        lines.append((f"A2L {painted_names([path.name])}", True))
+        return lines
 
     def _handle_load_result(self, choice: Optional[str]) -> None:
         """
@@ -8032,14 +8400,18 @@ class S19TuiApp(App):
         self.refresh_bindings()
 
     def check_action(self, action: str, parameters: tuple) -> Optional[bool]:
-        """Gate app actions by the active window (batch-97 I-11, D10).
+        """Gate app actions by the active window (batch-97 I-11, D10) and
+        by the Load dialog (Inc 9b, LLR-173.2e).
 
         Summary:
             ``confirm_attention`` (the ``c`` key and its ^K palette entry)
             runs only while Flow Execution is the active window — off it the
             key does nothing and the binding is not active. Inc-8 (D28):
             ``+`` / ``-`` page only on A2L and MAC, and ``,`` / ``.`` only
-            on Workspace — elsewhere they would page a hidden view. Every
+            on Workspace — elsewhere they would page a hidden view. Inc 9b
+            (G3): the four ``priority=True`` actions in
+            ``_LOAD_DIALOG_INERT_ACTIONS`` are inert while any screen on the
+            stack is a ``LoadDialog`` (the whole-stack guard, S9b-1). Every
             other action falls through to Textual's own check.
 
         Args:
@@ -8050,6 +8422,10 @@ class S19TuiApp(App):
             Optional[bool]: ``False`` for an action off its window, else
             what ``App.check_action`` returns.
         """
+        if action in _LOAD_DIALOG_INERT_ACTIONS and any(
+            isinstance(s, LoadDialog) for s in self.screen_stack
+        ):
+            return False
         if action == "confirm_attention":
             return self._active_screen_key == "flow_execution"
         if action in ("page_next_context", "page_prev_context"):
@@ -11703,7 +12079,7 @@ class S19TuiApp(App):
             self.logger.warning("Project load refused (%s): %r", folder_reason, name)
             return
         if not project_dir.exists():
-            self.set_status(f"Project not found: {name}")
+            self.set_status(safe_text(f"Project not found: {painted_names([name])}").plain)
             self.logger.warning("Project not found: %s", name)
             return
         # LLR-172.5g / E3 R3: a name the project list does not list (by
@@ -11740,7 +12116,21 @@ class S19TuiApp(App):
             return
         name = match
         project_dir = self.workarea / name
-        data_files, a2l_files, error = validate_project_files(project_dir)
+        # R2-N2: the one link-safe listing (LLR-173.4n), shared with the
+        # preview, replaces ``validate_project_files`` here so a linked
+        # child is neither listed nor installed. F-12 / LLR-173.1g: an
+        # unreadable picked project paints one status line and returns.
+        try:
+            data_files, a2l_files, error = self._list_project_files(project_dir)
+        except OSError:
+            self.set_status(
+                safe_text(
+                    f"Project NOT loaded: '{painted_names([name])}' could not be "
+                    "read — check that the folder can be opened, then load again."
+                ).plain
+            )
+            self.logger.warning("Project load refused (could not be read): %r", name)
+            return
         if error:
             self.set_status(error)
             self.logger.warning("Project validation failed: %s", error)
@@ -11752,23 +12142,15 @@ class S19TuiApp(App):
         # and named as a problem.
         a2l_problem: Optional[ProjectFileProblem] = None
         if a2l_files:
-            try:
-                a2l_stat = os.lstat(a2l_files[0])
-            except OSError as exc:
+            # A9b-R2-6: the one A2L admission rule, shared with the preview,
+            # so the A2L the preview marks is exactly the A2L the install
+            # keeps (HLR-173a).
+            a2l_reason = self._a2l_admission(a2l_files[0])
+            if a2l_reason is not None:
                 self.logger.warning(
                     "Project A2L not readable: %r (%s)",
-                    str(a2l_files[0]), type(exc).__name__,
+                    str(a2l_files[0]), a2l_reason,
                 )
-                a2l_reason: Optional[str] = "could not be read"
-            else:
-                if not stat.S_ISREG(a2l_stat.st_mode) or _is_reparse_point(
-                    a2l_files[0]
-                ):
-                    a2l_reason = "is a link or junction"
-                elif a2l_stat.st_size > workspace.DEFAULT_COPY_SIZE_CAP_BYTES:
-                    a2l_reason = "is too large to open"
-                else:
-                    a2l_reason = None
             if a2l_reason is not None and not data_files:
                 self.set_status(
                     safe_text(
@@ -11812,6 +12194,38 @@ class S19TuiApp(App):
                 )
             self.set_status(safe_text(message).plain)
             self.logger.warning("No data or A2L file in project: %r", name)
+            return
+        # S9b-2: the lstat regular-file gate on ``project.json`` runs before
+        # any manifest read AND before the reset — a FIFO, link or directory
+        # is refused here with 0 opens (R2-N5) and the session unchanged
+        # (B99); an absent file keeps the 9a "no project.json" path.
+        manifest_path = project_dir / PROJECT_MANIFEST_NAME
+        try:
+            manifest_stat = os.lstat(manifest_path)
+        except FileNotFoundError:
+            manifest_stat = None
+        except OSError:
+            self.set_status(
+                safe_text(
+                    f"Project NOT loaded: '{painted_names([name])}' could not be "
+                    "read — check that the folder can be opened, then load again."
+                ).plain
+            )
+            self.logger.warning("Project load refused (manifest unreadable): %r", name)
+            return
+        # SEC9b-2: the same test as ``_folder_holds_project`` and the preview.
+        if manifest_stat is not None and (
+            not stat.S_ISREG(manifest_stat.st_mode) or _is_reparse_point(manifest_path)
+        ):
+            self.set_status(
+                safe_text(
+                    f"Project NOT loaded: '{painted_names([name])}' could not be "
+                    "read — check that the folder can be opened, then load again."
+                ).plain
+            )
+            self.logger.warning(
+                "Project load refused (manifest not a regular file): %r", name
+            )
             return
         # HLR-165 / LLR-165.1: the ONE reset seam — after the project
         # validates, before the first install — so the primary parse's
@@ -12097,22 +12511,29 @@ class S19TuiApp(App):
         """
         Summary:
             The projects of this work area, in sorted order: each direct
-            child folder that is not a reserved home and passes the one
-            "is this folder a project here" check (LLR-171.4c) — a link or
-            junction is never listed.
+            child folder that is not a reserved home, passes the one
+            "is this folder a project here" check (LLR-171.4c) and holds
+            project content (Q7 / LLR-173.4a) — a link or junction is never
+            listed.
 
         Returns:
-            List[str]: The project folder names.
+            List[str]: The project folder names, in ``iterdir`` sorted order.
 
         Data Flow:
             - The link check runs before ``is_dir()``, which follows a
-              junction; no folder content is read.
+              junction; a non-folder is skipped.
+            - ``_folder_holds_project`` (the §1.3 content test) is the last
+              step: ``False`` skips the folder, ``True`` or ``None`` (the
+              content could not be read) lists it — a fail-open listing.
+            - An ``OSError`` from ``iterdir`` propagates; each caller catches
+              it (``_typed_load_route``, ``_handle_load_project``,
+              ``_load_dialog_rows``).
 
         Dependencies:
             Uses:
-                - _project_folder_refusal
+                - _project_folder_refusal / _folder_holds_project
             Used by:
-                - the Load project dialog
+                - _load_dialog_rows / _typed_load_route / _handle_load_project
         """
         reserved_folded = {home.casefold() for home in RESERVED_WORKAREA_HOMES}
         projects = []
@@ -12126,8 +12547,16 @@ class S19TuiApp(App):
                 continue
             if self._project_folder_refusal(item) is not None:
                 continue
-            if item.is_dir():
-                projects.append(item.name)
+            if not item.is_dir():
+                continue
+            # Q7 / LLR-173.4a: a folder that holds no ``project.json``, no
+            # data file and no A2L file is not a listed project (§1.3). The
+            # fail-open listing (``held is None``) keeps the typed route's
+            # ``could not be read`` arm reachable (F-3, TC-B100-38).
+            held = self._folder_holds_project(item)
+            if held is False:
+                continue
+            projects.append(item.name)
         return projects
 
     @staticmethod
@@ -12203,6 +12632,164 @@ class S19TuiApp(App):
             return "link"
         if not contained_in_workarea(folder, self.workarea):
             return "outside"
+        return None
+
+    def _folder_holds_project(self, folder: Path) -> Optional[bool]:
+        """
+        Summary:
+            The one §1.3 content test (Q7 / LLR-173.4a), shared by the
+            project list, the pick match and the typed route (F-3): does
+            this work-area folder hold a project?
+
+        Args:
+            folder (Path): A direct child folder of this work area.
+
+        Returns:
+            Optional[bool]: ``True`` when a regular ``project.json`` sits
+            at the top or the folder holds a data, MAC or A2L file;
+            ``False`` when it holds none of those; ``None`` when its
+            content could not be read.
+
+        Data Flow:
+            - ``os.lstat(folder / PROJECT_MANIFEST_NAME)``: a regular file
+              that is not a reparse point -> ``True``; any ``OSError``
+              falls through to the listing, as the old step 11 did.
+            - ``_list_project_files`` (link-safe, R2-N2): non-empty data or
+              A2L -> ``True``; an ``OSError`` -> ``None``; else ``False``.
+            - Reads metadata and at most one folder listing, writes
+              nothing, and never raises an ``OSError``.
+
+        Dependencies:
+            Uses:
+                - ``_list_project_files`` / ``_is_reparse_point``
+                - ``PROJECT_MANIFEST_NAME``
+            Used by:
+                - ``list_projects`` / ``_typed_load_route``
+        """
+        manifest_path = folder / PROJECT_MANIFEST_NAME
+        try:
+            manifest_stat = os.lstat(manifest_path)
+        except OSError:
+            manifest_stat = None
+        if (
+            manifest_stat is not None
+            and stat.S_ISREG(manifest_stat.st_mode)
+            and not _is_reparse_point(manifest_path)
+        ):
+            return True
+        try:
+            data_files, a2l_files, _error = self._list_project_files(folder)
+        except OSError:
+            return None
+        if data_files or a2l_files:
+            return True
+        return False
+
+    def _list_project_files(
+        self, folder: Path
+    ) -> tuple[list[Path], list[Path], Optional[str]]:
+        """
+        Summary:
+            The one link-safe listing of a project folder (R2-N2,
+            LLR-173.4n), shared by the preview and the install: one
+            ``os.scandir`` with ``follow_symlinks=False`` collecting each
+            regular file whose suffix is in ``PROJECT_DATA_EXTENSIONS``
+            (which includes MAC) or ``A2L_EXTENSIONS``. A link, a directory
+            or any other kind is skipped, so a linked ``.s19`` / ``.mac`` /
+            ``.a2l`` is neither listed nor installed.
+
+        Args:
+            folder (Path): The project directory to scan.
+
+        Returns:
+            tuple[list[Path], list[Path], Optional[str]]:
+                ``(data_files, a2l_files, error)`` — the 9a
+                ``validate_project_files`` shape. ``data_files`` is sorted
+                by ``(name.lower(), name)``; ``error`` is ``None`` or the
+                9a "more than one MAC / A2L" refusal string (A9b-R3-4).
+
+        Raises:
+            OSError: Propagates to the caller's catch (``_folder_holds_project``
+                -> ``None``, the preview -> ``could not be read``,
+                ``_handle_load_project`` -> LLR-173.1g).
+
+        Data Flow:
+            - One ``os.scandir(folder)`` with ``follow_symlinks=False``.
+            - ``entry.is_file(follow_symlinks=False)`` and not
+              ``_is_reparse_point`` is the no-follow test (a symlink or any
+              other reparse point is not a file); one ``lstat`` per entry,
+              metadata only, writes nothing.
+
+        Dependencies:
+            Uses:
+                - ``PROJECT_DATA_EXTENSIONS`` / ``MAC_EXTENSIONS`` /
+                  ``A2L_EXTENSIONS`` / ``_is_reparse_point``
+            Used by:
+                - ``_folder_holds_project`` / ``_load_dialog_preview`` /
+                  ``_handle_load_project``
+        """
+        data_files: list[Path] = []
+        mac_files: list[Path] = []
+        a2l_files: list[Path] = []
+        with os.scandir(folder) as entries:
+            for entry in entries:
+                item = Path(entry.path)
+                # SEC9b-3: ``is_file(follow_symlinks=False)`` is False only for
+                # a symlink; ``_is_reparse_point`` also catches every other
+                # reparse point (a WSL link, a cloud placeholder).
+                if not entry.is_file(follow_symlinks=False) or _is_reparse_point(item):
+                    continue
+                suffix = item.suffix.lower()
+                if suffix in PROJECT_DATA_EXTENSIONS:
+                    data_files.append(item)
+                    if suffix in MAC_EXTENSIONS:
+                        mac_files.append(item)
+                elif suffix in A2L_EXTENSIONS:
+                    a2l_files.append(item)
+        data_files.sort(key=lambda item: (item.name.lower(), item.name))
+        if len(mac_files) > 1:
+            return data_files, a2l_files, "Project already has more than one MAC file."
+        if len(a2l_files) > 1:
+            return data_files, a2l_files, "Project already has more than one A2L file."
+        return data_files, a2l_files, None
+
+    def _a2l_admission(self, a2l_path: Path) -> Optional[str]:
+        """
+        Summary:
+            The one A2L admission rule (A9b-R2-6), lifted from the 9a
+            install arm so the preview and ``_handle_load_project`` share it
+            (HLR-173a): the A2L the preview marks is exactly the A2L the
+            install keeps.
+
+        Args:
+            a2l_path (Path): The A2L file to admit.
+
+        Returns:
+            Optional[str]: ``None`` when admissible (a regular file, not a
+            reparse point, within ``DEFAULT_COPY_SIZE_CAP_BYTES``); else the
+            9a reason string verbatim — ``is a link or junction``,
+            ``is too large to open`` or ``could not be read`` (A9b-R3-2).
+
+        Data Flow:
+            - ``os.lstat``: an ``OSError`` -> ``could not be read``.
+            - A non-regular file or a reparse point -> ``is a link or
+              junction``; over the size cap (read at call time) ->
+              ``is too large to open``.
+
+        Dependencies:
+            Uses:
+                - ``_is_reparse_point`` / ``workspace.DEFAULT_COPY_SIZE_CAP_BYTES``
+            Used by:
+                - ``_load_dialog_preview`` / ``_handle_load_project``
+        """
+        try:
+            a2l_stat = os.lstat(a2l_path)
+        except OSError:
+            return "could not be read"
+        if not stat.S_ISREG(a2l_stat.st_mode) or _is_reparse_point(a2l_path):
+            return "is a link or junction"
+        if a2l_stat.st_size > workspace.DEFAULT_COPY_SIZE_CAP_BYTES:
+            return "is too large to open"
         return None
 
     def _copy_project_subfolders(
@@ -12762,7 +13349,9 @@ class S19TuiApp(App):
             Classify one user-typed Load path into an action and a reason
             word, reading only metadata (HLR-172a, LLR-172.5): a project,
             a data file, an A2L file, or a refusal. It never paints, never
-            writes, and never raises — every ``OSError`` becomes a reason.
+            writes, and never raises — every ``OSError`` becomes a reason,
+            and so does a ``ValueError`` / ``RuntimeError`` from
+            ``resolve_input_path`` (SEC9b-1).
 
         Args:
             path (Path): The path typed into the Load dialog (or the
@@ -12773,7 +13362,7 @@ class S19TuiApp(App):
                 name of a listed project; ``("data", "")``; ``("a2l", "")``;
                 or ``("refuse", reason)`` with ``reason`` one of
                 ``not found``, ``not a supported file``, ``not a project``,
-                ``outside``, ``link``, ``unreadable``.
+                ``outside``, ``link``, ``link file``, ``unreadable``.
 
         Data Flow:
             - A relative typed path keeps the file route only (step 0): a
@@ -12785,19 +13374,27 @@ class S19TuiApp(App):
               for links/junctions, matched by ``normcase`` against
               ``list_projects`` (the on-disk spelling is routed, E3 R3), then
               tested for project content (§1.3).
+            - A link on the walk refuses ``link``; when the typed path names
+              a data or A2L file (not ``project.json``) it refuses
+              ``link file`` instead (CR9b-03).
 
         Dependencies:
             Uses:
                 - ``resolve_input_path`` / ``list_projects``
-                - ``validate_project_files`` / ``_is_reparse_point``
+                - ``_folder_holds_project`` / ``_is_reparse_point``
             Used by:
-                - ``_load_path_from_user_input``
+                - ``_load_path_from_user_input`` / ``_load_dialog_verdict``
         """
         text = str(path).strip().strip('"')
-        if not Path(text).is_absolute():
+        try:
             normalized = resolve_input_path(path, self.base_dir)
-            if normalized is None:
-                return ("refuse", "not found")
+        except (ValueError, RuntimeError):
+            # SEC9b-1: a path too long for the OS (``ValueError``) or a POSIX
+            # ``~user`` with no home (``RuntimeError``) is refused, never raised.
+            return ("refuse", "not found")
+        if normalized is None:
+            return ("refuse", "not found")
+        if not Path(text).is_absolute():
             if os.path.isdir(normalized):
                 return ("refuse", "not a supported file")
             suffix = normalized.suffix.lower()
@@ -12807,9 +13404,6 @@ class S19TuiApp(App):
                 return ("data", "")
             return ("refuse", "not a supported file")
 
-        normalized = resolve_input_path(path, self.base_dir)
-        if normalized is None:
-            return ("refuse", "not found")
         typed = os.path.abspath(normalized)
         w = os.path.abspath(self.workarea)
         ntyped = os.path.normcase(typed)
@@ -12838,11 +13432,6 @@ class S19TuiApp(App):
                 return ("data", "")
             return ("refuse", "not a supported file")
 
-        if not is_manifest and suffix in A2L_EXTENSIONS:
-            return ("a2l", "")
-        if not is_manifest and suffix in SUPPORTED_EXTENSIONS:
-            return ("data", "")
-
         last_stat: Optional[os.stat_result] = None
         for i in range(1, len(parts) + 1):
             prefix = os.path.join(w, *parts[:i])
@@ -12853,8 +13442,25 @@ class S19TuiApp(App):
             except OSError:
                 return ("refuse", "unreadable")
             if stat.S_ISLNK(st_info.st_mode) or _is_reparse_point(Path(prefix)):
+                if not is_manifest and (
+                    suffix in A2L_EXTENSIONS or suffix in SUPPORTED_EXTENSIONS
+                ):
+                    return ("refuse", "link file")
                 return ("refuse", "link")
             last_stat = st_info
+
+        # S9b-7: the data / A2L returns are taken only after the lstat walk
+        # shows a regular file; a folder named ``x.s19`` then reaches the
+        # project route below (S9b-7 R2).
+        if (
+            not is_manifest
+            and last_stat is not None
+            and stat.S_ISREG(last_stat.st_mode)
+        ):
+            if suffix in A2L_EXTENSIONS:
+                return ("a2l", "")
+            if suffix in SUPPORTED_EXTENSIONS:
+                return ("data", "")
 
         if is_manifest:
             folder_parts = parts[:-1]
@@ -12883,23 +13489,13 @@ class S19TuiApp(App):
             return ("refuse", "not a project")
 
         folder = self.workarea / name
-        manifest_path = folder / PROJECT_MANIFEST_NAME
-        try:
-            manifest_stat = os.lstat(manifest_path)
-        except OSError:
-            manifest_stat = None
-        if (
-            manifest_stat is not None
-            and stat.S_ISREG(manifest_stat.st_mode)
-            and not _is_reparse_point(manifest_path)
-        ):
+        # F-3: the one §1.3 test (Q7), lifted into ``_folder_holds_project``
+        # so the list, the pick match and the typed route share one definition.
+        held = self._folder_holds_project(folder)
+        if held is True:
             return ("project", name)
-        try:
-            data_files, a2l_files, error = validate_project_files(folder)
-        except OSError:
+        if held is None:
             return ("refuse", "unreadable")
-        if data_files or a2l_files or error:
-            return ("project", name)
         return ("refuse", "not a project")
 
     def _load_path_from_user_input(self, path: Path) -> None:
@@ -12958,6 +13554,11 @@ class S19TuiApp(App):
                 f"Project NOT loaded: '{t}' passes through a link or junction — "
                 "pick a project in the list."
             )
+        elif value == "link file":
+            line = (
+                f"File NOT loaded: '{t}' is a link or junction — open the "
+                "file it points to."
+            )
         else:
             line = (
                 f"Project NOT loaded: '{t}' could not be read — check that "
@@ -12966,41 +13567,58 @@ class S19TuiApp(App):
         self.set_status(safe_text(line).plain)
         self.logger.warning("Typed load refused (%s): %r", value, str(path))
 
-    def _handle_load_dialog(self, path: Optional[Path]) -> None:
+    def _handle_load_dialog(self, result: Optional[LoadChoice]) -> None:
         """
         Summary:
-            Handle the LoadFileScreen result callback and defer the actual load work
-            so Textual can process the screen-pop message before any blocking code runs.
+            The one Load dialog router (LLR-173.1e): receive a
+            :class:`LoadChoice` or ``None`` (escape / Cancel) and defer the
+            actual load work so Textual can process the screen-pop message
+            before any blocking code runs.
 
         Args:
-            path (Optional[Path]): Path entered in the dialog, or ``None`` on cancel.
+            result (Optional[LoadChoice]): The dialog's one result — the
+                ``kind`` / ``value`` pair — or ``None`` on cancel.
 
         Returns:
             None
 
         Data Flow:
-            - Return immediately on cancel.
-            - Log a ``modal_dismiss_scheduled`` phase boundary and flush the handler.
-            - Schedule ``_load_path_from_user_input`` via ``call_after_refresh`` so the
-              modal-pop message processes before the load starts on the main thread.
+            - ``None`` -> ``_rehome_focus_after_load`` (LLR-166.1, A9b-03),
+              then return with the session unchanged.
+            - Log a ``modal_dismiss_scheduled`` phase boundary and flush.
+            - Dispatch through ``call_after_refresh`` so the modal-pop
+              message processes first: ``project`` -> ``_route_load_project``;
+              ``workarea`` -> ``_load_workarea_file``; ``path`` / ``recent``
+              -> ``_load_path_from_user_input(Path(value))``. ``LoadKind`` is
+              a closed ``Literal``, so there is no else arm.
 
         Dependencies:
             Uses:
-                - ``_load_path_from_user_input``
-                - ``_flush_logger``
-                - ``call_after_refresh``
+                - ``_route_load_project`` / ``_load_workarea_file``
+                - ``_load_path_from_user_input`` / ``_flush_logger``
+                - ``_rehome_focus_after_load`` / ``call_after_refresh``
             Used by:
-                - ``action_load_file`` (LoadFileScreen result callback)
+                - ``action_load_file`` / ``action_load_project``
         """
-        if path is None:
+        if result is None:
+            self._rehome_focus_after_load()
             return
-        self.logger.info("Load phase boundary: modal_dismiss_scheduled path=%s", path)
+        self.logger.info(
+            "Load phase boundary: modal_dismiss_scheduled kind=%s value=%r",
+            result.kind,
+            result.value,
+        )
         self._flush_logger()
         # Defer the load so Textual's pop_screen message queued by Screen.dismiss()
         # is processed first; otherwise the modal stays visible for the duration of
         # the copy/parse/install pipeline because dismiss() invokes this callback
         # synchronously before scheduling the pop.
-        self.call_after_refresh(self._load_path_from_user_input, path)
+        if result.kind == "project":
+            self.call_after_refresh(self._route_load_project, result.value)
+        elif result.kind == "workarea":
+            self.call_after_refresh(self._load_workarea_file, result.value)
+        else:
+            self.call_after_refresh(self._load_path_from_user_input, Path(result.value))
 
     def load_from_path(self, path: Path) -> None:
         """
@@ -13061,9 +13679,22 @@ class S19TuiApp(App):
             copy_elapsed,
         )
         self._flush_logger()
-        if not contained_in_workarea(normalized, self.workarea):
+        # LLR-172.1n (CR9-1): a source found only through the relative
+        # fallback is not recorded (the fallback's ``resolve()`` follows a
+        # link, against LLR-172.1a). ``via_fallback`` is pure — no filesystem
+        # call — because ``resolve_input_path`` returns the typed candidate
+        # unchanged when it exists, so the result is relative exactly when the
+        # typed text is relative.
+        typed = Path(str(path).strip().strip('"')).expanduser()
+        via_fallback = normalized.is_absolute() and not typed.is_absolute()
+        if not contained_in_workarea(normalized, self.workarea) and not via_fallback:
             if not record_recent_source(normalized):
                 self.logger.warning("Recent sources not updated: %r", str(normalized))
+        elif not contained_in_workarea(normalized, self.workarea):
+            self.logger.info(
+                "Recent source not recorded (found through the fallback): %r",
+                str(normalized),
+            )
         self.set_progress(50, f"Parsing {copied.name}...")
         # Kick the worker off before anything else so the modal-dismiss callback yields
         # control back to the event loop promptly. Workarea refresh + diagnostic log are
@@ -13128,9 +13759,18 @@ class S19TuiApp(App):
             self.logger.warning("A2L load rejected by workarea guard: %s", exc)
             return
         copy_elapsed = time.perf_counter() - copy_started
-        if not contained_in_workarea(normalized, self.workarea):
+        # LLR-172.1n (CR9-1): the same condition as ``load_from_path`` — a
+        # source found only through the relative fallback is not recorded.
+        typed = Path(str(path).strip().strip('"')).expanduser()
+        via_fallback = normalized.is_absolute() and not typed.is_absolute()
+        if not contained_in_workarea(normalized, self.workarea) and not via_fallback:
             if not record_recent_source(normalized):
                 self.logger.warning("Recent sources not updated: %r", str(normalized))
+        elif not contained_in_workarea(normalized, self.workarea):
+            self.logger.info(
+                "Recent source not recorded (found through the fallback): %r",
+                str(normalized),
+            )
         self.refresh_files()
         copied_size = copied.stat().st_size
         self.logger.info(
@@ -13167,7 +13807,9 @@ class S19TuiApp(App):
         # switch. Refresh it here (C-15.1: the only orphaned load site).
         self._refresh_loaded_panel()
         self.set_progress(100, f"Loaded {copied.name}")
-        self.set_status(f"A2L loaded: {copied.name}")
+        # S9b-5: the name is painted through ``painted_names`` (the one
+        # category scrub), the same scrub as the dialog.
+        self.set_status(safe_text(f"A2L loaded: {painted_names([copied.name])}").plain)
         # LLR-166.2: the A2L load tail re-homes the focus by the same rule
         # as the image load tail.
         self._rehome_focus_after_load()
@@ -13323,10 +13965,39 @@ class S19TuiApp(App):
             return
 
     def _load_from_item(self, item: ListItem) -> None:
+        """The ``#files_list`` pick: read ``item.data`` (the on-disk name)
+        and load it exactly as the Workarea Files list's pick does (G1)."""
         filename = getattr(item, "data", None)
         if not filename:
             return
-        candidate = self.workarea / WORKAREA_TEMP / filename
+        self._load_workarea_file(filename)
+
+    def _load_workarea_file(self, name: str) -> None:
+        """
+        Summary:
+            Load one ``workarea/temp`` file by its on-disk name, in place
+            (LLR-173.1b): the A2L arm keeps the 9a ``load_a2l_from_path``
+            route (with its ``copy_into_workarea``, 256 MB cap and link
+            re-check — A9b-05); the data arm loads with 0 copies.
+
+        Args:
+            name (str): The on-disk file name inside ``workarea/temp``.
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``candidate = self.workarea / WORKAREA_TEMP / name``.
+            - A deleted file loads nothing, silently (F-11, the 9a list
+              pick's behaviour).
+
+        Dependencies:
+            Uses:
+                - ``load_a2l_from_path`` / ``load_selected_file``
+            Used by:
+                - ``_load_from_item`` / ``_handle_load_dialog``
+        """
+        candidate = self.workarea / WORKAREA_TEMP / name
         if candidate.exists():
             self.logger.info("Loading from workarea selection: %s", candidate)
             if candidate.suffix.lower() in A2L_EXTENSIONS:

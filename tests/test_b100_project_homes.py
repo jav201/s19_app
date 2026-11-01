@@ -1017,14 +1017,19 @@ def test_tc_b100_32_data_file_loaded_into_a2l_only_project_is_recorded(tmp_path:
 def test_tc_b100_32_empty_folder_is_refused_before_any_reset(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str
 ) -> None:
-    """LLR-171.2d / .2e: a folder E holding only ``project.json`` (recording
-    an absent ``firmware.s19``) → 1 status message holding "no data or A2L
-    file" and "load a file and Save project"; an empty folder E → 1 message
-    holding "no project.json" and "load a file and Save project"; in both,
-    0 session resets and the open project N stays open.
+    """LLR-171.2d / LLR-173.4a: a folder E holding only ``project.json``
+    (recording an absent ``firmware.s19``) → 1 status message holding "no
+    data or A2L file" and "load a file and Save project"; an empty folder E
+    → 1 message holding "is not a project" and "pick a project in the list"
+    (Inc 9b re-pin, E2 F-1: LLR-171.2e is retired, superseded by
+    LLR-173.4a — an empty folder is no longer a listed project, so the
+    project load's listing match refuses it before any file check); in
+    both, 0 session resets and the open project N stays open.
 
-    RED (base): "No supported files in project: E". Negative controls:
-    the old line; the ``no data or A2L file`` branch reached for 2e."""
+    RED (base, Inc 8b): "No supported files in project: E". Negative
+    controls: the old line; the ``no data or A2L file`` branch reached for
+    the empty folder; at Inc 9b, the empty folder still listed (``no
+    project.json`` painted instead of ``is not a project``)."""
     base = tmp_path / "app"
     projects.save_case01_project(base, "N", files=("firmware.s19",))
     empty = _workarea(base) / "E"
@@ -1043,7 +1048,11 @@ def test_tc_b100_32_empty_folder_is_refused_before_any_reset(
         return messages, len(resets), app.current_project
 
     messages, resets, project = projects.run_app(base, _scenario)
-    assert len(_with(messages, case, "load a file and Save project")) == 1, messages
+    expected = {
+        "no data or A2L file": ("no data or A2L file", "load a file and Save project"),
+        "no project.json": ("is not a project", "pick a project in the list"),
+    }[case]
+    assert len(_with(messages, *expected)) == 1, messages
     assert resets == 0, resets
     assert project == "N", project
 
@@ -1052,15 +1061,23 @@ def test_tc_b100_32_empty_folder_is_refused_before_any_reset(
 def test_tc_b100_32_a2l_guard_of_an_a2l_only_folder(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str
 ) -> None:
-    """LLR-171.2f (R5, S3-3): ``P/firmware.a2l`` a file symbolic link to an
-    outside A2L, no data file → 1 status message holding "link or junction"
-    and "replace the A2L file, then Load again", 0 resets, no A2L attached;
-    the cap lowered to the A2L's size − 1 → 1 message holding "too large to
-    open", 0 resets; the cap at exactly the A2L's size → attached, 3 tags.
+    """LLR-171.2f (R5, S3-3), re-pinned at batch-100 Inc 9b E5 (M87) to
+    LLR-173.4n: ``P/firmware.a2l`` a file symbolic link to an outside A2L,
+    no data file → the link-safe listing (``_list_project_files``) leaves the
+    link out, so the folder holds no data or A2L file: 1 status message
+    holding "no data or A2L file" and "load a file and Save project", 0
+    resets, no A2L attached; the cap lowered to the A2L's size − 1 → 1
+    message holding "too large to open" and "replace the A2L file, then Load
+    again", 0 resets; the cap at exactly the A2L's size → attached, 3 tags.
 
-    RED (base): "No supported files" for all three (the at-cap arm never
-    attaches). Negative controls: no guard → the link's target attached;
-    ``>=`` → the at-cap arm refused."""
+    Why the re-pin: 9a's ``validate_project_files`` listed the link and the
+    A2L guard refused it; 9b's listing never lists a link, so the guard is
+    not reached (the guard's own reparse test is pinned by
+    ``test_tc_b100_32_a2l_admission_refuses_any_reparse_point``).
+    RED (base 9a): "No supported files" for all three (the at-cap arm never
+    attaches). Negative controls: a listing that follows links → the link's
+    target is listed (and refused by the guard, so the message changes) →
+    RED; ``>=`` → the at-cap arm refused."""
     base = tmp_path / "app"
     workarea = _workarea(base)
     project_dir = workarea / "P"
@@ -1090,9 +1107,47 @@ def test_tc_b100_32_a2l_guard_of_an_a2l_only_folder(
     if arm == "at cap":
         assert tags == 3 and a2l_path is not None, messages
         return
-    reason = "link or junction" if arm == "link" else "too large to open"
-    assert len(_with(messages, reason, "replace the A2L file, then Load again")) == 1, messages
+    if arm == "link":
+        expected = ("no data or A2L file", "load a file and Save project")
+    else:
+        expected = ("too large to open", "replace the A2L file, then Load again")
+    assert len(_with(messages, *expected)) == 1, messages
     assert resets == 0 and a2l_path is None, (resets, a2l_path)
+
+
+@pytest.mark.parametrize("kind", ["reparse point", "regular"])
+def test_tc_b100_32_a2l_admission_refuses_any_reparse_point(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, kind: str
+) -> None:
+    """LLR-171.2f, A9b-R2-6 (batch-100 Inc 9b E5, M87): the one A2L
+    admission rule, called directly — a regular ``P/firmware.a2l`` that
+    ``_is_reparse_point`` reports as a reparse point (a cloud placeholder,
+    which ``lstat`` reports as a regular file) → ``is a link or junction``;
+    the same file not a reparse point → ``None`` (admitted).
+
+    Why: the project listing filters links first, so the admission's own
+    reparse test is the last line if a file becomes a reparse point between
+    the listing and the install; it must not rest on ``S_ISREG`` alone.
+    Negative control: the admission without ``_is_reparse_point`` → the
+    reparse arm returns ``None`` → RED (M87)."""
+    base = tmp_path / "app"
+    project_dir = _workarea(base) / "P"
+    project_dir.mkdir(parents=True)
+    a2l = project_dir / "firmware.a2l"
+    shutil.copyfile(projects.CASE01_DIR / "firmware.a2l", a2l)
+    if kind == "reparse point":
+        real = app_module._is_reparse_point
+        monkeypatch.setattr(
+            app_module,
+            "_is_reparse_point",
+            lambda path: Path(path).name == "firmware.a2l" or real(path),
+        )
+
+    async def _scenario(app, pilot, log):
+        return app._a2l_admission(a2l)
+
+    verdict = projects.run_app(base, _scenario)
+    assert verdict == ("is a link or junction" if kind == "reparse point" else None), verdict
 
 
 def test_tc_b100_32_over_cap_a2l_beside_a_data_file_is_left_out(
@@ -1382,27 +1437,21 @@ async def _at_open_project(pilot, app, name: str) -> None:
     click OK; close a Load-result panel if one opens."""
     from textual.widgets import Label
 
-    from s19_app.tui.screens import LoadProjectScreen
+    from tests.support.b100_load_dialog import highlight_row, is_load_dialog
 
     await pilot.press("1")
     for _ in range(4):
         await pilot.pause()
     await pilot.press("p")
     await projects.wait_for(
-        pilot, lambda: isinstance(app.screen, LoadProjectScreen), "the Load project dialog"
+        pilot, lambda: is_load_dialog(app.screen), "the Load dialog"
     )
-    row = next(
-        item
-        for item in app.screen.query("#project_list ListItem")
-        if str(item.query_one(Label).render()) == name
-    )
-    await pilot.click(row)
-    await pilot.pause()
-    assert await pilot.click("#project_ok"), "click missed #project_ok"
+    await highlight_row(pilot, app, name)
+    assert await pilot.click("#load_ok"), "click missed #load_ok"
     await projects.wait_for(
         pilot,
-        lambda: not isinstance(app.screen, LoadProjectScreen),
-        "the Load project dialog to close",
+        lambda: not is_load_dialog(app.screen),
+        "the Load dialog to close",
     )
     for _ in range(60):
         if len(app.screen.query(LOAD_RESULT_CLOSE)) > 0:
@@ -1412,22 +1461,21 @@ async def _at_open_project(pilot, app, name: str) -> None:
 
 
 async def _at_listed_projects(pilot, app) -> list:
-    """Open the Load project dialog by keys, read its rows, cancel it."""
-    from textual.widgets import Label
-
-    from s19_app.tui.screens import LoadProjectScreen
+    """Open the Load dialog by keys (``p``), read the loadable rows of its
+    Projects section, cancel it."""
+    from tests.support.b100_load_dialog import is_load_dialog, section_prompts
 
     await pilot.press("1")
     for _ in range(4):
         await pilot.pause()
     await pilot.press("p")
     await projects.wait_for(
-        pilot, lambda: isinstance(app.screen, LoadProjectScreen), "the Load project dialog"
+        pilot, lambda: is_load_dialog(app.screen), "the Load dialog"
     )
-    rows = [str(item.query_one(Label).render()) for item in app.screen.query("#project_list ListItem")]
-    assert await pilot.click("#project_cancel"), "click missed #project_cancel"
+    rows = section_prompts(app.screen, "Projects")
+    assert await pilot.click("#load_cancel"), "click missed #load_cancel"
     await projects.wait_for(
-        pilot, lambda: not isinstance(app.screen, LoadProjectScreen), "the Load project dialog to close"
+        pilot, lambda: not is_load_dialog(app.screen), "the Load dialog to close"
     )
     return rows
 
@@ -1452,17 +1500,17 @@ async def _at_save_through_dialog(pilot, app, log, name: str) -> list:
 
 
 async def _at_load_file(pilot, app, path: Path) -> None:
-    from s19_app.tui.screens import LoadFileScreen
+    from tests.support.b100_load_dialog import highlight_row, is_load_dialog
 
     await pilot.press("l")
-    await projects.wait_for(pilot, lambda: isinstance(app.screen, LoadFileScreen), "the Load file dialog")
+    await projects.wait_for(pilot, lambda: is_load_dialog(app.screen), "the Load dialog")
     assert await pilot.click("#load_path"), "click missed #load_path"
     await pilot.press("ctrl+a")
     await pilot.press("delete")
     await pilot.press(*str(path))
     assert await pilot.click("#load_ok"), "click missed #load_ok"
     await projects.wait_for(
-        pilot, lambda: not isinstance(app.screen, LoadFileScreen), "the Load file dialog to close"
+        pilot, lambda: not is_load_dialog(app.screen), "the Load dialog to close"
     )
 
 
@@ -1910,11 +1958,19 @@ def test_e4_llr_171_2g_linked_a2l_beside_a_mac_is_never_parsed(
     ``firmware.a2l`` that is a file symbolic link to an outside A2L → the
     project opens with the MAC, 0 calls of ``_load_a2l_data_with_cache``
     and ``parse_a2l_file`` with a path named ``firmware.a2l`` (spy), the
-    session holds no A2L, and the Load-result panel names ``firmware.a2l``
-    as "not readable" with "link or junction".
+    session holds no A2L, and the Load-result panel's A2L slot reads
+    ``(none)``.
+
+    Re-pinned at batch-100 Inc 9b E5 (LLR-173.4n): 9a's
+    ``validate_project_files`` listed the link and the install refused it, so
+    the panel named ``firmware.a2l`` as "not readable" with "link or
+    junction"; 9b's link-safe ``_list_project_files`` never lists a link, so
+    the A2L is neither listed nor installed and the panel names no A2L.
 
     Mutant M54: the A2L list cleared only for ``choose_install_set`` → the
-    MAC load parses the A2L → 1+ spy calls → RED."""
+    MAC load parses the A2L → 1+ spy calls → RED. Negative control: a
+    listing that follows links → the target is listed (and parsed, or
+    refused with a problem row) → RED."""
     base = tmp_path / "app"
     project_dir = projects.save_case01_project(base, "P", files=("firmware.mac",))
     outside = projects.copy_sources(tmp_path / "outside", projects.CASE01_DIR, "firmware.a2l")
@@ -1955,7 +2011,7 @@ def test_e4_llr_171_2g_linked_a2l_beside_a_mac_is_never_parsed(
     assert parsed == [], parsed
     assert a2l_path is None and tags == 0 and has_mac, (a2l_path, tags, has_mac)
     flat = projects.flat(panel)
-    assert "not readable" in flat and "firmware.a2l" in flat and "link or junction" in flat, panel
+    assert "A2L (none)" in flat and "firmware.a2l" not in flat, panel
 
 
 def test_e4_llr_171_1m_document_inside_p_follows_its_copy(tmp_path: Path) -> None:

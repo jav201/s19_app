@@ -18,13 +18,20 @@ copies into), never the work-area root and never the ``.staging`` subfolder;
 Boundary: no file loaded yet -> the list is empty.
 
 AT-B99-13 (US-151) — black-box Textual pilot, real keys and clicks only: with
-projects ``P1``, ``P2`` and the ``patches`` home present, the Load project
-dialog lists ``P1`` and ``P2`` only, and three pick paths (keyboard highlight
-+ ``#project_ok``; click the item + ``#project_ok``; keyboard highlight +
-focus ``#project_ok`` + ``enter``) each load ``P2`` with the status naming it.
+projects ``P1``, ``P2`` and the ``patches`` home present, the Load dialog's
+Projects section lists ``P1`` and ``P2`` only, and three pick paths (keyboard
+highlight + ``#load_ok``; click the row + ``#load_ok``; keyboard highlight +
+focus ``#load_ok`` + ``enter``) each load ``P2`` with the status naming it.
 After a file load the Workarea Files list shows that file and picking it loads
 it. Empty boundary: with no project, pressing Load loads nothing and the
 current file stays loaded.
+
+Inc 9b re-pin (ruling Q9): the separate Load project dialog is retired; ``p``
+opens the one Load dialog with the focus on ``#load_list`` (an ``OptionList``
+with section headings) and the first project row highlighted. With 0
+projects the dialog now opens and paints the ``no projects`` line
+(LLR-173.2a); Load there paints ``nothing selected`` (LLR-173.2i) and still
+loads nothing.
 """
 from __future__ import annotations
 
@@ -35,7 +42,13 @@ from pathlib import Path
 from textual.widgets import Label, ListItem, ListView
 
 from s19_app.tui.app import S19TuiApp
-from s19_app.tui.screens import LoadProjectScreen
+from tests.support.b100_load_dialog import (
+    click_row,
+    highlight_row,
+    highlighted_prompt,
+    is_load_dialog,
+    section_prompts,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE01 = ROOT / "examples" / "case_01_basic_valid" / "firmware.s19"
@@ -65,11 +78,8 @@ def _files_list_names(app: S19TuiApp) -> list:
 
 
 def _project_list_names(app: S19TuiApp) -> list:
-    """The painted names of the Load project dialog items."""
-    return [
-        str(item.query_one(Label).render())
-        for item in app.screen.query("#project_list ListItem")
-    ]
+    """The painted, loadable rows of the Load dialog's Projects section."""
+    return section_prompts(app.screen, "Projects")
 
 
 async def _wait_for(pilot, predicate, description: str, attempts: int = 100):
@@ -153,12 +163,19 @@ def test_tc_b99_34_pick_loads_the_picked_file_name(tmp_path):
 
 def test_tc_b99_35_reserved_homes_are_not_projects(tmp_path):
     """With P1, P2 and every RESERVED_WORKAREA_HOMES name present, the
-    project list holds P1 and P2 only; reserved-only -> empty list."""
+    project list holds P1 and P2 only; reserved-only -> empty list.
+
+    Inc 9b re-pin (Q7, LLR-173.4a): a listed project must hold project
+    content, so P1 and P2 each hold a ``.s19``, and one reserved home
+    (``patches``) holds one too; it is still left out, so the reserved-name
+    rule (not emptiness) is what keeps it off the list."""
     from s19_app.tui.workspace import RESERVED_WORKAREA_HOMES
 
     app = S19TuiApp(base_dir=tmp_path)
     for name in ("P1", "P2", *RESERVED_WORKAREA_HOMES):
         (app.workarea / name).mkdir(parents=True, exist_ok=True)
+    for name in ("P1", "P2", "patches"):
+        shutil.copy2(CASE01, app.workarea / name / "firmware.s19")
 
     assert sorted(app.list_projects()) == ["P1", "P2"]
 
@@ -208,16 +225,8 @@ async def _open_load_project_dialog(pilot, app: S19TuiApp) -> None:
     await pilot.press("p")
     await _wait_for(
         pilot,
-        lambda: isinstance(app.screen, LoadProjectScreen),
-        "the Load project dialog",
-    )
-
-
-def _project_item(app: S19TuiApp, name: str) -> ListItem:
-    return next(
-        item
-        for item in app.screen.query("#project_list ListItem")
-        if str(item.query_one(Label).render()) == name
+        lambda: is_load_dialog(app.screen),
+        "the Load dialog",
     )
 
 
@@ -251,13 +260,12 @@ def test_at_b99_13_project_and_file_pickers_load_by_name(tmp_path):
             _make_project(app, "P2")
             await pilot.pause()
             await _open_load_project_dialog(pilot, app)
-            # Keyboard highlight: focus the list by clicking the P1 row,
-            # move the highlight to P2 with the Down key.
-            row = _project_item(app, "P1")
-            await pilot.click(row)
+            # Keyboard highlight: ``p`` focuses the list on the first
+            # project row (P1); the Down key moves the highlight to P2.
+            await highlight_row(pilot, app, "P1")
             await pilot.press("down")
             await pilot.pause()
-            assert await pilot.click("#project_ok"), "click missed #project_ok"
+            assert await pilot.click("#load_ok"), "click missed #load_ok"
             await _wait_for(
                 pilot,
                 lambda: "Loaded project 'P2'" in _status_text(app),
@@ -272,10 +280,9 @@ def test_at_b99_13_project_and_file_pickers_load_by_name(tmp_path):
             _make_project(app, "P2")
             await pilot.pause()
             await _open_load_project_dialog(pilot, app)
-            row = _project_item(app, "P2")
-            await pilot.click(row)
+            assert await click_row(pilot, app, "P2"), "click missed the P2 row"
             await pilot.pause()
-            assert await pilot.click("#project_ok"), "click missed #project_ok"
+            assert await pilot.click("#load_ok"), "click missed #load_ok"
             await _wait_for(
                 pilot,
                 lambda: "Loaded project 'P2'" in _status_text(app),
@@ -290,12 +297,16 @@ def test_at_b99_13_project_and_file_pickers_load_by_name(tmp_path):
             _make_project(app, "P2")
             await pilot.pause()
             await _open_load_project_dialog(pilot, app)
-            row = _project_item(app, "P1")
-            await pilot.click(row)
+            await highlight_row(pilot, app, "P1")
             await pilot.press("down")
+            await pilot.pause()
+            # The tab order is path, list, preview, Load, Cancel
+            # (LLR-173.2c): two tabs from the list reach ``#load_ok``.
+            await pilot.press("tab")
             await pilot.pause()
             await pilot.press("tab")
             await pilot.pause()
+            assert app.focused is not None and app.focused.id == "load_ok", app.focused
             await pilot.press("enter")
             await _wait_for(
                 pilot,
@@ -330,14 +341,32 @@ def test_at_b99_13_project_and_file_pickers_load_by_name(tmp_path):
             assert await pilot.click(
                 "#ws_load_project_button"
             ), "click missed #ws_load_project_button"
+            # Inc 9b (LLR-173.2a / LLR-173.4d): the dialog opens with the
+            # disabled ``no projects`` line in its Projects section.
+            await _wait_for(pilot, lambda: is_load_dialog(app.screen), "the Load dialog")
+            painted = section_prompts(app.screen, "Projects", loadable_only=False)
+            assert section_prompts(app.screen, "Projects") == [], painted
+            assert any("no projects" in line for line in painted), painted
+            # With 0 projects the highlight falls back to the first loadable
+            # row (H-1, LLR-173.2b): here the loaded file's work-area copy.
+            assert highlighted_prompt(app.screen) == "a.s19", highlighted_prompt(app.screen)
+            # Load with nothing selected — the empty path field, reached
+            # with shift+tab — paints ``nothing selected`` (LLR-173.2h); the
+            # dialog stays and nothing loads.
+            await pilot.press("shift+tab")
+            await _wait_for(
+                pilot, lambda: app.screen.focused.id == "load_path", "the focus on #load_path"
+            )
+            await pilot.press("enter")
             await _wait_for(
                 pilot,
-                lambda: "No saved projects found." in _status_text(app),
-                "the no-projects status line",
+                lambda: "nothing selected"
+                in str(app.screen.query_one("#load_reason").render()),
+                "the nothing-selected reason in #load_reason",
             )
-            assert not isinstance(app.screen, LoadProjectScreen), (
-                "the dialog must not open with no project"
-            )
+            assert is_load_dialog(app.screen), "the dialog stays open on an empty Load"
+            await pilot.press("escape")
+            await _wait_for(pilot, lambda: not is_load_dialog(app.screen), "the Load dialog to close")
             assert "a.s19" in _file_status_text(app), _file_status_text(app)
 
     asyncio.run(_dialog_lists_projects_only())
