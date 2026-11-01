@@ -1,0 +1,18 @@
+# green-02 re-pinned nodes — batch-100 Inc 10 E4 integration
+# head: 741cc0774e02f3baa7c749dbe53dd3ecaaa067b8 + working tree
+# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc10\s19_app\__init__.py
+# source sha256[:16]:
+#   s19_app/tui/screens.py 58186f0551f9b02e
+#   s19_app/tui/screens_directionb.py c53fd29b14f5c8ed
+#   s19_app/tui/app.py ac5b417b8c3e6b47
+# test sha256[:16]:
+#   tests/test_b100_load_question.py d80dfa1c70db283e
+#   tests/test_b100_session_reset.py 27e0036d37d03008
+#   tests/test_b99_editor_image.py 8147ee6a6f99702d
+# LOCALAPPDATA=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int10/lad ; NO_COLOR unset
+# command: python -m pytest -p no:cacheprovider -q -rfE --tb=short tests/test_b100_session_reset.py::test_tc_b100_10_interim_discard_notice tests/test_b100_session_reset.py::test_tc_b100_10_notice_names_every_discarded_entry tests/test_b100_session_reset.py::test_at_b100_03_project_load_over_unsaved_work_saves_only_p2 tests/test_b99_editor_image.py::test_tc_b99_40_strip_shows_new_file_source_byte
+# started: 2026-10-31T19:03:19-06:00
+.....                                                                    [100%]
+5 passed in 56.03s
+# exit: 0
+# finished: 2026-10-31T19:04:17-06:00

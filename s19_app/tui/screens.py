@@ -1300,6 +1300,92 @@ class ConfirmDiscardScreen(ModalScreen[bool]):
             self.dismiss(False)
 
 
+class ConfirmQuestionScreen(ModalScreen[bool]):
+    """One-question confirm modal shown before unsaved work is replaced.
+
+    Summary:
+        A generic yes/no question shown before an image-replacing route
+        discards unsaved work (HLR-174, LLR-174.2). ``Replace`` dismisses
+        ``True`` (the app continues with the load); ``Cancel`` dismisses
+        ``False`` (nothing changes). The title, body and the two button
+        labels arrive as already-painted plain ``str`` parameters — the
+        screen neither scrubs nor rewrites them and owns no painted
+        literal of its own, so Inc 12 can reuse it for the quit question.
+        The box reuses the shared ``.modal-dialog`` token classes.
+
+    Args:
+        title (str): The question title (already painted, markup-safe).
+        body (str): The question body (already painted, markup-safe).
+        yes_label (str): The ``#confirm_yes`` button label (already painted).
+        no_label (str): The ``#confirm_no`` button label (already painted).
+
+    Dependencies:
+        Used by:
+            - S19TuiApp._confirm_then_load (the load question); Inc 12
+              builds the quit question from it.
+    """
+
+    AUTO_FOCUS = "#confirm_no"
+    BINDINGS = [
+        Binding("y", "answer(True)", show=False),
+        Binding("n", "answer(False)", show=False),
+        Binding("escape", "answer(False)", show=False),
+    ]
+
+    def __init__(
+        self,
+        title: str,
+        body: str,
+        yes_label: str,
+        no_label: str,
+    ) -> None:
+        super().__init__()
+        self._question_title = title
+        self._question_body = body
+        self._yes_label = yes_label
+        self._no_label = no_label
+        self._dismissed = False
+
+    def compose(self) -> ComposeResult:
+        yield Container(
+            Label(
+                self._question_title,
+                id="confirm_title",
+                classes="modal-title",
+                markup=False,
+            ),
+            Static(self._question_body, id="confirm_body", markup=False),
+            Container(
+                Button(
+                    Text(self._yes_label),
+                    id="confirm_yes",
+                    classes="modal-confirm",
+                ),
+                Button(Text(self._no_label), id="confirm_no"),
+                id="confirm_buttons",
+                classes="modal-buttons",
+            ),
+            id="confirm_box",
+            classes="modal-dialog",
+        )
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        event.stop()
+        if event.button.id == "confirm_yes":
+            self._close(True)
+        elif event.button.id == "confirm_no":
+            self._close(False)
+
+    def action_answer(self, value: bool) -> None:
+        self._close(value)
+
+    def _close(self, result: bool) -> None:
+        if self._dismissed:
+            return
+        self._dismissed = True
+        self.dismiss(result)
+
+
 class SelectVariantScreen(ModalScreen[Optional[str]]):
     """Modal dialog for selecting the active S19/HEX variant of a project.
 

@@ -29,6 +29,12 @@ Scenarios:
                   ``firmware`` variant marked, beside Q, two work-area files
                   and one recorded recent source (CASE02). ``--close`` does
                   not apply.
+  lq-question     Load CASE01 through the loader, apply one Patch Editor
+                  entry the way the test helper ``add_and_apply`` does (same
+                  widget ids, same values, D true), then start a project
+                  load of P through ``_route_load_project("P")``: the replace
+                  question (``ConfirmQuestionScreen``) stays open,
+                  unanswered. ``--close`` does not apply.
 
 ``--close`` dismisses the panel after it opens, so the capture shows the
 summary line and ``#status_text`` the load left behind.
@@ -50,7 +56,8 @@ ROOT = Path(__file__).resolve().parents[2]
 CASE01 = ROOT / "examples" / "case_01_basic_valid" / "firmware.s19"
 CASE02 = ROOT / "examples" / "case_02_gaps_and_patch_targets" / "firmware.s19"
 SCENARIOS = ("pe-clean", "pe-saveback", "pe-problems", "pe-damaged", "pe-patched",
-             "pe-unreadable", "pe-document", "pe-a2l-only", "wa-files", "ld-dialog")
+             "pe-unreadable", "pe-document", "pe-a2l-only", "wa-files", "ld-dialog",
+             "lq-question")
 
 
 def seed(workarea: Path, scenario: str) -> None:
@@ -116,6 +123,14 @@ def seed(workarea: Path, scenario: str) -> None:
         temp.mkdir(parents=True, exist_ok=True)
         shutil.copy2(CASE01, temp / "fw.s19")
         shutil.copy2(CASE01.with_name("firmware.a2l"), temp / "cal.a2l")
+    if scenario == "lq-question":
+        # The replace-question surface: P is the clean manifest (as
+        # pe-clean), and the temp folder holds fw2.s19 (a CASE02 copy) as
+        # a work-area file. The driver loads CASE01 itself and patches it,
+        # so P must stay a clean one-variant project.
+        temp = workarea / "temp"
+        temp.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(CASE02, temp / "fw2.s19")
     text = json.dumps(manifest, indent=2)
     if scenario == "pe-damaged":
         text = '{"schema_version": 1, "active_variant": '
@@ -131,10 +146,13 @@ def build_app(base: Path, scenario: str, close: bool):
     )
 
     seed(base / WORKAREA_DIRNAME / WORKAREA_SUBDIR, scenario)
-    if scenario == "ld-dialog":
+    if scenario in ("ld-dialog", "lq-question"):
         # The recent-sources store lives under %LOCALAPPDATA%; point it at a
         # scratch folder under --base so the real one is never touched
-        # (capture.ps1 does not set LOCALAPPDATA).
+        # (capture.ps1 does not set LOCALAPPDATA). ld-dialog records a
+        # recent source directly; lq-question records CASE01 through
+        # load_from_path. The capture script deletes --base afterwards, so
+        # this folder is cleaned up with it.
         lad = base / "lad"
         lad.mkdir(parents=True, exist_ok=True)
         os.environ["LOCALAPPDATA"] = str(lad)
@@ -151,7 +169,14 @@ def build_app(base: Path, scenario: str, close: bool):
 
         def on_mount(self) -> None:
             super().on_mount()
-            self.call_after_refresh(self._e13_drive)
+            # Run the drive as its own task (not through call_after_refresh)
+            # so the Textual message loop stays free to dispatch the button
+            # presses the drive posts (Patch Editor Add / Apply). A drive
+            # scheduled through call_after_refresh runs inside the message
+            # loop and blocks it across its awaits, so those messages would
+            # only be processed after the drive had already asked the
+            # question.
+            self._e13_drive_task = asyncio.create_task(self._e13_drive())
 
         async def _e13_drive(self) -> None:
             try:
@@ -164,6 +189,50 @@ def build_app(base: Path, scenario: str, close: bool):
                     self.action_load_project()
                     for _ in range(60):
                         if type(self.screen).__name__ == "LoadDialog":
+                            break
+                        await asyncio.sleep(0.1)
+                    await asyncio.sleep(0.5)
+                elif scenario == "lq-question":
+                    from textual.widgets import Input
+
+                    # 1. Load CASE01 through the loader (the copy lands in
+                    # workarea/temp) and wait until the image is installed.
+                    self.load_from_path(CASE01)
+                    for _ in range(60):
+                        cur = self.current_file
+                        if cur is not None and Path(cur.path).name == "firmware.s19":
+                            break
+                        await asyncio.sleep(0.1)
+                    await asyncio.sleep(0.4)
+                    # 2. One Patch Editor entry, exactly as the test helper
+                    # add_and_apply does: same widget ids, same values
+                    # (0x8000007C <- DE AD BE EF), then Apply (D true).
+                    self.action_show_screen("patch")
+                    for _ in range(30):
+                        if len(self.query("#patch_entry_add_button")) > 0:
+                            break
+                        await asyncio.sleep(0.1)
+                    self.query_one("#patch_entry_address_input", Input).value = ""
+                    self.query_one("#patch_entry_bytes_input", Input).value = ""
+                    self.query_one("#patch_entry_address_input", Input).value = "0x8000007C"
+                    self.query_one("#patch_entry_bytes_input", Input).value = "DE AD BE EF"
+                    self.query_one("#patch_entry_add_button").press()
+                    for _ in range(30):
+                        if len(self._change_service.document.entries) >= 1:
+                            break
+                        await asyncio.sleep(0.1)
+                    self.query_one("#patch_doc_apply_button").press()
+                    for _ in range(30):
+                        cur = self.current_file
+                        if cur is not None and self._change_service.differs_from_last_saved(cur.mem_map):
+                            break
+                        await asyncio.sleep(0.1)
+                    await asyncio.sleep(0.2)
+                    # 3. Start a project load of P through the guarded
+                    # route, and leave the replace question open.
+                    self._route_load_project("P")
+                    for _ in range(60):
+                        if type(self.screen).__name__ == "ConfirmQuestionScreen":
                             break
                         await asyncio.sleep(0.1)
                     await asyncio.sleep(0.5)

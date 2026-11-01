@@ -1,0 +1,17 @@
+mutant id: M15
+target file: s19_app/tui/screens.py
+old text:             id="confirm_box",
+new text:             id="load_dialog",
+sha256 before: 69a749f331f6d5c1b64ec5757f69d9f737d9fb63fac07c1b28273c9d39ba270d
+occurrences of old text: 1
+command: pytest -q --tb=line -p no:cacheprovider --basetemp=<scratch>/c10/btm tests/test_b100_load_question.py::test_tc_b100_45_modal_builds_from_its_parameters
+cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\c10\mutc
+s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\c10\mutc\s19_app\__init__.py
+pytest exit code: 1
+pytest summary: 1 failed in 3.76s
+verdict: KILLED
+restored = True
+
+--- pytest output (failure lines) ---
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\c10\mutc\tests\test_b100_load_question.py:950: AssertionError: []
+FAILED tests/test_b100_load_question.py::test_tc_b100_45_modal_builds_from_its_parameters

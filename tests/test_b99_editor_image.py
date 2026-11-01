@@ -163,14 +163,27 @@ async def _wait_for(pilot, predicate, description: str, attempts: int = 100):
     raise AssertionError(f"did not settle: {description}")
 
 
-async def _load_fixture(app: S19TuiApp, pilot, src: Path, name: str) -> None:
-    """Drive the Load file dialog (rail key ``l``) and wait for the status."""
+async def _load_fixture(
+    app: S19TuiApp, pilot, src: Path, name: str, answer: str | None = None
+) -> None:
+    """Drive the Load file dialog (rail key ``l``) and wait for the status.
+
+    Inc 10 re-pin (E2-rulings census): with ``answer`` set, the load over an
+    unsaved image is expected to ask the load question first, which is
+    answered with that key before the load status is awaited."""
     await pilot.press("l")
     for _ in range(6):
         await pilot.pause()
     assert await pilot.click("#load_path"), "click missed #load_path"
     await pilot.press(*str(src))
     assert await pilot.click("#load_ok"), "click missed #load_ok"
+    if answer is not None:
+        await _wait_for(
+            pilot,
+            lambda: type(app.screen).__name__ == "ConfirmQuestionScreen",
+            "the load question (Inc 10)",
+        )
+        await pilot.press(answer)
     await _wait_for(
         pilot,
         lambda: f"Loaded {name}" in _status_text(app),
@@ -501,8 +514,9 @@ def test_tc_b99_40_strip_shows_new_file_source_byte(tmp_path: Path) -> None:
             )
             # Load file B: the load-triggered strip refresh pushes file B's
             # map through source_image_view while the journal still holds
-            # file A's source bytes — the defect this arm pins.
-            await _load_fixture(app, pilot, src_b, "img_b.s19")
+            # file A's source bytes — the defect this arm pins. Inc 10: the
+            # Apply left file A unsaved, so the load asks; ``y`` replaces.
+            await _load_fixture(app, pilot, src_b, "img_b.s19", answer="y")
             await _wait_for(
                 pilot,
                 lambda: "99 98 97 96" in _strip_plain(app)

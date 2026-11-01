@@ -1,0 +1,28 @@
+# guards-01 — batch-100 Inc 10 E4 integration
+# head: 741cc0774e02f3baa7c749dbe53dd3ecaaa067b8 + working tree
+# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc10\s19_app\__init__.py
+# source sha256[:16]:
+#   s19_app/tui/screens.py 58186f0551f9b02e
+#   s19_app/tui/screens_directionb.py c53fd29b14f5c8ed
+#   s19_app/tui/app.py ac5b417b8c3e6b47
+# test sha256[:16]:
+#   tests/test_b100_load_question.py d80dfa1c70db283e
+#   tests/test_b100_session_reset.py 27e0036d37d03008
+#   tests/test_b99_editor_image.py 8147ee6a6f99702d
+# LOCALAPPDATA=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int10/lad ; NO_COLOR unset
+# command: python -m pytest -p no:cacheprovider -q -rfE --tb=short tests/test_id_registry.py tests/test_b99_staging.py tests/test_engine_unchanged.py tests/test_b100_load_dialog.py
+# started: 2026-10-31T19:04:18-06:00
+.......F................................................................ [ 40%]
+........................................................................ [ 80%]
+..................................                                       [100%]
+================================== FAILURES ===================================
+____________ test_tc607_scanned_corpus_matches_the_declared_bound _____________
+tests\test_id_registry.py:595: in test_tc607_scanned_corpus_matches_the_declared_bound
+    assert actual == EXPECTED_SCANNED_TEST_FILES, (
+E   AssertionError: the guard scanned 231 test modules, not the declared 230. If tests/ legitimately grew, bump EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a decision rather than a rubber stamp.
+E   assert 231 == 230
+=========================== short test summary info ===========================
+FAILED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+1 failed, 177 passed in 814.58s (0:13:34)
+# exit: 1
+# finished: 2026-10-31T19:17:55-06:00

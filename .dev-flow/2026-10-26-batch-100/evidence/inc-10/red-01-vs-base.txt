@@ -1,0 +1,129 @@
+# RED-on-base transcript, batch-100 Inc 10 (tester E4)
+# base sha: 741cc0774e02f3baa7c749dbe53dd3ecaaa067b8
+# cwd: /tmp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/base10
+# s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\s19_app\__init__.py
+# test file sha256:
+cc6e0220972bdf852170bc9fb5a9359cf252b6cfb4c5eb43335879dcd0e9891f *tests/test_b100_load_question.py
+27e0036d37d0300851fdfbd6840783fa3925b3eb065414bbd35ede7784a570fe *tests/test_b100_session_reset.py
+8147ee6a6f99702dddb13ba9f2825fedaaaf1b1aabcd1ef5ee1de5402225f66b *tests/test_b99_editor_image.py
+# LOCALAPPDATA=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc10-tester/lad-red
+# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q -rfE --tb=line tests/test_b100_load_question.py <5 re-pinned nodes>
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_b100_load_question.py:458: AttributeError: 'S19TuiApp' object has no attribute '_load_would_lose'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_b100_load_question.py:551: AssertionError: live-guard control: (0, 'b.s19', True)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_b100_load_question.py:748: AttributeError: 'PatchEditorPanel' object has no attribute 'is_dirty'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_b100_load_question.py:824: AssertionError: private _dirty reads outside the panel: ['app.py:10944']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_b100_load_question.py:120: ImportError: cannot import name 'ConfirmQuestionScreen' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_b100_load_question.py:120: ImportError: cannot import name 'ConfirmQuestionScreen' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_b100_load_question.py:120: ImportError: cannot import name 'ConfirmQuestionScreen' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_b100_load_question.py:120: ImportError: cannot import name 'ConfirmQuestionScreen' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_b100_load_question.py:120: ImportError: cannot import name 'ConfirmQuestionScreen' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_b100_load_question.py:120: ImportError: cannot import name 'ConfirmQuestionScreen' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_b100_load_question.py:120: ImportError: cannot import name 'ConfirmQuestionScreen' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_b100_load_question.py:120: ImportError: cannot import name 'ConfirmQuestionScreen' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_b100_load_question.py:120: ImportError: cannot import name 'ConfirmQuestionScreen' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_b100_load_question.py:120: ImportError: cannot import name 'ConfirmQuestionScreen' from 's19_app.tui.screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\s19_app\tui\screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_b100_load_question.py:1665: AssertionError: {'again': (False, ['second.json'], 1, False), 'again after cancel': (False, 1, False), 'clean': (False, ['second.json'], 1, False), 'first': (False, ['second.json'], 1, False), ...}
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_b100_load_question.py:1690: AssertionError: ConfirmQuestionScreen is not defined once in screens.py
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_b100_load_question.py:2213: AssertionError: ['_route_load_project:7526:_handle_load_project', '_handle_select_variant:7971:load_from_path', '_load_path_from_user_...:13511:load_from_path', '_load_workarea_file:13972:load_a2l_from_path', '_load_workarea_file:13974:load_selected_file']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_b100_load_question.py:2395: AssertionError: {('dialog', 'U.MAC'): 0, ('dialog', 'c.a2l'): 0, ('dialog', 'x.hex'): 0, ('dialog', 'x.mac'): 0, ...}
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_b100_load_question.py:2479: AssertionError: setup: Save project left the flag set
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the load question
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_b100_session_reset.py:600: AssertionError: ["Loaded project 'P1' -> firmware.s19 + firmware.mac - variant 1 of 1, 1 problem -", 'Loaded prg.s19 (S19 only)', "Loa...variant 1 of 1, 1 problem - details: p", 'Closed the Patch Editor document (1 entries); unsaved changes were not kept']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_b100_session_reset.py:643: AssertionError: ["Loaded project 'P1' -> firmware.s19 + firmware.mac - variant 1 of 1, 1 problem -", 'Loaded prg.s19 (S19 only)', "Loa...variant 1 of 1, 1 problem - details: p", 'Closed the Patch Editor document (3 entries); unsaved changes were not kept']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_b100_session_reset.py:128: AssertionError: timed out waiting for the load question (Inc 10)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_b100_session_reset.py:128: AssertionError: timed out waiting for the load question (Inc 10)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base10\tests\test_b99_editor_image.py:163: AssertionError: did not settle: the load question (Inc 10)
+=========================== short test summary info ===========================
+FAILED tests/test_b100_load_question.py::test_tc_b100_44_twenty_four_cells_ask_by_kind
+FAILED tests/test_b100_load_question.py::test_tc_b100_44_saved_states_load_without_asking
+FAILED tests/test_b100_load_question.py::test_tc_b100_44_undo_alone_and_repatch_after_save_ask
+FAILED tests/test_b100_load_question.py::test_tc_b100_44_attach_asks_nothing_and_keeps_the_patch
+FAILED tests/test_b100_load_question.py::test_tc_b100_44_project_load_asks_iff_a_flag_is_set
+FAILED tests/test_b100_load_question.py::test_tc_b100_44_patch_editor_reader_follows_its_writers
+FAILED tests/test_b100_load_question.py::test_tc_b100_44_no_private_dirty_read_outside_the_panel
+FAILED tests/test_b100_load_question.py::test_tc_b100_44_guard_reads_the_public_reader
+FAILED tests/test_b100_load_question.py::test_tc_b100_45_one_modal_with_replace_and_cancel
+FAILED tests/test_b100_load_question.py::test_tc_b100_45_modal_builds_from_its_parameters
+FAILED tests/test_b100_load_question.py::test_tc_b100_45_focus_starts_on_cancel_on_every_route
+FAILED tests/test_b100_load_question.py::test_tc_b100_45_y_replaces_with_the_focus_on_either_button
+FAILED tests/test_b100_load_question.py::test_tc_b100_45_n_and_escape_cancel_with_the_focus_on_either_button
+FAILED tests/test_b100_load_question.py::test_tc_b100_45_enter_answers_with_the_focused_button
+FAILED tests/test_b100_load_question.py::test_tc_b100_45_click_answers_with_the_clicked_button
+FAILED tests/test_b100_load_question.py::test_tc_b100_45_other_keys_leave_the_question_open
+FAILED tests/test_b100_load_question.py::test_tc_b100_45_priority_keys_are_inert_under_the_question
+FAILED tests/test_b100_load_question.py::test_tc_b100_45_names_paint_literally
+FAILED tests/test_b100_load_question.py::test_tc_b100_45_patch_editor_load_keeps_its_own_guard
+FAILED tests/test_b100_load_question.py::test_tc_b100_45_title_names_what_is_replaced
+FAILED tests/test_b100_load_question.py::test_tc_b100_45_unsaved_image_is_named_by_its_file_name
+FAILED tests/test_b100_load_question.py::test_tc_b100_45_patch_editor_entries_named_only_when_w
+FAILED tests/test_b100_load_question.py::test_tc_b100_45_flow_item_named_with_its_flow_name
+FAILED tests/test_b100_load_question.py::test_tc_b100_45_load_target_named_per_route
+FAILED tests/test_b100_load_question.py::test_tc_b100_45_body_says_unsaved_changes_once_in_two_sentences
+FAILED tests/test_b100_load_question.py::test_tc_b100_45_buttons_and_body_stay_fully_visible[size0-long]
+FAILED tests/test_b100_load_question.py::test_tc_b100_45_buttons_and_body_stay_fully_visible[size1-long]
+FAILED tests/test_b100_load_question.py::test_tc_b100_45_buttons_and_body_stay_fully_visible[size2-long]
+FAILED tests/test_b100_load_question.py::test_tc_b100_45_buttons_and_body_stay_fully_visible[size3-short]
+FAILED tests/test_b100_load_question.py::test_tc_b100_45_a_second_answer_is_ignored
+FAILED tests/test_b100_load_question.py::test_tc_b100_45_change_file_dropdown_keeps_the_guard
+FAILED tests/test_b100_load_question.py::test_tc_b100_45_modal_imports_nothing_from_the_app
+FAILED tests/test_b100_load_question.py::test_tc_b100_46_reset_runs_after_the_answer
+FAILED tests/test_b100_load_question.py::test_tc_b100_46_cancel_keeps_the_session_and_runs_no_reset
+FAILED tests/test_b100_load_question.py::test_tc_b100_46_project_load_handler_asks_nothing
+FAILED tests/test_b100_load_question.py::test_tc_b100_46_refused_project_after_yes_keeps_the_work
+FAILED tests/test_b100_load_question.py::test_tc_b100_46_unreadable_a2l_project_after_yes_keeps_the_work
+FAILED tests/test_b100_load_question.py::test_tc_b100_46_cancelled_variant_switch_keeps_the_pending_selection
+FAILED tests/test_b100_load_question.py::test_tc_b100_72_every_route_asks_and_cancel_keeps_the_session
+FAILED tests/test_b100_load_question.py::test_tc_b100_72_replace_runs_the_load_on_every_route[load dialog]
+FAILED tests/test_b100_load_question.py::test_tc_b100_72_replace_runs_the_load_on_every_route[workarea]
+FAILED tests/test_b100_load_question.py::test_tc_b100_72_replace_runs_the_load_on_every_route[v]
+FAILED tests/test_b100_load_question.py::test_tc_b100_72_replace_runs_the_load_on_every_route[panel v]
+FAILED tests/test_b100_load_question.py::test_tc_b100_72_replace_runs_the_load_on_every_route[project]
+FAILED tests/test_b100_load_question.py::test_tc_b100_72_every_load_call_passes_the_seam
+FAILED tests/test_b100_load_question.py::test_tc_b100_72_one_question_per_request
+FAILED tests/test_b100_load_question.py::test_tc_b100_72_typed_path_takes_its_kind_from_the_classification
+FAILED tests/test_b100_load_question.py::test_tc_b100_72_workarea_file_takes_its_kind_from_its_suffix
+FAILED tests/test_b100_load_question.py::test_tc_b100_12_cancelled_question_rehomes_the_focus
+FAILED tests/test_b100_load_question.py::test_tc_b100_70_project_load_asks_only_while_the_document_is_unsaved
+FAILED tests/test_b100_load_question.py::test_tc_b100_66_question_text_holds_no_decision_ids
+FAILED tests/test_b100_load_question.py::test_at_b100_15_load_over_unsaved_work_asks_one_question_per_route
+FAILED tests/test_b100_session_reset.py::test_tc_b100_10_interim_discard_notice
+FAILED tests/test_b100_session_reset.py::test_tc_b100_10_notice_names_every_discarded_entry
+FAILED tests/test_b100_session_reset.py::test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size0]
+FAILED tests/test_b100_session_reset.py::test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size1]
+FAILED tests/test_b99_editor_image.py::test_tc_b99_40_strip_shows_new_file_source_byte
+57 failed in 573.21s (0:09:33)
+# pytest exit code: 1

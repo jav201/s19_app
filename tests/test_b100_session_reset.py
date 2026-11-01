@@ -585,19 +585,22 @@ def test_tc_b100_10_outgoing_service_finishes_after_rebind(tmp_path: Path) -> No
 
 
 def test_tc_b100_10_interim_discard_notice(tmp_path: Path) -> None:
-    """LED-2026-10-26-batch-100.55(a): with N > 0 entries outgoing, the
-    project load's status names the closed document — ``Closed the Patch
-    Editor document (N entries); unsaved changes were not kept`` — so the
-    reset's discard is never silent. The line states only what Inc 3 can
-    know (the document held N entries); it does not call them unsaved —
-    the panel's dirty flag has no public reader until Inc 10 (Inc 10's
-    question replaces this line and re-pins this arm)."""
+    """LLR-165.3 Inc 10 arm (ruling Q2, C48; re-pinned at Inc 10 from the
+    LED .55(a) interim notice): with 1 entry outgoing, a project load paints
+    0 lines holding ``Closed the Patch Editor document`` and the
+    loaded-project summary stays the freshest line. From Inc 10 every
+    shipped project load asks the load question before the reset, so the
+    interim line only repeated it — and for a saved document it said
+    "unsaved changes were not kept", which was false.
+
+    Negative control: the interim block kept → 1 line → RED."""
 
     app = _load_p1_add_entry_load_p2(tmp_path, entries=1)
-    assert app.log_lines[-1] == (
-        "Closed the Patch Editor document (1 entries); "
-        "unsaved changes were not kept"
-    ), list(app.log_lines)
+    lines = list(app.log_lines)
+    assert not any("Closed the Patch Editor document" in line for line in lines), lines
+    assert lines[-1] == (
+        "Loaded project 'P2' -> prg.s19 - variant 1 of 1, 1 problem - details: p"
+    ), lines
 
 
 def test_tc_b100_10_no_discard_notice_when_nothing_unsaved(tmp_path: Path) -> None:
@@ -627,13 +630,20 @@ def test_tc_b100_10_no_discard_notice_when_nothing_unsaved(tmp_path: Path) -> No
 
 
 def test_tc_b100_10_notice_names_every_discarded_entry(tmp_path: Path) -> None:
-    """The count is exact: 3 outgoing entries -> ``(3 entries)``."""
+    """LLR-165.3 Inc 10 arm (ruling Q2; re-pinned at Inc 10): 3 outgoing
+    entries → still 0 closed-document lines (the line is gone for every
+    count, not only for one), and the loaded-project summary is the
+    freshest line.
+
+    Negative control: the interim block kept → ``(3 entries)`` painted →
+    RED."""
 
     app = _load_p1_add_entry_load_p2(tmp_path, entries=3)
-    assert app.log_lines[-1] == (
-        "Closed the Patch Editor document (3 entries); "
-        "unsaved changes were not kept"
-    ), list(app.log_lines)
+    lines = list(app.log_lines)
+    assert not any("Closed the Patch Editor document" in line for line in lines), lines
+    assert lines[-1] == (
+        "Loaded project 'P2' -> prg.s19 - variant 1 of 1, 1 problem - details: p"
+    ), lines
 
 
 # ---------------------------------------------------------------------------
@@ -720,12 +730,18 @@ def test_tc_b100_11_bare_s19_reload_after_unload_shows_no_a2l_tags(
 # ---------------------------------------------------------------------------
 
 
-async def _open_project_through_dialog(pilot, app: S19TuiApp, name: str) -> None:
+async def _open_project_through_dialog(
+    pilot, app: S19TuiApp, name: str, question: list | None = None
+) -> None:
     """Open an existing project through the shipped Load project surface:
     the app-level ``p`` binding opens the Load project dialog (the brief's
     ``p`` route; the Workspace is reached first with rail key ``1`` when a
     rail screen took the focus — only the Segment Split window re-binds
-    ``p``, and it is never displayed in this scene)."""
+    ``p``, and it is never displayed in this scene).
+
+    Inc 10 re-pin (§C.5): when ``question`` is a list, the load is expected
+    to ask the load question first; its painted body is appended to
+    ``question`` and the question is answered ``y`` (replace)."""
     from tests.support.b100_load_dialog import highlight_row, is_load_dialog
 
     await pilot.press("1")
@@ -741,6 +757,15 @@ async def _open_project_through_dialog(pilot, app: S19TuiApp, name: str) -> None
         lambda: not is_load_dialog(app.screen),
         f"the Load dialog to close after loading {name}",
     )
+    if question is not None:
+        await _wait_for(
+            pilot,
+            lambda: type(app.screen).__name__ == "ConfirmQuestionScreen",
+            "the load question (Inc 10)",
+        )
+        await _flush(pilot, 4)
+        question.append(str(app.screen.query_one("#confirm_body").visual))
+        await pilot.press("y")
     # Inc 6 (HLR-178): the dialog route opens the Load-result panel;
     # dismiss it first with its shown key ``esc``.
     await _wait_for(
@@ -777,8 +802,9 @@ def test_at_b100_03_project_load_over_unsaved_work_saves_only_p2(
 ) -> None:
     """HLR-165's acceptance scene, by keys only: load P1 (S19 + MAC + A2L)
     through the Load project dialog (``p``), add ONE Patch Editor entry
-    through the panel's own inputs, load P2 through the dialog (the
-    interim closed-document notice names the entry, LED .55(a)), Save
+    through the panel's own inputs, load P2 through the dialog (Inc 10:
+    the load question names ``Patch Editor entries`` and is answered
+    ``y``; the LED .55(a) interim notice is gone, ruling Q2), Save
     project as P2 — P2's folder holds ``prg.s19`` + ``project.json`` ONLY
     (P-2's re-save at base also wrote P1's ``firmware.mac`` /
     ``firmware.a2l``), the Loaded panel shows no MAC and no A2L. Both
@@ -862,19 +888,13 @@ def test_at_b100_03_project_load_over_unsaved_work_saves_only_p2(
                 "click missed #patch_tab_inspector"
             )
             await pilot.pause()
-            # The load-over: P2 replaces P1. The closed-document notice is
-            # the freshest painted line (LED .55(a)); the loaded-project
-            # line stays in the log history and both are asserted on the
-            # captured log below.
-            await _open_project_through_dialog(pilot, app, P2_NAME)
-            await _wait_for(
-                pilot,
-                lambda: (
-                    "Closed the Patch Editor document (1 entries); "
-                    "unsaved changes were not kept" in _status_text(app)
-                ),
-                "the interim closed-document notice (LED .55(a)) as the freshest line",
-            )
+            # The load-over: P2 replaces P1. Inc 10 (§C.5): the unsaved P1
+            # entry and draft make the load ask; the question names the
+            # Patch Editor work and is answered ``y``. The interim
+            # closed-document notice (LED .55(a)) is gone (ruling Q2).
+            question: list = []
+            await _open_project_through_dialog(pilot, app, P2_NAME, question=question)
+            assert len(question) == 1 and "Patch Editor entries" in question[0], question
             # LED .55(b): the reset cleared the panel's paste buffer —
             # P1's draft must not survive into P2's session.
             await _wait_for(
@@ -935,10 +955,6 @@ def test_at_b100_03_project_load_over_unsaved_work_saves_only_p2(
     assert p2_files == ["prg.s19", "project.json"], (
         f"P2 files after save: {p2_files}"
     )
-    assert (
-        "Closed the Patch Editor document (1 entries); "
-        "unsaved changes were not kept" in log_lines
-    ), log_lines
 
 
 def test_tc_b100_10_reset_leaves_the_patch_editor_clean_for_the_next_load(
