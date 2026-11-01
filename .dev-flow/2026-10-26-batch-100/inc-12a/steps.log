@@ -17,3 +17,4 @@
 2026-11-01 01:10 E5 reviews: code PWN (CR12a-1..3), security PWN (SE5-12a-1 MAJOR..4); rulings written; corrective start (Opus software-dev)
 2026-11-01 01:32 green-03-merged (merged with b100-inc11): 254 passed / 2 failed (Inc 11 arm calls _start_load_worker without gen) → MERGE-12a-1 to corrective
 2026-11-01 01:33 E5 corrective done (Opus software-dev): SE5-12a-1..3, CR12a-3, MERGE-12a-1; green-05 busy file 81 passed/1 skip; app 15ffc7bdbb599615
+2026-11-01 01:44 E13 bz-busy (DeepSeek v4 Pro): 3 PNG, failures=0; orchestrator (Opus) viewed 118: OBS-12a-1 ETA readout contradicts elapsed
