@@ -50,7 +50,7 @@ func: new (module level, beside the other app constants). `BusyKey = Literal["fi
 
 callers: `_busy_begin_action` (reads a row); TC-B100-51 / TC-B100-66 (read the table). Inc 12b reads the labels through `_BusyRun.label` only.
 module: s19_app/tui/app.py
-examples: A12-27 (LLR-176.2b) `len(_BUSY_ACTIONS) == 7`. The keys equal the 7 `BusyKey` values. Each label is non-empty and each row has at least 1 step (7 of 7). The step counts are `3, 3, 4, 4, 2, 2, 1` (18 names). TC-B100-66 scans the 7 labels, the 18 step names and the failure template `<label> failed` and finds 0 decision ids (no `HLR-`, `LLR-`, `US-`, `AT-`, `TC-`, `LED`, `UX-`, `CR`, `SEC`). Negative control: code read on `8947666`, no table → RED. A mutation that removes the `diff_report` row → `len == 6` → RED.
+examples: A12-27 (LLR-176.2b) `len(_BUSY_ACTIONS) == 7`. The keys equal the 7 `BusyKey` values. Each label is non-empty and each row has at least 1 step (7 of 7). The step counts are `3, 3, 4, 4, 2, 2, 1` (19 names; corrected at close, SR-12a-1). TC-B100-66 scans the 7 labels, the 19 step names and the failure template `<label> failed` and finds 0 decision ids (no `HLR-`, `LLR-`, `US-`, `AT-`, `TC-`, `LED`, `UX-`, `CR`, `SEC`). Negative control: code read on `8947666`, no table → RED. A mutation that removes the `diff_report` row → `len == 6` → RED.
 examples: A12-28 (LLR-176.2, TC-B100-51) the fixture list holds the 24 baseline sites (P12a-1; Inc 9b, 10 and 11 add none, baseline-notes "Numbers"). Each site is keyed by (function, ordinal of the `set_progress` call inside it), because line numbers move. Each maps to exactly one seam event:
 
 | # | baseline site (`8947666` line) | value | maps to |
@@ -555,7 +555,7 @@ Held, by reading against this design: `test_report_progress.py::test_failed_repo
 | X-2 | `_load_workarea_file` (S-i) | the pick-time `lstat` / size gate inside `go` (after the Inc 10 question); `not a regular file` / `too large to open` lines | none: its A2L arm reaches `load_a2l_from_path` (begins `a2l_load`), its data arm reaches `load_selected_file` (no run at 12a) | a refused pick paints its line before any begin (the re-check runs inside `go`, after the question), so 0 begins (G-B's TC-B100-39 arms can assert `app._busy.runs == {}`) |
 | X-3 | `refresh_files` (S-h) | the `recent_kind` filter | called between the begin and the end of `load_a2l_from_path`, in `_post_worker_launch` during a file-load run, and after the Save end | it writes no status line and no T, so it adds no seam event |
 | X-4 | `_typed_load_route` / `_load_path_from_user_input` (S-j) | the path refusal (EACCES / ENAMETOOLONG / NUL) → `("refuse", "not found")` | `load_from_path` begins only after the router chose `data` | a refused typed text never begins |
-| X-5 | `BINDINGS` (S-l) | `Load` / `Projects` labels | the action table's labels (`Loading {name}`, …) | distinct strings; TC-B100-66 scans both sets (G-A: 7 labels, 18 step names, `<label> failed`; G-B: 2 token pairs) |
+| X-5 | `BINDINGS` (S-l) | `Load` / `Projects` labels | the action table's labels (`Loading {name}`, …) | distinct strings; TC-B100-66 scans both sets (G-A: 7 labels, 19 step names (corrected at close, SR-12a-1), `<label> failed`; G-B: 2 token pairs) |
 | X-6 | `__init__` / `SNAPSHOT_EXCLUSIONS` | no new attribute | `self._busy` and its exclusion line (A12-74) | G-B adds no `self.` attribute (confirm at E4) |
 | X-7 | `set_status` from G-B refusals | refusal lines at any time | while a run exists they go to the log only; T keeps the progress line | no conflict; a G-B test that reads T after a refusal reads `Ready.` or the file state when no run exists |
 | X-8 | test files | `test_b100_recents.py`, `test_b97_key_bar.py`, `test_b100_load_dialog.py` | `tests/test_b100_busy.py` (new), the re-pins above | no shared test file except TC-B100-66's scan in `test_b100_load_dialog.py` |
@@ -662,7 +662,7 @@ decision: their examples use spies (begin, steps, ends, bar values). HLR-176a's 
 - **R-4 (reads of T while a worker runs).** A test that reads T between a begin and an end now sees the progress line. The census of such reads among the 29 files that name `status_text` is owed at E4 (E2 rulings).
 - **R-5 (failure-path round trip only).** Each worker run posts the `_busy_fail` cross-thread call only on the exception path (S12a-06); the success path has no extra no-op post.
 - **R-6 (80 columns).** At 80×24 the progress line is cut before the elapsed time (F-3). The text tests pass; the visible elapsed time needs a width of about 70 columns for T.
-- **R-7 (open runs in stubbed tests).** A test that stubs a worker leaves its run and timer open until the app exits (A12-75). Textual stops every timer at exit.
+- **R-7 (open runs in stubbed tests).** A test that stubs a worker leaves its run and timer open until the app exits (A12-75). Textual does not stop the busy timer before `#status_text` is gone, so `_busy_tick` returns when `#status_text` is absent (SR-12a-2, corrected at close).
 - **R-8 (P-1, P-3, P-6 pending; P-4 superseded).** The design assumes P-1 and P-6. If P-1 is rejected, the fallback is named there. If P-6 is rejected, A12-01's `⠋` holds only from a fresh app. P-4 is superseded by A12a-06.
 
 ## Platform notes

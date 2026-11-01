@@ -106,7 +106,7 @@ def _listed_project_name(self, name: str) -> Optional[str]: ...   # S-k, LLR-172
   - It replaces `candidate.exists()` by `st = os.lstat(candidate)`. `FileNotFoundError` keeps the silent return (9b B88). Any other `OSError` → `not a regular file` (fail closed).
   - `not stat.S_ISREG(st.st_mode) or _is_reparse_point(candidate)` → `File NOT loaded: '<pn(name)>' is not a regular file — pick another file.`
   - `st.st_size > workspace.DEFAULT_COPY_SIZE_CAP_BYTES` (read through the module at call time, as the 9b A2L admission does) → `File NOT loaded: '<pn(name)>' is too large to open — load a smaller file.`
-  - Both checks run before the Inc 10 question, so a refused pick never asks. Both surfaces reach it: `_load_from_item` (`#files_list`) and the 9b router (`workarea` choice).
+  - Both checks run inside `go`, after the Inc 10 question (S12a-03), so the check runs at use time (corrected at close, D-6). Both surfaces reach it: `_load_from_item` (`#files_list`) and the 9b router (`workarea` choice).
   - `_load_dialog_verdict` stays free of filesystem calls (9b B55). The `workarea` refusal is therefore a status line after the dialog closed, not `#load_reason`.
   - Two new token rows (E1 §D.2) and their text live in G-B. TC-B100-66 scans them.
 - **S-j, the path refusal (LLR-172.5i).** `_typed_load_route` wraps its one `resolve_input_path(path, self.base_dir)` call (the post-9b shape, SEC9b-1) as `try: normalized = resolve_input_path(path, self.base_dir)` / `except (OSError, ValueError, RuntimeError): return ("refuse", "not found")`. The catch must never narrow below that tuple.
