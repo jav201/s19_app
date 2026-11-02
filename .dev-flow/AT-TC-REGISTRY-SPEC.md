@@ -264,6 +264,8 @@ hygiene guard: fails **loud** and **names every offender** rather than asserting
 
 ### 5.1 The rules
 
+> **batch-101 Inc 1:** G4 is retired (see §5.3); the live rules are G1–G3 and G5–G7.
+
 | # | Direction | Rule | Closes |
 |---|---|---|---|
 | **G1** | node → registry | Every id derivable from a node name (§2.4 forms 1–2) is registered | unregistered node |
@@ -285,6 +287,8 @@ direction"* — that is **G1 + G2 only**. The six phantoms it presents as headli
 **G3 and G4 are therefore not scope creep — they are the minimum that closes the evidence the item cites.**
 
 ### 5.3 G4's exempt anchors
+
+> **Retired in batch-101 Inc 1.** The strict-EARS `REQUIREMENTS.md` has no `- Validation:` lines, so G4 (TC-603) and `g4_exempt_anchors` were removed (Inc 1 ruling R-3). This section is history.
 
 `REQUIREMENTS.md` legitimately names non-live ids in history sections (`## History / superseded`, line
 1108) and in the retirement note at line 5068. The exemption is **structural, not keyword-based**: the

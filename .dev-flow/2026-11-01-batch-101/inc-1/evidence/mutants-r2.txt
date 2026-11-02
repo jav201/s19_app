@@ -1,0 +1,6 @@
+== mutant m1
+FAILED tests/test_requirements_canon.py::test_canon_modules_are_s0_to_s17_in_order
+1 failed, 10 passed in 0.38s
+== mutant m2
+FAILED tests/test_requirements_canon.py::test_review_files_name_only_existing_tests
+1 failed, 10 passed in 0.41s

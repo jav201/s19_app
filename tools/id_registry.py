@@ -236,7 +236,7 @@ def iter_tokens(text: str) -> Iterator[Tuple[IdToken, int]]:
             - classify
         Used by:
             - derive_citation_nodes
-            - the G3/G4/G5 rules in tests/test_id_registry.py
+            - the G3/G5 rules in tests/test_id_registry.py (G4 retired, batch-101 Inc 1)
     """
     # Precompute line starts once so the scan stays linear rather than counting
     # newlines from position 0 for every match.

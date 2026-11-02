@@ -6,17 +6,17 @@
 
 ==================================================================
 ## M1-rename-canon  (row R-DOC-CANON.1)  rename REQUIREMENTS.md
-mutant M1-rename-canon applied to C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work
+mutant M1-rename-canon applied to <scratch>\mutant-work
 $ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
 FFFFFF.FF.F                                                              [100%]
 ================================== FAILURES ===================================
 ______________________ test_canon_is_one_file_with_rows _______________________
 tests\test_requirements_canon.py:189: in test_canon_is_one_file_with_rows
     assert CANON.is_file(), f"{CANON} is missing: the requirements live in one file at the repository root"
-E   AssertionError: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
+E   AssertionError: <scratch>\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
 E   assert False
 E    +  where False = is_file()
-E    +    where is_file = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/2930bd84-0658-469f-8d0c-b7e22474ed09/scratchpad/mutant-work/REQUIREMENTS.md').is_file
+E    +    where is_file = WindowsPath('<scratch>/mutant-work/REQUIREMENTS.md').is_file
 ____________________ test_canon_rows_have_id_form_sentence ____________________
 tests\test_requirements_canon.py:201: in test_canon_rows_have_id_form_sentence
     rows = _rows()
@@ -29,7 +29,7 @@ tests\test_requirements_canon.py:156: in _canon
                        ^^^^^^^^^^^^
 tests\test_requirements_canon.py:98: in canon_text
     pytest.fail(f"{CANON} is missing: the requirements live in one file at the repository root")
-E   Failed: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
+E   Failed: <scratch>\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
 ____________________ test_canon_rows_open_with_their_form _____________________
 tests\test_requirements_canon.py:225: in test_canon_rows_open_with_their_form
     rows = _rows()
@@ -42,7 +42,7 @@ tests\test_requirements_canon.py:156: in _canon
                        ^^^^^^^^^^^^
 tests\test_requirements_canon.py:98: in canon_text
     pytest.fail(f"{CANON} is missing: the requirements live in one file at the repository root")
-E   Failed: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
+E   Failed: <scratch>\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
 ________________ test_canon_rows_hold_the_obligation_word_once ________________
 tests\test_requirements_canon.py:242: in test_canon_rows_hold_the_obligation_word_once
     rows = _rows()
@@ -55,7 +55,7 @@ tests\test_requirements_canon.py:156: in _canon
                        ^^^^^^^^^^^^
 tests\test_requirements_canon.py:98: in canon_text
     pytest.fail(f"{CANON} is missing: the requirements live in one file at the repository root")
-E   Failed: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
+E   Failed: <scratch>\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
 ________________________ test_canon_row_ids_are_unique ________________________
 tests\test_requirements_canon.py:257: in test_canon_row_ids_are_unique
     rows = _rows()
@@ -68,7 +68,7 @@ tests\test_requirements_canon.py:156: in _canon
                        ^^^^^^^^^^^^
 tests\test_requirements_canon.py:98: in canon_text
     pytest.fail(f"{CANON} is missing: the requirements live in one file at the repository root")
-E   Failed: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
+E   Failed: <scratch>\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
 __________________ test_canon_modules_are_s0_to_s17_in_order __________________
 tests\test_requirements_canon.py:275: in test_canon_modules_are_s0_to_s17_in_order
     canon = _canon()
@@ -78,21 +78,21 @@ tests\test_requirements_canon.py:156: in _canon
                        ^^^^^^^^^^^^
 tests\test_requirements_canon.py:98: in canon_text
     pytest.fail(f"{CANON} is missing: the requirements live in one file at the repository root")
-E   Failed: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
+E   Failed: <scratch>\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
 ___________________ test_canon_s0_table_cites_existing_rows ___________________
 tests\test_requirements_canon.py:362: in test_canon_s0_table_cites_existing_rows
     text = canon_text()
            ^^^^^^^^^^^^
 tests\test_requirements_canon.py:98: in canon_text
     pytest.fail(f"{CANON} is missing: the requirements live in one file at the repository root")
-E   Failed: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
+E   Failed: <scratch>\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
 ____________________ test_review_files_hold_the_decisions _____________________
 tests\test_requirements_canon.py:391: in test_review_files_hold_the_decisions
     links = set(_REVIEW_LINK_RE.findall(canon_text()))
                                         ^^^^^^^^^^^^
 tests\test_requirements_canon.py:98: in canon_text
     pytest.fail(f"{CANON} is missing: the requirements live in one file at the repository root")
-E   Failed: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
+E   Failed: <scratch>\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
 ______________________ test_canon_rows_are_one_sentence _______________________
 tests\test_requirements_canon.py:465: in test_canon_rows_are_one_sentence
     rows = _rows()
@@ -105,7 +105,7 @@ tests\test_requirements_canon.py:156: in _canon
                        ^^^^^^^^^^^^
 tests\test_requirements_canon.py:98: in canon_text
     pytest.fail(f"{CANON} is missing: the requirements live in one file at the repository root")
-E   Failed: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
+E   Failed: <scratch>\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
 =========================== short test summary info ===========================
 FAILED tests/test_requirements_canon.py::test_canon_is_one_file_with_rows - A...
 FAILED tests/test_requirements_canon.py::test_canon_rows_have_id_form_sentence
@@ -121,7 +121,7 @@ RESULT M1-rename-canon: target test_canon_is_one_file_with_rows -> RED; 9 test(s
 
 ==================================================================
 ## M2a-form-Shall  (row R-DOC-CANON.2)  form Shall on R-DOC-README.1
-mutant M2a-form-Shall applied to C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work
+mutant M2a-form-Shall applied to <scratch>\mutant-work
 $ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
 .F.........                                                              [100%]
 ================================== FAILURES ===================================
@@ -139,7 +139,7 @@ RESULT M2a-form-Shall: target test_canon_rows_have_id_form_sentence -> RED; 1 te
 
 ==================================================================
 ## M2b-fourth-cell  (row R-DOC-CANON.2)  a 4th cell on R-DOC-README.1
-mutant M2b-fourth-cell applied to C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work
+mutant M2b-fourth-cell applied to <scratch>\mutant-work
 $ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
 .F.........                                                              [100%]
 ================================== FAILURES ===================================
@@ -157,7 +157,7 @@ RESULT M2b-fourth-cell: target test_canon_rows_have_id_form_sentence -> RED; 1 t
 
 ==================================================================
 ## M3-when-row-opens-U  (row R-DOC-CANON.3)  R-DOC-README.1 filed under When, sentence opens 'The system shall'
-mutant M3-when-row-opens-U applied to C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work
+mutant M3-when-row-opens-U applied to <scratch>\mutant-work
 $ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
 ..F........                                                              [100%]
 ================================== FAILURES ===================================
@@ -175,7 +175,7 @@ RESULT M3-when-row-opens-U: target test_canon_rows_open_with_their_form -> RED; 
 
 ==================================================================
 ## M4-two-shall  (row R-DOC-CANON.4)  a second 'shall' in R-DOC-README.1
-mutant M4-two-shall applied to C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work
+mutant M4-two-shall applied to <scratch>\mutant-work
 $ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
 ...F.......                                                              [100%]
 ================================== FAILURES ===================================
@@ -193,7 +193,7 @@ RESULT M4-two-shall: target test_canon_rows_hold_the_obligation_word_once -> RED
 
 ==================================================================
 ## M5-copied-row  (row R-DOC-CANON.5)  R-DOC-README.1 copied below itself
-mutant M5-copied-row applied to C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work
+mutant M5-copied-row applied to <scratch>\mutant-work
 $ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
 ....F......                                                              [100%]
 ================================== FAILURES ===================================
@@ -211,14 +211,14 @@ RESULT M5-copied-row: target test_canon_row_ids_are_unique -> RED; 1 test(s) RED
 
 ==================================================================
 ## M6-swap-module-headings  (row R-DOC-CANON.6)  headings of S2 and S3 swapped
-mutant M6-swap-module-headings applied to C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work
+mutant M6-swap-module-headings applied to <scratch>\mutant-work
 $ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
 .....F.....                                                              [100%]
 ================================== FAILURES ===================================
 __________________ test_canon_modules_are_s0_to_s17_in_order __________________
 tests\test_requirements_canon.py:277: in test_canon_modules_are_s0_to_s17_in_order
     assert found == MODULES, (
-E   AssertionError: the '## S<n> · ' headings of C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work\REQUIREMENTS.md read ['S0', 'S1', 'S3', 'S2', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11', 'S12', 'S13', 'S14', 'S15', 'S16', 'S17'], want ['S0', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11', 'S12', 'S13', 'S14', 'S15', 'S16', 'S17'] (lines [59, 261, 500, 998, 1255, 1531, 1951, 2358, 2828, 3230, 3468, 3796, 4703, 5285, 5717, 6045, 6382, 6673])
+E   AssertionError: the '## S<n> · ' headings of <scratch>\mutant-work\REQUIREMENTS.md read ['S0', 'S1', 'S3', 'S2', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11', 'S12', 'S13', 'S14', 'S15', 'S16', 'S17'], want ['S0', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11', 'S12', 'S13', 'S14', 'S15', 'S16', 'S17'] (lines [59, 261, 500, 998, 1255, 1531, 1951, 2358, 2828, 3230, 3468, 3796, 4703, 5285, 5717, 6045, 6382, 6673])
 E   assert ['S0', 'S1', ...4', 'S5', ...] == ['S0', 'S1', ...4', 'S5', ...]
 E     
 E     At index 2 diff: 'S3' != 'S2'
@@ -230,7 +230,7 @@ RESULT M6-swap-module-headings: target test_canon_modules_are_s0_to_s17_in_order
 
 ==================================================================
 ## M7-history-one-byte  (row R-DOC-CANON.7)  one byte of the history file flipped (offset 100)
-mutant M7-history-one-byte applied to C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work
+mutant M7-history-one-byte applied to <scratch>\mutant-work
 $ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
 ......F....                                                              [100%]
 ================================== FAILURES ===================================
@@ -249,7 +249,7 @@ RESULT M7-history-one-byte: target test_canon_history_is_the_committed_blob -> R
 
 ==================================================================
 ## M7b-history-crlf  (row R-DOC-CANON.7)  history file with CRLF line endings
-mutant M7b-history-crlf applied to C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work
+mutant M7b-history-crlf applied to <scratch>\mutant-work
 $ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
 ......F....                                                              [100%]
 ================================== FAILURES ===================================
@@ -268,7 +268,7 @@ RESULT M7b-history-crlf: target test_canon_history_is_the_committed_blob -> RED;
 
 ==================================================================
 ## M8a-nope-id-in-absorbing-cell  (row R-DOC-CANON.8)  R-NOPE.1 in the absorbing cell of HLR-001
-mutant M8a-nope-id-in-absorbing-cell applied to C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work
+mutant M8a-nope-id-in-absorbing-cell applied to <scratch>\mutant-work
 $ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
 .......F...                                                              [100%]
 ================================== FAILURES ===================================
@@ -284,7 +284,7 @@ RESULT M8a-nope-id-in-absorbing-cell: target test_canon_s0_table_cites_existing_
 
 ==================================================================
 ## M8b-unresolved-abbreviation  (row R-DOC-CANON.8)  abbreviation R-TUI-052.1 ... .99 in HLR-008
-mutant M8b-unresolved-abbreviation applied to C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work
+mutant M8b-unresolved-abbreviation applied to <scratch>\mutant-work
 $ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
 .......F...                                                              [100%]
 ================================== FAILURES ===================================
@@ -301,7 +301,7 @@ RESULT M8b-unresolved-abbreviation: target test_canon_s0_table_cites_existing_ro
 ==================================================================
 ## M8c-parser-sees-zero-ids  (row R-DOC-CANON.8)  every '| HLR-' line of S0.2 unreadable (0 ids)
 (M8c rewrote 104 S0.2 lines)
-mutant M8c-parser-sees-zero-ids applied to C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work
+mutant M8c-parser-sees-zero-ids applied to <scratch>\mutant-work
 $ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
 .......F...                                                              [100%]
 ================================== FAILURES ===================================
@@ -316,7 +316,7 @@ RESULT M8c-parser-sees-zero-ids: target test_canon_s0_table_cites_existing_rows 
 
 ==================================================================
 ## M9a-remove-review-file  (row R-DOC-CANON.9)  S7-ears-strict.md removed
-mutant M9a-remove-review-file applied to C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work
+mutant M9a-remove-review-file applied to <scratch>\mutant-work
 $ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
 ........F..                                                              [100%]
 ================================== FAILURES ===================================
@@ -335,7 +335,7 @@ RESULT M9a-remove-review-file: target test_review_files_hold_the_decisions -> RE
 
 ==================================================================
 ## M9b-break-module-table-link  (row R-DOC-CANON.9)  S7 module-table link points at a missing file
-mutant M9b-break-module-table-link applied to C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work
+mutant M9b-break-module-table-link applied to <scratch>\mutant-work
 $ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
 ........F..                                                              [100%]
 ================================== FAILURES ===================================
@@ -354,7 +354,7 @@ RESULT M9b-break-module-table-link: target test_review_files_hold_the_decisions 
 
 ==================================================================
 ## M9c-no-decisions-heading  (row R-DOC-CANON.9)  S5 review file: the Decisions heading renamed
-mutant M9c-no-decisions-heading applied to C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work
+mutant M9c-no-decisions-heading applied to <scratch>\mutant-work
 $ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
 ........F..                                                              [100%]
 ================================== FAILURES ===================================
@@ -372,7 +372,7 @@ RESULT M9c-no-decisions-heading: target test_review_files_hold_the_decisions -> 
 
 ==================================================================
 ## M10-phantom-test-name  (row R-DOC-CANON.10)  test_does_not_exist cited in S2-ears-strict.md
-mutant M10-phantom-test-name applied to C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work
+mutant M10-phantom-test-name applied to <scratch>\mutant-work
 $ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
 .........F.                                                              [100%]
 ================================== FAILURES ===================================
@@ -388,7 +388,7 @@ RESULT M10-phantom-test-name: target test_review_files_name_only_existing_tests 
 
 ==================================================================
 ## M11-two-sentences  (row R-DOC-CANON.11)  R-DOC-README.1 with a second sentence
-mutant M11-two-sentences applied to C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work
+mutant M11-two-sentences applied to <scratch>\mutant-work
 $ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
 ..........F                                                              [100%]
 ================================== FAILURES ===================================
@@ -406,7 +406,7 @@ RESULT M11-two-sentences: target test_canon_rows_are_one_sentence -> RED; 1 test
 
 ==================================================================
 ## M12-canon-shrunk-to-3-rows  (row R-DOC-CANONfloor)  canon cut to 3 rows (blind-parser control)
-mutant M12-canon-shrunk-to-3-rows applied to C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work
+mutant M12-canon-shrunk-to-3-rows applied to <scratch>\mutant-work
 $ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
 .FFFFF.F..F                                                              [100%]
 ================================== FAILURES ===================================
@@ -416,32 +416,32 @@ tests\test_requirements_canon.py:201: in test_canon_rows_have_id_form_sentence
            ^^^^^^^
 tests\test_requirements_canon.py:163: in _rows
     pytest.fail(
-E   Failed: the parser found 3 canon rows in C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work\REQUIREMENTS.md, below the floor of 2623: rows were lost, or the tables no longer carry the header '| Id | Form | Requirement |'
+E   Failed: the parser found 3 canon rows in <scratch>\mutant-work\REQUIREMENTS.md, below the floor of 2623: rows were lost, or the tables no longer carry the header '| Id | Form | Requirement |'
 ____________________ test_canon_rows_open_with_their_form _____________________
 tests\test_requirements_canon.py:225: in test_canon_rows_open_with_their_form
     rows = _rows()
            ^^^^^^^
 tests\test_requirements_canon.py:163: in _rows
     pytest.fail(
-E   Failed: the parser found 3 canon rows in C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work\REQUIREMENTS.md, below the floor of 2623: rows were lost, or the tables no longer carry the header '| Id | Form | Requirement |'
+E   Failed: the parser found 3 canon rows in <scratch>\mutant-work\REQUIREMENTS.md, below the floor of 2623: rows were lost, or the tables no longer carry the header '| Id | Form | Requirement |'
 ________________ test_canon_rows_hold_the_obligation_word_once ________________
 tests\test_requirements_canon.py:242: in test_canon_rows_hold_the_obligation_word_once
     rows = _rows()
            ^^^^^^^
 tests\test_requirements_canon.py:163: in _rows
     pytest.fail(
-E   Failed: the parser found 3 canon rows in C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work\REQUIREMENTS.md, below the floor of 2623: rows were lost, or the tables no longer carry the header '| Id | Form | Requirement |'
+E   Failed: the parser found 3 canon rows in <scratch>\mutant-work\REQUIREMENTS.md, below the floor of 2623: rows were lost, or the tables no longer carry the header '| Id | Form | Requirement |'
 ________________________ test_canon_row_ids_are_unique ________________________
 tests\test_requirements_canon.py:257: in test_canon_row_ids_are_unique
     rows = _rows()
            ^^^^^^^
 tests\test_requirements_canon.py:163: in _rows
     pytest.fail(
-E   Failed: the parser found 3 canon rows in C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work\REQUIREMENTS.md, below the floor of 2623: rows were lost, or the tables no longer carry the header '| Id | Form | Requirement |'
+E   Failed: the parser found 3 canon rows in <scratch>\mutant-work\REQUIREMENTS.md, below the floor of 2623: rows were lost, or the tables no longer carry the header '| Id | Form | Requirement |'
 __________________ test_canon_modules_are_s0_to_s17_in_order __________________
 tests\test_requirements_canon.py:277: in test_canon_modules_are_s0_to_s17_in_order
     assert found == MODULES, (
-E   AssertionError: the '## S<n> · ' headings of C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work\REQUIREMENTS.md read ['S0'], want ['S0', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11', 'S12', 'S13', 'S14', 'S15', 'S16', 'S17'] (lines [59])
+E   AssertionError: the '## S<n> · ' headings of <scratch>\mutant-work\REQUIREMENTS.md read ['S0'], want ['S0', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11', 'S12', 'S13', 'S14', 'S15', 'S16', 'S17'] (lines [59])
 E   assert ['S0'] == ['S0', 'S1', ...4', 'S5', ...]
 E     
 E     Right contains 17 more items, first extra item: 'S1'
@@ -459,7 +459,7 @@ tests\test_requirements_canon.py:465: in test_canon_rows_are_one_sentence
            ^^^^^^^
 tests\test_requirements_canon.py:163: in _rows
     pytest.fail(
-E   Failed: the parser found 3 canon rows in C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mutant-work\REQUIREMENTS.md, below the floor of 2623: rows were lost, or the tables no longer carry the header '| Id | Form | Requirement |'
+E   Failed: the parser found 3 canon rows in <scratch>\mutant-work\REQUIREMENTS.md, below the floor of 2623: rows were lost, or the tables no longer carry the header '| Id | Form | Requirement |'
 =========================== short test summary info ===========================
 FAILED tests/test_requirements_canon.py::test_canon_rows_have_id_form_sentence
 FAILED tests/test_requirements_canon.py::test_canon_rows_open_with_their_form

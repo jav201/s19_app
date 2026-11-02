@@ -94,6 +94,8 @@ MINTED: List[Tuple[str, str, List[str]]] = [
         "some status.",
         ["tests/test_id_registry.py::test_tc602_g3_every_citation_is_registered"],
     ),
+    # TC-603 (G4) is RETIRED since batch-101 Inc 1; this one-shot seed keeps the
+    # historical entry, but never re-run it with --write over the live registry.
     (
         "TC-603",
         "G4 - an id cited in REQUIREMENTS.md is LIVE unless the citation falls under "

@@ -12,7 +12,7 @@ Totals (counted by script, one per id; a row with several ids counts each): 317 
 
 | Id | Change | Rows | Status |
 |---|---|---|---|
-| D0-8 | When the new `REQUIREMENTS.md` replaces the old one, update the registry guard's exempt headings (`AT-TC-REGISTRY.jsonl` `g4_exempt_anchors`) and its scan count in `tests/test_id_registry.py` in the same change; register batch-100's AT-B100 and TC-B100 ids too (S0 D0-13) | — | open |
+| D0-8 | When the new `REQUIREMENTS.md` replaces the old one, update the registry guard's exempt headings (`AT-TC-REGISTRY.jsonl` `g4_exempt_anchors`) and its scan count in `tests/test_id_registry.py` in the same change; register batch-100's AT-B100 and TC-B100 ids too (S0 D0-13) | — | done differently (batch-101 Inc 1): G4 and `g4_exempt_anchors` retired instead of updated (ruling R-3); scan count measured (R-7). AT-B100/TC-B100 ids are batch-scoped, outside the registry's authority (registry spec §2.3), so none is registered |
 | D0-9 | README: describe the Check Editor, Flow Execution and Split / Join / Export; drop "ten single-context screens" | R-DOC-README.2 | open |
 | D0-10 | README key table: add `=`, `]`, Ctrl+Q, `d`, `c` | R-DOC-README.3 | open |
 | D0-11 | README: Operations runs `crc` only (with S13 D13-13); flows are `<project>/flows/<name>.json`, not `flow.json` | R-DOC-README.4 | open |

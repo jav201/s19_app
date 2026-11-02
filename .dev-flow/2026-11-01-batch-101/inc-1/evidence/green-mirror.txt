@@ -1,5 +1,5 @@
 # GREEN on the new canon: tests/test_requirements_canon.py run in a temporary mirror (scratch), not in the worktree
-# mirror root: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\2930bd84-0658-469f-8d0c-b7e22474ed09\scratchpad\mirror
+# mirror root: <scratch>\mirror
 # date (UTC): 2026-11-02T05:58:20Z
 # mirror contents: REQUIREMENTS.md = s19w/canon/REQUIREMENTS.md; docs/requirements/history/REQUIREMENTS-legacy-e273181.md = git show e273181:REQUIREMENTS.md; docs/requirements/review/ = s19w/review/S*-ears-strict.md (18 files); tests/ = copy of the worktree tests tree
 # sha256 REQUIREMENTS.md: 0709ab3f03483665b5f6eecb909a41ee2d9467832ab030330392a3f8420a8e99

@@ -161,7 +161,7 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-155 · LLR-155.1 … .8 | **absorbed** · S5: R-TUI-002.5, R-TUI-006.1, R-TUI-006.2; S8: R-PATCH-SAVE-FOLDER-001.10, R-CHG-003.18, R-CHG-003.19; S11: R-TUI-012.14; S13: R-CRC-WRITE-001.5 … .26; S15: R-FLOW-WRITE.1 … .8, R-FLOW-CHAIN.1 … .10 | Private staging and exclusive create are design. Reports that probe a free name first: S14 D14-11, S15 D15-12. |
 | HLR-156 · LLR-156.1 … .4 | **absorbed** · S15: R-FLOW-PATCH.1 … .11, R-FLOW-RPT.1 … .14, R-FLOW-CHAIN.11 … .18 | PATCH step status. |
 | HLR-157 · LLR-157.1 … .4 | **absorbed** · S8: R-CHG-002.1, R-CHG-003.8, R-CHG-003.21, R-CHG-003.23 | Save-back writes source plus document (S8 D8-3); the Patch Editor controls are S10.8 (D10-12). |
-| HLR-158 · LLR-158.1 … .3 | **absorbed** · S2: R-A2L-024 … 027, R-A2L-056 … 058.3, R-A2L-006.7 | Decoding. Encoding is deferred with the symbol input (S10 D10-13, D10-42). |
+| HLR-158 · LLR-158.1 … .3 | **absorbed** · S2: R-A2L-024, R-A2L-025, R-A2L-026, R-A2L-027, R-A2L-056, R-A2L-057, R-A2L-058.1, R-A2L-058.2, R-A2L-058.3, R-A2L-006.7 | Decoding. Encoding is deferred with the symbol input (S10 D10-13, D10-42). |
 | HLR-159 · LLR-159.1, .2 | **absorbed** · S13: R-CRC-CHECK-002.1 … .4; S15: R-FLOW-CRC.1 … .8 | Empty and partly covered CRC targets. |
 | HLR-160 · LLR-160.1 … .5 | **absorbed** · S17: R-SEG-NAME.1 … R-SEG-PLACE.18 | Export names and placement, S17.7 (D17-12). |
 | HLR-161 · LLR-161.1, .2 | **absorbed** · S10: R-PE-031 | The help-window note is S7's (passed by S10). |

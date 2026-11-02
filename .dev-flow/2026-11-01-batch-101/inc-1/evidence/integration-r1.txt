@@ -1,4 +1,4 @@
-s19_app from C:\Users\jjgh8\Github\s19_app-b101-canon\s19_app\__init__.py
+s19_app from <repo>\s19_app\__init__.py
 e273181aaa7692eaf6a1e40141120a92dad5097e
 E             At index 101 diff: b'1' != b'0'
 E             Use -v to get more diff

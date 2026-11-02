@@ -19,8 +19,9 @@ reads the canon, the history file, the review files and the test sources (text o
 about 2 s) and runs in the PR lane, because PRs are where requirements change.
 
 ``MIN_ROWS`` is the size of the canon when it was built, a floor and not an exact
-count: later increments add rows freely, and a row is retired by a ruling that lowers
-the floor in the same change, never dropped by accident.
+count: it stops a parser that reads nothing from passing, and a change that retires
+rows below it must lower it in the same change. It cannot catch a row dropped while
+others are added.
 """
 
 from __future__ import annotations
@@ -278,6 +279,8 @@ def test_canon_modules_are_s0_to_s17_in_order() -> None:
         f"the '## S<n> · ' headings of {CANON} read {found}, want {MODULES} "
         f"(lines {[n for _, n in canon.modules]})"
     )
+    orphans = [f"{r.id} (line {r.line})" for r in canon.rows if r.module is None]
+    assert not orphans, f"rows outside any '## S<n> · ' module: {orphans[:SHOWN]}"
     per_module = Counter(r.module for r in canon.rows)
     empty = [m for m in MODULES if per_module[m] < 1]
     assert not empty, f"modules with no requirement row: {empty}"
@@ -405,7 +408,7 @@ def test_review_files_hold_the_decisions() -> None:
     _report("R-DOC-CANON.9 a module's decisions are not kept where the canon says", offenders, len(MODULES))
 
 
-_TEST_NAME_SPAN_RE = re.compile(r"`(test_\w*[A-Za-z0-9])`")
+_TEST_NAME_SPAN_RE = re.compile(r"`(?:[\w/.-]+\.py::)?(test_\w*[A-Za-z0-9])`")
 _DEF_RE = re.compile(r"^[ \t]*(?:async[ \t]+)?def[ \t]+(test_\w+)", re.MULTILINE)
 _CLASS_RE = re.compile(r"^[ \t]*class[ \t]+(Test\w*)", re.MULTILINE)
 
@@ -424,8 +427,8 @@ def test_review_files_name_only_existing_tests() -> None:
 
     Why: a rationale that cites ``test_x`` as the proof of a decision is a promise. A
     renamed or deleted test turns the promise into a phantom that reads as coverage.
-    Whole code spans only: a file (``test_x.py``) or a prefix (``test_b100_``) names
-    no single test and is skipped.
+    Whole code spans only (``test_y`` or ``tests/x.py::test_y``): a file
+    (``test_x.py``) or a prefix (``test_b100_``) names no single test and is skipped.
     """
     files = sorted(REVIEW_DIR.glob("*.md"))
     defined = _defined_test_names()
