@@ -1686,6 +1686,22 @@ Source: `.dev-flow/design/RECONCILE-operator-requests-2026-10-23.md` (69 request
   - **What closes it:** a profile of `_save_project_files` (`s19_app/tui/app.py`) against the base handler, then either optimise the worker step back under ~0.8 s or re-rule the TC-B100-20 bound for Save project with a cited reason. The bound is not raised before the profile.
 - **▸ (test hygiene, SR12b-7, batch-100 Inc 12b E5 / fix round 2; routed by the orchestrator 2026-11-01) 30 wait helpers in 26 test files poll with a count of bare `pilot.pause()` calls.** Since Inc 12a/12b the work they wait for runs on workers, so the bound is not time and the tight loop delays the worker's `call_from_thread` round trips (91 loops in 40 files; census `2026-10-26-batch-100/evidence/fix-2/SR12b-7-census.txt`). Fix round 2 re-pinned the two that R-1 and R-3 needed.
   - **What closes it:** re-pin each to the wall-clock + `asyncio.sleep` pattern (CI12a-1; `_wait_yielding` in `tests/test_b100_active_variant.py`) when its module is next touched, shared helpers first.
+- **▸ (known failed, KF-101-L, batch-101 P0; operator ruling 2026-11-01) Load surfaces: UX-I-01, -02, -03, -04, -05, -12, -13, -14, -15, -16 fail their checks** (`2026-11-01-batch-101/p0/known-failed.md`). Flagged harms: UX-I-13 and UX-I-10 show a wrong result on screen; UX-I-12 risks opening the wrong file; UX-I-03 a false reason line.
+  - **What closes it:** review in the next iteration — class a (HLR-178, HLR-173a): fix the code; class b: keep the approved design or run a prototype round.
+- **▸ (known failed, KF-101-S, batch-101 P0) Save dialog, after-save status and progress row: UX-I-06, -07, -08, -09, -10, -11, -19** (`p0/known-failed.md`).
+  - **What closes it:** the same review.
+- **▸ (known failed, KF-101-Q, batch-101 P0) Questions: UX-I-17, UX-I-18, UX-I-20, F-17** (`p0/known-failed.md`).
+  - **What closes it:** the same review.
+- **▸ (known failed, KF-101-V, batch-101 P0) Views at the 118-column reference width: F-08, F-09, F-10, F-11, F-12, F-25, F-32** (`p0/known-failed.md`). F-25 is a wrong-result risk; F-10 and F-11 may block a task at 118 columns.
+  - **What closes it:** the same review (class a against the approved layouts).
+- **▸ (known failed, KF-101-M, batch-101 P0) Memory Map on the 10 MB demo image: F-15** — blank until a key, seconds per key.
+  - **What closes it:** paint on first show; ≤ 300 ms per key as a serial timing arm; a bounded widget count.
+- **▸ (known failed, KF-101-P, batch-101 P0) Patch Editor: F-04 (save-back prompt only on the JSON tab; D10-40) and F-22 (Save asks no name; class b)** (`p0/known-failed.md`).
+  - **What closes it:** the same review.
+- **▸ (known failed, KF-101-F, batch-101 P0) Flows, new UI (class c): F-36 (no REPORT block in the builder; blocks a task), F-48 (no reference to an external step's output), F-50 (no Builder Confirm; Terminal mode does not run the command)** (`p0/known-failed.md`).
+  - **What closes it:** a design round after v1.0.0; the guide documents the limits.
+- **▸ (known failed, KF-101-K, batch-101 P0) Shell, keys, settings, Operations: F-19 (settings menu cannot be closed; R-SHELL-SETTINGS.5, D6-26), F-20 (`]` conflict), F-31 (placeholder operations; R-OPS-002.1, D13-13)** (`p0/known-failed.md`).
+  - **What closes it:** the same review.
 - **▸ (deferral, batch-100 close; operator ruling 2026-11-01) post-close CI confirmation: GitHub CI run 41372953464 on `f72eef1` was still running at the close and is not counted as a pass.** The batch closed on the Linux gate (`2026-10-26-batch-100/evidence/batch-end/linux-gate-f72eef1-*`). The same run owes the advisory `snapshot` job result for the 29 density cells of LLR-173.2m.
   - **What closes it:** read that run's FAILED set against the 5 known failures; anything new is fixed in batch-101 (release hardening).
 - **▸ (test hygiene, G-015, batch-100 close) 13 timing-bound arms fail when the full suite runs in parallel** (TC-B100-20 ×4, AT-B100-17 8 MiB load, TC-B100-30 ×3, TC-B100-61 ×4, TC-B100-05); serially they pass (`evidence/batch-end/linux-gate-f72eef1-timing-serial.txt`).
