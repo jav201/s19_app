@@ -51,3 +51,11 @@ Re-review scope (independent): **A-1, A-2, S-1, S-2 only.**
 - **Inc 9** (works after Inc 8 in `flow_execution_service.py`): Inc 8 now also changes `run_chain_set._run_one`, `ChainRunOutcome` (field `in_place_inputs`) and `compose_chain_set_report` (Input provenance). Inc 9 must keep both new fields and the suffix when it edits `run_chain_set` / `write_chain_set_report`. `change_doc_ref` and `a2l_ref` values change for rebound PATCH refs (I-4).
 - **Inc 7**: `diff_report_service.py` prints `change_doc_ref` (value only, escaped as before).
 - Every surface that paints a block summary gains the read suffix only on an in-place read (I-7); no existing test run reads a copy in place (architect E3 §4).
+
+## Round 2 (2026-11-02)
+
+Re-review (E3-r2.md): PASS-WITH-NOTES — A-1, A-2, S-1, S-2 closed. Rulings on the new MINORs (E4 addenda, binding):
+- N-1: case R-CRC-CONFIG-001.11/7(a) uses a non-hex string, `z` × 1 000 000, expecting `"` + 63 × `z` + `…`; graph :106 corrected the same way.
+- N-2: option (c), no 5th source file: when a block's summary ends with a refusal/status token that a consumer matches by suffix (e.g. `unresolved`, read by flow_screens._failure_detail), the read suffix ` · read <copy> in place of <ref>` is inserted BEFORE that final token, so the token stays last; R-FLOW-EXT.12's text states the placement; new case 12/10 (an in-place read followed by a junction-refused A2L keeps `[MANIFEST-PATH-ESCAPE]` in the lane line).
+- N-3: the new dataclass fields use `field(default_factory=list|dict)`.
+- N-4: the suffix's `finally` wraps the per-block `except`, so error results carry it; new case 12/9 (apply_change_document raises after an in-place read).
