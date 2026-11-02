@@ -1,0 +1,28 @@
+== E5 mutant 040 ==
+== date: 2026-11-02T14:11:21Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+___________ test_r_tst_040_041_every_upper_timing_bound_is_reported ___________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m2/bt/040/test_r_tst_040_041_every_upper0')
+
+    def test_r_tst_040_041_every_upper_timing_bound_is_reported(tmp_path) -> None:
+        from tests.support import suite_census
+    
+        sites = {_norm_site(site) for site in _unreported_sites(TESTS_ROOT)}
+>       assert sites == set(), (
+            "raw upper timing bounds: " + ", ".join(sorted(sites))
+        )
+E       AssertionError: raw upper timing bounds: tests/test_b100_active_variant.py:740
+E       assert {'tests/test_...riant.py:740'} == set()
+E         
+E         Extra items in the left set:
+E         'tests/test_b100_active_variant.py:740'
+E         Use -v to get more diff
+
+tests\test_suite_hygiene.py:1182: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_040_041_every_upper_timing_bound_is_reported
+1 failed in 28.82s
+pytest exit: 1

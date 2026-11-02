@@ -1,0 +1,27 @@
+== E5 mutant 013-014 ==
+== date: 2026-11-02T14:03:17Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+________________ test_r_tst_013_014_ci_checks_out_full_history ________________
+
+    def test_r_tst_013_014_ci_checks_out_full_history() -> None:
+        text = WORKFLOW_PATH.read_text(encoding="utf-8")
+        jobs = _workflow_jobs(text)
+        assert "snapshot" in jobs, "snapshot job must stay present"
+        tui_steps = _job_steps(jobs["tui-ci"])
+        checkouts = [
+            step
+            for step in tui_steps
+            if (_step_value(step, "uses") or "").startswith("actions/checkout@")
+        ]
+        assert len(checkouts) == 1
+        checkout_lines = "\n".join(checkouts[0])
+>       assert "fetch-depth: 0" in checkout_lines
+E       AssertionError: assert 'fetch-depth: 0' in '      - name: Check out repository\n        uses: actions/checkout@v4\n        with:\n          persist-credentials: false\n'
+
+tests\test_suite_hygiene.py:768: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_013_014_ci_checks_out_full_history
+1 failed in 0.19s
+pytest exit: 1

@@ -1,0 +1,46 @@
+== E5 mutant 005-6 ==
+== date: 2026-11-02T13:56:57Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________ test_r_tst_005_detector_finds_each_timing_arm_form[form5] __________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m2/bt/005-6/test_r_tst_005_detector_finds_0')
+form = 'form5'
+
+    @pytest.mark.parametrize(
+        "form", ["form1", "form2", "form3", "form4", "form5", "form6", "form7"]
+    )
+    def test_r_tst_005_detector_finds_each_timing_arm_form(tmp_path, form) -> None:
+        from tests.support import suite_census
+    
+        if form == "form6":
+            (tmp_path / "measure_mod.py").write_text(_FORM6_SUPPORT, encoding="utf-8")
+            (tmp_path / "test_form6.py").write_text(_FORM6_TEST, encoding="utf-8")
+            test_name = "test_f"
+        else:
+            _, source = _FORM_SOURCES[form]
+            (tmp_path / f"test_{form}.py").write_text(source, encoding="utf-8")
+            test_name = {
+                "form1": "test_a",
+                "form2": "test_b",
+                "form3": "test_c",
+                "form4": "test_d",
+                "form5": "test_e",
+                "form7": "test_g",
+            }[form]
+        arms = suite_census.timing_arms(tmp_path)
+        found = [key for key in arms if key.endswith(f"::{test_name}")]
+>       assert len(found) == 1, (
+            f"{form} ({_FORM_SOURCES[form][0]}): planted arm not detected exactly "
+            f"once in {arms}"
+        )
+E       AssertionError: form5 (hook-recorded stamp list): planted arm not detected exactly once in {}
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_suite_hygiene.py:562: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form5]
+1 failed in 0.21s
+pytest exit: 1

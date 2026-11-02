@@ -1,0 +1,27 @@
+== E5 mutant 002 ==
+== date: 2026-11-02T13:55:03Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_r_tst_002_every_timing_arm_carries_serial_timing ____________
+
+    def test_r_tst_002_every_timing_arm_carries_serial_timing() -> None:
+        from tests.support import suite_census
+    
+        assert set(suite_census.SAMPLED_TIMING_ARMS) == _SAMPLED_PIN
+        arms = {_norm_arm_key(key) for key in suite_census.timing_arms(TESTS_ROOT)}
+        lost = sorted(_BASE_STATIC_ARMS - arms)
+        assert not lost, f"census lost base timing arms: {lost}"
+        marked, refusals = _marked_set(TESTS_ROOT)
+        assert not refusals, "\n".join(refusals)
+        arm_set = arms | set(suite_census.SAMPLED_TIMING_ARMS)
+        guard_lines = _marker_guard_lines(arm_set, set(), marked)
+>       assert not guard_lines, "\n".join(guard_lines)
+E       AssertionError: timing arm without serial_timing: tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second
+E       assert not ['timing arm without serial_timing: tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second']
+
+tests\test_suite_hygiene.py:348: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_002_every_timing_arm_carries_serial_timing
+1 failed in 34.29s
+pytest exit: 1

@@ -1,0 +1,26 @@
+== E5 mutant 006 ==
+== date: 2026-11-02T13:59:33Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________ test_r_tst_006_detector_ignores_intervals_no_assert_reads __________
+
+    def test_r_tst_006_detector_ignores_intervals_no_assert_reads() -> None:
+        from tests.support import suite_census
+    
+        arms = {_norm_arm_key(key) for key in suite_census.timing_arms(TESTS_ROOT)}
+        assert not [
+            node for node in arms if node.startswith("tests/test_sync_evidence.py::")
+        ], "clock intervals used as file times must not be timing arms"
+>       assert (
+            "tests/test_b100_project_homes.py::test_tc_b100_31_copy_ceiling_2000_files"
+            not in arms
+        ), "a test that only prints its interval is not a timing arm"
+E       AssertionError: a test that only prints its interval is not a timing arm
+E       assert 'tests/test_b100_project_homes.py::test_tc_b100_31_copy_ceiling_2000_files' not in {'tests/test_a2l_alignment_sizing.py::test_at120_oversized_alignment_layout_clamps_to_none', 'tests/test_a2l_alignment...ar', 'tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second', ...}
+
+tests\test_suite_hygiene.py:581: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_006_detector_ignores_intervals_no_assert_reads
+1 failed in 31.38s
+pytest exit: 1

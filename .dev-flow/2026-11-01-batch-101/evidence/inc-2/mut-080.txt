@@ -1,0 +1,25 @@
+== E5 mutant 080 ==
+== date: 2026-11-02T14:17:06Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________ test_r_tst_080_report_goldens_hold_no_tool_version ______________
+
+    def test_r_tst_080_report_goldens_hold_no_tool_version() -> None:
+        goldens = TESTS_ROOT / "goldens"
+        pinned = []
+        for path in sorted(goldens.rglob("*")):
+            if not path.is_file():
+                continue
+            data = path.read_bytes()
+            if re.search(rb"Tool version: [0-9]", data):
+                pinned.append(path.relative_to(REPO_ROOT).as_posix())
+>       assert not pinned, "goldens pin a tool version: " + ", ".join(pinned)
+E       AssertionError: goldens pin a tool version: tests/goldens/batch35/at054b-before-after-report.md
+E       assert not ['tests/goldens/batch35/at054b-before-after-report.md']
+
+tests\test_suite_hygiene.py:1623: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_080_report_goldens_hold_no_tool_version
+1 failed in 0.21s
+pytest exit: 1

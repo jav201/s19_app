@@ -1,0 +1,56 @@
+== E5 mutant 041 ==
+== date: 2026-11-02T14:14:02Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+___________ test_r_tst_040_041_every_upper_timing_bound_is_reported ___________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m2/bt/041/test_r_tst_040_041_every_upper0')
+
+    def test_r_tst_040_041_every_upper_timing_bound_is_reported(tmp_path) -> None:
+        from tests.support import suite_census
+    
+        sites = {_norm_site(site) for site in _unreported_sites(TESTS_ROOT)}
+        assert sites == set(), (
+            "raw upper timing bounds: " + ", ".join(sorted(sites))
+        )
+        for forbidden in _NOT_UPPER_BOUND_SITES:
+            assert forbidden not in sites, f"not an upper timing bound: {forbidden}"
+    
+        # Planted marked arm with four raw bounds: a float literal, an int
+        # literal, a scaled timing_bound call and a module constant (R-TST-041).
+        planted_lines = [
+            "import time",
+            "",
+            "from tests.support.timing import timing_bound",
+            "",
+            "LIMIT = 1",
+            "",
+            "",
+            "def test_raw_bounds_arm():",
+            "    start = time.perf_counter()",
+            "    work()",
+            "    elapsed = time.perf_counter() - start",
+            "    assert elapsed < 1.0",
+            "    assert elapsed < 2",
+            "    assert elapsed < timing_bound(1.0) * 2",
+            "    assert elapsed < LIMIT",
+        ]
+        planted = tmp_path / "test_raw_bounds_planted.py"
+        planted.write_text("\n".join(planted_lines) + "\n", encoding="utf-8")
+        planted_sites = _unreported_sites(tmp_path)
+        raw_lines = [
+            i + 1
+            for i, line in enumerate(planted_lines)
+            if line.strip().startswith("assert elapsed <")
+        ]
+>       assert len(planted_sites) == 4, f"expected 4 raw-bound sites: {planted_sites}"
+E       AssertionError: expected 4 raw-bound sites: []
+E       assert 0 == 4
+E        +  where 0 = len([])
+
+tests\test_suite_hygiene.py:1215: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_040_041_every_upper_timing_bound_is_reported
+1 failed in 31.61s
+pytest exit: 1

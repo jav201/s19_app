@@ -1,0 +1,23 @@
+== E5 mutant 011 ==
+== date: 2026-11-02T14:02:12Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________________ test_r_tst_011_push_runs_two_lanes ______________________
+
+    def test_r_tst_011_push_runs_two_lanes() -> None:
+        text = WORKFLOW_PATH.read_text(encoding="utf-8")
+        jobs = _workflow_jobs(text)
+        steps = _job_steps(jobs["tui-ci"])
+        runs = [_step_run(step) for step in _lane_steps(steps, "push")]
+>       assert runs == [PUSH_LANE_1, PUSH_LANE_2]
+E       assert ['pytest -q  ...-q  # MUTANT'] == ['pytest -v -...erial_timing']
+E         
+E         At index 0 diff: 'pytest -q  # MUTANT: single step' != 'pytest -v -rs -n auto -m "not serial_timing"'
+E         Use -v to get more diff
+
+tests\test_suite_hygiene.py:737: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_011_push_runs_two_lanes - asse...
+1 failed in 0.20s
+pytest exit: 1

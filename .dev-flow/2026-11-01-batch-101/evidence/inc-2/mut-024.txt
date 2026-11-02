@@ -1,0 +1,61 @@
+== E5 mutant 024 ==
+== date: 2026-11-02T14:05:48Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+________________ test_r_tst_024_shared_wait_failure_texts[W1] _________________
+
+case = 'W1'
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m2/bt/024/test_r_tst_024_shared_wait_fai0')
+
+    @pytest.mark.parametrize("case", [f"W{i}" for i in range(1, 10)])
+    def test_r_tst_024_shared_wait_failure_texts(case, tmp_path) -> None:
+        from tests.support import suite_census
+    
+        if case in {"W1", "W2", "W3", "W4", "W5", "W6"}:
+            from tests import b97_probes
+            from tests.support import b100_load_dialog
+            from tests.support import b100_projects
+    
+            pilot = _FakePilot()
+            if case == "W1":
+                coro = b100_projects.wait_for(
+                    pilot, lambda: False, "the thing", timeout=0.2
+                )
+                expected = "timed out waiting for the thing"
+            elif case == "W2":
+                coro = b100_load_dialog.wait_for(
+                    pilot, lambda: False, "the Load dialog", timeout=0.2
+                )
+                expected = "timed out waiting for the Load dialog"
+            elif case == "W3":
+                coro = b97_probes.settled(pilot, lambda: False, "row 2 back", timeout=0.2)
+                expected = "did not settle: row 2 back"
+            elif case == "W4":
+                coro = b100_projects.read_load_result_panel(
+                    pilot, _App(_EmptyScreen()), timeout=0.2
+                )
+                expected = "the Load-result panel was not painted"
+            elif case == "W5":
+                coro = b100_projects.dismiss_load_result_panel(
+                    pilot, _App(_EmptyScreen()), timeout=0.2
+                )
+                expected = "the Load-result panel did not open"
+            else:  # W6
+                coro = b100_projects.dismiss_load_result_panel(
+                    pilot, _App(_StickyScreen()), timeout=0.2
+                )
+                expected = "the Load-result panel did not close on esc"
+            with pytest.raises(AssertionError) as excinfo:
+                asyncio.run(coro)
+>           assert str(excinfo.value) == expected
+E           AssertionError: assert 'waited too l...for the thing' == 'timed out wa...for the thing'
+E             
+E             - timed out waiting for the thing
+E             + waited too long for the thing
+
+tests\test_suite_hygiene.py:1042: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W1]
+1 failed in 60.78s (0:01:00)
+pytest exit: 1

@@ -1,0 +1,48 @@
+== E5 mutant 045 ==
+== date: 2026-11-02T14:15:30Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______________ test_r_tst_043_045_qc_tm_section_rows_and_count _______________
+
+pytester = <Pytester WindowsPath('<HOME>/AppData/Local/Temp/s19m2/bt/045/test_r_tst_043_045_qc_tm_section_rows_and_count0')>
+
+    def test_r_tst_043_045_qc_tm_section_rows_and_count(pytester) -> None:
+        result = _inner_run(pytester, {"test_qc_tm_rows.py": _PLANTED_THREE_ARMS})
+        assert result.ret == 0, result.stdout.str()
+        rows, count_line = _qc_tm_rows(result.stdout.str())
+        assert rows == [
+            "LOW 15.0%  0.850 s / 1.000 s  b  test_qc_tm_rows.py::test_b",
+            "25.0%  0.750 s / 1.000 s  c  test_qc_tm_rows.py::test_c",
+            "40.0%  0.600 s / 1.000 s  a  test_qc_tm_rows.py::test_a",
+        ], rows
+>       assert count_line == "QC-TM: 3 bounds, 1 under 20 % margin"
+E       AssertionError: assert 'QC-TM: 3 bou...r 20 % margin' == 'QC-TM: 3 bou...r 20 % margin'
+E         
+E         - QC-TM: 3 bounds, 1 under 20 % margin
+E         ?                  ^
+E         + QC-TM: 3 bounds, 3 under 20 % margin
+E         ?                  ^
+
+<HOME>\AppData\Local\Temp\s19m2\wt\tests\test_suite_hygiene.py:1364: AssertionError
+---------------------------- Captured stdout call -----------------------------
+running: <HOME>\anaconda3\envs\s19env\python.exe -mpytest --basetemp=<HOME>\AppData\Local\Temp\s19m2\bt\045\test_r_tst_043_045_qc_tm_section_rows_and_count0\runpytest-0 -p no:cacheprovider
+     in: <HOME>\AppData\Local\Temp\s19m2\bt\045\test_r_tst_043_045_qc_tm_section_rows_and_count0
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: <HOME>\AppData\Local\Temp\s19m2\bt\045\test_r_tst_043_045_qc_tm_section_rows_and_count0
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collected 3 items
+
+test_qc_tm_rows.py ...                                                   [100%]
+============================ QC-TM timing margins =============================
+LOW 15.0%  0.850 s / 1.000 s  b  test_qc_tm_rows.py::test_b
+25.0%  0.750 s / 1.000 s  c  test_qc_tm_rows.py::test_c
+40.0%  0.600 s / 1.000 s  a  test_qc_tm_rows.py::test_a
+QC-TM: 3 bounds, 3 under 20 % margin
+
+============================== 3 passed in 0.02s ==============================
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_043_045_qc_tm_section_rows_and_count
+1 failed in 0.86s
+pytest exit: 1

@@ -1,0 +1,6 @@
+commit 57d19f4 (golden re-run, R-3)
+s19_app from worktree: s19_app-b101-inc2/s19_app/__init__.py
+tests\test_tui_report_filter_surface.py:773: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+1 failed, 133 passed in 338.95s (0:05:38)

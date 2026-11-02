@@ -1,0 +1,34 @@
+== E5 mutant 004 ==
+== date: 2026-11-02T13:56:05Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+F.                                                                       [100%]
+================================== FAILURES ===================================
+__________________ test_r_tst_004_a_marked_non_arm_is_named ___________________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m2/bt/004/test_r_tst_004_a_marked_non_ar0')
+
+    def test_r_tst_004_a_marked_non_arm_is_named(tmp_path) -> None:
+        from tests.support import suite_census
+    
+        planted = tmp_path / "test_marked_non_arm.py"
+        planted.write_text(_PLANTED_MARKED_NON_ARM, encoding="utf-8")
+        arms = suite_census.timing_arms(tmp_path)
+        assert arms == {}, f"non-arm reported as arm: {arms}"
+        marked, refusals = _marked_set(tmp_path)
+        assert not refusals
+        guard_lines = _marker_guard_lines(set(arms), set(), marked)
+        keys = sorted(marked)
+        assert len(keys) == 1
+>       assert guard_lines == [
+            f"serial_timing on a test that is not a timing arm: {keys[0]}"
+        ]
+E       AssertionError: assert [] == ['serial_timi...m.py::test_y']
+E         
+E         Right contains one more item: 'serial_timing on a test that is not a timing arm: tests/test_marked_non_arm.py::test_y'
+E         Use -v to get more diff
+
+tests\test_suite_hygiene.py:424: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_004_a_marked_non_arm_is_named
+1 failed, 1 passed in 0.23s
+pytest exit: 1

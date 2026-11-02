@@ -1,0 +1,30 @@
+== E5 mutant 082 ==
+== date: 2026-11-02T14:18:12Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________________ test_r_tst_082_wrong_version_still_differs __________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001483205A710>
+
+    def test_r_tst_082_wrong_version_still_differs(monkeypatch) -> None:
+        import s19_app.version
+    
+        from tests.conftest import canonical_report_bytes
+    
+        monkeypatch.setattr(s19_app.version, "__version__", "9.9.9")
+        produced = canonical_report_bytes(b"- Tool version: 0.0.0\n")
+>       assert produced == b"- Tool version: 0.0.0\n", (
+            "a produced report's own version must not be touched by the canonicalizer"
+        )
+E       AssertionError: a produced report's own version must not be touched by the canonicalizer
+E       assert b'- Tool version: <MASKED>\n' == b'- Tool version: 0.0.0\n'
+E         
+E         At index 16 diff: b'<' != b'0'
+E         Use -v to get more diff
+
+tests\test_suite_hygiene.py:1649: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_082_wrong_version_still_differs
+1 failed in 0.19s
+pytest exit: 1

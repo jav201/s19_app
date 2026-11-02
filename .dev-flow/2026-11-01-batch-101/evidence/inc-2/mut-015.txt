@@ -1,0 +1,28 @@
+== E5 mutant 015 ==
+== date: 2026-11-02T14:03:32Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________________ test_r_tst_015_016_017_ci_time_limits ____________________
+
+    def test_r_tst_015_016_017_ci_time_limits() -> None:
+        text = WORKFLOW_PATH.read_text(encoding="utf-8")
+        jobs = _workflow_jobs(text)
+        tui_lines = jobs["tui-ci"]
+        steps = _job_steps(tui_lines)
+        by_run = {}
+        for step in steps:
+            run = _step_run(step)
+            if run:
+                by_run[run] = step
+        for command in (PR_LANE_1, PR_LANE_2, PUSH_LANE_1, PUSH_LANE_2):
+            assert command in by_run, f"missing lane step: {command}"
+>       assert _step_value(by_run[PUSH_LANE_1], "timeout-minutes") == "180"
+E       assert None == '180'
+E        +  where None = _step_value(['      - name: Run full test suite (pushes)', "        if: github.event_name == 'push'", '        run: pytest -v -rs -n auto -m "not serial_timing"', ''], 'timeout-minutes')
+
+tests\test_suite_hygiene.py:792: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_015_016_017_ci_time_limits - a...
+1 failed in 0.20s
+pytest exit: 1

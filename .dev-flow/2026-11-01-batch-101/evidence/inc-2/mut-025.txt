@@ -1,0 +1,101 @@
+== E5 mutant 025 ==
+== date: 2026-11-02T14:07:01Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______ test_r_tst_025_load_project_clock_stops_at_the_install_callback _______
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m2/bt/025/test_r_tst_025_load_project_cl0')
+
+    def test_r_tst_025_load_project_clock_stops_at_the_install_callback(tmp_path) -> None:
+        from tests.support import b100_projects as projects
+    
+        base = tmp_path / "app"
+        projects.save_case01_project(base, files=("firmware.s19",))
+        for _ in range(3):
+            stamps = []
+    
+            async def scenario(app, pilot, log):
+                real_install = app._install_prepared_project
+    
+                def recorder(prepared):
+                    real_install(prepared)
+                    stamps.append(time.perf_counter())
+    
+                app._install_prepared_project = recorder
+                stamps.append(time.perf_counter())
+                elapsed = await projects.load_project(pilot, app, "P")
+                assert (
+                    app._install_prepared_project is recorder
+                ), "the install wrapper must be restored (E3A-12)"
+                return elapsed
+    
+>           elapsed = projects.run_app(base, scenario)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_suite_hygiene.py:1102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_suite_hygiene.py:1096: in scenario
+    elapsed = await projects.load_project(pilot, app, "P")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+name = 'P'
+
+    async def load_project(pilot, app, name: str = "P") -> float:
+        """Open project ``name`` through the shipped handler; returns the time
+        in seconds from the request to the end of the install.
+    
+        Inc 12b (E2 ruling "Vacuous timing", census C11): the handler returns
+        at once and the reopen runs on a worker, so the handler's own wall time
+        bounds nothing. The clock runs from the call until the install callback
+        returns (``current_project`` and the image are set in that one callback),
+        as ``test_b100_active_variant.py``'s TC-B100-20 measures: the install
+        method is wrapped on the instance for one call and stamps the clock at
+        its return, so the poll no longer adds up to one cycle to the reading."""
+        import time
+    
+        start = time.perf_counter()
+        real_install = app._install_prepared_project
+        stamps: list = []
+    
+        def _record(prepared):
+            return real_install(prepared)  # MUTANT: stamp moved to after the wait
+    
+    
+        app._install_prepared_project = _record
+        try:
+            app._handle_load_project(name)
+            await wait_for(
+                pilot,
+                lambda: app.current_project == name and app.current_file is not None,
+                f"the project load of {name}",
+            )
+            if not stamps:
+>               raise AssertionError(
+                    f"the project install callback of {name} was not reached"
+                )
+E               AssertionError: the project install callback of P was not reached
+
+tests\support\b100_projects.py:670: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_025_load_project_clock_stops_at_the_install_callback
+1 failed in 5.21s
+pytest exit: 1

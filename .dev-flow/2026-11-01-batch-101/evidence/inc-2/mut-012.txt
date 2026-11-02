@@ -1,0 +1,36 @@
+== E5 mutant 012 ==
+== date: 2026-11-02T14:02:36Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+______________ test_r_tst_012_serial_lane_runs_after_a_red_lane _______________
+
+    def test_r_tst_012_serial_lane_runs_after_a_red_lane() -> None:
+        text = WORKFLOW_PATH.read_text(encoding="utf-8")
+        jobs = _workflow_jobs(text)
+        steps = _job_steps(jobs["tui-ci"])
+        by_run = {}
+        for step in steps:
+            run = _step_run(step)
+            if run:
+                by_run[run] = step
+        lane2_ifs = [
+            _step_value(by_run[command], "if") for command in (PR_LANE_2, PUSH_LANE_2)
+        ]
+>       assert set(lane2_ifs) == {LANE_2_IF_PR, LANE_2_IF_PUSH}, lane2_ifs
+E       AssertionError: ["github.event_name == 'pull_request' && steps.install.outcome == 'success'", "github.event_name == 'push' && steps.install.outcome == 'success'"]
+E       assert {"github.even...== 'success'"} == {"github.even...== 'success'"}
+E         
+E         Extra items in the left set:
+E         "github.event_name == 'pull_request' && steps.install.outcome == 'success'"
+E         "github.event_name == 'push' && steps.install.outcome == 'success'"
+E         Extra items in the right set:
+E         "github.event_name == 'push' && !cancelled() && steps.install.outcome == 'success'"
+E         "github.event_name == 'pull_request' && !cancelled() && steps.install.outcome == 'success'"
+E         Use -v to get more diff
+
+tests\test_suite_hygiene.py:753: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_012_serial_lane_runs_after_a_red_lane
+1 failed in 0.21s
+pytest exit: 1

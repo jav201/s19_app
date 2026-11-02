@@ -1,0 +1,22 @@
+== E5 mutant 005 ==
+== date: 2026-11-02T13:58:45Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_r_tst_002_every_timing_arm_carries_serial_timing ____________
+
+    def test_r_tst_002_every_timing_arm_carries_serial_timing() -> None:
+        from tests.support import suite_census
+    
+        assert set(suite_census.SAMPLED_TIMING_ARMS) == _SAMPLED_PIN
+        arms = {_norm_arm_key(key) for key in suite_census.timing_arms(TESTS_ROOT)}
+        lost = sorted(_BASE_STATIC_ARMS - arms)
+>       assert not lost, f"census lost base timing arms: {lost}"
+E       AssertionError: census lost base timing arms: ['tests/test_a2l_alignment_sizing.py::test_at120_oversized_alignment_layout_clamps_to_none', 'tests/test_a2l_alignment_sizing.py::test_tc149_dos_clamp_includes_padding', 'tests/test_a2l_inline_axis_length.py::test_at111_oversized_axis_clamps_to_none', 'tests/test_a2l_inline_axis_length.py::test_tc138_dos_clamp_pure_arithmetic', 'tests/test_a2l_multiline_headers.py::test_at101_megabyte_unterminated_block_is_linear', 'tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling', 'tests/test_b100_project_homes.py::test_tc_b100_31_junction_cycle_ends', 'tests/test_b100_save_dialog.py::test_tc_b100_65_emitting_4mib_image_recomputes_fast', 'tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_at_most_three_of_twenty_keystrokes', 'tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_is_a_150ms_debounce', 'tests/test_b100_save_dialog.py::test_tc_b100_65_session_decided_once_per_open_case06', 'tests/test_compare_engine.py::test_large_image_perf', 'tests/test_tui_app.py::test_build_mac_view_cache_scales_under_load', 'tests/test_tui_app.py::test_end_to_end_load_pipeline_under_budget', 'tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac']
+E       assert not ['tests/test_a2l_alignment_sizing.py::test_at120_oversized_alignment_layout_clamps_to_none', 'tests/test_a2l_alignment...t_at101_megabyte_unterminated_block_is_linear', 'tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling', ...]
+
+tests\test_suite_hygiene.py:343: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_002_every_timing_arm_carries_serial_timing
+1 failed in 30.10s
+pytest exit: 1

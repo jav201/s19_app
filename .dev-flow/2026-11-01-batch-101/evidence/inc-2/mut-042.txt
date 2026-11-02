@@ -1,0 +1,51 @@
+== E5 mutant 042 ==
+== date: 2026-11-02T14:14:59Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______________ test_r_tst_042_margin_report_is_a_test_property _______________
+
+pytester = <Pytester WindowsPath('<HOME>/AppData/Local/Temp/s19m2/bt/042/test_r_tst_042_margin_report_is_a_test_property0')>
+
+    def test_r_tst_042_margin_report_is_a_test_property(pytester) -> None:
+        result = _inner_run(
+            pytester,
+            {
+                "test_margin_property.py": (
+                    "def test_arm():\n"
+                    "    from tests.support.timing import report_margin\n"
+                    "    assert report_margin('p', 0.85, 1.0) == 1.0\n"
+                )
+            },
+            junit=True,
+        )
+        assert result.ret == 0, result.stdout.str()
+        prop = ["qc_tm", "p|0.850|1.000|15.0"]
+        records = _probe_records(pytester)
+        phases = {
+            record["when"]: record
+            for record in records
+            if record["nodeid"].endswith("::test_arm")
+        }
+>       assert prop in phases["call"]["props"], phases
+E       AssertionError: {'call': {'nodeid': 'test_margin_property.py::test_arm', 'outcome': 'passed', 'props': [], 'when': 'call'}, 'setup': {...p'}, 'teardown': {'nodeid': 'test_margin_property.py::test_arm', 'outcome': 'passed', 'props': [], 'when': 'teardown'}}
+E       assert ['qc_tm', 'p|0.850|1.000|15.0'] in []
+
+<HOME>\AppData\Local\Temp\s19m2\wt\tests\test_suite_hygiene.py:1327: AssertionError
+---------------------------- Captured stdout call -----------------------------
+running: <HOME>\anaconda3\envs\s19env\python.exe -mpytest --basetemp=<HOME>\AppData\Local\Temp\s19m2\bt\042\test_r_tst_042_margin_report_is_a_test_property0\runpytest-0 -p no:cacheprovider --junitxml=junit.xml
+     in: <HOME>\AppData\Local\Temp\s19m2\bt\042\test_r_tst_042_margin_report_is_a_test_property0
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: <HOME>\AppData\Local\Temp\s19m2\bt\042\test_r_tst_042_margin_report_is_a_test_property0
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collected 1 item
+
+test_margin_property.py .                                                [100%]
+
+- generated xml file: <HOME>\AppData\Local\Temp\s19m2\bt\042\test_r_tst_042_margin_report_is_a_test_property0\junit.xml -
+============================== 1 passed in 0.04s ==============================
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_042_margin_report_is_a_test_property
+1 failed in 0.86s
+pytest exit: 1

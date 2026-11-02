@@ -1,0 +1,33 @@
+== E5 mutant 005-7 ==
+== date: 2026-11-02T13:58:02Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+.F                                                                       [100%]
+================================== FAILURES ===================================
+___________ test_r_tst_040_041_every_upper_timing_bound_is_reported ___________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m2/bt/005-7/test_r_tst_040_041_every_upper0')
+
+    def test_r_tst_040_041_every_upper_timing_bound_is_reported(tmp_path) -> None:
+        from tests.support import suite_census
+    
+        sites = {_norm_site(site) for site in _unreported_sites(TESTS_ROOT)}
+>       assert sites == set(), (
+            "raw upper timing bounds: " + ", ".join(sorted(sites))
+        )
+E       AssertionError: raw upper timing bounds: tests/test_a2l_alignment_sizing.py:255, tests/test_a2l_alignment_sizing.py:405, tests/test_a2l_inline_axis_length.py:356, tests/test_a2l_inline_axis_length.py:572, tests/test_a2l_multiline_headers.py:324, tests/test_b100_active_variant.py:740, tests/test_b100_document.py:1212, tests/test_b100_document.py:368, tests/test_b100_document.py:967, tests/test_b100_project_check.py:1042, tests/test_b100_project_check.py:1055, tests/test_b100_project_check.py:1073, tests/test_b100_project_check.py:1089, tests/test_b100_project_check.py:1210, tests/test_b100_project_check.py:1294, tests/test_b100_project_check.py:1378, tests/test_b100_project_check.py:1381, tests/test_b100_project_check.py:365, tests/test_b100_project_check.py:388, tests/test_b100_project_check.py:849, tests/test_b100_project_check.py:852, tests/test_b100_project_check.py:989, tests/test_b100_project_check.py:990, tests/test_b100_project_check.py:993, tests/test_b100_project_check.py:996, tests/test_b100_project_homes.py:365, tests/test_b100_project_homes.py:769, tests/test_b100_save_dialog.py:2335, tests/test_b100_save_dialog.py:2339, tests/test_b100_save_dialog.py:3466, tests/test_b100_save_dialog.py:3504, tests/test_b100_save_dialog.py:3546, tests/test_b100_save_guards.py:2529, tests/test_compare_engine.py:281, tests/test_suite_hygiene.py:833, tests/test_suite_hygiene.py:851, tests/test_tui_app.py:1249, tests/test_tui_app.py:1341, tests/test_tui_app.py:918
+E       assert {'tests/test_....py:740', ...} == set()
+E         
+E         Extra items in the left set:
+E         'tests/test_b100_save_guards.py:2529'
+E         'tests/test_b100_project_check.py:993'
+E         'tests/test_b100_save_dialog.py:3546'
+E         'tests/test_b100_project_check.py:1294'
+E         'tests/test_b100_project_check.py:1042'...
+E         
+E         ...Full output truncated (35 lines hidden), use '-vv' to show
+
+tests\test_suite_hygiene.py:1182: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_040_041_every_upper_timing_bound_is_reported
+1 failed, 1 passed in 29.30s
+pytest exit: 1
