@@ -1,0 +1,7 @@
+== M-at17: the parser sends no byte reports inside the read (only the final one)
+mutated s19_app/tui/a2l.py
+E       AssertionError: bar values at the step-2 byte reports: [66]
+E       assert 0 >= 2
+E        +  where 0 = increases([66])
+1 failed in 15.72s
+e91dd008c31e9c9e

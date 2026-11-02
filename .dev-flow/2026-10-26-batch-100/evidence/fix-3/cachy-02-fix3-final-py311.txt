@@ -1,0 +1,17 @@
+Python 3.11.18
+570b4b5
+ M tests/test_b100_a2l_progress.py
+ M tests/test_b100_busy.py
+ M tests/test_b100_workers.py
+ M tests/test_b97_flow_execution.py
+==== 4-NODES
+4 passed in 28.02s
+==== AT17-1
+1 passed in 22.65s
+==== AT17-2
+1 passed in 22.68s
+==== AT17-3
+1 passed in 22.56s
+==== MODULES
+271 passed, 1 xfailed in 2027.96s (0:33:47)
+exit=0

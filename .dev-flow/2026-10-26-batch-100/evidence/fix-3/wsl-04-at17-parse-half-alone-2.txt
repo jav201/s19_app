@@ -1,0 +1,4 @@
+/home/jav201/s19fix3/s19_app/__init__.py 3.12.7 | packaged by Anaconda, Inc. | (main, Oct  4 2024, 13:27:36) [GCC 11.2.0]
+.                                                                        [100%]
+1 passed in 17.76s
+exit=0

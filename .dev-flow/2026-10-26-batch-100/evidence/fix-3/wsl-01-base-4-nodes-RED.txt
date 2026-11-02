@@ -1,0 +1,168 @@
+/home/jav201/s19fix3/s19_app/__init__.py 3.12.7 | packaged by Anaconda, Inc. | (main, Oct  4 2024, 13:27:36) [GCC 11.2.0]
+FFF.                                                                     [100%]
+=================================== FAILURES ===================================
+__________ test_tc_b100_73_small_a2l_reports_once_and_parses_the_same __________
+
+tmp_path = PosixPath('/tmp/pytest-of-jav201/pytest-0/test_tc_b100_73_small_a2l_repo0')
+
+    def test_tc_b100_73_small_a2l_reports_once_and_parses_the_same(tmp_path: Path) -> None:
+        """LLR-176.4 boundary, LLR-176.4a (D12b-02, D12b-04): case_01's A2L
+        (1 444 bytes, 53 lines — smaller than one progress chunk) → exactly one
+        report ``(1444, 1444)``; the result equals the parse with no callback.
+    
+        Why: a small A2L must still finish its step (the bar's final report).
+        Negative control: no final report → 0 calls → RED; base: no callback →
+        RED."""
+        seen, progress = _recorder()
+        with_cb = _parse_with(CASE01_A2L, progress)
+>       assert seen == [(1444, 1444)], seen
+E       AssertionError: [(1391, 1391)]
+E       assert [(1391, 1391)] == [(1444, 1444)]
+E         
+E         At index 0 diff: (1391, 1391) != (1444, 1444)
+E         Use -v to get more diff
+
+tests/test_b100_a2l_progress.py:118: AssertionError
+________________ test_tc_b100_51_a2l_load_ends_once_on_success _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-jav201/pytest-0/test_tc_b100_51_a2l_load_ends_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7d0a88798500>
+
+    def test_tc_b100_51_a2l_load_ends_once_on_success(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """LLR-176.2c success, A12a-03 (A12-38, A12-41): ``load_a2l_from_path``
+        of case_01's A2L → 1 begin ``Loading firmware.a2l``, bar
+        ``[0, 33, 66, 0]``, the log gains only ``A2L loaded: firmware.a2l``
+        (the outcome), ``#status_text`` ``Ready.``, 1 effective end, 0 timers;
+        a missing A2L and a ``.txt`` begin nothing.
+    
+        Why: the outcome is the action's last painted line, which other tests
+        read in ``#log_line_4``.
+        RED (base, p12a U1.4): bar ``[10, 50, 100]``, 4 log lines."""
+        seam = Seam(monkeypatch)
+        (tmp_path / "x.txt").write_text("x", encoding="utf-8")
+    
+        async def scenario(app, pilot, log):
+            mark = len(log.messages)
+            app.load_a2l_from_path(CASE01 / "firmware.a2l")
+            await _drain(app, pilot)  # Inc 12b re-pin: the attach runs on a worker
+            out = (list(seam.bar), log.since(mark), _status(app), len(_busy_timers(app)), list(seam.begins))
+            begins = len(seam.begins)
+            app.load_a2l_from_path(tmp_path / "missing.a2l")
+            app.load_a2l_from_path(tmp_path / "x.txt")
+            await _settle(pilot, 3)
+            return out, len(seam.begins) - begins
+    
+        (bar, added, final, timers, begins), refused = _run(tmp_path / "app", scenario)
+        # Inc 12b (C12b-30): step 2 after the copy, the parser's one byte report
+        # (1444, 1444) at the end of step 2, step 3, the end.
+        assert bar == [0, 33, 66, 66, 0], bar
+>       assert [(n, d, t) for _k, _g, n, d, t in seam.steps if _k == "a2l_load"] == [
+            (2, None, None), (2, 1444, 1444), (3, None, None)
+        ], seam.steps
+E       AssertionError: [('a2l_load', 1, 2, None, None), ('a2l_load', 1, 2, 1391, 1391), ('a2l_load', 1, 3, None, None)]
+E       assert [(2, None, No..., None, None)] == [(2, None, No..., None, None)]
+E         
+E         At index 1 diff: (2, 1391, 1391) != (2, 1444, 1444)
+E         Use -v to get more diff
+
+tests/test_b100_busy.py:1838: AssertionError
+___ test_at_b100_18_quit_confirm_half_slow_save_as_leaves_no_partial_folder ____
+
+tmp_path = PosixPath('/tmp/pytest-of-jav201/pytest-0/test_at_b100_18_quit_confirm_h0')
+
+    def test_at_b100_18_quit_confirm_half_slow_save_as_leaves_no_partial_folder(tmp_path: Path) -> None:
+        """AT-B100-18 quit-confirm half, HLR-177c: the engineer opens project
+        ``S`` (case_01 trio plus 2 000 files under ``flows/``), saves it as
+        ``S9`` through the Save dialog, and while the save-as runs presses
+        ``q`` then ``y`` → the app is still running right after ``y``; it exits
+        once the save ends, and the work area then holds ``S9`` complete (its
+        ``project.json`` records exactly the files on disk) — no partial
+        project folder.
+    
+        Why: closing the app mid-copy left a partial project (the R12 backlog
+        row). Negative control: an exit on ``y`` stops the app mid-copy → RED;
+        base: the save-as runs inside the click, so ``q`` arrives after it and
+        exits with no question → RED."""
+        base = tmp_path / "app"
+        s = trio(W(base) / "S")
+        projects.bulk_files(s, "flows", 2000)
+    
+        async def scenario(app, pilot, log):
+            await ld.open_project_through_dialog(pilot, app, "S", confirm="enter")
+            await projects.dismiss_load_result_panel(pilot, app)
+            await sd.save_through_dialog(pilot, app, "S9")
+            neutral_focus(app)
+            await pilot.press("q")
+            await wait(pilot, lambda: is_quit_question(app.screen) or not running(app), "the quit question", 10)
+            asked = is_quit_question(app.screen)
+            if asked:
+                await pilot.press("y")
+                for _ in range(4):
+                    await pilot.pause()
+            alive_after_y = running(app)
+            exited = await wait_exit(app, 300)
+            return asked, alive_after_y, exited
+    
+        asked, alive_after_y, exited = run(base, scenario)
+        assert asked is True, "q during the save-as exited without asking"
+>       assert alive_after_y is True, "the app stopped right after y, with the save still running"
+E       AssertionError: the app stopped right after y, with the save still running
+E       assert False is True
+
+tests/test_b100_workers.py:3090: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2943 App initialized. base_dir=/tmp/pytest-of-jav201/pytest-0/test_at_b100_18_quit_confirm_h0/app workarea=/tmp/pytest-of-jav201/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea
+INFO     s19tui:app.py:7957 Workarea refreshed. files=0
+INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.004
+INFO     s19tui:app.py:8104 Load project action triggered.
+INFO     s19tui:app.py:15054 Load phase boundary: modal_dismiss_scheduled kind=project value='S'
+WARNING  s19tui:app.py:13515 Project S: no project.json project.json (None)
+INFO     s19tui:app.py:921 A2L cache miss: path=/tmp/pytest-of-jav201/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S/firmware.a2l size_bytes=1391
+INFO     s19tui:app.py:13757 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18161 Load summary: file_type=s19 path=/tmp/pytest-of-jav201/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:13774 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:13757 Load phase boundary: parse_branch_entry path=firmware.mac suffix=.mac
+INFO     s19tui:app.py:16461 Load phase boundary: mac_parse_entry path=firmware.mac
+INFO     s19tui:app.py:16467 Load phase boundary: mac_parse_done path=firmware.mac rows=2 diagnostics=1 elapsed=0.000s
+INFO     s19tui:app.py:16481 MAC parse summary (mirrored): path=/tmp/pytest-of-jav201/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S/firmware.mac rows=2 parse_ok=1 diagnostics=1 valid_addresses=1
+INFO     s19tui:app.py:16502 Load phase boundary: mac_a2l_resolve_entry path=firmware.mac a2l_path=/tmp/pytest-of-jav201/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S/firmware.a2l
+INFO     s19tui:app.py:16508 Load phase boundary: mac_a2l_resolve_done path=firmware.mac has_a2l_data=True
+INFO     s19tui:app.py:16514 MAC parse summary: path=/tmp/pytest-of-jav201/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S/firmware.mac total_records=2 parse_ok=1 diagnostics=1 valid_addresses=1 a2l_path=/tmp/pytest-of-jav201/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S/firmware.a2l elapsed_seconds=0.000
+INFO     s19tui:app.py:13799 Load phase boundary: mac_merge_entry path=firmware.mac has_primary=True
+INFO     s19tui:app.py:13806 Load phase boundary: mac_merge_done path=firmware.mac file_type=s19
+INFO     s19tui:app.py:18161 Load summary: file_type=s19+mac path=/tmp/pytest-of-jav201/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S/firmware.mac addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:13828 Load phase boundary: parse_branch_done path=firmware.mac branch=mac
+INFO     s19tui:app.py:17679 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:17679 Load phase boundary: apply_install_state path=firmware.mac precomputed=False
+INFO     s19tui:app.py:13710 Project loaded. name=S file=/tmp/pytest-of-jav201/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S/firmware.s19 mac=/tmp/pytest-of-jav201/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S/firmware.mac
+INFO     s19tui:app.py:18289 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:17695 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18289 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:17695 Load phase boundary: apply_sections_done path=firmware.mac
+INFO     s19tui:app.py:17707 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:17707 Load phase boundary: apply_hex_done path=firmware.mac
+INFO     s19tui:app.py:17274 MAC validation computed: records=2 issues=9 elapsed_seconds=0.000
+INFO     s19tui:app.py:17329 MAC row cache built: records=2 elapsed_seconds=0.000
+INFO     s19tui:app.py:16234 Load phase boundary: populate_issues_table_done rows=9 total=9 elapsed=0.006
+INFO     s19tui:app.py:18874 Load phase boundary: populate_mac_table_done rows=2 total=2 elapsed=0.007
+INFO     s19tui:app.py:19252 Load phase boundary: populate_a2l_table_done rows=3 total=3 elapsed=0.000
+INFO     s19tui:app.py:17720 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:16234 Load phase boundary: populate_issues_table_done rows=9 total=9 elapsed=0.007
+INFO     s19tui:app.py:18874 Load phase boundary: populate_mac_table_done rows=2 total=2 elapsed=0.008
+INFO     s19tui:app.py:19252 Load phase boundary: populate_a2l_table_done rows=3 total=3 elapsed=0.000
+INFO     s19tui:app.py:17720 Load phase boundary: apply_a2l_done path=firmware.mac
+INFO     s19tui:app.py:18516 Memory Map updated. ranges=2
+INFO     s19tui:app.py:17737 Loaded file successfully: path=/tmp/pytest-of-jav201/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S/firmware.s19 file_type=s19 elapsed_seconds=0.455 has_mac=False precomputed=False
+INFO     s19tui:app.py:18516 Memory Map updated. ranges=2
+INFO     s19tui:app.py:17737 Loaded file successfully: path=/tmp/pytest-of-jav201/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S/firmware.mac file_type=s19 elapsed_seconds=0.495 has_mac=True precomputed=False
+INFO     s19tui:app.py:8039 Save project action triggered for /tmp/pytest-of-jav201/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S/firmware.s19
+INFO     s19tui:app.py:11769 Project saved image. name=S9 file=/tmp/pytest-of-jav201/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S9/firmware.s19
+INFO     s19tui:app.py:11769 Project saved mac. name=S9 file=/tmp/pytest-of-jav201/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S9/firmware.mac
+INFO     s19tui:app.py:11769 Project saved a2l. name=S9 file=/tmp/pytest-of-jav201/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S9/firmware.a2l
+INFO     s19tui:app.py:7957 Workarea refreshed. files=0
+=========================== short test summary info ============================
+FAILED tests/test_b100_a2l_progress.py::test_tc_b100_73_small_a2l_reports_once_and_parses_the_same
+FAILED tests/test_b100_busy.py::test_tc_b100_51_a2l_load_ends_once_on_success
+FAILED tests/test_b100_workers.py::test_at_b100_18_quit_confirm_half_slow_save_as_leaves_no_partial_folder
+3 failed, 1 passed in 21.90s
+exit=1

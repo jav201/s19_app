@@ -1,0 +1,75 @@
+/home/jav201/s19fix3/s19_app/__init__.py 3.12.7 | packaged by Anaconda, Inc. | (main, Oct  4 2024, 13:27:36) [GCC 11.2.0]
+........................................................................ [ 26%]
+........................................................................ [ 52%]
+...............x...................F.................s.....s............ [ 79%]
+..........s......................................s......                 [100%]
+=================================== FAILURES ===================================
+________________ test_at_b100_17_parse_half_case06_a2l_by_keys _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-jav201/pytest-26/test_at_b100_17_parse_half_cas0')
+
+    def test_at_b100_17_parse_half_case06_a2l_by_keys(tmp_path: Path) -> None:
+        """AT-B100-17 parse half, LLR-177.5, LLR-176.4: the engineer types the
+        case_06 A2L path into the Load dialog (``l``, the path, ``enter``) →
+        while ``#status_text`` shows ``step 2/3 Parse`` the bar
+        (``#progress_bar``) rises at least 2 times and the elapsed time
+        advances; the attach then ends with ``A2L loaded: firmware.a2l`` in the
+        status log.
+    
+        Why: the parse is 5 s of the 8.76 s attach; a bar frozen through it
+        reads as a hang (the bar then holds while tags are extracted, E2 ruling
+        P2-8). Negative control (P12b-4, executed): the loop is blocked → no
+        step-2 sample → RED; no parser callback → 0 rises → RED."""
+        base = tmp_path / "app"
+        step2 = re.compile(r"^[" + FRAMES + r"] Loading firmware\.a2l  ·  step 2/3 Parse  ·  (\d\d:\d\d)$")
+    
+        async def scenario(app, pilot, log):
+            neutral_focus(app)
+            await pilot.press("l")
+            await ld.wait_for_dialog(pilot, app)
+            await ld.type_into_path(pilot, app, str(CASE06 / "firmware.a2l"))
+            await pilot.press("enter")
+            samples = []
+            deadline = time.monotonic() + 300
+            while time.monotonic() < deadline:
+                m = step2.match(status(app))
+                if m:
+                    samples.append((bar(app), m.group(1)))
+                elif samples:
+                    break
+                if painted_log(app)[-1].startswith("A2L loaded"):
+                    break
+                await pilot.pause(0.05)
+            await wait(pilot, lambda: painted_log(app)[-1] == "A2L loaded: firmware.a2l", "the attach to end", 300)
+            return samples
+    
+        samples = run(base, scenario)
+        values = [v for v, _e in samples]
+>       assert increases(values) >= 2, f"bar values sampled in step 2: {values}"
+E       AssertionError: bar values sampled in step 2: [66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66]
+E       assert 0 >= 2
+E        +  where 0 = increases([66, 66, 66, 66, 66, 66, ...])
+
+tests/test_b100_workers.py:3159: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2943 App initialized. base_dir=/tmp/pytest-of-jav201/pytest-26/test_at_b100_17_parse_half_cas0/app workarea=/tmp/pytest-of-jav201/pytest-26/test_at_b100_17_parse_half_cas0/app/.s19tool/workarea
+INFO     s19tui:app.py:7957 Workarea refreshed. files=0
+INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.005
+INFO     s19tui:app.py:7966 Load file action triggered.
+INFO     s19tui:app.py:15054 Load phase boundary: modal_dismiss_scheduled kind=path value='/home/jav201/s19fix3/examples/case_06_large_nested_a2l/firmware.a2l'
+WARNING  s19tui:app.py:15237 Large A2L detected before copy: path=/home/jav201/s19fix3/examples/case_06_large_nested_a2l/firmware.a2l size_bytes=36702962 threshold_bytes=2097152
+INFO     s19tui:app.py:15283 A2L copy complete: path=/tmp/pytest-of-jav201/pytest-26/test_at_b100_17_parse_half_cas0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=36702962 copy_seconds=0.042
+INFO     s19tui:app.py:921 A2L cache miss: path=/tmp/pytest-of-jav201/pytest-26/test_at_b100_17_parse_half_cas0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=36702962
+WARNING  s19tui:app.py:15321 Recent sources not updated: '/home/jav201/s19fix3/examples/case_06_large_nested_a2l/firmware.a2l'
+INFO     s19tui:app.py:7957 Workarea refreshed. files=1
+INFO     s19tui:app.py:18108 A2L parse summary: path=/tmp/pytest-of-jav201/pytest-26/test_at_b100_17_parse_half_cas0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=7.114 sections=1 tags=220040 errors=0
+WARNING  s19tui:app.py:18117 A2L parse exceeded threshold: path=/tmp/pytest-of-jav201/pytest-26/test_at_b100_17_parse_half_cas0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=7.114 threshold_seconds=2.500
+INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.005
+INFO     s19tui:app.py:18823 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.007
+INFO     s19tui:app.py:19252 Load phase boundary: populate_a2l_table_done rows=200 total=220040 elapsed=0.023
+WARNING  s19tui:app.py:15334 A2L view refresh was slow: path=/tmp/pytest-of-jav201/pytest-26/test_at_b100_17_parse_half_cas0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=4.316 threshold_seconds=2.500
+INFO     s19tui:app.py:15349 A2L loaded: /tmp/pytest-of-jav201/pytest-26/test_at_b100_17_parse_half_cas0/app/.s19tool/workarea/temp/firmware.a2l
+=========================== short test summary info ============================
+FAILED tests/test_b100_workers.py::test_at_b100_17_parse_half_case06_a2l_by_keys
+1 failed, 266 passed, 4 skipped, 1 xfailed in 1490.78s (0:24:50)
+exit=1

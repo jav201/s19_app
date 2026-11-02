@@ -1,0 +1,54 @@
+/home/jav201/s19fix3/s19_app/__init__.py 3.12.7 | packaged by Anaconda, Inc. | (main, Oct  4 2024, 13:27:36) [GCC 11.2.0]
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________ test_at_b100_17_parse_half_case06_a2l_by_keys _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-jav201/pytest-29/test_at_b100_17_parse_half_cas0')
+
+    def test_at_b100_17_parse_half_case06_a2l_by_keys(tmp_path: Path) -> None:
+        """AT-B100-17 parse half, LLR-177.5, LLR-176.4: the engineer types the
+        case_06 A2L path into the Load dialog (``l``, the path, ``enter``) →
+        while ``#status_text`` shows ``step 2/3 Parse`` the bar
+        (``#progress_bar``) rises at least 2 times and the elapsed time
+        advances; the attach then ends with ``A2L loaded: firmware.a2l`` in the
+        status log.
+    
+        Why: the parse is 5 s of the 8.76 s attach; a bar frozen through it
+        reads as a hang (the bar then holds while tags are extracted, E2 ruling
+        P2-8). Negative control (P12b-4, executed): the loop is blocked → no
+        step-2 sample → RED; no parser callback → 0 rises → RED."""
+        base = tmp_path / "app"
+        step2 = re.compile(r"^[" + FRAMES + r"] Loading firmware\.a2l  ·  step 2/3 Parse  ·  (\d\d:\d\d)$")
+    
+        async def scenario(app, pilot, log):
+            neutral_focus(app)
+            await pilot.press("l")
+            await ld.wait_for_dialog(pilot, app)
+            await ld.type_into_path(pilot, app, str(CASE06 / "firmware.a2l"))
+            await pilot.press("enter")
+            samples = []
+            deadline = time.monotonic() + 300
+            while time.monotonic() < deadline:
+                m = step2.match(status(app))
+                if m:
+                    samples.append((bar(app), m.group(1)))
+                elif samples:
+                    break
+                if painted_log(app)[-1].startswith("A2L loaded"):
+                    break
+                await pilot.pause(0.05)
+            await wait(pilot, lambda: painted_log(app)[-1] == "A2L loaded: firmware.a2l", "the attach to end", 300)
+            return samples
+    
+        samples = run(base, scenario)
+        values = [v for v, _e in samples]
+>       assert increases(values) >= 2, f"bar values sampled in step 2: {values}"
+E       AssertionError: bar values sampled in step 2: [66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66]
+E       assert 0 >= 2
+E        +  where 0 = increases([66, 66, 66, 66, 66, 66, ...])
+
+tests/test_b100_workers.py:3159: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b100_workers.py::test_at_b100_17_parse_half_case06_a2l_by_keys
+1 failed in 17.22s
+exit=1
