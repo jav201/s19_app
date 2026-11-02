@@ -1,10 +1,10 @@
 tc-b97-55 diagnosis  date=2026-10-29T11:15:54-06:00
 test: tests/test_b97_flow_execution.py::test_tc_b97_55_input_queued_during_a_run_starts_no_second_run
-python: C:\Users\jjgh8\anaconda3\envs\s19env\python.exe  flags: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8  NO_COLOR unset  pytest -p no:cacheprovider
-CHANGE PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc4  (s19_app.__file__ verified there)
-BASE   PYTHONPATH=C:\Users\jjgh8\AppData\Local\Temp\kimi-inc4-fix2\base31 (verified)
-command: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/tc55/campaign.sh  (10 rounds; each round 20 CPU burners x40s + 4 CHANGE + 4 BASE pytest concurrently, probe plugin tc55probe.py)
-command: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/tc55/force.sh {late_rehome|stale_then_rehome}  (CHANGE only, TC55_FORCE injects a late rehome at the queued enter)
+python: <HOME>\anaconda3\envs\s19env\python.exe  flags: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8  NO_COLOR unset  pytest -p no:cacheprovider
+CHANGE PYTHONPATH=<HOME>\Github\s19_app-b100-inc4  (s19_app.__file__ verified there)
+BASE   PYTHONPATH=<HOME>\AppData\Local\Temp\kimi-inc4-fix2\base31 (verified)
+command: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/tc55/campaign.sh  (10 rounds; each round 20 CPU burners x40s + 4 CHANGE + 4 BASE pytest concurrently, probe plugin tc55probe.py)
+command: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/tc55/force.sh {late_rehome|stale_then_rehome}  (CHANGE only, TC55_FORCE injects a late rehome at the queued enter)
 
 == LOAD RESULTS (rc per run) ==
      40 base rc=0

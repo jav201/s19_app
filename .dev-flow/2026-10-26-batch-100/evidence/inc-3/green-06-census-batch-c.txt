@@ -7,7 +7,7 @@ tree: inc-3 implemented
 ================================== FAILURES ===================================
 _____________________________ test_at078a_counts ______________________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28648/test_at078a_counts0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28648/test_at078a_counts0')
 
     def test_at078a_counts(tmp_path: Path) -> None:
         """A run's strip reads its aggregates exactly, with a proportional bar.
@@ -56,7 +56,7 @@ E         Use -v to get more diff
 tests\test_tui_patch_checks_strip.py:297: AssertionError
 ____________________________ test_save_back_prompt ____________________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28648/test_save_back_prompt0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28648/test_save_back_prompt0')
 
     def test_save_back_prompt(tmp_path: Path) -> None:
         """The post-apply prompt offers an editable suggestion; decline writes
@@ -165,7 +165,7 @@ E       assert None is not None
 tests\test_tui_patch_editor_v2.py:630: AssertionError
 _____________ test_saveback_width_16_caps_records_and_empties_s0 ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28648/test_saveback_width_16_caps_re0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28648/test_saveback_width_16_caps_re0')
 
     def test_saveback_width_16_caps_records_and_empties_s0(tmp_path: Path) -> None:
         """AT-015.3 (reinforcement) — selecting 16 bytes/line on the real
@@ -187,7 +187,7 @@ E       assert None is not None
 tests\test_tui_patch_editor_v2.py:1166: AssertionError
 ________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28648/test_at_056e_a2b_diff_report_b0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28648/test_at_056e_a2b_diff_report_b0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000174DC15ABD0>
 
     def test_at_056e_a2b_diff_report_byte_identical_despite_selection(

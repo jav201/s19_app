@@ -1,4 +1,4 @@
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+<HOME>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -8,7 +8,7 @@ The event loop scope for asynchronous fixtures will default to the fixture cachi
 ================================== FAILURES ===================================
 _______________ test_tc024_report_trigger_invalid_dest_refused ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18243/test_tc024_report_trigger_inva0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-18243/test_tc024_report_trigger_inva0')
 
     def test_tc024_report_trigger_invalid_dest_refused(tmp_path: Path) -> None:
         """A refused report (invalid no-project dest) surfaces the diagnostic (LLR-005.4).
@@ -56,7 +56,7 @@ E       AssertionError: assert 'bad destination' in 'Compared A.s19 vs B.s19: 1 
 tests\test_tui_diff_screen.py:568: AssertionError
 ___________ test_a16_canonicaliser_residue_guard_can_actually_fire ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18243/test_a16_canonicaliser_residue0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-18243/test_a16_canonicaliser_residue0')
 
     def test_a16_canonicaliser_residue_guard_can_actually_fire(tmp_path: Path) -> None:
         """A-16 — the guard inside `canonical_report_bytes` is not decorative.

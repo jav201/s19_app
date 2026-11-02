@@ -49,7 +49,7 @@ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 \
   tests/test_address_census.py
 ```
 (import probe first: `python -c "import s19_app; print(s19_app.__file__)"` —
-prints `C:\Users\jjgh8\Github\s19_app-b99-inc13\s19_app\__init__.py`.)
+prints `<HOME>\Github\s19_app-b99-inc13\s19_app\__init__.py`.)
 
 ## 4 · Test results
 
@@ -87,7 +87,7 @@ row: the Bytes placeholder `DE AD BE EF` → `hex bytes, e.g. DE AD BE EF`).
 | File | sha256 |
 |---|---|
 | `evidence/inc-13/red-tc653.txt` | 136e208a4038948a3b1dec6341bd0d37b4f626ad4b7764849c296724d7e98805 |
-| `evidence/inc-13/red-snapshot.txt` | 6f09a0751f1fa48dddab6e40176ea210a563c22f1f572181176bfdd34372ed14 |
+| `evidence/inc-13/red-snapshot.txt` | 91956f9b89a520794aca49f23a71ea3654ebc89f1288329f617b6f3bad1c0923 |
 | `evidence/inc-13/green-tc653.txt` | 007b36bb5dc5d15ebe7964acadfc10cc9021adefee329c1e77231fa18f8b3d48 |
 | `evidence/inc-13/green-snapshot.txt` | bbf039d46da172279395ca6b7d2ff2c274fd7af45a7018cb1cb4856b13551cbd |
 | `evidence/inc-13/green-id-registry.txt` | 10ea027a5a888bf32406aeb871eaef08d420cb9234259096509cb5147623f61a |

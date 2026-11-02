@@ -20,7 +20,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-self = WindowsPath('C:/Users/jjgh8/Github/s19_app-b99-inc11/prototypes/cambios_10_12_2026/help_sections.md')
+self = WindowsPath('<HOME>/Github/s19_app-b99-inc11/prototypes/cambios_10_12_2026/help_sections.md')
 mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
 
     def open(self, mode='r', buffering=-1, encoding=None,
@@ -33,7 +33,7 @@ mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
             encoding = io.text_encoding(encoding)
 >       return io.open(self, mode, buffering, encoding, errors, newline)
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\Github\\s19_app-b99-inc11\\prototypes\\cambios_10_12_2026\\help_sections.md'
+E       FileNotFoundError: [Errno 2] No such file or directory: '<HOME>\\Github\\s19_app-b99-inc11\\prototypes\\cambios_10_12_2026\\help_sections.md'
 
 ..\..\anaconda3\envs\s19env\Lib\pathlib.py:1044: FileNotFoundError
 __________________ test_tc707_numbering_generated_sequential __________________
@@ -53,7 +53,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-self = WindowsPath('C:/Users/jjgh8/Github/s19_app-b99-inc11/prototypes/cambios_10_12_2026/help_sections.md')
+self = WindowsPath('<HOME>/Github/s19_app-b99-inc11/prototypes/cambios_10_12_2026/help_sections.md')
 mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
 
     def open(self, mode='r', buffering=-1, encoding=None,
@@ -66,7 +66,7 @@ mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
             encoding = io.text_encoding(encoding)
 >       return io.open(self, mode, buffering, encoding, errors, newline)
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\Github\\s19_app-b99-inc11\\prototypes\\cambios_10_12_2026\\help_sections.md'
+E       FileNotFoundError: [Errno 2] No such file or directory: '<HOME>\\Github\\s19_app-b99-inc11\\prototypes\\cambios_10_12_2026\\help_sections.md'
 
 ..\..\anaconda3\envs\s19env\Lib\pathlib.py:1044: FileNotFoundError
 =========================== short test summary info ===========================

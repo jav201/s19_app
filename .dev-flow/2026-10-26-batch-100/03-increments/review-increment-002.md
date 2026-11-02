@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Reviewer | `code-reviewer`. Independent: I did not write this code. The implementer was Kimi K2.8. |
-| Tree reviewed | worktree `C:\Users\jjgh8\Github\s19_app-b100-inc2`, detached at `2edfee2`, with uncommitted changes. `app.py` sha256 `935726ca3b6c…` and `workspace.py` `6c7db1448758…` both equal `pre-mutation-hashes.txt`. |
+| Tree reviewed | worktree `<HOME>\Github\s19_app-b100-inc2`, detached at `2edfee2`, with uncommitted changes. `app.py` sha256 `935726ca3b6c…` and `workspace.py` `6c7db1448758…` both equal `pre-mutation-hashes.txt`. |
 | Contract | `01-requirements.md`: HLR-164, LLR-164.1..164.4, the refusal-token table, LED .49 and .50. `design/design-proposal-b100.md` §5.2. `kimi/BRIEF-inc-2.md` and `BRIEF-COMMON.md`. Precedent: `review-increment-001.md`. |
 | Interpreter proof | `…\scratchpad\fixed\s19_app\__init__.py` and `…\scratchpad\base\s19_app\__init__.py`. Both used `PYTHONPATH` = that tree, `NO_COLOR` unset and s19env 3.11. The worktree was never edited. |
 | **Verdict** | **approve-with-fixes.** Recorded token: **`BLOCK — BLOCK-UNTIL: F1, F2`** (2 HIGH). This verdict authorises nothing. The increment does not advance until F1 and F2 are fixed and I have re-read both fixes on the diff. F3–F7 (MAJOR) should land in the same corrective pass. |
@@ -86,7 +86,7 @@
 | Field | Value |
 |---|---|
 | Reviewer | `code-reviewer`, the same reviewer as round 1. I did not write the fix. |
-| Tree re-read | worktree `C:\Users\jjgh8\Github\s19_app-b100-inc2` at `2edfee2`, with Inc 2 and fix pass 1 uncommitted. `app.py` sha256 `b2dcf23c1f9a…` and `workspace.py` `d2137e1d5b5d…` both equal `pre-mutation-hashes-fix1.txt`. |
+| Tree re-read | worktree `<HOME>\Github\s19_app-b100-inc2` at `2edfee2`, with Inc 2 and fix pass 1 uncommitted. `app.py` sha256 `b2dcf23c1f9a…` and `workspace.py` `d2137e1d5b5d…` both equal `pre-mutation-hashes-fix1.txt`. |
 | Contract | main `3bafa06`: LED .52 (a) the open project's name ignores case and the save uses the on-disk name; (b) a failed save removes every file it placed and restores the app state; (c) "P2 open" means another project is open. Plus `kimi/BRIEF-inc-2-fix1.md` and `security-increment-002.md` SEC2-1..3. |
 | Inputs | `HANDOFF.md` §"Fix pass 1"; packet `increment-002.md` §1, §2, §4, §5, §6; 36 transcripts in `evidence/inc-2/`. |
 | Interpreter proof | `…\scratchpad\fix1\s19_app\__init__.py`. That scratch copy holds `git archive 2edfee2` plus the 5 changed files, with hashes equal to the worktree. `NO_COLOR` was unset. The worktree was never edited. |
@@ -166,7 +166,7 @@ Each is discharged only when a re-read of the applied fix shows a recursive pre-
 | Field | Value |
 |---|---|
 | Reviewer | `code-reviewer`, the same reviewer as rounds 1 and 2. I did not write the fix. |
-| Tree re-read | worktree `C:\Users\jjgh8\Github\s19_app-b100-inc2` at `2edfee2`, with Inc 2 and fix passes 1 and 2 uncommitted. `app.py` sha256 `52b5f9495107…` and `workspace.py` `d2137e1d5b5d…` both equal `pre-mutation-hashes-fix2.txt`. |
+| Tree re-read | worktree `<HOME>\Github\s19_app-b100-inc2` at `2edfee2`, with Inc 2 and fix passes 1 and 2 uncommitted. `app.py` sha256 `52b5f9495107…` and `workspace.py` `d2137e1d5b5d…` both equal `pre-mutation-hashes-fix2.txt`. |
 | Inputs | `kimi/BRIEF-inc-2-fix2.md`; `HANDOFF.md` §"Fix pass 2"; packet §1, §2, §4, §6; `evidence/inc-2/` (54 files, 50 hashed). |
 | Interpreter proof | `…\scratchpad\fix2\s19_app\__init__.py`. That scratch copy holds `git archive 2edfee2` plus the 5 changed files, with hashes equal to the worktree. `NO_COLOR` was unset. The worktree was never edited. |
 | **Verdict** | **approve-with-fixes.** Recorded token: **`BLOCK — BLOCK-UNTIL: R3-1`** (1 HIGH). **R2-1 and R2-2 are discharged by re-read.** R2-3, R2-4 and R2-5 are closed. The new HIGH, R3-1, is in the same rollback: it walks INTO junctions that already exist in the project, and it deleted a file outside the work area (executed probe). |
@@ -233,7 +233,7 @@ It is discharged only when a re-read of the applied fix shows one non-following 
 |---|---|
 | Reviewer | `code-reviewer`, the same reviewer as rounds 1–3. I did not write the fix. |
 | Scope | BOUNDED by the operator at the iteration cap: the fixes for R3-1 and R3-2, plus a check that R2-1 has not regressed. Anything new beyond those would stop the increment for a redesign. |
-| Tree re-read | worktree `C:\Users\jjgh8\Github\s19_app-b100-inc2`, fix pass 3 uncommitted. `app.py` sha256 `fee2d17a6876…` and `workspace.py` `2f6dbdb4cf04…` both equal `pre-mutation-hashes-fix3.txt`. |
+| Tree re-read | worktree `<HOME>\Github\s19_app-b100-inc2`, fix pass 3 uncommitted. `app.py` sha256 `fee2d17a6876…` and `workspace.py` `2f6dbdb4cf04…` both equal `pre-mutation-hashes-fix3.txt`. |
 | Interpreter proof | `…\scratchpad\fix3\s19_app\__init__.py`. That scratch copy holds `git archive 2edfee2` plus the 5 changed files, with identical hashes. `NO_COLOR` was unset. The worktree was never edited. |
 | **Verdict** | **PASS-WITH-NOTES.** 0 HIGH, 0 MAJOR open. **R3-1 is discharged by re-read and by probe.** R3-2 is closed. R2-1 has not regressed. No new finding. |
 
@@ -280,7 +280,7 @@ It is discharged only when a re-read of the applied fix shows one non-following 
 |---|---|
 | Reviewer | `code-reviewer`, the same reviewer as rounds 1–4. I did not write the redesign. |
 | Why this round | Security found SEC2-5 (MAJOR): an incomplete snapshot made the rollback delete pre-existing user files. SEC2-6 is a concurrent writer's file deleted the same way. The operator stopped the increment and ruled "Lista exacta" (LED .53, main `4a4533b`): a failed save removes exactly what it created. |
-| Tree re-read | worktree `C:\Users\jjgh8\Github\s19_app-b100-inc2`, uncommitted. `app.py` sha256 `fcb1bf400645…`, `workspace.py` `8ef1763e180c…` and `services/project_gather_service.py` `c2d8cc2864a1…`, all equal to `restore-fix4.txt`. |
+| Tree re-read | worktree `<HOME>\Github\s19_app-b100-inc2`, uncommitted. `app.py` sha256 `fcb1bf400645…`, `workspace.py` `8ef1763e180c…` and `services/project_gather_service.py` `c2d8cc2864a1…`, all equal to `restore-fix4.txt`. |
 | Inputs | `kimi/BRIEF-inc-2-fix4.md`; `HANDOFF.md` §"Redesign (LED .53)"; packet §1, §2, §4, §5, §6; `evidence/inc-2/` (82 files, 78 hashed). |
 | Interpreter proof | `…\scratchpad\fix4\s19_app\__init__.py`. That scratch copy holds `git archive 2edfee2` plus the 6 changed files, with identical hashes. `NO_COLOR` was unset. The worktree was never edited. |
 | **Verdict** | **PASS-WITH-NOTES.** 0 HIGH. **1 MAJOR open (R5-1)**: a recorded note that does not block, the same way N1 was handled in Inc 1 round 2. It must be fixed in this increment (a one-line fix in the gather) or scheduled in the ledger. 1 MINOR (R5-2). Every earlier probe still passes on the redesign. |
@@ -349,7 +349,7 @@ SEC2-5 and SEC2-6 are closed by construction (R7 and R8 RED first, then GREEN). 
 | Field | Value |
 |---|---|
 | Reviewer | `code-reviewer`, the same reviewer as rounds 1–5. I did not write the fix. |
-| Tree re-read | worktree `C:\Users\jjgh8\Github\s19_app-b100-inc2`, uncommitted. `app.py` sha256 `e30805c44126…`, `workspace.py` `2ab2ba749fb5…`, `services/project_gather_service.py` `bc8b6eeacac4…`. |
+| Tree re-read | worktree `<HOME>\Github\s19_app-b100-inc2`, uncommitted. `app.py` sha256 `e30805c44126…`, `workspace.py` `2ab2ba749fb5…`, `services/project_gather_service.py` `bc8b6eeacac4…`. |
 | Inputs | `kimi/BRIEF-inc-2-fix5.md`; `HANDOFF.md` §"Redesign fix pass"; `security-increment-002.md` Round 4 (SEC2-7 HIGH, SEC2-8, SEC2-9); packet §1, §2, §4, §6; `evidence/inc-2/` (105 files, 101 hashed). |
 | Interpreter proof | `…\scratchpad\fix5\s19_app\__init__.py`. That scratch copy holds `git archive 2edfee2` plus the 7 changed files, with identical hashes. `NO_COLOR` was unset. The worktree was never edited. |
 | **Verdict** | **PASS.** 0 HIGH, 0 MAJOR open. **R5-1 and R5-2 are closed, and Mf now dies.** Two MINOR notes on the record (R6-1, R6-2). |

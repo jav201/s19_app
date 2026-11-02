@@ -97,13 +97,13 @@ recorded as open, not fixed; a further widening is the operator's to rule.
 
 | File | Kind | Change |
 |---|---|---|
-| `C:\Users\jjgh8\Github\s19_app\pyproject.toml` | **source** | new `evidence` table; **24 lines added, 0 removed** (17 in rev 1 + 7 from the F2 comment correction) |
-| `C:\Users\jjgh8\Github\s19_app\.github\workflows\tui-ci.yml` | **source** | `tui-ci` job only: install rerouted, 3 ad-hoc lines removed, 1 guard added |
-| `C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-08-24-batch-88\01-requirements.md` | record | `ID-B88-09`: two new ⚠ bullets (operator, rev 1) + this revision's F3/F4/F5 corrections; `HLR-88.6` + `LLR-88.12` thresholds; criterion 8 |
-| `C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-08-24-batch-88\02-review-security.md` | record | pip-warning surface refinement (operator, rev 1); F2 heading corrected; the ruled guard line marked superseded as a quotation |
-| `C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-08-24-batch-88\03-increments\00-increment-plan.md` | record | Inc 6 row: superseded ruling struck, EDITS clause appended — **by supersession, not rewrite**, because §2b forbids editing the baseline to match what happened |
-| `C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-08-24-batch-88\03-increments\increment-006.md` | record | this packet |
-| `C:\Users\jjgh8\Github\s19_app\.dev-flow\_derived\` | derived | Atlas regenerated with `--atlas --write` **after** this packet existed |
+| `<HOME>\Github\s19_app\pyproject.toml` | **source** | new `evidence` table; **24 lines added, 0 removed** (17 in rev 1 + 7 from the F2 comment correction) |
+| `<HOME>\Github\s19_app\.github\workflows\tui-ci.yml` | **source** | `tui-ci` job only: install rerouted, 3 ad-hoc lines removed, 1 guard added |
+| `<HOME>\Github\s19_app\.dev-flow\2026-08-24-batch-88\01-requirements.md` | record | `ID-B88-09`: two new ⚠ bullets (operator, rev 1) + this revision's F3/F4/F5 corrections; `HLR-88.6` + `LLR-88.12` thresholds; criterion 8 |
+| `<HOME>\Github\s19_app\.dev-flow\2026-08-24-batch-88\02-review-security.md` | record | pip-warning surface refinement (operator, rev 1); F2 heading corrected; the ruled guard line marked superseded as a quotation |
+| `<HOME>\Github\s19_app\.dev-flow\2026-08-24-batch-88\03-increments\00-increment-plan.md` | record | Inc 6 row: superseded ruling struck, EDITS clause appended — **by supersession, not rewrite**, because §2b forbids editing the baseline to match what happened |
+| `<HOME>\Github\s19_app\.dev-flow\2026-08-24-batch-88\03-increments\increment-006.md` | record | this packet |
+| `<HOME>\Github\s19_app\.dev-flow\_derived\` | derived | Atlas regenerated with `--atlas --write` **after** this packet existed |
 
 | **SOURCE files** | **`2`** — `pyproject.toml` and `.github/workflows/tui-ci.yml`. Four records and the derived Atlas are not source. |
 |---|---|

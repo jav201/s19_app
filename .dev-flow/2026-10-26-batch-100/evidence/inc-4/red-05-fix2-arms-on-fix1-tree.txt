@@ -1,13 +1,13 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py -k "every_window_load_lands_on_its_target or map_load_keeps_the_region_row or stale_text_input or visible_find_input"
-tree: C:/Users/jjgh8/Github/s19_app-b100-inc4 (worktree at 24d5b7f WITH fix pass 1 uncommitted — the pre-fix-pass-2 tree)
-env: PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc4 ; NO_COLOR unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+tree: <HOME>/Github/s19_app-b100-inc4 (worktree at 24d5b7f WITH fix pass 1 uncommitted — the pre-fix-pass-2 tree)
+env: PYTHONPATH=<HOME>/Github/s19_app-b100-inc4 ; NO_COLOR unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 
-import proof: C:\Users\jjgh8\Github\s19_app-b100-inc4\s19_app\__init__.py
+import proof: <HOME>\Github\s19_app-b100-inc4\s19_app\__init__.py
 ...F........F.F                                                          [100%]
 ================================== FAILURES ===================================
 _________ test_tc_b100_12_every_window_load_lands_on_its_target[map] __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29100/test_tc_b100_12_every_window_l3')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29100/test_tc_b100_12_every_window_l3')
 window_key = 'map'
 
     @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))
@@ -104,7 +104,7 @@ E       AssertionError: timed out waiting for the LLR-116.5 landing: the focus o
 tests\test_b100_focus.py:217: AssertionError
 _______ test_tc_b100_12_map_load_keeps_the_region_row_and_down_walks_it _______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29100/test_tc_b100_12_map_load_keeps0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29100/test_tc_b100_12_map_load_keeps0')
 
     def test_tc_b100_12_map_load_keeps_the_region_row_and_down_walks_it(
         tmp_path: Path,
@@ -202,7 +202,7 @@ E       AssertionError: timed out waiting for the LLR-116.5 landing: the focus o
 tests\test_b100_focus.py:217: AssertionError
 _____________ test_tc_b100_12_visible_find_input_keeps_its_focus ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29100/test_tc_b100_12_visible_find_i0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29100/test_tc_b100_12_visible_find_i0')
 
     def test_tc_b100_12_visible_find_input_keeps_its_focus(tmp_path: Path) -> None:
         """LED .58 (c), the visible half: a VISIBLE text input in the ACTIVE

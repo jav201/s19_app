@@ -39,7 +39,7 @@ derived, not as source.)
 | 3 | `~/.claude/templates/dev-flow/close-template.md` | Story B — assurance limits + the review-debt ledger |
 | 4 | `~/.claude/templates/dev-flow/validation-template.md` | Story A — the Layer C table |
 | 5 | `~/.claude/docs/FLOW-VERSION.md` | the rev47 bump and re-hash |
-| 6 | `C:/Users/jjgh8/Github/s19_app/pyproject.toml` | the imaging dependency |
+| 6 | `<HOME>/Github/s19_app/pyproject.toml` | the imaging dependency |
 
 **Increments the proposed scope requires — 10**, decomposed so that no increment mixes two
 oracle-moving changes: V22 · `_artifacts` · V5+V2+V6 · V23+V8×2 · Pillow · V25+checklist ·
@@ -315,8 +315,8 @@ correction, carried in the §2.6 corrections table. No ❌ is left standing with
 ## 2.8 · Probe transcripts (C-39 / C-56)
 
 > Every figure below was produced by a command run this session against the live tree at
-> `C:\Users\jjgh8\Github\s19_app` and the live flow repo at `C:\Users\jjgh8\.claude`. Working files
-> are under `C:\Users\jjgh8\.claude\jobs\6650e29d\tmp\`. **No probe wrote to either repo.**
+> `<HOME>\Github\s19_app` and the live flow repo at `<HOME>\.claude`. Working files
+> are under `<HOME>\.claude\jobs\6650e29d\tmp\`. **No probe wrote to either repo.**
 > **Two probes operate on tokens this document deliberately does not reproduce** (M-6): writing the
 > token would add an occurrence to the very census the probe measures.
 

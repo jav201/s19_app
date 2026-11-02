@@ -209,10 +209,10 @@ All paths are under `.dev-flow/2026-10-25-batch-99/evidence/inc-6/`.
 
 | Evidence artifact | Path | SHA-256 |
 |---|---|---|
-| mutation (orchestrator, review round 2): `safe_text` removed from the collision reason → the new in-range ESC arm FAILS, the old arm still passes (1 failed, 1 passed); source restored, hash a7559269… | `mut-review2-esc.txt` | `a272f92c06ad3a4e4ec88cbf6aa4aee21565971abe923d706a2d154751033836` |
+| mutation (orchestrator, review round 2): `safe_text` removed from the collision reason → the new in-range ESC arm FAILS, the old arm still passes (1 failed, 1 passed); source restored, hash a7559269… | `mut-review2-esc.txt` | `fafcfd1f639537a10769f26a4a2f572d7600b8533432bfd70cc76dc2733eb835` |
 | GREEN after the in-range ESC arm (25 passed, 3.11) | `green-review2.txt` | `2e3744124e37b893a5ffa2293607d9fab202ff8eb970614a622fabf46176a981` |
-| Worktree import check | `import-check.txt` | `70a9806f79dd7d1569d6529e4e5829ba1ffd2b7a789d6e005208f57433634600` |
-| RED first node (ImportError) | `red-initial.txt` | `2954fb5c15f102f75509767038e6acb0817f373cfb85592e2aa6752b5f03ace1` |
+| Worktree import check | `import-check.txt` | `80475e4b68d571601958ac02af0649ef30d33be2478086df9523a546a215164c` |
+| RED first node (ImportError) | `red-initial.txt` | `78dde2fcda666adfb7284e9f5e228bdc9fe4c5d3cd529caf2c067db5b856d1cf` |
 | RED whole module (17 failed) | `red-full.txt` | `f49d10d945c9bb2041efb1949932bf16d501cd6126971ca0ded4c5f721bcf632` |
 | GREEN whole module (17 passed) | `green-full.txt` | `84edb92669a4d2114606e83a379ea0c57d7868dc15c69fbf814f81abda664ed3` |
 | GREEN TC-B99-28 (1 passed) | `green-tc_b99_28.txt` | `889dc047aa1aa92bc08f3ca19883a47540e43805a11f4912ec4960c813e14984` |
@@ -227,10 +227,10 @@ All paths are under `.dev-flow/2026-10-25-batch-99/evidence/inc-6/`.
 | GREEN test_id_registry.py (13 passed) | `green-id-registry.txt` | `ae46853d102a482b576d66868bd68c86c82ad1d080184936f2e20249279bf20b` |
 | GREEN test_segment_ops.py (23 passed) | `green-segment-ops.txt` | `415991b5ddcd5a2c6d6b83002ae0d2f77fcef6b4362098cc192e616852dbcfdc` |
 | Mutant LLR-160.1 (KILLED) | `mut-LLR-160.1.txt` | `a9496227429972ae5ec07f4b8d5d32c74a441dcc012a3ee94485dc425d69e716` |
-| Mutant LLR-160.2 (KILLED) | `mut-LLR-160.2.txt` | `bc1cb5bb623685d435aac1cffabcac41699e6a535bd2852935df7430bef0f36b` |
-| Mutant LLR-160.3 (KILLED) | `mut-LLR-160.3.txt` | `1d951a0daf3ddc15addabd0f91db31d8dd49a6f00e3d5fec58deb7c8d1b81808` |
-| Mutant LLR-160.4 (KILLED) | `mut-LLR-160.4.txt` | `a68c9588aa7b49e3b6efacb5385d19f8b8e59e4c98f7992b05adf26cb03d5b2a` |
-| Mutant LLR-160.5 (KILLED) | `mut-LLR-160.5.txt` | `dcc79d0354146087ea5f55eb08c4c38bc720d1565854f12b93908c5df1d684aa` |
+| Mutant LLR-160.2 (KILLED) | `mut-LLR-160.2.txt` | `eaded649de3afd5563dab95d757f3626f5b5a0dd01951f3f166fb93f30c3179e` |
+| Mutant LLR-160.3 (KILLED) | `mut-LLR-160.3.txt` | `146788c6fb775995c855f3d91a2bc139f5089c125b442f1642b61fa1c4604b39` |
+| Mutant LLR-160.4 (KILLED) | `mut-LLR-160.4.txt` | `d05f7172c2f5fec0c07356191c14b7d40b114275916c2762a02a543e8a6e1406` |
+| Mutant LLR-160.5 (KILLED) | `mut-LLR-160.5.txt` | `3ae0e4307cadea9cdc54c2925b9ba39c31f0c77b7bd6aea08ee048d9861e5eb9` |
 | Reverse census probe | `reverse-census.txt` | `75d53766d50ecb6b4706e7eec19a8c01f38f45caafe58de811a093f8b3fadc98` |
 | Pre-mutation baseline hashes | `baseline-hashes.txt` | `ddcb2be15c4a470ec9f0e46640b950517deb0c32f3b04734fe15c51d56165236` |
 

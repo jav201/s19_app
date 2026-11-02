@@ -101,7 +101,7 @@ WRITE-OUT.
 
 ```bash
 # from the worktree root, with the s19env interpreter:
-python -c "import s19_app; print(s19_app.__file__)"   # C:\Users\jjgh8\Github\s19_app-b99-inc2\s19_app\__init__.py
+python -c "import s19_app; print(s19_app.__file__)"   # <HOME>\Github\s19_app-b99-inc2\s19_app\__init__.py
 pytest tests/test_b99_s0.py -v                        # -> 6 passed
 pytest tests/test_b99_s0.py -k tc_b99_04              # -> 2 passed, 4 deselected
 pytest tests/test_b99_s0.py -k tc_b99_05              # -> 1 passed, 5 deselected
@@ -133,7 +133,7 @@ re-pinned/flake nodes + both companions, final idle run: 39 passed
 |---|---|
 | Mutation applied | re-admit `S0` in `_is_data_record` (`return record.type in {"S0", "S1", "S2", "S3"}`) — the declared negative control for LLR-153.1/153.2/153.3; LLR-153.4's control is the P-2 baseline RED |
 | Instrument | project code: the implementer's own hand via the Edit tool, restore checked by SHA-256 |
-| Where it ran | this worktree (`C:\Users\jjgh8\Github\s19_app-b99-inc2`), run by the implementer |
+| Where it ran | this worktree (`<HOME>\Github\s19_app-b99-inc2`), run by the implementer |
 | Transcript | `evidence/inc-2/mut-LLR-153.1.txt` — **6 failed** (every node RED) |
 | Restore proven by | `s19_app/core.py` SHA-256 returned to `6821f378a150290e42d20f17b2c5865a423d99f5fd752fa31a0ce75c3148f683` (pre-mutation value, recorded before the mutation) |
 | Bytecode cache | run with `PYTHONDONTWRITEBYTECODE=1` (C-46) |
@@ -180,24 +180,24 @@ All under `artifact_homes.evidence` = `.dev-flow/2026-10-25-batch-99/evidence/in
 
 | Evidence artifact | Path | SHA-256 |
 |---|---|---|
-| RED baseline, TC-B99-04 | `red-tc_b99_04_predicate.txt` | `e769259c837c4b7aa46fc52681574b1b47f52c050185279748bc046129b5cbb1` |
-| RED baseline, TC-B99-04 boundary | `red-tc_b99_04_boundary.txt` | `5316fafba632a23c74015e4beeda943fd7bf4eb5b666b3d46d963426cab2e605` |
-| RED baseline, TC-B99-05 | `red-tc_b99_05.txt` | `0ca95d139ff03c9db49ee64911d818450a049714eea49642ca1db4707439bcd6` |
-| RED baseline, TC-B99-06 | `red-tc_b99_06.txt` | `ecc40d35b68de4dcd60f2d812273eb5a7bb91454b0f4870ec090c523047d10ce` |
-| RED baseline, TC-B99-07 | `red-tc_b99_07.txt` | `c1bfd46ced020de781d1795e5a3b724048fb18c0d616956e8cec199fde5985a7` |
-| RED baseline, AT-B99-02 (P-1 oracle) | `red-at_b99_02.txt` | `1d7478cdfdac43761cf62c30637d59b89fb70b3dc53d7ca81b49a06a7145f582` |
+| RED baseline, TC-B99-04 | `red-tc_b99_04_predicate.txt` | `dc2c59c41c724de1f1b9c99c5ed0188a2b5a02e15fe2532a020219983e252c4b` |
+| RED baseline, TC-B99-04 boundary | `red-tc_b99_04_boundary.txt` | `139e3b31e47ebfc1f5ff11f53b9b4d24d24aedb5b77deb68f9bbcf93218f1b8e` |
+| RED baseline, TC-B99-05 | `red-tc_b99_05.txt` | `f8778ec92c2ef32e279f5814c1f40c819b4e07151b6b029d2b575097c1a2c727` |
+| RED baseline, TC-B99-06 | `red-tc_b99_06.txt` | `85bb4d13d42131fe2aa25fce2ca636868939b858dacd1a1ce727c6763135214b` |
+| RED baseline, TC-B99-07 | `red-tc_b99_07.txt` | `e89fa44b9c9b5ae0bf00fb2e3020709f4a126fa856557e6b95857350420694b6` |
+| RED baseline, AT-B99-02 (P-1 oracle) | `red-at_b99_02.txt` | `65311389eff1ed6bffe10605498e4ae1359f8670307388f704b327c1da39006a` |
 | RED full-file tail summary | `red-full.txt` | `95e5e1b5bd38b9bf8ff507c3740121fe6248b1009d1f8ed73631aa7e23111765` |
-| GREEN full run (6 passed) | `green-full.txt` | `d4f5beb22c3a44a7b94a8ec572b6c15d2d53ec67f0d5c37dda29541b2847135d` |
-| GREEN TC-B99-04 | `green-tc_b99_04_predicate.txt` | `316c38791acb58dcaf28b84195c5b6a7754a4b05d1221a47250c939549486579` |
-| GREEN TC-B99-04 boundary | `green-tc_b99_04_boundary.txt` | `8329bd375c9333fe68c117a55fbc740943334e9dbdbcc94b8bb4e28d881622bf` |
-| GREEN TC-B99-05 | `green-tc_b99_05.txt` | `21f28740d7290c5ba8e90d23c57105c5e441b2859bc89cd3fb30633efbf69efd` |
-| GREEN TC-B99-06 | `green-tc_b99_06.txt` | `935d4787a0882ae19fdcdee7d63e600caba44f7af7e21e3a6f8e9582be320132` |
-| GREEN TC-B99-07 | `green-tc_b99_07.txt` | `f58eaf76b58f479c6050e7c32ca24c2878492a3bf811fde09ff3186ff5ef75f2` |
-| GREEN AT-B99-02 | `green-at_b99_02.txt` | `666906028fdaf81e3a6a5ccc30d02c6c6ae9ad9874c30d7403df6d62a78d1dbf` |
+| GREEN full run (6 passed) | `green-full.txt` | `2fabf63b4c6e791d012c4bd4324be77d19fe1e4967e2b87afa36041d1b8a2511` |
+| GREEN TC-B99-04 | `green-tc_b99_04_predicate.txt` | `873476ccbad0a119e9afad3b74b9ac51569465297896a7604e5ac523b797df13` |
+| GREEN TC-B99-04 boundary | `green-tc_b99_04_boundary.txt` | `98535d54aaeb79f87bf3b1a27749e313e95035e9492c206998e741249386cf7f` |
+| GREEN TC-B99-05 | `green-tc_b99_05.txt` | `546abbaf6c8b83e29ba8bb17ebcc62664ed2edb967a320e2efcb683fc4c4e9f0` |
+| GREEN TC-B99-06 | `green-tc_b99_06.txt` | `ea8c2362e3131f83c15270aba8bba4ff5285139ae9915682c0fd74954e36a8e2` |
+| GREEN TC-B99-07 | `green-tc_b99_07.txt` | `6f46e1c8d9093ca1df1e5fb94df5143245f6db0e5ab32b190072f056c03de5b8` |
+| GREEN AT-B99-02 | `green-at_b99_02.txt` | `8c97edf2391ec7bd71239b46ee69fd97c96c735f8ef092e1878c3080e1dd559f` |
 | Mutation LLR-153.1, original verdict KILLED 6/6 — transcript refreshed in review round 1 after the F1/F2/F5 test rewrite (6/6 RED re-verified; restore digest `6821f378…` re-proven) | `mut-LLR-153.1.txt` | `9be2a805bb2f03b8f27664c7c35c17e08b9e848e320a21da34e7b86b99fde39b` |
-| Census batch (27 files, first run: 15 failed / 743 passed) | `green-census.txt` | `f0464258da59f6a2ce5b496e301242851f2f1fa6b54a296cc7eadd097ed86081` |
-| Census failed-node re-run (idle machine) | `census-failed-rerun.txt` | `bdf85ae11edaf32f5718b6b8392795c36dfdd4be2d705d30ac059fa0b21fe388` |
-| Census re-pinned nodes (final, idle — 39 passed) | `census-repinned.txt` | `72a365d68d0cef0427bc49572c449e785a91c305ba2bdf5c9e3c110b04b1e610` |
+| Census batch (27 files, first run: 15 failed / 743 passed) | `green-census.txt` | `3d5bac3646ef5a0f4ee5dc8186a2dbe85182d88f759072cf537f6591a3ba5a4f` |
+| Census failed-node re-run (idle machine) | `census-failed-rerun.txt` | `b6474536bf8000ca42ce4f6481d2b689aca22e9851a910fa83135c355ff5aa53` |
+| Census re-pinned nodes (final, idle — 39 passed) | `census-repinned.txt` | `ba0d9ee7a98ef92b9394b5e3bc864b949efeedb4ad92247457d1912f62423db8` |
 | Snapshot suite (round 1, 33 passed) | `green-snapshot.txt` | `66e86483a65f067a3d3641bc75c171d424312477a149c3f2091009fadd9b3e56` |
 | Re-pin proof: 16 snapshot SVG text-element diffs | `repin-snapshot-svg-multiset.txt` | `758318724a8f0d27db658f9c4541ea0b8d1ee254668ed917f93bea9bacbd4865` |
 | Re-pin proof: 16 snapshot SVG raw diffs | `repin-snapshot-svg-diffs.txt` | `3ba7d28cd6d72b4827dae19ab3339fa67377b1a29b472a1405c9fe744f9a3c76` |
@@ -213,7 +213,7 @@ All under `artifact_homes.evidence` = `.dev-flow/2026-10-25-batch-99/evidence/in
 | GREEN fix round: `test_b99_s0.py` (6 passed) | `green-fix-b99_s0.txt` | `26de0e7bb4df9567f4aa0d4fbd159bd4352fee839a171916043e970a79fd1ed0` |
 | GREEN fix round: AT-288 on the batch99 golden (1 passed) | `green-fix-at288.txt` | `28f78c73388cc9fc22aa2874be8907e82173340b7c13e240cf76b0ae94a10348` |
 | GREEN fix round: snapshot suite, colours on (33 passed) | `green-fix-snapshot.txt` | `3fcec9ed4bdeb0ba01739b987fe6649aa6faf62049cf196c2bbcca33e013d105` |
-| GREEN fix round: `test_tui_directionb.py` full file (182 passed; the 2 failures are the freeze guards, RED by design) | `green-fix-directionb.txt` | `4eb29851c8fe29e2153706b42d62fb0a2f0e7c49320edbb56c0cfc1db1c47665` |
+| GREEN fix round: `test_tui_directionb.py` full file (182 passed; the 2 failures are the freeze guards, RED by design) | `green-fix-directionb.txt` | `fa32541b575f1b0742028a242691a4c1081ddcc341c071f6ba9d07ce20f6a809` |
 | Mutation F1: S0 re-admit vs **step 4 alone** (control PASS, then step-4 RED on the painted S0 row) | `mut-F1-step4.txt` | `92fead926cf8b82afade2cb8bde8cca219bbe46295fc305effaf1b7ed5c2be21` |
 | Mutation F5: S0 re-admit vs TC-B99-06 on **both** checksum-defective files (two arms, both RED) | `mut-F5.txt` | `c839991045b099747caba69cd6a9b1fdd0cfc4712d368157f409e5d58e59ab47` |
 | AT-288 capture, new home outside the sealed batch-92 evidence folder | `tests/goldens/batch99/at288-pre-move-report.bin` | `4efafaddddc85e5a33295ba7d261c46666fc92a62b9569a1f4f23d4b6be58121` |

@@ -1,5 +1,5 @@
 # Orchestrator isolation re-run of the 4 non-known census failures (2026-10-30)
-# tree: /c/Users/jjgh8/Github/s19_app-b100-inc6  app.py sha256[:16]=762d1a98c8a65903 vxs=76b276077ded9717
+# tree: <HOME>/Github/s19_app-b100-inc6  app.py sha256[:16]=762d1a98c8a65903 vxs=76b276077ded9717
 # base: main checkout at 093a7c0 (source clean; only records modified)
 ## TREE run 1
 PASSED tests/test_before_after_report.py::test_tc330_before_after_row_reveal_hide_state_machine

@@ -2,9 +2,9 @@
    [before save] project=None file=temp/firmware.s19 mac=firmware.mac a2l=temp/firmware.a2l entries=0
    [before save] #status_context = (none)  |  firmware.a2l
    save dialog = SaveProjectScreen; labels=['Save project folder under:', 'Project name (new folder name):']; buttons=['Browse...', 'Save', 'Cancel']
-   parent prefill = C:\Users\jjgh8\AppData\Local\Temp\cwui_pt526fax\.s19tool\workarea
+   parent prefill = <HOME>\AppData\Local\Temp\cwui_pt526fax\.s19tool\workarea
    after save: screen = Screen
-   recorded = [('log', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwui_pt526fax\\.s19tool\\workarea\\P1 (variant 'firmware')"), ('log', 'Project saved + manifest verified')]
+   recorded = [('log', "Saved project to <HOME>\\AppData\\Local\\Temp\\cwui_pt526fax\\.s19tool\\workarea\\P1 (variant 'firmware')"), ('log', 'Project saved + manifest verified')]
    painted status = Loaded firmware.mac (S19+MAC)
 == U2.2 `U` unload all
    recorded = [('log', 'Unloaded all artifacts.')]
@@ -16,9 +16,9 @@
    [after load prg] #status_context = P1:prg (2/2)  |  (none)
    P1 tree after loose load = ['firmware.a2l', 'firmware.mac', 'firmware.s19', 'prg.s19', 'project.json']
    save dialog = SaveProjectScreen; labels=['Save project folder under:', 'Project name (new folder name):']; buttons=['Browse...', 'Save', 'Cancel']
-   parent prefill = C:\Users\jjgh8\AppData\Local\Temp\cwui_pt526fax\.s19tool\workarea
+   parent prefill = <HOME>\AppData\Local\Temp\cwui_pt526fax\.s19tool\workarea
    after save: screen = Screen
-   recorded = [('log', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwui_pt526fax\\.s19tool\\workarea\\P2 (variant 'prg')"), ('log', 'Project saved + manifest verified')]
+   recorded = [('log', "Saved project to <HOME>\\AppData\\Local\\Temp\\cwui_pt526fax\\.s19tool\\workarea\\P2 (variant 'prg')"), ('log', 'Project saved + manifest verified')]
    painted status = Loaded prg.s19 (S19 only)
    P2 tree = ['prg.s19', 'project.json']
    P1 tree = ['firmware.a2l', 'firmware.mac', 'firmware.s19', 'prg.s19', 'project.json']

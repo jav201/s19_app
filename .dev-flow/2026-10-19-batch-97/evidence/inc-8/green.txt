@@ -23,32 +23,32 @@
 ........................................................................ [ 96%]
 .........................................................                [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_execution.py:1479: assert "c — Confirm: confirms the attention lane's waiting external step" in '1. Run saved flows as a set of lanes, one lane per chain: each lane shows its blocks as cards joined by cables, and e...ard.\n\n33. ≡ — a report block card.\n\n34. ─ — a cable between two blocks.\n\n35. ▶ — the cable feeds the next block.'
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_execution.py:1948: AssertionError: ['#key_bar', '#key_bar KeyRow', '#key_bar KeyRow > .key-bar--key', '#key_bar #key_bar_global > .key-bar--description', '#key_bar #key_bar_window > .key-bar--description', '#key_bar KeyRow > .key-bar--tag', ...]
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1130: AssertionError: ((118, 54), 2)
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1130: AssertionError: ((118, 53), 3)
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1082: AssertionError: ((118, 53), 1, ['NOTICES', '● source    ok', 'loaded prg.s19 (11 ranges)', '──────────────────────────────────────────────────────────────────────────────────────────────────────────', '● patch     ok', 'applied 6 entries', ...])
-C:\Users\jjgh8\Github\s19_app\tests\test_id_registry.py:503: AssertionError: G2 (registry -> node) failed with 1 offender(s):
-C:\Users\jjgh8\Github\s19_app\tests\test_id_registry.py:550: AssertionError: the guard scanned 198 test modules, not the declared 197. If tests/ legitimately grew, bump EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a decision rather than a rubber stamp.
-C:\Users\jjgh8\Github\s19_app\tests\test_id_registry.py:726: AssertionError: G2 failed with 1 offender(s):
-C:\Users\jjgh8\Github\s19_app\tests\test_id_registry.py:748: AssertionError: the counterfactual is only meaningful from a green baseline; these rules were already red: ['G2']
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_commandbar.py:2704: AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_commandbar.py:3017: AssertionError: 1 LIVE registry rows name a node that no longer exists:
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_diff_screen.py:523: AssertionError: the status must show both written report paths; status was 'Compared A.s19 vs B.s19: 1 runs.'
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_diff_screen.py:3498: AssertionError: _DIFF_MIN_H is only the right floor if at least one HEX ROW is visible AT it: painted content height 1, of which 1 is the 'Image A - Run #...' header, leaving 0 hex rows. A floor that declares a terminal deliverable and then shows a header and nothing else is WORSE than the notice it replaces
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_diff_screen.py:3912: AssertionError: the App BINDINGS block must be byte-for-byte the committed set. Added: [('c', 'confirm_attention', 'Confirm', False), ('d', 'a2l_describe_tag', 'Describe tag', False)]; removed: []
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_directionb.py:4523: AssertionError: region row 0x80010000 never became hit-testable after scrolling its viewport
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_flow_builder_b94.py:185: AssertionError: (96, 17)
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_flow_execution_b94.py:340: AssertionError: (96, 17)
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_flow_execution_b94.py:424: assert (96, 17) == (96, 18)
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_report_filter_surface.py:773: AssertionError: baseline wrote []
+<HOME>\Github\s19_app\tests\test_b97_flow_execution.py:1479: assert "c — Confirm: confirms the attention lane's waiting external step" in '1. Run saved flows as a set of lanes, one lane per chain: each lane shows its blocks as cards joined by cables, and e...ard.\n\n33. ≡ — a report block card.\n\n34. ─ — a cable between two blocks.\n\n35. ▶ — the cable feeds the next block.'
+<HOME>\Github\s19_app\tests\test_b97_flow_execution.py:1948: AssertionError: ['#key_bar', '#key_bar KeyRow', '#key_bar KeyRow > .key-bar--key', '#key_bar #key_bar_global > .key-bar--description', '#key_bar #key_bar_window > .key-bar--description', '#key_bar KeyRow > .key-bar--tag', ...]
+<HOME>\Github\s19_app\tests\test_b97_patch_editor.py:1130: AssertionError: ((118, 54), 2)
+<HOME>\Github\s19_app\tests\test_b97_patch_editor.py:1130: AssertionError: ((118, 53), 3)
+<HOME>\Github\s19_app\tests\test_b97_width.py:1082: AssertionError: ((118, 53), 1, ['NOTICES', '● source    ok', 'loaded prg.s19 (11 ranges)', '──────────────────────────────────────────────────────────────────────────────────────────────────────────', '● patch     ok', 'applied 6 entries', ...])
+<HOME>\Github\s19_app\tests\test_id_registry.py:503: AssertionError: G2 (registry -> node) failed with 1 offender(s):
+<HOME>\Github\s19_app\tests\test_id_registry.py:550: AssertionError: the guard scanned 198 test modules, not the declared 197. If tests/ legitimately grew, bump EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a decision rather than a rubber stamp.
+<HOME>\Github\s19_app\tests\test_id_registry.py:726: AssertionError: G2 failed with 1 offender(s):
+<HOME>\Github\s19_app\tests\test_id_registry.py:748: AssertionError: the counterfactual is only meaningful from a green baseline; these rules were already red: ['G2']
+<HOME>\Github\s19_app\tests\test_tui_commandbar.py:2704: AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+<HOME>\Github\s19_app\tests\test_tui_commandbar.py:3017: AssertionError: 1 LIVE registry rows name a node that no longer exists:
+<HOME>\Github\s19_app\tests\test_tui_diff_screen.py:523: AssertionError: the status must show both written report paths; status was 'Compared A.s19 vs B.s19: 1 runs.'
+<HOME>\Github\s19_app\tests\test_tui_diff_screen.py:3498: AssertionError: _DIFF_MIN_H is only the right floor if at least one HEX ROW is visible AT it: painted content height 1, of which 1 is the 'Image A - Run #...' header, leaving 0 hex rows. A floor that declares a terminal deliverable and then shows a header and nothing else is WORSE than the notice it replaces
+<HOME>\Github\s19_app\tests\test_tui_diff_screen.py:3912: AssertionError: the App BINDINGS block must be byte-for-byte the committed set. Added: [('c', 'confirm_attention', 'Confirm', False), ('d', 'a2l_describe_tag', 'Describe tag', False)]; removed: []
+<HOME>\Github\s19_app\tests\test_tui_directionb.py:4523: AssertionError: region row 0x80010000 never became hit-testable after scrolling its viewport
+<HOME>\Github\s19_app\tests\test_tui_flow_builder_b94.py:185: AssertionError: (96, 17)
+<HOME>\Github\s19_app\tests\test_tui_flow_execution_b94.py:340: AssertionError: (96, 17)
+<HOME>\Github\s19_app\tests\test_tui_flow_execution_b94.py:424: assert (96, 17) == (96, 18)
+<HOME>\Github\s19_app\tests\test_tui_report_filter_surface.py:773: AssertionError: baseline wrote []
 [1;31mTextual Snapshot Report[0m
 
 [1;30;41m29[0m[30;41m mismatched snapshots[0m
 
-[1mView the [0m]8;id=7836340;file://C:\Users\jjgh8\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+[1mView the [0m]8;id=7836340;file://<HOME>\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
 
-[2mC:\Users\jjgh8\Github\s19_app\snapshot_report.html[0m
+[2m<HOME>\Github\s19_app\snapshot_report.html[0m
 
 =========================== short test summary info ===========================
 FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_c_after_the_dwell_confirms_the_attention_lane

@@ -1,6 +1,6 @@
 # PDR review — qa-reviewer — Batch 2026-10-11-batch-92
 
-**Lens:** qa-reviewer (PDR). **Mode:** plan — results are PENDING and declared `planned`. **Independence:** read-only on the proposal (`design/design-proposal.md`); this file is the only write. All checks executed against the worktree at `C:/Users/jjgh8/Github/s19_app-b92` on 2026-10-12; proposal read in full; contract `01-requirements.md` read in full; P2 closure evidence (`02-review.md`, `review-closure-qa.md`, `review-lens-qa.md`) read.
+**Lens:** qa-reviewer (PDR). **Mode:** plan — results are PENDING and declared `planned`. **Independence:** read-only on the proposal (`design/design-proposal.md`); this file is the only write. All checks executed against the worktree at `<HOME>/Github/s19_app-b92` on 2026-10-12; proposal read in full; contract `01-requirements.md` read in full; P2 closure evidence (`02-review.md`, `review-closure-qa.md`, `review-lens-qa.md`) read.
 
 ## Verdict
 

@@ -2,7 +2,7 @@ FFFFFFFFFFF.                                                             [100%]
 ================================== FAILURES ===================================
 __________________ test_stress_guard_large_s19_window_count ___________________
 
-large_s19 = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25695/test_stress_guard_large_s19_wi0/stress.s19')
+large_s19 = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25695/test_stress_guard_large_s19_wi0/stress.s19')
 
     def test_stress_guard_large_s19_window_count(large_s19: Path) -> None:
         """Stress guard (LLR-035.2): the large_s19 fixture parses to 201 contiguous
@@ -28,8 +28,8 @@ E        +  where 200 = len([(134217728, 134221824), (134222080, 134226176), (13
 tests\test_entropy_service.py:300: AssertionError
 _____________ test_at288_report_hex_sections_identical_after_move _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25695/test_at288_report_hex_sections0')
-large_s19 = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25695/test_at288_report_hex_sections0/stress.s19')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25695/test_at288_report_hex_sections0')
+large_s19 = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25695/test_at288_report_hex_sections0/stress.s19')
 
     def test_at288_report_hex_sections_identical_after_move(
         tmp_path: Path, large_s19: Path
@@ -160,7 +160,7 @@ E        +  where 320 = CoverageStats(image_span=320, covered_bytes=82, coverage
 tests\test_tui_directionb.py:3795: AssertionError
 _______________ test_at037_stats_strip_matches_case_02_coverage _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25695/test_at037_stats_strip_matches0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25695/test_at037_stats_strip_matches0')
 
     def test_at037_stats_strip_matches_case_02_coverage(tmp_path: Path) -> None:
         """Black-box: the `#map_stats` strip shows the seven case_02 metrics as
@@ -215,7 +215,7 @@ E       assert 'Mapped 93 B / 2.0 GiB span (0.0000%) · 4 ranges (4 valid) · 3 
 tests\test_tui_directionb.py:4020: AssertionError
 _______________ test_tc031_engine_modules_have_no_diff_vs_main ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25695/test_tc031_engine_modules_have0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25695/test_tc031_engine_modules_have0')
 
     def test_tc031_engine_modules_have_no_diff_vs_main(tmp_path: Path) -> None:
         """The engine / data-processing modules show zero diff vs ``main``.
@@ -250,7 +250,7 @@ E         +  1 file changed, 24 insertions(+)
 tests\test_tui_directionb.py:7050: AssertionError
 __________ test_tc031_engine_modules_have_no_name_only_diff_vs_main ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25695/test_tc031_engine_modules_have1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25695/test_tc031_engine_modules_have1')
 
     def test_tc031_engine_modules_have_no_name_only_diff_vs_main(tmp_path: Path) -> None:
         """No engine module file appears in ``git diff --name-only main``.
@@ -276,7 +276,7 @@ E         Use -v to get more diff
 tests\test_tui_directionb.py:7067: AssertionError
 ______________ test_at040a_per_range_micro_bar_colour_and_width _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25695/test_at040a_per_range_micro_ba0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25695/test_at040a_per_range_micro_ba0')
 
     def test_at040a_per_range_micro_bar_colour_and_width(tmp_path: Path) -> None:
         """AT-040a / LLR-042.7 (black-box, C-10b): each range row renders a micro-bar;
@@ -418,7 +418,7 @@ E       AttributeError: 'types.SimpleNamespace' object has no attribute 'type'
 s19_app\core.py:233: AttributeError
 ______ test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden _______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25695/test_at_054b_no_filter_bkey_re0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25695/test_at_054b_no_filter_bkey_re0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000126800A80D0>
 
     def test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden(
@@ -481,7 +481,7 @@ E             Use -v to get more diff
 tests\test_before_after_report.py:899: AssertionError
 ________________ test_at031b_two_saves_are_distinct_no_clobber ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25695/test_at031b_two_saves_are_dist0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25695/test_at031b_two_saves_are_dist0')
 
     def test_at031b_two_saves_are_distinct_no_clobber(tmp_path: Path) -> None:
         """AT-031b (idempotent boundary) — two saves keep both, distinct names.
@@ -516,9 +516,9 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
     
         saved = list(patches.glob("*.json"))
 >       assert len(saved) == 2, f"two saves must keep two files, found {saved}"
-E       AssertionError: two saves must keep two files, found [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25695/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')]
+E       AssertionError: two saves must keep two files, found [WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25695/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')]
 E       assert 1 == 2
-E        +  where 1 = len([WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25695/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')])
+E        +  where 1 = len([WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25695/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')])
 
 tests\test_tui_patch_editor_v2.py:1336: AssertionError
 =========================== short test summary info ===========================

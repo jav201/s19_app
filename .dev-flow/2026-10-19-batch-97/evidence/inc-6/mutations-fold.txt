@@ -11,30 +11,30 @@ M7-attention-class-on-every-confirm [flow_screens.py] test_tc_b97_23_two_waiting
     | 1 failed in 5.55s
 M22-no-dwell [flow_screens.py] test_tc_b97_64_burst_on_two_waiting_lanes_confirms_one: RED (KILLED)
     restore sha256 2e46f312ab18c17662ed8251d7d9c50c9791a790463920b720c65a266611498c == before 2e46f312ab18c17662ed8251d7d9c50c9791a790463920b720c65a266611498c
-    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_execution.py:1512: AssertionError: ([(0, 2), (1, 2)], None, False)
+    | <HOME>\Github\s19_app\tests\test_b97_flow_execution.py:1512: AssertionError: ([(0, 2), (1, 2)], None, False)
     | 1 failed in 7.76s
 M22-no-dwell [flow_screens.py] test_tc_b97_64_two_external_steps_end_ok: GREEN (SURVIVED)
     restore sha256 2e46f312ab18c17662ed8251d7d9c50c9791a790463920b720c65a266611498c == before 2e46f312ab18c17662ed8251d7d9c50c9791a790463920b720c65a266611498c
     | 1 passed in 7.21s
 M23-dwell-base-from-an-earlier-event [flow_screens.py] test_tc_b97_64_burst_on_two_waiting_lanes_confirms_one: RED (KILLED)
     restore sha256 2e46f312ab18c17662ed8251d7d9c50c9791a790463920b720c65a266611498c == before 2e46f312ab18c17662ed8251d7d9c50c9791a790463920b720c65a266611498c
-    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_execution.py:1512: AssertionError: ([(0, 2), (1, 2)], None, False)
+    | <HOME>\Github\s19_app\tests\test_b97_flow_execution.py:1512: AssertionError: ([(0, 2), (1, 2)], None, False)
     | 1 failed in 7.49s
 M23-dwell-base-from-an-earlier-event [flow_screens.py] test_tc_b97_64_two_external_steps_end_ok: RED (KILLED)
     restore sha256 2e46f312ab18c17662ed8251d7d9c50c9791a790463920b720c65a266611498c == before 2e46f312ab18c17662ed8251d7d9c50c9791a790463920b720c65a266611498c
-    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_execution.py:1557: AssertionError: waiting at the second external step after one confirm: (2, None, False, False)
+    | <HOME>\Github\s19_app\tests\test_b97_flow_execution.py:1557: AssertionError: waiting at the second external step after one confirm: (2, None, False, False)
     | 1 failed in 7.26s
 M46-new-run-does-not-restart-the-attention [flow_screens.py] test_tc_b97_64_a_new_set_run_restarts_the_dwell: RED (KILLED)
     restore sha256 2e46f312ab18c17662ed8251d7d9c50c9791a790463920b720c65a266611498c == before 2e46f312ab18c17662ed8251d7d9c50c9791a790463920b720c65a266611498c
-    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_execution.py:1741: AssertionError: ([(1, 2)], None)
+    | <HOME>\Github\s19_app\tests\test_b97_flow_execution.py:1741: AssertionError: ([(1, 2)], None)
     | 1 failed in 7.49s
 M47-scroll-home-removed [flow_screens.py] test_tc_b97_23_lanes_return_home_when_no_lane_waits: RED (KILLED)
     restore sha256 2e46f312ab18c17662ed8251d7d9c50c9791a790463920b720c65a266611498c == before 2e46f312ab18c17662ed8251d7d9c50c9791a790463920b720c65a266611498c
-    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_execution.py:1808: AssertionError: 14
+    | <HOME>\Github\s19_app\tests\test_b97_flow_execution.py:1808: AssertionError: 14
     | 1 failed in 23.05s
 M48-confirm-line-claims-the-outcome [flow_screens.py] test_tc_b97_64_c_after_the_dwell_confirms_the_attention_lane: RED (KILLED)
     restore sha256 2e46f312ab18c17662ed8251d7d9c50c9791a790463920b720c65a266611498c == before 2e46f312ab18c17662ed8251d7d9c50c9791a790463920b720c65a266611498c
-    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_execution.py:1477: AssertionError: ['Confirmed flash_chain — the run continues.']
+    | <HOME>\Github\s19_app\tests\test_b97_flow_execution.py:1477: AssertionError: ['Confirmed flash_chain — the run continues.']
     | 1 failed in 7.58s
 M48-confirm-line-claims-the-outcome [flow_screens.py] test_tc_b97_64_a_failed_rerun_says_so_on_the_status_line: RED (KILLED)
     restore sha256 2e46f312ab18c17662ed8251d7d9c50c9791a790463920b720c65a266611498c == before 2e46f312ab18c17662ed8251d7d9c50c9791a790463920b720c65a266611498c
@@ -46,13 +46,13 @@ M49-failed-rerun-not-said [app.py] test_tc_b97_64_a_failed_rerun_says_so_on_the_
     | 1 failed in 7.19s
 M50-in-flight-line-removed [flow_screens.py] test_tc_b97_55_c_during_a_run_says_a_run_is_in_progress: RED (KILLED)
     restore sha256 2e46f312ab18c17662ed8251d7d9c50c9791a790463920b720c65a266611498c == before 2e46f312ab18c17662ed8251d7d9c50c9791a790463920b720c65a266611498c
-    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_execution.py:1771: AssertionError: c ignored — flash_chain started waiting a moment ago. Press c again to confirm.
+    | <HOME>\Github\s19_app\tests\test_b97_flow_execution.py:1771: AssertionError: c ignored — flash_chain started waiting a moment ago. Press c again to confirm.
     | 1 failed in 6.89s
 M51-head-time-is-the-lane-duration [flow_screens.py] test_tc_b97_63_lane_head_time_is_on_the_set_clock: RED (KILLED)
     restore sha256 2e46f312ab18c17662ed8251d7d9c50c9791a790463920b720c65a266611498c == before 2e46f312ab18c17662ed8251d7d9c50c9791a790463920b720c65a266611498c
-    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_execution.py:1830: AssertionError: ('◇ patch_chain · done with notices · 0.017s · 4 blocks · wrote fw_app_patched.s19', '00:00.017 ◇ patch_chain · done with notices · wrote fw_app_patched.s19')
+    | <HOME>\Github\s19_app\tests\test_b97_flow_execution.py:1830: AssertionError: ('◇ patch_chain · done with notices · 0.017s · 4 blocks · wrote fw_app_patched.s19', '00:00.017 ◇ patch_chain · done with notices · wrote fw_app_patched.s19')
     | 1 failed in 5.52s
 M52-legend-word-back-to-ok [flow_screens.py] test_tc_b97_33_flow_execution_glyphs_closed_and_in_the_legend: RED (KILLED)
     restore sha256 2e46f312ab18c17662ed8251d7d9c50c9791a790463920b720c65a266611498c == before 2e46f312ab18c17662ed8251d7d9c50c9791a790463920b720c65a266611498c
-    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1767: AssertionError: [' ▓ ok  ░ not run / skipped  ✗ error  ◇ notices  □ waiting for a human  ▪ owed before the lane goes on           ']
+    | <HOME>\Github\s19_app\tests\test_b97_chips_help.py:1767: AssertionError: [' ▓ ok  ░ not run / skipped  ✗ error  ◇ notices  □ waiting for a human  ▪ owed before the lane goes on           ']
     | 1 failed in 5.80s

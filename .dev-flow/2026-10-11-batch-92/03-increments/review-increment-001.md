@@ -4,7 +4,7 @@ code-reviewer — spawned as a generic agent with agents/code-reviewer.md · **O
 
 Standalone copy of the review recorded in the packet's §4b cell
 (`03-increments/increment-001.md`), written at the Phase-3 increment gate. Every check below was
-**executed by the reviewer in the worktree** `C:/Users/jjgh8/Github/s19_app-b92` (2026-10-12), not
+**executed by the reviewer in the worktree** `<HOME>/Github/s19_app-b92` (2026-10-12), not
 read from the packet's claims.
 
 ## Scope reviewed

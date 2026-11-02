@@ -45,8 +45,8 @@ fixtures discussed in §2 contain synthetic canon ids; they are written here as 
 arms are **described rather than pasted**, because pasting a non-conforming token would mint a V23
 NOTICE against this document. Substitutions are flagged at each site.
 
-**Notation.** `W` = `C:\Users\jjgh8\Github\s19_app`, branch `claude/batch-88-audit-closures` ·
-`PY` = `C:\Users\jjgh8\anaconda3\envs\s19env\python.exe` (used **directly**, never through
+**Notation.** `W` = `<HOME>\Github\s19_app`, branch `claude/batch-88-audit-closures` ·
+`PY` = `<HOME>\anaconda3\envs\s19env\python.exe` (used **directly**, never through
 `conda run`, and never without `PYTHONIOENCODING=utf-8` — see §6.1) · `ORIG` = the shipped validator,
 LF-normalised · `PATCHED` = the 29-arm proposal · `MUT/<n>` = a single-edit mutant of `PATCHED`, each
 guarded by an `assert s != src` so a mutation that changes nothing is a hard error rather than a
@@ -581,11 +581,11 @@ the validator.
 
 ```
 # validator, at any station
-PYTHONIOENCODING=utf-8 /c/Users/jjgh8/anaconda3/envs/s19env/python.exe \
+PYTHONIOENCODING=utf-8 <HOME>/anaconda3/envs/s19env/python.exe \
     ~/.claude/docs/tools/devflow-validate.py "$W" > 04-gate-<station>.txt 2>&1
 
 # the suite, at P4, owned by the orchestrator
-PYTHONIOENCODING=utf-8 /c/Users/jjgh8/anaconda3/envs/s19env/python.exe \
+PYTHONIOENCODING=utf-8 <HOME>/anaconda3/envs/s19env/python.exe \
     -m pytest -q -m "not slow" > 04-suite.txt 2>&1
 ```
 

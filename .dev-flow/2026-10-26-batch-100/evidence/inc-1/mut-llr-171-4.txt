@@ -2,13 +2,13 @@ mutation: llr-171-4 on s19_app/tui/workspace.py
 hash before: 305e197c1a8d2a94ef077ac6c893c83e0d5449268c43b28df6e73a800acb43d1
 hash mutated: 8baeebe83e4941c447a590cf265967ba0e8b5a990ee346b4a571145ef620469e
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py -k tc_b100_62
-tree: /c/Users/jjgh8/Github/s19_app-b100-inc1
+tree: <HOME>/Github/s19_app-b100-inc1
 
 .F                                                                       [100%]
 ================================== FAILURES ===================================
 _______ test_tc_b100_62_junction_destination_is_refused_nothing_written _______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27189/test_tc_b100_62_junction_desti0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27189/test_tc_b100_62_junction_desti0')
 
     def test_tc_b100_62_junction_destination_is_refused_nothing_written(
         tmp_path: Path,

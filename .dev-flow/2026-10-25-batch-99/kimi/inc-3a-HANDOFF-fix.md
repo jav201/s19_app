@@ -1,6 +1,6 @@
 # HANDOFF — batch-99 Increment 3a · review round 1 fixes (code-reviewer F1–F6)
 
-Worktree: `C:\Users\jjgh8\Github\s19_app-b99-inc3a` (branch `b99-inc3a`, base `a52e2be`).
+Worktree: `<HOME>\Github\s19_app-b99-inc3a` (branch `b99-inc3a`, base `a52e2be`).
 Nothing committed — all changes are in the working tree for the orchestrator.
 Contract amendment read from the MAIN checkout per the brief: LLR-155.3 +
 LED-2026-10-25-batch-99.7 (the immutability invariant; TC-B99-13 models

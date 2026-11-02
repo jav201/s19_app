@@ -112,7 +112,7 @@ LLR-135); on the Map window the focus is on the auto-selected region row and
 ## 3 · How to test
 
 ```bash
-# interpreter: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe
+# interpreter: <HOME>/anaconda3/envs/s19env/python.exe
 export PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<this worktree>
 unset NO_COLOR
 python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py
@@ -241,67 +241,67 @@ The module now holds 32 nodes. On the FINAL tree `7168c1c9` the focus module tog
 
 | Evidence artifact | Path — under `artifact_homes.evidence` | SHA-256 |
 |---|---|---|
-| green-07-tc330-isolation.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-07-tc330-isolation.txt | 6971e66618c57040d2e4605e13e2cd318889a87dd1b7a786e22203d13bfd9d75 |
-| green-08-fix1-focus-module.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-08-fix1-focus-module.txt | 88f39d17f5c3e537371f1a7b142976ef09f5d676115fe50360d26123c5672ff1 |
-| green-09-reverse-census.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-09-reverse-census.txt | 07cb8e22ea6ced6026f6eb9b66c5e63c55dc96a75f44cebe1bda3a9d888915b1 |
-| green-10-census-flakes-isolation.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-10-census-flakes-isolation.txt | f5ddd724e1fe96a99ea1e393cc26aa387b8ac49e4586c7a9733ac2939ea21609 |
-| green-11-fix2-focus-module.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-11-fix2-focus-module.txt | f4850695eeaf65d3f9dd8ea8e4c710d4148f34eab0d25c2b7e710aed5577d57d |
-| green-12-fix2-map-tests.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-12-fix2-map-tests.txt | ff8ffa8548e3697d15c9db6fb3002bd12c57bba1c5b183271aa4eb07f78d7102 |
-| green-13-fix2-focus-module-final.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-13-fix2-focus-module-final.txt | 9d65b653199fcdb865d42528de763bd4fc760ef1374dc02266526607f9c82eb8 |
-| green-13b-fix2-tui-app.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-13b-fix2-tui-app.txt | ae72fb944fc33fef53db3d75c9e4be3d1cc137fcd13e3882d0385928731749d8 |
-| green-14-fix2-focus-module-final.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-14-fix2-focus-module-final.txt | caa9428d4bd1e6248ff8bd38031787fed7ce94ffab5bfef4f159b266987cbc6a |
-| green-15-fix2-census-flakes-isolation.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-15-fix2-census-flakes-isolation.txt | d2dd91af01f47e75e022004f0b3dbafe415f7f87c52844e59d9fed8a19f54dc7 |
-| green-16-fix2-at061a-isolation-and-base.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-16-fix2-at061a-isolation-and-base.txt | 5899cb33d2375dbf94768b33ebd25d38eebd390d9bb12c8df4a018c817657773 |
-| green-17-fix2-at061a-flake-rate.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-17-fix2-at061a-flake-rate.txt | 02f1100b05215b1cfc06105aa1414e7e1ca75ca14e7972035024e90fb4b8e67f |
-| green-18-fix2-tcb9755-isolation.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-18-fix2-tcb9755-isolation.txt | 95f75c82d29e4155af64ddb6682c2a0ae5512e5382e28de0a08b5b70d9eeaf18 |
-| green-19-tc-b97-55-at-base-x5.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-19-tc-b97-55-at-base-x5.txt | 4f11e05df5d5e178928f35109d63101f6b89c3b13886db5046e8cfb17c2f291b |
-| green-20-orch-focus-module.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-20-orch-focus-module.txt | 49fe32d9d4a5da9ed0ca63687370c9114d38dec60407a11b4fe1f80e11c63080 |
-| green-21-r3-final-focus-tuiapp.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-21-r3-final-focus-tuiapp.txt | 1efc23afcbc9a6470ee5597b0d9e0f7f1d1d241aface740da929d74d31a64f7e |
-| guards-census.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/guards-census.txt | 6b1460a871fed550957d6b5715256c8e66bd3a2b9450572cf3640c1a17624b24 |
-| guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/guards.txt | fbfd6894c178e0c61c578e86868fe489247a4ad9df6b09f527a7038f00187299 |
-| import-proof.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/import-proof.txt | 5072d4a4744e2854a656a4368fc5c44286117dab803172374e6e30169dd52149 |
-| mut-F1-diff-old-target-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-F1-diff-old-target-full.txt | 31c41fd5d7f51d362f59b9fdb56917916e884034ddc9afcb1bc5c656138f2331 |
-| mut-F1-map-unfocusable-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-F1-map-unfocusable-full.txt | 48e6298d4e74b7a28b41da7ec72f0d72409e40d25770224cffc10bac94f0bbb9 |
-| mut-FB-no-fallback-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-FB-no-fallback-full.txt | 490139581709d12aaecfd0baf7a1f5e493527a00f759c399fb072503aa4e0a21 |
-| mut-fix2-F1_diff_old_target-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-fix2-F1_diff_old_target-full.txt | 678cda0c51df45a25ad021e724b2e06cc0ea9bb363c9399e07c824ee14d229d6 |
-| mut-fix2-F1_map_unfocusable-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-fix2-F1_map_unfocusable-full.txt | 4d7a32e46ff6b8badeea61cfcb6a13a26fd5dddf3877c72f09d9e04e1f548bb3 |
-| mut-fix2-FB_no_fallback-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-fix2-FB_no_fallback-full.txt | 28fb867c20c999c4d4d278ab50a504e24f5769101e17ca18cf22f5e271e5b688 |
-| mut-fix2-K1_a2l_tail-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-fix2-K1_a2l_tail-full.txt | 21a67de79bb04c0b2c6243302076e05dccfb0fc8222fffe149103f4eb89a6ba9 |
-| mut-fix2-K2_input_target-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-fix2-K2_input_target-full.txt | b34dff56c869a101eb8890657448dc6d0034d38fd6048603bacd367af7a7dc20 |
-| mut-fix2-K3_drop_mac-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-fix2-K3_drop_mac-full.txt | 5c153a99f38954c3e9923e226327c60d98f52c3a3e2af816faf713b82c81b9ce |
-| mut-fix2-K4_finalize_tail-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-fix2-K4_finalize_tail-full.txt | 9e3593aba05768af7d8a9e35dc85d03c6db2923d692482e2b0e40af8d017439d |
-| mut-fix2-LC_chrome_input_taken-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-fix2-LC_chrome_input_taken-full.txt | bc0d73edf17dd33680d4e447d1b1d7babd350c5b741172694b741832f4d21755 |
-| mut-fix2-LD_self_focused-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-fix2-LD_self_focused-full.txt | 16a2c2aca639e3b1df409d7c0a05b4b2e5b4d6a4911c291f8038a442644f12e4 |
-| mut-fix2-R1_always_rehome-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-fix2-R1_always_rehome-full.txt | 0c6f816b01d5f52e642407f5735195387d37645dd16431186f82bdcec656a6e9 |
-| mut-fix2-R2_no_text_clause-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-fix2-R2_no_text_clause-full.txt | c7870de4ad92c52de91e9fd80eb20e1fe7ed054a226f84edbf6263a628464d36 |
-| mut-fix2-R5_widget_focus-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-fix2-R5_widget_focus-full.txt | c017b453c3c47df07717ac5b93faa85e1a26a397c315bd9b6a5f73bfeaab8705 |
-| mut-fix2-R7_none_no_rehome-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-fix2-R7_none_no_rehome-full.txt | fe28ee934df604da5bead2d957046dc793c14a89ae8712d5753a4dd43bd19a67 |
-| mut-K1-a2l-tail-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-K1-a2l-tail-full.txt | 2fea3f85e3680489ebc8ac61e029683459f484c874515e9f8dc1269c0ee02460 |
-| mut-K2-input-target-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-K2-input-target-full.txt | c5fc3f75573a516b5e71ab53ed2e230260903fb8154b20af14511e28621af43c |
-| mut-K3-drop-mac-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-K3-drop-mac-full.txt | 48a3664813ff86ebf433dfd04bb08b6393d6ef72982385e1b17e696c2ebee25c |
-| mut-K4-finalize-tail-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-K4-finalize-tail-full.txt | aaba52ddad692e6628155c71bac712322a20887fec7d2d7d13031fa79e62e896 |
-| mut-LC-chrome-input-taken-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-LC-chrome-input-taken-full.txt | 1171045c711d97149277261b892124a914ddb5da240ca3dae7867325b0b25ae6 |
-| mut-LD-self-focused-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-LD-self-focused-full.txt | 8ea96808bb0f0c8b6d439d4dbb681ff8d114b2245758af1755ec697f407f42fa |
-| mut-R1-always-rehome-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-R1-always-rehome-full.txt | b863523ea66c698d9af5d6c6935752faedcdf72a3390e7e0bc6f21eaec259928 |
-| mut-R2-no-text-clause-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-R2-no-text-clause-full.txt | 32f4011c694ec3e450fb3fb2aa130ce91783b7b5da63427c7d033871a7bb44c5 |
-| mut-R5-widget-focus-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-R5-widget-focus-full.txt | 6fafde04b8a0a343654a6e37846ff8775eeee9a063d495025cb0150703c21a6d |
-| mut-R7-none-no-rehome-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-R7-none-no-rehome-full.txt | ceba73a02f91978f0c87842e5d28ad3fcbe165ddbb69d2f354f1b47d5e38e00a |
-| mut-RA-no-reassert-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-RA-no-reassert-full.txt | 334288f02941025a2ef04a81c516899251e11966c5b29eeaf5ccf19f188c31ac |
-| orch-guards-census-final.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/orch-guards-census-final.txt | 46070e2e9189db25a5a726f4b0cf4309da7210ce69929f6a693745b0d5b9b48d |
-| green-22-r3-map-files.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-22-r3-map-files.txt | b059b0a6a6ce3d0231660e4cae4d9f7e48d74b792e12dd978e650171e2197bd1 |
-| orch-guards-census.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/orch-guards-census.txt | 87f4e69abd574cc65a824904d00969b2d6d866436ae276688a27de0419f7dd49 |
-| orch-guards-final.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/orch-guards-final.txt | 55c1a2d14d18351aa4c8328952f586bd2348cc9d88e3b8d5e9b89e0fbf2df5ce |
-| orch-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/orch-guards.txt | 0b2db89345e2ca839667f480d7dccef38976f74f7f610c937f1e03686a7ef54d |
-| red-01-focus-module.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/red-01-focus-module.txt | c836bac4995c385ff818585ca17dd24c26e89697a0e71ff4fbac75ba8bd085e2 |
-| red-02-focus-module.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/red-02-focus-module.txt | 09e576d0590a3d448a72bafbcc15ce9e172cf36b27d130ba96384b90dea9d669 |
-| red-03-census-failures-at-base.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/red-03-census-failures-at-base.txt | bad061e31a043929e8cbdb287a45d6eeac25824d3d676ba13c850230b748b1a1 |
-| red-04-fix1-module-at-base.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/red-04-fix1-module-at-base.txt | b3426dbb69df4a276dcf0bf3057b293765b97f2fef675be427557337b4db13ee |
-| red-05-fix2-arms-on-fix1-tree.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/red-05-fix2-arms-on-fix1-tree.txt | dbcde89e56b37ff5c993a5dc06bdaec46d4d5af77b78fb75196fa3ba56b91942 |
-| red-06-fix2-module-at-base.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/red-06-fix2-module-at-base.txt | f30faf07426867e7e8aebe364d0283c5579d34dbe07024bd91e2545ecf0fa36e |
-| red-07-r3-1-hidden-map-row.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/red-07-r3-1-hidden-map-row.txt | 15218367b916dc6b23f0cc796b21f6d1b2b34210f901a723b9b58520120f9249 |
+| green-07-tc330-isolation.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-07-tc330-isolation.txt | 3cbe80221bd0da28fbacdea31cef5c68a2c115f7a8f75ff026d482473a26055e |
+| green-08-fix1-focus-module.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-08-fix1-focus-module.txt | 1b0e5949aac99776d1aee97e9a71343d772aea0183afad0fb047f7906d39e5e2 |
+| green-09-reverse-census.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-09-reverse-census.txt | 37682ed984a944bf9ea5939206f1367acd834a71a5ea454628eacc27deb786d3 |
+| green-10-census-flakes-isolation.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-10-census-flakes-isolation.txt | 617af14671bda29e372f17bf49b6b8a9cc6e1bed7be40d20f997ad3fec0bc65b |
+| green-11-fix2-focus-module.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-11-fix2-focus-module.txt | 74c979b8eff4fff8aee62ef4e2e8632c08db61b806fa31279e903659f7d14c4f |
+| green-12-fix2-map-tests.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-12-fix2-map-tests.txt | 9975678f39626aca963597b7fdda2cc3b17dd59a69942cdd1bb24f49ee117fbd |
+| green-13-fix2-focus-module-final.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-13-fix2-focus-module-final.txt | bcfde2c2f59cc9a78696f79f6b5905b4bc37f147bdb28d827518d15c1bba2b1a |
+| green-13b-fix2-tui-app.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-13b-fix2-tui-app.txt | b8c1c148886436ec57d379ef477eccc509f2adefdc3129ddbd8a506d5dff63f9 |
+| green-14-fix2-focus-module-final.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-14-fix2-focus-module-final.txt | 99d8401149616ce8096ecf39fe2ee3bab7259fe01ce60af5c8d1f7d1c5388324 |
+| green-15-fix2-census-flakes-isolation.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-15-fix2-census-flakes-isolation.txt | 6253be4e6321dd7a53f735737f5b144b08c82a8450ea90361ef89250399f5dea |
+| green-16-fix2-at061a-isolation-and-base.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-16-fix2-at061a-isolation-and-base.txt | 206d0f1ae36cdf2eb478400a4c5f42547cbf0cd8344b5a8eb6d720d536248118 |
+| green-17-fix2-at061a-flake-rate.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-17-fix2-at061a-flake-rate.txt | d8a730d4ed6c9924db6848130a36663df4a212809e379a1efe27c1263c31821b |
+| green-18-fix2-tcb9755-isolation.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-18-fix2-tcb9755-isolation.txt | 7649695dcd1def5fd27a79ecc1d32b2e0066a23843df1a560476409f60b97551 |
+| green-19-tc-b97-55-at-base-x5.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-19-tc-b97-55-at-base-x5.txt | c207b10448cd5b441ceaa932e6b7c6ba2ca7e63cbf6409adff36af0238640f28 |
+| green-20-orch-focus-module.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-20-orch-focus-module.txt | 8919f652fc78ea38dd0204ef807adbfa9f1fc8cd2773fb89d1ad51cfc3da97a6 |
+| green-21-r3-final-focus-tuiapp.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-21-r3-final-focus-tuiapp.txt | 09b690b367704d36b256346ab410a355dfe25b7f5b405b836f8452a695f7ff07 |
+| guards-census.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/guards-census.txt | 3bb8e7887953011ae51ae749f0ca673489f4dec8113c9a1dffcae9933e793f73 |
+| guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/guards.txt | 016e2ad7c18f16245fc8ba7770d12fe5ce1d366241be83b9851c9caf2c43302c |
+| import-proof.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/import-proof.txt | a9a6f2d4b429b69c682f0dee22add5f807a84a627fd4a6bb07976af34addc490 |
+| mut-F1-diff-old-target-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-F1-diff-old-target-full.txt | 9b55ad7b07940d039e76dc26f4673e2eff09dd436aecd338f4a05105786edfdd |
+| mut-F1-map-unfocusable-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-F1-map-unfocusable-full.txt | 1f3fe50db40a77d062f36e72a847a6af43ccf1328c23590538ac34a39b0fe5fd |
+| mut-FB-no-fallback-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-FB-no-fallback-full.txt | 6145e74eeaa5008ad299b145854c18d3a8865890857f4f188274fb781902c172 |
+| mut-fix2-F1_diff_old_target-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-fix2-F1_diff_old_target-full.txt | 18d82241cb1e7b21cb1dc5c07dfd4f731fca8dfb112b7b99d383db4ba3c4dad4 |
+| mut-fix2-F1_map_unfocusable-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-fix2-F1_map_unfocusable-full.txt | 2a782f80c7bb285a758d1a2e4f058cc04b1ef876debf01b059c78bef98b9fdfd |
+| mut-fix2-FB_no_fallback-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-fix2-FB_no_fallback-full.txt | e5be13f3a5b49b4ce406422020977d64f2b9913ac08af4162677a5d606224169 |
+| mut-fix2-K1_a2l_tail-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-fix2-K1_a2l_tail-full.txt | 7b9678fc926626fb79b2d285095ce5e5fb7fe897d81323038b0dc22bc787e2cb |
+| mut-fix2-K2_input_target-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-fix2-K2_input_target-full.txt | 4c4dd4d78fed29fd3f956fea11a630c9bf9e8f59c021e7816cc703d05bf1c93b |
+| mut-fix2-K3_drop_mac-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-fix2-K3_drop_mac-full.txt | 806f315758c4bd7785587f70d4f7715138bb26cabf7881bedb66ad2c40c2cdd6 |
+| mut-fix2-K4_finalize_tail-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-fix2-K4_finalize_tail-full.txt | 35dd25503f554c64745a2cd0ab245e05fad9adc223b3a759db537d864d955700 |
+| mut-fix2-LC_chrome_input_taken-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-fix2-LC_chrome_input_taken-full.txt | e91bc2e1e984d936cd40cfd7dc82e60d8a6d3004bf5411b0108209a017805777 |
+| mut-fix2-LD_self_focused-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-fix2-LD_self_focused-full.txt | c24f36182404c5581f88e03cea9ae9b0d4c7908fe33ef82b0912d28edec425e3 |
+| mut-fix2-R1_always_rehome-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-fix2-R1_always_rehome-full.txt | 190653d17eec14c5873702f41bc6c80212af4f7e033e6b22fdf8163492e3e61d |
+| mut-fix2-R2_no_text_clause-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-fix2-R2_no_text_clause-full.txt | 4fef0b64496983fb36b26f7cdc954e55e6afafd7d97c8217ac817972d6d0065c |
+| mut-fix2-R5_widget_focus-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-fix2-R5_widget_focus-full.txt | e618b76f260fb1ee99c5d817020805f5dc08f83d887ef9424b64dfd06a944a59 |
+| mut-fix2-R7_none_no_rehome-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-fix2-R7_none_no_rehome-full.txt | 999c5dad39ea2e9db8c2d0692f145d5b9d94e5b966276c1c3518a797981de5e6 |
+| mut-K1-a2l-tail-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-K1-a2l-tail-full.txt | fd37fbcc6736402cd20df294ea6e86500b943509248f81baa2714f7200b7b745 |
+| mut-K2-input-target-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-K2-input-target-full.txt | 4a213c8532f026299debae7b90087eb604713b642f2e9757766b39f1f205d9a9 |
+| mut-K3-drop-mac-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-K3-drop-mac-full.txt | b82ceaac34c075114b65a0bb4a24f5b01ff8ce2a5beb0ca98d4859747f7b0781 |
+| mut-K4-finalize-tail-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-K4-finalize-tail-full.txt | f45c96b8cc9ae78be97c0300ae2e434ff710a9ca21587ba4d1319b76bd375610 |
+| mut-LC-chrome-input-taken-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-LC-chrome-input-taken-full.txt | 1537f266f248fee3080f998056e421d4da346cca2a2c24e0faf8c9d14f21a54e |
+| mut-LD-self-focused-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-LD-self-focused-full.txt | b42ad404ee1256c33415d85a80ebd1cabf5a10c97a6180cd1a37fcfa234fd224 |
+| mut-R1-always-rehome-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-R1-always-rehome-full.txt | ca988b2ad615383b51a157187df7d8964e4cff39100c68d5bd42938cfdebaa43 |
+| mut-R2-no-text-clause-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-R2-no-text-clause-full.txt | de41d2caf11063b477eeb6c725cb6255e357e7d1bf883f9b27c9f2cd5888ba4c |
+| mut-R5-widget-focus-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-R5-widget-focus-full.txt | daed1c849b6da7a72c2ea302b791089a58bc017ba6973fe756eddb3c53e4e793 |
+| mut-R7-none-no-rehome-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-R7-none-no-rehome-full.txt | 14afbc025c9d91147a602837a3d974e348fe0772a58465d6552a01758529f53b |
+| mut-RA-no-reassert-full.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/mut-RA-no-reassert-full.txt | 282f7ef1898907f38e5cac8203210975d7a4605eb36f6f3c9b229f52d3bcedad |
+| orch-guards-census-final.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/orch-guards-census-final.txt | 0a35dadd7f871e01d7c0b686c4abb14786d70c2ea1ae060a19cdad1390df7703 |
+| green-22-r3-map-files.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/green-22-r3-map-files.txt | 01971662173a8f828f5ff0d6cf8560473a032d5a6eba2fc207a830393c50f2e5 |
+| orch-guards-census.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/orch-guards-census.txt | 3fdd3687e897a4921ffdcf854bed98d6aa169ff05e08b075d077c460ac8c0ec1 |
+| orch-guards-final.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/orch-guards-final.txt | 2ab9c74d64b180e3910cee5ebd5b41cfbdace1306e1322d32edb3109d4f65c4f |
+| orch-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/orch-guards.txt | ab27e5721fcfd47b395dc6ccf36a9220d171c1fc4b3d5517b9fd40d3cd9db2a5 |
+| red-01-focus-module.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/red-01-focus-module.txt | b8c87286907ff5c6bcc420cc78aeb6282fc6a47e809734ba412cf31b6de44dd1 |
+| red-02-focus-module.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/red-02-focus-module.txt | 5d3146daf379d47f2a869ac9ebdf46393cdfb9d5e9c26f5e9006fe8982ed6aa7 |
+| red-03-census-failures-at-base.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/red-03-census-failures-at-base.txt | f1795b720741a360833ed1744595059763ccf6544ba73f1fa2de1d57506d7a9b |
+| red-04-fix1-module-at-base.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/red-04-fix1-module-at-base.txt | 798dd92c5b7405d53bed4cc7d593247586c9905a90c4e5f8e07031816c64480a |
+| red-05-fix2-arms-on-fix1-tree.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/red-05-fix2-arms-on-fix1-tree.txt | 462a856d1f965116e7b1a37a3553a92e1a0c93f87b43107f12d09b6da64a5c5c |
+| red-06-fix2-module-at-base.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/red-06-fix2-module-at-base.txt | 34d9b88a2448a63edf277cc58cfd03484457b49c61025af71689225df9ef1e76 |
+| red-07-r3-1-hidden-map-row.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/red-07-r3-1-hidden-map-row.txt | 91f43efc0bf500fa885251f281d172e33b26fed4e2b4a9a286a5c1c3485d8e50 |
 | reverse-census-files.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/reverse-census-files.txt | 23183e15560aeab7fa71ec80b6777b8f4ebd10a4a4a156826028de5fa8a47675 |
-| reverse-census-fix2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/reverse-census-fix2.txt | 405adb7f146f3a64c228014d3573cb91fffc56c78255e7c2d6ade73bee2f14fe |
-| tc-b97-55-diagnosis.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/tc-b97-55-diagnosis.txt | 69fbd39c1b84b2af0cee61b692156e39327a3626a5a17354188bd03044733e25 |
+| reverse-census-fix2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/reverse-census-fix2.txt | 1493a4e760a5b73f0594da5eb08c703a59ecf98a580c7c3a2814a52bebcd6f32 |
+| tc-b97-55-diagnosis.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-4/tc-b97-55-diagnosis.txt | 5a48e41554052bb847e17bd66673f0bb8c491172629ec284929610102285b54b |
 
 | Field | Value |
 |---|---|

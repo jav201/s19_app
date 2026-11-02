@@ -1,10 +1,10 @@
-== import C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc-9b-design\work\tree\s19_app\__init__.py
+== import <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc-9b-design\work\tree\s19_app\__init__.py
 == U1 p with 0 projects -> stack ['Screen'] status ['No saved projects found.']
 == U2 list_projects ['[b]P', 'ab', 'c', 'E', 'j', 'n', 's']
 == U3 _handle_load_project('E') -> ["Project NOT loaded: 'E' has no project.json — load a file and Save project."] project= None
 == U3 _handle_load_project('n') -> ["Project NOT loaded: 'n' has no project.json — load a file and Save project."] project= None
 == U3 _handle_load_project('j') -> ["Project NOT loaded: 'j' has no data or A2L file — load a file and Save project."] project= None
-== U4 typed <workarea>/E -> ["Project NOT loaded: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\p9b_9afbc38u\\.s19tool\\workarea\\E' is not a project — pick a project in the list."]
+== U4 typed <workarea>/E -> ["Project NOT loaded: '<HOME>\\AppData\\Local\\Temp\\p9b_9afbc38u\\.s19tool\\workarea\\E' is not a project — pick a project in the list."]
 == U5 p -> stack ['Screen', 'LoadProjectScreen'] focused project_list index 0 rows 7
 == U5 painted labels ['P', 'ab', 'c', 'E', 'j', 'n', 's']
 == U5 '[b]P' label renders 'P' type Content spans [(0, 1, 'b')]

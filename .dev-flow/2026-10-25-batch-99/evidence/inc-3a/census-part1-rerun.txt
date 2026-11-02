@@ -7,7 +7,7 @@
 ================================== FAILURES ===================================
 ___________ test_tc1800_reload_same_content_reuses_existing_target ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25811/test_tc1800_reload_same_conten0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25811/test_tc1800_reload_same_conten0')
 
     def test_tc1800_reload_same_content_reuses_existing_target(tmp_path: Path) -> None:
         workarea = _workarea(tmp_path)
@@ -33,7 +33,7 @@ E         Use -v to get more diff
 tests\test_copy_into_workarea_content_dedup.py:46: AssertionError
 _________________ test_tc018_existing_name_is_dedup_suffixed __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25811/test_tc018_existing_name_is_de0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25811/test_tc018_existing_name_is_de0')
 
     def test_tc018_existing_name_is_dedup_suffixed(tmp_path: Path) -> None:
         """TC-018 — a save onto an existing filename is dedup-suffixed.
@@ -50,7 +50,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         assert first is not None and second is not None
 >       assert first != second, "the second save silently clobbered the first"
 E       AssertionError: the second save silently clobbered the first
-E       assert WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25811/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json') != WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25811/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json')
+E       assert WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25811/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json') != WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25811/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json')
 
 tests\test_unified_write.py:385: AssertionError
 ____________ test_tc607_scanned_corpus_matches_the_declared_bound _____________

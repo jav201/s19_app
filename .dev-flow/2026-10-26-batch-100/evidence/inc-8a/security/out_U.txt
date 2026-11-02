@@ -1,4 +1,4 @@
-# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc8a\s19_app\__init__.py
+# s19_app import: <HOME>\Github\s19_app-b100-inc8a\s19_app\__init__.py
 # NO_COLOR present: False | python 3.11.15
 == U1 hostile documents under / at the caps
   U1a 1 MiB of [                     bytes= 1048576 outcome=unreadable detail='RecursionError' entries=- t=0.006s

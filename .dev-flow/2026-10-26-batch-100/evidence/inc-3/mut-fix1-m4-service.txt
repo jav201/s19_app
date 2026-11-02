@@ -1,6 +1,6 @@
 pre-mutation sha256: 18ee4d450529d0cb0fb7f33a274cd7295d9051cbc620414c22bb4c3868201c1e
 mutant sha256: 23f54ec7965ea9f9a00fa39b0a8ec941b2fce0320f94a62e541bfa32c3822623
-cmd: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py
+cmd: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py
 r's R8
                 # probe shape: the ledger holds the outgoing rows without the
                 # seam's repaint, so this is load-bearing even though today's

@@ -42,7 +42,7 @@ and were not opportunistically applied this increment — flagged in §6.
 
 ## 3. How to test
 
-Run from the repo root `C:\Users\jjgh8\Github\s19_app`:
+Run from the repo root `<HOME>\Github\s19_app`:
 
 ```
 python -m pytest -q tests/test_cdfx_changelist.py     # the new module

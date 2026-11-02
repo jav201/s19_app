@@ -18,14 +18,14 @@
 #   |     if len(entries) > REOPEN_MAX_ENTRIES:
 # edit 4 NEW:
 #   |     if False:
-# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b
+# cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b
 # env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
-# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[20000-entries] tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[20000-entries]
+# command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[20000-entries] tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[20000-entries]
 # started 2026-10-30T23:11:04Z  finished 2026-10-30T23:12:19Z  rc=1
 FF                                                                       [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b\tests\test_b100_document.py:959: AssertionError: ('20000-entries', 'ok')
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b\tests\test_b100_document.py:1189: AssertionError: []
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b\tests\test_b100_document.py:959: AssertionError: ('20000-entries', 'ok')
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b\tests\test_b100_document.py:1189: AssertionError: []
 =========================== short test summary info ===========================
 FAILED tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[20000-entries]
 FAILED tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[20000-entries]

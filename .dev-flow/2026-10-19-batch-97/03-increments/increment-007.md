@@ -232,17 +232,17 @@ All paths are under `.dev-flow/2026-10-19-batch-97/evidence/inc-7/`.
 
 | Evidence artifact | Path | SHA-256 |
 |---|---|---|
-| RED on HEAD (9 failed / 1 passed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/red.txt` | `b4573cd8aae1234e2768ef08b076fc459c49a48a0b74753794406520912b6e69` |
-| RED re-run, clean HEAD worktree | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/red-rerun.txt` | `945018c94a6194f0021f2e14417c79c59be0ee0464fd2aa9cdd496713cff67fa` |
-| AT RED on `51ee191` (4 failed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/red-at.txt` | `6925e2e7b38a815c5ec3c5af2b2167c83033a988c7b9fce72a0b3d7ab00b319d` |
+| RED on HEAD (9 failed / 1 passed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/red.txt` | `55ded3344947207f45d7a5a63971d5170943e0cf4587491c27667d8012cbc282` |
+| RED re-run, clean HEAD worktree | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/red-rerun.txt` | `429d6e27db2cce126f1cf42e99f5e245b8bbf32d2b4ec6c6acfa4b8e913f0003` |
+| AT RED on `51ee191` (4 failed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/red-at.txt` | `d0ac49dc257bd81028fe0ccddcf8079ee1640e629758b3f1aa4e2fbf9cf0cb72` |
 | Gate file list (26) | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/gate-files.txt` | `41c4c69e82111abf2c1386d90e773610e8088eaa72235fa334e8590db3482d88` |
-| GREEN gate (1153 passed / 5 failed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/green.txt` | `c638915c31b85d58eda2410dd2dbdf2ae7742708ea454f3478a5072cfec9f75f` |
+| GREEN gate (1153 passed / 5 failed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/green.txt` | `d8467879810ec0a0d63e463fba3f63e6dfa588fb19476b21fb5698a74b0aac69` |
 | Non-baseline re-runs | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/rerun-nonbaseline.txt` | `f886d53473e19e9b8acad36a6e5ce9f2d3302706f04ba24dc2f06fec72db947b` |
-| Mutations (16 mutants) | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/mutations.txt` | `ec7eba0b3ea56037ef4d3bd656827f65496e06204b463e189b37781030119d54` |
+| Mutations (16 mutants) | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/mutations.txt` | `78581d1a3b0d8c1e0ffbc65616034f002c5489b77ad8b0c08ce9479f88dd25b3` |
 | Mutations fold (M6b, M7) | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/mutations-fold.txt` | `44c2efe29100cf844dc3c9926452f53b3831d325b3414200b9ed77a579d0fc42` |
-| Mutation script (fix round: M17–M19 added) | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/mutate.py` | `eed3cf3e9d1e500334b08546c1c305ab50fb478fa120fc55117c011c34d873ff` |
-| Snapshot env parity | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/snapshot-env-parity.txt` | `d7a405653bcc23cf35767ec8e9d656fd9e6b2c2a16ee9a1397c8cf5f32fd533a` |
-| Snapshot before (29 xfailed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/snapshot-before.txt` | `2b2387faf94aef7e64f8cccd9a0ba7f70b8d5d90758624e9b2822595d75b26c5` |
+| Mutation script (fix round: M17–M19 added) | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/mutate.py` | `b494fe32affa8a6f865a881cd6e4e588fc035e61503aac10ae2bf24f5f3a6ba3` |
+| Snapshot env parity | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/snapshot-env-parity.txt` | `64f9d8a722568c18d3cd2a919491a4456a38c005ea201d9df38459318c49c089` |
+| Snapshot before (29 xfailed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/snapshot-before.txt` | `b32467042e5477e8cd9d85ec7c86347e1e6a374593d62b63a20420ae3d21abde` |
 | Snapshot regen | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/snapshot-regen.txt` | `2ff5b1c0a319a83e501e1805bf9ad3bfa2587ed48d46c9548efe095a04baf2fe` |
 | Snapshot cell row diff | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/snapshot-cells-diff.txt` | `d7be11f6ba753413e0f462bbe8687de7922769cb965292feabfd5e7bdf23634e` |
 | Snapshot reconciliation | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/snapshot-reconcile.txt` | `e73c02994edbab4b7ec4f4f28ad042ccd264f7d1523bfdbec58810febd77eb3b` |
@@ -256,7 +256,7 @@ All paths are under `.dev-flow/2026-10-19-batch-97/evidence/inc-7/`.
 | WT Patch help, scrolled to the keys block | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/png/impl.inc7.help-patch-end.png` | `73fca7a479f920e9f7e7a8d4b6671372f9a183300c9bddcef1debfb6230b33b6` |
 | WT Patch help, 80x24 | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/png/impl.inc7.help-patch.80x24.png` | `3ad569a069773b0a026ae4bec837cd650ea19979d4f0621280fa7088debb8a86` |
 | WT Map help (fits: auto height kept) | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/png/impl.inc7.help-map.png` | `a11dbd882a0f1eddee5fd6018cf43961f2aca324ef1b38112a9f4d07c11ec0b2` |
-| Fix-round RED (5 failed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/red-r2.txt` | `925d4045169229d737eeb0f31bec3495434decb97ffcd10a2c3fca0f577c460e` |
+| Fix-round RED (5 failed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/red-r2.txt` | `e653a2ea9b0af5396649f657c7fece81f87bccd7e7960d624889092f4441948e` |
 | Fix-round gate file list (9) | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/gate-files-r2.txt` | `d39a8f7a832dd40abdc42c6bcb90ee5f79c4e5519511b2515e55299fd094a7d7` |
 | Fix-round GREEN (437 passed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/green-r2.txt` | `a41e788e25352cc1e8b9dd1df5808a4372a970e54c4284a04cdf8a5f1a337336` |
 | Fix-round mutations (7 / 7 killed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/mutations-r2.txt` | `b6b69336101efb9b7f6358b8010d3ddeb3ed5077d8aba88ec697e88d6453ad68` |
@@ -265,7 +265,7 @@ All paths are under `.dev-flow/2026-10-19-batch-97/evidence/inc-7/`.
 | WT Patch help, top, 80x24 (fix round) | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/png/impl.inc7.r2.help-patch.80x24.png` | `2fcbb39915a79ee19ea99ba6cf83661f0e1659a6449cab59c9a08c1d5dc83b82` |
 | WT Patch help after pagedown, no tab, 80x24 | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/png/impl.inc7.r2.help-patch-pgdn.80x24.png` | `da1991fc4d3062116813008ee092c8cf9c40a51f9795a3195565e048513b3e27` |
 | WT Patch help at its end (blank row, focus tint) | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/png/impl.inc7.r2.help-patch-end.png` | `742ad63035d41d8150c69fd00ca40745f2b5e0f33018ef0edbfe120b408f972b` |
-| Full suite (11 failed / 3617 passed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/suite-full.txt` | `d0a5813f491c6759f3bf30fccf3d1b030e54c35ea954ff746272521f2bd3a05e` |
+| Full suite (11 failed / 3617 passed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/suite-full.txt` | `953ec1376c5e567e56451c1d63a3ba444741795a98d7aa19dde2ad197f4ed906` |
 | Non-baseline nodes re-run | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/suite-nonbaseline-rerun.txt` | `aa29377d5a2b0725415ccb6b36a34d61dea2c30610c6f4a18f6bc3c475d92563` |
 | Post-suite test fixes | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/post-suite-fix.txt` | `b2fb4d63663cd26078197a0f0af06147f707e813b7a673f2f65ce4e20bc21d82` |
 | First-round partial suite (stopped) | `.dev-flow/2026-10-19-batch-97/evidence/inc-7/suite-full-partial-r1.txt` | `f7276b31743bd79bd4e5278c0ac9dae91141c8aba6bc83d29076498f533d9704` |

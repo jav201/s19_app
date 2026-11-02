@@ -73,7 +73,7 @@ new dependency.
 ## 3. How to test
 
 ```
-# from repo root C:\Users\jjgh8\Github\s19_app
+# from repo root <HOME>\Github\s19_app
 python -m pytest -q tests/test_unified_roundtrip.py tests/test_cdfx_unchanged.py   # the new TC-025 / TC-027
 python -m pytest -q tests/test_unified_write.py tests/test_unified_export.py       # the extended S57-02 arms
 python -m pytest -q                                                               # full suite — baseline + new

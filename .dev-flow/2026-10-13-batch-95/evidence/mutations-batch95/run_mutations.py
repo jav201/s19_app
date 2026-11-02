@@ -17,7 +17,7 @@ inc-003c of batch-95, in the spirit of ``tools/mutation_harness.py``:
 
 Usage::
 
-    C:/Users/jjgh8/anaconda3/envs/s19env/python.exe \
+    <HOME>/anaconda3/envs/s19env/python.exe \
         evidence/mutations-batch95/run_mutations.py
     ... --only INC002-M1            # run a single mutation
 """
@@ -34,7 +34,7 @@ from typing import List, Optional, Sequence, Tuple
 
 REPO = Path(__file__).resolve().parent.parent.parent
 OUT_DIR = Path(__file__).resolve().parent
-PY = r"C:/Users/jjgh8/anaconda3/envs/s19env/python.exe"
+PY = r"<HOME>/anaconda3/envs/s19env/python.exe"
 
 
 @dataclass(frozen=True)

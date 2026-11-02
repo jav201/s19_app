@@ -2,7 +2,7 @@ FFFF...F.....F...FF........................................F......       [100%]
 ================================== FAILURES ===================================
 ____________ test_tc_b94_05_mode_capture_in_run_record_and_report _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26594/test_tc_b94_05_mode_capture_in0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26594/test_tc_b94_05_mode_capture_in0')
 
     def test_tc_b94_05_mode_capture_in_run_record_and_report(tmp_path: Path) -> None:
         """TC-B94-05 (LLR-019.2, white-box): the record's mode field reads
@@ -38,7 +38,7 @@ E        +  where None = ChainSetRunRecord(mode='parallel', outcomes=[], report_
 tests\test_flow_chainset_b94.py:124: AssertionError
 __________ test_tc_b94_05_parallel_dispatch_runs_chains_concurrently __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26594/test_tc_b94_05_parallel_dispat0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26594/test_tc_b94_05_parallel_dispat0')
 
     def test_tc_b94_05_parallel_dispatch_runs_chains_concurrently(
         tmp_path: Path,
@@ -76,7 +76,7 @@ E         Use -v to get more diff
 tests\test_flow_chainset_b94.py:155: AssertionError
 ____________ test_tc_b94_28_run_consumes_each_chains_own_bindings _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26594/test_tc_b94_28_run_consumes_ea0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26594/test_tc_b94_28_run_consumes_ea0')
 
     def test_tc_b94_28_run_consumes_each_chains_own_bindings(tmp_path: Path) -> None:
         """TC-B94-28 (LLR-018.2, integration): chain A's provenance names A's
@@ -110,7 +110,7 @@ E         Use -v to get more diff
 tests\test_flow_chainset_b94.py:204: AssertionError
 ______________ test_tc_b94_30_chain_set_report_provenance_lines _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26594/test_tc_b94_30_chain_set_repor0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26594/test_tc_b94_30_chain_set_repor0')
 
     def test_tc_b94_30_chain_set_report_provenance_lines(tmp_path: Path) -> None:
         """TC-B94-30 (LLR-020.2, C-42): the report carries one provenance line
@@ -139,7 +139,7 @@ E       AttributeError: 'NoneType' object has no attribute 'read_text'
 tests\test_flow_chainset_b94.py:279: AttributeError
 _______________ test_at_b94_24_service_half_reloaded_set_reruns _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26594/test_at_b94_24_service_half_re0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26594/test_at_b94_24_service_half_re0')
 
     def test_at_b94_24_service_half_reloaded_set_reruns(tmp_path: Path) -> None:
         """The C-12 chain at the service layer: the RELOADED set is what re-runs
@@ -191,7 +191,7 @@ E       assert None is not None
 tests\test_flow_chainset_b94.py:528: AssertionError
 ___________ test_at_b94_20_rebind_run_reads_each_chains_own_inputs ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26594/test_at_b94_20_rebind_run_read0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26594/test_at_b94_20_rebind_run_read0')
 
     def test_at_b94_20_rebind_run_reads_each_chains_own_inputs(tmp_path: Path) -> None:
         """AT-B94-20 (HLR-018, black-box): rebind chain A->variant_b.hex and
@@ -250,7 +250,7 @@ E         Use -v to get more diff
 tests\test_tui_flow_execution_b94.py:595: AssertionError
 ______________ test_tc_b94_29_run_log_emission_and_all_clean_arm ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26594/test_tc_b94_29_run_log_emissio0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26594/test_tc_b94_29_run_log_emissio0')
 
     def test_tc_b94_29_run_log_emission_and_all_clean_arm(tmp_path: Path) -> None:
         """TC-B94-29 (LLR-020.1, white-box over the shipped strip): per chain
@@ -290,7 +290,7 @@ E           assert 'base · started' in "Chain set not run: lanes 'base', 'base_
 tests\test_tui_flow_execution_b94.py:858: AssertionError
 __________ test_at_b94_24_save_reload_rerun_regenerates_and_notices ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26594/test_at_b94_24_save_reload_rer0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26594/test_at_b94_24_save_reload_rer0')
 
     def test_at_b94_24_save_reload_rerun_regenerates_and_notices(tmp_path: Path) -> None:
         """AT-B94-24 (HLR-021, black-box; C-10 non-default battery + C-12):
@@ -405,7 +405,7 @@ E         Use -v to get more diff
 tests\test_tui_flow_execution_b94.py:975: AssertionError
 __________________ test_tc702_resave_refreshes_stale_copies ___________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26594/test_tc702_resave_refreshes_st0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26594/test_tc702_resave_refreshes_st0')
 
     def test_tc702_resave_refreshes_stale_copies(tmp_path: Path) -> None:
         """TC-702 (LLR-138.4, snapshot refresh): divergence from a later COMMON

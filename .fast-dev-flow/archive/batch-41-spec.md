@@ -6,7 +6,7 @@
 - **Route:** /fast-dev-flow (tracked hygiene batch — operator rule 2026-07-13: NO loose direct edits)
 - **Run mode:** autonomous + self-merge (operator-stated, batch-41 kickoff; standing auth is per-batch, never carried). Decisions → MEMORY.md at close (fast-flow does NOT sync the vault).
 - **security_required:** FALSE — no sensitive pattern genuinely fires. The `escape` pattern match is a keyboard-key false positive (Escape → dismiss modal); no untrusted-input sink, auth, secrets, or external surface changes. batch-39 already hardened the paste/report sinks.
-- **Env note:** the assigned worktree `heuristic-wu-1c7c49` is empty/unregistered; the batch-41 branch is checked out in the MAIN repo dir (non-detached). All work happens in `C:/Users/jjgh8/OneDrive/Documents/Github/s19_app`.
+- **Env note:** the assigned worktree `heuristic-wu-1c7c49` is empty/unregistered; the batch-41 branch is checked out in the MAIN repo dir (non-detached). All work happens in `<HOME>/OneDrive/Documents/Github/s19_app`.
 
 ## 1. Objective
 

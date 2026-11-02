@@ -6,7 +6,7 @@ Reviewer role: code-reviewer (correctness, simplicity, reuse, conformance to the
 
 ## Scope reviewed
 
-- Tree `C:/Users/jjgh8/Github/s19_app-b100-inc12a`, branch `b100-inc12a` at `71376a3`. That commit merges `b100-inc11` at `7ac9674`. The working-tree `s19_app/` matches HEAD.
+- Tree `<HOME>/Github/s19_app-b100-inc12a`, branch `b100-inc12a` at `71376a3`. That commit merges `b100-inc11` at `7ac9674`. The working-tree `s19_app/` matches HEAD.
 - Diff: `git diff b100-inc11..b100-inc12a -- s19_app tests`. That is 16 files. `git diff -w` on the source is `app.py` +654/-174 and `styles.tcss` +8. I read the whole `-w` source diff, plus the seam functions in the merged tree (`app.py:19833`–`:20096`) and the full post-merge bodies of `_commit_project_save` (`:11197`–`:12031`), `_handle_load_project` (`:13326`–`:13472`), `load_from_path`, `load_a2l_from_path`, `_load_workarea_file` and the 4 workers.
 - Tests: I read the new tests in `tests/test_b100_busy.py` (exception rule, action table, census, AST rules) and the re-pins in `test_report_progress.py` and `test_tui_app.py`, and sampled the sweep tests in `test_b100_recents.py`. I did not review the other test files line by line.
 - Design checked against: `inc-12a/codewire/interfaces-12a.md` (fixed, Q-1…Q-7), `proto-12a-indicator.md` (the Save step list at `:436`–`:455`), `E2-rulings.md` (P-3), `E3-rulings.md` (rounds 1 and 2), `E4-impl-notes.md`, and `E4-integration-notes.md` (SR-12a-1…3, D-1…D-8).
@@ -81,7 +81,7 @@ All by reading unless marked as a probe.
 - Whether an Inc 11 test catches a reverted Save abort arm (CR12a-2): **not-run**.
 - Full suite and whole modules: **not-run**. The brief forbids them because the host is busy.
 
-Probe files are in `C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/rev12a-code-reviewer/`.
+Probe files are in `<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/rev12a-code-reviewer/`.
 
 ## Text for the packet's 4b `Independent review` cell
 

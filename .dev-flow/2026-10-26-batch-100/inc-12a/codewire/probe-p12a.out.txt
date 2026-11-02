@@ -1,4 +1,4 @@
-import C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc-12a-design\work\tree\s19_app\__init__.py
+import <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc-12a-design\work\tree\s19_app\__init__.py
 == U1.1 file_load success progress=[10, 50, 100] end_bar=100 status_text='Loaded firmware.s19 (S19 only)' exc=None
    log+ ['Copying into workarea temp...', 'Parsing firmware.s19...', 'Loaded firmware.s19 (S19 only)', 'Loaded firmware.s19']
 == U1.2 file_load failure (parse raises -> _handle_load_error) progress=[10, 50, 100] end_bar=100 status_text='Loaded firmware.s19 (S19 only)' exc=None
@@ -15,7 +15,7 @@ import C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c24
    log+ ["Project NOT loaded: 'Q' has no data or A2L file — load a file and Save project."]
 == U1.8 B9 wa-files seed problems [('no digests saved', 'project.json', None)]
 == U1.9 save_project success progress=[] end_bar=100 status_text='Loaded firmware.s19 (S19 only)' exc=None
-   log+ ['Project saved + manifest verified', 'Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c24']
+   log+ ['Project saved + manifest verified', 'Saved project to <HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-clde\\a8feab43-c24']
 == U1.10 save_project failure (placement OSError after mkdir) progress=[] end_bar=100 status_text='Loaded firmware.s19 (S19 only)' exc=None
    log+ ['Project NOT saved: could not save — [Errno 28] synthetic no space. check the folder.']
    S2 exists after failure: False
@@ -30,16 +30,16 @@ import C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c24
 == U1.15 before_after refused (nothing loaded) progress=[15, 0] end_bar=0 status_text='Ready.' exc=None
    log+ ['Before/after report refused: No applied change summary - apply a change document and save ']
 == U1.16 before_after success (composer stubbed) progress=[15, 100] end_bar=100 status_text='Ready.' exc=None
-   log+ ['Before/after report written: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\']
+   log+ ['Before/after report written: <HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-clde\\']
 == U2.1 refresh_files rows ['a.s19', 'b.hex', 'c.mac', 'd.a2l', 'd.a2l.json', 'e.txt']
-== U2.2 pick folder fw.s19 -> parse calls ['fw.s19'] exc=None log+ ["Load failed: [Errno 13] Permission denied: 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\claude"]
-== U2.3 pick junction fw.s19 -> parse calls ['fw.s19'] exc=None log+ ["Load failed: [Errno 13] Permission denied: 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\claude"]
-== U2.4 pick file symlink fw.s19 -> parse calls ['fw.s19'] current_file=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc-12a-design\work\ptmp3\p12a_v7681mm1\.s19tool\workarea\temp\fw.s19
+== U2.2 pick folder fw.s19 -> parse calls ['fw.s19'] exc=None log+ ["Load failed: [Errno 13] Permission denied: 'C:\\\\Users\\\\<USER>\\\\AppData\\\\Local\\\\Temp\\\\claude"]
+== U2.3 pick junction fw.s19 -> parse calls ['fw.s19'] exc=None log+ ["Load failed: [Errno 13] Permission denied: 'C:\\\\Users\\\\<USER>\\\\AppData\\\\Local\\\\Temp\\\\claude"]
+== U2.4 pick file symlink fw.s19 -> parse calls ['fw.s19'] current_file=<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc-12a-design\work\ptmp3\p12a_v7681mm1\.s19tool\workarea\temp\fw.s19
 == U2.5 cap 1024: picks edge.s19 (1024 B) big.s19 (1025 B) -> parse calls ['edge.s19', 'big.s19']
 == U2.6 _typed_load_route('fw\x00.s19') raises ValueError: stat: embedded null character in path
 == U2.7 _load_path_from_user_input('fw\x00.s19') raises ValueError
-== U2.6 _typed_load_route('C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\inc-12a-design\\work\\ptmp3\\p12a_v7681mm1\\fw\x00.s19') -> ('refuse', 'not found')
-== U2.7 _load_path_from_user_input('C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\inc-12a-design\\work\\ptmp3\\p12a_v7681mm1\\fw\x00.s19') -> returned
+== U2.6 _typed_load_route('<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\inc-12a-design\\work\\ptmp3\\p12a_v7681mm1\\fw\x00.s19') -> ('refuse', 'not found')
+== U2.7 _load_path_from_user_input('<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\inc-12a-design\\work\\ptmp3\\p12a_v7681mm1\\fw\x00.s19') -> returned
 == U2.8 list_projects with 'fw-v1.', 'fw-v2 ', 'P' on nt -> ['P']
 == U3.1 palette load entries [('Load file', 'load_file'), ('Load project', 'load_project')]
 == U3.2 bindings [('ctrl+l', 'load_file', 'Load file'), ('l', 'load_file', 'Load file'), ('p', 'load_project', 'Load project')]

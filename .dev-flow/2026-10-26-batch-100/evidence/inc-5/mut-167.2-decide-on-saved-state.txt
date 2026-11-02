@@ -1,6 +1,6 @@
 # command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation 167.2-decide-on-saved-state
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# tree: <HOME>\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation 167.2-decide-on-saved-state
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
 # date: 2026-10-29T19:48:25+00:00
 # requirement: LLR-167.2
 # mutation: emit-or-copy decided on differs_from_last_saved (A-08) — file s19_app/tui/app.py
@@ -12,7 +12,7 @@
 ================================== FAILURES ===================================
 _________________ test_tc_b100_14_applied_then_undone_copies __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29957/test_tc_b100_14_applied_then_u0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29957/test_tc_b100_14_applied_then_u0')
 
     def test_tc_b100_14_applied_then_undone_copies(tmp_path: Path) -> None:
         """Applied, then the entry undone (the image still holds the applied
@@ -35,7 +35,7 @@ E         Use -v to get more diff
 tests\test_b100_save_image.py:346: AssertionError
 ____________________ test_tc_b100_14_unapplied_entry_emits ____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29957/test_tc_b100_14_unapplied_entr0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29957/test_tc_b100_14_unapplied_entr0')
 
     def test_tc_b100_14_unapplied_entry_emits(tmp_path: Path) -> None:
         """Only an unapplied change entry writing new bytes: the pre-check is
@@ -54,7 +54,7 @@ E         Use -v to get more diff
 tests\test_b100_save_image.py:357: AssertionError
 _____________________ test_tc_b100_14_save_back_then_emit _____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29957/test_tc_b100_14_save_back_then0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29957/test_tc_b100_14_save_back_then0')
 
     def test_tc_b100_14_save_back_then_emit(tmp_path: Path) -> None:
         """Save-back, then the decision: pre-check true → emit."""
@@ -75,7 +75,7 @@ E         Use -v to get more diff
 tests\test_b100_save_image.py:370: AssertionError
 _________ test_tc_b100_15_save_back_then_save_project_keeps_the_patch _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29957/test_tc_b100_15_save_back_then0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29957/test_tc_b100_15_save_back_then0')
 
     def test_tc_b100_15_save_back_then_save_project_keeps_the_patch(
         tmp_path: Path,

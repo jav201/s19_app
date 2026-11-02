@@ -4,7 +4,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 _____________ test_tc_b100_05_disguised_clash_refused_naming_both _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27416/test_tc_b100_05_disguised_clas0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27416/test_tc_b100_05_disguised_clas0')
 
     def test_tc_b100_05_disguised_clash_refused_naming_both(tmp_path: Path) -> None:
         """Project ``ab`` exists and is not open; ``a b`` is refused BEFORE any

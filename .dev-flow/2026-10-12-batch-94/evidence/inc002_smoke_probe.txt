@@ -22,10 +22,10 @@ run ok; result tail:
 |wrote reports/20261014T043223Z-flow-a2b.md
 |█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░█
 |2 ranges · 0x0‥ 0x1020
-|C:\Users\jjgh8\AppData\Local\Temp\tmpt0ypa1ao\.s19tool\workarea\proj\out.s19
+|<HOME>\AppData\Local\Temp\tmpt0ypa1ao\.s19tool\workarea\proj\out.s19
 provenance lines:
 |- Image A: patch.out [flow] path=`block 2 (patch).out` parse-errors=0
-|- Image B: base [external] path=`C:\Users\jjgh8\AppData\Local\Temp\tmpt0ypa1ao\.s19tool\workarea\proj\base.s19` parse-errors=0
+|- Image B: base [external] path=`<HOME>\AppData\Local\Temp\tmpt0ypa1ao\.s19tool\workarea\proj\base.s19` parse-errors=0
 |- Image A artifacts: none
 |- Image B artifacts: none
 SMOKE OK

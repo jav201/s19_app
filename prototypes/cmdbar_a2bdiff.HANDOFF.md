@@ -1,7 +1,7 @@
 # HANDOFF — command-bar deletion · A2B diff master–detail · operations staged removal
 
 **Date:** 2026-08-06 · **From:** design session (tui-design + runnable in-app prototype) ·
-**To:** a fresh agent running the full `/dev-flow` V-model in `C:\Users\jjgh8\Github\s19_app`.
+**To:** a fresh agent running the full `/dev-flow` V-model in `C:\Users\<USER>\Github\s19_app`.
 **Operator decisions (2026-08-06):** three verdicts, all resolved — see §2. Two independent lanes;
 **suggested split: batch N = UI lane (S-1..S-9), batch N+1 = operations lane (S-10..S-13)** —
 Phase 0 may re-split, but S-13 (deletion) MUST land after S-10..S-12 (migration) is merged and green.

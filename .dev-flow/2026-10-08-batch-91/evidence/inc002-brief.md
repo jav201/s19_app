@@ -1,6 +1,6 @@
 # CHUNK — Kimi K2.7-code — batch-91 increment 002 (the docs catch-up)
 
-You implement batch-91's increment 002 in `C:/Users/jjgh8/Github/s19_app`:
+You implement batch-91's increment 002 in `<HOME>/Github/s19_app`:
 the docs describe the shipped app. Read the contract first:
 `.dev-flow/2026-10-08-batch-91/01-requirements.md` — HLR-123 / LLR-123.1/.2/.3.
 

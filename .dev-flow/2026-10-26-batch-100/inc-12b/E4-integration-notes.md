@@ -2,9 +2,9 @@
 
 Status: DONE (E4 integration). Final source shas and pass counts at the end.
 
-Worktree: `C:/Users/jjgh8/Github/s19_app-b100-inc12b`, branch `b100-inc12b` at `ef0cdb8` (12b E4 commit `dabcd41` + merge of `b100-inc12a` at `9012835`).
+Worktree: `<HOME>/Github/s19_app-b100-inc12b`, branch `b100-inc12b` at `ef0cdb8` (12b E4 commit `dabcd41` + merge of `b100-inc12a` at `9012835`).
 Source edits allowed: `s19_app/tui/app.py`, `s19_app/tui/a2l.py`, `s19_app/tui/styles.tcss`.
-Scratch: `C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int12b/` (`run.sh`, node lists `new.nodes`, `rep.nodes`, `LOCALAPPDATA=…/int12b/lad`, `--basetemp=…/int12b/bt/<label>`).
+Scratch: `<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int12b/` (`run.sh`, node lists `new.nodes`, `rep.nodes`, `LOCALAPPDATA=…/int12b/lad`, `--basetemp=…/int12b/bt/<label>`).
 
 Checked at start: the merged `app.py` carries the three 12a corrective hunks (`_append_log_line` → `safe_text(message).plain.strip()` at `:20068`; the file-load outcome through `painted_names` at `:17920`; `_listed_project_name` exact-name-first at `:13911`).
 

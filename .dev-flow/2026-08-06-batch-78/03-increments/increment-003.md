@@ -142,7 +142,7 @@ anywhere else, no collision with an existing name.
 ## 3. How to test
 
 ```bash
-cd C:/Users/jjgh8/Github/s19_app
+cd <HOME>/Github/s19_app
 
 # the increment's own node
 python -m pytest tests/test_tui_diff_screen.py::test_at_b78_31_written_report_is_complete_under_display_caps -v

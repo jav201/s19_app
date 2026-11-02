@@ -1,7 +1,7 @@
 ============================= test session starts =============================
-platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- <HOME>\anaconda3\envs\s19env\python.exe
 cachedir: .pytest_cache
-rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc10
+rootdir: <HOME>\Github\s19_app-b99-inc10
 configfile: pyproject.toml
 plugins: textual-snapshot-1.1.0, syrupy-4.8.0
 collecting ... collected 7 items / 6 deselected / 1 selected
@@ -11,7 +11,7 @@ tests/test_b99_a2l_encode.py::test_at_b99_09_a2l_window_physical_column FAILED [
 ================================== FAILURES ===================================
 __________________ test_at_b99_09_a2l_window_physical_column __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25996/test_at_b99_09_a2l_window_phys0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25996/test_at_b99_09_a2l_window_phys0')
 
     def test_at_b99_09_a2l_window_physical_column(tmp_path: Path) -> None:
         """AT-B99-09 (US-147): through the shipped Load dialog, the A2L window
@@ -37,8 +37,8 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
            ^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-s19_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25996/test_at_b99_09_a2l_window_phys0/case.s19')
-a2l_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25996/test_at_b99_09_a2l_window_phys0/case.a2l')
+s19_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25996/test_at_b99_09_a2l_window_phys0/case.s19')
+a2l_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25996/test_at_b99_09_a2l_window_phys0/case.a2l')
 size = (118, 40)
 
     async def _run_at_09(s19_path: Path, a2l_path: Path, size: tuple[int, int]) -> None:

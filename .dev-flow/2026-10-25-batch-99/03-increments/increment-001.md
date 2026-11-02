@@ -121,7 +121,7 @@ Regression companion: `tests/test_address_census.py` — 23 passed.
 |---|---|
 | Mutation applied | three, one per LLR (see Mutation verdicts below): timestamp into the S0 text · drop one coverage class from the manifest · copy the S0 payload into the reader's data map — all re-applied on the review-round-1 fixed tree (see Review round 1 fixes) |
 | Instrument | project code: the implementer's own hand via the Edit tool / a JSON edit, restore checked by SHA-256 |
-| Where it ran | this worktree (`C:\Users\jjgh8\Github\s19_app-b99-inc1`), run by the implementer |
+| Where it ran | this worktree (`<HOME>\Github\s19_app-b99-inc1`), run by the implementer |
 | Transcript | `evidence/inc-1/mut-LLR-152.1.txt` · `mut-LLR-152.2.txt` · `mut-LLR-152.3.txt` (each: node FAILED) |
 | Restore proven by | file hash returned to its pre-mutation value (review-round-1 fixed tree; see Review round 1 fixes): generate.py → `9bcdc26d145fd177d50092eb13f6f3699d89b5cdfa78e648b9d7a26e66b7f059`; manifest.json → `f5fa3eb77d9d05348c1c323dab4c9fbfa89212b32e4a03e617739206cf2ecd7f`; independent_reader.py → `b9a172e21a3e215b9e455515fb7b2d61fc4326d8705f2f87797ddd40970ccb76` (also recorded in `baseline-hashes.txt`) |
 | Bytecode cache | run with `PYTHONDONTWRITEBYTECODE=1` (C-46); `__pycache__` never created under `tests/support` or `tests/fixtures` |
@@ -177,21 +177,21 @@ All under `artifact_homes.evidence` = `.dev-flow/2026-10-25-batch-99/evidence/in
 
 | Evidence artifact | Path | SHA-256 |
 |---|---|---|
-| GREEN after the TC-B99-03b id rename (5 passed) | `green-rename-corpus.txt` | `e9557167349a0232287fed6e7fa3828d4b65a5ad52933e0fc1486cba31baff8e` |
-| RED baseline (no modules) | `red-initial-collection.txt` | `522c5af7776e027b57e0a8952aee6f06c91612517ab0374e165c95bb613b7252` |
-| RED baseline (tests in, corpus out) | `red-no-corpus.txt` | `056ffc76d366234d42df4c75d361345856ef279daaba2c38ccf5647559c55c81` |
-| GREEN full run (4 passed) | `green-full.txt` | `b28d9d4fb54d74b63124f2024c47009c5cddaa4129ea97ebfecce25a91710dd7` |
-| GREEN TC-B99-01 | `green-tc_b99_01.txt` | `a87c8fdcd1adc97fb4896fec636a9c21290a12055b2dacdc6a123725b5e002e1` |
+| GREEN after the TC-B99-03b id rename (5 passed) | `green-rename-corpus.txt` | `94517669bf8e1e1ad9c3caf1078b0527176277a1406fe88f051c4bfc14f2eba0` |
+| RED baseline (no modules) | `red-initial-collection.txt` | `dac79a419795ef54cf53440bfcca8944d05e9e4f9bb9ee17985c843dd7302b46` |
+| RED baseline (tests in, corpus out) | `red-no-corpus.txt` | `aaeeae6f449435fdd318f8e3513eb3b4065f6270bab2ff2268022ba0658d8633` |
+| GREEN full run (4 passed) | `green-full.txt` | `a682e89129767a153ad86928b7304cd0b6b708e38a89eb088077b6cf016ab15c` |
+| GREEN TC-B99-01 | `green-tc_b99_01.txt` | `a87088496f23cb79a10ae98d06afb0c25c768ba6c53acf920de7020bcca87c1c` |
 | GREEN TC-B99-02 | `green-tc_b99_02.txt` | `b8cee2de486a9c2554ffb75e4976e539658f961a4b80432b6d43af28b4dc030` |
-| GREEN TC-B99-03 | `green-tc_b99_03.txt` | `8681a192f056bf31e90a2cd453fde92d8d1ddae8d5b435c4363c5cb16915b344` |
-| GREEN AT-B99-01 | `green-at_b99_01.txt` | `5d7737e4af54944c920852c0cae5b67a03caf5df3e8f1de683191d35fa8a1e1d` |
+| GREEN TC-B99-03 | `green-tc_b99_03.txt` | `fb5ec3d9b7462936bf7cb4c679647d47863bdadfca715c973c08986d1ad0be1f` |
+| GREEN AT-B99-01 | `green-at_b99_01.txt` | `b9503b01fb9a31cab519a511c974023a8be82c3fc7011e49c372b2a705cc9e53` |
 | GREEN regression companion | `green-address-census.txt` | `5bfd63c88ad09be005ee5395614b41ba9589df552c4c236225972bc26704bfd7` |
-| GREEN fix round: full corpus run (5 passed) | `green-fix-corpus.txt` | `8c4eeafae8e2da99f51a7676528b809e32ed4d577b918d7f0d7743cfac497585` |
+| GREEN fix round: full corpus run (5 passed) | `green-fix-corpus.txt` | `bb3c07317cf6f3e2c50554dd36dbda635b58dae4ac43acb1f261704ac6d47e37` |
 | GREEN fix round: regression companion (23 passed) | `green-fix-address-census.txt` | `18f40c11abf28277250594db308f6d424485f711f140895410969cc73a77fc0e` |
-| Mutation LLR-152.1 (KILLED, re-run on fixed tree) | `mut-LLR-152.1.txt` | `e47e0daa0d141ea0024f64ee7c10b32f237e32008efb390b5af08781b8aea569` |
-| Mutation LLR-152.2 (KILLED, re-run on fixed tree; first attempt survived) | `mut-LLR-152.2.txt` | `bb240893fc9600dfcc4890a157a852ac6439a0b9159caacaf795afdc1bf517a1` |
-| Mutation LLR-152.3 (KILLED, re-run on fixed tree) | `mut-LLR-152.3.txt` | `db5da9c647a57878b972557c899a33c238dcb4da5d8a5b9498861f7d626a8b5f` |
-| Mutation F4 negative control (KILLED — reader segment wrap broken) | `mut-F4.txt` | `7dfa176171c503c74a6329c11467a5785ce4a46f2cb2945db3ab5b6cfbb12a37` |
+| Mutation LLR-152.1 (KILLED, re-run on fixed tree) | `mut-LLR-152.1.txt` | `40cbe64a5c7579529818a8162930dc3e55306ed2e8164a6a780ee1bb230247cd` |
+| Mutation LLR-152.2 (KILLED, re-run on fixed tree; first attempt survived) | `mut-LLR-152.2.txt` | `48241a36d76caec89a97a1cbf8f1d9d1b6c0713371e72bea0f5a538dcf206f93` |
+| Mutation LLR-152.3 (KILLED, re-run on fixed tree) | `mut-LLR-152.3.txt` | `5fe0fd3b388aa05e29d1cb04745fa3595ebd7f501f34fc6df08cf88c06eecd6c` |
+| Mutation F4 negative control (KILLED — reader segment wrap broken) | `mut-F4.txt` | `15d5bfbd02865d3591b7461cc339f9d165a6c9f2d3cc8079b1afdfb87bacad28` |
 | Instrument RED-proof (`--check` tampered arm) | `instrument-redproof-check.txt` | `90345b598cae08ecd7de0a580aa471db076587d392bfd11d4d8bcb71dc9d4039` |
 | Emitted-form: `--check` stdout | `emitted-check.txt` | `471f79851d60478ad5d383855ce2cfd5152cab10bc0d1929435045215ee18d5f` |
 | Emitted-form: A2L pins + census positive control (refreshed in review round 1) | `emitted-a2l-pins.txt` | `86688d47b32399e3db8088e00f6bc008a66ab56f675c1989930dc46ce526de48` |

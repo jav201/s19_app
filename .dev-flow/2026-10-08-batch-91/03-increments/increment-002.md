@@ -80,7 +80,7 @@ closes") was enforced by reading every named surface against the code.
 
 ```bash
 # the batch's own sanity gate for a docs-only increment
-C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest tests/test_id_registry.py -q -p no:cacheprovider
+<HOME>/anaconda3/envs/s19env/python.exe -m pytest tests/test_id_registry.py -q -p no:cacheprovider
 
 # the inspection arms (run at close-out against the emitted files)
 grep -n "CDFX" README.md docs/overview.md docs/architecture.md docs/crc-algorithm-designer/01-requirements.md
@@ -221,7 +221,7 @@ Increment 003 — the registry hygiene (`HLR-124`).
 
 | Evidence artifact | Path — under `artifact_homes.evidence` | SHA-256 |
 |---|---|---|
-| the coordinator's brief (verbatim) | `.dev-flow/2026-10-08-batch-91/evidence/inc002-brief.md` | `75170b8457558910ec2cd09a8b7687f3b60f4cdd5f5673ad6016b337c339f9f8` |
+| the coordinator's brief (verbatim) | `.dev-flow/2026-10-08-batch-91/evidence/inc002-brief.md` | `c3586ce0fcfac48247ceb33c97a42797d3baa3cf4bc7df60c82494b880c247cb` |
 | the failed opencode launch | `.dev-flow/2026-10-08-batch-91/evidence/inc002-run.log` | `418935dfa1cad1f8eacca319ae4e5ae7c80adc3ee16ec66509a62d85933b9021` |
 
 | Field | Value |

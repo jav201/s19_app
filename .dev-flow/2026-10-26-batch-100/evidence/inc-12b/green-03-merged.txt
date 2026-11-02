@@ -1,5 +1,5 @@
 commit 81ac4c0 (merge of main into b100-inc12b)
-C:\Users\jjgh8\Github\s19_app-b100-inc12b\s19_app\__init__.py
+<HOME>\Github\s19_app-b100-inc12b\s19_app\__init__.py
 cmd: pytest tests/test_b100_workers.py tests/test_b100_a2l_progress.py tests/test_b100_save_dialog.py::test_tc_b100_65_a_load_landing_under_the_dialog_rebuilds_the_session
 ................................x..............................          [100%]
 62 passed, 1 xfailed in 954.77s (0:15:54)

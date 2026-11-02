@@ -66,7 +66,7 @@ placeholder, the window help, and the refusal message on Add/Edit.
 
 ```bash
 # from the worktree root, with the s19env interpreter:
-python -c "import s19_app; print(s19_app.__file__)"   # C:\Users\jjgh8\Github\s19_app-b99-inc11\s19_app\__init__.py
+python -c "import s19_app; print(s19_app.__file__)"   # <HOME>\Github\s19_app-b99-inc11\s19_app\__init__.py
 pytest tests/test_b99_bytes_field.py -v               # -> 3 passed
 pytest tests/test_b99_bytes_field.py -k tc_b99_32     # -> 1 passed, 2 deselected
 pytest tests/test_b99_bytes_field.py -k tc_b99_33     # -> 1 passed, 2 deselected
@@ -105,7 +105,7 @@ created or edited).
 |---|---|
 | Mutation applied | baseline RED at HEAD (unmodified tree): all 3 new nodes FAILED — `red-initial.txt` (TC-B99-32: `100`/`G1` not refused with the token named; TC-B99-33: placeholder lacks `hex`, help lacks the rule; AT-B99-12: the saved file holds `0F 0A 1F 14`, P-16). Then two C-40 mutations on the fixed tree, one per LLR (see Mutation verdicts). |
 | Instrument | project code: the implementer's own hand via the Edit tool, restore checked by SHA-256 |
-| Where it ran | this worktree (`C:\Users\jjgh8\Github\s19_app-b99-inc11`), run by the implementer |
+| Where it ran | this worktree (`<HOME>\Github\s19_app-b99-inc11`), run by the implementer |
 | Transcript | `evidence/inc-11/red-initial.txt` · `mut-LLR-161.1.txt` · `mut-LLR-161.2.txt` (each: the arm FAILED) |
 | Restore proven by | file hashes returned to pre-mutation values (`baseline-hashes.txt`): change_service.py → `06a39682…a60e`; screens_directionb.py → `116b082f…9541`; window_help.py → `bb55a4e9…d41f` |
 | Bytecode cache | run with `PYTHONDONTWRITEBYTECODE=1` (C-46) |
@@ -148,16 +148,16 @@ All under `artifact_homes.evidence` = `.dev-flow/2026-10-25-batch-99/evidence/in
 
 | Evidence artifact | Path | SHA-256 |
 |---|---|---|
-| RED baseline at HEAD (3 failed) | `red-initial.txt` | `0dbf1556e2819599f7a6297a34586db3310a8d83e1a7b57e72d2ceadb66747b0` |
-| GREEN full run (3 passed) | `green-full.txt` | `5fe530628f2fcbba20ddc8406a2b17b2badf88b23b798306459ed6484e04e69b` |
-| GREEN TC-B99-32 | `green-tc_b99_32.txt` | `211d494e1e36ad5039af440c76a89eb1ebf52c75e516923ec3289317c74fb607` |
-| GREEN TC-B99-33 | `green-tc_b99_33.txt` | `593568a9aa59470155a3b6466400ac61125d23fea4938b5ea3ad6589f0ef6e56` |
-| GREEN AT-B99-12 | `green-at_b99_12.txt` | `60f9a140a5e76d6941ef461d56daaff461b65d37664affb969feaeae27763f7d` |
+| RED baseline at HEAD (3 failed) | `red-initial.txt` | `b221a2f26c209495c307edb4e6b28dec63a44eb3d18589cf193246d282f104b5` |
+| GREEN full run (3 passed) | `green-full.txt` | `a1f87a9f0fdea2bfaf5030a771a65bf3d72d94d83277cef83a1b9e20c73ee0ce` |
+| GREEN TC-B99-32 | `green-tc_b99_32.txt` | `934e80cdab4b11e0625c78211f74e56e9f5a457b92cdb96ade45141386cb01b1` |
+| GREEN TC-B99-33 | `green-tc_b99_33.txt` | `8d599049dbedcfc14e5e756a3ef1d9b9e9f46f65cae895296ef86f1760e35acc` |
+| GREEN AT-B99-12 | `green-at_b99_12.txt` | `aa69650c88dcf8213af60e2b9161829cad5c706c2213f06c80cc1799400d2910` |
 | GREEN re-pinned companions (30 passed) | `green-repinned.txt` | `b0c1f0208e87d1b4ffe6a02816a5ad618fb845944ac48d3b8d501bababe6fa3a` |
 | GREEN regression companion (23 passed) | `green-address-census.txt` | `abaf7e686e2723989b3713ad455594ed3ba420f7f2014171519220869400f0f8` |
 | GREEN affected reverse-census file set (11 files: 352 passed, 5 pre-existing failures) | `green-affected-summary.txt` + per-file `green-test_*.txt` | `1d5a4d66185e0248bb583318324edae8408b0d6bf7a2335c972d962c9a50fb05` |
 | HEAD-isolation: AT-031b fails at HEAD too | `red-at031b-head-isolation.txt` | `2be0260e30385a452217c180e45c0b12eb5075f547311e2ffcda154ad56da3d5` |
-| HEAD-isolation: at_056e + TC-707 ×2 fail at HEAD too | `red-head-isolation-others.txt` | `2342bbf6d4ed8ba67b1daf4d24e41fbcfdde37cafa93b00b933430432f54300d` |
+| HEAD-isolation: at_056e + TC-707 ×2 fail at HEAD too | `red-head-isolation-others.txt` | `cf05393668f6476ee88f9637006cac4102fa8080750f4563808bdcdd3950146a` |
 | Pre-existing-failures verdict (5 nodes, all isolated) | `pre-existing-failures.txt` | `7af5d26723cc365273007c400f2d2b0de2fb6b4a63d3c21082adf6aefbea08c1` |
 | GREEN affected: `test_b97_chips_help.py` (79 passed) | `green-test_b97_chips_help.txt` | e6bdab68061204d09351e5b7005a37622b09886330de4122ce1b82f25a152eb3 |
 | GREEN affected: `test_b97_flow_execution.py` (75 passed) | `green-test_b97_flow_execution.txt` | ce665d834859490e1f87705d315fcd48a6101f571dbee407135a8c09d58fbfea |
@@ -165,13 +165,13 @@ All under `artifact_homes.evidence` = `.dev-flow/2026-10-25-batch-99/evidence/in
 | GREEN affected: `test_before_after_report.py` (15 passed) | `green-test_before_after_report.txt` | 8ce1265d03bb01b59743161782a282a640fe43755fb52902a5c2ae99ad1e9914 |
 | GREEN affected: `test_loadfilescreen_input.py` (33 passed) | `green-test_loadfilescreen_input.txt` | a49654d22cc766484ee352a89d6f71e11f43e5b0c973e89a0c5775c30d924187 |
 | GREEN affected: `test_tui_patch_editor_b94.py` (17 passed) | `green-test_tui_patch_editor_b94.txt` | 205c326368552a8e5bce29fa7e4395716291b81a703ed54f03fc0acd0743eb6b |
-| GREEN affected: `test_tui_patch_editor_v2.py` (51 passed + 1 pre-existing) | `green-test_tui_patch_editor_v2.txt` | d9a7f6c5fc4815b45ed8a06e9153b55b461d90c7b22ea05a9a4e0b7a80ee0b79 |
-| GREEN affected: `test_tui_patch_glyphs.py` (11 passed + 1 HEAD-flaky) | `green-test_tui_patch_glyphs.txt` | 4b05a2d9da78ec452abce32a655c591943523be2036f68476a077ac83bd87a38 |
+| GREEN affected: `test_tui_patch_editor_v2.py` (51 passed + 1 pre-existing) | `green-test_tui_patch_editor_v2.txt` | 449a3b4faebd9611b1e25633383cb91be0c5b3fb574126b4be58fe149c07a0fd |
+| GREEN affected: `test_tui_patch_glyphs.py` (11 passed + 1 HEAD-flaky) | `green-test_tui_patch_glyphs.txt` | 0cc38943dc20fa46b6b0361c74effdf293b3dccc3eb94c63d0322b8ad0dd3c47 |
 | GREEN affected: `test_tui_patch_layout.py` (9 passed) | `green-test_tui_patch_layout.txt` | b48b8bfcdc679239868ed749ee5dad79c09270cf7c1b6c853756d7aab41da6b9 |
 | GREEN affected: `test_tui_report_filter_surface.py` (13 passed + 1 pre-existing) | `green-test_tui_report_filter_surface.txt` | e6bdab68061204d09351e5b7005a37622b09886330de4122ce1b82f25a152eb30 |
 | GREEN affected: `test_window_usage_help.py` (36 passed + 2 environmental) | `green-test_window_usage_help.txt` | e6bdab68061204d09351e5b7005a37622b09886330de4122ce1b82f25a152eb31 |
-| Mutation LLR-161.1 (KILLED) | `mut-LLR-161.1.txt` | `94fa5e3ab9287e3fee7f85ed53e278ac241fd90557af64151a045d8b5fdafe66` |
-| Mutation LLR-161.2 (KILLED) | `mut-LLR-161.2.txt` | `12786f02914fefd495c7800b0b1bc2f7fba006318002808264d1f771caabe88e` |
+| Mutation LLR-161.1 (KILLED) | `mut-LLR-161.1.txt` | `35151cf58711f25866ea4ed6accb92444e69ec3bc09ecaddf4d8eda72f7f180f` |
+| Mutation LLR-161.2 (KILLED) | `mut-LLR-161.2.txt` | `033f25882e17883db3bd87170495bc8e70154d7215ae845786617f788885c08e` |
 | Pre-mutation hashes | `baseline-hashes.txt` | `9580352bbf192917f60cddcdd7cd3db1d68d4e81d7bae6cec5a299b6bf13387f` |
 | Reverse census probes | `reverse-census.txt` | `7444f5ee061468cd988c2e6fb7aaa701feefd1e94534236a188cddb39f17056b` |
 
@@ -261,9 +261,9 @@ on the rewritten black-box shape (`0F 0A 1F 14`,
 | Evidence artifact | Path | SHA-256 |
 |---|---|---|
 | Pre-mutation hashes (fix round) | `baseline-hashes-fix.txt` | `5dd3e3af2f8dde36d9701d6116d293149949dd142320f36fb03ed987ed228336` |
-| Mutation: `int()` without the fullmatch (TC-32 KILLED) | `mut-LLR-161.1-fix.txt` | `c6573087992c56eb40bb72364042af1cde4d6b44cc5bcb34b39383d74db4f147` |
-| Mutation: HEAD base-0-first grammar (AT RED `0F 0A 1F 14`) | `mut-LLR-161.1-fix-headgrammar.txt` | `7b52aa7f866cd2f21ad3a1a6051d2e24bea35d496919cc3ea0a8fcf50112c84a` |
-| GREEN after fixes (3 passed) | `green-fix-b99_bytes_field.txt` | `73cc9be0e6f2e8ead8f7b1b7ebd2e5093a843e0b6f968530770bb9e799a6732f` |
+| Mutation: `int()` without the fullmatch (TC-32 KILLED) | `mut-LLR-161.1-fix.txt` | `8e195fb98381fad2af1b52d15054efbcc2a09e6dd429380046bcbfe87a5387c6` |
+| Mutation: HEAD base-0-first grammar (AT RED `0F 0A 1F 14`) | `mut-LLR-161.1-fix-headgrammar.txt` | `04d545f6d500cebd4c882b216174a442bef9307c17c47a6725495029e1c72823` |
+| GREEN after fixes (3 passed) | `green-fix-b99_bytes_field.txt` | `9a2ecd6509db09755ad72e9b07ec0ccb42a80ed7c52417a20f2879df7d531412` |
 | GREEN re-pinned companions (30 passed) | `green-fix-repinned.txt` | `708e82509e8584b9c9d3dee9dff75484b4baf0853e107a5530807432b4dbdb6c` |
 | GREEN address census (23 passed) | `green-fix-address-census.txt` | `80edbf35a246b80e456af5c6a6b1fb80663e55679aa8a5d5c2db39b3eceeea61` |
 | AT-B99-12 stability, 8/8 passed | `stability-at12.txt` | `d6ead106b2f1804994a39ff290ab4f2b0a4ae5a3e52474cb375364e04a35c0f8` |

@@ -1,9 +1,9 @@
 # Kimi brief — batch-100 Increment 4 · corrective pass 1
 
-Keep working in the same worktree, `C:\Users\jjgh8\Github\s19_app-b100-inc4`. It holds your uncommitted Inc 4 changes; keep them. `BRIEF-COMMON.md` still applies, and the SOURCE file is still only `app.py`.
+Keep working in the same worktree, `<HOME>\Github\s19_app-b100-inc4`. It holds your uncommitted Inc 4 changes; keep them. `BRIEF-COMMON.md` still applies, and the SOURCE file is still only `app.py`.
 
 **Read first (MAIN checkout):**
-- `C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-10-26-batch-100\03-increments\review-increment-004.md` (F1–F10). The reviewer's probes and mutants are in `...\scratchpad\r4\`.
+- `<HOME>\Github\s19_app\.dev-flow\2026-10-26-batch-100\03-increments\review-increment-004.md` (F1–F10). The reviewer's probes and mutants are in `...\scratchpad\r4\`.
 - `01-requirements-ledger.md` LED .57 (the orchestrator's rulings).
 
 **Fix:**

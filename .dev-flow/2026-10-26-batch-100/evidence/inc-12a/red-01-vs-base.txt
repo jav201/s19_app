@@ -1,6 +1,6 @@
 # batch-100 Inc 12a — E4 tester — RED capture against the base revision
 # base sha: 051f58613efa8fab6c9d477babfbe19a06f59f67  (051f586 Merge branch 'main' into b100-inc11)
-# base tree: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/base12a (detached scratch worktree; tests copied from the Inc 12a worktree, source untouched)
+# base tree: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/base12a (detached scratch worktree; tests copied from the Inc 12a worktree, source untouched)
 # git status (tests only modified/added): 
 #    M tests/test_b100_announce.py
 #    M tests/test_b100_load_dialog.py
@@ -15,140 +15,140 @@
 #    M tests/test_tui_patch_history_strip.py
 #    M tests/test_tui_report_attribution.py
 #   ?? tests/test_b100_busy.py
-# s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\s19_app\__init__.py
-# interpreter: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe (3.11.15 textual 8.2.8)
-# env: NO_COLOR unset, PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/t12a/lad
+# s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\s19_app\__init__.py
+# interpreter: <HOME>/anaconda3/envs/s19env/python.exe (3.11.15 textual 8.2.8)
+# env: NO_COLOR unset, PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/t12a/lad
 # started: 2026-10-31T23:56:23-06:00
-# command: python -m pytest -p no:cacheprovider --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/t12a/bt-red --tb=line -rfEs -q <node ids below>
+# command: python -m pytest -p no:cacheprovider --basetemp=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/t12a/bt-red --tb=line -rfEs -q <node ids below>
 
 FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFsFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF [ 53%]
 FFFFFFFFFFFFFFFFFF....FFFFFFFFFFFFFFF.F.FFFFFFFFFFFF..FFFFFFFF.          [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:277: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:304: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:327: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:346: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:381: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:430: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:430: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:430: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:430: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:430: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:430: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:466: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:512: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:533: AttributeError: type object 'S19TuiApp' has no attribute '_busy_tick'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:566: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:599: AttributeError: module 's19_app.tui.app' has no attribute '_BusyRun'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:599: AttributeError: module 's19_app.tui.app' has no attribute '_BusyRun'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:599: AttributeError: module 's19_app.tui.app' has no attribute '_BusyRun'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:599: AttributeError: module 's19_app.tui.app' has no attribute '_BusyRun'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:599: AttributeError: module 's19_app.tui.app' has no attribute '_BusyRun'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:616: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:644: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:672: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:699: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:734: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:734: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:731: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:770: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:803: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:842: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:982: AssertionError: ['Loaded firmware.s19 (S19 only)']
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:982: AssertionError: []
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:982: AssertionError: []
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:982: AssertionError: []
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1024: AssertionError: ['Loaded firmware.s19 (S19 only)']
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1024: AssertionError: []
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1024: AssertionError: []
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1024: AssertionError: []
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1080: AssertionError: ['Loaded [b]x.s19 (S19 only)']
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1080: AssertionError: ['Loaded fw\u202egpj.s19 (S19 only)']
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1080: AssertionError: []
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1141: AssertionError: []
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1158: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1158: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1181: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1220: AssertionError: ['Loaded firmware.s19 (S19 only)']
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1242: AttributeError: 'S19TuiApp' object has no attribute '_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1298: AssertionError: []
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1376: AssertionError: []
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1376: AssertionError: []
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1376: AssertionError: []
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1376: AssertionError: []
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1399: AssertionError: [10, 50]
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1424: AssertionError: []
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1457: AssertionError: []
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1479: AttributeError: module 's19_app.tui.app' has no attribute '_BUSY_ACTIONS'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1553: AssertionError: [('action_before_after_report', 'begin', 'before_after', None, '0/1'), ('_start_before_after_worker', 'end', 'before_a...t_generate_report_worker', 'step', 'report', 2, '0/1'), ('_finish_generate_report', 'end', 'report', None, '0/1'), ...]
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1581: AssertionError: [('action_before_after_report', 5091), ('_start_before_after_worker', 5186), ('_start_before_after_worker', 5174), ('_start_before_after_worker', 5160), ('_trigger_generate_report', 5781), ('_start_generate_report_worker', 5927), ...]
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1603: AssertionError: ('_start_load_worker', ['self', 'path', 'a2l_files'])
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1648: AssertionError: [10, 50, 100]
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1690: AssertionError: ([10, 50, 100], ['Load failed: synthetic parse failure', 'Load failed'], 'Ready.', 0)
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1718: AssertionError: [10, 0]
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1749: AssertionError: [10, 50, 100]
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1779: AssertionError: [10, 0]
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1804: AssertionError: []
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1833: AssertionError: []
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1890: AssertionError: []
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1932: AssertionError: []
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1972: AssertionError: []
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2007: AssertionError: [15, 55, 100]
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2043: AssertionError: []
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2043: AssertionError: []
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2085: AssertionError: [15, 55, 100]
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2085: AssertionError: [15, 0]
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2085: AssertionError: [15, 55, 0]
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2085: AssertionError: [15, 55, 0]
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2099: AssertionError: the progress seam does not exist
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2136: AssertionError: [15, 100]
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2136: AssertionError: [15, 0]
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2202: AssertionError: ['Ready.', 'Ready.', 'Ready.', 'Ready.', 'Ready.', 'Ready.', ...]
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_load_dialog.py:1736: AssertionError: [['^k Palette', '^d Density', '^l Load file', '^s Save project', 'x Operations', '? Help', ...], ['Workspace', '/ Find', 'g Go-to', ', Hex-', '. Hex+', 'k Legend', ...]]
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_load_dialog.py:3726: AttributeError: module 's19_app.tui.app' has no attribute '_BUSY_ACTIONS'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_load_dialog.py:3771: AssertionError: ["Load failed: [Errno 13] Permission denied: 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-j...\\\\scratchpad\\\\t12a\\\\bt-red\\\\test_tc_b100_66_pick_refusal_t0\\\\app\\\\.s19tool\\\\workarea\\\\temp\\\\fw.s19'"]
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_announce.py:512: AttributeError: type object 'S19TuiApp' has no attribute 'end_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3315: AssertionError: ['fw-v1', 'fw-v1.', 'fw-v2', 'fw-v2 ', 'P']
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3359: AssertionError: ['a.s19', 'b.hex', 'c.mac', 'd.a2l', 'd.a2l.json', 'e.txt']
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3359: AssertionError: ['F.S19', 'g.srec', 'h.ihex', 'notes', 'x.a2l.json']
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3359: AssertionError: ['d.a2l.json']
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3372: AssertionError: refresh_files
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3479: AssertionError: ("PermissionError(13, 'injected: access denied')", [])
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3479: AssertionError: ("OSError(38, 'injected: name too long')", [])
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3447: PermissionError: [Errno 13] injected: access denied: 'fw_eacces.s19'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3447: OSError: [Errno 38] injected: name too long: 'fw_toolong.s19'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3501: AssertionError: ['_handle_load_project', '_typed_load_route']
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3522: AttributeError: 'S19TuiApp' object has no attribute '_listed_project_name'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3592: AssertionError: [('_handle_load_project', "Project NOT loaded: '{}' could not be read — check that the folder can be opened, then load...d_project', "Project NOT loaded: '{}' could not be read — check that the folder can be opened, then load again."), ...]
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3699: AssertionError: ['fw.s19']
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3699: AssertionError: ['fw.s19']
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3699: AssertionError: ['fw.s19']
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3699: AssertionError: ['fw.s19']
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3699: AssertionError: ['fw.s19']
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3699: AssertionError: ['fw.s19']
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3747: AssertionError: ['fw.s19']
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3807: AssertionError: (['x.s19'], LoadedFile(path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4c...76, sample_count=64, entropy=6.0, band='medium', low_confidence=False)], out_of_order_count=0, entry_point=2147483648))
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3858: AssertionError: (['big.s19'], [])
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3858: AssertionError: ([], ['c.a2l'])
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:2598: AssertionError: ['ab', 'fw-v1', 'fw-v1.']
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_report_progress.py:78: AssertionError: LLR-176.1k: a completed report must leave the bar cleared; got 100/100
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_report_progress.py:147: AssertionError: AC-1: kickoff must paint the progress line, got "Loaded project 'proj' -> a.s19"
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_report_progress.py:165: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_before_after_report.py:276: AssertionError: a successfully written before/after report must begin the bar at 0 and leave it cleared, not mid-fill. Sequence: [15, 100]
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_report_off_ui_thread.py:239: AssertionError: a fully written diff report must pass its step and end cleared; sequence: [15, 55, 100]
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_tui_report_attribution.py:113: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_tui_report_attribution.py:113: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_tui_report_attribution.py:113: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_tui_report_attribution.py:113: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_tui_report_attribution.py:113: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b97_key_bar.py:408: AssertionError: ('workspace', 'rail', ['^k Palette', '^d Density', '^l Load file', '^s Save project', 'x Operations', '? Help', ...])
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b97_key_bar.py:408: AssertionError: ('workspace', 'rail', ['^k Palette', '^d Density', '^l Load file', '^s Save project', 'x Operations', '? Help', ...])
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b97_key_bar.py:431: AssertionError: ('workspace', ['^k Palette', '^d Density', '^l Load file', '^s Save project', 'x Operations', '? Help'])
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b97_key_bar.py:1413: AssertionError: ((118, 54), 'workspace', ' ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help  q Quit  ^p palette                    ')
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b97_key_bar.py:1123: AssertionError: ('workspace', ['^l Load file'])
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b97_key_bar.py:1123: AssertionError: ('workspace', ['^l Load file'])
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b97_key_bar.py:1123: AssertionError: ('workspace', ['^l Load file'])
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_tui_diff_screen.py:3916: AssertionError: the App BINDINGS block must be byte-for-byte the committed set. Added: [('c', 'confirm_attention', 'Confirm', False), ('ctrl+l', 'load_file', 'Load file', True), ('d', 'a2l_describe_tag', 'Describe tag', False), ('l', 'load_file', 'Load file', False), ('p', 'load_project', 'Load project', False)]; removed: [('ctrl+l', 'load_file', 'Load', True), ('l', 'load_file', 'Load', False), ('p', 'load_project', 'Projects', False)]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:277: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:304: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:327: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:346: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:381: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:430: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:430: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:430: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:430: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:430: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:430: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:466: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:512: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:533: AttributeError: type object 'S19TuiApp' has no attribute '_busy_tick'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:566: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:599: AttributeError: module 's19_app.tui.app' has no attribute '_BusyRun'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:599: AttributeError: module 's19_app.tui.app' has no attribute '_BusyRun'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:599: AttributeError: module 's19_app.tui.app' has no attribute '_BusyRun'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:599: AttributeError: module 's19_app.tui.app' has no attribute '_BusyRun'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:599: AttributeError: module 's19_app.tui.app' has no attribute '_BusyRun'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:616: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:644: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:672: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:699: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:734: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:734: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:731: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:770: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:803: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:842: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:982: AssertionError: ['Loaded firmware.s19 (S19 only)']
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:982: AssertionError: []
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:982: AssertionError: []
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:982: AssertionError: []
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1024: AssertionError: ['Loaded firmware.s19 (S19 only)']
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1024: AssertionError: []
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1024: AssertionError: []
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1024: AssertionError: []
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1080: AssertionError: ['Loaded [b]x.s19 (S19 only)']
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1080: AssertionError: ['Loaded fw\u202egpj.s19 (S19 only)']
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1080: AssertionError: []
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1141: AssertionError: []
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1158: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1158: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1181: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1220: AssertionError: ['Loaded firmware.s19 (S19 only)']
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1242: AttributeError: 'S19TuiApp' object has no attribute '_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1298: AssertionError: []
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1376: AssertionError: []
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1376: AssertionError: []
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1376: AssertionError: []
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1376: AssertionError: []
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1399: AssertionError: [10, 50]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1424: AssertionError: []
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1457: AssertionError: []
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1479: AttributeError: module 's19_app.tui.app' has no attribute '_BUSY_ACTIONS'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1553: AssertionError: [('action_before_after_report', 'begin', 'before_after', None, '0/1'), ('_start_before_after_worker', 'end', 'before_a...t_generate_report_worker', 'step', 'report', 2, '0/1'), ('_finish_generate_report', 'end', 'report', None, '0/1'), ...]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1581: AssertionError: [('action_before_after_report', 5091), ('_start_before_after_worker', 5186), ('_start_before_after_worker', 5174), ('_start_before_after_worker', 5160), ('_trigger_generate_report', 5781), ('_start_generate_report_worker', 5927), ...]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1603: AssertionError: ('_start_load_worker', ['self', 'path', 'a2l_files'])
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1648: AssertionError: [10, 50, 100]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1690: AssertionError: ([10, 50, 100], ['Load failed: synthetic parse failure', 'Load failed'], 'Ready.', 0)
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1718: AssertionError: [10, 0]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1749: AssertionError: [10, 50, 100]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1779: AssertionError: [10, 0]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1804: AssertionError: []
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1833: AssertionError: []
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1890: AssertionError: []
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1932: AssertionError: []
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:1972: AssertionError: []
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2007: AssertionError: [15, 55, 100]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2043: AssertionError: []
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2043: AssertionError: []
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2085: AssertionError: [15, 55, 100]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2085: AssertionError: [15, 0]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2085: AssertionError: [15, 55, 0]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2085: AssertionError: [15, 55, 0]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2099: AssertionError: the progress seam does not exist
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2136: AssertionError: [15, 100]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2136: AssertionError: [15, 0]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_busy.py:2202: AssertionError: ['Ready.', 'Ready.', 'Ready.', 'Ready.', 'Ready.', 'Ready.', ...]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_load_dialog.py:1736: AssertionError: [['^k Palette', '^d Density', '^l Load file', '^s Save project', 'x Operations', '? Help', ...], ['Workspace', '/ Find', 'g Go-to', ', Hex-', '. Hex+', 'k Legend', ...]]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_load_dialog.py:3726: AttributeError: module 's19_app.tui.app' has no attribute '_BUSY_ACTIONS'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_load_dialog.py:3771: AssertionError: ["Load failed: [Errno 13] Permission denied: 'C:\\\\Users\\\\<USER>\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-j...\\\\scratchpad\\\\t12a\\\\bt-red\\\\test_tc_b100_66_pick_refusal_t0\\\\app\\\\.s19tool\\\\workarea\\\\temp\\\\fw.s19'"]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_announce.py:512: AttributeError: type object 'S19TuiApp' has no attribute 'end_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3315: AssertionError: ['fw-v1', 'fw-v1.', 'fw-v2', 'fw-v2 ', 'P']
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3359: AssertionError: ['a.s19', 'b.hex', 'c.mac', 'd.a2l', 'd.a2l.json', 'e.txt']
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3359: AssertionError: ['F.S19', 'g.srec', 'h.ihex', 'notes', 'x.a2l.json']
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3359: AssertionError: ['d.a2l.json']
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3372: AssertionError: refresh_files
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3479: AssertionError: ("PermissionError(13, 'injected: access denied')", [])
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3479: AssertionError: ("OSError(38, 'injected: name too long')", [])
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3447: PermissionError: [Errno 13] injected: access denied: 'fw_eacces.s19'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3447: OSError: [Errno 38] injected: name too long: 'fw_toolong.s19'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3501: AssertionError: ['_handle_load_project', '_typed_load_route']
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3522: AttributeError: 'S19TuiApp' object has no attribute '_listed_project_name'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3592: AssertionError: [('_handle_load_project', "Project NOT loaded: '{}' could not be read — check that the folder can be opened, then load...d_project', "Project NOT loaded: '{}' could not be read — check that the folder can be opened, then load again."), ...]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3699: AssertionError: ['fw.s19']
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3699: AssertionError: ['fw.s19']
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3699: AssertionError: ['fw.s19']
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3699: AssertionError: ['fw.s19']
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3699: AssertionError: ['fw.s19']
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3699: AssertionError: ['fw.s19']
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3747: AssertionError: ['fw.s19']
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3807: AssertionError: (['x.s19'], LoadedFile(path=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4c...76, sample_count=64, entropy=6.0, band='medium', low_confidence=False)], out_of_order_count=0, entry_point=2147483648))
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3858: AssertionError: (['big.s19'], [])
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:3858: AssertionError: ([], ['c.a2l'])
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b100_recents.py:2598: AssertionError: ['ab', 'fw-v1', 'fw-v1.']
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_report_progress.py:78: AssertionError: LLR-176.1k: a completed report must leave the bar cleared; got 100/100
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_report_progress.py:147: AssertionError: AC-1: kickoff must paint the progress line, got "Loaded project 'proj' -> a.s19"
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_report_progress.py:165: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_before_after_report.py:276: AssertionError: a successfully written before/after report must begin the bar at 0 and leave it cleared, not mid-fill. Sequence: [15, 100]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_report_off_ui_thread.py:239: AssertionError: a fully written diff report must pass its step and end cleared; sequence: [15, 55, 100]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_tui_report_attribution.py:113: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_tui_report_attribution.py:113: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_tui_report_attribution.py:113: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_tui_report_attribution.py:113: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_tui_report_attribution.py:113: AttributeError: 'S19TuiApp' object has no attribute 'begin_busy'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b97_key_bar.py:408: AssertionError: ('workspace', 'rail', ['^k Palette', '^d Density', '^l Load file', '^s Save project', 'x Operations', '? Help', ...])
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b97_key_bar.py:408: AssertionError: ('workspace', 'rail', ['^k Palette', '^d Density', '^l Load file', '^s Save project', 'x Operations', '? Help', ...])
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b97_key_bar.py:431: AssertionError: ('workspace', ['^k Palette', '^d Density', '^l Load file', '^s Save project', 'x Operations', '? Help'])
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b97_key_bar.py:1413: AssertionError: ((118, 54), 'workspace', ' ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help  q Quit  ^p palette                    ')
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b97_key_bar.py:1123: AssertionError: ('workspace', ['^l Load file'])
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b97_key_bar.py:1123: AssertionError: ('workspace', ['^l Load file'])
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_b97_key_bar.py:1123: AssertionError: ('workspace', ['^l Load file'])
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12a\tests\test_tui_diff_screen.py:3916: AssertionError: the App BINDINGS block must be byte-for-byte the committed set. Added: [('c', 'confirm_attention', 'Confirm', False), ('ctrl+l', 'load_file', 'Load file', True), ('d', 'a2l_describe_tag', 'Describe tag', False), ('l', 'load_file', 'Load file', False), ('p', 'load_project', 'Load project', False)]; removed: [('ctrl+l', 'load_file', 'Load', True), ('l', 'load_file', 'Load', False), ('p', 'load_project', 'Projects', False)]
 =========================== short test summary info ===========================
 FAILED tests/test_b100_busy.py::test_tc_b100_50_begin_paints_the_first_progress_line
 FAILED tests/test_b100_busy.py::test_tc_b100_50_long_label_stays_on_one_row

@@ -8,19 +8,19 @@
 # edit 1 NEW:
 #   |         if False:
 #   |             findings.append(
-# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
+# cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
 # env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
-# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_28_writer_refuses_a_value_out_of_form
+# command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_28_writer_refuses_a_value_out_of_form
 # started 2026-10-30T23:11:50Z  finished 2026-10-30T23:11:51Z  rc=1
 F.FFFF...FF.                                                             [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:418: assert '{\n  "schema_version": 1,\n  "active_variant": "firmware",\n  "batch": [],\n  "assignments": {},\n  "active_document": "firmware.s19"\n}' is None
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:418: assert '{\n  "schema_version": 1,\n  "active_variant": "firmware",\n  "batch": [],\n  "assignments": {},\n  "active_document": "patches\\\\boost.json"\n}' is None
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:418: assert '{\n  "schema_version": 1,\n  "active_variant": "firmware",\n  "batch": [],\n  "assignments": {},\n  "active_document": "patches/sub/boost.json"\n}' is None
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:418: assert '{\n  "schema_version": 1,\n  "active_variant": "firmware",\n  "batch": [],\n  "assignments": {},\n  "active_document": "patches/boost.txt"\n}' is None
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:418: assert '{\n  "schema_version": 1,\n  "active_variant": "firmware",\n  "batch": [],\n  "assignments": {},\n  "active_document": "templates/t.json"\n}' is None
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:418: assert '{\n  "schema_version": 1,\n  "active_variant": "firmware",\n  "batch": [],\n  "assignments": {},\n  "active_document": "Patches/boost.json"\n}' is None
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:418: assert '{\n  "schema_version": 1,\n  "active_variant": "firmware",\n  "batch": [],\n  "assignments": {},\n  "active_document": "patches/\\u001b]0;x\\u0007a.json"\n}' is None
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:418: assert '{\n  "schema_version": 1,\n  "active_variant": "firmware",\n  "batch": [],\n  "assignments": {},\n  "active_document": "firmware.s19"\n}' is None
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:418: assert '{\n  "schema_version": 1,\n  "active_variant": "firmware",\n  "batch": [],\n  "assignments": {},\n  "active_document": "patches\\\\boost.json"\n}' is None
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:418: assert '{\n  "schema_version": 1,\n  "active_variant": "firmware",\n  "batch": [],\n  "assignments": {},\n  "active_document": "patches/sub/boost.json"\n}' is None
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:418: assert '{\n  "schema_version": 1,\n  "active_variant": "firmware",\n  "batch": [],\n  "assignments": {},\n  "active_document": "patches/boost.txt"\n}' is None
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:418: assert '{\n  "schema_version": 1,\n  "active_variant": "firmware",\n  "batch": [],\n  "assignments": {},\n  "active_document": "templates/t.json"\n}' is None
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:418: assert '{\n  "schema_version": 1,\n  "active_variant": "firmware",\n  "batch": [],\n  "assignments": {},\n  "active_document": "Patches/boost.json"\n}' is None
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:418: assert '{\n  "schema_version": 1,\n  "active_variant": "firmware",\n  "batch": [],\n  "assignments": {},\n  "active_document": "patches/\\u001b]0;x\\u0007a.json"\n}' is None
 =========================== short test summary info ===========================
 FAILED tests/test_b100_document.py::test_tc_b100_28_writer_refuses_a_value_out_of_form['firmware.s19']
 FAILED tests/test_b100_document.py::test_tc_b100_28_writer_refuses_a_value_out_of_form['patches\\\\boost.json']

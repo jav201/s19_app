@@ -38,7 +38,7 @@ clause). `memory.py`, `memory_validate.py` and the engine were not touched.
 
 ## 3. How to test
 
-Run from the repo root `C:\Users\jjgh8\Github\s19_app`:
+Run from the repo root `<HOME>\Github\s19_app`:
 
 ```
 python -m py_compile s19_app/tui/cdfx/memory_display.py s19_app/tui/cdfx/__init__.py tests/test_memory_display.py

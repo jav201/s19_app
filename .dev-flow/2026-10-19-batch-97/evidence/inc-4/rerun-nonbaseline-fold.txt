@@ -16,10 +16,10 @@ cc11018c2c457d2594211db7b9e40c5d3664f877e897bf5bc22f0247a7b8dd76 *s19_app/tui/wi
 == fold tree · tests/test_tui_patch_glyphs.py::test_at077e_image_generation_invalidates · run 3
 1 passed in 2.39s
 == fold tree · whole module tests/test_tui_patch_glyphs.py (order context of the full suite)
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_glyphs.py:400: AssertionError: arm (b) remove_entry: the mutation must actually have taken effect; expected 2 rows, got 3
+<HOME>\Github\s19_app\tests\test_tui_patch_glyphs.py:400: AssertionError: arm (b) remove_entry: the mutation must actually have taken effect; expected 2 rows, got 3
 1 failed, 11 passed in 19.11s
 
-== clean HEAD 98f3c84 worktree (C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc4/head), for comparison (removed after)
+== clean HEAD 98f3c84 worktree (<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc4/head), for comparison (removed after)
 98f3c84 batch-97 Inc-3: Check Editor as a ledger + report-fields card
 -- at077e run 1
 1 passed in 2.79s

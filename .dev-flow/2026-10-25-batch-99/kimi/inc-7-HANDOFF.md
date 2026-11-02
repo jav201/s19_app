@@ -1,6 +1,6 @@
 # HANDOFF — batch-99 Increment 7 (HLR-162 · Load project and Workarea Files load by name)
 
-Worktree: `C:\Users\jjgh8\Github\s19_app-b99-inc7` (branch `b99-inc7`, base `f1ba70c`). Nothing committed — all changes are in the working tree for the orchestrator.
+Worktree: `<HOME>\Github\s19_app-b99-inc7` (branch `b99-inc7`, base `f1ba70c`). Nothing committed — all changes are in the working tree for the orchestrator.
 
 ## What was built
 - `s19_app/tui/workspace.py`: new tuple constant `RESERVED_WORKAREA_HOMES` (`temp`, `patches`, `templates`, `logs`, `crc`, `flows`, `flowsets`, `splits`, `reports`) with a doc comment (LLR-162.2). Writer census: only `temp`/`patches` are created directly under the work area (`ensure_workarea`, `workspace.py:85-86`); the other seven are `.s19tool/` homes or per-project homes — no extra home found, the LLR's closed set stands.

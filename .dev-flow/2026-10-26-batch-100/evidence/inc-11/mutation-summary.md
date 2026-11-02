@@ -1,8 +1,8 @@
 # Inc 11 — Mutation stage summary
 
-Copy: `C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut11`
-Interpreter: `C:/Users/jjgh8/anaconda3/envs/s19env/python.exe`
-`LOCALAPPDATA` redirected to the scratch folder on every run; `C:/Users/jjgh8/AppData/Local/s19_app` never created (checked before and after).
+Copy: `<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut11`
+Interpreter: `<HOME>/anaconda3/envs/s19env/python.exe`
+`LOCALAPPDATA` redirected to the scratch folder on every run; `<HOME>/AppData/Local/s19_app` never created (checked before and after).
 
 Baseline sha256[:16] (before == after):
 - s19_app/tui/screens.py `3d1d07526bcafd5a`

@@ -1,10 +1,10 @@
 # green-03-corrective: the same arms (plus the touched project-match neighbours and the two renamed CR12a-3 nodes) on the corrective worktree.
 # Run 1: default basetemp.
-# tree: C:/Users/jjgh8/Github/s19_app-b100-inc12a
+# tree: <HOME>/Github/s19_app-b100-inc12a
 # head: 71376a3
 # date: 2026-11-01T01:15:36-06:00
-s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc12a\s19_app\__init__.py
-# cmd: pytest -p no:cacheprovider -q -rs --tb=short --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12a/bt/green tests/test_b100_busy.py::test_tc_b100_50_names_paint_literally_through_load_from_path tests/test_b100_busy.py::test_tc_b100_50_control_bytes_never_reach_the_status_log tests/test_b100_recents.py::test_tc_b100_38_one_project_match_prefers_the_exact_listed_name tests/test_b100_recents.py::test_tc_b100_38_picking_proj_loads_proj_when_proj_differs_by_case tests/test_b100_recents.py::test_tc_b100_38_one_project_match tests/test_b100_recents.py::test_tc_b100_38_one_project_match_returns_the_listed_spelling tests/test_report_progress.py::test_report_generation_drives_progress_bar_then_clears_it tests/test_report_progress.py::test_finish_generate_report_clears_bar
+s19_app.__file__ = <HOME>\Github\s19_app-b100-inc12a\s19_app\__init__.py
+# cmd: pytest -p no:cacheprovider -q -rs --tb=short --basetemp=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12a/bt/green tests/test_b100_busy.py::test_tc_b100_50_names_paint_literally_through_load_from_path tests/test_b100_busy.py::test_tc_b100_50_control_bytes_never_reach_the_status_log tests/test_b100_recents.py::test_tc_b100_38_one_project_match_prefers_the_exact_listed_name tests/test_b100_recents.py::test_tc_b100_38_picking_proj_loads_proj_when_proj_differs_by_case tests/test_b100_recents.py::test_tc_b100_38_one_project_match tests/test_b100_recents.py::test_tc_b100_38_one_project_match_returns_the_listed_spelling tests/test_report_progress.py::test_report_generation_drives_progress_bar_then_clears_it tests/test_report_progress.py::test_finish_generate_report_clears_bar
 ...s..s....                                                              [100%]
 =========================== short test summary info ===========================
 SKIPPED [1] tests\test_b100_busy.py:1038: not run on Windows (the name cannot be created), never passed
@@ -13,11 +13,11 @@ SKIPPED [1] tests\test_b100_recents.py:3574: the volume is case-insensitive: Pro
 # exit: 0
 
 # Run 2: SE5-12a-3 on-disk arm on a case-sensitive folder.
-# tree: C:/Users/jjgh8/Github/s19_app-b100-inc12a
+# tree: <HOME>/Github/s19_app-b100-inc12a
 # head: 71376a3
 # date: 2026-11-01T01:16:25-06:00
-s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc12a\s19_app\__init__.py
-# cmd: pytest -p no:cacheprovider -q -rs --tb=short --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12a/bt/csparent/green tests/test_b100_recents.py::test_tc_b100_38_picking_proj_loads_proj_when_proj_differs_by_case
+s19_app.__file__ = <HOME>\Github\s19_app-b100-inc12a\s19_app\__init__.py
+# cmd: pytest -p no:cacheprovider -q -rs --tb=short --basetemp=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12a/bt/csparent/green tests/test_b100_recents.py::test_tc_b100_38_picking_proj_loads_proj_when_proj_differs_by_case
 .                                                                        [100%]
 1 passed in 2.97s
 # exit: 0

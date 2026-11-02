@@ -1,5 +1,5 @@
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\Github\s19_app\s19_app\tui\app.py:7985 in _handle_save_dialog 
+│ <HOME>\Github\s19_app\s19_app\tui\app.py:7985 in _handle_save_dialog 
 │                                                                              
 │    7982 │   │   saved_primary_name: Optional[str] = None                     
 │    7983 │   │   try:                                                         
@@ -15,15 +15,15 @@
 │ │         data_files = []                                                  │ 
 │ │              error = None                                                │ 
 │ │  existing_suffixes = set()                                               │ 
-│ │    parent_resolved = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pro… │ 
+│ │    parent_resolved = WindowsPath('<HOME>/AppData/Local/Temp/pro… │ 
 │ │            payload = SaveProjectPayload(                                 │ 
 │ │                      │                                                   │ 
-│ │                      parent_folder='C:\\Users\\jjgh8\\AppData\\Local\\T… │ 
+│ │                      parent_folder='<HOME>\\AppData\\Local\\T… │ 
 │ │                      │   project_name='P',                               │ 
 │ │                      │   batch=(),                                       │ 
 │ │                      │   assignments={}                                  │ 
 │ │                      )                                                   │ 
-│ │        project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pro… │ 
+│ │        project_dir = WindowsPath('<HOME>/AppData/Local/Temp/pro… │ 
 │ │ saved_primary_name = None                                                │ 
 │ │   saved_variant_id = None                                                │ 
 │ │               self = S19TuiApp(                                          │ 
@@ -33,7 +33,7 @@
 │ │                      )                                                   │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app\s19_app\tui\workspace.py:342 in                
+│ <HOME>\Github\s19_app\s19_app\tui\workspace.py:342 in                
 │ copy_into_workarea                                                           
 │                                                                              
 │   339 │   │   │   f"Refusing to copy: destination traverses a symbolic link  
@@ -45,15 +45,15 @@
 │   345 │   │   │   f"Refusing to copy: source size {size} bytes exceeds cap { 
 │                                                                              
 │ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
-│ │          destination = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/p… │ 
+│ │          destination = WindowsPath('<HOME>/AppData/Local/Temp/p… │ 
 │ │       max_size_bytes = 268435456                                         │ 
-│ │ resolved_destination = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/p… │ 
-│ │      resolved_source = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/p… │ 
-│ │               source = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/p… │ 
-│ │        workarea_root = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/p… │ 
+│ │ resolved_destination = WindowsPath('<HOME>/AppData/Local/Temp/p… │ 
+│ │      resolved_source = WindowsPath('<HOME>/AppData/Local/Temp/p… │ 
+│ │               source = WindowsPath('<HOME>/AppData/Local/Temp/p… │ 
+│ │        workarea_root = WindowsPath('<HOME>/AppData/Local/Temp/p… │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1013 in stat             
+│ <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:1013 in stat             
 │                                                                              
 │   1010 │   │   Return the result of the stat() system call on this path, lik 
 │   1011 │   │   os.stat() does.                                               
@@ -65,16 +65,16 @@
 │                                                                              
 │ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
 │ │ follow_symlinks = True                                                   │ 
-│ │            self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/projpr… │ 
+│ │            self = WindowsPath('<HOME>/AppData/Local/Temp/projpr… │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 ╰──────────────────────────────────────────────────────────────────────────────
 FileNotFoundError: [WinError 2] The system cannot find the file specified: 
-'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_8kvqy9ag\\.s19tool\\workarea
+'<HOME>\\AppData\\Local\\Temp\\projprobe_8kvqy9ag\\.s19tool\\workarea
 \temp\\firmware.s19'
 work copy: temp/firmware.s19 exists: True
 save-back status: ['Patched image saved as firmware.s19', 'Saved + verified: firmware.s19']
 work copy exists after save-back: False | app still holds: temp/firmware.s19
 workarea files: ['firmware.s19']
 after Save-project dismiss: app running? False | return_code: 1
-run_test outcome: EXCEPTION FileNotFoundError: [WinError 2] The system cannot find the file specified: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_8kvqy9ag\\.s19tool\\workarea\\temp\\firmware.s19' | app.return_code: 1
+run_test outcome: EXCEPTION FileNotFoundError: [WinError 2] The system cannot find the file specified: '<HOME>\\AppData\\Local\\Temp\\projprobe_8kvqy9ag\\.s19tool\\workarea\\temp\\firmware.s19' | app.return_code: 1
 P folder left behind: []

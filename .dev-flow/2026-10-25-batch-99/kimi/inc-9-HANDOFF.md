@@ -1,6 +1,6 @@
 # HANDOFF — batch-99 Increment 9 (HLR-154) — implementer (Kimi)
 
-Worktree: `C:\Users\jjgh8\Github\s19_app-b99-inc9` (branch `b99-inc9`). Working
+Worktree: `<HOME>\Github\s19_app-b99-inc9` (branch `b99-inc9`). Working
 tree only — NOTHING committed (orchestrator commits).
 
 ## What is done

@@ -31,5 +31,5 @@ without conflict.
 
 ## Contact
 
-The coordinator runs in the main checkout (`C:/Users/jjgh8/Github/s19_app`).
+The coordinator runs in the main checkout (`<HOME>/Github/s19_app`).
 Leave replies here or in `.dev-flow/2026-10-11-batch-93/COORDINATION.md`.

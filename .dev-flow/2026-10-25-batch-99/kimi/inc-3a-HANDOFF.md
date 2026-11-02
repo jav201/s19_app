@@ -1,6 +1,6 @@
 # HANDOFF — batch-99 Increment 3a (HLR-155, private staging / atomic placement)
 
-Worktree: `C:\Users\jjgh8\Github\s19_app-b99-inc3a` (branch `b99-inc3a`, base `a52e2be`).
+Worktree: `<HOME>\Github\s19_app-b99-inc3a` (branch `b99-inc3a`, base `a52e2be`).
 Nothing committed — all changes are in the working tree for the orchestrator.
 
 ## What is done

@@ -131,7 +131,7 @@ Reverse-census affected suite (19 files, incl. `tests/test_address_census.py`):
 |---|---|
 | Mutation applied | four, one per LLR + PQ-7 (see Mutation verdicts below) |
 | Instrument | the implementer's own hand via the Edit tool; restore checked by SHA-256 against `baseline-hashes.txt` (recorded before the first mutation) |
-| Where it ran | this worktree (`C:\Users\jjgh8\Github\s19_app-b99-inc8`), run by the implementer |
+| Where it ran | this worktree (`<HOME>\Github\s19_app-b99-inc8`), run by the implementer |
 | Transcript | `evidence/inc-8/mut-LLR-156.1.txt` · `mut-LLR-156.2.txt` · `mut-LLR-156.4.txt` · `mut-PQ7.txt` (each: the targeted node FAILED) |
 | Restore proven by | all six touched files returned to their pre-mutation SHA-256 (`baseline-hashes.txt`): flow_execution_service.py `165d9457…`, flow_report_service.py `26cb97bf…`, flow_screens.py `bfbfb9e7…` |
 | Bytecode cache | run with `PYTHONDONTWRITEBYTECODE=1` (C-46) |
@@ -180,7 +180,7 @@ All under `artifact_homes.evidence` = `.dev-flow/2026-10-25-batch-99/evidence/in
 
 | Evidence artifact | Path | SHA-256 |
 |---|---|---|
-| RED baseline on the unmodified tree (15 failed, 2 passed) | `.dev-flow/2026-10-25-batch-99/evidence/inc-8/red-tc17-20-at06-07.txt` | `9710bf0eb890d0c4d0c7ad9448fa0e405b8f7fc36cae7c09dff8ce3b055269e8` |
+| RED baseline on the unmodified tree (15 failed, 2 passed) | `.dev-flow/2026-10-25-batch-99/evidence/inc-8/red-tc17-20-at06-07.txt` | `211fa6daaf3e85dfc224b458a8cf81b25314ebe01b6ebfd33eac346028e42a44` |
 | GREEN full new-file run (17 passed) | `.dev-flow/2026-10-25-batch-99/evidence/inc-8/green-tc17-20-at06-07.txt` | `6cc4333ccb096d834bd3563b9650eacf0b29aa6d57e53bb2b1e857642b55a244` |
 | GREEN re-pinned census/chain-set nodes (7 passed) | `.dev-flow/2026-10-25-batch-99/evidence/inc-8/green-repins.txt` | `d9a883328ab45f1fbeb07bdd0fa65204296c461297bc45e3ebef47f4f02d733c` |
 | GREEN reverse-census affected suite (362 passed, EXIT=0) | `.dev-flow/2026-10-25-batch-99/evidence/inc-8/green-affected-suite.txt` | `85581ee71b5fb25536d666d542ff8aa8102e7bcd0d91ffa348309e9da518d6ea` |
@@ -189,7 +189,7 @@ All under `artifact_homes.evidence` = `.dev-flow/2026-10-25-batch-99/evidence/in
 | Mutation LLR-156.4 (KILLED — Not-applied section made conditional) | `mut-LLR-156.4.txt` | `8bea7b19…` |
 | Mutation PQ-7 (KILLED — `md_safe` removed from the Refusals cell; first attempt at `_failure_detail` survived and was re-aimed) | `mut-PQ7.txt` | `8ac6f583…` |
 | Reverse census probe (19 files) | `.dev-flow/2026-10-25-batch-99/evidence/inc-8/reverse-census.txt` | `4b0ce926fafe3815b3ace62f4c91a39edb6c80d9505fee90d332c6db4dc5fd44` |
-| Emitted reports (flow + chain-set, direct driver) | `.dev-flow/2026-10-25-batch-99/evidence/inc-8/emitted-reports.txt` | `bb5b90f5ccf9f8a2f7b289d742347cc43b1e10aecd976580b80138d399afb2df` |
+| Emitted reports (flow + chain-set, direct driver) | `.dev-flow/2026-10-25-batch-99/evidence/inc-8/emitted-reports.txt` | `40ce5a8467f432e9fe6fc798b612d178ae2da2f24136c6254544d4c5a722fe1e` |
 | Pre-mutation hashes of every touched file | `.dev-flow/2026-10-25-batch-99/evidence/inc-8/baseline-hashes.txt` | `f958198e3f9cb9da2fabf3457fae142967d36ad7b2083b1eea8c4c270ffad292` |
 
 | Field | Value |

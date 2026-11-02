@@ -1,9 +1,9 @@
 # HANDOFF — batch-99 Increment 1 · review round 1 fixes (F1–F5)
 
-Worktree: `C:\Users\jjgh8\Github\s19_app-b99-inc1` (branch `b99-wip`, base commit `e4c4324`).
+Worktree: `<HOME>\Github\s19_app-b99-inc1` (branch `b99-wip`, base commit `e4c4324`).
 No commits made — all changes are in the working tree for the orchestrator.
-Interpreter: `C:\Users\jjgh8\anaconda3\envs\s19env\python.exe`; worktree import proven:
-`s19_app.__file__` = `C:\Users\jjgh8\Github\s19_app-b99-inc1\s19_app\__init__.py`.
+Interpreter: `<HOME>\anaconda3\envs\s19env\python.exe`; worktree import proven:
+`s19_app.__file__` = `<HOME>\Github\s19_app-b99-inc1\s19_app\__init__.py`.
 
 ## What was done (exactly per BRIEF-inc-1-fix.md)
 

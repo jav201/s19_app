@@ -495,7 +495,7 @@ discipline and the reason `TC-497` exists. The fourth is B-1.
   artefacts I did not reconstruct), or the full §6.3 regression baselines (`123 passed` / `44 passed`).
   Those remain unverified by this lane and I am not asserting them.
 - **The probe scripts live in the scratchpad**, not the repo. They are reproduction aids, not deliverables:
-  `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-OneDrive-Documents-Github-s19-app--claude-worktrees-backlog-revision-s19-app-a6e12c\9f2a68ff-2369-4781-a9fe-714a18959601\scratchpad\{p1_prefixmax,p2_cost,p3_subseq,p4_census,p5_x2}.py`
+  `<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-OneDrive-Documents-Github-s19-app--claude-worktrees-backlog-revision-s19-app-a6e12c\9f2a68ff-2369-4781-a9fe-714a18959601\scratchpad\{p1_prefixmax,p2_cost,p3_subseq,p4_census,p5_x2}.py`
 
 ---
 

@@ -1,6 +1,6 @@
 # Inc 11 — E5 corrective notes (the Save project dialog)
 
-Stage E5, the one corrective pass. Inputs: `03-increments/review-increment-020.md` (CR F1–F3), `03-increments/security-increment-020.md` (SE5-11-1, SE5-11-2), the reviewers' probes (`scratchpad/rev11-code/probe_stale_inventory.py`, `scratchpad/rev11-security/probe_midload*.py`), `E5-rulings.md`, and the orchestrator's mutation rows (`evidence/inc-11/mutation-summary.md`, 18 survivors). Tree `C:/Users/jjgh8/Github/s19_app-b100-inc11`, branch `b100-inc11` at `051f586` plus this pass (not committed). Evidence states use the seven words only.
+Stage E5, the one corrective pass. Inputs: `03-increments/review-increment-020.md` (CR F1–F3), `03-increments/security-increment-020.md` (SE5-11-1, SE5-11-2), the reviewers' probes (`scratchpad/rev11-code/probe_stale_inventory.py`, `scratchpad/rev11-security/probe_midload*.py`), `E5-rulings.md`, and the orchestrator's mutation rows (`evidence/inc-11/mutation-summary.md`, 18 survivors). Tree `<HOME>/Github/s19_app-b100-inc11`, branch `b100-inc11` at `051f586` plus this pass (not committed). Evidence states use the seven words only.
 
 ## Result
 
@@ -15,7 +15,7 @@ Every row marked `corrective` and every MUT11 row is done. Source files touched:
 | MUT11 kills on the scratch copy | `evidence/inc-11/mut-kill-03-corrective.txt` | 7 of 7 KILLED, each source restored and sha-verified | executed |
 | GREEN on the final source | `evidence/inc-11/green-05-final.txt` | `68 passed in 537.46s` | executed |
 
-Every transcript prints `s19_app.__file__` (worktree: `C:\Users\jjgh8\Github\s19_app-b100-inc11\s19_app\__init__.py`; RED: `...\scratchpad\base11c\s19_app\__init__.py`; kills: `...\scratchpad\corr11\mutcap\s19_app\__init__.py`). Env on every run: `env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<scratchpad>/corr11/la`, `--basetemp` under `<scratchpad>/corr11/`. No timing arm failed in any run. No pytest of mine is left running. `base11c` was restored to its clean state (`git status` empty).
+Every transcript prints `s19_app.__file__` (worktree: `<HOME>\Github\s19_app-b100-inc11\s19_app\__init__.py`; RED: `...\scratchpad\base11c\s19_app\__init__.py`; kills: `...\scratchpad\corr11\mutcap\s19_app\__init__.py`). Env on every run: `env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<scratchpad>/corr11/la`, `--basetemp` under `<scratchpad>/corr11/`. No timing arm failed in any run. No pytest of mine is left running. `base11c` was restored to its clean state (`git status` empty).
 
 Not run, by the operator override: whole touched modules (`test_loadfilescreen_input.py`, `test_address_census.py`), the full suite (`not-run`, owed to the batch-end battery).
 

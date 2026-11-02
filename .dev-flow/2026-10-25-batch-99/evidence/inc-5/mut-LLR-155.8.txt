@@ -2,7 +2,7 @@ FF                                                                       [100%]
 ================================== FAILURES ===================================
 ____________ test_tc_b99_38_concurrent_crc_writes_of_the_same_stem ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26635/test_tc_b99_38_concurrent_crc_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26635/test_tc_b99_38_concurrent_crc_0')
 
     def test_tc_b99_38_concurrent_crc_writes_of_the_same_stem(tmp_path: Path) -> None:
         """Two concurrent writers of ``fw-crc.s19`` per trial, 20 trials: every

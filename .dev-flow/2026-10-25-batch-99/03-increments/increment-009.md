@@ -116,7 +116,7 @@ validation_service_supplemental) 235 passed · `tests/test_tui_app.py`
 |---|---|
 | Mutation applied | three, one per LLR (see Mutation verdicts below); baseline RED first: the whole new file run against the UNMODIFIED tree |
 | Instrument | project code: the implementer's own hand via the Edit tool; restore checked by SHA-256 against `baseline-hashes.txt` |
-| Where it ran | this worktree (`C:\Users\jjgh8\Github\s19_app-b99-inc9`), run by the implementer |
+| Where it ran | this worktree (`<HOME>\Github\s19_app-b99-inc9`), run by the implementer |
 | Transcript | `evidence/inc-9/red-initial.txt` (16 failed, 4 controls passed — the passing four are pure boundary controls: trailing-blank-lines, well-formed HEX controls, the examples/corpus zero-code control and the clean-source flow control) · `mut-LLR-154.1.txt` · `mut-LLR-154.2.txt` · `mut-LLR-154.3.txt` |
 | Restore proven by | core.py → `123eda01…` · hexfile.py → `c9761efb…` · flow_execution_service.py → `9feeecb7…` (all back to their pre-mutation digests recorded in `baseline-hashes.txt`; app.py untouched by mutations at `029b8bc5…`) |
 | Bytecode cache | run with `PYTHONDONTWRITEBYTECODE=1` (C-46) |
@@ -164,7 +164,7 @@ All under `artifact_homes.evidence` = `.dev-flow/2026-10-25-batch-99/evidence/in
 
 | Evidence artifact | Path | SHA-256 |
 |---|---|---|
-| RED baseline, unmodified tree (16 failed, 4 controls passed) | `red-initial.txt` | `828d4761cce5eee3819255cdad3056148b148c55b57cd7d76a132dab24d18168` |
+| RED baseline, unmodified tree (16 failed, 4 controls passed) | `red-initial.txt` | `ce01e91a3a0b53daf2c5ad931b2acfb4df13aeb2efd423c26067d198197b94d0` |
 | GREEN full run (20 passed) | `green-full.txt` | `e9ae1fd20406757b80df7492aa25be75473bcacd9c4b5e97f6084933dffe710a` |
 | GREEN TC-B99-08 (7 passed) | `green-tc_b99_08.txt` | `b968dcff3240636ff01c475c82ec78fb75f9317eb55812ca3d4c26fa87c542a5` |
 | GREEN TC-B99-09 (4 passed) | `green-tc_b99_09.txt` | `f62dd37b6450b0dbe550e8ac3b26d332177712d4c0c6b3cc2ae22012d4f7a41d` |
@@ -177,7 +177,7 @@ All under `artifact_homes.evidence` = `.dev-flow/2026-10-25-batch-99/evidence/in
 | GREEN test_tui_app (62 passed, 1 xfailed) | `green-tui-app.txt` | `dd8e569ad4268cf42e350ebba55ee428a784addd701ad4ed5980eedd28983e75` |
 | Mutation LLR-154.1 (KILLED) | `mut-LLR-154.1.txt` | `205fe11e89928a06be9be70c52f33541ae06fa66ce1be9793e660b6b71f1ff17` |
 | Mutation LLR-154.2 (KILLED) | `mut-LLR-154.2.txt` | `8792007c6c7c090f03038033a28b5a33bb7ede110b317624a0e0844c8272b70f` |
-| Mutation LLR-154.3 (KILLED, 5 arms) | `mut-LLR-154.3.txt` | `a32d03b5c782930735a893b987487536144559d2a8de193c0ccb15523429519d` |
+| Mutation LLR-154.3 (KILLED, 5 arms) | `mut-LLR-154.3.txt` | `8e3d2e900039b198cfc4f983d95d96b6e2af72fb7076f3e2eefb709f6af42ec6` |
 | Reverse census probes | `reverse-census.txt` | `784b3eff3bffd220908af92dec658a3a7dc5d8f3466fa1d87bbbc5114a0d5d48` |
 | Pre-mutation hashes (4 SOURCE files + new test) | `baseline-hashes.txt` | `d85aeb367c12af8ba60e6a4e5c365555942edbe9e28af1b85e8f9fef205a4921` |
 | Painted-status probe (diagnostic) | `probe_status.py` | working-tree diagnostic script (not a transcript) |
@@ -284,7 +284,7 @@ not a regression. Final post-mutation confirmation: `test_b99_truncation.py` +
 
 | Evidence artifact | Path | SHA-256 |
 |---|---|---|
-| RED fix round (2 failed — the two source arms; 4 passed) | `red-fix-tests.txt` | `608f058ee3b68e51b5d531d6fa89ccf98526ab165ccaf957855a31c7ecacc2cc` |
+| RED fix round (2 failed — the two source arms; 4 passed) | `red-fix-tests.txt` | `9959c447dff915f3b3ba7e27de65354a1e7faa32841a9e992ac472bbd817efd8` |
 | GREEN full truncation file (23 passed) | `green-fix-full.txt` | `c69c5a7d16ad4c3a52e6e04ea41a7e69a2cf73878a23e4ad708133731ce96393` |
 | GREEN loader census (68 passed + 1 expected engine-guard failure) | `green-fix-loaders.txt` | `3806f5f90d805b62c0676d0562afe52f7c7d8e4fb274105f88035b5105302f27` |
 | GREEN final post-mutation (24 passed) | `green-fix-final.txt` | `84c219a4036d24581cf326fe1be4883d64652514d407e68681447ebfd17dbc4d` |
@@ -349,12 +349,12 @@ declared in round 1;
 
 | Evidence artifact | Path | SHA-256 |
 |---|---|---|
-| RED fix round 2 (2 failed — both new arms on the pre-fix tree) | `red-fix2.txt` | `2c4dbf320bf8343c12fde78a87f0e54fe45dc4e55636fa50bc1c08184087957d` |
+| RED fix round 2 (2 failed — both new arms on the pre-fix tree) | `red-fix2.txt` | `3b88f3672470d00e4b4034d279f9bd1ccce33ebf73f6e2fc6437d059d24ca2d3` |
 | GREEN full truncation file (25 passed) | `green-fix2-full.txt` | `be62d5a54261a2c9d302d2eec90a155ea89103b0a5040f835aa9cb243a88f89e` |
 | GREEN HEX-loader census (15 files: 522 passed, 6 declared failures — 4 engine guards, at031b pre-existing on main, at068b green in isolation) | `green-fix2-hexloaders.txt` | `4aceb65b1c7c744a53b8b6f4081bb1647e32019959d08ea61aedaac4cc4dd5a3` |
 | GREEN address census + id registry (36 passed) | `green-fix2-census-registry.txt` | `90fb312b9c69a36524d85c17946193e41a18ab4096792aed3c4c8468ac4d2ed1` |
 | AT-B99-03 stability ×8 (3 passed each) | `stability-fix2-at03.txt` | `e296824f90e6db1826672035ffb25d867034ec0ad9b078d3d7dfeb715e21fad8` |
-| Mutation N1 (splitlines → split(b"\n")) — KILLED | `mut-N1.txt` | `148a2a9e17d708b1afb5cb1a8402277297fe02389561604f0adfecdfd5740f76` |
+| Mutation N1 (splitlines → split(b"\n")) — KILLED | `mut-N1.txt` | `985a146c623f73c8b3a65dc966cc38806f80fc3ce4bdcfe577b7b4ccc03f221e` |
 | Fix-2 baseline hashes (pre-mutation digests) | `fix2-baseline-hashes.txt` | `2cc1d2408f205e82b4f701e1a3ef6175ddb6500a2bedba8ce37e1d53fa1aabbe` |
 
 Restore proof: hexfile.py → `a51ec5d9…` — the fixed-tree digest after the

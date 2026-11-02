@@ -53,7 +53,7 @@ ATLAS-TRACE realm columns; V20 confirms `atlas current (4 files, census 2)`.
 ## 3 · How to test
 
 ```bash
-cd "C:\Users\jjgh8\Github\s19_app\.claude\worktrees\dev-flow-68a67d"
+cd "<HOME>\Github\s19_app\.claude\worktrees\dev-flow-68a67d"
 
 # 1 — per-id grep loop: every batch-86 heading id present in the canon (>= 1 each)
 for id in "US-86-1" "HLR-86.1" "HLR-86.2" "HLR-86.3" "LLR-86.1" "LLR-86.2" "LLR-86.3" \
@@ -62,7 +62,7 @@ for id in "US-86-1" "HLR-86.1" "HLR-86.2" "HLR-86.3" "LLR-86.1" "LLR-86.2" "LLR-
 
 # 2 — validator: V22 unreflected drops 288 -> 276, final line 0 block
 #     (if V20 blocks on stale Atlas: regenerate with --atlas --write, then re-run)
-python ~/.claude/docs/tools/devflow-validate.py "C:\Users\jjgh8\Github\s19_app\.claude\worktrees\dev-flow-68a67d"
+python ~/.claude/docs/tools/devflow-validate.py "<HOME>\Github\s19_app\.claude\worktrees\dev-flow-68a67d"
 
 # 3 — source-scope pin: the batch's source diff is empty
 git diff --stat $(git merge-base HEAD origin/main) -- s19_app/ tests/ tools/ pyproject.toml

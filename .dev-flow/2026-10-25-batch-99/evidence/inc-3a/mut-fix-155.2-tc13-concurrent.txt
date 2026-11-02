@@ -2,7 +2,7 @@ FF                                                                       [100%]
 ================================== FAILURES ===================================
 ______ test_tc_b99_13_concurrent_placements_one_name_own_bytes_returned _______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26227/test_tc_b99_13_concurrent_plac0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26227/test_tc_b99_13_concurrent_plac0')
 
     def test_tc_b99_13_concurrent_placements_one_name_own_bytes_returned(
         tmp_path: Path,
@@ -65,8 +65,8 @@ tests\test_b99_staging.py:484: in place
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-source = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26227/test_tc_b99_13_concurrent_plac0/t13-09-False-0/shared.s19')
-destination = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26227/test_tc_b99_13_concurrent_plac0/.s19tool/workarea/out/trial09/diff')
+source = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26227/test_tc_b99_13_concurrent_plac0/t13-09-False-0/shared.s19')
+destination = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26227/test_tc_b99_13_concurrent_plac0/.s19tool/workarea/out/trial09/diff')
 max_size_bytes = 268435456
 
     def copy_into_workarea(
@@ -231,12 +231,12 @@ max_size_bytes = 268435456
                 # unconditional take of the requested name.
 >               claim_fd = os.open(str(claim_path), os.O_CREAT | os.O_WRONLY)
                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-E               PermissionError: [Errno 13] Permission denied: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-26227\\test_tc_b99_13_concurrent_plac0\\.s19tool\\workarea\\out\\trial09\\diff\\shared.s19'
+E               PermissionError: [Errno 13] Permission denied: '<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-26227\\test_tc_b99_13_concurrent_plac0\\.s19tool\\workarea\\out\\trial09\\diff\\shared.s19'
 
 s19_app\tui\workspace.py:511: PermissionError
 _______________ test_tc_b99_13_zero_byte_target_is_never_reused _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26227/test_tc_b99_13_zero_byte_targe0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26227/test_tc_b99_13_zero_byte_targe0')
 
     def test_tc_b99_13_zero_byte_target_is_never_reused(tmp_path: Path) -> None:
         """A 0-byte target may be another writer's claim placeholder (C1(a))."""
@@ -254,7 +254,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         )
 E       AssertionError: a 0-byte target (another writer's claim) must never be reused
 E       assert 'empty.s19' != 'empty.s19'
-E        +  where 'empty.s19' = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26227/test_tc_b99_13_zero_byte_targe0/.s19tool/workarea/out/empty.s19').name
+E        +  where 'empty.s19' = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26227/test_tc_b99_13_zero_byte_targe0/.s19tool/workarea/out/empty.s19').name
 
 tests\test_b99_staging.py:515: AssertionError
 =========================== short test summary info ===========================

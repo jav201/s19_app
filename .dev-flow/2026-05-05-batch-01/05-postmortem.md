@@ -5,7 +5,7 @@
 **Date:** 2026-05-07
 **Source artifacts:** `state.json`, `01-requirements.md`, `02-review.md`, `03-increments/increment-001.md` … `increment-009.md`, `04-validation.md`
 **Co-authors:** `architect` agent + `qa-reviewer` agent
-**Worktree:** `C:\Users\jjgh8\OneDrive\Documents\Github\s19_app\.claude\worktrees\lucid-margulis-a63fd4`
+**Worktree:** `<HOME>\OneDrive\Documents\Github\s19_app\.claude\worktrees\lucid-margulis-a63fd4`
 **Branch:** `claude/lucid-margulis-a63fd4`
 
 ---

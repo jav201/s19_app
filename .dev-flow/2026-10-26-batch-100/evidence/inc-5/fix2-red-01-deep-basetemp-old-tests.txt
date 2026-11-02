@@ -1,14 +1,14 @@
 # command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py -k tc_b100_16 or at_b100_05 --basetemp=<deep, 114 chars>
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree; corrective pass 2 (OLD tests, pre-change))
+# tree: <HOME>\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree; corrective pass 2 (OLD tests, pre-change))
 # source sha256 (16): app.py ecfe48ae4da0f24e · apply.py 6d00f17fcefb704c · change_service.py 95da58bf3bcc27cd · project_gather_service.py 11697d6c85efb9e2 · test_b100_save_image.py 559768f390ded771
-# PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T22:39:37Z
-# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\__init__.py
+# s19_app.__file__ = <HOME>\Github\s19_app-b100-inc5\s19_app\__init__.py
 FF.F                                                                     [100%]
 ================================== FAILURES ===================================
 ______________________ test_tc_b100_16_one_applied_entry ______________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/b100deep/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb/test_tc_b100_16_one_applied_en0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/b100deep/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb/test_tc_b100_16_one_applied_en0')
 
     def test_tc_b100_16_one_applied_entry(tmp_path: Path) -> None:
         """1 applied entry → the status carries 1 entry and 0 applied by this
@@ -22,13 +22,13 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/b100deep/aaaaaaaaaaaaa
         final = lines[-1]
         assert final.startswith("Saved project to"), lines
 >       assert "firmware.s19 + 1 change entry, 0 applied by this save" in final, final
-E       AssertionError: Saved project to C:\Users\jjgh8\AppData\Local\Temp\b100deep\aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\test_tc_b100_16_one_applied_en0\app\.s19tool\workarea\P1 (variant 'firmware') — firmware
-E       assert 'firmware.s19 + 1 change entry, 0 applied by this save' in "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\b100deep\\aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\\bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\\test_tc_b100_16_one_applied_en0\\app\\.s19tool\\workarea\\P1 (variant 'firmware') — firmware"
+E       AssertionError: Saved project to <HOME>\AppData\Local\Temp\b100deep\aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\test_tc_b100_16_one_applied_en0\app\.s19tool\workarea\P1 (variant 'firmware') — firmware
+E       assert 'firmware.s19 + 1 change entry, 0 applied by this save' in "Saved project to <HOME>\\AppData\\Local\\Temp\\b100deep\\aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\\bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\\test_tc_b100_16_one_applied_en0\\app\\.s19tool\\workarea\\P1 (variant 'firmware') — firmware"
 
 tests\test_b100_save_image.py:644: AssertionError
 _________________ test_tc_b100_16_entry_added_after_the_apply _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/b100deep/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb/test_tc_b100_16_entry_added_af0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/b100deep/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb/test_tc_b100_16_entry_added_af0')
 
     def test_tc_b100_16_entry_added_after_the_apply(tmp_path: Path) -> None:
         """1 applied + 1 added after the apply → 2 entries, 1 applied by this
@@ -42,13 +42,13 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/b100deep/aaaaaaaaaaaaa
         lines, project, _ = _save_session(tmp_path, scenario)
         final = lines[-1]
 >       assert "firmware.s19 + 2 change entries, 1 applied by this save" in final, final
-E       AssertionError: Saved project to C:\Users\jjgh8\AppData\Local\Temp\b100deep\aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\test_tc_b100_16_entry_added_af0\app\.s19tool\workarea\P1 (variant 'firmware') — firmware
-E       assert 'firmware.s19 + 2 change entries, 1 applied by this save' in "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\b100deep\\aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\\bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\\test_tc_b100_16_entry_added_af0\\app\\.s19tool\\workarea\\P1 (variant 'firmware') — firmware"
+E       AssertionError: Saved project to <HOME>\AppData\Local\Temp\b100deep\aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\test_tc_b100_16_entry_added_af0\app\.s19tool\workarea\P1 (variant 'firmware') — firmware
+E       assert 'firmware.s19 + 2 change entries, 1 applied by this save' in "Saved project to <HOME>\\AppData\\Local\\Temp\\b100deep\\aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\\bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\\test_tc_b100_16_entry_added_af0\\app\\.s19tool\\workarea\\P1 (variant 'firmware') — firmware"
 
 tests\test_b100_save_image.py:661: AssertionError
 _________ test_at_b100_05_save_project_saves_the_patched_image[size1] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/b100deep/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb/test_at_b100_05_save_project_s1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/b100deep/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb/test_at_b100_05_save_project_s1')
 size = (220, 60)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
@@ -138,7 +138,7 @@ size = (220, 60)
 E           AssertionError: Apply: 1 applied, 0 skipped, 0 blocked
 E             Project saved + manifest verified
 E             Saved + verified: firmware.s19 — 1 entry applied before this save (0x8000007C)
-E             Saved project to C:\Users\jjgh8\AppData\Local\Temp\b100deep\aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\test_at_b100_05_save_project_s1\app\.s19tool\workarea\P1 (variant 'firmware') — firmware
+E             Saved project to <HOME>\AppData\Local\Temp\b100deep\aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\test_at_b100_05_save_project_s1\app\.s19tool\workarea\P1 (variant 'firmware') — firmware
 E           assert '1 change entry, 0 applied by this save' in "Apply: 1 applied, 0 skipped, 0 blocked\nProject saved + manifest verified\nSaved + verified: firmware.s19 — 1 entry a...bbbbbbbbbbbbbbbbbbbbbbbb\\test_at_b100_05_save_project_s1\\app\\.s19tool\\workarea\\P1 (variant 'firmware') — firmware"
 
 tests\test_b100_save_image.py:1709: AssertionError

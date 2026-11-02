@@ -1,5 +1,5 @@
 dee0d96
-C:\Users\jjgh8\Github\s19_app-b100-fix1\s19_app\__init__.py
+<HOME>\Github\s19_app-b100-fix1\s19_app\__init__.py
 ..F...F..F..............FFF......F.                                      [100%]
 ================================== FAILURES ===================================
 _ test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project] _
@@ -85,11 +85,11 @@ E   AssertionError: did not settle: the list pick re-loads one.s19
 ____________ test_tc016s_snapshot_setup_loads_only_public_fixtures ____________
 tests\test_tui_snapshot.py:1270: in test_tc016s_snapshot_setup_loads_only_public_fixtures
     assert "snapshot_public" in parts or "pytest" in " ".join(parts).lower(), (
-E   AssertionError: public s19 fixture must live in a pytest temp dir, got C:\Users\jjgh8\AppData\Local\Temp\s19r\bt\snapshot_public0\snap.s19
-E   assert ('snapshot_public' in {'appdata', 'bt', 'c:\\', 'jjgh8', 'local', 's19r', ...} or 'pytest' in 'local snap.s19 appdata jjgh8 snapshot_public0 temp c:\\ bt s19r users')
-E    +  where 'local snap.s19 appdata jjgh8 snapshot_public0 temp c:\\ bt s19r users' = <built-in method lower of str object at 0x000001B0FF726D30>()
-E    +    where <built-in method lower of str object at 0x000001B0FF726D30> = 'local snap.s19 appdata jjgh8 snapshot_public0 temp c:\\ bt s19r users'.lower
-E    +      where 'local snap.s19 appdata jjgh8 snapshot_public0 temp c:\\ bt s19r users' = <built-in method join of str object at 0x00007FF928C5E8C8>({'appdata', 'bt', 'c:\\', 'jjgh8', 'local', 's19r', ...})
+E   AssertionError: public s19 fixture must live in a pytest temp dir, got <HOME>\AppData\Local\Temp\s19r\bt\snapshot_public0\snap.s19
+E   assert ('snapshot_public' in {'appdata', 'bt', 'c:\\', '<USER>', 'local', 's19r', ...} or 'pytest' in 'local snap.s19 appdata <USER> snapshot_public0 temp c:\\ bt s19r users')
+E    +  where 'local snap.s19 appdata <USER> snapshot_public0 temp c:\\ bt s19r users' = <built-in method lower of str object at 0x000001B0FF726D30>()
+E    +    where <built-in method lower of str object at 0x000001B0FF726D30> = 'local snap.s19 appdata <USER> snapshot_public0 temp c:\\ bt s19r users'.lower
+E    +      where 'local snap.s19 appdata <USER> snapshot_public0 temp c:\\ bt s19r users' = <built-in method join of str object at 0x00007FF928C5E8C8>({'appdata', 'bt', 'c:\\', '<USER>', 'local', 's19r', ...})
 E    +        where <built-in method join of str object at 0x00007FF928C5E8C8> = ' '.join
 =========================== short test summary info ===========================
 FAILED tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project]

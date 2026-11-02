@@ -1,15 +1,15 @@
-s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc8b\s19_app\__init__.py
+s19_app.__file__ = <HOME>\Github\s19_app-b100-inc8b\s19_app\__init__.py
 .FIRST PANEL: Project P opened with 1 problem Opened firmware.s19 recorded as the active variant (the latest saved) Variants 1 in the project MAC (none) A2L (none) Problems found (the rest loaded) ! not readable: firmware.a2l too large to open - replace the file, or Save project to drop it
-SAVE LINES: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30781\\test_probe_d3_save_project_doe0\\app\\.s19tool\\workarea\\P (variant 'firmware')"]
+SAVE LINES: ['Project saved + manifest verified', "Saved project to <HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-30781\\test_probe_d3_save_project_doe0\\app\\.s19tool\\workarea\\P (variant 'firmware')"]
 SECOND PANEL: Project P opened with 1 problem Opened firmware.s19 recorded as the active variant (the latest saved) Variants 1 in the project MAC (none) A2L (none) Problems found (the rest loaded) ! not readable: firmware.a2l too large to open - replace the file, or Save project to drop it
 .template is_file (normal spelling): True
-SAVE LINES: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30781\\test_probe_i1_crc_template_rea0\\app\\.s19tool\\workarea\\P (variant 'firmware')", 'templates/con.json was copied but not recorded in project.json (Windows reserves that name) — rename it in the common folder, select the new name, then Save project.']
+SAVE LINES: ['Project saved + manifest verified', "Saved project to <HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-30781\\test_probe_i1_crc_template_rea0\\app\\.s19tool\\workarea\\P (variant 'firmware')", 'templates/con.json was copied but not recorded in project.json (Windows reserves that name) — rename it in the common folder, select the new name, then Save project.']
 UNRECORDED LINES: ['templates/con.json was copied but not recorded in project.json (Windows reserves that name) — rename it in the common folder, select the new name, then Save project.']
 .F
 ================================== FAILURES ===================================
 __________ test_probe_i2_unload_of_an_a2l_only_session_does_nothing ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30781/test_probe_i2_unload_of_an_a2l0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30781/test_probe_i2_unload_of_an_a2l0')
 
     def test_probe_i2_unload_of_an_a2l_only_session_does_nothing(tmp_path):
         """I-2: after D-5 the A2L slot of an A2L-only project is present (with
@@ -30,7 +30,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 >       before, after, lines = projects.run_app(base, _scenario)
                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-..\..\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r8b\test_r8b_probes.py:105: 
+..\..\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r8b\test_r8b_probes.py:105: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\support\b100_projects.py:587: in run_app
     return asyncio.run(_drive())
@@ -47,7 +47,7 @@ tests\support\b100_projects.py:587: in run_app
 tests\support\b100_projects.py:585: in _drive
     return await scenario(app, pilot, log)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-..\..\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r8b\test_r8b_probes.py:97: in _scenario
+..\..\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r8b\test_r8b_probes.py:97: in _scenario
     await projects.load_project(pilot, app, "P")
 tests\support\b100_projects.py:615: in load_project
     await wait_for(

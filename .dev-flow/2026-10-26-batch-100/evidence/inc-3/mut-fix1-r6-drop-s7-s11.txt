@@ -1,6 +1,6 @@
 pre-mutation sha256: 18ee4d450529d0cb0fb7f33a274cd7295d9051cbc620414c22bb4c3868201c1e
 mutant sha256: 4b958a07501a39b363f33b4277f9eb3773ec270cfc2fe128a238693fafed6267
-cmd: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py
+cmd: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py
 .....FF..........                                                        [100%]
 ================================== FAILURES ===================================
 ________ test_tc_b100_09_load_over_matches_cold_outside_the_allow_list ________

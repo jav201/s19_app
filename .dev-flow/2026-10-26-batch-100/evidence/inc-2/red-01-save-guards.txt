@@ -1,9 +1,9 @@
-cmd: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc2 python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py
-tree: C:/Users/jjgh8/Github/s19_app-b100-inc2 (base 2edfee2, unmodified)
+cmd: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<HOME>/Github/s19_app-b100-inc2 python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py
+tree: <HOME>/Github/s19_app-b100-inc2 (base 2edfee2, unmodified)
 
 =================================== ERRORS ====================================
 _______________ ERROR collecting tests/test_b100_save_guards.py _______________
-ImportError while importing test module 'C:\Users\jjgh8\Github\s19_app-b100-inc2\tests\test_b100_save_guards.py'.
+ImportError while importing test module '<HOME>\Github\s19_app-b100-inc2\tests\test_b100_save_guards.py'.
 Hint: make sure your test modules/packages have valid Python names.
 Traceback:
 ..\..\anaconda3\envs\s19env\Lib\importlib\__init__.py:126: in import_module
@@ -11,7 +11,7 @@ Traceback:
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 tests\test_b100_save_guards.py:42: in <module>
     from s19_app.tui.workspace import PROJECT_NAME_MAX_CHARS
-E   ImportError: cannot import name 'PROJECT_NAME_MAX_CHARS' from 's19_app.tui.workspace' (C:\Users\jjgh8\Github\s19_app-b100-inc2\s19_app\tui\workspace.py)
+E   ImportError: cannot import name 'PROJECT_NAME_MAX_CHARS' from 's19_app.tui.workspace' (<HOME>\Github\s19_app-b100-inc2\s19_app\tui\workspace.py)
 =========================== short test summary info ===========================
 ERROR tests/test_b100_save_guards.py
 !!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!

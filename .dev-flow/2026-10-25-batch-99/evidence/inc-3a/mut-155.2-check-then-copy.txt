@@ -2,7 +2,7 @@ FF                                                                       [100%]
 ================================== FAILURES ===================================
 ____________ test_tc_b99_12_eight_writers_one_name_zero_mismatches ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25773/test_tc_b99_12_eight_writers_o0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25773/test_tc_b99_12_eight_writers_o0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001BECC091F50>
 
     def test_tc_b99_12_eight_writers_one_name_zero_mismatches(
@@ -48,7 +48,7 @@ E       assert 140 == 0
 tests\test_b99_staging.py:225: AssertionError
 ___________ test_tc_b99_13_target_replaced_between_check_and_reuse ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25773/test_tc_b99_13_target_replaced0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25773/test_tc_b99_13_target_replaced0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001BECA94E490>
 
     def test_tc_b99_13_target_replaced_between_check_and_reuse(
@@ -90,7 +90,7 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001BECA94E490>
         )
 E       AssertionError: the replaced target must not be reused
 E       assert 'keep.s19' != 'keep.s19'
-E        +  where 'keep.s19' = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25773/test_tc_b99_13_target_replaced0/.s19tool/workarea/out/keep.s19').name
+E        +  where 'keep.s19' = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25773/test_tc_b99_13_target_replaced0/.s19tool/workarea/out/keep.s19').name
 
 tests\test_b99_staging.py:318: AssertionError
 =========================== short test summary info ===========================

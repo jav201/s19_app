@@ -1,14 +1,14 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py
 mutant: F1_diff_old_target
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc4 (worktree at 24d5b7f + Inc 4 + fix pass 1 + fix pass 2, mutant applied)
+tree: <HOME>\Github\s19_app-b100-inc4 (worktree at 24d5b7f + Inc 4 + fix pass 1 + fix pass 2, mutant applied)
 applied app.py sha256: c28d8feb7d46b06e95a1e5bc1ce4c7ebae560cfc67e7527548ab549c04b1a959
-env: PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc4 ; NO_COLOR unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+env: PYTHONPATH=<HOME>\Github\s19_app-b100-inc4 ; NO_COLOR unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
 
 F............F.................                                          [100%]
 ================================== FAILURES ===================================
 _______ test_tc_b100_12_focus_target_table_matches_the_window_registry ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29159/test_tc_b100_12_focus_target_t0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29159/test_tc_b100_12_focus_target_t0')
 
     def test_tc_b100_12_focus_target_table_matches_the_window_registry(
         tmp_path: Path,
@@ -83,7 +83,7 @@ E                +  where False = AbDiffPanel(id='ab_diff_panel', classes='diff-
 tests\test_b100_focus.py:278: AssertionError
 _________ test_tc_b100_12_every_window_load_lands_on_its_target[diff] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29159/test_tc_b100_12_every_window_l7')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29159/test_tc_b100_12_every_window_l7')
 window_key = 'diff'
 
     @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))

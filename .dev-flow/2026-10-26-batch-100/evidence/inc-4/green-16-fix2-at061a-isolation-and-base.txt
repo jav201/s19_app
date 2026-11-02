@@ -1,5 +1,5 @@
 A) this tree, the earlier isolation trio (as green-10)
-tree: /c/Users/jjgh8/Github/s19_app-b100-inc4 ; PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc4 ; NO_COLOR unset
+tree: <HOME>/Github/s19_app-b100-inc4 ; PYTHONPATH=<HOME>/Github/s19_app-b100-inc4 ; NO_COLOR unset
 tests\test_before_after_report.py:1202: AssertionError
 =========================== short test summary info ===========================
 FAILED tests/test_before_after_report.py::test_at_061a_persistent_control_survives_then_writes_pair_and_clears

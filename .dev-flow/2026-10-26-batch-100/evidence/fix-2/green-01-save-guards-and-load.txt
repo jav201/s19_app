@@ -1,5 +1,5 @@
 HEAD dee0d96 + fix round 2 working tree
-C:\Users\jjgh8\Github\s19_app-b100-fix1\s19_app\__init__.py
+<HOME>\Github\s19_app-b100-fix1\s19_app\__init__.py
 ........................................................................ [ 86%]
 ...........                                                              [100%]
 83 passed, 1 deselected in 507.70s (0:08:27)

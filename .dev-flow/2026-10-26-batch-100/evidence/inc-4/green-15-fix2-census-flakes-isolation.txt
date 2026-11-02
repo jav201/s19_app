@@ -1,11 +1,11 @@
 cmd: python -m pytest -q -p no:cacheprovider <2 nodes failing in reverse-census-fix2 that were not in the base-failure set>
-tree: /c/Users/jjgh8/Github/s19_app-b100-inc4 ; PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc4 ; NO_COLOR unset
+tree: <HOME>/Github/s19_app-b100-inc4 ; PYTHONPATH=<HOME>/Github/s19_app-b100-inc4 ; NO_COLOR unset
 
 .F                                                                       [100%]
 ================================== FAILURES ===================================
 ____ test_at_061a_persistent_control_survives_then_writes_pair_and_clears _____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29566/test_at_061a_persistent_contro0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29566/test_at_061a_persistent_contro0')
 
     def test_at_061a_persistent_control_survives_then_writes_pair_and_clears(
         tmp_path: Path,

@@ -1,12 +1,12 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 2 — extended module against the fix-pass-1 tree, BEFORE the fix-pass-2 source changes)
-env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc2 (NO_COLOR unset)
+tree: <HOME>\Github\s19_app-b100-inc2 (fix pass 2 — extended module against the fix-pass-1 tree, BEFORE the fix-pass-2 source changes)
+env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<HOME>\Github\s19_app-b100-inc2 (NO_COLOR unset)
 
 ........................F..F...                                          [100%]
 ================================== FAILURES ===================================
 ____ test_tc_b100_07_failed_save_removes_every_placed_path[merge-gathered] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27549/test_tc_b100_07_failed_save_re0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27549/test_tc_b100_07_failed_save_re0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000027CBCA55F50>
 case = 'merge-gathered'
 
@@ -88,7 +88,7 @@ E         Use -v to get more diff
 tests\test_b100_save_guards.py:1115: AssertionError
 _________ test_tc_b100_07_manifest_mismatch_is_the_newest_status_line _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27549/test_tc_b100_07_manifest_misma0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27549/test_tc_b100_07_manifest_misma0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000027CBF0A6A10>
 
     def test_tc_b100_07_manifest_mismatch_is_the_newest_status_line(
@@ -127,11 +127,11 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000027CBF0A6A10>
     
         messages = asyncio.run(_drive())
 >       assert messages[-1] == "Manifest verify MISMATCH", messages
-E       AssertionError: ['Manifest verify MISMATCH', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27549\\test_tc_b100_07_manifest_misma0\\app\\.s19tool\\workarea\\proj (variant 'firmware')"]
+E       AssertionError: ['Manifest verify MISMATCH', "Saved project to <HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27549\\test_tc_b100_07_manifest_misma0\\app\\.s19tool\\workarea\\proj (variant 'firmware')"]
 E       assert "Saved projec...t 'firmware')" == 'Manifest verify MISMATCH'
 E         
 E         - Manifest verify MISMATCH
-E         + Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-27549\test_tc_b100_07_manifest_misma0\app\.s19tool\workarea\proj (variant 'firmware')
+E         + Saved project to <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-27549\test_tc_b100_07_manifest_misma0\app\.s19tool\workarea\proj (variant 'firmware')
 
 tests\test_b100_save_guards.py:1158: AssertionError
 =========================== short test summary info ===========================

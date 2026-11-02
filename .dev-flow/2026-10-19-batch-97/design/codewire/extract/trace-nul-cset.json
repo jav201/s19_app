@@ -4,8 +4,8 @@
    "test": "tests/test_flow_chainset_b94.py::test_tc_b94_31_empty_set_and_hostile_sets_fail_closed",
    "depth": 0,
    "in": {
-    "set_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\bad.json",
-    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj"
+    "set_path": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\bad.json",
+    "project_dir": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj"
    },
    "out": [
     null,
@@ -26,7 +26,7 @@
     ]
    ],
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\bad.json": [
+    "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\bad.json": [
      "{ not json"
     ]
    }
@@ -35,8 +35,8 @@
    "test": "tests/test_flow_chainset_b94.py::test_tc_b94_31_empty_set_and_hostile_sets_fail_closed",
    "depth": 0,
    "in": {
-    "set_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\wrong.json",
-    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj"
+    "set_path": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\wrong.json",
+    "project_dir": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj"
    },
    "out": [
     null,
@@ -57,7 +57,7 @@
     ]
    ],
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\wrong.json": [
+    "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\wrong.json": [
      "{\"schema_version\": 2, \"kind\": \"chain-set\", \"name\": \"x\", \"chains\": []}"
     ]
    }
@@ -66,8 +66,8 @@
    "test": "tests/test_flow_chainset_b94.py::test_tc_b94_31_empty_set_and_hostile_sets_fail_closed",
    "depth": 0,
    "in": {
-    "set_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\escape.json",
-    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj"
+    "set_path": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\escape.json",
+    "project_dir": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj"
    },
    "out": [
     null,
@@ -88,7 +88,7 @@
     ]
    ],
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\escape.json": [
+    "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\escape.json": [
      "{\"schema_version\": 1, \"kind\": \"chain-set\", \"name\": \"variants_a_b\", \"chains\": [{\"chain\": \"a\", \"template\": \"base\", \"inputs\": [[0, \"../outside.s19\"]], \"outputs\": [\"out.s19\"]}, {\"chain\": \"b\", \"template\": \"base\", \"inputs\": [[0, \"variant_b.hex\"]], \"outputs\": [\"out.s19\"]}]}"
     ]
    }
@@ -97,8 +97,8 @@
    "test": "tests/test_flow_chainset_b94.py::test_tc_b94_31_empty_set_and_hostile_sets_fail_closed",
    "depth": 0,
    "in": {
-    "set_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\shape.json",
-    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj"
+    "set_path": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\shape.json",
+    "project_dir": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj"
    },
    "out": [
     null,
@@ -119,7 +119,7 @@
     ]
    ],
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\shape.json": [
+    "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\shape.json": [
      "{\"schema_version\": 1, \"kind\": \"chain-set\", \"name\": \"variants_a_b\", \"chains\": [{\"chain\": \"a\", \"template\": \"../evil\", \"inputs\": [[0, \"base.s19\"]], \"outputs\": [\"out.s19\"]}, {\"chain\": \"b\", \"template\": \"base\", \"inputs\": [[0, \"variant_b.hex\"]], \"outputs\": [\"out.s19\"]}]}"
     ]
    }
@@ -128,8 +128,8 @@
    "test": "tests/test_flow_chainset_b94.py::test_tc_b94_31_empty_set_and_hostile_sets_fail_closed",
    "depth": 0,
    "in": {
-    "set_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\huge.json",
-    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj"
+    "set_path": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\huge.json",
+    "project_dir": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj"
    },
    "out": [
     null,
@@ -162,7 +162,7 @@
      "name": "x",
      "chains": []
     },
-    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj"
+    "project_dir": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj"
    },
    "out": [
     null,
@@ -214,7 +214,7 @@
       }
      ]
     },
-    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj"
+    "project_dir": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj"
    },
    "out": [
     null,
@@ -266,7 +266,7 @@
       }
      ]
     },
-    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj"
+    "project_dir": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj"
    },
    "out": [
     null,
@@ -293,7 +293,7 @@
    "test": "tests/test_flow_chainset_b94.py::test_tc_b94_31_empty_set_and_hostile_sets_fail_closed",
    "depth": 2,
    "in": {
-    "project_root": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj",
+    "project_root": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj",
     "raw_entry": "../outside.s19",
     "context": "chains[0].inputs.ref",
     "issues": []
@@ -304,7 +304,7 @@
    "test": "tests/test_flow_chainset_b94.py::test_tc_b94_31_empty_set_and_hostile_sets_fail_closed",
    "depth": 2,
    "in": {
-    "project_root": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj",
+    "project_root": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj",
     "raw_entry": "variant_b.hex",
     "context": "chains[1].inputs.ref",
     "issues": [
@@ -323,9 +323,9 @@
      }
     ]
    },
-   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\variant_b.hex",
+   "out": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\variant_b.hex",
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\variant_b.hex": [
+    "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\variant_b.hex": [
      "S107100001020304DE",
      "S9030000FC"
     ]
@@ -335,7 +335,7 @@
    "test": "tests/test_flow_chainset_b94.py::test_tc_b94_31_empty_set_and_hostile_sets_fail_closed",
    "depth": 2,
    "in": {
-    "project_root": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj",
+    "project_root": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj",
     "raw_entry": "variant_b.hex",
     "context": "chains[1].inputs.ref",
     "issues": [
@@ -354,9 +354,9 @@
      }
     ]
    },
-   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\variant_b.hex",
+   "out": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\variant_b.hex",
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\variant_b.hex": [
+    "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\variant_b.hex": [
      "S107100001020304DE",
      "S9030000FC"
     ]

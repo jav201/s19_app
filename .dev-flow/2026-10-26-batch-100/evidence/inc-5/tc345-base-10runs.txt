@@ -1,33 +1,33 @@
 # command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document -rfE
-# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base (8d6056f + working-tree changes: 0 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base (8d6056f + working-tree changes: 0 source paths modified)
+# PYTHONPATH=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:00:20Z
 .                                                                        [100%]
 1 passed in 2.08s
 # exit: 0
 # command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document -rfE
-# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base (8d6056f + working-tree changes: 0 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base (8d6056f + working-tree changes: 0 source paths modified)
+# PYTHONPATH=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:00:49Z
 .                                                                        [100%]
 1 passed in 2.17s
 # exit: 0
 # command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document -rfE
-# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base (8d6056f + working-tree changes: 0 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base (8d6056f + working-tree changes: 0 source paths modified)
+# PYTHONPATH=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:00:23Z
 .                                                                        [100%]
 1 passed in 2.07s
 # exit: 0
 # command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document -rfE
-# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base (8d6056f + working-tree changes: 0 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base (8d6056f + working-tree changes: 0 source paths modified)
+# PYTHONPATH=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:00:27Z
 F                                                                        [100%]
 ================================== FAILURES ===================================
 ________ test_tc345_entry_edit_json_disabled_for_file_backed_document _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29982/test_tc345_entry_edit_json_dis0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29982/test_tc345_entry_edit_json_dis0')
 
     def test_tc345_entry_edit_json_disabled_for_file_backed_document(
         tmp_path: Path,
@@ -87,31 +87,31 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 
 tests\test_tui_patch_editor_v2.py:4037: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_tui_patch_editor_v2.py:4009: in _drive
     async with app.run_test(size=(120, 40)) as pilot:
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\contextlib.py:217: in __aexit__
+<HOME>\anaconda3\envs\s19env\Lib\contextlib.py:217: in __aexit__
     await anext(self.gen)
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: in run_test
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: in run_test
     raise self._exception
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:663: in _process_messages_loop
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:663: in _process_messages_loop
     await self._dispatch_message(message)
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:739: in _dispatch_message
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:739: in _dispatch_message
     await self._on_message(message)
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:829: in _on_message
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:829: in _on_message
     await invoke(method, message)
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:96: in invoke
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:96: in invoke
     return await _invoke(callback, *params)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:56: in _invoke
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:56: in _invoke
     result = callback(*params[:parameter_count])
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 s19_app\tui\app.py:3342: in on_patch_editor_panel_action_requested
@@ -169,49 +169,49 @@ expect_type = <class 's19_app.tui.screens_directionb.PatchEditorPanel'>
 >           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
 E           textual.css.query.NoMatches: No nodes match '#patch_editor_panel' on Screen(id='_default')
 
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: NoMatches
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: NoMatches
 =========================== short test summary info ===========================
 FAILED tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document
 1 failed in 2.61s
 # exit: 1
 # command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document -rfE
-# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base (8d6056f + working-tree changes: 0 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base (8d6056f + working-tree changes: 0 source paths modified)
+# PYTHONPATH=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:00:31Z
 .                                                                        [100%]
 1 passed in 2.13s
 # exit: 0
 # command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document -rfE
-# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base (8d6056f + working-tree changes: 0 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base (8d6056f + working-tree changes: 0 source paths modified)
+# PYTHONPATH=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:00:34Z
 .                                                                        [100%]
 1 passed in 2.13s
 # exit: 0
 # command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document -rfE
-# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base (8d6056f + working-tree changes: 0 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base (8d6056f + working-tree changes: 0 source paths modified)
+# PYTHONPATH=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:00:37Z
 .                                                                        [100%]
 1 passed in 2.17s
 # exit: 0
 # command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document -rfE
-# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base (8d6056f + working-tree changes: 0 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base (8d6056f + working-tree changes: 0 source paths modified)
+# PYTHONPATH=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:00:40Z
 .                                                                        [100%]
 1 passed in 2.07s
 # exit: 0
 # command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document -rfE
-# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base (8d6056f + working-tree changes: 0 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base (8d6056f + working-tree changes: 0 source paths modified)
+# PYTHONPATH=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:00:43Z
 .                                                                        [100%]
 1 passed in 1.99s
 # exit: 0
 # command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document -rfE
-# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base (8d6056f + working-tree changes: 0 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base (8d6056f + working-tree changes: 0 source paths modified)
+# PYTHONPATH=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:00:46Z
 .                                                                        [100%]
 1 passed in 2.05s

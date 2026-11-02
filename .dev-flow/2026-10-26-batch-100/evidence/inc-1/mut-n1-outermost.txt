@@ -1,10 +1,10 @@
 cmd: pytest -q -p no:cacheprovider tests/test_b100_reuse.py -k nested_anchor  (MUTANT N1: outermost walk reverted to nearest)
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 — detached e044112 + inc1 + fix1 + fix2-with-mut-n1
+tree: <HOME>\Github\s19_app-b100-inc1 — detached e044112 + inc1 + fix1 + fix2-with-mut-n1
 F.                                                                       [100%]
 ================================== FAILURES ===================================
 _________ test_tc_b100_62_nested_anchor_junction_refused_without_root _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27288/test_tc_b100_62_nested_anchor_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27288/test_tc_b100_62_nested_anchor_0')
 
     def test_tc_b100_62_nested_anchor_junction_refused_without_root(
         tmp_path: Path,

@@ -433,7 +433,7 @@ require an execution round-trip that dominates the measurement and hides the cos
 **Probe hygiene applied while producing this catalog:** every temp tree was created under
 `tempfile.mkdtemp` and deleted in a `finally` (verified `exists=False` in each transcript); both
 `git archive` exports were taken at the short root
-`C:/Users/jjgh8/AppData/Local/Temp/claude/b63/qa/` and deleted afterward; `.../b63/a` and
+`<HOME>/AppData/Local/Temp/claude/b63/qa/` and deleted afterward; `.../b63/a` and
 `.../b63/b` were never touched; every probe was written to a file and invoked by path.
 
 ---

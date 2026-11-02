@@ -6,7 +6,7 @@
 # Replacement:
         f"{number}) {step}" for number, step in enumerate(steps, start=1)
 # Claim: rendering the generated numbering with ')' instead of '. ' breaks the numbered-steps voice — TC-707's sequential-numbering assertion (and the '1. ' boundary) must redden
-# Command: PYTHONUTF8=1 C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest tests/test_window_usage_help.py::test_tc707_numbering_generated_sequential tests/test_window_usage_help.py::test_tc707_boundary_no_orphan_seats_no_blank_modal -q -p no:cacheprovider
+# Command: PYTHONUTF8=1 <HOME>/anaconda3/envs/s19env/python.exe -m pytest tests/test_window_usage_help.py::test_tc707_numbering_generated_sequential tests/test_window_usage_help.py::test_tc707_boundary_no_orphan_seats_no_blank_modal -q -p no:cacheprovider
 # sha256 before mutation: 0b4dbc172285a65338fa5731d2a9d8103d3f36882334f459d64c2f74d526067b
 # sha256 after restore:   0b4dbc172285a65338fa5731d2a9d8103d3f36882334f459d64c2f74d526067b
 # restore verified: True

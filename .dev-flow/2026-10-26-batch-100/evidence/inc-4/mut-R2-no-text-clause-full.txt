@@ -1,5 +1,5 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc4 (MUTANT R2-no-text-clause)
+tree: <HOME>\Github\s19_app-b100-inc4 (MUTANT R2-no-text-clause)
 started: 2026-10-27 08:22:11
 
 MUTANT R2-no-text-clause APPLIED 66932377248dee287762ad86bded9d0814227774003c4c416958bf63ff3c7635
@@ -8,7 +8,7 @@ MUTANT R2-no-text-clause APPLIED 66932377248dee287762ad86bded9d0814227774003c4c4
 ================================== FAILURES ===================================
 __________ test_tc_b100_12_text_input_in_a_content_window_is_rehomed __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28933/test_tc_b100_12_text_input_in_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28933/test_tc_b100_12_text_input_in_0')
 
     def test_tc_b100_12_text_input_in_a_content_window_is_rehomed(
         tmp_path: Path,

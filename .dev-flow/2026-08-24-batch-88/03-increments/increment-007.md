@@ -166,12 +166,12 @@ construction.
 
 | File | Kind | Change |
 |---|---|---|
-| `C:\Users\jjgh8\.claude\docs\tools\devflow-validate.py` | source | `V25` (block comment + `_BACKUP_MAX_DAYS`, `_v25_outcome`, `_v25_probe`, `_remote_tip_age_days`, `v25_backup_verified`) + registration in `CHECKS` / `_RULE_COVERS` / `_RULE_SELECTOR` + new selector `S4`; the derivation (`_SELFTEST_EXEMPT`, `_armed_rules`, `_exempt_verdict`) and the `print` capture shim; **26** arms added. **rev 2:** the age oracle's domain narrowed to `refs/remotes/origin/`, `GIT_TERMINAL_PROMPT=0` on the probe, a two-remote fixture and a skewed author/committer pair, and the exemption sweep widened from one rule to all 23 |
-| `C:\Users\jjgh8\.claude\templates\dev-flow\phase-checklists.md` | source | INTAKE row 5 added (RC-2); rows 5-8 renumbered 6-9, text byte-identical |
-| `C:\Users\jjgh8\.claude\docs\FLOW-VERSION.md` | source | rev47 bump, 2 rows re-hashed and re-counted, aggregate updated, changelog row appended. **rev 2:** the validator's row re-hashed again (`a5814eb46aa852f9` → `3fec22d51759d4a9`, 5584 → 5648 lines), aggregate `9519967809d27089` → `a280beca91743d7c`, and the rev47 row corrected — the revision string does NOT advance, because rev47 is unpublished and it is the ORDERING that repeats, not the content |
-| `C:\Users\jjgh8\.claude\skills\dev-flow\` | build output | `--sync-bundle` mirror; `V15` reports *bundle identical* |
-| `C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-08-24-batch-88\03-increments\increment-007.md` | record | this packet |
-| `C:\Users\jjgh8\Github\s19_app\.dev-flow\_derived\` | derived | Atlas regenerated with `--atlas --write` **after** this packet existed |
+| `<HOME>\.claude\docs\tools\devflow-validate.py` | source | `V25` (block comment + `_BACKUP_MAX_DAYS`, `_v25_outcome`, `_v25_probe`, `_remote_tip_age_days`, `v25_backup_verified`) + registration in `CHECKS` / `_RULE_COVERS` / `_RULE_SELECTOR` + new selector `S4`; the derivation (`_SELFTEST_EXEMPT`, `_armed_rules`, `_exempt_verdict`) and the `print` capture shim; **26** arms added. **rev 2:** the age oracle's domain narrowed to `refs/remotes/origin/`, `GIT_TERMINAL_PROMPT=0` on the probe, a two-remote fixture and a skewed author/committer pair, and the exemption sweep widened from one rule to all 23 |
+| `<HOME>\.claude\templates\dev-flow\phase-checklists.md` | source | INTAKE row 5 added (RC-2); rows 5-8 renumbered 6-9, text byte-identical |
+| `<HOME>\.claude\docs\FLOW-VERSION.md` | source | rev47 bump, 2 rows re-hashed and re-counted, aggregate updated, changelog row appended. **rev 2:** the validator's row re-hashed again (`a5814eb46aa852f9` → `3fec22d51759d4a9`, 5584 → 5648 lines), aggregate `9519967809d27089` → `a280beca91743d7c`, and the rev47 row corrected — the revision string does NOT advance, because rev47 is unpublished and it is the ORDERING that repeats, not the content |
+| `<HOME>\.claude\skills\dev-flow\` | build output | `--sync-bundle` mirror; `V15` reports *bundle identical* |
+| `<HOME>\Github\s19_app\.dev-flow\2026-08-24-batch-88\03-increments\increment-007.md` | record | this packet |
+| `<HOME>\Github\s19_app\.dev-flow\_derived\` | derived | Atlas regenerated with `--atlas --write` **after** this packet existed |
 
 | **SOURCE files** | **`3`** / 4 — the batch's declared maximum; the bundle is a build output, the packet is a record, the Atlas is derived |
 |---|---|

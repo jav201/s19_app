@@ -150,7 +150,7 @@ than as acceptance, it is **adequate on three of four properties**:
 
 - **Where.**
   - `01-requirements-architect.md:399` — a shell snippet containing
-    `$HOME/.claude/projects/C--Users-jjgh8-OneDrive-Documents-Github-s19-app/memory/…`, which
+    `$HOME/.claude/projects/C--Users-<USER>-OneDrive-Documents-Github-s19-app/memory/…`, which
     discloses the **Windows account name** and the OneDrive/GitHub folder layout. This is the only
     occurrence of the account name across all six artifacts.
   - `PLAN.md:70`, `01-requirements.md:134`, `01-requirements-consolidated.md:254` — the absolute path
@@ -166,7 +166,7 @@ than as acceptance, it is **adequate on three of four properties**:
   client deliverable) at the same cost.
 
 - **Recommendation.** **No change required for this batch.** Two things worth recording rather than
-  fixing: (a) if any batch artifact is ever routed to a client or a public repo, `jjgh8` and the `G:`
+  fixing: (a) if any batch artifact is ever routed to a client or a public repo, `<USER>` and the `G:`
   paths are the two strings to strip; (b) **the text that actually travels is clean** — see the
   clearance below.
 

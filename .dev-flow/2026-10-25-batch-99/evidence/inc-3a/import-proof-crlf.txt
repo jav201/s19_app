@@ -1,5 +1,5 @@
 worktree import proof (BRIEF-COMMON rule: paste into packet):
-C:\Users\jjgh8\Github\s19_app-b99-inc3a\s19_app\__init__.py
+<HOME>\Github\s19_app-b99-inc3a\s19_app\__init__.py
 
 CRLF check after all edits (source files must stay CRLF):
 s19_app/tui/workspace.py CRLF= 658 LF= 658

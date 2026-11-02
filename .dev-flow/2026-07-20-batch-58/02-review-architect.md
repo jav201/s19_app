@@ -2,7 +2,7 @@
 
 **Reviewer:** architect · **Date:** 2026-07-20 · **Artifact:** `.dev-flow/2026-07-20-batch-58/01-requirements.md`
 **Governing design:** `docs/crc-algorithm-designer/01-requirements.md` (approved) · **Base keel:** `84180b4` (#110)
-**Evidence base:** real checkout `C:/Users/jjgh8/OneDrive/Documents/Github/s19_app`, branch `feat/batch-58-crc-designer-view`.
+**Evidence base:** real checkout `<HOME>/OneDrive/Documents/Github/s19_app`, branch `feat/batch-58-crc-designer-view`.
 
 ---
 

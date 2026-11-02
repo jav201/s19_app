@@ -23,7 +23,7 @@ The "NOTES" qualifying the pass:
 
 ## 2. Per-HLR/LLR-cluster results
 
-All commands executed from the worktree root (`C:\Users\jjgh8\OneDrive\Documents\Github\s19_app\.claude\worktrees\sweet-yonath-bd8bd2`, branch `claude/batch-07`, HEAD b1cde0c) with `python -m pytest`. Evidence lines are verbatim tool output.
+All commands executed from the worktree root (`<HOME>\OneDrive\Documents\Github\s19_app\.claude\worktrees\sweet-yonath-bd8bd2`, branch `claude/batch-07`, HEAD b1cde0c) with `python -m pytest`. Evidence lines are verbatim tool output.
 
 | # | Cluster (HLRs / LLRs) | TCs | Command | Verbatim evidence | Verdict |
 |---|---|---|---|---|---|

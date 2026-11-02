@@ -1,6 +1,6 @@
 RED transcript: tests/test_b99_crc_region.py (new/updated tests) against the PRE-FIX tree (HEAD 08b6d4f sources restored in a scratch copy)
 scratch import check:
-C:\Users\jjgh8\AppData\Local\Temp\tmp.jrdTo5Sh36\s19red\s19_app\__init__.py
+<HOME>\AppData\Local\Temp\tmp.jrdTo5Sh36\s19red\s19_app\__init__.py
 E             00:00.006 partial_flow · started
 E             00:00.035 ◇ partial_flow · done with notices · wrote out_partial.s19
 E           assert '466 of 512 region bytes absent (0xFA00-0xFC00)' in '00:00.000 empty_flow · started\n00:00.006 ✗ empty_flow · block 2/3 CRC — CRC region 0x20000-0x30000 holds 0 image byt...· chain halted\n00:00.006 partial_flow · started\n00:00.035 ◇ partial_flow · done with notices · wrote out_partial.s19'

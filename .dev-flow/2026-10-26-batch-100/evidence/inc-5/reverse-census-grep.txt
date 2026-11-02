@@ -1,4 +1,4 @@
-# reverse census (B1) — tree /c/Users/jjgh8/Github/s19_app-b100-inc5, base 8d6056f + Inc 5
+# reverse census (B1) — tree <HOME>/Github/s19_app-b100-inc5, base 8d6056f + Inc 5
 ## brief grep: grep -rln "save_patched\|_handle_save_dialog\|gather_project_artifacts\|save_patched_image\|mark_saved" tests/ --include=*.py
 tests/test_b100_reuse.py
 tests/test_b100_save_guards.py

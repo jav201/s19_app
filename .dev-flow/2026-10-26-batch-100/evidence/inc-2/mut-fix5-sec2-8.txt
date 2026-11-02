@@ -1,5 +1,5 @@
 cmd: pytest -q -p no:cacheprovider tests/test_b100_save_guards.py::test_tc_b100_07_failed_verify_leaves_no_folder_fresh  (MUTANT sec2-8, fix-pass-5 tree)
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 5, mutant sec2-8)
+tree: <HOME>\Github\s19_app-b100-inc2 (fix pass 5, mutant sec2-8)
 
 F                                                                        [100%]
 ================================== FAILURES ===================================

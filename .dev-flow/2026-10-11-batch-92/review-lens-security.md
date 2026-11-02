@@ -1,6 +1,6 @@
 # Security lens review — batch 2026-10-11-batch-92 (station P2, trigger C8 / family C)
 
-**Lens:** security-reviewer · **Worktree:** `C:/Users/jjgh8/Github/s19_app-b92` · **Date:** 2026-10-12
+**Lens:** security-reviewer · **Worktree:** `<HOME>/Github/s19_app-b92` · **Date:** 2026-10-12
 **Inputs read:** role file, `stations/p2-review.md`, `01-requirements.md` (LLR-003.2, IFC, §6.3), `design/module-map-delta.md` §3, plus the live code and tests cited below.
 
 ## Verdict

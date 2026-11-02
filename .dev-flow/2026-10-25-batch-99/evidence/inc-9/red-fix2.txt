@@ -2,7 +2,7 @@ FF                                                                       [100%]
 ================================== FAILURES ===================================
 ___________________ test_tc_b99_09_line_endings_cr_lf_crlf ____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26324/test_tc_b99_09_line_endings_cr0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26324/test_tc_b99_09_line_endings_cr0')
 
     def test_tc_b99_09_line_endings_cr_lf_crlf(tmp_path):
         """The same HEX content saved CR-only, LF-only and CRLF: every encoding
@@ -32,7 +32,7 @@ E             Use -v to get more diff
 tests\test_b99_truncation.py:383: AssertionError
 ________________ test_tc_b99_09_cr_only_binary_tail_after_eof _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26324/test_tc_b99_09_cr_only_binary_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26324/test_tc_b99_09_cr_only_binary_0')
 
     def test_tc_b99_09_cr_only_binary_tail_after_eof(tmp_path):
         """A CR-only HEX file followed by raw ``0xFF`` padding: the load succeeds

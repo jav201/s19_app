@@ -1,6 +1,6 @@
 # command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_active_variant.py -k tc_b100_18 or tc_b100_19 or tc_b100_20
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree) with mutation 168.2-saveback-not-activated
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# tree: <HOME>\Github\s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree) with mutation 168.2-saveback-not-activated
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
 # date: 2026-10-30T01:15:08+00:00
 # requirement: LLR-168.2
 # mutation: the save-back no longer activates the written file nor rewrites the manifest — file s19_app/tui/app.py
@@ -12,7 +12,7 @@
 ================================== FAILURES ===================================
 ___________ test_tc_b100_19_save_back_becomes_the_active_variant[A] ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30135/test_tc_b100_19_save_back_beco0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30135/test_tc_b100_19_save_back_beco0')
 case = 'A'
 
     @pytest.mark.parametrize("case", ["A", "B"])
@@ -60,7 +60,7 @@ E         + firmware
 tests\test_b100_active_variant.py:253: AssertionError
 ___________ test_tc_b100_19_save_back_becomes_the_active_variant[B] ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30135/test_tc_b100_19_save_back_beco1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30135/test_tc_b100_19_save_back_beco1')
 case = 'B'
 
     @pytest.mark.parametrize("case", ["A", "B"])
@@ -107,7 +107,7 @@ E         + firmware
 tests\test_b100_active_variant.py:253: AssertionError
 _________________ test_tc_b100_20_save_back_carries_every_key _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30135/test_tc_b100_20_save_back_carr0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30135/test_tc_b100_20_save_back_carr0')
 
     def test_tc_b100_20_save_back_carries_every_key(tmp_path: Path) -> None:
         base = tmp_path / "app"
@@ -129,7 +129,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 tests\test_b100_active_variant.py:323: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30135/test_tc_b100_20_save_back_carr0/app/.s19tool/workarea/P')
+project_dir = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30135/test_tc_b100_20_save_back_carr0/app/.s19tool/workarea/P')
 before_bytes = b'{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"],"assignments":{"firmware":["checks/...start":2147483712,"end":2147483775}],"gathered":{"patches":["patches/cs_seed.json"],"checks":["checks/ck_seed.json"]}}'
 
     def _assert_carried(project_dir: Path, before_bytes: bytes) -> dict:

@@ -7,7 +7,7 @@ Painted text is scanned in every scenario (codes, class names, control chars).""
 import json, os, re, shutil, subprocess, sys, time, hashlib
 from pathlib import Path
 
-WT = Path(r"C:\Users\jjgh8\Github\s19_app-b100-inc8a")
+WT = Path(r"<HOME>\Github\s19_app-b100-inc8a")
 sys.path.insert(0, str(WT))
 import s19_app
 print("# s19_app import:", s19_app.__file__)

@@ -1,6 +1,6 @@
 # CHUNK — Kimi — batch-93 increment 002 (the wrap audit + the responsive regimes)
 
-You implement batch-93's increment 002 in C:/Users/jjgh8/Github/s19_app. Read the
+You implement batch-93's increment 002 in <HOME>/Github/s19_app. Read the
 contract first: `.dev-flow/2026-10-11-batch-93/01-requirements.md` — HLR-130 (the
 wrap audit: NO authored line wrapping at any tested geometry) and HLR-131 (the
 responsive regimes: the layout stacks on narrow panels and re-apportions on
@@ -9,7 +9,7 @@ working tree — build on it, do not re-do it.
 
 ## SANDBOX
 - Never write outside the project tree. No git. House env for every run:
-  `C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest ... -q -p no:cacheprovider`
+  `<HOME>/anaconda3/envs/s19env/python.exe -m pytest ... -q -p no:cacheprovider`
 
 ## THE WORK
 1. **HLR-130**: audit every authored line the Memory Map surface paints (region

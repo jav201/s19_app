@@ -132,11 +132,11 @@ What the RED run measured on `main`, per arm:
 
 | Evidence artifact | Path — under `.dev-flow/2026-10-19-batch-97/evidence/inc-2/` | SHA-256 |
 |---|---|---|
-| RED transcript | `red.txt` | `ba7677b3b5522b7c9a9fbabde4e753a4bca5984e0e2f8dbf4ead5b74aaa39e33` |
+| RED transcript | `red.txt` | `af277ee466e530f6e9b97580c00005c0cf7ed78e2e8991a5f2399ff66cd4b48a` |
 | GREEN transcript | `green.txt` | `4a596f4367fa9ebc4af7d4c23020d7752a6ae652c0832d51aabf8ab16fa06f4f` |
 | Reverse-census greps | `census.txt` | `a3e07b52122488b850fd3370f12773ab870c236d6b1eaa3110e7fdfd1afdc7ef` |
 | Reverse-census run | `census-run.txt` | `1a452754e095dfcf2c080ed9ba43c640df09e0191a6a7248363c0b1dd3a4ad38` |
-| Mutation battery transcript | `mutations.txt` | `b2b36cddbb667686d59a524507d9037d69bdced6a885c5cd1fcfcdd96cdbc434` |
+| Mutation battery transcript | `mutations.txt` | `2cf5a90af2e5e67af9c992d96f89b8aa7785ee3f19f418c06c99389fe92b7635` |
 | Mutation battery script | `mutate.py` | `5d3914093e347698a0a8c65fe73f2b037bc662f21f331f151f8c7ee80177d61f` |
 | Residual probe (in-memory NUL refs) | `residual-probe.txt` | `0c12cc6bd518890677f271156882ba93ca9eac9b3b2b1d9b667f6ac3556d46cf` |
 

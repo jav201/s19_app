@@ -1,6 +1,6 @@
 # CHUNK — Kimi K2.7-code — batch-91 increment 001 (the foundation adoption)
 
-You implement batch-91's increment 001 in `C:/Users/jjgh8/Github/s19_app`:
+You implement batch-91's increment 001 in `<HOME>/Github/s19_app`:
 the foundation engines' contract adoption — docstring tokens in the existing test
 modules + the LIVE registry entries.
 

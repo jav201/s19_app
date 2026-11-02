@@ -2,25 +2,25 @@
 # cmd: python -m pytest tests/test_b97_chips_help.py -q -rfE -p no:cacheprovider --color=no --tb=line
 FFFFFFFFFFFFFF.F.F.FFF                                                   [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:70: AssertionError: assert 'flows' in ('patch', 'checks', 'templates', 'reports')
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:98: AssertionError: FLOWS_SUBDIR must be imported exactly once
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:113: AssertionError: assert 'flows' in ('patch', 'checks', 'templates', 'reports')
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:149: AssertionError: assert 'session' in ('patch', 'checks', 'templates', 'reports')
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:167: AssertionError: assert 'session' in ('patch', 'checks', 'templates', 'reports')
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:216: AssertionError: assert 4 >= 6
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:238: AssertionError: assert 4 >= 6
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:289: assert 'id_suffix' in mappingproxy(OrderedDict([('self', <Parameter "self">), ('family', <Parameter "family: 'str'">)]))
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:332: AssertionError: assert False
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:349: AssertionError: assert False
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:428: AssertionError: file: the seam must not be called
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:398: AssertionError: assert 'flows' in ('patch', 'checks', 'templates', 'reports')
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:428: AssertionError: junction: the seam must not be called
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:398: AssertionError: assert 'flows' in ('patch', 'checks', 'templates', 'reports')
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:398: AssertionError: assert 'flows' in ('patch', 'checks', 'templates', 'reports')
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:398: AssertionError: assert 'flows' in ('patch', 'checks', 'templates', 'reports')
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:519: AssertionError: ('patch', '📂 Open folder')
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:553: AssertionError: assert '📂 Open folder' == '📂 Open patches/'
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:569: AssertionError: assert 'session' in ('patch', 'checks', 'templates', 'reports')
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:70: AssertionError: assert 'flows' in ('patch', 'checks', 'templates', 'reports')
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:98: AssertionError: FLOWS_SUBDIR must be imported exactly once
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:113: AssertionError: assert 'flows' in ('patch', 'checks', 'templates', 'reports')
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:149: AssertionError: assert 'session' in ('patch', 'checks', 'templates', 'reports')
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:167: AssertionError: assert 'session' in ('patch', 'checks', 'templates', 'reports')
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:216: AssertionError: assert 4 >= 6
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:238: AssertionError: assert 4 >= 6
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:289: assert 'id_suffix' in mappingproxy(OrderedDict([('self', <Parameter "self">), ('family', <Parameter "family: 'str'">)]))
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:332: AssertionError: assert False
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:349: AssertionError: assert False
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:428: AssertionError: file: the seam must not be called
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:398: AssertionError: assert 'flows' in ('patch', 'checks', 'templates', 'reports')
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:428: AssertionError: junction: the seam must not be called
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:398: AssertionError: assert 'flows' in ('patch', 'checks', 'templates', 'reports')
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:398: AssertionError: assert 'flows' in ('patch', 'checks', 'templates', 'reports')
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:398: AssertionError: assert 'flows' in ('patch', 'checks', 'templates', 'reports')
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:519: AssertionError: ('patch', '📂 Open folder')
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:553: AssertionError: assert '📂 Open folder' == '📂 Open patches/'
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:569: AssertionError: assert 'session' in ('patch', 'checks', 'templates', 'reports')
 =========================== short test summary info ===========================
 FAILED tests/test_b97_chips_help.py::test_tc_b97_27_flows_family_targets_project_flows_dir
 FAILED tests/test_b97_chips_help.py::test_tc_b97_27_flows_folder_name_imported_never_redeclared

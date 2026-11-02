@@ -6,7 +6,7 @@
   1. The 37 "UI change = yes" rows leave scope. They are known failed checks in `p0/known-failed.md`, carried as 8 grouped backlog rows `KF-101-*`.
   2. No prototype round runs in batch-101.
   3. Help or README text that describes absent features is fixed by changing the text.
-  4. The strict-EARS canon from the requirements re-write session (`C:/Users/jjgh8/Github/s19w/review/S<n>-ears-strict.md`, 2612 rows) **replaces** the canon. It lands as batch-101's **first** increment, together with the 29119-3 test-case records.
+  4. The strict-EARS canon from the requirements re-write session (`<HOME>/Github/s19w/review/S<n>-ears-strict.md`, 2612 rows) **replaces** the canon. It lands as batch-101's **first** increment, together with the 29119-3 test-case records.
   5. Every later defect increment cites the **new** canon's row ids and adds or modifies EARS rows there.
 - **Read first:** §b, the increment table; §e, what starts now.
 

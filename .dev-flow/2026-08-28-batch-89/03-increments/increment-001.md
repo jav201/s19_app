@@ -126,7 +126,7 @@ sync and its reasoning would be silently dropped.** All four fixed in the same c
 export PYTHONIOENCODING=utf-8     # cp1252 otherwise; see increment-002.md — at rev48 this
                                   # was not optional, the selftest CRASHED without it
 python ~/.claude/docs/tools/devflow-validate.py --selftest
-python ~/.claude/docs/tools/devflow-validate.py "C:/Users/jjgh8/Github/s19_app" | grep V26
+python ~/.claude/docs/tools/devflow-validate.py "<HOME>/Github/s19_app" | grep V26
 ```
 
 > **⚠ These commands do not reproduce this increment's numbers today.** The validator is at

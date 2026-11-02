@@ -4,7 +4,7 @@ In a graph file, each node/entity/finding block keeps only the values of its pro
 (name, in, out, req, module, modify, inner, open, examples, contract, sequence, edges, anchor,
 evidence) is blanked. Non-graph prose (the `>` header is already skipped by the tool) is kept."""
 import re, sys
-sys.path.insert(0, r"C:\Users\jjgh8\Github\code-wire\tools")
+sys.path.insert(0, r"<HOME>\Github\code-wire\tools")
 import codewire_ste as ste
 PROSE = ("func", "desc", "what", "consequence", "decision")
 GRAPH_SECTIONS = ("## Nodes", "## Entities", "## Edges", "## Findings")

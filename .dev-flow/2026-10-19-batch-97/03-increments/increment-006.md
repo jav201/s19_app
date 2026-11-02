@@ -252,21 +252,21 @@ All paths are under `.dev-flow/2026-10-19-batch-97/evidence/`.
 | Evidence artifact | Path | SHA-256 |
 |---|---|---|
 | RED selection | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/red-selection.txt` | `04d821688c5e39b5b8fe78100f504272fa117972121b4cf7d2faedb729f8e741` |
-| RED (57+26+41+10 failed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/red.txt` | `2dd1a2bc78533fb7a86e19bb9cd1b48b5d33846bdbe9c37d834750b843b819f1` |
-| RED re-run (20 failed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/red-rerun.txt` | `186eadfd46ef7bb099d174ba6b25f07745d027e3b3addddbf6b8c978e3b4d798` |
-| RED re-run 2 (2 failed) + the HEAD probe | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/red-rerun2.txt` | `90485268aa94e5a0cc5b059495d8edae5c4a55ab98f7213965ed9f6b0185f47f` |
-| RED re-run 3 (the vacuous TC-34 arm guarded: GREEN Inc-6, RED HEAD, M29 RED) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/red-rerun3.txt` | `173f5d4850277fab67968c67c802454aa103280ee306d721117a4ecc0a664b45` |
+| RED (57+26+41+10 failed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/red.txt` | `bdbf91777beb17b2f83161f6b1a8d82571c41f0a53bd0d4a86fb847418da0c12` |
+| RED re-run (20 failed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/red-rerun.txt` | `ae5e2601ac97a565fdb593ce5540b52a68069b4c89cfeb5dda1649de75801203` |
+| RED re-run 2 (2 failed) + the HEAD probe | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/red-rerun2.txt` | `c5a47829e3a0806f0bb79670393485f26ad1e99862799129b2140bd483dcf00c` |
+| RED re-run 3 (the vacuous TC-34 arm guarded: GREEN Inc-6, RED HEAD, M29 RED) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/red-rerun3.txt` | `fbe62bc7f951305ede9eb4e1efd5907dfcf6c496ead3bc3c7902d1e3236dd100` |
 | Gate file list | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/gate-files.txt` | `3b34c53a1d226b0f383767482c0c9283852ec18cd101be6483192015d9b81fbb` |
-| GREEN gate (1009 passed / 29 xf / 2 failed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/green.txt` | `a9f594ebacba8806788621a2302268e070ee167d5c3f35bb70ecff45200fd811` |
+| GREEN gate (1009 passed / 29 xf / 2 failed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/green.txt` | `61f49fed1a26a16b151bd8813d13b5da67b76fdd5b39cf741ac5d9500b10d0c6` |
 | Non-baseline re-runs (at073b 5/5 Inc-6, 2/5 fail HEAD; AT-B78-03 row) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/rerun-nonbaseline.txt` | `ea62dfbe8d84e4b8d81094bc288660a0e145cd6ae8a60d1f92b69601849f777b` |
-| Mutations (66 / 1 / 0) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/mutations.txt` | `138d856ae110f1a532a755260ab20dda8072fe3b1e797d7fa4daff604f51689c` |
+| Mutations (66 / 1 / 0) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/mutations.txt` | `b062a1f8dd9064917bb39f39244c8c726d82de79e798cbc4eed2c2e9e70d5906` |
 | Mutation script (first run; the fold appended M46–M52 to `mutate.py`, so these bytes are kept as) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/mutate.pre-fold.py` | `a90173ac6b7582908e598cff52a3ac4a806a4829e51e47c4948363948ea75960` |
-| Two-step probe, Inc-6 tree (waits at 2, then `ok`) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/probe-two-ext.txt` | `e502537fb37c3ed629c0256a7d7f07a1825fd100453e8e6c9aa75fded52404ae` |
+| Two-step probe, Inc-6 tree (waits at 2, then `ok`) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/probe-two-ext.txt` | `6e0446f96953ab03fd662960f2da694c3ff840d3c4253c8059783cabff237e14` |
 | Probe script | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/probe_two_ext.py` | `88e0d710688acaede66c4b3207dad9d17c2288c430abba964c8e40463e667d64` |
 | Budget | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/budget.txt` | `a25f8ec6fcbca6d4790d2f26daf57b84c17d4122c495cd012cc757d9b536ea42` |
 | Budget script | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/measure_budget.py` | `48bfb2729d8c6ce5ba2d1be9e05e78fbdb31f223137c7959c5799e8b11310957` |
-| Frames HEAD | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/frames-b514b07.txt` | `675f95e16d8d0ef4915bbc7b0753946384658915dd3d5bd7276d735f38303ac7` |
-| Frames Inc-6 | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/frames-inc6.txt` | `675f95e16d8d0ef4915bbc7b0753946384658915dd3d5bd7276d735f38303ac7` |
+| Frames HEAD | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/frames-b514b07.txt` | `d8798b522e25cd547ccd553e4ce1897c8e8cd38954dd36fb487160e4c77157ce` |
+| Frames Inc-6 | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/frames-inc6.txt` | `d8798b522e25cd547ccd553e4ce1897c8e8cd38954dd36fb487160e4c77157ce` |
 | Frames diff (empty) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/frames-diff.txt` | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
 | Frames script | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/frames.py` | `d7d22e01a35a6b66985b3c2a006c5190f3e2af35130e1a9165eb7308fb5af847` |
 | Cells HEAD (×3 runs, same digest) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/cells-head.txt` | `8bc937d17414f7f03b5525ee114c01c9fc58aa2c655b1e522c95314bfcdba9dd` |
@@ -279,20 +279,20 @@ All paths are under `.dev-flow/2026-10-19-batch-97/evidence/`.
 | Cells settled, Inc-6 | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/cells-inc6-settled.txt` | `6202ee56eef1d16ced1335d5abf518d1920298c7421e033304e9b680e078f058` |
 | Cells diff settled (1 cell, A2L column) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/cells-diff-settled.txt` | `013e422d892f2f348c057732d32d0ca274f40d8e437b51ce907a3fdeb14cb060` |
 | Settled instrument | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/snapshot_cells_settled.py` | `7be6ac8b678df427396d3e885b143741ca3446b8e0dc52e5c188bf34272eeb68` |
-| A2L-column race, isolated 8/8 both trees | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/context-race.txt` | `5ef60a7e0ce4756763f8cb09d6558e44baa05f607ac7977a7960c96a3ae5be56` |
+| A2L-column race, isolated 8/8 both trees | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/context-race.txt` | `48076a3e2a8d5e18559a0ccec74c9771869f2f729c9554197979b7821223c023` |
 | Race probe | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/context_race_probe.py` | `ac289752bc45d925b45326caeee6d53e4fe034cf2866a9e9e256ad09cf873765` |
-| Pre-Inc-6 probe: second confirm (service) | `.dev-flow/2026-10-19-batch-97/evidence/pc-before-inc6-2026-10-22/probe-second-confirm.txt` | `2723a3c6f34fa5b5b47ba1bd8e3f208d3de9083dfe1862b14fdf8966c8313397` |
+| Pre-Inc-6 probe: second confirm (service) | `.dev-flow/2026-10-19-batch-97/evidence/pc-before-inc6-2026-10-22/probe-second-confirm.txt` | `ff915ceebac68396e2c166ae7336d69a583c0fc2fd901958cb7be0766372b7ca` |
 | Script | `.dev-flow/2026-10-19-batch-97/evidence/pc-before-inc6-2026-10-22/probe_second_confirm.py` | `04763470bf18db34fc947f1a56d268b12af090c4de387b95283f951acbd75dc1` |
 | Pre-Inc-6 probe: `c` scope | `.dev-flow/2026-10-19-batch-97/evidence/pc-before-inc6-2026-10-22/c-scope-probe.txt` | `2ae292db27bd66908f1d149c166c59d3b8356107ce1c261f068a034c2b25011f` |
 | Script | `.dev-flow/2026-10-19-batch-97/evidence/pc-before-inc6-2026-10-22/c_scope_probe.py` | `7f0303ff84e64e9cd64898fe6dc619d8b630a1bb36bca6f1db9385ec7df1db72` |
-| Pre-Inc-6 probe: fx regions | `.dev-flow/2026-10-19-batch-97/evidence/pc-before-inc6-2026-10-22/fx-regions.txt` | `28a869d051297d9d11bd278437d2e22b2f3ef77a171d38ea9336e232ff50a0ff` |
+| Pre-Inc-6 probe: fx regions | `.dev-flow/2026-10-19-batch-97/evidence/pc-before-inc6-2026-10-22/fx-regions.txt` | `b74e0b779e2f2e3c1ccfb0cc75cdfa6292f5654d5f1cb8cb3e713d1e9c9baaeb` |
 | Script | `.dev-flow/2026-10-19-batch-97/evidence/pc-before-inc6-2026-10-22/fx_regions.py` | `bfe0499b075e1b27e8484b30423c70e08e908aab0db04d24a22dcae7be2f40de` |
 | WT idle 118x54 | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/png/impl.flow-execution-idle.png` | `b80f125639ec4111b5787fa67f63f2fd072dc274a46089da431f64b2017f53b4` |
 | WT idle 118x53 | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/png/impl.flow-execution-idle.118x53.png` | `6eb15cffaf8d42ffa677bdcd9dac94759a8e56666281096988e4e6ecc54847c3` |
 | WT idle 220x60 | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/png/impl.flow-execution-idle.220.png` | `dbd75bcc95937cde7e7fc80e7620ee21ef1bdad34a69432f44c93464ea2dd1ab` |
 | WT paused 118x53 | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/png/impl.flow-execution-paused.118x53.png` | `7f1c0819729bdda1368ff00cd132d8e4a826a3895d0aff5615b2c5a09207c7e2` |
 | WT paused 220x60 | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/png/impl.flow-execution-paused.220.png` | `cc17b6f7dcbbee42c53037d026f2172499bff2a3285054ced8a7bc86a7786400` |
-| Full suite (12 failed / 3542 passed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/suite-full.txt` | `56339b6517afb75baef6f8c61727a365dfb57c2a76b8ff1ca1e405fed5ecdf83` |
+| Full suite (12 failed / 3542 passed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/suite-full.txt` | `9ddb339e77c6de07650dbda70a394a2569d29f91ba35f1a8596aaecde1ad1edc` |
 | Post-suite GREEN (262 passed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/green-post-suite.txt` | `35a9a8fd97f2cc1ea0fecd6c9dd932feef1f6af100efd77c849c531ab082c8a7` |
 | F6 mutation (RED / restored GREEN) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/mutation-f6.txt` | `1e43ca653b00c4305170de6d82ead3dd3cb3031656b421d03290ceaeaa9ed9b6` |
 | Suite non-baseline re-run (5/5 passed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/rerun-nonbaseline-suite.txt` | `7520b1702dabe15347f34f3f9f2855e8285d5b5aaae971ab828d2c7ce838e2f7` |
@@ -305,12 +305,12 @@ All paths are under `.dev-flow/2026-10-19-batch-97/evidence/`.
 
 | Evidence artifact | Path | SHA-256 |
 |---|---|---|
-| Fold RED (6 failed / 2 passed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/red-fold.txt` | `f6494b3830f91176dd12ccf15aba770647c71491522128901ba532425901c326` |
-| Fold GREEN (1014 passed / 29 xf / 2 failed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/green-fold.txt` | `8f3822cee9eeba32d5b4a290c16c910a351a0b96eae8311bfdf0d5bd5b01b54d` |
+| Fold RED (6 failed / 2 passed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/red-fold.txt` | `e9ff40e86020c61ef43e40c38848c21865f81199316ddf28bf044d1820f74d69` |
+| Fold GREEN (1014 passed / 29 xf / 2 failed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/green-fold.txt` | `dcf89c564bca54d4eb1b2f5e1ecf1958348d5344a10874e2848a84b0497bb894` |
 | AT-B94-17 1/5 fold, 1/5 pre-fold | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/rerun-nonbaseline-fold.txt` | `d7007b613c2058101cb00fa927813842654f3122d64f8e66e7c3ba2d461ca652` |
-| Fold mutations (13 / 1 / 0) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/mutations-fold.txt` | `270865d5afd997d84308007d1173d55eed8b78527fc0486441bb4bcdb28b5b34` |
+| Fold mutations (13 / 1 / 0) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/mutations-fold.txt` | `187c6170a56506fbf8146826ae2c2125de5fdb67b80fd4090b0c9bbbea4d06d2` |
 | Mutation script (after the fold) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/mutate.py` | `2810607a4367bfbd89ea5d2b6b977de0252738e1a806c0ec2313d989eef8eb41` |
-| Frames fold (= HEAD) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/frames-fold.txt` | `675f95e16d8d0ef4915bbc7b0753946384658915dd3d5bd7276d735f38303ac7` |
+| Frames fold (= HEAD) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/frames-fold.txt` | `d8798b522e25cd547ccd553e4ce1897c8e8cd38954dd36fb487160e4c77157ce` |
 | Frames diff fold (empty) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/frames-diff-fold.txt` | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
 | Cells fold | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/cells-fold.txt` | `f0f5f246732bb703947f8d6449c206cef74623feef38749f011ed8a3a86182da` |
 | Cells diff fold (1 cell, A2L column) | `.dev-flow/2026-10-19-batch-97/evidence/inc-6/cells-diff-fold.txt` | `0b9abcfa6ed8656960123034b0300d29b0bafa15993d9db1b40e071cd2db1748` |

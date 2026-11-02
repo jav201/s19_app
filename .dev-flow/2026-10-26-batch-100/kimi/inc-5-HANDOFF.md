@@ -1,6 +1,6 @@
 # HANDOFF — batch-100 Increment 5 (implementer: software-dev, replacing Kimi)
 
-Worktree `C:\Users\jjgh8\Github\s19_app-b100-inc5`, branch `b100-inc5`, base `8d6056f`.
+Worktree `<HOME>\Github\s19_app-b100-inc5`, branch `b100-inc5`, base `8d6056f`.
 
 ## Progress
 - [x] Read briefs, design §5.5, contract HLR-167 / LLR-167.1–167.8, LED .45 .50 .53 .56 .60, SEC-4 probe, architecture §11 rows.

@@ -1,6 +1,6 @@
 ============================= test session starts =============================
 platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
-rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc3b
+rootdir: <HOME>\Github\s19_app-b99-inc3b
 configfile: pyproject.toml
 plugins: textual-snapshot-1.1.0, syrupy-4.8.0
 collected 31 items / 28 deselected / 3 selected
@@ -10,7 +10,7 @@ tests\test_b99_staging.py FFF                                            [100%]
 ================================== FAILURES ===================================
 ______________ test_tc_b99_15_duplicate_write_out_names_refused _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26583/test_tc_b99_15_duplicate_write0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26583/test_tc_b99_15_duplicate_write0')
 
     def test_tc_b99_15_duplicate_write_out_names_refused(tmp_path: Path) -> None:
         """Two lanes resolving to one output name (compared case-folded —
@@ -47,7 +47,7 @@ E         Use -v to get more diff
 tests\test_b99_staging.py:1646: AssertionError
 ___________ test_at_b99_04_duplicate_names_refused_nothing_written ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26583/test_at_b99_04_duplicate_names0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26583/test_at_b99_04_duplicate_names0')
 
     def test_at_b99_04_duplicate_names_refused_nothing_written(
         tmp_path: Path,
@@ -114,7 +114,7 @@ E       assert []
 tests\test_b99_staging.py:1997: AssertionError
 ______________ test_tc_b99_ux_c10_d7_lane_name_renders_literally ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26583/test_tc_b99_ux_c10_d7_lane_nam0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26583/test_tc_b99_ux_c10_d7_lane_nam0')
 
     def test_tc_b99_ux_c10_d7_lane_name_renders_literally(tmp_path: Path) -> None:
         """The D7 refusal names the lanes — a hostile lane name is a new

@@ -1,4 +1,4 @@
-import: C:\Users\jjgh8\Github\s19_app\s19_app\__init__.py
+import: <HOME>\Github\s19_app\s19_app\__init__.py
 == U3 case_01 size 1444 lines 53 text-mode bytes 1391 (short by 53) buffer.tell distinct 1 first 1444 last 1444 non-decreasing True
 == U3 case_01 loop plain 0.000 s, with tell per line 0.000 s
 == U3 case_06 size 37742888 lines 1039926 text-mode bytes 36702962 (short by 1039926) buffer.tell distinct 4608 first 8192 last 37742888 non-decreasing True
@@ -7,7 +7,7 @@ import: C:\Users\jjgh8\Github\s19_app\s19_app\__init__.py
 == U2 P1 image open: _parse_loaded_file(P2/firmware.mac) -> file_type=s19 path=p1img.s19 parent=u2 mac=firmware.mac
 == U2 P1 image open: _parse_loaded_file(P2/firmware.s19) -> mac carried=None
 == U1 case_01 cold P2 digest ('P2\\firmware.s19', 'f254f33fe5405d40', 'P2', 'P2\\firmware.a2l', 'P2\\firmware.mac', 0)
-== U1 case_01 P1 before: ('C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\inc-12b-design\\work\\p12b\\u1-case_01-over\\p1img.s19', 'f254f33fe5405d40', None, None, None, 0)
+== U1 case_01 P1 before: ('<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\inc-12b-design\\work\\p12b\\u1-case_01-over\\p1img.s19', 'f254f33fe5405d40', None, None, None, 0)
 == U1 case_01 P2-over-P1 digest ('P2\\firmware.s19', 'f254f33fe5405d40', 'P2', 'P2\\firmware.a2l', 'P2\\firmware.mac', 0) equal_to_cold=True snapshot names differing ['_image_generation', 'log_lines']
 == U1 case_06 cold P6 digest ('P6\\firmware.s19', 'f917cd2dca22da9a', 'P6', 'P6\\firmware.a2l', 'P6\\firmware.mac', 0) wall 7.34 s
 (first run stopped at U4 with a StylesheetError: the recording subclass lived outside the package, so CSS_PATH resolved next to the probe; fixed with an absolute CSS_PATH and U4 re-run alone:)

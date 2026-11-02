@@ -1,11 +1,11 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py::test_tc_b100_62_group_junction_unresolved_destination_refused (RED proof: the group caller change reverted — destination resolved before the shared guard)
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 (fix pass 1 with ONLY the place_group_into_workarea guard change reverted)
+tree: <HOME>\Github\s19_app-b100-inc1 (fix pass 1 with ONLY the place_group_into_workarea guard change reverted)
 
 F                                                                        [100%]
 ================================== FAILURES ===================================
 ________ test_tc_b100_62_group_junction_unresolved_destination_refused ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27233/test_tc_b100_62_group_junction0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27233/test_tc_b100_62_group_junction0')
 
     def test_tc_b100_62_group_junction_unresolved_destination_refused(
         tmp_path: Path,

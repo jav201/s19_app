@@ -2,7 +2,7 @@ FF                                                                       [100%]
 ================================== FAILURES ===================================
 ___ test_tc_b100_54_file_load_sync_refuses_when_the_project_folder_is_gone ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/s19f2/bt/test_tc_b100_54_file_load_sync0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19f2/bt/test_tc_b100_54_file_load_sync0')
 
     def test_tc_b100_54_file_load_sync_refuses_when_the_project_folder_is_gone(tmp_path: Path) -> None:
         """SE5-12b-2 tail (fix round 2), LLR-176.2c / the CR12b-2 refusal
@@ -152,7 +152,7 @@ E                   textual.worker.WorkerFailed: Worker raised exception: FileEx
 ..\..\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: WorkerFailed
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\Github\s19_app-b100-fix1\s19_app\tui\app.py:14610 in          
+│ <HOME>\Github\s19_app-b100-fix1\s19_app\tui\app.py:14610 in          
 │ _sync_loaded_file_to_project                                                 
 │                                                                              
 │   14607 │   │   project_dir = self._active_project_dir()                     
@@ -164,7 +164,7 @@ E                   textual.worker.WorkerFailed: Worker raised exception: FileEx
 │   14613 │   │   │   self.logger.warning("Project validation failed during sy 
 │                                                                              
 │ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
-│ │ project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/s19f2/bt/t… │ 
+│ │ project_dir = WindowsPath('<HOME>/AppData/Local/Temp/s19f2/bt/t… │ 
 │ │        self = S19TuiApp(                                                 │ 
 │ │               │   title='Hex Edit Tool',                                 │ 
 │ │               │   classes={'-dark-mode'},                                │ 
@@ -172,7 +172,7 @@ E                   textual.worker.WorkerFailed: Worker raised exception: FileEx
 │ │               )                                                          │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1116 in mkdir            
+│ <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:1116 in mkdir            
 │                                                                              
 │   1113 │   │   Create a new directory at this given path.                    
 │   1114 │   │   """                                                           
@@ -186,16 +186,16 @@ E                   textual.worker.WorkerFailed: Worker raised exception: FileEx
 │ │ exist_ok = True                                                          │ 
 │ │     mode = 511                                                           │ 
 │ │  parents = True                                                          │ 
-│ │     self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/s19f2/bt/test… │ 
+│ │     self = WindowsPath('<HOME>/AppData/Local/Temp/s19f2/bt/test… │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 ╰──────────────────────────────────────────────────────────────────────────────
 FileExistsError: [WinError 183] Cannot create a file when that file already 
 exists: 
-'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\s19f2\\bt\\test_tc_b100_54_file_load_s
+'<HOME>\\AppData\\Local\\Temp\\s19f2\\bt\\test_tc_b100_54_file_load_s
 nc0\\app\\.s19tool\\workarea\\P2'
 __ test_tc_b100_54_a2l_sync_refuses_when_the_project_folder_turns_unreadable __
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/s19f2/bt/test_tc_b100_54_a2l_sync_refus0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19f2/bt/test_tc_b100_54_a2l_sync_refus0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000186B92F19D0>
 
     def test_tc_b100_54_a2l_sync_refuses_when_the_project_folder_turns_unreadable(
@@ -283,7 +283,7 @@ s19_app\tui\app.py:14719: in _sync_loaded_a2l_to_project
                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/s19f2/bt/test_tc_b100_54_a2l_sync_refus0/app/.s19tool/workarea/P2')
+project_dir = WindowsPath('<HOME>/AppData/Local/Temp/s19f2/bt/test_tc_b100_54_a2l_sync_refus0/app/.s19tool/workarea/P2')
 
     def _validate(project_dir):
         if sys._getframe(1).f_code.co_name == "_sync_loaded_a2l_to_project":
@@ -293,7 +293,7 @@ E           PermissionError: [Errno 13] synthetic: the folder cannot be read
 tests\test_b100_workers.py:3254: PermissionError
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\Github\s19_app-b100-fix1\s19_app\tui\app.py:15317 in          
+│ <HOME>\Github\s19_app-b100-fix1\s19_app\tui\app.py:15317 in          
 │ _install_attached_a2l                                                        
 │                                                                              
 │   15314 │   │   │   self._rehome_focus_after_load()                          
@@ -305,16 +305,16 @@ tests\test_b100_workers.py:3254: PermissionError
 │   15320 │   │   │   │   gen,                                                 
 │                                                                              
 │ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
-│ │       copied = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/s19f2/bt/… │ 
+│ │       copied = WindowsPath('<HOME>/AppData/Local/Temp/s19f2/bt/… │ 
 │ │          gen = 2                                                         │ 
 │ │          req = A2LAttachRequest(                                         │ 
 │ │                │                                                         │ 
-│ │                source=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/s1… │ 
+│ │                source=WindowsPath('<HOME>/AppData/Local/Temp/s1… │ 
 │ │                │   copy=True,                                            │ 
 │ │                │                                                         │ 
-│ │                temp_dir=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │                temp_dir=WindowsPath('<HOME>/AppData/Local/Temp/… │ 
 │ │                │                                                         │ 
-│ │                workarea=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │                workarea=WindowsPath('<HOME>/AppData/Local/Temp/… │ 
 │ │                │   record_recent=True,                                   │ 
 │ │                │   a2l_cache=None,                                       │ 
 │ │                │   gen=2                                                 │ 
@@ -322,28 +322,28 @@ tests\test_b100_workers.py:3254: PermissionError
 │ │       result = A2LAttachResult(                                          │ 
 │ │                │   request=A2LAttachRequest(                             │ 
 │ │                │   │                                                     │ 
-│ │                source=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/s1… │ 
+│ │                source=WindowsPath('<HOME>/AppData/Local/Temp/s1… │ 
 │ │                │   │   copy=True,                                        │ 
 │ │                │   │                                                     │ 
-│ │                temp_dir=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │                temp_dir=WindowsPath('<HOME>/AppData/Local/Temp/… │ 
 │ │                │   │                                                     │ 
-│ │                workarea=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │                workarea=WindowsPath('<HOME>/AppData/Local/Temp/… │ 
 │ │                │   │   record_recent=True,                               │ 
 │ │                │   │   a2l_cache=None,                                   │ 
 │ │                │   │   gen=2                                             │ 
 │ │                │   ),                                                    │ 
 │ │                │                                                         │ 
-│ │                path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/s19f… │ 
+│ │                path=WindowsPath('<HOME>/AppData/Local/Temp/s19f… │ 
 │ │                │   entry=(                                               │ 
 │ │                │   │   (                                                 │ 
 │ │                │   │   │                                                 │ 
-│ │                'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\s19f2\\bt\\test… │ 
+│ │                '<HOME>\\AppData\\Local\\Temp\\s19f2\\bt\\test… │ 
 │ │                │   │   │   1793553568595061500,                          │ 
 │ │                │   │   │   1444                                          │ 
 │ │                │   │   ),                                                │ 
 │ │                │   │   {                                                 │ 
 │ │                │   │   │   'path':                                       │ 
-│ │                'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\s19f2\\bt\\test… │ 
+│ │                '<HOME>\\AppData\\Local\\Temp\\s19f2\\bt\\test… │ 
 │ │                │   │   │   'sections': [                                 │ 
 │ │                │   │   │   │   {                                         │ 
 │ │                │   │   │   │   │   'name': 'PROJECT',                    │ 
@@ -660,7 +660,7 @@ tests\test_b100_workers.py:3254: PermissionError
 │ │ view_started = 635076.9637964                                            │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-fix1\s19_app\tui\app.py:14719 in          
+│ <HOME>\Github\s19_app-b100-fix1\s19_app\tui\app.py:14719 in          
 │ _sync_loaded_a2l_to_project                                                  
 │                                                                              
 │   14716 │   │   if not project_dir:                                          
@@ -672,7 +672,7 @@ tests\test_b100_workers.py:3254: PermissionError
 │   14722 │   │   │   return                                                   
 │                                                                              
 │ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
-│ │ project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/s19f2/bt/t… │ 
+│ │ project_dir = WindowsPath('<HOME>/AppData/Local/Temp/s19f2/bt/t… │ 
 │ │        self = S19TuiApp(                                                 │ 
 │ │               │   title='Hex Edit Tool',                                 │ 
 │ │               │   classes={'-dark-mode'},                                │ 
@@ -680,7 +680,7 @@ tests\test_b100_workers.py:3254: PermissionError
 │ │               )                                                          │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-fix1\tests\test_b100_workers.py:3254 in   
+│ <HOME>\Github\s19_app-b100-fix1\tests\test_b100_workers.py:3254 in   
 │ _validate                                                                    
 │                                                                              
 │   3251 │                                                                     
@@ -692,7 +692,7 @@ tests\test_b100_workers.py:3254: PermissionError
 │   3257 │   monkeypatch.setattr(app_module, "validate_project_files", _valida 
 │                                                                              
 │ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
-│ │ project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/s19f2/bt/t… │ 
+│ │ project_dir = WindowsPath('<HOME>/AppData/Local/Temp/s19f2/bt/t… │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 ╰──────────────────────────────────────────────────────────────────────────────
 PermissionError: [Errno 13] synthetic: the folder cannot be read

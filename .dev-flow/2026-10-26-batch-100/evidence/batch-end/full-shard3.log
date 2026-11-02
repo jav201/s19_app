@@ -1,5 +1,5 @@
 9e4dd3b
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\s19_app\__init__.py
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\s19_app\__init__.py
 ......ss................................................................ [  5%]
 ........................................................................ [ 11%]
 ..........................s............................................. [ 17%]
@@ -18,11 +18,11 @@ C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-
 .....................................................................x.. [ 95%]
 ..................................................                       [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b100_save_image.py:1412: IndexError: list index out of range
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\s19_app\tui\segment_split_view.py:891: s19_app.tui.segment_split_view.ExportRefusedError: "t_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.s19" resolves to 290 characters — over the platform limit of 260
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b99_export.py:762: AssertionError: "t_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA.s19" resolves to 282 characters — over the platform limit of 260
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b99_export.py:820: AssertionError: precondition: this run's tmp home must allow a 152-character home
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b99_export.py:1280: AssertionError: Export failed: Export stopped: Not saved: firmware_locality_01.s19 in C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\fb3\bt\test_tc_b99_41_part_way_failur1\.s19tool\workarea\splits could not be written: forced failure on the second fill. Nothing written.. Al
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b100_save_image.py:1412: IndexError: list index out of range
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\s19_app\tui\segment_split_view.py:891: s19_app.tui.segment_split_view.ExportRefusedError: "t_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.s19" resolves to 290 characters — over the platform limit of 260
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b99_export.py:762: AssertionError: "t_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA.s19" resolves to 282 characters — over the platform limit of 260
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b99_export.py:820: AssertionError: precondition: this run's tmp home must allow a 152-character home
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b99_export.py:1280: AssertionError: Export failed: Export stopped: Not saved: firmware_locality_01.s19 in <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\fb3\bt\test_tc_b99_41_part_way_failur1\.s19tool\workarea\splits could not be written: forced failure on the second fill. Nothing written.. Al
 =========================== short test summary info ===========================
 FAILED tests/test_b100_save_image.py::test_tc_b100_59_refused_plan_writes_nothing
 FAILED tests/test_b99_export.py::test_tc_b99_29_hostile_set_writes_nothing_outside

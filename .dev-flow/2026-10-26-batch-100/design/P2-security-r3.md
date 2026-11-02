@@ -2,8 +2,8 @@
 
 - **Reviewer:** `security-reviewer`. This is a bounded round-3 verification, the operator's decision after the P2 iteration cap. **Scope:** only the closure of my open findings R2-01..R2-09 and the carried S-02, S-08 and S-16. This is not a new full review. Anything new I noticed is a PDR condition and does not block, because none of it is HIGH.
 - **Sources:** the contract at `4e9c8f1` (`01-requirements.md`, ledger LED .14 to .23, and the `02-review.md` "Round 2" section) and `docs/ARCHITECTURE.md` B100-I13 to B100-I22.
-- **Execution:** the probe ran on the `git archive 1d677ba` snapshot from earlier rounds. `s19_app.__file__` printed `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\snap\s19_app\__init__.py`.
-  - Probe script and output: `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\probes\p2sec_r3_probe.py` / `.out`.
+- **Execution:** the probe ran on the `git archive 1d677ba` snapshot from earlier rounds. `s19_app.__file__` printed `<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\snap\s19_app\__init__.py`.
+  - Probe script and output: `<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\probes\p2sec_r3_probe.py` / `.out`.
   - The probe made one scratch folder (`scratchpad\r3work`) and removed it at the end; the output records `scratch folder removed: True`.
   - I also read the code paths: `changes/apply.py:776-781` and `services/manifest_writer.py:13-15`, `:366`, `:431`.
 

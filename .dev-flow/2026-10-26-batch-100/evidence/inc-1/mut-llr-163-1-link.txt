@@ -1,11 +1,11 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py::test_tc_b100_01_link_candidate_is_never_reused (MUTANT link: the reparse skip removed in _match_identical and the candidate followed with os.stat instead of os.lstat)
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 (fix pass 1 + mutant)
+tree: <HOME>\Github\s19_app-b100-inc1 (fix pass 1 + mutant)
 
 F                                                                        [100%]
 ================================== FAILURES ===================================
 _______________ test_tc_b100_01_link_candidate_is_never_reused ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27239/test_tc_b100_01_link_candidate0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27239/test_tc_b100_01_link_candidate0')
 
     def test_tc_b100_01_link_candidate_is_never_reused(tmp_path: Path) -> None:
         """Boundary catalog (LLR-163.1): a link sitting at a ``_<N>`` candidate
@@ -25,7 +25,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         result = place_into_workarea(source, destination)
 >       assert not result.reused
 E       AssertionError: assert not True
-E        +  where True = PlacementResult(path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27239/test_tc_b100_01_link_candidate0/.s19tool/workarea/target/staged_1.s19'), reused=True).reused
+E        +  where True = PlacementResult(path=WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27239/test_tc_b100_01_link_candidate0/.s19tool/workarea/target/staged_1.s19'), reused=True).reused
 
 tests\test_b100_reuse.py:293: AssertionError
 =========================== short test summary info ===========================

@@ -1,5 +1,5 @@
 # green-03-merged: tree 71376a3 (b100-inc12a + b100-inc11 7ac9674)
-s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc12a\s19_app\__init__.py
+s19_app.__file__ = <HOME>\Github\s19_app-b100-inc12a\s19_app\__init__.py
 .........................................s.............................. [ 28%]
 ........................................................................ [ 56%]
 ........................................................................ [ 84%]
@@ -40,7 +40,7 @@ tests\support\b100_save_dialog.py:307: in _drive
 E   textual.worker.WorkerFailed: Worker raised exception: TypeError("S19TuiApp._start_load_worker() missing 1 required keyword-only argument: 'gen'")
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:370 
+│ <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:370 
 │ in _run                                                                      
 │                                                                              
 │   367 │   │   │   self.state = WorkerState.RUNNING                           
@@ -71,7 +71,7 @@ E   textual.worker.WorkerFailed: Worker raised exception: TypeError("S19TuiApp._
 │ │                 required keyword-only argument: \'gen\'")')              │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:354 
+│ <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:354 
 │ in run                                                                       
 │                                                                              
 │   351 │   │   Returns:                                                       
@@ -88,11 +88,11 @@ E   textual.worker.WorkerFailed: Worker raised exception: TypeError("S19TuiApp._
 │ │        │   name='_start_load_worker'                                     │ 
 │ │        │   group='load'                                                  │ 
 │ │        │                                                                 │ 
-│ │        description="_start_load_worker(WindowsPath('C:/Users/jjgh8/AppD… │ 
+│ │        description="_start_load_worker(WindowsPath('<HOME>/AppD… │ 
 │ │        >                                                                 │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:326 
+│ <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:326 
 │ in _run_threaded                                                             
 │                                                                              
 │   323 │   │                                                                  
@@ -110,11 +110,11 @@ E   textual.worker.WorkerFailed: Worker raised exception: TypeError("S19TuiApp._
 │ │        │   name='_start_load_worker'                                     │ 
 │ │        │   group='load'                                                  │ 
 │ │        │                                                                 │ 
-│ │        description="_start_load_worker(WindowsPath('C:/Users/jjgh8/AppD… │ 
+│ │        description="_start_load_worker(WindowsPath('<HOME>/AppD… │ 
 │ │        >                                                                 │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\concurrent\futures\thread.py:58 in  
+│ <HOME>\anaconda3\envs\s19env\Lib\concurrent\futures\thread.py:58 in  
 │ run                                                                          
 │                                                                              
 │    55 │   │   │   return                                                     
@@ -132,7 +132,7 @@ E   textual.worker.WorkerFailed: Worker raised exception: TypeError("S19TuiApp._
 │ │        0x0000020D9948EC50>                                               │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:309 
+│ <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:309 
 │ in run_callable                                                              
 │                                                                              
 │   306 │   │   def run_callable(work: Callable[[], ResultType]) -> ResultType 
@@ -149,12 +149,12 @@ E   textual.worker.WorkerFailed: Worker raised exception: TypeError("S19TuiApp._
 │ │        │   name='_start_load_worker'                                     │ 
 │ │        │   group='load'                                                  │ 
 │ │        │                                                                 │ 
-│ │        description="_start_load_worker(WindowsPath('C:/Users/jjgh8/AppD… │ 
+│ │        description="_start_load_worker(WindowsPath('<HOME>/AppD… │ 
 │ │        >                                                                 │ 
 │ │ work = functools.partial(<function S19TuiApp._start_load_worker at       │ 
 │ │        0x0000020D997F1EE0>, S19TuiApp(title='Hex Edit Tool',             │ 
 │ │        classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}),        │ 
-│ │        WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-j… │ 
+│ │        WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-j… │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 ╰──────────────────────────────────────────────────────────────────────────────
 TypeError: S19TuiApp._start_load_worker() missing 1 required keyword-only 
@@ -194,7 +194,7 @@ tests\support\b100_save_dialog.py:307: in _drive
 E   textual.worker.WorkerFailed: Worker raised exception: TypeError("S19TuiApp._start_load_worker() missing 1 required keyword-only argument: 'gen'")
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:370 
+│ <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:370 
 │ in _run                                                                      
 │                                                                              
 │   367 │   │   │   self.state = WorkerState.RUNNING                           
@@ -225,7 +225,7 @@ E   textual.worker.WorkerFailed: Worker raised exception: TypeError("S19TuiApp._
 │ │                 required keyword-only argument: \'gen\'")')              │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:354 
+│ <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:354 
 │ in run                                                                       
 │                                                                              
 │   351 │   │   Returns:                                                       
@@ -242,11 +242,11 @@ E   textual.worker.WorkerFailed: Worker raised exception: TypeError("S19TuiApp._
 │ │        │   name='_start_load_worker'                                     │ 
 │ │        │   group='load'                                                  │ 
 │ │        │                                                                 │ 
-│ │        description="_start_load_worker(WindowsPath('C:/Users/jjgh8/AppD… │ 
+│ │        description="_start_load_worker(WindowsPath('<HOME>/AppD… │ 
 │ │        >                                                                 │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:326 
+│ <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:326 
 │ in _run_threaded                                                             
 │                                                                              
 │   323 │   │                                                                  
@@ -264,11 +264,11 @@ E   textual.worker.WorkerFailed: Worker raised exception: TypeError("S19TuiApp._
 │ │        │   name='_start_load_worker'                                     │ 
 │ │        │   group='load'                                                  │ 
 │ │        │                                                                 │ 
-│ │        description="_start_load_worker(WindowsPath('C:/Users/jjgh8/AppD… │ 
+│ │        description="_start_load_worker(WindowsPath('<HOME>/AppD… │ 
 │ │        >                                                                 │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\concurrent\futures\thread.py:58 in  
+│ <HOME>\anaconda3\envs\s19env\Lib\concurrent\futures\thread.py:58 in  
 │ run                                                                          
 │                                                                              
 │    55 │   │   │   return                                                     
@@ -286,7 +286,7 @@ E   textual.worker.WorkerFailed: Worker raised exception: TypeError("S19TuiApp._
 │ │        0x0000020D99D17490>                                               │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:309 
+│ <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:309 
 │ in run_callable                                                              
 │                                                                              
 │   306 │   │   def run_callable(work: Callable[[], ResultType]) -> ResultType 
@@ -303,12 +303,12 @@ E   textual.worker.WorkerFailed: Worker raised exception: TypeError("S19TuiApp._
 │ │        │   name='_start_load_worker'                                     │ 
 │ │        │   group='load'                                                  │ 
 │ │        │                                                                 │ 
-│ │        description="_start_load_worker(WindowsPath('C:/Users/jjgh8/AppD… │ 
+│ │        description="_start_load_worker(WindowsPath('<HOME>/AppD… │ 
 │ │        >                                                                 │ 
 │ │ work = functools.partial(<function S19TuiApp._start_load_worker at       │ 
 │ │        0x0000020D997F1EE0>, S19TuiApp(title='Hex Edit Tool',             │ 
 │ │        classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}),        │ 
-│ │        WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-j… │ 
+│ │        WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-j… │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 ╰──────────────────────────────────────────────────────────────────────────────
 TypeError: S19TuiApp._start_load_worker() missing 1 required keyword-only 

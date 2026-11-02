@@ -19,7 +19,7 @@ public class U32G {
 $title = "GLYPH-RULER-B97"
 $script:found = [IntPtr]::Zero
 function Find([string]$t) { $script:found=[IntPtr]::Zero; $cb=[U32G+EnumProc]{ param($h,$l) $sb=New-Object System.Text.StringBuilder 256; [void][U32G]::GetWindowText($h,$sb,256); if($sb.ToString() -eq $t){$script:found=$h; return $false}; return $true }; [void][U32G]::EnumWindows($cb,[IntPtr]::Zero); return $script:found }
-$py = "C:\Users\jjgh8\anaconda3\envs\s19env\python.exe"
+$py = "<HOME>\anaconda3\envs\s19env\python.exe"
 $script = Join-Path (Get-Location) "glyph_ruler.py"
 $argLine = '--size 90,44 --title "{0}" "{1}" "{2}"' -f $title, $py, $script
 Start-Process "wt.exe" -ArgumentList $argLine | Out-Null

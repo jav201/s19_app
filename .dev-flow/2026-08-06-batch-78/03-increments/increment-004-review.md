@@ -1,7 +1,7 @@
 # Code Review — batch-78 Increment 4 (`HLR-123`)
 
 **Reviewer:** `code-reviewer` (independent; did not author the change)
-**Diff:** `24d812f..89d0a78` · **Branch:** `claude/batch-78-cmdbar-a2bdiff` · **Repo:** `C:\Users\jjgh8\Github\s19_app`
+**Diff:** `24d812f..89d0a78` · **Branch:** `claude/batch-78-cmdbar-a2bdiff` · **Repo:** `<HOME>\Github\s19_app`
 **Authority:** `01-requirements.md` §7 Inc-4 row · `HLR-123` · `LLR-123.1/.2/.3` · §5.3 `AT-B78-20…22` · §6.5 Amendment D · §8 `A-6`
 **Method:** every figure below was re-executed in a detached worktree at `89d0a78`
 (`scratchpad/wt78`, `git worktree add … --detach`). No file in the operator's tree was

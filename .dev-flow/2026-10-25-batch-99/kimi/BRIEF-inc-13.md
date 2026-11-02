@@ -1,6 +1,6 @@
 # Kimi brief — batch-99 Increment 13 · P4 suite fixes (tests only)
 
-Read `BRIEF-COMMON.md` first. Worktree: `C:\Users\jjgh8\Github\s19_app-b99-inc13` (detached at the commit the orchestrator names on launch). Packet: `.dev-flow/2026-10-25-batch-99/03-increments/increment-013.md` (copy the shape of `increment-012.md`, which was also a tests-only unit). **SOURCE files: 0.** Do not edit anything under `s19_app/`.
+Read `BRIEF-COMMON.md` first. Worktree: `<HOME>\Github\s19_app-b99-inc13` (detached at the commit the orchestrator names on launch). Packet: `.dev-flow/2026-10-25-batch-99/03-increments/increment-013.md` (copy the shape of `increment-012.md`, which was also a tests-only unit). **SOURCE files: 0.** Do not edit anything under `s19_app/`.
 
 The full suite on `e7732f6` (`evidence/suite-full-e7732f6.txt`) has two failures that the batch caused on purpose and whose tests were never re-pinned. Neither is a product defect. Each re-pin is recorded as `test::node — old → new — requirement`.
 

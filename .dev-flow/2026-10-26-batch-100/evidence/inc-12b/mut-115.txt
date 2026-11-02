@@ -2,9 +2,9 @@ mutant id: 115
 target file: s19_app/tui/a2l.py
 old -> new: _PROGRESS_LINES: 4096 -> 1
 sha256 before: d70b17982f1cee30240e701a9480eb722f5a087935359ce608fbd9781436175d
-command: timeout 900 env -u NO_COLOR LOCALAPPDATA='C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut12b-lad' PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line "tests/test_b100_a2l_progress.py::test_tc_b100_73_case06_reports_bytes_and_parses_the_same"
-cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut12b
-s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut12b\s19_app\__init__.py
+command: timeout 900 env -u NO_COLOR LOCALAPPDATA='<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut12b-lad' PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line "tests/test_b100_a2l_progress.py::test_tc_b100_73_case06_reports_bytes_and_parses_the_same"
+cwd: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut12b
+s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut12b\s19_app\__init__.py
 pytest summary: 1 failed in 15.63s
 verdict: KILLED
 restored = True

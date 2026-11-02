@@ -1,6 +1,6 @@
 # HANDOFF — batch-99 Increment 9 · review round 2 fix (fix2)
 
-Worktree: `C:\Users\jjgh8\Github\s19_app-b99-inc9` (branch b99-inc9). Not committed, per brief.
+Worktree: `<HOME>\Github\s19_app-b99-inc9` (branch b99-inc9). Not committed, per brief.
 
 ## What the brief asked (BRIEF-inc-9-fix2.md)
 
@@ -18,7 +18,7 @@ Worktree: `C:\Users\jjgh8\Github\s19_app-b99-inc9` (branch b99-inc9). Not commit
 ## Worktree proof
 
 `python -c "import s19_app; print(s19_app.__file__)"` →
-`C:\Users\jjgh8\Github\s19_app-b99-inc9\s19_app\__init__.py` (this worktree).
+`<HOME>\Github\s19_app-b99-inc9\s19_app\__init__.py` (this worktree).
 
 ## What was done
 

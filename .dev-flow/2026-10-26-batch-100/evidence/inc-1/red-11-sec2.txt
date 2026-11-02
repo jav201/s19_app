@@ -1,10 +1,10 @@
 cmd: pytest -q -p no:cacheprovider tests/test_b100_reuse.py -k invalid_path_spelling  (RED: SEC-2 wrap removed)
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 — detached e044112 + inc1 + fix1 + fix2-with-red-11
+tree: <HOME>\Github\s19_app-b100-inc1 — detached e044112 + inc1 + fix1 + fix2-with-red-11
 F                                                                        [100%]
 ================================== FAILURES ===================================
 _______ test_tc_b100_62_invalid_path_spelling_is_a_containment_refusal ________
 
-self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27277/test_tc_b100_62_invalid_path_s0/base/.s19tool/workarea/bad"name')
+self = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27277/test_tc_b100_62_invalid_path_s0/base/.s19tool/workarea/bad"name')
 mode = 511, parents = True, exist_ok = True
 
     def mkdir(self, mode=0o777, parents=False, exist_ok=False):
@@ -13,13 +13,13 @@ mode = 511, parents = True, exist_ok = True
         """
         try:
 >           os.mkdir(self, mode)
-E           FileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27277\\test_tc_b100_62_invalid_path_s0\\base\\.s19tool\\workarea\\bad"name'
+E           FileNotFoundError: [WinError 3] The system cannot find the path specified: '<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27277\\test_tc_b100_62_invalid_path_s0\\base\\.s19tool\\workarea\\bad"name'
 
 ..\..\anaconda3\envs\s19env\Lib\pathlib.py:1116: FileNotFoundError
 
 During handling of the above exception, another exception occurred:
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27277/test_tc_b100_62_invalid_path_s0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27277/test_tc_b100_62_invalid_path_s0')
 
     def test_tc_b100_62_invalid_path_spelling_is_a_containment_refusal(
         tmp_path: Path,
@@ -45,7 +45,7 @@ s19_app\tui\workspace.py:1079: in place_into_workarea
     self.mkdir(mode, parents=False, exist_ok=exist_ok)
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27277/test_tc_b100_62_invalid_path_s0/base/.s19tool/workarea/bad"name')
+self = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27277/test_tc_b100_62_invalid_path_s0/base/.s19tool/workarea/bad"name')
 mode = 511, parents = False, exist_ok = True
 
     def mkdir(self, mode=0o777, parents=False, exist_ok=False):
@@ -54,7 +54,7 @@ mode = 511, parents = False, exist_ok = True
         """
         try:
 >           os.mkdir(self, mode)
-E           OSError: [WinError 123] The filename, directory name, or volume label syntax is incorrect: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27277\\test_tc_b100_62_invalid_path_s0\\base\\.s19tool\\workarea\\bad"name'
+E           OSError: [WinError 123] The filename, directory name, or volume label syntax is incorrect: '<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27277\\test_tc_b100_62_invalid_path_s0\\base\\.s19tool\\workarea\\bad"name'
 
 ..\..\anaconda3\envs\s19env\Lib\pathlib.py:1116: OSError
 =========================== short test summary info ===========================

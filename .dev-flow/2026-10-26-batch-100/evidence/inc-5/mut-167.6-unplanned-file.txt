@@ -1,6 +1,6 @@
 # command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation 167.6-unplanned-file
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# tree: <HOME>\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation 167.6-unplanned-file
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
 # date: 2026-10-29T19:55:54+00:00
 # requirement: LLR-167.6
 # mutation: the handler places a file the plan did not name (the source copy beside the emitted image) — file s19_app/tui/app.py
@@ -12,7 +12,7 @@
 ================================== FAILURES ===================================
 ___________________ test_tc_b100_15_patched_s19_is_emitted ____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_tc_b100_15_patched_s19_is0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29961/test_tc_b100_15_patched_s19_is0')
 
     def test_tc_b100_15_patched_s19_is_emitted(tmp_path: Path) -> None:
         """A patched S19 → the project image is source + document (0 differing
@@ -37,7 +37,7 @@ E         Use -v to get more diff
 tests\test_b100_save_image.py:446: AssertionError
 _____________ test_tc_b100_15_entry_removed_after_apply_is_absent _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_tc_b100_15_entry_removed_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29961/test_tc_b100_15_entry_removed_0')
 
     def test_tc_b100_15_entry_removed_after_apply_is_absent(tmp_path: Path) -> None:
         """Two entries applied, one removed → the saved image holds only the
@@ -61,7 +61,7 @@ E         Use -v to get more diff
 tests\test_b100_save_image.py:503: AssertionError
 ___________________ test_tc_b100_15_patched_hex_is_emitted ____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_tc_b100_15_patched_hex_is0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29961/test_tc_b100_15_patched_hex_is0')
 
     def test_tc_b100_15_patched_hex_is_emitted(tmp_path: Path) -> None:
         """A patched Intel HEX source → 0 differing addresses."""
@@ -128,7 +128,7 @@ E       AssertionError: timed out waiting for the HEX Save project
 tests\test_b100_save_image.py:149: AssertionError
 ________________ test_tc_b100_15_mac_and_a2l_stay_byte_copies _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_tc_b100_15_mac_and_a2l_st0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29961/test_tc_b100_15_mac_and_a2l_st0')
 
     def test_tc_b100_15_mac_and_a2l_stay_byte_copies(tmp_path: Path) -> None:
         """A project holding S19 + MAC + A2L, patched and saved as another
@@ -189,7 +189,7 @@ E       AssertionError: timed out waiting for the P2 save
 tests\test_b100_save_image.py:149: AssertionError
 _________ test_tc_b100_15_save_back_then_save_project_keeps_the_patch _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_tc_b100_15_save_back_then0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29961/test_tc_b100_15_save_back_then0')
 
     def test_tc_b100_15_save_back_then_save_project_keeps_the_patch(
         tmp_path: Path,
@@ -217,7 +217,7 @@ E         Use -v to get more diff
 tests\test_b100_save_image.py:599: AssertionError
 ___________ test_tc_b100_15_clashing_name_lands_as_the_next_variant ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_tc_b100_15_clashing_name_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29961/test_tc_b100_15_clashing_name_0')
 
     def test_tc_b100_15_clashing_name_lands_as_the_next_variant(tmp_path: Path) -> None:
         """The target already holds a DIFFERENT ``firmware.s19`` → the patched
@@ -245,7 +245,7 @@ E         Use -v to get more diff
 tests\test_b100_save_image.py:619: AssertionError
 ______________________ test_tc_b100_16_one_applied_entry ______________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_tc_b100_16_one_applied_en0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29961/test_tc_b100_16_one_applied_en0')
 
     def test_tc_b100_16_one_applied_entry(tmp_path: Path) -> None:
         """1 applied entry → the status carries 1 entry and 0 applied by this
@@ -258,15 +258,15 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         lines, _, _ = _save_session(tmp_path, scenario)
         final = lines[-1]
 >       assert final.startswith("Saved project to"), lines
-E       AssertionError: ['Loaded firmware.s19 (S19 only)', 'Project NOT saved: the plan named C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-o..._one_applied_en0\\app\\.s19tool\\workarea\\P1\\firmware.s19 (new) but the file landed at C:\\Users\\jjgh8\\AppData\\L']
+E       AssertionError: ['Loaded firmware.s19 (S19 only)', 'Project NOT saved: the plan named <HOME>\\AppData\\Local\\Temp\\pytest-o..._one_applied_en0\\app\\.s19tool\\workarea\\P1\\firmware.s19 (new) but the file landed at <HOME>\\AppData\\L']
 E       assert False
 E        +  where False = <built-in method startswith of str object at 0x0000021F0C81F990>('Saved project to')
-E        +    where <built-in method startswith of str object at 0x0000021F0C81F990> = 'Project NOT saved: the plan named C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-29961\\test_tc_b100_16_one_applied_en0\\app\\.s19tool\\workarea\\P1\\firmware.s19 (new) but the file landed at C:\\Users\\jjgh8\\AppData\\L'.startswith
+E        +    where <built-in method startswith of str object at 0x0000021F0C81F990> = 'Project NOT saved: the plan named <HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-29961\\test_tc_b100_16_one_applied_en0\\app\\.s19tool\\workarea\\P1\\firmware.s19 (new) but the file landed at <HOME>\\AppData\\L'.startswith
 
 tests\test_b100_save_image.py:640: AssertionError
 _________________ test_tc_b100_16_entry_added_after_the_apply _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_tc_b100_16_entry_added_af0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29961/test_tc_b100_16_entry_added_af0')
 
     def test_tc_b100_16_entry_added_after_the_apply(tmp_path: Path) -> None:
         """1 applied + 1 added after the apply → 2 entries, 1 applied by this
@@ -280,13 +280,13 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         lines, project, _ = _save_session(tmp_path, scenario)
         final = lines[-1]
 >       assert "firmware.s19 + 2 change entries, 1 applied by this save" in final, final
-E       AssertionError: Project NOT saved: the plan named C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-29961\test_tc_b100_16_entry_added_af0\app\.s19tool\workarea\P1\firmware.s19 (new) but the file landed at C:\Users\jjgh8\AppData\L
-E       assert 'firmware.s19 + 2 change entries, 1 applied by this save' in 'Project NOT saved: the plan named C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-29961\\test_tc_b100_16_entry_added_af0\\app\\.s19tool\\workarea\\P1\\firmware.s19 (new) but the file landed at C:\\Users\\jjgh8\\AppData\\L'
+E       AssertionError: Project NOT saved: the plan named <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-29961\test_tc_b100_16_entry_added_af0\app\.s19tool\workarea\P1\firmware.s19 (new) but the file landed at <HOME>\AppData\L
+E       assert 'firmware.s19 + 2 change entries, 1 applied by this save' in 'Project NOT saved: the plan named <HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-29961\\test_tc_b100_16_entry_added_af0\\app\\.s19tool\\workarea\\P1\\firmware.s19 (new) but the file landed at <HOME>\\AppData\\L'
 
 tests\test_b100_save_image.py:658: AssertionError
 _______________ test_tc_b100_17_emit_refusal_writes_no_manifest _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_tc_b100_17_emit_refusal_w0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29961/test_tc_b100_17_emit_refusal_w0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000021F0EB55790>
 
     def test_tc_b100_17_emit_refusal_writes_no_manifest(
@@ -314,15 +314,15 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000021F0EB55790>
         lines, project, _ = _save_session(tmp_path, scenario)
         assert "the patched image was not written: forced emit refusal" in lines[-1], lines
 >       assert not project.exists(), sorted(project.rglob("*"))
-E       AssertionError: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_tc_b100_17_emit_refusal_w0/app/.s19tool/workarea/P1/firmware.s19')]
+E       AssertionError: [WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29961/test_tc_b100_17_emit_refusal_w0/app/.s19tool/workarea/P1/firmware.s19')]
 E       assert not True
 E        +  where True = exists()
-E        +    where exists = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_tc_b100_17_emit_refusal_w0/app/.s19tool/workarea/P1').exists
+E        +    where exists = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29961/test_tc_b100_17_emit_refusal_w0/app/.s19tool/workarea/P1').exists
 
 tests\test_b100_save_image.py:733: AssertionError
 ____________ test_tc_b100_58_save_project_records_the_saved_state _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_tc_b100_58_save_project_r0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29961/test_tc_b100_58_save_project_r0')
 
     def test_tc_b100_58_save_project_records_the_saved_state(tmp_path: Path) -> None:
         """loaded → False; applied → True; applied → Save project → False."""
@@ -373,7 +373,7 @@ E       AssertionError: timed out waiting for the Save project success line
 tests\test_b100_save_image.py:149: AssertionError
 ______________ test_tc_b100_70_unwritten_document_keeps_the_flag ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_tc_b100_70_unwritten_docu0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29961/test_tc_b100_70_unwritten_docu0')
 
     def test_tc_b100_70_unwritten_document_keeps_the_flag(tmp_path: Path) -> None:
         """A Save project that emits the image but does NOT write the editor's
@@ -384,15 +384,15 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         dirty_before, dirty_after, status = _dirty_after_save(tmp_path, blocked=False)
         assert dirty_before is True
 >       assert status.startswith("Saved project to"), status
-E       AssertionError: Project NOT saved: the plan named C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-29961\test_tc_b100_70_unwritten_docu0\app\.s19tool\workarea\P1\firmware.s19 (new) but the file landed at C:\Users\jjgh8\AppData\L
+E       AssertionError: Project NOT saved: the plan named <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-29961\test_tc_b100_70_unwritten_docu0\app\.s19tool\workarea\P1\firmware.s19 (new) but the file landed at <HOME>\AppData\L
 E       assert False
 E        +  where False = <built-in method startswith of str object at 0x0000021F0D2A4030>('Saved project to')
-E        +    where <built-in method startswith of str object at 0x0000021F0D2A4030> = 'Project NOT saved: the plan named C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-29961\\test_tc_b100_70_unwritten_docu0\\app\\.s19tool\\workarea\\P1\\firmware.s19 (new) but the file landed at C:\\Users\\jjgh8\\AppData\\L'.startswith
+E        +    where <built-in method startswith of str object at 0x0000021F0D2A4030> = 'Project NOT saved: the plan named <HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-29961\\test_tc_b100_70_unwritten_docu0\\app\\.s19tool\\workarea\\P1\\firmware.s19 (new) but the file landed at <HOME>\\AppData\\L'.startswith
 
 tests\test_b100_save_image.py:1275: AssertionError
 _________ test_at_b100_05_save_project_saves_the_patched_image[size0] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_at_b100_05_save_project_s0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29961/test_at_b100_05_save_project_s0')
 size = (118, 54)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
@@ -499,7 +499,7 @@ E       AssertionError: timed out waiting for the painted Save project success l
 tests\test_b100_save_image.py:149: AssertionError
 _________ test_at_b100_05_save_project_saves_the_patched_image[size1] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29961/test_at_b100_05_save_project_s1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29961/test_at_b100_05_save_project_s1')
 size = (220, 60)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])

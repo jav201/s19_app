@@ -1,8 +1,8 @@
 # Kimi brief — batch-100 Increment 3 · corrective pass 2 (bounded)
 
-Work in the same worktree, `C:\Users\jjgh8\Github\s19_app-b100-inc3`. It holds Inc 3 and fix pass 1, uncommitted; keep both. `BRIEF-COMMON.md` applies. SOURCE files stay at 1: `app.py`.
+Work in the same worktree, `<HOME>\Github\s19_app-b100-inc3`. It holds Inc 3 and fix pass 1, uncommitted; keep both. `BRIEF-COMMON.md` applies. SOURCE files stay at 1: `app.py`.
 
-**Read first**, in the MAIN checkout: `C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-10-26-batch-100\03-increments\review-increment-003.md` §"Round 2" (R2-1, R2-2).
+**Read first**, in the MAIN checkout: `<HOME>\Github\s19_app\.dev-flow\2026-10-26-batch-100\03-increments\review-increment-003.md` §"Round 2" (R2-1, R2-2).
 
 **Fix (this pass covers only these two):**
 1. **R2-1 (MAJOR).** LED .55 (b) says the reset clears the paste buffer, but `mark_loaded()` clears only the dirty flag. After loading P2, P1's draft text stays in the paste buffer, now marked clean, so "Parse pasted" could apply P1's draft to P2. That breaks PH-2.

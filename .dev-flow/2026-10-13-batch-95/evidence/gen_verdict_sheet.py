@@ -16,7 +16,7 @@ import shutil
 import tempfile
 from pathlib import Path
 
-ROOT = Path("C:/Users/jjgh8/Github/s19_app")
+ROOT = Path("<HOME>/Github/s19_app")
 OUT = ROOT / ".dev-flow/2026-10-13-batch-95/evidence"
 EXAMPLE_PRG = ROOT / "examples" / "case_00_public" / "prg.s19"
 

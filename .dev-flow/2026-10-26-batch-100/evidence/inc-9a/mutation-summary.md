@@ -5,7 +5,7 @@ E4 tester protocol: **KILLED** = a named node failed on an assertion; **SURVIVED
 = all named nodes passed; **INVALID** = mutant did not import/compile (none here).
 `LOCALAPPDATA` was pinned to the scratch folder for every run, and both frozen
 files' sha256 (`workspace.py` `a3342ed048ebe157`, `app.py` `6223201188232562`)
-were identical before the first and after the last mutant; `C:/Users/jjgh8/AppData/Local/s19_app`
+were identical before the first and after the last mutant; `<HOME>/AppData/Local/s19_app`
 did not exist before or after.
 
 | id | requirement | file | test | verdict |

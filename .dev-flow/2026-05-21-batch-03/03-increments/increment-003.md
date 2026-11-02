@@ -68,7 +68,7 @@ new dependency.
 
 ## 3. How to test
 
-Run from the repo root `C:\Users\jjgh8\Github\s19_app`:
+Run from the repo root `<HOME>\Github\s19_app`:
 
 ```
 python -m pytest -q tests/test_cdfx_display.py     # the new module

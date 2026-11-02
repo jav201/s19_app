@@ -3,12 +3,12 @@
 | Field | Value |
 |---|---|
 | Reviewer | `code-reviewer`. Independent: I did not write this code. The implementer was Kimi K2.8. |
-| Tree reviewed | worktree `C:\Users\jjgh8\Github\s19_app-b100-inc3`, detached at `dad6423`, with uncommitted changes. `app.py` sha256 `ca8e539b4c8c…`, equal to the HANDOFF's final hash. The worktree was never edited. My only command inside it was a read-only `pytest tests/test_id_registry.py` run with `PYTHONDONTWRITEBYTECODE=1 -p no:cacheprovider`; `git status` was unchanged afterwards. |
+| Tree reviewed | worktree `<HOME>\Github\s19_app-b100-inc3`, detached at `dad6423`, with uncommitted changes. `app.py` sha256 `ca8e539b4c8c…`, equal to the HANDOFF's final hash. The worktree was never edited. My only command inside it was a read-only `pytest tests/test_id_registry.py` run with `PYTHONDONTWRITEBYTECODE=1 -p no:cacheprovider`; `git status` was unchanged afterwards. |
 | Contract | `01-requirements.md`: HLR-165, LLR-165.1..165.4, P-25, P-26, LED .50 and .51. `design/ARQ-batch-100.md` §2.1–§2.3 (S1–S13, K1/K2, U1, the seam). `design/design-proposal-b100.md` §5.3. `kimi/BRIEF-inc-3.md`, `BRIEF-COMMON.md`. Precedents: `review-increment-001.md`, `review-increment-002.md`. |
 | Interpreter proof | s19env Python 3.11.15. `…\scratchpad\base\s19_app\__init__.py` (`git archive dad6423` + the new test file), `…\scratchpad\fixed\s19_app\__init__.py` (archive + the 3 changed files, `app.py` hash equal to the worktree), and one tree per mutant under `…\scratchpad\mut\<id>\`. `PYTHONPATH` = that tree, `NO_COLOR` unset (`env -u`), `PYTHONDONTWRITEBYTECODE=1`. |
 | **Verdict** | **approve-with-fixes.** Recorded token: **`BLOCK — BLOCK-UNTIL: F1`** (1 HIGH). This verdict authorises nothing. The increment does not advance until F1 is fixed and I have re-read the fix on the diff and re-run mutant R6. F2–F4 (MAJOR) should land in the same corrective pass. F2 and F3 each need an orchestrator ruling first. |
 
-`…\scratchpad` = `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad`.
+`…\scratchpad` = `<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad`.
 
 ## BLUF
 
@@ -132,7 +132,7 @@ Notes (no finding):
 | Field | Value |
 |---|---|
 | Reviewer | `code-reviewer`, the same reviewer as round 1. I did not write the fix. |
-| Tree re-read | worktree `C:\Users\jjgh8\Github\s19_app-b100-inc3` at `dad6423`, with Inc 3 and fix pass 1 uncommitted. `app.py` sha256 `18ee4d450529…`, equal to HANDOFF §"Fix pass 1". Still 1 SOURCE file. CRLF preserved: `app.py` 14508/14508, test file 885/885. The worktree was not edited. |
+| Tree re-read | worktree `<HOME>\Github\s19_app-b100-inc3` at `dad6423`, with Inc 3 and fix pass 1 uncommitted. `app.py` sha256 `18ee4d450529…`, equal to HANDOFF §"Fix pass 1". Still 1 SOURCE file. CRLF preserved: `app.py` 14508/14508, test file 885/885. The worktree was not edited. |
 | Contract | main `3d3cee0`: LED .55 (a) the notice wording `Closed the Patch Editor document (N entries); unsaved changes were not kept`; (b) the seam calls `panel.mark_loaded()`. `kimi/BRIEF-inc-3-fix1.md`. |
 | Interpreter proof | `…\scratchpad\fix1\s19_app\__init__.py`, a copy of the worktree's `s19_app` with an identical `app.py` (`cmp`). Mutant trees are under `…\scratchpad\mut1\<id>\`. `NO_COLOR` unset, s19env 3.11. |
 | **Verdict** | **approve — PASS-WITH-NOTES.** 0 HIGH open. **F1 is discharged**: I re-read the seeding on the diff and re-ran R6 myself, and it is now RED. F2–F11 are closed, with one exception. **R2-1 (MAJOR)** is new: `mark_loaded()` does not clear the paste buffer, which LED .55(b) and the packet both claim it does. It does not block, but it must be fixed in this increment or the ledger must be corrected before Inc 10. |
@@ -195,7 +195,7 @@ Notes (no finding):
 | Field | Value |
 |---|---|
 | Reviewer | `code-reviewer`, the same reviewer as rounds 1–2. I did not write the fix. |
-| Tree re-read | worktree `C:\Users\jjgh8\Github\s19_app-b100-inc3` at `dad6423`, with Inc 3 and fix passes 1–2 uncommitted. `app.py` sha256 `ddc64e1803ee…`. `git diff --name-only` lists `s19_app/tui/app.py` and `tests/test_id_registry.py` only, so **`screens_directionb.py` is untouched** (`git diff --quiet` ✓). Still 1 SOURCE file. CRLF preserved: 14511/14511. The worktree was not edited. |
+| Tree re-read | worktree `<HOME>\Github\s19_app-b100-inc3` at `dad6423`, with Inc 3 and fix passes 1–2 uncommitted. `app.py` sha256 `ddc64e1803ee…`. `git diff --name-only` lists `s19_app/tui/app.py` and `tests/test_id_registry.py` only, so **`screens_directionb.py` is untouched** (`git diff --quiet` ✓). Still 1 SOURCE file. CRLF preserved: 14511/14511. The worktree was not edited. |
 | Contract | `kimi/BRIEF-inc-3-fix2.md`; LED .55(b), with the buffer clear now delivered as worded |
 | Interpreter proof | `…\scratchpad\fix2\s19_app\__init__.py`, a copy with an `app.py` identical to the worktree (`cmp`). Mutants are in `…\scratchpad\mut2\<id>\`. `NO_COLOR` unset, s19env 3.11. |
 | **Verdict** | **approve — PASS.** R2-1 and R2-2 are closed. 0 HIGH and 0 MAJOR are open. |

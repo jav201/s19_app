@@ -1,6 +1,6 @@
 # command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_announce.py
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree) with mutation 178.1-fallback-called-recorded
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# tree: <HOME>\Github\s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree) with mutation 178.1-fallback-called-recorded
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
 # date: 2026-10-30T01:47:09+00:00
 # requirement: LLR-178.1
 # mutation: the composer reports 'recorded active' for the fallback (next valid) case — file s19_app/tui/services/variant_execution_service.py
@@ -29,7 +29,7 @@ E         + recorded
 tests\test_b100_announce.py:189: AssertionError
 _____________ test_tc_b100_55_latest_never_comes_from_file_times ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30151/test_tc_b100_55_latest_never_c0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30151/test_tc_b100_55_latest_never_c0')
 
     def test_tc_b100_55_latest_never_comes_from_file_times(tmp_path: Path) -> None:
         """A touched (newer) file is never called latest: only the variant the
@@ -57,7 +57,7 @@ E         Use -v to get more diff
 tests\test_b100_announce.py:244: AssertionError
 ______ test_at_b100_19_the_panel_names_the_opened_variant_and_why[size0] ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30151/test_at_b100_19_the_panel_name0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30151/test_at_b100_19_the_panel_name0')
 size = (118, 54)
 
     @pytest.mark.parametrize("size", SIZES)
@@ -136,7 +136,7 @@ E       assert 'the next valid variant (the recorded one is missing or not reada
 tests\test_b100_announce.py:544: AssertionError
 ______ test_at_b100_19_the_panel_names_the_opened_variant_and_why[size1] ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30151/test_at_b100_19_the_panel_name1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30151/test_at_b100_19_the_panel_name1')
 size = (220, 60)
 
     @pytest.mark.parametrize("size", SIZES)

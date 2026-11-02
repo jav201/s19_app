@@ -5,9 +5,9 @@ VERDICT: PASS-WITH-NOTES — 0 HIGH, 0 MAJOR, 3 MINOR, 5 NIT. Nothing found lets
 | Field | Value |
 |---|---|
 | **Reviewer** | `security-reviewer`, independent, read-only toward the source and the tests |
-| **Subject** | `git diff 4fef292 -- s19_app tests` in the worktree `C:\Users\jjgh8\Github\s19_app-b100-inc9a` (branch `b100-inc9a`, uncommitted): `s19_app/tui/workspace.py` (`recent_store_path`, `recent_kind`, `_recent_entry_ok`, `read_recent_sources`, `_encode_recent_store`, `record_recent_source`, `list_workarea_files`), `s19_app/tui/app.py` (`_typed_load_route`, `_load_path_from_user_input`, the listing check in `_handle_load_project`, the R14 skip in `list_projects`, `refresh_files`, the record calls in `load_from_path` / `load_a2l_from_path`), `tests/conftest.py` (C8 guard), the `tests/test_b99_staging.py` allow-list re-pin |
+| **Subject** | `git diff 4fef292 -- s19_app tests` in the worktree `<HOME>\Github\s19_app-b100-inc9a` (branch `b100-inc9a`, uncommitted): `s19_app/tui/workspace.py` (`recent_store_path`, `recent_kind`, `_recent_entry_ok`, `read_recent_sources`, `_encode_recent_store`, `record_recent_source`, `list_workarea_files`), `s19_app/tui/app.py` (`_typed_load_route`, `_load_path_from_user_input`, the listing check in `_handle_load_project`, the R14 skip in `list_projects`, `refresh_files`, the record calls in `load_from_path` / `load_a2l_from_path`), `tests/conftest.py` (C8 guard), the `tests/test_b99_staging.py` allow-list re-pin |
 | **Design context read** | `inc-9a/E3-security.md` (rounds 1–2), `inc-9a/E3-rulings.md` R1–R17, `01-requirements.md` LLR-172.1*–172.6a, `inc-9a/E4-integration-notes.md` |
-| **Execution** | Three probe scripts run from a session scratch folder with s19env Python `-I`, the worktree first on `sys.path` (each printed `import: C:\Users\jjgh8\Github\s19_app-b100-inc9a\s19_app\__init__.py`), `LOCALAPPDATA` set to a scratch folder and asserted before any call. The real `%LOCALAPPDATA%` was never a target. Targeted test run: `tests/test_b100_recents.py` with `LOCALAPPDATA` set to a scratch folder (result in §3). No source, test or requirement was edited; `git status` showed the same set before and after. |
+| **Execution** | Three probe scripts run from a session scratch folder with s19env Python `-I`, the worktree first on `sys.path` (each printed `import: <HOME>\Github\s19_app-b100-inc9a\s19_app\__init__.py`), `LOCALAPPDATA` set to a scratch folder and asserted before any call. The real `%LOCALAPPDATA%` was never a target. Targeted test run: `tests/test_b100_recents.py` with `LOCALAPPDATA` set to a scratch folder (result in §3). No source, test or requirement was edited; `git status` showed the same set before and after. |
 
 ## 1 · Findings
 
@@ -40,7 +40,7 @@ VERDICT: PASS-WITH-NOTES — 0 HIGH, 0 MAJOR, 3 MINOR, 5 NIT. Nothing found lets
 
 ## 3 · Tests run
 
-`env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<scratch>\lad-run C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q -rs tests/test_b100_recents.py` (cwd = worktree): **141 passed in 269.08 s, 0 skipped, 0 failed, exit 0** (`executed`). Windows-only arms ran, including the symlink, junction, `\\?\` and 8.3 arms. No test in the suite covers SEC9-1, SEC9-2 or SEC9-3; the arms that would are proposed in §1.
+`env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<scratch>\lad-run <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q -rs tests/test_b100_recents.py` (cwd = worktree): **141 passed in 269.08 s, 0 skipped, 0 failed, exit 0** (`executed`). Windows-only arms ran, including the symlink, junction, `\\?\` and 8.3 arms. No test in the suite covers SEC9-1, SEC9-2 or SEC9-3; the arms that would are proposed in §1.
 
 ## 4 · Evidence checklist
 

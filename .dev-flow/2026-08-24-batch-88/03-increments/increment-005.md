@@ -80,10 +80,10 @@ pinned by `A8`, so that changing it later is a decision and not an accident.
 
 | File | Kind | Change |
 |---|---|---|
-| `C:\Users\jjgh8\.claude\docs\tools\devflow-validate.py` | source | `_artifacts` body (9 lines, including the direct-child traversal guard) + full docstring replacement; two new helpers `_art_live_root` / `_art_why`, following the `_v2_live_root` / `_v2_why` pattern; the `rev39` arm comment at `:3958` corrected (`R-88-12`); **32** arms added |
-| `C:\Users\jjgh8\.claude\skills\dev-flow\scripts\devflow-validate.py` | build output | `--sync-bundle` mirror; `V15` reports *bundle identical* |
-| `C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-08-24-batch-88\03-increments\increment-005.md` | record | this packet |
-| `C:\Users\jjgh8\Github\s19_app\.dev-flow\_derived\` | derived | Atlas regenerated with `--atlas --write` **after** this packet existed |
+| `<HOME>\.claude\docs\tools\devflow-validate.py` | source | `_artifacts` body (9 lines, including the direct-child traversal guard) + full docstring replacement; two new helpers `_art_live_root` / `_art_why`, following the `_v2_live_root` / `_v2_why` pattern; the `rev39` arm comment at `:3958` corrected (`R-88-12`); **32** arms added |
+| `<HOME>\.claude\skills\dev-flow\scripts\devflow-validate.py` | build output | `--sync-bundle` mirror; `V15` reports *bundle identical* |
+| `<HOME>\Github\s19_app\.dev-flow\2026-08-24-batch-88\03-increments\increment-005.md` | record | this packet |
+| `<HOME>\Github\s19_app\.dev-flow\_derived\` | derived | Atlas regenerated with `--atlas --write` **after** this packet existed |
 
 | **SOURCE files** | **`1`** / 4 — the bundle is a declared build output, the packet is a record, the Atlas is derived |
 |---|---|

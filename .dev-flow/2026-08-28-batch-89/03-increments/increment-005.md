@@ -19,10 +19,10 @@
 **`run()` now prints three preflight lines before any rule runs.** Live output, this machine:
 
 ```
-devflow-validate · C:\Users\jjgh8\Github\s19_app
+devflow-validate · <HOME>\Github\s19_app
   git · 2.49.0, at or above the 2.28.0 floor
   stdout · encoding `utf-8`, errors `backslashreplace` -- every finding is emitted verbatim
-  filesystem · FOLDS CASE -- probed at C:\Users\jjgh8\AppData\Local\Temp, on the same volume as the tree under check
+  filesystem · FOLDS CASE -- probed at <HOME>\AppData\Local\Temp, on the same volume as the tree under check
 ```
 
 **All three were already assumed by rules that ship, and none was reported.** `V16`, `V25`,

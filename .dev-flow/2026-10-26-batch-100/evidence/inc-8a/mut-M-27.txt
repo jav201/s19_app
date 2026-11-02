@@ -9,13 +9,13 @@
 #   |             elif document_write_failure is not None:
 #   |                 document_lines.append(document_write_failure)
 #   |                 carried_active_document = None
-# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d
+# cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d
 # env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
-# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_save_guards.py::test_tc_b100_05_r3_failed_write_carries_the_target_document
+# command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_save_guards.py::test_tc_b100_05_r3_failed_write_carries_the_target_document
 # started 2026-10-30T23:11:18Z  finished 2026-10-30T23:11:22Z  rc=1
 F                                                                        [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d\tests\test_b100_save_guards.py:2572: AssertionError: {'active_variant': 'firmware_1', 'assignments': {}, 'batch': [], 'derived_from': {'firmware_1.s19': {'base': 'firmware.s19', 'differ': 4, 'sha256': '8a35f3808f25ff85a9ce1100bbce23783a7031b82c6f3d14cc1f749a0df40e51'}}, ...}
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d\tests\test_b100_save_guards.py:2572: AssertionError: {'active_variant': 'firmware_1', 'assignments': {}, 'batch': [], 'derived_from': {'firmware_1.s19': {'base': 'firmware.s19', 'differ': 4, 'sha256': '8a35f3808f25ff85a9ce1100bbce23783a7031b82c6f3d14cc1f749a0df40e51'}}, ...}
 =========================== short test summary info ===========================
 FAILED tests/test_b100_save_guards.py::test_tc_b100_05_r3_failed_write_carries_the_target_document
 1 failed in 2.85s

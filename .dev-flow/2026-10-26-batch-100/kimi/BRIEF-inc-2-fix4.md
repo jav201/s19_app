@@ -1,11 +1,11 @@
 # Kimi brief — batch-100 Increment 2 · redesign of the failed-save rollback (operator decision)
 
-Work in the same worktree, `C:\Users\jjgh8\Github\s19_app-b100-inc2`. It holds Inc 2 plus fix passes 1–3, uncommitted; keep them. `BRIEF-COMMON.md` still applies.
+Work in the same worktree, `<HOME>\Github\s19_app-b100-inc2`. It holds Inc 2 plus fix passes 1–3, uncommitted; keep them. `BRIEF-COMMON.md` still applies.
 
 **The SOURCE files are now 3:** `app.py`, `workspace.py` and `s19_app/tui/services/project_gather_service.py` (LED .53).
 
 **Read first, in the MAIN checkout:**
-- `C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-10-26-batch-100\01-requirements-ledger.md` → LED .53. This is the operator's ruling.
+- `<HOME>\Github\s19_app\.dev-flow\2026-10-26-batch-100\01-requirements-ledger.md` → LED .53. This is the operator's ruling.
 - `...\03-increments\security-increment-002.md` → "Round 3", findings SEC2-5 and SEC2-6. It includes the probe cases R7 and R8 in `...\scratchpad\probes\sec_inc2_r3_probe.py`.
 
 **The design (LED .53):** a failed save removes EXACTLY what THIS save created.

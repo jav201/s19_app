@@ -1,7 +1,7 @@
 ============================= test session starts =============================
-platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- <HOME>\anaconda3\envs\s19env\python.exe
 cachedir: .pytest_cache
-rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc3b
+rootdir: <HOME>\Github\s19_app-b99-inc3b
 configfile: pyproject.toml
 plugins: textual-snapshot-1.1.0, syrupy-4.8.0
 collecting ... collected 31 items / 29 deselected / 2 selected
@@ -12,7 +12,7 @@ tests/test_b99_staging.py::test_tc_b99_13_no_final_name_replace_outside_placemen
 ================================== FAILURES ===================================
 ______________ test_tc_b99_13_gather_drift_places_next_free_name ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26576/test_tc_b99_13_gather_drift_pl0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26576/test_tc_b99_13_gather_drift_pl0')
 
     def test_tc_b99_13_gather_drift_places_next_free_name(tmp_path: Path) -> None:
         """LLR-155.3 (LED .7): the gather's drift limb rides HLR-155's placement

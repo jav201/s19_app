@@ -253,7 +253,7 @@ review packet. The operator judges on the page, not in chat.
 
 ---
 
-## 7 · Evidence and tooling (all under `C:\Users\jjgh8\Github\s19_app\prototypes\b94_polish\`)
+## 7 · Evidence and tooling (all under `<HOME>\Github\s19_app\prototypes\b94_polish\`)
 
 - `b94_polish.html` — the review page: baseline findings, brief, the 12 variants at 118x54,
   batch-96 section, verdict form, **§7 the 220x60 pass**, method.
@@ -283,7 +283,7 @@ review packet. The operator judges on the page, not in chat.
   (replace the `sys.path` insert of `_APP_COPY` with the repo root) or refresh `appcopy/` from the
   branch under review with `git archive`. Scenarios: `patch-editor`, `check-editor`,
   `flow-builder`, `flow-builder-ext`, `flow-execution`, `flow-execution-paused`.
-  Python: `C:\Users\jjgh8\anaconda3\envs\s19env\python.exe`; clear `NO_COLOR` before any run.
+  Python: `<HOME>\anaconda3\envs\s19env\python.exe`; clear `NO_COLOR` before any run.
 
 ---
 

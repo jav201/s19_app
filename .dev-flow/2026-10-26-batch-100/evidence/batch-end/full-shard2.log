@@ -1,5 +1,5 @@
 9e4dd3b
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\s19_app\__init__.py
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\s19_app\__init__.py
 ..................................................FF.F.................. [  5%]
 ........................................................................ [ 11%]
 ..................................................F..................... [ 17%]
@@ -19,54 +19,54 @@ C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-
 FFFFFFFFFFFFFFFFFFF..................................................... [ 99%]
 .........                                                                [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b100_active_variant.py:711: AssertionError: 1.1221655999543145
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b100_active_variant.py:711: AssertionError: 1.0316967000253499
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b100_active_variant.py:711: AssertionError: 1.4375495000276715
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b100_project_homes.py:2110: AssertionError: WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/fb2/bt/test_e4_llr_171_1m_rebind_only1/app/.s19tool/workarea/Q/patches/x.json')
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b100_save_guards.py:709: AssertionError: ['Project NOT saved: path too long — shorten the name.', 'Project NOT saved: name too long (at most 64 characters) — shorten the name.', 'Project NOT saved: name too long (at most 64 characters) — shorten the name.']
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b100_save_guards.py:722: AssertionError: tmp_path too deep for the L = 150 enabler: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\fb2\bt\test_tc_b100_06_path_limit_met0\.s19tool\workarea
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b100_save_guards.py:2511: AssertionError: Save project took 1.493 s
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_commandbar.py:2704: AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_patch_glyphs.py:356: AssertionError: PRECONDITION: the run must render real verdicts before the mutation, or the post-mutation assertion is vacuous
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1270: AssertionError: public s19 fixture must live in a pytest temp dir, got C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\fb2\bt\snapshot_public0\snap.s19
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b100_active_variant.py:711: AssertionError: 1.1221655999543145
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b100_active_variant.py:711: AssertionError: 1.0316967000253499
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b100_active_variant.py:711: AssertionError: 1.4375495000276715
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b100_project_homes.py:2110: AssertionError: WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/fb2/bt/test_e4_llr_171_1m_rebind_only1/app/.s19tool/workarea/Q/patches/x.json')
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b100_save_guards.py:709: AssertionError: ['Project NOT saved: path too long — shorten the name.', 'Project NOT saved: name too long (at most 64 characters) — shorten the name.', 'Project NOT saved: name too long (at most 64 characters) — shorten the name.']
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b100_save_guards.py:722: AssertionError: tmp_path too deep for the L = 150 enabler: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\fb2\bt\test_tc_b100_06_path_limit_met0\.s19tool\workarea
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b100_save_guards.py:2511: AssertionError: Save project took 1.493 s
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_commandbar.py:2704: AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_patch_glyphs.py:356: AssertionError: PRECONDITION: the run must render real verdicts before the mutation, or the post-mutation assertion is vacuous
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1220: AssertionError: assert False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_snapshot.py:1270: AssertionError: public s19 fixture must live in a pytest temp dir, got <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\fb2\bt\snapshot_public0\snap.s19
 --------------------------- snapshot report summary ---------------------------
 29 snapshots failed.
 [1;31mTextual Snapshot Report[0m
 
 [1;30;41m29[0m[30;41m mismatched snapshots[0m
 
-[1mView the [0m]8;id=2345299;file://C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+[1mView the [0m]8;id=2345299;file://<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
 
-[2mC:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\[0m[2;93ma8feab43-c248-4ccb-[0m
+[2m<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\[0m[2;93ma8feab43-c248-4ccb-[0m
 [2;93m86cf-122b894659b2[0m[2m\scratchpad\full\snapshot_report.html[0m
 
 =========================== short test summary info ===========================

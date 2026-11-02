@@ -1,10 +1,10 @@
 # Kimi brief — batch-100 Increment 1 · corrective pass 1
 
-The same worktree, `C:\Users\jjgh8\Github\s19_app-b100-inc1`, already holds your Inc 1 changes, uncommitted. Keep them. `BRIEF-COMMON.md` still applies.
+The same worktree, `<HOME>\Github\s19_app-b100-inc1`, already holds your Inc 1 changes, uncommitted. Keep them. `BRIEF-COMMON.md` still applies.
 
 **Read first, from the MAIN checkout (absolute paths; your worktree copies are older):**
-- `C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-10-26-batch-100\03-increments\review-increment-001.md`, the code-reviewer's findings F1–F11.
-- `C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-10-26-batch-100\01-requirements.md`, the amended LLR-163.1 (grep `### LLR-163.1`), and `01-requirements-ledger.md` LED .49.
+- `<HOME>\Github\s19_app\.dev-flow\2026-10-26-batch-100\03-increments\review-increment-001.md`, the code-reviewer's findings F1–F11.
+- `<HOME>\Github\s19_app\.dev-flow\2026-10-26-batch-100\01-requirements.md`, the amended LLR-163.1 (grep `### LLR-163.1`), and `01-requirements-ledger.md` LED .49.
 
 **SOURCE files are now 4 (⚠ at cap, LED .49):** `workspace.py`, `segment_split_view.py`, `app.py`, and `s19_app/tui/services/project_gather_service.py`. Packet §2 states why the increment cannot be smaller: the gather is a writer that resolves its destination before the guard, so the guard has to see that destination unresolved.
 

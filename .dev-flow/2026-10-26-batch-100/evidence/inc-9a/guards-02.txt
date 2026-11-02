@@ -1,10 +1,10 @@
 # guards-02 (final): the guards-01 command (8b guard set: test_import_census, test_tui_snapshot, test_id_registry, test_batch91_registry_hygiene, test_address_census, test_engine_unchanged), after the E5 corrective pass
 # date: 2026-10-31T07:45:10-06:00
-# cwd: C:/Users/jjgh8/Github/s19_app-b100-inc9a
+# cwd: <HOME>/Github/s19_app-b100-inc9a
 # sha256[:16] workspace.py=0af4b92489233ff2 app.py=bbf04117fbf0d3f5
-# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc9a\s19_app\__init__.py
+# s19_app.__file__ = <HOME>\Github\s19_app-b100-inc9a\s19_app\__init__.py
 # env: env -u NO_COLOR LOCALAPPDATA=<scratchpad>/e5fix/lad/<run id> PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=.
-# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_import_census.py tests/test_tui_snapshot.py tests/test_id_registry.py tests/test_batch91_registry_hygiene.py tests/test_address_census.py tests/test_engine_unchanged.py -rfE
+# command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_import_census.py tests/test_tui_snapshot.py tests/test_id_registry.py tests/test_batch91_registry_hygiene.py tests/test_address_census.py tests/test_engine_unchanged.py -rfE
 
 ........................................................................ [ 96%]
 ...                                                                      [100%]

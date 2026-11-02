@@ -1,9 +1,9 @@
 # Kimi brief — batch-100 Increment 3 · corrective pass 1
 
-You work in the same worktree, `C:\Users\jjgh8\Github\s19_app-b100-inc3`. It holds your Inc 3 changes, uncommitted; keep them. `BRIEF-COMMON.md` still applies. SOURCE files stay at 1: `app.py`.
+You work in the same worktree, `<HOME>\Github\s19_app-b100-inc3`. It holds your Inc 3 changes, uncommitted; keep them. `BRIEF-COMMON.md` still applies. SOURCE files stay at 1: `app.py`.
 
 **Read first (MAIN checkout):**
-- `C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-10-26-batch-100\03-increments\review-increment-003.md` (F1–F11). The reviewer's mutant R6 and probes are in `...\scratchpad\mut\` and `...\scratchpad\probes\`.
+- `<HOME>\Github\s19_app\.dev-flow\2026-10-26-batch-100\03-increments\review-increment-003.md` (F1–F11). The reviewer's mutant R6 and probes are in `...\scratchpad\mut\` and `...\scratchpad\probes\`.
 - `01-requirements-ledger.md` LED .55 (orchestrator rulings on F2 and F3).
 
 **Fix:**

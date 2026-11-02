@@ -1,7 +1,7 @@
 # isolation run: at077c + at_056e against HEAD sources
 >       return io.open(self, mode, buffering, encoding, errors, newline)
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\Github\\s19_app-b99-inc11\\prototypes\\cambios_10_12_2026\\help_sections.md'
+E       FileNotFoundError: [Errno 2] No such file or directory: '<HOME>\\Github\\s19_app-b99-inc11\\prototypes\\cambios_10_12_2026\\help_sections.md'
 
 ..\..\anaconda3\envs\s19env\Lib\pathlib.py:1044: FileNotFoundError
 =========================== short test summary info ===========================

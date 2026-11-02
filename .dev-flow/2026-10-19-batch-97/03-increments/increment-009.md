@@ -47,7 +47,7 @@
 
 | Evidence | File | SHA-256 |
 |---|---|---|
-| RED (1 failed, HEAD screens.py) | `.dev-flow/2026-10-19-batch-97/evidence/inc-9/red.txt` | `fb3289e5ef7f4a58403549001c7f7be35eeeee35f1324078d9e225c24dffc4f6` |
+| RED (1 failed, HEAD screens.py) | `.dev-flow/2026-10-19-batch-97/evidence/inc-9/red.txt` | `596e95bbd37c2df70e08364a3f75527bd7db4ddcc2f3c957b137339c55ac8158` |
 | Mutants (2/2 killed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-9/mutations.txt` | `e159a0f5baa6995ce5d9c2ed9531469574915cd5bf525c7ccf2cf44f6b9003eb` |
 | Mutant script | `.dev-flow/2026-10-19-batch-97/evidence/inc-9/mutate.py` | `c6b1014fbe8dc29f09b0d6b7165f3a1028cc2fe71158c256e3195a34a347549f` |
 | GREEN gate (594 passed / 3 baseline failed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-9/green.txt` | `6cddb37c10e983a8194832c5dbcef1af477d0d4fc42d0d963e0a87f0f31e484c` |

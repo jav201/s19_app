@@ -1,7 +1,7 @@
 # Inc 12b E4 integration — green-01-new
 # sha: ef0cdb8d03d6481a06a80d6276b66a3a0871fd04 (+ working-tree edits); app.py sha256[:16]=6ada85782fdd80de a2l.py=d70b17982f1cee30 styles.tcss=f7b4f75911b296a4
-# s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc12b\s19_app\__init__.py
-# command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int12b/lad/green-01-new C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int12b/bt/green-01-new -q --no-header --tb=short -rfEXx <nodes>
+# s19_app.__file__: <HOME>\Github\s19_app-b100-inc12b\s19_app\__init__.py
+# command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int12b/lad/green-01-new <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider --basetemp=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int12b/bt/green-01-new -q --no-header --tb=short -rfEXx <nodes>
 # nodes:
 #   tests/test_b100_workers.py
 #   tests/test_b100_a2l_progress.py

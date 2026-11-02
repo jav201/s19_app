@@ -1,10 +1,10 @@
 == Guards re-run alone: the green-04 session-teardown error came from a debug script (outside pytest's guard) that wrote the recent store under the shared scratch LOCALAPPDATA at 13:19:46Z during that session; stray file removed first
-tree: C:/Users/jjgh8/Github/s19_app-b100-inc12b  (git HEAD 81ac4c0)
+tree: <HOME>/Github/s19_app-b100-inc12b  (git HEAD 81ac4c0)
 date: 2026-11-01T13:24:45Z
-s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc12b\s19_app\__init__.py
+s19_app.__file__: <HOME>\Github\s19_app-b100-inc12b\s19_app\__init__.py
 source sha256[:16]: app.py 46f7ee6aa8a0fbfb  a2l.py 73c3820fe0d6ecd2  styles.tcss f7b4f75911b296a4
-env: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12b/la
-cmd: pytest -p no:cacheprovider --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12b/bt/green04b -rA tests/test_id_registry.py tests/test_b99_staging.py
+env: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12b/la
+cmd: pytest -p no:cacheprovider --basetemp=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12b/bt/green04b -rA tests/test_id_registry.py tests/test_b99_staging.py
 ............................................                             [100%]
 =================================== PASSES ====================================
 =========================== short test summary info ===========================

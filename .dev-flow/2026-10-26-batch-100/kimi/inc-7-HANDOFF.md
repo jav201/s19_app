@@ -4,7 +4,7 @@ State: Parts A, B, C code and tests DONE; GREEN on the tree for every touched mo
 (run during authoring). RED on base DONE. No commit. Ending at ~190k context per the
 brief; resume with the steps below.
 
-Scratch: `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc7-impl\`
+Scratch: `<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc7-impl\`
 - `run_pytest.sh <tree> <out> <label> <pytest args>` — writes a transcript with the header
   (command, tree, PYTHONPATH, NO_COLOR, import proof, 4 source hashes).
 - `mutate.py [ids…]` — 19 mutants (C-40); each writes `evidence/inc-7/mut-<id>.txt`,
@@ -39,7 +39,7 @@ Remaining steps (in order; never run mutations while any other pytest runs on th
    RED table, instrument RED-proof, mutation table, reverse census + re-pin list below, ledger,
    evidence table via devflow-evidence.py), PENDING_SECTION6, PENDING_CHECKLIST (16 rows, copy
    increment-006.md's shape). Then
-   `C:/Users/jjgh8/anaconda3/envs/s19env/python.exe C:/Users/jjgh8/.claude/docs/tools/devflow-evidence.py --root . <evidence files> --write .dev-flow/2026-10-26-batch-100/03-increments/increment-007.md`
+   `<HOME>/anaconda3/envs/s19env/python.exe <HOME>/.claude/docs/tools/devflow-evidence.py --root . <evidence files> --write .dev-flow/2026-10-26-batch-100/03-increments/increment-007.md`
 6. Remove the base worktree; end this file with `__KIMI_UNIT_DONE__` + 5-line summary.
 
 Re-pins (test::node — old → new — requirement):
@@ -122,7 +122,7 @@ __KIMI_UNIT_DONE__
 
 ## Corrective pass 1 (cp1, 2026-10-30) — resume here
 
-Scratch: `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp7-1\`
+Scratch: `<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp7-1\`
 (`run.sh <tree> <out> <label> <pytest args>`; `mutate_cp1.py` = 19 cp1 mutants -> `mut-cp1-<id>.txt`;
 `mutate_prior.py` = the 23 earlier mutants on the cp1 tree -> `mut-cp1-prior-<id>.txt`; `pre/` = copy of the
 pre-fix sources (hashes b3a8da7ae550bda5 / bd33c8be189d2c87 / 0e29d80841fa3f38 / e23ea8f72bc93153) with the cp1
@@ -155,7 +155,7 @@ Remaining (in order, serial, nothing else running): green-cp1-touched-modules.tx
 
 ## Corrective pass 2 (cp2, 2026-10-30) — resume here
 
-Scratch: `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp7-2\`
+Scratch: `<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp7-2\`
 (`pre/` = full tree copy of the cp1 sources, hashes ab36c9a2a6216de5 / aae7d7fdde4d735e / 3b46619711652f9c / 49d6efdc73e26b28,
 verified; `run.sh <tree> <out> <label> <pytest args>`; `nodes_cp2.txt` = the cp2 arm list; `patch_*.py` = the edits applied, CRLF-aware).
 
@@ -191,7 +191,7 @@ Remaining: RED on cp7-2/pre -> mutants (cp2 + prior 42) -> green touched modules
   FINAL-FINAL hashes: manifest_writer 3711eba2c27f3691; variant_execution_service 425f610345f263c6; app bd4dca9461d381c5; screens 49d6efdc73e26b28; 
   RESUME: (1) bash scratchpad/cp7-2/chain.sh (re-runs red, 50 mutants, green, probes, census, guards; ~2 h, serial);
   (2) packet §4 "Corrective pass 2 — results" + §6 cp2 dispositions + checklist rows 2/4/5/11 + §7, then
-  python C:/Users/jjgh8/.claude/docs/tools/devflow-evidence.py --root <worktree> <cp2 evidence files> --write <packet>;
+  python <HOME>/.claude/docs/tools/devflow-evidence.py --root <worktree> <cp2 evidence files> --write <packet>;
   (3) report via SubagentHandback. Pieces drafted: §1/§2/§3 already in the packet.
 - Chain on 3711eba2/425f6103/bd4dca94: 9 save_guards nodes failed (their stubs return SimpleNamespace findings without
   `.details`) -> app.py reads `getattr(issue, "details", {})`; mutant SEC7-R2-3-class target re-anchored (line now ends with ",").

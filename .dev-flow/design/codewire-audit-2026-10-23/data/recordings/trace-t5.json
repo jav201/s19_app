@@ -637,12 +637,12 @@
    "test": "cwaudit/test_t5_project.py::test_t5a_save_load_resave_case01",
    "depth": 0,
    "in": {
-    "source": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\src\\firmware.s19",
-    "destination": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp"
+    "source": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\src\\firmware.s19",
+    "destination": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp"
    },
-   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
+   "out": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -653,7 +653,7 @@
      "S31580000070303132333435363738393A3B3C3D3E3F82",
      "S705800000007A"
     ],
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\src\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\src\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -670,16 +670,16 @@
    "test": "cwaudit/test_t5_project.py::test_t5a_save_load_resave_case01",
    "depth": 0,
    "in": {
-    "source": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\src\\firmware.mac",
-    "destination": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp"
+    "source": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\src\\firmware.mac",
+    "destination": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp"
    },
-   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac",
+   "out": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac",
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac": [
      "; Synthetic MAC",
      "BLOCK_A=80000000"
     ],
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\src\\firmware.mac": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\src\\firmware.mac": [
      "; Synthetic MAC",
      "BLOCK_A=80000000"
     ]
@@ -689,12 +689,12 @@
    "test": "cwaudit/test_t5_project.py::test_t5a_save_load_resave_case01",
    "depth": 0,
    "in": {
-    "source": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\src\\firmware.a2l",
-    "destination": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp"
+    "source": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\src\\firmware.a2l",
+    "destination": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp"
    },
-   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.a2l",
+   "out": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.a2l",
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.a2l": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.a2l": [
      "/begin PROJECT CASE01 \"Synthetic project for S19Tool stress testing\"",
      "  /begin HEADER",
      "    VERSION \"1.0\"",
@@ -749,7 +749,7 @@
      "  /end MODULE",
      "/end PROJECT"
     ],
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\src\\firmware.a2l": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\src\\firmware.a2l": [
      "/begin PROJECT CASE01 \"Synthetic project for S19Tool stress testing\"",
      "  /begin HEADER",
      "    VERSION \"1.0\"",
@@ -810,12 +810,12 @@
    "test": "cwaudit/test_t5_project.py::test_t5a_save_load_resave_case01",
    "depth": 1,
    "in": {
-    "source": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
-    "destination": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P"
+    "source": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
+    "destination": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P"
    },
-   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
+   "out": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -826,7 +826,7 @@
      "S31580000070303132333435363738393A3B3C3D3E3F82",
      "S705800000007A"
     ],
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -843,16 +843,16 @@
    "test": "cwaudit/test_t5_project.py::test_t5a_save_load_resave_case01",
    "depth": 1,
    "in": {
-    "source": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac",
-    "destination": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P"
+    "source": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac",
+    "destination": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P"
    },
-   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.mac",
+   "out": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.mac",
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.mac": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.mac": [
      "; Synthetic MAC",
      "BLOCK_A=80000000"
     ],
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac": [
      "; Synthetic MAC",
      "BLOCK_A=80000000"
     ]
@@ -862,12 +862,12 @@
    "test": "cwaudit/test_t5_project.py::test_t5a_save_load_resave_case01",
    "depth": 1,
    "in": {
-    "source": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.a2l",
-    "destination": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P"
+    "source": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.a2l",
+    "destination": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P"
    },
-   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
+   "out": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l": [
      "/begin PROJECT CASE01 \"Synthetic project for S19Tool stress testing\"",
      "  /begin HEADER",
      "    VERSION \"1.0\"",
@@ -922,7 +922,7 @@
      "  /end MODULE",
      "/end PROJECT"
     ],
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.a2l": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.a2l": [
      "/begin PROJECT CASE01 \"Synthetic project for S19Tool stress testing\"",
      "  /begin HEADER",
      "    VERSION \"1.0\"",
@@ -985,12 +985,12 @@
    "test": "cwaudit/test_t5_project.py::test_t5a_save_load_resave_case01",
    "depth": 0,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
     "a2l_files": null
    },
    "out": {
     "LoadedFile": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
      "file_type": "s19",
      "mem_map": {
       "0x0": 67,
@@ -1114,7 +1114,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -1131,12 +1131,12 @@
    "test": "cwaudit/test_t5_project.py::test_t5a_save_load_resave_case01",
    "depth": 0,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac",
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac",
     "a2l_files": null
    },
    "out": {
     "LoadedFile": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
      "file_type": "s19",
      "mem_map": {
       "0x0": 67,
@@ -1213,7 +1213,7 @@
      "errors": [],
      "a2l_path": null,
      "a2l_data": null,
-     "mac_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac",
+     "mac_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac",
      "mac_records": [
       {
        "line_number": 1,
@@ -1279,7 +1279,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac": [
      "; Synthetic MAC",
      "BLOCK_A=80000000"
     ]
@@ -1289,14 +1289,14 @@
    "test": "cwaudit/test_t5_project.py::test_t5a_save_load_resave_case01",
    "depth": 1,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
     "a2l_files": [
-     "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l"
+     "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l"
     ]
    },
    "out": {
     "LoadedFile": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
      "file_type": "s19",
      "mem_map": {
       "0x0": 67,
@@ -1371,9 +1371,9 @@
       true
      ],
      "errors": [],
-     "a2l_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
+     "a2l_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
      "a2l_data": {
-      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
+      "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
       "sections": [
        {
         "name": "PROJECT",
@@ -1560,7 +1560,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l": [
      "/begin PROJECT CASE01 \"Synthetic project for S19Tool stress testing\"",
      "  /begin HEADER",
      "    VERSION \"1.0\"",
@@ -1615,7 +1615,7 @@
      "  /end MODULE",
      "/end PROJECT"
     ],
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -1632,14 +1632,14 @@
    "test": "cwaudit/test_t5_project.py::test_t5a_save_load_resave_case01",
    "depth": 1,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.mac",
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.mac",
     "a2l_files": [
-     "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l"
+     "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l"
     ]
    },
    "out": {
     "LoadedFile": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
      "file_type": "s19",
      "mem_map": {
       "0x0": 67,
@@ -1714,9 +1714,9 @@
       true
      ],
      "errors": [],
-     "a2l_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
+     "a2l_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
      "a2l_data": {
-      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
+      "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
       "sections": [
        {
         "name": "PROJECT",
@@ -1856,7 +1856,7 @@
       },
       "compu_tabs_by_name": {}
      },
-     "mac_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.mac",
+     "mac_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.mac",
      "mac_records": [
       {
        "line_number": 1,
@@ -1922,7 +1922,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l": [
      "/begin PROJECT CASE01 \"Synthetic project for S19Tool stress testing\"",
      "  /begin HEADER",
      "    VERSION \"1.0\"",
@@ -1977,7 +1977,7 @@
      "  /end MODULE",
      "/end PROJECT"
     ],
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.mac": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.mac": [
      "; Synthetic MAC",
      "BLOCK_A=80000000"
     ]
@@ -1989,11 +1989,11 @@
    "test": "cwaudit/test_t5_project.py::test_t5a_save_load_resave_case01",
    "depth": 1,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19"
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19"
    },
    "out": {
     "S19File": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
      "records": [
       {
        "SRecord": {
@@ -2235,7 +2235,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -2252,11 +2252,11 @@
    "test": "cwaudit/test_t5_project.py::test_t5a_save_load_resave_case01",
    "depth": 0,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19"
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19"
    },
    "out": {
     "S19File": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
      "records": [
       {
        "SRecord": {
@@ -2498,7 +2498,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -2515,11 +2515,11 @@
    "test": "cwaudit/test_t5_project.py::test_t5a_save_load_resave_case01",
    "depth": 0,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19"
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19"
    },
    "out": {
     "S19File": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
      "records": [
       {
        "SRecord": {
@@ -2761,7 +2761,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -2778,11 +2778,11 @@
    "test": "cwaudit/test_t5_project.py::test_t5a_save_load_resave_case01",
    "depth": 0,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19"
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19"
    },
    "out": {
     "S19File": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
      "records": [
       {
        "SRecord": {
@@ -3024,7 +3024,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -3041,11 +3041,11 @@
    "test": "cwaudit/test_t5_project.py::test_t5a_save_load_resave_case01",
    "depth": 2,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19"
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19"
    },
    "out": {
     "S19File": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
      "records": [
       {
        "SRecord": {
@@ -3287,7 +3287,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -3304,11 +3304,11 @@
    "test": "cwaudit/test_t5_project.py::test_t5a_save_load_resave_case01",
    "depth": 0,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19"
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19"
    },
    "out": {
     "S19File": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
      "records": [
       {
        "SRecord": {
@@ -3550,7 +3550,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -3569,10 +3569,10 @@
    "test": "cwaudit/test_t5_project.py::test_t5a_save_load_resave_case01",
    "depth": 1,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
     "s19": {
      "S19File": {
-      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
+      "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
       "records": [
        {
         "SRecord": {
@@ -3818,7 +3818,7 @@
    },
    "out": {
     "LoadedFile": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
      "file_type": "s19",
      "mem_map": {
       "0x0": 67,
@@ -3942,7 +3942,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -3959,10 +3959,10 @@
    "test": "cwaudit/test_t5_project.py::test_t5a_save_load_resave_case01",
    "depth": 2,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
     "s19": {
      "S19File": {
-      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
+      "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
       "records": [
        {
         "SRecord": {
@@ -4203,9 +4203,9 @@
       "endian": "big"
      }
     },
-    "a2l_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
+    "a2l_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
     "a2l_data": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
      "sections": [
       {
        "name": "PROJECT",
@@ -4386,7 +4386,7 @@
    },
    "out": {
     "LoadedFile": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
      "file_type": "s19",
      "mem_map": {
       "0x0": 67,
@@ -4461,9 +4461,9 @@
       true
      ],
      "errors": [],
-     "a2l_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
+     "a2l_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
      "a2l_data": {
-      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
+      "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
       "sections": [
        {
         "name": "PROJECT",
@@ -4650,7 +4650,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l": [
      "/begin PROJECT CASE01 \"Synthetic project for S19Tool stress testing\"",
      "  /begin HEADER",
      "    VERSION \"1.0\"",
@@ -4705,7 +4705,7 @@
      "  /end MODULE",
      "/end PROJECT"
     ],
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -4726,7 +4726,7 @@
    "in": {
     "s19": {
      "S19File": {
-      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
+      "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
       "records": [
        {
         "SRecord": {
@@ -5018,7 +5018,7 @@
    "in": {
     "s19": {
      "S19File": {
-      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
+      "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
       "records": [
        {
         "SRecord": {
@@ -5352,7 +5352,7 @@
    "in": {
     "primary_loaded": {
      "LoadedFile": {
-      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
+      "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
       "file_type": "s19",
       "mem_map": {
        "0x0": 67,
@@ -5478,7 +5478,7 @@
    },
    "out": {
     "LoadedFile": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.s19",
      "file_type": "s19",
      "mem_map": {
       "0x0": 67,
@@ -5608,7 +5608,7 @@
    "in": {
     "primary_loaded": {
      "LoadedFile": {
-      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
+      "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
       "file_type": "s19",
       "mem_map": {
        "0x0": 67,
@@ -5683,9 +5683,9 @@
        true
       ],
       "errors": [],
-      "a2l_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
+      "a2l_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
       "a2l_data": {
-       "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
+       "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
        "sections": [
         {
          "name": "PROJECT",
@@ -5874,7 +5874,7 @@
    },
    "out": {
     "LoadedFile": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
      "file_type": "s19",
      "mem_map": {
       "0x0": 67,
@@ -5949,9 +5949,9 @@
       true
      ],
      "errors": [],
-     "a2l_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
+     "a2l_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
      "a2l_data": {
-      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
+      "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
       "sections": [
        {
         "name": "PROJECT",
@@ -6144,12 +6144,12 @@
    "test": "cwaudit/test_t5_project.py::test_t5a_save_load_resave_case01",
    "depth": 1,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac",
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac",
     "a2l_files": null
    },
    "out": {
     "LoadedFile": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac",
      "file_type": "mac",
      "mem_map": {
       "0x80000000": 0
@@ -6167,7 +6167,7 @@
      ],
      "a2l_path": null,
      "a2l_data": null,
-     "mac_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac",
+     "mac_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac",
      "mac_records": [
       {
        "line_number": 1,
@@ -6199,7 +6199,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac": [
      "; Synthetic MAC",
      "BLOCK_A=80000000"
     ]
@@ -6209,14 +6209,14 @@
    "test": "cwaudit/test_t5_project.py::test_t5a_save_load_resave_case01",
    "depth": 2,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.mac",
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.mac",
     "a2l_files": [
-     "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l"
+     "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l"
     ]
    },
    "out": {
     "LoadedFile": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.mac",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.mac",
      "file_type": "mac",
      "mem_map": {
       "0x80000000": 0
@@ -6232,9 +6232,9 @@
        "message": "Line 1: expected one '=' separator"
       }
      ],
-     "a2l_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
+     "a2l_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
      "a2l_data": {
-      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
+      "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
       "sections": [
        {
         "name": "PROJECT",
@@ -6374,7 +6374,7 @@
       },
       "compu_tabs_by_name": {}
      },
-     "mac_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.mac",
+     "mac_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.mac",
      "mac_records": [
       {
        "line_number": 1,
@@ -6406,7 +6406,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l": [
      "/begin PROJECT CASE01 \"Synthetic project for S19Tool stress testing\"",
      "  /begin HEADER",
      "    VERSION \"1.0\"",
@@ -6461,7 +6461,7 @@
      "  /end MODULE",
      "/end PROJECT"
     ],
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.mac": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.mac": [
      "; Synthetic MAC",
      "BLOCK_A=80000000"
     ]
@@ -6473,10 +6473,10 @@
    "test": "cwaudit/test_t5_project.py::test_t5a_save_load_resave_case01",
    "depth": 2,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac"
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac"
    },
    "out": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac",
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac",
     "records": [
      {
       "line_number": 1,
@@ -6500,7 +6500,7 @@
     ]
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.mac": [
      "; Synthetic MAC",
      "BLOCK_A=80000000"
     ]
@@ -6510,10 +6510,10 @@
    "test": "cwaudit/test_t5_project.py::test_t5a_save_load_resave_case01",
    "depth": 3,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.mac"
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.mac"
    },
    "out": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.mac",
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.mac",
     "records": [
      {
       "line_number": 1,
@@ -6537,7 +6537,7 @@
     ]
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.mac": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.mac": [
      "; Synthetic MAC",
      "BLOCK_A=80000000"
     ]
@@ -6549,10 +6549,10 @@
    "test": "cwaudit/test_t5_project.py::test_t5a_save_load_resave_case01",
    "depth": 0,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.a2l"
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.a2l"
    },
    "out": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.a2l",
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.a2l",
     "sections": [
      {
       "name": "PROJECT",
@@ -6731,7 +6731,7 @@
     "compu_tabs_by_name": {}
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.a2l": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.a2l": [
      "/begin PROJECT CASE01 \"Synthetic project for S19Tool stress testing\"",
      "  /begin HEADER",
      "    VERSION \"1.0\"",
@@ -6792,10 +6792,10 @@
    "test": "cwaudit/test_t5_project.py::test_t5a_save_load_resave_case01",
    "depth": 2,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l"
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l"
    },
    "out": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
     "sections": [
      {
       "name": "PROJECT",
@@ -6974,7 +6974,7 @@
     "compu_tabs_by_name": {}
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l": [
      "/begin PROJECT CASE01 \"Synthetic project for S19Tool stress testing\"",
      "  /begin HEADER",
      "    VERSION \"1.0\"",
@@ -7610,7 +7610,7 @@
    "depth": 0,
    "in": {
     "a2l_data": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.a2l",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\temp\\firmware.a2l",
      "sections": [
       {
        "name": "PROJECT",
@@ -7969,7 +7969,7 @@
    "depth": 0,
    "in": {
     "a2l_data": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.a2l",
      "sections": [
       {
        "name": "PROJECT",
@@ -8537,7 +8537,7 @@
    "in": {
     "payload": {
      "SaveProjectPayload": {
-      "parent_folder": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea",
+      "parent_folder": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea",
       "project_name": "P",
       "batch": [],
       "assignments": {}
@@ -8552,7 +8552,7 @@
    "in": {
     "payload": {
      "SaveProjectPayload": {
-      "parent_folder": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea",
+      "parent_folder": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea",
       "project_name": "P",
       "batch": [
        "patch.json"
@@ -8573,7 +8573,7 @@
    "in": {
     "payload": {
      "SaveProjectPayload": {
-      "parent_folder": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea",
+      "parent_folder": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea",
       "project_name": "P",
       "batch": [],
       "assignments": {}
@@ -8595,7 +8595,7 @@
        {
         "VariantDescriptor": {
          "variant_id": "firmware",
-         "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
+         "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
          "file_type": "s19"
         }
        }
@@ -8603,8 +8603,8 @@
       "active_id": "firmware"
      }
     },
-    "project_root": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P",
-    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4",
+    "project_root": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P",
+    "base_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4",
     "batch": [],
     "assignments": {},
     "declared_regions": [
@@ -8619,11 +8619,11 @@
     "gathered": {}
    },
    "out": [
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\project.json",
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\project.json",
     []
    ],
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\project.json": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\project.json": [
      "{",
      "  \"schema_version\": 1,",
      "  \"active_variant\": \"firmware\",",
@@ -8653,7 +8653,7 @@
        {
         "VariantDescriptor": {
          "variant_id": "firmware",
-         "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
+         "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P\\firmware.s19",
          "file_type": "s19"
         }
        }
@@ -8661,7 +8661,7 @@
       "active_id": "firmware"
      }
     },
-    "project_root": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P",
+    "project_root": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P",
     "batch": [],
     "assignments": {},
     "declared_regions": [
@@ -8687,7 +8687,7 @@
    "test": "cwaudit/test_t5_project.py::test_t5a_save_load_resave_case01",
    "depth": 1,
    "in": {
-    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P"
+    "project_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P"
    },
    "out": {
     "ProjectManifest": {
@@ -8712,7 +8712,7 @@
    "test": "cwaudit/test_t5_project.py::test_t5a_save_load_resave_case01",
    "depth": 1,
    "in": {
-    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P"
+    "project_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ssp68cy4\\.s19tool\\workarea\\P"
    },
    "out": {
     "ProjectManifest": {

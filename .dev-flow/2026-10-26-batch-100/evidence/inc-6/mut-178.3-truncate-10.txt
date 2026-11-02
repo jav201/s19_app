@@ -1,6 +1,6 @@
 # command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_announce.py -k tc_b100_67
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree) with mutation 178.3-truncate-10
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# tree: <HOME>\Github\s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree) with mutation 178.3-truncate-10
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
 # date: 2026-10-30T01:48:20+00:00
 # requirement: LLR-178.3
 # mutation: the problem list is truncated at 10 rows — file s19_app/tui/screens.py
@@ -12,7 +12,7 @@
 ================================== FAILURES ===================================
 ______ test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30155/test_tc_b100_67_thirty_problem0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30155/test_tc_b100_67_thirty_problem0')
 
     def test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last(tmp_path: Path) -> None:
         async def _scenario(pilot, app):

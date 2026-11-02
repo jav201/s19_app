@@ -1,6 +1,6 @@
 == head: 17474791bde5dfea48f379883c91fd69c34853c7 (worktree with uncommitted Inc 11 changes)
-== s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc11\s19_app\__init__.py
-== command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<scratchpad>/int11/lad/g1b C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider --basetemp=<scratchpad>/int11/bt/g1b -q --no-header -rfEs -p no:randomly --tb=short tests/test_b100_save_dialog.py
+== s19_app.__file__: <HOME>\Github\s19_app-b100-inc11\s19_app\__init__.py
+== command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<scratchpad>/int11/lad/g1b <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider --basetemp=<scratchpad>/int11/bt/g1b -q --no-header -rfEs -p no:randomly --tb=short tests/test_b100_save_dialog.py
 ........................................................................ [ 46%]
 ........................................................................ [ 93%]
 ..........                                                               [100%]

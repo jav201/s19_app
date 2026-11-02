@@ -2,7 +2,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 ________ test_tc_b99_41_case_folded_collision_refuses_before_any_write ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26730/test_tc_b99_41_case_folded_col0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26730/test_tc_b99_41_case_folded_col0')
 
     def test_tc_b99_41_case_folded_collision_refuses_before_any_write(
         tmp_path: Path,
@@ -26,7 +26,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 E       AssertionError: the refusal happened before the mkdir
 E       assert not True
 E        +  where True = exists()
-E        +    where exists = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26730/test_tc_b99_41_case_folded_col0/.s19tool/workarea/splits').exists
+E        +    where exists = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26730/test_tc_b99_41_case_folded_col0/.s19tool/workarea/splits').exists
 
 tests\test_b99_export.py:616: AssertionError
 =========================== short test summary info ===========================

@@ -3,9 +3,9 @@
 | Field | Value |
 |---|---|
 | Reviewer | `code-reviewer` (independent; did not write this code; implementer Kimi K2.8) |
-| Tree reviewed | worktree `C:\Users\jjgh8\Github\s19_app-b100-inc1`, detached at `e044112` plus uncommitted changes |
+| Tree reviewed | worktree `<HOME>\Github\s19_app-b100-inc1`, detached at `e044112` plus uncommitted changes |
 | Contract | main checkout `f3c867e`: `01-requirements.md` HLR-163, LLR-163.1..163.7, LLR-171.4; `design/design-proposal-b100.md` §5.1; `kimi/BRIEF-inc-1.md` + `BRIEF-COMMON.md`; `docs/architecture.md` §11 B100-I6/I13/I14/I22 |
-| Interpreter proof | `C:\Users\jjgh8\Github\s19_app-b100-inc1\s19_app\__init__.py` (PYTHONPATH = worktree, NO_COLOR unset, s19env 3.11) |
+| Interpreter proof | `<HOME>\Github\s19_app-b100-inc1\s19_app\__init__.py` (PYTHONPATH = worktree, NO_COLOR unset, s19env 3.11) |
 | **Verdict** | **approve-with-fixes**. Recorded token: **`BLOCK — BLOCK-UNTIL: F1`** (1 HIGH). This verdict authorises nothing. The increment does not advance until F1 is fixed and this reviewer has re-read the fix on the diff. F2–F5 (MAJOR) should land in the same corrective pass. |
 
 ## Scope reviewed
@@ -89,7 +89,7 @@
 | Field | Value |
 |---|---|
 | Reviewer | `code-reviewer`, the same reviewer as round 1. I did not write the fix. |
-| Tree re-read | worktree `C:\Users\jjgh8\Github\s19_app-b100-inc1` at `e044112` with Inc 1 and fix pass 1 uncommitted; `workspace.py` sha256 `c10a9d82…` |
+| Tree re-read | worktree `<HOME>\Github\s19_app-b100-inc1` at `e044112` with Inc 1 and fix pass 1 uncommitted; `workspace.py` sha256 `c10a9d82…` |
 | Contract | main `5f0ef66`: amended LLR-163.1 and LED .49 (the root is read off the unresolved destination; the group is a second placement kind; 4 source files) |
 | Inputs | `HANDOFF.md` §"Fix pass 1", `BRIEF-inc-1-fix1.md`, packet `increment-001.md` (§2, §4, §5, §6) |
 | **Verdict** | **approve — PASS-WITH-NOTES.** 0 HIGH open. **F1 is discharged**, because I re-read the applied fix on the diff and re-ran the escape probes myself. One new MAJOR (N1) stays open as a recorded note. It does not block, because no shipped writer can build the path it needs. It must be closed in this increment or scheduled in the ledger before Inc 8b. |
@@ -156,7 +156,7 @@
 | Field | Value |
 |---|---|
 | Reviewer | `code-reviewer`, the same reviewer; I did not write the fix |
-| Tree re-read | worktree `C:\Users\jjgh8\Github\s19_app-b100-inc1`: `e044112` plus Inc 1, fix pass 1 and fix pass 2, all uncommitted |
+| Tree re-read | worktree `<HOME>\Github\s19_app-b100-inc1`: `e044112` plus Inc 1, fix pass 1 and fix pass 2, all uncommitted |
 | Contract | main `412de63`, LED .50 (app paths stay unresolved; the 9 `app.py` placement calls pass `workarea_root=self.workarea`; the guard walks to the OUTERMOST anchor; SEC-2) |
 | **Verdict** | **approve-with-fixes.** Recorded token: **`BLOCK — BLOCK-UNTIL: R3-1`** (1 HIGH). N1–N5 and the F9 nit are closed. Fix pass 2 introduced R3-1, a regression: the Split/Join export now refuses whenever the app's base folder is reached through a junction, a case that worked at base and after fix pass 1. The cause is one rebound variable. |
 

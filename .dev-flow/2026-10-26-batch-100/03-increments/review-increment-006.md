@@ -3,14 +3,14 @@
 | Field | Value |
 |---|---|
 | Reviewer | `code-reviewer`. I am independent of this code: `software-dev` implemented it, not me. |
-| Tree reviewed | Worktree `C:\Users\jjgh8\Github\s19_app-b100-inc6`, base `093a7c0`, uncommitted. Source sha256 (16): `app.py` `d37ee857f64b202d`, `screens.py` `a957b576658777b0`, `variant_execution_service.py` `8e2e8cf059eb48aa`, `styles.tcss` `781f04ed2cc30897`. These equal the packet §4 hashes. New test files: `test_b100_active_variant.py` `a8fa71b063a08099`, `test_b100_announce.py` `75ab528348a68420`, `tests/support/b100_projects.py` `bbe74da61a4ed72a`. I did not edit the worktree. My only commands inside it were `git diff` / `git status` / `sha256sum`; this report is the one file I created there. |
+| Tree reviewed | Worktree `<HOME>\Github\s19_app-b100-inc6`, base `093a7c0`, uncommitted. Source sha256 (16): `app.py` `d37ee857f64b202d`, `screens.py` `a957b576658777b0`, `variant_execution_service.py` `8e2e8cf059eb48aa`, `styles.tcss` `781f04ed2cc30897`. These equal the packet §4 hashes. New test files: `test_b100_active_variant.py` `a8fa71b063a08099`, `test_b100_announce.py` `75ab528348a68420`, `tests/support/b100_projects.py` `bbe74da61a4ed72a`. I did not edit the worktree. My only commands inside it were `git diff` / `git status` / `sha256sum`; this report is the one file I created there. |
 | Contract | `01-requirements.md`: HLR-168 (LLR-168.1/.2/.3), HLR-178 (LLR-178.1/.2/.3), LLR-166.1 (TC-B100-12 panel arms), AT-B100-04/-05/-06/-19/-20. Ledger LED .59, .61–.66. `design/design-proposal-b100.md` §5.6. `PROJECT_RULES.md` (docstring contract). Briefs `kimi/BRIEF-COMMON.md`, `kimi/BRIEF-inc-6.md`. Precedent: `review-increment-005.md` (main checkout). The orchestrator's OQ-1 ruling as handed to me: (a) a writer creating `project.json` where none existed is ACCEPTED; (b) a DAMAGED `project.json` must not be silently replaced — the writer keeps the file it placed, skips the rewrite, and the status says `project.json` is damaged and was not rewritten. |
 | Interpreter proof | s19env Python 3.11.15. Trees under `…\scratchpad\r6\`:<br>• `base\` = `git archive 093a7c0`;<br>• `fixed\` = base plus the 15 changed and 3 new files, hash-equal to the worktree (18/18 `OK`);<br>• `mut\<id>\` = one tree per reviewer mutant (`s19_app`, `tests`, `examples`, `tools` copied from `fixed\`, one single-occurrence edit, CRLF kept).<br>Every transcript prints `s19_app.__file__` from its own tree. Runs used `PYTHONPATH` set to that tree, `NO_COLOR` unset (`env -u`), `PYTHONUTF8=1`, `PYTHONDONTWRITEBYTECODE=1`, `PYTHONIOENCODING=utf-8`, `-p no:cacheprovider`. |
 | **Verdict** | **FAIL (reject until fixed).** Recorded token: **`BLOCK — BLOCK-UNTIL: F1`** (1 HIGH). This verdict authorises nothing. The increment does not advance until F1 is fixed and I have re-read the fix on the diff and re-run probe P1. F2 (MAJOR) should land in the same corrective pass. |
 
 Scratch trees `base\`, `fixed\`, `mut\` were deleted after the runs; the transcripts and `probes	est_r6_probes.py` remain under `…\scratchpad6\`.
 
-`…\scratchpad` = `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad`.
+`…\scratchpad` = `<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad`.
 
 ## BLUF
 
@@ -119,7 +119,7 @@ F1 is discharged only when I re-read the fix on the diff and re-run P1. The rest
 
 | Field | Value |
 |---|---|
-| Tree re-reviewed | Worktree `C:\Users\jjgh8\Github\s19_app-b100-inc6`, base `093a7c0`, uncommitted. Source sha256 (16): `app.py` `762d1a98c8a65903`, `screens.py` `ea549ab4bd9d3ef4`, `variant_execution_service.py` `395dcbde3b28851b`, `styles.tcss` `781f04ed2cc30897` (unchanged). These equal the coordinator's hashes and packet §4 "Final source hashes after corrective pass 1". `tests/support/b100_projects.py` is `4027c3fd47f7197d`. I did not edit the worktree; this section is my only change. |
+| Tree re-reviewed | Worktree `<HOME>\Github\s19_app-b100-inc6`, base `093a7c0`, uncommitted. Source sha256 (16): `app.py` `762d1a98c8a65903`, `screens.py` `ea549ab4bd9d3ef4`, `variant_execution_service.py` `395dcbde3b28851b`, `styles.tcss` `781f04ed2cc30897` (unchanged). These equal the coordinator's hashes and packet §4 "Final source hashes after corrective pass 1". `tests/support/b100_projects.py` is `4027c3fd47f7197d`. I did not edit the worktree; this section is my only change. |
 | Interpreter proof | s19env Python 3.11.15. `…\scratchpad\r6\fixed2\` = `git archive 093a7c0` plus the 15 changed and 3 new files, hash-equal to the worktree (18/18). `mut\MA2`, `mut\MB2`, `mut\MV` = one tree per reviewer mutant. Each transcript prints `s19_app.__file__` from its own tree. Same environment as round 1. I deleted those trees after the runs; the transcripts below remain. |
 | **Verdict** | **PASS-WITH-NOTES.** F1 (HIGH) is discharged: I re-read the fix on the diff and re-ran P1, now on all 4 writers. F2 is discharged. F3 and F5 are resolved. F4 (MINOR, UX wording) stays open, as declared, and goes to Inc 11. Nothing blocks. |
 

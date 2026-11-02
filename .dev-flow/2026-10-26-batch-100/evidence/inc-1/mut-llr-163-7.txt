@@ -2,13 +2,13 @@ mutation: llr-163-7 on s19_app/tui/workspace.py
 hash before: 305e197c1a8d2a94ef077ac6c893c83e0d5449268c43b28df6e73a800acb43d1
 hash mutated: a8785098f21ca864942a5a1003c16a4b4905e3dc69bb1738d86da8cf6cdd4558
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py -k tc_b100_68
-tree: /c/Users/jjgh8/Github/s19_app-b100-inc1
+tree: <HOME>/Github/s19_app-b100-inc1
 
 F..                                                                      [100%]
 ================================== FAILURES ===================================
 ______ test_tc_b100_68_prediction_walks_the_same_names_as_the_placement _______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27186/test_tc_b100_68_prediction_wal0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27186/test_tc_b100_68_prediction_wal0')
 
     def test_tc_b100_68_prediction_walks_the_same_names_as_the_placement(
         tmp_path: Path,
@@ -26,7 +26,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
             digest, source.stat().st_size, destination, "firmware.s19"
         )
 >       assert predicted.path.name == "firmware_2.s19", predicted
-E       AssertionError: PlacementResult(path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27186/test_tc_b100_68_prediction_wal0/.s19tool/workarea/target/firmware_1.s19'), reused=False)
+E       AssertionError: PlacementResult(path=WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27186/test_tc_b100_68_prediction_wal0/.s19tool/workarea/target/firmware_1.s19'), reused=False)
 E       assert 'firmware_1.s19' == 'firmware_2.s19'
 E         
 E         - firmware_2.s19

@@ -27,7 +27,7 @@ No parser import added; no logging added (F-S-07 confidentiality contract preser
 
 ```bash
 # from the worktree root (cwd-first resolves the editable .pth to THIS worktree)
-cd C:/Users/jjgh8/OneDrive/Documents/Github/s19_app/.claude/worktrees/hungry-burnell-b75534
+cd <HOME>/OneDrive/Documents/Github/s19_app/.claude/worktrees/hungry-burnell-b75534
 python -m ruff check s19_app/tui/services/report_service.py tests/test_report_service.py
 python -m pytest tests/test_report_service.py -v
 python -m pytest tests/test_entropy_service.py -q      # Inc-1 regression

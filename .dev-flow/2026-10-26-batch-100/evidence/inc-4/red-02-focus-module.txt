@@ -1,13 +1,13 @@
 CMD: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py
-TREE: C:\Users\jjgh8\Github\s19_app-b100-inc4 (Inc 4 changes REVERTED — unmodified base for the RED counterfactual)
-PYTHONPATH: C:/Users/jjgh8/Github/s19_app-b100-inc4
+TREE: <HOME>\Github\s19_app-b100-inc4 (Inc 4 changes REVERTED — unmodified base for the RED counterfactual)
+PYTHONPATH: <HOME>/Github/s19_app-b100-inc4
 NO_COLOR: unset
 
 FFFFFFFFFF                                                               [100%]
 ================================== FAILURES ===================================
 _______ test_tc_b100_12_focus_target_table_matches_the_window_registry ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28806/test_tc_b100_12_focus_target_t0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28806/test_tc_b100_12_focus_target_t0')
 
     def test_tc_b100_12_focus_target_table_matches_the_window_registry(
         tmp_path: Path,
@@ -26,7 +26,7 @@ E       AttributeError: type object 'S19TuiApp' has no attribute '_FOCUS_TARGETS
 tests\test_b100_focus.py:195: AttributeError
 ________________ test_tc_b100_12_load_file_tail_rehomes_focus _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28806/test_tc_b100_12_load_file_tail0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28806/test_tc_b100_12_load_file_tail0')
 
     def test_tc_b100_12_load_file_tail_rehomes_focus(tmp_path: Path) -> None:
         """Load file (the dialog route's tail): with the focus on the hidden
@@ -101,7 +101,7 @@ E       AssertionError: timed out waiting for the focus to settle on the window'
 tests\test_b100_focus.py:153: AssertionError
 _______________ test_tc_b100_12_load_project_tail_rehomes_focus _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28806/test_tc_b100_12_load_project_t0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28806/test_tc_b100_12_load_project_t0')
 
     def test_tc_b100_12_load_project_tail_rehomes_focus(tmp_path: Path) -> None:
         """Load project: the project install runs the same tail and re-homes
@@ -172,7 +172,7 @@ E       AssertionError: timed out waiting for the focus to settle on the window'
 tests\test_b100_focus.py:153: AssertionError
 ______________ test_tc_b100_12_workarea_files_pick_rehomes_focus ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28806/test_tc_b100_12_workarea_files0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28806/test_tc_b100_12_workarea_files0')
 
     def test_tc_b100_12_workarea_files_pick_rehomes_focus(tmp_path: Path) -> None:
         """Workarea Files pick: selecting a temp file in the workspace list
@@ -254,7 +254,7 @@ E       AssertionError: timed out waiting for the focus to settle on the window'
 tests\test_b100_focus.py:153: AssertionError
 _________________ test_tc_b100_12_healthy_focus_is_not_moved __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28806/test_tc_b100_12_healthy_focus_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28806/test_tc_b100_12_healthy_focus_0')
 
     def test_tc_b100_12_healthy_focus_is_not_moved(tmp_path: Path) -> None:
         """The re-home lands on the ACTIVE window's target: with the MAC screen
@@ -330,7 +330,7 @@ E             + sje_table)
 tests\test_b100_focus.py:329: AssertionError
 ____________ test_tc_b100_12_split_join_window_target_is_its_table ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28806/test_tc_b100_12_split_join_win0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28806/test_tc_b100_12_split_join_win0')
 
     def test_tc_b100_12_split_join_window_target_is_its_table(tmp_path: Path) -> None:
         """Boundary: a load while the Split / Join / Export window is displayed
@@ -425,7 +425,7 @@ E            +      where _SegTable(id='sje_table') = S19TuiApp(title='Hex Edit 
 tests\test_b100_focus.py:361: AssertionError
 ___________________ test_tc_b100_13_a2l_tail_rehomes_focus ____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28806/test_tc_b100_13_a2l_tail_rehom0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28806/test_tc_b100_13_a2l_tail_rehom0')
 
     def test_tc_b100_13_a2l_tail_rehomes_focus(tmp_path: Path) -> None:
         """The A2L load tail applies the LLR-166.1 rule: with the focus on the
@@ -504,7 +504,7 @@ E       AssertionError: timed out waiting for the focus to settle on the window'
 tests\test_b100_focus.py:153: AssertionError
 _________________ test_tc_b100_13_a2l_only_load_with_no_image _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28806/test_tc_b100_13_a2l_only_load_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28806/test_tc_b100_13_a2l_only_load_0')
 
     def test_tc_b100_13_a2l_only_load_with_no_image(tmp_path: Path) -> None:
         """Boundary: an A2L load with NO image loaded still re-homes the focus.
@@ -578,7 +578,7 @@ E       AssertionError: timed out waiting for the focus to settle on the window'
 tests\test_b100_focus.py:153: AssertionError
 ___ test_at_b100_04_focus_lands_and_single_keys_reach_their_screens[size0] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28806/test_at_b100_04_focus_lands_an0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28806/test_at_b100_04_focus_lands_an0')
 size = (118, 54)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
@@ -697,7 +697,7 @@ E       AssertionError: timed out waiting for the focus to settle on the window'
 tests\test_b100_focus.py:153: AssertionError
 ___ test_at_b100_04_focus_lands_and_single_keys_reach_their_screens[size1] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28806/test_at_b100_04_focus_lands_an1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28806/test_at_b100_04_focus_lands_an1')
 size = (220, 60)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])

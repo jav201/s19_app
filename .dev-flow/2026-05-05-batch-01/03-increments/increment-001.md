@@ -99,7 +99,7 @@ Deferrals folded in (per `.dev-flow/02-review.md` §Deferrals):
   ============================= test session starts =============================
   platform win32 -- Python 3.14.4, pytest-9.0.3, pluggy-1.6.0 -- C:\Python314\python.exe
   cachedir: .pytest_cache
-  rootdir: C:\Users\jjgh8\OneDrive\Documents\Github\s19_app\.claude\worktrees\lucid-margulis-a63fd4
+  rootdir: <HOME>\OneDrive\Documents\Github\s19_app\.claude\worktrees\lucid-margulis-a63fd4
   configfile: pyproject.toml
   collecting ... collected 1 item
 

@@ -1,6 +1,6 @@
 # HANDOFF — batch-100 Increment 2 (Save project name guards)
 
-Worktree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (detached at 2edfee2, Inc 1 merged).
+Worktree: <HOME>\Github\s19_app-b100-inc2 (detached at 2edfee2, Inc 1 merged).
 Nothing committed — all changes are in the working tree. Do not commit; the orchestrator does.
 
 ## What was done

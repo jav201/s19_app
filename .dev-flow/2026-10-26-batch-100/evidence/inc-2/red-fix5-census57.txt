@@ -1,5 +1,5 @@
 cmd: pytest -q -p no:cacheprovider tests/test_b100_reuse.py::test_tc_b100_57_export_holds_no_byte_identity_rule (RED, pre-pass tree)
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 5, pre-pass reconstruction)
+tree: <HOME>\Github\s19_app-b100-inc2 (fix pass 5, pre-pass reconstruction)
 
 F                                                                        [100%]
 ================================== FAILURES ===================================

@@ -27,9 +27,9 @@ E    +    where <built-in method count of str object at 0x000002750A84F030> = ' 
 
 [1;30;41m29[0m[30;41m mismatched snapshots[0m
 
-[1mView the [0m]8;id=17315769;file://C:\Users\jjgh8\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+[1mView the [0m]8;id=17315769;file://<HOME>\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
 
-[2mC:\Users\jjgh8\Github\s19_app\snapshot_report.html[0m
+[2m<HOME>\Github\s19_app\snapshot_report.html[0m
 
 =========================== short test summary info ===========================
 FAILED tests/test_flow_builder_render.py::test_at088b_every_render_sink_renders_hostile_literally

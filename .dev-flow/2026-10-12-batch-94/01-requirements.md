@@ -85,7 +85,7 @@ spike: schema unchanged).
 
 ### 1.4 References
 
-- Station rules: `C:/Users/jjgh8/.claude/skills/dev-flow/stations/p1-requirements.md` (core path steps 1–8, C-54, draft-time controls C-15/C-15.1/C-35/C-36/C-39/C-40/C-42/C-16/C-17).
+- Station rules: `<HOME>/.claude/skills/dev-flow/stations/p1-requirements.md` (core path steps 1–8, C-54, draft-time controls C-15/C-15.1/C-35/C-36/C-39/C-40/C-42/C-16/C-17).
 - Field guides: `templates/guides/req-template.md`, `req-template.part2.md`, `templates/ifc-template.md` (same bundle).
 - Batch plan: `.dev-flow/2026-10-12-batch-94/PLAN.md` (R8–R12, roadmap Inc-001…004, operator grant).
 - Architecture map: `docs/architecture.md` §10 (batch-94 declarations, R8–R12) and §11 (interface rows; frozen Part B contracts; batch-94 pending rows).

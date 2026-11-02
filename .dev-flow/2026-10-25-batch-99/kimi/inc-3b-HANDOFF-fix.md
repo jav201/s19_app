@@ -1,6 +1,6 @@
 # HANDOFF — batch-99 Increment 3b · review round 1 fixes (F1–F4)
 
-Worktree: `C:\Users\jjgh8\Github\s19_app-b99-inc3b` (branch `b99-inc3b`, base
+Worktree: `<HOME>\Github\s19_app-b99-inc3b` (branch `b99-inc3b`, base
 `f1ba70c`, uncommitted — orchestrator commits). Interpreter check:
 `import s19_app` prints a path inside this worktree (proven at session
 start).

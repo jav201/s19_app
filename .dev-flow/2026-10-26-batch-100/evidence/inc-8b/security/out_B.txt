@@ -1,4 +1,4 @@
-s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc8b\s19_app\__init__.py
+s19_app.__file__ = <HOME>\Github\s19_app-b100-inc8b\s19_app\__init__.py
 
 == B1 P/reports swapped for a junction to outside between plan and copy ==
   B1: Q exists=False files=0 marker files=[] outside unchanged=True
@@ -35,7 +35,7 @@ s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc8b\s19_app\__init__.py
   B4: Q exists=False files=0 marker files=[] outside unchanged=True
     | 'Project NOT saved: could not save \u2014 patches/boost.json could not be copied \u2014 check the folder.'
     scan: {}
-    current_project_dir after: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s8b\runs\B4\base\.s19tool\workarea\P
+    current_project_dir after: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s8b\runs\B4\base\.s19tool\workarea\P
 
 == B5 Q created by another writer between the plan and mkdir (user files) ==
   Q contents after: ['keep.txt', 'reports/r.md']

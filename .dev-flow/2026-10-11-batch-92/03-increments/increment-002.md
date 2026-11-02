@@ -186,7 +186,7 @@ Frozen dual-guard: TC-027 source guard 1 passed (`increment-002-dual-guard-sourc
 |---|---|
 | Mutation applied | TC-653's own census: `tui/checks_view.py:41` `from ..utils import safe_text` flipped back to `from .screens_directionb import safe_text` (the retired address — which still resolves at runtime since screens_directionb re-exports the same object, so ONLY the census can catch it) |
 | Instrument | project code: my own hand (python edit); the restore proven by SHA-256, not `git status` |
-| Where it ran | **my own worktree** `C:/Users/jjgh8/Github/s19_app-b92` |
+| Where it ran | **my own worktree** `<HOME>/Github/s19_app-b92` |
 | Transcript | `evidence/increment-002-tc653-red.transcript` — `AssertionError: safe_text importer set drifted from the measured set: extra=[] missing=['s19_app.tui.checks_view']` |
 | Restore proven by | **file hash returned to its pre-mutation value**: `s19_app/tui/checks_view.py` `badbba330a6d3fd504034df82abea752b60063e6af6b866a6c007ec5c41404fd` (pre == post) |
 | Bytecode cache | `PYTHONDONTWRITEBYTECODE=1` on every run (C-46) |
@@ -196,7 +196,7 @@ Frozen dual-guard: TC-027 source guard 1 passed (`increment-002-dual-guard-sourc
 
 | Field | Value |
 |---|---|
-| **RED counterfactual** | one consumer (`s19_app/tui/checks_view.py:41`) flipped back to `from .screens_directionb import …` made THIS increment's own TC-653 census fail (`missing=['s19_app.tui.checks_view']`) · transcript `evidence/increment-002-tc653-red.transcript` (SHA-256 `25f0e3a2d401f24469be4d29285ece0ae5008252f42ce6a0af5c28145a906f24`) · restore digest `badbba330a6d3fd504034df82abea752b60063e6af6b866a6c007ec5c41404fd` |
+| **RED counterfactual** | one consumer (`s19_app/tui/checks_view.py:41`) flipped back to `from .screens_directionb import …` made THIS increment's own TC-653 census fail (`missing=['s19_app.tui.checks_view']`) · transcript `evidence/increment-002-tc653-red.transcript` (SHA-256 `bbaea260049a8f34d387298fc7733a57f54ddc39dcd4e832fbddbb53ab14654a`) · restore digest `badbba330a6d3fd504034df82abea752b60063e6af6b866a6c007ec5c41404fd` |
 
 | Field | Value |
 |---|---|
@@ -240,19 +240,19 @@ drive the strip through the shipped service path with a `0 of 0` divide-by-zero 
 
 | Evidence artifact | Path — under `artifact_homes.evidence` | SHA-256 |
 |---|---|---|
-| New/changed TC modules run (5 passed) | `.dev-flow/2026-10-11-batch-92/evidence/increment-002-tc-modules.transcript` | `215b3b010544ddfef77ac890ee673b7f55e9b6085bb1a94f45a246b725f6affe` |
-| Repointed + affected test files run (72 passed) | `.dev-flow/2026-10-11-batch-92/evidence/increment-002-repointed-files.transcript` | `2db189ad5f9fe54b24e3628c4a5e152ef26cfbed3952d4367b0548d126828b45` |
-| AT-290 hostile oracle family + AT-291 strip nodes run (14 passed) | `.dev-flow/2026-10-11-batch-92/evidence/increment-002-at-family.transcript` | `6e66d4b3edb1defea08e60721d8eec77e16d5a360aa00f281c4b13d9858879bf` |
-| Full directionb guard host run (183 passed) | `.dev-flow/2026-10-11-batch-92/evidence/increment-002-directionb-guard.transcript` | `dc8c9e075a9330280514454ebe5f3d31a8c4e7c8d37512dbdbd7ba61ea6221ac` |
-| Frozen SOURCE guard TC-027 run (1 passed) | `.dev-flow/2026-10-11-batch-92/evidence/increment-002-dual-guard-source.transcript` | `73125e61db100c1ebd63fcf1c7ccee177256680c846838f79b6e5a67ec59e11e` |
-| Frozen TEST-file guard TC-031 pair + TC-032 run (3 passed) | `.dev-flow/2026-10-11-batch-92/evidence/increment-002-dual-guard-testfile.transcript` | `59fa80a4c102a421215cb6aa34e9bd7235f35ac025459f5a5c693bba9187faa6` |
+| New/changed TC modules run (5 passed) | `.dev-flow/2026-10-11-batch-92/evidence/increment-002-tc-modules.transcript` | `7e05eb408fb3d4344572ba30684d654e0a2d31b4cfc046d821bd99777890e964` |
+| Repointed + affected test files run (72 passed) | `.dev-flow/2026-10-11-batch-92/evidence/increment-002-repointed-files.transcript` | `cc177fc567a2aaf782e931f92ad8d5e5e019accfde037aa814e561c028ea192e` |
+| AT-290 hostile oracle family + AT-291 strip nodes run (14 passed) | `.dev-flow/2026-10-11-batch-92/evidence/increment-002-at-family.transcript` | `5f80e806324463d5d4a25280b21617c6dd96e25bb51dc1d84106a8eacfbd623c` |
+| Full directionb guard host run (183 passed) | `.dev-flow/2026-10-11-batch-92/evidence/increment-002-directionb-guard.transcript` | `8bd138d499e62cbb3543631c044087ab2d198f2a749ff123c6555c84269db0f0` |
+| Frozen SOURCE guard TC-027 run (1 passed) | `.dev-flow/2026-10-11-batch-92/evidence/increment-002-dual-guard-source.transcript` | `463d68025948ef1994f6fa7a83e6c0b645e6515e964a017be7c38f91b08d1990` |
+| Frozen TEST-file guard TC-031 pair + TC-032 run (3 passed) | `.dev-flow/2026-10-11-batch-92/evidence/increment-002-dual-guard-testfile.transcript` | `007e06c83f1d96aa799e63f859dcc7426c4f97f70c00a7f2de3593e20b205e02` |
 | Cold-import probes (5/5) | `.dev-flow/2026-10-11-batch-92/evidence/increment-002-cold-probes.transcript` | `3b2b8da539fdf6b9d75e133c9b58075fc5cd972f32acb52aba149c7e85b23491` |
 | Body-hash verification of the move | `.dev-flow/2026-10-11-batch-92/evidence/increment-002-body-hash.txt` | `7beb20c3418a6ff48fdd6f182ca940628e5cc9d5c3a420ce93e5ce2989c78f7d` |
-| TC-653 RED counterfactual | `.dev-flow/2026-10-11-batch-92/evidence/increment-002-tc653-red.transcript` | `25f0e3a2d401f24469be4d29285ece0ae5008252f42ce6a0af5c28145a906f24` |
-| TC-654 RED arm (service edge) | `.dev-flow/2026-10-11-batch-92/evidence/increment-002-tc654-red.transcript` | `aa106ce8074986dd538f4295558f0503787bd317fa9794d24fb50b92d1f334b5` |
-| TC-654 RED arm (copy shim) | `.dev-flow/2026-10-11-batch-92/evidence/increment-002-shim-copy-red.transcript` | `55a3e2d5d60886c09569daaef0a67590ad3419b842169f87ef9b33adec87529b` |
+| TC-653 RED counterfactual | `.dev-flow/2026-10-11-batch-92/evidence/increment-002-tc653-red.transcript` | `bbaea260049a8f34d387298fc7733a57f54ddc39dcd4e832fbddbb53ab14654a` |
+| TC-654 RED arm (service edge) | `.dev-flow/2026-10-11-batch-92/evidence/increment-002-tc654-red.transcript` | `8af133098163e209649ead8015e120b325ca3806a41dd96ea0cf17bb2c31e68e` |
+| TC-654 RED arm (copy shim) | `.dev-flow/2026-10-11-batch-92/evidence/increment-002-shim-copy-red.transcript` | `6e3f04805b364e95afbc4db42de8e52a1c76c9d74d3de498290ee8fecd60b5d6` |
 | Copy-shim `is`-identity probe | `.dev-flow/2026-10-11-batch-92/evidence/increment-002-shim-copy-identity-probe.txt` | `a6d4d8dfbb0419d18cd8022c586f53bf9080b088cf392bb1cb58bf521459913b` |
-| C-17 `from_markup` RED arm at the new address | `.dev-flow/2026-10-11-batch-92/evidence/increment-002-from-markup-red.transcript` | `815e8d911c8f3bd942cd2d1232173f64d253a44ff9501058a97d8562d3160df5` |
+| C-17 `from_markup` RED arm at the new address | `.dev-flow/2026-10-11-batch-92/evidence/increment-002-from-markup-red.transcript` | `92059a27cc5df1140856c680afcc9b68cac133a013663948e329cf9876823a9d` |
 
 | Field | Value |
 |---|---|

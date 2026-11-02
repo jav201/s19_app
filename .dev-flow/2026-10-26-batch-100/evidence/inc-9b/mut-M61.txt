@@ -2,9 +2,9 @@ mutant: M61
 file: s19_app/tui/app.py
 old -> new: '                (painted_names([value], clip=len(value)), False),' -> '                (painted_names([value], clip=120), False),'
 sha256 before: ae3d1cd924c42a2a9e7a920cd95aab8b21f4d9b324afdfb627be86fdf36df9ab
-command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_load_dialog.py::test_tc_b100_43_recent_preview_shows_the_store_facts_only
-cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b
-s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b\s19_app\__init__.py
+command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_load_dialog.py::test_tc_b100_43_recent_preview_shows_the_store_facts_only
+cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b
+s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b\s19_app\__init__.py
 ---
 pytest: 1 passed in 3.35s
 verdict: SURVIVED

@@ -1,5 +1,5 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc4 (MUTANT K1-a2l-tail)
+tree: <HOME>\Github\s19_app-b100-inc4 (MUTANT K1-a2l-tail)
 started: 2026-10-27 08:02:30
 
 MUTANT K1-a2l-tail APPLIED 4553671bdae5228898ef80b909bd606a618d0b6b9ab2afcd620243607ba1240e
@@ -8,7 +8,7 @@ MUTANT K1-a2l-tail APPLIED 4553671bdae5228898ef80b909bd606a618d0b6b9ab2afcd62024
 ================================== FAILURES ===================================
 __________ test_tc_b100_12_text_input_in_a_content_window_is_rehomed __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28928/test_tc_b100_12_text_input_in_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28928/test_tc_b100_12_text_input_in_0')
 
     def test_tc_b100_12_text_input_in_a_content_window_is_rehomed(
         tmp_path: Path,
@@ -99,7 +99,7 @@ E       AssertionError: timed out waiting for the focus to settle on the window'
 tests\test_b100_focus.py:167: AssertionError
 ________________ test_tc_b100_12_empty_state_target_falls_back ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28928/test_tc_b100_12_empty_state_ta0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28928/test_tc_b100_12_empty_state_ta0')
 
     def test_tc_b100_12_empty_state_target_falls_back(tmp_path: Path) -> None:
         """LED .57 (b): in a bare session the Workspace window shows its empty
@@ -182,7 +182,7 @@ E       AssertionError: timed out waiting for the focus to settle on the window'
 tests\test_b100_focus.py:167: AssertionError
 _________ test_tc_b100_12_bad_default_focus_is_rehomed_behind_a_modal _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28928/test_tc_b100_12_bad_default_fo0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28928/test_tc_b100_12_bad_default_fo0')
 
     def test_tc_b100_12_bad_default_focus_is_rehomed_behind_a_modal(
         tmp_path: Path,
@@ -306,7 +306,7 @@ E             + sje_table
 tests\test_b100_focus.py:716: AssertionError
 ___________________ test_tc_b100_13_a2l_tail_rehomes_focus ____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28928/test_tc_b100_13_a2l_tail_rehom0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28928/test_tc_b100_13_a2l_tail_rehom0')
 
     def test_tc_b100_13_a2l_tail_rehomes_focus(tmp_path: Path) -> None:
         """The A2L load tail applies the LLR-166.1 rule: with the focus on the
@@ -389,7 +389,7 @@ E       AssertionError: timed out waiting for the focus to settle on the window'
 tests\test_b100_focus.py:167: AssertionError
 _________________ test_tc_b100_13_a2l_only_load_with_no_image _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28928/test_tc_b100_13_a2l_only_load_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28928/test_tc_b100_13_a2l_only_load_0')
 
     def test_tc_b100_13_a2l_only_load_with_no_image(tmp_path: Path) -> None:
         """Boundary: an A2L load with NO image loaded still re-homes the focus.

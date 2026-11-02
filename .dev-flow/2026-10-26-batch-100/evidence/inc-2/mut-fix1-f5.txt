@@ -1,11 +1,11 @@
-cmd: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc2 (NO_COLOR unset) python -m pytest -q -p no:cacheprovider 'tests/test_b100_save_guards.py::test_tc_b100_07_failed_merge_removes_placed_files[exact-ab-gather]' 'tests/test_b100_save_guards.py::test_tc_b100_07_failed_merge_removes_placed_files[exact-ab-manifest-refused]'
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (MUTANT M-F5 — the placed-file unlink deleted from _abort_save)
+cmd: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<HOME>\Github\s19_app-b100-inc2 (NO_COLOR unset) python -m pytest -q -p no:cacheprovider 'tests/test_b100_save_guards.py::test_tc_b100_07_failed_merge_removes_placed_files[exact-ab-gather]' 'tests/test_b100_save_guards.py::test_tc_b100_07_failed_merge_removes_placed_files[exact-ab-manifest-refused]'
+tree: <HOME>\Github\s19_app-b100-inc2 (MUTANT M-F5 — the placed-file unlink deleted from _abort_save)
 
 FF                                                                       [100%]
 ================================== FAILURES ===================================
 _____ test_tc_b100_07_failed_merge_removes_placed_files[exact-ab-gather] ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27522/test_tc_b100_07_failed_merge_r0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27522/test_tc_b100_07_failed_merge_r0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001929E5D5610>
 target = 'exact', typed = 'ab', stage = 'gather'
 
@@ -79,7 +79,7 @@ E         Use -v to get more diff
 tests\test_b100_save_guards.py:999: AssertionError
 _ test_tc_b100_07_failed_merge_removes_placed_files[exact-ab-manifest-refused] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27522/test_tc_b100_07_failed_merge_r1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27522/test_tc_b100_07_failed_merge_r1')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001929F56C3D0>
 target = 'exact', typed = 'ab', stage = 'manifest-refused'
 

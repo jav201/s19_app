@@ -66,5 +66,5 @@ async def drive(tmp: Path, sleepy: bool, noprog: bool = False):
     import s19_app; print(s19_app.__file__); print(("noprog " if noprog else "") + ("sleepy " if sleepy else "bare   "), {k: round(v - t0, 3) for k, v in sorted(marks.items(), key=lambda kv: kv[1])})
 
 for sleepy, noprog in ((True, False), (True, True), (True, False), (True, True), (True, False), (True, True)):
-    d = Path(tempfile.mkdtemp(dir=r"C:/Users/jjgh8/AppData/Local/Temp/s19f2"))
+    d = Path(tempfile.mkdtemp(dir=r"<HOME>/AppData/Local/Temp/s19f2"))
     asyncio.run(drive(d, sleepy, noprog))

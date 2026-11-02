@@ -56,7 +56,7 @@
     },
     "ctx": {
      "FlowContext": {
-      "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P",
+      "project_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P",
       "mac_records": null,
       "a2l_data": null,
       "variant": null,
@@ -131,7 +131,7 @@
       }
      ],
      "written_paths": [
-      "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\out.s19"
+      "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\out.s19"
      ],
      "diagnostics": [],
      "image_ranges": [
@@ -241,7 +241,7 @@
     },
     "ctx": {
      "FlowContext": {
-      "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P",
+      "project_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P",
       "mac_records": null,
       "a2l_data": null,
       "variant": null,
@@ -286,7 +286,7 @@
       }
      ],
      "written_paths": [
-      "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\a.s19"
+      "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\a.s19"
      ],
      "diagnostics": [],
      "image_ranges": [
@@ -396,7 +396,7 @@
     },
     "ctx": {
      "FlowContext": {
-      "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P",
+      "project_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P",
       "mac_records": null,
       "a2l_data": null,
       "variant": null,
@@ -441,7 +441,7 @@
       }
      ],
      "written_paths": [
-      "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\b.s19"
+      "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\b.s19"
      ],
      "diagnostics": [],
      "image_ranges": [
@@ -500,11 +500,11 @@
    "test": "cwaudit/test_t3_flow.py::test_t3a_flow_case01",
    "depth": 1,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\firmware.s19"
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\firmware.s19"
    },
    "out": {
     "S19File": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\firmware.s19",
      "records": [
       {
        "SRecord": {
@@ -746,7 +746,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -763,11 +763,11 @@
    "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
    "depth": 3,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19"
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19"
    },
    "out": {
     "S19File": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
      "records": [
       {
        "SRecord": {
@@ -1009,7 +1009,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -1026,11 +1026,11 @@
    "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
    "depth": 4,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19"
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19"
    },
    "out": {
     "S19File": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
      "records": [
       {
        "SRecord": {
@@ -1272,7 +1272,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -1291,10 +1291,10 @@
    "test": "cwaudit/test_t3_flow.py::test_t3a_flow_case01",
    "depth": 1,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\firmware.s19",
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\firmware.s19",
     "s19": {
      "S19File": {
-      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\firmware.s19",
+      "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\firmware.s19",
       "records": [
        {
         "SRecord": {
@@ -1540,7 +1540,7 @@
    },
    "out": {
     "LoadedFile": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\firmware.s19",
      "file_type": "s19",
      "mem_map": {
       "0x0": 67,
@@ -1664,7 +1664,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -1681,10 +1681,10 @@
    "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
    "depth": 3,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
     "s19": {
      "S19File": {
-      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
+      "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
       "records": [
        {
         "SRecord": {
@@ -1930,7 +1930,7 @@
    },
    "out": {
     "LoadedFile": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
      "file_type": "s19",
      "mem_map": {
       "0x0": 67,
@@ -2054,7 +2054,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -2071,10 +2071,10 @@
    "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
    "depth": 3,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
     "s19": {
      "S19File": {
-      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
+      "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
       "records": [
        {
         "SRecord": {
@@ -2320,7 +2320,7 @@
    },
    "out": {
     "LoadedFile": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
      "file_type": "s19",
      "mem_map": {
       "0x0": 67,
@@ -2444,7 +2444,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -2465,7 +2465,7 @@
    "in": {
     "s19": {
      "S19File": {
-      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\firmware.s19",
+      "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\firmware.s19",
       "records": [
        {
         "SRecord": {
@@ -2757,7 +2757,7 @@
    "in": {
     "s19": {
      "S19File": {
-      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
+      "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
       "records": [
        {
         "SRecord": {
@@ -3049,7 +3049,7 @@
    "in": {
     "s19": {
      "S19File": {
-      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
+      "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
       "records": [
        {
         "SRecord": {
@@ -3400,8 +3400,8 @@
    "test": "cwaudit/test_t3_flow.py::test_t3a_flow_case01",
    "depth": 1,
    "in": {
-    "path_text": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\patch.json",
-    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P",
+    "path_text": "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\patch.json",
+    "base_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P",
     "a2l_context": null
    },
    "out": {
@@ -3439,11 +3439,11 @@
       }
      ],
      "issues": [],
-     "source_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\patch.json"
+     "source_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\patch.json"
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\patch.json": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\patch.json": [
      "{",
      "  \"format\": \"s19app-changeset\",",
      "  \"version\": \"2.0\",",
@@ -3470,8 +3470,8 @@
    "test": "cwaudit/test_t3_flow.py::test_t3a_flow_case01",
    "depth": 1,
    "in": {
-    "path_text": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\check.chk.json",
-    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P",
+    "path_text": "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\check.chk.json",
+    "base_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P",
     "a2l_context": null
    },
    "out": {
@@ -3499,11 +3499,11 @@
       }
      ],
      "issues": [],
-     "source_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\check.chk.json"
+     "source_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\check.chk.json"
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\check.chk.json": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\check.chk.json": [
      "{",
      "  \"format\": \"s19app-changeset\",",
      "  \"version\": \"2.0\",",
@@ -3525,8 +3525,8 @@
    "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
    "depth": 3,
    "in": {
-    "path_text": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\patch.json",
-    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P",
+    "path_text": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\patch.json",
+    "base_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P",
     "a2l_context": null
    },
    "out": {
@@ -3564,11 +3564,11 @@
       }
      ],
      "issues": [],
-     "source_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\patch.json"
+     "source_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\patch.json"
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\patch.json": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\patch.json": [
      "{",
      "  \"format\": \"s19app-changeset\",",
      "  \"version\": \"2.0\",",
@@ -3595,8 +3595,8 @@
    "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
    "depth": 4,
    "in": {
-    "path_text": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\lane_b.json",
-    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P",
+    "path_text": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\lane_b.json",
+    "base_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P",
     "a2l_context": null
    },
    "out": {
@@ -3621,11 +3621,11 @@
       }
      ],
      "issues": [],
-     "source_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\lane_b.json"
+     "source_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\lane_b.json"
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\lane_b.json": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\lane_b.json": [
      "{",
      "  \"format\": \"s19app-changeset\",",
      "  \"version\": \"2.0\",",
@@ -3684,7 +3684,7 @@
        }
       ],
       "issues": [],
-      "source_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\patch.json"
+      "source_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\patch.json"
      }
     },
     "mem_map": {
@@ -3749,7 +3749,7 @@
    },
    "out": {
     "ChangeSummary": {
-     "source_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\patch.json",
+     "source_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\patch.json",
      "kind": "change",
      "encoding": "utf-8",
      "value_mode": "text",
@@ -3889,7 +3889,7 @@
        }
       ],
       "issues": [],
-      "source_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\patch.json"
+      "source_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\patch.json"
      }
     },
     "mem_map": {
@@ -3954,7 +3954,7 @@
    },
    "out": {
     "ChangeSummary": {
-     "source_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\patch.json",
+     "source_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\patch.json",
      "kind": "change",
      "encoding": "utf-8",
      "value_mode": "text",
@@ -4081,7 +4081,7 @@
        }
       ],
       "issues": [],
-      "source_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\lane_b.json"
+      "source_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\lane_b.json"
      }
     },
     "mem_map": {
@@ -4146,7 +4146,7 @@
    },
    "out": {
     "ChangeSummary": {
-     "source_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\lane_b.json",
+     "source_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\lane_b.json",
      "kind": "change",
      "encoding": "utf-8",
      "value_mode": "text",
@@ -4516,7 +4516,7 @@
        }
       ],
       "issues": [],
-      "source_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\check.chk.json"
+      "source_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\check.chk.json"
      }
     },
     "mem_map": {
@@ -4581,7 +4581,7 @@
    },
    "out": {
     "CheckRunResult": {
-     "source_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\check.chk.json",
+     "source_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\check.chk.json",
      "timestamp_utc": "2026-10-23T18:09:38.081653+00:00",
      "variant_id": null,
      "aggregates": {
@@ -4684,7 +4684,7 @@
       2147483776
      ]
     ],
-    "dest_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P",
+    "dest_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P",
     "filename": "out.s19",
     "source_kind": "s19",
     "bytes_per_line": 32,
@@ -4694,11 +4694,11 @@
     }
    },
    "out": [
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\out.s19",
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\out.s19",
     []
    ],
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\out.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\out.s19": [
      "S00F00004341534530315F4241534943B2",
      "S311000000004341534530315F4241534943B0",
      "S32580000000533139544F4F4C5F424153494300010203000102030405060708090A0B0C0D0E2F",
@@ -4770,7 +4770,7 @@
       2147483776
      ]
     ],
-    "dest_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P",
+    "dest_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P",
     "filename": "a.s19",
     "source_kind": "s19",
     "bytes_per_line": 32,
@@ -4780,11 +4780,11 @@
     }
    },
    "out": [
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\a.s19",
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\a.s19",
     []
    ],
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\a.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\a.s19": [
      "S00F00004341534530315F4241534943B2",
      "S311000000004341534530315F4241534943B0",
      "S32580000000533139544F4F4C5F424153494300010203000102030405060708090A0B0C0D0E2F",
@@ -4856,7 +4856,7 @@
       2147483776
      ]
     ],
-    "dest_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P",
+    "dest_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P",
     "filename": "b.s19",
     "source_kind": "s19",
     "bytes_per_line": 32,
@@ -4866,11 +4866,11 @@
     }
    },
    "out": [
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\b.s19",
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\b.s19",
     []
    ],
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\b.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\b.s19": [
      "S00F00004341534530315F4241534943B2",
      "S311000000004341534530315F4241534943B0",
      "S32580000000533139544F4F4C5F424153494300010203000102030405060708090A0B0C0D0E2F",
@@ -4887,12 +4887,12 @@
    "test": "cwaudit/test_t3_flow.py::test_t3a_flow_case01",
    "depth": 2,
    "in": {
-    "source": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\temp\\out.s19",
-    "destination": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P"
+    "source": "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\temp\\out.s19",
+    "destination": "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P"
    },
-   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\out.s19",
+   "out": "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\out.s19",
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\out.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\out.s19": [
      "S00F00004341534530315F4241534943B2",
      "S311000000004341534530315F4241534943B0",
      "S32580000000533139544F4F4C5F424153494300010203000102030405060708090A0B0C0D0E2F",
@@ -4901,7 +4901,7 @@
      "S32580000060202122232425262728292A2B2C2D2E2F303132333435363738393A3BCFCBB78B24",
      "S70500000000FA"
     ],
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\temp\\out.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\temp\\out.s19": [
      "S00F00004341534530315F4241534943B2",
      "S311000000004341534530315F4241534943B0",
      "S32580000000533139544F4F4C5F424153494300010203000102030405060708090A0B0C0D0E2F",
@@ -4916,12 +4916,12 @@
    "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
    "depth": 5,
    "in": {
-    "source": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\temp\\a.s19",
-    "destination": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P"
+    "source": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\temp\\a.s19",
+    "destination": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P"
    },
-   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\a.s19",
+   "out": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\a.s19",
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\a.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\a.s19": [
      "S00F00004341534530315F4241534943B2",
      "S311000000004341534530315F4241534943B0",
      "S32580000000533139544F4F4C5F424153494300010203000102030405060708090A0B0C0D0E2F",
@@ -4930,7 +4930,7 @@
      "S32580000060202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F0A",
      "S70500000000FA"
     ],
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\temp\\a.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\temp\\a.s19": [
      "S00F00004341534530315F4241534943B2",
      "S311000000004341534530315F4241534943B0",
      "S32580000000533139544F4F4C5F424153494300010203000102030405060708090A0B0C0D0E2F",
@@ -4945,12 +4945,12 @@
    "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
    "depth": 3,
    "in": {
-    "source": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\temp\\b.s19",
-    "destination": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P"
+    "source": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\temp\\b.s19",
+    "destination": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P"
    },
-   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\b.s19",
+   "out": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\b.s19",
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\b.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\b.s19": [
      "S00F00004341534530315F4241534943B2",
      "S311000000004341534530315F4241534943B0",
      "S32580000000533139544F4F4C5F424153494300010203000102030405060708090A0B0C0D0E2F",
@@ -4959,7 +4959,7 @@
      "S32580000060202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F0A",
      "S70500000000FA"
     ],
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\temp\\b.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\temp\\b.s19": [
      "S00F00004341534530315F4241534943B2",
      "S311000000004341534530315F4241534943B0",
      "S32580000000533139544F4F4C5F424153494300010203000102030405060708090A0B0C0D0E2F",
@@ -5061,9 +5061,9 @@
        ]
       ],
       "written_paths": [
-       "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\out.s19"
+       "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\out.s19"
       ],
-      "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P",
+      "project_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P",
       "change_records": [
        {
         "FlowChangeRecord": {
@@ -5156,7 +5156,7 @@
     ],
     "ctx": {
      "FlowContext": {
-      "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P",
+      "project_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P",
       "mac_records": null,
       "a2l_data": null,
       "variant": null,
@@ -5181,10 +5181,10 @@
          "BlockResult(index=2, kind='write_out', status='ok', summary='wrote a.s19', diagnostics=[], findings=[])"
         ],
         "written_paths": [
-         "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\a.s19"
+         "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\a.s19"
         ],
         "inputs": [
-         "('firmware.s19', 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\cwaudit_590pb6g1\\\\.s19tool\\\\workarea\\\\P\\\\firmware.s19')"
+         "('firmware.s19', 'C:\\\\Users\\\\<USER>\\\\AppData\\\\Local\\\\Temp\\\\cwaudit_590pb6g1\\\\.s19tool\\\\workarea\\\\P\\\\firmware.s19')"
         ],
         "started_at": 2036424.0102094,
         "finished_at": 2036424.0189433,
@@ -5202,10 +5202,10 @@
          "BlockResult(index=2, kind='write_out', status='ok', summary='wrote b.s19', diagnostics=[], findings=[])"
         ],
         "written_paths": [
-         "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\b.s19"
+         "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\b.s19"
         ],
         "inputs": [
-         "('firmware.s19', 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\cwaudit_590pb6g1\\\\.s19tool\\\\workarea\\\\P\\\\firmware.s19')"
+         "('firmware.s19', 'C:\\\\Users\\\\<USER>\\\\AppData\\\\Local\\\\Temp\\\\cwaudit_590pb6g1\\\\.s19tool\\\\workarea\\\\P\\\\firmware.s19')"
         ],
         "started_at": 2036424.0104416,
         "finished_at": 2036424.0275329,
@@ -5213,7 +5213,7 @@
        }
       }
      ],
-     "report_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\reports\\20261023T180938Z-chain-set-report.md",
+     "report_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\reports\\20261023T180938Z-chain-set-report.md",
      "diagnostics": []
     }
    }
@@ -5239,10 +5239,10 @@
           "BlockResult(index=2, kind='write_out', status='ok', summary='wrote a.s19', diagnostics=[], findings=[])"
          ],
          "written_paths": [
-          "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\a.s19"
+          "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\a.s19"
          ],
          "inputs": [
-          "('firmware.s19', 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\cwaudit_590pb6g1\\\\.s19tool\\\\workarea\\\\P\\\\firmware.s19')"
+          "('firmware.s19', 'C:\\\\Users\\\\<USER>\\\\AppData\\\\Local\\\\Temp\\\\cwaudit_590pb6g1\\\\.s19tool\\\\workarea\\\\P\\\\firmware.s19')"
          ],
          "started_at": 2036424.0102094,
          "finished_at": 2036424.0189433,
@@ -5260,10 +5260,10 @@
           "BlockResult(index=2, kind='write_out', status='ok', summary='wrote b.s19', diagnostics=[], findings=[])"
          ],
          "written_paths": [
-          "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\b.s19"
+          "<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\b.s19"
          ],
          "inputs": [
-          "('firmware.s19', 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\cwaudit_590pb6g1\\\\.s19tool\\\\workarea\\\\P\\\\firmware.s19')"
+          "('firmware.s19', 'C:\\\\Users\\\\<USER>\\\\AppData\\\\Local\\\\Temp\\\\cwaudit_590pb6g1\\\\.s19tool\\\\workarea\\\\P\\\\firmware.s19')"
          ],
          "started_at": 2036424.0104416,
          "finished_at": 2036424.0275329,
@@ -5278,7 +5278,7 @@
     "set_name": "chain-set",
     "generated_at": "datetime.datetime(2026, 10, 23, 18, 9, 38, 117660, tzinfo=datetime.timezone.utc)"
    },
-   "out": "# Chain-set report — chain-set\n\n- **Generated:** 2026-10-23 18:09:38 UTC\n- **Mode:** parallel\n- **Chains:** 2\n\n## Chain ledger\n\n| # | Chain | Template | Status | Blocks | Elapsed |\n|---|-------|----------|--------|--------|---------|\n| 1 | laneA | t | ✓ ok | 3 | 0.009s |\n| 2 | laneB | t | ✓ ok | 3 | 0.017s |\n\n## Input provenance\n\n- Chain laneA input 1: firmware\\.s19 [bound] path=`C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19`\n- Chain laneB input 1: firmware\\.s19 [bound] path=`C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19`\n\n---\n*Generated by the s19_app Flow Execution (chain-set run).*"
+   "out": "# Chain-set report — chain-set\n\n- **Generated:** 2026-10-23 18:09:38 UTC\n- **Mode:** parallel\n- **Chains:** 2\n\n## Chain ledger\n\n| # | Chain | Template | Status | Blocks | Elapsed |\n|---|-------|----------|--------|--------|---------|\n| 1 | laneA | t | ✓ ok | 3 | 0.009s |\n| 2 | laneB | t | ✓ ok | 3 | 0.017s |\n\n## Input provenance\n\n- Chain laneA input 1: firmware\\.s19 [bound] path=`<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19`\n- Chain laneB input 1: firmware\\.s19 [bound] path=`<HOME>\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19`\n\n---\n*Generated by the s19_app Flow Execution (chain-set run).*"
   }
  ]
 }

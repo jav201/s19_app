@@ -1,6 +1,6 @@
 # command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation sec4-resolved-staging
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# tree: <HOME>\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation sec4-resolved-staging
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
 # date: 2026-10-29T20:00:49+00:00
 # requirement: LLR-167.7 (SEC-4, LED .56)
 # mutation: the staging root resolves dest_dir again (the pre-SEC-4 walk) — file s19_app/tui/changes/apply.py
@@ -12,7 +12,7 @@
 ================================== FAILURES ===================================
 ______ test_tc_b100_69_sec4_junction_save_back_stages_in_this_work_area _______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29964/test_tc_b100_69_sec4_junction_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29964/test_tc_b100_69_sec4_junction_0')
 
     def test_tc_b100_69_sec4_junction_save_back_stages_in_this_work_area(
         tmp_path: Path,
@@ -50,7 +50,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 E       AssertionError: ("Loaded firmware.s19 (S19 only)
 E         Loaded project 'J' -> firmware.s19
 E         Patched image not saved - see issues
-E         [MF-WRITE-...on traverses a symbolic link or reparse point: C:\\Users\\jjgh8\\", ['T', 'T\\firmware.s19', 'temp', 'temp\\.staging'])
+E         [MF-WRITE-...on traverses a symbolic link or reparse point: <HOME>\\", ['T', 'T\\firmware.s19', 'temp', 'temp\\.staging'])
 E       assert ['T', 'T\\fir...mp\\.staging'] == ['T', 'T\\firmware.s19']
 E         
 E         Left contains 2 more items, first extra item: 'temp'

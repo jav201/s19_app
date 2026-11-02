@@ -1,6 +1,6 @@
 # Kimi brief — batch-99 Increment 1 · review fixes (code-reviewer findings F1–F5)
 
-Read `BRIEF-COMMON.md` first. Same worktree, `C:\Users\jjgh8\Github\s19_app-b99-inc1`, on branch `b99-wip` (Inc-1 is committed there as `e4c4324`). Do not commit; leave the changes in the working tree.
+Read `BRIEF-COMMON.md` first. Same worktree, `<HOME>\Github\s19_app-b99-inc1`, on branch `b99-wip` (Inc-1 is committed there as `e4c4324`). Do not commit; leave the changes in the working tree.
 
 The independent code review returned **changes required**. Fix exactly these findings:
 

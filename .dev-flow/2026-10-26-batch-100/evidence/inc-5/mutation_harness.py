@@ -146,7 +146,7 @@ MUTATIONS = {
     ),
 }
 
-PYTHON = r"C:\Users\jjgh8\anaconda3\envs\s19env\python.exe"
+PYTHON = r"<HOME>\anaconda3\envs\s19env\python.exe"
 
 
 def sha(path: Path) -> str:

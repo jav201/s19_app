@@ -2,7 +2,7 @@
 ================================== FAILURES ===================================
 _______________ test_tc_b99_22_save_blocks_overlapping_entries ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26295/test_tc_b99_22_save_blocks_ove0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26295/test_tc_b99_22_save_blocks_ove0')
 
     def test_tc_b99_22_save_blocks_overlapping_entries(tmp_path: Path) -> None:
         """The save re-derive runs the same collision refresh as the apply, so
@@ -32,7 +32,7 @@ E       NameError: name 'DISPOSITION_BLOCKED' is not defined
 tests\test_b99_editor_image.py:337: NameError
 _______________ test_tc_b99_40_strip_shows_new_file_source_byte _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26295/test_tc_b99_40_strip_shows_new0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26295/test_tc_b99_40_strip_shows_new0')
 
     def test_tc_b99_40_strip_shows_new_file_source_byte(tmp_path: Path) -> None:
         """After a NEW file loads, the strip's "was" line shows the NEW file's
@@ -94,7 +94,7 @@ E       assert '99 98 97 96' in '0000EB10 +0 +1 +2 +3 +4 +5 +6 +7\n  was    20 4
 tests\test_b99_editor_image.py:503: AssertionError
 _________________ test_at_b99_08_save_back_keeps_editor_image _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26295/test_at_b99_08_save_back_keeps0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26295/test_at_b99_08_save_back_keeps0')
 
     def test_at_b99_08_save_back_keeps_editor_image(tmp_path: Path) -> None:
         """Add / Apply / Undo / Add / Apply / Add (no apply) / save back: the
@@ -264,7 +264,7 @@ E       assert 'includes 1 entry not applied before this save' in 'Saved + verif
 tests\test_b99_editor_image.py:675: AssertionError
 __________ test_at_b99_08_verify_mismatch_status_still_names_entries __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26295/test_at_b99_08_verify_mismatch0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26295/test_at_b99_08_verify_mismatch0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000170E1AC0750>
 
     def test_at_b99_08_verify_mismatch_status_still_names_entries(

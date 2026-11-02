@@ -1,13 +1,13 @@
-# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/mut/ME
-# command: python -m pytest -q -p no:cacheprovider -rfE --basetemp=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/ME tests/test_b100_active_variant.py -k tc_b100_20
+# tree: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/mut/ME
+# command: python -m pytest -q -p no:cacheprovider -rfE --basetemp=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/ME tests/test_b100_active_variant.py -k tc_b100_20
 # date: 2026-10-30T03:02:00Z
-# s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r6\mut\ME\s19_app\__init__.py
+# s19_app.__file__ = <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r6\mut\ME\s19_app\__init__.py
 # python 3.11.15
 FFFF                                                                     [100%]
 ================================== FAILURES ===================================
 _________________ test_tc_b100_20_save_back_carries_every_key _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/ME/test_tc_b100_20_save_back_carr0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/ME/test_tc_b100_20_save_back_carr0')
 
     def test_tc_b100_20_save_back_carries_every_key(tmp_path: Path) -> None:
         base = tmp_path / "app"
@@ -29,7 +29,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-
 tests\test_b100_active_variant.py:323: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/ME/test_tc_b100_20_save_back_carr0/app/.s19tool/workarea/P')
+project_dir = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/ME/test_tc_b100_20_save_back_carr0/app/.s19tool/workarea/P')
 before_bytes = b'{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"],"assignments":{"firmware":["checks/...start":2147483712,"end":2147483775}],"gathered":{"patches":["patches/cs_seed.json"],"checks":["checks/ck_seed.json"]}}'
 
     def _assert_carried(project_dir: Path, before_bytes: bytes) -> dict:
@@ -50,7 +50,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:304: AssertionError
 _______ test_tc_b100_20_variant_append_carries_every_key_and_activates ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/ME/test_tc_b100_20_variant_append0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/ME/test_tc_b100_20_variant_append0')
 
     def test_tc_b100_20_variant_append_carries_every_key_and_activates(tmp_path: Path) -> None:
         base = tmp_path / "app"
@@ -86,7 +86,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-
 tests\test_b100_active_variant.py:355: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/ME/test_tc_b100_20_variant_append0/app/.s19tool/workarea/P')
+project_dir = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/ME/test_tc_b100_20_variant_append0/app/.s19tool/workarea/P')
 before_bytes = b'{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"],"assignments":{"firmware":["checks/...start":2147483712,"end":2147483775}],"gathered":{"patches":["patches/cs_seed.json"],"checks":["checks/ck_seed.json"]}}'
 
     def _assert_carried(project_dir: Path, before_bytes: bytes) -> dict:
@@ -107,7 +107,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:304: AssertionError
 _________________ test_tc_b100_20_mac_sync_carries_every_key __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/ME/test_tc_b100_20_mac_sync_carri0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/ME/test_tc_b100_20_mac_sync_carri0')
 
     def test_tc_b100_20_mac_sync_carries_every_key(tmp_path: Path) -> None:
         base = tmp_path / "app"
@@ -135,7 +135,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-
 tests\test_b100_active_variant.py:381: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/ME/test_tc_b100_20_mac_sync_carri0/app/.s19tool/workarea/P')
+project_dir = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/ME/test_tc_b100_20_mac_sync_carri0/app/.s19tool/workarea/P')
 before_bytes = b'{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"],"assignments":{"firmware":["checks/...start":2147483712,"end":2147483775}],"gathered":{"patches":["patches/cs_seed.json"],"checks":["checks/ck_seed.json"]}}'
 
     def _assert_carried(project_dir: Path, before_bytes: bytes) -> dict:
@@ -156,7 +156,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:304: AssertionError
 _________________ test_tc_b100_20_a2l_sync_carries_every_key __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/ME/test_tc_b100_20_a2l_sync_carri0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/ME/test_tc_b100_20_a2l_sync_carri0')
 
     def test_tc_b100_20_a2l_sync_carries_every_key(tmp_path: Path) -> None:
         base = tmp_path / "app"
@@ -184,7 +184,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-
 tests\test_b100_active_variant.py:405: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/ME/test_tc_b100_20_a2l_sync_carri0/app/.s19tool/workarea/P')
+project_dir = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/ME/test_tc_b100_20_a2l_sync_carri0/app/.s19tool/workarea/P')
 before_bytes = b'{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"],"assignments":{"firmware":["checks/...start":2147483712,"end":2147483775}],"gathered":{"patches":["patches/cs_seed.json"],"checks":["checks/ck_seed.json"]}}'
 
     def _assert_carried(project_dir: Path, before_bytes: bytes) -> dict:

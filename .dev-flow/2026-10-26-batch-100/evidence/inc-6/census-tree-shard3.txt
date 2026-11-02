@@ -1,6 +1,6 @@
-# command: python -m pytest -q -p no:cacheprovider -rfE --basetemp=C:/Users/jjgh8/AppData/Local/Temp/i6t3 tests/test_b100_save_guards.py tests/test_b97_chips_help.py tests/test_b97_load_project_dialog.py tests/test_b99_crc_region.py tests/test_b99_staging.py tests/test_loadfilescreen_input.py tests/test_report_progress.py tests/test_tui_manifest_save.py tests/test_tui_report_view.py 
-# tree: C:/Users/jjgh8/Github/s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree incl. re-pins)
-# runner: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc6-impl/py.sh (sets PYTHONPATH to that tree; NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8)
+# command: python -m pytest -q -p no:cacheprovider -rfE --basetemp=<HOME>/AppData/Local/Temp/i6t3 tests/test_b100_save_guards.py tests/test_b97_chips_help.py tests/test_b97_load_project_dialog.py tests/test_b99_crc_region.py tests/test_b99_staging.py tests/test_loadfilescreen_input.py tests/test_report_progress.py tests/test_tui_manifest_save.py tests/test_tui_report_view.py 
+# tree: <HOME>/Github/s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree incl. re-pins)
+# runner: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc6-impl/py.sh (sets PYTHONPATH to that tree; NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8)
 # date: 2026-10-30T01:48:43Z
 ........................................................................ [ 32%]
 ..........................................................F............. [ 65%]
@@ -9,7 +9,7 @@
 ================================== FAILURES ===================================
 ____________________ test_at_b99_10_flow_crc_region_pilot _____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t3/test_at_b99_10_flow_crc_region0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/i6t3/test_at_b99_10_flow_crc_region0')
 
     def test_at_b99_10_flow_crc_region_pilot(tmp_path: Path) -> None:
         """Flow Execution, driven ONLY by keys and clicks: the empty-region lane
@@ -212,7 +212,7 @@ E           textual.css.query.NoMatches: No nodes match '#fx_import' on LoadResu
 ..\..\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: NoMatches
 _________ test_at_b99_04_duplicate_refused_distinct_parallel_markers __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t3/test_at_b99_04_duplicate_refus0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/i6t3/test_at_b99_04_duplicate_refus0')
 
     def test_at_b99_04_duplicate_refused_distinct_parallel_markers(tmp_path: Path) -> None:
         """AT-B99-04 (HLR-155 D7 + the distinct-name parallel arm, LLR-155.5):

@@ -2,13 +2,13 @@ mutation: llr-163-3 on s19_app/tui/workspace.py
 hash before: 305e197c1a8d2a94ef077ac6c893c83e0d5449268c43b28df6e73a800acb43d1
 hash mutated: 74eb7bc2d4de3e84e8905d44f50a9695192b789f5da4adcf4ff6d0c73064c9ce
 cmd: python -m pytest -q -p no:cacheprovider tests/test_unified_write.py::test_tc018_existing_name_is_dedup_suffixed tests/test_tui_patch_editor_v2.py::test_at031b_two_saves_are_distinct_no_clobber tests/test_b99_export.py::test_tc_b99_31_changed_bytes_take_the_next_free_name
-tree: /c/Users/jjgh8/Github/s19_app-b100-inc1
+tree: <HOME>/Github/s19_app-b100-inc1
 
 FFF                                                                      [100%]
 ================================== FAILURES ===================================
 _________________ test_tc018_existing_name_is_dedup_suffixed __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27183/test_tc018_existing_name_is_de0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27183/test_tc018_existing_name_is_de0')
 
     def test_tc018_existing_name_is_dedup_suffixed(tmp_path: Path) -> None:
         """TC-018 — re-pinned at batch-100 Inc 1 (G-005 / LLR-163.3).
@@ -29,13 +29,13 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 >       assert first == second, (
             f"identical bytes must reuse the first file, got {first} and {second}"
         )
-E       AssertionError: identical bytes must reuse the first file, got C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-27183\test_tc018_existing_name_is_de0\.s19tool\workarea\patches\cs.json and C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-27183\test_tc018_existing_name_is_de0\.s19tool\workarea\patches\cs_1.json
-E       assert WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27183/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json') == WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27183/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs_1.json')
+E       AssertionError: identical bytes must reuse the first file, got <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-27183\test_tc018_existing_name_is_de0\.s19tool\workarea\patches\cs.json and <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-27183\test_tc018_existing_name_is_de0\.s19tool\workarea\patches\cs_1.json
+E       assert WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27183/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json') == WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27183/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs_1.json')
 
 tests\test_unified_write.py:388: AssertionError
 ________________ test_at031b_two_saves_are_distinct_no_clobber ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27183/test_at031b_two_saves_are_dist0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27183/test_at031b_two_saves_are_dist0')
 
     def test_at031b_two_saves_are_distinct_no_clobber(tmp_path: Path) -> None:
         """AT-031b (idempotent boundary) — re-pinned at batch-100 Inc 1 (G-005 /
@@ -112,14 +112,14 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 >           assert len(unchanged) == 1, (
                 f"two saves of an unchanged document reuse one file, found {unchanged}"
             )
-E           AssertionError: two saves of an unchanged document reuse one file, found [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27183/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json'), WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27183/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes_1.json')]
+E           AssertionError: two saves of an unchanged document reuse one file, found [WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27183/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json'), WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27183/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes_1.json')]
 E           assert 2 == 1
-E            +  where 2 = len([WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27183/test_at031b_two_saves_are_dist0/.s19tool/...ata/Local/Temp/pytest-of-jjgh8/pytest-27183/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes_1.json')])
+E            +  where 2 = len([WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27183/test_at031b_two_saves_are_dist0/.s19tool/...ata/Local/Temp/pytest-of-<USER>/pytest-27183/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes_1.json')])
 
 tests\test_tui_patch_editor_v2.py:1334: AssertionError
 ____________ test_tc_b99_31_changed_bytes_take_the_next_free_name _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27183/test_tc_b99_31_changed_bytes_t0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27183/test_tc_b99_31_changed_bytes_t0')
 
     def test_tc_b99_31_changed_bytes_take_the_next_free_name(tmp_path: Path) -> None:
         from s19_app.tui import segment_split_view as ssv

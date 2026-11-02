@@ -1,6 +1,6 @@
 # Code-Wire annex to the batch-97 PDR
 
-> Method: Code-Wire draft v2.5 (`C:\Users\jjgh8\Github\code-wire` at `6d91188`), forward direction (PDR to DDR).
+> Method: Code-Wire draft v2.5 (`<HOME>\Github\code-wire` at `6d91188`), forward direction (PDR to DDR).
 > Product: `s19_app` at `7d823a7`, Python 3.11.15 (`s19env`), Textual 8.2.8. The product tree was not changed. Marks and the probe ran in a throwaway worktree.
 > This annex is an input to the PDR record. It is not a PDR verdict.
 
@@ -150,7 +150,7 @@ Such a variant chooses the risky flows and writes examples only for the CHANGED 
 
 ## Files
 
-All files are in `C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-10-19-batch-97\design\codewire\`.
+All files are in `<HOME>\Github\s19_app\.dev-flow\2026-10-19-batch-97\design\codewire\`.
 
 | Path | Content |
 |---|---|

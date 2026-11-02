@@ -19,7 +19,7 @@
 ## 0 · Verify the ground before trusting anything here
 
 ```bash
-cd <repo-root>                                            # C:\Users\jjgh8\Github\s19_app, branch main
+cd <repo-root>                                            # <HOME>\Github\s19_app, branch main
 python ~/.claude/docs/tools/devflow-validate.py .         # expect: 0 block · 254 notice · 15 n/a
 #   V20 line: atlas current (4 files, census 2)
 python ~/.claude/docs/tools/devflow-validate.py --selftest # expect exit 0, 192 arms

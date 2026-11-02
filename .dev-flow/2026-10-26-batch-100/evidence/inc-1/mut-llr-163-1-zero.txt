@@ -1,11 +1,11 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py::test_tc_b100_01_zero_byte_candidate_is_never_reused (MUTANT zero: the 0-byte candidate skip removed from _match_identical)
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 (fix pass 1 + mutant)
+tree: <HOME>\Github\s19_app-b100-inc1 (fix pass 1 + mutant)
 
 F                                                                        [100%]
 ================================== FAILURES ===================================
 _____________ test_tc_b100_01_zero_byte_candidate_is_never_reused _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27240/test_tc_b100_01_zero_byte_cand0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27240/test_tc_b100_01_zero_byte_cand0')
 
     def test_tc_b100_01_zero_byte_candidate_is_never_reused(
         tmp_path: Path,
@@ -22,7 +22,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         result = place_into_workarea(source, destination)
 >       assert not result.reused
 E       AssertionError: assert not True
-E        +  where True = PlacementResult(path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27240/test_tc_b100_01_zero_byte_cand0/.s19tool/workarea/target/staged.s19'), reused=True).reused
+E        +  where True = PlacementResult(path=WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27240/test_tc_b100_01_zero_byte_cand0/.s19tool/workarea/target/staged.s19'), reused=True).reused
 
 tests\test_b100_reuse.py:313: AssertionError
 =========================== short test summary info ===========================

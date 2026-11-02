@@ -6,87 +6,87 @@ cc11018c2c457d2594211db7b9e40c5d3664f877e897bf5bc22f0247a7b8dd76 *s19_app/tui/wi
 ....................FFFFFFFF.FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF........... [ 55%]
 .FFFFFFFFFFFFFF..FFFFFFFFFFFFFFFFFF.......FFFFFFFF......F                [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:532: AssertionError: list / canvas displayed: (False, False)
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:564: AssertionError: ['flow_palette_patch', 'flow_palette_crc', 'flow_palette_a2b', 'flow_palette_external_step']
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:598: AssertionError: EXT-STEP inputs on 1 row(s): [13]
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:631: assert (None is not None)
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:660: assert None is not None
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:706: AssertionError: [(44, 3), (44, 3), (44, 3), (44, 3)]
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:465: AssertionError: #flow_pipeline: expected exactly 1 widget, found 0
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:786: AssertionError: ('crc-family', [])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:832: AssertionError: [' — al confirmar, la SALIDA se copia aquí', 'sesión: ', 'comando exacto (terminal) / instrucción (manual)', 'LOG — ob...h absoluto preferido', 'sesión: (sin proyecto activo — el directorio de sesión se muestra al cargar un proyecto)', ...]
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:465: AssertionError: #flow_pipeline: expected exactly 1 widget, found 0
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:910: AssertionError: outside the panel: {'flow_clip_status'}
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:939: AssertionError: ['Funnel (0)']
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:975: AssertionError: #flow_ext_session is displayed
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:975: AssertionError: #flow_ext_session is displayed
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1006: AssertionError: a scope selector is composed
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1081: AssertionError: ['flow_palette_patch', 'flow_palette_crc', 'flow_palette_a2b', 'flow_palette_external_step']
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1185: AssertionError: no nul_add_refusal
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1185: AssertionError: no nul_add_refusal
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1185: AssertionError: no nul_add_refusal
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1185: AssertionError: no nul_add_refusal
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1185: AssertionError: no nul_add_refusal
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1185: AssertionError: no nul_add_refusal
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1185: AssertionError: no nul_add_refusal
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1185: AssertionError: no nul_add_refusal
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1185: AssertionError: no nul_add_refusal
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_palette_source' on Screen(id='_default')
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_palette_source' on Screen(id='_default')
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_palette_source' on Screen(id='_default')
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_palette_source' on Screen(id='_default')
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_palette_source' on Screen(id='_default')
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_palette_source' on Screen(id='_default')
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_palette_source' on Screen(id='_default')
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_palette_source' on Screen(id='_default')
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_palette_source' on Screen(id='_default')
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:465: AssertionError: #flow_pipeline: expected exactly 1 widget, found 0
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:465: AssertionError: #flow_pipeline: expected exactly 1 widget, found 0
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1298: AssertionError: 4
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:465: AssertionError: #flow_pipeline: expected exactly 1 widget, found 0
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1408: AssertionError: the CHECK chip is not reachable by tab: ['flow_panel', 'flow_palette_patch', 'flow_palette_crc', 'flow_palette_a2b', 'flow_palette_external_step', 'flow_kind', 'flow_ref', 'flow_add', 'flow_funnel_toggle', 'flow_pick', 'flow_copy', 'flow_paste', 'flow_scope', 'flow_run', 'flow_clear', 'flow_save', 'flow_load', 'flow_result', 'rail_item_workspace', 'rail_item_a2l', 'rail_item_mac', 'rail_item_map', 'rail_item_issues', 'rail_item_patch', 'rail_item_check_editor', 'rail_item_diff', 'rail_item_flow', 'rail_item_flow_execution', 'rail_item_checks', 'rail_item_crc_designer', 'window_help_flow', 'flow_panel', 'flow_palette_patch', 'flow_palette_crc', 'flow_palette_a2b', 'flow_palette_external_step', 'flow_kind', 'flow_ref', 'flow_add', 'flow_funnel_toggle', 'flow_pick', 'flow_copy', 'flow_paste', 'flow_scope', 'flow_run', 'flow_clear', 'flow_save', 'flow_load', 'flow_result', 'rail_item_workspace', 'rail_item_a2l', 'rail_item_mac', 'rail_item_map', 'rail_item_issues', 'rail_item_patch', 'rail_item_check_editor', 'rail_item_diff', 'rail_item_flow', 'rail_item_flow_execution', 'rail_item_checks']
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1488: AssertionError: the scoped Flow Builder section exists
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:796: assert None is not None
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_pipeline' on FlowBuilderPanel(id='flow_panel')
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_pipeline' on FlowBuilderPanel(id='flow_panel')
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:873: AssertionError: ((118, 54), ['flow_help', 'flow_clip_status'])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:873: AssertionError: ((119, 54), ['flow_help', 'flow_clip_status'])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:873: AssertionError: ((120, 54), ['flow_help', 'flow_ext_output', 'flow_clip_status'])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:873: AssertionError: ((160, 56), ['flow_clip_status'])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:873: AssertionError: ((220, 60), ['flow_clip_status'])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:873: AssertionError: ((260, 70), ['flow_clip_status'])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:892: AssertionError: ((118, 54), Region(x=51, y=47, width=16, height=3), Region(x=5, y=4, width=112, height=40))
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:892: AssertionError: ((118, 53), Region(x=51, y=47, width=16, height=3), Region(x=5, y=4, width=112, height=39))
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:892: AssertionError: ((119, 54), Region(x=52, y=47, width=16, height=3), Region(x=5, y=4, width=113, height=40))
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:892: AssertionError: ((120, 54), Region(x=53, y=47, width=16, height=3), Region(x=23, y=4, width=96, height=40))
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:892: AssertionError: ((160, 56), Region(x=93, y=46, width=16, height=3), Region(x=23, y=4, width=136, height=42))
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:918: AssertionError: {'nowrap-legend': 0, 'nowrap-pipeline': 0, 'nowrap-ribbon': 0}
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:918: AssertionError: {'nowrap-legend': 0, 'nowrap-pipeline': 0, 'nowrap-ribbon': 0}
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:918: AssertionError: {'nowrap-legend': 0, 'nowrap-pipeline': 0, 'nowrap-ribbon': 0}
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:918: AssertionError: {'nowrap-legend': 0, 'nowrap-pipeline': 0, 'nowrap-ribbon': 0}
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:918: AssertionError: {'nowrap-legend': 0, 'nowrap-pipeline': 0, 'nowrap-ribbon': 0}
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:918: AssertionError: {'nowrap-legend': 0, 'nowrap-pipeline': 0, 'nowrap-ribbon': 0}
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_pipeline_scroll' on FlowBuilderPanel(id='flow_panel')
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_pipeline_scroll' on FlowBuilderPanel(id='flow_panel')
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_pipeline_scroll' on FlowBuilderPanel(id='flow_panel')
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_pipeline_scroll' on FlowBuilderPanel(id='flow_panel')
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_pipeline_scroll' on FlowBuilderPanel(id='flow_panel')
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_pipeline_scroll' on FlowBuilderPanel(id='flow_panel')
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_pipeline_scroll' on FlowBuilderPanel(id='flow_panel')
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_pipeline_scroll' on FlowBuilderPanel(id='flow_panel')
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_pipeline_scroll' on FlowBuilderPanel(id='flow_panel')
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_palette_source' on FlowBuilderPanel(id='flow_panel')
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_palette_source' on FlowBuilderPanel(id='flow_panel')
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_palette_source' on FlowBuilderPanel(id='flow_panel')
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1216: AssertionError: one folder chip and one help chip in the header: (0, 1)
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1302: AssertionError: labels with no `label — effect` line: ['', '(no FLOW_KIND_GLYPHS)', '?', 'A2B-DIFF', 'Add', 'Añadir var', 'CRC', 'Clear', 'Copiar', 'EXT-STEP', 'Funnel', 'LOG — obligatorio (texto de constancia)', 'Load…', 'PATCH', 'Pegar', 'Run', 'SALIDA — path absoluto preferido', 'Save…', 'VARIABLE ([A-Z0-9_])', 'comando exacto (terminal) / instrucción (manual)', 'enter', 'image A — file or #n', 'image B — file or #n', 'nº', 'ref (image / change-doc / output name)', 'valor a sustituir', '□', '◈', '○', '●', '✖']
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1336: AssertionError: the Builder's closed glyph vocabularies exist
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1336: AssertionError: the Builder's closed glyph vocabularies exist
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1391: AssertionError: ['✖']
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1433: AssertionError: ('pipeline_empty', [])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1433: AssertionError: ('ribbon_no_session', [])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1433: AssertionError: ('load_refused', [])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_execution.py:223: AssertionError: assert ['PAUSED - ESPERANDO HUMANO'] == []
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:532: AssertionError: list / canvas displayed: (False, False)
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:564: AssertionError: ['flow_palette_patch', 'flow_palette_crc', 'flow_palette_a2b', 'flow_palette_external_step']
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:598: AssertionError: EXT-STEP inputs on 1 row(s): [13]
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:631: assert (None is not None)
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:660: assert None is not None
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:706: AssertionError: [(44, 3), (44, 3), (44, 3), (44, 3)]
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:465: AssertionError: #flow_pipeline: expected exactly 1 widget, found 0
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:786: AssertionError: ('crc-family', [])
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:832: AssertionError: [' — al confirmar, la SALIDA se copia aquí', 'sesión: ', 'comando exacto (terminal) / instrucción (manual)', 'LOG — ob...h absoluto preferido', 'sesión: (sin proyecto activo — el directorio de sesión se muestra al cargar un proyecto)', ...]
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:465: AssertionError: #flow_pipeline: expected exactly 1 widget, found 0
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:910: AssertionError: outside the panel: {'flow_clip_status'}
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:939: AssertionError: ['Funnel (0)']
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:975: AssertionError: #flow_ext_session is displayed
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:975: AssertionError: #flow_ext_session is displayed
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1006: AssertionError: a scope selector is composed
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1081: AssertionError: ['flow_palette_patch', 'flow_palette_crc', 'flow_palette_a2b', 'flow_palette_external_step']
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1185: AssertionError: no nul_add_refusal
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1185: AssertionError: no nul_add_refusal
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1185: AssertionError: no nul_add_refusal
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1185: AssertionError: no nul_add_refusal
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1185: AssertionError: no nul_add_refusal
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1185: AssertionError: no nul_add_refusal
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1185: AssertionError: no nul_add_refusal
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1185: AssertionError: no nul_add_refusal
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1185: AssertionError: no nul_add_refusal
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_palette_source' on Screen(id='_default')
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_palette_source' on Screen(id='_default')
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_palette_source' on Screen(id='_default')
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_palette_source' on Screen(id='_default')
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_palette_source' on Screen(id='_default')
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_palette_source' on Screen(id='_default')
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_palette_source' on Screen(id='_default')
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_palette_source' on Screen(id='_default')
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_palette_source' on Screen(id='_default')
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:465: AssertionError: #flow_pipeline: expected exactly 1 widget, found 0
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:465: AssertionError: #flow_pipeline: expected exactly 1 widget, found 0
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1298: AssertionError: 4
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:465: AssertionError: #flow_pipeline: expected exactly 1 widget, found 0
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1408: AssertionError: the CHECK chip is not reachable by tab: ['flow_panel', 'flow_palette_patch', 'flow_palette_crc', 'flow_palette_a2b', 'flow_palette_external_step', 'flow_kind', 'flow_ref', 'flow_add', 'flow_funnel_toggle', 'flow_pick', 'flow_copy', 'flow_paste', 'flow_scope', 'flow_run', 'flow_clear', 'flow_save', 'flow_load', 'flow_result', 'rail_item_workspace', 'rail_item_a2l', 'rail_item_mac', 'rail_item_map', 'rail_item_issues', 'rail_item_patch', 'rail_item_check_editor', 'rail_item_diff', 'rail_item_flow', 'rail_item_flow_execution', 'rail_item_checks', 'rail_item_crc_designer', 'window_help_flow', 'flow_panel', 'flow_palette_patch', 'flow_palette_crc', 'flow_palette_a2b', 'flow_palette_external_step', 'flow_kind', 'flow_ref', 'flow_add', 'flow_funnel_toggle', 'flow_pick', 'flow_copy', 'flow_paste', 'flow_scope', 'flow_run', 'flow_clear', 'flow_save', 'flow_load', 'flow_result', 'rail_item_workspace', 'rail_item_a2l', 'rail_item_mac', 'rail_item_map', 'rail_item_issues', 'rail_item_patch', 'rail_item_check_editor', 'rail_item_diff', 'rail_item_flow', 'rail_item_flow_execution', 'rail_item_checks']
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1488: AssertionError: the scoped Flow Builder section exists
+<HOME>\Github\s19_app\tests\test_b97_width.py:796: assert None is not None
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_pipeline' on FlowBuilderPanel(id='flow_panel')
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_pipeline' on FlowBuilderPanel(id='flow_panel')
+<HOME>\Github\s19_app\tests\test_b97_width.py:873: AssertionError: ((118, 54), ['flow_help', 'flow_clip_status'])
+<HOME>\Github\s19_app\tests\test_b97_width.py:873: AssertionError: ((119, 54), ['flow_help', 'flow_clip_status'])
+<HOME>\Github\s19_app\tests\test_b97_width.py:873: AssertionError: ((120, 54), ['flow_help', 'flow_ext_output', 'flow_clip_status'])
+<HOME>\Github\s19_app\tests\test_b97_width.py:873: AssertionError: ((160, 56), ['flow_clip_status'])
+<HOME>\Github\s19_app\tests\test_b97_width.py:873: AssertionError: ((220, 60), ['flow_clip_status'])
+<HOME>\Github\s19_app\tests\test_b97_width.py:873: AssertionError: ((260, 70), ['flow_clip_status'])
+<HOME>\Github\s19_app\tests\test_b97_width.py:892: AssertionError: ((118, 54), Region(x=51, y=47, width=16, height=3), Region(x=5, y=4, width=112, height=40))
+<HOME>\Github\s19_app\tests\test_b97_width.py:892: AssertionError: ((118, 53), Region(x=51, y=47, width=16, height=3), Region(x=5, y=4, width=112, height=39))
+<HOME>\Github\s19_app\tests\test_b97_width.py:892: AssertionError: ((119, 54), Region(x=52, y=47, width=16, height=3), Region(x=5, y=4, width=113, height=40))
+<HOME>\Github\s19_app\tests\test_b97_width.py:892: AssertionError: ((120, 54), Region(x=53, y=47, width=16, height=3), Region(x=23, y=4, width=96, height=40))
+<HOME>\Github\s19_app\tests\test_b97_width.py:892: AssertionError: ((160, 56), Region(x=93, y=46, width=16, height=3), Region(x=23, y=4, width=136, height=42))
+<HOME>\Github\s19_app\tests\test_b97_width.py:918: AssertionError: {'nowrap-legend': 0, 'nowrap-pipeline': 0, 'nowrap-ribbon': 0}
+<HOME>\Github\s19_app\tests\test_b97_width.py:918: AssertionError: {'nowrap-legend': 0, 'nowrap-pipeline': 0, 'nowrap-ribbon': 0}
+<HOME>\Github\s19_app\tests\test_b97_width.py:918: AssertionError: {'nowrap-legend': 0, 'nowrap-pipeline': 0, 'nowrap-ribbon': 0}
+<HOME>\Github\s19_app\tests\test_b97_width.py:918: AssertionError: {'nowrap-legend': 0, 'nowrap-pipeline': 0, 'nowrap-ribbon': 0}
+<HOME>\Github\s19_app\tests\test_b97_width.py:918: AssertionError: {'nowrap-legend': 0, 'nowrap-pipeline': 0, 'nowrap-ribbon': 0}
+<HOME>\Github\s19_app\tests\test_b97_width.py:918: AssertionError: {'nowrap-legend': 0, 'nowrap-pipeline': 0, 'nowrap-ribbon': 0}
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_pipeline_scroll' on FlowBuilderPanel(id='flow_panel')
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_pipeline_scroll' on FlowBuilderPanel(id='flow_panel')
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_pipeline_scroll' on FlowBuilderPanel(id='flow_panel')
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_pipeline_scroll' on FlowBuilderPanel(id='flow_panel')
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_pipeline_scroll' on FlowBuilderPanel(id='flow_panel')
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_pipeline_scroll' on FlowBuilderPanel(id='flow_panel')
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_pipeline_scroll' on FlowBuilderPanel(id='flow_panel')
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_pipeline_scroll' on FlowBuilderPanel(id='flow_panel')
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_pipeline_scroll' on FlowBuilderPanel(id='flow_panel')
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_palette_source' on FlowBuilderPanel(id='flow_panel')
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_palette_source' on FlowBuilderPanel(id='flow_panel')
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_palette_source' on FlowBuilderPanel(id='flow_panel')
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:1216: AssertionError: one folder chip and one help chip in the header: (0, 1)
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:1302: AssertionError: labels with no `label — effect` line: ['', '(no FLOW_KIND_GLYPHS)', '?', 'A2B-DIFF', 'Add', 'Añadir var', 'CRC', 'Clear', 'Copiar', 'EXT-STEP', 'Funnel', 'LOG — obligatorio (texto de constancia)', 'Load…', 'PATCH', 'Pegar', 'Run', 'SALIDA — path absoluto preferido', 'Save…', 'VARIABLE ([A-Z0-9_])', 'comando exacto (terminal) / instrucción (manual)', 'enter', 'image A — file or #n', 'image B — file or #n', 'nº', 'ref (image / change-doc / output name)', 'valor a sustituir', '□', '◈', '○', '●', '✖']
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:1336: AssertionError: the Builder's closed glyph vocabularies exist
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:1336: AssertionError: the Builder's closed glyph vocabularies exist
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:1391: AssertionError: ['✖']
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:1433: AssertionError: ('pipeline_empty', [])
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:1433: AssertionError: ('ribbon_no_session', [])
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:1433: AssertionError: ('load_refused', [])
+<HOME>\Github\s19_app\tests\test_b97_flow_execution.py:223: AssertionError: assert ['PAUSED - ESPERANDO HUMANO'] == []
 =========================== short test summary info ===========================
 FAILED tests/test_b97_flow_builder.py::test_tc_b97_13_pipeline_cards_and_cables_replace_list_and_canvas
 FAILED tests/test_b97_flow_builder.py::test_tc_b97_14_palette_offers_every_kind_in_order

@@ -2,7 +2,7 @@
 ================================== FAILURES ===================================
 _______________ test_tc_b99_31_bin_pair_placed_under_one_suffix _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26729/test_tc_b99_31_bin_pair_placed0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26729/test_tc_b99_31_bin_pair_placed0')
 
     def test_tc_b99_31_bin_pair_placed_under_one_suffix(tmp_path: Path) -> None:
         """The BIN and its .addr sidecar are placed as ONE group: the second
@@ -38,7 +38,7 @@ E         Use -v to get more diff
 tests\test_b99_export.py:444: AssertionError
 ____________ test_tc_b99_31_orphan_sidecar_claims_the_pair_suffix _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26729/test_tc_b99_31_orphan_sidecar_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26729/test_tc_b99_31_orphan_sidecar_0')
 
     def test_tc_b99_31_orphan_sidecar_claims_the_pair_suffix(tmp_path: Path) -> None:
         """PQ-2(a): `<name>.bin`/`.addr` exist with different bytes AND an orphan
@@ -76,7 +76,7 @@ E         Use -v to get more diff
 tests\test_b99_export.py:482: AssertionError
 ___________ test_tc_b99_31_mismatched_sidecar_never_reuses_the_pair ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26729/test_tc_b99_31_mismatched_side0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26729/test_tc_b99_31_mismatched_side0')
 
     def test_tc_b99_31_mismatched_sidecar_never_reuses_the_pair(tmp_path: Path) -> None:
         """PQ-2(b): the BIN is byte-identical but the .addr carries another base

@@ -1,6 +1,6 @@
 # command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation 167.5-saveback-only
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# tree: <HOME>\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation 167.5-saveback-only
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
 # date: 2026-10-29T19:53:09+00:00
 # requirement: LLR-167.5
 # mutation: mark_saved called on the save-back path only (Save project's call removed) — file s19_app/tui/app.py
@@ -12,7 +12,7 @@
 ================================== FAILURES ===================================
 ____________ test_tc_b100_58_save_project_records_the_saved_state _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29960/test_tc_b100_58_save_project_r0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29960/test_tc_b100_58_save_project_r0')
 
     def test_tc_b100_58_save_project_records_the_saved_state(tmp_path: Path) -> None:
         """loaded → False; applied → True; applied → Save project → False."""

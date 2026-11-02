@@ -637,7 +637,7 @@
       "address_text": "",
       "value_text": "",
       "bytes_text": "",
-      "path_text": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20965\\test_tc_b94_10_dirty_flag_tran0\\.s19tool\\workarea\\patches\\t.json",
+      "path_text": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20965\\test_tc_b94_10_dirty_flag_tran0\\.s19tool\\workarea\\patches\\t.json",
       "scope_text": "active",
       "paste_text": ""
      }
@@ -1841,11 +1841,11 @@
       }
      }
     },
-    "path_text": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20965\\test_tc_b94_10_dirty_flag_tran0\\.s19tool\\workarea\\patches\\t.json"
+    "path_text": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20965\\test_tc_b94_10_dirty_flag_tran0\\.s19tool\\workarea\\patches\\t.json"
    },
    "out": null,
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20965\\test_tc_b94_10_dirty_flag_tran0\\.s19tool\\workarea\\patches\\t.json": [
+    "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20965\\test_tc_b94_10_dirty_flag_tran0\\.s19tool\\workarea\\patches\\t.json": [
      "{",
      "  \"format\": \"s19app-changeset\",",
      "  \"version\": \"2.0\",",

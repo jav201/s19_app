@@ -2,7 +2,7 @@
 input at HEAD — is the block added, and what does Run paint?"""
 import asyncio, sys, tempfile
 from pathlib import Path
-REPO = Path(r"C:\Users\jjgh8\Github\s19_app")
+REPO = Path(r"<HOME>\Github\s19_app")
 sys.path.insert(0, str(REPO))
 from textual import events
 from textual.widgets import Input, Select, Button

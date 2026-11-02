@@ -1,5 +1,5 @@
 cmd: pytest -q -p no:cacheprovider tests/test_b100_reuse.py -k app_placements_name  (MUTANT: one app.py call drops workarea_root)
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 — detached e044112 + inc1 + fix1 + fix2-with-mut-census
+tree: <HOME>\Github\s19_app-b100-inc1 — detached e044112 + inc1 + fix1 + fix2-with-mut-census
 F                                                                        [100%]
 ================================== FAILURES ===================================
 ____________ test_tc_b100_01_app_placements_name_the_workarea_root ____________

@@ -2,7 +2,7 @@ F.                                                                       [100%]
 ================================== FAILURES ===================================
 ____________ test_tc_b99_12_eight_writers_one_name_zero_mismatches ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26216/test_tc_b99_12_eight_writers_o0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26216/test_tc_b99_12_eight_writers_o0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000213BE070C10>
 
     def test_tc_b99_12_eight_writers_one_name_zero_mismatches(
@@ -58,8 +58,8 @@ tests\test_b99_staging.py:322: in place
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-source = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26216/test_tc_b99_12_eight_writers_o0/sources/trial03/w6/same.s19')
-destination = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26216/test_tc_b99_12_eight_writers_o0/.s19tool/workarea/out/trial03')
+source = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26216/test_tc_b99_12_eight_writers_o0/sources/trial03/w6/same.s19')
+destination = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26216/test_tc_b99_12_eight_writers_o0/.s19tool/workarea/out/trial03')
 max_size_bytes = 268435456
 
     def copy_into_workarea(
@@ -224,7 +224,7 @@ max_size_bytes = 268435456
                 # unconditional take of the requested name.
 >               claim_fd = os.open(str(claim_path), os.O_CREAT | os.O_WRONLY)
                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-E               PermissionError: [Errno 13] Permission denied: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-26216\\test_tc_b99_12_eight_writers_o0\\.s19tool\\workarea\\out\\trial03\\same.s19'
+E               PermissionError: [Errno 13] Permission denied: '<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-26216\\test_tc_b99_12_eight_writers_o0\\.s19tool\\workarea\\out\\trial03\\same.s19'
 
 s19_app\tui\workspace.py:511: PermissionError
 =========================== short test summary info ===========================

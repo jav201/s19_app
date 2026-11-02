@@ -1,12 +1,12 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b99_staging.py::test_tc_b99_14_preexisting_folder_survives_placement_failure (MUTANT S-F5: created_project_dir forced True on the FileExistsError branch)
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 2 — MUTANT, reverted after the run)
-env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc2 (NO_COLOR unset)
+tree: <HOME>\Github\s19_app-b100-inc2 (fix pass 2 — MUTANT, reverted after the run)
+env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<HOME>\Github\s19_app-b100-inc2 (NO_COLOR unset)
 
 F                                                                        [100%]
 ================================== FAILURES ===================================
 ________ test_tc_b99_14_preexisting_folder_survives_placement_failure _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27571/test_tc_b99_14_preexisting_fol0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27571/test_tc_b99_14_preexisting_fol0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002526522D9D0>
 
     def test_tc_b99_14_preexisting_folder_survives_placement_failure(
@@ -73,7 +73,7 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002526522D9D0>
 E       AssertionError: a pre-existing folder must survive the failure
 E       assert False
 E        +  where False = is_dir()
-E        +    where is_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27571/test_tc_b99_14_preexisting_fol0/.s19tool/workarea/proj').is_dir
+E        +    where is_dir = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27571/test_tc_b99_14_preexisting_fol0/.s19tool/workarea/proj').is_dir
 
 tests\test_b99_staging.py:1294: AssertionError
 =========================== short test summary info ===========================

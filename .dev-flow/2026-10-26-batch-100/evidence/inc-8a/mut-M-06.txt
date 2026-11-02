@@ -9,13 +9,13 @@
 #   |             elif document_write_failure is not None:
 #   |                 document_lines.append(document_write_failure)
 #   |                 recorded_document = f"{document_home}/{document_row.landing.name}"
-# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c
+# cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c
 # env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
-# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_29_forced_write_failure_saves_without_the_document
+# command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_29_forced_write_failure_saves_without_the_document
 # started 2026-10-30T23:09:40Z  finished 2026-10-30T23:09:47Z  rc=1
 F                                                                        [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c\tests\test_b100_document.py:792: AssertionError: assert 'active_document' not in {'active_document': 'patches/changes.json', 'active_variant': 'firmware', 'assignments': {}, 'batch': [], ...}
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c\tests\test_b100_document.py:792: AssertionError: assert 'active_document' not in {'active_document': 'patches/changes.json', 'active_variant': 'firmware', 'assignments': {}, 'batch': [], ...}
 =========================== short test summary info ===========================
 FAILED tests/test_b100_document.py::test_tc_b100_29_forced_write_failure_saves_without_the_document
 1 failed in 5.86s

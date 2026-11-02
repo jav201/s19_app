@@ -1,12 +1,12 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py -k 'census or removes_every_placed_path or forced_oserror and manifest-refused' (MUTANT R2-4: the manifest-not-ok exit rolls back with a bare _remove_created_project_dir — no state restore, no placed-path removal)
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 2 — MUTANT, reverted after the run)
-env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc2 (NO_COLOR unset)
+tree: <HOME>\Github\s19_app-b100-inc2 (fix pass 2 — MUTANT, reverted after the run)
+env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<HOME>\Github\s19_app-b100-inc2 (NO_COLOR unset)
 
 FFFF.                                                                    [100%]
 ================================== FAILURES ===================================
 ________ test_tc_b100_07_ast_census_every_post_creation_return_removes ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27567/test_tc_b100_07_ast_census_eve0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27567/test_tc_b100_07_ast_census_eve0')
 
     def test_tc_b100_07_ast_census_every_post_creation_return_removes(
         tmp_path: Path,
@@ -65,7 +65,7 @@ E            +  where False = any(<generator object test_tc_b100_07_ast_census_e
 tests\test_b100_save_guards.py:826: AssertionError
 ______ test_tc_b100_07_forced_oserror_leaves_no_folder[manifest-refused] ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27567/test_tc_b100_07_forced_oserror0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27567/test_tc_b100_07_forced_oserror0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002FAE13001D0>
 stage = 'manifest-refused'
 
@@ -120,16 +120,16 @@ stage = 'manifest-refused'
             f"{stage}: the failed save left app state behind — "
             f"before {state_before!r}, after {state_after!r}"
         )
-E       AssertionError: manifest-refused: the failed save left app state behind — before (['a'], ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27567\\test_tc_b100_07_forced_oserror0\\app\\.s19tool\\workarea\\pre\\a.s19'], 'a', None, 'pre'), after (['a'], ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27567\\test_tc_b100_07_forced_oserror0\\app\\.s19tool\\workarea\\stage-manifest-refused\\a.s19'], 'a', None, 'pre')
+E       AssertionError: manifest-refused: the failed save left app state behind — before (['a'], ['<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27567\\test_tc_b100_07_forced_oserror0\\app\\.s19tool\\workarea\\pre\\a.s19'], 'a', None, 'pre'), after (['a'], ['<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27567\\test_tc_b100_07_forced_oserror0\\app\\.s19tool\\workarea\\stage-manifest-refused\\a.s19'], 'a', None, 'pre')
 E       assert (['a'], ['C:\..., None, 'pre') == (['a'], ['C:\..., None, 'pre')
 E         
-E         At index 1 diff: ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27567\\test_tc_b100_07_forced_oserror0\\app\\.s19tool\\workarea\\stage-manifest-refused\\a.s19'] != ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27567\\test_tc_b100_07_forced_oserror0\\app\\.s19tool\\workarea\\pre\\a.s19']
+E         At index 1 diff: ['<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27567\\test_tc_b100_07_forced_oserror0\\app\\.s19tool\\workarea\\stage-manifest-refused\\a.s19'] != ['<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27567\\test_tc_b100_07_forced_oserror0\\app\\.s19tool\\workarea\\pre\\a.s19']
 E         Use -v to get more diff
 
 tests\test_b100_save_guards.py:981: AssertionError
 ____ test_tc_b100_07_failed_save_removes_every_placed_path[merge-gathered] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27567/test_tc_b100_07_failed_save_re0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27567/test_tc_b100_07_failed_save_re0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002FAE2C6E690>
 case = 'merge-gathered'
 
@@ -212,7 +212,7 @@ E         Use -v to get more diff
 tests\test_b100_save_guards.py:1115: AssertionError
 _ test_tc_b100_07_failed_save_removes_every_placed_path[merge-gathered-reused] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27567/test_tc_b100_07_failed_save_re1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27567/test_tc_b100_07_failed_save_re1')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002FAE389A250>
 case = 'merge-gathered-reused'
 

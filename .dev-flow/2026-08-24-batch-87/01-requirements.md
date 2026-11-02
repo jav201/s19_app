@@ -132,7 +132,7 @@ baseline; P-14 and P-15 are findings registered, not scope.
 > **These transcripts are corpus input** (C-56). Every line below is pasted, not retyped; no
 > mutated or corrupted token appears anywhere in this document — where a probe mutated something,
 > the mutation is described by position and operation and the mutated text is not reproduced.
-> All synthetic corpora were built under `C:\Users\jjgh8\.claude\jobs\4783ea0a\tmp\`. **The real
+> All synthetic corpora were built under `<HOME>\.claude\jobs\4783ea0a\tmp\`. **The real
 > tree was never mutated** (C-40).
 
 ### M-1 — validator baseline, Atlas census, registry state

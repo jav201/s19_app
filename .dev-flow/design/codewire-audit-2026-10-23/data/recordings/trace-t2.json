@@ -401,12 +401,12 @@
    "test": "cwaudit/test_t2_patch_editor.py::test_t2a_apply_undo_apply_saveback",
    "depth": 0,
    "in": {
-    "source": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\src\\firmware.s19",
-    "destination": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp"
+    "source": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\src\\firmware.s19",
+    "destination": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp"
    },
-   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19",
+   "out": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19",
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19": [
      "S00E00004341534530325F47415053E9",
      "S31580010000444154453D30303030303030303B4153BF",
      "S315800100104349495F50415443485F5441524745548F",
@@ -416,7 +416,7 @@
      "S31580010130101112131415161718191A1B1C1D1E1FC0",
      "S705800000007A"
     ],
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\src\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\src\\firmware.s19": [
      "S00E00004341534530325F47415053E9",
      "S31580010000444154453D30303030303030303B4153BF",
      "S315800100104349495F50415443485F5441524745548F",
@@ -432,12 +432,12 @@
    "test": "cwaudit/test_t2_patch_editor.py::test_t2a_apply_undo_apply_saveback",
    "depth": 3,
    "in": {
-    "source": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\p16.s19",
-    "destination": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea"
+    "source": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\p16.s19",
+    "destination": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea"
    },
-   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p16.s19",
+   "out": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p16.s19",
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p16.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p16.s19": [
      "S0030000FC",
      "S310000000004341534530325F47415053E7",
      "S31580010000444154453D1E231F26201E20233B415338",
@@ -448,7 +448,7 @@
      "S31580010130101112131415161718191A1B1C1D1E1FC0",
      "S70500000000FA"
     ],
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\p16.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\p16.s19": [
      "S0030000FC",
      "S310000000004341534530325F47415053E7",
      "S31580010000444154453D1E231F26201E20233B415338",
@@ -465,12 +465,12 @@
    "test": "cwaudit/test_t2_patch_editor.py::test_t2a_apply_undo_apply_saveback",
    "depth": 3,
    "in": {
-    "source": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\p32.s19",
-    "destination": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea"
+    "source": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\p32.s19",
+    "destination": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea"
    },
-   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p32.s19",
+   "out": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p32.s19",
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p32.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p32.s19": [
      "S00E00004341534530325F47415053E9",
      "S310000000004341534530325F47415053E7",
      "S32580010000444154453D1E231F26201E20233B41534349495F50415443485F5441524745545E",
@@ -479,7 +479,7 @@
      "S32580010120000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F48",
      "S70500000000FA"
     ],
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\p32.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\p32.s19": [
      "S00E00004341534530325F47415053E9",
      "S310000000004341534530325F47415053E7",
      "S32580010000444154453D1E231F26201E20233B41534349495F50415443485F5441524745545E",
@@ -496,12 +496,12 @@
    "test": "cwaudit/test_t2_patch_editor.py::test_t2a_apply_undo_apply_saveback",
    "depth": 0,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19",
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19",
     "a2l_files": null
    },
    "out": {
     "LoadedFile": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19",
      "file_type": "s19",
      "mem_map": {
       "0x0": 67,
@@ -639,7 +639,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19": [
      "S00E00004341534530325F47415053E9",
      "S31580010000444154453D30303030303030303B4153BF",
      "S315800100104349495F50415443485F5441524745548F",
@@ -657,11 +657,11 @@
    "test": "cwaudit/test_t2_patch_editor.py::test_t2a_apply_undo_apply_saveback",
    "depth": 1,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19"
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19"
    },
    "out": {
     "S19File": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19",
      "records": [
       {
        "SRecord": {
@@ -873,7 +873,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19": [
      "S00E00004341534530325F47415053E9",
      "S31580010000444154453D30303030303030303B4153BF",
      "S315800100104349495F50415443485F5441524745548F",
@@ -889,11 +889,11 @@
    "test": "cwaudit/test_t2_patch_editor.py::test_t2a_apply_undo_apply_saveback",
    "depth": 0,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19"
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19"
    },
    "out": {
     "S19File": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19",
      "records": [
       {
        "SRecord": {
@@ -1105,7 +1105,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19": [
      "S00E00004341534530325F47415053E9",
      "S31580010000444154453D30303030303030303B4153BF",
      "S315800100104349495F50415443485F5441524745548F",
@@ -1121,11 +1121,11 @@
    "test": "cwaudit/test_t2_patch_editor.py::test_t2a_apply_undo_apply_saveback",
    "depth": 3,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p16.s19"
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p16.s19"
    },
    "out": {
     "S19File": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p16.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p16.s19",
      "records": [
       {
        "SRecord": {
@@ -1350,7 +1350,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p16.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p16.s19": [
      "S0030000FC",
      "S310000000004341534530325F47415053E7",
      "S31580010000444154453D1E231F26201E20233B415338",
@@ -1367,11 +1367,11 @@
    "test": "cwaudit/test_t2_patch_editor.py::test_t2a_apply_undo_apply_saveback",
    "depth": 3,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p32.s19"
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p32.s19"
    },
    "out": {
     "S19File": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p32.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p32.s19",
      "records": [
       {
        "SRecord": {
@@ -1580,7 +1580,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p32.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p32.s19": [
      "S00E00004341534530325F47415053E9",
      "S310000000004341534530325F47415053E7",
      "S32580010000444154453D1E231F26201E20233B41534349495F50415443485F5441524745545E",
@@ -1597,10 +1597,10 @@
    "test": "cwaudit/test_t2_patch_editor.py::test_t2a_apply_undo_apply_saveback",
    "depth": 1,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19",
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19",
     "s19": {
      "S19File": {
-      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19",
+      "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19",
       "records": [
        {
         "SRecord": {
@@ -1816,7 +1816,7 @@
    },
    "out": {
     "LoadedFile": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19",
      "file_type": "s19",
      "mem_map": {
       "0x0": 67,
@@ -1954,7 +1954,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19": [
      "S00E00004341534530325F47415053E9",
      "S31580010000444154453D30303030303030303B4153BF",
      "S315800100104349495F50415443485F5441524745548F",
@@ -1974,7 +1974,7 @@
    "in": {
     "s19": {
      "S19File": {
-      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19",
+      "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19",
       "records": [
        {
         "SRecord": {
@@ -2263,7 +2263,7 @@
    "in": {
     "primary_loaded": {
      "LoadedFile": {
-      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19",
+      "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19",
       "file_type": "s19",
       "mem_map": {
        "0x0": 67,
@@ -2403,7 +2403,7 @@
    },
    "out": {
     "LoadedFile": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19",
      "file_type": "s19",
      "mem_map": {
       "0x0": 67,
@@ -3599,12 +3599,12 @@
       2147549504
      ]
     ],
-    "dest_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea",
+    "dest_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea",
     "filename": "p16.s19",
     "source_kind": "s19",
     "bytes_per_line": 16,
     "s0_header": null,
-    "source_image_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19"
+    "source_image_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19"
    },
    "out": {
     "ChangeActionResult": {
@@ -3614,7 +3614,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19": [
      "S00E00004341534530325F47415053E9",
      "S31580010000444154453D30303030303030303B4153BF",
      "S315800100104349495F50415443485F5441524745548F",
@@ -3691,7 +3691,7 @@
       2147549504
      ]
     ],
-    "dest_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea",
+    "dest_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea",
     "filename": "p32.s19",
     "source_kind": "s19",
     "bytes_per_line": 32,
@@ -3699,7 +3699,7 @@
      "bytes": 11,
      "text": "CASE02_GAPS"
     },
-    "source_image_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19"
+    "source_image_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19"
    },
    "out": {
     "ChangeActionResult": {
@@ -3709,7 +3709,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\temp\\firmware.s19": [
      "S00E00004341534530325F47415053E9",
      "S31580010000444154453D30303030303030303B4153BF",
      "S315800100104349495F50415443485F5441524745548F",
@@ -3788,18 +3788,18 @@
       2147549504
      ]
     ],
-    "dest_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea",
+    "dest_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea",
     "filename": "p16.s19",
     "source_kind": "s19",
     "bytes_per_line": 16,
     "s0_header": null
    },
    "out": [
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p16.s19",
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p16.s19",
     []
    ],
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p16.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p16.s19": [
      "S0030000FC",
      "S310000000004341534530325F47415053E7",
      "S31580010000444154453D1E231F26201E20233B415338",
@@ -3877,7 +3877,7 @@
       2147549504
      ]
     ],
-    "dest_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea",
+    "dest_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea",
     "filename": "p32.s19",
     "source_kind": "s19",
     "bytes_per_line": 32,
@@ -3887,11 +3887,11 @@
     }
    },
    "out": [
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p32.s19",
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p32.s19",
     []
    ],
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p32.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p32.s19": [
      "S00E00004341534530325F47415053E9",
      "S310000000004341534530325F47415053E7",
      "S32580010000444154453D1E231F26201E20233B41534349495F50415443485F5441524745545E",
@@ -3908,7 +3908,7 @@
    "test": "cwaudit/test_t2_patch_editor.py::test_t2a_apply_undo_apply_saveback",
    "depth": 2,
    "in": {
-    "written_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p16.s19",
+    "written_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p16.s19",
     "intended_mem_map": {
      "0x0": 67,
      "0x1": 65,
@@ -3972,11 +3972,11 @@
        }
       }
      },
-     "written_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p16.s19"
+     "written_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p16.s19"
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p16.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p16.s19": [
      "S0030000FC",
      "S310000000004341534530325F47415053E7",
      "S31580010000444154453D1E231F26201E20233B415338",
@@ -3993,7 +3993,7 @@
    "test": "cwaudit/test_t2_patch_editor.py::test_t2a_apply_undo_apply_saveback",
    "depth": 2,
    "in": {
-    "written_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p32.s19",
+    "written_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p32.s19",
     "intended_mem_map": {
      "0x0": 67,
      "0x1": 65,
@@ -4057,11 +4057,11 @@
        }
       }
      },
-     "written_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p32.s19"
+     "written_path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p32.s19"
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p32.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_74rh1601\\.s19tool\\workarea\\p32.s19": [
      "S00E00004341534530325F47415053E9",
      "S310000000004341534530325F47415053E7",
      "S32580010000444154453D1E231F26201E20233B41534349495F50415443485F5441524745545E",

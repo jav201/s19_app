@@ -5,8 +5,8 @@ description: LLR-172.1d (Q1): the record runs only after a successful install
 target file: s19_app/tui/app.py
 edit: '        if not contained_in_workarea(normalized, self.workarea):\n            if not record_recent_source(normalized):\n                self.logger.warning("Recent sources not updated: %r", str(normalized))\n        self.set_progress(50, f"Parsing {copied.name}...")' -> '        self._pending_recent_source = normalized\n        self.set_progress(50, f"Parsing {copied.name}...")'
 edit: '        loaded = prepared.loaded\n        # Variant stamping happens HERE, at apply time on the main UI thread:' -> '        loaded = prepared.loaded\n        source = getattr(self, "_pending_recent_source", None)\n        self._pending_recent_source = None\n        if source is not None and not contained_in_workarea(source, self.workarea):\n            if not record_recent_source(source):\n                self.logger.warning("Recent sources not updated: %r", str(source))\n        # Variant stamping happens HERE, at apply time on the main UI thread:'
-cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt  (a copy of the worktree, never the worktree)
-s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt\s19_app\__init__.py
+cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt  (a copy of the worktree, never the worktree)
+s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt\s19_app\__init__.py
 sha256 before: bbf04117fbf0d3f5951e8c5a493bed65e66c4fe87a838b861ae606f71e5934cb
 env: env -u NO_COLOR LOCALAPPDATA=<scratchpad>/e5fix/lad/<run id> PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=.
 command: python -m pytest -p no:cacheprovider -q --tb=line -rA 'tests/test_b100_recents.py::test_tc_b100_34_source_that_copies_then_fails_to_parse_is_recorded'
@@ -14,7 +14,7 @@ command: python -m pytest -p no:cacheprovider -q --tb=line -rA 'tests/test_b100_
 --- pytest per-node summary ---
 FAILED tests/test_b100_recents.py::test_tc_b100_34_source_that_copies_then_fails_to_parse_is_recorded
 --- failure lines ---
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt\tests\test_b100_recents.py:902: AssertionError: assert [] == [('C:\\Users\....s19', 's19')]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt\tests\test_b100_recents.py:902: AssertionError: assert [] == [('C:\\Users\....s19', 's19')]
 --- pytest tail ---
 =========================== short test summary info ===========================
 FAILED tests/test_b100_recents.py::test_tc_b100_34_source_that_copies_then_fails_to_parse_is_recorded

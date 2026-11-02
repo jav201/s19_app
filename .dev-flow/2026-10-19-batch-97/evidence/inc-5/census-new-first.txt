@@ -3,22 +3,22 @@
 .....................................F.................................. [ 76%]
 .........FF.............................F...F                            [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\Github\s19_app\tests\test_flow_external_step_b96.py:421: AssertionError: assert ['a2b', 'chec...'source', ...] == ['a2b', 'crc'...tep', 'patch']
-C:\Users\jjgh8\Github\s19_app\tests\test_flow_funnel_b96.py:330: AssertionError: assert 'Variables (1)' == 'Funnel (1)'
-C:\Users\jjgh8\Github\s19_app\tests\test_flow_funnel_b96.py:436: AssertionError: assert 'cargue un proyecto' in 'Paste refused: load a project first (the paste is checked against the session directory).'
-C:\Users\jjgh8\Github\s19_app\tests\test_flow_funnel_b96.py:475: AssertionError: assert 'portapapeles está vacío' in 'Paste: the clipboard is empty - nothing to paste.'
-C:\Users\jjgh8\Github\s19_app\tests\test_flow_multi_image_ui.py:151: AttributeError: type object 'FlowBuilderPanel' has no attribute '_SCOPE_OPTIONS'
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_scope' on Screen(id='_default')
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_scope' on Screen(id='_default')
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_scope' on Screen(id='_default')
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_flow_builder_b94.py:174: AssertionError: assert ['a2b', 'chec...'source', ...] == ['a2b', 'crc'...tep', 'patch']
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_flow_builder_b94.py:400: AssertionError: assert 'b77hostilemark' in '┌─ canvas · grid on · 1 block ─────────────────────────────────────────────────────────┐\n│                          ...·       ·       ·       ·  │\n└─│prg.s19 (s19)│──────────────────────────────────────────────────────────────────────┘'
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_flow_builder_b94.py:462: assert 7 == 4
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1163: AssertionError: [2, 7, 0, 1, 3, 1, ...]
-C:\Users\jjgh8\Github\s19_app\tests\test_window_usage_help.py:215: AssertionError: flow: step not found verbatim in help_sections.md: "Build a chain of blocks that runs on the loaded image: the pipeline shows each block as a card, in run order, joined by cables, and the area under Run lists each block's verdict. Flows are project-only: Save… and Load… use the project's `flows\\` folder (LLR-003.7)."
-C:\Users\jjgh8\Github\s19_app\tests\test_window_usage_help.py:251: AssertionError: flow: the shipped step count must match the md's numbered items (4); got 51
-C:\Users\jjgh8\Github\s19_app\tests\test_window_usage_help.py:530: AssertionError: flow: [title label, `?` chip]
-C:\Users\jjgh8\Github\s19_app\tests\test_changes_file_notation_help.py:174: AssertionError: flow: batch-95 step drifted from help_sections.md: "Build a chain of blocks that runs on the loaded image: the pipeline shows each block as a card, in run order, joined by cables, and the area under Run lists each block's verdict. Flows are project-only: Save… and Load… use the project's `flows\\` folder (LLR-003.7)."
+<HOME>\Github\s19_app\tests\test_flow_external_step_b96.py:421: AssertionError: assert ['a2b', 'chec...'source', ...] == ['a2b', 'crc'...tep', 'patch']
+<HOME>\Github\s19_app\tests\test_flow_funnel_b96.py:330: AssertionError: assert 'Variables (1)' == 'Funnel (1)'
+<HOME>\Github\s19_app\tests\test_flow_funnel_b96.py:436: AssertionError: assert 'cargue un proyecto' in 'Paste refused: load a project first (the paste is checked against the session directory).'
+<HOME>\Github\s19_app\tests\test_flow_funnel_b96.py:475: AssertionError: assert 'portapapeles está vacío' in 'Paste: the clipboard is empty - nothing to paste.'
+<HOME>\Github\s19_app\tests\test_flow_multi_image_ui.py:151: AttributeError: type object 'FlowBuilderPanel' has no attribute '_SCOPE_OPTIONS'
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_scope' on Screen(id='_default')
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_scope' on Screen(id='_default')
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#flow_scope' on Screen(id='_default')
+<HOME>\Github\s19_app\tests\test_tui_flow_builder_b94.py:174: AssertionError: assert ['a2b', 'chec...'source', ...] == ['a2b', 'crc'...tep', 'patch']
+<HOME>\Github\s19_app\tests\test_tui_flow_builder_b94.py:400: AssertionError: assert 'b77hostilemark' in '┌─ canvas · grid on · 1 block ─────────────────────────────────────────────────────────┐\n│                          ...·       ·       ·       ·  │\n└─│prg.s19 (s19)│──────────────────────────────────────────────────────────────────────┘'
+<HOME>\Github\s19_app\tests\test_tui_flow_builder_b94.py:462: assert 7 == 4
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1163: AssertionError: [2, 7, 0, 1, 3, 1, ...]
+<HOME>\Github\s19_app\tests\test_window_usage_help.py:215: AssertionError: flow: step not found verbatim in help_sections.md: "Build a chain of blocks that runs on the loaded image: the pipeline shows each block as a card, in run order, joined by cables, and the area under Run lists each block's verdict. Flows are project-only: Save… and Load… use the project's `flows\\` folder (LLR-003.7)."
+<HOME>\Github\s19_app\tests\test_window_usage_help.py:251: AssertionError: flow: the shipped step count must match the md's numbered items (4); got 51
+<HOME>\Github\s19_app\tests\test_window_usage_help.py:530: AssertionError: flow: [title label, `?` chip]
+<HOME>\Github\s19_app\tests\test_changes_file_notation_help.py:174: AssertionError: flow: batch-95 step drifted from help_sections.md: "Build a chain of blocks that runs on the loaded image: the pipeline shows each block as a card, in run order, joined by cables, and the area under Run lists each block's verdict. Flows are project-only: Save… and Load… use the project's `flows\\` folder (LLR-003.7)."
 =========================== short test summary info ===========================
 FAILED tests/test_flow_external_step_b96.py::test_tc1804_builder_palette_select_and_config_row_gate
 FAILED tests/test_flow_funnel_b96.py::test_tc1817_builder_funnel_table_edits

@@ -2,7 +2,7 @@ F
 ================================== FAILURES ===================================
 ____________ test_tc_b99_30_mac_only_export_writes_no_data_record _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26728/test_tc_b99_30_mac_only_export0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26728/test_tc_b99_30_mac_only_export0')
 
     def test_tc_b99_30_mac_only_export_writes_no_data_record(tmp_path: Path) -> None:
         """The writer takes its bytes from the image's DECLARED ranges: a MAC

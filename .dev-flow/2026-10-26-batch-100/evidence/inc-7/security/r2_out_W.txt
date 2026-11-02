@@ -1,4 +1,4 @@
-# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# s19_app import: <HOME>\Github\s19_app-b100-inc7\s19_app\__init__.py
 # NO_COLOR present: False | python 3.11.15
 [W1 intermediate junction] issues: [('MANIFEST-PATH-ESCAPE', 'jdir/secret.json'), ('MANIFEST-PATH-ESCAPE', './jdir/secret.json'), ('MANIFEST-PATH-ESCAPE', 'real/../jdir/secret.json'), ('MANIFEST-PATH-ESCAPE', 'real\\..\\jdir\\secret.json'), ('MANIFEST-PATH-ESCAPE', 'JDIR/secret.json'), ('MANIFEST-PATH-ESCAPE', 'real/inner/secret.json'), ('MANIFEST-PATH-ESCAPE', 'real/./inner/secret.json'), ('MANIFEST-PATH-ESCAPE', 'jdir/secret.json'), ('MANIFEST-PATH-ESCAPE', 'real/inner/secret.json')]
    accepted: 'real\\a.json'                     INSIDE exists=True
@@ -6,11 +6,11 @@
    folder entries: ['SUB', 'project.json', 'sub']
 [W2a real-then-junction] issues: []
    accepted: 'sub\\a.json'                      INSIDE exists=True
-   accepted: 'SUB\\secret.json'                 OUTSIDE -> C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s7b\runs\W2a_1793370564049\outside\secret.json exists=True
+   accepted: 'SUB\\secret.json'                 OUTSIDE -> <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s7b\runs\W2a_1793370564049\outside\secret.json exists=True
    accepted: 'sub\\a.json'                      INSIDE exists=True
-   accepted: 'SUB\\secret.json'                 OUTSIDE -> C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s7b\runs\W2a_1793370564049\outside\secret.json exists=True
+   accepted: 'SUB\\secret.json'                 OUTSIDE -> <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s7b\runs\W2a_1793370564049\outside\secret.json exists=True
    accepted: 'sub\\a.json'                      INSIDE exists=True
-   accepted: 'SUB\\secret.json'                 OUTSIDE -> C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s7b\runs\W2a_1793370564049\outside\secret.json exists=True
+   accepted: 'SUB\\secret.json'                 OUTSIDE -> <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s7b\runs\W2a_1793370564049\outside\secret.json exists=True
    rewrite refusal: None
    fsutil: 4084\app\.s19tool\workarea\P is enabled.
    folder entries: ['SUB', 'project.json', 'sub']
@@ -20,11 +20,11 @@
    folder entries: ['SUB', 'project.json']
 [W2c missing-name-then-junction] issues: []
    accepted: 'sub\\missing.json'                INSIDE exists=False
-   accepted: 'SUB\\secret.json'                 OUTSIDE -> C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s7b\runs\W2c_1793370564117\outside\secret.json exists=True
+   accepted: 'SUB\\secret.json'                 OUTSIDE -> <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s7b\runs\W2c_1793370564117\outside\secret.json exists=True
    accepted: 'sub\\missing.json'                INSIDE exists=False
-   accepted: 'SUB\\secret.json'                 OUTSIDE -> C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s7b\runs\W2c_1793370564117\outside\secret.json exists=True
+   accepted: 'SUB\\secret.json'                 OUTSIDE -> <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s7b\runs\W2c_1793370564117\outside\secret.json exists=True
    accepted: 'sub\\missing.json'                INSIDE exists=False
-   accepted: 'SUB\\secret.json'                 OUTSIDE -> C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s7b\runs\W2c_1793370564117\outside\secret.json exists=True
+   accepted: 'SUB\\secret.json'                 OUTSIDE -> <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s7b\runs\W2c_1793370564117\outside\secret.json exists=True
    rewrite refusal: None
    fsutil: 4153\app\.s19tool\workarea\P is enabled.
    folder entries: ['A.s19', 'a.s19', 'project.json']

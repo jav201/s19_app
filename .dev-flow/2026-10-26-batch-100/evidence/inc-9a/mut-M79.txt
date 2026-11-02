@@ -3,9 +3,9 @@ requirement: HLR-172a (ruling Q3)
 target file: s19_app/tui/app.py
 edit: '        if action == "project":\n            self._route_load_project(value)\n            return' -> '        if action == "project":\n            self._handle_load_project(value)\n            return'
 sha256 before: 62232011882325626771cb015ccfce4b34c15945e90b8432fd628c61fcf22d80
-cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a
+cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a
 command: pytest -q --tb=line tests/test_b100_recents.py::test_at_b100_12_outside_load_is_remembered_and_typed_project_path_opens[size0] tests/test_b100_recents.py::test_at_b100_12_outside_load_is_remembered_and_typed_project_path_opens[size1]
-s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a\s19_app\__init__.py
+s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a\s19_app\__init__.py
 pytest summary: 2 failed in 85.93s (0:01:25)
 verdict: KILLED
 restored = True

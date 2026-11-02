@@ -1,6 +1,6 @@
 # command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree + corrective pass 1) with mutation MX-no-rollback-on-defect
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree + corrective pass 1) with mutation MX-no-rollback-on-defect
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:49:47+00:00
 # finding: review F1 / SEC-7 (non-OSError half)
 # mutation: a non-OSError after the folder's creation escapes without rollback — file s19_app/tui/app.py
@@ -12,7 +12,7 @@
 ================================== FAILURES ===================================
 ____ test_tc_b100_17_non_os_error_after_the_emit_rolls_back_then_surfaces _____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30046/test_tc_b100_17_non_os_error_a0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30046/test_tc_b100_17_non_os_error_a0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000029F459485D0>
 
     def test_tc_b100_17_non_os_error_after_the_emit_rolls_back_then_surfaces(
@@ -42,10 +42,10 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000029F459485D0>
     
         before, after, project = asyncio.run(_drive())
 >       assert not project.exists(), sorted(project.rglob("*"))
-E       AssertionError: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30046/test_tc_b100_17_non_os_error_a0/app/.s19tool/workarea/P1/firmware.s19')]
+E       AssertionError: [WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30046/test_tc_b100_17_non_os_error_a0/app/.s19tool/workarea/P1/firmware.s19')]
 E       assert not True
 E        +  where True = exists()
-E        +    where exists = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30046/test_tc_b100_17_non_os_error_a0/app/.s19tool/workarea/P1').exists
+E        +    where exists = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30046/test_tc_b100_17_non_os_error_a0/app/.s19tool/workarea/P1').exists
 
 tests\test_b100_save_image.py:796: AssertionError
 =========================== short test summary info ===========================

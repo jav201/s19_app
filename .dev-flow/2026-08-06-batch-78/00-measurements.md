@@ -10,7 +10,7 @@ majority path; `Esc` does not return focus today, so that S-2 clause is **net-ne
 preserved behaviour; and re-homing the context labels to `#loaded_panel` **removes them from 9 of
 10 screens**, because that panel is composed inside `#screen_workspace` only.
 
-- **Repo:** `C:\Users\jjgh8\Github\s19_app` (the path in the launch prompt, `…\OneDrive\Documents\
+- **Repo:** `<HOME>\Github\s19_app` (the path in the launch prompt, `…\OneDrive\Documents\
   Github\s19_app`, retains only `.claude/` — the repo moved 2026-07-31).
 - **Branch:** `claude/batch-78-cmdbar-a2bdiff`, cut off `origin/main` @ **`f6ff1d3`**.
 - **Scope of this batch:** Lane 1 (S-1…S-4) + Lane 2 (S-5…S-9). Lane 3 (S-10…S-13) is chartered

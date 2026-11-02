@@ -2,7 +2,7 @@
 │ │      style = '@click app.quit'                                           │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\rich\console.py:1496  
+│ <HOME>\anaconda3\envs\s19env\Lib\site-packages\rich\console.py:1496  
 │ in get_style                                                                 
 ╰──────────────────────────────────────────────────────────────────────────────
 MissingStyle: Failed to get style '@click app.quit'; unable to parse '@click' a

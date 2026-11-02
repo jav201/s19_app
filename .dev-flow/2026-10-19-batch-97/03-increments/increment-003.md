@@ -158,15 +158,15 @@ PC-24 — the 118x53 arms run here: TC-B97-08 (census + docked row), TC-B97-36 (
 
 | Evidence artifact | Path | SHA-256 |
 |---|---|---|
-| RED transcript | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/red.txt` | `3f98df8d14fcfde47b60b56a8ef0dfb9ae7ae12b63921365815ab4a369476051` |
-| GREEN transcript (gate set) | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/green.txt` | `784e0aa10de678faf94a30598f707e6954cb2f27a9c31eca0b304a913a7dc50f` |
+| RED transcript | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/red.txt` | `272b54bd2c5085f9151d2a876491782a9b20da91e9ac5c7e1e806f2307c8b4a1` |
+| GREEN transcript (gate set) | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/green.txt` | `507e4b69e363c39112768d1e3f145396ea9b186dd0b496ad39f722562a4f3791` |
 | Guard host | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/guard-host.txt` | `ac58b7a9bcc3332e51a9dcf63a1224c351e4ea2c316f0b7efe1cf9ff5c15c826` |
 | Reverse-census greps | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/census.txt` | `1a568a3ea2ea8cb9db942d220cdce5e92939a390e549b232715f2e7c30e312b9` |
 | Reverse-census run | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/census-run.txt` | `9df9b0d694f39012ad89aabdaf64caf555b96a62ec5c763d6526c2a5e4995008` |
-| Mutation battery | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/mutations.txt` | `fe50dd545a99f0dbfdca84d4ba2d4ff965bfa334e867bde5a4a58ae79426754c` |
-| Mutation rerun (M1, M4, M5 after the oracle fixes) | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/mutations-rerun.txt` | `f0eed50dacfbb72c03c95e63232619c1d0150fad88af0374fc0879f936048a03` |
-| Full suite, fold tree (orchestrator) | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/full-suite-fold.txt` | `f46c37f6fd1f25ff1bb3789f4d93861af1961830dd662f779c18b4900b40cc59` |
-| Non-baseline isolation re-runs (orchestrator) | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/rerun-nonbaseline.txt` | `7fef78f58f21a575efcba3796d82e2b3cd05ffb93965eb20bf0327477a4d0e51` |
+| Mutation battery | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/mutations.txt` | `167f19a51de7419d17468e4f28a3c7a45ab3e3e168eeef82b6a2f082c204a481` |
+| Mutation rerun (M1, M4, M5 after the oracle fixes) | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/mutations-rerun.txt` | `e26118eff892f04b09707f1f0dd7ab1383acda0ffa4021c2b10e725b6ea6ed77` |
+| Full suite, fold tree (orchestrator) | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/full-suite-fold.txt` | `8570b0798ee04e0d9a1de3d81951361bf664c1a0dff47a85c88d37a237f9d70f` |
+| Non-baseline isolation re-runs (orchestrator) | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/rerun-nonbaseline.txt` | `138ac05e654a93f3d3ffd2b3d4a7f41b149a20a56ed516a1717365bc6b30bacb` |
 | Mutation script (first run `83284d7f…4fbccb`; extended in place at the fold — the digest is the current file) | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/mutate.py` | `d5857b58af4ccc5639719c5cdc6aa04ba6b6d7400e025321a18fe5945d1483ae` |
 | Snapshot-cell renderer | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/snapshot_cells.py` | `32e690ba9bff890251da19799124c2bc41bb3559e97dc184388d5957fa418dcb` |
 | Cells on HEAD / Inc-3 / diff | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/cells-head.txt` · `cells-inc3.txt` · `cells-diff.txt` | `05cb41cb…e755c9` · `f94b31b7…40be12` · `76fddacc…35cb086` |
@@ -230,11 +230,11 @@ Final source digests (first 16): `screens_directionb.py 3b15dd65bace9c43`, `app.
 
 | Fold evidence | Path | SHA-256 |
 |---|---|---|
-| RED (fold) | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/red-fold.txt` | `efe1f447d18d6f13ee6e374b1c6ea5b16dc567121e86237936d0e2ce0fc0009e` |
-| GREEN gate set (fold) | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/green-fold.txt` | `fa135113d9d4c67dd0a8d98cc39d2be40855b46ff57b266732fdc6dd98a9eb12` |
+| RED (fold) | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/red-fold.txt` | `84b89478f7520c73bbb484761ece81286103cee24bc2736e0da0e85d33e49d89` |
+| GREEN gate set (fold) | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/green-fold.txt` | `7337b80f2b514ddf718643df9aec64aeaaf2912a56b912a9ff99d205cbe1979d` |
 | TC-081.1 isolation re-runs | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/tc081-1-rerun-fold.txt` | `81906f721019dfa86af0f0ddcdb099772441d61ca0123c4def473b5d9d6a1c9d` |
 | Guard host (fold) | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/guard-host-fold.txt` | `78f3909805ae96134870ff0aa2eb588fc3180872499a96029b84074ef1429605` |
-| Mutation fold run | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/mutations-fold.txt` | `63203bc788b2463619c27655a253edc2cff9845dd78a95bb90e66993310a8355` |
+| Mutation fold run | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/mutations-fold.txt` | `1796113623c3a7cbde7fc624c3ecda9704eb9201b8b1c8364d882a114d408c7e` |
 | Mutation script (46 mutants) | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/mutate.py` | `d5857b58af4ccc5639719c5cdc6aa04ba6b6d7400e025321a18fe5945d1483ae` |
 | Pane budget | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/form-measure-fold.txt` · `.dev-flow/2026-10-19-batch-97/evidence/inc-3/measure_fold.py` | `3f420664978803422662717a1920ab4c22b012f5cbc361f6bdd5c2d6ba9f1eea` · `259cccacab9b52709945fe5d7722e169628e50a525bdf93ad1e239fa72619c47` |
 | Capture 118x54 (fold) | `.dev-flow/2026-10-19-batch-97/evidence/inc-3/png/impl.check-editor.png` | `209bb6a1ffec81dea5f5d2e3888d4d75137016ea787a91d98b90696dbd1764ce` |
@@ -307,9 +307,9 @@ The orchestrator runs the full suite node by node against the baseline (PC-12), 
 
 ## Gate — full suite, node by node against the baseline (orchestrator, 2026-10-21)
 
-- **Run:** `evidence/inc-3/full-suite-fold.txt` (SHA-256 `f46c37f6fd1f25ff1bb3789f4d93861af1961830dd662f779c18b4900b40cc59`) — 11 failed, 3231 passed, 3 skipped, 32 xfailed in 1:15:13, on the fold tree (after the code-reviewer F1 re-read). An earlier pre-fold run (`full-suite.txt`) and one attempt stopped by the host for low memory at 6 % are superseded.
+- **Run:** `evidence/inc-3/full-suite-fold.txt` (SHA-256 `8570b0798ee04e0d9a1de3d81951361bf664c1a0dff47a85c88d37a237f9d70f`) — 11 failed, 3231 passed, 3 skipped, 32 xfailed in 1:15:13, on the fold tree (after the code-reviewer F1 re-read). An earlier pre-fold run (`full-suite.txt`) and one attempt stopped by the host for low memory at 6 % are superseded.
 - **Comparison** (PC-12 command vs `evidence/baseline-pytest-51ee191.txt`):
-  - not in the baseline (5): `test_tui_diff_screen.py::test_tc024_report_trigger_surfaces_paths`, `test_tui_flow_builder_b94.py::test_at_b94_17_template_save_listing_import_and_dedup`, `test_tui_patch_big.py::test_at075a_titles`, `test_tui_patch_editor_v2.py::test_at064a_refresh_rereads_edited_file_into_editor`, `::test_save_back_prompt`. Re-run in isolation (`evidence/inc-3/rerun-nonbaseline.txt`, SHA-256 `7fef78f58f21a575efcba3796d82e2b3cd05ffb93965eb20bf0327477a4d0e51`): 4 pass; `test_save_back_prompt` is intermittent — 2/3 on the Inc-3 tree and 1/3 on a clean worktree at HEAD `f93dadc` with no Inc-3 source (removed after use), failing at `test_tui_patch_editor_v2.py:630`. **Verdict: no regression; all five are the order/timing flake class already recorded at Inc-1/Inc-2.**
+  - not in the baseline (5): `test_tui_diff_screen.py::test_tc024_report_trigger_surfaces_paths`, `test_tui_flow_builder_b94.py::test_at_b94_17_template_save_listing_import_and_dedup`, `test_tui_patch_big.py::test_at075a_titles`, `test_tui_patch_editor_v2.py::test_at064a_refresh_rereads_edited_file_into_editor`, `::test_save_back_prompt`. Re-run in isolation (`evidence/inc-3/rerun-nonbaseline.txt`, SHA-256 `138ac05e654a93f3d3ffd2b3d4a7f41b149a20a56ed516a1717365bc6b30bacb`): 4 pass; `test_save_back_prompt` is intermittent — 2/3 on the Inc-3 tree and 1/3 on a clean worktree at HEAD `f93dadc` with no Inc-3 source (removed after use), failing at `test_tui_patch_editor_v2.py:630`. **Verdict: no regression; all five are the order/timing flake class already recorded at Inc-1/Inc-2.**
   - baseline nodes green in this run (4): `at057b`, `at_batch41_escape`, `at077c`, `undo_redo ac1` — recorded, not claimed as fixed.
   - counts reconciled: xfailed 32 = baseline 32 (the 29 snapshot-envelope cells + the baseline's own; the Inc-3 strict xfail became a pin, LED-.13), skipped 3 = 3, XPASS 0.
 - **Routed:** the flakes (now incl. `test_save_back_prompt`, `at_b94_17`, `at075a`, `at064a`) → backlog at close (suite hygiene); the silent `except ValueError: size = 1` fallback → backlog at close.

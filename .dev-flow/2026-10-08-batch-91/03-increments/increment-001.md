@@ -143,7 +143,7 @@ above and in `increment-003.md`.)
 
 ```bash
 # the adopted modules — byte-identical green (docstring lines only)
-C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest tests/test_core_srecord_validation.py \
+<HOME>/anaconda3/envs/s19env/python.exe -m pytest tests/test_core_srecord_validation.py \
   tests/test_hexfile.py tests/test_hex_emit.py tests/test_range_index.py tests/test_address_census.py \
   tests/test_address_origin.py tests/test_a2l_enriched.py tests/test_a2l_missing_length_fix.py \
   tests/test_a2l_record_layout_length.py tests/test_tui_a2l.py tests/test_validation_a2l.py \
@@ -159,11 +159,11 @@ C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest tests/test_core_srecor
   tests/test_examples_pilot_gifs.py tests/test_sync_evidence.py tests/test_cli.py -q -p no:cacheprovider
 
 # the guard + the batch's own acceptance
-C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest \
+<HOME>/anaconda3/envs/s19env/python.exe -m pytest \
   tests/test_id_registry.py tests/test_batch91_adoption.py -q -p no:cacheprovider
 
 # the executed RED counterfactuals (in-memory mutations; the shipped registry is hash-pinned)
-PYTHONDONTWRITEBYTECODE=1 C:/Users/jjgh8/anaconda3/envs/s19env/python.exe \
+PYTHONDONTWRITEBYTECODE=1 <HOME>/anaconda3/envs/s19env/python.exe \
   .dev-flow/2026-10-08-batch-91/evidence/inc001_counterfactuals.py
 ```
 
@@ -329,7 +329,7 @@ Increment 002 — the docs catch-up (`HLR-123`).
 
 | Evidence artifact | Path — under `artifact_homes.evidence` | SHA-256 |
 |---|---|---|
-| the coordinator's brief (verbatim) | `.dev-flow/2026-10-08-batch-91/evidence/inc001-brief.md` | `46dad73d9117d44862ff78dbad4be9d2d04954448671d23466a71dbd57bfe8fa` |
+| the coordinator's brief (verbatim) | `.dev-flow/2026-10-08-batch-91/evidence/inc001-brief.md` | `cc95fd3f4a417cd4264c4e82653d8aa68f369747e354bba931bb62003c06869b` |
 | the failed opencode launch (provider key absent) | `.dev-flow/2026-10-08-batch-91/evidence/inc001-run.log` | `418935dfa1cad1f8eacca319ae4e5ae7c80adc3ee16ec66509a62d85933b9021` |
 | node-derivation script (the library's machinery) | `.dev-flow/2026-10-08-batch-91/evidence/inc001_derive_nodes.py` | `df27271da3ce02e8c144d57fe94e2a90cffb7b2574734a5d870a60e601aa54f7` |
 | docstring-insertion script (additions-only verified) | `.dev-flow/2026-10-08-batch-91/evidence/inc001_docstrings.py` | `c31ea555a40fd998f44ea60969faaaf808824f5b83dc0905a310849400692b2f` |

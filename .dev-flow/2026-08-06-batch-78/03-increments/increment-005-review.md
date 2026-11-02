@@ -2,7 +2,7 @@
 
 **Reviewer:** `code-reviewer` (independent; did not write this increment)
 **Diff under review:** `b12b205..9015b7f` on `claude/batch-78-cmdbar-a2bdiff`
-**Repo:** `C:\Users\jjgh8\Github\s19_app`
+**Repo:** `<HOME>\Github\s19_app`
 **Date:** 2026-08-06
 
 ---

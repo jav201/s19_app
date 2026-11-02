@@ -115,7 +115,7 @@ One line per **failed** axis. **SEC-F2 holds by construction:** author-constant 
 ## 3. How to test
 
 ```bash
-cd C:/Users/jjgh8/Github/s19_app
+cd <HOME>/Github/s19_app
 
 # the increment's own nodes
 python -m pytest tests/test_tui_diff_screen.py -k "b78_23 or b78_29 or b78_30 or b78_31 or b78_32 or b78_33 or b78_51 or b78_52 or b78_53" -q

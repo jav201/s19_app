@@ -1,5 +1,5 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc4 (MUTANT RA-no-reassert)
+tree: <HOME>\Github\s19_app-b100-inc4 (MUTANT RA-no-reassert)
 started: 2026-10-27 08:37:37
 
 MUTANT RA-no-reassert APPLIED da8123c1c1de2fd79b68f4e9420afe412a8627f3aee0d959fddd05bd322df3f6
@@ -8,7 +8,7 @@ MUTANT RA-no-reassert APPLIED da8123c1c1de2fd79b68f4e9420afe412a8627f3aee0d959fd
 ================================== FAILURES ===================================
 _________ test_tc_b100_12_every_window_load_lands_on_its_target[map] __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28938/test_tc_b100_12_every_window_l3')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28938/test_tc_b100_12_every_window_l3')
 window_key = 'map'
 
     @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))

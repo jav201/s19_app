@@ -48,7 +48,7 @@ xxxxxxxxx............................................................... [ 92%]
 ================================== FAILURES ===================================
 _____ test_at_038a_saveback_trigger_report_pair_reread_from_surfaced_path _____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23735/test_at_038a_saveback_trigger_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23735/test_at_038a_saveback_trigger_0')
 
     def test_at_038a_saveback_trigger_report_pair_reread_from_surfaced_path(
         tmp_path: Path,
@@ -201,7 +201,7 @@ E       assert ([])
 tests\test_before_after_report.py:324: AssertionError
 ____ test_at_061a_persistent_control_survives_then_writes_pair_and_clears _____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23735/test_at_061a_persistent_contro0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23735/test_at_061a_persistent_contro0')
 
     def test_at_061a_persistent_control_survives_then_writes_pair_and_clears(
         tmp_path: Path,
@@ -316,7 +316,7 @@ E       assert False
 tests\test_before_after_report.py:1182: AssertionError
 ______ test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23735/test_at_b78_03_the_palette_act0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23735/test_at_b78_03_the_palette_act0')
 
     def test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact(
         tmp_path: Path,
@@ -400,7 +400,7 @@ E         Use -v to get more diff
 tests\test_tui_commandbar.py:2704: AssertionError
 _______________ test_at_b78_32_app_bindings_block_is_untouched ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23735/test_at_b78_32_app_bindings_bl0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23735/test_at_b78_32_app_bindings_bl0')
 
     def test_at_b78_32_app_bindings_block_is_untouched(tmp_path: Path) -> None:
         """AT-B78-32 (PIN) -- Lane 1 does not disturb the App ``BINDINGS`` block.
@@ -493,7 +493,7 @@ E         Use -v to get more diff
 tests\test_tui_diff_screen.py:3882: AssertionError
 ________________ test_at031b_two_saves_are_distinct_no_clobber ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23735/test_at031b_two_saves_are_dist0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23735/test_at031b_two_saves_are_dist0')
 
     def test_at031b_two_saves_are_distinct_no_clobber(tmp_path: Path) -> None:
         """AT-031b (idempotent boundary) — two saves keep both, distinct names.
@@ -528,14 +528,14 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
     
         saved = list(patches.glob("*.json"))
 >       assert len(saved) == 2, f"two saves must keep two files, found {saved}"
-E       AssertionError: two saves must keep two files, found [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23735/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')]
+E       AssertionError: two saves must keep two files, found [WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23735/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')]
 E       assert 1 == 2
-E        +  where 1 = len([WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23735/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')])
+E        +  where 1 = len([WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23735/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')])
 
 tests\test_tui_patch_editor_v2.py:1336: AssertionError
 _______________ test_at068a_undo_redo_roundtrip_through_surface _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23735/test_at068a_undo_redo_roundtri0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23735/test_at068a_undo_redo_roundtri0')
 
     def test_at068a_undo_redo_roundtrip_through_surface(tmp_path: Path) -> None:
         """Undo restores the prior change-set; Redo re-applies it (AT-068a).
@@ -631,7 +631,7 @@ E         Use -v to get more diff
 tests\test_tui_patch_editor_v2.py:3655: AssertionError
 ________________________ test_at077c_stale_provenance _________________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23735/test_at077c_stale_provenance0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23735/test_at077c_stale_provenance0')
 
     def test_at077c_stale_provenance(tmp_path: Path) -> None:
         """Mutating the document reverts every glyph to ``·`` — three ways.
@@ -759,7 +759,7 @@ E            +  where ['·', '·', '·'] = _glyphs(S19TuiApp(title='Hex Edit Too
 tests\test_tui_patch_glyphs.py:356: AssertionError
 ________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23735/test_at_056e_a2b_diff_report_b0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23735/test_at_056e_a2b_diff_report_b0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000028755F44B90>
 
     def test_at_056e_a2b_diff_report_byte_identical_despite_selection(
@@ -823,7 +823,7 @@ E         Use -v to get more diff
 tests\test_tui_report_filter_surface.py:773: AssertionError
 _________________ test_tc018_existing_name_is_dedup_suffixed __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23735/test_tc018_existing_name_is_de0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23735/test_tc018_existing_name_is_de0')
 
     def test_tc018_existing_name_is_dedup_suffixed(tmp_path: Path) -> None:
         """TC-018 — a save onto an existing filename is dedup-suffixed.
@@ -840,16 +840,16 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         assert first is not None and second is not None
 >       assert first != second, "the second save silently clobbered the first"
 E       AssertionError: the second save silently clobbered the first
-E       assert WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23735/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json') != WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23735/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json')
+E       assert WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23735/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json') != WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23735/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json')
 
 tests\test_unified_write.py:385: AssertionError
 [1;31mTextual Snapshot Report[0m
 
 [1;30;41m29[0m[30;41m mismatched snapshots[0m
 
-[1mView the [0m]8;id=15495772;file://C:\Users\jjgh8\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+[1mView the [0m]8;id=15495772;file://<HOME>\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
 
-[2mC:\Users\jjgh8\Github\s19_app\snapshot_report.html[0m
+[2m<HOME>\Github\s19_app\snapshot_report.html[0m
 
 =========================== short test summary info ===========================
 FAILED tests/test_before_after_report.py::test_at_038a_saveback_trigger_report_pair_reread_from_surfaced_path

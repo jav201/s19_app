@@ -76,15 +76,15 @@ Evidence home: `.dev-flow/2026-10-26-batch-100/evidence/fix-1/`, `fix-2/`, `fix-
 
 | Artifact | Path | SHA-256 |
 |---|---|---|
-| green-project-homes-171-1m-tc31.txt | .dev-flow/2026-10-26-batch-100/evidence/fix-1/green-project-homes-171-1m-tc31.txt | 6e4164da5a9a6d8ff18e96373dce0545033bbc2544eb6676a5fdc4a922b8f67f |
-| green-load-dialog-tc43-tc63.txt | .dev-flow/2026-10-26-batch-100/evidence/fix-1/green-load-dialog-tc43-tc63.txt | 018b1380cf3a03357f6dc04fa0695f58997991cd5a479b4490b808ef920f57d0 |
-| green-01-save-guards-and-load.txt | .dev-flow/2026-10-26-batch-100/evidence/fix-2/green-01-save-guards-and-load.txt | f9f66145efaa0f11b1992bf5a93d70937e7a8b18eaee595ee496e72af390762d |
+| green-project-homes-171-1m-tc31.txt | .dev-flow/2026-10-26-batch-100/evidence/fix-1/green-project-homes-171-1m-tc31.txt | 60f8f43139336ccf6f06857ae3bde966a89ef2fa842bb1ef9b2a86212aea4f99 |
+| green-load-dialog-tc43-tc63.txt | .dev-flow/2026-10-26-batch-100/evidence/fix-1/green-load-dialog-tc43-tc63.txt | 640f52b06c5918071270bdf77bb01d0d1ee9ff5084c75b8633c252b0ddfcc0bc |
+| green-01-save-guards-and-load.txt | .dev-flow/2026-10-26-batch-100/evidence/fix-2/green-01-save-guards-and-load.txt | 5ece11a7eb3139b9aac1497a9cbefe9a2e0116f62745e2b0cdcbc6cd2dfe6530 |
 | green-02a-workers.txt | .dev-flow/2026-10-26-batch-100/evidence/fix-2/green-02a-workers.txt | 3a8b2f902161b6cf171270536331b6acd09960480c61ab216e5c83fc3241e51f |
 | green-02b-busy.txt | .dev-flow/2026-10-26-batch-100/evidence/fix-2/green-02b-busy.txt | 1b978e300c5cbb222196b40b8bc5e107480315c49a4eba33613bb1d499746c49 |
 | green-02c-question-reuse-ids.txt | .dev-flow/2026-10-26-batch-100/evidence/fix-2/green-02c-question-reuse-ids.txt | d51258bc09847fd8290a3ac34ffe49d2ad0a60b9de7ecbfe1c4008dfdace8c15 |
 | wsl-02-fix-4-nodes-GREEN.txt | .dev-flow/2026-10-26-batch-100/evidence/fix-3/wsl-02-fix-4-nodes-GREEN.txt | d755432dd2074e6955b8225ad9f50b7051589a58e79933d8ef126e5434134d26 |
 | wsl-06-module-workers-after-at17.txt | .dev-flow/2026-10-26-batch-100/evidence/fix-3/wsl-06-module-workers-after-at17.txt | aa11ded30f1a971136dd0249ad6008c8893faf499cda0b54d1a360420001dbcc |
-| win-01-fix-4-nodes.txt | .dev-flow/2026-10-26-batch-100/evidence/fix-3/win-01-fix-4-nodes.txt | 17e583a412912126f8633a748338fb0d920262ab61d12705641b0572f2e00913 |
+| win-01-fix-4-nodes.txt | .dev-flow/2026-10-26-batch-100/evidence/fix-3/win-01-fix-4-nodes.txt | 6206c73a79ff561f3fd188105797bc622ea85fa700448ca583441b0fd45223cb |
 | linux-gate-f72eef1-summary.txt | .dev-flow/2026-10-26-batch-100/evidence/batch-end/linux-gate-f72eef1-summary.txt | c78f6c8ffda8c60ea6cfc13aaa3904c96d1e15f67ec93976cafa5a3125d8bfad |
 
 ## 4b · Independent review

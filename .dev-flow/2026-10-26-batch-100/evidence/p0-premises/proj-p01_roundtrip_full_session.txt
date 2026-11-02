@@ -1,11 +1,11 @@
 # command: S19_WT=<scratch>/snap1d677ba PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 (NO_COLOR unset) s19env/python.exe p01_roundtrip_full_session.py 
-# probe source: C:/Users/jjgh8/Github/s19_app/.dev-flow/design/investigation-projects-2026-10-23/p01_roundtrip_full_session.py
+# probe source: <HOME>/Github/s19_app/.dev-flow/design/investigation-projects-2026-10-23/p01_roundtrip_full_session.py
 # tree: 1d677ba (git archive)
 # started: 2026-10-26T06:43:50-06:00
 
 SESSION before save: {'file': 'firmware.s19', 'file_dir': 'temp', 'mem': '97B/ca59d9e96607', 'mac_path': 'firmware.mac', 'mac_records': 2, 'a2l_path': 'firmware.a2l', 'a2l_dir': 'temp', 'a2l_tags': 3, 'project': None, 'variants': None, 'active_variant': None, 'change_entries': 1, 'change_source': None, 'declared_regions': 0}
   in-memory patch changed 4 bytes at ['0x8000007c', '0x8000007d', '0x8000007e', '0x8000007f']
-SAVE status: ['Apply: 1 applied, 0 skipped, 0 blocked', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_l12_bp8g\\.s19tool\\workarea\\P1 (variant 'firmware')", 'Project saved + manifest verified'] notices: []
+SAVE status: ['Apply: 1 applied, 0 skipped, 0 blocked', "Saved project to <HOME>\\AppData\\Local\\Temp\\projprobe_l12_bp8g\\.s19tool\\workarea\\P1 (variant 'firmware')", 'Project saved + manifest verified'] notices: []
 PROJECT TREE:
     firmware.a2l  1444  a43f41b53603
     firmware.mac  33  990c68f3f632

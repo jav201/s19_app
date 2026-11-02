@@ -1,8 +1,8 @@
 # Inc 11 E5 corrective pass - the full tests/test_b100_save_dialog.py, run once (operator override allows it once, after the targeted runs were green)
 # State of this run: app.py 01a04707c96420dd (corrective rows done, BEFORE the MUT11-M-47 guard removal), screens.py dc988721ae7b6a87; test file BEFORE the MUT11 arms (157 ids = the E4 154 + 3 corrective ids). The final source and the MUT11 arms are covered by green-05-final.txt.
-$ cd C:/Users/jjgh8/Github/s19_app-b100-inc11
-$ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr11/la python -m pytest -q -rfEs tests/test_b100_save_dialog.py -p no:cacheprovider --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr11/bt/f
-s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc11\s19_app\__init__.py
+$ cd <HOME>/Github/s19_app-b100-inc11
+$ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr11/la python -m pytest -q -rfEs tests/test_b100_save_dialog.py -p no:cacheprovider --basetemp=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr11/bt/f
+s19_app.__file__ = <HOME>\Github\s19_app-b100-inc11\s19_app\__init__.py
 ........................................................................ [ 45%]
 ........................................................................ [ 91%]
 .............                                                            [100%]

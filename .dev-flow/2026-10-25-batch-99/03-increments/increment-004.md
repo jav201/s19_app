@@ -86,7 +86,7 @@ budget: 2 of 3 used.
 
 ```bash
 # from the worktree root, with the s19env interpreter:
-python -c "import s19_app; print(s19_app.__file__)"   # -> C:\Users\jjgh8\Github\s19_app-b99-inc4\s19_app\__init__.py (proved, this session)
+python -c "import s19_app; print(s19_app.__file__)"   # -> <HOME>\Github\s19_app-b99-inc4\s19_app\__init__.py (proved, this session)
 pytest tests/test_b99_editor_image.py -q                        # -> 8 passed
 pytest tests/test_b99_editor_image.py -k tc_b99_21              # -> 1 passed, 7 deselected
 pytest tests/test_b99_editor_image.py -k tc_b99_22              # -> 2 passed, 6 deselected
@@ -127,7 +127,7 @@ on the fixed tree) and none asserts an HLR-157 behaviour.
 |---|---|
 | Mutation applied | 4, one per declared negative control (see Mutation verdicts) — each applied, shown RED, reverted; restore verified by SHA-256 |
 | Instrument | project code: the implementer's own hand via the Edit tool; restore checked by SHA-256 against the recorded fixed-tree hashes |
-| Where it ran | this worktree (`C:\Users\jjgh8\Github\s19_app-b99-inc4`), run by the implementer |
+| Where it ran | this worktree (`<HOME>\Github\s19_app-b99-inc4`), run by the implementer |
 | Transcript | `evidence/inc-4/mut-LLR-157.1.txt` · `mut-LLR-157.1-alias.txt` · `mut-LLR-157.2.txt` · `mut-LLR-157.4.txt` (each: the targeted node FAILED) |
 | Restore proven by | `change_service.py` back to `b07708f602b8…` and `app.py` back to `613a0ff05c7e…` after every revert (`fixed-tree-hashes.txt`); no mutant left in place |
 | Bytecode cache | run with `PYTHONDONTWRITEBYTECODE=1` (C-46) |
@@ -208,27 +208,27 @@ All under `artifact_homes.evidence` = `.dev-flow/2026-10-25-batch-99/evidence/in
 
 | Evidence artifact | Path | SHA-256 |
 |---|---|---|
-| RED baseline (unmodified tree, 5 failed) | `red-initial.txt` | `2da973b69f17b3ac836a3144acd62ffd8447e692f5da66a324849c379ade1c7a` |
+| RED baseline (unmodified tree, 5 failed) | `red-initial.txt` | `2b920c1d1b9eb105cb7b823cb9ae046cb944a9b6e9df427e5027d75e6f362288` |
 | GREEN full run (5 passed) | `green-editor-image.txt` | `1d04ab07a8967ce79b3097c9756fde4c7c60e73342c17921547a52b23b486623` |
 | GREEN TC-B99-21 | `green-tc_b99_21.txt` | `cc38d973857bd7b11229a892d01adb7233fc7d1c963568d21a91caa89f93cde6` |
 | GREEN TC-B99-22 | `green-tc_b99_22.txt` | `52a03cecd5feeb15c1166ad228473b2fdbc33145865b1c001618678ee41f8a3a` |
 | GREEN TC-B99-40 (round-1 `-k tc_b99_40` run) | `green-tc_b99_40.txt` | `4da0effc28e5f137c10f0dd1262923323d486bf707675f61ff1517f005cbe626` |
 | GREEN AT-B99-08 | `green-at_b99_08.txt` | `828310c345f571e2b9c0b0d70caab23b441753175fc66359f7add9a409336929` |
-| GREEN regression companion (round-2 re-run, 32 census files, 586 passed) | `green-regression.txt` | `d254c4d7df995df9db8a99ab7320b9e4c5952232daccb1f61f57fd50440fadfd` |
+| GREEN regression companion (round-2 re-run, 32 census files, 586 passed) | `green-regression.txt` | `72107891579c972c9c2917869c9de6825b4cb38e73f691e81fd19f2afc7fe5c4` |
 | GREEN address census (23 passed) | `green-address-census.txt` | `a5ae8a9580e3d978e68ad10f5be8daeb216b5d13c26a09e131abeec26d13752c` |
 | Flake isolation re-run (at077c red IN isolation — flaky on main, F7) | `green-flake-isolation.txt` | `24305c2685836f6d9d2d0b84732df1a6ce068945d4b03e2e0d3081f4e54af0c9` |
-| Mutation LLR-157.1 (KILLED) | `mut-LLR-157.1.txt` | `5e3c10d89f8fc61c2103519e7021ed3668d7692dfcd89b8e0f20eb776de55147` |
-| Mutation LLR-157.1 alias arm (KILLED) | `mut-LLR-157.1-alias.txt` | `5f0c23f51b92e5c83e0123817cacd3fc4aece0fa6d0c96764ffcb8c44c32dc60` |
-| Mutation LLR-157.2 (KILLED) | `mut-LLR-157.2.txt` | `da4e0b5288203b4fc36e536f1dffecc07123f5893a08c533a2077d51b5cc2866` |
-| Mutation LLR-157.4 (KILLED) | `mut-LLR-157.4.txt` | `84131820f2ec4a7f7da53a7e0464444f2884df06f5e41aeb10f7b3d7103805b0` |
+| Mutation LLR-157.1 (KILLED) | `mut-LLR-157.1.txt` | `008fd878099589fc27d89992af510c72bd3d80842dadbd652e1c208129d26e47` |
+| Mutation LLR-157.1 alias arm (KILLED) | `mut-LLR-157.1-alias.txt` | `6e6d2ca4f9d849360a96d0e446b6c3f41f16d27d3aacc558faf8b5efdab24679` |
+| Mutation LLR-157.2 (KILLED) | `mut-LLR-157.2.txt` | `4d515e44b86c11fc21e66336d3bd2eae7c6244c204f1909e3043c845c7d73c2b` |
+| Mutation LLR-157.4 (KILLED) | `mut-LLR-157.4.txt` | `945f629e4eb7fc3496a1be94a06292e9b5af0c815c2718f41cc4b763bcee13d2` |
 | Reverse census probes (refreshed round 2) | `reverse-census.txt` | `c5a3a26abe8061f7a8fcc48731880a1ae536a8bd53cfd289d3baf87a3654be67` |
 | Pre-mutation (baseline) hashes | `baseline-hashes.txt` | `bde09ea79d71e3a2dca225c6216ac4e48d1f36a512dd7b3e0f409c397460f4f4` |
 | Fixed-tree hashes (restore target) | `fixed-tree-hashes.txt` | `3211697678b5dd2f5cf4673b0a4243b2752019b3ec116def2f620c2055421a1f` |
-| RED review-fix round (4 failed/4 passed, round-1 tree) | `red-fix-round.txt` | `d6526dd45db7bce485e0fb581b4424354f362cc00f08d7daed2405e19872e78f` |
+| RED review-fix round (4 failed/4 passed, round-1 tree) | `red-fix-round.txt` | `bcc291793aa24ba2413f71571fc111aa07ae53a3e29d1812447266a5eaac528b` |
 | GREEN review-fix round (8 passed) | `green-fix-round.txt` | `ff9d709ae8363cda12c1e2b0cb476edffe740b696e036cf4e4d74f5f8c970fa9` |
 | GREEN AT-B99-08 ×8 (each run 2 passed) | `green-at_b99_08-x8.txt` | `d3dcd49e595be41d8345597ebff51f66d5087e70c4fa0905945b3d5f319886ff` |
-| Mutation F1 — skip the save collision refresh (KILLED) | `mut-F1.txt` | `1282404b04543532d60eb22fd58fdb4df247610985253d3abe01ddab27cefc2a` |
-| Mutation F3 — drop the not-applied names (KILLED) | `mut-F3.txt` | `3c3cde8388a14a1208693aed8658c209eb3e11354771bbb698a69cfec68fbf18` |
+| Mutation F1 — skip the save collision refresh (KILLED) | `mut-F1.txt` | `8b96c9bb6ff778c067eb814cc4cd0d41015ee0b7b51c997287a7fef568df62d9` |
+| Mutation F3 — drop the not-applied names (KILLED) | `mut-F3.txt` | `54ba778c788f38a136ae33001b4eb235f37f1318372b6f548b560e909f686326` |
 
 `SHA256SUMS.txt` is the folder's own digest list (LF line endings, the sums
 file excluded from its own list); every digest above is of the stored

@@ -1,8 +1,8 @@
 # command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_announce.py tests/test_b100_active_variant.py -k junction_loop or digit_limit or int-over-digit-limit
-# tree: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc6-fix3/pass2 (the corrective-pass-2 tree (e494c50c) copied before pass 3, with the pass-3 tests copied in), sources: 762d1a98c8a65903 *s19_app/tui/app.py;ea549ab4bd9d3ef4 *s19_app/tui/screens.py;e494c50cd7266bff *s19_app/tui/services/variant_execution_service.py;781f04ed2cc30897 *s19_app/tui/styles.tcss;
-# PYTHONPATH=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc6-fix3/pass2 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc6-fix3/pass2 (the corrective-pass-2 tree (e494c50c) copied before pass 3, with the pass-3 tests copied in), sources: 762d1a98c8a65903 *s19_app/tui/app.py;ea549ab4bd9d3ef4 *s19_app/tui/screens.py;e494c50cd7266bff *s19_app/tui/services/variant_execution_service.py;781f04ed2cc30897 *s19_app/tui/styles.tcss;
+# PYTHONPATH=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc6-fix3/pass2 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-30T05:13:31Z
-# s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc6-fix3\pass2\s19_app\__init__.py
+# s19_app.__file__ = <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc6-fix3\pass2\s19_app\__init__.py
 FFFFFFF                                                                  [100%]
 ================================== FAILURES ===================================
 ______ test_tc_b100_67_junction_loop_entry_is_a_skipped_row_not_a_crash _______
@@ -35,7 +35,7 @@ tests\test_b100_announce.py:96: AssertionError
 
 During handling of the above exception, another exception occurred:
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30193/test_tc_b100_67_junction_loop_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30193/test_tc_b100_67_junction_loop_0')
 
     def test_tc_b100_67_junction_loop_entry_is_a_skipped_row_not_a_crash(tmp_path: Path) -> None:
         """SEC6-7 remainder: ``gathered`` records ``loop/x.json`` where ``loop``
@@ -73,27 +73,27 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 
 tests\test_b100_announce.py:693: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_announce.py:686: in _drive
     async with app.run_test(size=(118, 54), notifications=True) as pilot:
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\contextlib.py:231: in __aexit__
+<HOME>\anaconda3\envs\s19env\Lib\contextlib.py:231: in __aexit__
     await self.gen.athrow(typ, value, traceback)
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: in run_test
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: in run_test
     raise self._exception
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:702: in _flush_next_callbacks
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:702: in _flush_next_callbacks
     await invoke(callback.callback)
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:96: in invoke
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:96: in invoke
     return await _invoke(callback, *params)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:56: in _invoke
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:56: in _invoke
     result = callback(*params[:parameter_count])
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 s19_app\tui\app.py:7019: in _route_load_project
@@ -106,7 +106,7 @@ s19_app\tui\services\variant_execution_service.py:631: in read_project_manifest
 s19_app\tui\services\variant_execution_service.py:325: in _resolve_manifest_entry
     resolved = (project_root / text).resolve()
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1005: in resolve
+<HOME>\anaconda3\envs\s19env\Lib\pathlib.py:1005: in resolve
     check_eloop(e)
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
@@ -116,12 +116,12 @@ e = OSError(22, 'The name of the file cannot be resolved by the system')
         winerror = getattr(e, 'winerror', 0)
         if e.errno == ELOOP or winerror == _WINERROR_CANT_RESOLVE_FILENAME:
 >           raise RuntimeError("Symlink loop from %r" % e.filename)
-E           RuntimeError: Symlink loop from 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30193\\test_tc_b100_67_junction_loop_0\\app\\.s19tool\\workarea\\P\\loop\\x.json'
+E           RuntimeError: Symlink loop from '<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-30193\\test_tc_b100_67_junction_loop_0\\app\\.s19tool\\workarea\\P\\loop\\x.json'
 
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:990: RuntimeError
+<HOME>\anaconda3\envs\s19env\Lib\pathlib.py:990: RuntimeError
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1003 in resolve          
+│ <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:1003 in resolve          
 │                                                                              
 │   1000 │   │   # Ensure we get an exception by calling stat()                
 │   1001 │   │   if not strict:                                                
@@ -132,13 +132,13 @@ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:990: RuntimeError
 │   1006 │   │   return p                                                      
 │                                                                              
 │ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
-│ │      p = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8… │ 
-│ │      s = 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pyte… │ 
-│ │   self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8… │ 
+│ │      p = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>… │ 
+│ │      s = '<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pyte… │ 
+│ │   self = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>… │ 
 │ │ strict = False                                                           │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1013 in stat             
+│ <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:1013 in stat             
 │                                                                              
 │   1010 │   │   Return the result of the stat() system call on this path, lik 
 │   1011 │   │   os.stat() does.                                               
@@ -150,17 +150,17 @@ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:990: RuntimeError
 │                                                                              
 │ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
 │ │ follow_symlinks = True                                                   │ 
-│ │            self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest… │ 
+│ │            self = WindowsPath('<HOME>/AppData/Local/Temp/pytest… │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 ╰──────────────────────────────────────────────────────────────────────────────
 OSError: [WinError 1921] The name of the file cannot be resolved by the system:
-'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30193\\test_tc
+'<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-30193\\test_tc
 b100_67_junction_loop_0\\app\\.s19tool\\workarea\\P\\loop\\x.json'
 
 During handling of the above exception, another exception occurred:
 
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4 
+│ <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4 
 │ ccb-86cf-122b894659b2\scratchpad\inc6-fix3\pass2\s19_app\tui\app.py:7019 in  
 │ _route_load_project                                                          
 │                                                                              
@@ -185,7 +185,7 @@ During handling of the above exception, another exception occurred:
 │ │          )                                    │                            
 │ ╰───────────────────────────────────────────────╯                            
 │                                                                              
-│ C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4 
+│ <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4 
 │ ccb-86cf-122b894659b2\scratchpad\inc6-fix3\pass2\s19_app\tui\app.py:10141 in 
 │ _handle_load_project                                                         
 │                                                                              
@@ -201,14 +201,14 @@ During handling of the above exception, another exception occurred:
 │ │         a2l_files = []                                                   │ 
 │ │        data_files = [                                                    │ 
 │ │                     │                                                    │ 
-│ │                     WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pyte… │ 
+│ │                     WindowsPath('<HOME>/AppData/Local/Temp/pyte… │ 
 │ │                     │                                                    │ 
-│ │                     WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pyte… │ 
+│ │                     WindowsPath('<HOME>/AppData/Local/Temp/pyte… │ 
 │ │                     ]                                                    │ 
 │ │ discarded_unsaved = 0                                                    │ 
 │ │             error = None                                                 │ 
 │ │              name = 'P'                                                  │ 
-│ │       project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pyte… │ 
+│ │       project_dir = WindowsPath('<HOME>/AppData/Local/Temp/pyte… │ 
 │ │              self = S19TuiApp(                                           │ 
 │ │                     │   title='Hex Edit Tool',                           │ 
 │ │                     │   classes={'-dark-mode'},                          │ 
@@ -220,13 +220,13 @@ During handling of the above exception, another exception occurred:
 │ │                     │   │   VariantDescriptor(                           │ 
 │ │                     │   │   │   variant_id='firmware',                   │ 
 │ │                     │   │   │                                            │ 
-│ │                     path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp… │ 
+│ │                     path=WindowsPath('<HOME>/AppData/Local/Temp… │ 
 │ │                     │   │   │   file_type='s19'                          │ 
 │ │                     │   │   ),                                           │ 
 │ │                     │   │   VariantDescriptor(                           │ 
 │ │                     │   │   │   variant_id='firmware_1',                 │ 
 │ │                     │   │   │                                            │ 
-│ │                     path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp… │ 
+│ │                     path=WindowsPath('<HOME>/AppData/Local/Temp… │ 
 │ │                     │   │   │   file_type='s19'                          │ 
 │ │                     │   │   )                                            │ 
 │ │                     │   ),                                               │ 
@@ -234,7 +234,7 @@ During handling of the above exception, another exception occurred:
 │ │                     )                                                    │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4 
+│ <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4 
 │ ccb-86cf-122b894659b2\scratchpad\inc6-fix3\pass2\s19_app\tui\services\varian 
 │ t_execution_service.py:631 in read_project_manifest                          
 │                                                                              
@@ -267,24 +267,24 @@ During handling of the above exception, another exception occurred:
 │ │         gathered = {}                                                    │ 
 │ │     gathered_raw = {'patches': ['loop/x.json']}                          │ 
 │ │           handle = <_io.BufferedReader                                   │ 
-│ │                    name='C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest… │ 
+│ │                    name='<HOME>\\AppData\\Local\\Temp\\pytest… │ 
 │ │             home = 'patches'                                             │ 
 │ │           issues = []                                                    │ 
-│ │    manifest_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytes… │ 
+│ │    manifest_path = WindowsPath('<HOME>/AppData/Local/Temp/pytes… │ 
 │ │          payload = {                                                     │ 
 │ │                    │   'schema_version': 1,                              │ 
 │ │                    │   'active_variant': 'firmware_1',                   │ 
 │ │                    │   'gathered': {'patches': ['loop/x.json']}          │ 
 │ │                    }                                                     │ 
-│ │      project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytes… │ 
-│ │     project_root = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytes… │ 
+│ │      project_dir = WindowsPath('<HOME>/AppData/Local/Temp/pytes… │ 
+│ │     project_root = WindowsPath('<HOME>/AppData/Local/Temp/pytes… │ 
 │ │ resolved_entries = []                                                    │ 
 │ │   schema_version = 1                                                     │ 
 │ │       size_bytes = 95                                                    │ 
 │ │       size_probe = None                                                  │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4 
+│ <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4 
 │ ccb-86cf-122b894659b2\scratchpad\inc6-fix3\pass2\s19_app\tui\services\varian 
 │ t_execution_service.py:325 in _resolve_manifest_entry                        
 │                                                                              
@@ -299,12 +299,12 @@ During handling of the above exception, another exception occurred:
 │ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
 │ │      context = "gathered['patches']"                                     │ 
 │ │       issues = []                                                        │ 
-│ │ project_root = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of… │ 
+│ │ project_root = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of… │ 
 │ │    raw_entry = 'loop/x.json'                                             │ 
 │ │         text = 'loop/x.json'                                             │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1005 in resolve          
+│ <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:1005 in resolve          
 │                                                                              
 │   1002 │   │   │   try:                                                      
 │   1003 │   │   │   │   p.stat()                                              
@@ -315,13 +315,13 @@ During handling of the above exception, another exception occurred:
 │   1008 │   def stat(self, *, follow_symlinks=True):                          
 │                                                                              
 │ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
-│ │      p = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8… │ 
-│ │      s = 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pyte… │ 
-│ │   self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8… │ 
+│ │      p = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>… │ 
+│ │      s = '<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pyte… │ 
+│ │   self = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>… │ 
 │ │ strict = False                                                           │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:990 in check_eloop       
+│ <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:990 in check_eloop       
 │                                                                              
 │    987 │   │   def check_eloop(e):                                           
 │    988 │   │   │   winerror = getattr(e, 'winerror', 0)                      
@@ -338,7 +338,7 @@ During handling of the above exception, another exception occurred:
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 ╰──────────────────────────────────────────────────────────────────────────────
 RuntimeError: Symlink loop from 
-'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30193\\test_tc
+'<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-30193\\test_tc
 b100_67_junction_loop_0\\app\\.s19tool\\workarea\\P\\loop\\x.json'
 ________ test_tc_b100_67_integer_over_the_digit_limit_reads_as_damaged ________
 
@@ -370,7 +370,7 @@ tests\test_b100_announce.py:96: AssertionError
 
 During handling of the above exception, another exception occurred:
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30193/test_tc_b100_67_integer_over_t0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30193/test_tc_b100_67_integer_over_t0')
 
     def test_tc_b100_67_integer_over_the_digit_limit_reads_as_damaged(tmp_path: Path) -> None:
         """SEC6-8: ``project.json`` holds a 5 000-digit integer (``json.load``
@@ -395,27 +395,27 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 
 tests\test_b100_announce.py:718: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_announce.py:713: in _drive
     async with app.run_test(size=(118, 54), notifications=True) as pilot:
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\contextlib.py:231: in __aexit__
+<HOME>\anaconda3\envs\s19env\Lib\contextlib.py:231: in __aexit__
     await self.gen.athrow(typ, value, traceback)
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: in run_test
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: in run_test
     raise self._exception
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:702: in _flush_next_callbacks
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:702: in _flush_next_callbacks
     await invoke(callback.callback)
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:96: in invoke
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:96: in invoke
     return await _invoke(callback, *params)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:56: in _invoke
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:56: in _invoke
     result = callback(*params[:parameter_count])
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 s19_app\tui\app.py:7019: in _route_load_project
@@ -426,12 +426,12 @@ s19_app\tui\app.py:10141: in _handle_load_project
 s19_app\tui\services\variant_execution_service.py:512: in read_project_manifest
     payload = json.load(handle)
               ^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\__init__.py:293: in load
+<HOME>\anaconda3\envs\s19env\Lib\json\__init__.py:293: in load
     return loads(fp.read(),
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\__init__.py:346: in loads
+<HOME>\anaconda3\envs\s19env\Lib\json\__init__.py:346: in loads
     return _default_decoder.decode(s)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:337: in decode
+<HOME>\anaconda3\envs\s19env\Lib\json\decoder.py:337: in decode
     obj, end = self.raw_decode(s, idx=_w(s, 0).end())
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -454,10 +454,10 @@ idx = 0
                        ^^^^^^^^^^^^^^^^^^^^^^
 E           ValueError: Exceeds the limit (4300 digits) for integer string conversion: value has 5000 digits; use sys.set_int_max_str_digits() to increase the limit
 
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
+<HOME>\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4 
+│ <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4 
 │ ccb-86cf-122b894659b2\scratchpad\inc6-fix3\pass2\s19_app\tui\app.py:7019 in  
 │ _route_load_project                                                          
 │                                                                              
@@ -482,7 +482,7 @@ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
 │ │          )                                    │                            
 │ ╰───────────────────────────────────────────────╯                            
 │                                                                              
-│ C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4 
+│ <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4 
 │ ccb-86cf-122b894659b2\scratchpad\inc6-fix3\pass2\s19_app\tui\app.py:10141 in 
 │ _handle_load_project                                                         
 │                                                                              
@@ -498,14 +498,14 @@ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
 │ │         a2l_files = []                                                   │ 
 │ │        data_files = [                                                    │ 
 │ │                     │                                                    │ 
-│ │                     WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pyte… │ 
+│ │                     WindowsPath('<HOME>/AppData/Local/Temp/pyte… │ 
 │ │                     │                                                    │ 
-│ │                     WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pyte… │ 
+│ │                     WindowsPath('<HOME>/AppData/Local/Temp/pyte… │ 
 │ │                     ]                                                    │ 
 │ │ discarded_unsaved = 0                                                    │ 
 │ │             error = None                                                 │ 
 │ │              name = 'P'                                                  │ 
-│ │       project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pyte… │ 
+│ │       project_dir = WindowsPath('<HOME>/AppData/Local/Temp/pyte… │ 
 │ │              self = S19TuiApp(                                           │ 
 │ │                     │   title='Hex Edit Tool',                           │ 
 │ │                     │   classes={'-dark-mode'},                          │ 
@@ -517,13 +517,13 @@ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
 │ │                     │   │   VariantDescriptor(                           │ 
 │ │                     │   │   │   variant_id='firmware',                   │ 
 │ │                     │   │   │                                            │ 
-│ │                     path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp… │ 
+│ │                     path=WindowsPath('<HOME>/AppData/Local/Temp… │ 
 │ │                     │   │   │   file_type='s19'                          │ 
 │ │                     │   │   ),                                           │ 
 │ │                     │   │   VariantDescriptor(                           │ 
 │ │                     │   │   │   variant_id='firmware_1',                 │ 
 │ │                     │   │   │                                            │ 
-│ │                     path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp… │ 
+│ │                     path=WindowsPath('<HOME>/AppData/Local/Temp… │ 
 │ │                     │   │   │   file_type='s19'                          │ 
 │ │                     │   │   )                                            │ 
 │ │                     │   ),                                               │ 
@@ -531,7 +531,7 @@ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
 │ │                     )                                                    │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4 
+│ <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4 
 │ ccb-86cf-122b894659b2\scratchpad\inc6-fix3\pass2\s19_app\tui\services\varian 
 │ t_execution_service.py:512 in read_project_manifest                          
 │                                                                              
@@ -554,15 +554,15 @@ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
 │ │                 │   issues=[]                                            │ 
 │ │                 )                                                        │ 
 │ │        handle = <_io.BufferedReader                                      │ 
-│ │                 name='C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of… │ 
+│ │                 name='<HOME>\\AppData\\Local\\Temp\\pytest-of… │ 
 │ │        issues = []                                                       │ 
-│ │ manifest_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-o… │ 
-│ │   project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-o… │ 
+│ │ manifest_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-o… │ 
+│ │   project_dir = WindowsPath('<HOME>/AppData/Local/Temp/pytest-o… │ 
 │ │    size_bytes = 5030                                                     │ 
 │ │    size_probe = None                                                     │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\__init__.py:293 in load        
+│ <HOME>\anaconda3\envs\s19env\Lib\json\__init__.py:293 in load        
 │                                                                              
 │   290 │   To use a custom ``JSONDecoder`` subclass, specify it with the ``cl 
 │   291 │   kwarg; otherwise ``JSONDecoder`` is used.                          
@@ -575,7 +575,7 @@ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
 │ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
 │ │               cls = None                                                 │ 
 │ │                fp = <_io.BufferedReader                                  │ 
-│ │                     name='C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytes… │ 
+│ │                     name='<HOME>\\AppData\\Local\\Temp\\pytes… │ 
 │ │                kw = {}                                                   │ 
 │ │       object_hook = None                                                 │ 
 │ │ object_pairs_hook = None                                                 │ 
@@ -584,7 +584,7 @@ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
 │ │         parse_int = None                                                 │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\__init__.py:346 in loads       
+│ <HOME>\anaconda3\envs\s19env\Lib\json\__init__.py:346 in loads       
 │                                                                              
 │   343 │   if (cls is None and object_hook is None and                        
 │   344 │   │   │   parse_int is None and parse_float is None and              
@@ -606,7 +606,7 @@ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
 │ │                     999999999999999999999999999999999999999999999999999… │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:337 in decode       
+│ <HOME>\anaconda3\envs\s19env\Lib\json\decoder.py:337 in decode       
 │                                                                              
 │   334 │   │   containing a JSON document).                                   
 │   335 │   │                                                                  
@@ -624,7 +624,7 @@ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
 │ │ self = <json.decoder.JSONDecoder object at 0x00000126456BB410>           │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:353 in raw_decode   
+│ <HOME>\anaconda3\envs\s19env\Lib\json\decoder.py:353 in raw_decode   
 │                                                                              
 │   350 │   │                                                                  
 │   351 │   │   """                                                            
@@ -645,7 +645,7 @@ ValueError: Exceeds the limit (4300 digits) for integer string conversion: valu
 has 5000 digits; use sys.set_int_max_str_digits() to increase the limit
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[save-back-int-over-digit-limit] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30193/test_tc_b100_20_damaged_manife0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30193/test_tc_b100_20_damaged_manife0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001264B529950>
 writer = 'save-back', damage = 'int-over-digit-limit'
 
@@ -673,13 +673,13 @@ tests\test_b100_active_variant.py:528:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_active_variant.py:507: in _run_writer
     asyncio.run(_drive())
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_active_variant.py:482: in _drive
@@ -692,12 +692,12 @@ s19_app\tui\app.py:10141: in _handle_load_project
 s19_app\tui\services\variant_execution_service.py:512: in read_project_manifest
     payload = json.load(handle)
               ^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\__init__.py:293: in load
+<HOME>\anaconda3\envs\s19env\Lib\json\__init__.py:293: in load
     return loads(fp.read(),
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\__init__.py:346: in loads
+<HOME>\anaconda3\envs\s19env\Lib\json\__init__.py:346: in loads
     return _default_decoder.decode(s)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:337: in decode
+<HOME>\anaconda3\envs\s19env\Lib\json\decoder.py:337: in decode
     obj, end = self.raw_decode(s, idx=_w(s, 0).end())
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -720,10 +720,10 @@ idx = 0
                        ^^^^^^^^^^^^^^^^^^^^^^
 E           ValueError: Exceeds the limit (4300 digits) for integer string conversion: value has 5000 digits; use sys.set_int_max_str_digits() to increase the limit
 
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
+<HOME>\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-int-over-digit-limit] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30193/test_tc_b100_20_damaged_manife1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30193/test_tc_b100_20_damaged_manife1')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001264D84FD90>
 writer = 'variant-append', damage = 'int-over-digit-limit'
 
@@ -751,13 +751,13 @@ tests\test_b100_active_variant.py:528:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_active_variant.py:507: in _run_writer
     asyncio.run(_drive())
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_active_variant.py:482: in _drive
@@ -770,12 +770,12 @@ s19_app\tui\app.py:10141: in _handle_load_project
 s19_app\tui\services\variant_execution_service.py:512: in read_project_manifest
     payload = json.load(handle)
               ^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\__init__.py:293: in load
+<HOME>\anaconda3\envs\s19env\Lib\json\__init__.py:293: in load
     return loads(fp.read(),
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\__init__.py:346: in loads
+<HOME>\anaconda3\envs\s19env\Lib\json\__init__.py:346: in loads
     return _default_decoder.decode(s)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:337: in decode
+<HOME>\anaconda3\envs\s19env\Lib\json\decoder.py:337: in decode
     obj, end = self.raw_decode(s, idx=_w(s, 0).end())
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -798,10 +798,10 @@ idx = 0
                        ^^^^^^^^^^^^^^^^^^^^^^
 E           ValueError: Exceeds the limit (4300 digits) for integer string conversion: value has 5000 digits; use sys.set_int_max_str_digits() to increase the limit
 
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
+<HOME>\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[mac-sync-int-over-digit-limit] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30193/test_tc_b100_20_damaged_manife2')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30193/test_tc_b100_20_damaged_manife2')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000012648A31910>
 writer = 'mac-sync', damage = 'int-over-digit-limit'
 
@@ -829,13 +829,13 @@ tests\test_b100_active_variant.py:528:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_active_variant.py:507: in _run_writer
     asyncio.run(_drive())
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_active_variant.py:482: in _drive
@@ -848,12 +848,12 @@ s19_app\tui\app.py:10141: in _handle_load_project
 s19_app\tui\services\variant_execution_service.py:512: in read_project_manifest
     payload = json.load(handle)
               ^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\__init__.py:293: in load
+<HOME>\anaconda3\envs\s19env\Lib\json\__init__.py:293: in load
     return loads(fp.read(),
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\__init__.py:346: in loads
+<HOME>\anaconda3\envs\s19env\Lib\json\__init__.py:346: in loads
     return _default_decoder.decode(s)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:337: in decode
+<HOME>\anaconda3\envs\s19env\Lib\json\decoder.py:337: in decode
     obj, end = self.raw_decode(s, idx=_w(s, 0).end())
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -876,10 +876,10 @@ idx = 0
                        ^^^^^^^^^^^^^^^^^^^^^^
 E           ValueError: Exceeds the limit (4300 digits) for integer string conversion: value has 5000 digits; use sys.set_int_max_str_digits() to increase the limit
 
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
+<HOME>\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[a2l-sync-int-over-digit-limit] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30193/test_tc_b100_20_damaged_manife3')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30193/test_tc_b100_20_damaged_manife3')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001264C3ABE50>
 writer = 'a2l-sync', damage = 'int-over-digit-limit'
 
@@ -907,13 +907,13 @@ tests\test_b100_active_variant.py:528:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_active_variant.py:507: in _run_writer
     asyncio.run(_drive())
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_active_variant.py:482: in _drive
@@ -926,12 +926,12 @@ s19_app\tui\app.py:10141: in _handle_load_project
 s19_app\tui\services\variant_execution_service.py:512: in read_project_manifest
     payload = json.load(handle)
               ^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\__init__.py:293: in load
+<HOME>\anaconda3\envs\s19env\Lib\json\__init__.py:293: in load
     return loads(fp.read(),
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\__init__.py:346: in loads
+<HOME>\anaconda3\envs\s19env\Lib\json\__init__.py:346: in loads
     return _default_decoder.decode(s)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:337: in decode
+<HOME>\anaconda3\envs\s19env\Lib\json\decoder.py:337: in decode
     obj, end = self.raw_decode(s, idx=_w(s, 0).end())
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -954,10 +954,10 @@ idx = 0
                        ^^^^^^^^^^^^^^^^^^^^^^
 E           ValueError: Exceeds the limit (4300 digits) for integer string conversion: value has 5000 digits; use sys.set_int_max_str_digits() to increase the limit
 
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
+<HOME>\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
 __ test_tc_b100_20_variant_append_with_a_junction_loop_entry_does_not_crash ___
 
-self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30193/test_tc_b100_20_variant_append0/app/.s19tool/workarea/P/loop/x.json')
+self = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30193/test_tc_b100_20_variant_append0/app/.s19tool/workarea/P/loop/x.json')
 strict = False
 
     def resolve(self, strict=False):
@@ -984,10 +984,10 @@ strict = False
             try:
 >               p.stat()
 
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1003: 
+<HOME>\anaconda3\envs\s19env\Lib\pathlib.py:1003: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30193/test_tc_b100_20_variant_append0/app/.s19tool/workarea/P/loop/x.json')
+self = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30193/test_tc_b100_20_variant_append0/app/.s19tool/workarea/P/loop/x.json')
 
     def stat(self, *, follow_symlinks=True):
         """
@@ -996,13 +996,13 @@ self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-301
         """
 >       return os.stat(self, follow_symlinks=follow_symlinks)
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-E       OSError: [WinError 1921] The name of the file cannot be resolved by the system: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30193\\test_tc_b100_20_variant_append0\\app\\.s19tool\\workarea\\P\\loop\\x.json'
+E       OSError: [WinError 1921] The name of the file cannot be resolved by the system: '<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-30193\\test_tc_b100_20_variant_append0\\app\\.s19tool\\workarea\\P\\loop\\x.json'
 
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1013: OSError
+<HOME>\anaconda3\envs\s19env\Lib\pathlib.py:1013: OSError
 
 During handling of the above exception, another exception occurred:
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30193/test_tc_b100_20_variant_append0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30193/test_tc_b100_20_variant_append0')
 
     def test_tc_b100_20_variant_append_with_a_junction_loop_entry_does_not_crash(
         tmp_path: Path,
@@ -1037,13 +1037,13 @@ tests\test_b100_active_variant.py:596:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_active_variant.py:507: in _run_writer
     asyncio.run(_drive())
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_active_variant.py:482: in _drive
@@ -1058,7 +1058,7 @@ s19_app\tui\services\variant_execution_service.py:631: in read_project_manifest
 s19_app\tui\services\variant_execution_service.py:325: in _resolve_manifest_entry
     resolved = (project_root / text).resolve()
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1005: in resolve
+<HOME>\anaconda3\envs\s19env\Lib\pathlib.py:1005: in resolve
     check_eloop(e)
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
@@ -1068,9 +1068,9 @@ e = OSError(22, 'The name of the file cannot be resolved by the system')
         winerror = getattr(e, 'winerror', 0)
         if e.errno == ELOOP or winerror == _WINERROR_CANT_RESOLVE_FILENAME:
 >           raise RuntimeError("Symlink loop from %r" % e.filename)
-E           RuntimeError: Symlink loop from 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30193\\test_tc_b100_20_variant_append0\\app\\.s19tool\\workarea\\P\\loop\\x.json'
+E           RuntimeError: Symlink loop from '<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-30193\\test_tc_b100_20_variant_append0\\app\\.s19tool\\workarea\\P\\loop\\x.json'
 
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:990: RuntimeError
+<HOME>\anaconda3\envs\s19env\Lib\pathlib.py:990: RuntimeError
 =========================== short test summary info ===========================
 FAILED tests/test_b100_announce.py::test_tc_b100_67_junction_loop_entry_is_a_skipped_row_not_a_crash
 FAILED tests/test_b100_announce.py::test_tc_b100_67_integer_over_the_digit_limit_reads_as_damaged

@@ -9,7 +9,7 @@ only, see I1).
 
 Verification performed (never the test suite):
 
-- `C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m py_compile s19_app/tui/screens.py` → OK.
+- `<HOME>/anaconda3/envs/s19env/python.exe -m py_compile s19_app/tui/screens.py` → OK.
 - Runtime import from the working tree + spot checks of the signature,
   `AUTO_FOCUS`, `BINDINGS`, `DEFAULT_CSS`, `SavePreview` frozen-ness,
   `SaveProjectPayload` equality, the `plan` property (no setter), and the old
@@ -142,11 +142,11 @@ binding, class, and status-line literal follows the graph character-for-characte
 ## Open questions
 
 - None blocking. One environment note for the tester: in this shell, the
-  `s19tool` editable install points at `C:\Users\jjgh8\Github\s19_app` (the
+  `s19tool` editable install points at `<HOME>\Github\s19_app` (the
   read-only canonical repo), not this working tree, so `python -I -c "import
   s19_app.tui.screens ..."` resolves the stale installed copy. The checks here
   were run against the working tree via cwd import
-  (`s19_app/__init__.py` → `C:\Users\jjgh8\Github\s19_app-b100-inc11\s19_app`).
+  (`s19_app/__init__.py` → `<HOME>\Github\s19_app-b100-inc11\s19_app`).
   The I1-2 assertion (`'project_gather_service' in vars(s)` → `False`) holds on
   the working-tree module regardless.
 

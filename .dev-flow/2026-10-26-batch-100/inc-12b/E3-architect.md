@@ -2,7 +2,7 @@ PASS-WITH-NOTES
 
 # Inc 12b — E3 PDR round 1, architect
 
-Scope read: `E1-scope.md`, `E1-rulings.md`, `E2-rulings.md`, `E1-requirements-draft.md`, `codewire/interfaces-12b.md`, `baseline-12b.md` / `baseline-notes.md`, `proto-12b-load-save.md` (P-1), `proto-12b-a2l-refusal.md` (P-2), the 12a seam (`inc-12a-design/codewire/interfaces-12a.md`, `E3-rulings.md`), the Inc 11 `_PreparedSave` seam. Code: `C:/Users/jjgh8/Github/s19_app` at `2305c8b` (Inc 9b merged; read only). Textual 8.2.8 source under the s19env. One static probe, executed: `work/e3-architect/fixedpause.py` → `work/e3-architect/fixedpause.out.txt` (parses test sources only; no test was run).
+Scope read: `E1-scope.md`, `E1-rulings.md`, `E2-rulings.md`, `E1-requirements-draft.md`, `codewire/interfaces-12b.md`, `baseline-12b.md` / `baseline-notes.md`, `proto-12b-load-save.md` (P-1), `proto-12b-a2l-refusal.md` (P-2), the 12a seam (`inc-12a-design/codewire/interfaces-12a.md`, `E3-rulings.md`), the Inc 11 `_PreparedSave` seam. Code: `<HOME>/Github/s19_app` at `2305c8b` (Inc 9b merged; read only). Textual 8.2.8 source under the s19env. One static probe, executed: `work/e3-architect/fixedpause.py` → `work/e3-architect/fixedpause.out.txt` (parses test sources only; no test was run).
 
 Counts: HIGH 0 · MAJOR 1 · MINOR 1 · NIT 2. Plus 13 design-fix items (binding E2 rows the prototypes or the fixed files do not carry yet), listed separately; they are not findings.
 

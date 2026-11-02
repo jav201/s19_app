@@ -231,24 +231,24 @@ All paths under `.dev-flow/2026-10-19-batch-97/evidence/inc-5/`.
 | HEAD source digests | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/source-digests-head.txt` | `8403687213cc19aa86763cb1ceb7349bbafed32ed7724e49a9355211af679d92` |
 | Census files | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/census-files.txt` | `47a0e79c89e43dd83ffd19d8356bd388138b70e64bc47c0caa1a7065be734b28` |
 | on HEAD | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/census-head-run.txt` | `53841ebaa6962c4af1fb4de7d2164b3d801b58840e36e6d7732162028a411765` |
-| on Inc-5 before rewrites | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/census-new-first.txt` | `bf2c1cd2a975a29f1b60a06e58f81fa670f0e722f58fab190a95e7d3112171fe` |
+| on Inc-5 before rewrites | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/census-new-first.txt` | `8476e1f29d10c28829baf92e6203502882f26fb0c2784650e49423b52a66b04c` |
 | RED selection | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/red-selection.txt` | `1383006edfd09b8bd660579bde67c1edc3ce737550da5807d1b077aeece0ce8d` |
-| RED | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/red.txt` | `fa44b203f874b8df07175b50292feb0a0cb0dd2530cc2236bae0b10fbc2799d4` |
-| re-run | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/red-rerun.txt` | `7d6975ec7ecc16495cb5efbdb82b56fff0d4ba743220124bd177c63fedef9ee5` |
-| re-run 2 | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/red-rerun2.txt` | `af14fc33a160ef3b74825c51d5b3d56b609fe06a39e90934196cf8d5e41befbb` |
+| RED | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/red.txt` | `74c9b5fef41ea7b451a75f0d680d50e048b5dcc32d82c58f2ce7f03da2ee031e` |
+| re-run | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/red-rerun.txt` | `04db48a3c7e3b3f8cde6bab160e08f1eb3af973e3074cb1d35a776272cb74601` |
+| re-run 2 | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/red-rerun2.txt` | `ab2c8a78830fc9cac5cf5ff5666d41ec684f078dcd450e4f35cca0896ae91e57` |
 | Gate file list | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/gate-files.txt` | `b74fbf46153b7e09e16a367e19124948eea7a8e10f1760a22e159b45799b333e` |
-| GREEN gate | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/green.txt` | `0cae02c652416c0ff2776a5ebd847f61ad31fd167558b64697e3fab04b70219c` |
+| GREEN gate | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/green.txt` | `8344bbba80d09d3228cacdbc094ec6ab7de7977d279e00e373d70f7f66e0cb63` |
 | GREEN after edits | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/green-after-fixes.txt` | `342a9ad79003b494ee2f28e75442da874fb952da57974828539b826a13f2f76f` |
 | Non-baseline re-runs (Inc-5 + HEAD) | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/rerun-nonbaseline.txt` | `cf536f9737c4cf4d5a3b2acca87ce5601e17d77acbb96054b7a2f6c9e1450658` |
-| Full suite (gate close) | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/suite-full.txt` | `ed83303e23629c2e63c4b6f7f1a2acc7db01e86dc093bf38fcfa36b656ea2f4a` |
+| Full suite (gate close) | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/suite-full.txt` | `9e7d9f5045015ef5168aff72317a83234ee2481938f2533b0e3ebbee26ddfc54` |
 | Full-suite non-baseline re-runs | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/suite-rerun-nonbaseline.txt` | `023cf2df3ec98d76fdabfdcf75eab99a620e0c43ece5155081fbb94331860a8c` |
 | Non-baseline nodes on clean HEAD | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/suite-head-flake-check.txt` | `69e984811207bc3e73c3c76e79511a5b1e37f7eef514fe7ba57f44cdefbd2040` |
 | Gate re-read mutations (M54, M55) | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/mutations-gate-reread.txt` | `1fa967e581859d207a277ff1036c9b6bec7783b121e1eae40cfadbdb180f8394` |
-| Mutations | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/mutations.txt` | `49a44eea38ea9079abbc5b97167d81af5e724222fb9ee1103496fe3e38818586` |
-| re-run | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/mutations-rerun.txt` | `c43d96f78bedea26f7a8b35b2b669c427f915aaec24f8c1360ece1fb40fe9531` |
+| Mutations | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/mutations.txt` | `f38b8a0e6c4d4ad83dc382bd40316d9b2c0bfe085c893f2dc62b336d034c1b16` |
+| re-run | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/mutations-rerun.txt` | `9bd1cb3a0e23456fa34c69cbc852efe1bcd24eb279fa102077a5145aee2bd345` |
 | script (first run; the fold appended to `mutate.py`, so these bytes are kept as) | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/mutate.pre-fold.py` | `6baee1670f1ce5aaecbeebf7daf64065ddf5a0d3d194b6546b14a4f24b7b030a` |
-| Frames HEAD | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/frames-09e44de.txt` | `ead4adea79ccd532373a5f27b7f6b98ecf87946af9311879a0dee7d2b3961e46` |
-| Inc-5 | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/frames-inc5.txt` | `ead4adea79ccd532373a5f27b7f6b98ecf87946af9311879a0dee7d2b3961e46` |
+| Frames HEAD | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/frames-09e44de.txt` | `c91c5cdff40e754511263a2cd37798a26c322d038287239493d3885a22454dfe` |
+| Inc-5 | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/frames-inc5.txt` | `c91c5cdff40e754511263a2cd37798a26c322d038287239493d3885a22454dfe` |
 | diff | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/frames-diff.txt` | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
 | positive control | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/frames-positive-control.txt` | `10ed73663ec6354865a61b440cc248afae40f2e2acbd2ef44489374edbfe3e10` |
 | script | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/frames.py` | `37753da6bbf4c3990a9a90e68aa308ba6a91f8ad5b0e397fee28d2e71118588d` |
@@ -270,10 +270,10 @@ All paths under `.dev-flow/2026-10-19-batch-97/evidence/inc-5/`.
 | Evidence artifact | Path | SHA-256 |
 |---|---|---|
 | RED selection | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/red-fold-selection.txt` | `1883680b9516d37174e8065881085975e608ed6ce8098c4c7485bd7946a3b062` |
-| RED fold (49 failed / 6 passed; 4 failed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/red-fold.txt` | `8bd56aaa39b42bc75b9d3987733d0e5b60c5503f0f3830b17a9baf1c43458fed` |
+| RED fold (49 failed / 6 passed; 4 failed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/red-fold.txt` | `531cef0a6893ff0558f35acfcb2d389a7d2c88df3170331b77d640433311463d` |
 | Gate file list | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/gate-files-fold.txt` | `c29266564d44b5ee91cb97c51f896413317b17c077d423d6a7ca4981f54cdfd2` |
-| GREEN fold (686 / 29 xf / 1 F; 36; 152) | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/green-fold.txt` | `4fc3f4648fbec1d980941593da25cbc9db9d5a31a6bdc7f0ea38865ad6473ac7` |
-| Mutations fold (28 / 1 / 0) | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/mutations-fold.txt` | `5ddab934467784bbf0ea503851760f635c60edc7553511ea5ab7b472ae77ff3c` |
+| GREEN fold (686 / 29 xf / 1 F; 36; 152) | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/green-fold.txt` | `79c79504dce237749b57113ba3056a36c9f570b42e229694f5f3a7db28712c36` |
+| Mutations fold (28 / 1 / 0) | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/mutations-fold.txt` | `d2253d9c258e9d9782903e0cda1fc049777110f59b7294b8a85f26c7c4196329` |
 | script (after the fold) | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/mutate.py` | `16e667bc4a131bcd0f1775379ae163d242893f251e6a8a24fb8d2ae6b6712ab1` |
 | Budget fold | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/budget-fold.txt` | `457bb2fbb0c4f1e5dee32adb6619a7af8a56131e15c9c06f2dc071ccd4d93ef0` |
 | script | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/measure_budget_fold.py` | `102ee84d80d68bd452867fb21d5bd2c4eb289048e03c80f9d1d1e02af2e75d87` |
@@ -281,7 +281,7 @@ All paths under `.dev-flow/2026-10-19-batch-97/evidence/inc-5/`.
 | script | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/measure_band.py` | `bbd26815e9617aa1fb31b604d6b026d06ce29b80ded7c9cc39e38222d181a063` |
 | Snapshot cells fold (= HEAD) | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/cells-fold.txt` | `8bc937d17414f7f03b5525ee114c01c9fc58aa2c655b1e522c95314bfcdba9dd` |
 | diff (empty) | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/cells-diff-fold.txt` | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
-| Frames fold (= HEAD) | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/frames-fold.txt` | `ead4adea79ccd532373a5f27b7f6b98ecf87946af9311879a0dee7d2b3961e46` |
+| Frames fold (= HEAD) | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/frames-fold.txt` | `c91c5cdff40e754511263a2cd37798a26c322d038287239493d3885a22454dfe` |
 | diff (empty) | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/frames-diff-fold.txt` | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
 | WT 118x54 (fold) | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/png/impl.flow-builder.png` | `440a8e1025a102802bb1c4683b973ab654783df0aa177bbc551846b75b16c076` |
 | WT 118x53 (fold) | `.dev-flow/2026-10-19-batch-97/evidence/inc-5/png/impl.flow-builder.118x53.png` | `092e2545b2ec5ff27133f3e5d47854a049b6841642fcb3fa5f68bff614943ed3` |

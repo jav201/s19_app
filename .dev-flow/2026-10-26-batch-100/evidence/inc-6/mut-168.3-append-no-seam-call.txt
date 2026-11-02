@@ -1,6 +1,6 @@
 # command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_active_variant.py -k tc_b100_18 or tc_b100_19 or tc_b100_20
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree) with mutation 168.3-append-no-seam-call
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# tree: <HOME>\Github\s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree) with mutation 168.3-append-no-seam-call
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
 # date: 2026-10-30T01:15:33+00:00
 # requirement: LLR-168.3
 # mutation: the seam call is removed from the variant append — file s19_app/tui/app.py
@@ -12,7 +12,7 @@
 ================================== FAILURES ===================================
 _______ test_tc_b100_20_variant_append_carries_every_key_and_activates ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30136/test_tc_b100_20_variant_append0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30136/test_tc_b100_20_variant_append0')
 
     def test_tc_b100_20_variant_append_carries_every_key_and_activates(tmp_path: Path) -> None:
         base = tmp_path / "app"
@@ -48,7 +48,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 tests\test_b100_active_variant.py:355: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30136/test_tc_b100_20_variant_append0/app/.s19tool/workarea/P')
+project_dir = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30136/test_tc_b100_20_variant_append0/app/.s19tool/workarea/P')
 before_bytes = b'{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"],"assignments":{"firmware":["checks/...start":2147483712,"end":2147483775}],"gathered":{"patches":["patches/cs_seed.json"],"checks":["checks/ck_seed.json"]}}'
 
     def _assert_carried(project_dir: Path, before_bytes: bytes) -> dict:

@@ -1,7 +1,7 @@
-# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2
-# command: python -m pytest -q -p no:cacheprovider -rfE --basetemp=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/g2 tests/test_b100_active_variant.py tests/test_b100_announce.py tests/test_b100_focus.py tests/test_b100_save_image.py tests/test_b100_session_reset.py tests/test_import_census.py tests/test_id_registry.py
+# tree: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2
+# command: python -m pytest -q -p no:cacheprovider -rfE --basetemp=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/g2 tests/test_b100_active_variant.py tests/test_b100_announce.py tests/test_b100_focus.py tests/test_b100_save_image.py tests/test_b100_session_reset.py tests/test_import_census.py tests/test_id_registry.py
 # date: 2026-10-30T04:21:06Z
-# s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r6\fixed2\s19_app\__init__.py
+# s19_app.__file__ = <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r6\fixed2\s19_app\__init__.py
 # python 3.11.15
 ........................................................................ [ 42%]
 ........................................................................ [ 84%]
@@ -18,7 +18,7 @@ ______ ERROR at setup of test_tc600_g1_every_named_node_id_is_registered ______
 tests\test_id_registry.py:343: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-start = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2/tests/test_id_registry.py')
+start = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2/tests/test_id_registry.py')
 
     def repo_root(start: Optional[Path] = None) -> Path:
         """
@@ -65,7 +65,7 @@ ______ ERROR at setup of test_tc601_g2_live_entries_name_existing_nodes _______
 tests\test_id_registry.py:343: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-start = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2/tests/test_id_registry.py')
+start = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2/tests/test_id_registry.py')
 
     def repo_root(start: Optional[Path] = None) -> Path:
         """
@@ -112,7 +112,7 @@ ________ ERROR at setup of test_tc602_g3_every_citation_is_registered _________
 tests\test_id_registry.py:343: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-start = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2/tests/test_id_registry.py')
+start = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2/tests/test_id_registry.py')
 
     def repo_root(start: Optional[Path] = None) -> Path:
         """
@@ -159,7 +159,7 @@ _______ ERROR at setup of test_tc603_g4_requirements_citations_are_live _______
 tests\test_id_registry.py:343: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-start = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2/tests/test_id_registry.py')
+start = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2/tests/test_id_registry.py')
 
     def repo_root(start: Optional[Path] = None) -> Path:
         """
@@ -206,7 +206,7 @@ ____ ERROR at setup of test_tc604_g5_grammar_holds_or_is_registered_legacy ____
 tests\test_id_registry.py:343: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-start = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2/tests/test_id_registry.py')
+start = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2/tests/test_id_registry.py')
 
     def repo_root(start: Optional[Path] = None) -> Path:
         """
@@ -253,7 +253,7 @@ _________ ERROR at setup of test_tc605_g6_normalized_keys_are_unique __________
 tests\test_id_registry.py:343: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-start = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2/tests/test_id_registry.py')
+start = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2/tests/test_id_registry.py')
 
     def repo_root(start: Optional[Path] = None) -> Path:
         """
@@ -300,7 +300,7 @@ _____ ERROR at setup of test_tc606_g7_no_stem_exceeds_the_high_water_mark _____
 tests\test_id_registry.py:343: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-start = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2/tests/test_id_registry.py')
+start = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2/tests/test_id_registry.py')
 
     def repo_root(start: Optional[Path] = None) -> Path:
         """
@@ -347,7 +347,7 @@ ___ ERROR at setup of test_tc607_scanned_corpus_matches_the_declared_bound ____
 tests\test_id_registry.py:343: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-start = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2/tests/test_id_registry.py')
+start = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2/tests/test_id_registry.py')
 
     def repo_root(start: Optional[Path] = None) -> Path:
         """
@@ -394,7 +394,7 @@ __________ ERROR at setup of test_tc609_registry_file_is_well_formed __________
 tests\test_id_registry.py:343: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-start = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2/tests/test_id_registry.py')
+start = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2/tests/test_id_registry.py')
 
     def repo_root(start: Optional[Path] = None) -> Path:
         """
@@ -441,7 +441,7 @@ ____ ERROR at setup of test_tc610_reservations_are_recorded_and_respected _____
 tests\test_id_registry.py:343: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-start = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2/tests/test_id_registry.py')
+start = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2/tests/test_id_registry.py')
 
     def repo_root(start: Optional[Path] = None) -> Path:
         """
@@ -488,7 +488,7 @@ _ ERROR at setup of test_at280_registry_and_repository_agree_in_both_directions 
 tests\test_id_registry.py:343: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-start = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2/tests/test_id_registry.py')
+start = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2/tests/test_id_registry.py')
 
     def repo_root(start: Optional[Path] = None) -> Path:
         """
@@ -535,7 +535,7 @@ ___________ ERROR at setup of test_at281_every_guard_rule_can_fail ____________
 tests\test_id_registry.py:343: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-start = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2/tests/test_id_registry.py')
+start = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2/tests/test_id_registry.py')
 
     def repo_root(start: Optional[Path] = None) -> Path:
         """

@@ -1,12 +1,12 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py -k 'junction_target or junction_cycle or walk_tree_no_links'  (RED run against the fix-pass-2 tree, BEFORE the fix-pass-3 source changes)
-tree: C:/Users/jjgh8/Github/s19_app-b100-inc2 (detached 2edfee2, Inc 2 + fix passes 1-2)
-env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc2 (NO_COLOR unset)
+tree: <HOME>/Github/s19_app-b100-inc2 (detached 2edfee2, Inc 2 + fix passes 1-2)
+env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<HOME>/Github/s19_app-b100-inc2 (NO_COLOR unset)
 
 .FFF                                                                     [100%]
 ================================== FAILURES ===================================
 ___________ test_tc_b100_07_rollback_never_touches_junction_target ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27598/test_tc_b100_07_rollback_never0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27598/test_tc_b100_07_rollback_never0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001D2C6E348D0>
 
     def test_tc_b100_07_rollback_never_touches_junction_target(
@@ -68,7 +68,7 @@ E       assert 'user-work.txt' in ['keep.txt']
 tests\test_b100_save_guards.py:1291: AssertionError
 _____________ test_tc_b100_07_junction_cycle_does_not_block_save ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27598/test_tc_b100_07_junction_cycle0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27598/test_tc_b100_07_junction_cycle0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001D2C87E13D0>
 
     def test_tc_b100_07_junction_cycle_does_not_block_save(
@@ -108,13 +108,13 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001D2C87E13D0>
 >       assert "Saved project" in status, (
             f"a junction cycle must not block the save, got {status!r}"
         )
-E       AssertionError: a junction cycle must not block the save, got "Project NOT saved: could not save — [WinError 3] The system cannot find the path specified: 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-jjgh8\\\\pytest-27598\\\\test_tc_b100_07_junction_cycle0\\\\app\\\\.s19tool\\\\workarea\\\\ab\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop'. check the folder."
-E       assert 'Saved project' in "Project NOT saved: could not save — [WinError 3] The system cannot find the path specified: 'C:\\\\Users\\\\jjgh8\\\\...op\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop'. check the folder."
+E       AssertionError: a junction cycle must not block the save, got "Project NOT saved: could not save — [WinError 3] The system cannot find the path specified: 'C:\\\\Users\\\\<USER>\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-<USER>\\\\pytest-27598\\\\test_tc_b100_07_junction_cycle0\\\\app\\\\.s19tool\\\\workarea\\\\ab\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop'. check the folder."
+E       assert 'Saved project' in "Project NOT saved: could not save — [WinError 3] The system cannot find the path specified: 'C:\\\\Users\\\\<USER>\\\\...op\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop'. check the folder."
 
 tests\test_b100_save_guards.py:1336: AssertionError
 _______ test_tc_b100_07_walk_tree_no_links_yields_reparse_point_as_leaf _______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27598/test_tc_b100_07_walk_tree_no_l0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27598/test_tc_b100_07_walk_tree_no_l0')
 
     def test_tc_b100_07_walk_tree_no_links_yields_reparse_point_as_leaf(
         tmp_path: Path,
@@ -125,7 +125,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         and never loops on a junction cycle."""
         b100_links.require_junctions()
 >       from s19_app.tui.workspace import walk_tree_no_links
-E       ImportError: cannot import name 'walk_tree_no_links' from 's19_app.tui.workspace' (C:\Users\jjgh8\Github\s19_app-b100-inc2\s19_app\tui\workspace.py)
+E       ImportError: cannot import name 'walk_tree_no_links' from 's19_app.tui.workspace' (<HOME>\Github\s19_app-b100-inc2\s19_app\tui\workspace.py)
 
 tests\test_b100_save_guards.py:1354: ImportError
 =========================== short test summary info ===========================

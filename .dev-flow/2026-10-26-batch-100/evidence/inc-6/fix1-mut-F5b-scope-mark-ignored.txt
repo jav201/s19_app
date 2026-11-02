@@ -1,9 +1,9 @@
 # mutation: F5b-scope-mark-ignored — F5b (LLR-178.1): manifest_is_damaged ignores the whole-manifest mark (a top level that is not an object)
 # file: s19_app/tui/services/variant_execution_service.py (sha256 before 395dcbde3b28851b)
-# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=C:\Users\jjgh8\AppData\Local\Temp\f1mut-F5b-scope-mark-ignored tests/test_b100_active_variant.py -k damaged_manifest_is_never and not-an-object
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (corrective pass 1, mutated in place, then restored)
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
-# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\__init__.py
+# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=<HOME>\AppData\Local\Temp\f1mut-F5b-scope-mark-ignored tests/test_b100_active_variant.py -k damaged_manifest_is_never and not-an-object
+# tree: <HOME>\Github\s19_app-b100-inc6 (corrective pass 1, mutated in place, then restored)
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# s19_app.__file__ = <HOME>\Github\s19_app-b100-inc6\s19_app\__init__.py
 # date: 2026-10-30T03:33:44Z
 # --- old
 #           or issue.details.get(_ISSUE_SCOPE) == _SCOPE_MANIFEST
@@ -15,7 +15,7 @@ FFFF                                                                     [100%]
 ================================== FAILURES ===================================
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[save-back-not-an-object] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-F5b-scope-mark-ignored/test_tc_b100_20_damaged_manife0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-F5b-scope-mark-ignored/test_tc_b100_20_damaged_manife0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002ADF903C210>
 writer = 'save-back', damage = 'not-an-object'
 
@@ -50,7 +50,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:521: AssertionError
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-not-an-object] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-F5b-scope-mark-ignored/test_tc_b100_20_damaged_manife1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-F5b-scope-mark-ignored/test_tc_b100_20_damaged_manife1')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002ADFB9E0D50>
 writer = 'variant-append', damage = 'not-an-object'
 
@@ -85,7 +85,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:521: AssertionError
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[mac-sync-not-an-object] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-F5b-scope-mark-ignored/test_tc_b100_20_damaged_manife2')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-F5b-scope-mark-ignored/test_tc_b100_20_damaged_manife2')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002ADFB856B90>
 writer = 'mac-sync', damage = 'not-an-object'
 
@@ -120,7 +120,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:521: AssertionError
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[a2l-sync-not-an-object] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-F5b-scope-mark-ignored/test_tc_b100_20_damaged_manife3')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-F5b-scope-mark-ignored/test_tc_b100_20_damaged_manife3')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002ADFB8743D0>
 writer = 'a2l-sync', damage = 'not-an-object'
 

@@ -2,8 +2,8 @@
 
 - **Reviewer:** `security-reviewer`, at P2 round 1, because trigger family C fired (C6 input surface and C8 markup) and the scan reported `security_required: true`.
 - **Under review:** `01-requirements.md` and `01-requirements-ledger.md` at `3060d66`. Context: `design/ARQ-batch-100.md` and the code at `1d677ba`.
-- **Execution:** every probe ran against a `git archive 1d677ba` snapshot, never against the live checkout. Each probe printed `s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\snap\s19_app\__init__.py`. Runtime: Python 3.12.7 (no 3.11 is installed on this host), Textual 8.2.8, Windows 11, `LongPathsEnabled = 0`.
-- **Probe scripts and outputs:** `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\probes\` (`p2sec_probe.py`/`.out`, `p2sec_probe2.py`/`.out`, `p2sec_probe3.py`/`.out`, `p2sec_probe4.py`/`.out`).
+- **Execution:** every probe ran against a `git archive 1d677ba` snapshot, never against the live checkout. Each probe printed `s19_app.__file__ = <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\snap\s19_app\__init__.py`. Runtime: Python 3.12.7 (no 3.11 is installed on this host), Textual 8.2.8, Windows 11, `LongPathsEnabled = 0`.
+- **Probe scripts and outputs:** `<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\probes\` (`p2sec_probe.py`/`.out`, `p2sec_probe2.py`/`.out`, `p2sec_probe3.py`/`.out`, `p2sec_probe4.py`/`.out`).
 - **Severity map:** HIGH is the station's `blocker`. MAJOR and MINOR are the station's `major` and `minor`.
 
 ## Findings

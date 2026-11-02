@@ -1,6 +1,6 @@
 # Kimi brief — batch-99 Increment 2 · review fixes (code-reviewer F1–F6)
 
-Read `BRIEF-COMMON.md` first. Same worktree, `C:\Users\jjgh8\Github\s19_app-b99-inc2`, branch `b99-inc2` (commit fc81767 on main `a52e2be`, plus an uncommitted orchestrator fix in `tests/test_b99_s0.py`: a wait for the LoadGuardScreen button — keep it). Do not commit.
+Read `BRIEF-COMMON.md` first. Same worktree, `<HOME>\Github\s19_app-b99-inc2`, branch `b99-inc2` (commit fc81767 on main `a52e2be`, plus an uncommitted orchestrator fix in `tests/test_b99_s0.py`: a wait for the LoadGuardScreen button — keep it). Do not commit.
 
 The independent review returned **changes required**. Fix exactly these:
 

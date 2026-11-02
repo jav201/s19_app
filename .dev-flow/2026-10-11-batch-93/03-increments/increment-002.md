@@ -91,19 +91,19 @@ green on the new law.
 
 ```bash
 # the wrap audit (the whole harness — never a -k subset of its limbs)
-C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest tests/test_tui_map_wrap.py \
+<HOME>/anaconda3/envs/s19env/python.exe -m pytest tests/test_tui_map_wrap.py \
   -q -p no:cacheprovider
 
 # the regime arms + the settled click family
-C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest tests/test_tui_map_big.py \
+<HOME>/anaconda3/envs/s19env/python.exe -m pytest tests/test_tui_map_big.py \
   tests/test_tui_directionb.py -q -p no:cacheprovider
 
 # the before/after evidence probes (read-only; print the audit facts)
-C:/Users/jjgh8/anaconda3/envs/s19env/python.exe \
+<HOME>/anaconda3/envs/s19env/python.exe \
   .dev-flow/2026-10-11-batch-93/evidence/inc002_probe.py        # the wrap walk
-C:/Users/jjgh8/anaconda3/envs/s19env/python.exe \
+<HOME>/anaconda3/envs/s19env/python.exe \
   .dev-flow/2026-10-11-batch-93/evidence/inc002_boundary_probe.py # the live-resize legs
-C:/Users/jjgh8/anaconda3/envs/s19env/python.exe \
+<HOME>/anaconda3/envs/s19env/python.exe \
   .dev-flow/2026-10-11-batch-93/evidence/inc002_regime_probe.py   # the panel↔terminal mapping
 ```
 
@@ -275,7 +275,7 @@ Increment 003 — legend A (the spec sheet) + the command-bar interlock (`HLR-13
 
 | Evidence artifact | Path — under `artifact_homes.evidence` | SHA-256 |
 |---|---|---|
-| the coordinator's brief (verbatim) | `.dev-flow/2026-10-11-batch-93/evidence/inc002-brief.md` | `2327728b11d8d793c43f5f9f2d47899808c54511f0136a2ad547d54599a2ab31` |
+| the coordinator's brief (verbatim) | `.dev-flow/2026-10-11-batch-93/evidence/inc002-brief.md` | `8a540e7d5ecdee77e8b9e6022b70b3765fcce22ee792c6a97ee3f9ab858cbbe7` |
 | the re-measured thresholds + audit findings | `.dev-flow/2026-10-11-batch-93/evidence/inc002-pilot-measurements.md` | `53bfe387cd82190a648f03e302ca56f6ab3f85c2b031cc6eff2a5d8df439c37b` |
 | the wrap-audit walk probe | `.dev-flow/2026-10-11-batch-93/evidence/inc002_probe.py` | `77bbde6607380ea32fdbd66fb0f47b61bd0e4ab8517e2606e4ad00b14ca479c0` |
 | the audit's before-transcript (the inc-001 tree's defects) | `.dev-flow/2026-10-11-batch-93/evidence/inc002_probe.out.txt` | `3a198f779ed6ca7c8ad403980f0a1ba3536a26e7ac67682b026bff0ce61f2d2f` |

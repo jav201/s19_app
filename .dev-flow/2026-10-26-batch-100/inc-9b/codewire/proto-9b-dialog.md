@@ -1,6 +1,6 @@
 # Code-Wire prototype — Inc 9b, group G-A (`screens.py` + `styles.tcss`)
 
-Stage E2 of the design-first pipeline for Inc 9b ("the Load dialog"). This is the graph only. Nothing in `s19_app/` changes, and the 9a worktree `C:\Users\jjgh8\Github\s19_app-b100-inc9a` stays read-only. New code is a node whose `func:` starts with "new". The shared interfaces are those in `interfaces-9b.md` (fixed). This group changes none of them; the one scope change it proposes is under "Proposals". G-B (`app.py`) writes its prototype in parallel. The seams are listed under "Seams with G-B".
+Stage E2 of the design-first pipeline for Inc 9b ("the Load dialog"). This is the graph only. Nothing in `s19_app/` changes, and the 9a worktree `<HOME>\Github\s19_app-b100-inc9a` stays read-only. New code is a node whose `func:` starts with "new". The shared interfaces are those in `interfaces-9b.md` (fixed). This group changes none of them; the one scope change it proposes is under "Proposals". G-B (`app.py`) writes its prototype in parallel. The seams are listed under "Seams with G-B".
 
 **Base and inputs.**
 - Code: the 9a tree (`4fef292`; `screens.py` and `styles.tcss` are byte-identical there). `LoadFileScreen` is at `screens.py:184-227`, `LoadProjectScreen` at `screens.py:696-735`. The shared modal rules are at `styles.tcss:1576-1597`, `:1732-1765`. `OsClipboardInput` is at `os_clipboard_input.py:432`.

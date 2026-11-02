@@ -191,7 +191,7 @@ Ranked by expected yield, based on what actually paid this session:
 | `~/.claude` (claude-config) | ✅ clean, `0/0` — rev38, rev39, the 11 diagrams |
 | `~/.claude/skills` (agent-skills) | ✅ clean, `0/0` — both mirrors |
 | `~/kimi/agent-skills` | ✅ clean, `0/0` — pulled to match after each rev |
-| `C:\Users\jjgh8\flow-diagrams-rescued-2026-08-18\` | 📋 **deliberate, 50 MB.** Staging only; the 11 editable sources are safely in `claude-config`. The PNGs + PDF are derivable. **Delete when satisfied.** |
+| `<HOME>\flow-diagrams-rescued-2026-08-18\` | 📋 **deliberate, 50 MB.** Staging only; the 11 editable sources are safely in `claude-config`. The PNGs + PDF are derivable. **Delete when satisfied.** |
 | Scratchpad (`mutant.py`, `mutant2.py`, `split.py`) | 🗑️ ephemeral, deliberate — kill-mutation copies, their transcripts are in the rev38/rev39 changelog rows |
 
 **Nothing is uncommitted. Nothing is unpushed. Two PRs are open and unmerged, deliberately.**

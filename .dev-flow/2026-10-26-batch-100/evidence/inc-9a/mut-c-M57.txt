@@ -4,8 +4,8 @@ mutant: M57
 description: LLR-172.4a: the lister does not sort
 target file: s19_app/tui/workspace.py
 edit: '    files.sort(key=lambda p: (p.name.casefold(), p.name))\n    return files' -> '    return files'
-cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt  (a copy of the worktree, never the worktree)
-s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt\s19_app\__init__.py
+cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt  (a copy of the worktree, never the worktree)
+s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt\s19_app\__init__.py
 sha256 before: 0af4b92489233ff2bd01412a78bef3addc4408b1b907ed4ba49e1955dc01702c
 env: env -u NO_COLOR LOCALAPPDATA=<scratchpad>/e5fix/lad/<run id> PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=.
 command: python -m pytest -p no:cacheprovider -q --tb=line -rA 'tests/test_b100_recents.py::test_tc_b100_37_lister_sorts_whatever_order_the_folder_yields' 'tests/test_b100_recents.py::test_tc_b100_37_lister_returns_the_regular_files_sorted'
@@ -14,7 +14,7 @@ command: python -m pytest -p no:cacheprovider -q --tb=line -rA 'tests/test_b100_
 PASSED tests/test_b100_recents.py::test_tc_b100_37_lister_returns_the_regular_files_sorted
 FAILED tests/test_b100_recents.py::test_tc_b100_37_lister_sorts_whatever_order_the_folder_yields
 --- failure lines ---
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt\tests\test_b100_recents.py:1970: AssertionError: ['c.a2l', 'B.s19', 'a.hex']
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt\tests\test_b100_recents.py:1970: AssertionError: ['c.a2l', 'B.s19', 'a.hex']
 --- pytest tail ---
 PASSED tests/test_b100_recents.py::test_tc_b100_37_lister_returns_the_regular_files_sorted
 FAILED tests/test_b100_recents.py::test_tc_b100_37_lister_sorts_whatever_order_the_folder_yields

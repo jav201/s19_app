@@ -1,7 +1,7 @@
 import sys, asyncio
 root = sys.argv[1]
 sys.path.insert(0, root)
-sys.path.insert(1, r"C:\Users\jjgh8\Github\s19_app")
+sys.path.insert(1, r"<HOME>\Github\s19_app")
 import tempfile, pathlib
 from s19_app.tui.app import S19TuiApp
 import s19_app; print("module from", s19_app.__file__)

@@ -1,10 +1,10 @@
 # Kimi brief — batch-99 Increment 6 · review fixes (code-reviewer + security-reviewer)
 
-Read `BRIEF-COMMON.md` from the MAIN checkout (`C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-10-25-batch-99\kimi\BRIEF-COMMON.md`). Same worktree, `C:\Users\jjgh8\Github\s19_app-b99-inc6` (uncommitted, on `f1ba70c`). Do not commit. Source budget: `segment_split_view.py`, `segment_ops.py`, `workspace.py`.
+Read `BRIEF-COMMON.md` from the MAIN checkout (`<HOME>\Github\s19_app\.dev-flow\2026-10-25-batch-99\kimi\BRIEF-COMMON.md`). Same worktree, `<HOME>\Github\s19_app-b99-inc6` (uncommitted, on `f1ba70c`). Do not commit. Source budget: `segment_split_view.py`, `segment_ops.py`, `workspace.py`.
 
 **Two interpreters this time.** Run `tests/test_b99_export.py` on BOTH:
-- `C:\Users\jjgh8\anaconda3\envs\s19env\python.exe` (3.11);
-- `C:\Users\jjgh8\anaconda3\envs\mapperenv\python.exe` (3.12.13, Textual 8.2.8).
+- `<HOME>\anaconda3\envs\s19env\python.exe` (3.11);
+- `<HOME>\anaconda3\envs\mapperenv\python.exe` (3.12.13, Textual 8.2.8).
 
 Set `PYTHONPATH=<worktree>` for both. The project declares `requires-python >= 3.11`.
 

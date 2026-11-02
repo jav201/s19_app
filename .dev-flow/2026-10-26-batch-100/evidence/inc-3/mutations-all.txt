@@ -1,7 +1,7 @@
 === m1-order ===
 pre-mutation sha256: ca8e539b4c8c3c812e9460ac88d72c32e62e9a79c180646d29c3f6d9b62f6c45
 mutant sha256: 57cad0d8400f84243e34d34519fe1cc30184f378b4646e9b8d0c946bb9c9ddcf
-cmd: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py -k tc_b100_08 or tc_b100_09_load_over
+cmd: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py -k tc_b100_08 or tc_b100_09_load_over
 F...F                                                                    [100%]
 ================================== FAILURES ===================================
 __________ test_tc_b100_08_reset_runs_once_before_the_first_install ___________
@@ -93,7 +93,7 @@ harness exit: 0
 === m2-reset-line ===
 pre-mutation sha256: ca8e539b4c8c3c812e9460ac88d72c32e62e9a79c180646d29c3f6d9b62f6c45
 mutant sha256: 89b535962a8744eafc5ae14f3140454dab9585cb66ac547a4813e82ff8830d42
-cmd: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py -k tc_b100_09_load_over
+cmd: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py -k tc_b100_09_load_over
 on_group', 'in_memory', 'length', 'link_map', 'lower_limit', 'matrix_dim', 'max_diff', 'memory_checked', 'memory_region', 'missing_ranges', 'name', 'overlap_conflict', 'physical_value', 'raw_available', 'raw_bytes', 'raw_value', 'reason', 'record_layout_name', 'schema_ok', 'section', 'source', 'symbol_link', 'unit', 'upper_limit', 'valid', 'value_outside_limits', 'virtual'], ['access', 'address', 'axis_meta', 'bit_org', 'byte_size', 'char_type', 'compu_method_name', 'compu_method_unit', 'conversion', 'conversion_error', 'conversion_status', 'datatype', 'decode_endian', 'decode_error', 'decode_type', 'deposit', 'description', 'display_identifier', 'effective_byte_order', 'element_count', 'endian', 'function_group', 'in_memory', 'length', 'link_map', 'lower_limit', 'matrix_dim', 'max_diff', 'memory_checked', 'memory_region', 'missing_ranges', 'name', 'overlap_conflict', 'physical_value', 'raw_available', 'raw_bytes', 'raw_value', 'reason', 'record_layout_name', 'schema_ok', 'section', 'source', 'symbol_link', 'unit', 'upper_limit', 'valid', 'value_outside_limits', 'virtual'], ['access', 'address', 'axis_meta', 'bit_org', 'byte_size', 'char_type', 'compu_method_name', 'compu_method_unit', 'conversion', 'conversion_error', 'conversion_status', 'datatype', 'decode_endian', 'decode_error', 'decode_type', 'deposit', 'description', 'display_identifier', 'effective_byte_order', 'element_count', 'endian', 'function_group', 'in_memory', 'length', 'link_map', 'lower_limit', 'matrix_dim', 'max_diff', 'memory_checked', 'memory_region', 'missing_ranges', 'name', 'overlap_conflict', 'physical_value', 'raw_available', 'raw_bytes', 'raw_value', 'reason', 'record_layout_name', 'schema_ok', 'section', 'source', 'symbol_link', 'unit', 'upper_limit', 'valid', 'value_outside_limits', 'virtual']], _a2l_row_key_to_tag: cold=[] warm=['a2l:0', 'a2l:1', 'a2l:2'], _a2l_summary_lines: cold=[] warm=['A2L Sections:', '- PROJECT CASE01 "Synthetic project for S19Tool stress testing" (lines 1-53)', '  - HEADER (lines 2-5)', '  - MODULE BASIC "Synthetic ECU module" (lines 7-52)', '    - MOD_COMMON "" (lines 8-14)', '    - MOD_PAR "" (lines 16-18)', '    - RECORD_LAYOUT RL_U8 (lines 20-22)', '    - RECORD_LAYOUT RL_U16 (lines 24-26)', '    - RECORD_LAYOUT RL_U32 (lines 28-30)', '    - COMPU_METHOD CM_IDENT "%6.2" IDENTICAL "%6.2" "" (lines 32-34)', '    - CHARACTERISTIC CAL_BLOCK_A "CAL_BLOCK_A synthetic characteristic" (lines 36-38)', '    - CHARACTERISTIC CAL_BLOCK_B "CAL_BLOCK_B synthetic characteristic" (lines 39-41)', '    - MEASUREMENT MEAS_STATUS "MEAS_STATUS synthetic measurement" (lines 42-45)', '    - GROUP GRP_BASIC "GRP_BASIC group" (lines 46-51)', '      - REF_CHARACTERISTIC (lines 47-50)', '', 'A2L Tags:', '- CHARACTERISTIC CAL_BLOCK_A: 0x80000010 len=1 mem=unknown OUT(image)', '- CHARACTERISTIC CAL_BLOCK_B: 0x80000040 len=1 mem=unknown OUT(image)', '- MEASUREMENT MEAS_STATUS: 0x80000000 len=1 mem=unknown OUT(image)'], _validation_issues: cold=[] warm=['ValidationIssue', 'ValidationIssue', 'ValidationIssue', 'ValidationIssue', 'ValidationIssue', 'ValidationIssue', 'ValidationIssue', 'ValidationIssue', 'ValidationIssue', 'ValidationIssue'], current_a2l_data: cold=None warm=['compu_methods_by_name', 'compu_tabs_by_name', 'errors', 'path', 'record_layouts_by_name', 'sections', 'tags'], current_a2l_path: cold=None warm='.s19tool/workarea/P1/firmware.a2l'
 E       assert not {'_a2l_enriched_key', '_a2l_enriched_tags', '_a2l_filtered_tags', '_a2l_row_key_to_tag', '_a2l_summary_lines', '_validation_issues', ...}
 
@@ -146,7 +146,7 @@ harness exit: 0
 === m3-domain ===
 pre-mutation sha256: ca8e539b4c8c3c812e9460ac88d72c32e62e9a79c180646d29c3f6d9b62f6c45
 mutant sha256: c9e933d78b50bd108a71968a47741136b3c7fa7970e4f1e1514c5bfdeea3621f
-cmd: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py -k tc_b100_09_domain
+cmd: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py -k tc_b100_09_domain
 F                                                                        [100%]
 ================================== FAILURES ===================================
 ____________ test_tc_b100_09_domain_matches_the_live_source_census ____________
@@ -187,7 +187,7 @@ harness exit: 0
 === m4-service ===
 pre-mutation sha256: ca8e539b4c8c3c812e9460ac88d72c32e62e9a79c180646d29c3f6d9b62f6c45
 mutant sha256: 7c1721d76cbfac0474053cb7fe6f8ec0740322b6d0087c682087f7031edb25fd
-cmd: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py -k tc_b100_10 or tc_b100_09_load_over
+cmd: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py -k tc_b100_10 or tc_b100_09_load_over
  for name in cold
             if cold[name] != warm.get(name)
         } | (set(warm) - set(cold))
@@ -301,7 +301,7 @@ harness exit: 0
 === m5-unload ===
 pre-mutation sha256: ca8e539b4c8c3c812e9460ac88d72c32e62e9a79c180646d29c3f6d9b62f6c45
 mutant sha256: eeb079640c5840b1ff4b547e70ba05a709f9ca822523c86159a64e64d70c3cfe
-cmd: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py -k tc_b100_11
+cmd: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py -k tc_b100_11
 FFF                                                                      [100%]
 ================================== FAILURES ===================================
 ______________ test_tc_b100_11_unload_all_clears_the_parsed_a2l _______________

@@ -1,5 +1,5 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc4 (MUTANT R5-widget-focus)
+tree: <HOME>\Github\s19_app-b100-inc4 (MUTANT R5-widget-focus)
 started: 2026-10-27 08:44:48
 
 MUTANT R5-widget-focus APPLIED 5026be1344d6b23d69f1c38bba80fabdece609f7f59d2fb78c1f11b6ded225e2
@@ -8,7 +8,7 @@ MUTANT R5-widget-focus APPLIED 5026be1344d6b23d69f1c38bba80fabdece609f7f59d2fb78
 ================================== FAILURES ===================================
 _________________ test_tc_b100_12_rehome_lands_synchronously __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28940/test_tc_b100_12_rehome_lands_s0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28940/test_tc_b100_12_rehome_lands_s0')
 
     def test_tc_b100_12_rehome_lands_synchronously(tmp_path: Path) -> None:
         """The landing is a synchronous ``Screen.set_focus``, not

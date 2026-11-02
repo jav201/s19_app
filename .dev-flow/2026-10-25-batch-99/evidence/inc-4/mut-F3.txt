@@ -2,7 +2,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 _________________ test_at_b99_08_save_back_keeps_editor_image _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26319/test_at_b99_08_save_back_keeps0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26319/test_at_b99_08_save_back_keeps0')
 
     def test_at_b99_08_save_back_keeps_editor_image(tmp_path: Path) -> None:
         """Add / Apply / Undo / Add / Apply / Add (no apply) / save back: the

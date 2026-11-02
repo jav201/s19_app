@@ -9,7 +9,7 @@
 
 | Field | Value |
 |---|---|
-| Gate record | `python "C:/Users/jjgh8/.claude/skills/dev-flow/scripts/devflow-validate.py" .` from the project root · exit 1 · 5 block · 404 notice · 2026-10-19 |
+| Gate record | `python "<HOME>/.claude/skills/dev-flow/scripts/devflow-validate.py" .` from the project root · exit 1 · 5 block · 404 notice · 2026-10-19 |
 | Gated tree | `5943f0c657ba1cd0bcd5d9da66c65924c487c3b9` · dirty — .dev-flow/2026-10-12-batch-94/06-docs/executive-summary.md, .dev-flow/2026-10-12-batch-94/06-docs/functionality.md, .dev-flow/2026-10-12-batch-94/06-docs/traceability-matrix.md, .dev-flow/BACKLOG-CODE.md, REQUIREMENTS.md, .dev-flow/2026-10-12-batch-94/06-docs/diagrams/ (the close record itself excluded) |
 
 ## 🔑 At a glance (read first)
@@ -149,7 +149,7 @@ Phase 3 took its one recorded iteration (`state.json` `iterations_per_station.P3
 
 ### Working-file reconciliation (C-44) — every file this batch touched
 
-> Sweep run against `C:/Users/jjgh8/Github/s19_app-b94` (the only repository this batch touched): `git rev-parse HEAD` = `70bebb8` · `git log @{u}..HEAD` = **59 commits** on `kimi/batch-94-flows-and-editors`, **none pushed** — `origin` exists (github.com/jav201/s19_app), the PR is P6's business. No auxiliary repo was touched (the flow bundle is a read-only mirror — the `V7` guard; `FLOW-VERSION.md` `2026-10-12-rev102`). `git status --short` was **0 lines at this artifact's intake** and shows **5 entries at completion**: this file plus four concurrent `06-docs/` edits observed mid-run (a parallel P6 docs pass — not made by, and not owned by, this artifact; recorded here per C-44, to be reconciled by the close sweep).
+> Sweep run against `<HOME>/Github/s19_app-b94` (the only repository this batch touched): `git rev-parse HEAD` = `70bebb8` · `git log @{u}..HEAD` = **59 commits** on `kimi/batch-94-flows-and-editors`, **none pushed** — `origin` exists (github.com/jav201/s19_app), the PR is P6's business. No auxiliary repo was touched (the flow bundle is a read-only mirror — the `V7` guard; `FLOW-VERSION.md` `2026-10-12-rev102`). `git status --short` was **0 lines at this artifact's intake** and shows **5 entries at completion**: this file plus four concurrent `06-docs/` edits observed mid-run (a parallel P6 docs pass — not made by, and not owned by, this artifact; recorded here per C-44, to be reconciled by the close sweep).
 
 | Repo | File(s) | Terminal state | Landing / backlog ref |
 |------|---------|----------------|-----------------------|

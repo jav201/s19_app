@@ -10,7 +10,7 @@ text and recommendation, then checking the consolidated document against it — 
 amendment table**.
 **Constraint honoured: zero production-source edits, zero edits to any existing `.dev-flow` artifact.**
 This file is the only file written. All counterfactuals ran in a `git archive` export of `031ca8d` at
-the short root `C:/Users/jjgh8/AppData/Local/Temp/claude/b63/g1`, removed at close;
+the short root `<HOME>/AppData/Local/Temp/claude/b63/g1`, removed at close;
 `/b63/{a,b,qa,arch,archb,r1,r2,r3,g2}` never touched. Probe script written to a file and invoked by
 path. **Ceiling actually used: 4 000 synthetic hits, one 400 kB temp file, peak < 2 MB** — three
 orders below the 200 000-hit / 50 MB cap. The declared-domain D1 fixture was never built.

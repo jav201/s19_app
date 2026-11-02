@@ -8,7 +8,7 @@
 >       assert not (project_dir / "out_hostile.s19").exists()
 E       AssertionError: assert not True
 E        +  where True = exists()
-E        +    where exists = (WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26042/test_at_b99_07_hostile_symbol_0/.s19tool/workarea/proj1') / 'out_hostile.s19').exists
+E        +    where exists = (WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26042/test_at_b99_07_hostile_symbol_0/.s19tool/workarea/proj1') / 'out_hostile.s19').exists
 
 tests\test_b99_patch_truth.py:582: AssertionError
 =========================== short test summary info ===========================

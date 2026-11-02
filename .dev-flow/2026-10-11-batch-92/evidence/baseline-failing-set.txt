@@ -1,5 +1,5 @@
 # Baseline reference — batch 2026-10-11-batch-92 — the known-unstable corpus of this machine
-# Worktree: C:/Users/jjgh8/Github/s19_app-b92 @ base 410cde5 (pre-increment state).
+# Worktree: <HOME>/Github/s19_app-b92 @ base 410cde5 (pre-increment state).
 #
 # Measured instability (five executed full-suite runs on identical base code, 2026-10-11/12):
 #   run 1: 38 failed / 2722 passed · run 2: 36 / 2724 · run 3: 40 / 2720

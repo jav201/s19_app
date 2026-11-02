@@ -140,7 +140,7 @@ family, recorded in §6.
 ## 3 · How to test
 
 ```bash
-# interpreter: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe
+# interpreter: <HOME>/anaconda3/envs/s19env/python.exe
 export PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<this worktree>
 unset NO_COLOR
 python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py
@@ -233,7 +233,7 @@ failed (no-op) mutation attempt was re-recorded (`red-11-sec2.txt`) and the no-o
 |---|---|
 | Mutation applied | LLR-163.5 oracle hardening: the swapped-branch mutation (`if placement.reused:` → `if not placement.reused:`) SURVIVED the first TC-B100-03 because that version counted the two status messages without pinning which load produced which — `mut-llr-163-5.txt` (1 passed) is the vacuous-oracle catch. The order oracle (`statuses.index(added[0]) < statuses.index(named[0])`) was added; the same mutation then goes RED — `mut-llr-163-5b.txt` (1 failed). Restore proven by hash in every transcript. |
 | Instrument | project code, own hand via a one-off patch script (position + operation, never pasted requirement text); restore from a byte-copy, verified by SHA-256 |
-| Where it ran | this worktree (`C:\Users\jjgh8\Github\s19_app-b100-inc1`), implementer agent |
+| Where it ran | this worktree (`<HOME>\Github\s19_app-b100-inc1`), implementer agent |
 | Transcript | `evidence/inc-1/mut-llr-163-5.txt` (survived — oracle strengthened) and `evidence/inc-1/mut-llr-163-5b.txt` (KILLED) |
 | Restore proven by | `restore: <sha256>` + `RESTORE OK` line in each `mut-*.txt`; final tree hashes equal `pre-mutation-hashes.txt` |
 | Bytecode cache | `PYTHONDONTWRITEBYTECODE=1` in every run (C-46) |
@@ -279,65 +279,65 @@ failed (no-op) mutation attempt was re-recorded (`red-11-sec2.txt`) and the no-o
 
 | Evidence artifact | Path — under `artifact_homes.evidence` | SHA-256 |
 |---|---|---|
-| import-proof.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/import-proof.txt | 935124e09ad399b77998ab018c514337ad00dea7cc1318f92383e076b5b44702 |
-| red-01-new-module.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-01-new-module.txt | 8607ee2f6ece28dd55a9558e9cc1320b5767852f670995b1d6e52c4547128f54 |
-| red-02-repins.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-02-repins.txt | 8e23b49ed362ea67eb7adaef295ac15df96893db6bc09b5f737d2820154b802e |
-| green-01-test-b100-reuse.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-01-test-b100-reuse.txt | 72b3c430b42df0afd544251286941e2f08bdcee9fde32336b5284ab1f61cde11 |
-| green-02-repins.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-02-repins.txt | 22e28dcfa3254258f80d625c457d6f2f9dcda48e685be660e9f0275084c69bf4 |
-| mut-llr-163-1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-163-1.txt | b76876f4a41648df06fb11c501bfda1fdf32067d16b20ec69fb223f782368a38 |
-| mut-llr-163-2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-163-2.txt | 37213be6460733faffb337affcd1fb41caedd935032c77a615a6c35bd7b87058 |
-| mut-llr-163-3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-163-3.txt | 74cadde5cd7800d3681edb33845ea992efbfea70eaa326125213f6e6b74ca7ab |
-| mut-llr-163-5.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-163-5.txt | f726e71710fb3f7891c3839f2e0c4b430bb912f3b7fe1b06f9d440f22a751c66 |
-| mut-llr-163-5b.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-163-5b.txt | 3600aacae0b5ab9671a491ca8826578bfda4dbeb8330be8642d4c42e4255b261 |
-| mut-llr-163-6.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-163-6.txt | 57cfbc8c59feb89559aaea5d6afbd36d737e00139aa1e7114240f182ce59bf9b |
-| mut-llr-163-7.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-163-7.txt | 8063f19b0653ea86c74fea7b078fd441c4e01794432de6f435ee2a957326ebae |
-| mut-llr-171-4.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-171-4.txt | 66c3b311faca1be58ce80a49cdcbea8171904d2627154649032430e432717bba |
+| import-proof.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/import-proof.txt | 8158f0eec85f9e7383da1313f19626787c86aaca157937fca843e3f672042151 |
+| red-01-new-module.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-01-new-module.txt | 706d1bf8300b798bb71e92d832fc0b0b43fc1e29ea9d79da40d37ab1c97e1ed2 |
+| red-02-repins.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-02-repins.txt | 0d1a8662a2ca2ba8756da86ecba2f26e1c67b02061320f7024e4af1da54cb92d |
+| green-01-test-b100-reuse.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-01-test-b100-reuse.txt | ca05630d77e5de3fefacc9af8a446497ee2a1a1fd0f952ae34c13be8cfdd40e2 |
+| green-02-repins.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-02-repins.txt | 55c716dca8f4361202eece59870c274ba05ff34ec53ca95fb211c4fb503b82ca |
+| mut-llr-163-1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-163-1.txt | 9eba90d2ef3c30b235b1b500c1ec054d5812fbd722451a1d67cd8a8702caa71b |
+| mut-llr-163-2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-163-2.txt | a26a579c921745f057b8018f0196ac0a3e1f1b60468d963e667eeababbf764af |
+| mut-llr-163-3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-163-3.txt | 9ea03af6b3f81e8fae517920e1f7a019c5fa751bcecd585d3ecf15b466b3348e |
+| mut-llr-163-5.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-163-5.txt | d33d680fb8d7ae773d7f4cc1f06015c134375725aef52e7edbca8653488d710a |
+| mut-llr-163-5b.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-163-5b.txt | a3e31aaa13fb5601fe4b6bd4c7a6dcb8a1ba51cbadbf7bc6411e7050d4e4274c |
+| mut-llr-163-6.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-163-6.txt | 8f26f7ba7ec692ff8ba3e28c698063183dfb669b2771893a127f2b21ee241724 |
+| mut-llr-163-7.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-163-7.txt | 31278704f9ce2653200969171b96f0d95c2a87d326e2b918b98b4596fac088f3 |
+| mut-llr-171-4.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-171-4.txt | 8af00875a41d33aeb92d068b837a582f98e7d6e26ed982b56edab891475b46a3 |
 | pre-mutation-hashes.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/pre-mutation-hashes.txt | 920b9d54961767e91c3770affcef7f1416fff4bd520e0d57f30ee918ab9b15eb |
-| mut-llr-155-3-allowlist.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-155-3-allowlist.txt | 22d9f16d2bd8d21f67772493d7c2426e887668be156d767af1f0ae4d64dd0baf |
-| reverse-census-tests.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/reverse-census-tests.txt | 4bce1ec27490c65675fae65c35b0fbafb07760554a5071eaa89ce65eb453063a |
-| reverse-census-tests-2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/reverse-census-tests-2.txt | c2877e13b01475a716cf3be99622cdd1d90ab43e8402dceb7e0f346923de3b12 |
-| reverse-census-tests-3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/reverse-census-tests-3.txt | edf7497ba4259f054fc818c4222296fa0f1ddc52037bffba1c615fc947b4d6c9 |
-| reverse-census-tests-4.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/reverse-census-tests-4.txt | 905281b7a7418643b0f8ef8ba51da551aa402894497bb23cb5f6e5dbcab185c4 |
-| guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/guards.txt | 110ea2e3d4e7e7059574bae9b3c7b828bdbe8a409403ab8eeb93cd0775f5dc3c |
-| guards-census.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/guards-census.txt | 3095d5eaf3c6876e308afe74f7dcf587cb963225cb2e69d84e3486f85befebac |
-| red-03-fix1-arms.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-03-fix1-arms.txt | 338f60f49b7cc49ffa06e835b8b5f998af5da600f35927d749feb48788e02c9d |
-| red-04-revert-export.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-04-revert-export.txt | 9cdec8ece8039d6c982aebd09fcb9569ffc764ce7d4fde693c9f521e7b4151b5 |
-| red-05-revert-group.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-05-revert-group.txt | a181aa878b4545c9a800dd60a584aa58fd0ca2b9132a5c3ffc58939f747ef9d7 |
-| red-06-revert-gather.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-06-revert-gather.txt | f3dfe0ec0ebca33b297f0c53b3ce96eff23001c2f48f4e0a040b5bc977f1b818 |
-| green-03-fix1-arms.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-03-fix1-arms.txt | 6829ce16c0e5f4e0e6011c39ff59a1786dfdc712064f86d39fbc943fb62c1ffa |
-| green-04-staging.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-04-staging.txt | a2fab1c83ef15af423993c1a2efcfed673458d0b9dab2ac37a28b18e8b731516 |
-| green-05-gather-repins.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-05-gather-repins.txt | 4132cccf6d4d4956da15aabf0d06b8f0acc0e71cd17fc1cf4ab8fa1c1155a5a9 |
-| green-06-census-files.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-06-census-files.txt | eddf9b504b2d9c3224c14f70e17f16480a74c9ad39a9fac0d51d083479408028 |
-| green-07-tui-files.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-07-tui-files.txt | c9a256aac5d1bdb0bf499676e21d248bce2feb5d38ef0b9d39a9e883cce4e102 |
-| green-08-remaining-census.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-08-remaining-census.txt | f857a76911d0c37708bab8eb0522023b55003f1beb2999bf6df9d0317204a1cb |
-| mut-F2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-F2.txt | de4a614d4b29a36c3362019eac68691c64349f02ef8ca916508921042ebee61b |
-| mut-llr-163-1-fold.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-163-1-fold.txt | bc815eab582e76f7bf7fb17533b7ae8eba50648e86c646a3d9f205206eefe86b |
-| mut-llr-163-1-barename.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-163-1-barename.txt | e115656d5fa1b4bea7cfa7dc890a51732fb6324b596599c347551b3456bad43c |
-| mut-llr-163-1-link.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-163-1-link.txt | 74d472560268574012a8bdb281a0ab2fd34517a0ad3400d5ec5ddac54546757b |
-| mut-llr-163-1-zero.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-163-1-zero.txt | 39b2e47fe62e665fddecb25c6cc6500eb4a849719c842d21c19bfd44dc79fb93 |
-| mut-llr-163-1-cap.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-163-1-cap.txt | a24fc7fe0c3a2fbf7844fd9f5a0ad8f74d676868d6bccc0f296247d2d6e59f8a |
+| mut-llr-155-3-allowlist.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-155-3-allowlist.txt | 0aa26c29214cea738f5add1f995594da04d7face477fdfc35bb27fe02602c33f |
+| reverse-census-tests.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/reverse-census-tests.txt | 512e80a39fe85f577d64b57f910be6a8f927bb760f4da83ff895e8f26953d2d5 |
+| reverse-census-tests-2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/reverse-census-tests-2.txt | 4bad96ecdb34c2f732046ab10f5ad3d97eef5aedd4e818c7abe8bc5cd5052caa |
+| reverse-census-tests-3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/reverse-census-tests-3.txt | 79f66e641facd5d3eb3b26c590a0b2d2dc3855cef1e4d1a63703919e51efe23e |
+| reverse-census-tests-4.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/reverse-census-tests-4.txt | e849c632a743508da3f7f034e8fa97ebc4a8f59a08bb7bf10f3511d3c36f4f41 |
+| guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/guards.txt | 4e7d0835bf9ef118b4b00dfa016817fc67cbab4a077b1bb152ca05239a3028ac |
+| guards-census.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/guards-census.txt | 8d19507d91c8ac664d2258f4d7ad0eab8dd0eca191e2b69cdadd9fafdfe2f78e |
+| red-03-fix1-arms.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-03-fix1-arms.txt | 4f85567ad465aca26c0eec3a1a1d7ed42a24324726c4960c53833149bcc8ff26 |
+| red-04-revert-export.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-04-revert-export.txt | c3758d205ae0b758790ffec2bd782d009e3deef466ed6d1989200c438ee8425e |
+| red-05-revert-group.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-05-revert-group.txt | c0a03cd7321b3ba4476cf9837e43689d080016eca1d90e9bcb92bcbfedfdb49d |
+| red-06-revert-gather.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-06-revert-gather.txt | 0beda50a241aeecdd85f37655fdfa292e69817bc7acf38cd7252bbf65dd1da9f |
+| green-03-fix1-arms.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-03-fix1-arms.txt | c7f45c0203a9094989ff85da7b7d22fc1531f4dfb59464f4a928a221e538c1aa |
+| green-04-staging.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-04-staging.txt | 520b313e1eb01d504ddaf2060e6ab837d22da62f9273acdbd1d10425d448f2ab |
+| green-05-gather-repins.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-05-gather-repins.txt | 1e26395a373bbe96af83e6ff67f136231e58df01018dadb35d7e5654f035a266 |
+| green-06-census-files.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-06-census-files.txt | e3091e2bb3586dea2dc2a3e8447a3b5ff8ea914e0b1b459bcb882c109d470c0d |
+| green-07-tui-files.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-07-tui-files.txt | 1eafa2a73783d94a7318d5ec13deb08020b4757d6caec55b0eceb1a8ec50c07d |
+| green-08-remaining-census.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-08-remaining-census.txt | 16cd1d1d4b2ff38a48d0fd263e2c183f6057bfcba6a7f4c1637c395acb304be4 |
+| mut-F2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-F2.txt | e98c44f64cb2ec6329425497eac97b6b772d4a33033b656d7e043a4ac6369053 |
+| mut-llr-163-1-fold.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-163-1-fold.txt | 033d6f42f27d809eec6718dc3eadaef1226bc6a3994555f8a8b385c6f573d8fc |
+| mut-llr-163-1-barename.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-163-1-barename.txt | 31fbf8951bdbff4e3f41b0def3cd22e4c1c9fb058fe6f7f52b788b2e91a286d2 |
+| mut-llr-163-1-link.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-163-1-link.txt | 69a4b63cd945678169a047a33e39bfd477acdf6537ffa7e9507b9429e20a1815 |
+| mut-llr-163-1-zero.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-163-1-zero.txt | d7e1785084af8faa42246e930097fc6c4fada4fbb5a6a00c04425fc85b8ab66f |
+| mut-llr-163-1-cap.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-llr-163-1-cap.txt | 391236f0bcd9084d56eb8ddd568ef4698a3b3683f9e7610b62c1ce7cc15a6088 |
 | pre-mutation-hashes-fix2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/pre-mutation-hashes-fix2.txt | 8094a4b831c257bdb05533f48dd7c2010f683b8a1b61ff81dc40726d298076a9 |
-| red-07-routes.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-07-routes.txt | a8e95c4baac98face4a07af7021f1e15fbabe0300734aad43927cecd3b89e545 |
-| red-08-save-copies.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-08-save-copies.txt | 597c23fab370c3b791d99378adf1c9d4bec01a281224e98833bdaf3b4ce04105 |
-| red-09-gather.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-09-gather.txt | 716f779f4284a5a45dc629a7a3217932c1ce81738309ea571c830cd077a041ba |
-| red-10-export.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-10-export.txt | 8a6e06a7dc393a1bd51e6be8f0cdf61cf30579d7e30affae4510ba060108e6d2 |
-| red-11-sec2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-11-sec2.txt | 0d44491516af879b048d89824099943c44fd9529f2ec3a9ecb22e509482a1a19 |
-| red-12-shortname.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-12-shortname.txt | 77e7bf3d89cb94ad8cb72e38a7b7c8083c0b2b82a3988c2bd77c3357c0fb0bc7 |
-| red-13-n5.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-13-n5.txt | f160f9b6e63cc3b62e3204cf90a38a5697c8c123a8ed0e410f1070e7387156e5 |
-| green-09-fix2-arms.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-09-fix2-arms.txt | f02b4bac04653cd5ee66711488d84d9f7b5d350cfb46573b17f192009567389e |
-| green-10-affected.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-10-affected.txt | aeeee119aa73cbe2557f4fb8162eeef999ca0129c8da7fa3199e28b471c33237 |
-| green-11-tui-files.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-11-tui-files.txt | 2dce0f2b849514c3f0a8d2ae30c03b4c99e45db94764f6b3f2ab238f9071e1b0 |
-| green-12-flake-isolation.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-12-flake-isolation.txt | f64c8eea4b2c8d9a6de458d8883f313f354eed018c7810a4f39a87ae74dca6d0 |
-| mut-n1-outermost.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-n1-outermost.txt | 2debd3fc24808c465a558cb58f5e1ee0f0c4d248d2c5734177294ef6e901be48 |
-| mut-census-root.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-census-root.txt | 0bc1570db6f384a257d8a902c1011cb561b6d743338773299f6c2cbff431be26 |
-| red-14-r3-1-junctioned-base.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-14-r3-1-junctioned-base.txt | 44bcbee95a60b5ea153d206a1728d9e0bcd8f9c160fb3ce014581b0cbf90b871 |
-| green-13-reuse-module.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-13-reuse-module.txt | 31f7e0d7d4325f0142b06d99696f2f2dfdd1b570efd79c0f9c2241ade0e2b546 |
-| green-14-affected.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-14-affected.txt | 2e9305cf5c206982c2aea4e367e303853bcbe4dcc11dd72f47368860b48824e5 |
-| green-15-active-dir-census.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-15-active-dir-census.txt | 74ef27fd60ad389118add0fd106931f56cf6fdec4a06c873d3b433deb379144b |
-| mut-n1-outermost-fix3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-n1-outermost-fix3.txt | 2d7c42d9aed646537364940b7eb4567049e077f75696309950be0f6a62b2e76f |
-| mut-census-root-fix3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-census-root-fix3.txt | 5bb9afd1b26db81e771e67ac02e07771d3ba3ad4d7f7f2e9f69a202c59e902da |
+| red-07-routes.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-07-routes.txt | b2143d377640d8db9247feb3fa691d4758b2924717c6a816d477dda851974ac3 |
+| red-08-save-copies.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-08-save-copies.txt | c37b682938dc8d00997b444655e3f51a2a87ca295b5ac9f9e4778470f0e39a82 |
+| red-09-gather.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-09-gather.txt | d5d18aaf4f055a72ff1bda7be794741c2fbb5182e9da17760c8c34e4266f7205 |
+| red-10-export.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-10-export.txt | 4efa6c44dace819cf1ad004f4aa0019e7251ddee424ab3d6becbe4c7efb20b5d |
+| red-11-sec2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-11-sec2.txt | 7f1c57280c879419d09113a626260a3a760b0688587f8c35c92d0420fb9e781b |
+| red-12-shortname.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-12-shortname.txt | eafa7e1e7f632d1e734fc71578910c2885276b45e0130a5e6beca7bc0657a762 |
+| red-13-n5.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-13-n5.txt | 2a53180438b9d7c4ecfcb36d4ec97fe18c7bdd200665bbc51bbac342df134ebd |
+| green-09-fix2-arms.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-09-fix2-arms.txt | 3d659ebdbb3e8dfcbe6c62879d1876aa8d6c1bb7b3d3aba48b8ecd792ce4b925 |
+| green-10-affected.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-10-affected.txt | 720f45a8eb282aaf17f2ed69e3e84533e535972a49967bbb4aefbe1ed1e937a1 |
+| green-11-tui-files.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-11-tui-files.txt | bd347586f39fcb7c5ca7bf469c710ad494ee8ec2e7f75e44ba659da10b16ce7f |
+| green-12-flake-isolation.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-12-flake-isolation.txt | b014eac1c367c942e846832305f909792f88dcf01b1a49093f360a7745ebeeac |
+| mut-n1-outermost.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-n1-outermost.txt | 3c6abaf93ee61ad3d27a6515be7a6c550fd73f31f6a9f62be3cb1c449f4c7ad4 |
+| mut-census-root.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-census-root.txt | 3d0e7665bc77d3320c26123c9c2b4477c678b784af1dae5d520152a89f92102f |
+| red-14-r3-1-junctioned-base.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/red-14-r3-1-junctioned-base.txt | e45e1e929d671366720fec1477276a4d148c98ab454a875bb541d57c36fc1a7b |
+| green-13-reuse-module.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-13-reuse-module.txt | e87460cfd909f369a5f7f087ea3aa7e2815b8a09693239cd26e635d972bce7af |
+| green-14-affected.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-14-affected.txt | 6013d2021e193c0548ae017f3abaed1fb4ee033114258e55a27be256b2888445 |
+| green-15-active-dir-census.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/green-15-active-dir-census.txt | 6f8b953a77e06e53008c9bcb3a99818a9cb1e94012a08bafb3d84d6335c368cc |
+| mut-n1-outermost-fix3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-n1-outermost-fix3.txt | 01cad0631b5d1599f95fc82240128a52723b83946193b3174930ad43101d12c5 |
+| mut-census-root-fix3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/mut-census-root-fix3.txt | c2794e572f29d82c701a41cd70fbdffcbe4b9d5aec92171e120e36e2355863b9 |
 | pre-mutation-hashes-fix3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/pre-mutation-hashes-fix3.txt | b86141392067c64474f5bac1607ca4cc0e1932a86d1a155202878785434eacdb |
-| orchestrator-gate.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/orchestrator-gate.txt | f3a2f94f829a38eb549ec0985b037816f063486e79de7989c6281dedc92c5f3a |
+| orchestrator-gate.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-1/orchestrator-gate.txt | bf0e665ef120cd686c7989b691c1b79b9495e7a83b781ccdd4fba524883fedb0 |
 
 | Field | Value |
 |---|---|

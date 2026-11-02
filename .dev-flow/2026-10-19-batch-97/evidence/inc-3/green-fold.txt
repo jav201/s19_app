@@ -10,7 +10,7 @@ xxxx...                                                                  [100%]
 ================================== FAILURES ===================================
 ____________________________ test_tc081_1_derived _____________________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23029/test_tc081_1_derived0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23029/test_tc081_1_derived0')
 
     def test_tc081_1_derived(tmp_path: Path) -> None:
         """Depths are derived from the two stacks, across every branch quadrant.
@@ -75,9 +75,9 @@ tests\test_tui_patch_history_strip.py:427: AssertionError
 
 [1;30;41m29[0m[30;41m mismatched snapshots[0m
 
-[1mView the [0m]8;id=12717069;file://C:\Users\jjgh8\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+[1mView the [0m]8;id=12717069;file://<HOME>\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
 
-[2mC:\Users\jjgh8\Github\s19_app\snapshot_report.html[0m
+[2m<HOME>\Github\s19_app\snapshot_report.html[0m
 
 =========================== short test summary info ===========================
 PASSED tests/test_b97_check_editor.py::test_tc_b97_08_census_rows_and_one_docked_row[size0]

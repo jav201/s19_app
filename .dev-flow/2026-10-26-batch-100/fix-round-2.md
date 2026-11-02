@@ -1,8 +1,8 @@
 # Batch-100 — batch-end fix round 2: the battery's real failures and routed items
 
-- **Branch / worktree:** `b100-fix1` = `main` 760f885 + fix round 1 (dee0d96), `C:/Users/jjgh8/Github/s19_app-b100-fix1`. Nothing committed.
+- **Branch / worktree:** `b100-fix1` = `main` 760f885 + fix round 1 (dee0d96), `<HOME>/Github/s19_app-b100-fix1`. Nothing committed.
 - **Input:** the battery re-run alone from a short basetemp (`rerun1.log`, 7 failed / 28 passed) and the routed list of the brief.
-- **Runs:** only the touched nodes and their neighbours (operator override: no full suite). Env `env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=.`, `LOCALAPPDATA` under the scratchpad, `--basetemp C:/Users/jjgh8/AppData/Local/Temp/s19f2/bt`, interpreter `s19env`; `s19_app.__file__` printed first = this worktree. The real `%LOCALAPPDATA%\s19_app` was not created (checked: absent).
+- **Runs:** only the touched nodes and their neighbours (operator override: no full suite). Env `env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=.`, `LOCALAPPDATA` under the scratchpad, `--basetemp <HOME>/AppData/Local/Temp/s19f2/bt`, interpreter `s19env`; `s19_app.__file__` printed first = this worktree. The real `%LOCALAPPDATA%\s19_app` was not created (checked: absent).
 - **Evidence folder:** `evidence/fix-2/`. Evidence states use the seven words.
 
 ## Summary
@@ -156,7 +156,7 @@ Working-copy (CRLF) bytes. Tool (not capped): `tools/e13/run.py` `a83a13ed7dde4d
 
 - [x] Tests/type checks/lint — the touched nodes and neighbours ran (table above); no type checker or linter run (none in the brief). Full suite not run (operator override).
 - [x] No secrets in code or output — the diff adds tests, two guards, one class attribute and docs; no credentials, tokens or env values.
-- [x] No destructive commands without approval — none. Scratch files under the scratchpad and `C:/Users/jjgh8/AppData/Local/Temp/s19f2/` only; the temporary worktree `s19f2/base4dfb` (detached `4dfb5a1`, clean, used only to time the base) was removed with `git worktree remove` at the end. The real `%LOCALAPPDATA%\s19_app` does not exist (checked at the end).
+- [x] No destructive commands without approval — none. Scratch files under the scratchpad and `<HOME>/AppData/Local/Temp/s19f2/` only; the temporary worktree `s19f2/base4dfb` (detached `4dfb5a1`, clean, used only to time the base) was removed with `git worktree remove` at the end. The real `%LOCALAPPDATA%\s19_app` does not exist (checked at the end).
 - [x] File count within cap — 2 source files of 4.
 - [x] Review packet attached — this file.
 

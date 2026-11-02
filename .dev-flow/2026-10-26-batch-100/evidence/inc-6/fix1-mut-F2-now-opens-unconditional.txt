@@ -1,9 +1,9 @@
 # mutation: F2-now-opens-unconditional — F2 / SEC6-4 (LLR-168.3): the append paints 'now opens' whatever the rewrite returned
 # file: s19_app/tui/app.py (sha256 before 762d1a98c8a65903)
-# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=C:\Users\jjgh8\AppData\Local\Temp\f1mut-F2-now-opens-unconditional tests/test_b100_active_variant.py -k now_opens_only or (damaged_manifest_is_never and variant-append)
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (corrective pass 1, mutated in place, then restored)
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
-# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\__init__.py
+# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=<HOME>\AppData\Local\Temp\f1mut-F2-now-opens-unconditional tests/test_b100_active_variant.py -k now_opens_only or (damaged_manifest_is_never and variant-append)
+# tree: <HOME>\Github\s19_app-b100-inc6 (corrective pass 1, mutated in place, then restored)
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# s19_app.__file__ = <HOME>\Github\s19_app-b100-inc6\s19_app\__init__.py
 # date: 2026-10-30T03:33:59Z
 # --- old
 #                           if self._rewrite_project_manifest(project_dir, saved):
@@ -13,7 +13,7 @@ FFFF                                                                     [100%]
 ================================== FAILURES ===================================
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-not-json] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-F2-now-opens-unconditional/test_tc_b100_20_damaged_manife0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-F2-now-opens-unconditional/test_tc_b100_20_damaged_manife0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000027A3D7B9810>
 writer = 'variant-append', damage = 'not-json'
 
@@ -53,7 +53,7 @@ E       assert not ["Project 'P' now opens firmware_1.s19"]
 tests\test_b100_active_variant.py:531: AssertionError
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-not-an-object] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-F2-now-opens-unconditional/test_tc_b100_20_damaged_manife1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-F2-now-opens-unconditional/test_tc_b100_20_damaged_manife1')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000027A3D92D050>
 writer = 'variant-append', damage = 'not-an-object'
 
@@ -93,7 +93,7 @@ E       assert not ["Project 'P' now opens firmware_1.s19"]
 tests\test_b100_active_variant.py:531: AssertionError
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-over-cap] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-F2-now-opens-unconditional/test_tc_b100_20_damaged_manife2')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-F2-now-opens-unconditional/test_tc_b100_20_damaged_manife2')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000027A3EF7CDD0>
 writer = 'variant-append', damage = 'over-cap'
 
@@ -133,7 +133,7 @@ E       assert not ["Project 'P' now opens firmware_1.s19"]
 tests\test_b100_active_variant.py:531: AssertionError
 _________ test_tc_b100_20_append_says_now_opens_only_after_the_write __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-F2-now-opens-unconditional/test_tc_b100_20_append_says_no0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-F2-now-opens-unconditional/test_tc_b100_20_append_says_no0')
 
     def test_tc_b100_20_append_says_now_opens_only_after_the_write(tmp_path: Path) -> None:
         """A real write failure (``project.json`` read-only, review probe P2):

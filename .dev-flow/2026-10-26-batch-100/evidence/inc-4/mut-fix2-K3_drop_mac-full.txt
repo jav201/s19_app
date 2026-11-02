@@ -1,14 +1,14 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py
 mutant: K3_drop_mac
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc4 (worktree at 24d5b7f + Inc 4 + fix pass 1 + fix pass 2, mutant applied)
+tree: <HOME>\Github\s19_app-b100-inc4 (worktree at 24d5b7f + Inc 4 + fix pass 1 + fix pass 2, mutant applied)
 applied app.py sha256: ed7e86a2d35018b00fec4b22dfdea760cf39131be22a521639e4f3d9798ac2a5
-env: PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc4 ; NO_COLOR unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+env: PYTHONPATH=<HOME>\Github\s19_app-b100-inc4 ; NO_COLOR unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
 
 F...F...F......................                                          [100%]
 ================================== FAILURES ===================================
 _______ test_tc_b100_12_focus_target_table_matches_the_window_registry ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29113/test_tc_b100_12_focus_target_t0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29113/test_tc_b100_12_focus_target_t0')
 
     def test_tc_b100_12_focus_target_table_matches_the_window_registry(
         tmp_path: Path,
@@ -39,7 +39,7 @@ E         Use -v to get more diff
 tests\test_b100_focus.py:263: AssertionError
 __________ test_tc_b100_12_rehome_lands_on_the_active_windows_target __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29113/test_tc_b100_12_rehome_lands_o0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29113/test_tc_b100_12_rehome_lands_o0')
 
     def test_tc_b100_12_rehome_lands_on_the_active_windows_target(
         tmp_path: Path,
@@ -125,7 +125,7 @@ E       AssertionError: timed out waiting for the focus to settle on the window'
 tests\test_b100_focus.py:174: AssertionError
 _________ test_tc_b100_12_every_window_load_lands_on_its_target[mac] __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29113/test_tc_b100_12_every_window_l2')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29113/test_tc_b100_12_every_window_l2')
 window_key = 'mac'
 
     @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))

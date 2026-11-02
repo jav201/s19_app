@@ -1,5 +1,5 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc4 (MUTANT F1-map-unfocusable)
+tree: <HOME>\Github\s19_app-b100-inc4 (MUTANT F1-map-unfocusable)
 started: 2026-10-27 08:40:47
 
 MUTANT F1-map-unfocusable APPLIED 3262f4260767f62de822717777b0e00fb7aa495c36203440da3179c73e8b5961
@@ -8,7 +8,7 @@ F........F...................                                            [100%]
 ================================== FAILURES ===================================
 _______ test_tc_b100_12_focus_target_table_matches_the_window_registry ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28939/test_tc_b100_12_focus_target_t0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28939/test_tc_b100_12_focus_target_t0')
 
     def test_tc_b100_12_focus_target_table_matches_the_window_registry(
         tmp_path: Path,
@@ -83,7 +83,7 @@ E                +  where False = MemoryMapPanel(id='memory_map_panel').can_focu
 tests\test_b100_focus.py:228: AssertionError
 _________ test_tc_b100_12_every_window_load_lands_on_its_target[map] __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28939/test_tc_b100_12_every_window_l3')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28939/test_tc_b100_12_every_window_l3')
 window_key = 'map'
 
     @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))

@@ -1,6 +1,6 @@
 ============================= test session starts =============================
 platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
-rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc3b
+rootdir: <HOME>\Github\s19_app-b99-inc3b
 configfile: pyproject.toml
 plugins: textual-snapshot-1.1.0, syrupy-4.8.0
 collected 31 items / 29 deselected / 2 selected
@@ -10,7 +10,7 @@ tests\test_b99_staging.py F.                                             [100%]
 ================================== FAILURES ===================================
 _________ test_tc_b99_16_corrupted_write_out_is_error_naming_address __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26585/test_tc_b99_16_corrupted_write0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26585/test_tc_b99_16_corrupted_write0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000209631AC1D0>
 
     def test_tc_b99_16_corrupted_write_out_is_error_naming_address(

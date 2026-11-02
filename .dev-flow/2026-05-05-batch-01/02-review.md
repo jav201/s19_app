@@ -193,7 +193,7 @@ Per `/dev-flow-en` Phase 2 spec: *"if blockers exist, force `iterate` back to ph
 #### S-002 — Symlink / NTFS junction follow-through not covered [BLOCKER]
 - **Target:** HLR-005 Statement; LLR-005.1 / LLR-005.2 acceptance criteria.
 - **Observation:** Neither LLR mentions reparse points, NTFS junctions (`mklink /J`), or symbolic links. `shutil.copy2(source, target)` follows symlinks on the source side by default, and `Path.iterdir()` in `validate_project_files` does not distinguish a real file from a junction-to-elsewhere. On Windows, directory junctions can be created without the SeCreateSymbolicLinkPrivilege.
-- **Threat scenario:** A project directory contains a junction `prj.s19 -> C:\Users\jjgh8\AppData\Roaming\…`. `validate_project_files` accepts it as a "file"; subsequent re-save through `copy_into_workarea` reads through the junction and copies that content into the audit trail.
+- **Threat scenario:** A project directory contains a junction `prj.s19 -> <HOME>\AppData\Roaming\…`. `validate_project_files` accepts it as a "file"; subsequent re-save through `copy_into_workarea` reads through the junction and copies that content into the audit trail.
 - **Recommended fix:** Add to LLR-005.1 and LLR-005.2: *"the audit shall verify that `validate_project_files` rejects directory entries whose `is_symlink()` is true or whose `lstat().st_file_attributes` indicates a reparse point, and that `copy_into_workarea` resolves both `source` and `destination` and refuses to operate when either escapes the configured workarea root or crosses a reparse point."* Add a corresponding TC.
 
 #### S-003 — Unbounded copy size and unbounded workarea growth not in scope [major]

@@ -99,15 +99,15 @@
 
 ## Input provenance
 
-- Chain mix input 1: prg\.s19 [bound] path=`C:\Users\jjgh8\AppData\Local\Temp\tmplbzs_c2i\.s19tool\workarea\proj\prg.s19`
-- Chain bad input 1: prg\.s19 [bound] path=`C:\Users\jjgh8\AppData\Local\Temp\tmplbzs_c2i\.s19tool\workarea\proj\prg.s19`
-- Chain good input 1: prg\.s19 [bound] path=`C:\Users\jjgh8\AppData\Local\Temp\tmplbzs_c2i\.s19tool\workarea\proj\prg.s19`
+- Chain mix input 1: prg\.s19 [bound] path=`<HOME>\AppData\Local\Temp\tmplbzs_c2i\.s19tool\workarea\proj\prg.s19`
+- Chain bad input 1: prg\.s19 [bound] path=`<HOME>\AppData\Local\Temp\tmplbzs_c2i\.s19tool\workarea\proj\prg.s19`
+- Chain good input 1: prg\.s19 [bound] path=`<HOME>\AppData\Local\Temp\tmplbzs_c2i\.s19tool\workarea\proj\prg.s19`
 
 ## Written files
 
-- Chain mix: `C:\Users\jjgh8\AppData\Local\Temp\tmplbzs_c2i\.s19tool\workarea\proj\out_mix.s19`
+- Chain mix: `<HOME>\AppData\Local\Temp\tmplbzs_c2i\.s19tool\workarea\proj\out_mix.s19`
 - Chain bad: none
-- Chain good: `C:\Users\jjgh8\AppData\Local\Temp\tmplbzs_c2i\.s19tool\workarea\proj\out_good.s19`
+- Chain good: `<HOME>\AppData\Local\Temp\tmplbzs_c2i\.s19tool\workarea\proj\out_good.s19`
 
 ## Not applied
 

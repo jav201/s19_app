@@ -9,9 +9,9 @@
 # edit 1 NEW:
 #   |         MF_BAD_STRUCTURE,
 #   |         CHG_FORMAT,
-# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b
+# cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b
 # env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
-# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document]
+# command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document]
 # started 2026-10-30T23:10:40Z  finished 2026-10-30T23:10:41Z  rc=0
 .                                                                        [100%]
 1 passed in 0.61s

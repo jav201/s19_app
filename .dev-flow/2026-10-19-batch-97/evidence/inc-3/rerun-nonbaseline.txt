@@ -2,7 +2,7 @@
 ================================== FAILURES ===================================
 ____________________________ test_save_back_prompt ____________________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23082/test_save_back_prompt0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23082/test_save_back_prompt0')
 
     def test_save_back_prompt(tmp_path: Path) -> None:
         """The post-apply prompt offers an editable suggestion; decline writes

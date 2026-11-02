@@ -15,7 +15,7 @@
 ## 0 · Verify the ground
 
 ```bash
-cd C:\Users\jjgh8\Github\s19_app          # branch claude/batch-88-audit-closures
+cd <HOME>\Github\s19_app          # branch claude/batch-88-audit-closures
 export PYTHONIOENCODING=utf-8
 python ~/.claude/docs/tools/devflow-validate.py .          # expect: 0 block · 294 notice · 13 n/a
 python ~/.claude/docs/tools/devflow-validate.py --selftest # expect: SELFTEST PASSED, 192 arms, exit 0

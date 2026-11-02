@@ -1,6 +1,6 @@
 # Inc 12a — E4 integration notes (progress indicator, labels, backlog sweep)
 
-Stage E4, integration step. Inputs read: `E4-impl-notes.md` (3 declared deviations), `E4-tester-notes.md`, `codewire/interfaces-12a.md`, `codewire/proto-12a-indicator.md`, `codewire/proto-12a-sweep.md`, `E3-rulings.md` (round 1 and the round-2 addenda), `E1-requirements-draft.md` (LLR-176.1r, LLR-176.2b). Worktree `C:/Users/jjgh8/Github/s19_app-b100-inc12a`, branch `b100-inc12a` at `051f586` plus the uncommitted Inc 12a change. Evidence states use the seven words only.
+Stage E4, integration step. Inputs read: `E4-impl-notes.md` (3 declared deviations), `E4-tester-notes.md`, `codewire/interfaces-12a.md`, `codewire/proto-12a-indicator.md`, `codewire/proto-12a-sweep.md`, `E3-rulings.md` (round 1 and the round-2 addenda), `E1-requirements-draft.md` (LLR-176.1r, LLR-176.2b). Worktree `<HOME>/Github/s19_app-b100-inc12a`, branch `b100-inc12a` at `051f586` plus the uncommitted Inc 12a change. Evidence states use the seven words only.
 
 Abbreviations: `B` = `tests/test_b100_busy.py`, `LD` = `tests/test_b100_load_dialog.py`, `AN` = `tests/test_b100_announce.py`, `RP` = `tests/test_report_progress.py`, `SR` = `tests/test_b100_session_reset.py`, `R` = `tests/test_b100_recents.py`. Transcripts are under `.dev-flow/2026-10-26-batch-100/evidence/inc-12a/`.
 
@@ -64,7 +64,7 @@ Implementer open questions: the `_busy` `SNAPSHOT_EXCLUSIONS` entry was added by
 
 ## Final pass counts
 
-Each count is read from one complete run's own summary line. green-01 ran alone; green-02 and the guards ran in parallel. No timing arm failed in any run. Every transcript prints `s19_app.__file__` = `C:\Users\jjgh8\Github\s19_app-b100-inc12a\s19_app\__init__.py` at its top, and ends with `real %LOCALAPPDATA%\s19_app exists: no`.
+Each count is read from one complete run's own summary line. green-01 ran alone; green-02 and the guards ran in parallel. No timing arm failed in any run. Every transcript prints `s19_app.__file__` = `<HOME>\Github\s19_app-b100-inc12a\s19_app\__init__.py` at its top, and ends with `real %LOCALAPPDATA%\s19_app exists: no`.
 
 | Run | Transcript | Result | State |
 |---|---|---|---|

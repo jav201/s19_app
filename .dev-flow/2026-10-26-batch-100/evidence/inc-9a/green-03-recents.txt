@@ -1,10 +1,10 @@
 # green-03: tests/test_b100_recents.py in full after the E5 corrective pass (final)
 # date: 2026-10-31T07:07:17-06:00
-# cwd: C:/Users/jjgh8/Github/s19_app-b100-inc9a
+# cwd: <HOME>/Github/s19_app-b100-inc9a
 # sha256[:16] workspace.py=0af4b92489233ff2 app.py=bbf04117fbf0d3f5
-# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc9a\s19_app\__init__.py
+# s19_app.__file__ = <HOME>\Github\s19_app-b100-inc9a\s19_app\__init__.py
 # env: env -u NO_COLOR LOCALAPPDATA=<scratchpad>/e5fix/lad/<run id> PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=.
-# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfEs tests/test_b100_recents.py
+# command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfEs tests/test_b100_recents.py
 
 ........................................................................ [ 45%]
 ........................................................................ [ 91%]

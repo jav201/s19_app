@@ -190,7 +190,7 @@ LLR-155.8).
 
 ```bash
 # from the worktree root, with the s19env interpreter, NO_COLOR unset:
-python -c "import s19_app; print(s19_app.__file__)"   # -> C:\Users\jjgh8\Github\s19_app-b99-inc3a\s19_app\__init__.py
+python -c "import s19_app; print(s19_app.__file__)"   # -> <HOME>\Github\s19_app-b99-inc3a\s19_app\__init__.py
 pytest tests/test_b99_staging.py -q                   # -> 17 passed (after the review-round fixes)
 pytest tests/test_b99_staging.py -k tc_b99_11 -q      # -> 2 passed
 pytest tests/test_b99_staging.py -k tc_b99_12 -q      # -> 5 passed
@@ -369,7 +369,7 @@ pre-existing, none from this increment — see the reverse-census section),
 |---|---|
 | Mutation applied | four (C-40), one per declared negative control; each reverted by hash |
 | Instrument | project code: the implementer's own hand via the Edit tool; restore checked by SHA-256 |
-| Where it ran | this worktree (`C:\Users\jjgh8\Github\s19_app-b99-inc3a`), run by the implementer |
+| Where it ran | this worktree (`<HOME>\Github\s19_app-b99-inc3a`), run by the implementer |
 | Transcripts | `evidence/inc-3a/mut-155.1-shared-staging.txt` · `mut-155.2-check-then-copy.txt` · `mut-155.3-no-source-verify.txt` · `mut-155.7-rederived-unlink.txt` (each: target node FAILED) |
 | Restore proven by | file hashes returned to pre-mutation values: `apply.py` → `52071a04…`, `workspace.py` → `21cd8f87…` (recorded in the run log; both verified after the last mutation) |
 | Bytecode cache | run with `PYTHONDONTWRITEBYTECODE=1` (C-46) |
@@ -426,19 +426,19 @@ All under `artifact_homes.evidence` = `.dev-flow/2026-10-25-batch-99/evidence/in
 
 | Evidence artifact | Path | SHA-256 |
 |---|---|---|
-| Worktree import proof + CRLF check | `import-proof-crlf.txt` | `b52fd19163af05ed238679810413f7c8a378ba2cdd419ece5ba50d43ccc8a50e` |
-| RED baseline, whole file | `red-all.txt` | `a7227a942139811926be6da5e3001ea8ee6d369ab2c400807f17aaeb3d291bb8` |
-| RED TC-B99-11 | `red-tc_b99_11.txt` | `c2e9cdaba12bea8634c820fef8d40750214209e67360b5ad412ba9c6642c2470` |
-| RED TC-B99-12 (PQ-8: `parallel mismatches: 140`) | `red-tc_b99_12.txt` | `1c4ba257f142b8f92daf95e6dbb70d481115156ccef4bf1f43450641425b9cd0` |
-| RED TC-B99-13 | `red-tc_b99_13.txt` | `32a634d7d1a7874b1927a4544f1bea1a6981418f4b0910e5aa7fab54b2eb8819` |
-| RED TC-B99-14 | `red-tc_b99_14.txt` | `c7acc5780ac0ca103cdd6e47f8eed2d8c2113a1efad75d29de54a6bfb2af3d8b` |
+| Worktree import proof + CRLF check | `import-proof-crlf.txt` | `9be0fe03f3aad0ab0c91f7d601defb93aa14f9f2a8a5e781bf343937cab1488c` |
+| RED baseline, whole file | `red-all.txt` | `03f38cb41ae3184e2941adb80207c11d68d70ac9141cc96bb91a08a3c195f6c9` |
+| RED TC-B99-11 | `red-tc_b99_11.txt` | `b3a318174aaaf235c246aa4de8cf94e2f35100d3e7ea24e44f5dec4ebc46ee9a` |
+| RED TC-B99-12 (PQ-8: `parallel mismatches: 140`) | `red-tc_b99_12.txt` | `0b784c9d35a0aa9c9823a8fecc47378f1c3d49b667f4d9ecca70b821c5f0c1ba` |
+| RED TC-B99-13 | `red-tc_b99_13.txt` | `2ada4b83ab97cc83759db363c3f20dbdbfea3a527eb06e7e310a04c23baa37a6` |
+| RED TC-B99-14 | `red-tc_b99_14.txt` | `487eb60d073a0661b8365d2d131f56dece681222cd254baebbeb415d1e8fd863` |
 | RED TC-B99-39 | `red-tc_b99_39.txt` | `6da20c881265779953da10feeed2b5b098e5a8b5ccc36d29526db043df5a1c6b` |
 | RED AT-B99-05 (P-15) | `red-at_b99_05.txt` | `b664f923204dd600fea37732dba18cb1f4803e3824b51c268a9a6935b2dc1fd9` |
-| RED UX-C10 arms | `red-ux_c10.txt` | `32e666bb185531e7e8785e13cc83dd3157721eb1723c92d428c649fcbcc29da1` |
-| Mutation shared staging (KILLED) | `mut-155.1-shared-staging.txt` | `979ebcacee2f7ef9000191b442826d71651f7a7932a750f225ea3bcf11622244` |
-| Mutation check-then-copy (KILLED) | `mut-155.2-check-then-copy.txt` | `afdc8aef5f434d75ca422c45154440149c28b3707928cf4e58c7a039afbb0fb9` |
-| Mutation no source verify (KILLED) | `mut-155.3-no-source-verify.txt` | `0d03c57e09ed1ff1c9d3c4d75f28e8c327424a464ce8af3ac845f0e7b8a51799` |
-| Mutation re-derived unlink (KILLED) | `mut-155.7-rederived-unlink.txt` | `9742e1c91e144728285f7ff7a43a1cb00bac8aca9fa5289795ee8f27ae031175` |
+| RED UX-C10 arms | `red-ux_c10.txt` | `11ef168c186574875170f88a48c254f35a4b9aaaaf61d0c716ae87897481138f` |
+| Mutation shared staging (KILLED) | `mut-155.1-shared-staging.txt` | `cfd0b21c8a2362db4b7679368a88f2a007c977f721389e68ec7f7d5ad39ed14d` |
+| Mutation check-then-copy (KILLED) | `mut-155.2-check-then-copy.txt` | `ff402057f69457bb5478da9e28f4edde2456fe0e694c3687c97e122d736e564a` |
+| Mutation no source verify (KILLED) | `mut-155.3-no-source-verify.txt` | `3aab1f79a46f1d53f7ef7d4e99b66dba6216bfe3af6f1a0865eef207e8cf0e7a` |
+| Mutation re-derived unlink (KILLED) | `mut-155.7-rederived-unlink.txt` | `d355d4ac9932f2b65d41c07b6cdf50a476cbcdfbc4ccf1bf40df335bf8a31031` |
 | GREEN whole file (12 passed) | `green-all.txt` | `b9be08fef3174cd84727fc6ea828d291a255247260085098ea6abca370a41498` |
 | GREEN TC-B99-11 | `green-tc_b99_11.txt` | `df5a1989c036243ae45bf3b9d53f0e401993a2e1e4f87582d0824497f3de2f8f` |
 | GREEN TC-B99-12 (3 arms) | `green-tc_b99_12.txt` | `6c14011f23367521957706b3401010ddf6168caf2db1850b73d43ac0dd5c1e3e` |
@@ -450,10 +450,10 @@ All under `artifact_homes.evidence` = `.dev-flow/2026-10-25-batch-99/evidence/in
 | GREEN UX-C10 arms | `green-ux_c10.txt` | `7b476da739dcbe5069b98d72dcf842ec8b3dc3bed2b3129fb4b557c6008d4a4d` |
 | GREEN staging-seam re-pins (10 passed) | `green-staging-block-repin.txt` | `232efe8f68a63b2f40a15d69073131d8520b91921fb5b18379f2fcd68094ea8e` |
 | GREEN final (increment + re-pinned files, 27 passed) | `green-final.txt` | `0eafc6c5cc116ff13f70bdc314f3e09d02328ab42973d441b7f0a91f4f97866c` |
-| Reverse census part 1 | `census-part1.txt` | `c5e2c5f121c1c017917ab664242888bcb41ea4d2f3fc31f4981ad494cbe5c8da` |
-| Reverse census part 1 rerun (AT-038c flake check) | `census-part1-rerun.txt` | `2b3af0a52d631c3a500c5d33d315f0e6c1d7cb2f0152d5ba804aa3652c0ad775` |
-| Reverse census part 2 (heavy TUI) | `census-part2.txt` | `e0243ca8693dfe2757432f06ac8316a629213a58efd20cb2a7ccd07039ead4b2` |
-| `test_tui_patch_editor_v2.py` full file (this tree) | `census-patch-editor-v2.txt` | `a1048420fd233f76a559cf59f342370fab2ef298e4b142523531f4e4e749f551` |
+| Reverse census part 1 | `census-part1.txt` | `0f629c8ffa450170e3523c5cbf9c9a73d733d1b610e63e8360be4712eb63b1ad` |
+| Reverse census part 1 rerun (AT-038c flake check) | `census-part1-rerun.txt` | `2b6b6ca52059653200f2dce07e91b6bd5b1951126d931660d21cf36b5ea43b36` |
+| Reverse census part 2 (heavy TUI) | `census-part2.txt` | `39d5765fb80d3ba86dea00ede6253e2fbf5d749e818f7fcef6558a9e9e574f1d` |
+| `test_tui_patch_editor_v2.py` full file (this tree) | `census-patch-editor-v2.txt` | `e91959d6293134f15a5a7a8287f323603de42c59ddbe6fa7da39c59fa3c34ec9` |
 | same file at base `a52e2be` (scratch worktree) | `baseline-patch-editor-v2-at-HEAD.txt` | `245a6281700f7fa296c90403bd721b83eb1923d9cd982ceac0ef6415a00e325c` |
 | Reverse census hit list | `reverse-census-hits.txt` | `8b4b347ca312fcc7165c97c0cbb90e8679b1bfd03fe43111a43c41cbef5a9395` |
 | Fix-round GREEN, whole file (17 passed) | `green-fix-all.txt` | `601b7988c46daab41d107b0a54f7f4f73d70d768bdbc3e129186b53aeda8a91a` |
@@ -462,29 +462,29 @@ All under `artifact_homes.evidence` = `.dev-flow/2026-10-25-batch-99/evidence/in
 | Fix-round GREEN, TC-B99-13 after the contention fix | `green-fix-tc13.txt` | `0f881abfad8fbdefcec296339b0f1e5f24b7723e34045ca93127c5289bc78864` |
 | Fix-round GREEN, changes-apply seam (41 passed) | `green-fix-changes-apply.txt` | `2f2ab19445fb2509a43d55c68f12613389f55fe37aea554d5976b00affdaf56f` |
 | Fix-round AT-B99-05 stability (8/8 passed) | `stability-at05.txt` | `6265ca34bace6b63837a39fc85862617e26bae0be2b6d85f514d2b413c4dcb58` |
-| Fix-round RED, new/changed arms at base `a52e2be` (6 failed / 2 passed) | `red-fix-new-arms.txt` | `f5d812d9338ce69d6543c07b49e05bc71732706e021e29bbd1b5e2f9be26c871` |
-| Fix-round RED, AT-B99-05 black-box at base (P-15) | `red-at_b99_05.txt` | `166d8538a38277b8182185d9e1bfd15c86b819e8c2d8d88923215ec979d66d65` |
-| Fix-round RED, TC-B99-14 black-box at base | `red-fix-tc14.txt` | `0d70d5a1f55f91b8bd8a3237e34f7e3fe716045aa7c2008cb471acf3165f5b83` |
-| Fix mutation shared staging (KILLED) | `mut-fix-155.1-shared-staging.txt` | `61f1d21a54af24053d9ac8e6ed75b2f8fdbf87939d4d742b632a85257d2ebc3b` |
-| Fix mutation check-then-copy (KILLED) | `mut-fix-155.2-check-then-copy.txt` | `48e9b783ca01100136fcbac06df0ece0e16164d217b788cf759b9ee36e3f3485` |
-| Fix mutation check-then-copy vs concurrent TC-B99-13 (KILLED) | `mut-fix-155.2-tc13-concurrent.txt` | `0cbdc933726f6e33c13b0574ff882e51b2ac19f4bce01a953809ffba99a40b7e` |
+| Fix-round RED, new/changed arms at base `a52e2be` (6 failed / 2 passed) | `red-fix-new-arms.txt` | `43d4e2726b076058765e6650895d0255909df7419551d4716d08e5e53ac91e19` |
+| Fix-round RED, AT-B99-05 black-box at base (P-15) | `red-at_b99_05.txt` | `07432b5ec0380c1bc4759eb1db1880b0d28497b9e527ab0add0f57510c3680bc` |
+| Fix-round RED, TC-B99-14 black-box at base | `red-fix-tc14.txt` | `1e05ec92047c8d9bf5a3ac1d4d215756d8a2390ba2659993f01178788a3a0e16` |
+| Fix mutation shared staging (KILLED) | `mut-fix-155.1-shared-staging.txt` | `6c60e36d5dcac8ff000d4b761acb01e7973e05d9481dd1e925309d1ee174826e` |
+| Fix mutation check-then-copy (KILLED) | `mut-fix-155.2-check-then-copy.txt` | `6e755b949a7a255877e9cd65e93b62e8980e80dbed62c5ee27c8269284990c6f` |
+| Fix mutation check-then-copy vs concurrent TC-B99-13 (KILLED) | `mut-fix-155.2-tc13-concurrent.txt` | `a0179ac83b0f42957e0d417576d8f64641808309efcca6f53c355af8b301c99a` |
 | Fix mutation 155.3 supersession statement | `mut-155.3-superseded.txt` | `837c81def50ded2fd195a65fdebb4a9df1d2468184a904b91373560abc1fa824` |
-| Fix mutation re-derived unlink (KILLED) | `mut-fix-155.7-rederived-unlink.txt` | `27ca7d10b18b7f305736e3e91029c482370e6084c3827eb9792e329f4f1ce928` |
-| Fix mutation no directory handling (KILLED) | `mut-fix-f1-no-directory-handling.txt` | `3de78d089a56d9b1694ca31fa8b94ed32049b2a027c8652f25c01ad4876626f2` |
-| Fix mutation staging under `temp/` (KILLED) | `mut-fix-f3-shared-temp-staging.txt` | `1cf4855813b6e00cf803dfcd26a81f4833a39944a59cb1639b9fb9e2d178dcfb` |
+| Fix mutation re-derived unlink (KILLED) | `mut-fix-155.7-rederived-unlink.txt` | `96ef059fbd5e35a8b373976e753484532967b9f7c28844a174e140a1dceeea6f` |
+| Fix mutation no directory handling (KILLED) | `mut-fix-f1-no-directory-handling.txt` | `ca8e870fc1c8f2f65901c513302f5859c76c1c5621a12f3f8cc8b8b5369ca1ad` |
+| Fix mutation staging under `temp/` (KILLED) | `mut-fix-f3-shared-temp-staging.txt` | `c8fb04839ea2a0b240b1d0181de4137e9694ad712647e6fa171d3f563fbca5c6` |
 | Fix-round CRLF verification (all edited sources pure CRLF) | `crlf-fix.txt` | `df363a484785cb0a8cf87e330c6686b5245d56f14ef4d72fe8f0254bad02edf9` |
-| Fix2 RED, the four new arms on the review-round-2 tree (4 failed, declared mechanisms) | `red-fix2-new-arms.txt` | `fc59674b2824bd71c5d7fedfddfa5ae1de42167474689ccf78526347b87fb481` |
+| Fix2 RED, the four new arms on the review-round-2 tree (4 failed, declared mechanisms) | `red-fix2-new-arms.txt` | `40c36fba044d8a785c9be3eae0da7e402663f50fc7f07795d5282b81a5afd1f3` |
 | Fix2 RED, full staging file on the review-round-2 tree (intermediate test state) | `red-fix2-full.txt` | `8f3d72d9f73fc41c64c8918904f44a6fb71c5c197810dc7b5a0b4e2483b13545` |
-| Fix2 GREEN, staging file (23 passed) | `green-fix2-staging.txt` | `5eb1d085ec1b190418ab6e2b1f54bd8dbe48da5cfac671e3468206b3c8707f5d` |
+| Fix2 GREEN, staging file (23 passed) | `green-fix2-staging.txt` | `38e44fda00a8a32cf284946f0ba2762c2c64226e382de85a870f44c40b75b18e` |
 | Fix2 GREEN, re-pinned files (94) + address census (23) + AT-B99-05 x8 (8/8) | `green-fix2-repinned-census-at05.txt` | `f0fe65456a0da32af2e96c258b1d792da206951fb8be383fd9a20919e557a97b` |
-| Fix2 mutation pre-claim lstat removed / S-F1 (KILLED) | `mut-fix2-sf1-no-preclaim-lstat.txt` | `0016e854076b38e555cf6e40b653880cf6fff9c49d6a022e3288a2e4becca072` |
-| Fix2 mutation copy2 unwrap / S-F6 (KILLED) | `mut-fix2-sf6-unwrap-copy2.txt` | `4f787596e60e8273946a2991f1b9d674fa707493872efa97b62d6d9d95615a2e` |
-| Fix2 mutation check-then-copy, O_EXCL dropped (KILLED; mismatches 35 / 68) | `mut-fix2-155.2-check-then-copy.txt` | `5a0a1c2c7493bd008fe2b0396689d5b515c01ae1006c2e8786c5cd98d5ebbef0` |
-| Fix2 mutation staging under `temp/`, checks removed / F3+S-F2+S-F3 (KILLED) | `mut-fix2-f3-temp-staging.txt` | `051db8b1436ab36d0878d2a0014550b1e1a56a47d3c69faa60dac8bc51b13223` |
-| Fix2 mutation cleanup no-op / F6a (KILLED) | `mut-fix2-f6a-no-cleanup.txt` | `0c339f7314dedfa496fffbfa60f422b7dc4e43f12d74593f653cad2628f80b28` |
-| Fix2 mutation created-flag forced True / S-F5 (KILLED) | `mut-fix2-sf5-flag-always-true.txt` | `d79610aecb29d1f539302ce711ab8f9352a91b3db67b632de8b5a8e998bb244f` |
+| Fix2 mutation pre-claim lstat removed / S-F1 (KILLED) | `mut-fix2-sf1-no-preclaim-lstat.txt` | `659132042a09fc69b9a46e4d31d970bf23d44714ac4e6b25b778a759b897336b` |
+| Fix2 mutation copy2 unwrap / S-F6 (KILLED) | `mut-fix2-sf6-unwrap-copy2.txt` | `4292e8a1326cb9dc887c491bc269cfa8593c1db65ae4082c6962fbdc8e7619d2` |
+| Fix2 mutation check-then-copy, O_EXCL dropped (KILLED; mismatches 35 / 68) | `mut-fix2-155.2-check-then-copy.txt` | `df33dd5dc7d29a9ad3c1b98c6137360137d0fc6ca5336a5891cfa43c12fece41` |
+| Fix2 mutation staging under `temp/`, checks removed / F3+S-F2+S-F3 (KILLED) | `mut-fix2-f3-temp-staging.txt` | `85d32bfd3af09f3884bdf0a48cf8875c26535a4af11ed3a271a0942f65b1a0ad` |
+| Fix2 mutation cleanup no-op / F6a (KILLED) | `mut-fix2-f6a-no-cleanup.txt` | `0b8382906daf9d5d7e15116a75f4d8f20812727e0ec4d53fcc5732570fad759b` |
+| Fix2 mutation created-flag forced True / S-F5 (KILLED) | `mut-fix2-sf5-flag-always-true.txt` | `d5e50cb9bc131080eef24063012c99dcd5ee913ce825fdd4eccfb95f3c6c7e16` |
 | Fix2 mutation pre-mutation source snapshot (restore verification) | `mut-fix2-pre-snapshot.txt` | `87f084e9778d88822e9b6999aed81652caa0281202e3e2697c5a2c61158195f9` |
-| Fix2 GREEN, reverse-census batch (341 passed / 4 failed — 3 environmental `git diff main` pins, see §4; 1 documented pre-existing `test_tc018`) | `green-fix2-reverse-census.txt` | `095109da7b193f6caa3b1484d830560f55e177c337d180378a0029e4bd674ff9` |
+| Fix2 GREEN, reverse-census batch (341 passed / 4 failed — 3 environmental `git diff main` pins, see §4; 1 documented pre-existing `test_tc018`) | `green-fix2-reverse-census.txt` | `8a0b7f728cf7b0d0e3e9fccbb769ab1c1acf82df0e9b7cab4c33ac51f04ca68f` |
 | Fix2 CRLF verification (all four edited sources pure CRLF) | `crlf-fix2.txt` | `f852ee716428fb125d3ab00710db1989de94e818c6bc911d5b3faf67b50e782f` |
 
 | Field | Value |

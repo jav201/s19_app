@@ -15,11 +15,11 @@ Method summary (full text in report.md):
 import json, re, sys, os, glob, collections
 from datetime import datetime, timezone, timedelta
 
-ROOT = "C:/Users/jjgh8/.claude/projects/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2"
+ROOT = "<HOME>/.claude/projects/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2"
 SUB = ROOT + "/subagents/"
 MAIN = ROOT + ".jsonl"
-EV = "C:/Users/jjgh8/Github/s19_app-b100-inc7/.dev-flow/2026-10-26-batch-100/evidence/inc-7/"
-SCR = "C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/"
+EV = "<HOME>/Github/s19_app-b100-inc7/.dev-flow/2026-10-26-batch-100/evidence/inc-7/"
+SCR = "<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/"
 OUT = SCR + "timing7/"
 
 AGENTS = [  # id, label, role

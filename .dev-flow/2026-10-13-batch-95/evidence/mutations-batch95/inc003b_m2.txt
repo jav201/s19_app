@@ -6,7 +6,7 @@
 # Replacement:
         return _FAMILY_SUBDIR[family], workarea / "checks"
 # Claim: a no-project Checks chip pointed at a (nonexistent) COMMON checks/ home instead of the contracted workarea/patches — TC-703's no-project arm must redden
-# Command: PYTHONUTF8=1 C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes -q -p no:cacheprovider
+# Command: PYTHONUTF8=1 <HOME>/anaconda3/envs/s19env/python.exe -m pytest tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes -q -p no:cacheprovider
 # sha256 before mutation: 73aa4cd1a459957feaba64b8d30a9ef80eaffdb103476b4c862fe7944f41d90c
 # sha256 after restore:   73aa4cd1a459957feaba64b8d30a9ef80eaffdb103476b4c862fe7944f41d90c
 # restore verified: True
@@ -24,7 +24,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 _______ test_tc703_checks_chip_resolves_check_artifact_home_both_modes ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19099/test_tc703_checks_chip_resolve0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-19099/test_tc703_checks_chip_resolve0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000265D1E3E850>
 
     def test_tc703_checks_chip_resolves_check_artifact_home_both_modes(
@@ -60,7 +60,7 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000265D1E3E850>
             "(the contract's literal ruling — not a checks/ COMMON home)"
         )
 E       AssertionError: no-project Checks chip must open the COMMON workarea/patches home (the contract's literal ruling — not a checks/ COMMON home)
-E       assert WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19099/test_tc703_checks_chip_resolve0/.s19tool/workarea/checks') == (((WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19099/test_tc703_checks_chip_resolve0') / '.s19tool') / 'workarea') / 'patches')
+E       assert WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-19099/test_tc703_checks_chip_resolve0/.s19tool/workarea/checks') == (((WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-19099/test_tc703_checks_chip_resolve0') / '.s19tool') / 'workarea') / 'patches')
 
 tests\test_open_folder_chips.py:213: AssertionError
 =========================== short test summary info ===========================

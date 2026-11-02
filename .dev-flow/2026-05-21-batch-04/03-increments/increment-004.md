@@ -49,7 +49,7 @@ tests.
 ## 3. How to test
 
 ```powershell
-# From the repo root C:\Users\jjgh8\Github\s19_app
+# From the repo root <HOME>\Github\s19_app
 
 # 1. Syntax / compile gate (ruff not installed — py_compile substitute)
 python -m py_compile s19_app/tui/cdfx/changeset.py s19_app/tui/cdfx/__init__.py tests/conftest.py tests/test_unified_changeset.py

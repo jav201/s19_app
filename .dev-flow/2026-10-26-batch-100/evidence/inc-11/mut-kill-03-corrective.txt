@@ -3,10 +3,10 @@
 ===== M-09 file=s19_app/tui/screens.py matches=1 sha_before=dc988721ae7b6a87
 old: '        if event.input.id != "project_name" or not self._live or self._dismissed:' 
 new: '        if event.input.id != "project_name" or self._dismissed:'
-s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr11\mutcap\s19_app\__init__.py
+s19_app.__file__ = <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr11\mutcap\s19_app\__init__.py
 F                                                                        [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr11\mutcap\tests\test_b100_save_dialog.py:3872: AssertionError: (['early', 'early'], [False, True])
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr11\mutcap\tests\test_b100_save_dialog.py:3872: AssertionError: (['early', 'early'], [False, True])
 =========================== short test summary info ===========================
 FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_a_change_before_the_first_preview_starts_no_recompute
 1 failed in 3.47s
@@ -15,10 +15,10 @@ restored=True sha_after=dc988721ae7b6a87
 ===== M-14 file=s19_app/tui/screens.py matches=1 sha_before=dc988721ae7b6a87
 old: '        self._shown = False\n        self.call_after_refresh(self._mark_shown)' 
 new: '        self.call_after_refresh(self._mark_shown)'
-s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr11\mutcap\s19_app\__init__.py
+s19_app.__file__ = <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr11\mutcap\s19_app\__init__.py
 F                                                                        [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr11\mutcap\tests\test_b100_save_dialog.py:3913: AssertionError: ('two', SavePlan(target=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-8...'firmware.s19 unchanged copy', manifest_keys=(), refusal=None, folders=(), skipped_links=(), copies=(), total_bytes=0))
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr11\mutcap\tests\test_b100_save_dialog.py:3913: AssertionError: ('two', SavePlan(target=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-8...'firmware.s19 unchanged copy', manifest_keys=(), refusal=None, folders=(), skipped_links=(), copies=(), total_bytes=0))
 =========================== short test summary info ===========================
 FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_a_save_queued_before_a_repaint_is_shown_repaints
 1 failed in 3.83s
@@ -27,10 +27,10 @@ restored=True sha_after=dc988721ae7b6a87
 ===== M-42 file=s19_app/tui/app.py matches=1 sha_before=1a3ed1e9ed0976eb
 old: '        self._save_session = None\n        self._save_confirmed = None\n        self._save_painted_preview = None\n        if payload is None:' 
 new: '        self._save_confirmed = None\n        self._save_painted_preview = None\n        if payload is None:'
-s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr11\mutcap\s19_app\__init__.py
+s19_app.__file__ = <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr11\mutcap\s19_app\__init__.py
 F                                                                        [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr11\mutcap\tests\test_b100_save_dialog.py:3950: AssertionError: (_SaveSession(image_step=_ProjectImageStep(emit=False, derived=None, summary=None, payload=None, name='', carried=0, a...19', size=358),), skipped_links=(), unreadable=(), over_ceiling=None), emitted_record=None, payload_sha256=None), None)
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr11\mutcap\tests\test_b100_save_dialog.py:3950: AssertionError: (_SaveSession(image_step=_ProjectImageStep(emit=False, derived=None, summary=None, payload=None, name='', carried=0, a...19', size=358),), skipped_links=(), unreadable=(), over_ceiling=None), emitted_record=None, payload_sha256=None), None)
 =========================== short test summary info ===========================
 FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_dialog_save_as_leaves_no_session_for_the_next_direct_save
 1 failed in 8.49s
@@ -39,10 +39,10 @@ restored=True sha_after=1a3ed1e9ed0976eb
 ===== M-45 file=s19_app/tui/app.py matches=1 sha_before=1a3ed1e9ed0976eb
 old: '            and confirmed.typed_name == payload.project_name\n' 
 new: ''
-s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr11\mutcap\s19_app\__init__.py
+s19_app.__file__ = <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr11\mutcap\s19_app\__init__.py
 F                                                                        [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr11\mutcap\tests\test_b100_save_dialog.py:3983: AssertionError: (True, False)
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr11\mutcap\tests\test_b100_save_dialog.py:3983: AssertionError: (True, False)
 =========================== short test summary info ===========================
 FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_confirm_is_not_reused_for_another_typed_name
 1 failed in 5.82s
@@ -51,10 +51,10 @@ restored=True sha_after=1a3ed1e9ed0976eb
 ===== M-68 file=s19_app/tui/app.py matches=1 sha_before=1a3ed1e9ed0976eb
 old: '            if loaded and not image_step.emit:' 
 new: '            if loaded:'
-s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr11\mutcap\s19_app\__init__.py
+s19_app.__file__ = <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr11\mutcap\s19_app\__init__.py
 F                                                                        [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr11\mutcap\tests\test_b100_save_dialog.py:3441: AssertionError: [1, 1]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr11\mutcap\tests\test_b100_save_dialog.py:3441: AssertionError: [1, 1]
 =========================== short test summary info ===========================
 FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_session_decided_once_per_open_case06
 1 failed in 30.25s
@@ -63,10 +63,10 @@ restored=True sha_after=1a3ed1e9ed0976eb
 ===== M-74 file=s19_app/tui/app.py matches=1 sha_before=1a3ed1e9ed0976eb
 old: '                rows=(),\n                plan=prepared.plan,' 
 new: '                rows=prepared.plan.rows if prepared.plan is not None else (),\n                plan=prepared.plan,'
-s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr11\mutcap\s19_app\__init__.py
+s19_app.__file__ = <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr11\mutcap\s19_app\__init__.py
 F                                                                        [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\rich\control.py:192: AttributeError: 'SavePlanRow' object has no attribute 'translate'
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\rich\control.py:192: AttributeError: 'SavePlanRow' object has no attribute 'translate'
 =========================== short test summary info ===========================
 FAILED tests/test_b100_save_dialog.py::test_tc_b100_47_target_with_two_mac_files_refused_in_the_dialog
 1 failed in 9.48s
@@ -75,10 +75,10 @@ restored=True sha_after=1a3ed1e9ed0976eb
 ===== M-96 file=s19_app/tui/services/project_gather_service.py matches=1 sha_before=e11a5e75d7346183
 old: '                    folded = {os.path.normcase(entry) for entry in listing}\n                    name_landed = next(\n                        candidate\n                        for candidate in _placed_name_candidates(name)\n                        if os.path.normcase(candidate) not in folded\n                    )' 
 new: '                    folded = set(listing)\n                    name_landed = next(\n                        candidate\n                        for candidate in _placed_name_candidates(name)\n                        if candidate not in folded\n                    )'
-s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr11\mutcap\s19_app\__init__.py
+s19_app.__file__ = <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr11\mutcap\s19_app\__init__.py
 F                                                                        [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr11\mutcap\tests\test_b100_save_dialog.py:4026: AssertionError: ['firmware.s19 + 1 change entry, 1 applied by this save', 'image firmware.s19 — new', 'document patches/changes.json — new', 'folder notes/ (0 files) — new', 'folder patches/ (1 file) — new', 'project.json — new']
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr11\mutcap\tests\test_b100_save_dialog.py:4026: AssertionError: ['firmware.s19 + 1 change entry, 1 applied by this save', 'image firmware.s19 — new', 'document patches/changes.json — new', 'folder notes/ (0 files) — new', 'folder patches/ (1 file) — new', 'project.json — new']
 =========================== short test summary info ===========================
 FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_document_free_name_walk_folds_case
 1 failed in 4.83s

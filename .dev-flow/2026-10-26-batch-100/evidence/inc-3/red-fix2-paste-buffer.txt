@@ -6,7 +6,7 @@ FF                                                                       [100%]
 ================================== FAILURES ===================================
 _____ test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size0] _____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28776/test_at_b100_03_project_load_o0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28776/test_at_b100_03_project_load_o0')
 size = (118, 54)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
@@ -202,7 +202,7 @@ E       AssertionError: timed out waiting for the paste buffer cleared by the re
 tests\test_b100_session_reset.py:128: AssertionError
 _____ test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size1] _____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28776/test_at_b100_03_project_load_o1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28776/test_at_b100_03_project_load_o1')
 size = (220, 60)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])

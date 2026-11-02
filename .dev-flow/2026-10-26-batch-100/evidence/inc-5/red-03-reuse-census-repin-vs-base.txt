@@ -1,6 +1,6 @@
 # command: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py::test_tc_b100_01_app_placements_name_the_workarea_root -rfE
-# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base (8d6056f + working-tree changes: 0 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base (8d6056f + working-tree changes: 0 source paths modified)
+# PYTHONPATH=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T20:59:47Z
 F                                                                        [100%]
 ================================== FAILURES ===================================

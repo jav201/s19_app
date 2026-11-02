@@ -52,7 +52,7 @@ assert the **emitted figure**.
 ```bash
 export PYTHONIOENCODING=utf-8          # cp1252 otherwise; corrupts the transcript, never the numbers
 python ~/.claude/docs/tools/devflow-validate.py --selftest          # PASSED, 194 arms, 9 V22
-python ~/.claude/docs/tools/devflow-validate.py "C:/Users/jjgh8/Github/s19_app" | grep V22
+python ~/.claude/docs/tools/devflow-validate.py "<HOME>/Github/s19_app" | grep V22
 ```
 
 ---

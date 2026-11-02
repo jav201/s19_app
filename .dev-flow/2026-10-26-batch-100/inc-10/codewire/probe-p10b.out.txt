@@ -1,4 +1,4 @@
-import C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc-10-design\work\tree\s19_app
+import <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc-10-design\work\tree\s19_app
 U0 Button.BINDINGS keys: ['enter']
 U0 PatchEditorPanel.is_dirty exists: False
 U0 painted_names: '[b]x.s19' 'ab.s19' 120 …

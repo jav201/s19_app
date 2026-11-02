@@ -1,6 +1,6 @@
 ==============================================================================
 inc003 mutation battery — batch-94 increment 003 (fx_a Flow Execution)
-cwd: C:\Users\jjgh8\Github\s19_app-b94
+cwd: <HOME>\Github\s19_app-b94
 ==============================================================================
 
 [phase 0] resolving node ids via pytest --collect-only
@@ -11,7 +11,7 @@ cwd: C:\Users\jjgh8\Github\s19_app-b94
 
 [phase 2] clean-tree baseline (all nodes, ONE pytest run)
   $ pytest [tests/test_tui_flow_execution_b94.py::test_at_b94_02_rail_twelve_entries_mount_panels tests/test_tui_flow_execution_b94.py::test_tc_b94_08_rail_entries_census_and_duplicate_rejection tests/test_tui_flow_execution_b94.py::test_at_b94_19_import_mounts_lanes_side_by_side tests/test_tui_flow_execution_b94.py::test_tc_b94_26_lane_mounting_and_render_census tests/test_tui_flow_execution_b94.py::test_at_b94_20_rebind_run_reads_each_chains_own_inputs tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop tests/test_tui_flow_execution_b94.py::test_at_b94_21_parallel_mode_overlaps_isolates_and_captures tests/test_flow_chainset_b94.py::test_tc_b94_05_mode_capture_in_run_record_and_report tests/test_tui_flow_execution_b94.py::test_at_b94_22_default_run_is_strictly_sequential tests/test_tui_flow_execution_b94.py::test_at_b94_23_run_log_inline_failure_and_report_provenance tests/test_tui_flow_execution_b94.py::test_tc_b94_29_run_log_emission_and_all_clean_arm tests/test_tui_flow_execution_b94.py::test_at_b94_24_save_reload_rerun_regenerates_and_notices tests/test_tui_flow_execution_b94.py::test_at_b94_20_rebind_run_reads_each_chains_own_inputs tests/test_flow_chainset_b94.py::test_tc_b94_30_chain_set_report_provenance_lines tests/test_flow_chainset_b94.py::test_tc_b94_31_chain_set_serializer_round_trip]
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+<HOME>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -28,7 +28,7 @@ The event loop scope for asynchronous fixtures will default to the fixture cachi
           -> '    + RAIL_ENTRIES[8:]'
     before: 47db4dc99f4913e2dedacfdd9a4df4d4ea1c313434896eaba41ebe410a981975
   $ pytest [tests/test_tui_flow_execution_b94.py::test_at_b94_02_rail_twelve_entries_mount_panels]
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+<HOME>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -36,7 +36,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 _______________ test_at_b94_02_rail_twelve_entries_mount_panels _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19312/test_at_b94_02_rail_twelve_ent0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-19312/test_at_b94_02_rail_twelve_ent0')
 
     def test_at_b94_02_rail_twelve_entries_mount_panels(tmp_path: Path) -> None:
         """AT-B94-02 (HLR-002, LLR-002.1; black-box): the rail shows TWELVE
@@ -75,7 +75,7 @@ FAILED tests/test_tui_flow_execution_b94.py::test_at_b94_02_rail_twelve_entries_
     after:  47db4dc99f4913e2dedacfdd9a4df4d4ea1c313434896eaba41ebe410a981975 restore-ok=True
     arm 01 [tests/test_tui_flow_execution_b94.py::test_at_b94_02_rail_twelve_entries_mount_panels]: RED (KILLED)
   $ pytest [tests/test_tui_flow_execution_b94.py::test_tc_b94_08_rail_entries_census_and_duplicate_rejection]
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+<HOME>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -109,7 +109,7 @@ FAILED tests/test_tui_flow_execution_b94.py::test_tc_b94_08_rail_entries_census_
           -> '            if stem is None:\r\n                from .services.flow_model import Flow as _CancelledFlow\r\n                panel.add_lane("cancelled", _CancelledFlow(name="cancelled", blocks=[]))\r\n                return  # cancelled — 0 lanes mounted (LLR-017.1 cancel arm)'
     before: 47db4dc99f4913e2dedacfdd9a4df4d4ea1c313434896eaba41ebe410a981975
   $ pytest [tests/test_tui_flow_execution_b94.py::test_at_b94_19_import_mounts_lanes_side_by_side]
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+<HOME>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -117,7 +117,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 _______________ test_at_b94_19_import_mounts_lanes_side_by_side _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19313/test_at_b94_19_import_mounts_l0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-19313/test_at_b94_19_import_mounts_l0')
 
     def test_at_b94_19_import_mounts_lanes_side_by_side(tmp_path: Path) -> None:
         """AT-B94-19 (HLR-017, black-box): importing a template adds one lane;
@@ -209,7 +209,7 @@ FAILED tests/test_tui_flow_execution_b94.py::test_at_b94_19_import_mounts_lanes_
     after:  47db4dc99f4913e2dedacfdd9a4df4d4ea1c313434896eaba41ebe410a981975 restore-ok=True
     arm 02 [tests/test_tui_flow_execution_b94.py::test_at_b94_19_import_mounts_lanes_side_by_side]: RED (KILLED)
   $ pytest [tests/test_tui_flow_execution_b94.py::test_tc_b94_26_lane_mounting_and_render_census]
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+<HOME>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -217,7 +217,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 _______________ test_tc_b94_26_lane_mounting_and_render_census ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19314/test_tc_b94_26_lane_mounting_a0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-19314/test_tc_b94_26_lane_mounting_a0')
 
     def test_tc_b94_26_lane_mounting_and_render_census(tmp_path: Path) -> None:
         """TC-B94-26 (LLR-017.1/.2, white-box over the shipped panel): lane
@@ -289,7 +289,7 @@ FAILED tests/test_tui_flow_execution_b94.py::test_tc_b94_26_lane_mounting_and_re
           -> '        for _lane in self._lanes:\r\n            _lane.bindings[src_index] = value\r\n'
     before: 65385e925653b25c89290f6cfeb058e47a64252a60d4edeb4c8d8dd1e3b6adf6
   $ pytest [tests/test_tui_flow_execution_b94.py::test_at_b94_20_rebind_run_reads_each_chains_own_inputs]
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+<HOME>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -297,7 +297,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 ___________ test_at_b94_20_rebind_run_reads_each_chains_own_inputs ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19315/test_at_b94_20_rebind_run_read0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-19315/test_at_b94_20_rebind_run_read0')
 
     def test_at_b94_20_rebind_run_reads_each_chains_own_inputs(tmp_path: Path) -> None:
         """AT-B94-20 (HLR-018, black-box): rebind chain A->variant_b.hex and
@@ -359,7 +359,7 @@ FAILED tests/test_tui_flow_execution_b94.py::test_at_b94_20_rebind_run_reads_eac
     after:  65385e925653b25c89290f6cfeb058e47a64252a60d4edeb4c8d8dd1e3b6adf6 restore-ok=True
     arm 03 [tests/test_tui_flow_execution_b94.py::test_at_b94_20_rebind_run_reads_each_chains_own_inputs]: RED (KILLED)
   $ pytest [tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop]
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+<HOME>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -367,7 +367,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 _______________ test_tc_b94_27_lane_binding_isolation_and_noop ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19316/test_tc_b94_27_lane_binding_is0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-19316/test_tc_b94_27_lane_binding_is0')
 
     def test_tc_b94_27_lane_binding_isolation_and_noop(tmp_path: Path) -> None:
         """TC-B94-27 (LLR-018.1, white-box over the shipped panel): editing lane
@@ -443,7 +443,7 @@ FAILED tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolati
           -> '    record = ChainSetRunRecord(mode="sequential")'
     before: c27e7428e0f058b8fb7ce440b56b3de766c2ea4e27a6b220709d8f3ac3e72771
   $ pytest [tests/test_tui_flow_execution_b94.py::test_at_b94_21_parallel_mode_overlaps_isolates_and_captures]
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+<HOME>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -451,7 +451,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 _________ test_at_b94_21_parallel_mode_overlaps_isolates_and_captures _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19317/test_at_b94_21_parallel_mode_o0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-19317/test_at_b94_21_parallel_mode_o0')
 
     def test_at_b94_21_parallel_mode_overlaps_isolates_and_captures(tmp_path: Path) -> None:
         """AT-B94-21 (HLR-019, LLR-019.2; C-10 non-default arm, black-box): the
@@ -514,7 +514,7 @@ FAILED tests/test_tui_flow_execution_b94.py::test_at_b94_21_parallel_mode_overla
     after:  c27e7428e0f058b8fb7ce440b56b3de766c2ea4e27a6b220709d8f3ac3e72771 restore-ok=True
     arm 04 [tests/test_tui_flow_execution_b94.py::test_at_b94_21_parallel_mode_overlaps_isolates_and_captures]: RED (KILLED)
   $ pytest [tests/test_flow_chainset_b94.py::test_tc_b94_05_mode_capture_in_run_record_and_report]
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+<HOME>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -522,7 +522,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 ____________ test_tc_b94_05_mode_capture_in_run_record_and_report _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19318/test_tc_b94_05_mode_capture_in0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-19318/test_tc_b94_05_mode_capture_in0')
 
     def test_tc_b94_05_mode_capture_in_run_record_and_report(tmp_path: Path) -> None:
         """TC-B94-05 (LLR-019.2, white-box): the record's mode field reads
@@ -567,7 +567,7 @@ FAILED tests/test_flow_chainset_b94.py::test_tc_b94_05_mode_capture_in_run_recor
           -> '    if True or mode == CHAIN_RUN_PARALLEL:'
     before: c27e7428e0f058b8fb7ce440b56b3de766c2ea4e27a6b220709d8f3ac3e72771
   $ pytest [tests/test_tui_flow_execution_b94.py::test_at_b94_22_default_run_is_strictly_sequential]
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+<HOME>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -575,7 +575,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 ______________ test_at_b94_22_default_run_is_strictly_sequential ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19319/test_at_b94_22_default_run_is_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-19319/test_at_b94_22_default_run_is_0')
 
     def test_at_b94_22_default_run_is_strictly_sequential(tmp_path: Path) -> None:
         """AT-B94-22 (HLR-019 default arm, black-box): an untouched run executes
@@ -633,7 +633,7 @@ FAILED tests/test_tui_flow_execution_b94.py::test_at_b94_22_default_run_is_stric
           -> '            log.append("· ", style=_S_ERR)'
     before: 65385e925653b25c89290f6cfeb058e47a64252a60d4edeb4c8d8dd1e3b6adf6
   $ pytest [tests/test_tui_flow_execution_b94.py::test_at_b94_23_run_log_inline_failure_and_report_provenance]
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+<HOME>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -641,7 +641,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 _________ test_at_b94_23_run_log_inline_failure_and_report_provenance _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19320/test_at_b94_23_run_log_inline_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-19320/test_at_b94_23_run_log_inline_0')
 
     def test_at_b94_23_run_log_inline_failure_and_report_provenance(
         tmp_path: Path,
@@ -707,7 +707,7 @@ FAILED tests/test_tui_flow_execution_b94.py::test_at_b94_23_run_log_inline_failu
           -> '                log.append("✗ ", style=_S_LABEL)'
     before: 65385e925653b25c89290f6cfeb058e47a64252a60d4edeb4c8d8dd1e3b6adf6
   $ pytest [tests/test_tui_flow_execution_b94.py::test_tc_b94_29_run_log_emission_and_all_clean_arm]
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+<HOME>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -715,7 +715,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 ______________ test_tc_b94_29_run_log_emission_and_all_clean_arm ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19321/test_tc_b94_29_run_log_emissio0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-19321/test_tc_b94_29_run_log_emissio0')
 
     def test_tc_b94_29_run_log_emission_and_all_clean_arm(tmp_path: Path) -> None:
         """TC-B94-29 (LLR-020.1, white-box over the shipped strip): per chain
@@ -769,7 +769,7 @@ FAILED tests/test_tui_flow_execution_b94.py::test_tc_b94_29_run_log_emission_and
           -> '            bindings = {}'
     before: 47db4dc99f4913e2dedacfdd9a4df4d4ea1c313434896eaba41ebe410a981975
   $ pytest [tests/test_tui_flow_execution_b94.py::test_at_b94_24_save_reload_rerun_regenerates_and_notices]
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+<HOME>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -777,7 +777,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 __________ test_at_b94_24_save_reload_rerun_regenerates_and_notices ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19322/test_at_b94_24_save_reload_rer0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-19322/test_at_b94_24_save_reload_rer0')
 
     def test_at_b94_24_save_reload_rerun_regenerates_and_notices(tmp_path: Path) -> None:
         """AT-B94-24 (HLR-021, black-box; C-10 non-default battery + C-12):
@@ -898,7 +898,7 @@ FAILED tests/test_tui_flow_execution_b94.py::test_at_b94_24_save_reload_rerun_re
           -> '    for index, ref in {}.items():'
     before: c27e7428e0f058b8fb7ce440b56b3de766c2ea4e27a6b220709d8f3ac3e72771
   $ pytest [tests/test_tui_flow_execution_b94.py::test_at_b94_20_rebind_run_reads_each_chains_own_inputs]
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+<HOME>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -906,7 +906,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 ___________ test_at_b94_20_rebind_run_reads_each_chains_own_inputs ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19323/test_at_b94_20_rebind_run_read0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-19323/test_at_b94_20_rebind_run_read0')
 
     def test_at_b94_20_rebind_run_reads_each_chains_own_inputs(tmp_path: Path) -> None:
         """AT-B94-20 (HLR-018, black-box): rebind chain A->variant_b.hex and
@@ -974,7 +974,7 @@ FAILED tests/test_tui_flow_execution_b94.py::test_at_b94_20_rebind_run_reads_eac
     after:  c27e7428e0f058b8fb7ce440b56b3de766c2ea4e27a6b220709d8f3ac3e72771 restore-ok=True
     arm 09 [tests/test_tui_flow_execution_b94.py::test_at_b94_20_rebind_run_reads_each_chains_own_inputs]: RED (KILLED)
   $ pytest [tests/test_flow_chainset_b94.py::test_tc_b94_30_chain_set_report_provenance_lines]
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+<HOME>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -982,7 +982,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 ______________ test_tc_b94_30_chain_set_report_provenance_lines _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19324/test_tc_b94_30_chain_set_repor0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-19324/test_tc_b94_30_chain_set_repor0')
 
     def test_tc_b94_30_chain_set_report_provenance_lines(tmp_path: Path) -> None:
         """TC-B94-30 (LLR-020.2, C-42): the report carries one provenance line
@@ -1050,7 +1050,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         rerun_lines = [ln for ln in rerun_report.splitlines() if ln.startswith("- Chain ")]
         assert len(rerun_lines) == 1
 >       assert "variant_b.hex" in rerun_lines[0]
-E       AssertionError: assert 'variant_b.hex' in '- Chain a input 1: base\\.s19 [bound] path=`C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-19324\\test_tc_b94_30_chain_set_repor0\\.s19tool\\workarea\\proj\\base.s19`'
+E       AssertionError: assert 'variant_b.hex' in '- Chain a input 1: base\\.s19 [bound] path=`<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-19324\\test_tc_b94_30_chain_set_repor0\\.s19tool\\workarea\\proj\\base.s19`'
 
 tests\test_flow_chainset_b94.py:324: AssertionError
 =========================== short test summary info ===========================
@@ -1066,7 +1066,7 @@ FAILED tests/test_flow_chainset_b94.py::test_tc_b94_30_chain_set_report_provenan
           -> ''
     before: 828ae15a07255aecc0aa6b605c6085429b2338a2d849e0fb3b3ad11116104a4e
   $ pytest [tests/test_flow_chainset_b94.py::test_tc_b94_31_chain_set_serializer_round_trip]
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+<HOME>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -1074,7 +1074,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 _______________ test_tc_b94_31_chain_set_serializer_round_trip ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19325/test_tc_b94_31_chain_set_seria0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-19325/test_tc_b94_31_chain_set_seria0')
 
     def test_tc_b94_31_chain_set_serializer_round_trip(tmp_path: Path) -> None:
         """TC-B94-31 (LLR-021.1, unit): ONE document; chain count == lane count;

@@ -130,7 +130,7 @@ Spec Check specs in patches/     ▼   Write as spec.chk.json
 │                                                                 ││                                           │
 │                                                                 ││                                           │
 ╰───────────────────────────────────────────────────── 6 entries ─╯╰───────────────────────────────────────────╯
- File    Change files in patches/ ▼  C:\Users\jjgh8\AppData\Local\Temp\TMP\calib_hotf  Load   Refresh   
+ File    Change files in patches/ ▼  <HOME>\AppData\Local\Temp\TMP\calib_hotf  Load   Refresh   
   Validate   Apply loaded changes   Save                                                                        
  ✓ check passed   ✗ check failed   ◐ uncheckable   · not checked   -- byte not in the image                     
 ===== patch-editor 220x60
@@ -179,7 +179,7 @@ Spec Check specs in patches/     ▼   Write as spec.chk.json
 │                                                                                                                   ││                                                                             │
 │                                                                                                                   ││                                                                             │
 ╰─────────────────────────────────────────────────────────────────────────────────────────────────────── 6 entries ─╯╰─────────────────────────────────────────────────────────────────────────────╯
- File    Change files in patches/                             ▼  C:\Users\jjgh8\AppData\Local\Temp\TMP\calib_hotfix.json                                                   Load   Refresh   
+ File    Change files in patches/                             ▼  <HOME>\AppData\Local\Temp\TMP\calib_hotfix.json                                                   Load   Refresh   
   Validate   Apply loaded changes   Save                                                                                                                                                            
  ✓ check passed   ✗ check failed   ◐ uncheckable   · not checked   -- byte not in the image                                                                                                         
 ===== flow-builder 118x54
@@ -222,13 +222,13 @@ Spec Check specs in patches/     ▼   Write as spec.chk.json
     wrote fw_app_patched.s19                                                                                    
  █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░█████                                                               
  11 ranges · 0x17E0‥ 0x10000                                                                                    
-  wrote C:\Users\jjgh8\AppData\Local\Temp\TMP\.s19tool\workarea\proj1\fw_app_patched.s19                
+  wrote <HOME>\AppData\Local\Temp\TMP\.s19tool\workarea\proj1\fw_app_patched.s19                
                                                                                                                 
  ◉ load  ▣ patch  ✓ check  ⊕ CRC  ▼ write-out  ⏚ A2B diff  » external step  ─ cable  ▶ feeds the next block     
 ===== flow-builder 220x60
                                                                                   Flow Builder                                                                                    ?  📂 Open flows/ 
                                                                                                                                                                                                     
- Flow: patch_chain  · saved  LOAD → PATCH → CHECK → WRITE-OUT                                                         session C:\Users\jjgh8\AppData\Local\Temp\TMP\.s19tool\workarea\proj1 
+ Flow: patch_chain  · saved  LOAD → PATCH → CHECK → WRITE-OUT                                                         session <HOME>\AppData\Local\Temp\TMP\.s19tool\workarea\proj1 
 ╭─ chain · 4 blocks ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
 │ ╭─ 1 ───────────────────────────────────────╮    ╭─ 2 ───────────────────────────────────────╮    ╭─ 3 ───────────────────────────────────────╮    ╭─ 4 ───────────────────────────────────────╮ │
 │ │ ◉ LOAD                                    │    │ ▣ PATCH                                   │    │ ✓ CHECK                                   │    │ ▼ WRITE-OUT                               │ │
@@ -265,7 +265,7 @@ Spec Check specs in patches/     ▼   Write as spec.chk.json
     wrote fw_app_patched.s19                                                                                                                                                                        
  █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░█████                                                                                                                                                   
  11 ranges · 0x17E0‥ 0x10000                                                                                                                                                                        
-  wrote C:\Users\jjgh8\AppData\Local\Temp\TMP\.s19tool\workarea\proj1\fw_app_patched.s19                                                                                                    
+  wrote <HOME>\AppData\Local\Temp\TMP\.s19tool\workarea\proj1\fw_app_patched.s19                                                                                                    
                                                                                                                                                                                                     
                                                                                                                                                                                                     
                                                                                                                                                                                                     

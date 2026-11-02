@@ -1,4 +1,4 @@
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+<HOME>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -71,7 +71,7 @@ E       assert not [AddressSite(file='s19_app/tui/screens_directionb.py', line=8
 tests\test_address_census.py:309: AssertionError
 __________________ test_tc024_report_trigger_surfaces_paths ___________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20757/test_tc024_report_trigger_surf0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-20757/test_tc024_report_trigger_surf0')
 
     def test_tc024_report_trigger_surfaces_paths(tmp_path: Path) -> None:
         """A successful report trigger surfaces both written paths (LLR-005.4).
@@ -131,12 +131,12 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         )
 E       AssertionError: the status must show both written report paths; status was 'Compared A.s19 vs B.s19: 1 runs.'
 E       assert ('20260101T000000Z-diff-report.md' in 'Compared A.s19 vs B.s19: 1 runs.')
-E        +  where '20260101T000000Z-diff-report.md' = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20757/test_tc024_report_trigger_surf0/20260101T000000Z-diff-report.md').name
+E        +  where '20260101T000000Z-diff-report.md' = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-20757/test_tc024_report_trigger_surf0/20260101T000000Z-diff-report.md').name
 
 tests\test_tui_diff_screen.py:523: AssertionError
 ___________ test_at064c_edit_json_disabled_for_file_backed_document ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20757/test_at064c_edit_json_disabled0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-20757/test_at064c_edit_json_disabled0')
 
     def test_at064c_edit_json_disabled_for_file_backed_document(
         tmp_path: Path,
@@ -243,7 +243,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     with self.open(mode='r', encoding=encoding, errors=errors) as f:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-self = WindowsPath('C:/Users/jjgh8/Github/s19_app-b94/prototypes/cambios_10_12_2026/help_sections.md')
+self = WindowsPath('<HOME>/Github/s19_app-b94/prototypes/cambios_10_12_2026/help_sections.md')
 mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
 
     def open(self, mode='r', buffering=-1, encoding=None,
@@ -255,7 +255,7 @@ mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
         if "b" not in mode:
             encoding = io.text_encoding(encoding)
 >       return io.open(self, mode, buffering, encoding, errors, newline)
-E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\Github\\s19_app-b94\\prototypes\\cambios_10_12_2026\\help_sections.md'
+E       FileNotFoundError: [Errno 2] No such file or directory: '<HOME>\\Github\\s19_app-b94\\prototypes\\cambios_10_12_2026\\help_sections.md'
 
 ..\..\anaconda3\Lib\pathlib.py:1013: FileNotFoundError
 __________________ test_tc707_numbering_generated_sequential __________________
@@ -273,7 +273,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     with self.open(mode='r', encoding=encoding, errors=errors) as f:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-self = WindowsPath('C:/Users/jjgh8/Github/s19_app-b94/prototypes/cambios_10_12_2026/help_sections.md')
+self = WindowsPath('<HOME>/Github/s19_app-b94/prototypes/cambios_10_12_2026/help_sections.md')
 mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
 
     def open(self, mode='r', buffering=-1, encoding=None,
@@ -285,12 +285,12 @@ mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
         if "b" not in mode:
             encoding = io.text_encoding(encoding)
 >       return io.open(self, mode, buffering, encoding, errors, newline)
-E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\Github\\s19_app-b94\\prototypes\\cambios_10_12_2026\\help_sections.md'
+E       FileNotFoundError: [Errno 2] No such file or directory: '<HOME>\\Github\\s19_app-b94\\prototypes\\cambios_10_12_2026\\help_sections.md'
 
 ..\..\anaconda3\Lib\pathlib.py:1013: FileNotFoundError
 ============================== warnings summary ===============================
 ..\..\anaconda3\Lib\site-packages\pytest_textual_snapshot.py:367
-  C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_textual_snapshot.py:367: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  <HOME>\anaconda3\Lib\site-packages\pytest_textual_snapshot.py:367: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
     now=datetime.utcnow(),
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
@@ -298,9 +298,9 @@ E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh
 
 [1;30;41m29[0m[30;41m mismatched snapshots[0m
 
-[1mView the [0m]8;id=9908281;file://C:\Users\jjgh8\Github\s19_app-b94\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+[1mView the [0m]8;id=9908281;file://<HOME>\Github\s19_app-b94\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
 
-[2mC:\Users\jjgh8\Github\s19_app-b94\snapshot_report.html[0m
+[2m<HOME>\Github\s19_app-b94\snapshot_report.html[0m
 
 =========================== short test summary info ===========================
 FAILED tests/test_address_census.py::test_at_b83_08_tree_holds_no_assembled_selectors

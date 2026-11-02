@@ -1,8 +1,8 @@
 # P2 security review, round 2: batch-100 (Load + projects)
 
 - **Reviewer:** `security-reviewer`, P2 round 2. This round re-reviews the contract as amended at `0c7ca1d`: `01-requirements.md`, ledger LED .2 to .13, and `02-review.md`. The rulings are in `design/P2-dispositions-r1.md`.
-- **Execution:** every probe ran on the same `git archive 1d677ba` snapshot as round 1. `s19_app.__file__` printed `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\snap\s19_app\__init__.py`. Runtime: Python 3.12.7, Textual 8.2.8, Windows 11.
-  - Probe script and output: `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\probes\p2sec_r2_probe.py` / `.out`. The probe made one scratch folder (`scratchpad\r2work`) and removed it at the end; the output records `scratch folder removed: True`.
+- **Execution:** every probe ran on the same `git archive 1d677ba` snapshot as round 1. `s19_app.__file__` printed `<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\snap\s19_app\__init__.py`. Runtime: Python 3.12.7, Textual 8.2.8, Windows 11.
+  - Probe script and output: `<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\probes\p2sec_r2_probe.py` / `.out`. The probe made one scratch folder (`scratchpad\r2work`) and removed it at the end; the output records `scratch folder removed: True`.
   - The security pattern scan was re-run on the amended contract: `devflow-scan-spec.py` → 5 control rows ok, flags `token`, `session`, `permission`, `secret`, `hash`, `form`, `escape`, `expose`, `security_required: true`.
 - **Severity map:** HIGH is the station's `blocker`. MAJOR and MINOR are the station's `major` and `minor`.
 

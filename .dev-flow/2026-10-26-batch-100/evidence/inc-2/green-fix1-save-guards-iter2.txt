@@ -1,11 +1,11 @@
-cmd: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc2 (NO_COLOR unset) python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 1 GREEN — sources fixed, tests corrected)
+cmd: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<HOME>\Github\s19_app-b100-inc2 (NO_COLOR unset) python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py
+tree: <HOME>\Github\s19_app-b100-inc2 (fix pass 1 GREEN — sources fixed, tests corrected)
 
 .........................FF                                              [100%]
 ================================== FAILURES ===================================
 ________ test_at_b100_02_name_refusals_through_the_save_dialog[size0] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27508/test_at_b100_02_name_refusals_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27508/test_at_b100_02_name_refusals_0')
 size = (118, 54)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
@@ -129,7 +129,7 @@ E       AssertionError: did not settle: the durable line naming P2's file
 tests\test_b100_save_guards.py:122: AssertionError
 ________ test_at_b100_02_name_refusals_through_the_save_dialog[size1] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27508/test_at_b100_02_name_refusals_1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27508/test_at_b100_02_name_refusals_1')
 size = (220, 60)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])

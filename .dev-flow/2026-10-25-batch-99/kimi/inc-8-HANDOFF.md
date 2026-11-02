@@ -1,8 +1,8 @@
 # HANDOFF — batch-99 Increment 8 (HLR-156, PATCH status and run records say what was not applied)
 
-Worktree: `C:\Users\jjgh8\Github\s19_app-b99-inc8` (branch b99-inc8, uncommitted working tree — the orchestrator commits).
-Interpreter: `C:\Users\jjgh8\anaconda3\envs\s19env\python.exe`; every run sets `PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8`, `PYTHONPATH=<worktree>`, `env -u NO_COLOR`. Worktree import proven:
-`python -c "import s19_app; print(s19_app.__file__)"` → `C:\Users\jjgh8\Github\s19_app-b99-inc8\s19_app\__init__.py`.
+Worktree: `<HOME>\Github\s19_app-b99-inc8` (branch b99-inc8, uncommitted working tree — the orchestrator commits).
+Interpreter: `<HOME>\anaconda3\envs\s19env\python.exe`; every run sets `PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8`, `PYTHONPATH=<worktree>`, `env -u NO_COLOR`. Worktree import proven:
+`python -c "import s19_app; print(s19_app.__file__)"` → `<HOME>\Github\s19_app-b99-inc8\s19_app\__init__.py`.
 
 ## What is done
 

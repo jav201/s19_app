@@ -4,7 +4,7 @@
 ================================== FAILURES ===================================
 _______________ test_tc_b97_21_three_lane_run_paints_each_cable _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_21_three_lane_run_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_21_three_lane_run_0')
 
     def test_tc_b97_21_three_lane_run_paints_each_cable(tmp_path: Path) -> None:
         """TC-B97-21 (LLR-147.1, painted arm): after the 3-lane run at 118x54 the
@@ -51,7 +51,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
 pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
 panel = FlowExecutionPanel(id='fx_panel')
-project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_21_three_lane_run_0/.s19tool/workarea/proj1')
+project_dir = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_21_three_lane_run_0/.s19tool/workarea/proj1')
 
     async def body(app, pilot, panel, project_dir):
         before = [cable_marks(app, panel, i, 4) for i in range(3)] if panel.query("#fx_cable_0_0") else None
@@ -66,7 +66,7 @@ E       assert '◇' in '░ patch_chain · not run · 4 blocks\n╭─ ◉ LOAD
 tests\test_b97_flow_execution.py:440: AssertionError
 ___ test_tc_b97_23_three_lane_pause_waiting_lane_in_view_focus_kept[size0] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_23_three_lane_paus0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_23_three_lane_paus0')
 size = (118, 54)
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002608046AA90>
 
@@ -145,7 +145,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
 pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
 panel = FlowExecutionPanel(id='fx_panel')
-project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_23_three_lane_paus0/.s19tool/workarea/proj1')
+project_dir = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_23_three_lane_paus0/.s19tool/workarea/proj1')
 
     async def body(app, pilot, panel, project_dir):
         required_main = [w for w in panel.query("#fx_required") if is_displayed(w)]
@@ -156,7 +156,7 @@ E       assert []
 tests\test_b97_flow_execution.py:543: AssertionError
 ___ test_tc_b97_23_three_lane_pause_waiting_lane_in_view_focus_kept[size1] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_23_three_lane_paus1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_23_three_lane_paus1')
 size = (118, 53)
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000260827A2510>
 
@@ -235,7 +235,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
 pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
 panel = FlowExecutionPanel(id='fx_panel')
-project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_23_three_lane_paus1/.s19tool/workarea/proj1')
+project_dir = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_23_three_lane_paus1/.s19tool/workarea/proj1')
 
     async def body(app, pilot, panel, project_dir):
         required_main = [w for w in panel.query("#fx_required") if is_displayed(w)]
@@ -246,7 +246,7 @@ E       assert []
 tests\test_b97_flow_execution.py:543: AssertionError
 _______________ test_tc_b97_23_two_waiting_lanes_one_attention ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_23_two_waiting_lan0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_23_two_waiting_lan0')
 
     def test_tc_b97_23_two_waiting_lanes_one_attention(tmp_path: Path) -> None:
         """TC-B97-23 (LLR-147.3 boundary: two lanes waiting): one REQUIRED line
@@ -277,7 +277,7 @@ E         Use -v to get more diff
 tests\test_b97_flow_execution.py:606: AssertionError
 _ test_tc_b97_23_waiting_card_past_the_viewport_is_brought_into_view[deep-size0] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_23_waiting_card_pa2')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_23_waiting_card_pa2')
 size = (118, 54), fixture = 'deep'
 
     @pytest.mark.parametrize("size", VERTICAL)
@@ -317,7 +317,7 @@ E           assert 37 > 38
 tests\test_b97_flow_execution.py:643: AssertionError
 _ test_tc_b97_23_waiting_card_past_the_viewport_is_brought_into_view[deep-size1] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_23_waiting_card_pa3')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_23_waiting_card_pa3')
 size = (118, 53), fixture = 'deep'
 
     @pytest.mark.parametrize("size", VERTICAL)
@@ -357,7 +357,7 @@ E           assert 37 > 37
 tests\test_b97_flow_execution.py:643: AssertionError
 ____________ test_tc_b97_25_painted_lanes_log_and_rerun_in_english ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_25_painted_lanes_l0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_25_painted_lanes_l0')
 
     def test_tc_b97_25_painted_lanes_log_and_rerun_in_english(tmp_path: Path) -> None:
         """TC-B97-25 (LLR-147.5, painted arm): the painted lanes and run log of
@@ -396,7 +396,7 @@ E        +  where False = any(<generator object test_tc_b97_25_painted_lanes_log
 tests\test_b97_flow_execution.py:802: AssertionError
 ________ test_tc_b97_52_waiting_colour_only_on_waiting_human_elements _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_52_waiting_colour_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_52_waiting_colour_0')
 
     def test_tc_b97_52_waiting_colour_only_on_waiting_human_elements(tmp_path: Path) -> None:
         """TC-B97-52 (LLR-147.7): over the 3-lane paused run every painted cell
@@ -486,7 +486,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
 pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
 panel = FlowExecutionPanel(id='fx_panel')
-project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_52_waiting_colour_0/.s19tool/workarea/proj1')
+project_dir = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_52_waiting_colour_0/.s19tool/workarea/proj1')
 
     async def body(app, pilot, panel, project_dir):
 >       assert any(
@@ -499,7 +499,7 @@ E        +  where False = any(<generator object test_tc_b97_52_waiting_colour_on
 tests\test_b97_flow_execution.py:914: AssertionError
 _________ test_tc_b97_53_no_blank_row_outside_or_between_lanes[size0] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_53_no_blank_row_ou0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_53_no_blank_row_ou0')
 size = (118, 54)
 
     @pytest.mark.parametrize("size", [(118, 54), (118, 53), (220, 60)])
@@ -534,7 +534,7 @@ E         + fx_log)
 tests\test_b97_flow_execution.py:1019: AssertionError
 _________ test_tc_b97_53_no_blank_row_outside_or_between_lanes[size1] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_53_no_blank_row_ou1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_53_no_blank_row_ou1')
 size = (118, 53)
 
     @pytest.mark.parametrize("size", [(118, 54), (118, 53), (220, 60)])
@@ -569,7 +569,7 @@ E         + fx_log)
 tests\test_b97_flow_execution.py:1019: AssertionError
 _________ test_tc_b97_53_no_blank_row_outside_or_between_lanes[size2] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_53_no_blank_row_ou2')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_53_no_blank_row_ou2')
 size = (220, 60)
 
     @pytest.mark.parametrize("size", [(118, 54), (118, 53), (220, 60)])
@@ -604,7 +604,7 @@ E         + fx_log)
 tests\test_b97_flow_execution.py:1019: AssertionError
 ______________ test_tc_b97_53_run_log_paints_at_most_eight_lines ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_53_run_log_paints_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_53_run_log_paints_0')
 
     def test_tc_b97_53_run_log_paints_at_most_eight_lines(tmp_path: Path) -> None:
         """TC-B97-53 (LLR-147.8, design §3 ``FX_LOG_MAX_ROWS = 8``): five lanes
@@ -647,7 +647,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
 pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
 panel = FlowExecutionPanel(id='fx_panel')
-project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_53_run_log_paints_0/.s19tool/workarea/proj1')
+project_dir = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_53_run_log_paints_0/.s19tool/workarea/proj1')
 
     async def body(app, pilot, panel, project_dir):
         rows = [r.strip() for r in painted_rows(app, panel.query_one("#fx_log")) if r.strip()]
@@ -658,7 +658,7 @@ E       AttributeError: 'NoneType' object has no attribute 'read_text'
 tests\test_b97_flow_execution.py:1058: AttributeError
 _ test_tc_b97_54_run_and_each_waiting_confirm_are_the_filled_elements[stems0-expected0] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_54_run_and_each_wa0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_54_run_and_each_wa0')
 stems = ('patch_chain', 'flash_chain', 'err_chain')
 expected = ['fx_confirm_1', 'fx_run']
 
@@ -690,7 +690,7 @@ E         Use -v to get more diff
 tests\test_b97_flow_execution.py:1098: AssertionError
 _ test_tc_b97_54_run_and_each_waiting_confirm_are_the_filled_elements[stems1-expected1] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_54_run_and_each_wa1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_54_run_and_each_wa1')
 stems = ('flash_chain', 'flash_chain')
 expected = ['fx_confirm_0', 'fx_confirm_1', 'fx_run']
 
@@ -722,7 +722,7 @@ E         Use -v to get more diff
 tests\test_b97_flow_execution.py:1098: AssertionError
 ______________ test_tc_b97_55_confirm_rerun_is_one_run_at_a_time ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_55_confirm_rerun_i0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_55_confirm_rerun_i0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000026081FD8290>
 
     def test_tc_b97_55_confirm_rerun_is_one_run_at_a_time(tmp_path: Path, monkeypatch) -> None:
@@ -773,7 +773,7 @@ E       assert (0 == 1)
 tests\test_b97_flow_execution.py:1209: AssertionError
 ____ test_tc_b97_55_confirm_rerun_that_raises_leaves_the_entry_unconfirmed ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_55_confirm_rerun_t0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_55_confirm_rerun_t0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002608042A010>
 
     def test_tc_b97_55_confirm_rerun_that_raises_leaves_the_entry_unconfirmed(tmp_path: Path, monkeypatch) -> None:
@@ -834,7 +834,7 @@ E        +  where 0 = len([])
 tests\test_b97_flow_execution.py:1265: AssertionError
 _______________ test_tc_b97_56_focus_order_keys_and_chip_states _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_56_focus_order_key0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_56_focus_order_key0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000026082800AD0>
 
     def test_tc_b97_56_focus_order_keys_and_chip_states(tmp_path: Path, monkeypatch) -> None:
@@ -937,7 +937,7 @@ E   ValueError: 'fx_confirm_1' is not in list
 tests\test_b97_flow_execution.py:1312: ValueError
 ____________________ test_tc_b97_63_three_lane_head_marks _____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_63_three_lane_head0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_63_three_lane_head0')
 
     def test_tc_b97_63_three_lane_head_marks(tmp_path: Path) -> None:
         """TC-B97-63 (LLR-147.12, header marks on the 3-lane run): ``◇ □ ✗`` —
@@ -963,7 +963,7 @@ E         Use -v to get more diff
 tests\test_b97_flow_execution.py:1422: AssertionError
 ________ test_tc_b97_64_c_after_the_dwell_confirms_the_attention_lane _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_64_c_after_the_dwe0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_64_c_after_the_dwe0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000260FF7068D0>
 
     def test_tc_b97_64_c_after_the_dwell_confirms_the_attention_lane(tmp_path: Path, monkeypatch) -> None:
@@ -1018,7 +1018,7 @@ E         Use -v to get more diff
 tests\test_b97_flow_execution.py:1477: AssertionError
 ___________ test_tc_b97_64_burst_on_two_waiting_lanes_confirms_one ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_64_burst_on_two_wa0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_64_burst_on_two_wa0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000260816A9350>
 
     def test_tc_b97_64_burst_on_two_waiting_lanes_confirms_one(tmp_path: Path, monkeypatch) -> None:
@@ -1061,7 +1061,7 @@ E         Use -v to get more diff
 tests\test_b97_flow_execution.py:1518: AssertionError
 ____________ test_tc_b97_64_arriving_with_bracket_c_confirms[rail] ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_64_arriving_with_b0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_64_arriving_with_b0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000260810F8A10>
 arrival = 'rail'
 
@@ -1111,7 +1111,7 @@ E         Use -v to get more diff
 tests\test_b97_flow_execution.py:1605: AssertionError
 ____________ test_tc_b97_64_arriving_with_bracket_c_confirms[none] ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_64_arriving_with_b1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_64_arriving_with_b1')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000026080645410>
 arrival = 'none'
 
@@ -1161,7 +1161,7 @@ E         Use -v to get more diff
 tests\test_b97_flow_execution.py:1605: AssertionError
 ____________ test_tc_b97_64_c_confirms_nothing_out_of_scope[modal] ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_64_c_confirms_noth1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_64_c_confirms_noth1')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000260804EF710>
 scope = 'modal'
 
@@ -1226,7 +1226,7 @@ E             Use -v to get more diff
 tests\test_b97_flow_execution.py:1659: AssertionError
 ______ test_tc_b97_64_stray_enter_on_run_runs_again_and_confirms_nothing ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_64_stray_enter_on_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_64_stray_enter_on_0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000260809A9A10>
 
     def test_tc_b97_64_stray_enter_on_run_runs_again_and_confirms_nothing(tmp_path: Path, monkeypatch) -> None:
@@ -1258,7 +1258,7 @@ E       assert (1 == 1 and 0 == 1)
 tests\test_b97_flow_execution.py:1688: AssertionError
 __________ test_tc_b97_64_a_failed_rerun_says_so_on_the_status_line ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_64_a_failed_rerun_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_64_a_failed_rerun_0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000026081C40390>
 
     def test_tc_b97_64_a_failed_rerun_says_so_on_the_status_line(tmp_path: Path, monkeypatch) -> None:
@@ -1296,7 +1296,7 @@ E         - error
 tests\test_b97_flow_execution.py:1718: AssertionError
 _______________ test_tc_b97_64_a_new_set_run_restarts_the_dwell _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_64_a_new_set_run_r0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_64_a_new_set_run_r0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000026082816B50>
 
     def test_tc_b97_64_a_new_set_run_restarts_the_dwell(tmp_path: Path, monkeypatch) -> None:
@@ -1332,7 +1332,7 @@ E         Use -v to get more diff and None == 2)
 tests\test_b97_flow_execution.py:1747: AssertionError
 _____ test_tc_b97_64_a_restart_with_no_lane_waiting_clears_the_attention ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_64_a_restart_with_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_64_a_restart_with_0')
 
     def test_tc_b97_64_a_restart_with_no_lane_waiting_clears_the_attention(tmp_path: Path) -> None:
         """TC-B97-64 / I-7 (c) (Inc-6 gate re-read, code-reviewer F6): a new set
@@ -1368,7 +1368,7 @@ E       assert False is True
 tests\test_b97_flow_execution.py:1778: AssertionError
 ___________ test_tc_b97_55_c_during_a_run_says_a_run_is_in_progress ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_55_c_during_a_run_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_55_c_during_a_run_0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000260FFE71450>
 
     def test_tc_b97_55_c_during_a_run_says_a_run_is_in_progress(tmp_path: Path, monkeypatch) -> None:
@@ -1407,7 +1407,7 @@ E         + c: no lane is waiting for confirmation.
 tests\test_b97_flow_execution.py:1808: AssertionError
 ______________ test_tc_b97_63_lane_head_time_is_on_the_set_clock ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_63_lane_head_time_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_tc_b97_63_lane_head_time_0')
 
     def test_tc_b97_63_lane_head_time_is_on_the_set_clock(tmp_path: Path) -> None:
         """TC-B97-63 / LLR-147.12 (gate fold, ux L2): a lane head's time is the
@@ -1433,7 +1433,7 @@ E           StopIteration
 tests\test_b97_flow_execution.py:1866: StopIteration
 _______ test_at_b97_09_three_lanes_run_paused_lane_in_view_english_log ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_at_b97_09_three_lanes_run0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_at_b97_09_three_lanes_run0')
 
     def test_at_b97_09_three_lanes_run_paused_lane_in_view_english_log(tmp_path: Path) -> None:
         """AT-B97-09 (US-137 / HLR-147, black-box): rail key ``]`` → Flow
@@ -1494,7 +1494,7 @@ E         Use -v to get more diff
 tests\test_b97_flow_execution.py:2039: AssertionError
 _________________ test_at_b97_20_keys_only_run_pause_confirm __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_at_b97_20_keys_only_run_p0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26597/test_at_b97_20_keys_only_run_p0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002608162FC90>
 
     def test_at_b97_20_keys_only_run_pause_confirm(tmp_path: Path, monkeypatch) -> None:

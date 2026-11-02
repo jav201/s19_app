@@ -2,9 +2,9 @@ mutant: M96
 file: s19_app/tui/app.py
 old -> new: '            if candidate.suffix.lower() in A2L_EXTENSIONS:\n                self.load_a2l_from_path(candidate)\n            else:\n                self.load_selected_file(candidate)' -> '            self.load_a2l_from_path(candidate)'
 sha256 before: ae3d1cd924c42a2a9e7a920cd95aab8b21f4d9b324afdfb627be86fdf36df9ab
-command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_load_dialog.py::test_tc_b100_40_workarea_data_choice_loads_in_place_with_no_copy
-cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b
-s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b\s19_app\__init__.py
+command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_load_dialog.py::test_tc_b100_40_workarea_data_choice_loads_in_place_with_no_copy
+cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b
+s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b\s19_app\__init__.py
 ---
 pytest: 1 failed in 28.44s
 verdict: KILLED

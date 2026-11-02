@@ -2,7 +2,7 @@ FFF.FFFFF.FF                                                             [100%]
 ================================== FAILURES ===================================
 _____________ test_tc_b99_11_same_name_save_back_keeps_work_copy ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25737/test_tc_b99_11_same_name_save_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25737/test_tc_b99_11_same_name_save_0')
 
     def test_tc_b99_11_same_name_save_back_keeps_work_copy(tmp_path: Path) -> None:
         """A save-back under the loaded image's own name keeps the work copy.
@@ -31,12 +31,12 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 E       AssertionError: the loaded work copy temp/firmware.s19 must survive the save-back
 E       assert False
 E        +  where False = exists()
-E        +    where exists = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25737/test_tc_b99_11_same_name_save_0/.s19tool/workarea/temp/firmware.s19').exists
+E        +    where exists = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25737/test_tc_b99_11_same_name_save_0/.s19tool/workarea/temp/firmware.s19').exists
 
 tests\test_b99_staging.py:142: AssertionError
 ____________ test_tc_b99_12_eight_writers_one_name_zero_mismatches ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25737/test_tc_b99_12_eight_writers_o0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25737/test_tc_b99_12_eight_writers_o0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FD79A92710>
 
     def test_tc_b99_12_eight_writers_one_name_zero_mismatches(
@@ -82,7 +82,7 @@ E       assert 140 == 0
 tests\test_b99_staging.py:214: AssertionError
 ___________ test_tc_b99_12_forced_permission_error_refuses_cleanly ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25737/test_tc_b99_12_forced_permissi0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25737/test_tc_b99_12_forced_permissi0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FD77F20310>
 
     def test_tc_b99_12_forced_permission_error_refuses_cleanly(
@@ -103,7 +103,7 @@ E       assert None is not None
 tests\test_b99_staging.py:226: AssertionError
 ___________ test_tc_b99_13_target_replaced_between_check_and_reuse ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25737/test_tc_b99_13_target_replaced0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25737/test_tc_b99_13_target_replaced0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FD7999AA10>
 
     def test_tc_b99_13_target_replaced_between_check_and_reuse(
@@ -140,7 +140,7 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FD7999AA10>
             f"the caller must receive a path holding its own bytes, got "
             f"{returned} -> {_data(returned)}"
         )
-E       AssertionError: the caller must receive a path holding its own bytes, got C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-25737\test_tc_b99_13_target_replaced0\.s19tool\workarea\out\keep.s19 -> {4096: 153}
+E       AssertionError: the caller must receive a path holding its own bytes, got <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-25737\test_tc_b99_13_target_replaced0\.s19tool\workarea\out\keep.s19 -> {4096: 153}
 E       assert {4096: 153} == {4096: 17}
 E         
 E         Differing items:
@@ -150,7 +150,7 @@ E         Use -v to get more diff
 tests\test_b99_staging.py:303: AssertionError
 _______________ test_tc_b99_13_zero_byte_target_is_never_reused _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25737/test_tc_b99_13_zero_byte_targe0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25737/test_tc_b99_13_zero_byte_targe0')
 
     def test_tc_b99_13_zero_byte_target_is_never_reused(tmp_path: Path) -> None:
         """A 0-byte target may be another writer's claim placeholder (C1(a))."""
@@ -168,7 +168,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         )
 E       AssertionError: a 0-byte target (another writer's claim) must never be reused
 E       assert 'empty.s19' != 'empty.s19'
-E        +  where 'empty.s19' = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25737/test_tc_b99_13_zero_byte_targe0/.s19tool/workarea/out/empty.s19').name
+E        +  where 'empty.s19' = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25737/test_tc_b99_13_zero_byte_targe0/.s19tool/workarea/out/empty.s19').name
 
 tests\test_b99_staging.py:323: AssertionError
 ____________ test_tc_b99_39_delete_calls_delete_only_owned_staging ____________
@@ -199,7 +199,7 @@ E        +  where 0 = len([])
 tests\test_b99_staging.py:526: AssertionError
 _________________ test_tc_b99_14_save_project_missing_source __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25737/test_tc_b99_14_save_project_mi0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25737/test_tc_b99_14_save_project_mi0')
 
     def test_tc_b99_14_save_project_missing_source(tmp_path: Path) -> None:
         """A missing source at Save project: failure-severity status leading with
@@ -251,7 +251,7 @@ E       assert []
 tests\test_b99_staging.py:636: AssertionError
 ____________ test_at_b99_05_save_project_after_same_name_save_back ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25737/test_at_b99_05_save_project_af0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25737/test_at_b99_05_save_project_af0')
 
     def test_at_b99_05_save_project_after_same_name_save_back(tmp_path: Path) -> None:
         """Load -> patch -> save back as firmware.s19 -> Save project: the app is
@@ -308,7 +308,7 @@ E       assert False is True
 tests\test_b99_staging.py:697: AssertionError
 _________ test_tc_b99_ux_c10_save_project_filename_renders_literally __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25737/test_tc_b99_ux_c10_save_projec0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25737/test_tc_b99_ux_c10_save_projec0')
 
     def test_tc_b99_ux_c10_save_project_filename_renders_literally(tmp_path: Path) -> None:
         """The Save project file name is a new file-derived sink: a hostile
@@ -327,7 +327,7 @@ tests\test_b99_staging.py:100: in _image
          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25737/test_tc_b99_ux_c10_save_projec0/[red]x[/red][@click=app.quit].s19')
+self = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25737/test_tc_b99_ux_c10_save_projec0/[red]x[/red][@click=app.quit].s19')
 mode = 'w', buffering = -1, encoding = 'ascii', errors = None, newline = None
 
     def open(self, mode='r', buffering=-1, encoding=None,
@@ -340,12 +340,12 @@ mode = 'w', buffering = -1, encoding = 'ascii', errors = None, newline = None
             encoding = io.text_encoding(encoding)
 >       return io.open(self, mode, buffering, encoding, errors, newline)
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-25737\\test_tc_b99_ux_c10_save_projec0\\[red]x[\\red][@click=app.quit].s19'
+E       FileNotFoundError: [Errno 2] No such file or directory: '<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-25737\\test_tc_b99_ux_c10_save_projec0\\[red]x[\\red][@click=app.quit].s19'
 
 ..\..\anaconda3\envs\s19env\Lib\pathlib.py:1044: FileNotFoundError
 __________ test_tc_b99_ux_c10_placement_error_path_renders_literally __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25737/test_tc_b99_ux_c10_placement_e0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25737/test_tc_b99_ux_c10_placement_e0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FD7B0371D0>
 
     def test_tc_b99_ux_c10_placement_error_path_renders_literally(

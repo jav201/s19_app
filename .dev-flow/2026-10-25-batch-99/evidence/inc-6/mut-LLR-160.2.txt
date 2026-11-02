@@ -1,8 +1,8 @@
             f"the junction destination ({kind}) must refuse; got {raised!r}"
         )
-E       AssertionError: the junction destination (junction) must refuse; got ExportWriteError('Refusing to copy: destination is not contained inside <base>/.s19tool/workarea/: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-26725\\test_tc_b99_29_junction_destin0\\escaped_home — files already written before the failure: nothing')
+E       AssertionError: the junction destination (junction) must refuse; got ExportWriteError('Refusing to copy: destination is not contained inside <base>/.s19tool/workarea/: <HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-26725\\test_tc_b99_29_junction_destin0\\escaped_home — files already written before the failure: nothing')
 E       assert False
-E        +  where False = isinstance(ExportWriteError('Refusing to copy: destination is not contained inside <base>/.s19tool/workarea/: C:\\Users\\jjgh8\\A...jgh8\\pytest-26725\\test_tc_b99_29_junction_destin0\\escaped_home — files already written before the failure: nothing'), <class 's19_app.tui.workspace.WorkareaContainmentError'>)
+E        +  where False = isinstance(ExportWriteError('Refusing to copy: destination is not contained inside <base>/.s19tool/workarea/: <HOME>\\A...jgh8\\pytest-26725\\test_tc_b99_29_junction_destin0\\escaped_home — files already written before the failure: nothing'), <class 's19_app.tui.workspace.WorkareaContainmentError'>)
 
 tests\test_b99_export.py:200: AssertionError
 =========================== short test summary info ===========================

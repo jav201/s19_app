@@ -1,6 +1,6 @@
-# command: python -m pytest -q -p no:cacheprovider -rfE --basetemp=C:/Users/jjgh8/AppData/Local/Temp/i6t1 tests/test_b100_focus.py tests/test_b100_session_reset.py tests/test_b97_flow_execution.py tests/test_b97_width.py tests/test_b99_load_project.py tests/test_flow_multi_image_ui.py tests/test_manifest_writer.py tests/test_tui_diff_screen.py tests/test_tui_report_filter_surface.py tests/test_variant_execution.py 
-# tree: C:/Users/jjgh8/Github/s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree incl. re-pins)
-# runner: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc6-impl/py.sh (sets PYTHONPATH to that tree; NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8)
+# command: python -m pytest -q -p no:cacheprovider -rfE --basetemp=<HOME>/AppData/Local/Temp/i6t1 tests/test_b100_focus.py tests/test_b100_session_reset.py tests/test_b97_flow_execution.py tests/test_b97_width.py tests/test_b99_load_project.py tests/test_flow_multi_image_ui.py tests/test_manifest_writer.py tests/test_tui_diff_screen.py tests/test_tui_report_filter_surface.py tests/test_variant_execution.py 
+# tree: <HOME>/Github/s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree incl. re-pins)
+# runner: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc6-impl/py.sh (sets PYTHONPATH to that tree; NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8)
 # date: 2026-10-30T01:48:43Z
 ............................................F....FF..................... [ 18%]
 ........................................................................ [ 37%]
@@ -11,7 +11,7 @@
 ================================== FAILURES ===================================
 ___________ test_tc_b100_10_no_discard_notice_when_nothing_unsaved ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t1/test_tc_b100_10_no_discard_not0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/i6t1/test_tc_b100_10_no_discard_not0')
 
     def test_tc_b100_10_no_discard_notice_when_nothing_unsaved(tmp_path: Path) -> None:
         """A clean load-over (0 outgoing entries) paints no closed-document
@@ -43,7 +43,7 @@ E         + Loaded project 'P2' -> prg.s19 - variant 1 of 1, 1 problem - details
 tests\test_b100_session_reset.py:619: AssertionError
 _____ test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size0] _____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t1/test_at_b100_03_project_load_o0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/i6t1/test_at_b100_03_project_load_o0')
 size = (118, 54)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
@@ -282,7 +282,7 @@ E           textual.css.query.NoMatches: No nodes match '#patch_entry_address_in
 ..\..\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: NoMatches
 _____ test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size1] _____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t1/test_at_b100_03_project_load_o1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/i6t1/test_at_b100_03_project_load_o1')
 size = (220, 60)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
@@ -521,7 +521,7 @@ E           textual.css.query.NoMatches: No nodes match '#patch_entry_address_in
 ..\..\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: NoMatches
 _______________ test_at_b78_32_app_bindings_block_is_untouched ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t1/test_at_b78_32_app_bindings_bl0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/i6t1/test_at_b78_32_app_bindings_bl0')
 
     def test_at_b78_32_app_bindings_block_is_untouched(tmp_path: Path) -> None:
         """AT-B78-32 (PIN) -- Lane 1 does not disturb the App ``BINDINGS`` block.
@@ -619,7 +619,7 @@ E         ...Full output truncated (3 lines hidden), use '-vv' to show
 tests\test_tui_diff_screen.py:3912: AssertionError
 ________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t1/test_at_056e_a2b_diff_report_b0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/i6t1/test_at_056e_a2b_diff_report_b0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001D7CFB4F210>
 
     def test_at_056e_a2b_diff_report_byte_identical_despite_selection(

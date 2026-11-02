@@ -18,7 +18,7 @@ outcome status: error [('source', 'ok', 'loaded prg.s19 (11 ranges)'), ('patch',
 
 ## Input provenance
 
-- Chain badlane input 1: prg\.s19 [bound] path=`C:\Users\jjgh8\AppData\Local\Temp\rwprobe_vjnyppc8\.s19tool\workarea\proj\prg.s19`
+- Chain badlane input 1: prg\.s19 [bound] path=`<HOME>\AppData\Local\Temp\rwprobe_vjnyppc8\.s19tool\workarea\proj\prg.s19`
 
 ## Written files
 

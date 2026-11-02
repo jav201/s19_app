@@ -1,8 +1,8 @@
 # Inc 9b — mutation summary (E4 mutation stage)
 
-Copy under test: `C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut9b`
-Interpreter: `C:/Users/jjgh8/anaconda3/envs/s19env/python.exe` (env `s19env`)
-`s19_app.__file__` resolves inside the copy. Every pytest run set `LOCALAPPDATA` to the scratch folder; `C:/Users/jjgh8/AppData/Local/s19_app` never existed before or after.
+Copy under test: `<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut9b`
+Interpreter: `<HOME>/anaconda3/envs/s19env/python.exe` (env `s19env`)
+`s19_app.__file__` resolves inside the copy. Every pytest run set `LOCALAPPDATA` to the scratch folder; `<HOME>/AppData/Local/s19_app` never existed before or after.
 
 ## Results
 

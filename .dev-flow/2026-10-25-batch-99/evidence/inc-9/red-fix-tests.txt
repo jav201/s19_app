@@ -24,7 +24,7 @@ E         Use -v to get more diff
 tests\test_b99_truncation.py:275: AssertionError
 ____________________ test_tc_b99_09_binary_tail_after_eof _____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26193/test_tc_b99_09_binary_tail_aft0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26193/test_tc_b99_09_binary_tail_aft0')
 
     def test_tc_b99_09_binary_tail_after_eof(tmp_path):
         """A valid HEX (272 data bytes) followed by 50 000 newlines and raw

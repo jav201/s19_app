@@ -1,6 +1,6 @@
 # Batch-100 — batch-end fix round 1: the Linux-runner failures
 
-- **Branch / worktree:** `b100-fix1` from `main` 760f885, `C:/Users/jjgh8/Github/s19_app-b100-fix1`. Nothing committed.
+- **Branch / worktree:** `b100-fix1` from `main` 760f885, `<HOME>/Github/s19_app-b100-fix1`. Nothing committed.
 - **Scope:** rows CI9b-3, CI9b-4, CI11-1, CI11-2, CI11-3, CI11-4 of the CI fix list (CI runs 41284211218 and 41290452101).
 - **Host:** Windows only. No Linux host, no WSL. Posix behaviour comes from reading the code, from pure-function probes with `posixpath` and drive-rooted texts, and from the posix test arm forced on Windows where that works. Where only the Linux CI can show the posix arm, the row says so.
 - **Evidence folder:** `evidence/fix-1/`.

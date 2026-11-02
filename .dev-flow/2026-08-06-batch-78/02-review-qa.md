@@ -2,7 +2,7 @@
 
 **Under review:** `.dev-flow/2026-08-06-batch-78/01-requirements.md` (804 lines, 31 `AT-B78-nn`, 45 `TC-B78-nn`, 13 increments)
 **Axis:** testability — whether these acceptances can actually fail.
-**Repo:** `C:\Users\jjgh8\Github\s19_app` · branch `claude/batch-78-cmdbar-a2bdiff` @ `544f16b`
+**Repo:** `<HOME>\Github\s19_app` · branch `claude/batch-78-cmdbar-a2bdiff` @ `544f16b`
 **Method:** every finding below is executed. All mutations were applied **in-process** (monkeypatch / subclass) from an out-of-repo scratchpad with `PYTHONDONTWRITEBYTECODE=1`, and reverted in the same process with the predicate re-run. **`git diff --stat -- s19_app/ tests/ .dev-flow/` is empty** — no tracked file was modified by this lane. `state.json`, `PLAN.md`, `00-measurements.md`, `01-requirements.md`, `AT-TC-REGISTRY.jsonl` and `prototypes/memmap2.*` were **read only**.
 
 ---

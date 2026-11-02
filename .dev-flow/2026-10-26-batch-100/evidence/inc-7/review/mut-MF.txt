@@ -1,16 +1,16 @@
-# mutant: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r7\mut\MF\s19_app\tui\services\variant_execution_service.py
+# mutant: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r7\mut\MF\s19_app\tui\services\variant_execution_service.py
 #   old: b'    issues[:] = [issue for issue in issues if id(issue) not in folded]\r\n    issues.append('
 #   new: b'    issues[:] = [issue for issue in issues if id(issue) not in folded]\r\n    return\r\n    issues.append('
 #   sha256[:16] before bd33c8be189d2c87 after 5b724f03aef8749b
 # cmd: python -m pytest -p no:cacheprovider -q tests/test_b100_project_check.py tests/test_r7_probes.py::test_pf_skipped_entries_beyond_the_bound_are_counted
-# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r7/mut/MF  PYTHONPATH=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r7/mut/MF  NO_COLOR unset
-# s19_app import: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r7\mut\MF\s19_app\__init__.py
+# tree: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r7/mut/MF  PYTHONPATH=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r7/mut/MF  NO_COLOR unset
+# s19_app import: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r7\mut\MF\s19_app\__init__.py
 ........................................................................ [ 98%]
 F                                                                        [100%]
 ================================== FAILURES ===================================
 ____________ test_pf_skipped_entries_beyond_the_bound_are_counted _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30292/test_pf_skipped_entries_beyond0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30292/test_pf_skipped_entries_beyond0')
 
     def test_pf_skipped_entries_beyond_the_bound_are_counted(tmp_path: Path) -> None:
         project_dir = tmp_path / "P"

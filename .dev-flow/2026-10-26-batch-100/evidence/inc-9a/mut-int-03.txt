@@ -1,16 +1,16 @@
 # mut-int-03 (integration sanity mutant, expected RED; run in a COPY of the worktree at scratchpad/int9a/mutwt, never in the worktree): s19_app/tui/app.py: S7: load_from_path records the work copy instead of the source | applied 03 20c4f48bf8872efb | the copy's file is restored from a byte copy after the run and its sha256 verified
 # date: 2026-10-31T04:42:23-06:00
 fatal: not a git repository (or any of the parent directories): .git
-# cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int9a/mutwt  branch:  base: 4fef292 (uncommitted worktree)
-# interpreter: C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+# cwd: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int9a/mutwt  branch:  base: 4fef292 (uncommitted worktree)
+# interpreter: <HOME>\anaconda3\envs\s19env\python.exe
 # env: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<worktree>
 # sha256[:16] workspace.py=a3342ed048ebe157 app.py=20c4f48bf8872efb
-# s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int9a\mutwt\s19_app\__init__.py
+# s19_app.__file__ = <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int9a\mutwt\s19_app\__init__.py
 # command: python -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_recents.py::test_tc_b100_34_outside_load_records_the_source_not_the_work_copy -rfE
 
 F                                                                        [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int9a\mutwt\tests\test_b100_recents.py:718: AssertionError: assert [('C:\\Users\....s19', 's19')] == [('C:\\Users\....s19', 's19')]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int9a\mutwt\tests\test_b100_recents.py:718: AssertionError: assert [('C:\\Users\....s19', 's19')] == [('C:\\Users\....s19', 's19')]
 =========================== short test summary info ===========================
 FAILED tests/test_b100_recents.py::test_tc_b100_34_outside_load_records_the_source_not_the_work_copy
 1 failed in 2.28s

@@ -4,7 +4,7 @@
 or `00b`). **Base:** `claude/batch-63-report-table-caps` @ `031ca8d` == `origin/main`.
 **Artifact language:** English. **Constraint honoured: zero production-source edits.** All
 counterfactuals ran in a `git archive` export at the short root
-`C:/Users/jjgh8/AppData/Local/Temp/claude/b63/r2`, deleted at close (`r2 removed: YES`);
+`<HOME>/AppData/Local/Temp/claude/b63/r2`, deleted at close (`r2 removed: YES`);
 `.../b63/{a,b,qa,r1,r3}` were never touched. Every probe was written to a file and invoked by path.
 Fixture ceiling actually used: **4 000 hits / < 1 MB peak** — three orders below the 200 000-hit cap.
 

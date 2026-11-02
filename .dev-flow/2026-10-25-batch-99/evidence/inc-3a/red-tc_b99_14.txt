@@ -2,7 +2,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 _________________ test_tc_b99_14_save_project_missing_source __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25742/test_tc_b99_14_save_project_mi0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25742/test_tc_b99_14_save_project_mi0')
 
     def test_tc_b99_14_save_project_missing_source(tmp_path: Path) -> None:
         """A missing source at Save project: failure-severity status leading with

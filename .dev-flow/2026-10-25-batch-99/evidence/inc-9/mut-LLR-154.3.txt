@@ -2,7 +2,7 @@ FFFFF                                                                    [100%]
 ================================== FAILURES ===================================
 _ test_tc_b99_10_source_error_no_file[synth_no_terminator.s19-s19-S19-NO-TERMINATOR] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26099/test_tc_b99_10_source_error_no0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26099/test_tc_b99_10_source_error_no0')
 name = 'synth_no_terminator.s19', file_type = 's19', code = 'S19-NO-TERMINATOR'
 
     @pytest.mark.parametrize("name,file_type,code", _FLOW_DEFECTS)
@@ -36,7 +36,7 @@ E         + notices
 tests\test_b99_truncation.py:322: AssertionError
 _ test_tc_b99_10_source_error_no_file[synth_wrong_s5.s19-s19-S19-COUNT-MISMATCH] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26099/test_tc_b99_10_source_error_no1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26099/test_tc_b99_10_source_error_no1')
 name = 'synth_wrong_s5.s19', file_type = 's19', code = 'S19-COUNT-MISMATCH'
 
     @pytest.mark.parametrize("name,file_type,code", _FLOW_DEFECTS)
@@ -70,7 +70,7 @@ E         + notices
 tests\test_b99_truncation.py:322: AssertionError
 _ test_tc_b99_10_source_error_no_file[synth_after_terminator.s19-s19-S19-AFTER-TERMINATOR] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26099/test_tc_b99_10_source_error_no2')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26099/test_tc_b99_10_source_error_no2')
 name = 'synth_after_terminator.s19', file_type = 's19'
 code = 'S19-AFTER-TERMINATOR'
 
@@ -105,7 +105,7 @@ E         + notices
 tests\test_b99_truncation.py:322: AssertionError
 __ test_tc_b99_10_source_error_no_file[synth_hex_no_eof.hex-hex-HEX-NO-EOF] ___
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26099/test_tc_b99_10_source_error_no3')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26099/test_tc_b99_10_source_error_no3')
 name = 'synth_hex_no_eof.hex', file_type = 'hex', code = 'HEX-NO-EOF'
 
     @pytest.mark.parametrize("name,file_type,code", _FLOW_DEFECTS)
@@ -139,7 +139,7 @@ E         + notices
 tests\test_b99_truncation.py:322: AssertionError
 _ test_tc_b99_10_source_error_no_file[synth_hex_after_eof.hex-hex-HEX-AFTER-EOF] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26099/test_tc_b99_10_source_error_no4')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26099/test_tc_b99_10_source_error_no4')
 name = 'synth_hex_after_eof.hex', file_type = 'hex', code = 'HEX-AFTER-EOF'
 
     @pytest.mark.parametrize("name,file_type,code", _FLOW_DEFECTS)

@@ -3,7 +3,7 @@
 **Written:** 2026-07-31 · **For:** a fresh session with a full context window
 **Branch:** `claude/batch-76-r-tui-102-impl` · **HEAD:** `14bcad6` · **Base:** `origin/main` = `291bb76`
 **PR:** [#184](https://github.com/jav201/s19_app/pull/184) — **open, BLOCKED, do not merge**
-**Repo:** `C:\Users\jjgh8\Github\s19_app` (moved out of OneDrive; local `main` was 34 commits stale — always read from `origin/main`)
+**Repo:** `<HOME>\Github\s19_app` (moved out of OneDrive; local `main` was 34 commits stale — always read from `origin/main`)
 
 ---
 

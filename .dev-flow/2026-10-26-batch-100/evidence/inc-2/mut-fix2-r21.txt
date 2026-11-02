@@ -1,12 +1,12 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py::test_tc_b100_07_failed_save_removes_every_placed_path (MUTANT R2-1: the pre-save snapshot back to a TOP-LEVEL name set — sub-folder paths are not recorded)
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 2 — MUTANT, reverted after the run)
-env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc2 (NO_COLOR unset)
+tree: <HOME>\Github\s19_app-b100-inc2 (fix pass 2 — MUTANT, reverted after the run)
+env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<HOME>\Github\s19_app-b100-inc2 (NO_COLOR unset)
 
 .F.                                                                      [100%]
 ================================== FAILURES ===================================
 _ test_tc_b100_07_failed_save_removes_every_placed_path[merge-gathered-reused] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27566/test_tc_b100_07_failed_save_re1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27566/test_tc_b100_07_failed_save_re1')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000163EE96A550>
 case = 'merge-gathered-reused'
 

@@ -186,7 +186,7 @@ artifacts):
 |---|---|
 | Mutation applied | the strongest kill per family, each by position and operation: **routing** — the `=` binding's `show_screen` target repointed to the patch screen (arm 01 → AT-B94-01 RED); **geometry** — the reworked entries table's height collapsed so the editor leaves the viewport (arm 02 → AT-B94-03, TC-B94-09 RED); **guard** — the dirty-load guard's `if self._dirty:` branch disabled (arm 05 → AT-B94-06 RED) and the cancel branch flipped to dismiss-with-loss (arm 06 → AT-B94-07 RED); **retirement** — a variant-reacting handler inserted into the reworked panel (arm 17 v2 → TC-B94-11 RED); **report addendum** — the `## Checks` heading spelling drifted (arm 22 → TC-B94-16 RED); **primitive** — the `safe_text` scrub table dropped ESC from the C0 range (arm 23 → TC-B94-17 RED) |
 | Instrument | project code: own hand through the battery runner — `python -B .dev-flow/2026-10-12-batch-94/evidence/inc001_battery.py` (a script in the project's stack; field guide §`Mutation verdicts`) |
-| Where it ran | **this tree** (`C:/Users/jjgh8/Github/s19_app-b94`), run by the orchestrator's increment session at Phase 3 — the same session that wrote the code; no other lane's tree |
+| Where it ran | **this tree** (`<HOME>/Github/s19_app-b94`), run by the orchestrator's increment session at Phase 3 — the same session that wrote the code; no other lane's tree |
 | Transcript | `.dev-flow/2026-10-12-batch-94/evidence/inc001_battery.txt` (full battery + fix-round banners) and `inc001_battery_fold_round.txt` (fold-round arms 05/06) |
 | Restore proven by | **file hash returned to its pre-mutation value** — every arm prints `after: <sha256> restore-ok=True` and the verdict table prints `restore-hash OK` (e.g. `app.py` restored to `6db01493…`, `screens_directionb.py` to `9b8f5ada…`, `diff_report_service.py` to `8bf29221…`); `git status` was not accepted as proof |
 | Bytecode cache | cleared — the runner invokes `python -B` (C-46) |
@@ -231,22 +231,22 @@ artifacts):
 | Evidence artifact | Path — under `artifact_homes.evidence` | SHA-256 |
 |---|---|---|
 | battery runner (23 arms, fix/fold rounds, hash restores) | `.dev-flow/2026-10-12-batch-94/evidence/inc001_battery.py` | `9cd9e467ee1ca7f5472f1c0c65399530881771b21b59197c88ace975395b687b` |
-| main battery transcript — 23 arms, FIX ROUND A banners, arm-17 v1/v2, spot-check, final suite tail | `.dev-flow/2026-10-12-batch-94/evidence/inc001_battery.txt` | `64336b10c0514cae798afb260d6ba3048c51f2e9eea1b9f58baea411580c745a` |
-| fold-round re-verification of arms 05/06 | `.dev-flow/2026-10-12-batch-94/evidence/inc001_battery_fold_round.txt` | `045adce63c6e9b5c282d1d01d83cf084009ea96305752c5b8478e1b7f98cf908` |
+| main battery transcript — 23 arms, FIX ROUND A banners, arm-17 v1/v2, spot-check, final suite tail | `.dev-flow/2026-10-12-batch-94/evidence/inc001_battery.txt` | `8fc84d860c9d79321db87cbf9aba90ef99952e564e2918d71c671a9bc0fcc16b` |
+| fold-round re-verification of arms 05/06 | `.dev-flow/2026-10-12-batch-94/evidence/inc001_battery_fold_round.txt` | `bcee4172fe577471549718d7c9152a76d34bb32a693bea4d18dbd7d096a5e00e` |
 | F1 popup probe runner (stack-drain, both arms) | `.dev-flow/2026-10-12-batch-94/evidence/inc001_fold_popup_probe.py` | `0d7e888fc767f50eaf6d9c585dfa472b2a033fbf8c9f4eac66d418a61205191b` |
 | F1 popup probe output — `PROBE: PASS — exactly one popup, stack drains empty (both arms)` | `.dev-flow/2026-10-12-batch-94/evidence/inc001_fold_popup_probe.txt` | `f1b7eb8bd0d8551bf97e8f6e6ea312a818ed9484e8e89bbca46f5798cd6ffb72` |
 | v2 check-spec round-trip probe (writer/reader/runner + apply-gate negative control) | `.dev-flow/2026-10-12-batch-94/evidence/p1_probe_chk_roundtrip.py` | `fbc349f3198f975f8e0176c83fee6a984f7f620c86b50d3574500cfd7e8292e6` |
 | round-trip probe output (315-byte emitted form; `blocked: 2`; `PROBE OK`) | `.dev-flow/2026-10-12-batch-94/evidence/p1_probe_chk_roundtrip.txt` | `03332561f3320536bbcc6b7bea4e597d7c846a52e427c9d0007cae4b49eb02ee` |
 | diff-report emitted-form probe runner | `.dev-flow/2026-10-12-batch-94/evidence/p1_probe_diff_report_emitted.py` | `af1febb9213d769ae558bdd1b2411aa2d54ae14230567451957629207263695f` |
-| diff-report base form paste (30 header lines verbatim) | `.dev-flow/2026-10-12-batch-94/evidence/p1_probe_diff_report_emitted.txt` | `581cdb77e7b5a174e3fa424e1cea4025e313e5e2b29d959b6eae93112afc28cb` |
+| diff-report base form paste (30 header lines verbatim) | `.dev-flow/2026-10-12-batch-94/evidence/p1_probe_diff_report_emitted.txt` | `e7939ac9d0ed63c147cd0c612d2c0f590a0016d0dbc61328721c9a0d6124e323` |
 | base rail census probe (10 entries, no Check Editor — the RED side of AT-B94-01) | `.dev-flow/2026-10-12-batch-94/evidence/p1_probe_rail_census.py` / `.txt` | `547af7813f72404401f66e524ed801418f4046dd10daf36f803c1c52c481a22a` / `ddd4e5d98499952433c17917c60204460514b7aef0ebc9c05d9079bbdd4d9c69` |
 | R-1 rail-key probe (`=`/`]` runtime resolution, no collision) | `.dev-flow/2026-10-12-batch-94/evidence/pdr_rail_key_probe.py` / `.txt` | `b86143598b461c72469a28ad5e869d0aa7d8c5a71f4eb770f806ee777100a409` / `a721166a47215fbb06a6dacdbfb8c4a4146cb7ee8d4b73d9835c8b350ea83a03` |
 | boxed workspace budgets (74×12 @80×24 · 96×18 @120×30 · 136×28 @160×40) | `.dev-flow/2026-10-12-batch-94/evidence/p1-pilot-measurements.txt` | `ce79223e18fb35628a1750e0bf1b746265472e771ac554a98be561ffbdbd0555` |
-| suite transcript — the FULL guard host `test_tui_directionb.py`, one complete run (184 passed) | `.dev-flow/2026-10-12-batch-94/evidence/inc001_suite_directionb.txt` | `7ed768f4fe7e495a07684e5098a5e835316b548615061076811b8f723759934b` |
-| suite transcript — editors + variants five-file run (52 passed) | `.dev-flow/2026-10-12-batch-94/evidence/inc001_suite_editors.txt` | `9435bb5997198e48b16f665d101d80d40dd278789a86251408270b74a8caae0f` |
-| suite transcript — the patch-family rewrite group (74 passed) | `.dev-flow/2026-10-12-batch-94/evidence/inc001_suite_patch_family.txt` | `fb986e6a49b5e0cbca6f48225752b3f0e30502d73ffac556557331c56c8552b7` |
-| suite transcript — commandbar + id-registry guards (58 passed) | `.dev-flow/2026-10-12-batch-94/evidence/inc001_suite_commandbar_registry.txt` | `8016f1b24811f76a97d536372a837d72ed8a9ff9292d0102294f3c4f8dd5ae5f` |
-| suite transcript — snapshot matrix (3 passed + 29 xfailed, per-cell census) | `.dev-flow/2026-10-12-batch-94/evidence/inc001_suite_snapshot.txt` | `2c4bb70e05eaf469332f1c2656167ff54c7267faa6d3a04c7c2d1f6f87c156ba` |
+| suite transcript — the FULL guard host `test_tui_directionb.py`, one complete run (184 passed) | `.dev-flow/2026-10-12-batch-94/evidence/inc001_suite_directionb.txt` | `3840db33b54a4c13f1e5365d86d5ca30045b7ac732118c8d791506cccba4528d` |
+| suite transcript — editors + variants five-file run (52 passed) | `.dev-flow/2026-10-12-batch-94/evidence/inc001_suite_editors.txt` | `fa8e38fb97657ec7616d543a6672756c8c2570f61372e8c744bb62965cf35ce8` |
+| suite transcript — the patch-family rewrite group (74 passed) | `.dev-flow/2026-10-12-batch-94/evidence/inc001_suite_patch_family.txt` | `77b29a7242af93897dcbd0894151a77b1230ccb85b2bf9def2a99de0eca61638` |
+| suite transcript — commandbar + id-registry guards (58 passed) | `.dev-flow/2026-10-12-batch-94/evidence/inc001_suite_commandbar_registry.txt` | `034d3b18913bd04417461fe58822c786475c5059005114b0e006aa04fe306be5` |
+| suite transcript — snapshot matrix (3 passed + 29 xfailed, per-cell census) | `.dev-flow/2026-10-12-batch-94/evidence/inc001_suite_snapshot.txt` | `4a408a60d37a0594ab9c9eedcc7784b72ce6ca908263e434d5d5ebdedfd1c1d6` |
 
 | Field | Value |
 |---|---|

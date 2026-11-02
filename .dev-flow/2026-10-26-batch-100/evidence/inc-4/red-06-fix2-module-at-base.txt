@@ -1,13 +1,13 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py
-tree: /c/Users/jjgh8/AppData/Local/Temp/kimi-inc4-fix2/base31 (git archive 31eb572 'batch-100 Inc 4 gate round 1' + the final tests/test_b100_focus.py from the fix-pass-2 worktree)
-env: PYTHONPATH=/c/Users/jjgh8/AppData/Local/Temp/kimi-inc4-fix2/base31 ; NO_COLOR unset (env -u) ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+tree: <HOME>/AppData/Local/Temp/kimi-inc4-fix2/base31 (git archive 31eb572 'batch-100 Inc 4 gate round 1' + the final tests/test_b100_focus.py from the fix-pass-2 worktree)
+env: PYTHONPATH=<HOME>/AppData/Local/Temp/kimi-inc4-fix2/base31 ; NO_COLOR unset (env -u) ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 
-import proof: C:\Users\jjgh8\Github\s19_app-b100-inc4\s19_app\__init__.py
+import proof: <HOME>\Github\s19_app-b100-inc4\s19_app\__init__.py
 FFFFF.FFF.FFFFFFFF..F.F..FFFFFF                                          [100%]
 ================================== FAILURES ===================================
 _______ test_tc_b100_12_focus_target_table_matches_the_window_registry ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29102/test_tc_b100_12_focus_target_t0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29102/test_tc_b100_12_focus_target_t0')
 
     def test_tc_b100_12_focus_target_table_matches_the_window_registry(
         tmp_path: Path,
@@ -29,7 +29,7 @@ E       AttributeError: type object 'S19TuiApp' has no attribute '_FOCUS_TARGETS
 tests\test_b100_focus.py:262: AttributeError
 ________________ test_tc_b100_12_load_file_tail_rehomes_focus _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29102/test_tc_b100_12_load_file_tail0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29102/test_tc_b100_12_load_file_tail0')
 
     def test_tc_b100_12_load_file_tail_rehomes_focus(tmp_path: Path) -> None:
         """Load file (the dialog route's tail): with the focus on the hidden
@@ -59,13 +59,13 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 
 tests\test_b100_focus.py:316: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_focus.py:313: in _drive
@@ -110,7 +110,7 @@ E       AssertionError: timed out waiting for the focus to settle on the window'
 tests\test_b100_focus.py:174: AssertionError
 _______________ test_tc_b100_12_load_project_tail_rehomes_focus _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29102/test_tc_b100_12_load_project_t0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29102/test_tc_b100_12_load_project_t0')
 
     def test_tc_b100_12_load_project_tail_rehomes_focus(tmp_path: Path) -> None:
         """Load project: the project install runs the same tail and re-homes
@@ -136,13 +136,13 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 
 tests\test_b100_focus.py:339: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_focus.py:336: in _drive
@@ -187,7 +187,7 @@ E       AssertionError: timed out waiting for the focus to settle on the window'
 tests\test_b100_focus.py:174: AssertionError
 ______________ test_tc_b100_12_workarea_files_pick_rehomes_focus ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29102/test_tc_b100_12_workarea_files0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29102/test_tc_b100_12_workarea_files0')
 
     def test_tc_b100_12_workarea_files_pick_rehomes_focus(tmp_path: Path) -> None:
         """Workarea Files pick: selecting a temp file in the workspace list
@@ -224,13 +224,13 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 
 tests\test_b100_focus.py:373: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_focus.py:370: in _drive
@@ -275,7 +275,7 @@ E       AssertionError: timed out waiting for the focus to settle on the window'
 tests\test_b100_focus.py:174: AssertionError
 __________ test_tc_b100_12_rehome_lands_on_the_active_windows_target __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29102/test_tc_b100_12_rehome_lands_o0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29102/test_tc_b100_12_rehome_lands_o0')
 
     def test_tc_b100_12_rehome_lands_on_the_active_windows_target(
         tmp_path: Path,
@@ -310,13 +310,13 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 
 tests\test_b100_focus.py:405: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_focus.py:403: in _drive
@@ -361,7 +361,7 @@ E       AssertionError: timed out waiting for the focus to settle on the window'
 tests\test_b100_focus.py:174: AssertionError
 ______ test_tc_b100_12_every_window_load_lands_on_its_target[workspace] _______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29102/test_tc_b100_12_every_window_l0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29102/test_tc_b100_12_every_window_l0')
 window_key = 'workspace'
 
     @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))
@@ -411,13 +411,13 @@ window_key = 'workspace'
 
 tests\test_b100_focus.py:498: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -453,7 +453,7 @@ E               AttributeError: type object 'S19TuiApp' has no attribute '_FOCUS
 tests\test_b100_focus.py:494: AttributeError
 _________ test_tc_b100_12_every_window_load_lands_on_its_target[a2l] __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29102/test_tc_b100_12_every_window_l1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29102/test_tc_b100_12_every_window_l1')
 window_key = 'a2l'
 
     @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))
@@ -503,13 +503,13 @@ window_key = 'a2l'
 
 tests\test_b100_focus.py:498: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -545,7 +545,7 @@ E               AttributeError: type object 'S19TuiApp' has no attribute '_FOCUS
 tests\test_b100_focus.py:494: AttributeError
 _________ test_tc_b100_12_every_window_load_lands_on_its_target[mac] __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29102/test_tc_b100_12_every_window_l2')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29102/test_tc_b100_12_every_window_l2')
 window_key = 'mac'
 
     @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))
@@ -595,13 +595,13 @@ window_key = 'mac'
 
 tests\test_b100_focus.py:498: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -637,7 +637,7 @@ E               AttributeError: type object 'S19TuiApp' has no attribute '_FOCUS
 tests\test_b100_focus.py:494: AttributeError
 ________ test_tc_b100_12_every_window_load_lands_on_its_target[issues] ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29102/test_tc_b100_12_every_window_l4')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29102/test_tc_b100_12_every_window_l4')
 window_key = 'issues'
 
     @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))
@@ -687,13 +687,13 @@ window_key = 'issues'
 
 tests\test_b100_focus.py:498: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -729,7 +729,7 @@ E               AttributeError: type object 'S19TuiApp' has no attribute '_FOCUS
 tests\test_b100_focus.py:494: AttributeError
 ________ test_tc_b100_12_every_window_load_lands_on_its_target[patch] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29102/test_tc_b100_12_every_window_l5')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29102/test_tc_b100_12_every_window_l5')
 window_key = 'patch'
 
     @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))
@@ -779,13 +779,13 @@ window_key = 'patch'
 
 tests\test_b100_focus.py:498: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -821,7 +821,7 @@ E               AttributeError: type object 'S19TuiApp' has no attribute '_FOCUS
 tests\test_b100_focus.py:494: AttributeError
 _____ test_tc_b100_12_every_window_load_lands_on_its_target[check_editor] _____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29102/test_tc_b100_12_every_window_l6')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29102/test_tc_b100_12_every_window_l6')
 window_key = 'check_editor'
 
     @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))
@@ -871,13 +871,13 @@ window_key = 'check_editor'
 
 tests\test_b100_focus.py:498: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -913,7 +913,7 @@ E               AttributeError: type object 'S19TuiApp' has no attribute '_FOCUS
 tests\test_b100_focus.py:494: AttributeError
 _________ test_tc_b100_12_every_window_load_lands_on_its_target[diff] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29102/test_tc_b100_12_every_window_l7')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29102/test_tc_b100_12_every_window_l7')
 window_key = 'diff'
 
     @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))
@@ -963,13 +963,13 @@ window_key = 'diff'
 
 tests\test_b100_focus.py:498: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -1005,7 +1005,7 @@ E               AttributeError: type object 'S19TuiApp' has no attribute '_FOCUS
 tests\test_b100_focus.py:494: AttributeError
 _________ test_tc_b100_12_every_window_load_lands_on_its_target[flow] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29102/test_tc_b100_12_every_window_l8')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29102/test_tc_b100_12_every_window_l8')
 window_key = 'flow'
 
     @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))
@@ -1055,13 +1055,13 @@ window_key = 'flow'
 
 tests\test_b100_focus.py:498: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -1097,7 +1097,7 @@ E               AttributeError: type object 'S19TuiApp' has no attribute '_FOCUS
 tests\test_b100_focus.py:494: AttributeError
 ____ test_tc_b100_12_every_window_load_lands_on_its_target[flow_execution] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29102/test_tc_b100_12_every_window_l9')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29102/test_tc_b100_12_every_window_l9')
 window_key = 'flow_execution'
 
     @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))
@@ -1147,13 +1147,13 @@ window_key = 'flow_execution'
 
 tests\test_b100_focus.py:498: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -1189,7 +1189,7 @@ E               AttributeError: type object 'S19TuiApp' has no attribute '_FOCUS
 tests\test_b100_focus.py:494: AttributeError
 ________ test_tc_b100_12_every_window_load_lands_on_its_target[checks] ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29102/test_tc_b100_12_every_window_l10')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29102/test_tc_b100_12_every_window_l10')
 window_key = 'checks'
 
     @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))
@@ -1239,13 +1239,13 @@ window_key = 'checks'
 
 tests\test_b100_focus.py:498: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -1281,7 +1281,7 @@ E               AttributeError: type object 'S19TuiApp' has no attribute '_FOCUS
 tests\test_b100_focus.py:494: AttributeError
 _____ test_tc_b100_12_every_window_load_lands_on_its_target[crc_designer] _____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29102/test_tc_b100_12_every_window_l11')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29102/test_tc_b100_12_every_window_l11')
 window_key = 'crc_designer'
 
     @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))
@@ -1331,13 +1331,13 @@ window_key = 'crc_designer'
 
 tests\test_b100_focus.py:498: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -1373,7 +1373,7 @@ E               AttributeError: type object 'S19TuiApp' has no attribute '_FOCUS
 tests\test_b100_focus.py:494: AttributeError
 _______ test_tc_b100_12_stale_text_input_in_a_content_window_is_rehomed _______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29102/test_tc_b100_12_stale_text_inp0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29102/test_tc_b100_12_stale_text_inp0')
 
     def test_tc_b100_12_stale_text_input_in_a_content_window_is_rehomed(
         tmp_path: Path,
@@ -1434,13 +1434,13 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 
 tests\test_b100_focus.py:646: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_focus.py:643: in _drive
@@ -1485,7 +1485,7 @@ E       AssertionError: timed out waiting for the focus to settle on the window'
 tests\test_b100_focus.py:174: AssertionError
 ________________ test_tc_b100_12_empty_state_target_falls_back ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29102/test_tc_b100_12_empty_state_ta0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29102/test_tc_b100_12_empty_state_ta0')
 
     def test_tc_b100_12_empty_state_target_falls_back(tmp_path: Path) -> None:
         """LED .57 (b): in a bare session the Workspace window shows its empty
@@ -1519,13 +1519,13 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 
 tests\test_b100_focus.py:734: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_focus.py:731: in _drive
@@ -1570,7 +1570,7 @@ E       AssertionError: timed out waiting for the focus to settle on the window'
 tests\test_b100_focus.py:174: AssertionError
 _________ test_tc_b100_12_bad_default_focus_is_rehomed_behind_a_modal _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29102/test_tc_b100_12_bad_default_fo0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29102/test_tc_b100_12_bad_default_fo0')
 
     def test_tc_b100_12_bad_default_focus_is_rehomed_behind_a_modal(
         tmp_path: Path,
@@ -1630,13 +1630,13 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 
 tests\test_b100_focus.py:906: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_focus.py:874: in _drive
@@ -1658,7 +1658,7 @@ E       AssertionError: timed out waiting for the Load project dialog
 tests\test_b100_focus.py:78: AssertionError
 _________________ test_tc_b100_12_rehome_lands_synchronously __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29102/test_tc_b100_12_rehome_lands_s0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29102/test_tc_b100_12_rehome_lands_s0')
 
     def test_tc_b100_12_rehome_lands_synchronously(tmp_path: Path) -> None:
         """The landing is a synchronous ``Screen.set_focus``, not
@@ -1694,13 +1694,13 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 
 tests\test_b100_focus.py:939: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -1729,7 +1729,7 @@ E           AttributeError: 'S19TuiApp' object has no attribute '_rehome_focus_a
 tests\test_b100_focus.py:933: AttributeError
 ___________________ test_tc_b100_13_a2l_tail_rehomes_focus ____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29102/test_tc_b100_13_a2l_tail_rehom0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29102/test_tc_b100_13_a2l_tail_rehom0')
 
     def test_tc_b100_13_a2l_tail_rehomes_focus(tmp_path: Path) -> None:
         """The A2L load tail applies the LLR-166.1 rule: with the focus on the
@@ -1763,13 +1763,13 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 
 tests\test_b100_focus.py:975: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_focus.py:972: in _drive
@@ -1814,7 +1814,7 @@ E       AssertionError: timed out waiting for the focus to settle on the window'
 tests\test_b100_focus.py:174: AssertionError
 _________________ test_tc_b100_13_a2l_only_load_with_no_image _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29102/test_tc_b100_13_a2l_only_load_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29102/test_tc_b100_13_a2l_only_load_0')
 
     def test_tc_b100_13_a2l_only_load_with_no_image(tmp_path: Path) -> None:
         """Boundary: an A2L load with NO image loaded still re-homes the focus.
@@ -1843,13 +1843,13 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 
 tests\test_b100_focus.py:1001: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_focus.py:998: in _drive
@@ -1894,7 +1894,7 @@ E       AssertionError: timed out waiting for the focus to settle on the window'
 tests\test_b100_focus.py:174: AssertionError
 ___ test_at_b100_04_focus_lands_and_single_keys_reach_their_screens[size0] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29102/test_at_b100_04_focus_lands_an0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29102/test_at_b100_04_focus_lands_an0')
 size = (118, 54)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
@@ -1968,13 +1968,13 @@ size = (118, 54)
 
 tests\test_b100_focus.py:1146: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_focus.py:1112: in _drive
@@ -2019,7 +2019,7 @@ E       AssertionError: timed out waiting for the focus to settle on the window'
 tests\test_b100_focus.py:174: AssertionError
 ___ test_at_b100_04_focus_lands_and_single_keys_reach_their_screens[size1] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29102/test_at_b100_04_focus_lands_an1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29102/test_at_b100_04_focus_lands_an1')
 size = (220, 60)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
@@ -2093,13 +2093,13 @@ size = (220, 60)
 
 tests\test_b100_focus.py:1146: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_focus.py:1112: in _drive

@@ -1,7 +1,7 @@
 # command: python -m pytest -q -p no:cacheprovider tests/test_flow_execution_service.py tests/test_flow_multi_image_ui.py tests/test_id_registry.py tests/test_loadfilescreen_input.py tests/test_manifest_verify.py tests/test_manifest_writer.py tests/test_project_gather.py tests/test_report_logging.py tests/test_report_progress.py tests/test_tui_app.py tests/test_tui_commandbar.py tests/test_tui_diff_screen.py tests/test_tui_directionb.py tests/test_tui_evidence_packs.py tests/test_tui_flow_execution_b94.py tests/test_tui_manifest_save.py tests/test_tui_patch_card.py tests/test_tui_patch_editor_v2.py tests/test_tui_patch_history_strip.py tests/test_tui_patch_layout.py tests/test_tui_patch_variant.py tests/test_tui_report_filter_surface.py tests/test_tui_report_seam.py tests/test_tui_report_view.py tests/test_tui_variants.py tests/test_variant_execution.py tests/test_workspace_variants.py -rfE
-# tree: /c/Users/jjgh8/Github/s19_app-b100-inc6 (base 093a7c0 + Inc 6, fix3) | sources: 762d1a98c8a65903 *s19_app/tui/app.py;ea549ab4bd9d3ef4 *s19_app/tui/screens.py;76b276077ded9717 *s19_app/tui/services/variant_execution_service.py;781f04ed2cc30897 *s19_app/tui/styles.tcss;
-# PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc6 | NO_COLOR unset | 2026-10-30T00:42:34-06:00
-s19_app: C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\__init__.py
+# tree: <HOME>/Github/s19_app-b100-inc6 (base 093a7c0 + Inc 6, fix3) | sources: 762d1a98c8a65903 *s19_app/tui/app.py;ea549ab4bd9d3ef4 *s19_app/tui/screens.py;76b276077ded9717 *s19_app/tui/services/variant_execution_service.py;781f04ed2cc30897 *s19_app/tui/styles.tcss;
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc6 | NO_COLOR unset | 2026-10-30T00:42:34-06:00
+s19_app: <HOME>\Github\s19_app-b100-inc6\s19_app\__init__.py
                     app.query_one("#diff_path_a", Input).value = str(
                         project_dir / "a.s19"
                     )

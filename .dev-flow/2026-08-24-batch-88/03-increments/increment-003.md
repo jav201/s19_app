@@ -53,8 +53,8 @@ sentinel ``**`` that classifies root files **without** silencing sub-directory o
 
 | File | Kind | Change |
 |---|---|---|
-| `C:\Users\jjgh8\.claude\docs\tools\devflow-validate.py` | source | V5 grammar + outcome core, V8 resolver + outcome core, **54** arms |
-| `C:\Users\jjgh8\.claude\skills\dev-flow\scripts\devflow-validate.py` | build output | `--sync-bundle` mirror, verified byte-identical after `tr -d '\r'` |
+| `<HOME>\.claude\docs\tools\devflow-validate.py` | source | V5 grammar + outcome core, V8 resolver + outcome core, **54** arms |
+| `<HOME>\.claude\skills\dev-flow\scripts\devflow-validate.py` | build output | `--sync-bundle` mirror, verified byte-identical after `tr -d '\r'` |
 
 **SOURCE files: 1 / 4.**
 
@@ -89,7 +89,7 @@ arithmetic**, never as a count: `b09 782 = 733 − 3 + 52` · `b10 816 = 782 −
 ### The mandatory battery — 16 kills, **16 reddened, 0 survivors on the first arm set**
 
 Every mutant was built as a single edit against a **COPY** under
-`C:\Users\jjgh8\.claude\jobs\c0c0fa47\tmp\` and asserted **non-no-op at build time** — a mutation
+`<HOME>\.claude\jobs\c0c0fa47\tmp\` and asserted **non-no-op at build time** — a mutation
 that changed nothing is a hard error in the harness, not a silent green. Harness: `kills.py`.
 
 | id | the edit | reddened by |

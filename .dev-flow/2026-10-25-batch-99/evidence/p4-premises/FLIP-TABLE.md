@@ -1,6 +1,6 @@
 # Premise flip table — the investigation probes re-run on main `e7732f6` (all 12 increments)
 
-Run 2026-10-26 with `S19_WT=C:/Users/jjgh8/Github/s19_app`, `s19env`. Before-state: `../p0-premises/` (on `307065f`). Three probes were written against the pre-batch API and crash on the new one (the export now returns `PlacedExport(path, action)`; the flow writes nothing when PATCH errors). Their adapted copies sit in `adapted/` with a header comment; the probe logic is otherwise unchanged.
+Run 2026-10-26 with `S19_WT=<HOME>/Github/s19_app`, `s19env`. Before-state: `../p0-premises/` (on `307065f`). Three probes were written against the pre-batch API and crash on the new one (the export now returns `PlacedExport(path, action)`; the flow writes nothing when PATCH errors). Their adapted copies sit in `adapted/` with a header comment; the probe logic is otherwise unchanged.
 
 | Premise | Before (`307065f`) | After (`e7732f6`) | Transcript |
 |---|---|---|---|

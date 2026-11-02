@@ -1,11 +1,11 @@
-# Inc-6 RED re-run (PC-11 reorders + the log-cap arm) on HEAD b514b07 source, worktree; s19_app from: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\s19_app\__init__.py
+# Inc-6 RED re-run (PC-11 reorders + the log-cap arm) on HEAD b514b07 source, worktree; s19_app from: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\s19_app\__init__.py
 0e1f00310bee5f68513585892d49fd862e4f91ade350b248b94a5cf7af51b390 *s19_app/tui/flow_screens.py
 fd5c696021bd6972466ab96aa33b53ac55b2be20874a21bceeaf90ab7ad6f621 *s19_app/tui/app.py
 FFFFFFFFFFFFFFFFFFFF                                                     [100%]
 ================================== FAILURES ===================================
 tests\test_b97_flow_execution.py:440: AssertionError: lane 0 paints its notices cable: '┌─[ patch_chain ]──────────────────────────┐\n│ tpl patch_chain· 4 blocks                │\n│ source → patch → check → write_out       │\n│ in1 prg.s19                              │\n│ sesión: …e_run_0\\.s19tool\\workarea\\proj1 │\n│ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓ 100% ◈  0.023s            │\n└──────────────────────────────────────────┘'
 tests\test_b97_flow_execution.py:852: AssertionError: the set picker parses its option as markup: ['bold', 'red', 'link=e', '@click=app.quit']
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_card_1_2' on FlowExecutionPanel(id='fx_panel')
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_card_1_2' on FlowExecutionPanel(id='fx_panel')
 tests\test_b97_flow_execution.py:1529: AssertionError: waiting at the second external step after one confirm: (0, 2, True, False)
 tests\test_b97_flow_execution.py:1056: AssertionError: ['00:00.000 ▶ patch_chain · started', '00:00.019 ◈ patch_chain · done · wrote fw_app_patched.s19', '00:00.019 ▶ patch_...atched.s19', '00:00.040 ▶ patch_chain_3 · started', '00:00.055 ◈ patch_chain_3 · done · wrote fw_app_patched.s19', ...]
 tests\test_b97_chips_help.py:1873: AssertionError: ('lanes_empty', '(no chains — Import… adds a lane)')

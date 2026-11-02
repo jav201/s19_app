@@ -4,7 +4,7 @@ PASS-WITH-NOTES
 
 Role: security-reviewer. Finding prefix S10-. Counts: HIGH 0 · MAJOR 2 · MINOR 2 · NIT 0.
 
-Scope: `E1-scope.md`, `E1-rulings.md`, `E2-rulings.md`, `E1-requirements-draft.md` (HLR-174 … LLR-174.4c, read for the failure paths), `codewire/interfaces-10.md`, `baseline-10.md` / `baseline-notes.md`, `proto-10-dialog.md`, `proto-10-app.md`. I read the code read-only: main `8947666` (`C:/Users/jjgh8/Github/s19_app`) and the 9b worktree (`C:/Users/jjgh8/Github/s19_app-b100-inc9b`, uncommitted 9b code) for the router, `check_action`, `_load_workarea_file` and `LoadDialog`. Textual 8.2.8.
+Scope: `E1-scope.md`, `E1-rulings.md`, `E2-rulings.md`, `E1-requirements-draft.md` (HLR-174 … LLR-174.4c, read for the failure paths), `codewire/interfaces-10.md`, `baseline-10.md` / `baseline-notes.md`, `proto-10-dialog.md`, `proto-10-app.md`. I read the code read-only: main `8947666` (`<HOME>/Github/s19_app`) and the 9b worktree (`<HOME>/Github/s19_app-b100-inc9b`, uncommitted 9b code) for the router, `check_action`, `_load_workarea_file` and `LoadDialog`. Textual 8.2.8.
 
 Probes I ran (throwaway, in `work/e3-security/`, `LOCALAPPDATA` = `work/e3-security/localappdata`, fixtures in `work/e3-security/tmp`). They imported the main checkout at `8947666` (clean apart from the untracked `prototypes/`).
 - `probe_sec_dropdown.py` → `probe_sec_dropdown.out.txt` (S10-02, executed)

@@ -14,7 +14,7 @@
   "Apply: 1 applied, 0 skipped, 0 blocked",
   "Project saved + manifest verified",
   "Saved + verified: firmware_1.s19 — 1 entry applied before this save (0x8000007C)",
-  "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\s19c\\ux\\b-w220\\.s19tool\\workarea\\P (variant 'firmware_1') — firmware.s19 + 1 change entry, 0 applied by this save"
+  "Saved project to <HOME>\\AppData\\Local\\Temp\\s19c\\ux\\b-w220\\.s19tool\\workarea\\P (variant 'firmware_1') — firmware.s19 + 1 change entry, 0 applied by this save"
  ],
  "dialog_preview": "variant firmware.s19\n● variant firmware_1.s19\nproject file: ok",
  "reopen_screen": "LoadResultScreen",

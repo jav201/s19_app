@@ -207,17 +207,17 @@ The ribbon, file row, document controls and legend are 1 row each (slack 0). The
 
 | Evidence artifact | Path | SHA-256 |
 |---|---|---|
-| RED transcript | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/red.txt` | `a9d7f6f10d33113814b6dcf563d2e6e254d65f888dc9831eb8990e29dba6a550` |
-| RED re-run (PC-11 reorders) | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/red-rerun.txt` | `a92335fce045838a17ffcedd24d28a1d57d3052add71adaa4ffe49e52b8b29ed` |
-| RED re-run TC-B97-40 (clean HEAD worktree) | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/red-tc40.txt` | `7953c48be316dfe09c5115e643f38f8f874bb7bfd622ac4aae39ffb8b8bfa6e2` |
-| GREEN gate set | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/green.txt` | `bb2f74518f94427a955916d9ee7a86dfe2ef3c5d6419be0916955a456892c376` |
+| RED transcript | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/red.txt` | `564b18e40cfcba73602a0e61023ec94d72a1b32f01eb7a715d989898648ce3a6` |
+| RED re-run (PC-11 reorders) | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/red-rerun.txt` | `d6eb619507d6e29f2d15cfe5035532453ac5d2d0b44e2b2c02626ca11a247a33` |
+| RED re-run TC-B97-40 (clean HEAD worktree) | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/red-tc40.txt` | `2f48831d981bc646fabb968996cc655b5292e577386dcb9166ff21e860d37887` |
+| GREEN gate set | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/green.txt` | `8348272c31e74e5a70f2f03adeb79a108ab387394de8f519aa3cafb4a10a9cc2` |
 | GREEN re-run of files touched after it | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/green-after-fixes.txt` | `6f34a690d6e82ccd4468edd6fc8a8bf46cf8a364cbba9838333d4f1714bdb3c7` |
 | Gate file list | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/gate-files.txt` | `95b77de9228813056d165f8d0e88c32c24f0e2f2e1685249fc68fb5c5f24c444` |
 | Guard host | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/guard-host.txt` | `16453bfbecd0728b84896a65e4bd2452bcd07923e99127afb40ac629153fd8c0` |
-| Flake comparison (HEAD vs Inc-4) | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/rerun-nonbaseline.txt` | `ab89b63f0b881330d1dad1bba2900f5b9749c0b468859e0b89b5fa87e17c9dfa` |
+| Flake comparison (HEAD vs Inc-4) | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/rerun-nonbaseline.txt` | `a6f912ea0950383b7fd5abeedd85ad98f31979395e7a82e175bac045b6483f41` |
 | Reverse-census file list · greps | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/census-files.txt` · `census.txt` | `49ba336d95034beab598edc907a97cfd9f73b12a49e61cc5243f1606d0e25cbd` · `afbe709a5bc9c2bd8b8207f2389fc67d68bc288e5363a2f408d1f37e44969b31` |
-| Census run on HEAD · on the Inc-4 tree before the rewrites | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/census-head-run.txt` · `census-new-first.txt` | `43be508d8b4b1cc11923846d84d3b73ab84802f3a2889668267d575a0c9cc2e2` · `041d0cb8f4bd8a29468fd54e1028e27359bc64d17c57cdd6339f89dd92a31b21` |
-| Mutation battery · rerun (M39) · script | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/mutations.txt` · `mutations-rerun.txt` · `mutate.py` | `f8271258c998be4799af87c751bba54ab0f6c52ee46a4003c8f8d70d6372106d` · `09078adf003ad1e6f7fbb9e5f5abc91a09f02ec912816fb20cdb68b375442cf5` · `4bdd04eca4cb9dcf9cb9b96ebd3155e1253c761f1835c42a87806ba853ee26ce` |
+| Census run on HEAD · on the Inc-4 tree before the rewrites | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/census-head-run.txt` · `census-new-first.txt` | `9b9264357d8b91aa5479b2d976b040b875451283d95acd172bedb6a722e8e52c` · `5e146f6dc77d02112638c9188c4fb1de8211b826b893b87f1a1ebf3b9b3ccf3d` |
+| Mutation battery · rerun (M39) · script | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/mutations.txt` · `mutations-rerun.txt` · `mutate.py` | `72c4426e48aeb15fb558d723f077b114e2b05e914f19cba0b30b6e79347d13d0` · `7f6e91a50fef51471a37ea455ec51ab7eca1bf0250090b47c5113537dbafcae0` · `4bdd04eca4cb9dcf9cb9b96ebd3155e1253c761f1835c42a87806ba853ee26ce` |
 | Snapshot cells HEAD · Inc-4 · diff | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/cells-head.txt` · `cells-inc4.txt` · `cells-diff.txt` | `369616a0351679e32fd6afc6b42ef83416ae33841a94335ba5ffc9f0ba4e4b32` · `fd4436dda919bdaa10e0085dd124ed772e3dc5cb167e2e00ccf029b1095ab301` · `e05fdab0a17cb71e9b40f157597d4870ac2977f418527ecf8926550d0e4d16a9` |
 | Check Editor frames HEAD · Inc-4 · diff · positive control · script | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/check-frames-98f3c84.txt` · `check-frames-inc4.txt` · `check-frames-diff.txt` · `check-frames-positive-control.txt` · `check_frames.py` | `256b89b991dce10af09252a8576a42436e0e930bc3dd0070b7488bb6f5a176cb` · `256b89b991dce10af09252a8576a42436e0e930bc3dd0070b7488bb6f5a176cb` · `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` · `ac7a1bb42c96e5b7b68203d5a8ec897adb3a56803e2e37dc3eff6038654f090a` · `2d622f13ff24f8097b6fe181bb0c9c3817061e46f6dc17b54c11d842db462b2e` |
 | PC-24 budget · script | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/budget.txt` · `measure_budget.py` | `c042193c4eeb8e0c41356c459fe44c79a07ecf7e9d07f07322ba2a62591321fb` · `74267307856d325d31c3def7cc1dbe072afe9a06746b1c292cdc0c4458a71818` |
@@ -225,19 +225,19 @@ The ribbon, file row, document controls and legend are 1 row each (slack 0). The
 | Capture 118x53 (fold) | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/png/impl.patch-editor.118x53.png` | `6d58cc26784d6436957312699b5a0b3e4901424f7f93e8d06af93af405d615be` |
 | Capture 220x60 (fold) | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/png/impl.patch-editor.220.png` | `7f72b516cc913d72e50d19bdb69ad529ada556a6b288122149dc8b40aacdbe6f` |
 | Capture 118x54 JSON tab | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/png/impl.patch-editor-json.png` | `e69c9d469cfbf3777bb68fda34dcacdec41696964d1a7d425ffd6be69fc0731b` |
-| **Fold** RED (pre-fold source) | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/red-fold.txt` | `0fd55287562293a3de247875f95447c267a25987ff6e84383df01279513297d5` |
-| **Fold** GREEN gate set | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/green-fold.txt` | `c9723f64d046229437347574853e7308451a0f13f9ee701d21a4ba6926e2fe85` |
+| **Fold** RED (pre-fold source) | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/red-fold.txt` | `47c754a6fd67f83053ce8d1202b5d34b2b2f32e1c876ee9a1b8c478792bc6ecf` |
+| **Fold** GREEN gate set | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/green-fold.txt` | `87e7ec9592cf22adb84d1d849784c0989ba040a1141bb07268e2acacbbdbac69` |
 | **Fold** guard host | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/guard-host-fold.txt` | `c7982fbd4e9f77a3df681af6ee7fb5cc6c4912377f053c419f95c71af1cf8e19` |
-| **Fold** non-baseline re-runs (at058b, at077e, at_061a vs HEAD) | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/rerun-nonbaseline-fold.txt` | `481642b0054603cbdcdf181339a4bd89fb0a41a5b057745e9d3545eb1174731d` |
-| **Fold** mutations · script (48 mutants) | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/mutations-fold.txt` · `mutate.py` | `36f5c3eeebc847c1f2ab4b8888e5b8de1df4656df16cad8d97c27bf63590ef65` · `26016be7ff69d6e4d0c37a735a3fe07716e55822321d4627f6122a3244c4915b` |
+| **Fold** non-baseline re-runs (at058b, at077e, at_061a vs HEAD) | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/rerun-nonbaseline-fold.txt` | `861839372e8c72741ded01b3ee5842ab3dcdacb7db17bc6fc875f33bb783c445` |
+| **Fold** mutations · script (48 mutants) | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/mutations-fold.txt` · `mutate.py` | `25e4b54763873551d4d2bdd2910ee19935c406f1fb2c228e40d5a647e62e6576` · `26016be7ff69d6e4d0c37a735a3fe07716e55822321d4627f6122a3244c4915b` |
 | **Fold** pane budget | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/budget-fold.txt` | `51d9691e0bc56fdc5828d2ad5f0573f2b1c8b4dabdeaaa5c78924809621b0237` |
 | **Fold** Check Editor frames · diff | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/check-frames-fold.txt` · `check-frames-diff-fold.txt` | `256b89b991dce10af09252a8576a42436e0e930bc3dd0070b7488bb6f5a176cb` · `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
-| **Fold** validator `--brief` (after `--atlas --write`): only V2 blocks (16 AT ids of later increments, as before the fold) | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/validate-brief-fold.txt` | `42f79f6a60e16685c4ce26bb77c7f0e6a9f59aee6f2dba86350f78ce20743c51` |
+| **Fold** validator `--brief` (after `--atlas --write`): only V2 blocks (16 AT ids of later increments, as before the fold) | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/validate-brief-fold.txt` | `402c345bb6872a7fd51e2e707c7684f84b701ced71b4d9dfae82878a8532ed7e` |
 | **Fold** help-draft restore diff | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/help-draft-restore.diff` | `bbc3601795711243abc14a33e01aa8b8a99f59fed4cd68ce88c3559946b09840` |
 | First-run captures kept | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/png/impl.patch-editor.pre-fold.png` · `impl.patch-editor.118x53.pre-fold.png` · `impl.patch-editor.220.pre-fold.png` · `impl.patch-editor-json.pre-fold.png` | `e5427d69…f76a9` · `81498f40…7bd08` · `5c61ac81…7c` · `29378892…6df0` (= the first-run digests) |
-| Full suite, fold tree (orchestrator) | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/full-suite-fold.txt` | `220b8f1ed1b185d36becba38b192b3a4008875fcb2d682aed4e65bd020811deb` |
+| Full suite, fold tree (orchestrator) | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/full-suite-fold.txt` | `760eb59c5b2a2abdcf5ef6e51d92d7aeaf28df2689d07ecfcee44f263b53d1f6` |
 | Non-baseline re-runs of the gate suite, at068a hardening (orchestrator) | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/rerun-nonbaseline-suite.txt` | `2483995ebcb921f6ee0cd75a794b7402b38ede79331dd230de9892d0a8029e92` |
-| `test_tui_patch_editor_v2.py` module after the at068a hardening (orchestrator) | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/patch-v2-module-after-hardening.txt` | `458e98bc174eb60a491d9ab28333d1a0ad6d2a34b18fb1dc72112cf8e2beaf01` |
+| `test_tui_patch_editor_v2.py` module after the at068a hardening (orchestrator) | `.dev-flow/2026-10-19-batch-97/evidence/inc-4/patch-v2-module-after-hardening.txt` | `0f7c776b51121f72d1e190cf481e9e1571c7f3bb224f40896840caf3aa59154e` |
 
 | Field | Value |
 |---|---|

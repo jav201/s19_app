@@ -1,6 +1,6 @@
 # HANDOFF — batch-99 Increment 10 (HLR-158, map row B99-I4)
 
-Worktree: `C:\Users\jjgh8\Github\s19_app-b99-inc10` (branch b99-inc10). Working
+Worktree: `<HOME>\Github\s19_app-b99-inc10` (branch b99-inc10). Working
 tree only — **no commit**, per the brief. The orchestrator commits.
 
 ## What was done

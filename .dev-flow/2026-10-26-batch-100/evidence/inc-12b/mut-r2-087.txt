@@ -3,9 +3,9 @@ target file: s19_app/tui/app.py
 description: _on_project_saved: saved_painted = len(tail) > 1 -> False
 old -> new: '            saved_painted = len(tail) > 1' -> '            saved_painted = False'
 sha256 before: 46f7ee6aa8a0fbfbc6571b095bbf7d4c4661de5bd3f1ecf96e9b1347c424210d
-command: timeout 900 env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\lad C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=short --basetemp=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\bt\mut-087 "tests/test_b100_busy.py::test_tc_b100_51_raise_after_a_multi_line_tail_paints_the_saved_line_once"
-cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mutc12b
-s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mutc12b\s19_app\__init__.py
+command: timeout 900 env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\lad <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=short --basetemp=<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\bt\mut-087 "tests/test_b100_busy.py::test_tc_b100_51_raise_after_a_multi_line_tail_paints_the_saved_line_once"
+cwd: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mutc12b
+s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mutc12b\s19_app\__init__.py
 pytest summary: 1 failed in 4.13s
 elapsed: 5.1s
 verdict: KILLED
@@ -18,13 +18,13 @@ F                                                                        [100%]
 __ test_tc_b100_51_raise_after_a_multi_line_tail_paints_the_saved_line_once ___
 tests\test_b100_busy.py:3271: in test_tc_b100_51_raise_after_a_multi_line_tail_paints_the_saved_line_once
     assert len(saved) == 1, saved
-E   AssertionError: ["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b89...e_after_a_0\\app\\.s19tool\\workarea\\S3 (variant 'firmware') — firmware.s19 + 1 change entry, 0 applied by this save"]
+E   AssertionError: ["Saved project to <HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-clde\\a8feab43-c248-4ccb-86cf-122b89...e_after_a_0\\app\\.s19tool\\workarea\\S3 (variant 'firmware') — firmware.s19 + 1 change entry, 0 applied by this save"]
 E   assert 2 == 1
-E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b89...e_after_a_0\\app\\.s19tool\\workarea\\S3 (variant 'firmware') — firmware.s19 + 1 change entry, 0 applied by this save"])
+E    +  where 2 = len(["Saved project to <HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-clde\\a8feab43-c248-4ccb-86cf-122b89...e_after_a_0\\app\\.s19tool\\workarea\\S3 (variant 'firmware') — firmware.s19 + 1 change entry, 0 applied by this save"])
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
 
-│ C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4 
+│ <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4 
 
 │ ccb-86cf-122b894659b2\scratchpad\mutc12b\s19_app\tui\app.py:12283 in         
 
@@ -96,7 +96,7 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │              line = 'Saved project to                                    │ 
 
-│ │                     C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--… │ 
+│ │                     <HOME>\\AppData\\Local\\Temp\\claude\\C--… │ 
 
 │ │           mem_map = {                                                    │ 
 
@@ -136,11 +136,11 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │                                            │ 
 
-│ │                     project_dir=WindowsPath('C:/Users/jjgh8/AppData/Loc… │ 
+│ │                     project_dir=WindowsPath('<HOME>/AppData/Loc… │ 
 
 │ │                     │   │   │                                            │ 
 
-│ │                     save_as_source=WindowsPath('C:/Users/jjgh8/AppData/… │ 
+│ │                     save_as_source=WindowsPath('<HOME>/AppData/… │ 
 
 │ │                     │   │   │   source_gone=None,                        │ 
 
@@ -238,7 +238,7 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │   │   │                                    │ 
 
-│ │                     saved_path=WindowsPath('C:/Users/jjgh8/AppData/Loca… │ 
+│ │                     saved_path=WindowsPath('<HOME>/AppData/Loca… │ 
 
 │ │                     │   │   │   │   │   verify_result=VerifyResult(      │ 
 
@@ -272,13 +272,13 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │   │   │   │                                │ 
 
-│ │                     written_path=WindowsPath('C:/Users/jjgh8/AppData/Lo… │ 
+│ │                     written_path=WindowsPath('<HOME>/AppData/Lo… │ 
 
 │ │                     │   │   │   │   │   ),                               │ 
 
 │ │                     │   │   │   │   │                                    │ 
 
-│ │                     source_image_path=WindowsPath('C:/Users/jjgh8/AppDa… │ 
+│ │                     source_image_path=WindowsPath('<HOME>/AppDa… │ 
 
 │ │                     │   │   │   │   ),                                   │ 
 
@@ -322,7 +322,7 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │   │                                        │ 
 
-│ │                     target=WindowsPath('C:/Users/jjgh8/AppData/Local/Te… │ 
+│ │                     target=WindowsPath('<HOME>/AppData/Local/Te… │ 
 
 │ │                     │   │   │   │   target_kind='new',                   │ 
 
@@ -334,11 +334,11 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │   │   │   │                                │ 
 
-│ │                     source=WindowsPath('C:/Users/jjgh8/AppData/Local/Te… │ 
+│ │                     source=WindowsPath('<HOME>/AppData/Local/Te… │ 
 
 │ │                     │   │   │   │   │   │                                │ 
 
-│ │                     landing=WindowsPath('C:/Users/jjgh8/AppData/Local/T… │ 
+│ │                     landing=WindowsPath('<HOME>/AppData/Local/T… │ 
 
 │ │                     │   │   │   │   │   │   action='new'                 │ 
 
@@ -350,11 +350,11 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │   │   │   │                                │ 
 
-│ │                     source=WindowsPath('C:/Users/jjgh8/AppData/Local/Te… │ 
+│ │                     source=WindowsPath('<HOME>/AppData/Local/Te… │ 
 
 │ │                     │   │   │   │   │   │                                │ 
 
-│ │                     landing=WindowsPath('C:/Users/jjgh8/AppData/Local/T… │ 
+│ │                     landing=WindowsPath('<HOME>/AppData/Local/T… │ 
 
 │ │                     │   │   │   │   │   │   action='new'                 │ 
 
@@ -366,11 +366,11 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │   │   │   │                                │ 
 
-│ │                     source=WindowsPath('C:/Users/jjgh8/AppData/Local/Te… │ 
+│ │                     source=WindowsPath('<HOME>/AppData/Local/Te… │ 
 
 │ │                     │   │   │   │   │   │                                │ 
 
-│ │                     landing=WindowsPath('C:/Users/jjgh8/AppData/Local/T… │ 
+│ │                     landing=WindowsPath('<HOME>/AppData/Local/T… │ 
 
 │ │                     │   │   │   │   │   │   action='new'                 │ 
 
@@ -384,7 +384,7 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │   │   │   │                                │ 
 
-│ │                     landing=WindowsPath('C:/Users/jjgh8/AppData/Local/T… │ 
+│ │                     landing=WindowsPath('<HOME>/AppData/Local/T… │ 
 
 │ │                     │   │   │   │   │   │   action='new'                 │ 
 
@@ -398,7 +398,7 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │   │   │   │                                │ 
 
-│ │                     landing=WindowsPath('C:/Users/jjgh8/AppData/Local/T… │ 
+│ │                     landing=WindowsPath('<HOME>/AppData/Local/T… │ 
 
 │ │                     │   │   │   │   │   │   action='new'                 │ 
 
@@ -452,7 +452,7 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │                                            │ 
 
-│ │                     parent_folder='C:\\Users\\jjgh8\\AppData\\Local\\Te… │ 
+│ │                     parent_folder='<HOME>\\AppData\\Local\\Te… │ 
 
 │ │                     │   │   │   project_name='S3',                       │ 
 
@@ -506,7 +506,7 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │                                            │ 
 
-│ │                     source_path=WindowsPath('C:/Users/jjgh8/AppData/Loc… │ 
+│ │                     source_path=WindowsPath('<HOME>/AppData/Loc… │ 
 
 │ │                     │   │   │   summary=ChangeSummary(                   │ 
 
@@ -568,7 +568,7 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │   │                                        │ 
 
-│ │                     saved_path=WindowsPath('C:/Users/jjgh8/AppData/Loca… │ 
+│ │                     saved_path=WindowsPath('<HOME>/AppData/Loca… │ 
 
 │ │                     │   │   │   │   verify_result=VerifyResult(          │ 
 
@@ -602,13 +602,13 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │   │   │                                    │ 
 
-│ │                     written_path=WindowsPath('C:/Users/jjgh8/AppData/Lo… │ 
+│ │                     written_path=WindowsPath('<HOME>/AppData/Lo… │ 
 
 │ │                     │   │   │   │   ),                                   │ 
 
 │ │                     │   │   │   │                                        │ 
 
-│ │                     source_image_path=WindowsPath('C:/Users/jjgh8/AppDa… │ 
+│ │                     source_image_path=WindowsPath('<HOME>/AppDa… │ 
 
 │ │                     │   │   │   ),                                       │ 
 
@@ -670,11 +670,11 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │                                                │ 
 
-│ │                     workarea=WindowsPath('C:/Users/jjgh8/AppData/Local/… │ 
+│ │                     workarea=WindowsPath('<HOME>/AppData/Local/… │ 
 
 │ │                     │   │                                                │ 
 
-│ │                     base_dir=WindowsPath('C:/Users/jjgh8/AppData/Local/… │ 
+│ │                     base_dir=WindowsPath('<HOME>/AppData/Local/… │ 
 
 │ │                     │   │   gen=2                                        │ 
 
@@ -700,7 +700,7 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │   │                                        │ 
 
-│ │                     path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp… │ 
+│ │                     path=WindowsPath('<HOME>/AppData/Local/Temp… │ 
 
 │ │                     │   │   │   │   file_type='s19'                      │ 
 
@@ -724,7 +724,7 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │                                                │ 
 
-│ │                     written_path=WindowsPath('C:/Users/jjgh8/AppData/Lo… │ 
+│ │                     written_path=WindowsPath('<HOME>/AppData/Lo… │ 
 
 │ │                     │   ),                                               │ 
 
@@ -760,7 +760,7 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │                                                │ 
 
-│ │                     written_path=WindowsPath('C:/Users/jjgh8/AppData/Lo… │ 
+│ │                     written_path=WindowsPath('<HOME>/AppData/Lo… │ 
 
 │ │                     │   ),                                               │ 
 
@@ -800,11 +800,11 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │                                                    │ 
 
-│ │                     project_dir=WindowsPath('C:/Users/jjgh8/AppData/Loc… │ 
+│ │                     project_dir=WindowsPath('<HOME>/AppData/Loc… │ 
 
 │ │                     │                                                    │ 
 
-│ │                     save_as_source=WindowsPath('C:/Users/jjgh8/AppData/… │ 
+│ │                     save_as_source=WindowsPath('<HOME>/AppData/… │ 
 
 │ │                     │   source_gone=None,                                │ 
 
@@ -898,7 +898,7 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │                                            │ 
 
-│ │                     saved_path=WindowsPath('C:/Users/jjgh8/AppData/Loca… │ 
+│ │                     saved_path=WindowsPath('<HOME>/AppData/Loca… │ 
 
 │ │                     │   │   │   verify_result=VerifyResult(              │ 
 
@@ -932,13 +932,13 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │   │                                        │ 
 
-│ │                     written_path=WindowsPath('C:/Users/jjgh8/AppData/Lo… │ 
+│ │                     written_path=WindowsPath('<HOME>/AppData/Lo… │ 
 
 │ │                     │   │   │   ),                                       │ 
 
 │ │                     │   │   │                                            │ 
 
-│ │                     source_image_path=WindowsPath('C:/Users/jjgh8/AppDa… │ 
+│ │                     source_image_path=WindowsPath('<HOME>/AppDa… │ 
 
 │ │                     │   │   ),                                           │ 
 
@@ -982,7 +982,7 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │                                                │ 
 
-│ │                     target=WindowsPath('C:/Users/jjgh8/AppData/Local/Te… │ 
+│ │                     target=WindowsPath('<HOME>/AppData/Local/Te… │ 
 
 │ │                     │   │   target_kind='new',                           │ 
 
@@ -994,11 +994,11 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │   │                                        │ 
 
-│ │                     source=WindowsPath('C:/Users/jjgh8/AppData/Local/Te… │ 
+│ │                     source=WindowsPath('<HOME>/AppData/Local/Te… │ 
 
 │ │                     │   │   │   │                                        │ 
 
-│ │                     landing=WindowsPath('C:/Users/jjgh8/AppData/Local/T… │ 
+│ │                     landing=WindowsPath('<HOME>/AppData/Local/T… │ 
 
 │ │                     │   │   │   │   action='new'                         │ 
 
@@ -1010,11 +1010,11 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │   │                                        │ 
 
-│ │                     source=WindowsPath('C:/Users/jjgh8/AppData/Local/Te… │ 
+│ │                     source=WindowsPath('<HOME>/AppData/Local/Te… │ 
 
 │ │                     │   │   │   │                                        │ 
 
-│ │                     landing=WindowsPath('C:/Users/jjgh8/AppData/Local/T… │ 
+│ │                     landing=WindowsPath('<HOME>/AppData/Local/T… │ 
 
 │ │                     │   │   │   │   action='new'                         │ 
 
@@ -1026,11 +1026,11 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │   │                                        │ 
 
-│ │                     source=WindowsPath('C:/Users/jjgh8/AppData/Local/Te… │ 
+│ │                     source=WindowsPath('<HOME>/AppData/Local/Te… │ 
 
 │ │                     │   │   │   │                                        │ 
 
-│ │                     landing=WindowsPath('C:/Users/jjgh8/AppData/Local/T… │ 
+│ │                     landing=WindowsPath('<HOME>/AppData/Local/T… │ 
 
 │ │                     │   │   │   │   action='new'                         │ 
 
@@ -1044,7 +1044,7 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │   │                                        │ 
 
-│ │                     landing=WindowsPath('C:/Users/jjgh8/AppData/Local/T… │ 
+│ │                     landing=WindowsPath('<HOME>/AppData/Local/T… │ 
 
 │ │                     │   │   │   │   action='new'                         │ 
 
@@ -1058,7 +1058,7 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │   │                                        │ 
 
-│ │                     landing=WindowsPath('C:/Users/jjgh8/AppData/Local/T… │ 
+│ │                     landing=WindowsPath('<HOME>/AppData/Local/T… │ 
 
 │ │                     │   │   │   │   action='new'                         │ 
 
@@ -1118,11 +1118,11 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │                                                │ 
 
-│ │                     project_dir=WindowsPath('C:/Users/jjgh8/AppData/Loc… │ 
+│ │                     project_dir=WindowsPath('<HOME>/AppData/Loc… │ 
 
 │ │                     │   │                                                │ 
 
-│ │                     save_as_source=WindowsPath('C:/Users/jjgh8/AppData/… │ 
+│ │                     save_as_source=WindowsPath('<HOME>/AppData/… │ 
 
 │ │                     │   │   source_gone=None,                            │ 
 
@@ -1216,7 +1216,7 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │   │                                        │ 
 
-│ │                     saved_path=WindowsPath('C:/Users/jjgh8/AppData/Loca… │ 
+│ │                     saved_path=WindowsPath('<HOME>/AppData/Loca… │ 
 
 │ │                     │   │   │   │   verify_result=VerifyResult(          │ 
 
@@ -1250,13 +1250,13 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │   │   │                                    │ 
 
-│ │                     written_path=WindowsPath('C:/Users/jjgh8/AppData/Lo… │ 
+│ │                     written_path=WindowsPath('<HOME>/AppData/Lo… │ 
 
 │ │                     │   │   │   │   ),                                   │ 
 
 │ │                     │   │   │   │                                        │ 
 
-│ │                     source_image_path=WindowsPath('C:/Users/jjgh8/AppDa… │ 
+│ │                     source_image_path=WindowsPath('<HOME>/AppDa… │ 
 
 │ │                     │   │   │   ),                                       │ 
 
@@ -1300,7 +1300,7 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │                                            │ 
 
-│ │                     target=WindowsPath('C:/Users/jjgh8/AppData/Local/Te… │ 
+│ │                     target=WindowsPath('<HOME>/AppData/Local/Te… │ 
 
 │ │                     │   │   │   target_kind='new',                       │ 
 
@@ -1312,11 +1312,11 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │   │   │                                    │ 
 
-│ │                     source=WindowsPath('C:/Users/jjgh8/AppData/Local/Te… │ 
+│ │                     source=WindowsPath('<HOME>/AppData/Local/Te… │ 
 
 │ │                     │   │   │   │   │                                    │ 
 
-│ │                     landing=WindowsPath('C:/Users/jjgh8/AppData/Local/T… │ 
+│ │                     landing=WindowsPath('<HOME>/AppData/Local/T… │ 
 
 │ │                     │   │   │   │   │   action='new'                     │ 
 
@@ -1328,11 +1328,11 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │   │   │                                    │ 
 
-│ │                     source=WindowsPath('C:/Users/jjgh8/AppData/Local/Te… │ 
+│ │                     source=WindowsPath('<HOME>/AppData/Local/Te… │ 
 
 │ │                     │   │   │   │   │                                    │ 
 
-│ │                     landing=WindowsPath('C:/Users/jjgh8/AppData/Local/T… │ 
+│ │                     landing=WindowsPath('<HOME>/AppData/Local/T… │ 
 
 │ │                     │   │   │   │   │   action='new'                     │ 
 
@@ -1344,11 +1344,11 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │   │   │                                    │ 
 
-│ │                     source=WindowsPath('C:/Users/jjgh8/AppData/Local/Te… │ 
+│ │                     source=WindowsPath('<HOME>/AppData/Local/Te… │ 
 
 │ │                     │   │   │   │   │                                    │ 
 
-│ │                     landing=WindowsPath('C:/Users/jjgh8/AppData/Local/T… │ 
+│ │                     landing=WindowsPath('<HOME>/AppData/Local/T… │ 
 
 │ │                     │   │   │   │   │   action='new'                     │ 
 
@@ -1362,7 +1362,7 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │   │   │                                    │ 
 
-│ │                     landing=WindowsPath('C:/Users/jjgh8/AppData/Local/T… │ 
+│ │                     landing=WindowsPath('<HOME>/AppData/Local/T… │ 
 
 │ │                     │   │   │   │   │   action='new'                     │ 
 
@@ -1376,7 +1376,7 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │   │   │                                    │ 
 
-│ │                     landing=WindowsPath('C:/Users/jjgh8/AppData/Local/T… │ 
+│ │                     landing=WindowsPath('<HOME>/AppData/Local/T… │ 
 
 │ │                     │   │   │   │   │   action='new'                     │ 
 
@@ -1430,7 +1430,7 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │                                                │ 
 
-│ │                     parent_folder='C:\\Users\\jjgh8\\AppData\\Local\\Te… │ 
+│ │                     parent_folder='<HOME>\\AppData\\Local\\Te… │ 
 
 │ │                     │   │   project_name='S3',                           │ 
 
@@ -1484,7 +1484,7 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │                                                │ 
 
-│ │                     source_path=WindowsPath('C:/Users/jjgh8/AppData/Loc… │ 
+│ │                     source_path=WindowsPath('<HOME>/AppData/Loc… │ 
 
 │ │                     │   │   summary=ChangeSummary(                       │ 
 
@@ -1546,7 +1546,7 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │                                            │ 
 
-│ │                     saved_path=WindowsPath('C:/Users/jjgh8/AppData/Loca… │ 
+│ │                     saved_path=WindowsPath('<HOME>/AppData/Loca… │ 
 
 │ │                     │   │   │   verify_result=VerifyResult(              │ 
 
@@ -1580,13 +1580,13 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │   │   │                                        │ 
 
-│ │                     written_path=WindowsPath('C:/Users/jjgh8/AppData/Lo… │ 
+│ │                     written_path=WindowsPath('<HOME>/AppData/Lo… │ 
 
 │ │                     │   │   │   ),                                       │ 
 
 │ │                     │   │   │                                            │ 
 
-│ │                     source_image_path=WindowsPath('C:/Users/jjgh8/AppDa… │ 
+│ │                     source_image_path=WindowsPath('<HOME>/AppDa… │ 
 
 │ │                     │   │   ),                                           │ 
 
@@ -1648,11 +1648,11 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │                                                    │ 
 
-│ │                     workarea=WindowsPath('C:/Users/jjgh8/AppData/Local/… │ 
+│ │                     workarea=WindowsPath('<HOME>/AppData/Local/… │ 
 
 │ │                     │                                                    │ 
 
-│ │                     base_dir=WindowsPath('C:/Users/jjgh8/AppData/Local/… │ 
+│ │                     base_dir=WindowsPath('<HOME>/AppData/Local/… │ 
 
 │ │                     │   gen=2                                            │ 
 
@@ -1686,7 +1686,7 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │        saved_line = 'Saved project to                                    │ 
 
-│ │                     C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--… │ 
+│ │                     <HOME>\\AppData\\Local\\Temp\\claude\\C--… │ 
 
 │ │     saved_painted = False                                                │ 
 
@@ -1760,7 +1760,7 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │                                                    │ 
 
-│ │                     saved_path=WindowsPath('C:/Users/jjgh8/AppData/Loca… │ 
+│ │                     saved_path=WindowsPath('<HOME>/AppData/Loca… │ 
 
 │ │                     │   verify_result=VerifyResult(                      │ 
 
@@ -1794,13 +1794,13 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   │                                                │ 
 
-│ │                     written_path=WindowsPath('C:/Users/jjgh8/AppData/Lo… │ 
+│ │                     written_path=WindowsPath('<HOME>/AppData/Lo… │ 
 
 │ │                     │   ),                                               │ 
 
 │ │                     │                                                    │ 
 
-│ │                     source_image_path=WindowsPath('C:/Users/jjgh8/AppDa… │ 
+│ │                     source_image_path=WindowsPath('<HOME>/AppDa… │ 
 
 │ │                     )                                                    │ 
 
@@ -1808,7 +1808,7 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │ │                     │   'Saved project to                                │ 
 
-│ │                     C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--… │ 
+│ │                     <HOME>\\AppData\\Local\\Temp\\claude\\C--… │ 
 
 │ │                     │   'Change document changes.json was not saved into │ 
 
@@ -1822,7 +1822,7 @@ E    +  where 2 = len(["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\
 
 │                                                                              
 
-│ C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4 
+│ <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4 
 
 │ ccb-86cf-122b894659b2\scratchpad\mutc12b\tests\test_b100_busy.py:1330 in     
 

@@ -94,15 +94,15 @@ Digests of the stored bytes, computed 2026-10-26 at the close gate; 12 of 13 equ
 | Joined AT-B99-04, 8 runs | `.dev-flow/2026-10-25-batch-99/evidence/ddr/green-at04-8x.txt` | `11be7af46692304327acb5b4be81b87eec9c5529ab72c8d58ec4bb86a22c06db` |
 | Joined AT-B99-11, 8 runs | `.dev-flow/2026-10-25-batch-99/evidence/ddr/green-at11-8x.txt` | `a95d62e819785a65b7edfb40c3627c7e600f5dbe1007fa074eb874e413f9059c` |
 | New TC-B99-18 dual-rider node (1 passed) | `.dev-flow/2026-10-25-batch-99/evidence/ddr/green-tc18-riders.txt` | `87752365aa869046469b03bf329d6f5c14b5d82c1c8455b31d17b74f7e403922` |
-| Full sweep `tests/test_b99_*.py` + address census + id registry (175 passed) | `.dev-flow/2026-10-25-batch-99/evidence/ddr/green-b99.txt` | `d3b08d72113129d05d55cd2c0cffb2f628fe2a44e7cd26a2c80bf6e1c28def20` |
+| Full sweep `tests/test_b99_*.py` + address census + id registry (175 passed) | `.dev-flow/2026-10-25-batch-99/evidence/ddr/green-b99.txt` | `f6715609cf316f55c772df024a1a08367ba15706f6850e63c227faff79a27698` |
 | Per-file run, truncation (24 passed) | `.dev-flow/2026-10-25-batch-99/evidence/ddr/green-truncation.txt` | `b546610b7daf22b35f8acd2a679d0dcfa8636a4e44b9817eebb07f59fb19681a` |
 | Per-file run, staging (31 passed) | `.dev-flow/2026-10-25-batch-99/evidence/ddr/green-staging.txt` | `fa6e402957d533bd9286d2a8647c8f6f752c835ca48d65201b17bbe629c6f4b0` |
-| Per-file run, export (23 passed) | `.dev-flow/2026-10-25-batch-99/evidence/ddr/green-export.txt` | `9254c8ada3232cbbc79aba464e70a174c29ac79b4fbd7890dbcc1ec2fed18a76` |
+| Per-file run, export (23 passed) | `.dev-flow/2026-10-25-batch-99/evidence/ddr/green-export.txt` | `9675f99fc50a3d5ba7e2b35d3f82acd5b0217ba0af4b2806a94a79a2644a3dfd` |
 | Per-file run, patch-truth (20 passed) | `.dev-flow/2026-10-25-batch-99/evidence/ddr/green-patch-truth.txt` | `bcf7be3151639c6e65817e71019b20f88a6045c44649d0f92fbc027cab6814f5` |
 | Per-file run, a2l (7 passed) | `.dev-flow/2026-10-25-batch-99/evidence/ddr/green-a2l.txt` | `3b6228ade0a9780c3651f3c8a774cdb00a83eda4b33452f3f1124a042894c9d3` |
 | Per-file run, bytes (3 passed) | `.dev-flow/2026-10-25-batch-99/evidence/ddr/green-bytes.txt` | `2662339370e1e14fb0a3801efbe3b6617f5cc7ebced8f02f9c0a53034a1b4093` |
-| DQ-6 mutant PQ-2(c), KILLED | `.dev-flow/2026-10-25-batch-99/evidence/ddr/mut-PQ2c.txt` | `a191ae494f868d7f2cbbd5c183b1428871929f5459a65a7db5d16b2f9f329878` |
-| DQ-6 mutant PQ-6, KILLED | `.dev-flow/2026-10-25-batch-99/evidence/ddr/mut-PQ6.txt` | `8446ed8ee0907702b8377fa12005fc7675fc7bab0b4d06e15f4ee5141b6f6f3d` |
+| DQ-6 mutant PQ-2(c), KILLED | `.dev-flow/2026-10-25-batch-99/evidence/ddr/mut-PQ2c.txt` | `95824cffb658ca2af21301dbfff33d89c91519afa8330dc303e42240f9605a2b` |
+| DQ-6 mutant PQ-6, KILLED | `.dev-flow/2026-10-25-batch-99/evidence/ddr/mut-PQ6.txt` | `c535a5b5eebd75a23f19080a9d028d765d85d133daaecf5530192f53a2157a1e` |
 
 ### Reverse census
 

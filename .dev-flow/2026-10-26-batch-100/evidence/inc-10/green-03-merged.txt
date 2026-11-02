@@ -1,13 +1,13 @@
 # GREEN re-record (CR10-02) on the merged tree 1747479 + corrective edits: load_question module, 5 re-pinned nodes, 4 guard files
-# tree: C:/Users/jjgh8/Github/s19_app-b100-inc10
+# tree: <HOME>/Github/s19_app-b100-inc10
 # HEAD: 17474791bde5dfea48f379883c91fd69c34853c7 ( M s19_app/tui/app.py  M s19_app/tui/screens_directionb.py  M tests/test_b100_load_question.py  M tests/test_id_registry.py )
-# s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc10\s19_app\__init__.py
+# s19_app.__file__: <HOME>\Github\s19_app-b100-inc10\s19_app\__init__.py
 # sha256[:16] s19_app/tui/app.py: 5a9550c493ab6ad1
 # sha256[:16] s19_app/tui/screens.py: 69a749f331f6d5c1
 # sha256[:16] s19_app/tui/screens_directionb.py: 1288d9015c281fe2
 # sha256[:16] tests/test_b100_load_question.py: c44244959bcd0e61
 # date: 2026-11-01T02:17:13Z
-# cmd: pytest tests/test_b100_load_question.py tests/test_b100_session_reset.py::test_tc_b100_10_interim_discard_notice tests/test_b100_session_reset.py::test_tc_b100_10_notice_names_every_discarded_entry tests/test_b100_session_reset.py::test_at_b100_03_project_load_over_unsaved_work_saves_only_p2 tests/test_b99_editor_image.py::test_tc_b99_40_strip_shows_new_file_source_byte tests/test_id_registry.py tests/test_b99_staging.py tests/test_engine_unchanged.py tests/test_b100_load_dialog.py -p no:cacheprovider --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/c10/bt
+# cmd: pytest tests/test_b100_load_question.py tests/test_b100_session_reset.py::test_tc_b100_10_interim_discard_notice tests/test_b100_session_reset.py::test_tc_b100_10_notice_names_every_discarded_entry tests/test_b100_session_reset.py::test_at_b100_03_project_load_over_unsaved_work_saves_only_p2 tests/test_b99_editor_image.py::test_tc_b99_40_strip_shows_new_file_source_byte tests/test_id_registry.py tests/test_b99_staging.py tests/test_engine_unchanged.py tests/test_b100_load_dialog.py -p no:cacheprovider --basetemp=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/c10/bt
 
 ........................................................................ [ 27%]
 ........................................................................ [ 55%]
@@ -16,15 +16,15 @@
 =================================== PASSES ====================================
 _______ test_tc_b100_46_unreadable_a2l_project_after_yes_keeps_the_work _______
 ------------------------------ Captured log call ------------------------------
-ERROR    s19_app.tui.a2l:a2l.py:213 A2L section parse failed: path=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\c10\bt\test_tc_b100_46_unreadable_a2l0\app\.s19tool\workarea\A2LONLY\cal.a2l reason=os_error
+ERROR    s19_app.tui.a2l:a2l.py:213 A2L section parse failed: path=<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\c10\bt\test_tc_b100_46_unreadable_a2l0\app\.s19tool\workarea\A2LONLY\cal.a2l reason=os_error
 Traceback (most recent call last):
-  File "C:\Users\jjgh8\Github\s19_app-b100-inc10\s19_app\tui\a2l.py", line 176, in build_section_tree
+  File "<HOME>\Github\s19_app-b100-inc10\s19_app\tui\a2l.py", line 176, in build_section_tree
     with path.open("r", encoding="utf-8", errors="replace") as handle:
          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py", line 1044, in open
+  File "<HOME>\anaconda3\envs\s19env\Lib\pathlib.py", line 1044, in open
     return io.open(self, mode, buffering, encoding, errors, newline)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-PermissionError: [Errno 13] Permission denied: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\c10\\bt\\test_tc_b100_46_unreadable_a2l0\\app\\.s19tool\\workarea\\A2LONLY\\cal.a2l'
+PermissionError: [Errno 13] Permission denied: '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\c10\\bt\\test_tc_b100_46_unreadable_a2l0\\app\\.s19tool\\workarea\\A2LONLY\\cal.a2l'
 =========================== short test summary info ===========================
 PASSED tests/test_b100_load_question.py::test_tc_b100_44_twenty_four_cells_ask_by_kind
 PASSED tests/test_b100_load_question.py::test_tc_b100_44_saved_states_load_without_asking
@@ -283,8 +283,8 @@ PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_more_than_one_mac_marks_n
 PASSED tests/test_b100_load_dialog.py::test_tc_b100_64_more_than_one_mac_marks_nothing[A2L]
 PASSED tests/test_b100_load_dialog.py::test_tc_b100_66_painted_text_carries_no_decision_id
 PASSED tests/test_b100_load_dialog.py::test_at_b100_14_one_load_dialog_from_record_to_reopen
-SKIPPED [1] tests\test_b100_load_dialog.py:377: the volume refuses this name (reported not run): [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\c10\\bt\\test_tc_b100_42_work_area_file6\\app\\.s19tool\\workarea\\temp\\nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.s19'
-SKIPPED [1] tests\test_b100_load_dialog.py:377: the volume refuses this name (reported not run): [WinError 3] The system cannot find the path specified: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\c10\\bt\\test_tc_b100_64_list_rows_neve0\\b\\.s19tool\\workarea\\PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP'
-SKIPPED [1] tests\test_b100_load_dialog.py:377: the volume refuses this name (reported not run): [WinError 3] The system cannot find the path specified: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\c10\\bt\\test_tc_b100_64_list_rows_neve1\\b\\.s19tool\\workarea\\PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP'
-SKIPPED [1] tests\test_b100_load_dialog.py:377: the volume refuses this name (reported not run): [WinError 3] The system cannot find the path specified: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\c10\\bt\\test_tc_b100_64_list_rows_neve2\\b\\.s19tool\\workarea\\PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP'
+SKIPPED [1] tests\test_b100_load_dialog.py:377: the volume refuses this name (reported not run): [Errno 2] No such file or directory: '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\c10\\bt\\test_tc_b100_42_work_area_file6\\app\\.s19tool\\workarea\\temp\\nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.s19'
+SKIPPED [1] tests\test_b100_load_dialog.py:377: the volume refuses this name (reported not run): [WinError 3] The system cannot find the path specified: '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\c10\\bt\\test_tc_b100_64_list_rows_neve0\\b\\.s19tool\\workarea\\PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP'
+SKIPPED [1] tests\test_b100_load_dialog.py:377: the volume refuses this name (reported not run): [WinError 3] The system cannot find the path specified: '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\c10\\bt\\test_tc_b100_64_list_rows_neve1\\b\\.s19tool\\workarea\\PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP'
+SKIPPED [1] tests\test_b100_load_dialog.py:377: the volume refuses this name (reported not run): [WinError 3] The system cannot find the path specified: '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\c10\\bt\\test_tc_b100_64_list_rows_neve2\\b\\.s19tool\\workarea\\PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP'
 257 passed, 4 skipped in 1472.62s (0:24:32)

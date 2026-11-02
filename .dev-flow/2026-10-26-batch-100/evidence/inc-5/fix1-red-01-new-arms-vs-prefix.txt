@@ -1,14 +1,14 @@
 # command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py -k verify_reread or non_os_error or failed_manifest or f2_ or mac_attach or differs_from_its_row or fresh_folder
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree; PRE-FIX sources (the reviewed diff), corrective-pass-1 test arms added)
+# tree: <HOME>\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree; PRE-FIX sources (the reviewed diff), corrective-pass-1 test arms added)
 # source sha256 (16): app.py 2f6b446594652dbc · apply.py 9cb482d5e2876f00 · change_service.py 3623a42e6d1cd13e · project_gather_service.py a0dae1342b64bc14 · test_b100_save_image.py 559768f390ded771
-# PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:29:14Z
-# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\__init__.py
+# s19_app.__file__ = <HOME>\Github\s19_app-b100-inc5\s19_app\__init__.py
 FF.FFF....                                                               [100%]
 ================================== FAILURES ===================================
 __________ test_tc_b100_17_verify_reread_failure_rolls_the_emit_back __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30038/test_tc_b100_17_verify_reread_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30038/test_tc_b100_17_verify_reread_0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000244BD2D5290>
 
     def test_tc_b100_17_verify_reread_failure_rolls_the_emit_back(
@@ -39,15 +39,15 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000244BD2D5290>
         lines, project, _ = _save_session(tmp_path, scenario)
         assert "Project NOT saved: could not save" in lines[-1], lines
 >       assert not project.exists(), sorted(project.rglob("*"))
-E       AssertionError: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30038/test_tc_b100_17_verify_reread_0/app/.s19tool/workarea/P1/firmware.s19')]
+E       AssertionError: [WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30038/test_tc_b100_17_verify_reread_0/app/.s19tool/workarea/P1/firmware.s19')]
 E       assert not True
 E        +  where True = exists()
-E        +    where exists = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30038/test_tc_b100_17_verify_reread_0/app/.s19tool/workarea/P1').exists
+E        +    where exists = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30038/test_tc_b100_17_verify_reread_0/app/.s19tool/workarea/P1').exists
 
 tests\test_b100_save_image.py:766: AssertionError
 ____ test_tc_b100_17_non_os_error_after_the_emit_rolls_back_then_surfaces _____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30038/test_tc_b100_17_non_os_error_a0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30038/test_tc_b100_17_non_os_error_a0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000244BFA41ED0>
 
     def test_tc_b100_17_non_os_error_after_the_emit_rolls_back_then_surfaces(
@@ -77,15 +77,15 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000244BFA41ED0>
     
         before, after, project = asyncio.run(_drive())
 >       assert not project.exists(), sorted(project.rglob("*"))
-E       AssertionError: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30038/test_tc_b100_17_non_os_error_a0/app/.s19tool/workarea/P1/firmware.s19')]
+E       AssertionError: [WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30038/test_tc_b100_17_non_os_error_a0/app/.s19tool/workarea/P1/firmware.s19')]
 E       assert not True
 E        +  where True = exists()
-E        +    where exists = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30038/test_tc_b100_17_non_os_error_a0/app/.s19tool/workarea/P1').exists
+E        +    where exists = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30038/test_tc_b100_17_non_os_error_a0/app/.s19tool/workarea/P1').exists
 
 tests\test_b100_save_image.py:796: AssertionError
 _____ test_f2_unreadable_source_refuses_and_the_app_keeps_running[image] ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30038/test_f2_unreadable_source_refu0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30038/test_f2_unreadable_source_refu0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000244C0622990>
 locked = 'image'
 
@@ -185,7 +185,7 @@ E       PermissionError: [Errno 13] Permission denied
 tests\test_b100_save_image.py:848: PermissionError
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\tui\app.py:8862 in           
+│ <HOME>\Github\s19_app-b100-inc5\s19_app\tui\app.py:8862 in           
 │ _handle_save_dialog                                                          
 │                                                                              
 │    8859 │   │   │   if self.current_file                                     
@@ -208,18 +208,18 @@ tests\test_b100_save_image.py:848: PermissionError
 │ │                         │   applied_by_save=0,                           │ 
 │ │                         │   refusal=None                                 │ 
 │ │                         )                                                │ 
-│ │                  item = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │                  item = WindowsPath('<HOME>/AppData/Local/Temp/… │ 
 │ │       missing_sources = []                                               │ 
 │ │   open_project_folded = ''                                               │ 
-│ │       parent_resolved = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │       parent_resolved = WindowsPath('<HOME>/AppData/Local/Temp/… │ 
 │ │               payload = SaveProjectPayload(                              │ 
 │ │                         │                                                │ 
-│ │                         parent_folder='C:\\Users\\jjgh8\\AppData\\Local… │ 
+│ │                         parent_folder='<HOME>\\AppData\\Local… │ 
 │ │                         │   project_name='P1',                           │ 
 │ │                         │   batch=(),                                    │ 
 │ │                         │   assignments={}                               │ 
 │ │                         )                                                │ 
-│ │           project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │           project_dir = WindowsPath('<HOME>/AppData/Local/Temp/… │ 
 │ │ project_file_suffixes = {                                                │ 
 │ │                         │   '.s19',                                      │ 
 │ │                         │   '.hex',                                      │ 
@@ -248,7 +248,7 @@ tests\test_b100_save_image.py:848: PermissionError
 │ │            typed_name = 'P1'                                             │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\tui\app.py:9371 in           
+│ <HOME>\Github\s19_app-b100-inc5\s19_app\tui\app.py:9371 in           
 │ _plan_project_save                                                           
 │                                                                              
 │    9368 │   │   │   │   )                                                    
@@ -274,7 +274,7 @@ tests\test_b100_save_image.py:848: PermissionError
 │ │                )                                                         │ 
 │ │       loaded = LoadedFile(                                               │ 
 │ │                │                                                         │ 
-│ │                path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pyte… │ 
+│ │                path=WindowsPath('<HOME>/AppData/Local/Temp/pyte… │ 
 │ │                │   file_type='s19',                                      │ 
 │ │                │   mem_map={                                             │ 
 │ │                │   │   2147483648: 83,                                   │ 
@@ -332,7 +332,7 @@ tests\test_b100_save_image.py:848: PermissionError
 │ │                │   out_of_order_count=0,                                 │ 
 │ │                │   entry_point=2147483648                                │ 
 │ │                )                                                         │ 
-│ │  project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of… │ 
+│ │  project_dir = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of… │ 
 │ │ project_name = 'P1'                                                      │ 
 │ │         self = S19TuiApp(                                                │ 
 │ │                │   title='Hex Edit Tool',                                │ 
@@ -341,7 +341,7 @@ tests\test_b100_save_image.py:848: PermissionError
 │ │                )                                                         │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\tui\app.py:1493 in           
+│ <HOME>\Github\s19_app-b100-inc5\s19_app\tui\app.py:1493 in           
 │ _file_digest                                                                 
 │                                                                              
 │    1490 │   digest = hashlib.sha256()                                        
@@ -356,11 +356,11 @@ tests\test_b100_save_image.py:848: PermissionError
 │ │ digest = <sha256 _hashlib.HASH object @ 0x00000244BF5B9F70>              │ 
 │ │ handle = <tests.test_b100_save_image._UnreadableHandle object at         │ 
 │ │          0x00000244BF257F90>                                             │ 
-│ │   path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8… │ 
+│ │   path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>… │ 
 │ │   size = 0                                                               │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\tui\app.py:1493 in <lambda>  
+│ <HOME>\Github\s19_app-b100-inc5\s19_app\tui\app.py:1493 in <lambda>  
 │                                                                              
 │    1490 │   digest = hashlib.sha256()                                        
 │    1491 │   size = 0                                                         
@@ -375,7 +375,7 @@ tests\test_b100_save_image.py:848: PermissionError
 │ │          0x00000244BF257F90>                                             │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc5\tests\test_b100_save_image.py:848 in 
+│ <HOME>\Github\s19_app-b100-inc5\tests\test_b100_save_image.py:848 in 
 │ read                                                                         
 │                                                                              
 │    845 │   │   self._handle.close()                                          
@@ -395,7 +395,7 @@ tests\test_b100_save_image.py:848: PermissionError
 PermissionError: [Errno 13] Permission denied
 ______ test_f2_unreadable_source_refuses_and_the_app_keeps_running[a2l] _______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30038/test_f2_unreadable_source_refu1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30038/test_f2_unreadable_source_refu1')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000244BF6E97D0>
 locked = 'a2l'
 
@@ -495,7 +495,7 @@ E       PermissionError: [Errno 13] Permission denied
 tests\test_b100_save_image.py:848: PermissionError
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\tui\app.py:8862 in           
+│ <HOME>\Github\s19_app-b100-inc5\s19_app\tui\app.py:8862 in           
 │ _handle_save_dialog                                                          
 │                                                                              
 │    8859 │   │   │   if self.current_file                                     
@@ -568,18 +568,18 @@ tests\test_b100_save_image.py:848: PermissionError
 │ │                         │   applied_by_save=0,                           │ 
 │ │                         │   refusal=None                                 │ 
 │ │                         )                                                │ 
-│ │                  item = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │                  item = WindowsPath('<HOME>/AppData/Local/Temp/… │ 
 │ │       missing_sources = []                                               │ 
 │ │   open_project_folded = ''                                               │ 
-│ │       parent_resolved = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │       parent_resolved = WindowsPath('<HOME>/AppData/Local/Temp/… │ 
 │ │               payload = SaveProjectPayload(                              │ 
 │ │                         │                                                │ 
-│ │                         parent_folder='C:\\Users\\jjgh8\\AppData\\Local… │ 
+│ │                         parent_folder='<HOME>\\AppData\\Local… │ 
 │ │                         │   project_name='P1',                           │ 
 │ │                         │   batch=(),                                    │ 
 │ │                         │   assignments={}                               │ 
 │ │                         )                                                │ 
-│ │           project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │           project_dir = WindowsPath('<HOME>/AppData/Local/Temp/… │ 
 │ │ project_file_suffixes = {                                                │ 
 │ │                         │   '.s19',                                      │ 
 │ │                         │   '.hex',                                      │ 
@@ -608,7 +608,7 @@ tests\test_b100_save_image.py:848: PermissionError
 │ │            typed_name = 'P1'                                             │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\tui\app.py:9385 in           
+│ <HOME>\Github\s19_app-b100-inc5\s19_app\tui\app.py:9385 in           
 │ _plan_project_save                                                           
 │                                                                              
 │    9382 │   │   │   files.append(                                            
@@ -624,7 +624,7 @@ tests\test_b100_save_image.py:848: PermissionError
 │ │                │   PlannedFile(                                          │ 
 │ │                │   │   role='image',                                     │ 
 │ │                │   │                                                     │ 
-│ │                source=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/py… │ 
+│ │                source=WindowsPath('<HOME>/AppData/Local/Temp/py… │ 
 │ │                │   │   name='firmware.s19',                              │ 
 │ │                │   │                                                     │ 
 │ │                digest='d37fbacaed599993db6dd9af09cda31279616dcbbf7deb95… │ 
@@ -688,7 +688,7 @@ tests\test_b100_save_image.py:848: PermissionError
 │ │                )                                                         │ 
 │ │       loaded = LoadedFile(                                               │ 
 │ │                │                                                         │ 
-│ │                path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pyte… │ 
+│ │                path=WindowsPath('<HOME>/AppData/Local/Temp/pyte… │ 
 │ │                │   file_type='s19',                                      │ 
 │ │                │   mem_map={                                             │ 
 │ │                │   │   2147483648: 83,                                   │ 
@@ -719,10 +719,10 @@ tests\test_b100_save_image.py:848: PermissionError
 │ │                │   range_validity=[True, True],                          │ 
 │ │                │   errors=[],                                            │ 
 │ │                │                                                         │ 
-│ │                a2l_path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │                a2l_path=WindowsPath('<HOME>/AppData/Local/Temp/… │ 
 │ │                │   a2l_data={                                            │ 
 │ │                │   │   'path':                                           │ 
-│ │                'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8… │ 
+│ │                '<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>… │ 
 │ │                │   │   'sections': [                                     │ 
 │ │                │   │   │   {                                             │ 
 │ │                │   │   │   │   'name': 'PROJECT',                        │ 
@@ -1042,7 +1042,7 @@ tests\test_b100_save_image.py:848: PermissionError
 │ │                │   entry_point=2147483648                                │ 
 │ │                )                                                         │ 
 │ │      payload = b'S00F00004341534530315F4241534943B2\r\nS325800000005331… │ 
-│ │  project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of… │ 
+│ │  project_dir = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of… │ 
 │ │ project_name = 'P1'                                                      │ 
 │ │         self = S19TuiApp(                                                │ 
 │ │                │   title='Hex Edit Tool',                                │ 
@@ -1051,7 +1051,7 @@ tests\test_b100_save_image.py:848: PermissionError
 │ │                )                                                         │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\tui\app.py:1493 in           
+│ <HOME>\Github\s19_app-b100-inc5\s19_app\tui\app.py:1493 in           
 │ _file_digest                                                                 
 │                                                                              
 │    1490 │   digest = hashlib.sha256()                                        
@@ -1066,11 +1066,11 @@ tests\test_b100_save_image.py:848: PermissionError
 │ │ digest = <sha256 _hashlib.HASH object @ 0x00000244BD394F10>              │ 
 │ │ handle = <tests.test_b100_save_image._UnreadableHandle object at         │ 
 │ │          0x00000244BFAA69D0>                                             │ 
-│ │   path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8… │ 
+│ │   path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>… │ 
 │ │   size = 0                                                               │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\tui\app.py:1493 in <lambda>  
+│ <HOME>\Github\s19_app-b100-inc5\s19_app\tui\app.py:1493 in <lambda>  
 │                                                                              
 │    1490 │   digest = hashlib.sha256()                                        
 │    1491 │   size = 0                                                         
@@ -1085,7 +1085,7 @@ tests\test_b100_save_image.py:848: PermissionError
 │ │          0x00000244BFAA69D0>                                             │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc5\tests\test_b100_save_image.py:848 in 
+│ <HOME>\Github\s19_app-b100-inc5\tests\test_b100_save_image.py:848 in 
 │ read                                                                         
 │                                                                              
 │    845 │   │   self._handle.close()                                          
@@ -1105,7 +1105,7 @@ tests\test_b100_save_image.py:848: PermissionError
 PermissionError: [Errno 13] Permission denied
 ______ test_f2_byte_range_locked_image_refuses_and_the_app_keeps_running ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30038/test_f2_byte_range_locked_imag0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30038/test_f2_byte_range_locked_imag0')
 
     @pytest.mark.skipif(sys.platform != "win32", reason="msvcrt byte-range lock")
     def test_f2_byte_range_locked_image_refuses_and_the_app_keeps_running(
@@ -1183,7 +1183,7 @@ E   PermissionError: [Errno 13] Permission denied
 s19_app\tui\app.py:1493: PermissionError
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\tui\app.py:8862 in           
+│ <HOME>\Github\s19_app-b100-inc5\s19_app\tui\app.py:8862 in           
 │ _handle_save_dialog                                                          
 │                                                                              
 │    8859 │   │   │   if self.current_file                                     
@@ -1206,18 +1206,18 @@ s19_app\tui\app.py:1493: PermissionError
 │ │                         │   applied_by_save=0,                           │ 
 │ │                         │   refusal=None                                 │ 
 │ │                         )                                                │ 
-│ │                  item = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │                  item = WindowsPath('<HOME>/AppData/Local/Temp/… │ 
 │ │       missing_sources = []                                               │ 
 │ │   open_project_folded = ''                                               │ 
-│ │       parent_resolved = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │       parent_resolved = WindowsPath('<HOME>/AppData/Local/Temp/… │ 
 │ │               payload = SaveProjectPayload(                              │ 
 │ │                         │                                                │ 
-│ │                         parent_folder='C:\\Users\\jjgh8\\AppData\\Local… │ 
+│ │                         parent_folder='<HOME>\\AppData\\Local… │ 
 │ │                         │   project_name='P1',                           │ 
 │ │                         │   batch=(),                                    │ 
 │ │                         │   assignments={}                               │ 
 │ │                         )                                                │ 
-│ │           project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │           project_dir = WindowsPath('<HOME>/AppData/Local/Temp/… │ 
 │ │ project_file_suffixes = {                                                │ 
 │ │                         │   '.s19',                                      │ 
 │ │                         │   '.hex',                                      │ 
@@ -1246,7 +1246,7 @@ s19_app\tui\app.py:1493: PermissionError
 │ │            typed_name = 'P1'                                             │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\tui\app.py:9371 in           
+│ <HOME>\Github\s19_app-b100-inc5\s19_app\tui\app.py:9371 in           
 │ _plan_project_save                                                           
 │                                                                              
 │    9368 │   │   │   │   )                                                    
@@ -1272,7 +1272,7 @@ s19_app\tui\app.py:1493: PermissionError
 │ │                )                                                         │ 
 │ │       loaded = LoadedFile(                                               │ 
 │ │                │                                                         │ 
-│ │                path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pyte… │ 
+│ │                path=WindowsPath('<HOME>/AppData/Local/Temp/pyte… │ 
 │ │                │   file_type='s19',                                      │ 
 │ │                │   mem_map={                                             │ 
 │ │                │   │   2147483648: 83,                                   │ 
@@ -1330,7 +1330,7 @@ s19_app\tui\app.py:1493: PermissionError
 │ │                │   out_of_order_count=0,                                 │ 
 │ │                │   entry_point=2147483648                                │ 
 │ │                )                                                         │ 
-│ │  project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of… │ 
+│ │  project_dir = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of… │ 
 │ │ project_name = 'P1'                                                      │ 
 │ │         self = S19TuiApp(                                                │ 
 │ │                │   title='Hex Edit Tool',                                │ 
@@ -1339,7 +1339,7 @@ s19_app\tui\app.py:1493: PermissionError
 │ │                )                                                         │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\tui\app.py:1493 in           
+│ <HOME>\Github\s19_app-b100-inc5\s19_app\tui\app.py:1493 in           
 │ _file_digest                                                                 
 │                                                                              
 │    1490 │   digest = hashlib.sha256()                                        
@@ -1353,12 +1353,12 @@ s19_app\tui\app.py:1493: PermissionError
 │ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
 │ │ digest = <sha256 _hashlib.HASH object @ 0x00000244C1216C10>              │ 
 │ │ handle = <_io.BufferedReader                                             │ 
-│ │          name='C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\… │ 
-│ │   path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8… │ 
+│ │          name='<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\… │ 
+│ │   path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>… │ 
 │ │   size = 0                                                               │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\tui\app.py:1493 in <lambda>  
+│ <HOME>\Github\s19_app-b100-inc5\s19_app\tui\app.py:1493 in <lambda>  
 │                                                                              
 │    1490 │   digest = hashlib.sha256()                                        
 │    1491 │   size = 0                                                         
@@ -1370,7 +1370,7 @@ s19_app\tui\app.py:1493: PermissionError
 │                                                                              
 │ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
 │ │ handle = <_io.BufferedReader                                             │ 
-│ │          name='C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\… │ 
+│ │          name='<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\… │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 ╰──────────────────────────────────────────────────────────────────────────────
 PermissionError: [Errno 13] Permission denied

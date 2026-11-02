@@ -397,7 +397,7 @@ Stated because a manufactured finding is worse than none.
   `123 passed` / `44 passed` regression baselines, or the notice's own resident cost. Those remain
   unverified by this lane and I am not asserting them.
 - **Probe scripts live in the scratchpad**, not the repo:
-  `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-OneDrive-Documents-Github-s19-app--claude-worktrees-backlog-revision-s19-app-a6e12c\9f2a68ff-2369-4781-a9fe-714a18959601\scratchpad\{p6_tc498,p7_inc1_verdicts}.py`
+  `<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-OneDrive-Documents-Github-s19-app--claude-worktrees-backlog-revision-s19-app-a6e12c\9f2a68ff-2369-4781-a9fe-714a18959601\scratchpad\{p6_tc498,p7_inc1_verdicts}.py`
 
 ---
 

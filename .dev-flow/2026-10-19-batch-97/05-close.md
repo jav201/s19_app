@@ -27,7 +27,7 @@
 
 | Field | Value |
 |---|---|
-| Gate record | `python "C:/Users/jjgh8/.claude/skills/dev-flow/scripts/devflow-validate.py" .` from the project root · exit 0 · 0 block · 494 notice · 2026-10-25 |
+| Gate record | `python "<HOME>/.claude/skills/dev-flow/scripts/devflow-validate.py" .` from the project root · exit 0 · 0 block · 494 notice · 2026-10-25 |
 | Gated tree | `14ec95b62812252a87279e3a3673dd0687e3c1f7` · clean (the close record itself excluded) |
 | Requirements canon | `REQUIREMENTS.md` (`artifact_homes.requirements_canon` = `repo:REQUIREMENTS.md`) — `devflow-init.py --fold-canon` run at this close: `canon: REQUIREMENTS.md -- 81 folded, 0 kept, 0 refused` (HLR-144..HLR-151 and their LLRs); the LED-2026-10-19-batch-97.43 `^E` → `e` supersession of batch-95's HLR-135 / LLR-135.1 / LLR-135.5 rows had already landed in `432ecf0` |
 
@@ -97,7 +97,7 @@
 
 ## 3 · Working-file reconciliation (C-44)
 
-Sweep run 2026-10-25: `git status --short` and `git log main --not --remotes` (empty — every batch commit is on `origin/main`, tip `432ecf0`) in `C:\Users\jjgh8\Github\s19_app`, the only repository the batch touched (the flow bundle was read, not edited).
+Sweep run 2026-10-25: `git status --short` and `git log main --not --remotes` (empty — every batch commit is on `origin/main`, tip `432ecf0`) in `<HOME>\Github\s19_app`, the only repository the batch touched (the flow bundle was read, not edited).
 
 | File | State | Evidence |
 |---|---|---|

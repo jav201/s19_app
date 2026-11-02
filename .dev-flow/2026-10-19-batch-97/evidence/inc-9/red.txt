@@ -2,7 +2,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 ______________ test_load_project_button_loads_the_picked_project ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24292/test_load_project_button_loads0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-24292/test_load_project_button_loads0')
 
     def test_load_project_button_loads_the_picked_project(tmp_path: Path) -> None:
         project, screen, status = asyncio.run(_pick_second_project(tmp_path))

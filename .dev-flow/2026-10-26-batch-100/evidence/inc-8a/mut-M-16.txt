@@ -12,13 +12,13 @@
 #   |                 PLAN_ACTION_KEEP if predicted.reused else PLAN_ACTION_NEW,
 # edit 2 NEW:
 #   |                 PLAN_ACTION_NEW if planned.role == PLAN_ROLE_DOCUMENT else (PLAN_ACTION_KEEP if predicted.reused else PLAN_ACTION_NEW),
-# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
+# cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
 # env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
-# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_29_identical_changes_json_is_reused
+# command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_29_identical_changes_json_is_reused
 # started 2026-10-30T23:13:14Z  finished 2026-10-30T23:13:20Z  rc=1
 F                                                                        [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:691: AssertionError: ['Project NOT saved: the plan named C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30670\\test_tc_b10...pytest-30670\\test_tc_b100_29_identical_chan0\\app\\.s19tool\\workarea\\P\\patches\\changes.json (keep) — save again.']
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:691: AssertionError: ['Project NOT saved: the plan named <HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-30670\\test_tc_b10...pytest-30670\\test_tc_b100_29_identical_chan0\\app\\.s19tool\\workarea\\P\\patches\\changes.json (keep) — save again.']
 =========================== short test summary info ===========================
 FAILED tests/test_b100_document.py::test_tc_b100_29_identical_changes_json_is_reused
 1 failed in 4.50s

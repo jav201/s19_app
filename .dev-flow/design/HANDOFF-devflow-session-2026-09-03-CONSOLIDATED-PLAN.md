@@ -54,7 +54,7 @@
 
 ### ➕ APPENDED 2026-09-06 — Wave A landed, and the operator RULED on the four briefs
 
-**Wave A (four parallel Opus 5 lanes, 2026-09-03 → 06) shipped:** the post-`rev57` backlog reconciliation (`a13c079`) · flow **rev58** — `V2`'s node corpus declared via `artifact_homes.tests`, 565 → 585 arms, 19/19 mutants killed, `_V2_DECLARED` untouched (`~/.claude` `82a4a20`, bundle `21d3ee4`, `flow_hash 50d1c2d0191432bf`) · the Atlas regenerated on a clone-reproducible tree (`ed859d1`) · four measured briefs at `C:/Users/jjgh8/.claude/docs/analysis/briefs-2026-09-03/`.
+**Wave A (four parallel Opus 5 lanes, 2026-09-03 → 06) shipped:** the post-`rev57` backlog reconciliation (`a13c079`) · flow **rev58** — `V2`'s node corpus declared via `artifact_homes.tests`, 565 → 585 arms, 19/19 mutants killed, `_V2_DECLARED` untouched (`~/.claude` `82a4a20`, bundle `21d3ee4`, `flow_hash 50d1c2d0191432bf`) · the Atlas regenerated on a clone-reproducible tree (`ed859d1`) · four measured briefs at `<HOME>/.claude/docs/analysis/briefs-2026-09-03/`.
 
 **The code lane's `P0` was already shipped** (batch-79 Lane 1, `f198447` / PR #192, 2026-08-13) and its `IN FLIGHT` twins with it; batch-90 was therefore NOT opened, and the guard in §0 above is moot — its condition (2a complete) was met on 2026-09-03.
 
@@ -247,7 +247,7 @@ byte-untouched by tranches 1–2 (doc-only), so 2a's gate numbers are comparable
 (565 arms · 0 FAIL · 0 block on s19_app).
 
 **Standing guards for every step:** `export PYTHONIOENCODING=utf-8` in every shell · gate suite via
-`C:\Users\jjgh8\anaconda3\envs\s19env\python.exe -m pytest` directly, **never `conda run`**
+`<HOME>\anaconda3\envs\s19env\python.exe -m pytest` directly, **never `conda run`**
 (batch-87 harness rule) · never touch `prototypes\` or `build\` in `s19_app` (parallel session,
 `C-44`) · when applying candidate files, diff after `tr -d '\r'` and write in canon's line-ending
 convention (the 16 author-touched files are LF, canon is CRLF — input §1.1).
@@ -586,9 +586,9 @@ Everything else checked today survived — see §7.
 - `s19_app/.dev-flow/2026-08-28-batch-89/`: no `04-validation.md`, no `05-close.md` ✓;
   `state.json`: `mode: core`, `current_station: P3`,
   `stations_active = ['P0','ARQ','P1','PDR','P3']` ✓.
-- Candidate at `C:\Users\jjgh8\kimi\dev-flow-rev56-candidate\` = exactly 25 files ✓.
+- Candidate at `<HOME>\kimi\dev-flow-rev56-candidate\` = exactly 25 files ✓.
 - `R-89-3` filed at P2 in `BACKLOG-PROCESS.md:212`, subject = forensic-register preamble ✓.
-- Validator (`C:\Users\jjgh8\.claude\docs\tools\devflow-validate.py`): `_ATLAS_ID_ATTC:2096`
+- Validator (`<HOME>\.claude\docs\tools\devflow-validate.py`): `_ATLAS_ID_ATTC:2096`
   accepts `(?:B\d+-)?` ✓; `_V2_DECLARED` divergence documented as deliberate in
   `v2_at_without_node`'s docstring ✓; `_LEAN_OWNER:2694` English-only `**Requirement:**` ✓;
   `_V6_MARKER:377` `**Statement` ✓; `V28` requires `04-validation.md` + (`05-close.md` |

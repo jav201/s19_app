@@ -1,7 +1,7 @@
 # HANDOFF — Memory Map redesign, Variant A (gap-fold band bar)
 
 **Date:** 2026-08-01 · **From:** design session (tui-design + prototype captures) ·
-**To:** a fresh agent running the full `/dev-flow` V-model in `C:\Users\jjgh8\Github\s19_app`.
+**To:** a fresh agent running the full `/dev-flow` V-model in `C:\Users\<USER>\Github\s19_app`.
 **Operator decision (2026-08-01):** build **Variant A + the cross-cutting fixes** as one
 dev-flow batch. Variants B/C were evaluated and NOT chosen (B parked, C absorbed partially).
 

@@ -1,7 +1,7 @@
 """Shared helpers for the Inc 7 security probes (security-reviewer)."""
 import hashlib, os, subprocess, sys, time
 from pathlib import Path
-WT = Path(os.environ.get("PROBE_TREE", r"C:\Users\jjgh8\Github\s19_app-b100-inc7"))
+WT = Path(os.environ.get("PROBE_TREE", r"<HOME>\Github\s19_app-b100-inc7"))
 sys.path.insert(0, str(WT))
 import s19_app
 print("# s19_app import:", s19_app.__file__)

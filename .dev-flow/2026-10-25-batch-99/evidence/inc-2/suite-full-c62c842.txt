@@ -52,7 +52,7 @@
 ================================== FAILURES ===================================
 ____________ test_tc330_before_after_row_reveal_hide_state_machine ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25862/test_tc330_before_after_row_re0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25862/test_tc330_before_after_row_re0')
 
     def test_tc330_before_after_row_reveal_hide_state_machine(
         tmp_path: Path,
@@ -222,7 +222,7 @@ E                   textual.worker.WorkerFailed: Worker raised exception: NoMatc
 ..\..\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: WorkerFailed
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\Github\s19_app-b99-suite\s19_app\tui\app.py:13345 in          
+│ <HOME>\Github\s19_app-b99-suite\s19_app\tui\app.py:13345 in          
 │ set_status                                                                   
 │                                                                              
 │   13342 │   │   self.set_status(f"Goto 0x{addr:08X}")                        
@@ -243,7 +243,7 @@ E                   textual.worker.WorkerFailed: Worker raised exception: NoMatc
 │ │           )                                                              │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b99-suite\s19_app\tui\app.py:13364 in          
+│ <HOME>\Github\s19_app-b99-suite\s19_app\tui\app.py:13364 in          
 │ _append_log_line                                                             
 │                                                                              
 │   13361 │   │   cap = max(50, getattr(self.size, "width", 0))                
@@ -269,7 +269,7 @@ E                   textual.worker.WorkerFailed: Worker raised exception: NoMatc
 │ │           apply a change document'+34                                    │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b99-suite\s19_app\tui\app.py:13370 in          
+│ <HOME>\Github\s19_app-b99-suite\s19_app\tui\app.py:13370 in          
 │ _render_log_lines                                                            
 │                                                                              
 │   13367 │   │   lines = list(self.log_lines)                                 
@@ -333,7 +333,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-self = WindowsPath('C:/Users/jjgh8/Github/s19_app-b99-suite/prototypes/cambios_10_12_2026/help_sections.md')
+self = WindowsPath('<HOME>/Github/s19_app-b99-suite/prototypes/cambios_10_12_2026/help_sections.md')
 mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
 
     def open(self, mode='r', buffering=-1, encoding=None,
@@ -346,7 +346,7 @@ mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
             encoding = io.text_encoding(encoding)
 >       return io.open(self, mode, buffering, encoding, errors, newline)
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\Github\\s19_app-b99-suite\\prototypes\\cambios_10_12_2026\\help_sections.md'
+E       FileNotFoundError: [Errno 2] No such file or directory: '<HOME>\\Github\\s19_app-b99-suite\\prototypes\\cambios_10_12_2026\\help_sections.md'
 
 ..\..\anaconda3\envs\s19env\Lib\pathlib.py:1044: FileNotFoundError
 ____________ test_tc607_scanned_corpus_matches_the_declared_bound _____________
@@ -374,7 +374,7 @@ E       assert 204 == 199
 tests\test_id_registry.py:558: AssertionError
 ______ test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25862/test_at_b78_03_the_palette_act0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25862/test_at_b78_03_the_palette_act0')
 
     def test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact(
         tmp_path: Path,
@@ -458,7 +458,7 @@ E         Use -v to get more diff
 tests\test_tui_commandbar.py:2704: AssertionError
 _______________ test_at_b78_32_app_bindings_block_is_untouched ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25862/test_at_b78_32_app_bindings_bl0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25862/test_at_b78_32_app_bindings_bl0')
 
     def test_at_b78_32_app_bindings_block_is_untouched(tmp_path: Path) -> None:
         """AT-B78-32 (PIN) -- Lane 1 does not disturb the App ``BINDINGS`` block.
@@ -556,7 +556,7 @@ E         ...Full output truncated (3 lines hidden), use '-vv' to show
 tests\test_tui_diff_screen.py:3912: AssertionError
 _______________ test_tc031_engine_modules_have_no_diff_vs_main ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25862/test_tc031_engine_modules_have0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25862/test_tc031_engine_modules_have0')
 
     def test_tc031_engine_modules_have_no_diff_vs_main(tmp_path: Path) -> None:
         """The engine / data-processing modules show zero diff vs ``main``.
@@ -591,7 +591,7 @@ E         +  1 file changed, 83 insertions(+), 251 deletions(-)
 tests\test_tui_directionb.py:7051: AssertionError
 __________ test_tc031_engine_modules_have_no_name_only_diff_vs_main ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25862/test_tc031_engine_modules_have1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25862/test_tc031_engine_modules_have1')
 
     def test_tc031_engine_modules_have_no_name_only_diff_vs_main(tmp_path: Path) -> None:
         """No engine module file appears in ``git diff --name-only main``.
@@ -668,7 +668,7 @@ E             Use -v to get more diff
 tests\test_tui_issues_triage_b94.py:382: AssertionError
 _________________ test_verify_quiet_pass_on_faithful_hex_save _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25862/test_verify_quiet_pass_on_fait0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25862/test_verify_quiet_pass_on_fait0')
 
     def test_verify_quiet_pass_on_faithful_hex_save(tmp_path: Path) -> None:
         """A faithful HEX save-back surfaces one "saved + verified" status line
@@ -714,7 +714,7 @@ E       assert None is not None
 tests\test_tui_patch_editor_v2.py:929: AssertionError
 ________________ test_at031b_two_saves_are_distinct_no_clobber ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25862/test_at031b_two_saves_are_dist0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25862/test_at031b_two_saves_are_dist0')
 
     def test_at031b_two_saves_are_distinct_no_clobber(tmp_path: Path) -> None:
         """AT-031b (idempotent boundary) — two saves keep both, distinct names.
@@ -749,14 +749,14 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
     
         saved = list(patches.glob("*.json"))
 >       assert len(saved) == 2, f"two saves must keep two files, found {saved}"
-E       AssertionError: two saves must keep two files, found [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25862/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')]
+E       AssertionError: two saves must keep two files, found [WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25862/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')]
 E       assert 1 == 2
-E        +  where 1 = len([WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25862/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')])
+E        +  where 1 = len([WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25862/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')])
 
 tests\test_tui_patch_editor_v2.py:1336: AssertionError
 ______________ test_at057b_regroup_wiring_and_binding_regression ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25862/test_at057b_regroup_wiring_and0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25862/test_at057b_regroup_wiring_and0')
 
     def test_at057b_regroup_wiring_and_binding_regression(
         tmp_path: Path,
@@ -834,7 +834,7 @@ E       assert 0 == 2
 tests\test_tui_patch_editor_v2.py:2565: AssertionError
 ________________________ test_at077c_stale_provenance _________________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25862/test_at077c_stale_provenance0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25862/test_at077c_stale_provenance0')
 
     def test_at077c_stale_provenance(tmp_path: Path) -> None:
         """Mutating the document reverts every glyph to ``·`` — three ways.
@@ -1012,7 +1012,7 @@ E           textual.css.query.NoMatches: No nodes match '#patch_editor_panel' on
 ..\..\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: NoMatches
 ____________________________ test_tc081_1_derived _____________________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25862/test_tc081_1_derived0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25862/test_tc081_1_derived0')
 
     def test_tc081_1_derived(tmp_path: Path) -> None:
         """Depths are derived from the two stacks, across every branch quadrant.
@@ -1148,7 +1148,7 @@ E           textual.css.query.NoMatches: No nodes match '#patch_editor_panel' on
 ..\..\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: NoMatches
 ________________________ test_tc_035_4_routing_guards _________________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25862/test_tc_035_4_routing_guards0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25862/test_tc_035_4_routing_guards0')
 
     def test_tc_035_4_routing_guards(tmp_path: Path) -> None:
         """TC-035.4 — the scope button is selector-state-only; the run button
@@ -1232,7 +1232,7 @@ E         Use -v to get more diff
 tests\test_tui_patch_variant.py:732: AssertionError
 ________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25862/test_at_056e_a2b_diff_report_b0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25862/test_at_056e_a2b_diff_report_b0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001C159CE6B10>
 
     def test_at_056e_a2b_diff_report_byte_identical_despite_selection(
@@ -1296,7 +1296,7 @@ E         Use -v to get more diff
 tests\test_tui_report_filter_surface.py:773: AssertionError
 _________________ test_tc018_existing_name_is_dedup_suffixed __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25862/test_tc018_existing_name_is_de0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25862/test_tc018_existing_name_is_de0')
 
     def test_tc018_existing_name_is_dedup_suffixed(tmp_path: Path) -> None:
         """TC-018 — a save onto an existing filename is dedup-suffixed.
@@ -1313,7 +1313,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         assert first is not None and second is not None
 >       assert first != second, "the second save silently clobbered the first"
 E       AssertionError: the second save silently clobbered the first
-E       assert WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25862/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json') != WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25862/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json')
+E       assert WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25862/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json') != WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25862/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json')
 
 tests\test_unified_write.py:385: AssertionError
 ______________ test_tc707_copy_matches_help_sections_md_verbatim ______________
@@ -1336,7 +1336,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-self = WindowsPath('C:/Users/jjgh8/Github/s19_app-b99-suite/prototypes/cambios_10_12_2026/help_sections.md')
+self = WindowsPath('<HOME>/Github/s19_app-b99-suite/prototypes/cambios_10_12_2026/help_sections.md')
 mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
 
     def open(self, mode='r', buffering=-1, encoding=None,
@@ -1349,7 +1349,7 @@ mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
             encoding = io.text_encoding(encoding)
 >       return io.open(self, mode, buffering, encoding, errors, newline)
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\Github\\s19_app-b99-suite\\prototypes\\cambios_10_12_2026\\help_sections.md'
+E       FileNotFoundError: [Errno 2] No such file or directory: '<HOME>\\Github\\s19_app-b99-suite\\prototypes\\cambios_10_12_2026\\help_sections.md'
 
 ..\..\anaconda3\envs\s19env\Lib\pathlib.py:1044: FileNotFoundError
 __________________ test_tc707_numbering_generated_sequential __________________
@@ -1369,7 +1369,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-self = WindowsPath('C:/Users/jjgh8/Github/s19_app-b99-suite/prototypes/cambios_10_12_2026/help_sections.md')
+self = WindowsPath('<HOME>/Github/s19_app-b99-suite/prototypes/cambios_10_12_2026/help_sections.md')
 mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
 
     def open(self, mode='r', buffering=-1, encoding=None,
@@ -1382,7 +1382,7 @@ mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
             encoding = io.text_encoding(encoding)
 >       return io.open(self, mode, buffering, encoding, errors, newline)
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\Github\\s19_app-b99-suite\\prototypes\\cambios_10_12_2026\\help_sections.md'
+E       FileNotFoundError: [Errno 2] No such file or directory: '<HOME>\\Github\\s19_app-b99-suite\\prototypes\\cambios_10_12_2026\\help_sections.md'
 
 ..\..\anaconda3\envs\s19env\Lib\pathlib.py:1044: FileNotFoundError
 --------------------------- snapshot report summary ---------------------------

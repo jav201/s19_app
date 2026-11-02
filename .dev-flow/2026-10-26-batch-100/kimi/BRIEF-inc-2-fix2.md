@@ -1,9 +1,9 @@
 # Kimi brief — batch-100 Increment 2 · corrective pass 2
 
-You keep working in the same worktree, `C:\Users\jjgh8\Github\s19_app-b100-inc2`. It holds Inc 2 and fix pass 1, uncommitted; keep both. `BRIEF-COMMON.md` applies. You still have 2 SOURCE files: `app.py` and `workspace.py`.
+You keep working in the same worktree, `<HOME>\Github\s19_app-b100-inc2`. It holds Inc 2 and fix pass 1, uncommitted; keep both. `BRIEF-COMMON.md` applies. You still have 2 SOURCE files: `app.py` and `workspace.py`.
 
 **Read first.** These are in the MAIN checkout:
-- `C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-10-26-batch-100\03-increments\review-increment-002.md` §"Round 2" (R2-1..R2-5)
+- `<HOME>\Github\s19_app\.dev-flow\2026-10-26-batch-100\03-increments\review-increment-002.md` §"Round 2" (R2-1..R2-5)
 - `...\03-increments\security-increment-002.md` §"Round 2" (SEC2-4 and the trap it describes)
 
 **What to fix:**

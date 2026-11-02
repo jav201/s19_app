@@ -20,15 +20,15 @@ xxxxxx.................................................................. [ 69%]
 ........................................................................ [ 96%]
 ................................                                         [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_directionb.py:5275: AssertionError: 80x24: both widgets must have width; {'narrow': True, 'body_right': 79, 'grid_content_width': 62, 'bar': (0, 0, 0, 0), 'glance': (0, 0, 0, 0)}
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_commandbar.py:2704: AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+<HOME>\Github\s19_app\tests\test_tui_directionb.py:5275: AssertionError: 80x24: both widgets must have width; {'narrow': True, 'body_right': 79, 'grid_content_width': 62, 'bar': (0, 0, 0, 0), 'glance': (0, 0, 0, 0)}
+<HOME>\Github\s19_app\tests\test_tui_commandbar.py:2704: AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
 [1;31mTextual Snapshot Report[0m
 
 [1;30;41m29[0m[30;41m mismatched snapshots[0m
 
-[1mView the [0m]8;id=8846200;file://C:\Users\jjgh8\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+[1mView the [0m]8;id=8846200;file://<HOME>\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
 
-[2mC:\Users\jjgh8\Github\s19_app\snapshot_report.html[0m
+[2m<HOME>\Github\s19_app\snapshot_report.html[0m
 
 =========================== short test summary info ===========================
 FAILED tests/test_tui_directionb.py::test_at073b_glance_geometry_fits_and_reflows

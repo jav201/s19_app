@@ -1,6 +1,6 @@
 # Inc 9b — E4 implementation notes (G-B, `s19_app/tui/app.py`)
 
-Scope: only `s19_app/tui/app.py` edited. Interpreter: `C:/Users/jjgh8/anaconda3/envs/s19env/python.exe` (the file compiles with `-m py_compile`; the test suite was NOT run).
+Scope: only `s19_app/tui/app.py` edited. Interpreter: `<HOME>/anaconda3/envs/s19env/python.exe` (the file compiles with `-m py_compile`; the test suite was NOT run).
 
 ## Functions added / changed / deleted
 

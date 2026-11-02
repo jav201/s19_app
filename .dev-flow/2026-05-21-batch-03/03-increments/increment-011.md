@@ -53,7 +53,7 @@ needed** — no UI defect was found.
 
 ## 3. How to test
 
-Run from the repo root `C:\Users\jjgh8\Github\s19_app`:
+Run from the repo root `<HOME>\Github\s19_app`:
 
 ```
 python -m pytest -q tests/test_tui_patch_editor.py tests/test_tui_patch_containment.py

@@ -17,7 +17,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-PYTHON = r"C:\Users\jjgh8\anaconda3\envs\s19env\python.exe"
+PYTHON = r"<HOME>\anaconda3\envs\s19env\python.exe"
 APP = "s19_app/tui/app.py"
 SVC = "s19_app/tui/services/variant_execution_service.py"
 SCREENS = "s19_app/tui/screens.py"

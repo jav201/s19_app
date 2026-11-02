@@ -435,7 +435,7 @@ Inc-3.)*
 **Ledger notes (review-fix pass).** The `−1` is the retired `test_ac6_clipped_segments_are_a_known_layout_limitation` (Amendment C) — verified absent, **0 occurrences** in `tests/test_map_click_chain.py`. The `+21` is Inc-1's 19 new nodes **plus the 2 parametrizations of Amendment D's `TC-B77-03` differing-size arm**. **2539 is READ from a `--collect-only` run, not computed**; the arithmetic is shown only as a reconciliation, per *a carried number is re-derived, not copied*. Every pass/fail figure above is read from that run's own output — **none is spliced across runs** — and all three gate files were run after confirming the `bl77` baseline had drained to 0 pytest processes, because a contended run flakes the timing-sensitive geometry assertions and cannot serve as gate evidence (D-9).
 
 > ✅ **The pre-implementation baseline is now DERIVED, not inherited (D-15 discharged).** Executed in an
-> isolated detached worktree at `f8747b8` (`C:\Users\jjgh8\bl77`), touching neither the branch nor the
+> isolated detached worktree at `f8747b8` (`<HOME>\bl77`), touching neither the branch nor the
 > working tree, so nothing about Inc-1 could contaminate it. **Three things it settles:**
 > 1. **It reconciles exactly with collection:** `2514 + 2 + 3 = 2519` ✓.
 > 2. **It matches batch-76's close figure exactly** — so the inherited number was *right*, and is now
@@ -451,7 +451,7 @@ Inc-3.)*
 > at `f8747b8`, so nothing in Inc-1's gate can be a pre-existing failure wearing Inc-1's name. The
 > deferral cost a 35-minute re-run and bought certainty; recorded as the price actually paid.
 >
-> 📋 **C-44:** the worktree at `C:\Users\jjgh8\bl77` is **outside the repo tree**, registered via
+> 📋 **C-44:** the worktree at `<HOME>\bl77` is **outside the repo tree**, registered via
 > `git worktree`. It is retained only until Inc-1b's snapshot attribution is settled, then removed with
 > `git worktree remove`. Recorded here so it cannot be forgotten.
 

@@ -1,6 +1,6 @@
 # Kimi brief — batch-99 Increment 5 · review fixes (code-reviewer F1–F4)
 
-Read `BRIEF-COMMON.md` from the MAIN checkout (`C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-10-25-batch-99\kimi\BRIEF-COMMON.md`). Same worktree, `C:\Users\jjgh8\Github\s19_app-b99-inc5`, branch `b99-inc5`, now REBASED onto main `d62b0c1` (Inc 8's lane log line and Inc 7 are present; your Inc-5 work is commit `08b6d4f`). Do not commit.
+Read `BRIEF-COMMON.md` from the MAIN checkout (`<HOME>\Github\s19_app\.dev-flow\2026-10-25-batch-99\kimi\BRIEF-COMMON.md`). Same worktree, `<HOME>\Github\s19_app-b99-inc5`, branch `b99-inc5`, now REBASED onto main `d62b0c1` (Inc 8's lane log line and Inc 7 are present; your Inc-5 work is commit `08b6d4f`). Do not commit.
 
 **Source budget widened by the orchestrator: 3 files** — `operations/crc.py`, `services/flow_execution_service.py`, and now `s19_app/tui/flow_screens.py` (still within the 4-file cap).
 

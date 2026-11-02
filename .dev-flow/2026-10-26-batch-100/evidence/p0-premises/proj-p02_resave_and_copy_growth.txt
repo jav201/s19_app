@@ -1,11 +1,11 @@
 # command: S19_WT=<scratch>/snap1d677ba PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 (NO_COLOR unset) s19env/python.exe p02_resave_and_copy_growth.py 
-# probe source: C:/Users/jjgh8/Github/s19_app/.dev-flow/design/investigation-projects-2026-10-23/p02_resave_and_copy_growth.py
+# probe source: <HOME>/Github/s19_app/.dev-flow/design/investigation-projects-2026-10-23/p02_resave_and_copy_growth.py
 # tree: 1d677ba (git archive)
 # started: 2026-10-26T06:44:23-06:00
 
 [A] save-back 'firmware.s19' status: ['Patched image saved as firmware_1.s19 — 1 entry applied before this save (0x8000007C)', 'Saved + verified: firmware_1.s19 — 1 entry applied before this save (0x8000007C)']
 [A]   current_file.path after save-back: temp/firmware.s19
-[A] re-save status: ["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_21f0ocq7\\.s19tool\\workarea\\P (variant 'firmware')", 'Project saved + manifest verified']
+[A] re-save status: ["Saved project to <HOME>\\AppData\\Local\\Temp\\projprobe_21f0ocq7\\.s19tool\\workarea\\P (variant 'firmware')", 'Project saved + manifest verified']
 [A] project tree: ['firmware.s19', 'firmware_1.s19', 'project.json']
 [A] project.json: {'schema_version': 1, 'active_variant': 'firmware', 'batch': [], 'assignments': {}}
 [A]   firmware.s19: patched=False original=True
@@ -14,14 +14,14 @@
 [A]   status: ["Loaded project 'P' -> firmware.s19"]
 [B] save-back 'firmware-patched.s19' status: ['Patched image saved as firmware-patched.s19 — 1 entry applied before this save (0x8000007C)', 'Saved + verified: firmware-patched.s19 — 1 entry applied before this save (0x8000007C)']
 [B]   current_file.path after save-back: temp/firmware.s19
-[B] re-save status: ["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_kw1o21y4\\.s19tool\\workarea\\P (variant 'firmware')", 'Project saved + manifest verified']
+[B] re-save status: ["Saved project to <HOME>\\AppData\\Local\\Temp\\projprobe_kw1o21y4\\.s19tool\\workarea\\P (variant 'firmware')", 'Project saved + manifest verified']
 [B] project tree: ['firmware-patched.s19', 'firmware.s19', 'project.json']
 [B] project.json: {'schema_version': 1, 'active_variant': 'firmware', 'batch': [], 'assignments': {}}
 [B]   firmware-patched.s19: patched=True original=False
 [B]   firmware.s19: patched=False original=True
 [B] RELOAD -> file=firmware.s19 variants=['firmware-patched', 'firmware'] active=firmware image_is_patched=False image_is_original=True
 [B]   status: ["Loaded project 'P' -> firmware.s19"]
-[N] re-save status: ["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_e1rbab5r\\.s19tool\\workarea\\P (variant 'firmware')", 'Project saved + manifest verified']
+[N] re-save status: ["Saved project to <HOME>\\AppData\\Local\\Temp\\projprobe_e1rbab5r\\.s19tool\\workarea\\P (variant 'firmware')", 'Project saved + manifest verified']
 [N] project tree: ['firmware.s19', 'project.json']
 [N] project.json: {'schema_version': 1, 'active_variant': 'firmware', 'batch': [], 'assignments': {}}
 [N]   firmware.s19: patched=False original=True

@@ -5,9 +5,9 @@ old text:             if item.name == cleaned:
 
 new text: 
 sha256 before: 7fb2fa5f01e2311c5d39996a78346daabb4fc4afdf59a6070aaa543d5f92cc68
-command: cd C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut11 && timeout 900 env -u NO_COLOR LOCALAPPDATA='C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut11-lad' PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line "tests/test_b100_save_dialog.py::test_tc_b100_47_strasse_open_strasse_eszett_present_is_a_clash"
-cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut11
-s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut11\s19_app\__init__.py
+command: cd <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut11 && timeout 900 env -u NO_COLOR LOCALAPPDATA='<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut11-lad' PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line "tests/test_b100_save_dialog.py::test_tc_b100_47_strasse_open_strasse_eszett_present_is_a_clash"
+cwd: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut11
+s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut11\s19_app\__init__.py
 pytest summary: 1 failed in 13.38s
 verdict: KILLED
 restored = True

@@ -65,8 +65,8 @@
    dialog buttons= ['Load', 'Cancel']
    dialog widgets= ['Button', 'Container', 'Label', 'OsClipboardInput']
    after: screen = Screen
-   recorded     = [('log', 'File not found: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwui__warhk1q\\nope.s19')]
-   painted      = {'#status_text': 'Loaded firmware_1.s19 (S19 only)', '#log_line_1': 'Parsing firmware_1.s19...', '#log_line_2': 'Loaded firmware_1.s19 (S19 only)', '#log_line_3': 'Loaded firmware_1.s19', '#log_line_4': 'File not found: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwui__warhk1q\\nope.s19'}
+   recorded     = [('log', 'File not found: <HOME>\\AppData\\Local\\Temp\\cwui__warhk1q\\nope.s19')]
+   painted      = {'#status_text': 'Loaded firmware_1.s19 (S19 only)', '#log_line_1': 'Parsing firmware_1.s19...', '#log_line_2': 'Loaded firmware_1.s19 (S19 only)', '#log_line_3': 'Loaded firmware_1.s19', '#log_line_4': 'File not found: <HOME>\\AppData\\Local\\Temp\\cwui__warhk1q\\nope.s19'}
    temp dir     = ['firmware.s19', 'firmware_1.s19']
    Workarea Files list = []
    current_file = ('firmware_1.s19', '93B/5883d107ec4f')
@@ -76,7 +76,7 @@
    dialog widgets= ['Button', 'Container', 'Label', 'OsClipboardInput']
    after: screen = Screen
    recorded     = [('log', 'Unsupported file type: ')]
-   painted      = {'#status_text': 'Loaded firmware_1.s19 (S19 only)', '#log_line_1': 'Loaded firmware_1.s19 (S19 only)', '#log_line_2': 'Loaded firmware_1.s19', '#log_line_3': 'File not found: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwui__warhk1q\\nope.s19', '#log_line_4': 'Unsupported file type:'}
+   painted      = {'#status_text': 'Loaded firmware_1.s19 (S19 only)', '#log_line_1': 'Loaded firmware_1.s19 (S19 only)', '#log_line_2': 'Loaded firmware_1.s19', '#log_line_3': 'File not found: <HOME>\\AppData\\Local\\Temp\\cwui__warhk1q\\nope.s19', '#log_line_4': 'Unsupported file type:'}
    temp dir     = ['firmware.s19', 'firmware_1.s19']
    Workarea Files list = []
    current_file = ('firmware_1.s19', '93B/5883d107ec4f')

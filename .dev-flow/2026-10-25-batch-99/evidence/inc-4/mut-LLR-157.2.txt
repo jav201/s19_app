@@ -2,7 +2,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 _____________ test_tc_b99_22_save_rederives_and_names_not_applied _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26314/test_tc_b99_22_save_rederives_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26314/test_tc_b99_22_save_rederives_0')
 
     def test_tc_b99_22_save_rederives_and_names_not_applied(tmp_path: Path) -> None:
         """The save re-derives the image from every entry currently in the

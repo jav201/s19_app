@@ -27,7 +27,7 @@
 
 | Field | Value |
 |---|---|
-| Gate record | `python "C:/Users/jjgh8/.claude/skills/dev-flow/scripts/devflow-validate.py" .` from the project root · exit 0 · 0 block · 891 notice · 2026-10-26 |
+| Gate record | `python "<HOME>/.claude/skills/dev-flow/scripts/devflow-validate.py" .` from the project root · exit 0 · 0 block · 891 notice · 2026-10-26 |
 | Gated tree | `79d8810e4187d2cfe0f24aac862eb704d17790d0` · dirty — .dev-flow/BACKLOG-CODE.md, .dev-flow/BACKLOG-PROCESS.md (the close record itself excluded) |
 | Requirements canon | `REQUIREMENTS.md` (`artifact_homes.requirements_canon` = `repo:REQUIREMENTS.md`) — `devflow-init.py --fold-canon` run at this close: `canon: REQUIREMENTS.md -- 51 folded, 0 kept, 0 refused` (HLR-152..HLR-162 and their 40 live LLRs); LLR-157.3 then added by hand with status `retired` at the closing validator run (V26 / V22, `PLAN.md` §Gate notices) |
 
@@ -86,7 +86,7 @@ The per-LLR rows (40 live; LLR-157.3 retired at LED .2) are in `04-validation.md
 
 ## 3 · Working-file reconciliation (C-44)
 
-Sweep run 2026-10-26: `git status --short` and `git log main --not --remotes` in `C:\Users\jjgh8\Github\s19_app`, the only repository the batch touched. The flow bundle and the Kimi config were read, not edited.
+Sweep run 2026-10-26: `git status --short` and `git log main --not --remotes` in `<HOME>\Github\s19_app`, the only repository the batch touched. The flow bundle and the Kimi config were read, not edited.
 
 | File | State | Evidence |
 |---|---|---|
@@ -94,7 +94,7 @@ Sweep run 2026-10-26: `git status --short` and `git log main --not --remotes` in
 | `.dev-flow/2026-10-25-batch-99/**` (contract, ledger, review, PDR, DDR, packets, evidence, validation, post-mortem) and `docs/architecture.md` | ✅ committed **and landed** on `main` | through `bf3917d`, then the deliverable commit of this close |
 | `REQUIREMENTS.md` (canon fold), `.dev-flow/state.json`, `04-validation.md` (confirmation line), `06-docs/**` | ✅ committed in the deliverable commit of this close, pushed to `main` | the `Gated tree` row above |
 | `.dev-flow/BACKLOG-CODE.md`, `.dev-flow/BACKLOG-PROCESS.md` (carries) | ✅ committed in the close commit with this record, pushed to `main` | §4 |
-| worktree `C:\Users\jjgh8\Github\s19_app-b99-suite` | 🗑️ removed after the confirmation run | the full-suite worktree; every increment worktree was removed at its merge |
+| worktree `<HOME>\Github\s19_app-b99-suite` | 🗑️ removed after the confirmation run | the full-suite worktree; every increment worktree was removed at its merge |
 | `prototypes/` | 📋 left on purpose — untracked, never staged by rule | — |
 
 - **Found before the batch:** `none — no tracked file was modified when the batch began`

@@ -1,9 +1,9 @@
 # mutation: SEC6-7-no-resolve-catch — SEC6-7 (LLR-168.1 / LLR-178.1): the resolver no longer catches OSError / ValueError around resolve() and the reparse walk
 # file: s19_app/tui/services/variant_execution_service.py (sha256 before e494c50cd7266bff)
-# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=C:\Users\jjgh8\AppData\Local\Temp\f2mut-SEC6-7-no-resolve-catch tests/test_b100_announce.py tests/test_b100_active_variant.py -k overlong
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (corrective pass 2, mutated in place, then restored)
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
-# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\__init__.py
+# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=<HOME>\AppData\Local\Temp\f2mut-SEC6-7-no-resolve-catch tests/test_b100_announce.py tests/test_b100_active_variant.py -k overlong
+# tree: <HOME>\Github\s19_app-b100-inc6 (corrective pass 2, mutated in place, then restored)
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# s19_app.__file__ = <HOME>\Github\s19_app-b100-inc6\s19_app\__init__.py
 # date: 2026-10-30T04:41:01Z
 # --- old
 #       except (OSError, ValueError) as exc:
@@ -41,7 +41,7 @@ tests\test_b100_announce.py:93: AssertionError
 
 During handling of the above exception, another exception occurred:
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mut-SEC6-7-no-resolve-catch/test_tc_b100_67_overlong_entri0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f2mut-SEC6-7-no-resolve-catch/test_tc_b100_67_overlong_entri0')
 
     def test_tc_b100_67_overlong_entries_are_skipped_rows_not_a_crash(tmp_path: Path) -> None:
         """SEC6-7: a recorded 40 000-character entry in ``batch``,
@@ -117,7 +117,7 @@ s19_app\tui\services\variant_execution_service.py:325: in _resolve_manifest_entr
     p.stat()
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mut-SEC6-7-no-resolve-catch/test_tc_b100_67_overlong_entri0/app/.s19t...qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq')
+self = WindowsPath('<HOME>/AppData/Local/Temp/f2mut-SEC6-7-no-resolve-catch/test_tc_b100_67_overlong_entri0/app/.s19t...qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq')
 
     def stat(self, *, follow_symlinks=True):
         """
@@ -131,7 +131,7 @@ E       ValueError: stat: path too long for Windows
 ..\..\anaconda3\envs\s19env\Lib\pathlib.py:1013: ValueError
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\tui\app.py:7019 in           
+│ <HOME>\Github\s19_app-b100-inc6\s19_app\tui\app.py:7019 in           
 │ _route_load_project                                                          
 │                                                                              
 │    7016 │   │   │   │   - ``action_load_project`` (the dialog's dismiss call 
@@ -155,7 +155,7 @@ E       ValueError: stat: path too long for Windows
 │ │          )                                    │                            
 │ ╰───────────────────────────────────────────────╯                            
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\tui\app.py:10141 in          
+│ <HOME>\Github\s19_app-b100-inc6\s19_app\tui\app.py:10141 in          
 │ _handle_load_project                                                         
 │                                                                              
 │   10138 │   │   # order of ``build_variant_set`` (with a status warning when 
@@ -170,14 +170,14 @@ E       ValueError: stat: path too long for Windows
 │ │         a2l_files = []                                                   │ 
 │ │        data_files = [                                                    │ 
 │ │                     │                                                    │ 
-│ │                     WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mu… │ 
+│ │                     WindowsPath('<HOME>/AppData/Local/Temp/f2mu… │ 
 │ │                     │                                                    │ 
-│ │                     WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mu… │ 
+│ │                     WindowsPath('<HOME>/AppData/Local/Temp/f2mu… │ 
 │ │                     ]                                                    │ 
 │ │ discarded_unsaved = 0                                                    │ 
 │ │             error = None                                                 │ 
 │ │              name = 'P'                                                  │ 
-│ │       project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mu… │ 
+│ │       project_dir = WindowsPath('<HOME>/AppData/Local/Temp/f2mu… │ 
 │ │              self = S19TuiApp(                                           │ 
 │ │                     │   title='Hex Edit Tool',                           │ 
 │ │                     │   classes={'-dark-mode'},                          │ 
@@ -189,13 +189,13 @@ E       ValueError: stat: path too long for Windows
 │ │                     │   │   VariantDescriptor(                           │ 
 │ │                     │   │   │   variant_id='firmware',                   │ 
 │ │                     │   │   │                                            │ 
-│ │                     path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp… │ 
+│ │                     path=WindowsPath('<HOME>/AppData/Local/Temp… │ 
 │ │                     │   │   │   file_type='s19'                          │ 
 │ │                     │   │   ),                                           │ 
 │ │                     │   │   VariantDescriptor(                           │ 
 │ │                     │   │   │   variant_id='firmware_1',                 │ 
 │ │                     │   │   │                                            │ 
-│ │                     path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp… │ 
+│ │                     path=WindowsPath('<HOME>/AppData/Local/Temp… │ 
 │ │                     │   │   │   file_type='s19'                          │ 
 │ │                     │   │   )                                            │ 
 │ │                     │   ),                                               │ 
@@ -203,7 +203,7 @@ E       ValueError: stat: path too long for Windows
 │ │                     )                                                    │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\tui\services\variant_executi 
+│ <HOME>\Github\s19_app-b100-inc6\s19_app\tui\services\variant_executi 
 │ on_service.py:569 in read_project_manifest                                   
 │                                                                              
 │    566 │   │   )                                                             
@@ -233,9 +233,9 @@ E       ValueError: stat: path too long for Windows
 │ │                  )                                                       │ 
 │ │          entry = 'qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq… │ 
 │ │         handle = <_io.BufferedReader                                     │ 
-│ │                  name='C:\\Users\\jjgh8\\AppData\\Local\\Temp\\f2mut-SE… │ 
+│ │                  name='<HOME>\\AppData\\Local\\Temp\\f2mut-SE… │ 
 │ │         issues = []                                                      │ 
-│ │  manifest_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mut-S… │ 
+│ │  manifest_path = WindowsPath('<HOME>/AppData/Local/Temp/f2mut-S… │ 
 │ │        payload = {                                                       │ 
 │ │                  │   'schema_version': 1,                                │ 
 │ │                  │   'active_variant': 'firmware_1',                     │ 
@@ -256,14 +256,14 @@ E       ValueError: stat: path too long for Windows
 │ │                  │   │   ]                                               │ 
 │ │                  │   }                                                   │ 
 │ │                  }                                                       │ 
-│ │    project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mut-S… │ 
-│ │   project_root = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mut-S… │ 
+│ │    project_dir = WindowsPath('<HOME>/AppData/Local/Temp/f2mut-S… │ 
+│ │   project_root = WindowsPath('<HOME>/AppData/Local/Temp/f2mut-S… │ 
 │ │ schema_version = 1                                                       │ 
 │ │     size_bytes = 120134                                                  │ 
 │ │     size_probe = None                                                    │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\tui\services\variant_executi 
+│ <HOME>\Github\s19_app-b100-inc6\s19_app\tui\services\variant_executi 
 │ on_service.py:325 in _resolve_manifest_entry                                 
 │                                                                              
 │    322 │   │   )                                                             
@@ -277,12 +277,12 @@ E       ValueError: stat: path too long for Windows
 │ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
 │ │      context = 'batch'                                                   │ 
 │ │       issues = []                                                        │ 
-│ │ project_root = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mut-SEC… │ 
+│ │ project_root = WindowsPath('<HOME>/AppData/Local/Temp/f2mut-SEC… │ 
 │ │    raw_entry = 'qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq… │ 
 │ │         text = 'qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq… │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1003 in resolve          
+│ <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:1003 in resolve          
 │                                                                              
 │   1000 │   │   # Ensure we get an exception by calling stat()                
 │   1001 │   │   if not strict:                                                
@@ -293,13 +293,13 @@ E       ValueError: stat: path too long for Windows
 │   1006 │   │   return p                                                      
 │                                                                              
 │ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
-│ │      p = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mut-SEC6-7-no… │ 
-│ │      s = 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\f2mut-SEC6-7-no-resol… │ 
-│ │   self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mut-SEC6-7-no… │ 
+│ │      p = WindowsPath('<HOME>/AppData/Local/Temp/f2mut-SEC6-7-no… │ 
+│ │      s = '<HOME>\\AppData\\Local\\Temp\\f2mut-SEC6-7-no-resol… │ 
+│ │   self = WindowsPath('<HOME>/AppData/Local/Temp/f2mut-SEC6-7-no… │ 
 │ │ strict = False                                                           │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1013 in stat             
+│ <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:1013 in stat             
 │                                                                              
 │   1010 │   │   Return the result of the stat() system call on this path, lik 
 │   1011 │   │   os.stat() does.                                               
@@ -311,13 +311,13 @@ E       ValueError: stat: path too long for Windows
 │                                                                              
 │ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
 │ │ follow_symlinks = True                                                   │ 
-│ │            self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mut-… │ 
+│ │            self = WindowsPath('<HOME>/AppData/Local/Temp/f2mut-… │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 ╰──────────────────────────────────────────────────────────────────────────────
 ValueError: stat: path too long for Windows
 _______ test_tc_b100_20_a2l_sync_with_an_overlong_entry_does_not_crash ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mut-SEC6-7-no-resolve-catch/test_tc_b100_20_a2l_sync_with_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f2mut-SEC6-7-no-resolve-catch/test_tc_b100_20_a2l_sync_with_0')
 
     def test_tc_b100_20_a2l_sync_with_an_overlong_entry_does_not_crash(tmp_path: Path) -> None:
         """SEC6-7: the manifest records a 40 000-character entry in ``batch``,
@@ -372,7 +372,7 @@ s19_app\tui\services\variant_execution_service.py:325: in _resolve_manifest_entr
     p.stat()
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mut-SEC6-7-no-resolve-catch/test_tc_b100_20_a2l_sync_with_0/app/.s19t...qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq')
+self = WindowsPath('<HOME>/AppData/Local/Temp/f2mut-SEC6-7-no-resolve-catch/test_tc_b100_20_a2l_sync_with_0/app/.s19t...qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq')
 
     def stat(self, *, follow_symlinks=True):
         """

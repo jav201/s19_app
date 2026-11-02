@@ -1,6 +1,6 @@
 # Kimi brief — batch-99 DDR fixes (tests only)
 
-Read `BRIEF-COMMON.md` (this worktree, `.dev-flow/2026-10-25-batch-99/kimi/BRIEF-COMMON.md`), then `design/DDR-software-dev.md` and `design/DDR-qa.md`. Worktree `C:\Users\jjgh8\Github\s19_app-b99-ddr`, branch `b99-ddr` at `bab3bff` (all 12 increments merged). **No SOURCE file may change**: tests and the increment packets only. Do not commit.
+Read `BRIEF-COMMON.md` (this worktree, `.dev-flow/2026-10-25-batch-99/kimi/BRIEF-COMMON.md`), then `design/DDR-software-dev.md` and `design/DDR-qa.md`. Worktree `<HOME>\Github\s19_app-b99-ddr`, branch `b99-ddr` at `bab3bff` (all 12 increments merged). **No SOURCE file may change**: tests and the increment packets only. Do not commit.
 
 1. **C-18 (HIGH) — one joined node per AT.** AT-B99-03, -04, -08 and -11 are each spread over 2–5 nodes. For each AT, write ONE node named `test_at_b99_NN_<outcome>` that drives every named outcome of the AT, in sequence, through the shipped surface (copy the AT text from the HLR's "Observable outcome" in `01-requirements.md`). Rename the other nodes off the `at_b99` id to TC sub-arms of the TC they serve:
    - **AT-03 (HLR-154):** load the cut S19 → the status leads with the defect and the issues panel names it; then the flow over it → SOURCE failed, nothing written. The hostile-name arm becomes `test_tc_b99_10_hostile_name_renders_literally`.

@@ -406,7 +406,7 @@ with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
     _write(T._B78_DIFF_HEIGHT_ARTIFACT, T.b78_capture_diff_hex_a_geometry(base))
 ```
 
-Run: `PYTHONDONTWRITEBYTECODE=1 python capture_inc0.py C:/Users/jjgh8/Github/s19_app`
+Run: `PYTHONDONTWRITEBYTECODE=1 python capture_inc0.py <HOME>/Github/s19_app`
 
 **Independently reproduced.** The reviewer typed this script out verbatim as pasted, ran it in a
 fresh process, and got all three artifacts **byte-identically** — which closes C-35 provenance,

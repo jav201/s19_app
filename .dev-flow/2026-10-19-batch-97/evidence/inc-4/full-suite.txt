@@ -48,7 +48,7 @@ xx...................................................................... [ 92%]
 ================================== FAILURES ===================================
 ______ test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23605/test_at_b78_03_the_palette_act0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23605/test_at_b78_03_the_palette_act0')
 
     def test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact(
         tmp_path: Path,
@@ -132,7 +132,7 @@ E         Use -v to get more diff
 tests\test_tui_commandbar.py:2704: AssertionError
 _______________ test_at_b78_32_app_bindings_block_is_untouched ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23605/test_at_b78_32_app_bindings_bl0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23605/test_at_b78_32_app_bindings_bl0')
 
     def test_at_b78_32_app_bindings_block_is_untouched(tmp_path: Path) -> None:
         """AT-B78-32 (PIN) -- Lane 1 does not disturb the App ``BINDINGS`` block.
@@ -225,7 +225,7 @@ E         Use -v to get more diff
 tests\test_tui_diff_screen.py:3882: AssertionError
 ________________ test_at031b_two_saves_are_distinct_no_clobber ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23605/test_at031b_two_saves_are_dist0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23605/test_at031b_two_saves_are_dist0')
 
     def test_at031b_two_saves_are_distinct_no_clobber(tmp_path: Path) -> None:
         """AT-031b (idempotent boundary) — two saves keep both, distinct names.
@@ -260,14 +260,14 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
     
         saved = list(patches.glob("*.json"))
 >       assert len(saved) == 2, f"two saves must keep two files, found {saved}"
-E       AssertionError: two saves must keep two files, found [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23605/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')]
+E       AssertionError: two saves must keep two files, found [WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23605/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')]
 E       assert 1 == 2
-E        +  where 1 = len([WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23605/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')])
+E        +  where 1 = len([WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23605/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')])
 
 tests\test_tui_patch_editor_v2.py:1336: AssertionError
 ______________ test_at058b_id_census_and_wiring_survive_reparent ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23605/test_at058b_id_census_and_wiri0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23605/test_at058b_id_census_and_wiri0')
 
     def test_at058b_id_census_and_wiring_survive_reparent(tmp_path: Path) -> None:
         """AT-058b — every patch_* id + the run_checks wiring survive the reparent.
@@ -355,7 +355,7 @@ E       assert False is True
 tests\test_tui_patch_editor_v2.py:2685: AssertionError
 __________________ test_at077e_image_generation_invalidates ___________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23605/test_at077e_image_generation_i0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23605/test_at077e_image_generation_i0')
 
     def test_at077e_image_generation_invalidates(tmp_path: Path) -> None:
         """Loading a different image reverts the glyphs to ``·``, not a stale ``✓``.
@@ -431,7 +431,7 @@ E         Use -v to get more diff
 tests\test_tui_patch_glyphs.py:537: AssertionError
 ________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23605/test_at_056e_a2b_diff_report_b0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23605/test_at_056e_a2b_diff_report_b0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001D0720890D0>
 
     def test_at_056e_a2b_diff_report_byte_identical_despite_selection(
@@ -495,7 +495,7 @@ E         Use -v to get more diff
 tests\test_tui_report_filter_surface.py:773: AssertionError
 _________________ test_tc018_existing_name_is_dedup_suffixed __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23605/test_tc018_existing_name_is_de0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23605/test_tc018_existing_name_is_de0')
 
     def test_tc018_existing_name_is_dedup_suffixed(tmp_path: Path) -> None:
         """TC-018 — a save onto an existing filename is dedup-suffixed.
@@ -512,16 +512,16 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         assert first is not None and second is not None
 >       assert first != second, "the second save silently clobbered the first"
 E       AssertionError: the second save silently clobbered the first
-E       assert WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23605/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json') != WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23605/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json')
+E       assert WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23605/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json') != WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23605/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json')
 
 tests\test_unified_write.py:385: AssertionError
 [1;31mTextual Snapshot Report[0m
 
 [1;30;41m29[0m[30;41m mismatched snapshots[0m
 
-[1mView the [0m]8;id=9300618;file://C:\Users\jjgh8\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+[1mView the [0m]8;id=9300618;file://<HOME>\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
 
-[2mC:\Users\jjgh8\Github\s19_app\snapshot_report.html[0m
+[2m<HOME>\Github\s19_app\snapshot_report.html[0m
 
 =========================== short test summary info ===========================
 FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact

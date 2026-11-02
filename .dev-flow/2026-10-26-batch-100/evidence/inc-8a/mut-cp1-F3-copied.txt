@@ -6,13 +6,13 @@
 #   |         if copied:
 # edit 1 NEW:
 #   |         if False:
-# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1
+# cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1
 # env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
-# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_29_cp1_copied_document_outside_the_form_says_so
+# command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_29_cp1_copied_document_outside_the_form_says_so
 # started 2026-10-30T23:57:17Z  finished 2026-10-30T23:57:21Z  rc=1
 F                                                                        [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_document.py:1604: AssertionError: ["Change document boost.txt was not recorded in the project — it could not be placed in the project's patches folder"]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_document.py:1604: AssertionError: ["Change document boost.txt was not recorded in the project — it could not be placed in the project's patches folder"]
 =========================== short test summary info ===========================
 FAILED tests/test_b100_document.py::test_tc_b100_29_cp1_copied_document_outside_the_form_says_so
 1 failed in 2.87s

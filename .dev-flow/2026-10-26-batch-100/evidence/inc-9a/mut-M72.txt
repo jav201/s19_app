@@ -3,9 +3,9 @@ requirement: E3 R14
 target file: s19_app/tui/app.py
 edit: '            # E3 R14: Win32 opens ``temp.`` / ``ab `` as ``temp`` / ``ab``,\n            # so a name ending in a dot or a space would load another folder.\n            if item.name.endswith((".", " ")):\n                continue\n' -> ''
 sha256 before: 62232011882325626771cb015ccfce4b34c15945e90b8432fd628c61fcf22d80
-cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a
+cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a
 command: pytest -q --tb=line tests/test_b100_recents.py::test_tc_b100_38_project_list_skips_a_name_ending_in_a_dot_or_space[temp.] tests/test_b100_recents.py::test_tc_b100_38_project_list_skips_a_name_ending_in_a_dot_or_space[ab ]
-s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a\s19_app\__init__.py
+s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a\s19_app\__init__.py
 pytest summary: 2 failed in 4.75s
 verdict: KILLED
 restored = True

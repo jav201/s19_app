@@ -97,7 +97,7 @@ with `Path.read_bytes`; the `resolve_input_path` wiring is the increment-8 add.
 
 ## 3. How to test
 
-Run from the repo root `C:\Users\jjgh8\Github\s19_app`:
+Run from the repo root `<HOME>\Github\s19_app`:
 
 ```
 python -m pytest -q tests/test_cdfx_reader.py tests/test_cdfx_r_rules.py

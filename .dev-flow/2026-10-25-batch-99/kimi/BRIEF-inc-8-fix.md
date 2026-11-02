@@ -1,6 +1,6 @@
 # Kimi brief — batch-99 Increment 8 · review fixes (code-reviewer F1–F5)
 
-Read `BRIEF-COMMON.md` from the MAIN checkout (`C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-10-25-batch-99\kimi\BRIEF-COMMON.md`; it gained rules on test ids, the registry bump and black-box ATs). Same worktree, `C:\Users\jjgh8\Github\s19_app-b99-inc8` (uncommitted changes on `c62c842`). Do not commit.
+Read `BRIEF-COMMON.md` from the MAIN checkout (`<HOME>\Github\s19_app\.dev-flow\2026-10-25-batch-99\kimi\BRIEF-COMMON.md`; it gained rules on test ids, the registry bump and black-box ATs). Same worktree, `<HOME>\Github\s19_app-b99-inc8` (uncommitted changes on `c62c842`). Do not commit.
 
 - **F1 [HIGH] — two regressions the census missed.** `tests/test_tui_flow_execution_b94.py:596` (AT-B94-20) and `:816` (AT-B94-23) count every `- Chain ` line as a provenance line. The new report sections push the count from 2 to 8. Re-pin them with the same `" input "` filter you used in `test_flow_chainset_b94.py`, and check `:981` too. Record each as old → new → LLR-156.3. Then widen your census: grep `tests/` for every test that reads the chain-set or flow report text (`"- Chain"`, `"Status:"`, `"## "` headings, `compose_chain_set_report`, `write_chain_set_report`, the flow report path), run them all and include them in `green-full.txt`.
 - **F2 [HIGH] — AT-B99-06/07 are not black-box.** They go through `b97_fixtures` helpers (`_handle_load_project`, `action_show_screen`, `Button.press()`, `run.press()` for `#fx_run`). Rewrite them with the idiom in `tests/test_b99_s0.py:376-506`:

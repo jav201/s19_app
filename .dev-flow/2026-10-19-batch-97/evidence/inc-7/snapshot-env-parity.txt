@@ -4,8 +4,8 @@
 _________ test_tc016s_density_layout_snapshot[map-comfortable-80x24] __________
 
 snap_compare = <function snap_compare.<locals>.compare at 0x0000025CDA73A660>
-public_triple = {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24315/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24315/snapshot_public0/snap.s19')}
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24315/test_tc016s_density_layout_sna24')
+public_triple = {'a2l': WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-24315/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-24315/snapshot_public0/snap.s19')}
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-24315/test_tc016s_density_layout_sna24')
 screen = 'map', density = 'comfortable', size_key = '80x24'
 
     @pytest.mark.skipif(
@@ -51,14 +51,14 @@ screen = 'map', density = 'comfortable', size_key = '80x24'
         )
 E       AssertionError: assert False
 E        +  where False = <function snap_compare.<locals>.compare at 0x0000025CDA73A660>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}), terminal_size=(80, 24), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000025CDB737920>)
-E        +    where <function _snapshot_run_before.<locals>.run_before at 0x0000025CDB737920> = _snapshot_run_before('map', 'comfortable', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24315/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24315/snapshot_public0/snap.s19')})
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x0000025CDB737920> = _snapshot_run_before('map', 'comfortable', {'a2l': WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-24315/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-24315/snapshot_public0/snap.s19')})
 
 tests\test_tui_snapshot.py:1126: AssertionError
 _________ test_tc016s_density_layout_snapshot[map-comfortable-120x30] _________
 
 snap_compare = <function snap_compare.<locals>.compare at 0x0000025CDCF1D260>
-public_triple = {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24315/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24315/snapshot_public0/snap.s19')}
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24315/test_tc016s_density_layout_sna25')
+public_triple = {'a2l': WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-24315/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-24315/snapshot_public0/snap.s19')}
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-24315/test_tc016s_density_layout_sna25')
 screen = 'map', density = 'comfortable', size_key = '120x30'
 
     @pytest.mark.skipif(
@@ -104,7 +104,7 @@ screen = 'map', density = 'comfortable', size_key = '120x30'
         )
 E       AssertionError: assert False
 E        +  where False = <function snap_compare.<locals>.compare at 0x0000025CDCF1D260>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}), terminal_size=(120, 30), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000025CDAC58A40>)
-E        +    where <function _snapshot_run_before.<locals>.run_before at 0x0000025CDAC58A40> = _snapshot_run_before('map', 'comfortable', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24315/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24315/snapshot_public0/snap.s19')})
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x0000025CDAC58A40> = _snapshot_run_before('map', 'comfortable', {'a2l': WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-24315/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-24315/snapshot_public0/snap.s19')})
 
 tests\test_tui_snapshot.py:1126: AssertionError
 --------------------------- snapshot report summary ---------------------------
@@ -113,9 +113,9 @@ tests\test_tui_snapshot.py:1126: AssertionError
 
 [1;30;41m2[0m[30;41m mismatched snapshots[0m
 
-[1mView the [0m]8;id=2427139;file://C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\wt_ae0ef4f\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+[1mView the [0m]8;id=2427139;file://<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\wt_ae0ef4f\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
 
-[2mC:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\[0m[2;93ma8feab43-c248-4ccb-[0m
+[2m<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\[0m[2;93ma8feab43-c248-4ccb-[0m
 [2;93m86cf-122b894659b2[0m[2m\scratchpad\wt_ae0ef4f\snapshot_report.html[0m
 
 =========================== short test summary info ===========================

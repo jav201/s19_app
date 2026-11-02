@@ -1,6 +1,6 @@
 # command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation 167.7-rederive-writes-session
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# tree: <HOME>\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation 167.7-rederive-writes-session
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
 # date: 2026-10-29T19:57:32+00:00
 # requirement: LLR-167.7
 # mutation: rederive_for_save writes the session map — file s19_app/tui/services/change_service.py
@@ -12,7 +12,7 @@
 ================================== FAILURES ===================================
 ___________________ test_tc_b100_14_deciding_writes_nothing ___________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29962/test_tc_b100_14_deciding_write0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29962/test_tc_b100_14_deciding_write0')
 
     def test_tc_b100_14_deciding_writes_nothing(tmp_path: Path) -> None:
         """0 writes to the session map while deciding (the trap map is the
