@@ -1,0 +1,77 @@
+# Inc 8 — Flow CRC block and CRC configs, CRC init with reverse, external-step outputs: requirements (E1)
+
+Batch 2026-11-01-batch-101, increment 8. Base: `e266395` (branch `b101-inc8` = main). Stage E1 of the design-first flow (`dev-flow-v3-beta`).
+Findings: F-28 (+ CODE-CHANGES D13-23), F-49 (+ D15-17), D13-20 (P0 ruling, PLAN.md). Scope, decisions and reasons: `E1-rulings.md`. Slice: `E1-slice.md`. Test cases: `02-test-cases.md`. Graph: `codewire/graph-inc8.md`.
+
+Form column: U = ubiquitous, E = event (`When`), N = unwanted (`If … then`). "Base" column: what `e266395` does today (B = a probe run at E1 on the base tree from the session scratchpad; read-only on the worktree).
+Row status: **canon** = the row's text is unchanged, the code is made to meet it; **changed** = the canon row's wording is corrected here (`E1-rulings.md` C-1); **new** = a new canon row (id checked unused in `REQUIREMENTS.md`).
+
+## User stories
+
+### US-I8-1 — a Designer template given to a Flow CRC block is named as such (F-28)
+As the operator, when I give a Flow CRC block a file that the CRC Designer saved, I want the block to stop with a reason that says the file is a CRC Designer template and what a CRC config needs, so that I do not chase the bare text `'reverse'`.
+
+### US-I8-2 — a CRC config error names its field (D13-23)
+As the operator, I want each CRC config error for a missing field or a field that is not a number to name that field, so that I can correct the file at once.
+
+### US-I8-3 — one CRC for one set of parameters (D13-20)
+As the operator, I want the CRC operation and the Flow CRC block to compute the CRC that the CRC model of CTX-CRC and the CRC Designer give for the same parameters, so that a CRC I check or write agrees with the algorithm the target uses.
+
+### US-I8-4 — a later block reads this run's external output (F-49, D15-17)
+As the operator, I want a later block that names an external step's output to read the copy of this run's output, and a relative output path to be read under the project folder like the log, so that a flow never applies stale evidence without saying so.
+
+## Definitions (additions to CTX-CRCCONFIG and CTX-FLOW; terms only)
+
+- **Required field** (CTX-CRCCONFIG). `polynomial`, `init`, `reverse`, `final_xor`; each region's `start`, `end`, `output_address`; each group's `regions`, `output_address`; each group span's `start`, `end`.
+- **Number field** (CTX-CRCCONFIG). `polynomial`, `init`, `final_xor`; each region's `start`, `end`, `output_address`; each group's `output_address`; each group span's `start`, `end`. (`output_bytes` keeps its own rule text, CTX-CRCCONFIG rule texts.)
+- **`<name>`** in R-CRC-CONFIG-001.10 / .11: the field's key as CTX-CRCCONFIG writes it (`start`), without its region or group.
+- **`<value>`** in R-CRC-CONFIG-001.11: the field's value as JSON text: a string in double quotes (`"zz"`), `true`, `false`, `null`, a fraction (`1.5`), a list or an object as JSON.
+- **Designer template shape** (CTX-CRCCONFIG). A JSON object that has the key `algorithm` and does not have the key `polynomial` (the template file of CTX-DESIGNER has this shape).
+- **Template rule text** (added to the CTX-CRCCONFIG rule texts): `a CRC Designer template is not a CRC config - it has no regions or groups`.
+- **KAT message** (CTX-CRC). The 9 ASCII bytes `123456789` (0x31 … 0x39), the input of every `check` value.
+- **Bit-symmetric init** (CTX-CRC). An init whose 32 bits read the same in both directions (0x00000000, 0xFFFFFFFF, 0x0FF00FF0). Only an init that is not bit-symmetric shows D13-20.
+- **Output file name** (CTX-FLOW). The last part of an external step's output path (`step_patch.changes.json`), the name the copy of R-FLOW-EXT.5 asks for.
+- **The copy** (CTX-FLOW). The file the copy of R-FLOW-EXT.5 landed on: the output file name, the lowest free numbered name (R-TUI-006.2), or a file with the same content that is reused (R-TUI-006.1, .5).
+- **Names** (CTX-FLOW). A project ref names a file when it resolves (CTX-FLOW project ref) to that file's path; compared case-insensitively on Windows.
+- **In place of** (CTX-FLOW). A block reads the copy in place of a ref when the copy is another file than the one the ref names.
+
+## Requirements
+
+### D13-20 — the CRC model with reverse (US-I8-3)
+
+| Id | Form | Requirement | Threshold | Negative control | US | Status | Base |
+|---|---|---|---|---|---|---|---|
+| R-CRC-ENGINE-001.1 | U | The system shall compute each CRC of the CRC operation by the parametric model of CTX-CRC, with width 32 and the parameters of the CRC config. | 7/7 cases of `02-test-cases.md` give the model value; KAT message, poly 0x04C11DB7, init 0x12345678, reverse true, final_xor 0xFFFFFFFF → 0x0F8B7431 in the engine, the Operations check, the Operations write and the Flow CRC block | seed the register with the reflected init when reverse is true (the base line) → /1 gives 0x18026B2A → RED | US-I8-3 | canon | **No** for reverse true with an init that is not bit-symmetric (`crc.py:211`): 0x18026B2A (B). Yes otherwise |
+| R-CRC-ENGINE-002.2 | U | The system shall give in the CRC operation, for each polynomial, init, final XOR and reverse, the CRC that the CRC Designer gives for width 32, that polynomial, init and final XOR as xorout, and refin and refout equal to reverse. | 24/24 parameter sets equal (6 inits × reverse true/false × final_xor 0x0 / 0xFFFFFFFF, poly 0x04C11DB7, KAT message) | same mutant as R-CRC-ENGINE-001.1 → 8 of the 24 sets differ → RED | US-I8-3 | new | **No**: 8/24 differ (the 4 inits that are not bit-symmetric, with reverse true) (B) |
+| R-CRC-DESIGNER-001.1 | U | The system shall compute every CRC of the CRC Designer by the parametric model of CTX-CRC. | 6/6 catalogue check values over the KAT message: CRC-16/ARC 0xBB3D, CRC-16/MODBUS 0x4B37, CRC-16/RIELLO 0x63D0, CRC-16/TMS37157 0x26B1, CRC-32/ISO-HDLC 0xCBF43926, CRC-32/MPEG-2 0x0376E6E7 | reflect the init in the Designer's engine when refin is true → CRC-16/RIELLO gives another value → RED | US-I8-3 | canon (cited as the model's oracle; unchanged) | Yes: 6/6 (B) |
+
+### F-28 and D13-23 — CRC config reasons (US-I8-1, US-I8-2)
+
+| Id | Form | Requirement | Threshold | Negative control | US | Status | Base |
+|---|---|---|---|---|---|---|---|
+| R-CRC-CONFIG-001.10 | N | If a required field is missing, then the system shall give the reason `CRC config is structurally invalid: field '<name>' is missing`. | 8/8 fields of `02-test-cases.md` give the exact text, one reason each | format the reason from the bare key (base) → `CRC config is structurally invalid: 'reverse'` → RED | US-I8-2 | canon | **No**: `CRC config is structurally invalid: 'reverse'` (B) |
+| R-CRC-CONFIG-001.11 | N | If a number field holds something other than a number of CTX-CRCCONFIG, then the system shall give the reason `CRC config is structurally invalid: field '<name>' is not a number: <value>`. | 6/6 values of `02-test-cases.md` give the exact text, one reason each | pass the parser's own message through (base) → `… invalid literal for int() with base 16: 'zz'` → RED | US-I8-2 | canon | **No**: `CRC config is structurally invalid: invalid literal for int() with base 16: 'zz'`; `expected an integer, got a boolean`; `expected an int or hex string, got float` (B) |
+| R-CRC-CONFIG-001.16 | N | If the config text is a JSON object of the Designer template shape, then the system shall give the reason `CRC config is structurally invalid: a CRC Designer template is not a CRC config - it has no regions or groups`. | 3/3 template texts give exactly this one reason (the CRC Designer's own saved file among them); 1/1 object with both `algorithm` and `polynomial` is read as a CRC config; 1/1 Operations dialog shows the reason (AT) | delete the template check → the Designer's file gives `… field 'reverse' is missing` → RED | US-I8-1 | new | **No**: `CRC config is structurally invalid: 'reverse'` (B) |
+
+### F-28 — the Flow CRC block (US-I8-1)
+
+| Id | Form | Requirement | Threshold | Negative control | US | Status | Base |
+|---|---|---|---|---|---|---|---|
+| R-FLOW-CRC.1 | E | When a CRC block runs, the system shall compute its CRCs as S13.2 computes them, from the CRC config file the block names, read as S13 CTX-CRCCONFIG, over the working image as it stands after the blocks before it. | 1/1 CRC block with a CRC config file under `templates/` writes the model CRC (R-CRC-ENGINE-001.1/7) | the block skips the injection → no CRC bytes at the output address → RED | US-I8-1, US-I8-3 | changed (wording, C-1) | Yes, except the init of D13-20 |
+| R-FLOW-CRC.3 | N | If the CRC config file is refused or does not exist, then the system shall stop the flow with the summary `config unresolved` and the cause `crc config not found or not inside the project`. | 1/1 missing file gives the exact summary and cause | change the summary text → RED | US-I8-1 | changed (wording, C-1) | Yes (not pinned by an exact-text test today) |
+| R-FLOW-CRC.4 | N | If the CRC config file is not a valid CRC config, then the system shall stop the flow with the summary `config malformed` and the cause `crc config invalid: <first three errors, separated by "; ">`. | 3/3 files (a file the CRC Designer saved, a config with no `reverse`, a text that is not JSON) give summary `config malformed` and the exact cause | delete the template check of R-CRC-CONFIG-001.16 → /1 cause ends `field 'reverse' is missing` → RED | US-I8-1 | changed (wording, C-1) | **No** for /1, /2: cause `crc config invalid: CRC config is structurally invalid: 'reverse'` (guide ch17-05, B) |
+
+### F-49 and D15-17 — external-step outputs (US-I8-4)
+
+| Id | Form | Requirement | Threshold | Negative control | US | Status | Base |
+|---|---|---|---|---|---|---|---|
+| R-FLOW-EXT.2 | E | When a confirmed external step runs, the system shall read a relative log path and a relative output path under the open project folder. | 2/2: a relative log and a relative output, both present only under the project folder, are found while the working directory is elsewhere | read the relative output against the working directory (base) → /2 refused `output '<output>' does not exist …` → RED | US-I8-4 | canon | **No** for the output: `output 'rel.changes.json' does not exist - run the external step before confirming` (B). Yes for the log |
+| R-FLOW-EXT.9 | E | When a confirmed external step has copied its output, the system shall read that copy in place of the file named by each project ref of a later block of the same run that names `<project folder>/<output file name>`. | 12/12 cases of `02-test-cases.md`; the 18.9 case: the second run's output `BENCH=V2` copied as `_1`, the PATCH block applies it and the written image holds the V2 bytes | resolve later refs without the copy (base) → /1 written image holds the first copy's bytes → RED | US-I8-4 | new | **No**: run 2 copies as `step.changes_1.json`, PATCH reads `step.changes.json`, `out.s19` keeps `S1071000414103045F` (B) |
+| R-FLOW-EXT.10 | E | When a PATCH block reads an external step's copy in place of its change document ref, the system shall give the copy's file name as the block's change document in each report that lists the block's changes. | 3/3: the flow report (Change attribution), the chain-set report (Not applied) and an unbound ref kept as typed | keep the block's declared ref in the change records → /1 shows `step.changes.json` → RED | US-I8-4 | new | n/a on base (no copy is read in place of a ref) |
+| R-FLOW-EXT.11 | E | When a confirmed external step copies an output whose content differs from the file under the output file name, the system shall leave that file's name and content unchanged. | 2/2: after the second run the file under the output file name keeps its first bytes, and the folder holds the first copy and the numbered copy, no other new file | rename the earlier copy to a numbered name and place the new output under the output file name ("rotate") → /1 RED | US-I8-4 | new | Yes (R-TUI-006.2 numbered name, B) |
+
+## What changes for an operator (D13-20, a wrong-result fix)
+
+- **Changed results.** Only a CRC config with `reverse: true` **and** an init that is not bit-symmetric. Its CRC changes in: the Operations CRC check (computed values, so MATCH / MISMATCH verdicts), the Operations CRC write (the written field values), and the Flow CRC block (the injected bytes). Example: KAT message, poly 0x04C11DB7, init 0x12345678, reverse true, final_xor 0xFFFFFFFF: base 0x18026B2A, now 0x0F8B7431.
+- **Unchanged.** Every config with init 0x00000000 or 0xFFFFFFFF (the example config `examples/crc_config.example.json`, `DUMMY_CONFIG_TEXT`, every test and fixture of the tree), every config with `reverse: false`, and the CRC Designer preview (its engine already follows the model).
+- **Saved files.** CRC Designer templates (`*.crc.json`) keep their meaning: the Designer's engine does not change, and a template is not a CRC config (R-CRC-CONFIG-001.16). A saved CRC config with `reverse: true` and an init that is not bit-symmetric **changes meaning**: an image written with it by an earlier version now checks MISMATCH. The earlier result is reproduced exactly by setting init to the bit-reversed old init (B: equal for every input tried). Decision D-3 in `E1-rulings.md` (no runtime notice; a release note).
