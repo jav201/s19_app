@@ -1,0 +1,34 @@
+# RED on base: tests/test_requirements_canon.py run in the base worktree /c/Users/jjgh8/Github/s19_app-b101-base (detached at e273181, the OLD canon)
+# base HEAD: e273181aaa7692eaf6a1e40141120a92dad5097e
+# date (UTC): 2026-11-02T05:57:10Z
+# sha256 of the test file copied in: 79d654e4e6dd91b39571e39954408b33ab953fc9779beac32a4bca8d60053590
+# git status --porcelain before the run (the copied test only):
+?? tests/test_requirements_canon.py
+$ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=line tests/test_requirements_canon.py
+FFFFFFFFFFF                                                              [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\Github\s19_app-b101-base\tests\test_requirements_canon.py:191: AssertionError: C:\Users\jjgh8\Github\s19_app-b101-base\REQUIREMENTS.md holds no canon row (no table headed '| Id | Form | Requirement |')
+C:\Users\jjgh8\Github\s19_app-b101-base\tests\test_requirements_canon.py:163: Failed: the parser found 0 canon rows in C:\Users\jjgh8\Github\s19_app-b101-base\REQUIREMENTS.md, below the floor of 2623: rows were lost, or the tables no longer carry the header '| Id | Form | Requirement |'
+C:\Users\jjgh8\Github\s19_app-b101-base\tests\test_requirements_canon.py:163: Failed: the parser found 0 canon rows in C:\Users\jjgh8\Github\s19_app-b101-base\REQUIREMENTS.md, below the floor of 2623: rows were lost, or the tables no longer carry the header '| Id | Form | Requirement |'
+C:\Users\jjgh8\Github\s19_app-b101-base\tests\test_requirements_canon.py:163: Failed: the parser found 0 canon rows in C:\Users\jjgh8\Github\s19_app-b101-base\REQUIREMENTS.md, below the floor of 2623: rows were lost, or the tables no longer carry the header '| Id | Form | Requirement |'
+C:\Users\jjgh8\Github\s19_app-b101-base\tests\test_requirements_canon.py:163: Failed: the parser found 0 canon rows in C:\Users\jjgh8\Github\s19_app-b101-base\REQUIREMENTS.md, below the floor of 2623: rows were lost, or the tables no longer carry the header '| Id | Form | Requirement |'
+C:\Users\jjgh8\Github\s19_app-b101-base\tests\test_requirements_canon.py:277: AssertionError: the '## S<n> · ' headings of C:\Users\jjgh8\Github\s19_app-b101-base\REQUIREMENTS.md read [], want ['S0', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11', 'S12', 'S13', 'S14', 'S15', 'S16', 'S17'] (lines [])
+C:\Users\jjgh8\Github\s19_app-b101-base\tests\test_requirements_canon.py:299: AssertionError: C:\Users\jjgh8\Github\s19_app-b101-base\docs\requirements\history\REQUIREMENTS-legacy-e273181.md is missing: the replaced canon is kept in docs/requirements/history/
+C:\Users\jjgh8\Github\s19_app-b101-base\tests\test_requirements_canon.py:330: Failed: S0.2 (the heading '^#+ S0.2') or S0.3 is missing from the canon: the table of retired ids is gone
+C:\Users\jjgh8\Github\s19_app-b101-base\tests\test_requirements_canon.py:175: Failed: R-DOC-CANON.9 a module's decisions are not kept where the canon says: 36 offending (18 checked)
+C:\Users\jjgh8\Github\s19_app-b101-base\tests\test_requirements_canon.py:449: Failed: R-DOC-CANON.10 only 0 test names were checked in 0 files of C:\Users\jjgh8\Github\s19_app-b101-base\docs\requirements\review, below the bound of 1000: the review files are missing or are not being read
+C:\Users\jjgh8\Github\s19_app-b101-base\tests\test_requirements_canon.py:163: Failed: the parser found 0 canon rows in C:\Users\jjgh8\Github\s19_app-b101-base\REQUIREMENTS.md, below the floor of 2623: rows were lost, or the tables no longer carry the header '| Id | Form | Requirement |'
+=========================== short test summary info ===========================
+FAILED tests/test_requirements_canon.py::test_canon_is_one_file_with_rows - A...
+FAILED tests/test_requirements_canon.py::test_canon_rows_have_id_form_sentence
+FAILED tests/test_requirements_canon.py::test_canon_rows_open_with_their_form
+FAILED tests/test_requirements_canon.py::test_canon_rows_hold_the_obligation_word_once
+FAILED tests/test_requirements_canon.py::test_canon_row_ids_are_unique - Fail...
+FAILED tests/test_requirements_canon.py::test_canon_modules_are_s0_to_s17_in_order
+FAILED tests/test_requirements_canon.py::test_canon_history_is_the_committed_blob
+FAILED tests/test_requirements_canon.py::test_canon_s0_table_cites_existing_rows
+FAILED tests/test_requirements_canon.py::test_review_files_hold_the_decisions
+FAILED tests/test_requirements_canon.py::test_review_files_name_only_existing_tests
+FAILED tests/test_requirements_canon.py::test_canon_rows_are_one_sentence - F...
+11 failed in 0.30s
+# exit code: 1

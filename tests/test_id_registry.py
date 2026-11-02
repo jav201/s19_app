@@ -4,16 +4,16 @@ AT/TC id registry guard — ``AT-TC-REGISTRY.jsonl`` vs the repository.
 The registry is the single authority for AT/TC id allocation
 (`.dev-flow/AT-TC-REGISTRY-SPEC.md`). A document that claims that authority and
 is not enforced is worse than no document: it drifts silently while everyone
-believes it. This module is the enforcement — seven rules, G1..G7, each of which
-fails **loud** and **names every offender with its locus** rather than asserting
-a count (spec §5.4).
+believes it. This module is the enforcement — six rules, G1..G3 and G5..G7, each
+of which fails **loud** and **names every offender with its locus** rather than
+asserting a count (spec §5.4). G4 (citation -> liveness) was retired in batch-101
+Inc 1: the strict-EARS ``REQUIREMENTS.md`` holds no verifier column for it to read.
 
 Rules, and the failure each one closes::
 
     G1  node -> registry      an id on a test node that nobody registered
     G2  registry -> node      a LIVE entry naming a node that does not exist
     G3  citation -> registry  an id in circulation the registry never saw
-    G4  citation -> liveness  a phantom: REQUIREMENTS.md citing a dead verifier
     G5  grammar               a NEW legacy-shaped token
     G6  uniqueness            AT-065b and AT-65b both allocated
     G7  monotonicity          an id minted above the high-water mark
@@ -21,8 +21,10 @@ Rules, and the failure each one closes::
 G1+G2 alone are what the backlog item asked for, and they are **not enough**:
 the six phantoms the item presents as its own headline evidence are
 ``REQUIREMENTS.md`` <-> ``tests/`` divergences, and a registry<->``tests/``
-guard never looks at ``REQUIREMENTS.md``. G3 and G4 are the minimum that
-catches the cited evidence (spec §5.2).
+guard never looks at ``REQUIREMENTS.md``. G3 reads ``REQUIREMENTS.md`` for ids
+in circulation (spec §5.2); the phantom check G4 gave is now
+``tests/test_requirements_canon.py`` R-DOC-CANON.10 (every test named in the
+review files exists).
 
 Every rule is a plain function returning a list of problem strings, so the same
 code path is used twice: the ``TC-6xx`` tests assert it is empty on the real
@@ -37,7 +39,6 @@ PRs are where ids get minted (spec §7.4).
 from __future__ import annotations
 
 import copy
-import re
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Set, Tuple
 
@@ -162,8 +163,15 @@ from tools.id_registry import (
 # batch-100 Inc 12a: 233 -> 234 (tests/test_b100_busy.py).
 # batch-100 Inc 12b: 234 -> 237 (tests/test_b100_workers.py, tests/test_b100_a2l_progress.py,
 # tests/support/b100_workers.py).
-EXPECTED_SCANNED_TEST_FILES = 237
+# batch-101 Inc 1: 237 -> 239, measured (the guard's own count). The base e273181
+# already scanned 238 (tests/test_synth_release_case.py was added without the bump);
+# this increment adds tests/test_requirements_canon.py.
+EXPECTED_SCANNED_TEST_FILES = 239
 """Test modules scanned, including this one.
+
+batch-101 Inc 1: 237 -> 239. ``tests/test_synth_release_case.py`` was already on
+the base (e273181 scanned 238, TC-607 red) and ``tests/test_requirements_canon.py``
+(R-DOC-CANON.1..11) is added. MEASURED: the guard reports 239.
 
 batch-100 Inc 12a: 233 -> 234. ``tests/test_b100_busy.py`` (TC-B100-50, -51
 and AT-B100-17, HLR-176) was added. MEASURED: the guard reports 234.
@@ -253,23 +261,13 @@ four excluded directories) agrees at 153.
 
 EXPECTED_SCANNED_TOTAL = EXPECTED_SCANNED_TEST_FILES + 1  # + REQUIREMENTS.md
 
-#: A citation of a non-LIVE id is legitimate only under one of these headings
-#: (spec §5.3). The list is DATA, reviewable in the PR diff, not logic buried in
-#: a rule. Its refutation trigger is declared in advance: if it ever needs more
-#: than five anchors, G4's model of REQUIREMENTS.md is wrong and the rule should
-#: be weakened to G3-only rather than grown.
-MAX_EXEMPT_ANCHORS = 5
-
-_HEADING_RE = re.compile(r"^(#{1,6})\s+(.*?)\s*$")
-
-
 # ---------------------------------------------------------------------------
 # Corpus loading — done once, reused by every rule.
 # ---------------------------------------------------------------------------
 
 
 class _Corpus:
-    """Everything the seven rules read, gathered in one pass."""
+    """Everything the rules read, gathered in one pass."""
 
     def __init__(self, root: Path) -> None:
         self.root = root
@@ -300,8 +298,6 @@ class _Corpus:
         self.defined: Dict[str, Set[str]] = {
             rel: defined_names(src) for rel, src in self.test_sources.items()
         }
-        self.sections: Dict[int, str] = _heading_of_each_line(self.requirements)
-        self.asserts_verifier: Dict[int, bool] = _validation_bullet_lines(self.requirements)
 
     def _scan(
         self,
@@ -323,54 +319,6 @@ class _Corpus:
                 self.nonconforming.setdefault(token.raw, []).append(f"{rel}:{line}")
 
 
-def _heading_of_each_line(text: str) -> Dict[int, str]:
-    """Map every 1-based line number to the nearest preceding markdown heading."""
-    out: Dict[int, str] = {}
-    current = ""
-    for number, line in enumerate(text.splitlines(), start=1):
-        match = _HEADING_RE.match(line)
-        if match:
-            current = match.group(2).strip()
-        out[number] = current
-    return out
-
-
-_BULLET_RE = re.compile(r"^\s*[-*]\s+\**\s*(?P<label>[A-Za-z][A-Za-z /-]*)\s*\**\s*:")
-
-
-def _validation_bullet_lines(text: str) -> Dict[int, bool]:
-    """
-    Summary:
-        Map every 1-based line number to whether it lies inside a
-        ``- Validation:`` bullet — the *verifier column* G4 polices.
-
-    Args:
-        text (str): The ``REQUIREMENTS.md`` contents.
-
-    Returns:
-        Dict[int, bool]: ``True`` for the bullet's own line and each of its
-        continuation lines, up to the next bullet or blank line.
-
-    Data Flow:
-        - Walks the document once, tracking the label of the most recent
-          ``- <Label>:`` bullet; a blank line closes the bullet.
-
-    Dependencies:
-        Used by:
-            - g4_requirement_citations_are_live
-    """
-    out: Dict[int, bool] = {}
-    inside = False
-    for number, line in enumerate(text.splitlines(), start=1):
-        match = _BULLET_RE.match(line)
-        if match:
-            inside = match.group("label").strip().lower() == "validation"
-        elif not line.strip():
-            inside = False
-        out[number] = inside
-    return out
-
-
 @pytest.fixture(scope="module")
 def corpus() -> _Corpus:
     """The scanned corpus and the parsed registry, built once per module."""
@@ -378,7 +326,7 @@ def corpus() -> _Corpus:
 
 
 # ---------------------------------------------------------------------------
-# The seven rules. Each returns a list of human-locatable problem strings.
+# The six rules. Each returns a list of human-locatable problem strings.
 # ---------------------------------------------------------------------------
 
 
@@ -425,55 +373,6 @@ def g3_citations_are_registered(corpus: _Corpus, registry: Registry) -> List[str
     for key, locations in sorted(seen.items()):
         if key not in known:
             problems.append(f"{key} is cited at {sorted(set(locations))[:3]} but is not registered")
-    return problems
-
-
-def g4_requirement_citations_are_live(corpus: _Corpus, registry: Registry) -> List[str]:
-    """G4 — an id **asserted as a verifier** in ``REQUIREMENTS.md`` is LIVE,
-    unless the citation sits under a declared exempt anchor.
-
-    This is the rule that catches a phantom, and the only one that reads
-    ``REQUIREMENTS.md``'s structure rather than just its tokens.
-
-    RECORDED PREMISE CORRECTION (spec §5.3). The spec words G4 over *every*
-    citation, escaped only by an exempt heading anchor. Implemented that way it
-    fires on 28 citations at the seed commit, and inspection shows two different
-    populations:
-
-    * 17 sit in ``- Validation:`` bullets — the **verifier column**, a document
-      actively advertising a test that does not exist. Those are the phantoms.
-    * 11 sit in ``- Status:`` / ``**SUPERSEDED**`` prose that *already says the
-      verifier was deleted*, e.g. line 3839's "``tests/test_tui_entropy_viewer.py``
-      (AT-062a/b, TC-324/325) is deleted".
-
-    Firing on the second population would force honest history to be stripped of
-    its ids to stay green, which is a worse document. Escaping it via anchors is
-    not available either: these notes live inside ordinary feature sections, so
-    exempting their headings would exempt the live citations beside them — and
-    the spec's own refutation trigger caps the anchor list at five.
-
-    So G4 is scoped to the **verifier-asserting** line, which is what the defect
-    actually is: §6.1 describes it as prose saying "is deleted" *"while the
-    verifier column keeps citing the ids"*. The rule still catches every one of
-    the phantoms the backlog item cites as evidence — all seven are in
-    ``- Validation:`` bullets — and the anchor mechanism is retained on top.
-    """
-    by_key = registry.by_key()
-    exempt = {str(a).strip().lstrip("#").strip() for a in registry.meta.get("g4_exempt_anchors", [])}
-    problems = []
-    for key, located in sorted(corpus.requirement_citations.items()):
-        entry = by_key.get(key)
-        if entry is None or entry.status == "LIVE":
-            continue
-        for _, line in located:
-            if not corpus.asserts_verifier.get(line, False):
-                continue
-            heading = corpus.sections.get(line, "")
-            if heading not in exempt:
-                problems.append(
-                    f"REQUIREMENTS.md:{line} asserts {entry.id} ({entry.status}) as a live "
-                    f"verifier under heading {heading!r}, which is not a declared exempt anchor"
-                )
     return problems
 
 
@@ -533,7 +432,6 @@ RULES = (
     ("G1", g1_named_nodes_are_registered),
     ("G2", g2_live_entries_have_nodes),
     ("G3", g3_citations_are_registered),
-    ("G4", g4_requirement_citations_are_live),
     ("G5", g5_grammar_holds),
     ("G6", g6_keys_are_unique),
     ("G7", g7_no_stem_exceeds_high_water),
@@ -547,7 +445,7 @@ def _report(rule: str, problems: Sequence[str]) -> str:
 
 
 # ---------------------------------------------------------------------------
-# G1..G7 on the real tree.
+# G1..G3, G5..G7 on the real tree.
 # ---------------------------------------------------------------------------
 
 
@@ -567,12 +465,6 @@ def test_tc602_g3_every_citation_is_registered(corpus: _Corpus) -> None:
     """TC-602 / G3 — no id circulates in tests/ or REQUIREMENTS.md unregistered."""
     problems = g3_citations_are_registered(corpus, corpus.registry)
     assert not problems, _report("G3 (citation -> registry)", problems)
-
-
-def test_tc603_g4_requirements_citations_are_live(corpus: _Corpus) -> None:
-    """TC-603 / G4 — REQUIREMENTS.md does not advertise a dead verifier as live."""
-    problems = g4_requirement_citations_are_live(corpus, corpus.registry)
-    assert not problems, _report("G4 (citation -> liveness)", problems)
 
 
 def test_tc604_g5_grammar_holds_or_is_registered_legacy(corpus: _Corpus) -> None:
@@ -665,13 +557,6 @@ def test_tc609_registry_file_is_well_formed(corpus: _Corpus) -> None:
     assert registry.meta.get("schema") == 1
     assert registry.entries, "the registry is empty"
 
-    anchors = registry.meta.get("g4_exempt_anchors", [])
-    assert 0 < len(anchors) <= MAX_EXEMPT_ANCHORS, (
-        f"G4 declares {len(anchors)} exempt anchors; the spec's refutation trigger "
-        f"says that above {MAX_EXEMPT_ANCHORS} the rule's model of REQUIREMENTS.md "
-        f"is wrong and G4 should be weakened to G3-only rather than grown"
-    )
-
     problems: List[str] = []
     for entry in registry.entries:
         if entry.status not in ("LIVE", "RESERVED", "RETIRED", "BURNED"):
@@ -714,8 +599,8 @@ def test_tc610_reservations_are_recorded_and_respected(corpus: _Corpus) -> None:
     every id in the block to be ``RESERVED`` forever — which made the
     reservation's own purpose unreachable:
 
-    * ``G4`` requires an id to be ``LIVE`` once ``REQUIREMENTS.md`` cites it as a
-      verifier;
+    * ``G4`` (retired in batch-101 Inc 1) required an id to be ``LIVE`` once
+      ``REQUIREMENTS.md`` cited it as a verifier;
     * ``TC-610`` required it to stay ``RESERVED``.
 
     Both were executed against the tree and both reddened, so the two guards were
@@ -794,7 +679,7 @@ def _mutate(registry: Registry, **_: object) -> Registry:
 
 
 def test_at281_every_guard_rule_can_fail(corpus: _Corpus) -> None:
-    """AT-281 — each of G1..G7 goes red under one targeted mutation.
+    """AT-281 — each of G1..G3 and G5..G7 goes red under one targeted mutation.
 
     A rule that has never been observed to fail is indistinguishable from one
     that cannot. Each case below **records the substituted value**, not "the
@@ -839,23 +724,6 @@ def test_at281_every_guard_rule_can_fail(corpus: _Corpus) -> None:
     broken.entries = [e for e in broken.entries if e.key != cited_key]
     if not g3_citations_are_registered(corpus, broken):
         survived.append(f"G3 stayed green after removing cited entry {cited_key}")
-
-    # G4 — substitute: status "LIVE" -> "RETIRED" on an id REQUIREMENTS.md cites
-    # outside any exempt anchor, i.e. manufacture one phantom.
-    broken = _mutate(corpus.registry)
-    phantom = next(
-        e for e in broken.entries
-        if e.status == "LIVE"
-        and e.key in corpus.requirement_citations
-        and any(
-            corpus.sections.get(line, "") not in
-            {str(a).strip().lstrip("#").strip() for a in broken.meta.get("g4_exempt_anchors", [])}
-            for _, line in corpus.requirement_citations[e.key]
-        )
-    )
-    phantom.status = "RETIRED"
-    if not g4_requirement_citations_are_live(corpus, broken):
-        survived.append(f"G4 stayed green after retiring cited id {phantom.id}")
 
     # G5 — substitute: conforming false -> true on a legacy token, so the
     # corpus's non-conforming spelling loses its registered exemption.

@@ -92,7 +92,7 @@ Formerly deferred, **now shipped** (kept here so old citations resolve): apply-t
 |---|---|
 | project-level architecture | [architecture.md](./architecture.md) |
 | living Mermaid diagrams (system, TUI shell, layout, memory) | [diagrams/architecture.md](./diagrams/architecture.md) |
-| living `R-*` requirement traceability (engine + every batch) | [../REQUIREMENTS.md](../REQUIREMENTS.md) |
+| the requirements: strict EARS rows per module S0–S17 (rationale in [requirements/review/](./requirements/review/), earlier canon in [requirements/history/](./requirements/history/)) | [../REQUIREMENTS.md](../REQUIREMENTS.md) |
 | coding conventions, common commands, file-layer rules | [../CLAUDE.md](../CLAUDE.md) |
 | per-batch executive summary (stakeholder-level, what shipped) | `.dev-flow/<batch>/06-docs/executive-summary.md` |
 | per-batch functionality orientation (technical, terminology) | `.dev-flow/<batch>/06-docs/functionality.md` |
