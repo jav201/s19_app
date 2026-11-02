@@ -1,0 +1,33 @@
+9e4dd3b
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\s19_app\__init__.py
+......ss................................................................ [  5%]
+........................................................................ [ 11%]
+..........................s............................................. [ 17%]
+..............................sss....................................... [ 23%]
+........................................................................ [ 29%]
+................................................s...s................... [ 35%]
+.....s.....................................................F............ [ 41%]
+........................................................................ [ 47%]
+..........................................F...........F.F...F........... [ 53%]
+........................................................................ [ 59%]
+........................................................................ [ 65%]
+........................................................................ [ 71%]
+........................................................................ [ 77%]
+........................................................................ [ 83%]
+........................................................................ [ 89%]
+.....................................................................x.. [ 95%]
+..................................................                       [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b100_save_image.py:1412: IndexError: list index out of range
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\s19_app\tui\segment_split_view.py:891: s19_app.tui.segment_split_view.ExportRefusedError: "t_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.s19" resolves to 290 characters — over the platform limit of 260
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b99_export.py:762: AssertionError: "t_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA.s19" resolves to 282 characters — over the platform limit of 260
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b99_export.py:820: AssertionError: precondition: this run's tmp home must allow a 152-character home
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b99_export.py:1280: AssertionError: Export failed: Export stopped: Not saved: firmware_locality_01.s19 in C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\fb3\bt\test_tc_b99_41_part_way_failur1\.s19tool\workarea\splits could not be written: forced failure on the second fill. Nothing written.. Al
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_refused_plan_writes_nothing
+FAILED tests/test_b99_export.py::test_tc_b99_29_hostile_set_writes_nothing_outside
+FAILED tests/test_b99_export.py::test_tc_b99_41_collision_reason_is_scrubbed_clipped_and_indexed
+FAILED tests/test_b99_export.py::test_tc_b99_41_over_long_second_segment_refuses_before_any_write
+FAILED tests/test_b99_export.py::test_tc_b99_41_part_way_failure_status_names_the_first_file
+5 failed, 1187 passed, 9 skipped, 1 xfailed in 2841.98s (0:47:21)
+exit=1

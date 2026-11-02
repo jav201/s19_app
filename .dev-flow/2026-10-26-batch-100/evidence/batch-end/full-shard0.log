@@ -1,0 +1,31 @@
+9e4dd3b
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\s19_app\__init__.py
+s..................................................................s.... [  6%]
+........................................................................ [ 13%]
+........................................................................ [ 20%]
+........................................................................ [ 27%]
+........................................................................ [ 34%]
+...........F.FF......................................................... [ 41%]
+........................................................................ [ 48%]
+........................................................................ [ 55%]
+........................................................................ [ 62%]
+........................................................................ [ 68%]
+........................................................................ [ 75%]
+........................................................................ [ 82%]
+.................................................F...................... [ 89%]
+...........................................................F............ [ 96%]
+................x...................                                     [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b99_load_project.py:90: AssertionError: did not settle: the list pick re-loads a.s19
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b99_load_project.py:90: AssertionError: did not settle: the list pick re-loads one.s19
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b99_load_project.py:90: AssertionError: did not settle: the list pick re-loads a.s19
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_patch_big.py:409: AssertionError: after adding a 4th entry the SCRIPT subtitle must read 4; got '3 entries ●' (a static subtitle passes a 'subtitle exists' check and fails here)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_undo_redo_ux.py:145: AssertionError: Redo must clear the stale Checks panel (AC-1.2); got 1 stale rows
+=========================== short test summary info ===========================
+FAILED tests/test_b99_load_project.py::test_tc_b99_34_pick_loads_the_picked_file_name
+FAILED tests/test_b99_load_project.py::test_tc_b99_36_workarea_files_reads_the_load_folder
+FAILED tests/test_b99_load_project.py::test_at_b99_13_project_and_file_pickers_load_by_name
+FAILED tests/test_tui_patch_big.py::test_at075a_titles - AssertionError: afte...
+FAILED tests/test_undo_redo_ux.py::test_ac1_checks_panel_clears_after_undo_and_redo
+5 failed, 1036 passed, 2 skipped, 1 xfailed in 2822.32s (0:47:02)
+exit=1

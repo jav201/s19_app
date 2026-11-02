@@ -49,6 +49,8 @@ Branch history: `b100-inc11` was branched from `1747479` (Inc 10 integrated on t
 | `tests/test_loadfilescreen_input.py` | test | LLR-175.3c | `test_at042b` re-pinned to SEC9b-1 ruling B (an over-long paste is refused → `''`); `test_ac2_paste_reaches_project_name_input` built by `bare_save_dialog` |
 | `tests/test_id_registry.py` | config | HLR-175 | `EXPECTED_SCANNED_TEST_FILES` 231 → 233 (measured, F-9; the bump names `tests/test_b100_save_dialog.py` and `tests/support/b100_save_dialog.py`) |
 | 13 re-pinned test files | test | HLR-175 … HLR-175f | the 24 re-pinned nodes listed in `inc-11/E4-tester-notes.md` (each keeps what it proves, changes only how it reaches the dialog) |
+| `tests/test_tui_directionb.py` | test | HLR-175 | re-pin (53d08d5) |
+| `tests/test_tui_manifest_save.py` | test | HLR-175 | re-pin (53d08d5) |
 | `.dev-flow/2026-10-26-batch-100/01-requirements.md` | doc | HLR-175 … HLR-175f · LLR-175.x · LLR-173.7 | E1/E3/E5 edits (LED .92–.94) |
 | `.dev-flow/2026-10-26-batch-100/01-requirements-ledger.md` | doc | HLR-175 … HLR-175f · LLR-175.x | LED .92 – .94 |
 | `.dev-flow/BACKLOG-CODE.md` | doc | HLR-175 | items opened at the close (§6) |
@@ -154,6 +156,8 @@ Orchestrator-owned captures, real Windows Terminal: scenario `sd-dialog` (loads 
 | 19:33 | 23:18 | E4 | 2 x DeepSeek v4 Pro (G-A + G-B) + 1 x Opus (tester), then 1 x Opus (integration) | 154 new ids RED 154/154; GREEN 154/154 new, 35/35 re-pins, 249+4skip guards; 1 source fix (SR-11-1), 7 test fixes |
 | 23:20 | 00:31 | E5 | 1 x DeepSeek v4 Pro (mutants, 35 min) + 1 x Opus (code + security reviews, then corrective) | reviews FAIL (1 MAJOR + 1 HIGH); 80 mutants 62/18/0; corrective pass done; green-05 68 passed |
 | 00:35 | 00:40 | E5 round 2 + E13 | 1 x Opus (round-2 re-reviews) + 1 x DeepSeek v4 Pro (E13) | code PASS, security PASS-WITH-NOTES (SE5-11-3 MINOR); `sd-dialog` 3 PNGs, failures=0 |
+
+Note (corrected at close): times in this log are local (UTC−6), not UTC; see 05-postmortem.md Record corrections.
 
 First step start to the last logged step: 14:32Z to 00:40Z = about 10 h 8 min wall. Raw facts for the operator's comparison: **E3 (design, no code) caught 7 MAJOR in round 1 (A11-*, S11-01/S11-02) and 3 new MAJOR in round 2; E5 (code) caught 1 HIGH (SE5-11-1) and 1 MAJOR (CR11-F1); 1 corrective pass; 0 full-census launches.** The conclusion stays with the operator.
 

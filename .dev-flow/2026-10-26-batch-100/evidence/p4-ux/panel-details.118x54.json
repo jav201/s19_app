@@ -1,0 +1,8 @@
+{
+ "scenario": "panel-details",
+ "size": "118x54",
+ "focused": "result_body",
+ "title": "Project P opened with 2 problems",
+ "details_preview": "● variant broken.s19\nvariant firmware.s19\nproject file: ok",
+ "screen": "LoadDialog"
+}

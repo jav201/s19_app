@@ -8,6 +8,7 @@
 | Requirement(s) | `HLR-165 · LLR-165.1 · LLR-165.2 · LLR-165.3 · LLR-165.4` · LED-2026-10-26-batch-100.51 (interim notice, WORDING AMENDED by LED .55(a)) · LED .55(a)/(b) · consumes LED .50 (app paths stay unresolved; this increment adds no placement call) |
 | Acceptance | `AT-B100-03` · white-box `TC-B100-08 · TC-B100-09 · TC-B100-10 · TC-B100-11` (the interim-notice arms live under TC-B100-10) |
 | Agent | `software-dev` |
+| Implementer | Kimi (corrected at close) |
 | Date | `2026-10-27` (fix pass 1 same day: code-review F1–F11 + LED .55; fix pass 2 same day: review round 2, R2-1/R2-2) |
 
 ---

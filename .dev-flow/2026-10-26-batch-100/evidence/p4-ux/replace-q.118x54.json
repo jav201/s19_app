@@ -1,0 +1,10 @@
+{
+ "scenario": "replace-q",
+ "size": "118x54",
+ "focused": "confirm_no",
+ "title": "Replace firmware.s19?",
+ "body": "There are unsaved changes in firmware.s19 and Patch Editor entries. Load project P anyway?",
+ "yes_primary": true,
+ "no_primary": false,
+ "screen": "ConfirmQuestionScreen"
+}

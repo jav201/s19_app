@@ -1,0 +1,7 @@
+{
+ "scenario": "panel-saveback",
+ "size": "118x54",
+ "focused": "result_body",
+ "title": "Project P opened",
+ "screen": "LoadResultScreen"
+}

@@ -3,8 +3,8 @@
 | Field | Value |
 |---|---|
 | Batch | `2026-10-26-batch-100` |
-| Increment | `012` |
-| Lane | `main` · 2 SOURCE files (`app.py`, `styles.tcss`), at the 4-file cap |
+| Increment | `012a` (corrected at close) |
+| Lane | `main` · 2 SOURCE files (`app.py`, `styles.tcss`), of the 4-file cap (corrected at close) |
 | Requirement(s) | `HLR-176` · `HLR-176a` · `HLR-176b` · `HLR-176c` · `HLR-176d` · `LLR-176.1`–`LLR-176.1s` and `LLR-176.1t` (E5) · `LLR-176.2`–`LLR-176.2d` · `LLR-173.2m` (restored) · `LLR-172.4e` · `LLR-172.4f` · `LLR-172.5i` · `LLR-172.5j` · `LLR-172.5k` · `LLR-172.6b` · `LLR-172.6c` · `LLR-173.7` (extended) · `LLR-178.2` (extended) |
 | Acceptance | `AT-B100-17` (the 12a half: a worker load of a generated 8 MiB-data S19 by keys) · `TC-B100-50` (LLR-176.1 … LLR-176.1t) · `TC-B100-51` (LLR-176.2 … LLR-176.2d) · `TC-B100-41` (LLR-173.2m labels arm) · `TC-B100-66` (extension: the 7 progress labels, 19 step names, 2 token pairs) · `TC-B100-56` (extension: the project and file line as the project load's file state) · `TC-B100-37` / `TC-B100-38` / `TC-B100-39` (the sweep arms) — in `tests/test_b100_busy.py` (NEW, 52 functions / 81 items), `tests/test_b100_load_dialog.py` (3 functions), `tests/test_b100_announce.py` (1 function), `tests/test_b100_recents.py` (11 functions / 27 items), and 15 re-pinned functions (23 items) across `tests/test_report_progress.py`, `tests/test_before_after_report.py`, `tests/test_report_off_ui_thread.py`, `tests/test_tui_report_attribution.py`, `tests/test_b100_session_reset.py`, `tests/test_tui_app.py`, `tests/test_b97_key_bar.py`, `tests/test_tui_diff_screen.py`, `tests/test_tui_patch_history_strip.py`, `tests/test_b100_recents.py` and `tests/test_id_registry.py` |
 | Interfaces | consumes `set_progress` / `set_file_status` / `_append_log_line` / `painted_names` / `safe_text` / `recent_kind` / `list_projects` / `_load_workarea_file` / `_TYPED_REFUSAL_TOKENS` / `_handle_load_dialog`; adds the progress seam (`begin_busy` / `step_busy` / `end_busy` / `_busy_tick` / `_busy_line` / `_busy_begin_action` / `_busy_fail`, the `_BUSY_ACTIONS` table, `_BusyRun`), `_listed_project_name`, the one `#status_text.-busy` rule in `styles.tcss`, and the `gen` keyword-only parameter on the 4 workers and the 2 main-thread end sites |
@@ -51,6 +51,42 @@ Branch history: `b100-inc12a` was branched from `051f586` (Inc 11 E4 merged with
 | `tests/test_tui_diff_screen.py` | test | LLR-173.2m | `test_at_b78_32_app_bindings_block_is_untouched` re-pinned (D-1: the two missing frozen rows and the binding count 42) |
 | `tests/test_id_registry.py` | config | HLR-176 | `EXPECTED_SCANNED_TEST_FILES` 233 → 234 (measured, F-7; the bump names `tests/test_b100_busy.py`) |
 | 9 re-pinned test files | test | HLR-176 … HLR-176d · LLR-173.2m | the 15 re-pinned functions (23 items) listed in `inc-12a/E4-tester-notes.md` §3 (census rows A, B, C plus A9); each keeps what it proves, changes only how it reaches the bar or the key bar |
+| `AT-TC-REGISTRY.jsonl` | config | HLR-176 · LLR-176.1k | re-pin: TC-644's report-progress node names (the CR12a-3 rename) — 4cedb23 |
+| `tests/test_b97_key_bar.py` | test | HLR-176 | re-pin (d7b427d) |
+| `tests/test_before_after_report.py` | test | HLR-176 | re-pin (d7b427d) |
+| `tests/test_report_off_ui_thread.py` | test | HLR-176 | re-pin (d7b427d) |
+| `tests/test_tui_app.py` | test | HLR-176 | re-pin (d7b427d) |
+| `tests/test_tui_patch_history_strip.py` | test | HLR-176 | re-pin (d7b427d) |
+| `tests/test_tui_report_attribution.py` | test | HLR-176 | re-pin (d7b427d) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[a2l-comfortable-120x30].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[a2l-comfortable-160x40].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[a2l-comfortable-80x24].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[a2l-compact-120x30].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[a2l-compact-160x40].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[a2l-compact-80x24].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[diff-comfortable-120x30].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[issues-comfortable-120x30].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[issues-comfortable-160x40].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[issues-comfortable-80x24].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[issues-compact-120x30].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[issues-compact-160x40].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[issues-compact-80x24].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[mac-comfortable-120x30].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[mac-comfortable-160x40].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[mac-comfortable-80x24].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[mac-compact-120x30].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[mac-compact-160x40].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[mac-compact-80x24].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[map-comfortable-120x30].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[map-comfortable-80x24].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[patch-comfortable-120x30].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[patch-comfortable-80x24].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[workspace-comfortable-120x30].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[workspace-comfortable-160x40].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[workspace-comfortable-80x24].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[workspace-compact-120x30].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[workspace-compact-160x40].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[workspace-compact-80x24].svg` | generated | HLR-176 · LLR-173.2m | density snapshot regenerated for the Load / Projects labels — 4dfb5a1 (snapshot-regen run 41290253513) |
 | `.dev-flow/2026-10-26-batch-100/01-requirements.md` | doc | HLR-176 … HLR-176d · LLR-176.1x/.2x · LLR-173.2m · LLR-172.x | E1/E3/E5 edits (LED .95–.97) |
 | `.dev-flow/2026-10-26-batch-100/01-requirements-ledger.md` | doc | HLR-176 … HLR-176d · LLR-176.1x/.2x · LLR-173.2m · LLR-172.x | LED .95 – .97 |
 | `.dev-flow/BACKLOG-CODE.md` | doc | LLR-176.1r | items opened at the close (§6) |
@@ -162,6 +198,8 @@ Orchestrator-owned captures, real Windows Terminal: scenario `bz-busy` (loads CA
 | 01:32 | 01:32 | merged smoke | — | `green-03-merged.txt`: 254 passed / 2 failed (the Inc 11 arm without `gen`) → MERGE-12a-1 |
 | 01:44 | 01:44 | E13 | 1 x DeepSeek v4 Pro + 1 x Opus (visual check) | `bz-busy` 3 PNGs, failures=0; OBS-12a-1 |
 | 01:56 | 02:14 | E5 round 2 | 1 x Opus (software-dev) | 13 survivors killed (11 new arms, 2 existing), CR12a-2 AST rule; green-07-final 147 passed / 3 skipped; tests only |
+
+Note (corrected at close): times in this log are local (UTC−6), not UTC; see 05-postmortem.md Record corrections.
 
 First step start to the last logged step: 14:55Z to 02:14Z = about 11 h 19 min wall. Raw facts for the operator's comparison: **E3 (design, no code) caught 2 MAJOR in round 1 (S12a-01, S12a-02); E5 (code) caught 1 MAJOR (SE5-12a-1), 2 MINOR and 3 NIT; 1 corrective pass + 1 mutant-kill round; 0 full-census launches.** The conclusion stays with the operator.
 

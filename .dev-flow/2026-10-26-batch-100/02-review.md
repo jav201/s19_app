@@ -9,14 +9,14 @@
 
 ## ✅ Verdict (read first)
 
-- **Gate:** `iterate-to-refine` → Phase 1 (round 1: every reviewer returned `iterate-to-refine`; blockers present). Round 2 of the contract is applied; **round 2 re-review pending.**
+- **Gate:** `approved` — P2 approved after a bounded round 3 (round 1: every reviewer returned `iterate-to-refine`; blockers present; round 2 applied and the iteration cap reached; the operator chose a bounded round 3). **P2 verdict: approved.**
 - **Out-of-scope findings:** 1 named and routed below (A-01's writer routing → `BACKLOG-CODE.md` §*Routed 2026-10-26 — batch-100 P2 round 1*); QA-20 routed to the orchestrator (PLAN).
 
-- **Findings:** 6 blocker · 45 major · 35 minor (86 in all: ux 25, security 16, qa 27, architect 18). After round 2: 84 fixed, 1 routed (QA-20), 1 open (S-16, operator acceptance).
+- **Findings:** 6 blocker · 45 major · 35 minor (86 in all: ux 25, security 16, qa 27, architect 18). After round 3: all round-1 and round-2 findings closed or carried to PDR; 1 MINOR open (UX-22); 0 HIGH.
 - **shall/should check:** ✓ clean — round-2 contract: 85 `Statement` lines, 0 modal `should` (executed regex over `- **Statement:**` lines).
 - **Two-layer (blockers):** ✓ every story has an `AT` (21 ATs over 16 stories) · output reqs name deliverable+observation · both trace chains complete (`devflow-validate --brief`, V10/V21) · ATs are genuinely black-box (§3 preface bans `app._…` access and private calls; QA-01's `vars(app)` comparison is TC-B100-09)
 - **Census (change-first):** done — best-effort + gate-confirmed (§5.4 of the contract, 35 test sources)
-- **Security:** ⚠ 16 findings (0 HIGH): 15 fixed in round 2, S-16 open for the operator. Scan re-run on the round-2 contract: flags `token`, `session`, `permission`, `secret`, `hash`, `form`, `escape`, `expose`; `security_required: true`; each answered in the contract's §6.3.
+- **Security:** ⚠ 16 findings (0 HIGH): 15 fixed in round 2, S-16 decided by the operator (per-user recent-sources store). Scan re-run on the round-2 contract: flags `token`, `session`, `permission`, `secret`, `hash`, `form`, `escape`, `expose`; `security_required: true`; each answered in the contract's §6.3.
 - **Evidence checklists (architect / qa / security / ux):** ✓ all complete — in each reviewer file under `design/` (`P2-architect-r1.md`, `P2-qa-r1.md`, `P2-security-r1.md`, `P2-ux-r1.md`).
 
 > If gate = `approve` and every line is ✓, the Detail below is reference. Any blocker/⚠ → read the matching part.

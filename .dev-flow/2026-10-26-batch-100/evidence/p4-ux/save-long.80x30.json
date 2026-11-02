@@ -1,0 +1,23 @@
+{
+ "scenario": "save-long",
+ "size": "80x30",
+ "prefill": "P",
+ "prefill_summary": [
+  "firmware.s19 unchanged copy",
+  "image firmware.s19 — keep",
+  "project.json — rewrite"
+ ],
+ "prefill_where": "P — updates the open project",
+ "focused_on_open": "project_name",
+ "save_where": "a_rather_long_project_name_for_the_calibration_review — new folder",
+ "summary_rows": [
+  "firmware.s19 unchanged copy",
+  "image firmware.s19 — new",
+  "project.json — new"
+ ],
+ "focused": "project_name",
+ "titles": [
+  "Project name"
+ ],
+ "screen": "SaveProjectScreen"
+}

@@ -46,6 +46,16 @@
 | `tests/test_b100_project_homes.py` | test | LLR-173.4n | TC-B100-32 `[link]` and `test_e4_llr_171_2g_…_never_parsed` re-pinned to the 9b outcome; new `test_tc_b100_32_a2l_admission_refuses_any_reparse_point` |
 | `tests/test_b100_project_check.py` | test | LLR-173.1e (SR-3) | the paint clock starts when the load returns (`_paint_clock_start`) |
 | re-pins | test | HLR-173 | `test_tui_app.py`, `test_tui_helpers.py`, `test_b99_load_project.py`, `test_tui_directionb.py`, `test_b97_load_project_dialog.py`, `test_loadfilescreen_input.py`, `test_b100_active_variant.py`, `test_b100_announce.py`, `test_b100_reuse.py`, `test_b99_crc_region.py`, `test_b99_export.py`, `test_b99_patch_truth.py`, `test_b99_staging.py`, `test_b99_truncation.py`, `test_clipboard_tk_singleton.py`, `test_b100_document.py`, `test_b100_save_guards.py`, `test_b100_save_image.py`, `test_b100_session_reset.py` |
+| `tests/support/b100_load_dialog.py` | test | HLR-173 | NEW: the Load dialog drive helpers — 741cc07 |
+| `tests/test_b97_load_project_dialog.py` | test | HLR-173 | re-pin (741cc07) |
+| `tests/test_b99_crc_region.py` | test | HLR-173 | re-pin (741cc07) |
+| `tests/test_b99_load_project.py` | test | HLR-173 | re-pin (741cc07) |
+| `tests/test_b99_patch_truth.py` | test | HLR-173 | re-pin (741cc07) |
+| `tests/test_b99_truncation.py` | test | HLR-173 | re-pin (741cc07) |
+| `tests/test_clipboard_tk_singleton.py` | test | HLR-173 | re-pin (741cc07) |
+| `tests/test_tui_app.py` | test | HLR-173 | re-pin (741cc07) |
+| `tests/test_tui_directionb.py` | test | HLR-173 | re-pin (741cc07) |
+| `tests/test_tui_helpers.py` | test | HLR-173 | re-pin (741cc07) |
 | `tests/test_id_registry.py` | config | HLR-173 | `EXPECTED_SCANNED_TEST_FILES` 228 → 230 (measured, F2) |
 | `REQUIREMENTS.md` · `docs/architecture.md` | doc | CR9b-04 | LLR-151.1 marked superseded; the `LoadFileScreen` / `LoadProjectScreen` references re-pointed to `LoadDialog` |
 | `.dev-flow/2026-10-26-batch-100/01-requirements.md` | doc | HLR-173 … HLR-173e · LLR-172.1n | E1 / E3 / E5 edits (LED .86–.88) |
@@ -160,6 +170,8 @@ Orchestrator-owned captures, real Windows Terminal: scenario `ld-dialog` (key `p
 | 16:46 | 17:12 | E4 integration | 1 x Opus | SR-1 … SR-7; green-01 133 passed; guards 45 passed |
 | 19:23 | — | E5 | 1 x Opus (reviews + corrective) + 1 x DeepSeek v4 Pro (mutants) | code-review PWN (1 MAJOR test-only), security PWN (0 MAJOR); 70/96 → 91 killed + 5 equivalent; no re-review (nothing blocking) |
 | 19:33 | — | E13 | 1 x DeepSeek v4 Pro | `ld-dialog` 3 PNGs, failures=0, OBS-9b-1; close records start |
+
+Note (corrected at close): times in this log are local (UTC−6), not UTC; see 05-postmortem.md Record corrections.
 
 First step start to the last logged step: 13:41:04Z to 19:33Z = about 5 h 52 min wall. Raw facts for the operator's comparison: **E3 (design, no code) caught 6 MAJOR in round 1 (A9b-01 … A9b-06), 2 MAJOR in round 1 (S9b-1, S9b-2), 1 new MAJOR in round 2 (A9b-R2-1), 0 in round 3; E5 (code) caught 0 HIGH and 1 MAJOR (CR9b-01, test-only); 1 corrective pass; 0 full-census launches.** The conclusion stays with the operator.
 

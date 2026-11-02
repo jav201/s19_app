@@ -1,0 +1,4 @@
+13
+FAILED tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+1 failed, 12 passed in 142.57s (0:02:22)
+exit=0

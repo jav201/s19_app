@@ -1,0 +1,7 @@
+{
+ "scenario": "panel-unreadable",
+ "size": "118x54",
+ "focused": "result_body",
+ "title": "Project P opened with 2 problems",
+ "screen": "LoadResultScreen"
+}

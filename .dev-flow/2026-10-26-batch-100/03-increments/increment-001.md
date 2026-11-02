@@ -14,6 +14,7 @@
 | Requirement(s) | `HLR-163 / LLR-163.1–163.7 · LLR-171.4 (guard clause)` |
 | Acceptance | `AT-B100-01` · white-box `TC-B100-01 · TC-B100-02 · TC-B100-03 · TC-B100-57 · TC-B100-62 · TC-B100-68` · re-pinned `TC-018 · AT-031b · TC-B99-31` |
 | Agent | `software-dev` |
+| Implementer | Kimi (corrected at close) |
 | Date | `2026-10-26` |
 
 ---

@@ -165,6 +165,8 @@ Orchestrator-owned captures, real Windows Terminal: scenario `wa-files` (closed-
 | 13:52:09Z | — | E13 | orchestrator, Opus | `wa-files` captured 3/3; OBS-9a-1/9a-2 → backlog |
 | 13:52:09Z | 14:30Z | close records | DeepSeek v4 Pro (pi) | first run hung 6.5 h on stdin and was killed; relaunched `< /dev/null`, timeout 90 m |
 
+Note (corrected at close): times in this log are local (UTC−6), not UTC; see 05-postmortem.md Record corrections.
+
 First step start to the last logged step: 07:42:48Z to 14:30Z = about 6 h 47 min wall. Raw facts for the operator's comparison: **E3 (design, no code) caught 2 MAJOR in round 1 (A9-1, A9-2) and 1 MAJOR in round 1 (S9-1), 0 in round 2; E5 (code) caught 0 HIGH and 0 MAJOR; 1 corrective pass; 0 full-census launches.** The conclusion stays with the operator.
 
 ### Evidence files — bytes at a declared home, verbatim, hash-verified (C-59); full SHA-256 of the staged blobs

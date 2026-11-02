@@ -94,6 +94,10 @@ BLUF: two more inputs that crashed Load and the writers are now findings: a mani
 | `tests/test_id_registry.py` | config | HLR-168 | `EXPECTED_SCANNED_TEST_FILES` 219 → 222 |
 | `tests/test_import_census.py` | config | LLR-178.3 | `MEASURED_SAFE_TEXT_CONSUMERS` += `s19_app.tui.screens` (measured in, §6) |
 | `tests/test_b99_crc_region.py` · `tests/test_b99_staging.py` · `tests/test_b100_reuse.py` · `tests/test_b99_patch_truth.py` · `tests/test_b99_export.py` · `tests/test_b99_truncation.py` · `tests/test_b100_session_reset.py` | test | HLR-178 · LLR-178.2 · LLR-168.3 | re-pins (§4 reverse census) |
+| `tests/test_b99_crc_region.py` | test | HLR-178 | re-pin: the Load-result panel's dismissal (948e65c) |
+| `tests/test_b99_patch_truth.py` | test | HLR-178 | re-pin: the Load-result panel's dismissal (948e65c) |
+| `tests/test_b99_truncation.py` | test | HLR-178 | re-pin: the Load-result panel's dismissal (948e65c) |
+| `tools/e13/capture.ps1` | test | HLR-168 | NEW: the E13 real-terminal capture harness (DPI-aware; opens only the window it created) — 948e65c |
 | `HANDOFF.md` | doc | HLR-168 | implementer checkpoint (Part A, end); corrective pass 1 appended |
 | `.dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1_mutation_harness.py` | test | HLR-168 · HLR-178 | corrective pass 1 mutation harness (evidence) |
 

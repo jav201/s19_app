@@ -1,0 +1,21 @@
+{
+ "scenario": "load-p",
+ "size": "118x30",
+ "focused": "load_list",
+ "load_reason": "",
+ "preview": "● variant firmware.s19\nproject file: ok",
+ "highlighted": 1,
+ "rows": [
+  "Projects",
+  "P",
+  "Q",
+  "Work area",
+  "cal.a2l",
+  "fw.s19",
+  "Recent",
+  "firmware.s19 (s19)",
+  "firmware.s19 (s19)"
+ ],
+ "stacked": false,
+ "screen": "LoadDialog"
+}

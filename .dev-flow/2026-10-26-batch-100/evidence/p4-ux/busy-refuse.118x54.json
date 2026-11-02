@@ -1,0 +1,20 @@
+{
+ "scenario": "busy-refuse",
+ "size": "118x54",
+ "prefill": "P",
+ "prefill_summary": [
+  "firmware.s19 unchanged copy",
+  "image firmware.s19 — keep",
+  "project.json — rewrite"
+ ],
+ "prefill_where": "P — updates the open project",
+ "focused_on_open": "project_name",
+ "status_during": "⠦ Saving project P9  ·  step 2/4 Place the files  ·  00:00",
+ "screen_after_l": "Screen",
+ "log_tail": [
+  "Loaded firmware.s19 (S19 only)",
+  "Loaded project 'P' -> firmware.s19 - variant 1 of 1, 1 problem - details: p",
+  "busy: Saving project P9 is running — wait for it to finish."
+ ],
+ "screen": "Screen"
+}

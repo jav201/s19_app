@@ -1,0 +1,19 @@
+{
+ "scenario": "idle-after",
+ "size": "118x54",
+ "focused": "result_body",
+ "title": "Project P opened",
+ "focused_after": "files_list",
+ "status_text": "Loaded project 'P' -> firmware_1.s19",
+ "bar": {
+  "progress": 0,
+  "total": 100,
+  "display": true,
+  "visibility": "visible"
+ },
+ "log_tail": [
+  "Loaded firmware_1.s19 (S19 only)",
+  "Loaded project 'P' -> firmware_1.s19 - variant 2 of 2, 0 problems - details: p"
+ ],
+ "screen": "Screen"
+}

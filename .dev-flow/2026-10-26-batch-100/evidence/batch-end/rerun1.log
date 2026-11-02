@@ -1,0 +1,103 @@
+dee0d96
+C:\Users\jjgh8\Github\s19_app-b100-fix1\s19_app\__init__.py
+..F...F..F..............FFF......F.                                      [100%]
+================================== FAILURES ===================================
+_ test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project] _
+tests\test_b100_active_variant.py:711: in test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second
+    assert took < timing_bound(1.0), took
+E   AssertionError: 1.0456552999094129
+E   assert 1.0456552999094129 < 1.0
+E    +  where 1.0 = timing_bound(1.0)
+---------------------------- Captured stdout call -----------------------------
+save-project: trigger -> outcome 1.046 s; ['Project saved + manifest verified']
+______ test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second ______
+tests\test_b100_save_guards.py:2511: in test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
+    assert elapsed < timing_bound(1.0), f"Save project took {elapsed:.3f} s"
+E   AssertionError: Save project took 1.132 s
+E   assert 1.132393499952741 < 1.0
+E    +  where 1.0 = timing_bound(1.0)
+______________ test_tc_b97_flow_execution_css_section_is_scoped _______________
+tests\test_b97_flow_execution.py:2006: in test_tc_b97_flow_execution_css_section_is_scoped
+    assert sheet.startswith(old.rstrip()), "every rule shipped at b514b07 is byte-equal; Inc-6 only appends"
+E   AssertionError: every rule shipped at b514b07 is byte-equal; Inc-6 only appends
+E   assert False
+E    +  where False = <built-in method startswith of str object at 0x000001B0FA93BC50>('/* s19_app/tui/styles.tcss\n *\n * Direction B "Calm Dark" theme for the s19tui Textual app.\n *\n * Origin: extracte...#flow_panel #flow_legend {\n    height: 1;\n    padding: 0 1;\n    text-wrap: nowrap;\n    text-overflow: ellipsis;\n}')
+E    +    where <built-in method startswith of str object at 0x000001B0FA93BC50> = '/* s19_app/tui/styles.tcss\n *\n * Direction B "Calm Dark" theme for the s19tui Textual app.\n *\n * Origin: extracte...se;\n}\n\n.result-heading {\n    margin-top: 1;\n    text-style: bold;\n}\n\n.result-problem {\n    height: auto;\n}\n'.startswith
+E    +    and   '/* s19_app/tui/styles.tcss\n *\n * Direction B "Calm Dark" theme for the s19tui Textual app.\n *\n * Origin: extracte...#flow_panel #flow_legend {\n    height: 1;\n    padding: 0 1;\n    text-wrap: nowrap;\n    text-overflow: ellipsis;\n}' = <built-in method rstrip of str object at 0x000001B0FA1BDC40>()
+E    +      where <built-in method rstrip of str object at 0x000001B0FA1BDC40> = '/* s19_app/tui/styles.tcss\n *\n * Direction B "Calm Dark" theme for the s19tui Textual app.\n *\n * Origin: extracte...low_panel #flow_legend {\n    height: 1;\n    padding: 0 1;\n    text-wrap: nowrap;\n    text-overflow: ellipsis;\n}\n'.rstrip
+____________ test_at_b99_13_project_and_file_pickers_load_by_name _____________
+tests\test_b99_load_project.py:376: in test_at_b99_13_project_and_file_pickers_load_by_name
+    asyncio.run(_file_pick_after_load())
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b99_load_project.py:324: in _file_pick_after_load
+    await _pick_files_item_and_wait_load(pilot, app, "a.s19")
+tests\test_b99_load_project.py:128: in _pick_files_item_and_wait_load
+    await _wait_for(
+tests\test_b99_load_project.py:90: in _wait_for
+    raise AssertionError(f"did not settle: {description}")
+E   AssertionError: did not settle: the list pick re-loads a.s19
+_______________ test_tc_b99_34_pick_loads_the_picked_file_name ________________
+tests\test_b99_load_project.py:155: in test_tc_b99_34_pick_loads_the_picked_file_name
+    asyncio.run(_drive("a.s19"))
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b99_load_project.py:153: in _drive
+    await _pick_files_item_and_wait_load(pilot, app, name)
+tests\test_b99_load_project.py:128: in _pick_files_item_and_wait_load
+    await _wait_for(
+tests\test_b99_load_project.py:90: in _wait_for
+    raise AssertionError(f"did not settle: {description}")
+E   AssertionError: did not settle: the list pick re-loads a.s19
+_____________ test_tc_b99_36_workarea_files_reads_the_load_folder _____________
+tests\test_b99_load_project.py:210: in test_tc_b99_36_workarea_files_reads_the_load_folder
+    asyncio.run(_drive())
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b99_load_project.py:208: in _drive
+    await _pick_files_item_and_wait_load(pilot, app, "one.s19")
+tests\test_b99_load_project.py:128: in _pick_files_item_and_wait_load
+    await _wait_for(
+tests\test_b99_load_project.py:90: in _wait_for
+    raise AssertionError(f"did not settle: {description}")
+E   AssertionError: did not settle: the list pick re-loads one.s19
+____________ test_tc016s_snapshot_setup_loads_only_public_fixtures ____________
+tests\test_tui_snapshot.py:1270: in test_tc016s_snapshot_setup_loads_only_public_fixtures
+    assert "snapshot_public" in parts or "pytest" in " ".join(parts).lower(), (
+E   AssertionError: public s19 fixture must live in a pytest temp dir, got C:\Users\jjgh8\AppData\Local\Temp\s19r\bt\snapshot_public0\snap.s19
+E   assert ('snapshot_public' in {'appdata', 'bt', 'c:\\', 'jjgh8', 'local', 's19r', ...} or 'pytest' in 'local snap.s19 appdata jjgh8 snapshot_public0 temp c:\\ bt s19r users')
+E    +  where 'local snap.s19 appdata jjgh8 snapshot_public0 temp c:\\ bt s19r users' = <built-in method lower of str object at 0x000001B0FF726D30>()
+E    +    where <built-in method lower of str object at 0x000001B0FF726D30> = 'local snap.s19 appdata jjgh8 snapshot_public0 temp c:\\ bt s19r users'.lower
+E    +      where 'local snap.s19 appdata jjgh8 snapshot_public0 temp c:\\ bt s19r users' = <built-in method join of str object at 0x00007FF928C5E8C8>({'appdata', 'bt', 'c:\\', 'jjgh8', 'local', 's19r', ...})
+E    +        where <built-in method join of str object at 0x00007FF928C5E8C8> = ' '.join
+=========================== short test summary info ===========================
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project]
+FAILED tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_flow_execution_css_section_is_scoped
+FAILED tests/test_b99_load_project.py::test_at_b99_13_project_and_file_pickers_load_by_name
+FAILED tests/test_b99_load_project.py::test_tc_b99_34_pick_loads_the_picked_file_name
+FAILED tests/test_b99_load_project.py::test_tc_b99_36_workarea_files_reads_the_load_folder
+FAILED tests/test_tui_snapshot.py::test_tc016s_snapshot_setup_loads_only_public_fixtures
+7 failed, 28 passed in 297.76s (0:04:57)
+exit=1
