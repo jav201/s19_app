@@ -1,6 +1,2 @@
-EVID   .dev-flow/2026-11-01-batch-101/inc-1/04-validation.md cites evidence/integration-r2.txt, which is not committed
-EVID   .dev-flow/2026-11-01-batch-101/inc-1/04-validation.md cites evidence/law-guards.txt, which is not committed
-EVID   .dev-flow/2026-11-01-batch-101/inc-1/04-validation.md cites evidence/mutants-r2.txt, which is not committed
-EVID   .dev-flow/2026-11-01-batch-101/inc-1/04-validation.md cites evidence/trace-check.txt, which is not committed
-trace_check: 1 US, 11 active requirements (0 withdrawn), 4 gap(s)
-rc=1
+trace_check: 1 US, 11 active requirements (0 withdrawn), 0 gap(s)
+rc=0
