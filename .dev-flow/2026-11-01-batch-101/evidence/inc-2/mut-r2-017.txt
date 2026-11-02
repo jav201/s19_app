@@ -1,0 +1,39 @@
+# batch-101 Inc 2 E5 corrective — mutant re-run in a detached copy (removed afterwards)
+# env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<temp>/la, --basetemp <temp>/bt*, NO_COLOR unset; Windows, s19env Python 3.11.15, pytest 8.4.2
+
+== E5 corrective re-run of mutant M-017 against the row's own node ==
+== date: 2026-11-02T14:24:34Z ==
+tree: b101-inc2 HEAD ab879c8 + the E5 corrective diff (detached copy)
+mutant applied: both lane-2 conditions use success() instead of !cancelled()
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________________ test_r_tst_015_016_017_ci_time_limits ____________________
+
+    def test_r_tst_015_016_017_ci_time_limits() -> None:
+        text = WORKFLOW_PATH.read_text(encoding="utf-8")
+        jobs = _workflow_jobs(text)
+        tui_lines = jobs["tui-ci"]
+        steps = _job_steps(tui_lines)
+        by_run = {}
+        for step in steps:
+            run = _step_run(step)
+            if run:
+                by_run[run] = step
+        for command in (PR_LANE_1, PR_LANE_2, PUSH_LANE_1, PUSH_LANE_2):
+            assert command in by_run, f"missing lane step: {command}"
+        assert _step_value(by_run[PUSH_LANE_1], "timeout-minutes") == "180"
+        assert _step_value(by_run[PR_LANE_1], "timeout-minutes") == "120"
+        assert _step_value(by_run[PUSH_LANE_2], "timeout-minutes") == "45"
+        assert _step_value(by_run[PR_LANE_2], "timeout-minutes") == "30"
+        # R-TST-017: lane 2 still runs after a red or timed-out lane 1.
+>       assert _step_value(by_run[PR_LANE_2], "if") == LANE_2_IF_PR
+E       assert "github.event... == 'success'" == "github.event... == 'success'"
+E         
+E         - github.event_name == 'pull_request' && !cancelled() && steps.install.outcome == 'success'
+E         ?                                        ^ --  ^^^^
+E         + github.event_name == 'pull_request' && success() && steps.install.outcome == 'success'
+E         ?                                        ^^   ^^
+
+tests\test_suite_hygiene.py:884: AssertionError
+1 failed, 64 deselected in 0.27s
+pytest exit: 1

@@ -1772,7 +1772,8 @@ def test_at288_report_hex_sections_identical_after_move(
         import s19_app.version
 
         tokenized = emitted.replace(
-            s19_app.version.__version__.encode("utf-8"), b"<TOOL-VERSION>"
+            b"Tool version: " + s19_app.version.__version__.encode("utf-8"),
+            b"Tool version: <TOOL-VERSION>",
         )
         _AT288_CAPTURE.parent.mkdir(parents=True, exist_ok=True)
         _AT288_CAPTURE.write_bytes(tokenized)

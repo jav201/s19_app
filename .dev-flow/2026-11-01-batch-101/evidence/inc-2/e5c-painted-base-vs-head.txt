@@ -1,0 +1,55 @@
+# batch-101 Inc 2 E5 corrective — Windows, back to back: the serial_timing nodes of tests/test_b100_project_check.py on base (main e266395, temporary detached worktree) and head (b101-inc2 working tree with the E5 corrective; rev-parse shows ab879c8), 2 rounds, -s for the SEC6-5 timings
+# env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<temp>/la, --basetemp <temp>/bt*, NO_COLOR unset; Windows, s19env Python 3.11.15, pytest 8.4.2
+
+### round 1, base (e266395), cpu 31%
+<HOME>\AppData\Local\Temp\s19e5\wt-base\s19_app\__init__.py
+........SEC6-5 timings (s): {'read': 0.211, 'load': 0.303, 'painted': 0.981, 'appended': 0.55}
+.SEC6-5 timings (s): {'read': 0.135, 'load': 0.232, 'painted': 0.547, 'appended': 1.004}
+FSEC6-5 timings (s): {'read': 0.326, 'load': 0.609, 'painted': 1.062, 'appended': 1.075}
+F..SEC6-5 timings (s): {'read': 0.076, 'load': 0.266, 'painted': 0.961, 'appended': 0.754}
+        print("SEC6-5 timings (s):", {key: round(value, 3) for key, value in timings.items()})
+        print("SEC6-5 timings (s):", {key: round(value, 3) for key, value in timings.items()})
+2 failed, 13 passed in 34.53s
+### round 1, head (ab879c8), cpu 15%
+<HOME>\Github\s19_app-b101-inc2\s19_app\__init__.py
+........SEC6-5 timings (s): {'read': 0.221, 'load': 0.344, 'painted': 0.945, 'appended': 0.58}
+.SEC6-5 timings (s): {'read': 0.119, 'load': 0.193, 'painted': 0.0, 'appended': 0.998}
+.SEC6-5 timings (s): {'read': 0.294, 'load': 0.565, 'painted': 0.834, 'appended': 1.138}
+F..SEC6-5 timings (s): {'read': 0.062, 'load': 0.156, 'painted': 1.048, 'appended': 0.649}
+        print("SEC6-5 timings (s):", {key: round(value, 3) for key, value in timings.items()})
+        print("SEC6-5 timings (s):", {key: round(value, 3) for key, value in timings.items()})
+LOW -13.8%  1.138 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+LOW -6.8%  1.068 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+LOW -4.8%  1.048 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure
+LOW 0.2%  0.998 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+LOW 5.5%  0.945 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+LOW 7.5%  0.925 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+LOW 16.6%  0.834 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+QC-TM: 31 bounds, 7 under 20 % margin
+3 failed, 12 passed in 34.18s
+### round 2, base (e266395), cpu 13%
+<HOME>\AppData\Local\Temp\s19e5\wt-base\s19_app\__init__.py
+........SEC6-5 timings (s): {'read': 0.223, 'load': 0.328, 'painted': 0.998, 'appended': 0.613}
+.SEC6-5 timings (s): {'read': 0.3, 'load': 0.254, 'painted': 0.803, 'appended': 1.086}
+FSEC6-5 timings (s): {'read': 0.296, 'load': 0.603, 'painted': 0.562, 'appended': 0.853}
+...SEC6-5 timings (s): {'read': 0.082, 'load': 0.201, 'painted': 1.072, 'appended': 0.621}
+        print("SEC6-5 timings (s):", {key: round(value, 3) for key, value in timings.items()})
+        print("SEC6-5 timings (s):", {key: round(value, 3) for key, value in timings.items()})
+2 failed, 13 passed in 35.18s
+### round 2, head (ab879c8), cpu 15%
+<HOME>\Github\s19_app-b101-inc2\s19_app\__init__.py
+........SEC6-5 timings (s): {'read': 0.236, 'load': 0.44, 'painted': 0.925, 'appended': 0.632}
+.SEC6-5 timings (s): {'read': 0.107, 'load': 0.242, 'painted': 0.489, 'appended': 1.044}
+FSEC6-5 timings (s): {'read': 0.331, 'load': 0.702, 'painted': 1.062, 'appended': 1.09}
+F..SEC6-5 timings (s): {'read': 0.061, 'load': 0.409, 'painted': 0.849, 'appended': 0.699}
+        print("SEC6-5 timings (s):", {key: round(value, 3) for key, value in timings.items()})
+        print("SEC6-5 timings (s):", {key: round(value, 3) for key, value in timings.items()})
+LOW -7.9%  1.079 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+LOW -6.2%  1.062 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+LOW -4.4%  1.044 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+LOW 7.4%  0.926 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+LOW 7.5%  0.925 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+LOW 15.1%  0.849 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure
+QC-TM: 31 bounds, 6 under 20 % margin
+3 failed, 12 passed in 36.25s
+DONE

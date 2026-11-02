@@ -33,13 +33,16 @@ from __future__ import annotations
 import ast
 import asyncio
 import inspect
+import io
 import json
 import os
 import re
+import socket
 import subprocess
 import sys
 import time
 import xml.etree.ElementTree as etree
+import zipfile
 from pathlib import Path
 
 import pytest
@@ -48,7 +51,11 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 TESTS_ROOT = REPO_ROOT / "tests"
 WORKFLOW_PATH = REPO_ROOT / ".github" / "workflows" / "tui-ci.yml"
 CONVENTIONS_PATH = REPO_ROOT / "docs" / "engineering-rules.md"
-EVIDENCE_ROOT = REPO_ROOT / ".dev-flow" / "2026-11-01-batch-101" / "evidence"
+BATCH_ROOT = REPO_ROOT / ".dev-flow" / "2026-11-01-batch-101"
+EVIDENCE_ROOT = BATCH_ROOT / "evidence"
+
+# Install budget before lane 1 starts (R-TST-016/017, note N-3).
+_SETUP_MINUTES = 3
 
 MARKER_LINE = (
     "@pytest.mark.serial_timing: a wall-clock timing arm; "
@@ -152,14 +159,8 @@ _GOLDENS_WITH_VERSION = [
     "tests/goldens/batch99/at288-pre-move-report.bin",
 ]
 
-# Sites a coarse taint would reach but the position/key-aware taint must not
-# count as upper timing bounds (E3A-3).
-_NOT_UPPER_BOUND_SITES = [
-    "tests/test_b100_project_check.py:843",
-    "tests/test_b100_project_check.py:981",
-    "tests/test_b100_save_dialog.py:2331",
-    "tests/test_b100_save_dialog.py:3493",
-]
+# The tree R-TST-040's base-tree counts are pinned to (01-requirements.md).
+_BOUND_BASE_COMMIT = "b3bf42e"
 
 
 # ---------------------------------------------------------------------------
@@ -259,13 +260,57 @@ def _marker_guard_lines(arms, sampled, marked) -> list:
     return lines
 
 
-def _unreported_sites(root: Path) -> list:
+def _margin_guard_lines(root: Path) -> list:
+    """The margin guard's failure lines (R-TST-041), one per raw upper bound."""
     from tests.support import suite_census
 
+    sites = suite_census.unreported_upper_bounds(root, suite_census.timing_arms(root))
+    return [f"timing bound without report_margin: {_norm_site(site)}" for site in sites]
+
+
+def _newest_guard_lines(root: Path, baseline: dict) -> list:
+    """The newest-line guard's failure lines (R-TST-051), one per file above
+    its baseline."""
+    from tests.support import suite_census
+
+    base = {_norm_census_file_key(key): value for key, value in baseline.items()}
+    lines = []
+    for file, count in sorted(suite_census.newest_line_waits(root).items()):
+        key = _norm_census_file_key(file)
+        if count > base.get(key, 0):
+            lines.append(
+                _NEWEST_GUARD_TEXT.format(file=key, count=count, base=base.get(key, 0))
+            )
+    return lines
+
+
+def _git(*args):
+    """The stdout bytes of a git command run in the repository, or None when
+    git or the object is not available."""
     try:
-        return list(suite_census.unreported_upper_bounds(root))
-    except TypeError:
-        return list(suite_census.unreported_upper_bounds(root, suite_census.timing_arms(root)))
+        proc = subprocess.run(
+            ["git", *args], cwd=REPO_ROOT, capture_output=True, timeout=120
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return proc.stdout if proc.returncode == 0 else None
+
+
+def _merge_base_with_main():
+    for ref in ("main", "origin/main"):
+        out = _git("merge-base", "HEAD", ref)
+        if out:
+            return out.decode().strip()
+    return None
+
+
+def _extract_tests_tree(commit: str, dest: Path) -> Path:
+    data = _git("archive", "--format=zip", commit, "tests")
+    if data is None:
+        pytest.skip(f"git history holding {commit} is not available in this checkout")
+    with zipfile.ZipFile(io.BytesIO(data)) as archive:
+        archive.extractall(dest)
+    return dest / "tests"
 
 
 def _function_source(text: str, name: str) -> str:
@@ -501,8 +546,14 @@ def test_e():
 """,
     ),
     "form6": (
-        "wrapped bound, interval from another module",
-        None,  # written together with a planted support module
+        "interval returned by a test support module function",
+        """from tests.support import b100_projects as projects
+
+
+async def test_f(pilot, app):
+    elapsed = await projects.load_project(pilot, app, "P")
+    assert elapsed < 1.0
+""",
     ),
     "form7": (
         "clock under an import alias",
@@ -517,46 +568,23 @@ def test_g():
     ),
 }
 
-_FORM6_SUPPORT = """import time
-
-
-def measure():
-    start = time.perf_counter()
-    return time.perf_counter() - start
-"""
-
-_FORM6_TEST = """import measure_mod
-from tests.support.timing import report_margin
-from tests.support.timing import timing_bound
-
-
-def test_f():
-    elapsed = measure_mod.measure()
-    assert elapsed < report_margin("l", elapsed, timing_bound(1.0))
-"""
-
-
 @pytest.mark.parametrize(
     "form", ["form1", "form2", "form3", "form4", "form5", "form6", "form7"]
 )
 def test_r_tst_005_detector_finds_each_timing_arm_form(tmp_path, form) -> None:
     from tests.support import suite_census
 
-    if form == "form6":
-        (tmp_path / "measure_mod.py").write_text(_FORM6_SUPPORT, encoding="utf-8")
-        (tmp_path / "test_form6.py").write_text(_FORM6_TEST, encoding="utf-8")
-        test_name = "test_f"
-    else:
-        _, source = _FORM_SOURCES[form]
-        (tmp_path / f"test_{form}.py").write_text(source, encoding="utf-8")
-        test_name = {
-            "form1": "test_a",
-            "form2": "test_b",
-            "form3": "test_c",
-            "form4": "test_d",
-            "form5": "test_e",
-            "form7": "test_g",
-        }[form]
+    _, source = _FORM_SOURCES[form]
+    (tmp_path / f"test_{form}.py").write_text(source, encoding="utf-8")
+    test_name = {
+        "form1": "test_a",
+        "form2": "test_b",
+        "form3": "test_c",
+        "form4": "test_d",
+        "form5": "test_e",
+        "form6": "test_f",
+        "form7": "test_g",
+    }[form]
     arms = suite_census.timing_arms(tmp_path)
     found = [key for key in arms if key.endswith(f"::{test_name}")]
     assert len(found) == 1, (
@@ -704,13 +732,18 @@ def _lane_steps(steps, marker: str) -> list:
     return [step for step in picked if _step_run(step)]
 
 
-def _assert_no_script_injection(steps) -> None:
-    for step in steps:
-        run = _step_run(step)
-        if not run:
-            continue
-        assert "${{ github.event." not in run, f"event interpolation in a run line: {run}"
-        assert "${{ github.head_ref" not in run, f"head_ref interpolation in a run line: {run}"
+_SCRIPT_INJECTION = re.compile(r"\$\{\{\s*github\.(event\.|head_ref)")
+
+
+def _script_injections(text: str) -> list:
+    """Every run line, in every job, that interpolates event data (E3S-6)."""
+    hits = []
+    for job, lines in _workflow_jobs(text).items():
+        for step in _job_steps(lines):
+            run = _step_run(step)
+            if run and _SCRIPT_INJECTION.search(run):
+                hits.append(f"{job}: {run}")
+    return hits
 
 
 def _assert_no_unsafe_triggers(text: str) -> None:
@@ -725,8 +758,32 @@ def test_r_tst_010_pull_request_runs_two_lanes() -> None:
     steps = _job_steps(jobs["tui-ci"])
     runs = [_step_run(step) for step in _lane_steps(steps, "pull_request")]
     assert runs == [PR_LANE_1, PR_LANE_2]
-    _assert_no_script_injection(steps)
+    assert _script_injections(text) == []
     _assert_no_unsafe_triggers(text)
+
+
+_PLANTED_INJECTION_WORKFLOW = """on:
+  push:
+jobs:
+  a:
+    steps:
+      - name: x
+        run: echo ${{github.event.pull_request.title}}
+  b:
+    steps:
+      - name: y
+        run: echo ${{ github.head_ref }}
+      - name: z
+        run: echo ${{ matrix.os }}
+"""
+
+
+def test_r_tst_010_2_injection_ratchet_reads_every_run_line_of_every_job() -> None:
+    """E5S-2: the ratchet matches without the space and in any job."""
+    assert _script_injections(_PLANTED_INJECTION_WORKFLOW) == [
+        "a: echo ${{github.event.pull_request.title}}",
+        "b: echo ${{ github.head_ref }}",
+    ]
 
 
 def test_r_tst_011_push_runs_two_lanes() -> None:
@@ -735,7 +792,7 @@ def test_r_tst_011_push_runs_two_lanes() -> None:
     steps = _job_steps(jobs["tui-ci"])
     runs = [_step_run(step) for step in _lane_steps(steps, "push")]
     assert runs == [PUSH_LANE_1, PUSH_LANE_2]
-    _assert_no_script_injection(steps)
+    assert _script_injections(text) == []
 
 
 def test_r_tst_012_serial_lane_runs_after_a_red_lane() -> None:
@@ -777,6 +834,36 @@ def test_r_tst_013_014_ci_checks_out_full_history() -> None:
     assert "persist-credentials: false" in "\n".join(snap_checkouts[0])  # E3S-3
 
 
+def test_r_tst_013_snapshot_job_changes_only_persist_credentials() -> None:
+    """R-TST-013/1 (E5 F9): the snapshot checkout carries only
+    persist-credentials: false (no fetch-depth), and the snapshot job differs
+    from its base only by that setting."""
+    text = WORKFLOW_PATH.read_text(encoding="utf-8")
+    snap = _workflow_jobs(text)["snapshot"]
+    checkouts = [
+        step
+        for step in _job_steps(snap)
+        if (_step_value(step, "uses") or "").startswith("actions/checkout@")
+    ]
+    assert len(checkouts) == 1
+    with_values = [line.strip() for line in checkouts[0] if line.startswith("          ")]
+    assert with_values == ["persist-credentials: false"], with_values
+    base = _merge_base_with_main()
+    old = _git("show", f"{base}:.github/workflows/tui-ci.yml") if base else None
+    if old is None:
+        pytest.skip("the workflow's base version is not available in this checkout")
+    base_snap = _workflow_jobs(old.decode("utf-8"))["snapshot"]
+
+    def without_credentials_setting(lines):
+        return [
+            line.rstrip()
+            for line in lines
+            if line.strip() not in ("with:", "persist-credentials: false")
+        ]
+
+    assert without_credentials_setting(snap) == without_credentials_setting(base_snap)
+
+
 def test_r_tst_015_016_017_ci_time_limits() -> None:
     text = WORKFLOW_PATH.read_text(encoding="utf-8")
     jobs = _workflow_jobs(text)
@@ -793,15 +880,24 @@ def test_r_tst_015_016_017_ci_time_limits() -> None:
     assert _step_value(by_run[PR_LANE_1], "timeout-minutes") == "120"
     assert _step_value(by_run[PUSH_LANE_2], "timeout-minutes") == "45"
     assert _step_value(by_run[PR_LANE_2], "timeout-minutes") == "30"
+    # R-TST-017: lane 2 still runs after a red or timed-out lane 1.
+    assert _step_value(by_run[PR_LANE_2], "if") == LANE_2_IF_PR
+    assert _step_value(by_run[PUSH_LANE_2], "if") == LANE_2_IF_PUSH
     job_level = [
         line.strip() for line in tui_lines if line.startswith("    timeout-minutes:")
     ]
-    assert "timeout-minutes: 240" in job_level
+    assert job_level == ["timeout-minutes: 240"], job_level
     install_steps = [step for step in steps if _step_value(step, "id") == "install"]
     assert len(install_steps) == 1, "install step must carry id: install (E3A-13)"
-    # Lane-2 fits after a lane-1 stop: install + lane 1 + lane 2 <= job limit.
-    assert 3 + 180 + 45 <= 240
-    assert 3 + 120 + 30 <= 240
+    # Lane 2 fits after a lane-1 stop: install + lane 1 + lane 2 <= job limit.
+    job_limit = int(job_level[0].split(":", 1)[1])
+    for lane_1, lane_2 in ((PUSH_LANE_1, PUSH_LANE_2), (PR_LANE_1, PR_LANE_2)):
+        total = (
+            _SETUP_MINUTES
+            + int(_step_value(by_run[lane_1], "timeout-minutes"))
+            + int(_step_value(by_run[lane_2], "timeout-minutes"))
+        )
+        assert total <= job_limit, (lane_1, total, job_limit)
 
 
 def test_r_tst_018_ci_installs_pinned_xdist() -> None:
@@ -1133,8 +1229,18 @@ def test_r_tst_031_032_post_press_and_dwell_arms_keep_their_forms() -> None:
     dwell_body = _function_source(
         flow_text, "test_tc_b97_64_a_new_set_run_restarts_the_dwell"
     )
-    assert "_fx_clock" in dwell_body, (
-        "the dwell restart arm must read the injected dwell clock"
+    clock_patches = [
+        node
+        for node in ast.walk(ast.parse(dwell_body))
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr == "setattr"
+        and len(node.args) >= 2
+        and isinstance(node.args[1], ast.Constant)
+        and node.args[1].value == "_fx_clock"
+    ]
+    assert len(clock_patches) == 1, (
+        "the dwell restart arm must patch the injected dwell clock (_fx_clock)"
     )
     # These three arms keep no wall-clock bound: they stay in the parallel
     # lane.  If the census ever flags them, the marker guard would move them
@@ -1175,54 +1281,284 @@ def test_r_tst_040_report_margin_returns_the_bound(fresh_pending) -> None:
     assert drained == [("qc_tm", "x|0.500|1.000|50.0")]
 
 
-def test_r_tst_040_041_every_upper_timing_bound_is_reported(tmp_path) -> None:
+def test_r_tst_040_2_report_margin_refuses_unsafe_labels(fresh_pending) -> None:
+    """E3S-7 / E5S-3: a label holding the record separator or a control
+    character is refused and nothing is recorded; a plain label round-trips
+    through the drain and the QC-TM section."""
+    from tests.support import timing as timing_support
+
+    for label in ("a|b", "a\x1b[31m", "two\nlines"):
+        with pytest.raises(ValueError):
+            timing_support.report_margin(label, 0.5, 1.0)
+    assert fresh_pending == []
+    label = "TC-X case [p-1] (a/b)"
+    returned = timing_support.report_margin(label, 0.85, 1.0)
+    assert returned == 1.0
+    drained = []
+    assert timing_support.qc_tm_drain(drained) == 1
+    assert drained == [("qc_tm", f"{label}|0.850|1.000|15.0")]
+    assert timing_support.qc_tm_summary_lines([("tests/x.py::t", drained[0][1])]) == [
+        "QC-TM timing margins",
+        f"LOW 15.0%  0.850 s / 1.000 s  {label}  tests/x.py::t",
+        "QC-TM: 1 bounds, 1 under 20 % margin",
+    ]
+
+
+class _WrapStrip(ast.NodeTransformer):
+    """Undo a timing-arm wrap: report_margin(label, measured, bound) -> bound,
+    and drop the serial_timing marker."""
+
+    def visit_Call(self, node):
+        self.generic_visit(node)
+        func = node.func
+        name = (
+            func.id
+            if isinstance(func, ast.Name)
+            else func.attr if isinstance(func, ast.Attribute) else None
+        )
+        if name == "report_margin" and len(node.args) == 3 and not node.keywords:
+            return node.args[2]
+        return node
+
+    def _strip_marker(self, node):
+        self.generic_visit(node)
+        node.decorator_list = [
+            deco
+            for deco in node.decorator_list
+            if ast.unparse(deco) != "pytest.mark.serial_timing"
+        ]
+        return node
+
+    visit_FunctionDef = _strip_marker
+    visit_AsyncFunctionDef = _strip_marker
+
+
+def _module_functions(tree) -> dict:
+    functions = {}
+    for node in tree.body:
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            functions[node.name] = node
+        elif isinstance(node, ast.ClassDef):
+            for item in node.body:
+                if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    functions[f"{node.name}.{item.name}"] = item
+    return functions
+
+
+def _wrap_marks(node) -> tuple:
+    marked = any(
+        ast.unparse(deco) == "pytest.mark.serial_timing" for deco in node.decorator_list
+    )
+    wraps = sum(
+        1
+        for sub in ast.walk(node)
+        if isinstance(sub, ast.Call)
+        and (
+            (isinstance(sub.func, ast.Name) and sub.func.id == "report_margin")
+            or (isinstance(sub.func, ast.Attribute) and sub.func.attr == "report_margin")
+        )
+    )
+    return marked, wraps
+
+
+def _wrap_drift(base_source: str, head_source: str) -> list:
+    """Functions that gained a serial_timing marker or a report_margin wrap
+    against the base and differ from it by anything else (R-TST-049)."""
+    import copy
+
+    base_functions = _module_functions(ast.parse(base_source))
+    drift = []
+    for name, head_node in _module_functions(ast.parse(head_source)).items():
+        base_node = base_functions.get(name)
+        if base_node is None:
+            continue
+        head_marked, head_wraps = _wrap_marks(head_node)
+        base_marked, base_wraps = _wrap_marks(base_node)
+        if not ((head_marked and not base_marked) or head_wraps > base_wraps):
+            continue
+        stripped_head = ast.dump(_WrapStrip().visit(copy.deepcopy(head_node)))
+        stripped_base = ast.dump(_WrapStrip().visit(copy.deepcopy(base_node)))
+        if stripped_head != stripped_base:
+            drift.append(name)
+    return drift
+
+
+_WRAP_BASE = """def test_a():
+    elapsed = measure()
+    assert elapsed < 1.0
+    assert result() == []
+"""
+
+_WRAP_CLEAN = """@pytest.mark.serial_timing
+def test_a():
+    elapsed = measure()
+    assert elapsed < report_margin(
+        "a", elapsed, 1.0
+    )
+    assert result() == []
+"""
+
+_WRAP_DROPPED_ORACLE = """@pytest.mark.serial_timing
+def test_a():
+    elapsed = measure()
+    assert elapsed < report_margin("a", elapsed, 1.0)
+"""
+
+
+def test_r_tst_049_wrap_drift_detector_names_a_dropped_assertion() -> None:
+    """E5 F10: a wrap that also drops an oracle assertion is named; a marker
+    plus a reformatted wrap is not."""
+    assert _wrap_drift(_WRAP_BASE, _WRAP_CLEAN) == []
+    assert _wrap_drift(_WRAP_BASE, _WRAP_DROPPED_ORACLE) == ["test_a"]
+
+
+def test_r_tst_049_wrapped_arms_change_nothing_else() -> None:
+    """E5 F10: every function this branch wraps as a timing arm (against the
+    merge-base with main) differs from its base only by the serial_timing
+    marker and the report_margin wraps."""
+    base = _merge_base_with_main()
+    if base is None:
+        pytest.skip("no merge-base with main in this checkout")
+    drift = []
+    for path in sorted(TESTS_ROOT.rglob("*.py")):
+        text = path.read_text(encoding="utf-8")
+        if "report_margin" not in text and "serial_timing" not in text:
+            continue
+        rel = path.relative_to(REPO_ROOT).as_posix()
+        old = _git("show", f"{base}:{rel}")
+        if old is None:
+            continue
+        for name in _wrap_drift(old.decode("utf-8"), text):
+            drift.append(
+                f"wrapped timing arm changed beyond marker and report_margin: {rel}::{name}"
+            )
+    assert drift == [], "\n".join(drift)
+
+
+def test_r_tst_040_041_every_upper_timing_bound_is_reported() -> None:
+    lines = _margin_guard_lines(TESTS_ROOT)
+    assert lines == [], "\n".join(lines)
+
+
+def test_r_tst_040_1_base_tree_reports_its_37_bounds(tmp_path) -> None:
+    """R-TST-040/1, 040/3, 040/4 base halves: the census of the b3bf42e tree
+    reports exactly its 37 upper bounds, the 3 list-appended reads among them,
+    and none of the count or lower-bound comparisons."""
+    root = _extract_tests_tree(_BOUND_BASE_COMMIT, tmp_path)
+    lines = _margin_guard_lines(root)
+    sites = [line.rsplit(": ", 1)[1] for line in lines]
+    assert len(sites) == 37, "\n".join(lines)
+    for site in (
+        "tests/test_b100_project_check.py:841",
+        "tests/test_b100_project_check.py:978",
+        "tests/test_b100_project_check.py:1350",
+    ):
+        assert site in sites, f"list-appended bound not reported: {site}"
+    for site in (
+        "tests/test_b100_project_check.py:843",
+        "tests/test_b100_project_check.py:981",
+        "tests/test_b100_save_dialog.py:2331",
+        "tests/test_b100_save_dialog.py:3493",
+    ):
+        assert site not in sites, f"not an upper timing bound: {site}"
+    # `0.1 <= q_delay <= 0.5`: only the upper half is a bound.
+    assert sites.count("tests/test_b100_save_dialog.py:2335") == 1, sites
+
+
+_PLANTED_RAW_BOUNDS = [
+    "import time",
+    "",
+    "from tests.support.timing import timing_bound",
+    "",
+    "LIMIT = 1",
+    "",
+    "",
+    "def test_raw_bounds_arm():",
+    "    start = time.perf_counter()",
+    "    work()",
+    "    elapsed = time.perf_counter() - start",
+    "    assert elapsed < 1.0",
+    "    assert elapsed < 2",
+    "    assert elapsed < timing_bound(1.0) * 2",
+    "    assert elapsed < LIMIT",
+]
+
+
+def test_r_tst_041_margin_guard_names_each_raw_bound(tmp_path) -> None:
+    """R-TST-041/1, 041/2: a float literal, an int literal, a scaled
+    timing_bound call and a module constant, each named by the guard."""
+    root = tmp_path / "tests"
+    root.mkdir()
+    (root / "test_raw_bounds_planted.py").write_text(
+        "\n".join(_PLANTED_RAW_BOUNDS) + "\n", encoding="utf-8"
+    )
+    assert _margin_guard_lines(root) == [
+        "timing bound without report_margin: tests/test_raw_bounds_planted.py:12",
+        "timing bound without report_margin: tests/test_raw_bounds_planted.py:13",
+        "timing bound without report_margin: tests/test_raw_bounds_planted.py:14",
+        "timing bound without report_margin: tests/test_raw_bounds_planted.py:15",
+    ]
+
+
+_PLANTED_POSITIONS = """import time
+
+
+def _scene():
+    start = time.perf_counter()
+    rows = [1, 2]
+    return rows, time.perf_counter() - start
+
+
+def test_positions():
+    rows, elapsed = _scene()
+    assert len(rows) <= 5
+    assert elapsed < 1.0
+    start = time.perf_counter()
+    scene = {"read": time.perf_counter() - start, "rows": 3}
+    assert scene["rows"] <= 5
+    assert scene["read"] < 1.0
+    assert 0.1 <= elapsed
+"""
+
+
+def test_r_tst_040_3_counts_and_lower_bounds_are_not_bounds(tmp_path) -> None:
+    """R-TST-040/3 (E3A-3): a count from the non-interval tuple position, a
+    non-interval dict key and a lower bound are not upper timing bounds; the
+    interval position and key beside them are."""
+    root = tmp_path / "tests"
+    root.mkdir()
+    (root / "test_positions_planted.py").write_text(_PLANTED_POSITIONS, encoding="utf-8")
+    assert _margin_guard_lines(root) == [
+        "timing bound without report_margin: tests/test_positions_planted.py:13",
+        "timing bound without report_margin: tests/test_positions_planted.py:17",
+    ]
+
+
+_PLANTED_APPENDED = """import time
+
+
+def test_appended():
+    timing = []
+    t0 = time.perf_counter()
+    timing.append(time.perf_counter() - t0)
+    x = timing[0] if timing else None
+    assert x < 1.0
+"""
+
+
+def test_r_tst_040_4_appended_and_conditional_reads_are_bounds(tmp_path) -> None:
+    """R-TST-040/4 (N-1): an item of a list appended an interval, read through
+    a conditional expression, is a timing arm and an upper timing bound."""
     from tests.support import suite_census
 
-    sites = {_norm_site(site) for site in _unreported_sites(TESTS_ROOT)}
-    assert sites == set(), (
-        "raw upper timing bounds: " + ", ".join(sorted(sites))
-    )
-    for forbidden in _NOT_UPPER_BOUND_SITES:
-        assert forbidden not in sites, f"not an upper timing bound: {forbidden}"
-
-    # Planted marked arm with four raw bounds: a float literal, an int
-    # literal, a scaled timing_bound call and a module constant (R-TST-041).
-    planted_lines = [
-        "import time",
-        "",
-        "from tests.support.timing import timing_bound",
-        "",
-        "LIMIT = 1",
-        "",
-        "",
-        "def test_raw_bounds_arm():",
-        "    start = time.perf_counter()",
-        "    work()",
-        "    elapsed = time.perf_counter() - start",
-        "    assert elapsed < 1.0",
-        "    assert elapsed < 2",
-        "    assert elapsed < timing_bound(1.0) * 2",
-        "    assert elapsed < LIMIT",
+    root = tmp_path / "tests"
+    root.mkdir()
+    (root / "test_appended_planted.py").write_text(_PLANTED_APPENDED, encoding="utf-8")
+    arms = [_norm_arm_key(key) for key in suite_census.timing_arms(root)]
+    assert arms == ["tests/test_appended_planted.py::test_appended"], arms
+    assert _margin_guard_lines(root) == [
+        "timing bound without report_margin: tests/test_appended_planted.py:9",
     ]
-    planted = tmp_path / "test_raw_bounds_planted.py"
-    planted.write_text("\n".join(planted_lines) + "\n", encoding="utf-8")
-    planted_sites = _unreported_sites(tmp_path)
-    raw_lines = [
-        i + 1
-        for i, line in enumerate(planted_lines)
-        if line.strip().startswith("assert elapsed <")
-    ]
-    assert len(planted_sites) == 4, f"expected 4 raw-bound sites: {planted_sites}"
-    for number in raw_lines:
-        assert any(
-            site.endswith(f":{number}") and "test_raw_bounds_planted.py" in site
-            for site in planted_sites
-        ), f"planted raw bound at line {number} not reported: {planted_sites}"
-    guard_lines = [f"timing bound without report_margin: {site}" for site in planted_sites]
-    for line in guard_lines:
-        assert re.fullmatch(
-            r"timing bound without report_margin: .+:\d+", line
-        ), f"guard text malformed: {line}"
 
 
 # ---------------------------------------------------------------------------
@@ -1460,20 +1796,7 @@ def test_r_tst_050_status_log_keeps_every_painted_line(tmp_path) -> None:
     assert seen["app_log_lines"] == 4, seen
     # The QC-OR ratchet on the same tree: no file holds more newest-line
     # waits than its baseline (R-TST-051/1's pass state).
-    baseline = {
-        _norm_census_file_key(key): value
-        for key, value in suite_census.NEWEST_LINE_BASELINE.items()
-    }
-    counts = suite_census.newest_line_waits(TESTS_ROOT)
-    violations = [
-        _NEWEST_GUARD_TEXT.format(
-            file=_norm_census_file_key(file),
-            count=count,
-            base=baseline.get(_norm_census_file_key(file), 0),
-        )
-        for file, count in counts.items()
-        if count > baseline.get(_norm_census_file_key(file), 0)
-    ]
+    violations = _newest_guard_lines(TESTS_ROOT, suite_census.NEWEST_LINE_BASELINE)
     assert not violations, "\n".join(violations)
 
 
@@ -1499,64 +1822,76 @@ def _planted_reader_wait(pilot, app):
 
 
 def test_r_tst_051_newest_line_waits_do_not_grow(tmp_path) -> None:
+    """R-TST-051/2-4: the guard's own text for a wait added in a new file, in a
+    baselined file (planted under that file's own path, so its baseline n
+    applies) and through a support-module newest-line reader."""
     from tests.support import suite_census
 
-    baseline = {
-        _norm_census_file_key(key): value
-        for key, value in suite_census.NEWEST_LINE_BASELINE.items()
-    }
-
-    # One newest-line wait in a new file: 1 > baseline 0.
-    case_new = tmp_path / "new_file"
-    case_new.mkdir()
-    (case_new / "test_newest_planted.py").write_text(
-        _PLANTED_NEWEST_WAIT, encoding="utf-8"
-    )
-    counts = suite_census.newest_line_waits(case_new)
-    assert counts, "planted newest-line wait not counted"
-    key = next(iter(counts))
-    assert key.endswith("test_newest_planted.py") and counts[key] == 1, counts
-    assert _NEWEST_GUARD_TEXT.format(file=key, count=1, base=0) == (
-        f"newest-line wait added in {key}: 1 > baseline 0; "
-        "collect the painted lines with StatusLog.since(mark)"
-    )
-
-    # One more newest-line wait in a copy of a baselined file, and one more
-    # through a support-module newest-line reader (E3A-6).
-    pick = min(baseline, key=lambda name: baseline[name])
+    baseline = suite_census.NEWEST_LINE_BASELINE
+    pick = "tests/test_b100_reuse.py"
+    n = baseline[pick]
     source = (REPO_ROOT / pick).read_text(encoding="utf-8")
 
-    case_extra = tmp_path / "baselined_extra"
-    case_extra.mkdir()
-    (case_extra / "test_baselined_copy.py").write_text(
+    new_root = tmp_path / "new" / "tests"
+    new_root.mkdir(parents=True)
+    (new_root / "test_newest_planted.py").write_text(_PLANTED_NEWEST_WAIT, encoding="utf-8")
+    assert _newest_guard_lines(new_root, baseline) == [
+        "newest-line wait added in tests/test_newest_planted.py: 1 > baseline 0; "
+        "collect the painted lines with StatusLog.since(mark)"
+    ]
+
+    extra_root = tmp_path / "extra" / "tests"
+    extra_root.mkdir(parents=True)
+    (extra_root / "test_b100_reuse.py").write_text(
         source + _PLANTED_NEWEST_WAIT, encoding="utf-8"
     )
-    counts_extra = suite_census.newest_line_waits(case_extra)
-    assert counts_extra, "planted baselined copy not counted"
-    key_extra = next(iter(counts_extra))
-    assert counts_extra[key_extra] == baseline[pick] + 1, (
-        f"{key_extra}: expected {baseline[pick] + 1}, got {counts_extra[key_extra]}"
-    )
-    assert _NEWEST_GUARD_TEXT.format(
-        file=key_extra, count=baseline[pick] + 1, base=baseline[pick]
-    ) == (
-        f"newest-line wait added in {key_extra}: {baseline[pick] + 1} "
-        f"> baseline {baseline[pick]}; collect the painted lines with "
-        "StatusLog.since(mark)"
-    )
+    assert _newest_guard_lines(extra_root, baseline) == [
+        f"newest-line wait added in {pick}: {n + 1} > baseline {n}; "
+        "collect the painted lines with StatusLog.since(mark)"
+    ]
 
-    case_reader = tmp_path / "reader_extra"
-    case_reader.mkdir()
-    (case_reader / "test_reader_copy.py").write_text(
+    reader_root = tmp_path / "reader" / "tests"
+    reader_root.mkdir(parents=True)
+    (reader_root / "test_b100_reuse.py").write_text(
         source + _PLANTED_READER_WAIT, encoding="utf-8"
     )
-    counts_reader = suite_census.newest_line_waits(case_reader)
-    assert counts_reader, "planted reader wait not counted"
-    key_reader = next(iter(counts_reader))
-    assert counts_reader[key_reader] == baseline[pick] + 1, (
-        f"{key_reader}: expected {baseline[pick] + 1}, "
-        f"got {counts_reader[key_reader]}"
-    )
+    assert _newest_guard_lines(reader_root, baseline) == [
+        f"newest-line wait added in {pick}: {n + 1} > baseline {n}; "
+        "collect the painted lines with StatusLog.since(mark)"
+    ]
+
+    # The unchanged baselined file passes: the guard compares against n.
+    same_root = tmp_path / "same" / "tests"
+    same_root.mkdir(parents=True)
+    (same_root / "test_b100_reuse.py").write_text(source, encoding="utf-8")
+    assert _newest_guard_lines(same_root, baseline) == []
+
+
+_PLANTED_ALL_LINE_READER = """
+
+def painted_log(app):
+    return [str(line) for line in app.log_lines]
+
+
+def _correct_wait(pilot, app):
+    wait_for(pilot, lambda: "Saved" in painted_log(app), "saved")
+
+
+def _newest_wait(pilot, app):
+    wait_for(pilot, lambda: "Saved" in painted_log(app)[-1], "saved")
+"""
+
+
+def test_r_tst_051_all_line_reader_counts_only_under_minus_one(tmp_path) -> None:
+    """E5 F2: a wait that reads every painted line through an all-line reader
+    is the form the rule asks for and counts 0; the same reader under [-1]
+    reads only the newest line and counts 1."""
+    from tests.support import suite_census
+
+    root = tmp_path / "tests"
+    root.mkdir()
+    (root / "test_all_line_planted.py").write_text(_PLANTED_ALL_LINE_READER, encoding="utf-8")
+    assert suite_census.newest_line_waits(root) == {"tests/test_all_line_planted.py": 1}
 
 
 # ---------------------------------------------------------------------------
@@ -1564,46 +1899,150 @@ def test_r_tst_051_newest_line_waits_do_not_grow(tmp_path) -> None:
 # ---------------------------------------------------------------------------
 
 
+# A value that only names the kind of thing (a placeholder), never a real one.
+_PLACEHOLDER = re.compile(
+    r"<[^<>\s]*>|user|host|name|share|account|server|\.\.\.|\u2026|", re.IGNORECASE
+)
+
 _REDACTION_PATTERNS = [
     (
         "posix home path outside the runner image",
-        re.compile(r"/home/(?!runner/)[A-Za-z0-9][A-Za-z0-9._-]*"),
+        re.compile(r"/home/(?!runner/)(?P<name>[A-Za-z0-9][A-Za-z0-9._-]*)"),
     ),
     (
         "user-profile path",
-        re.compile(r"[A-Za-z]:[\\/]Users[\\/][A-Za-z0-9][A-Za-z0-9._-]*"),
+        re.compile(r"[A-Za-z]:[\\/]+Users[\\/]+(?P<name>[A-Za-z0-9][A-Za-z0-9._-]*)"),
+    ),
+    (
+        "unix-style user-profile path",
+        re.compile(
+            r"(?<![\w.:])/(?:mnt/[a-z]/|[a-z]/)?Users/(?P<name>[A-Za-z0-9][A-Za-z0-9._-]*)"
+        ),
+    ),
+    ("pytest temp folder of an account", re.compile(r"pytest-of-(?P<name>[A-Za-z0-9._-]+)")),
+    ("junit hostname attribute", re.compile(r'hostname="(?P<name>[A-Za-z0-9._-]*)"')),
+    (
+        "shell prompt user@host",
+        re.compile(r"(?<![\w.-])(?P<name>[A-Za-z0-9._-]+@[A-Za-z0-9._-]+):[~/]"),
+    ),
+    (
+        "unc host path",
+        re.compile(r"(?:^|[\s'\"(=])\\\\(?P<name>[A-Za-z0-9-]+)\\[A-Za-z0-9$_.-]+"),
     ),
     (
         "lan address",
         re.compile(
-            r"\b(?:10\.\d{1,3}\.\d{1,3}\.\d{1,3}"
+            r"\b(?P<name>10\.\d{1,3}\.\d{1,3}\.\d{1,3}"
             r"|192\.168\.\d{1,3}\.\d{1,3}"
             r"|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})\b"
         ),
     ),
 ]
 
-_REDACTION_SUFFIXES = {".txt", ".md", ".log", ".json", ".jsonl", ".yml", ".yaml"}
+
+def _is_placeholder(value: str) -> bool:
+    return all(_PLACEHOLDER.fullmatch(part) for part in re.split(r"[@.]", value))
+
+
+def _local_identity_names() -> set:
+    """The account and host names of the machine running the suite, read at
+    test time (never written into this file). The GitHub runner image's
+    public account `runner` is left out: its home is the allowed
+    /home/runner/ path and the word is common in the records."""
+    names = set()
+    for value in (
+        os.environ.get("USERNAME"),
+        os.environ.get("USER"),
+        Path.home().name,
+        socket.gethostname(),
+        os.environ.get("COMPUTERNAME"),
+        os.environ.get("HOSTNAME"),
+    ):
+        if value:
+            short = value.split(".")[0]
+            if len(short) >= 3 and short.lower() != "runner":
+                names.add(short)
+    return names
+
+
+def _redaction_hits(root: Path, identity_names, skip=frozenset()) -> list:
+    """`<file>: <form>: <match>` for each leak form in every text file under
+    root (a file holding a NUL byte or not decoding as UTF-8 is binary)."""
+    name_patterns = [
+        re.compile(rf"(?<![A-Za-z0-9]){re.escape(name)}(?![A-Za-z0-9])", re.IGNORECASE)
+        for name in sorted(identity_names)
+    ]
+    hits = []
+    for path in sorted(root.rglob("*")):
+        if not path.is_file() or path in skip:
+            continue
+        data = path.read_bytes()
+        if b"\x00" in data:
+            continue
+        try:
+            text = data.decode("utf-8")
+        except UnicodeDecodeError:
+            continue
+        rel = path.relative_to(root).as_posix()
+        for label, pattern in _REDACTION_PATTERNS:
+            for match in pattern.finditer(text):
+                if not _is_placeholder(match.group("name")):
+                    hits.append(f"{rel}: {label}: {match.group(0).strip()}")
+        for pattern in name_patterns:
+            for match in pattern.finditer(text):
+                hits.append(f"{rel}: local account or host name: {match.group(0)}")
+    return hits
+
+
+def _git_ignored(root: Path) -> frozenset:
+    out = _git("ls-files", "--others", "--ignored", "--exclude-standard", "-z", "--", str(root))
+    if not out:
+        return frozenset()
+    return frozenset(REPO_ROOT / name for name in out.decode("utf-8").split("\0") if name)
 
 
 def test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses() -> None:
+    """E3S-2 / E5S-1: every text file of the batch folder (records and
+    evidence, not git-ignored) holds no home path, account or host name,
+    junit host attribute, shell prompt, UNC host path or LAN address."""
     inc2_dir = EVIDENCE_ROOT / "inc-2"
     if not inc2_dir.is_dir():
         pytest.fail(
             "the increment's evidence folder is missing from this checkout; "
             "the redaction gate has nothing it is responsible for"
         )
-    hits = []
-    for path in sorted(EVIDENCE_ROOT.rglob("*")):
-        if not path.is_file() or path.suffix.lower() not in _REDACTION_SUFFIXES:
-            continue
-        text = path.read_text(encoding="utf-8", errors="replace")
-        for label, pattern in _REDACTION_PATTERNS:
-            for match in pattern.finditer(text):
-                hits.append(
-                    f"{path.relative_to(REPO_ROOT).as_posix()}: {label}: {match.group(0)}"
-                )
-    assert not hits, "unredacted committed evidence:\n" + "\n".join(hits)
+    hits = _redaction_hits(BATCH_ROOT, _local_identity_names(), _git_ignored(BATCH_ROOT))
+    assert not hits, "unredacted batch records or evidence:\n" + "\n".join(hits)
+
+
+_PLANTED_LEAKS = {
+    "posix home path outside the runner image": "cd /home/alice/work",
+    "user-profile path": "C:\\Users\\alice\\proj",
+    "unix-style user-profile path": "ls /mnt/c/Users/alice and /Users/bob",
+    "pytest temp folder of an account": "/tmp/pytest-of-alice/pytest-3",
+    "junit hostname attribute": '<testsuite hostname="build-box-7">',
+    "shell prompt user@host": "alice@build-box-7:~$ pytest",
+    "unc host path": "copied to \\\\fileserver01\\share",
+    "lan address": "ssh to 192.168.7.20",
+    "local account or host name": "probe-identity-xq7 ran it",
+}
+
+
+def test_r_tst_070_3_redaction_gate_names_each_leak_form(tmp_path) -> None:
+    """E5S-1 negative control: one planted line per form, each named; the
+    placeholder spellings of the records are not."""
+    for index, (form, line) in enumerate(_PLANTED_LEAKS.items()):
+        (tmp_path / f"leak{index}.xml").write_text(line + "\n", encoding="utf-8")
+    (tmp_path / "clean.md").write_text(
+        "<HOME>/Github and /home/runner/work, /tmp/pytest-of-<USER>/x, "
+        'hostname="<host>", user@host:~$, \\\\HOST\\share, /Users/<name>\n',
+        encoding="utf-8",
+    )
+    (tmp_path / "blob.bin").write_bytes(b"\x00/home/alice")
+    hits = _redaction_hits(tmp_path, {"probe-identity-xq7"})
+    named = {hit.split(": ")[1] for hit in hits}
+    assert named == set(_PLANTED_LEAKS), hits
+    assert not [hit for hit in hits if hit.startswith(("clean.md", "blob.bin"))], hits
 
 
 # ---------------------------------------------------------------------------

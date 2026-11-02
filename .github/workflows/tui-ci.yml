@@ -1,9 +1,13 @@
 name: tui-ci
 
-# Two-tier gate (batch-07 CI-1, operator decision 2026-06-10):
-#  - PRs run the fast lean suite (-m "not slow", ~10 min) for quick feedback.
+# Two-tier gate (batch-07 CI-1, operator decision 2026-06-10), two lanes each
+# (batch-101 Inc 2, R-TST-010/011):
+#  - PRs run the lean suite (-m "not slow"): lane 1 in parallel over the
+#    runner's CPUs without the wall-clock timing arms, then lane 2 the timing
+#    arms serially (-m "serial_timing and not slow").
 #  - Pushes to main / main-tui run the FULL suite (incl. slow perf smoke
-#    tests, ~35 min) as the exhaustive post-merge gate.
+#    tests) the same way: lane 1 parallel (-m "not serial_timing"), lane 2
+#    serial (-m serial_timing). Lane 2 also runs after a red or timed-out lane 1.
 on:
   pull_request:
     branches:
@@ -80,7 +84,6 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
           persist-credentials: false
 
       - name: Set up Python

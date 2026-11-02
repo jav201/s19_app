@@ -1052,8 +1052,11 @@ def canonical_report_bytes(raw: bytes, run_root: Optional[Path] = None) -> bytes
         Map report bytes to the canonical form of the LLR-054.4/055.3
         byte-identity pin: platform newline translation undone (CRLF -> LF),
         every spelling of the per-run pytest tmp root replaced by
-        ``<RUN-ROOT>``, and path separators normalized to ``/`` ONLY inside
-        run-root path spans — content bytes are never rewritten. The single
+        ``<RUN-ROOT>``, path separators normalized to ``/`` ONLY inside
+        run-root path spans, and the golden's ``TOOL_VERSION_TOKEN``
+        (``<TOOL-VERSION>``) replaced by ``s19_app.version.__version__`` read
+        at call time — other content bytes are never rewritten, and a
+        produced report holds no token, so its printed version is kept. The single
         shared home for the report byte-identity canonical form (batch-41
         consolidated the two former ``_canonical_report_bytes`` copies in
         ``tests/test_before_after_report.py`` and
@@ -1064,7 +1067,7 @@ def canonical_report_bytes(raw: bytes, run_root: Optional[Path] = None) -> bytes
             report, or a stored golden).
         run_root (Optional[Path]): The per-run root whose spellings are
             tokenized; ``None`` for stored goldens (already tokenized at
-            capture time — only the CRLF undo applies).
+            capture time — the CRLF undo and the version token apply).
 
     Returns:
         bytes: The canonical byte form compared by the byte-identity ATs.
@@ -1076,6 +1079,8 @@ def canonical_report_bytes(raw: bytes, run_root: Optional[Path] = None) -> bytes
     Dependencies:
         Uses:
             - RUN_ROOT_TOKEN
+            - TOOL_VERSION_TOKEN
+            - s19_app.version.__version__
         Used by:
             - tests/test_before_after_report.py (AT-054b)
             - tests/test_tui_report_seam.py (AT-055b)

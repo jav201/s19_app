@@ -1208,6 +1208,8 @@ def test_tc_b100_61_r2_2_legitimate_manifest_inside_every_cap_is_checked_whole(
     manifest = read_project_manifest(project_dir)
     took = time.perf_counter() - started
     assert took < report_margin("TC-B100-61 R2-2 read", took, timing_bound(1.0)), took
+    assert manifest.issues == [], manifest.issues[-1:]
+    assert len(manifest.batch) == 1000
     assert len(manifest.assignments["firmware"]) == 1000
     assert {path.name for path in manifest.files} == set(records)
     assert check_project_files(project_dir, manifest) == []
