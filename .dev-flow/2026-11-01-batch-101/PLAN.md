@@ -140,6 +140,7 @@ The UI rows are known failed checks for the next iteration.
 - The UI rows the architect flagged as wrong-result or blocked-task risks (UX-I-13, UX-I-10, UX-I-12, F-25, F-15, F-36, F-10/F-11) stay in the backlog per the operator's ruling; they are reported to the operator with their harm.
 - Inc 1 (canon swap) is built by the requirements re-write session on branch `b101-canon` from e273181 (agreed 2026-11-01); its test-case records and status document come in a later increment from the same session. Defect increments cite the new canon's row ids (`s19w/review/S<n>-ears-strict.md` ids, unchanged at the swap) and report every added or changed row to that session.
 - Worker model: Kimi K2.8 only (DeepSeek paused by the operator 2026-11-01); Opus designs, reviews, integrates. Pre-merge full suite on the LAN Linux host (pytest-xdist -n 8; timing arms serial).
+- **D15-18** (a `flows/` or `flowsets/` junction lets a flow save land outside the work area; R-FLOW-FILE.11 / R-FLOW-SET.7; raised by Inc 1's security review) joins **Inc 9** with a RED arm; a **`SECURITY.md`** (reporting path, supported versions) joins **Inc 14**. Inc 1 owns TC-607's file-count constant and the registry guard files while it is open (2026-11-01).
 - `base_ref` 7717394 is correct: the rollover commit e273181 is the batch's own opening commit.
 
 ## Risks / watch-items
