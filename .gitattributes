@@ -53,3 +53,4 @@ AT-TC-REGISTRY.jsonl text eol=lf
 # bytes above).
 tests/fixtures/synth/** -text
 .dev-flow/2026-10-26-batch-100/evidence/** -text
+.dev-flow/2026-11-01-batch-101/evidence/** -text

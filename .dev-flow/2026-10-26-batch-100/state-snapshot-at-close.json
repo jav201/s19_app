@@ -1,0 +1,300 @@
+{
+  "project": "s19_app",
+  "language": "en",
+  "batch_id": "2026-10-26-batch-100",
+  "batch_objective": "The Load + projects batch: one Load dialog that offers what is already loaded and opens projects, and a project that restores what was saved or says what it could not. Scope: the project round-trip findings of INVESTIGATION-project-roundtrip-2026-10-23 still open (PH-1 Save project drops a pending patch, PH-2 load over a project leaks its A2L/MAC/patches, PH-4 save-back opens the unpatched original, PH-5 manifest problems ignored; M-1..M-7, L-2..L-4), the Load dialog requests (a picker of work-area files and recent sources, Load opens projects, Enter-to-load D10), the G-005 save naming (byte-identical reuse, tests re-pinned), the Code-Wire UI items CW-U-2, CW-U-5, CW-U-12, CW-U-13, the reserved project name, and the progress indicator for long actions (N5 reopened). UI changes go through a prototype round with the operator's verdict before implementation.",
+  "mode": "full",
+  "mode_history": [
+    {
+      "from": null,
+      "to": "core",
+      "date": "2026-08-24",
+      "reason": "Same ruling as batch-85/86 (C-50): the IFC record's declared home is .dev-flow/<batch>/01-requirements.md, a Phase-1 artifact /fast-dev-flow has no phase for."
+    },
+    {
+      "from": null,
+      "to": "core",
+      "date": "2026-10-08",
+      "reason": "batch 2026-10-08-batch-91 opened by rollover from 2026-09-06-batch-90 (HELD at P1, not closed -- its hold reason, rev60's packet template, is long satisfied; it resumes as its own step); mode core declared by the commission"
+    },
+    {
+      "from": null,
+      "to": "core",
+      "date": "2026-10-11",
+      "reason": "batch 2026-10-11-batch-93 opened by rollover from 2026-10-08-batch-91 (HELD at P1, not closed -- its hold reason, rev60's packet template, is long satisfied; it resumes as its own step); mode core declared by the commission"
+    },
+    {
+      "from": "core",
+      "to": "full",
+      "date": "2026-10-12",
+      "reason": "operator standing preference this week (batch-92 commissioned full; batch-94 assumed full — to confirm at kickoff)"
+    },
+    {
+      "from": null,
+      "to": "full",
+      "date": "2026-10-19",
+      "reason": "batch 2026-10-19-batch-97 opened by rollover from 2026-10-12-batch-94 (closed at P6, synced); mode full by the operator's standing rule (dev-flow runs full) and the input: a design port of an operator-approved prototype round across four screens"
+    },
+    {
+      "from": null,
+      "to": "full",
+      "date": "2026-10-25",
+      "reason": "batch 2026-10-25-batch-99 opened by rollover from 2026-10-19-batch-97 (closed at P6, synced); mode full by the operator's commission (dev-flow full: P0/P1 requirements, P2 review)"
+    },
+    {
+      "from": null,
+      "to": "full",
+      "date": "2026-10-26",
+      "reason": "batch 2026-10-26-batch-100 opened by rollover from 2026-10-25-batch-99 (closed at P6, synced); mode full, as batch-99, by the operator's kickoff answers of 2026-10-26"
+    }
+  ],
+  "current_station": "P6",
+  "phase_status": "awaiting-sync",
+  "stations_active": [
+    "P0",
+    "ARQ",
+    "P1",
+    "P2",
+    "PDR",
+    "P3",
+    "DDR",
+    "P4",
+    "P5",
+    "P6"
+  ],
+  "iterations_per_station": {
+    "P0": 0,
+    "ARQ": 0,
+    "P1": 0,
+    "P2": 0,
+    "PDR": 0,
+    "P3": 0,
+    "DDR": 0,
+    "P4": 0,
+    "P5": 0,
+    "P6": 0
+  },
+  "triggers": {
+    "evaluated_at": "2026-10-26T06:56:41",
+    "fired": [
+      "A2",
+      "A3",
+      "B1",
+      "B4",
+      "C6",
+      "C8",
+      "D1",
+      "E1",
+      "E2"
+    ],
+    "not_fired": [
+      "A1",
+      "A4",
+      "B2",
+      "B3",
+      "C1",
+      "C2",
+      "C3",
+      "C4",
+      "C5",
+      "C7",
+      "D2",
+      "E3",
+      "F1",
+      "F2"
+    ],
+    "record": ".dev-flow/2026-10-26-batch-100/PLAN.md#triggers"
+  },
+  "artifact_homes": {
+    "requirements": "repo:.dev-flow/2026-10-26-batch-100/01-requirements.md",
+    "requirements_ledger": "repo:.dev-flow/2026-10-26-batch-100/01-requirements-ledger.md",
+    "traceability": "repo:.dev-flow/2026-10-26-batch-100/06-docs/traceability-matrix.md",
+    "tests": "repo:tests/",
+    "module_map": "repo:docs/architecture.md",
+    "increments": "repo:.dev-flow/2026-10-26-batch-100/03-increments/",
+    "evidence": "repo:.dev-flow/2026-10-26-batch-100/evidence/",
+    "backlog": "repo:.dev-flow/BACKLOG.md",
+    "design_pdr": "vault:s19_app/design/PDR-2026-10-26-batch-100.md",
+    "design_ddr": "vault:s19_app/design/DDR-2026-10-26-batch-100.md",
+    "postmortem": "vault:s19_app/dev-flow-batches/2026-10-26-batch-100/",
+    "metrics": "vault:s19_app/dev-flow-batches/2026-10-26-batch-100/README.md",
+    "requirements_canon": "repo:REQUIREMENTS.md"
+  },
+  "artifacts": {},
+  "decisions_log": [
+    {
+      "station": "P0",
+      "date": "2026-10-26",
+      "decision": "asked at the gate — operator verdict on design/plan-b100.html (design/veredicto-b100.json, exported 2026-10-26): D1 imagen, D2 ultima, D3 abre_y_reporta, D4 reabrir, D5 copiar, D6 abrir, D7 solo_workarea, every recommended option. D2 note: the switch to the latest saved image must be announced so it does not pass unnoticed; routed to the prototype round as surface P-E (Load project result: which variant opened and why, plus the D3 problem list). Triggers evaluated (PLAN.md#triggers). P0 intake closed; ARQ is next, and the prototype round is built in parallel."
+    },
+    {
+      "station": "ARQ",
+      "date": "2026-10-26",
+      "decision": "standing authorization — operator kickoff 2026-10-26 (PLAN header). ARQ approved with conditions (design/ARQ-batch-100.md; docs/architecture.md batch-100 rows R24-R33, B100-I1..I12): no module created, no boundary moved (A1 stays not fired); increments 8, 9, 12 split into 8a/8b, 9a/9b, 12a/12b (15 increments, sequential); P-E in the prototype round; orchestrator rulings O-1..O-11 recorded in ARQ section 10.1. P1 is next."
+    },
+    {
+      "station": "P1",
+      "date": "2026-10-26",
+      "decision": "standing authorization — operator kickoff 2026-10-26 (PLAN header). P1 requirements drafted (3060d66): US-153..US-168, HLR-163..HLR-178, 58 LLR, TC-B100-01..56 + 3 re-pinned tests, AT-B100-01..19; US-163..US-168 REFINE pending the prototype verdict (slots VS-*); validator 0 block. Orchestrator rulings on the author's open questions: Q-1 PROJECT_NAME_MAX_CHARS = 64 (P2 architect checks path limits); Q-2 O-9 narrowed to the silent-merge case (typed name differs from its sanitised folder and that folder holds a project), an exact-name save into an existing project keeps LLR-005.1 with a warning in the Inc 11 dialog — flagged to the operator; Q-3 vars(app) stays a TC, AT-B100-03 observes the surface; Q-4 US-143 precedent accepted; Q-5 pasted document saved as patches/changes.json with M-1 reuse; Q-6 stays slot VS-PD-3; Q-7 assumption accepted. P2 review (architect, qa-reviewer, security-reviewer, ux-reviewer) is next."
+    },
+    {
+      "station": "P2",
+      "date": "2026-10-26",
+      "decision": "asked at the gate — operator answer on S-16 (P2 round 1, security): the recent-sources list lives per user (\"Por usuario\"), in %APPDATA%\\s19_app\\recent_sources.json, outside any work area, so source paths never travel with a shared or committed .s19tool folder. To be written into the contract (LLR-172.x) with the round-2 re-review fixes. Also recorded: P1 round 2 applied (0c7ca1d), P2 round 2 re-review launched (architect, qa-reviewer, security-reviewer, ux-reviewer)."
+    },
+    {
+      "station": "P2",
+      "date": "2026-10-26",
+      "decision": "asked at the gate — P2 iteration cap (3) reached and surfaced to the operator: root cause, the contract's size (69 LLR, ~208k chars vs a 54k budget), so each fix round adds rules that carry new defects; converging (round 1: 6 HIGH / 45 MAJOR; round 2 closed 77 of 86, new 2 HIGH / 25 MAJOR, all with small concrete closures). Operator chose \"Ronda 3 acotada\": apply the round-2 dispositions, then each reviewer verifies ONLY the closure of its own open findings (no new full review); anything later is caught at each increment gate; then PDR."
+    },
+    {
+      "station": "P2",
+      "date": "2026-10-26",
+      "decision": "standing authorization — operator kickoff 2026-10-26 (PLAN header); bounded round 3 per the operator's choice at the P2 iteration cap. P2 approved: round-3 bounded verification by ux-reviewer, architect, security-reviewer, qa-reviewer all approve, 0 HIGH open (02-review.md Round 3); non-blocking conditions carried to PDR (UX-22, UX C-1/C-2, ARCH C-1..C-5, SEC PDR-C1..C3, PDR-QA-1/2). Orchestrator ruling PDR-C3: the recent store moves to %LOCALAPPDATA% (not roaming), per the operator's S-16 intent. PDR is next: design proposal, then architect + qa-reviewer + ux-reviewer."
+    },
+    {
+      "station": "PDR",
+      "date": "2026-10-26",
+      "decision": "asked at the gate — PDR-2026-10-26-batch-100 approved with conditions by architect (5 MINOR), qa-reviewer (3 MAJOR, 5 MINOR), ux-reviewer (5 MAJOR, 4 MINOR); no HIGH. Operator decision at this gate on C-UX-1/C-QA-1: \"Cruce con nombre\" — s19_app/tui/a2l.py gains an optional progress callback (bytes consumed), a named frozen-engine crossing; Inc 12 = 3 files and re-freezes a2l.py in test_engine_unchanged. Orchestrator rulings: C-UX-3 early alt+s closes the dialog and saves on a worker under the status line; C-QA-3 gate = six guard files + -k census; full suite after Inc 5, 8b, 12 and at P4 against evidence/suite-full-75f947a.txt (s19_app/tests identical to 1d677ba). All conditions owned per design/PDR-2026-10-26-batch-100.md. P3 is next: Inc 1 to Kimi K2.8."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-26",
+      "decision": "asked at the gate — Inc 1 reached the P3 iteration cap (3 corrective passes) and was surfaced to the operator. Root cause: each pass closed one junction-escape route, but the guard mixed resolved and unresolved spellings across callers. Status: security PASS-WITH-NOTES (SEC-1 closed); code-reviewer round 3 BLOCK-UNTIL R3-1 (HIGH regression: the export refuses under a junctioned base). Operator chose \"Pasada 3 acotada\": fix only R3-1 + test, R3-2/SEC-6 (drop .resolve() in _active_project_dir), R3-3 (workarea_root required in gather_project_artifacts); code-reviewer re-reads only that; anything new beyond it stops the increment for a redesign. Routed: SEC-4 to Inc 5 (changes/apply.py staging), SEC-5 to Inc 8b (flow_persistence writers), R3-4 to backlog."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-26",
+      "decision": "standing authorization — operator kickoff 2026-10-26 (PLAN header); bounded pass per the operator at the P3 iteration cap. P3 increment 001 (US-153 / HLR-163 + LLR-171.4 guard; workspace.py, segment_split_view.py, app.py, project_gather_service.py — 4 SOURCE at cap, LED .49) approved and merged (37827ce): implemented by Kimi K2.8 in four sessions (implementation + 3 corrective passes); code-reviewer round 1 BLOCK-UNTIL F1 HIGH (S-02 escape via export/group/gather) -> round 2 PASS-WITH-NOTES -> round 3 BLOCK-UNTIL R3-1 HIGH regression -> round 4 PASS-WITH-NOTES; security-reviewer round 1 BLOCK-UNTIL SEC-1 HIGH (resolved app paths) -> round 2 PASS-WITH-NOTES; orchestrator re-run 124 passed + guards 75/29 snapshots + census 84 (evidence/inc-1/orchestrator-gate.txt). Rulings LED .49, .50. Routed: SEC-4 to Inc 5, SEC-5 to Inc 8b, R3-4 and hardening notes to backlog."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-26",
+      "decision": "asked at the gate — Inc 2 reached the P3 iteration cap (3 corrective passes) and was surfaced to the operator. Pattern as in Inc 1: each filesystem fix opens a new junction case; round 3 R3-1 HIGH — the recursive rollback (rglob) walks into NTFS junctions on Python 3.11 and deleted a file outside the work area (executed). Operator chose \"Pasada 3 acotada\": one reusable walker that never descends into a reparse point (snapshot and removal), junction-out and loop tests RED first; security and code-reviewer re-read only that; anything new beyond it stops the increment for a redesign. The walker is reused by Inc 8b save-as (LLR-171.1)."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-26",
+      "decision": "asked at the gate — Inc 2 stopped by the operator's bounded-pass rule: code-reviewer round 4 PASS-WITH-NOTES (R3-1 closed), security round 3 found SEC2-5 MAJOR (an incomplete snapshot led the rollback to delete pre-existing user files; executed) and SEC2-6. Operator chose \"Lista exacta\" (LED .53): a failed save removes exactly what it created (non-reused placements + the gather's written files + created empty folders); no folder walk decides deletion; Inc 2 = 3 files (adds project_gather_service.py); walk_tree_no_links kept for Inc 8b."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-27",
+      "decision": "standing authorization — operator kickoff 2026-10-26 (PLAN header); operator decisions at the cap (bounded pass 3) and at the stop it triggered (\"Lista exacta\", LED .53). P3 increment 002 (US-154 / HLR-164; app.py, workspace.py, project_gather_service.py — 3 SOURCE) approved and merged: implemented by Kimi K2.8 in six sessions (implementation, 3 corrective passes, the LED .53 redesign, its corrective pass); code-reviewer r1 BLOCK-UNTIL F1/F2 HIGH -> r2 BLOCK-UNTIL R2-1/R2-2 -> r3 BLOCK-UNTIL R3-1 HIGH -> r4/r5 PASS-WITH-NOTES -> r6 PASS; security-reviewer r1-r3 PASS-WITH-NOTES (SEC2-1, SEC2-5 MAJOR) -> r4 BLOCK-UNTIL SEC2-7 HIGH -> r5 PASS-WITH-NOTES; orchestrator re-run 130 passed + guards 75/29 snapshots + census 85 (evidence/inc-2/orchestrator-gate.txt). Rulings LED .52-.54; SEC2-10 routed to Inc 7; the gather reuse rule moved from Inc 5 to Inc 2."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-27",
+      "decision": "standing authorization — operator kickoff 2026-10-26 (PLAN header). P3 increment 003 (US-155 / HLR-165, PH-2: a project load starts clean; app.py — 1 SOURCE) approved and merged: implemented by Kimi K2.8 (implementation + timeout resume + 2 corrective passes); code-reviewer r1 BLOCK-UNTIL F1 HIGH (snapshot scenario never set S7-S11) -> r2 PASS-WITH-NOTES (R2-1 MAJOR paste buffer survived the reset, fixed in Inc 3) -> r3 PASS; orchestrator re-run 109 passed + guards 75/29 snapshots + census 86/1 (at058b, the known patch_editor_v2 timing family: 5/5 alone on both trees, census re-run 87/87). Rulings LED .55 (interim notice wording; mark_loaded). ARQ 2.2 as-built note added (F10). F6 real-worker boundary arm -> qa-reviewer at Inc 7/8a."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-29",
+      "decision": "P3 increment 004 approved under the batch's standing authorization (code-reviewer PASS-WITH-NOTES after 3 rounds; R3-1 fixed per the reviewer's exact fix, LED .59); merged 92fac8e."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-29",
+      "decision": "P3 increment 015 (hotfix 3b of increment 003, operator: 'Hotfix ahora') approved under the batch's standing authorization (code-reviewer PASS-WITH-NOTES, 0 HIGH; LED .60); merged ee6dba8."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-29",
+      "decision": "P3 increment 005 approved under the batch's standing authorization (code-reviewer PASS-WITH-NOTES after 2 rounds, security-reviewer PASS-WITH-NOTES, SEC-4 discharged); merged 6c4b6ae; Inc 6 is next."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-30",
+      "decision": "P3 increment 006 approved under the batch's standing authorization (code-reviewer PASS-WITH-NOTES r2, security-reviewer PASS-WITH-NOTES r4, 3 corrective passes; orchestrator re-run: no new failure beyond the known 3 and the pre-existing at057b flake); Increment 7 is next."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-30",
+      "decision": "P3 increment 007 approved under the batch's standing authorization (code-reviewer r2 PASS-WITH-NOTES, security-reviewer r2 PASS-WITH-NOTES); corrective pass 2 verification cut by the operator, census/guards/probes/round-3 review deferred to Inc 8a (LED .70); Inc 8a runs as the design-first experiment (experiment-8a/PLAN.md)."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-30",
+      "decision": "P3 increment 008 (Inc 8a) approved under the batch's standing authorization (code-reviewer r2 PASS-WITH-NOTES, security-reviewer PASS-WITH-NOTES; design reviewed code-free in 3 rounds); run as the design-first experiment (experiment-8a/); per-increment test scope = new/modified requirements + guards, full battery at batch end (LED .75)."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-31",
+      "decision": "P3 increment 016 (Inc 8b) approved under the batch's standing authorization (autonomous; stop only on HIGH or operator decision): code review r2 PASS-WITH-NOTES, security PASS-WITH-NOTES; 5th source file operator-approved for F2 (2026-10-31); P3 increment for Inc 9a is next."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-31",
+      "decision": "P3 increment 017 (Inc 9a) approved under the batch's standing authorization (autonomous; stop only on HIGH or operator decision): code review PASS-WITH-NOTES, security PASS-WITH-NOTES, no round 2 (nothing blocking); per-increment test scope per the operator override of 2026-10-31; P3 increment for Inc 9b is next."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-31",
+      "decision": "P3 increment 018 (Inc 9b) approved under the batch's standing authorization (autonomous; stop only on HIGH or operator decision): E3 closed after 3 rounds; code review PASS-WITH-NOTES, security PASS-WITH-NOTES, corrective pass done, mutants 91 killed + 5 equivalent of 96; per-increment test scope per the operator override of 2026-10-31; P3 increment for Inc 10 is next."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-31",
+      "decision": "P3 increment 019 (Inc 10) approved under the batch's standing authorization (autonomous; stop only on HIGH or operator decision): E3 closed after 2 rounds; code review PASS-WITH-NOTES, security PASS-WITH-NOTES (same MINOR found independently, fixed); mutants 82 killed + 1 equivalent of 83; per-increment test scope per the operator override of 2026-10-31; P3 increment for Inc 11 is next."
+    },
+    {
+      "station": "P3",
+      "date": "2026-11-01",
+      "decision": "P3 increment 020 (Inc 11, the Save project dialog shows exactly what the save will do) approved under the batch's standing authorization; E5 two review rounds (code PASS, security PASS-WITH-NOTES); Inc 12a is next."
+    },
+    {
+      "station": "P3",
+      "date": "2026-11-01",
+      "decision": "P3 increment 021 (Inc 12a, the progress indicator, the labels Load / Projects and the backlog sweep) approved under the batch's standing authorization; E5 reviews PASS-WITH-NOTES, corrective pass in 2 rounds; Inc 12b is next."
+    },
+    {
+      "station": "P3",
+      "date": "2026-11-01",
+      "decision": "P3 increment 022 (Inc 12b: workers for project load / Save project / A2L parse, busy refusal, quit question, a2l.py progress) approved under the batch's standing authorization; code review FAIL then PASS-WITH-NOTES on re-review, security PASS-WITH-NOTES, mutants 115 rows (round 2: 0 open); batch-end battery is next."
+    },
+    {
+      "station": "P3",
+      "date": "2026-11-01",
+      "decision": "batch-100 batch-end fix rounds 1 and 2 merged on main (b100-fix1 at 677435e): battery failures CI11-1 (product), tc_b100_59, R-1..R-3 fixed or re-pinned; SE5-12b-2 guards, OBS-12b-1/2, A12-51 closed; R1-P1, SR12b-7, OBS-F2-1, R2-CI routed to BACKLOG-CODE; full suite deferred to CI."
+    },
+    {
+      "station": "P3",
+      "date": "2026-11-01",
+      "decision": "batch-100 batch-end fix round 3 merged on main (b100-fix3): the 4 new Linux failures of CI 41338318239 plus AT-B100-17 were test races/platform assumptions, product unchanged; verified on a Linux host on Python 3.11; SR12b-7b routed."
+    },
+    {
+      "station": "DDR",
+      "date": "2026-11-01",
+      "decision": "DDR discharged per increment: from Inc 8a each increment ran a code-free design review (E3, Code-Wire graph + architect/security, 1-2 rounds) before code; records in inc-*/E3-*.md and packets 008/016-022.",
+      "notes": "station label corrected at close (the script logs the station being left)"
+    },
+    {
+      "station": "P4",
+      "date": "2026-11-01",
+      "decision": "P4 validation PASS-WITH-NOTES under the standing authorization: Linux gate on f72eef1 (5 known + 13 timing arms under parallel load, serial re-run clean); expert UX inspection PASS-WITH-NOTES (G-001 discharged); GitHub CI 41372953464 deferred by operator ruling 2026-11-01 (post-close confirmation).",
+      "notes": "station label corrected at close (the script logs the station being left)"
+    },
+    {
+      "station": "P5",
+      "date": "2026-11-01",
+      "decision": "P5 post-mortem and close record approved: design-first moved defects to E3; the per-increment test-scope override cost 3 batch-end fix rounds; worker races in tests are the new failure family (SR12b-7/7b, G-015); release decision v1.0.0-rc1 with batch-101 release hardening.",
+      "notes": "station label corrected at close (the script logs the station being left)"
+    },
+    {
+      "station": "P6",
+      "date": "2026-11-01",
+      "decision": "P6 docs approved (executive summary, functionality, traceability matrix, 3 diagrams); canon folded (393 ids); merge to main, tag v1.0.0-rc1, then /dev-flow-sync.",
+      "notes": "station label corrected at close (the script logs the station being left)"
+    },
+    {
+      "station": "P6",
+      "date": "2026-11-01",
+      "decision": "synced-to-obsidian",
+      "notes": "G:/My Drive/ConsultIA/Obsidian_Vaults/AI-Consulting-Brain/01 - Proyectos/s19_app/dev-flow-batches/2026-10-26-batch-100/ (re-sync over the 2026-10-30 interim copy; visual-evidence refresh skipped by the orchestrator: batch-101 reworks the UI and the user guide's 181 real captures supersede the gallery for now)"
+    }
+  ],
+  "obsidian_synced": true,
+  "created_at": "2026-10-26T06:42:43.235979",
+  "owner": "C:/Users/jjgh8/Github/s19_app",
+  "base_ref": "1d677ba39d2c6aaf09f1ca7e623197065f0b8958"
+}
