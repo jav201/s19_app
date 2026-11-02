@@ -1,0 +1,662 @@
+# batch-101 Inc 2 E4 integration — LAN Linux host, gate lane 1
+# command: pytest -p no:cacheprovider --basetemp <OUT>/bt-l1 -n 8 --dist loadfile -rs -m "not serial_timing"  (timeout 7200)
+# env: PYTHONDONTWRITEBYTECODE=1 PYTHONUTF8=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. NO_COLOR unset; interpreter: s19ci env, Python 3.11.18, pytest 9.2.0, xdist 3.8.0
+# tree: origin/main e2663953 + Inc 2 diff (git diff --binary main of branch b101-inc2 working tree)
+# redaction: home folder -> <HOME>, account -> <USER>, run output folder -> <OUT>
+
+head = origin/main e2663953 + Inc 2 diff
+<HOME>/work/s19_app/s19_app/__init__.py
+ 03:37:27 up 10:20,  3 users,  load average: 0.73, 1.02, 0.98
+Mon Nov  2 09:37:27 AM UTC 2026
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0
+rootdir: <HOME>/work/s19_app
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+created: 8/8 workers
+8 workers [5270 items]
+
+s....................................................................... [  1%]
+.........................................................s.......s...... [  2%]
+........................................................................ [  4%]
+.........................................................s.............s [  5%]
+ssssssssssssssssssssssssss..............s........sss.....ss.........s... [  6%]
+.s.........s.........................ss........s............s..s....sss. [  8%]
+...........................................s...ss....sss........s......s [  9%]
+............s.s.s..ssssss....s....ss.........................ss......... [ 10%]
+....................ss...................s........s.........sss......... [ 12%]
+..................ss.............sss.................................... [ 13%]
+...............................................sss.ss................... [ 15%]
+...........................................................s............ [ 16%]
+.........................................................ss............. [ 17%]
+........................................................................ [ 19%]
+................s....................................................... [ 20%]
+...s.....................................................s....s...ssssss [ 21%]
+ss......................s..........sssss................................ [ 23%]
+......s......ss................................s........................ [ 24%]
+.............s....................s................................s.... [ 25%]
+..ss.........s.s...........................sssss........................ [ 27%]
+.............................s...s...................................... [ 28%]
+......s.F.....ssss....s................................................. [ 30%]
+......................................sssssss.................s........s [ 31%]
+........sss.......................s......s.............................. [ 32%]
+.....s.................................................................. [ 34%]
+...............s.......s................................................ [ 35%]
+..............................s.........x............................... [ 36%]
+........................................................................ [ 38%]
+..............................................................ss........ [ 39%]
+........................................................................ [ 40%]
+..ss.................................................................... [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 45%]
+..........................................................F............. [ 46%]
+...s.................................................................... [ 47%]
+...........s............................................................ [ 49%]
+........................................................................ [ 50%]
+....................................x................................... [ 51%]
+...........................................s...............ssss.......s. [ 53%]
+ssssss.................................................................. [ 54%]
+.............................................................FF......... [ 56%]
+........................................................................ [ 57%]
+........................................................................ [ 58%]
+..........................................................s............. [ 60%]
+........................................................................ [ 61%]
+............................................................ssssssssssss [ 62%]
+sssssssssssssssssF.....s................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 68%]
+........................................................................ [ 69%]
+........................................................................ [ 71%]
+........................................................................ [ 72%]
+...............x........................................................ [ 73%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+.........s.............................................................. [ 77%]
+................................ss...................................... [ 79%]
+........................................................................ [ 80%]
+..................................s..................................... [ 81%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+.............................F.......................................... [ 88%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+...................s.................................................... [ 94%]
+........................................................x............... [ 95%]
+.......................................................................F [ 97%]
+........................................................................ [ 98%]
+..............s......................................................... [ 99%]
+.........F....                                                           [100%]
+=================================== FAILURES ===================================
+_ test_tc_b97_23_waiting_card_past_the_viewport_is_brought_into_view[wait_third_6-size0] _
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('<OUT>/bt-l1/popen-gw1/test_tc_b97_23_waiting_card_pa0')
+size = (118, 54), fixture = 'wait_third_6'
+
+    @pytest.mark.parametrize("size", VERTICAL)
+    @pytest.mark.parametrize("fixture", ["wait_third_6", "deep"])
+    def test_tc_b97_23_waiting_card_past_the_viewport_is_brought_into_view(tmp_path: Path, size, fixture) -> None:
+        """TC-B97-23 (LLR-147.3, the waiting lane past the viewport; PC-24): on
+        ``wait_third_6`` the waiting card would lie past the viewport's right
+        edge at scroll 0 (fixture guard) and on ``deep`` past its right AND
+        bottom edges; after the pause the waiting card and its Confirm lie inside
+        the viewport and the focus is still on ``#fx_run``.
+    
+        RED by mutation: the scroll step removed → the card outside the
+        viewport.
+        """
+        stems = SIX if fixture == "wait_third_6" else DEEP
+        lane = len(stems) - 1
+    
+        async def body(app, pilot, panel, project_dir):
+            scroll = panel.query_one("#fx_lanes_scroll")
+            view = scroll.scrollable_content_region
+            card = panel.query_one(f"#fx_card_{lane}_4")
+            confirm = panel.query_one(f"#fx_confirm_{lane}")
+            await poll(pilot, lambda: _inside(card.region, view) and _inside(confirm.region, view))
+            at_zero = (card.region.right + int(scroll.scroll_x), card.region.bottom + int(scroll.scroll_y))
+            return (
+                at_zero, (view.right, view.bottom), _inside(card.region, view), _inside(confirm.region, view),
+                app.focused.id if app.focused else None,
+            )
+    
+        at_zero, edges, card_in, confirm_in, focused = run_fx(tmp_path, size, body, stems=stems, run=True)
+        assert at_zero[0] > edges[0], f"guard: the card lies past the right edge at scroll 0: {at_zero} {edges}"
+        if fixture == "deep":
+            assert at_zero[1] > edges[1], f"guard: the card lies past the bottom edge at scroll 0: {at_zero} {edges}"
+>       assert card_in and confirm_in
+E       assert (False)
+
+tests/test_b97_flow_execution.py:650: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2943 App initialized. base_dir=<OUT>/bt-l1/popen-gw1/test_tc_b97_23_waiting_card_pa0 workarea=<OUT>/bt-l1/popen-gw1/test_tc_b97_23_waiting_card_pa0/.s19tool/workarea
+INFO     s19tui:app.py:7957 Workarea refreshed. files=0
+INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.013
+WARNING  s19tui:app.py:13515 Project proj1: no project.json project.json (None)
+INFO     s19tui:app.py:13757 Load phase boundary: parse_branch_entry path=prg.s19 suffix=.s19
+INFO     s19tui:app.py:18161 Load summary: file_type=s19 path=<OUT>/bt-l1/popen-gw1/test_tc_b97_23_waiting_card_pa0/.s19tool/workarea/proj1/prg.s19 addresses=3968 range_count=11 range_bytes=3968 errors=0
+INFO     s19tui:app.py:13774 Load phase boundary: parse_branch_done path=prg.s19 branch=s19
+INFO     s19tui:app.py:17679 Load phase boundary: apply_install_state path=prg.s19 precomputed=False
+INFO     s19tui:app.py:13710 Project loaded. name=proj1 file=<OUT>/bt-l1/popen-gw1/test_tc_b97_23_waiting_card_pa0/.s19tool/workarea/proj1/prg.s19 mac=None
+INFO     s19tui:app.py:18289 Sections updated. count=11 rendered_ranges=11 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:17695 Load phase boundary: apply_sections_done path=prg.s19
+INFO     s19tui:app.py:17707 Load phase boundary: apply_hex_done path=prg.s19
+INFO     s19tui:app.py:19211 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17274 MAC validation computed: records=0 issues=0 elapsed_seconds=0.009
+INFO     s19tui:app.py:17329 MAC row cache built: records=0 elapsed_seconds=0.009
+INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.017
+INFO     s19tui:app.py:18823 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.029
+INFO     s19tui:app.py:17720 Load phase boundary: apply_a2l_done path=prg.s19
+INFO     s19tui:app.py:18516 Memory Map updated. ranges=11
+INFO     s19tui:app.py:17737 Loaded file successfully: path=<OUT>/bt-l1/popen-gw1/test_tc_b97_23_waiting_card_pa0/.s19tool/workarea/proj1/prg.s19 file_type=s19 elapsed_seconds=1.348 has_mac=False precomputed=False
+_________ test_tc016b_exception_diagnostics_do_not_leak_absolute_paths _________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+    def test_tc016b_exception_diagnostics_do_not_leak_absolute_paths() -> None:
+        """F2: `_display_path` guards `written_paths`, but an OSError message reaches
+        the report through a block's FINDINGS and carries the full host path
+        (username + local layout) into a document meant to be shareable.
+    
+        # TC-16b
+        """
+        _home = os.environ.get("USERPROFILE") or str(Path.home())
+        leaky = (r"FileExistsError: [WinError 183] Cannot create a file when that "
+                 rf"file already exists: '{_home}\AppData\Local\Temp\x\reports'")
+        # BOTH channels: run_flow puts exception text in `diagnostics` (the real
+        # vector — 5th positional of BlockResult), and a rule may put it in
+        # `findings`. Redaction must hold on either.
+        state = _state(block_results=[
+            BlockResult(0, "report", BLOCK_STATUS_ERROR, "report write failed",
+                        [leaky], [Finding("error", leaky)]),
+        ])
+        report = compose_flow_report(state, _AT)
+        assert "(diagnostic)" in report          # the vector is actually rendered
+        assert "Users" not in report
+>       assert os.environ.get("USERNAME", "") not in report
+E       AssertionError: assert '' not in '# Flow repo...r (FB-P1b).*'
+E         
+E         '' is contained here:
+E            (FB-P1b).*
+
+tests/test_flow_report_service.py:386: AssertionError
+______________ test_tc707_copy_matches_help_sections_md_verbatim _______________
+[gw7] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+    def test_tc707_copy_matches_help_sections_md_verbatim() -> None:
+        """TC-707 (LLR-140.2, the operator-editable home): every shipped step
+        string of the nine md-authored sections is a verbatim port of
+        ``help_sections.md`` — the md is the source draft, so a drifted copy
+        edit reddens here against the source. The batch-96
+        ``changes_file_notation`` section is code-authored (not an md port);
+        it is iterated here only if it ever lands in the md, and is covered by
+        TC-1802 otherwise."""
+>       md_text = _HELP_SECTIONS_MD.read_text(encoding="utf-8")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_window_usage_help.py:214: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/data/miniconda3/envs/s19ci/lib/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('<HOME>/work/s19_app/prototypes/cambios_10_12_2026/help_sections.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '<HOME>/work/s19_app/prototypes/cambios_10_12_2026/help_sections.md'
+
+/data/miniconda3/envs/s19ci/lib/python3.11/pathlib.py:1044: FileNotFoundError
+__________________ test_tc707_numbering_generated_sequential ___________________
+[gw7] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+    def test_tc707_numbering_generated_sequential() -> None:
+        """TC-707 (LLR-140.2, the numbered-steps voice): the rendered body's
+        paragraphs are numbered 1..N with no gap — the numbering is generated
+        at render so the operator's delete/reorder edits can never strand a
+        gap, and it matches the md's own sequential numbering per section."""
+>       md_text = _HELP_SECTIONS_MD.read_text(encoding="utf-8")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_window_usage_help.py:234: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/data/miniconda3/envs/s19ci/lib/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('<HOME>/work/s19_app/prototypes/cambios_10_12_2026/help_sections.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '<HOME>/work/s19_app/prototypes/cambios_10_12_2026/help_sections.md'
+
+/data/miniconda3/envs/s19ci/lib/python3.11/pathlib.py:1044: FileNotFoundError
+____________ test_tc016s_snapshot_setup_loads_only_public_fixtures _____________
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+public_triple = {'s19': PosixPath('<OUT>/bt-l1/popen-gw3/snapshot_public0/snap.s19'), 'a2l': PosixPath('<HOME>/...n-gw3/snapshot_public0/snap.a2l'), 'mac': PosixPath('<OUT>/bt-l1/popen-gw3/snapshot_public0/snap.mac')}
+
+    def test_tc016s_snapshot_setup_loads_only_public_fixtures(
+        public_triple: dict[str, Path],
+    ) -> None:
+        """The snapshot setup loads only public synthetic fixtures (LLR-007.2).
+    
+        Intent: S-2 — a committed SVG baseline embeds the rendered screen
+        content. Every baseline must trace to a public synthetic fixture so no
+        proprietary client byte / address / symbol is ever committed. This test
+        asserts (a) the snapshot fixture source is the ``conftest.py``
+        generators, (b) those generators wrote their output under a pytest temp
+        directory (never a client path), and (c) the snapshot ``run_before``
+        setup code references no static ``examples/`` artifact and no client
+        directory — its only data source is the generator-built triple.
+        """
+        # (a) The recorded fixture sources are exactly the conftest generators.
+        assert set(_PUBLIC_FIXTURE_SOURCES) == {
+            "make_large_s19",
+            "make_large_a2l",
+            "make_large_mac",
+        }, "snapshot fixture source must be the conftest.py public generators"
+        for name, generator in _PUBLIC_FIXTURE_SOURCES.items():
+            assert generator.__module__ in ("conftest", "tests.conftest"), (
+                f"{name} must be the conftest.py generator (got module "
+                f"{generator.__module__})"
+            )
+    
+        # (b) Every triple file is a synthetic, generator-written file living in
+        # a pytest temp directory — never a client artifact path.
+        for kind, path in public_triple.items():
+            assert path.exists(), f"public {kind} fixture must have been generated"
+            parts = {p.lower() for p in path.parts}
+>           assert "snapshot_public" in parts or "pytest" in " ".join(parts).lower(), (
+                f"public {kind} fixture must live in a pytest temp dir, got {path}"
+            )
+E           AssertionError: public s19 fixture must live in a pytest temp dir, got <OUT>/bt-l1/popen-gw3/snapshot_public0/snap.s19
+E           assert ('snapshot_public' in {'/', 'bt-l1', 'home', '<USER>', 'popen-gw3', 's19int2', ...} or 'pytest' in 's19int2 snapshot_public0 bt-l1 popen-gw3 snap.s19 home / <USER>')
+E            +  where 's19int2 snapshot_public0 bt-l1 popen-gw3 snap.s19 home / <USER>' = <built-in method lower of str object at 0x7f5989b10d30>()
+E            +    where <built-in method lower of str object at 0x7f5989b10d30> = 's19int2 snapshot_public0 bt-l1 popen-gw3 snap.s19 home / <USER>'.lower
+E            +      where 's19int2 snapshot_public0 bt-l1 popen-gw3 snap.s19 home / <USER>' = <built-in method join of str object at 0x55bfe9b8bf08>({'/', 'bt-l1', 'home', '<USER>', 'popen-gw3', 's19int2', ...})
+E            +        where <built-in method join of str object at 0x55bfe9b8bf08> = ' '.join
+
+tests/test_tui_snapshot.py:1270: AssertionError
+________ test_at_056e_a2b_diff_report_byte_identical_despite_selection _________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('<OUT>/bt-l1/popen-gw0/test_at_056e_a2b_diff_report_b0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f2d64effc10>
+
+    def test_at_056e_a2b_diff_report_byte_identical_despite_selection(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """AT-056e / LLR-054.5 (HLR-054 scope guard, Q-5 black-box arm).
+    
+        Intent: with a filter SELECTED on the report selector, the A2B diff
+        report driven through ITS shipped surface (Compare then Report on the
+        diff screen) is byte-identical (canonical form) to a no-filter A2B
+        run under the same environment pin — the sticky selection observably
+        does NOT leak into the always-complete diff report.
+        """
+        _pin_report_clocks(monkeypatch)
+    
+        def _session(root: Path, select_filter: bool) -> Dict[str, bytes]:
+            project_dir = _make_project(
+                root, "proj", filters={"f.json": _valid_filter_body()}
+            )
+    
+            async def _drive() -> Dict[str, bytes]:
+                app = S19TuiApp(base_dir=root)
+                async with app.run_test(size=(120, 40)) as pilot:
+                    await pilot.pause()
+                    await _load_project(app, pilot, "proj")
+                    if select_filter:
+                        await _select_filter_via_dropdown(app, pilot, "f.json")
+                    app.action_show_screen("diff")
+                    await pilot.pause()
+                    app.query_one("#diff_path_a", Input).value = str(
+                        project_dir / "a.s19"
+                    )
+                    app.query_one("#diff_path_b", Input).value = str(
+                        project_dir / "b.s19"
+                    )
+                    app.query_one("#diff_compare_button", Button).press()
+                    await _flush(pilot)
+                    app.query_one("#diff_report_button", Button).press()
+                    await _flush(pilot)
+                return _reports(project_dir)
+    
+            return asyncio.run(_drive())
+    
+        base_root = tmp_path / "base"
+        sel_root = tmp_path / "sel"
+        base_root.mkdir()
+        sel_root.mkdir()
+        baseline = _session(base_root, select_filter=False)
+        selected = _session(sel_root, select_filter=True)
+    
+        expected = {_DIFF_MD_NAME, _DIFF_HTML_NAME}
+>       assert set(baseline) == expected, f"baseline wrote {sorted(baseline)}"
+E       AssertionError: baseline wrote []
+E       assert set() == {'20260710T12...ff-report.md'}
+E         
+E         Extra items in the right set:
+E         '20260710T120000Z-diff-report.html'
+E         '20260710T120000Z-diff-report.md'
+E         Use -v to get more diff
+
+tests/test_tui_report_filter_surface.py:773: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2943 App initialized. base_dir=<OUT>/bt-l1/popen-gw0/test_at_056e_a2b_diff_report_b0/base workarea=<OUT>/bt-l1/popen-gw0/test_at_056e_a2b_diff_report_b0/base/.s19tool/workarea
+INFO     s19tui:app.py:7957 Workarea refreshed. files=0
+INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.016
+WARNING  s19tui:app.py:13515 Project proj: no digests saved project.json (None)
+INFO     s19tui:app.py:13757 Load phase boundary: parse_branch_entry path=a.s19 suffix=.s19
+INFO     s19tui:app.py:18161 Load summary: file_type=s19 path=<OUT>/bt-l1/popen-gw0/test_at_056e_a2b_diff_report_b0/base/.s19tool/workarea/proj/a.s19 addresses=4 range_count=1 range_bytes=4 errors=0
+INFO     s19tui:app.py:13774 Load phase boundary: parse_branch_done path=a.s19 branch=s19
+INFO     s19tui:app.py:17679 Load phase boundary: apply_install_state path=a.s19 precomputed=False
+INFO     s19tui:app.py:13710 Project loaded. name=proj file=<OUT>/bt-l1/popen-gw0/test_at_056e_a2b_diff_report_b0/base/.s19tool/workarea/proj/a.s19 mac=None
+INFO     s19tui:app.py:18289 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:17695 Load phase boundary: apply_sections_done path=a.s19
+INFO     s19tui:app.py:17707 Load phase boundary: apply_hex_done path=a.s19
+INFO     s19tui:app.py:19211 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17274 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17329 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:18823 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.013
+INFO     s19tui:app.py:17720 Load phase boundary: apply_a2l_done path=a.s19
+INFO     s19tui:app.py:18516 Memory Map updated. ranges=1
+INFO     s19tui:app.py:17737 Loaded file successfully: path=<OUT>/bt-l1/popen-gw0/test_at_056e_a2b_diff_report_b0/base/.s19tool/workarea/proj/a.s19 file_type=s19 elapsed_seconds=1.993 has_mac=False precomputed=False
+INFO     s19tui:app.py:2943 App initialized. base_dir=<OUT>/bt-l1/popen-gw0/test_at_056e_a2b_diff_report_b0/sel workarea=<OUT>/bt-l1/popen-gw0/test_at_056e_a2b_diff_report_b0/sel/.s19tool/workarea
+INFO     s19tui:app.py:7957 Workarea refreshed. files=0
+INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+WARNING  s19tui:app.py:13515 Project proj: no digests saved project.json (None)
+INFO     s19tui:app.py:13757 Load phase boundary: parse_branch_entry path=a.s19 suffix=.s19
+INFO     s19tui:app.py:18161 Load summary: file_type=s19 path=<OUT>/bt-l1/popen-gw0/test_at_056e_a2b_diff_report_b0/sel/.s19tool/workarea/proj/a.s19 addresses=4 range_count=1 range_bytes=4 errors=0
+INFO     s19tui:app.py:13774 Load phase boundary: parse_branch_done path=a.s19 branch=s19
+INFO     s19tui:app.py:17679 Load phase boundary: apply_install_state path=a.s19 precomputed=False
+INFO     s19tui:app.py:13710 Project loaded. name=proj file=<OUT>/bt-l1/popen-gw0/test_at_056e_a2b_diff_report_b0/sel/.s19tool/workarea/proj/a.s19 mac=None
+INFO     s19tui:app.py:18289 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:17695 Load phase boundary: apply_sections_done path=a.s19
+INFO     s19tui:app.py:17707 Load phase boundary: apply_hex_done path=a.s19
+INFO     s19tui:app.py:19211 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17274 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17329 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.016
+INFO     s19tui:app.py:18823 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.019
+INFO     s19tui:app.py:17720 Load phase boundary: apply_a2l_done path=a.s19
+INFO     s19tui:app.py:18516 Memory Map updated. ranges=1
+INFO     s19tui:app.py:17737 Loaded file successfully: path=<OUT>/bt-l1/popen-gw0/test_at_056e_a2b_diff_report_b0/sel/.s19tool/workarea/proj/a.s19 file_type=s19 elapsed_seconds=1.984 has_mac=False precomputed=False
+INFO     s19tui:app.py:5858 View reports action. project=proj count=0
+INFO     s19tui:app.py:5936 Report filter selected: <OUT>/bt-l1/popen-gw0/test_at_056e_a2b_diff_report_b0/sel/.s19tool/workarea/proj/filters/f.json
+INFO     s19tui:screens.py:2639 ReportViewerScreen dismissed by close.
+___________ test_tc1802_nine_md_sections_intact_tenth_section_added ____________
+[gw5] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+    def test_tc1802_nine_md_sections_intact_tenth_section_added() -> None:
+        """TC-1802 (the no-disturbance census): the data home holds EXACTLY
+        the nine batch-95 md-authored sections plus this one tenth key — and
+        every one of the nine is still a verbatim port of
+        ``help_sections.md`` (title + every step string), so the batch-96
+        addition disturbed nothing the batch-95 contract froze."""
+        # Named supersession (batch-97 Inc-3): the code-authored ``check_editor``
+        # section (LLR-148.6) joins the data home; it is not an md port either.
+        assert frozenset(WINDOW_HELP_SECTIONS) == _MD_AUTHORED_KEYS | {
+            SECTION_KEY,
+            "check_editor",
+            "patch",
+            "crc_designer",
+            "reports",
+            "flow",
+            # batch-97 Inc-6 (named supersession, D25 / LLR-148.6): the
+            # code-authored ``flow_execution`` section joins the data home.
+            "flow_execution",
+            # batch-97 Inc-8: the code-authored ``map`` section.
+            "map",
+        }, (
+            "the data home must hold exactly the nine md-authored sections "
+            "plus the batch-96 changes_file_notation and batch-97 check_editor "
+            "sections"
+        )
+>       md_text = _HELP_SECTIONS_MD.read_text(encoding="utf-8")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_changes_file_notation_help.py:174: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/data/miniconda3/envs/s19ci/lib/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('<HOME>/work/s19_app/prototypes/cambios_10_12_2026/help_sections.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '<HOME>/work/s19_app/prototypes/cambios_10_12_2026/help_sections.md'
+
+/data/miniconda3/envs/s19ci/lib/python3.11/pathlib.py:1044: FileNotFoundError
+______ test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact _______
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('<OUT>/bt-l1/popen-gw1/test_at_b78_03_the_palette_act0')
+
+    def test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact(
+        tmp_path: Path,
+    ) -> None:
+        """AT-B78-03 (GATE) -- the action set equals the Inc-0 ARTIFACT, not the producer.
+    
+        ⚠️ **This node was provably INERT before Inc-0 froze the artifact, and the
+        reason is worth carrying.** `CommandBar` is constructed as
+        `CommandBar(self._build_palette_entries())`, so an implementation comparing
+        the rendered palette against `_build_palette_entries()` compares a producer
+        with ITSELF: executed, the predicate stayed GREEN at `36 == 36` with a whole
+        `Binding` removed from `S19TuiApp.BINDINGS`.
+    
+        What breaks the circularity is the TEMPORAL FREEZE -- a set captured before
+        the change and read back from disk. So this reads
+        `tests/goldens/batch78/at-b78-03-palette-actions.json` and **never
+        regenerates it**; a run that rebuilds it has restored the tautology.
+        """
+        import json
+    
+        from s19_app.tui.command_bar import CommandBar
+    
+        frozen = json.loads(
+            Path("tests/goldens/batch78/at-b78-03-palette-actions.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        expected = frozen if isinstance(frozen, list) else frozen.get("actions", frozen)
+    
+        async def _drive():
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                bar = app.query_one(CommandBar)
+                await pilot.press("ctrl+k")
+                await pilot.pause()
+                rows = list(bar.query_one("#palette_list").children)
+                return [item.data for item in rows]
+    
+        observed = asyncio.run(_drive())
+    
+        # Union of both lanes' amendments to the frozen artifact (RC-1 rebase #4):
+        # batch-95 change 4 (LLR-135.6, ruling Q6/7a) hand-appended ONE action —
+        # "open_split_join_export", the palette-first Split / Join / Export screen
+        # entry — so the freeze now carries the 37 Inc-0 rows plus that one
+        # reviewed amendment (a REGENERATION would restore the tautology this
+        # node exists to break). batch-94's two non-digit rail bindings are NOT
+        # in the freeze — each is pinned as a named live-only delta below
+        # (Inc-001's Check Editor `=`; Inc-003's Flow Execution `]`, US-007).
+        assert len(expected) == 38, (
+            f"the frozen artifact must still carry the 37 Inc-0 actions plus the "
+            f"one batch-95 amendment; it has {len(expected)} -- if this fails "
+            f"the artifact was REGENERATED, which restores the tautology"
+        )
+        live_deltas = ["show_screen('check_editor')", "show_screen('flow_execution')"]
+        for added in live_deltas:
+            assert added in observed, (
+                f"a non-digit rail binding must add exactly one palette action "
+                f"({added!r}); observed={observed!r}"
+            )
+        observed_pre_change = [
+            a for a in observed if a not in live_deltas
+        ]
+        assert len(observed_pre_change) == len(observed) - len(live_deltas), (
+            "each live-only delta must appear exactly once (no duplicates)"
+        )
+>       assert observed_pre_change == list(expected), (
+            f"the pre-change palette action set must equal the Inc-0 freeze.\n"
+            f"missing: {sorted(set(expected) - set(observed_pre_change))}\n"
+            f"unexpected: {sorted(set(observed_pre_change) - set(expected))}"
+        )
+E       AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+E         missing: []
+E         unexpected: ['a2l_describe_tag', 'confirm_attention']
+E       assert ['focus_palet...us_goto', ...] == ['focus_palet...us_goto', ...]
+E         
+E         At index 13 diff: 'a2l_describe_tag' != 'view_reports'
+E         Left contains 2 more items, first extra item: 'open_settings_menu'
+E         Use -v to get more diff
+
+tests/test_tui_commandbar.py:2704: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2943 App initialized. base_dir=<OUT>/bt-l1/popen-gw1/test_at_b78_03_the_palette_act0 workarea=<OUT>/bt-l1/popen-gw1/test_at_b78_03_the_palette_act0/.s19tool/workarea
+INFO     s19tui:app.py:7957 Workarea refreshed. files=0
+INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.007
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_b100_recents.py:477: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [50] tests/support/b100_links.py:30: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_recents.py:545: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:643: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:669: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:686: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_recents.py:706: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:733: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:755: case-insensitive file system arm; Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_recents.py:774: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:801: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:867: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:908: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:968: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_recents.py:1002: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [3] tests/test_b100_recents.py:1035: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [4] tests/test_b100_recents.py:1071: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1145: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [2] tests/test_b100_recents.py:1181: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1209: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1250: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1281: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1320: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1339: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1466: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_recents.py:1704: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1772: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1804: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [2] tests/test_b100_recents.py:1980: Win32 name rule arm (stream / 8.3 / trailing dot or space); Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_save_dialog.py:517: Windows-only test arm (junction / case-insensitive volume); not run here
+SKIPPED [1] tests/test_b100_recents.py:2093: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_recents.py:2134: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [2] tests/test_b100_recents.py:2186: case-insensitive file system arm; Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_recents.py:2224: case-insensitive file system arm; Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_recents.py:2300: case-insensitive file system arm; Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_load_dialog.py:774: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only
+SKIPPED [3] tests/test_b100_recents.py:2300: Win32 name rule arm (stream / 8.3 / trailing dot or space); Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_document.py:1027: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [3] tests/test_b100_recents.py:2379: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [2] tests/test_b100_save_dialog.py:805: Windows-only arm; not run here
+SKIPPED [1] tests/test_b100_recents.py:2409: Win32 name rule arm (stream / 8.3 / trailing dot or space); Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_recents.py:2456: case-insensitive file system arm; Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_document.py:1222: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [3] tests/test_b100_recents.py:2456: Win32 name rule arm (stream / 8.3 / trailing dot or space); Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_recents.py:2493: case-insensitive file system arm; Windows only (E3 R12)
+SKIPPED [2] tests/test_b100_recents.py:2511: Win32 name rule arm (stream / 8.3 / trailing dot or space); Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_recents.py:2608: case-insensitive file system arm; Windows only (E3 R12)
+SKIPPED [2] tests/test_b100_recents.py:2608: Win32 name rule arm (stream / 8.3 / trailing dot or space); Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_document.py:1401: a case-folding filesystem is the Windows arm of this case
+SKIPPED [1] tests/test_b100_recents.py:2719: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_recents.py:2719: Win32 root-relative path arm; Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_document.py:1651: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_document.py:1698: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/support/b100_links.py:40: case-sensitive folders are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_document.py:1836: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [2] tests/test_b100_recents.py:2872: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:2993: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_recents.py:3029: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:3060: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_save_dialog.py:1023: Windows-only test arm (junction / case-insensitive volume); not run here
+SKIPPED [2] tests/test_b100_project_homes.py:790: trailing-dot names are a Windows-only arm
+SKIPPED [1] tests/test_b100_save_dialog.py:1291: Windows-only test arm (junction / case-insensitive volume); not run here
+SKIPPED [1] tests/test_b100_project_check.py:466: NUL is a device only on Windows (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_project_homes.py:1266: not run: the upper-case spelling needs a case-insensitive file system (Windows)
+SKIPPED [1] tests/test_b100_load_dialog.py:1956: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [2] tests/test_b100_save_dialog.py:1423: Windows-only arm; not run here
+SKIPPED [1] tests/test_b100_load_dialog.py:2450: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only
+SKIPPED [1] tests/test_b100_load_dialog.py:2576: Windows strips a trailing dot from a file name, so fw.s19. opens fw.s19; on posix fw.s19. is a distinct, missing name (fix round 1, CI9b-4)
+SKIPPED [1] tests/test_b100_load_dialog.py:2599: case-insensitive file system arm; Windows only
+SKIPPED [2] tests/test_b100_load_dialog.py:2642: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_save_image.py:960: msvcrt byte-range lock
+SKIPPED [3] tests/test_b100_project_homes.py:2167: reserved device names are a Windows-only arm
+SKIPPED [1] tests/test_b100_project_homes.py:2197: trailing-dot names are a Windows-only arm
+SKIPPED [1] tests/test_b100_project_homes.py:2343: not run: a con.json file needs the Windows extended spelling
+SKIPPED [1] tests/test_b100_load_dialog.py:2766: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_save_guards.py:1080: icacls deny-read is a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_save_guards.py:1226: icacls deny-read is a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_save_guards.py:1451: case-insensitive names are a Windows-only arm (PDR C-QA-6)
+SKIPPED [2] tests/test_b100_save_guards.py:1505: case-insensitive names are a Windows-only arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_save_guards.py:1709: an open handle blocks a replace only on Windows (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_save_guards.py:1732: an open handle blocks a replace only on Windows (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_save_guards.py:1791: an open handle blocks a replace only on Windows (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_save_guards.py:1991: an open handle blocks a replace only on Windows (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_load_dialog.py:3658: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only
+SKIPPED [1] tests/test_b100_load_dialog.py:3803: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only
+SKIPPED [1] tests/test_b100_save_guards.py:2539: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_active_variant.py:757: a read-only file blocks a replace only on Windows (PDR C-QA-6)
+SKIPPED [2] tests/test_b100_save_dialog.py:2992: Windows-only test arm (junction / case-insensitive volume); not run here
+SKIPPED [1] tests/test_b100_load_question.py:2017: an exclusively held file is a Windows-only arm (reported not run elsewhere)
+SKIPPED [1] tests/test_flow_persistence.py:213: NTFS junction is Windows-only
+SKIPPED [1] tests/test_b100_reuse.py:259: case-folding of candidate names is a Windows arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_reuse.py:1125: WinError 123 invalid-spelling arm is Windows-only (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_reuse.py:1145: case-insensitive anchor names are a Windows arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_reuse.py:1166: 8.3 short-name anchors are a Windows arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_reuse.py:1194: case-folded group word is a Windows arm (PDR C-QA-6)
+SKIPPED [1] tests/test_tui_workspace.py:143: NTFS junction is Windows-only
+SKIPPED [29] tests/test_tui_snapshot.py:1184: pytest-textual-snapshot not installed (dev-only optional extra)
+SKIPPED [1] tests/test_examples_smoke.py:120: case_08_release_demo: no S19/HEX image present
+SKIPPED [1] tests/test_a2l_enriched.py:123: examples/check_test.a2l not present
+SKIPPED [1] tests/test_a2l_enriched.py:135: examples/software_a.a2l not present
+SKIPPED [1] tests/test_examples_pilot_gifs.py:197: case_08_release_demo: no S19/HEX image present
+SKIPPED [1] tests/test_report_document_bytes.py:363: AT-175 can only fail where os.linesep != LF
+SKIPPED [1] tests/test_a2l_f841_cleanup.py:53: ruff is not installed in this environment (runtime-only)
+===== 8 failed, 5053 passed, 205 skipped, 4 xfailed in 3857.84s (1:04:17) ======
+EXIT=1
+Mon Nov  2 10:41:46 AM UTC 2026

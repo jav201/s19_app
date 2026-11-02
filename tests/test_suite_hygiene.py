@@ -1120,14 +1120,13 @@ def test_r_tst_031_032_post_press_and_dwell_arms_keep_their_forms() -> None:
         workers_text,
         "test_at_b100_18_quit_confirm_half_slow_save_as_leaves_no_partial_folder",
     )
-    assert "held_save_scene" in quit_body
-    assert 'Hold(monkeypatch, app_module, "place_into_workarea"' in workers_text, (
+    assert 'Hold(monkeypatch, app_module, "place_into_workarea"' in quit_body, (
         "the quit-confirm arm must hold the save worker at a forced slow step"
     )
     parse_body = _function_source(
         workers_text, "test_at_b100_17_parse_half_case06_a2l_by_keys"
     )
-    assert 'Spy(monkeypatch, S19TuiApp, "step_busy")' in parse_body, (
+    assert "= app.step_busy" in parse_body and "app.step_busy = " in parse_body, (
         "the parse arm must record states at the progress hook (step_busy)"
     )
     flow_text = (TESTS_ROOT / "test_b97_flow_execution.py").read_text(encoding="utf-8")

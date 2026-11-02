@@ -1,0 +1,875 @@
+# batch-101 Inc 2 E4 integration — Windows (the first 7 of the 12 touched arm files, unfiltered (-v))
+# env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<temp>/la, --basetemp <temp>/bt, NO_COLOR unset; s19env Python 3.11.15, pytest 8.4.2
+# tree: branch b101-inc2 working tree (rebased on main e266395 + the E4 integration fixes)
+
+<HOME>\Github\s19_app-b101-inc2\s19_app\__init__.py
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- <HOME>\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: <HOME>\Github\s19_app-b101-inc2
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 512 items
+
+tests/test_a2l_alignment_sizing.py::test_at113_multi_class_alignment_curve_length_16 PASSED [  0%]
+tests/test_a2l_alignment_sizing.py::test_at114_demo_packed_oracles_unchanged PASSED [  0%]
+tests/test_a2l_alignment_sizing.py::test_at115_alignment_is_the_sole_cause_of_the_delta PASSED [  0%]
+tests/test_a2l_alignment_sizing.py::test_at116_unmodeled_directive_still_forces_none PASSED [  0%]
+tests/test_a2l_alignment_sizing.py::test_at117_already_aligned_pad_zero_length_10 PASSED [  0%]
+tests/test_a2l_alignment_sizing.py::test_at118_over_align_uses_declared_value_length_16 PASSED [  1%]
+tests/test_a2l_alignment_sizing.py::test_at119_no_trailing_pad_length_17 PASSED [  1%]
+tests/test_a2l_alignment_sizing.py::test_at120_oversized_alignment_layout_clamps_to_none PASSED [  1%]
+tests/test_a2l_alignment_sizing.py::test_at122_hostile_alignment_value_forces_none PASSED [  1%]
+tests/test_a2l_alignment_sizing.py::test_tc143_alignment_directive_census_derived PASSED [  1%]
+tests/test_a2l_alignment_sizing.py::test_tc144_cumulative_offset_walk PASSED [  2%]
+tests/test_a2l_alignment_sizing.py::test_tc145_collect_declared_alignments PASSED [  2%]
+tests/test_a2l_alignment_sizing.py::test_tc146_align_up_primitive PASSED [  2%]
+tests/test_a2l_alignment_sizing.py::test_tc147_packed_no_regression_byte_identical PASSED [  2%]
+tests/test_a2l_alignment_sizing.py::test_tc148_mod_common_excluded_and_unmodeled_forces_none PASSED [  2%]
+tests/test_a2l_alignment_sizing.py::test_tc149_dos_clamp_includes_padding PASSED [  3%]
+tests/test_a2l_alignment_sizing.py::test_tc150_no_trailing_pad_r_c PASSED [  3%]
+tests/test_a2l_inline_axis_length.py::test_tc133_record_layout_full_span_datatype_and_axis_order PASSED [  3%]
+tests/test_a2l_inline_axis_length.py::test_tc133_full_span_or_none_on_unclassifiable PASSED [  3%]
+tests/test_a2l_inline_axis_length.py::test_tc133b_alignment_directive_forces_none PASSED [  3%]
+tests/test_a2l_inline_axis_length.py::test_tc134_inline_axis_counts_base10_and_external_gate PASSED [  4%]
+tests/test_a2l_inline_axis_length.py::test_tc135_axis_kind_census_completeness PASSED [  4%]
+tests/test_a2l_inline_axis_length.py::test_tc136_post_axis_pass_ordering_and_precedence PASSED [  4%]
+tests/test_a2l_inline_axis_length.py::test_tc137_scalar_value_unchanged PASSED [  4%]
+tests/test_a2l_inline_axis_length.py::test_tc138_dos_clamp_pure_arithmetic PASSED [  4%]
+tests/test_a2l_inline_axis_length.py::test_tc139_fail_closed_no_raises PASSED [  5%]
+tests/test_a2l_inline_axis_length.py::test_at104_demo_curve_std_axis_length_25 PASSED [  5%]
+tests/test_a2l_inline_axis_length.py::test_at105_demo_map_std_axis_length_51 PASSED [  5%]
+tests/test_a2l_inline_axis_length.py::test_at106_demo_curve_com_axis_stays_none PASSED [  5%]
+tests/test_a2l_inline_axis_length.py::test_at107_demo_curve_fix_axis_length_12 PASSED [  5%]
+tests/test_a2l_inline_axis_length.py::test_at107b_synthetic_single_line_curve_length_13 PASSED [  6%]
+tests/test_a2l_inline_axis_length.py::test_at108_derived_length_makes_row_memory_checkable PASSED [  6%]
+tests/test_a2l_inline_axis_length.py::test_at109_no_regression_non_curve_map_untouched PASSED [  6%]
+tests/test_a2l_inline_axis_length.py::test_at110_malformed_curve_fail_closed PASSED [  6%]
+tests/test_a2l_inline_axis_length.py::test_at111_oversized_axis_clamps_to_none PASSED [  6%]
+tests/test_a2l_multiline_headers.py::test_at096_std_com_golden_header_values PASSED [  7%]
+tests/test_a2l_multiline_headers.py::test_at097_all_fifty_characteristics_have_type_and_address PASSED [  7%]
+tests/test_a2l_multiline_headers.py::test_at098_single_line_characteristics_unchanged PASSED [  7%]
+tests/test_a2l_multiline_headers.py::test_at099_measurement_and_synthetic_no_kind_preserved PASSED [  7%]
+tests/test_a2l_multiline_headers.py::test_at100_axis_descr_max_points_and_external_flag PASSED [  7%]
+tests/test_a2l_multiline_headers.py::test_at100_axis_descr_short_body_no_crash PASSED [  8%]
+tests/test_a2l_multiline_headers.py::test_at101_hostile_comment_corpus[unterminated_block_eats_mandatory] PASSED [  8%]
+tests/test_a2l_multiline_headers.py::test_at101_hostile_comment_corpus[multiline_block_removed] PASSED [  8%]
+tests/test_a2l_multiline_headers.py::test_at101_hostile_comment_corpus[quoted_metachars_preserved] PASSED [  8%]
+tests/test_a2l_multiline_headers.py::test_at101_hostile_comment_corpus[unterminated_quote] PASSED [  8%]
+tests/test_a2l_multiline_headers.py::test_at101_hostile_comment_corpus[line_comment_truncates_to_newline] PASSED [  8%]
+tests/test_a2l_multiline_headers.py::test_at101_hostile_comment_corpus[block_comment_between_params] PASSED [  9%]
+tests/test_a2l_multiline_headers.py::test_at101_hostile_comment_corpus[stray_close_no_open] PASSED [  9%]
+tests/test_a2l_multiline_headers.py::test_at101_hostile_comment_corpus[comment_only_body] PASSED [  9%]
+tests/test_a2l_multiline_headers.py::test_at101_positive_control_clean_multiline_parses PASSED [  9%]
+tests/test_a2l_multiline_headers.py::test_at101_quoted_metachar_bytes_preserved PASSED [  9%]
+tests/test_a2l_multiline_headers.py::test_at101_megabyte_unterminated_block_is_linear PASSED [ 10%]
+tests/test_a2l_multiline_headers.py::test_at102_curve_map_length_stays_none PASSED [ 10%]
+tests/test_a2l_multiline_headers.py::test_at103_deposit_with_markup_metachars_renders_verbatim PASSED [ 10%]
+tests/test_a2l_multiline_headers.py::test_tc097_strip_removes_block_and_line_comments PASSED [ 10%]
+tests/test_a2l_multiline_headers.py::test_tc097_line_comment_truncates_to_next_newline_only PASSED [ 10%]
+tests/test_a2l_multiline_headers.py::test_tc097_unterminated_constructs_never_raise PASSED [ 11%]
+tests/test_a2l_multiline_headers.py::test_tc098_flatten_respects_quotes_across_lines PASSED [ 11%]
+tests/test_a2l_multiline_headers.py::test_tc098_flatten_escaped_quote_parity_with_splitter PASSED [ 11%]
+tests/test_a2l_multiline_headers.py::test_tc099_kind_anchor_index_0_1_2 PASSED [ 11%]
+tests/test_a2l_multiline_headers.py::test_tc099_bad_address_and_no_kind_and_short PASSED [ 11%]
+tests/test_a2l_multiline_headers.py::test_tc099_bare_kind_word_before_type_degrades_to_none_address PASSED [ 12%]
+tests/test_a2l_multiline_headers.py::test_tc100_axis_tokenise_full_body PASSED [ 12%]
+tests/test_a2l_multiline_headers.py::test_backcompat_parse_characteristic_header_delegates PASSED [ 12%]
+tests/test_a2l_multiline_headers.py::test_assemble_characteristic_header_public_and_facade PASSED [ 12%]
+tests/test_b100_active_variant.py::test_tc_b100_18_valid_gathered_is_an_equal_dict PASSED [ 12%]
+tests/test_b100_active_variant.py::test_tc_b100_18_list_instead_of_object_is_one_issue PASSED [ 13%]
+tests/test_b100_active_variant.py::test_tc_b100_18_home_value_not_a_list_is_one_issue PASSED [ 13%]
+tests/test_b100_active_variant.py::test_tc_b100_18_escaping_entry_is_one_issue_and_no_entry PASSED [ 13%]
+tests/test_b100_active_variant.py::test_tc_b100_18_absent_key_is_empty_with_no_issue PASSED [ 13%]
+tests/test_b100_active_variant.py::test_tc_b100_19_save_back_becomes_the_active_variant[A] PASSED [ 13%]
+tests/test_b100_active_variant.py::test_tc_b100_19_save_back_becomes_the_active_variant[B] PASSED [ 14%]
+tests/test_b100_active_variant.py::test_tc_b100_19_save_back_with_no_project_writes_no_manifest PASSED [ 14%]
+tests/test_b100_active_variant.py::test_tc_b100_20_save_back_carries_every_key PASSED [ 14%]
+tests/test_b100_active_variant.py::test_tc_b100_20_variant_append_carries_every_key_and_activates PASSED [ 14%]
+tests/test_b100_active_variant.py::test_tc_b100_20_mac_sync_carries_every_key PASSED [ 14%]
+tests/test_b100_active_variant.py::test_tc_b100_20_a2l_sync_carries_every_key PASSED [ 15%]
+tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[save-back-not-json] PASSED [ 15%]
+tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[save-back-not-an-object] PASSED [ 15%]
+tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[save-back-over-cap] PASSED [ 15%]
+tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[save-back-int-over-digit-limit] PASSED [ 15%]
+tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-not-json] PASSED [ 16%]
+tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-not-an-object] PASSED [ 16%]
+tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-over-cap] PASSED [ 16%]
+tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-int-over-digit-limit] PASSED [ 16%]
+tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[mac-sync-not-json] PASSED [ 16%]
+tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[mac-sync-not-an-object] PASSED [ 16%]
+tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[mac-sync-over-cap] PASSED [ 17%]
+tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[mac-sync-int-over-digit-limit] PASSED [ 17%]
+tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[a2l-sync-not-json] PASSED [ 17%]
+tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[a2l-sync-not-an-object] PASSED [ 17%]
+tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[a2l-sync-over-cap] PASSED [ 17%]
+tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[a2l-sync-int-over-digit-limit] PASSED [ 18%]
+tests/test_b100_active_variant.py::test_tc_b100_20_a2l_sync_with_an_overlong_entry_does_not_crash PASSED [ 18%]
+tests/test_b100_active_variant.py::test_tc_b100_20_variant_append_with_a_junction_loop_entry_does_not_crash PASSED [ 18%]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[variant-append] PASSED [ 18%]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync] PASSED [ 18%]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[a2l-sync] PASSED [ 19%]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-back] PASSED [ 19%]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project] FAILED [ 19%]
+tests/test_b100_active_variant.py::test_tc_b100_20_append_says_now_opens_only_after_the_write PASSED [ 19%]
+tests/test_b100_active_variant.py::test_tc_b100_20_append_says_now_opens_only_after_the_write_on_any_platform PASSED [ 19%]
+tests/test_b100_active_variant.py::test_tc_b100_20_schema_version_is_the_integer_one[1-None] PASSED [ 20%]
+tests/test_b100_active_variant.py::test_tc_b100_20_schema_version_is_the_integer_one[None-None] PASSED [ 20%]
+tests/test_b100_active_variant.py::test_tc_b100_20_schema_version_is_the_integer_one[2-was written by a newer version] PASSED [ 20%]
+tests/test_b100_active_variant.py::test_tc_b100_20_schema_version_is_the_integer_one[7-was written by a newer version] PASSED [ 20%]
+tests/test_b100_active_variant.py::test_tc_b100_20_schema_version_is_the_integer_one[True-was written by an unknown version] PASSED [ 20%]
+tests/test_b100_active_variant.py::test_tc_b100_20_schema_version_is_the_integer_one[1-was written by an unknown version] PASSED [ 21%]
+tests/test_b100_active_variant.py::test_tc_b100_20_schema_version_is_the_integer_one[1.0-was written by an unknown version] PASSED [ 21%]
+tests/test_b100_active_variant.py::test_tc_b100_20_schema_version_is_the_integer_one[0-was written by an unknown version] PASSED [ 21%]
+tests/test_b100_active_variant.py::test_tc_b100_20_schema_version_is_the_integer_one[-1-was written by an unknown version] PASSED [ 21%]
+tests/test_b100_active_variant.py::test_tc_b100_20_reader_keeps_a_float_schema_version PASSED [ 21%]
+tests/test_b100_active_variant.py::test_tc_b100_20_rewrite_never_drops_what_it_cannot_carry[bool-schema] PASSED [ 22%]
+tests/test_b100_active_variant.py::test_tc_b100_20_rewrite_never_drops_what_it_cannot_carry[float-schema] PASSED [ 22%]
+tests/test_b100_active_variant.py::test_tc_b100_20_rewrite_never_drops_what_it_cannot_carry[newer-schema] PASSED [ 22%]
+tests/test_b100_active_variant.py::test_tc_b100_20_rewrite_never_drops_what_it_cannot_carry[skipped-entry] PASSED [ 22%]
+tests/test_b100_active_variant.py::test_tc_b100_20_rewrite_never_drops_what_it_cannot_carry[string-schema] PASSED [ 22%]
+tests/test_b100_active_variant.py::test_tc_b100_20_rewrite_never_drops_what_it_cannot_carry[unknown-key] PASSED [ 23%]
+tests/test_b100_active_variant.py::test_tc_b100_71_save_back_records_derived_from[A] PASSED [ 23%]
+tests/test_b100_active_variant.py::test_tc_b100_71_save_back_records_derived_from[B] PASSED [ 23%]
+tests/test_b100_active_variant.py::test_tc_b100_71_emit_records_a_base_outside_the_project PASSED [ 23%]
+tests/test_b100_active_variant.py::test_tc_b100_71_byte_copy_records_nothing PASSED [ 23%]
+tests/test_b100_active_variant.py::test_tc_b100_71_unsafe_base_is_one_issue_and_no_entry PASSED [ 24%]
+tests/test_b100_active_variant.py::test_tc_b100_71_variant_append_carries_derived_from PASSED [ 24%]
+tests/test_b100_active_variant.py::test_at_b100_06_reopen_opens_the_saved_back_variant[size0-A] PASSED [ 24%]
+tests/test_b100_active_variant.py::test_at_b100_06_reopen_opens_the_saved_back_variant[size0-B] PASSED [ 24%]
+tests/test_b100_active_variant.py::test_at_b100_06_reopen_opens_the_saved_back_variant[size1-A] PASSED [ 24%]
+tests/test_b100_active_variant.py::test_at_b100_06_reopen_opens_the_saved_back_variant[size1-B] PASSED [ 25%]
+tests/test_b100_active_variant.py::test_at_b100_20_every_writer_carries_the_keys_it_does_not_own[size0] PASSED [ 25%]
+tests/test_b100_active_variant.py::test_at_b100_20_every_writer_carries_the_keys_it_does_not_own[size1] PASSED [ 25%]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_carry_the_active_document[save-back] PASSED [ 25%]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_carry_the_active_document[variant-append] PASSED [ 25%]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_carry_the_active_document[mac-sync] PASSED [ 25%]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_carry_the_active_document[a2l-sync] PASSED [ 26%]
+tests/test_b100_active_variant.py::test_at_b100_20_inc8a_every_writer_carries_the_active_document[size0] PASSED [ 26%]
+tests/test_b100_active_variant.py::test_at_b100_20_inc8a_every_writer_carries_the_active_document[size1] PASSED [ 26%]
+tests/test_b100_busy.py::test_tc_b100_50_begin_paints_the_first_progress_line PASSED [ 26%]
+tests/test_b100_busy.py::test_tc_b100_50_long_label_stays_on_one_row PASSED [ 26%]
+tests/test_b100_busy.py::test_tc_b100_50_begin_sets_the_bar_to_zero PASSED [ 27%]
+tests/test_b100_busy.py::test_tc_b100_50_steps_by_index_set_the_bar PASSED [ 27%]
+tests/test_b100_busy.py::test_tc_b100_50_step_amount_moves_the_bar_within_the_step PASSED [ 27%]
+tests/test_b100_busy.py::test_tc_b100_50_out_of_range_step_data_is_clamped[step 0-call0-step 1/3 a-0] PASSED [ 27%]
+tests/test_b100_busy.py::test_tc_b100_50_out_of_range_step_data_is_clamped[step m + 1-call1-step 3/3 c-66] PASSED [ 27%]
+tests/test_b100_busy.py::test_tc_b100_50_out_of_range_step_data_is_clamped[total 0-call2-step 2/3 b-50] PASSED [ 28%]
+tests/test_b100_busy.py::test_tc_b100_50_out_of_range_step_data_is_clamped[total -1-call3-step 2/3 b-50] PASSED [ 28%]
+tests/test_b100_busy.py::test_tc_b100_50_out_of_range_step_data_is_clamped[done -5-call4-step 2/3 b-50] PASSED [ 28%]
+tests/test_b100_busy.py::test_tc_b100_50_out_of_range_step_data_is_clamped[done total + 1-call5-step 2/3 b-66] PASSED [ 28%]
+tests/test_b100_busy.py::test_tc_b100_50_spinner_and_elapsed_advance_while_a_worker_runs PASSED [ 28%]
+tests/test_b100_busy.py::test_tc_b100_50_overlapping_runs_share_one_timer PASSED [ 29%]
+tests/test_b100_busy.py::test_tc_b100_50_action_shorter_than_a_tick PASSED [ 29%]
+tests/test_b100_busy.py::test_tc_b100_50_last_end_stops_the_timer PASSED [ 29%]
+tests/test_b100_busy.py::test_tc_b100_50_elapsed_is_minutes_and_seconds[0-00:00] PASSED [ 29%]
+tests/test_b100_busy.py::test_tc_b100_50_elapsed_is_minutes_and_seconds[59.9-00:59] PASSED [ 29%]
+tests/test_b100_busy.py::test_tc_b100_50_elapsed_is_minutes_and_seconds[60-01:00] PASSED [ 30%]
+tests/test_b100_busy.py::test_tc_b100_50_elapsed_is_minutes_and_seconds[3599-59:59] PASSED [ 30%]
+tests/test_b100_busy.py::test_tc_b100_50_elapsed_is_minutes_and_seconds[4503-75:03] PASSED [ 30%]
+tests/test_b100_busy.py::test_tc_b100_50_file_state_waits_while_a_run_is_shown PASSED [ 30%]
+tests/test_b100_busy.py::test_tc_b100_50_end_writes_the_outcome_to_the_status_log PASSED [ 30%]
+tests/test_b100_busy.py::test_tc_b100_50_last_end_paints_the_stored_file_state PASSED [ 31%]
+tests/test_b100_busy.py::test_tc_b100_50_last_end_clears_the_bar PASSED  [ 31%]
+tests/test_b100_busy.py::test_tc_b100_50_unknown_or_replaced_run_leaves_the_indicator[end of an unknown key] PASSED [ 31%]
+tests/test_b100_busy.py::test_tc_b100_50_unknown_or_replaced_run_leaves_the_indicator[step of an unknown key] PASSED [ 31%]
+tests/test_b100_busy.py::test_tc_b100_50_unknown_or_replaced_run_leaves_the_indicator[end of a replaced run] PASSED [ 31%]
+tests/test_b100_busy.py::test_tc_b100_50_a_newer_action_is_the_one_shown PASSED [ 32%]
+tests/test_b100_busy.py::test_tc_b100_50_the_newest_running_action_is_shown_after_an_end PASSED [ 32%]
+tests/test_b100_busy.py::test_tc_b100_50_a_begin_under_a_running_key_restarts_it PASSED [ 32%]
+tests/test_b100_busy.py::test_tc_b100_50_each_worker_action_begins_with_a_progress_line[file_load] PASSED [ 32%]
+tests/test_b100_busy.py::test_tc_b100_50_each_worker_action_begins_with_a_progress_line[report] PASSED [ 32%]
+tests/test_b100_busy.py::test_tc_b100_50_each_worker_action_begins_with_a_progress_line[diff_report] PASSED [ 33%]
+tests/test_b100_busy.py::test_tc_b100_50_each_worker_action_begins_with_a_progress_line[before_after] PASSED [ 33%]
+tests/test_b100_busy.py::test_tc_b100_50_progress_widgets_are_written_on_the_main_thread[file_load] PASSED [ 33%]
+tests/test_b100_busy.py::test_tc_b100_50_progress_widgets_are_written_on_the_main_thread[report] PASSED [ 33%]
+tests/test_b100_busy.py::test_tc_b100_50_progress_widgets_are_written_on_the_main_thread[diff_report] PASSED [ 33%]
+tests/test_b100_busy.py::test_tc_b100_50_progress_widgets_are_written_on_the_main_thread[before_after] PASSED [ 33%]
+tests/test_b100_busy.py::test_tc_b100_50_names_paint_literally_through_load_from_path[markup] PASSED [ 34%]
+tests/test_b100_busy.py::test_tc_b100_50_names_paint_literally_through_load_from_path[bidi override] PASSED [ 34%]
+tests/test_b100_busy.py::test_tc_b100_50_names_paint_literally_through_load_from_path[130 characters] PASSED [ 34%]
+tests/test_b100_busy.py::test_tc_b100_50_names_paint_literally_through_load_from_path[ESC and BEL] SKIPPED [ 34%]
+tests/test_b100_busy.py::test_tc_b100_50_control_bytes_never_reach_the_status_log PASSED [ 34%]
+tests/test_b100_busy.py::test_tc_b100_50_begin_busy_is_called_only_from_the_one_label_helper PASSED [ 35%]
+tests/test_b100_busy.py::test_tc_b100_50_the_bar_keeps_its_row_when_idle[size0-47] PASSED [ 35%]
+tests/test_b100_busy.py::test_tc_b100_50_the_bar_keeps_its_row_when_idle[size1-17] PASSED [ 35%]
+tests/test_b100_busy.py::test_tc_b100_50_running_line_paints_in_the_accent PASSED [ 35%]
+tests/test_b100_busy.py::test_tc_b100_50_status_line_has_one_owner_during_a_worker_load PASSED [ 35%]
+tests/test_b100_busy.py::test_tc_b100_50_image_pick_file_state_waits_for_a_running_report PASSED [ 36%]
+tests/test_b100_busy.py::test_tc_b100_50_kickoff_raise_ends_the_file_load_first PASSED [ 36%]
+tests/test_b100_busy.py::test_tc_b100_50_worker_raise_ends_the_action_first[file_load] PASSED [ 36%]
+tests/test_b100_busy.py::test_tc_b100_50_worker_raise_ends_the_action_first[report] PASSED [ 36%]
+tests/test_b100_busy.py::test_tc_b100_50_worker_raise_ends_the_action_first[diff_report] PASSED [ 36%]
+tests/test_b100_busy.py::test_tc_b100_50_worker_raise_ends_the_action_first[before_after] PASSED [ 37%]
+tests/test_b100_busy.py::test_tc_b100_50_a2l_raise_ends_the_action_first PASSED [ 37%]
+tests/test_b100_busy.py::test_tc_b100_50_project_raise_ends_the_action_first PASSED [ 37%]
+tests/test_b100_busy.py::test_tc_b100_50_save_raise_ends_the_action_first PASSED [ 37%]
+tests/test_b100_busy.py::test_tc_b100_51_action_table_names_the_seven_long_actions PASSED [ 37%]
+tests/test_b100_busy.py::test_tc_b100_51_every_baseline_bar_site_maps_to_a_seam_event PASSED [ 38%]
+tests/test_b100_busy.py::test_tc_b100_51_only_the_seam_sets_the_bar PASSED [ 38%]
+tests/test_b100_busy.py::test_tc_b100_51_workers_take_the_run_generation PASSED [ 38%]
+tests/test_b100_busy.py::test_tc_b100_51_file_load_ends_once_on_success PASSED [ 38%]
+tests/test_b100_busy.py::test_tc_b100_51_file_load_ends_once_on_a_parse_failure PASSED [ 38%]
+tests/test_b100_busy.py::test_tc_b100_51_file_load_ends_once_on_a_containment_refusal PASSED [ 39%]
+tests/test_b100_busy.py::test_tc_b100_51_a2l_load_ends_once_on_success PASSED [ 39%]
+tests/test_b100_busy.py::test_tc_b100_51_a2l_load_ends_once_on_a_containment_refusal PASSED [ 39%]
+tests/test_b100_busy.py::test_tc_b100_51_project_load_ends_once_on_success PASSED [ 39%]
+tests/test_b100_busy.py::test_tc_b100_51_project_load_without_an_a2l_skips_its_step PASSED [ 39%]
+tests/test_b100_busy.py::test_tc_b100_51_project_load_ends_once_on_a_failure_after_the_begin PASSED [ 40%]
+tests/test_b100_busy.py::test_tc_b100_51_save_project_reports_its_phases_as_steps PASSED [ 40%]
+tests/test_b100_busy.py::test_tc_b100_51_save_project_mismatch_tail_ends_with_the_mismatch PASSED [ 40%]
+tests/test_b100_busy.py::test_tc_b100_51_save_project_ends_once_on_a_placement_failure PASSED [ 40%]
+tests/test_b100_busy.py::test_tc_b100_51_report_ends_once_on_success PASSED [ 40%]
+tests/test_b100_busy.py::test_tc_b100_51_report_ends_once_on_a_failure[generator raises] PASSED [ 41%]
+tests/test_b100_busy.py::test_tc_b100_51_report_ends_once_on_a_failure[rejected input] PASSED [ 41%]
+tests/test_b100_busy.py::test_tc_b100_51_diff_report_ends_once_and_logs_its_outcome[written-written-written-bar0-Diff report written: {md}  |  {html}] PASSED [ 41%]
+tests/test_b100_busy.py::test_tc_b100_51_diff_report_ends_once_and_logs_its_outcome[markdown refused-refused-written-bar1-Report refused: synthetic] PASSED [ 41%]
+tests/test_b100_busy.py::test_tc_b100_51_diff_report_ends_once_and_logs_its_outcome[html raises-written-raise-bar2-Diff report failed: RuntimeError: x] PASSED [ 41%]
+tests/test_b100_busy.py::test_tc_b100_51_diff_report_ends_once_and_logs_its_outcome[html refused-written-refused-bar3-HTML report refused: y] PASSED [ 41%]
+tests/test_b100_busy.py::test_tc_b100_51_diff_report_without_a_comparison_begins_nothing PASSED [ 42%]
+tests/test_b100_busy.py::test_tc_b100_51_before_after_ends_once_and_logs_its_outcome[written] PASSED [ 42%]
+tests/test_b100_busy.py::test_tc_b100_51_before_after_ends_once_and_logs_its_outcome[refused] PASSED [ 42%]
+tests/test_b100_busy.py::test_at_b100_17_worker_load_of_an_8_mib_s19_by_keys PASSED [ 42%]
+tests/test_b100_busy.py::test_tc_b100_50_twelve_b_kickoff_raise_ends_the_run_first[project_load] PASSED [ 42%]
+tests/test_b100_busy.py::test_tc_b100_50_twelve_b_kickoff_raise_ends_the_run_first[save_project] PASSED [ 43%]
+tests/test_b100_busy.py::test_tc_b100_50_twelve_b_kickoff_raise_ends_the_run_first[a2l_load] PASSED [ 43%]
+tests/test_b100_busy.py::test_tc_b100_50_twelve_b_handler_raise_ends_the_run_first[project_load] PASSED [ 43%]
+tests/test_b100_busy.py::test_tc_b100_50_twelve_b_handler_raise_ends_the_run_first[save_project] PASSED [ 43%]
+tests/test_b100_busy.py::test_tc_b100_50_twelve_b_handler_raise_ends_the_run_first[a2l_load] PASSED [ 43%]
+tests/test_b100_busy.py::test_tc_b100_50_a2l_success_posts_no_failure_end PASSED [ 44%]
+tests/test_b100_busy.py::test_tc_b100_50_a2l_deferred_install_raise_ends_the_run PASSED [ 44%]
+tests/test_b100_busy.py::test_tc_b100_50_twelve_b_progress_reaches_the_widgets_from_workers_on_main[project_load] PASSED [ 44%]
+tests/test_b100_busy.py::test_tc_b100_50_twelve_b_progress_reaches_the_widgets_from_workers_on_main[save_project] PASSED [ 44%]
+tests/test_b100_busy.py::test_tc_b100_50_twelve_b_progress_reaches_the_widgets_from_workers_on_main[a2l_load] PASSED [ 44%]
+tests/test_b100_busy.py::test_tc_b100_51_twelve_b_seam_sites_sit_in_the_workers_and_handlers PASSED [ 45%]
+tests/test_b100_busy.py::test_tc_b100_50_a_restarted_key_becomes_the_newest_run PASSED [ 45%]
+tests/test_b100_busy.py::test_tc_b100_50_a_falling_amount_never_lowers_the_bar PASSED [ 45%]
+tests/test_b100_busy.py::test_tc_b100_50_ending_a_middle_run_shows_the_newest_remaining PASSED [ 45%]
+tests/test_b100_busy.py::test_tc_b100_50_a_begin_after_the_last_end_starts_one_timer PASSED [ 45%]
+tests/test_b100_busy.py::test_tc_b100_50_a_stale_failure_logs_nothing PASSED [ 46%]
+tests/test_b100_busy.py::test_tc_b100_51_every_save_abort_return_ends_its_run_first PASSED [ 46%]
+tests/test_b100_busy.py::test_tc_b100_51_save_validation_abort_ends_with_its_own_line PASSED [ 46%]
+tests/test_b100_busy.py::test_tc_b100_51_file_load_reads_the_copy_size_before_the_worker PASSED [ 46%]
+tests/test_b100_busy.py::test_tc_b100_51_file_load_into_an_open_project_ends_after_the_sync PASSED [ 46%]
+tests/test_b100_busy.py::test_tc_b100_53_use_time_resolve_error_refuses_and_keeps_the_app[load_from_path-OSError] PASSED [ 47%]
+tests/test_b100_busy.py::test_tc_b100_53_use_time_resolve_error_refuses_and_keeps_the_app[load_from_path-ValueError] PASSED [ 47%]
+tests/test_b100_busy.py::test_tc_b100_53_use_time_resolve_error_refuses_and_keeps_the_app[load_from_path-RuntimeError] PASSED [ 47%]
+tests/test_b100_busy.py::test_tc_b100_53_use_time_resolve_error_refuses_and_keeps_the_app[load_a2l_from_path-OSError] PASSED [ 47%]
+tests/test_b100_busy.py::test_tc_b100_53_use_time_resolve_error_refuses_and_keeps_the_app[load_a2l_from_path-ValueError] PASSED [ 47%]
+tests/test_b100_busy.py::test_tc_b100_53_use_time_resolve_error_refuses_and_keeps_the_app[load_a2l_from_path-RuntimeError] PASSED [ 48%]
+tests/test_b100_busy.py::test_tc_b100_53_path_gone_under_the_load_question_keeps_the_app PASSED [ 48%]
+tests/test_b100_busy.py::test_tc_b100_51_raise_after_the_commit_keeps_the_saved_line PASSED [ 48%]
+tests/test_b100_busy.py::test_tc_b100_50_progress_bar_paints_no_eta PASSED [ 48%]
+tests/test_b100_busy.py::test_tc_b100_50_project_deferred_install_raise_ends_the_run PASSED [ 48%]
+tests/test_b100_busy.py::test_tc_b100_51_save_failure_paints_its_lines_then_its_outcome PASSED [ 49%]
+tests/test_b100_busy.py::test_tc_b100_51_raise_after_a_multi_line_tail_paints_the_saved_line_once PASSED [ 49%]
+tests/test_b100_busy.py::test_tc_b100_53_path_refused_between_the_two_looks_keeps_the_app PASSED [ 49%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_accepts['patches/boost.json'] PASSED [ 49%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_accepts['checks/c.json'] PASSED [ 49%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_accepts['patches/changes.json'] PASSED [ 50%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_accepts['patches/changes_1.json'] PASSED [ 50%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_accepts['patches/boost.JSON'] PASSED [ 50%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_accepts['patches/boost.Json'] PASSED [ 50%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_accepts['patches/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa] PASSED [ 50%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses['firmware.s19'] PASSED [ 50%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses['../x.json'] PASSED [ 51%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses['project.json'] PASSED [ 51%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses['patches/x.txt'] PASSED [ 51%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses['/abs/x.json'] PASSED [ 51%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses['patches\\\\boost.json'] PASSED [ 51%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses['boost.json'] PASSED [ 52%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses['patches/sub/x.json'] PASSED [ 52%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses['patches/../x.json'] PASSED [ 52%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses['./patches/x.json'] PASSED [ 52%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses['templates/t.json'] PASSED [ 52%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses['flows/f.json'] PASSED [ 53%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses['C:patches/x.json'] PASSED [ 53%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses['C:/patches/x.json'] PASSED [ 53%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses['patches/.json'] PASSED [ 53%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses[' patches/boost.json'] PASSED [ 53%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses['patches/boost.json '] PASSED [ 54%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses['Patches/boost.json'] PASSED [ 54%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses['patches/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa] PASSED [ 54%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses['patches/\\x1b]0;x\\x07a.json'] PASSED [ 54%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses['patches/a\\x85.json'] PASSED [ 54%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses['patches/a\\x7f.json'] PASSED [ 55%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses['patches/a\\x00.json'] PASSED [ 55%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses[''] PASSED [ 55%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_is_total[7] PASSED [ 55%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_is_total[True] PASSED [ 55%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_is_total[None] PASSED [ 56%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_is_total[['patches/boost.json']] PASSED [ 56%]
+tests/test_b100_document.py::test_tc_b100_28_form_predicate_is_total[WindowsPath('patches/boost.json')] PASSED [ 56%]
+tests/test_b100_document.py::test_tc_b100_28_document_homes_equal_the_gather_homes PASSED [ 56%]
+tests/test_b100_document.py::test_tc_b100_28_writer_and_reader_round_trip[patches/boost.json] PASSED [ 56%]
+tests/test_b100_document.py::test_tc_b100_28_writer_and_reader_round_trip[checks/c.json] PASSED [ 57%]
+tests/test_b100_document.py::test_tc_b100_28_absent_key_is_byte_identical PASSED [ 57%]
+tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form['../x.json'-'MANIFEST-PATH-ESCAPE'] PASSED [ 57%]
+tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form['/abs/x.json'-'MANIFEST-PATH-ESCAPE'] PASSED [ 57%]
+tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form[7-'MANIFEST-BAD-STRUCTURE'] PASSED [ 57%]
+tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form['firmware.s19'-'MANIFEST-BAD-STRUCTURE'] PASSED [ 58%]
+tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form['project.json'-'MANIFEST-BAD-STRUCTURE'] PASSED [ 58%]
+tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form['patches/x.txt'-'MANIFEST-BAD-STRUCTURE'] PASSED [ 58%]
+tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form['patches\\\\boost.json'-'MANIFEST-BAD-STRUCTURE'] PASSED [ 58%]
+tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form['boost.json'-'MANIFEST-BAD-STRUCTURE'] PASSED [ 58%]
+tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form['patches/sub/x.json'-'MANIFEST-BAD-STRUCTURE'] PASSED [ 58%]
+tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form['templates/t.json'-'MANIFEST-BAD-STRUCTURE'] PASSED [ 59%]
+tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form['Patches/boost.json'-'MANIFEST-BAD-STRUCTURE'] PASSED [ 59%]
+tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form['patches/\\x1b]0;x\\x07a.json'-'MANIFEST-BAD-STRUCTURE'] PASSED [ 59%]
+tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form[True-'MANIFEST-BAD-STRUCTURE'] PASSED [ 59%]
+tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form[''-'MANIFEST-BAD-STRUCTURE'] PASSED [ 59%]
+tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form[['patches/boost.json']-'MANIFEST-BAD-STRUCTURE'] PASSED [ 60%]
+tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form['C:patches/x.json'-'MANIFEST-PATH-ESCAPE'] PASSED [ 60%]
+tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form['patches/NUL.json'-'MANIFEST-PATH-ESCAPE'] PASSED [ 60%]
+tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form['patches/x.json.'-'MANIFEST-PATH-ESCAPE'] PASSED [ 60%]
+tests/test_b100_document.py::test_tc_b100_28_document_finding_is_kept_first_beside_a_full_batch PASSED [ 60%]
+tests/test_b100_document.py::test_tc_b100_28_reader_null_and_absent_are_none PASSED [ 61%]
+tests/test_b100_document.py::test_tc_b100_28_reader_accepts_a_document_absent_from_disk PASSED [ 61%]
+tests/test_b100_document.py::test_tc_b100_28_writer_refuses_a_value_out_of_form['firmware.s19'] PASSED [ 61%]
+tests/test_b100_document.py::test_tc_b100_28_writer_refuses_a_value_out_of_form['../x.json'] PASSED [ 61%]
+tests/test_b100_document.py::test_tc_b100_28_writer_refuses_a_value_out_of_form['patches\\\\boost.json'] PASSED [ 61%]
+tests/test_b100_document.py::test_tc_b100_28_writer_refuses_a_value_out_of_form['patches/sub/boost.json'] PASSED [ 62%]
+tests/test_b100_document.py::test_tc_b100_28_writer_refuses_a_value_out_of_form['patches/boost.txt'] PASSED [ 62%]
+tests/test_b100_document.py::test_tc_b100_28_writer_refuses_a_value_out_of_form['templates/t.json'] PASSED [ 62%]
+tests/test_b100_document.py::test_tc_b100_28_writer_refuses_a_value_out_of_form['C:patches/boost.json'] PASSED [ 62%]
+tests/test_b100_document.py::test_tc_b100_28_writer_refuses_a_value_out_of_form['C:/x.json'] PASSED [ 62%]
+tests/test_b100_document.py::test_tc_b100_28_writer_refuses_a_value_out_of_form['patches/NUL.json'] PASSED [ 63%]
+tests/test_b100_document.py::test_tc_b100_28_writer_refuses_a_value_out_of_form['Patches/boost.json'] PASSED [ 63%]
+tests/test_b100_document.py::test_tc_b100_28_writer_refuses_a_value_out_of_form['patches/\\x1b]0;x\\x07a.json'] PASSED [ 63%]
+tests/test_b100_document.py::test_tc_b100_28_writer_refuses_a_value_out_of_form['patches/aaaaaaaaaaaaaaaaaaaaa] PASSED [ 63%]
+tests/test_b100_document.py::test_tc_b100_28_writer_refusal_writes_no_bytes PASSED [ 63%]
+tests/test_b100_document.py::test_tc_b100_28_writer_refuses_a_sub_folder_files_key_unless_it_is_the_document PASSED [ 64%]
+tests/test_b100_document.py::test_tc_b100_28_writer_refuses_a_junction_home PASSED [ 64%]
+tests/test_b100_document.py::test_tc_b100_28_a15_files_records_the_active_document PASSED [ 64%]
+tests/test_b100_document.py::test_tc_b100_28_a15_absent_document_has_no_record PASSED [ 64%]
+tests/test_b100_document.py::test_tc_b100_28_a15_junction_home_is_never_followed PASSED [ 64%]
+tests/test_b100_document.py::test_tc_b100_28_valid_key_is_carried_not_kept_aside PASSED [ 65%]
+tests/test_b100_document.py::test_tc_b100_28_refused_value_is_a_keep_reason PASSED [ 65%]
+tests/test_b100_document.py::test_tc_b100_28_variant_append_keeps_the_key PASSED [ 65%]
+tests/test_b100_document.py::test_tc_b100_29_pasted_document_lands_and_is_recorded PASSED [ 65%]
+tests/test_b100_document.py::test_tc_b100_29_pasted_check_document_lands_in_checks PASSED [ 65%]
+tests/test_b100_document.py::test_tc_b100_29_zero_entries_writes_no_document PASSED [ 66%]
+tests/test_b100_document.py::test_tc_b100_29_different_changes_json_lands_as_changes_1 PASSED [ 66%]
+tests/test_b100_document.py::test_tc_b100_29_identical_changes_json_is_reused PASSED [ 66%]
+tests/test_b100_document.py::test_tc_b100_29_file_backed_document_is_copied_and_recorded PASSED [ 66%]
+tests/test_b100_document.py::test_tc_b100_29_file_backed_zero_entries_is_recorded PASSED [ 66%]
+tests/test_b100_document.py::test_tc_b100_29_deleted_file_backed_document_is_not_placed PASSED [ 66%]
+tests/test_b100_document.py::test_tc_b100_29_forced_write_failure_saves_without_the_document PASSED [ 67%]
+tests/test_b100_document.py::test_tc_b100_29_failure_after_the_write_removes_the_document PASSED [ 67%]
+tests/test_b100_document.py::test_tc_b100_29_second_save_of_the_bound_document_writes_nothing PASSED [ 67%]
+tests/test_b100_document.py::test_tc_b100_29_document_inside_the_project_outside_its_home_is_not_placed PASSED [ 67%]
+tests/test_b100_document.py::test_tc_b100_29_r18_document_behind_a_junctioned_home_is_never_copied PASSED [ 67%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[1001-entries] PASSED [ 68%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[20000-entries] PASSED [ 68%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[5000-digit-integer] PASSED [ 68%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[bare-entries-is-5] PASSED [ 68%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-1MiB] PASSED [ 68%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-under-entries] PASSED [ 69%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[empty-entries] PASSED [ 69%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-is-5] PASSED [ 69%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-long-string] PASSED [ 69%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-wide-object] PASSED [ 69%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[exactly-1000-entries] PASSED [ 70%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[not-utf8] PASSED [ 70%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-byte-over-1MiB] PASSED [ 70%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-entry] PASSED [ 70%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[truncated] PASSED [ 70%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document] PASSED [ 71%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_missing_file_and_missing_home PASSED [ 71%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_a_folder_is_unreadable PASSED [ 71%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_linked_file_is_a_link PASSED [ 71%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_junction_home_is_a_link PASSED [ 71%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_held_file_is_io_error PASSED [ 72%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_symbol_entry_is_ok_with_or_without_context PASSED [ 72%]
+tests/test_b100_document.py::test_tc_b100_30_reopen_lists_the_recorded_document PASSED [ 72%]
+tests/test_b100_document.py::test_tc_b100_30_reopen_resolves_a_symbol_against_the_project_a2l PASSED [ 72%]
+tests/test_b100_document.py::test_tc_b100_30_reopen_never_applies_the_entries PASSED [ 72%]
+tests/test_b100_document.py::test_tc_b100_30_missing_document_is_one_missing_problem PASSED [ 73%]
+tests/test_b100_document.py::test_tc_b100_30_truncated_document_is_one_not_readable PASSED [ 73%]
+tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[20000-entries] PASSED [ 73%]
+tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[5000-digit-integer] PASSED [ 73%]
+tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[brackets-1MiB] PASSED [ 73%]
+tests/test_b100_document.py::test_tc_b100_30_held_document_is_not_readable_and_stays_recorded PASSED [ 74%]
+tests/test_b100_document.py::test_tc_b100_30_refused_record_is_one_not_readable_row_and_no_reopen PASSED [ 74%]
+tests/test_b100_document.py::test_tc_b100_30_linked_document_is_one_not_readable_row[recorded] PASSED [ 74%]
+tests/test_b100_document.py::test_tc_b100_30_linked_document_is_one_not_readable_row[unrecorded] PASSED [ 74%]
+tests/test_b100_document.py::test_tc_b100_30_reopened_document_loads_without_a_question PASSED [ 74%]
+tests/test_b100_document.py::test_tc_b100_29_gather_classifier_names_each_of_its_four_classes PASSED [ 75%]
+tests/test_b100_document.py::test_tc_b100_29_gather_classifier_never_copies_a_linked_source PASSED [ 75%]
+tests/test_b100_document.py::test_tc_b100_29_gather_classifier_home_spelled_in_another_case PASSED [ 75%]
+tests/test_b100_document.py::test_tc_b100_29_r12_bind_keeps_the_unresolved_spelling PASSED [ 75%]
+tests/test_b100_document.py::test_tc_b100_30_not_readable_document_paints_the_next_step_of_its_reason[too_large] PASSED [ 75%]
+tests/test_b100_document.py::test_tc_b100_30_not_readable_document_paints_the_next_step_of_its_reason[io_error] PASSED [ 75%]
+tests/test_b100_document.py::test_tc_b100_30_not_readable_document_paints_the_next_step_of_its_reason[link] PASSED [ 76%]
+tests/test_b100_document.py::test_tc_b100_30_not_readable_document_paints_the_next_step_of_its_reason[unreadable] PASSED [ 76%]
+tests/test_b100_document.py::test_tc_b100_28_cp1_form_refuses_device_stems_and_format_characters[patches/aux.json] PASSED [ 76%]
+tests/test_b100_document.py::test_tc_b100_28_cp1_form_refuses_device_stems_and_format_characters[checks/CON.json] PASSED [ 76%]
+tests/test_b100_document.py::test_tc_b100_28_cp1_form_refuses_device_stems_and_format_characters[patches/nul.JSON] PASSED [ 76%]
+tests/test_b100_document.py::test_tc_b100_28_cp1_form_refuses_device_stems_and_format_characters[patches/com1.json] PASSED [ 77%]
+tests/test_b100_document.py::test_tc_b100_28_cp1_form_refuses_device_stems_and_format_characters[patches/lpt9.json] PASSED [ 77%]
+tests/test_b100_document.py::test_tc_b100_28_cp1_form_refuses_device_stems_and_format_characters[patches/\u202eosj.exe.json] PASSED [ 77%]
+tests/test_b100_document.py::test_tc_b100_28_cp1_form_refuses_device_stems_and_format_characters[patches/a\u200bb.json] PASSED [ 77%]
+tests/test_b100_document.py::test_tc_b100_28_cp1_form_refuses_device_stems_and_format_characters[checks/\u2066x.json] PASSED [ 77%]
+tests/test_b100_document.py::test_tc_b100_28_cp1_form_refuses_device_stems_and_format_characters[patches/\ufeffx.json] PASSED [ 78%]
+tests/test_b100_document.py::test_tc_b100_29_cp1_device_stem_document_never_refuses_the_save[aux.json] PASSED [ 78%]
+tests/test_b100_document.py::test_tc_b100_29_cp1_device_stem_document_never_refuses_the_save[con.json] PASSED [ 78%]
+tests/test_b100_document.py::test_tc_b100_29_cp1_copied_document_outside_the_form_says_so PASSED [ 78%]
+tests/test_b100_document.py::test_tc_b100_29_cp1_in_home_document_outside_the_form_names_its_name PASSED [ 78%]
+tests/test_b100_document.py::test_tc_b100_29_cp1_held_reopened_document_paints_one_true_line PASSED [ 79%]
+tests/test_b100_document.py::test_tc_b100_29_cp1_document_recorded_elsewhere_paints_one_true_line PASSED [ 79%]
+tests/test_b100_document.py::test_tc_b100_29_cp1_unreadable_outside_document_is_not_placed PASSED [ 79%]
+tests/test_b100_document.py::test_tc_b100_29_cp1_failed_document_write_drops_the_key_from_the_plan PASSED [ 79%]
+tests/test_b100_document.py::test_tc_b100_29_cp1_case_sensitive_work_area_keeps_two_projects_apart PASSED [ 79%]
+tests/test_b100_document.py::test_tc_b100_29_cp1_junctioned_home_gives_no_document_row PASSED [ 80%]
+tests/test_b100_document.py::test_tc_b100_30_cp1_held_unrecorded_document_paints_the_reopen_reason PASSED [ 80%]
+tests/test_b100_document.py::test_tc_b100_30_cp1_next_step_follows_the_mark_not_the_reason_text PASSED [ 80%]
+tests/test_b100_document.py::test_tc_b100_30_cp1_changed_document_row_is_labelled_as_the_change_document PASSED [ 80%]
+tests/test_b100_document.py::test_tc_b100_30_cp1_missing_unrecorded_document_is_one_change_document_row PASSED [ 80%]
+tests/test_b100_document.py::test_at_b100_08_saved_document_reopens_with_the_project[size0] PASSED [ 81%]
+tests/test_b100_document.py::test_at_b100_08_saved_document_reopens_with_the_project[size1] PASSED [ 81%]
+tests/test_b100_project_check.py::test_tc_b100_21_save_records_every_file_digest PASSED [ 81%]
+tests/test_b100_project_check.py::test_tc_b100_21_no_files_is_byte_identical PASSED [ 81%]
+tests/test_b100_project_check.py::test_tc_b100_21_zero_byte_file_and_round_trip PASSED [ 81%]
+tests/test_b100_project_check.py::test_tc_b100_22_seam_scope_is_top_level_data_and_a2l PASSED [ 82%]
+tests/test_b100_project_check.py::test_tc_b100_23_digest_changed_between_write_and_verify PASSED [ 82%]
+tests/test_b100_project_check.py::test_tc_b100_23_derived_from_count_changed_is_one_mismatch PASSED [ 82%]
+tests/test_b100_project_check.py::test_tc_b100_23_unchanged_is_verified PASSED [ 82%]
+tests/test_b100_project_check.py::test_tc_b100_24_hostile_files_key_is_one_path_escape[../x.s19] PASSED [ 82%]
+tests/test_b100_project_check.py::test_tc_b100_24_hostile_files_key_is_one_path_escape[C:/abs/x.s19] PASSED [ 83%]
+tests/test_b100_project_check.py::test_tc_b100_24_hostile_files_key_is_one_path_escape[C:x.s19] PASSED [ 83%]
+tests/test_b100_project_check.py::test_tc_b100_24_hostile_files_key_is_one_path_escape[\\\\host\\share\\x.s19] PASSED [ 83%]
+tests/test_b100_project_check.py::test_tc_b100_24_hostile_files_key_is_one_path_escape[x.s19:ads] PASSED [ 83%]
+tests/test_b100_project_check.py::test_tc_b100_24_hostile_files_key_is_one_path_escape[CON] PASSED [ 83%]
+tests/test_b100_project_check.py::test_tc_b100_24_hostile_files_key_is_one_path_escape[x.s19.] PASSED [ 83%]
+tests/test_b100_project_check.py::test_tc_b100_24_hostile_files_key_is_one_path_escape[patches/NUL.json] PASSED [ 84%]
+tests/test_b100_project_check.py::test_tc_b100_24_sub_folder_key_is_one_bad_structure PASSED [ 84%]
+tests/test_b100_project_check.py::test_tc_b100_24_malformed_record_is_one_bad_structure[bool-size] PASSED [ 84%]
+tests/test_b100_project_check.py::test_tc_b100_24_malformed_record_is_one_bad_structure[negative] PASSED [ 84%]
+tests/test_b100_project_check.py::test_tc_b100_24_malformed_record_is_one_bad_structure[str-size] PASSED [ 84%]
+tests/test_b100_project_check.py::test_tc_b100_24_malformed_record_is_one_bad_structure[XYZ] PASSED [ 85%]
+tests/test_b100_project_check.py::test_tc_b100_24_malformed_record_is_one_bad_structure[63hex] PASSED [ 85%]
+tests/test_b100_project_check.py::test_tc_b100_24_malformed_record_is_one_bad_structure[65hex] PASSED [ 85%]
+tests/test_b100_project_check.py::test_tc_b100_24_valid_record_is_one_record PASSED [ 85%]
+tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[batch] PASSED [ 85%]
+tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[files] PASSED [ 86%]
+tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[declared_regions] PASSED [ 86%]
+tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[gathered] PASSED [ 86%]
+tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[derived_from] PASSED [ 86%]
+tests/test_b100_project_check.py::test_tc_b100_24_exactly_the_cap_is_read PASSED [ 86%]
+tests/test_b100_project_check.py::test_tc_b100_24_assignments_75_by_1000_is_one_issue_fast PASSED [ 87%]
+tests/test_b100_project_check.py::test_tc_b100_24_one_byte_over_one_mib_is_size_cap PASSED [ 87%]
+tests/test_b100_project_check.py::test_tc_b100_25_check_reports_each_case[clean] PASSED [ 87%]
+tests/test_b100_project_check.py::test_tc_b100_25_check_reports_each_case[2-image-edited] PASSED [ 87%]
+tests/test_b100_project_check.py::test_tc_b100_25_check_reports_each_case[5-image-deleted] PASSED [ 87%]
+tests/test_b100_project_check.py::test_tc_b100_25_check_reports_each_case[7-manifest-corrupt] PASSED [ 88%]
+tests/test_b100_project_check.py::test_tc_b100_25_check_reports_each_case[9-no-manifest-two-variants] PASSED [ 88%]
+tests/test_b100_project_check.py::test_tc_b100_25_check_reports_each_case[legacy] PASSED [ 88%]
+tests/test_b100_project_check.py::test_tc_b100_25_check_reports_each_case[hand-copied] PASSED [ 88%]
+tests/test_b100_project_check.py::test_tc_b100_25_load_reports_the_case[2-image-edited] PASSED [ 88%]
+tests/test_b100_project_check.py::test_tc_b100_25_load_reports_the_case[7-manifest-corrupt] PASSED [ 89%]
+tests/test_b100_project_check.py::test_tc_b100_25_unreadable_file_is_one_problem_never_a_raise PASSED [ 89%]
+tests/test_b100_project_check.py::test_tc_b100_25_recorded_device_name_is_not_readable PASSED [ 89%]
+tests/test_b100_project_check.py::test_tc_b100_26_active_deleted_the_other_opens PASSED [ 89%]
+tests/test_b100_project_check.py::test_tc_b100_26_every_image_deleted_the_mac_opens PASSED [ 89%]
+tests/test_b100_project_check.py::test_tc_b100_27_concurrent_manifest_writes PASSED [ 90%]
+tests/test_b100_project_check.py::test_tc_b100_27_no_shared_staging_name_in_the_writer_source PASSED [ 90%]
+tests/test_b100_project_check.py::test_tc_b100_60_reader_refuses_a_hostile_entry[C:x.s19] PASSED [ 90%]
+tests/test_b100_project_check.py::test_tc_b100_60_reader_refuses_a_hostile_entry[c:sub/x.s19] PASSED [ 90%]
+tests/test_b100_project_check.py::test_tc_b100_60_reader_refuses_a_hostile_entry[x.s19:ads] PASSED [ 90%]
+tests/test_b100_project_check.py::test_tc_b100_60_reader_refuses_a_hostile_entry[x.s19.] PASSED [ 91%]
+tests/test_b100_project_check.py::test_tc_b100_60_reader_refuses_a_hostile_entry[x.s19 ] PASSED [ 91%]
+tests/test_b100_project_check.py::test_tc_b100_60_reader_refuses_a_hostile_entry[CON] PASSED [ 91%]
+tests/test_b100_project_check.py::test_tc_b100_60_reader_refuses_a_hostile_entry[patches/NUL.json] PASSED [ 91%]
+tests/test_b100_project_check.py::test_tc_b100_60_reader_refuses_a_hostile_entry[nul.s19] PASSED [ 91%]
+tests/test_b100_project_check.py::test_tc_b100_60_reader_refuses_a_hostile_entry[sub./x.s19] PASSED [ 91%]
+tests/test_b100_project_check.py::test_tc_b100_60_reader_refuses_a_hostile_entry[patches/x.json ] PASSED [ 92%]
+tests/test_b100_project_check.py::test_tc_b100_60_reader_refuses_a_hostile_entry[../x.s19] PASSED [ 92%]
+tests/test_b100_project_check.py::test_tc_b100_60_reader_refuses_a_hostile_entry[C:/x.s19] PASSED [ 92%]
+tests/test_b100_project_check.py::test_tc_b100_60_reader_refuses_a_hostile_entry[\\\\host\\share\\x.s19] PASSED [ 92%]
+tests/test_b100_project_check.py::test_tc_b100_60_reader_refuses_a_hostile_entry[\\\\?\\C:\\x.s19] PASSED [ 92%]
+tests/test_b100_project_check.py::test_tc_b100_60_reader_accepts_plain_entries PASSED [ 93%]
+tests/test_b100_project_check.py::test_tc_b100_60_default_mode_is_unchanged PASSED [ 93%]
+tests/test_b100_project_check.py::test_tc_b100_61_case_6_is_only_not_readable PASSED [ 93%]
+tests/test_b100_project_check.py::test_tc_b100_61_checksum_errors_only_keep_the_image_open PASSED [ 93%]
+tests/test_b100_project_check.py::test_tc_b100_61_empty_image_is_not_readable_and_load_moves_on PASSED [ 93%]
+tests/test_b100_project_check.py::test_tc_b100_61_unreadable_a2l_is_its_own_problem_and_the_image_opens PASSED [ 94%]
+tests/test_b100_project_check.py::test_tc_b100_61_case_7_is_only_manifest_damaged PASSED [ 94%]
+tests/test_b100_project_check.py::test_tc_b100_61_changed_and_unrecorded_is_changed_on_disk PASSED [ 94%]
+tests/test_b100_project_check.py::test_tc_b100_61_seven_kinds_seven_next_steps_no_codes PASSED [ 94%]
+tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second PASSED [ 94%]
+tests/test_b100_project_check.py::test_tc_b100_61_skipped_entries_beyond_the_bound_are_counted PASSED [ 95%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read PASSED [ 95%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent FAILED [ 95%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked FAILED [ 95%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling FAILED [ 95%]
+tests/test_b100_project_check.py::test_tc_b100_61_r2_2_legitimate_manifest_inside_every_cap_is_checked_whole PASSED [ 96%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec7_r2_1_case_sensitive_folder_checks_each_spelling[sub/missing.json] PASSED [ 96%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec7_r2_1_case_sensitive_folder_checks_each_spelling[sub/real.json] PASSED [ 96%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec7_r2_2_one_serialize_checks_each_name_once PASSED [ 96%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure PASSED [ 96%]
+tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded PASSED [ 97%]
+tests/test_b100_project_check.py::test_tc_b100_62_manifest_write_refuses_a_project_swapped_for_a_junction PASSED [ 97%]
+tests/test_b100_project_check.py::test_tc_b100_62_swap_after_the_check_is_reported_never_written PASSED [ 97%]
+tests/test_b100_project_check.py::test_tc_b100_62_swap_toast_and_status_paint_no_exception_class PASSED [ 97%]
+tests/test_b100_project_check.py::test_at_b100_07_load_names_the_changed_file_and_the_hostile_record[size0] PASSED [ 97%]
+tests/test_b100_project_check.py::test_at_b100_07_load_names_the_changed_file_and_the_hostile_record[size1] PASSED [ 98%]
+tests/test_b100_project_check.py::test_tc_b100_23_active_document_changed_between_write_and_verify PASSED [ 98%]
+tests/test_b100_project_check.py::test_tc_b100_24_files_key_of_the_active_document_is_read PASSED [ 98%]
+tests/test_b100_project_check.py::test_tc_b100_24_refused_document_refuses_its_files_key PASSED [ 98%]
+tests/test_b100_project_check.py::test_tc_b100_24_derived_from_gets_no_document_exception PASSED [ 98%]
+tests/test_b100_project_check.py::test_tc_b100_25_missing_active_document_is_one_problem[with-record] PASSED [ 99%]
+tests/test_b100_project_check.py::test_tc_b100_25_missing_active_document_is_one_problem[without-record] PASSED [ 99%]
+tests/test_b100_project_check.py::test_tc_b100_25_missing_document_survives_the_no_digests_return PASSED [ 99%]
+tests/test_b100_project_check.py::test_tc_b100_25_recorded_document_present_and_equal_is_clean PASSED [ 99%]
+tests/test_b100_project_check.py::test_tc_b100_25_changed_document_is_named_by_its_project_text PASSED [ 99%]
+tests/test_b100_project_check.py::test_tc_b100_25_r7_missing_variant_never_names_the_document PASSED [100%]
+
+================================== FAILURES ===================================
+_ test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project] _
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int2/bt/test_tc_b100_20_writers_on_a_34')
+writer = 'save-project'
+
+    @pytest.mark.serial_timing
+    @pytest.mark.parametrize(
+        "writer", ["variant-append", "mac-sync", "a2l-sync", "save-back", "save-project"]
+    )
+    def test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second(
+        tmp_path: Path, writer: str
+    ) -> None:
+        """Inc 7 corrective pass 2, SEC7-R2-2 (SEC6-5's time bound for the
+        writers; security probe T2): P records 1 000 real files at the end of a
+        31-folder chain in ``batch``, ``assignments`` and ``gathered`` (no
+        finding, so every writer rewrites). Each in-project writer — variant
+        append, MAC sync, A2L sync, save-back — and Save project with that
+        composition reach their verified manifest line under 1 s from the
+        trigger.
+    
+        RED (cp1 tree): append 6.89 s, MAC sync 7.12 s, A2L sync 6.44 s,
+        save-back 6.42 s (one fresh walk per entry in the serializer).
+    
+        Fix round 2 R-1 (measurement re-pin, the Inc 12b F-23 rule): the loads
+        (Inc 12a) and Save project (Inc 12b) run on workers, so the polling
+        loop saw the outcome line some time after the app painted it. The clock
+        now stops when ``set_status`` receives the outcome line (the bound's end
+        point: the line is painted by the main-thread commit), not when the
+        settle loop notices it."""
+        from s19_app.tui.app import SaveProjectPayload
+    
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        names = projects.real_files_under_a_chain(project_dir)
+        manifest = projects.read_manifest(project_dir)
+        manifest.update(batch=names, assignments={"firmware": names}, gathered={"patches": names})
+        (project_dir / "project.json").write_text(
+            json.dumps(manifest, separators=(",", ":")), encoding="utf-8"
+        )
+        sources = {
+            "variant-append": (projects.CASE02_DIR, "firmware.s19"),
+            "mac-sync": (projects.CASE01_DIR, "firmware.mac"),
+            "a2l-sync": (projects.CASE01_DIR, "firmware.a2l"),
+        }
+        src = None
+        if writer in sources:
+            folder, name = sources[writer]
+            src = projects.copy_sources(tmp_path / "src", folder, name) / name
+        statuses: list = []
+        painted_at: list = []
+    
+        async def _drive() -> float:
+            app = S19TuiApp(base_dir=base)
+            real_set_status = app.set_status
+    
+            def _capture(message, *args, **kwargs):
+                statuses.append(str(message))
+                if not painted_at and any(o in str(message) for o in WRITER_OUTCOMES):
+                    painted_at.append(time.perf_counter())
+                return real_set_status(message, *args, **kwargs)
+    
+            app.set_status = _capture
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await _open_seeded_project(pilot, app)
+                statuses.clear()
+                painted_at.clear()
+                started = time.perf_counter()
+                if writer == "save-back":
+                    _apply_patch(app)
+                    app.on_patch_editor_panel_save_back_decision(
+                        PatchEditorPanel.SaveBackDecision("firmware.s19", 32)
+                    )
+                elif writer == "variant-append" or writer == "mac-sync":
+                    app.load_from_path(src)
+                elif writer == "a2l-sync":
+                    app.load_a2l_from_path(src)
+                else:
+                    app._handle_save_dialog(
+                        SaveProjectPayload(
+                            parent_folder=str(app.workarea),
+                            project_name="P",
+                            batch=tuple(names),
+                            assignments={"firmware": tuple(names)},
+                        )
+                    )
+                await _wait_yielding(
+                    pilot,
+                    lambda: any(o in s for s in statuses for o in WRITER_OUTCOMES),
+                    f"the {writer}'s manifest outcome",
+                )
+                return painted_at[0] - started
+    
+        took = asyncio.run(_drive())
+        outcomes = [s for s in statuses if any(o in s for o in WRITER_OUTCOMES)]
+        print(f"{writer}: trigger -> outcome {took:.3f} s; {outcomes[:1]}")
+        assert "manifest verified" in outcomes[0], outcomes
+>       assert took < report_margin(f"TC-B100-20 {writer}", took, timing_bound(1.0)), took
+E       AssertionError: 1.2599608999444172
+E       assert 1.2599608999444172 < 1.0
+E        +  where 1.0 = report_margin('TC-B100-20 save-project', 1.2599608999444172, 1.0)
+E        +    where 1.0 = timing_bound(1.0)
+
+tests\test_b100_active_variant.py:740: AssertionError
+---------------------------- Captured stdout call -----------------------------
+save-project: trigger -> outcome 1.260 s; ['Project saved + manifest verified']
+_______ test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent ________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int2/bt/test_tc_b100_61_sec6_5_deep_en0')
+
+    @pytest.mark.serial_timing
+    def test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent(tmp_path: Path) -> None:
+        """Inc 7 corrective SEC7-1 (the security probe A1's shape at a depth
+        the reader walks): 5 x 1 000 entries, 30 components deep, none on disk
+        and none escaping on the text. The first missing folder ends each walk
+        and is checked once per read → read, Load + panel and the variant
+        append's re-read each under 1 s; the 3 000 deep entries are kept and
+        the 2 000 nested ``files`` / ``derived_from`` keys are refused on the
+        text (100 rows + 1 counting row).
+    
+        RED (corrective-pass base): one ``resolve()`` per entry (A1: read
+        9.94 s, Load 10.74 s, append 10.64 s)."""
+        scene = _sec6_5_filesystem_scene(tmp_path, hostile.deep_missing_at_cap())
+>       _assert_sec6_5_bounded(scene)
+
+tests\test_b100_project_check.py:1106: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+scene = {'appended': 0.5477083999430761, 'load': 0.8373220000648871, 'manifest': ProjectManifest(schema_version=1, active_vari...tries above'})], files={}, derived_from={}, unknown_keys=(), active_document=None), 'painted': 1.0630369998980314, ...}
+
+    def _assert_sec6_5_bounded(scene: dict) -> None:
+        timings = {key: scene[key] for key in ("read", "load", "painted", "appended")}
+        print("SEC6-5 timings (s):", {key: round(value, 3) for key, value in timings.items()})
+        assert scene["read"] < report_margin("sec6_5 read", scene["read"], timing_bound(1.0)), timings
+        assert scene["load"] is not None and scene["load"] < report_margin(
+            "sec6_5 load", scene["load"], timing_bound(1.0)
+        ), timings
+>       assert scene["painted"] < report_margin(
+            "sec6_5 painted", scene["painted"], timing_bound(1.0)
+        ), timings
+E       AssertionError: {'appended': 0.5477083999430761, 'load': 0.8373220000648871, 'painted': 1.0630369998980314, 'read': 0.1975899999961257}
+E       assert 1.0630369998980314 < 1.0
+E        +  where 1.0 = report_margin('sec6_5 painted', 1.0630369998980314, 1.0)
+E        +    where 1.0 = timing_bound(1.0)
+
+tests\test_b100_project_check.py:993: AssertionError
+---------------------------- Captured stdout call -----------------------------
+SEC6-5 timings (s): {'read': 0.198, 'load': 0.837, 'painted': 1.063, 'appended': 0.548}
+___ test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked ___
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int2/bt/test_tc_b100_61_sec6_5_entries0')
+
+    @pytest.mark.serial_timing
+    def test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked(
+        tmp_path: Path,
+    ) -> None:
+        """Inc 7 corrective SEC7-1, re-pinned by corrective pass 2 (R2-2: the
+        ceiling bounds distinct folders; the file an entry ends on is always
+        checked): 3 x 1 000 entries under a real 8-level folder chain, so every
+        entry's own name needs a filesystem check. Every entry is kept, no
+        entry is unchecked, and every timing stays under 1 s.
+    
+        RED (cp1 tree): 1 000 valid entries skipped unchecked past the
+        2 000-call ceiling."""
+        parent = "/".join(["d"] * 8)
+    
+        def _folders(project_dir: Path) -> None:
+            (project_dir / parent).mkdir(parents=True)
+    
+        scene = _sec6_5_filesystem_scene(
+            tmp_path, hostile.existing_parent_at_cap(parent), setup=_folders
+        )
+>       _assert_sec6_5_bounded(scene)
+
+tests\test_b100_project_check.py:1135: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+scene = {'appended': 1.1753021000185981, 'load': 0.37475289998110384, 'manifest': ProjectManifest(schema_version=1, active_var...')]}, issues=[], files={}, derived_from={}, unknown_keys=(), active_document=None), 'painted': 0.8190879001049325, ...}
+
+    def _assert_sec6_5_bounded(scene: dict) -> None:
+        timings = {key: scene[key] for key in ("read", "load", "painted", "appended")}
+        print("SEC6-5 timings (s):", {key: round(value, 3) for key, value in timings.items()})
+        assert scene["read"] < report_margin("sec6_5 read", scene["read"], timing_bound(1.0)), timings
+        assert scene["load"] is not None and scene["load"] < report_margin(
+            "sec6_5 load", scene["load"], timing_bound(1.0)
+        ), timings
+        assert scene["painted"] < report_margin(
+            "sec6_5 painted", scene["painted"], timing_bound(1.0)
+        ), timings
+>       assert scene["appended"] < report_margin(
+            "sec6_5 appended", scene["appended"], timing_bound(1.0)
+        ), timings
+E       AssertionError: {'appended': 1.1753021000185981, 'load': 0.37475289998110384, 'painted': 0.8190879001049325, 'read': 0.137057299958542}
+E       assert 1.1753021000185981 < 1.0
+E        +  where 1.0 = report_margin('sec6_5 appended', 1.1753021000185981, 1.0)
+E        +    where 1.0 = timing_bound(1.0)
+
+tests\test_b100_project_check.py:996: AssertionError
+---------------------------- Captured stdout call -----------------------------
+SEC6-5 timings (s): {'read': 0.137, 'load': 0.375, 'painted': 0.819, 'appended': 1.175}
+_____ test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling ______
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int2/bt/test_tc_b100_61_sec6_5_distinc0')
+
+    @pytest.mark.serial_timing
+    def test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling(tmp_path: Path) -> None:
+        """Inc 7 corrective pass 2 (R2-2), the folder ceiling's worst case: 3 x
+        1 000 entries each under its own real folder, 1 000 ``files`` records
+        and 1 000 ``derived_from`` records with distinct bases (the most folder
+        and file checks the caps allow). Folder checks stop at
+        ``MANIFEST_FOLDER_CHECK_CAP`` (1 000); the 2 000 entries past it are skipped
+        unchecked and counted in one row (never silently); read, Load + panel
+        and the variant append's re-read each stay under 1 s."""
+    
+        def _folders(project_dir: Path) -> None:
+            for name in hostile.distinct_folder_names():
+                (project_dir / name).mkdir()
+                (project_dir / name / "x.json").write_text("{}", encoding="utf-8")
+    
+        scene = _sec6_5_filesystem_scene(tmp_path, hostile.distinct_folders_at_cap(), setup=_folders)
+>       _assert_sec6_5_bounded(scene)
+
+tests\test_b100_project_check.py:1160: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+scene = {'appended': 0.8700830999296159, 'load': 1.1034693999681622, 'manifest': ProjectManifest(schema_version=1, active_vari...e41e4649b934ca495991b7852b855', differ=1)}, unknown_keys=(), active_document=None), 'painted': 1.0695201000198722, ...}
+
+    def _assert_sec6_5_bounded(scene: dict) -> None:
+        timings = {key: scene[key] for key in ("read", "load", "painted", "appended")}
+        print("SEC6-5 timings (s):", {key: round(value, 3) for key, value in timings.items()})
+        assert scene["read"] < report_margin("sec6_5 read", scene["read"], timing_bound(1.0)), timings
+>       assert scene["load"] is not None and scene["load"] < report_margin(
+            "sec6_5 load", scene["load"], timing_bound(1.0)
+        ), timings
+E       AssertionError: {'appended': 0.8700830999296159, 'load': 1.1034693999681622, 'painted': 1.0695201000198722, 'read': 0.31172809994313866}
+E       assert (1.1034693999681622 is not None and 1.1034693999681622 < 1.0)
+E        +  where 1.0 = report_margin('sec6_5 load', 1.1034693999681622, 1.0)
+E        +    where 1.0 = timing_bound(1.0)
+
+tests\test_b100_project_check.py:990: AssertionError
+---------------------------- Captured stdout call -----------------------------
+SEC6-5 timings (s): {'read': 0.312, 'load': 1.103, 'painted': 1.07, 'appended': 0.87}
+============================ QC-TM timing margins =============================
+LOW -26.0%  1.260 s / 1.000 s  TC-B100-20 save-project  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project]
+LOW -17.5%  1.175 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+LOW -10.3%  1.103 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+LOW -6.3%  1.063 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+LOW 1.4%  0.986 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure
+LOW 16.3%  0.837 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+LOW 17.6%  0.824 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+LOW 18.1%  0.819 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+23.3%  0.767 s / 1.000 s  TC-B100-20 variant-append  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[variant-append]
+37.4%  0.626 s / 1.000 s  TC-B100-20 a2l-sync  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[a2l-sync]
+39.7%  0.603 s / 1.000 s  TC-B100-20 mac-sync  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync]
+41.7%  0.583 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure
+42.7%  0.573 s / 1.000 s  TC-B100-20 save-back  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-back]
+62.5%  0.375 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+66.6%  0.334 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+68.8%  0.312 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+71.7%  0.283 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+74.7%  0.253 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure
+80.0%  0.200 s / 1.000 s  TC-B100-61 checks a  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+80.2%  0.198 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+83.8%  0.162 s / 1.000 s  TC-B100-61 sec7 serialize  tests/test_b100_project_check.py::test_tc_b100_61_sec7_r2_2_one_serialize_checks_each_name_once
+86.3%  0.137 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+87.0%  0.130 s / 1.000 s  TC-B100-61 checks d  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+87.2%  0.128 s / 1.000 s  TC-B100-61 R2-2 read  tests/test_b100_project_check.py::test_tc_b100_61_r2_2_legitimate_manifest_inside_every_cap_is_checked_whole
+88.9%  0.111 s / 1.000 s  TC-B100-30 classifier exactly-1000-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[exactly-1000-entries]
+89.3%  0.107 s / 1.000 s  TC-B100-30 brackets-1MiB  tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[brackets-1MiB]
+91.1%  0.089 s / 1.000 s  TC-B100-30 5000-digit-integer  tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[5000-digit-integer]
+92.4%  0.076 s / 1.000 s  TC-B100-30 20000-entries  tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[20000-entries]
+92.8%  0.072 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure
+93.4%  0.066 s / 1.000 s  TC-B100-61 checks e  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+96.6%  0.168 s / 5.000 s  AT101  tests/test_a2l_multiline_headers.py::test_at101_megabyte_unterminated_block_is_linear
+98.1%  0.019 s / 1.000 s  TC-B100-61 checks b  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+98.4%  0.016 s / 1.000 s  TC-B100-24 assignments  tests/test_b100_project_check.py::test_tc_b100_24_assignments_75_by_1000_is_one_issue_fast
+98.7%  0.013 s / 1.000 s  TC-B100-28  tests/test_b100_document.py::test_tc_b100_28_document_finding_is_kept_first_beside_a_full_batch
+98.7%  0.013 s / 1.000 s  TC-B100-24 gathered  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[gathered]
+99.1%  0.009 s / 1.000 s  TC-B100-30 classifier 1001-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[1001-entries]
+99.1%  0.009 s / 1.000 s  TC-B100-24 declared_regions  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[declared_regions]
+99.2%  0.008 s / 1.000 s  TC-B100-30 classifier brackets-under-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-under-entries]
+99.3%  0.007 s / 1.000 s  TC-B100-24 derived_from  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[derived_from]
+99.4%  0.006 s / 1.000 s  TC-B100-30 classifier entries-long-string  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-long-string]
+99.4%  0.006 s / 1.000 s  TC-B100-30 classifier entries-wide-object  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-wide-object]
+99.4%  0.006 s / 1.000 s  TC-B100-24 batch  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[batch]
+99.4%  0.006 s / 1.000 s  TC-B100-24 files  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[files]
+99.5%  0.005 s / 1.000 s  TC-B100-30 classifier 5000-digit-integer  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[5000-digit-integer]
+99.5%  0.005 s / 1.000 s  TC-B100-30 classifier bare-entries-is-5  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[bare-entries-is-5]
+99.5%  0.005 s / 1.000 s  TC-B100-30 classifier brackets-1MiB  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-1MiB]
+99.5%  0.005 s / 1.000 s  TC-B100-30 classifier entries-is-5  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-is-5]
+99.5%  0.005 s / 1.000 s  TC-B100-30 classifier v1-document  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document]
+99.8%  0.005 s / 2.000 s  AT120  tests/test_a2l_alignment_sizing.py::test_at120_oversized_alignment_layout_clamps_to_none
+99.8%  0.004 s / 2.000 s  AT111  tests/test_a2l_inline_axis_length.py::test_at111_oversized_axis_clamps_to_none
+99.9%  0.001 s / 1.000 s  TC-B100-30 classifier empty-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[empty-entries]
+99.9%  0.001 s / 1.000 s  TC-B100-30 classifier one-entry  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-entry]
+99.9%  0.001 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+100.0%  0.000 s / 1.000 s  TC149  tests/test_a2l_alignment_sizing.py::test_tc149_dos_clamp_includes_padding
+100.0%  0.000 s / 1.000 s  TC138  tests/test_a2l_inline_axis_length.py::test_tc138_dos_clamp_pure_arithmetic
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier 20000-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[20000-entries]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier not-utf8  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[not-utf8]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier one-byte-over-1MiB  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-byte-over-1MiB]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier truncated  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[truncated]
+QC-TM: 59 bounds, 8 under 20 % margin
+============================ slowest 40 durations =============================
+93.37s call     tests/test_b100_busy.py::test_at_b100_17_worker_load_of_an_8_mib_s19_by_keys
+32.90s call     tests/test_b100_active_variant.py::test_at_b100_20_inc8a_every_writer_carries_the_active_document[size0]
+32.37s call     tests/test_b100_active_variant.py::test_at_b100_20_inc8a_every_writer_carries_the_active_document[size1]
+28.51s call     tests/test_b100_active_variant.py::test_at_b100_20_every_writer_carries_the_keys_it_does_not_own[size1]
+27.45s call     tests/test_b100_active_variant.py::test_at_b100_20_every_writer_carries_the_keys_it_does_not_own[size0]
+20.19s call     tests/test_b100_active_variant.py::test_at_b100_06_reopen_opens_the_saved_back_variant[size0-A]
+19.74s call     tests/test_b100_active_variant.py::test_at_b100_06_reopen_opens_the_saved_back_variant[size0-B]
+18.66s call     tests/test_b100_project_check.py::test_at_b100_07_load_names_the_changed_file_and_the_hostile_record[size0]
+18.35s call     tests/test_b100_active_variant.py::test_at_b100_06_reopen_opens_the_saved_back_variant[size1-A]
+17.87s call     tests/test_b100_active_variant.py::test_at_b100_06_reopen_opens_the_saved_back_variant[size1-B]
+17.52s call     tests/test_b100_project_check.py::test_at_b100_07_load_names_the_changed_file_and_the_hostile_record[size1]
+17.12s call     tests/test_b100_document.py::test_at_b100_08_saved_document_reopens_with_the_project[size0]
+16.62s call     tests/test_b100_document.py::test_at_b100_08_saved_document_reopens_with_the_project[size1]
+10.77s call     tests/test_b100_project_check.py::test_tc_b100_26_active_deleted_the_other_opens
+10.38s call     tests/test_b100_document.py::test_tc_b100_29_second_save_of_the_bound_document_writes_nothing
+8.63s call     tests/test_b100_project_check.py::test_tc_b100_25_load_reports_the_case[2-image-edited]
+8.63s call     tests/test_b100_project_check.py::test_tc_b100_25_load_reports_the_case[7-manifest-corrupt]
+8.56s call     tests/test_b100_project_check.py::test_tc_b100_61_case_7_is_only_manifest_damaged
+8.48s call     tests/test_b100_project_check.py::test_tc_b100_23_digest_changed_between_write_and_verify
+8.47s call     tests/test_b100_project_check.py::test_tc_b100_61_case_6_is_only_not_readable
+8.08s call     tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+7.87s call     tests/test_b100_project_check.py::test_tc_b100_26_every_image_deleted_the_mac_opens
+7.32s call     tests/test_b100_document.py::test_tc_b100_29_document_inside_the_project_outside_its_home_is_not_placed
+6.90s call     tests/test_b100_document.py::test_tc_b100_29_identical_changes_json_is_reused
+6.83s call     tests/test_b100_document.py::test_tc_b100_29_r18_document_behind_a_junctioned_home_is_never_copied
+6.73s call     tests/test_b100_document.py::test_tc_b100_29_different_changes_json_lands_as_changes_1
+6.70s call     tests/test_b100_document.py::test_tc_b100_29_forced_write_failure_saves_without_the_document
+6.29s call     tests/test_b100_busy.py::test_tc_b100_50_twelve_b_kickoff_raise_ends_the_run_first[project_load]
+6.20s call     tests/test_b100_active_variant.py::test_tc_b100_71_variant_append_carries_derived_from
+5.93s call     tests/test_b100_busy.py::test_tc_b100_50_worker_raise_ends_the_action_first[report]
+5.92s call     tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+5.92s call     tests/test_b100_busy.py::test_tc_b100_50_each_worker_action_begins_with_a_progress_line[report]
+5.85s call     tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+5.80s call     tests/test_b100_busy.py::test_tc_b100_51_report_ends_once_on_success
+5.78s call     tests/test_b100_busy.py::test_tc_b100_51_raise_after_a_multi_line_tail_paints_the_saved_line_once
+5.65s call     tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure
+5.64s call     tests/test_b100_busy.py::test_tc_b100_51_report_ends_once_on_a_failure[generator raises]
+5.56s call     tests/test_b100_busy.py::test_tc_b100_50_progress_widgets_are_written_on_the_main_thread[report]
+5.26s call     tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project]
+5.12s call     tests/test_b100_busy.py::test_tc_b100_53_path_gone_under_the_load_question_keeps_the_app
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_b100_busy.py:1038: not run on Windows (the name cannot be created), never passed
+============ 4 failed, 507 passed, 1 skipped in 1250.83s (0:20:50) ============
+EXIT=1

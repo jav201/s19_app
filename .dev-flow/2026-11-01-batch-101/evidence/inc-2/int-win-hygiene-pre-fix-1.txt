@@ -1,0 +1,52 @@
+# batch-101 Inc 2 E4 integration — Windows (tests/test_suite_hygiene.py, first run before the integration fixes (F-1, F-2 visible))
+# env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<temp>/la, --basetemp <temp>/bt, NO_COLOR unset; s19env Python 3.11.15, pytest 8.4.2
+# tree: branch b101-inc2 rebased on main e266395, before the fixes
+
+<HOME>\Github\s19_app-b101-inc2\s19_app\__init__.py
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: <HOME>\Github\s19_app-b101-inc2
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collected 54 items
+
+tests\test_suite_hygiene.py F.......................................F... [ 81%]
+..........                                                               [100%]
+
+================================== FAILURES ===================================
+______________ test_r_tst_001_serial_timing_marker_is_registered ______________
+
+    def test_r_tst_001_serial_timing_marker_is_registered() -> None:
+        proc = subprocess.run(
+            [sys.executable, "-m", "pytest", "--markers", "-p", "no:cacheprovider"],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=300,
+            env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+        )
+        lines = [line.strip() for line in proc.stdout.splitlines()]
+>       assert MARKER_LINE in lines
+E       assert '@pytest.mark.serial_timing: serial_timing: a wall-clock timing arm; run apart and serially (-m serial_timing)' in ["@pytest.mark.slow: marks tests as slow perf smoke tests (deselect with -m 'not slow')", '', "@pytest.mark.snapshot: ...shot')", '', '@pytest.mark.serial_timing: a wall-clock timing arm; run apart and serially (-m serial_timing)', '', ...]
+
+tests\test_suite_hygiene.py:329: AssertionError
+________ test_r_tst_031_032_post_press_and_dwell_arms_keep_their_forms ________
+
+    def test_r_tst_031_032_post_press_and_dwell_arms_keep_their_forms() -> None:
+        from tests.support import suite_census
+    
+        workers_text = (TESTS_ROOT / "test_b100_workers.py").read_text(encoding="utf-8")
+        quit_body = _function_source(
+            workers_text,
+            "test_at_b100_18_quit_confirm_half_slow_save_as_leaves_no_partial_folder",
+        )
+>       assert "held_save_scene" in quit_body
+E       assert 'held_save_scene' in 'def test_at_b100_18_quit_confirm_half_slow_save_as_leaves_no_partial_folder(tmp_path: Path, monkeypatch) -> None:\n  ...= projects.file_records(target), "S9 is a partial project"\n    assert len(list((target / "flows").iterdir())) == 2000'
+
+tests\test_suite_hygiene.py:1123: AssertionError
+============================ QC-TM timing margins =============================
+49.3%  0.203 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+65.1%  0.523 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+================== 2 failed, 52 passed in 114.45s (0:01:54) ===================
+EXIT=1

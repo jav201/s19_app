@@ -1,0 +1,537 @@
+# batch-101 Inc 2 E4 integration — LAN Linux host, serial timing measurement (head2)
+# tree: same as head1, second run
+# command: pytest -p no:cacheprovider --basetemp <OUT>/bt-<run> -rs --durations=0 -vv <selection>  (serial, no xdist; timeout 1800)
+# env: PYTHONDONTWRITEBYTECODE=1 PYTHONUTF8=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. NO_COLOR unset; Python 3.11.18, pytest 9.2.0; host otherwise idle
+# order run: base1, head1, base2, head2, basewaits1, basewaits2
+
+<HOME>/work/s19_app/s19_app/__init__.py
+ 03:20:35 up 10:04,  2 users,  load average: 1.03, 1.01, 0.76
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0 -- /data/miniconda3/envs/s19ci/bin/python
+rootdir: <HOME>/work/s19_app
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collecting ... collected 5330 items / 5270 deselected / 60 selected
+
+tests/test_a2l_alignment_sizing.py::test_at120_oversized_alignment_layout_clamps_to_none PASSED [  1%]
+tests/test_a2l_alignment_sizing.py::test_tc149_dos_clamp_includes_padding PASSED [  3%]
+tests/test_a2l_inline_axis_length.py::test_tc138_dos_clamp_pure_arithmetic PASSED [  5%]
+tests/test_a2l_inline_axis_length.py::test_at111_oversized_axis_clamps_to_none PASSED [  6%]
+tests/test_a2l_multiline_headers.py::test_at101_megabyte_unterminated_block_is_linear PASSED [  8%]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[variant-append] PASSED [ 10%]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync] PASSED [ 11%]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[a2l-sync] PASSED [ 13%]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-back] PASSED [ 15%]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project] PASSED [ 16%]
+tests/test_b100_busy.py::test_at_b100_17_worker_load_of_an_8_mib_s19_by_keys PASSED [ 18%]
+tests/test_b100_document.py::test_tc_b100_28_document_finding_is_kept_first_beside_a_full_batch PASSED [ 20%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[1001-entries] PASSED [ 21%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[20000-entries] PASSED [ 23%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[5000-digit-integer] PASSED [ 25%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[bare-entries-is-5] PASSED [ 26%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-1MiB] PASSED [ 28%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-under-entries] PASSED [ 30%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[empty-entries] PASSED [ 31%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-is-5] PASSED [ 33%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-long-string] PASSED [ 35%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-wide-object] PASSED [ 36%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[exactly-1000-entries] PASSED [ 38%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[not-utf8] PASSED [ 40%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-byte-over-1MiB] PASSED [ 41%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-entry] PASSED [ 43%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[truncated] PASSED [ 45%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document] PASSED [ 46%]
+tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[20000-entries] PASSED [ 48%]
+tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[5000-digit-integer] PASSED [ 50%]
+tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[brackets-1MiB] PASSED [ 51%]
+tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[batch] PASSED [ 53%]
+tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[files] PASSED [ 55%]
+tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[declared_regions] PASSED [ 56%]
+tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[gathered] PASSED [ 58%]
+tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[derived_from] PASSED [ 60%]
+tests/test_b100_project_check.py::test_tc_b100_24_assignments_75_by_1000_is_one_issue_fast PASSED [ 61%]
+tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second PASSED [ 63%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read PASSED [ 65%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent FAILED [ 66%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked PASSED [ 68%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling PASSED [ 70%]
+tests/test_b100_project_check.py::test_tc_b100_61_r2_2_legitimate_manifest_inside_every_cap_is_checked_whole PASSED [ 71%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec7_r2_2_one_serialize_checks_each_name_once PASSED [ 73%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure SKIPPED [ 75%]
+tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded PASSED [ 76%]
+tests/test_b100_project_homes.py::test_tc_b100_31_junction_cycle_ends SKIPPED [ 78%]
+tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10000 saved] PASSED [ 80%]
+tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10001 refused] PASSED [ 81%]
+tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_is_a_150ms_debounce PASSED [ 83%]
+tests/test_b100_save_dialog.py::test_tc_b100_65_session_decided_once_per_open_case06 PASSED [ 85%]
+tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_at_most_three_of_twenty_keystrokes PASSED [ 86%]
+tests/test_b100_save_dialog.py::test_tc_b100_65_emitting_4mib_image_recomputes_fast PASSED [ 88%]
+tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second PASSED [ 90%]
+tests/test_compare_engine.py::test_large_image_perf PASSED               [ 91%]
+tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock PASSED [ 93%]
+tests/test_tui_app.py::test_build_mac_view_cache_scales_under_load PASSED [ 95%]
+tests/test_tui_app.py::test_end_to_end_load_pipeline_under_budget PASSED [ 96%]
+tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[s19_first] PASSED [ 98%]
+tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[mac_first] PASSED [100%]
+
+=================================== FAILURES ===================================
+________ test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent ________
+
+tmp_path = PosixPath('<OUT>/bt-head2/test_tc_b100_61_sec6_5_deep_en0')
+
+    @pytest.mark.serial_timing
+    def test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent(tmp_path: Path) -> None:
+        """Inc 7 corrective SEC7-1 (the security probe A1's shape at a depth
+        the reader walks): 5 x 1 000 entries, 30 components deep, none on disk
+        and none escaping on the text. The first missing folder ends each walk
+        and is checked once per read → read, Load + panel and the variant
+        append's re-read each under 1 s; the 3 000 deep entries are kept and
+        the 2 000 nested ``files`` / ``derived_from`` keys are refused on the
+        text (100 rows + 1 counting row).
+    
+        RED (corrective-pass base): one ``resolve()`` per entry (A1: read
+        9.94 s, Load 10.74 s, append 10.64 s)."""
+        scene = _sec6_5_filesystem_scene(tmp_path, hostile.deep_missing_at_cap())
+>       _assert_sec6_5_bounded(scene)
+
+tests/test_b100_project_check.py:1106: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+scene = {'read': 0.2163628019989119, 'load': 0.40276766999886604, 'painted': 1.354649220003921, 'rows': 102, ...}
+
+    def _assert_sec6_5_bounded(scene: dict) -> None:
+        timings = {key: scene[key] for key in ("read", "load", "painted", "appended")}
+        print("SEC6-5 timings (s):", {key: round(value, 3) for key, value in timings.items()})
+        assert scene["read"] < report_margin("sec6_5 read", scene["read"], timing_bound(1.0)), timings
+        assert scene["load"] is not None and scene["load"] < report_margin(
+            "sec6_5 load", scene["load"], timing_bound(1.0)
+        ), timings
+>       assert scene["painted"] < report_margin(
+            "sec6_5 painted", scene["painted"], timing_bound(1.0)
+        ), timings
+E       AssertionError: {'read': 0.2163628019989119, 'load': 0.40276766999886604, 'painted': 1.354649220003921, 'appended': 1.005517958998098}
+E       assert 1.354649220003921 < 1.0
+E        +  where 1.0 = report_margin('sec6_5 painted', 1.354649220003921, 1.0)
+E        +    where 1.0 = timing_bound(1.0)
+
+tests/test_b100_project_check.py:993: AssertionError
+----------------------------- Captured stdout call -----------------------------
+SEC6-5 timings (s): {'read': 0.216, 'load': 0.403, 'painted': 1.355, 'appended': 1.006}
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2943 App initialized. base_dir=<OUT>/bt-head2/test_tc_b100_61_sec6_5_deep_en0/app workarea=<OUT>/bt-head2/test_tc_b100_61_sec6_5_deep_en0/app/.s19tool/workarea
+INFO     s19tui:app.py:7957 Workarea refreshed. files=0
+INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:8104 Load project action triggered.
+INFO     s19tui:app.py:15054 Load phase boundary: modal_dismiss_scheduled kind=project value='P'
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f0.… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f1.… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f2.… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f3.… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f4.… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f5.… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f6.… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f7.… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f8.… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f9.… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f10… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f11… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f12… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f13… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f14… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f15… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f16… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f17… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f18… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f19… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f20… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f21… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f22… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f23… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f24… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f25… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f26… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f27… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f28… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f29… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f30… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f31… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f32… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f33… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f34… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f35… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f36… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f37… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f38… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f39… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f40… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f41… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f42… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f43… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f44… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f45… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f46… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f47… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f48… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f49… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f50… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f51… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f52… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f53… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f54… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f55… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f56… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f57… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f58… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f59… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f60… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f61… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f62… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f63… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f64… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f65… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f66… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f67… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f68… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f69… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f70… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f71… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f72… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f73… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f74… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f75… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f76… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f77… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f78… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f79… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f80… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f81… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f82… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f83… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f84… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f85… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f86… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f87… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f88… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f89… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f90… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f91… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f92… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f93… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f94… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f95… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f96… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f97… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f98… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/sub/f99… (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged 1900 more recorded entries (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: no digests saved project.json (None)
+INFO     s19tui:app.py:13757 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18161 Load summary: file_type=s19 path=<OUT>/bt-head2/test_tc_b100_61_sec6_5_deep_en0/app/.s19tool/workarea/P/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:13774 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:17679 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:13710 Project loaded. name=P file=<OUT>/bt-head2/test_tc_b100_61_sec6_5_deep_en0/app/.s19tool/workarea/P/firmware.s19 mac=None
+INFO     s19tui:app.py:18289 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:17695 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:17707 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19211 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:17274 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17329 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:18823 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:17720 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:18516 Memory Map updated. ranges=2
+INFO     s19tui:app.py:17737 Loaded file successfully: path=<OUT>/bt-head2/test_tc_b100_61_sec6_5_deep_en0/app/.s19tool/workarea/P/firmware.s19 file_type=s19 elapsed_seconds=0.887 has_mac=False precomputed=False
+INFO     s19tui:app.py:15099 Load phase boundary: dialog_callback_entry path=<OUT>/bt-head2/test_tc_b100_61_sec6_5_deep_en0/src/extra.s19
+INFO     s19tui:app.py:15120 Load phase boundary: copy_started path=<OUT>/bt-head2/test_tc_b100_61_sec6_5_deep_en0/src/extra.s19
+INFO     s19tui:app.py:15133 Load phase boundary: copy_done path=extra.s19 elapsed=0.001s
+WARNING  s19tui:app.py:15152 Recent sources not updated: '<OUT>/bt-head2/test_tc_b100_61_sec6_5_deep_en0/src/extra.s19'
+INFO     s19tui:app.py:7957 Workarea refreshed. files=1
+INFO     s19tui:app.py:15170 File copied to temp: path=<OUT>/bt-head2/test_tc_b100_61_sec6_5_deep_en0/app/.s19tool/workarea/temp/extra.s19 size_bytes=349 copy_seconds=0.001
+INFO     s19tui:app.py:15176 Load phase boundary: worker_spawned path=extra.s19
+INFO     s19tui:app.py:17961 Load phase boundary: worker_parse_start path=extra.s19
+INFO     s19tui:app.py:17421 Loading file: path=<OUT>/bt-head2/test_tc_b100_61_sec6_5_deep_en0/app/.s19tool/workarea/temp/extra.s19 suffix=.s19 project=P
+INFO     s19tui:app.py:13757 Load phase boundary: parse_branch_entry path=extra.s19 suffix=.s19
+INFO     s19tui:app.py:18161 Load summary: file_type=s19 path=<OUT>/bt-head2/test_tc_b100_61_sec6_5_deep_en0/app/.s19tool/workarea/temp/extra.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:13774 Load phase boundary: parse_branch_done path=extra.s19 branch=s19
+INFO     s19tui:app.py:17980 Load phase boundary: worker_parse_done path=extra.s19 elapsed=0.022s
+INFO     s19tui:app.py:17825 Load phase boundary: prepare_entry path=extra.s19 file_type=s19
+INFO     s19tui:app.py:17844 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17274 MAC validation computed: records=0 issues=0 elapsed_seconds=0.011
+INFO     s19tui:app.py:17853 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:17873 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:17880 Load phase boundary: prepare_bases_done row_bases=7
+INFO     s19tui:app.py:17890 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:17896 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:17997 Load phase boundary: worker_compute_done path=extra.s19 precomputed=True elapsed=0.039s
+INFO     s19tui:app.py:18004 Load phase boundary: call_from_thread_apply_dispatched path=extra.s19
+INFO     s19tui:app.py:17679 Load phase boundary: apply_install_state path=extra.s19 precomputed=True
+INFO     s19tui:app.py:18289 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:17695 Load phase boundary: apply_sections_done path=extra.s19
+WARNING  s19tui:app.py:14466 Manifest not rewritten (holds entries that were skipped): <OUT>/bt-head2/test_tc_b100_61_sec6_5_deep_en0/app/.s19tool/workarea/P (placed <OUT>/bt-head2/test_tc_b100_61_sec6_5_deep_en0/app/.s19tool/workarea/P/extra.s19)
+INFO     s19tui:app.py:14695 Appended variant 'extra' into project: <OUT>/bt-head2/test_tc_b100_61_sec6_5_deep_en0/app/.s19tool/workarea/P
+INFO     s19tui:app.py:17707 Load phase boundary: apply_hex_done path=extra.s19
+INFO     s19tui:app.py:19211 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.013
+INFO     s19tui:app.py:18823 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.014
+INFO     s19tui:app.py:17720 Load phase boundary: apply_a2l_done path=extra.s19
+INFO     s19tui:app.py:18516 Memory Map updated. ranges=2
+INFO     s19tui:app.py:17737 Loaded file successfully: path=<OUT>/bt-head2/test_tc_b100_61_sec6_5_deep_en0/app/.s19tool/workarea/temp/extra.s19 file_type=s19 elapsed_seconds=0.623 has_mac=False precomputed=True
+============================= QC-TM timing margins =============================
+LOW -35.5%  1.355 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+LOW 4.3%  0.957 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+LOW 9.8%  0.902 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+LOW 19.8%  0.802 s / 1.000 s  TC-B100-20 save-project  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project]
+38.0%  0.620 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+38.0%  0.620 s / 1.000 s  TC-B100-05 merge  tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
+39.0%  0.183 s / 0.300 s  TC-B100-65 keystroke paint  tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_at_most_three_of_twenty_keystrokes
+44.3%  0.557 s / 1.000 s  TC-B100-20 variant-append  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[variant-append]
+46.4%  0.161 s / 0.300 s  TC-B100-65 4MiB paint  tests/test_b100_save_dialog.py::test_tc_b100_65_emitting_4mib_image_recomputes_fast
+49.2%  0.508 s / 1.000 s  TC-B100-20 mac-sync  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync]
+49.4%  0.152 s / 0.300 s  TC-B100-65 final paint  tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_is_a_150ms_debounce
+49.4%  0.203 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+49.6%  0.504 s / 1.000 s  TC-B100-20 a2l-sync  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[a2l-sync]
+56.0%  0.440 s / 1.000 s  TC-B100-20 save-back  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-back]
+59.7%  0.403 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+61.3%  0.775 s / 2.000 s  TC-B100-65 case06 paint  tests/test_b100_save_dialog.py::test_tc_b100_65_session_decided_once_per_open_case06
+66.3%  0.505 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+67.2%  0.164 s / 0.500 s  TC-B100-65 q delay  tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_is_a_150ms_debounce
+71.6%  0.284 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+75.5%  0.245 s / 1.000 s  TC-B100-61 checks a  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+75.8%  0.242 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+78.4%  0.216 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+80.3%  0.197 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+81.7%  0.183 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+82.6%  0.348 s / 2.000 s  TC-006 large image  tests/test_compare_engine.py::test_large_image_perf
+85.7%  0.143 s / 1.000 s  TC-B100-30 brackets-1MiB  tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[brackets-1MiB]
+86.1%  0.696 s / 5.000 s  TC-B100-31 10001 refused  tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10001 refused]
+87.0%  0.130 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+87.0%  0.130 s / 1.000 s  TC-B100-61 sec7 serialize  tests/test_b100_project_check.py::test_tc_b100_61_sec7_r2_2_one_serialize_checks_each_name_once
+89.2%  0.108 s / 1.000 s  TC-B100-30 classifier exactly-1000-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[exactly-1000-entries]
+91.2%  0.088 s / 1.000 s  TC-B100-30 20000-entries  tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[20000-entries]
+91.7%  0.083 s / 1.000 s  TC-B100-61 checks d  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+91.7%  0.083 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+92.1%  0.079 s / 1.000 s  TC-B100-30 5000-digit-integer  tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[5000-digit-integer]
+92.4%  1.524 s / 20.000 s  stress load s19_first  tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[s19_first]
+93.0%  1.410 s / 20.000 s  stress load mac_first  tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[mac_first]
+94.6%  0.536 s / 10.000 s  end-to-end load pipeline  tests/test_tui_app.py::test_end_to_end_load_pipeline_under_budget
+95.1%  0.098 s / 2.000 s  MAC view cache  tests/test_tui_app.py::test_build_mac_view_cache_scales_under_load
+95.4%  0.046 s / 1.000 s  TC-B100-61 checks e  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+95.7%  0.043 s / 1.000 s  TC-B100-61 R2-2 read  tests/test_b100_project_check.py::test_tc_b100_61_r2_2_legitimate_manifest_inside_every_cap_is_checked_whole
+96.2%  0.188 s / 5.000 s  AT101  tests/test_a2l_multiline_headers.py::test_at101_megabyte_unterminated_block_is_linear
+97.8%  0.022 s / 1.000 s  TC-B100-28  tests/test_b100_document.py::test_tc_b100_28_document_finding_is_kept_first_beside_a_full_batch
+98.6%  0.014 s / 1.000 s  TC-B100-30 classifier brackets-1MiB  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-1MiB]
+98.7%  0.013 s / 1.000 s  TC-B100-61 checks b  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+99.4%  0.006 s / 1.000 s  TC-B100-24 assignments  tests/test_b100_project_check.py::test_tc_b100_24_assignments_75_by_1000_is_one_issue_fast
+99.9%  0.001 s / 1.000 s  TC-B100-30 classifier 1001-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[1001-entries]
+99.9%  0.001 s / 1.000 s  TC-B100-30 classifier entries-long-string  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-long-string]
+99.9%  0.001 s / 1.000 s  TC-B100-24 files  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[files]
+99.9%  0.001 s / 1.000 s  TC-B100-24 declared_regions  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[declared_regions]
+99.9%  0.001 s / 1.000 s  TC-B100-24 derived_from  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[derived_from]
+99.9%  0.001 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+99.9%  0.001 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+100.0%  0.000 s / 2.000 s  AT120  tests/test_a2l_alignment_sizing.py::test_at120_oversized_alignment_layout_clamps_to_none
+100.0%  0.000 s / 1.000 s  TC149  tests/test_a2l_alignment_sizing.py::test_tc149_dos_clamp_includes_padding
+100.0%  0.000 s / 1.000 s  TC138  tests/test_a2l_inline_axis_length.py::test_tc138_dos_clamp_pure_arithmetic
+100.0%  0.000 s / 2.000 s  AT111  tests/test_a2l_inline_axis_length.py::test_at111_oversized_axis_clamps_to_none
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier 20000-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[20000-entries]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier 5000-digit-integer  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[5000-digit-integer]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier bare-entries-is-5  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[bare-entries-is-5]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier brackets-under-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-under-entries]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier empty-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[empty-entries]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier entries-is-5  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-is-5]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier entries-wide-object  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-wide-object]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier not-utf8  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[not-utf8]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier one-byte-over-1MiB  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-byte-over-1MiB]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier one-entry  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-entry]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier truncated  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[truncated]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier v1-document  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document]
+100.0%  0.000 s / 1.000 s  TC-B100-24 batch  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[batch]
+100.0%  0.000 s / 1.000 s  TC-B100-24 gathered  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[gathered]
+100.0%  0.000 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+QC-TM: 71 bounds, 4 under 20 % margin
+============================== slowest durations ===============================
+91.12s call     tests/test_b100_busy.py::test_at_b100_17_worker_load_of_an_8_mib_s19_by_keys
+58.14s call     tests/test_b100_save_dialog.py::test_tc_b100_65_emitting_4mib_image_recomputes_fast
+43.60s call     tests/test_b100_save_dialog.py::test_tc_b100_65_session_decided_once_per_open_case06
+8.83s call     tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10000 saved]
+8.70s call     tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_is_a_150ms_debounce
+8.20s call     tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10001 refused]
+6.67s call     tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+6.08s call     tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+6.08s call     tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[20000-entries]
+5.67s call     tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+4.97s call     tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project]
+4.96s call     tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_at_most_three_of_twenty_keystrokes
+4.90s call     tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync]
+4.85s call     tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[a2l-sync]
+4.74s call     tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[variant-append]
+4.73s call     tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
+4.72s call     tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+4.61s call     tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-back]
+4.54s call     tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+3.64s call     tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[5000-digit-integer]
+3.57s call     tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[brackets-1MiB]
+2.93s call     tests/test_compare_engine.py::test_large_image_perf
+1.70s call     tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[s19_first]
+1.58s call     tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[mac_first]
+0.71s call     tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+0.60s call     tests/test_tui_app.py::test_end_to_end_load_pipeline_under_budget
+0.40s call     tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+0.19s call     tests/test_a2l_multiline_headers.py::test_at101_megabyte_unterminated_block_is_linear
+0.17s call     tests/test_b100_project_check.py::test_tc_b100_61_sec7_r2_2_one_serialize_checks_each_name_once
+0.13s call     tests/test_b100_project_check.py::test_tc_b100_61_r2_2_legitimate_manifest_inside_every_cap_is_checked_whole
+0.11s call     tests/test_tui_app.py::test_build_mac_view_cache_scales_under_load
+0.11s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[exactly-1000-entries]
+0.03s teardown tests/test_tui_app.py::test_end_to_end_load_pipeline_under_budget
+0.03s call     tests/test_b100_project_check.py::test_tc_b100_24_assignments_75_by_1000_is_one_issue_fast
+0.02s call     tests/test_b100_document.py::test_tc_b100_28_document_finding_is_kept_first_beside_a_full_batch
+0.01s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-1MiB]
+0.00s call     tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[derived_from]
+0.00s call     tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[files]
+0.00s call     tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[declared_regions]
+0.00s setup    tests/test_tui_app.py::test_build_mac_view_cache_scales_under_load
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-long-string]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+0.00s setup    tests/test_a2l_alignment_sizing.py::test_at120_oversized_alignment_layout_clamps_to_none
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_sec7_r2_2_one_serialize_checks_each_name_once
+0.00s call     tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[gathered]
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[1001-entries]
+0.00s call     tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[batch]
+0.00s setup    tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_is_a_150ms_debounce
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+0.00s setup    tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project]
+0.00s setup    tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
+0.00s setup    tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10001 refused]
+0.00s setup    tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[a2l-sync]
+0.00s setup    tests/test_tui_app.py::test_end_to_end_load_pipeline_under_budget
+0.00s setup    tests/test_b100_document.py::test_tc_b100_28_document_finding_is_kept_first_beside_a_full_batch
+0.00s setup    tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync]
+0.00s setup    tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[s19_first]
+0.00s setup    tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[mac_first]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[declared_regions]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-is-5]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[batch]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[brackets-1MiB]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[1001-entries]
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-under-entries]
+0.00s setup    tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[variant-append]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+0.00s setup    tests/test_compare_engine.py::test_large_image_perf
+0.00s setup    tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-back]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[files]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_r2_2_legitimate_manifest_inside_every_cap_is_checked_whole
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[5000-digit-integer]
+0.00s setup    tests/test_b100_project_homes.py::test_tc_b100_31_junction_cycle_ends
+0.00s setup    tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_at_most_three_of_twenty_keystrokes
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-wide-object]
+0.00s setup    tests/test_b100_save_dialog.py::test_tc_b100_65_emitting_4mib_image_recomputes_fast
+0.00s setup    tests/test_b100_busy.py::test_at_b100_17_worker_load_of_an_8_mib_s19_by_keys
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[gathered]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[derived_from]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[bare-entries-is-5]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+0.00s setup    tests/test_b100_save_dialog.py::test_tc_b100_65_session_decided_once_per_open_case06
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[not-utf8]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[5000-digit-integer]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-under-entries]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-1MiB]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-long-string]
+0.00s teardown tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[mac_first]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-byte-over-1MiB]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[truncated]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-entry]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[empty-entries]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure
+0.00s teardown tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[20000-entries]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[exactly-1000-entries]
+0.00s setup    tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10000 saved]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_sec7_r2_2_one_serialize_checks_each_name_once
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[20000-entries]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_24_assignments_75_by_1000_is_one_issue_fast
+0.00s setup    tests/test_a2l_inline_axis_length.py::test_at111_oversized_axis_clamps_to_none
+0.00s setup    tests/test_a2l_multiline_headers.py::test_at101_megabyte_unterminated_block_is_linear
+0.00s setup    tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-wide-object]
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[20000-entries]
+0.00s call     tests/test_a2l_alignment_sizing.py::test_at120_oversized_alignment_layout_clamps_to_none
+0.00s setup    tests/test_a2l_alignment_sizing.py::test_tc149_dos_clamp_includes_padding
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-byte-over-1MiB]
+0.00s setup    tests/test_a2l_inline_axis_length.py::test_tc138_dos_clamp_pure_arithmetic
+0.00s call     tests/test_a2l_inline_axis_length.py::test_at111_oversized_axis_clamps_to_none
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[empty-entries]
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-entry]
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+0.00s teardown tests/test_compare_engine.py::test_large_image_perf
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[5000-digit-integer]
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[bare-entries-is-5]
+0.00s teardown tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10000 saved]
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[not-utf8]
+0.00s teardown tests/test_b100_save_dialog.py::test_tc_b100_65_session_decided_once_per_open_case06
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-is-5]
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[truncated]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[20000-entries]
+0.00s teardown tests/test_tui_app.py::test_build_mac_view_cache_scales_under_load
+0.00s teardown tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_at_most_three_of_twenty_keystrokes
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[brackets-1MiB]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[5000-digit-integer]
+0.00s teardown tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10001 refused]
+0.00s teardown tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[a2l-sync]
+0.00s teardown tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[5000-digit-integer]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-1MiB]
+0.00s teardown tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[s19_first]
+0.00s teardown tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-under-entries]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[derived_from]
+0.00s teardown tests/test_b100_busy.py::test_at_b100_17_worker_load_of_an_8_mib_s19_by_keys
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[exactly-1000-entries]
+0.00s teardown tests/test_b100_save_dialog.py::test_tc_b100_65_emitting_4mib_image_recomputes_fast
+0.00s teardown tests/test_b100_project_homes.py::test_tc_b100_31_junction_cycle_ends
+0.00s teardown tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document]
+0.00s teardown tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-back]
+0.00s teardown tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[variant-append]
+0.00s teardown tests/test_a2l_multiline_headers.py::test_at101_megabyte_unterminated_block_is_linear
+0.00s teardown tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_is_a_150ms_debounce
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_24_assignments_75_by_1000_is_one_issue_fast
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_r2_2_legitimate_manifest_inside_every_cap_is_checked_whole
+0.00s teardown tests/test_b100_document.py::test_tc_b100_28_document_finding_is_kept_first_beside_a_full_batch
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[declared_regions]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[files]
+0.00s call     tests/test_a2l_inline_axis_length.py::test_tc138_dos_clamp_pure_arithmetic
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-long-string]
+0.00s teardown tests/test_a2l_alignment_sizing.py::test_at120_oversized_alignment_layout_clamps_to_none
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[1001-entries]
+0.00s teardown tests/test_a2l_inline_axis_length.py::test_at111_oversized_axis_clamps_to_none
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[gathered]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[batch]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-byte-over-1MiB]
+0.00s call     tests/test_b100_project_homes.py::test_tc_b100_31_junction_cycle_ends
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[20000-entries]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-wide-object]
+0.00s call     tests/test_a2l_alignment_sizing.py::test_tc149_dos_clamp_includes_padding
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-entry]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[not-utf8]
+0.00s call     tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[truncated]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[empty-entries]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[bare-entries-is-5]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-is-5]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure
+0.00s teardown tests/test_a2l_inline_axis_length.py::test_tc138_dos_clamp_pure_arithmetic
+0.00s teardown tests/test_a2l_alignment_sizing.py::test_tc149_dos_clamp_includes_padding
+=========================== short test summary info ============================
+SKIPPED [2] tests/support/b100_links.py:30: directory junctions are a Windows-only test arm (PDR C-QA-6)
+===== 1 failed, 57 passed, 2 skipped, 5270 deselected in 306.21s (0:05:06) =====
+EXIT=1
+ 03:25:43 up 10:09,  2 users,  load average: 1.18, 1.10, 0.88

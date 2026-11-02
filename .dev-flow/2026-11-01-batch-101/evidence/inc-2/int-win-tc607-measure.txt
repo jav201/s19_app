@@ -1,0 +1,34 @@
+# batch-101 Inc 2 E4 integration — Windows (TC-607 measurement before the edit (-k scanned))
+# env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<temp>/la, --basetemp <temp>/bt, NO_COLOR unset; s19env Python 3.11.15, pytest 8.4.2
+# tree: branch b101-inc2 working tree (rebased on main e266395 + the E4 integration fixes), before the TC-607 edit
+
+<HOME>\Github\s19_app-b101-inc2\s19_app\__init__.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_tc607_scanned_corpus_matches_the_declared_bound _____________
+
+corpus = <tests.test_id_registry._Corpus object at 0x0000023119E7CD50>
+
+    def test_tc607_scanned_corpus_matches_the_declared_bound(corpus: _Corpus) -> None:
+        """TC-607 — the guard's corpus is bounded by a declared, executable constant.
+    
+        Asserting *how many files the guard opens* is deterministic where a
+        wall-clock budget would be flaky. Widening the scan — most obviously to
+        ``.dev-flow/``, which would make the guard's verdict depend on batch prose —
+        moves this count and turns the threshold red immediately.
+        """
+        actual = len(corpus.test_files)
+>       assert actual == EXPECTED_SCANNED_TEST_FILES, (
+            f"the guard scanned {actual} test modules, not the declared "
+            f"{EXPECTED_SCANNED_TEST_FILES}. If tests/ legitimately grew, bump "
+            f"EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a "
+            f"decision rather than a rubber stamp."
+        )
+E       AssertionError: the guard scanned 241 test modules, not the declared 239. If tests/ legitimately grew, bump EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a decision rather than a rubber stamp.
+E       assert 241 == 239
+
+tests\test_id_registry.py:502: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+1 failed, 11 deselected in 4.27s
+EXIT=1

@@ -1,0 +1,19 @@
+# batch-101 Inc 2 E4 integration — Windows (tests/test_b99_load_project.py, tests/test_b100_load_dialog.py (shared-wait callers))
+# env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<temp>/la, --basetemp <temp>/bt, NO_COLOR unset; s19env Python 3.11.15, pytest 8.4.2
+# tree: branch b101-inc2 working tree (rebased on main e266395 + the E4 integration fixes)
+
+<HOME>\Github\s19_app-b101-inc2\s19_app\__init__.py
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: <HOME>\Github\s19_app-b101-inc2
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collected 163 items
+
+tests\test_b99_load_project.py ....                                      [  2%]
+tests\test_b100_load_dialog.py ......................................... [ 27%]
+........................................................................ [ 71%]
+..............................................                           [100%]
+
+======================= 163 passed in 847.91s (0:14:07) =======================
+EXIT=0

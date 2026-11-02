@@ -1,6 +1,6 @@
 # Code-Wire graph — Inc 2 (test hygiene, timing arms and CI), batch-101
 
-Stage E2 of the design-first flow (`dev-flow-v3-beta`), corrected after E3 round 1 (`../E3-rulings.md`; changed lines carry the finding id in brackets). Graph only: no stub, mark or declaration in any tree. Base `b3bf42e`. Requirements `../01-requirements.md` (R-TST-001 … 071), slice `../E1-slice.md`, rulings `../E1-rulings.md`, cases `../02-test-cases.md`. Notation: Code-Wire v3.1 (`C:/Users/jjgh8/Github/code-wire/docs/Notation-Grammar.md`), as in `2026-10-26-batch-100/inc-12b/codewire/`.
+Stage E2 of the design-first flow (`dev-flow-v3-beta`), corrected after E3 round 1 (`../E3-rulings.md`; changed lines carry the finding id in brackets). Graph only: no stub, mark or declaration in any tree. Base `b3bf42e`. Requirements `../01-requirements.md` (R-TST-001 … 071), slice `../E1-slice.md`, rulings `../E1-rulings.md`, cases `../02-test-cases.md`. Notation: Code-Wire v3.1 (`<HOME>/Github/code-wire/docs/Notation-Grammar.md`), as in `2026-10-26-batch-100/inc-12b/codewire/`.
 
 How to read it:
 - One file holds the baseline and the prototype. Every node's `func:` starts with **unchanged**, **changed** (then "was: … / now: …", the baseline first) or **new**. Context nodes (unchanged) are here because a changed node calls them or wraps them.

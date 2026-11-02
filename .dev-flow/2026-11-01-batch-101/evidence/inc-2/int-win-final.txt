@@ -1,0 +1,24 @@
+# batch-101 Inc 2 E4 integration — Windows (final: hygiene suite + Inc 1 guards, after all evidence files were written)
+# env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<temp>/la, --basetemp <temp>/bt, NO_COLOR unset; s19env Python 3.11.15, pytest 8.4.2
+# tree: branch b101-inc2 working tree (rebased on main e266395 + the E4 integration fixes)
+
+<HOME>\Github\s19_app-b101-inc2\s19_app\__init__.py
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: <HOME>\Github\s19_app-b101-inc2
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collected 79 items
+
+tests\test_suite_hygiene.py ............................................ [ 55%]
+..........                                                               [ 68%]
+tests\test_id_registry.py ............                                   [ 83%]
+tests\test_batch91_registry_hygiene.py ..                                [ 86%]
+tests\test_requirements_canon.py ...........                             [100%]
+============================ QC-TM timing margins =============================
+47.0%  0.212 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+65.1%  0.523 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+
+======================= 79 passed in 150.38s (0:02:30) ========================
+EXIT=0
