@@ -285,9 +285,15 @@
       "date": "2026-11-01",
       "decision": "P6 docs approved (executive summary, functionality, traceability matrix, 3 diagrams); canon folded (393 ids); merge to main, tag v1.0.0-rc1, then /dev-flow-sync.",
       "notes": "station label corrected at close (the script logs the station being left)"
+    },
+    {
+      "station": "P6",
+      "date": "2026-11-01",
+      "decision": "synced-to-obsidian",
+      "notes": "G:/My Drive/ConsultIA/Obsidian_Vaults/AI-Consulting-Brain/01 - Proyectos/s19_app/dev-flow-batches/2026-10-26-batch-100/ (re-sync over the 2026-10-30 interim copy; visual-evidence refresh skipped by the orchestrator: batch-101 reworks the UI and the user guide's 181 real captures supersede the gallery for now)"
     }
   ],
-  "obsidian_synced": false,
+  "obsidian_synced": true,
   "created_at": "2026-10-26T06:42:43.235979",
   "owner": "C:/Users/jjgh8/Github/s19_app",
   "base_ref": "1d677ba39d2c6aaf09f1ca7e623197065f0b8958"
