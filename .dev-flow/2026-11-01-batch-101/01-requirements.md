@@ -130,8 +130,56 @@
 
 > Part A in every batch; Part B when the system's boundary has components a consumer can address independently. The block syntax, its fields and the rules that read them are in `templates/ifc-template.md`, which ships with the flow and is not copied into this batch.
 
-- **Part A — flows:** `<one fenced FLOW block per information flow: SOURCE, NODES (each node with exactly one owner, an LLR above — split a node two LLRs own), SINK>`
-- **Part B — boundary decomposition:** `<yes — one fenced COMPONENT block per component | no — and why no component of the boundary is addressable on its own>`
+- **Part A — flows:** three flows — (a) shipped in Inc 1, (b) and (c) planned (Inc 2 and Inc 4) — one fenced FLOW block each below. Batch-101's requirements are canon-hosted: every increment writes its rows into `REQUIREMENTS.md` (R-ids) and keeps its increment-level record in `inc-<n>/01-requirements.md` (see *Batch-101 increments — requirement homes* below), so this skeleton's headings are the only `HLR-`/`LLR-`/`US-` ids the contract declares. The owner-existence check (`V10`) reads only those headings; every node therefore names `LLR-001.1`, the one LLR id this contract declares, and puts the canon rows (or the planned increment) that actually govern the transform in its `fn`.
+
+**(a) — shipped (Inc 1, governed by R-DOC-CANON.1 … R-DOC-CANON.11):** the requirements canon `REQUIREMENTS.md` → the registry/canon guard tests.
+
+```
+FLOW: canon_to_guard_tests
+  SOURCE : `REQUIREMENTS.md` — the strict-EARS requirements canon (2623 rows, modules S0 … S17)
+  NODES  :
+    - fn    : parse the canon rows (`tests/test_requirements_canon.py::_rows`; governed by R-DOC-CANON.1 … R-DOC-CANON.11)
+      owner : LLR-001.1
+      in    : the `REQUIREMENTS.md` bytes
+      out   : the 2623 rows, each with id, form, sentence
+    - fn    : guard the canon's form — one guard test per R-DOC-CANON row (`tests/test_requirements_canon.py`)
+      owner : LLR-001.1
+      in    : the parsed rows
+      out   : 11/11 GREEN on the new canon · 11/11 RED on the base `e273181`
+  SINK   : the registry/canon guard tests (`tests/test_requirements_canon.py`) that gate every later canon edit
+```
+
+**(b) — PLANNED (Inc 2, not yet implemented; its R-rows are written when the increment lands):** the test suite's timing-arm margins → the gate report / junit properties.
+
+```
+FLOW: timing_margins_to_gate_report
+  SOURCE : the test suite's timing arms — each `serial_timing` arm's alone time and its margin
+  NODES  :
+    - fn    : measure each timing arm's alone time and margin, under the 20 % floor (QC-TM; PLANNED — Inc 2)
+      owner : LLR-001.1
+      in    : the arm's product-emitted stamp
+      out   : the arm's alone time and margin
+    - fn    : publish the margins to the gate report and the junit properties (QC-TM; PLANNED — Inc 2)
+      owner : LLR-001.1
+      in    : the measured margins
+      out   : the gate report margin table and the junit properties the TC-record generator reads
+  SINK   : the merge-gate report and the junit properties (`-m serial_timing` runs apart)
+```
+
+**(c) — PLANNED (Inc 4, not yet implemented; its R-rows are written when the increment lands):** change/check documents → symbol resolution through the loaded A2L.
+
+```
+FLOW: change_check_documents_to_symbol_resolution
+  SOURCE : a change document or a check document opened against the loaded A2L
+  NODES  :
+    - fn    : resolve each document symbol through the loaded A2L (PLANNED — Inc 4)
+      owner : LLR-001.1
+      in    : the document's symbol reference
+      out   : the resolved A2L symbol or an unresolved-symbol finding
+  SINK   : the symbol resolution the change/check document surfaces present
+```
+
+- **Part B — boundary decomposition:** no — batch-101's changes address no component of the boundary independently: the three flows above are file- and document-level (a canon file, transcripts, a gate report, change/check documents), and every UI row was routed to the backlog at P0 (PLAN.md, *Key decisions*), so no panel, channel or entry point is addressable on its own by this batch's changes.
 
 ---
 
