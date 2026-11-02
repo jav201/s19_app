@@ -1757,21 +1757,35 @@ def test_tc_b97_64_a_new_set_run_restarts_the_dwell(tmp_path: Path, monkeypatch)
     Why: the old lane's dwell base was taken before the run; reusing it would
     let a ``c`` typed during the run confirm the moment the run ends.
     Mutation: the restart arm removed → the ``c`` confirms 1.
+
+    Fix round 3 (CI10-1/2, then CI 41338318239): with the wall clock the
+    ``c`` was inside the dwell only if run end → ``c`` took under
+    ``CONFIRM_DWELL_S``; a slow host spent longer in ``run_lanes``' wait and
+    the ``c`` confirmed. The dwell clock is now the D15 seam ``_fx_clock``
+    held by the test: it moves only where the test moves it (the old base
+    ages 0.6 s before the run, none after), and the restarted base must read
+    the moved time before the ``c``.
     """
     from tests.b97_probes import record_statuses
 
     confirms = ConfirmSpy(monkeypatch)
     statuses = record_statuses(monkeypatch)
+    now = [100.0]
+    monkeypatch.setattr(fs, "_fx_clock", lambda: now[0])
 
     async def body(app, pilot, panel, project_dir):
         await poll(pilot, lambda: panel._attention_since is not None, 200)
-        await pilot.pause(0.6)
+        first = panel._attention_since
+        now[0] += 0.6
         await run_lanes(app, pilot, panel, key=True)
+        await poll(pilot, lambda: panel._attention_since == now[0], 200)
+        restarted = panel._attention_since
         await pilot.press("c")
         await settle(pilot, 6)
-        return list(confirms.posts), list(statuses)[-1:], panel._lanes[1].paused_block
+        return (first, restarted), list(confirms.posts), list(statuses)[-1:], panel._lanes[1].paused_block
 
-    posts, last, paused = run_fx(tmp_path, (118, 54), body, stems=THREE, run=True, evidence=True)
+    bases, posts, last, paused = run_fx(tmp_path, (118, 54), body, stems=THREE, run=True, evidence=True)
+    assert bases == (100.0, 100.6), bases
     assert posts == [] and paused == 2, (posts, paused)
     assert last and last[0].startswith("c ignored — flash_chain"), last
 

@@ -3052,7 +3052,7 @@ def test_at_b100_18_quit_half_q_during_a_save_asks_with_stay_focused(
     assert run(base, scenario) == ((True, "confirm_no", True), True)
 
 
-def test_at_b100_18_quit_confirm_half_slow_save_as_leaves_no_partial_folder(tmp_path: Path) -> None:
+def test_at_b100_18_quit_confirm_half_slow_save_as_leaves_no_partial_folder(tmp_path: Path, monkeypatch) -> None:
     """AT-B100-18 quit-confirm half, HLR-177c: the engineer opens project
     ``S`` (case_01 trio plus 2 000 files under ``flows/``), saves it as
     ``S9`` through the Save dialog, and while the save-as runs presses
@@ -3064,7 +3064,16 @@ def test_at_b100_18_quit_confirm_half_slow_save_as_leaves_no_partial_folder(tmp_
     Why: closing the app mid-copy left a partial project (the R12 backlog
     row). Negative control: an exit on ``y`` stops the app mid-copy → RED;
     base: the save-as runs inside the click, so ``q`` arrives after it and
-    exits with no question → RED."""
+    exits with no question → RED.
+
+    Fix round 3 (CI 41338318239, Linux): the save-as must still be running
+    when ``y`` is answered, and the 2 000-file copy alone does not make that
+    a fact — ``pilot.press("y")`` returned only after the save had ended
+    (the answer itself came while it ran, and the exit right after its end),
+    so ``running(app)`` read an app that had correctly exited. The save is
+    now held at its first placement (a forced slow step, the ``Hold`` of the
+    other quit arms, installed after the project load) until ``y`` has been
+    answered and observed; then it is released and finishes all files."""
     base = tmp_path / "app"
     s = trio(W(base) / "S")
     projects.bulk_files(s, "flows", 2000)
@@ -3072,16 +3081,21 @@ def test_at_b100_18_quit_confirm_half_slow_save_as_leaves_no_partial_folder(tmp_
     async def scenario(app, pilot, log):
         await ld.open_project_through_dialog(pilot, app, "S", confirm="enter")
         await projects.dismiss_load_result_panel(pilot, app)
-        await sd.save_through_dialog(pilot, app, "S9")
-        neutral_focus(app)
-        await pilot.press("q")
-        await wait(pilot, lambda: is_quit_question(app.screen) or not running(app), "the quit question", 10)
-        asked = is_quit_question(app.screen)
-        if asked:
-            await pilot.press("y")
-            for _ in range(4):
-                await pilot.pause()
-        alive_after_y = running(app)
+        hold = Hold(monkeypatch, app_module, "place_into_workarea")
+        try:
+            await sd.save_through_dialog(pilot, app, "S9")
+            await reached(pilot, hold, "Save project S9")
+            neutral_focus(app)
+            await pilot.press("q")
+            await wait(pilot, lambda: is_quit_question(app.screen) or not running(app), "the quit question", 10)
+            asked = is_quit_question(app.screen)
+            if asked:
+                await pilot.press("y")
+                for _ in range(4):
+                    await pilot.pause()
+            alive_after_y = running(app)
+        finally:
+            hold.release.set()
         exited = await wait_exit(app, 300)
         return asked, alive_after_y, exited
 
@@ -3116,11 +3130,29 @@ def test_at_b100_17_parse_half_case06_a2l_by_keys(tmp_path: Path) -> None:
     Why: the parse is 5 s of the 8.76 s attach; a bar frozen through it
     reads as a hang (the bar then holds while tags are extracted, E2 ruling
     P2-8). Negative control (P12b-4, executed): the loop is blocked → no
-    step-2 sample → RED; no parser callback → 0 rises → RED."""
+    step-2 sample → RED; no parser callback → 0 rises → RED.
+
+    Fix round 3 (WSL, 2 of 3 alone): the bar's rises are read at the
+    progress seam, not by sampling after ``enter``. On a fast disk the byte
+    reports end about 1.3 s into the parse and ``pilot.press("enter")``
+    returns after the last one, so every sample read the held 66. Each
+    ``step_busy`` byte report of step 2 now records the bar and
+    ``#status_text`` right after it is applied on the main thread: the bar
+    must rise at least 2 times inside step 2 (33 … 66) while the status line
+    reads ``step 2/3 Parse``. The elapsed-time clause keeps the samples."""
     base = tmp_path / "app"
     step2 = re.compile(r"^[" + FRAMES + r"] Loading firmware\.a2l  ·  step 2/3 Parse  ·  (\d\d:\d\d)$")
+    reports = []
 
     async def scenario(app, pilot, log):
+        applied = app.step_busy
+
+        def step_busy(key, gen, n, done=None, total=None):
+            applied(key, gen, n, done, total)
+            if key == "a2l_load" and n == 2 and done is not None:
+                reports.append((bar(app), status(app)))
+
+        app.step_busy = step_busy
         neutral_focus(app)
         await pilot.press("l")
         await ld.wait_for_dialog(pilot, app)
@@ -3141,8 +3173,10 @@ def test_at_b100_17_parse_half_case06_a2l_by_keys(tmp_path: Path) -> None:
         return samples
 
     samples = run(base, scenario)
-    values = [v for v, _e in samples]
-    assert increases(values) >= 2, f"bar values sampled in step 2: {values}"
+    values = [v for v, _s in reports]
+    assert increases(values) >= 2, f"bar values at the step-2 byte reports: {values}"
+    assert all(33 <= v <= 66 for v in values), values
+    assert all(step2.match(s) for _v, s in reports), {s for _v, s in reports if not step2.match(s)}
     assert len({e for _v, e in samples}) >= 2, f"elapsed texts in step 2: {sorted({e for _v, e in samples})}"
 
 

@@ -1,0 +1,33 @@
+(2.525, 'save dialog start')
+(3.902, 'begin save_project')
+(9.052, "save dialog closed runs=['save_project']")
+(11.07, 'q pressed')
+(11.07, "asked=True runs=['save_project']")
+(12.488, "end save_project 'Saved project to /tmp/pytest-of-jav201/p'")
+(12.541, 'y pressed runs=[] running=False')
+(12.721, 'after 4 pauses running=False')
+(12.721, 'exited=True')
+S9 manifest ok: True 2000
+1 passed in 13.38s
+(2.421, 'save dialog start')
+(3.761, 'begin save_project')
+(8.951, "save dialog closed runs=['save_project']")
+(10.968, 'q pressed')
+(10.968, "asked=True runs=['save_project']")
+(12.562, "end save_project 'Saved project to /tmp/pytest-of-jav201/p'")
+(12.611, 'y pressed runs=[] running=False')
+(12.804, 'after 4 pauses running=False')
+(12.804, 'exited=True')
+S9 manifest ok: True 2000
+1 passed in 13.15s
+(2.541, 'save dialog start')
+(3.915, 'begin save_project')
+(9.096, "save dialog closed runs=['save_project']")
+(11.113, 'q pressed')
+(11.113, "asked=True runs=['save_project']")
+(12.583, "end save_project 'Saved project to /tmp/pytest-of-jav201/p'")
+(12.634, 'y pressed runs=[] running=False')
+(12.939, 'after 4 pauses running=False')
+(12.939, 'exited=True')
+S9 manifest ok: True 2000
+1 passed in 13.37s

@@ -1,0 +1,16 @@
+== M-dwell: render_run without the restart arm
+mutated s19_app/tui/flow_screens.py
+E       AssertionError: (100.0, 100.0)
+E       assert (100.0, 100.0) == (100.0, 100.6)
+E         
+E         At index 1 diff: 100.0 != 100.6
+0f9a3a2fa1b337b4
+== M-quit: a confirmed quit exits at once
+mutated s19_app/tui/app.py
+E       AssertionError: the app stopped right after y, with the save still running
+E       assert False is True
+1 failed in 5.76s
+69f8e7b5fbbd8042
+== M-size: the parser's total off by one
+197:                    progress(handle.buffer.tell(), total)
+230:                progress(total, total)

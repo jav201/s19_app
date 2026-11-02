@@ -1,0 +1,273 @@
+# CI run 41338318239 (main 570b4b5, ubuntu, Python 3.11.17, textual 8.2.8) — excerpts of the 4 new failures
+# source: full job log, lines 302-558 (failure bodies) and 940-1080 (short summary)
+2026-11-01T22:36:14.3527310Z __________ test_tc_b100_73_small_a2l_reports_once_and_parses_the_same __________
+2026-11-01T22:36:14.3527669Z 
+2026-11-01T22:36:14.3527993Z tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_tc_b100_73_small_a2l_repo0')
+2026-11-01T22:36:14.3528413Z 
+2026-11-01T22:36:14.3528783Z     def test_tc_b100_73_small_a2l_reports_once_and_parses_the_same(tmp_path: Path) -> None:
+2026-11-01T22:36:14.3529201Z         """LLR-176.4 boundary, LLR-176.4a (D12b-02, D12b-04): case_01's A2L
+2026-11-01T22:36:14.3529818Z         (1 444 bytes, 53 lines — smaller than one progress chunk) → exactly one
+2026-11-01T22:36:14.3530178Z         report ``(1444, 1444)``; the result equals the parse with no callback.
+2026-11-01T22:36:14.3530457Z     
+2026-11-01T22:36:14.3530709Z         Why: a small A2L must still finish its step (the bar's final report).
+2026-11-01T22:36:14.3531135Z         Negative control: no final report → 0 calls → RED; base: no callback →
+2026-11-01T22:36:14.3531425Z         RED."""
+2026-11-01T22:36:14.3531615Z         seen, progress = _recorder()
+2026-11-01T22:36:14.3531860Z         with_cb = _parse_with(CASE01_A2L, progress)
+2026-11-01T22:36:14.3532114Z >       assert seen == [(1444, 1444)], seen
+2026-11-01T22:36:14.3532347Z E       AssertionError: [(1391, 1391)]
+2026-11-01T22:36:14.3532578Z E       assert [(1391, 1391)] == [(1444, 1444)]
+2026-11-01T22:36:14.3533160Z E         
+2026-11-01T22:36:14.3533358Z E         At index 0 diff: (1391, 1391) != (1444, 1444)
+2026-11-01T22:36:14.3533759Z E         
+2026-11-01T22:36:14.3534146Z E         Full diff: (-: missing in left side, +: extra in left side)
+2026-11-01T22:36:14.3534415Z E           [
+2026-11-01T22:36:14.3534579Z E               (
+2026-11-01T22:36:14.3534758Z E         -         1444,
+2026-11-01T22:36:14.3534944Z E         ?          ^^^
+2026-11-01T22:36:14.3535125Z E         +         1391,
+2026-11-01T22:36:14.3535301Z E         ?          ^^^
+2026-11-01T22:36:14.3535476Z E         -         1444,
+2026-11-01T22:36:14.3535651Z E         ?          ^^^
+2026-11-01T22:36:14.3535832Z E         +         1391,
+2026-11-01T22:36:14.3536007Z E         ?          ^^^
+2026-11-01T22:36:14.3536178Z E               ),
+2026-11-01T22:36:14.3536339Z E           ]
+2026-11-01T22:36:14.3536429Z 
+2026-11-01T22:36:14.3536546Z tests/test_b100_a2l_progress.py:118: AssertionError
+2026-11-01T22:36:14.3536887Z ________________ test_tc_b100_51_a2l_load_ends_once_on_success _________________
+2026-11-01T22:36:14.3537113Z 
+2026-11-01T22:36:14.3537297Z tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_tc_b100_51_a2l_load_ends_0')
+2026-11-01T22:36:14.3537716Z monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7e5186a08790>
+2026-11-01T22:36:14.3537952Z 
+2026-11-01T22:36:14.3538196Z     def test_tc_b100_51_a2l_load_ends_once_on_success(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+2026-11-01T22:36:14.3538650Z         """LLR-176.2c success, A12a-03 (A12-38, A12-41): ``load_a2l_from_path``
+2026-11-01T22:36:14.3539054Z         of case_01's A2L → 1 begin ``Loading firmware.a2l``, bar
+2026-11-01T22:36:14.3539369Z         ``[0, 33, 66, 0]``, the log gains only ``A2L loaded: firmware.a2l``
+2026-11-01T22:36:14.3539715Z         (the outcome), ``#status_text`` ``Ready.``, 1 effective end, 0 timers;
+2026-11-01T22:36:14.3540025Z         a missing A2L and a ``.txt`` begin nothing.
+2026-11-01T22:36:14.3540380Z     
+2026-11-01T22:36:14.3540622Z         Why: the outcome is the action's last painted line, which other tests
+2026-11-01T22:36:14.3540911Z         read in ``#log_line_4``.
+2026-11-01T22:36:14.3541178Z         RED (base, p12a U1.4): bar ``[10, 50, 100]``, 4 log lines."""
+2026-11-01T22:36:14.3541453Z         seam = Seam(monkeypatch)
+2026-11-01T22:36:14.3541711Z         (tmp_path / "x.txt").write_text("x", encoding="utf-8")
+2026-11-01T22:36:14.3541961Z     
+2026-11-01T22:36:14.3542149Z         async def scenario(app, pilot, log):
+2026-11-01T22:36:14.3542436Z             mark = len(log.messages)
+2026-11-01T22:36:14.3542695Z             app.load_a2l_from_path(CASE01 / "firmware.a2l")
+2026-11-01T22:36:14.3543035Z             await _drain(app, pilot)  # Inc 12b re-pin: the attach runs on a worker
+2026-11-01T22:36:14.3543476Z             out = (list(seam.bar), log.since(mark), _status(app), len(_busy_timers(app)), list(seam.begins))
+2026-11-01T22:36:14.3543943Z             begins = len(seam.begins)
+2026-11-01T22:36:14.3544212Z             app.load_a2l_from_path(tmp_path / "missing.a2l")
+2026-11-01T22:36:14.3544492Z             app.load_a2l_from_path(tmp_path / "x.txt")
+2026-11-01T22:36:14.3544744Z             await _settle(pilot, 3)
+2026-11-01T22:36:14.3544980Z             return out, len(seam.begins) - begins
+2026-11-01T22:36:14.3545202Z     
+2026-11-01T22:36:14.3545457Z         (bar, added, final, timers, begins), refused = _run(tmp_path / "app", scenario)
+2026-11-01T22:36:14.3545854Z         # Inc 12b (C12b-30): step 2 after the copy, the parser's one byte report
+2026-11-01T22:36:14.3546188Z         # (1444, 1444) at the end of step 2, step 3, the end.
+2026-11-01T22:36:14.3546453Z         assert bar == [0, 33, 66, 66, 0], bar
+2026-11-01T22:36:14.3546783Z >       assert [(n, d, t) for _k, _g, n, d, t in seam.steps if _k == "a2l_load"] == [
+2026-11-01T22:36:14.3547238Z             (2, None, None), (2, 1444, 1444), (3, None, None)
+2026-11-01T22:36:14.3547477Z         ], seam.steps
+2026-11-01T22:36:14.3547918Z E       AssertionError: [('a2l_load', 1, 2, None, None), ('a2l_load', 1, 2, 1391, 1391), ('a2l_load', 1, 3, None, None)]
+2026-11-01T22:36:14.3548354Z E       assert [(2, None, No..., None, None)] == [(2, None, No..., None, None)]
+2026-11-01T22:36:14.3548641Z E         
+2026-11-01T22:36:14.3548929Z E         At index 1 diff: (2, 1391, 1391) != (2, 1444, 1444)
+2026-11-01T22:36:14.3549239Z E         
+2026-11-01T22:36:14.3549459Z E         Full diff: (-: missing in left side, +: extra in left side)
+2026-11-01T22:36:14.3549722Z E           [
+2026-11-01T22:36:14.3549882Z E               (
+2026-11-01T22:36:14.3550051Z E                   2,
+2026-11-01T22:36:14.3550230Z E                   None,
+2026-11-01T22:36:14.3550415Z E                   None,
+2026-11-01T22:36:14.3550592Z E               ),
+2026-11-01T22:36:14.3550778Z E               (
+2026-11-01T22:36:14.3550944Z E                   2,
+2026-11-01T22:36:14.3551117Z E         -         1444,
+2026-11-01T22:36:14.3551296Z E         ?          ^^^
+2026-11-01T22:36:14.3551484Z E         +         1391,
+2026-11-01T22:36:14.3551662Z E         ?          ^^^
+2026-11-01T22:36:14.3551842Z E         -         1444,
+2026-11-01T22:36:14.3552017Z E         ?          ^^^
+2026-11-01T22:36:14.3552191Z E         +         1391,
+2026-11-01T22:36:14.3552363Z E         ?          ^^^
+2026-11-01T22:36:14.3552530Z E               ),
+2026-11-01T22:36:14.3552699Z E               (
+2026-11-01T22:36:14.3552862Z E                   3,
+2026-11-01T22:36:14.3553032Z E                   None,
+2026-11-01T22:36:14.3553208Z E                   None,
+2026-11-01T22:36:14.3553380Z E               ),
+2026-11-01T22:36:14.3553546Z E           ]
+2026-11-01T22:36:14.3553732Z 
+2026-11-01T22:36:14.3553833Z tests/test_b100_busy.py:1838: AssertionError
+2026-11-01T22:36:14.3554150Z ------------------------------ Captured log call -------------------------------
+2026-11-01T22:36:14.3554970Z INFO     s19tui:app.py:2943 App initialized. base_dir=/tmp/pytest-of-runner/pytest-0/test_tc_b100_51_a2l_load_ends_0/app workarea=/tmp/pytest-of-runner/pytest-0/test_tc_b100_51_a2l_load_ends_0/app/.s19tool/workarea
+2026-11-01T22:36:14.3555652Z INFO     s19tui:app.py:7957 Workarea refreshed. files=0
+2026-11-01T22:36:14.3556034Z INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.006
+2026-11-01T22:36:14.3556727Z INFO     s19tui:app.py:15283 A2L copy complete: path=/tmp/pytest-of-runner/pytest-0/test_tc_b100_51_a2l_load_ends_0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=1391 copy_seconds=0.003
+2026-11-01T22:36:14.3557578Z INFO     s19tui:app.py:921 A2L cache miss: path=/tmp/pytest-of-runner/pytest-0/test_tc_b100_51_a2l_load_ends_0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=1391
+2026-11-01T22:36:14.3558305Z WARNING  s19tui:app.py:15321 Recent sources not updated: '/home/runner/work/s19_app/s19_app/examples/case_01_basic_valid/firmware.a2l'
+2026-11-01T22:36:14.3558774Z INFO     s19tui:app.py:7957 Workarea refreshed. files=1
+2026-11-01T22:36:14.3559421Z INFO     s19tui:app.py:18108 A2L parse summary: path=/tmp/pytest-of-runner/pytest-0/test_tc_b100_51_a2l_load_ends_0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.001 sections=1 tags=3 errors=0
+2026-11-01T22:36:14.3560147Z INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.007
+2026-11-01T22:36:14.3560855Z INFO     s19tui:app.py:18823 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.007
+2026-11-01T22:36:14.3561565Z INFO     s19tui:app.py:19252 Load phase boundary: populate_a2l_table_done rows=3 total=3 elapsed=0.001
+2026-11-01T22:36:14.3562373Z INFO     s19tui:app.py:15341 A2L view refresh complete: path=/tmp/pytest-of-runner/pytest-0/test_tc_b100_51_a2l_load_ends_0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.008
+2026-11-01T22:36:14.3563168Z INFO     s19tui:app.py:15349 A2L loaded: /tmp/pytest-of-runner/pytest-0/test_tc_b100_51_a2l_load_ends_0/app/.s19tool/workarea/temp/firmware.a2l
+2026-11-01T22:36:14.3563973Z WARNING  s19tui:app.py:15196 A2L file not found: /tmp/pytest-of-runner/pytest-0/test_tc_b100_51_a2l_load_ends_0/missing.a2l
+2026-11-01T22:36:14.3564520Z WARNING  s19tui:app.py:15200 Unsupported A2L type: .txt
+2026-11-01T22:36:14.3564858Z ___ test_at_b100_18_quit_confirm_half_slow_save_as_leaves_no_partial_folder ____
+2026-11-01T22:36:14.3565092Z 
+2026-11-01T22:36:14.3565286Z tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_at_b100_18_quit_confirm_h0')
+2026-11-01T22:36:14.3565545Z 
+2026-11-01T22:36:14.3565771Z     def test_at_b100_18_quit_confirm_half_slow_save_as_leaves_no_partial_folder(tmp_path: Path) -> None:
+2026-11-01T22:36:14.3566212Z         """AT-B100-18 quit-confirm half, HLR-177c: the engineer opens project
+2026-11-01T22:36:14.3566568Z         ``S`` (case_01 trio plus 2 000 files under ``flows/``), saves it as
+2026-11-01T22:36:14.3566912Z         ``S9`` through the Save dialog, and while the save-as runs presses
+2026-11-01T22:36:14.3567383Z         ``q`` then ``y`` → the app is still running right after ``y``; it exits
+2026-11-01T22:36:14.3567753Z         once the save ends, and the work area then holds ``S9`` complete (its
+2026-11-01T22:36:14.3568156Z         ``project.json`` records exactly the files on disk) — no partial
+2026-11-01T22:36:14.3568438Z         project folder.
+2026-11-01T22:36:14.3568618Z     
+2026-11-01T22:36:14.3568861Z         Why: closing the app mid-copy left a partial project (the R12 backlog
+2026-11-01T22:36:14.3569286Z         row). Negative control: an exit on ``y`` stops the app mid-copy → RED;
+2026-11-01T22:36:14.3569668Z         base: the save-as runs inside the click, so ``q`` arrives after it and
+2026-11-01T22:36:14.3570006Z         exits with no question → RED."""
+2026-11-01T22:36:14.3570233Z         base = tmp_path / "app"
+2026-11-01T22:36:14.3570472Z         s = trio(W(base) / "S")
+2026-11-01T22:36:14.3570694Z         projects.bulk_files(s, "flows", 2000)
+2026-11-01T22:36:14.3570914Z     
+2026-11-01T22:36:14.3571092Z         async def scenario(app, pilot, log):
+2026-11-01T22:36:14.3571488Z             await ld.open_project_through_dialog(pilot, app, "S", confirm="enter")
+2026-11-01T22:36:14.3571847Z             await projects.dismiss_load_result_panel(pilot, app)
+2026-11-01T22:36:14.3572166Z             await sd.save_through_dialog(pilot, app, "S9")
+2026-11-01T22:36:14.3572427Z             neutral_focus(app)
+2026-11-01T22:36:14.3572643Z             await pilot.press("q")
+2026-11-01T22:36:14.3573019Z             await wait(pilot, lambda: is_quit_question(app.screen) or not running(app), "the quit question", 10)
+2026-11-01T22:36:14.3573415Z             asked = is_quit_question(app.screen)
+2026-11-01T22:36:14.3573724Z             if asked:
+2026-11-01T22:36:14.3574017Z                 await pilot.press("y")
+2026-11-01T22:36:14.3574240Z                 for _ in range(4):
+2026-11-01T22:36:14.3574459Z                     await pilot.pause()
+2026-11-01T22:36:14.3574735Z             alive_after_y = running(app)
+2026-11-01T22:36:14.3574969Z             exited = await wait_exit(app, 300)
+2026-11-01T22:36:14.3575223Z             return asked, alive_after_y, exited
+2026-11-01T22:36:14.3575438Z     
+2026-11-01T22:36:14.3575633Z         asked, alive_after_y, exited = run(base, scenario)
+2026-11-01T22:36:14.3575953Z         assert asked is True, "q during the save-as exited without asking"
+2026-11-01T22:36:14.3576359Z >       assert alive_after_y is True, "the app stopped right after y, with the save still running"
+2026-11-01T22:36:14.3576803Z E       AssertionError: the app stopped right after y, with the save still running
+2026-11-01T22:36:14.3577122Z E       assert False is True
+2026-11-01T22:36:14.3577245Z 
+2026-11-01T22:36:14.3577356Z tests/test_b100_workers.py:3090: AssertionError
+2026-11-01T22:36:14.3577672Z ------------------------------ Captured log call -------------------------------
+2026-11-01T22:36:14.3578401Z INFO     s19tui:app.py:2943 App initialized. base_dir=/tmp/pytest-of-runner/pytest-0/test_at_b100_18_quit_confirm_h0/app workarea=/tmp/pytest-of-runner/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea
+2026-11-01T22:36:14.3579133Z INFO     s19tui:app.py:7957 Workarea refreshed. files=0
+2026-11-01T22:36:14.3579511Z INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.006
+2026-11-01T22:36:14.3579913Z INFO     s19tui:app.py:8104 Load project action triggered.
+2026-11-01T22:36:14.3580290Z INFO     s19tui:app.py:15054 Load phase boundary: modal_dismiss_scheduled kind=project value='S'
+2026-11-01T22:36:14.3580718Z WARNING  s19tui:app.py:13515 Project S: no project.json project.json (None)
+2026-11-01T22:36:14.3581306Z INFO     s19tui:app.py:921 A2L cache miss: path=/tmp/pytest-of-runner/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S/firmware.a2l size_bytes=1391
+2026-11-01T22:36:14.3581935Z INFO     s19tui:app.py:13757 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+2026-11-01T22:36:14.3582700Z INFO     s19tui:app.py:18161 Load summary: file_type=s19 path=/tmp/pytest-of-runner/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+2026-11-01T22:36:14.3583627Z INFO     s19tui:app.py:13774 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+2026-11-01T22:36:14.3584130Z INFO     s19tui:app.py:13757 Load phase boundary: parse_branch_entry path=firmware.mac suffix=.mac
+2026-11-01T22:36:14.3584576Z INFO     s19tui:app.py:16461 Load phase boundary: mac_parse_entry path=firmware.mac
+2026-11-01T22:36:14.3585074Z INFO     s19tui:app.py:16467 Load phase boundary: mac_parse_done path=firmware.mac rows=2 diagnostics=1 elapsed=0.000s
+2026-11-01T22:36:14.3585890Z INFO     s19tui:app.py:16481 MAC parse summary (mirrored): path=/tmp/pytest-of-runner/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S/firmware.mac rows=2 parse_ok=1 diagnostics=1 valid_addresses=1
+2026-11-01T22:36:14.3586952Z INFO     s19tui:app.py:16502 Load phase boundary: mac_a2l_resolve_entry path=firmware.mac a2l_path=/tmp/pytest-of-runner/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S/firmware.a2l
+2026-11-01T22:36:14.3587691Z INFO     s19tui:app.py:16508 Load phase boundary: mac_a2l_resolve_done path=firmware.mac has_a2l_data=True
+2026-11-01T22:36:14.3588787Z INFO     s19tui:app.py:16514 MAC parse summary: path=/tmp/pytest-of-runner/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S/firmware.mac total_records=2 parse_ok=1 diagnostics=1 valid_addresses=1 a2l_path=/tmp/pytest-of-runner/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S/firmware.a2l elapsed_seconds=0.000
+2026-11-01T22:36:14.3589887Z INFO     s19tui:app.py:13799 Load phase boundary: mac_merge_entry path=firmware.mac has_primary=True
+2026-11-01T22:36:14.3590373Z INFO     s19tui:app.py:13806 Load phase boundary: mac_merge_done path=firmware.mac file_type=s19
+2026-11-01T22:36:14.3591142Z INFO     s19tui:app.py:18161 Load summary: file_type=s19+mac path=/tmp/pytest-of-runner/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S/firmware.mac addresses=97 range_count=2 range_bytes=97 errors=0
+2026-11-01T22:36:14.3591899Z INFO     s19tui:app.py:13828 Load phase boundary: parse_branch_done path=firmware.mac branch=mac
+2026-11-01T22:36:14.3592389Z INFO     s19tui:app.py:17679 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+2026-11-01T22:36:14.3592908Z INFO     s19tui:app.py:17679 Load phase boundary: apply_install_state path=firmware.mac precomputed=False
+2026-11-01T22:36:14.3593854Z INFO     s19tui:app.py:13710 Project loaded. name=S file=/tmp/pytest-of-runner/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S/firmware.s19 mac=/tmp/pytest-of-runner/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S/firmware.mac
+2026-11-01T22:36:14.3594774Z INFO     s19tui:app.py:18289 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+2026-11-01T22:36:14.3595261Z INFO     s19tui:app.py:17695 Load phase boundary: apply_sections_done path=firmware.s19
+2026-11-01T22:36:14.3595817Z INFO     s19tui:app.py:18289 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+2026-11-01T22:36:14.3596290Z INFO     s19tui:app.py:17695 Load phase boundary: apply_sections_done path=firmware.mac
+2026-11-01T22:36:14.3596708Z INFO     s19tui:app.py:17707 Load phase boundary: apply_hex_done path=firmware.s19
+2026-11-01T22:36:14.3597501Z INFO     s19tui:app.py:17707 Load phase boundary: apply_hex_done path=firmware.mac
+2026-11-01T22:36:14.3597951Z INFO     s19tui:app.py:17274 MAC validation computed: records=2 issues=9 elapsed_seconds=0.000
+2026-11-01T22:36:14.3598376Z INFO     s19tui:app.py:17329 MAC row cache built: records=2 elapsed_seconds=0.000
+2026-11-01T22:36:14.3598833Z INFO     s19tui:app.py:16234 Load phase boundary: populate_issues_table_done rows=9 total=9 elapsed=0.010
+2026-11-01T22:36:14.3599341Z INFO     s19tui:app.py:18874 Load phase boundary: populate_mac_table_done rows=2 total=2 elapsed=0.011
+2026-11-01T22:36:14.3599832Z INFO     s19tui:app.py:19252 Load phase boundary: populate_a2l_table_done rows=3 total=3 elapsed=0.001
+2026-11-01T22:36:14.3600284Z INFO     s19tui:app.py:17720 Load phase boundary: apply_a2l_done path=firmware.s19
+2026-11-01T22:36:14.3600733Z INFO     s19tui:app.py:16234 Load phase boundary: populate_issues_table_done rows=9 total=9 elapsed=0.010
+2026-11-01T22:36:14.3601268Z INFO     s19tui:app.py:18874 Load phase boundary: populate_mac_table_done rows=2 total=2 elapsed=0.011
+2026-11-01T22:36:14.3601750Z INFO     s19tui:app.py:19252 Load phase boundary: populate_a2l_table_done rows=3 total=3 elapsed=0.001
+2026-11-01T22:36:14.3602193Z INFO     s19tui:app.py:17720 Load phase boundary: apply_a2l_done path=firmware.mac
+2026-11-01T22:36:14.3602537Z INFO     s19tui:app.py:18516 Memory Map updated. ranges=2
+2026-11-01T22:36:14.3603250Z INFO     s19tui:app.py:17737 Loaded file successfully: path=/tmp/pytest-of-runner/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S/firmware.s19 file_type=s19 elapsed_seconds=1.066 has_mac=False precomputed=False
+2026-11-01T22:36:14.3604112Z INFO     s19tui:app.py:18516 Memory Map updated. ranges=2
+2026-11-01T22:36:14.3604786Z INFO     s19tui:app.py:17737 Loaded file successfully: path=/tmp/pytest-of-runner/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S/firmware.mac file_type=s19 elapsed_seconds=1.122 has_mac=True precomputed=False
+2026-11-01T22:36:14.3605731Z INFO     s19tui:app.py:8039 Save project action triggered for /tmp/pytest-of-runner/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S/firmware.s19
+2026-11-01T22:36:14.3606511Z INFO     s19tui:app.py:11769 Project saved image. name=S9 file=/tmp/pytest-of-runner/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S9/firmware.s19
+2026-11-01T22:36:14.3607286Z INFO     s19tui:app.py:11769 Project saved mac. name=S9 file=/tmp/pytest-of-runner/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S9/firmware.mac
+2026-11-01T22:36:14.3608051Z INFO     s19tui:app.py:11769 Project saved a2l. name=S9 file=/tmp/pytest-of-runner/pytest-0/test_at_b100_18_quit_confirm_h0/app/.s19tool/workarea/S9/firmware.a2l
+2026-11-01T22:36:14.3608587Z INFO     s19tui:app.py:7957 Workarea refreshed. files=0
+2026-11-01T22:36:14.3608912Z _______________ test_tc_b97_64_a_new_set_run_restarts_the_dwell ________________
+2026-11-01T22:36:14.3609132Z 
+2026-11-01T22:36:14.3609326Z tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_tc_b97_64_a_new_set_run_r0')
+2026-11-01T22:36:14.3609750Z monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7e516aab2010>
+2026-11-01T22:36:14.3609984Z 
+2026-11-01T22:36:14.3610181Z     def test_tc_b97_64_a_new_set_run_restarts_the_dwell(tmp_path: Path, monkeypatch) -> None:
+2026-11-01T22:36:14.3610601Z         """TC-B97-64 / I-7 (c) (gate fold, code-reviewer F1): a new set run
+2026-11-01T22:36:14.3610978Z         restarts the attention even when the same lane waits at the same block,
+2026-11-01T22:36:14.3611478Z         through ``_rearm_attention(restart=True)`` — so a ``c`` right after the
+2026-11-01T22:36:14.3611884Z         run ends is a ``c`` inside the dwell and confirms nothing.
+2026-11-01T22:36:14.3612145Z     
+2026-11-01T22:36:14.3612394Z         Why: the old lane's dwell base was taken before the run; reusing it would
+2026-11-01T22:36:14.3612752Z         let a ``c`` typed during the run confirm the moment the run ends.
+2026-11-01T22:36:14.3613138Z         Mutation: the restart arm removed → the ``c`` confirms 1.
+2026-11-01T22:36:14.3613400Z         """
+2026-11-01T22:36:14.3613658Z         from tests.b97_probes import record_statuses
+2026-11-01T22:36:14.3613992Z     
+2026-11-01T22:36:14.3614174Z         confirms = ConfirmSpy(monkeypatch)
+2026-11-01T22:36:14.3614426Z         statuses = record_statuses(monkeypatch)
+2026-11-01T22:36:14.3614653Z     
+2026-11-01T22:36:14.3614850Z         async def body(app, pilot, panel, project_dir):
+2026-11-01T22:36:14.3615169Z             await poll(pilot, lambda: panel._attention_since is not None, 200)
+2026-11-01T22:36:14.3615469Z             await pilot.pause(0.6)
+2026-11-01T22:36:14.3615718Z             await run_lanes(app, pilot, panel, key=True)
+2026-11-01T22:36:14.3615971Z             await pilot.press("c")
+2026-11-01T22:36:14.3616184Z             await settle(pilot, 6)
+2026-11-01T22:36:14.3616505Z             return list(confirms.posts), list(statuses)[-1:], panel._lanes[1].paused_block
+2026-11-01T22:36:14.3616818Z     
+2026-11-01T22:36:14.3629238Z         posts, last, paused = run_fx(tmp_path, (118, 54), body, stems=THREE, run=True, evidence=True)
+2026-11-01T22:36:14.3630168Z >       assert posts == [] and paused == 2, (posts, paused)
+2026-11-01T22:36:14.3630937Z E       AssertionError: ([(1, 2)], None)
+2026-11-01T22:36:14.3631305Z E       assert ([(1, 2)] == []
+2026-11-01T22:36:14.3631557Z E         
+2026-11-01T22:36:14.3631787Z E         Left contains one more item: (1, 2)
+2026-11-01T22:36:14.3632072Z E         
+2026-11-01T22:36:14.3632365Z E         Full diff: (-: missing in left side, +: extra in left side)
+2026-11-01T22:36:14.3632720Z E         - []
+2026-11-01T22:36:14.3632933Z E         + [
+2026-11-01T22:36:14.3633375Z E         +     (
+2026-11-01T22:36:14.3633715Z E         +         1,
+2026-11-01T22:36:14.3633943Z E         +         2,
+2026-11-01T22:36:14.3634150Z E         +     ),
+2026-11-01T22:36:14.3634353Z E         + ])
+2026-11-01T22:36:14.3634481Z 
+2026-11-01T22:36:14.3634635Z tests/test_b97_flow_execution.py:1775: AssertionError
+
+# --- short test summary (FAILED lines) ---
+1077:2026-11-01T22:36:15.8062747Z 9 failed, 5030 passed, 211 skipped, 4 xfailed in 13771.58s (3:49:31)
+# --- short test summary (FAILED lines) ---
+FAILED tests/test_b100_a2l_progress.py::test_tc_b100_73_small_a2l_reports_once_and_parses_the_same - AssertionError: [(1391, 1391)]
+FAILED tests/test_b100_busy.py::test_tc_b100_51_a2l_load_ends_once_on_success - AssertionError: [('a2l_load', 1, 2, None, None), ('a2l_load', 1, 2, 1391, 1391), ('a2l_load', 1, 3, None, None)]
+FAILED tests/test_b100_workers.py::test_at_b100_18_quit_confirm_half_slow_save_as_leaves_no_partial_folder - AssertionError: the app stopped right after y, with the save still running
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_a_new_set_run_restarts_the_dwell - AssertionError: ([(1, 2)], None)
+FAILED tests/test_changes_file_notation_help.py::test_tc1802_nine_md_sections_intact_tenth_section_added - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/s19_app/s19_app/prototypes/cambios_10_12_2026/hel
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact - AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection - AssertionError: baseline wrote []
+FAILED tests/test_window_usage_help.py::test_tc707_copy_matches_help_sections_md_verbatim - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/s19_app/s19_app/prototypes/cambios_10_12_2026/help_sections.md'
+FAILED tests/test_window_usage_help.py::test_tc707_numbering_generated_sequential - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/s19_app/s19_app/prototypes/cambios_10_12_2026/help_sections.md'
+9 failed, 5030 passed, 211 skipped, 4 xfailed in 13771.58s (3:49:31)

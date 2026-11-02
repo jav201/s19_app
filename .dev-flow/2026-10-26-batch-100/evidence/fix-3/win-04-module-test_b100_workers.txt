@@ -1,0 +1,92 @@
+C:\Users\jjgh8\Github\s19_app-b100-fix3\s19_app\__init__.py 3.11.15 | packaged by Anaconda, Inc. | (main, Jun 11 2026, 15:12:53) [MSC v.1942 64 bit (AMD64)]
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+rootdir: C:\Users\jjgh8\Github\s19_app-b100-fix3
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 70 items
+
+tests/test_b100_workers.py::test_tc_b100_53_project_load_refuses_cheaply_then_returns_before_the_install PASSED [  1%]
+tests/test_b100_workers.py::test_tc_b100_53_project_load_reads_every_file_on_a_worker PASSED [  2%]
+tests/test_b100_workers.py::test_tc_b100_53_save_refuses_before_any_worker_then_writes_on_one PASSED [  4%]
+tests/test_b100_workers.py::test_tc_b100_53_every_a2l_attach_route_parses_on_a_worker PASSED [  5%]
+tests/test_b100_workers.py::test_tc_b100_53_workarea_data_pick_parses_on_the_file_load_worker[files_list] PASSED [  7%]
+tests/test_b100_workers.py::test_tc_b100_53_workarea_data_pick_parses_on_the_file_load_worker[load_dialog] PASSED [  8%]
+tests/test_b100_workers.py::test_tc_b100_53_workarea_pick_begins_a_file_load_and_never_syncs_the_project PASSED [ 10%]
+tests/test_b100_workers.py::test_tc_b100_53_case06_project_load_keeps_the_loop_free_and_reports_parse_bytes PASSED [ 11%]
+tests/test_b100_workers.py::test_tc_b100_53_case06_a2l_attach_keeps_the_loop_free_and_reports_parse_bytes PASSED [ 12%]
+tests/test_b100_workers.py::test_tc_b100_53_held_save_keeps_the_loop_free PASSED [ 14%]
+tests/test_b100_workers.py::test_tc_b100_53_save_reports_each_file_placed PASSED [ 15%]
+tests/test_b100_workers.py::test_tc_b100_53_a_two_thousand_file_save_moves_the_bar_ten_times PASSED [ 17%]
+tests/test_b100_workers.py::test_tc_b100_53_session_is_written_only_on_the_main_thread PASSED [ 18%]
+tests/test_b100_workers.py::test_tc_b100_53_workers_read_only_their_frozen_request PASSED [ 20%]
+tests/test_b100_workers.py::test_tc_b100_53_project_over_an_open_image_equals_a_cold_load PASSED [ 21%]
+tests/test_b100_workers.py::test_tc_b100_53_reset_runs_after_the_worker_and_before_the_first_install PASSED [ 22%]
+tests/test_b100_workers.py::test_tc_b100_53_load_result_panel_opens_after_the_install PASSED [ 24%]
+tests/test_b100_workers.py::test_tc_b100_53_save_rederives_on_main_before_the_worker PASSED [ 25%]
+tests/test_b100_workers.py::test_tc_b100_53_save_adopts_only_after_the_commit PASSED [ 27%]
+tests/test_b100_workers.py::test_tc_b100_53_session_writers_are_refused_during_a_save PASSED [ 28%]
+tests/test_b100_workers.py::test_tc_b100_53_load_requests_are_refused_during_a_project_load PASSED [ 30%]
+tests/test_b100_workers.py::test_tc_b100_53_variant_unload_and_save_are_refused_while_busy PASSED [ 31%]
+tests/test_b100_workers.py::test_tc_b100_53_patch_editor_changes_are_refused_while_busy PASSED [ 32%]
+tests/test_b100_workers.py::test_tc_b100_53_patch_editor_continuations_are_refused_while_busy PASSED [ 34%]
+tests/test_b100_workers.py::test_tc_b100_53_busy_line_names_the_action_and_changes_nothing PASSED [ 35%]
+tests/test_b100_workers.py::test_tc_b100_53_busy_line_paints_a_hostile_name_literally[[b]P-[b]P] PASSED [ 37%]
+tests/test_b100_workers.py::test_tc_b100_53_busy_line_paints_a_hostile_name_literally[A\u202eB-AB] PASSED [ 38%]
+tests/test_b100_workers.py::test_tc_b100_53_refusals_stop_after_each_project_load_exit PASSED [ 40%]
+tests/test_b100_workers.py::test_tc_b100_53_action_starts_refuse_while_another_session_action_runs PASSED [ 41%]
+tests/test_b100_workers.py::test_tc_b100_53_running_session_action_ignores_reports PASSED [ 42%]
+tests/test_b100_workers.py::test_tc_b100_53_paste_box_is_read_only_during_a_project_load PASSED [ 44%]
+tests/test_b100_workers.py::test_tc_b100_53_a_load_queued_under_the_save_dialog_is_refused_at_its_commit PASSED [ 45%]
+tests/test_b100_workers.py::test_tc_b100_53_a_source_that_vanished_under_the_dialog_is_refused_by_the_save_worker XFAIL [ 47%]
+tests/test_b100_workers.py::test_tc_b100_53_quit_asks_only_while_a_session_action_runs PASSED [ 48%]
+tests/test_b100_workers.py::test_tc_b100_53_quit_question_emphasises_the_safe_answer PASSED [ 50%]
+tests/test_b100_workers.py::test_tc_b100_53_idle_quit_under_the_load_question_keeps_the_key PASSED [ 51%]
+tests/test_b100_workers.py::test_tc_b100_53_stay_keeps_the_save_running PASSED [ 52%]
+tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_waits_for_the_end[save] PASSED [ 54%]
+tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_waits_for_the_end[save_fails] PASSED [ 55%]
+tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_waits_for_the_end[project] PASSED [ 57%]
+tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_waits_for_the_end[a2l] PASSED [ 58%]
+tests/test_b100_workers.py::test_tc_b100_53_quit_boundaries PASSED       [ 60%]
+tests/test_b100_workers.py::test_tc_b100_54_project_worker_failure_keeps_the_session[PermissionError] PASSED [ 61%]
+tests/test_b100_workers.py::test_tc_b100_54_project_worker_failure_keeps_the_session[ValueError] PASSED [ 62%]
+tests/test_b100_workers.py::test_tc_b100_54_save_worker_non_os_error_rolls_back_and_reports PASSED [ 64%]
+tests/test_b100_workers.py::test_tc_b100_54_a2l_worker_failure_keeps_the_session[parse] PASSED [ 65%]
+tests/test_b100_workers.py::test_tc_b100_54_a2l_worker_failure_keeps_the_session[copy] PASSED [ 67%]
+tests/test_b100_workers.py::test_tc_b100_54_a2l_worker_failure_keeps_the_session[containment] PASSED [ 68%]
+tests/test_b100_workers.py::test_at_b100_18_worker_half_case06_project_load_by_keys PASSED [ 70%]
+tests/test_b100_workers.py::test_at_b100_18_refusal_half_l_during_a_save_by_keys PASSED [ 71%]
+tests/test_b100_workers.py::test_at_b100_18_quit_half_q_during_a_save_asks_with_stay_focused PASSED [ 72%]
+tests/test_b100_workers.py::test_at_b100_18_quit_confirm_half_slow_save_as_leaves_no_partial_folder PASSED [ 74%]
+tests/test_b100_workers.py::test_at_b100_17_parse_half_case06_a2l_by_keys PASSED [ 75%]
+tests/test_b100_workers.py::test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished[project_folder] PASSED [ 77%]
+tests/test_b100_workers.py::test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished[a2l_size] PASSED [ 78%]
+tests/test_b100_workers.py::test_tc_b100_54_file_load_sync_refuses_when_the_project_folder_is_gone PASSED [ 80%]
+tests/test_b100_workers.py::test_tc_b100_54_a2l_sync_refuses_when_the_project_folder_turns_unreadable PASSED [ 81%]
+tests/test_b100_workers.py::test_tc_b100_53_report_generate_keeps_the_regions_of_a_running_save PASSED [ 82%]
+tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_is_withdrawn_when_pasted_entries_were_not_saved PASSED [ 84%]
+tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_is_withdrawn_when_editor_edits_stay_unsaved PASSED [ 85%]
+tests/test_b100_workers.py::test_tc_b100_53_a_running_file_load_refuses_a_project_load_and_asks_before_quitting PASSED [ 87%]
+tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_is_withdrawn_when_the_load_fails[file_load_fails] PASSED [ 88%]
+tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_is_withdrawn_when_the_load_fails[project_fails] PASSED [ 90%]
+tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_is_withdrawn_when_the_load_fails[project_refused] PASSED [ 91%]
+tests/test_b100_workers.py::test_tc_b100_53_a_project_reload_reuses_the_a2l_parse PASSED [ 92%]
+tests/test_b100_workers.py::test_tc_b100_53_save_reports_the_change_document_as_one_placed_file[pasted] PASSED [ 94%]
+tests/test_b100_workers.py::test_tc_b100_53_save_reports_the_change_document_as_one_placed_file[file_backed] PASSED [ 95%]
+tests/test_b100_workers.py::test_tc_b100_53_in_place_a2l_pick_starts_at_the_parse_step PASSED [ 97%]
+tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_during_a_routed_project_load_exits_cleanly PASSED [ 98%]
+tests/test_b100_workers.py::test_tc_b100_54_failed_in_place_a2l_pick_keeps_the_files_list_cursor PASSED [100%]
+
+============================ slowest 10 durations =============================
+197.44s call     tests/test_b100_workers.py::test_tc_b100_53_workarea_data_pick_parses_on_the_file_load_worker[load_dialog]
+186.06s call     tests/test_b100_workers.py::test_tc_b100_53_workarea_data_pick_parses_on_the_file_load_worker[files_list]
+67.85s call     tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_waits_for_the_end[save_fails]
+30.93s call     tests/test_b100_workers.py::test_tc_b100_53_case06_project_load_keeps_the_loop_free_and_reports_parse_bytes
+24.83s call     tests/test_b100_workers.py::test_tc_b100_53_a_two_thousand_file_save_moves_the_bar_ten_times
+23.62s call     tests/test_b100_workers.py::test_at_b100_18_worker_half_case06_project_load_by_keys
+23.45s call     tests/test_b100_workers.py::test_at_b100_18_quit_confirm_half_slow_save_as_leaves_no_partial_folder
+21.46s call     tests/test_b100_workers.py::test_tc_b100_53_case06_a2l_attach_keeps_the_loop_free_and_reports_parse_bytes
+20.77s call     tests/test_b100_workers.py::test_at_b100_17_parse_half_case06_a2l_by_keys
+13.78s call     tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_is_withdrawn_when_editor_edits_stay_unsaved
+================== 69 passed, 1 xfailed in 921.95s (0:15:21) ==================
+exit=0
