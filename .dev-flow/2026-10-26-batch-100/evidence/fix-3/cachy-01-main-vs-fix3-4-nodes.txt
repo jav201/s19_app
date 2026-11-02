@@ -14,7 +14,7 @@ FAILED tests/test_b100_workers.py::test_at_b100_18_quit_confirm_half_slow_save_a
 4 passed in 30.78s
 ==== FIX3-MODULES
 python -m pytest: error: unrecognized arguments: -n
-  inifile: /home/javierg/work/s19_app/pyproject.toml
-  rootdir: /home/javierg/work/s19_app
+  inifile: <HOME>/work/s19_app/pyproject.toml
+  rootdir: <HOME>/work/s19_app
 
 exit=0
