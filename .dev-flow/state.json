@@ -152,6 +152,11 @@
       "station": "PDR",
       "date": "2026-11-02",
       "decision": "PDR discharged per increment (no prototype round in batch-101: the 37 UI rows are known failed checks by operator ruling)."
+    },
+    {
+      "station": "P3",
+      "date": "2026-11-02",
+      "decision": "P3 increment 001 (Inc 1, strict-EARS canon swap) approved and merged at 6a4eadb under the standing authorization: guard RED 11/11 on e273181, GREEN 11/11; 20/20 mutants; code-reviewer and security-reviewer PASS-WITH-NOTES; orchestrator re-run 67 passed, 2 failed = the version goldens, re-pinned after the merge. Ruling R-3 retires G4 (reverses review decision D0-8), raised to the operator."
     }
   ],
   "obsidian_synced": false,

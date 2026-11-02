@@ -1,9 +1,9 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 78 requirement files | corpus digest: e656a8a70ec3e72f -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 78 requirement files | corpus digest: 516c3335f9e060eb -->
 
 # ATLAS-IFC — how is the application addressed?
 
-59 FLOW declaration(s) · 29 COMPONENT declaration(s) · 1205 declared requirement heading ids — one row per declaration.
+62 FLOW declaration(s) · 29 COMPONENT declaration(s) · 1205 declared requirement heading ids — one row per declaration.
 
 ### FLOW `loaded_artifacts_readout` — .dev-flow/2026-08-21-batch-85/01-requirements.md:277
 - node `render_slots` — owner LLR-85.1
@@ -384,6 +384,17 @@
 - node `A2L parse progress callback (a2l.py, named frozen-engine crossing)` — owner LLR-176.4
 - node `worker moves with main-thread installs (app.py @work)` — owner LLR-177.1
 - node `worker failure handling (app.py)` — owner LLR-177.2
+
+### FLOW `canon_to_guard_tests` — .dev-flow/2026-11-01-batch-101/01-requirements.md:138
+- node `parse the canon rows (`tests/test_requirements_canon.py::_rows`; governed by R-DOC-CANON.1 … R-DOC-CANON.11)` — owner LLR-001.1
+- node `guard the canon's form — one guard test per R-DOC-CANON row (`tests/test_requirements_canon.py`)` — owner LLR-001.1
+
+### FLOW `timing_margins_to_gate_report` — .dev-flow/2026-11-01-batch-101/01-requirements.md:155
+- node `measure each timing arm's alone time and margin, under the 20 % floor (QC-TM; PLANNED — Inc 2)` — owner LLR-001.1
+- node `publish the margins to the gate report and the junit properties (QC-TM; PLANNED — Inc 2)` — owner LLR-001.1
+
+### FLOW `change_check_documents_to_symbol_resolution` — .dev-flow/2026-11-01-batch-101/01-requirements.md:172
+- node `resolve each document symbol through the loaded A2L (PLANNED — Inc 4)` — owner LLR-001.1
 
 ### COMPONENT `loaded_panel` — .dev-flow/2026-08-21-batch-85/01-requirements.md:504
 - inputs : loaded: Optional[LoadedFile] ; project: str
@@ -774,7 +785,7 @@
 
 ## STATUS — the real rules, run at derivation
 
-- [-] V10  01-requirements.md: 262 FLOW node(s), every one owned
+- [-] V10  01-requirements.md: 267 FLOW node(s), every one owned
 - [-] V11  01-requirements.md: 125 OUTPUT(s), each with an address and a declared consumer list
 - [!] V12  .dev-flow/2026-08-24-batch-87/01-requirements.md:845: COMPONENT workspace_body: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
 - [!] V12  .dev-flow/2026-10-12-batch-94/01-requirements.md:1131: COMPONENT check_editor_panel: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
