@@ -1,7 +1,7 @@
 # Diff report
 
 - Generated (UTC): 2026-07-10T12:00:00+00:00
-- Tool version: 0.1.0
+- Tool version: 1.0.0rc1
 - Image A: img.s19 [external] path=`<RUN-ROOT>/img.s19` parse-errors=0
 - Image B: img-patched.s19 [external] path=`<RUN-ROOT>/.s19tool/workarea/proj/img-patched.s19` parse-errors=0
 - Image A artifacts: summary=none; a2l=absent; mac=absent

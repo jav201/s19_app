@@ -11,7 +11,7 @@
 
 - Project: proj
 - Generated (UTC): 2026-07-27T12:00:00+00:00
-- Tool version: 0.1.0
+- Tool version: 1.0.0rc1
 - Context bytes: 64
 - Execution mode: batch
 - Assignment source: default
@@ -97,7 +97,7 @@ No mapped bytes - entropy not computed.
 
 - Project: proj
 - Generated (UTC): 2026-07-27T12:00:00+00:00
-- Tool version: 0.1.0
+- Tool version: 1.0.0rc1
 - Context bytes: 64
 - Execution mode: batch
 - Assignment source: default
@@ -334,7 +334,7 @@ No mapped bytes - entropy not computed.
 
 - Project: proj
 - Generated (UTC): 2026-07-27T12:00:00+00:00
-- Tool version: 0.1.0
+- Tool version: 1.0.0rc1
 - Context bytes: 64
 - Execution mode: batch
 - Assignment source: default
@@ -2264,7 +2264,7 @@ No mapped bytes - entropy not computed.
 
 - Project: proj
 - Generated (UTC): 2026-07-27T12:00:00+00:00
-- Tool version: 0.1.0
+- Tool version: 1.0.0rc1
 - Context bytes: 64
 - Execution mode: batch
 - Assignment source: default
@@ -2345,7 +2345,7 @@ None.
 
 - Project: proj
 - Generated (UTC): 2026-07-27T12:00:00+00:00
-- Tool version: 0.1.0
+- Tool version: 1.0.0rc1
 - Context bytes: 64
 - Execution mode: batch
 - Assignment source: default
@@ -3426,7 +3426,7 @@ No mapped bytes - entropy not computed.
 
 - Project: proj
 - Generated (UTC): 2026-07-27T12:00:00+00:00
-- Tool version: 0.1.0
+- Tool version: 1.0.0rc1
 - Context bytes: 64
 - Execution mode: batch
 - Assignment source: default
