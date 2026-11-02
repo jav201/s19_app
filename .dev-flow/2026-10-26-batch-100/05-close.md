@@ -27,7 +27,7 @@
 
 | Field | Value |
 |---|---|
-| Gate record | `python "C:/Users/jjgh8/.claude/skills/dev-flow/scripts/devflow-validate.py" --brief "C:/Users/jjgh8/Github/s19_app-b100-close"` from the project root · 2026-11-01 · `455 block · 847 notice · 45 not applicable` — the 3 blocks naming `05-close.md` (V64 §3 citations) are repaired by this record; the remainder is owed at the close: V22 canon fold-back (`--fold-canon`), V59 `base_ref` re-stamp after the rebase, V20 atlas regeneration |
+| Gate record | `python "<HOME>/.claude/skills/dev-flow/scripts/devflow-validate.py" --brief "<HOME>/Github/s19_app-b100-close"` from the project root · 2026-11-01 · `455 block · 847 notice · 45 not applicable` — the 3 blocks naming `05-close.md` (V64 §3 citations) are repaired by this record; the remainder is owed at the close: V22 canon fold-back (`--fold-canon`), V59 `base_ref` re-stamp after the rebase, V20 atlas regeneration |
 | Gated tree | `f72eef1efed1eca96d272f4e8f27d206e5e47b86` · dirty — `pyproject.toml`, `s19_app/version.py` (the `1.0.0rc1` version bump, release decision 2026-11-01) and the untracked gate evidence `evidence/batch-end/linux-gate-f72eef1-*.txt` (the close record itself excluded) |
 | Requirements canon | `REQUIREMENTS.md` (`artifact_homes.requirements_canon` = `repo:REQUIREMENTS.md`) — the canon carries through HLR-162 (batch-99); batch-100's 42 HLRs (HLR-163…HLR-178, including HLR-171a/b, 172a/b, 173a–e, 174a–d, 175a–f, 176a–d, 177a–c) and their 349 live LLRs are the new ids the `devflow-init.py --fold-canon` step owes at this close |
 
@@ -96,7 +96,7 @@ The 26 sub-HLRs (HLR-171a/b, 172a/b, 173a–e, 174a–d, 175a–f, 176a–d, 177
 
 ## 3 · Working-file reconciliation (C-44)
 
-Sweep run 2026-11-01: `git status --short` and `git log main --not --remotes` in `C:\Users\jjgh8\Github\s19_app-b100-close`, the only repository the batch touched. The flow bundle and the Kimi config were read, not edited.
+Sweep run 2026-11-01: `git status --short` and `git log main --not --remotes` in `<HOME>\Github\s19_app-b100-close`, the only repository the batch touched. The flow bundle and the Kimi config were read, not edited.
 
 | File | State | Evidence |
 |---|---|---|

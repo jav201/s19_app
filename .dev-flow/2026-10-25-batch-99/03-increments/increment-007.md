@@ -83,7 +83,7 @@ SOURCE budget: 2 / 4 used.
 
 ```bash
 # from the worktree root, with the s19env interpreter:
-python -c "import s19_app; print(s19_app.__file__)"   # -> C:\Users\jjgh8\Github\s19_app-b99-inc7\s19_app\__init__.py (proved, this session)
+python -c "import s19_app; print(s19_app.__file__)"   # -> <HOME>\Github\s19_app-b99-inc7\s19_app\__init__.py (proved, this session)
 pytest tests/test_b99_load_project.py -q                        # -> 4 passed
 pytest tests/test_b99_load_project.py -k tc_b99_34              # -> 1 passed, 3 deselected
 pytest tests/test_b99_load_project.py -k tc_b99_35              # -> 1 passed, 3 deselected
@@ -121,7 +121,7 @@ run together: 27 passed).
 |---|---|
 | Mutation applied | 3, one per declared negative control — each applied, shown RED, reverted; restore verified by SHA-256 |
 | Instrument | project code: the implementer's own hand via the Edit tool; restore checked by SHA-256 against `fixed-tree-hashes.txt` |
-| Where it ran | this worktree (`C:\Users\jjgh8\Github\s19_app-b99-inc7`), run by the implementer |
+| Where it ran | this worktree (`<HOME>\Github\s19_app-b99-inc7`), run by the implementer |
 | Transcript | `evidence/inc-7/mut-LLR-162.1.txt` · `mut-LLR-162.2.txt` · `mut-LLR-162.3.txt` |
 | Restore proven by | `app.py` back to `0979a4bb81aa…` after every revert (`fixed-tree-hashes.txt`); no mutant left in place |
 | Bytecode cache | run with `PYTHONDONTWRITEBYTECODE=1` (C-46) |
@@ -168,8 +168,8 @@ All under `artifact_homes.evidence` = `.dev-flow/2026-10-25-batch-99/evidence/in
 
 | Evidence artifact | Path | SHA-256 |
 |---|---|---|
-| GREEN, the new module alone (4 passed; AT-B99-13 also `1 passed` inside it) | `green-module-4.txt` | `21f49b05840a6d836d66d46297cf921c5e1aa07fd75c4cdf32a0f4942a2941d5` |
-| RED baseline (unmodified tree, 4 failed) | `red-initial.txt` | `0fb29b9c6e93ced6cdada9ce61358f744473008c2451b940ff0a672b0f571c5e` |
+| GREEN, the new module alone (4 passed; AT-B99-13 also `1 passed` inside it) | `green-module-4.txt` | `4d5c108310a9c8bdac8c2b78b5998fbd2e2111e770125fa61bf9181d4c1d5e30` |
+| RED baseline (unmodified tree, 4 failed) | `red-initial.txt` | `2479f4943d168774531cee49f1064643578ba33a05199f649794361712b7ac86` |
 | GREEN full new module + census jointly (27 passed) | `green-load-project.txt` | `26c565fcf1135b41ee51c897f0925632027fb0f430a37a619c481318588d8720` |
 | GREEN TC-B99-34 | `green-tc_b99_34.txt` | `5c791fbf6773ab9379093a22d5c8158cd791aba9d8f6c18a3cfe2c426da42f01` |
 | GREEN TC-B99-35 | `green-tc_b99_35.txt` | `05c9f480b3281343e40c28127e02dc632497cb69323a47e6a0223d4385870c21` |
@@ -177,10 +177,10 @@ All under `artifact_homes.evidence` = `.dev-flow/2026-10-25-batch-99/evidence/in
 | GREEN AT-B99-13 | `green-at_b99_13.txt` | `4738b60acc0f4d40eb0a5fa54d0aa2e48b9eda18ef1d5a282ec549b9e8809c1c` |
 | GREEN address census (23 passed) | `green-address-census.txt` | `04afa43b1f0188246296a98f40de34e5fae147955fe62d1bc102354469a7b832` |
 | GREEN id registry (13 passed) | `green-id-registry.txt` | `cd42569e418bf22ac5aff6ddce424a4fc7d526b4839a1e208f427f83c6921b0d` |
-| GREEN regression companion (census files: 390 passed, 1 xfailed, 1 pre-existing failure) | `green-regression.txt` | `b70fc7dd857427c330558aef5ccad94fd38f9f861d37787d511795a772ae0326` |
-| Mutation LLR-162.1 (KILLED) | `mut-LLR-162.1.txt` | `d124f3181227331d0a5914d05706b6437c73e5a1bc36b7ac91ef811acb5dea5d` |
-| Mutation LLR-162.2 (KILLED) | `mut-LLR-162.2.txt` | `8ad32ff85f6326e1b47200f5429d826d2434632602685dc77f9de8ff52f7b7ce` |
-| Mutation LLR-162.3 (KILLED) | `mut-LLR-162.3.txt` | `7e5803e24db30d816eda2ee3819c04b3acb0460671a2a33cae292c4ee071c1d2` |
+| GREEN regression companion (census files: 390 passed, 1 xfailed, 1 pre-existing failure) | `green-regression.txt` | `0e7772023c604fc0c064378757cb466d12fa39671f7ef2b5c35fcae68f21f6b1` |
+| Mutation LLR-162.1 (KILLED) | `mut-LLR-162.1.txt` | `d8d3ac977d37aee8c561699d5d8b018a44b6a35741f793884a631d23fdafc645` |
+| Mutation LLR-162.2 (KILLED) | `mut-LLR-162.2.txt` | `ce10bca310270b2286772de31b959ad7d8e191a05ebe72a9531fbe3215e884be` |
+| Mutation LLR-162.3 (KILLED) | `mut-LLR-162.3.txt` | `c2449b30441a907fda3af54f99825cba3be1a166f08d5a4bfe5edc5b47eb542e` |
 | Fixed-tree hashes (restore target) | `fixed-tree-hashes.txt` | `173f17e419cb75fbcb4245db46ac0e9f626cb075998ab6151874e2c874746d49` |
 
 `SHA256SUMS.txt` is the folder's own digest list; every digest above is of

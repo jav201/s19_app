@@ -268,7 +268,7 @@ the decisions page (§1.4). A story that depends on one is `REFINE` until it is 
 ### 2.7 Premise evaluation (C-43) — MANDATORY, one row per premise
 
 Probes executed 2026-10-25 on `307065f` (this batch's `base_ref`) with
-`S19_WT=C:/Users/jjgh8/Github/s19_app`, `PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1`, `NO_COLOR` unset,
+`S19_WT=<HOME>/Github/s19_app`, `PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1`, `NO_COLOR` unset,
 interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/p0-premises/` (one file per probe, `rw-pNN_*.txt`, `proj-p08_*.txt`).
 
 | # | Premise, as a truth-apt proposition | Tier | Verdict | Executed evidence (decisive output) | Disposition |

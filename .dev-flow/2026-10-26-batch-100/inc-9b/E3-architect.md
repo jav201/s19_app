@@ -1,6 +1,6 @@
 **Verdict: FAIL** — 0 HIGH · 6 MAJOR · 6 MINOR · 4 NIT
 
-E3 PDR r1, architect lens, Inc 9b (unified Load dialog). Code read on `C:/Users/jjgh8/Github/s19_app` @ `8947666` (9a merged; same code as the 9a worktree), Textual 8.2.8 in `s19env`. Read-only: `git status` on the repo shows no change from this review. Probes ran under `D/work/e3-architect/` (`probe_dd.py`, `probe_altl.py`, `probe_altl_prio.py`, `probe_focus.py`). The first three import no repository code. `probe_focus.py` imports the merged app read-only, with `PYTHONDONTWRITEBYTECODE=1` and a scratch `LOCALAPPDATA`.
+E3 PDR r1, architect lens, Inc 9b (unified Load dialog). Code read on `<HOME>/Github/s19_app` @ `8947666` (9a merged; same code as the 9a worktree), Textual 8.2.8 in `s19env`. Read-only: `git status` on the repo shows no change from this review. Probes ran under `D/work/e3-architect/` (`probe_dd.py`, `probe_altl.py`, `probe_altl_prio.py`, `probe_focus.py`). The first three import no repository code. `probe_focus.py` imports the merged app read-only, with `PYTHONDONTWRITEBYTECODE=1` and a scratch `LOCALAPPDATA`.
 
 Why FAIL: every fix is small. But A9b-04 changes a fixed interface, and A9b-05 reverses ruling B-2. A9b-10 has to be fixed before the draft merges. A9b-01, -02 and -03 are product defects that the prototypes' own examples would pass, so they have to be written into the graph before E4.
 

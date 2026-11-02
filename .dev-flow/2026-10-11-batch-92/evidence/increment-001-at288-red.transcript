@@ -1,4 +1,4 @@
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+<HOME>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -6,8 +6,8 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 _____________ test_at288_report_hex_sections_identical_after_move _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18241/test_at288_report_hex_sections0')
-large_s19 = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18241/test_at288_report_hex_sections0/stress.s19')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-18241/test_at288_report_hex_sections0')
+large_s19 = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-18241/test_at288_report_hex_sections0/stress.s19')
 
     def test_at288_report_hex_sections_identical_after_move(
         tmp_path: Path, large_s19: Path

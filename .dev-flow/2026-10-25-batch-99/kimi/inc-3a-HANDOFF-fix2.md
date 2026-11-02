@@ -1,6 +1,6 @@
 # HANDOFF — batch-99 Increment 3a · review round 2 fixes (security S-F1..F6, code F6a + LOWs)
 
-Worktree: `C:\Users\jjgh8\Github\s19_app-b99-inc3a` (branch `b99-inc3a`,
+Worktree: `<HOME>\Github\s19_app-b99-inc3a` (branch `b99-inc3a`,
 round-1-fixed working tree on `a52e2be`). Nothing committed — all changes
 are in the working tree for the orchestrator.
 

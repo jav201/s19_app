@@ -6,13 +6,13 @@
 #   |     if workarea is not None and _path_traverses_reparse_point(
 # edit 1 NEW:
 #   |     if False and workarea is not None and _path_traverses_reparse_point(
-# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
+# cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
 # env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
-# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_29_r18_document_behind_a_junctioned_home_is_never_copied
+# command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_29_r18_document_behind_a_junctioned_home_is_never_copied
 # started 2026-10-30T23:13:36Z  finished 2026-10-30T23:13:42Z  rc=1
 F                                                                        [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:905: AssertionError: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30682/test_tc_b100_29_r18_document_b0/app/.s19tool/workarea/Q/patches/boost.json')]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:905: AssertionError: [WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30682/test_tc_b100_29_r18_document_b0/app/.s19tool/workarea/Q/patches/boost.json')]
 =========================== short test summary info ===========================
 FAILED tests/test_b100_document.py::test_tc_b100_29_r18_document_behind_a_junctioned_home_is_never_copied
 1 failed in 4.54s

@@ -7,7 +7,7 @@
 (`git status --porcelain` shows only `.dev-flow/` additions). Probes read-only or `tempfile.mkdtemp`
 + `shutil.rmtree`; ceiling **E ≤ 4 000 entries / ≤ 8 000 addendum hits**, peak observed **4.1 MB**;
 the declared-domain D1 fixture was **never built**. Probe scripts written to a file and invoked by
-path at the short root `C:/Users/jjgh8/AppData/Local/Temp/claude/b63/r3`. `/b63/{a,b,qa,arch,archb,r1,r2}`
+path at the short root `<HOME>/AppData/Local/Temp/claude/b63/r3`. `/b63/{a,b,qa,arch,archb,r1,r2}`
 untouched.
 
 ---

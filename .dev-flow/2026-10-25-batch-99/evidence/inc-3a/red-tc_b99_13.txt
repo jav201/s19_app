@@ -2,7 +2,7 @@ FF                                                                       [100%]
 ================================== FAILURES ===================================
 ___________ test_tc_b99_13_target_replaced_between_check_and_reuse ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25741/test_tc_b99_13_target_replaced0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25741/test_tc_b99_13_target_replaced0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000230FF7BA5D0>
 
     def test_tc_b99_13_target_replaced_between_check_and_reuse(
@@ -39,7 +39,7 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000230FF7BA5D0>
             f"the caller must receive a path holding its own bytes, got "
             f"{returned} -> {_data(returned)}"
         )
-E       AssertionError: the caller must receive a path holding its own bytes, got C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-25741\test_tc_b99_13_target_replaced0\.s19tool\workarea\out\keep.s19 -> {4096: 153}
+E       AssertionError: the caller must receive a path holding its own bytes, got <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-25741\test_tc_b99_13_target_replaced0\.s19tool\workarea\out\keep.s19 -> {4096: 153}
 E       assert {4096: 153} == {4096: 17}
 E         
 E         Differing items:
@@ -49,7 +49,7 @@ E         Use -v to get more diff
 tests\test_b99_staging.py:303: AssertionError
 _______________ test_tc_b99_13_zero_byte_target_is_never_reused _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25741/test_tc_b99_13_zero_byte_targe0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25741/test_tc_b99_13_zero_byte_targe0')
 
     def test_tc_b99_13_zero_byte_target_is_never_reused(tmp_path: Path) -> None:
         """A 0-byte target may be another writer's claim placeholder (C1(a))."""
@@ -67,7 +67,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         )
 E       AssertionError: a 0-byte target (another writer's claim) must never be reused
 E       assert 'empty.s19' != 'empty.s19'
-E        +  where 'empty.s19' = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25741/test_tc_b99_13_zero_byte_targe0/.s19tool/workarea/out/empty.s19').name
+E        +  where 'empty.s19' = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25741/test_tc_b99_13_zero_byte_targe0/.s19tool/workarea/out/empty.s19').name
 
 tests\test_b99_staging.py:323: AssertionError
 =========================== short test summary info ===========================

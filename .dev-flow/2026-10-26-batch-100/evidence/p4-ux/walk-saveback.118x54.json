@@ -14,9 +14,9 @@
   "Apply: 1 applied, 0 skipped, 0 blocked",
   "Project saved + manifest verified",
   "Saved + verified: firmware_1.s19 — 1 entry applied before this save (0x8000007C)",
-  "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\s19c\\ux\\b-w118\\.s19tool\\workarea\\P (variant 'firmware_1') — firmwar"
+  "Saved project to <HOME>\\AppData\\Local\\Temp\\s19c\\ux\\b-w118\\.s19tool\\workarea\\P (variant 'firmware_1') — firmwar"
  ],
- "current_file_after_save": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\s19c\\ux\\b-w118\\.s19tool\\workarea\\P\\firmware.s19",
+ "current_file_after_save": "<HOME>\\AppData\\Local\\Temp\\s19c\\ux\\b-w118\\.s19tool\\workarea\\P\\firmware.s19",
  "current_project_after_save": "P",
  "dialog_preview": "variant firmware.s19\n● variant firmware_1.s19\nproject file: ok",
  "reopen_screen": "LoadResultScreen",

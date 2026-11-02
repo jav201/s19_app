@@ -1,13 +1,13 @@
 """PC-8 spike v2: batch-97 split, painted cells across 118->220->118, timing."""
 import asyncio, sys, tempfile, time
 from pathlib import Path
-sys.path.insert(0, r"C:\Users\jjgh8\Github\s19_app")
+sys.path.insert(0, r"<HOME>\Github\s19_app")
 from rich.text import Text
 from textual.widgets import DataTable
 from s19_app.tui.app import S19TuiApp
 from s19_app.utils import safe_text
 
-A2L = Path(r"C:\Users\jjgh8\Github\s19_app\examples\case_00_public\ASAP2_Demo_V161.a2l")
+A2L = Path(r"<HOME>\Github\s19_app\examples\case_00_public\ASAP2_Demo_V161.a2l")
 CAP, FMIN, PFLOOR, GUTTER = 10, 4, 42, 1
 
 def clip_param(name, w):

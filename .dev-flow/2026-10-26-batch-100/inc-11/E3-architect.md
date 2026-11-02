@@ -2,7 +2,7 @@ FAIL
 
 # E3 (PDR) — Inc 11, architect lens
 
-Reviewer: architect. Read-only. The code at `C:/Users/jjgh8/Github/s19_app` (`8947666`) and the 9b worktree were only read. One throwaway probe ran under `D/work/e3-architect/` (s19env, `-I`, `PYTHONDONTWRITEBYTECODE=1`, `LOCALAPPDATA` under `D/work`).
+Reviewer: architect. Read-only. The code at `<HOME>/Github/s19_app` (`8947666`) and the 9b worktree were only read. One throwaway probe ran under `D/work/e3-architect/` (s19env, `-I`, `PYTHONDONTWRITEBYTECODE=1`, `LOCALAPPDATA` under `D/work`).
 
 Counts: HIGH 0 · MAJOR 6 · MINOR 6 · NIT 5.
 
@@ -45,7 +45,7 @@ Why FAIL: six MAJOR defects. Each has a small fix, but every one changes a node 
 - **Census otherwise.** Categories A–I hold, read against the code: TC-B100-07 is the only AST census that names `_handle_save_dialog` (`test_b100_save_guards.py:772`); TC-B100-01's placement count is unchanged; the "Nothing written." substring assertions hold with the next step inserted. A11-03 and A11-11 add rows.
 - **Simplicity.** Nothing else is removable without re-opening a ruling. A11-02, A11-03 (option 2) and A11-06 are removals.
 
-Report: `C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc-11-design/E3-architect.md`
+Report: `<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc-11-design/E3-architect.md`
 
 ## Round 2
 

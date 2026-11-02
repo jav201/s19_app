@@ -1,6 +1,6 @@
 # CHUNK — Kimi — batch-93 increment 001 (the cockpit core: chrome kit + layout + peek + stats)
 
-You implement batch-93's increment 001 in C:/Users/jjgh8/Github/s19_app: the Memory
+You implement batch-93's increment 001 in <HOME>/Github/s19_app: the Memory
 Map cohesion pass — variant C's core. The contract is authoritative:
 `.dev-flow/2026-10-11-batch-93/01-requirements.md` — HLR-125 (the chrome kit),
 HLR-126 (the cockpit layout), HLR-127 (the aligned rows), HLR-128 (the 8-byte
@@ -12,7 +12,7 @@ don't copy.
 
 ## SANDBOX
 - Never write outside the project tree. No git. Use the house env for every run:
-  `C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest ...`
+  `<HOME>/anaconda3/envs/s19env/python.exe -m pytest ...`
 - batch-92 (the refactor) has MERGED: `hexview` now lives at `s19_app/render/hexview.py`,
   `safe_text` at `s19_app/utils.py`. Import from the new homes; do not re-create
   the old paths.
@@ -60,7 +60,7 @@ don't copy.
 - First run the four memmap modules + the map-related tests to see the current
   green state; adapt them as you go (never weaken an assertion — replace the old
   DOM expectation with the new contract's truth).
-- Run: `C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest tests/test_tui_map_big.py tests/test_map_click_chain.py tests/test_memmap_entropy_merge.py tests/test_legend_n8.py <your new test files> -q -p no:cacheprovider` — green.
+- Run: `<HOME>/anaconda3/envs/s19env/python.exe -m pytest tests/test_tui_map_big.py tests/test_map_click_chain.py tests/test_memmap_entropy_merge.py tests/test_legend_n8.py <your new test files> -q -p no:cacheprovider` — green.
 - Then the FULL suite once: `... -m pytest tests -q -p no:cacheprovider` — report
   the count and the failure census; the known environmental families (snapshot
   baselines vs CI fonts, the order-sensitive popup arms) are declared, not yours.

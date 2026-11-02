@@ -1,6 +1,6 @@
 # Kimi brief — batch-99 Increment 8 · review round 2 fix (N1)
 
-Read `BRIEF-COMMON.md` from the MAIN checkout (`C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-10-25-batch-99\kimi\BRIEF-COMMON.md`). Same worktree, `C:\Users\jjgh8\Github\s19_app-b99-inc8`. Do not commit.
+Read `BRIEF-COMMON.md` from the MAIN checkout (`<HOME>\Github\s19_app\.dev-flow\2026-10-25-batch-99\kimi\BRIEF-COMMON.md`). Same worktree, `<HOME>\Github\s19_app-b99-inc8`. Do not commit.
 
 - **N1 [MEDIUM] — a PATCH block with `notices` paints red in Flow Builder.** The notices arm puts its not-applied lines in `diagnostics` (`flow_execution_service.py:≈600`), and Flow Builder paints diagnostics as `sev-error` (`flow_screens.py:≈2203`). Follow the funnel arm's way instead:
   - put the not-applied lines of a `notices` PATCH in `findings` with `FINDING_WARN`;

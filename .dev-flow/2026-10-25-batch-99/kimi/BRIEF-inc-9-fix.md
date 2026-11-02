@@ -1,6 +1,6 @@
 # Kimi brief — batch-99 Increment 9 · review fixes (code-reviewer F1–F4)
 
-Read `BRIEF-COMMON.md` first. Same worktree, `C:\Users\jjgh8\Github\s19_app-b99-inc9` (branch `b99-inc9`, uncommitted changes on `c62c842`). Do not commit.
+Read `BRIEF-COMMON.md` first. Same worktree, `<HOME>\Github\s19_app-b99-inc9` (branch `b99-inc9`, uncommitted changes on `c62c842`). Do not commit.
 
 - **F1 [HIGH] — a HEX file with a binary tail now fails to load** (`s19_app/hexfile.py:50,123`). HEAD stopped reading at EOF. The new code reads to the end through a strict utf-8 text handle, so a valid HEX followed by newlines and `0xFF` padding raises `UnicodeDecodeError` ("Load failed") instead of loading with a `HEX-AFTER-EOF` notice.
   - Open the file in binary (`"rb"`). Decode lines strictly only up to and including the first EOF record. After it, count non-empty lines by stripping the BYTES; never decode them.

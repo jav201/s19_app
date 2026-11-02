@@ -65,7 +65,7 @@ GREEN on the finished tree is not claimed here (the implementers' code was not f
 
 ## 5. Environment and method notes
 
-- **RED import path.** Running the brief's command with the worktree as cwd imports the WORKTREE's `s19_app` (python `-m` puts cwd first; pytest's rootdir insertion does too), whatever `PYTHONPATH` says — confirmed with a probe node (`--import-mode=prepend` and `append` both printed the worktree path). The RED run therefore runs with cwd = the base worktree, the test and support files copied there byte-for-byte (sha256 prefixes in the transcript header), and restored afterwards (`git status` clean). Script (scratch, not committed): `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e4\red.sh`.
+- **RED import path.** Running the brief's command with the worktree as cwd imports the WORKTREE's `s19_app` (python `-m` puts cwd first; pytest's rootdir insertion does too), whatever `PYTHONPATH` says — confirmed with a probe node (`--import-mode=prepend` and `append` both printed the worktree path). The RED run therefore runs with cwd = the base worktree, the test and support files copied there byte-for-byte (sha256 prefixes in the transcript header), and restored afterwards (`git status` clean). Script (scratch, not committed): `<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e4\red.sh`.
 - `NO_COLOR` unset for every run (`env -u NO_COLOR`).
 - Timing thresholds (< 1 s) are asserted on this machine's wall clock inside the test; a slow CI host can make the timing nodes flaky.
 - Windows-only arms (junctions, share-mode locks, file symlinks) skip with a named reason elsewhere (PDR C-QA-6); here all ran (none skipped).

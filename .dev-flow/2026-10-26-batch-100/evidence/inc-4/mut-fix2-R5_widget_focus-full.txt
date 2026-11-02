@@ -1,14 +1,14 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py
 mutant: R5_widget_focus
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc4 (worktree at 24d5b7f + Inc 4 + fix pass 1 + fix pass 2, mutant applied)
+tree: <HOME>\Github\s19_app-b100-inc4 (worktree at 24d5b7f + Inc 4 + fix pass 1 + fix pass 2, mutant applied)
 applied app.py sha256: 07f5ea1d75d8eb37487ba9950d917153bc7af7922fb128606ce4ba74dae544c5
-env: PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc4 ; NO_COLOR unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+env: PYTHONPATH=<HOME>\Github\s19_app-b100-inc4 ; NO_COLOR unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
 
 .........F........F.......F....                                          [100%]
 ================================== FAILURES ===================================
 _________ test_tc_b100_12_every_window_load_lands_on_its_target[map] __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29360/test_tc_b100_12_every_window_l3')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29360/test_tc_b100_12_every_window_l3')
 window_key = 'map'
 
     @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))
@@ -105,7 +105,7 @@ E       AssertionError: timed out waiting for the LLR-116.5 landing: the focus o
 tests\test_b100_focus.py:217: AssertionError
 _______ test_tc_b100_12_map_load_keeps_the_region_row_and_down_walks_it _______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29360/test_tc_b100_12_map_load_keeps0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29360/test_tc_b100_12_map_load_keeps0')
 
     def test_tc_b100_12_map_load_keeps_the_region_row_and_down_walks_it(
         tmp_path: Path,
@@ -205,7 +205,7 @@ E       AssertionError: timed out waiting for the LLR-116.5 landing: the focus o
 tests\test_b100_focus.py:217: AssertionError
 _________________ test_tc_b100_12_rehome_lands_synchronously __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29360/test_tc_b100_12_rehome_lands_s0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29360/test_tc_b100_12_rehome_lands_s0')
 
     def test_tc_b100_12_rehome_lands_synchronously(tmp_path: Path) -> None:
         """The landing is a synchronous ``Screen.set_focus``, not

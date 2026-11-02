@@ -2,7 +2,7 @@
 
 **Verdict: PASS-WITH-NOTES.** 0 HIGH · 1 MAJOR · 1 MINOR · 2 NIT. No finding blocks. SE5-12b-1 (MAJOR) needs an orchestrator ruling. It is the S12b-01 loss again, this time on the committed arm, and the fix is one guarded line. SE5-12b-2 is my answer to SR12b-2: guard both calls. The open-project half needs no race. My answer to SR12b-6 is: keep it as declared residual risk, with no guard (see §Seam rulings).
 
-Role: security-reviewer, independent of the authors. Tree `C:/Users/jjgh8/Github/s19_app-b100-inc12b`, branch `b100-inc12b`, commit `81ac4c0`. Diff reviewed: `git diff main...b100-inc12b -- s19_app tests` (`a2l.py` in full; `styles.tcss` has no 12b hunk). Source read in `s19_app/tui/app.py`:
+Role: security-reviewer, independent of the authors. Tree `<HOME>/Github/s19_app-b100-inc12b`, branch `b100-inc12b`, commit `81ac4c0`. Diff reviewed: `git diff main...b100-inc12b -- s19_app tests` (`a2l.py` in full; `styles.tcss` has no 12b hunk). Source read in `s19_app/tui/app.py`:
 - the dataclasses `:450`–`:585`;
 - `parse_a2l_cached` `:877`;
 - the Save path: `_commit_project_save` `:11436`, `_save_project_worker` `:11517`, `_save_project_files` `:11536`–`:12152`, `_on_project_saved` `:12154`–`:12283`, `_abort_save` / `_restore_manifest` / `_keep_previous_manifest` `:10361`–`:10620`, `_copy_project_subfolders` `:14163`;
@@ -12,7 +12,7 @@ Role: security-reviewer, independent of the authors. Tree `C:/Users/jjgh8/Github
 
 Also read: `workspace.validate_project_files` / `_path_traverses_reparse_point`, `changes/io.write_change_document`, and `_save_clears_panel_flag` `:2536`. Design read: `inc-12b/E3-security.md` (both rounds), `E1-` / `E2-` / `E3-rulings.md`, `E4-app-notes.md`, `E4-a2l-notes.md`, `E4-integration-notes.md` (SR12b-1 … 7 and the orchestrator rulings), and `codewire/proto-12b-a2l-refusal.md` (`:133`, `:164`, `:179`, `:222`, `:320`–`:330`). From 12a: `codewire/proto-12a-sweep.md:394` (R-B1).
 
-Probes (executed; the scripts and their output are under `C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/rev12b-security/`; `LOCALAPPDATA` pointed there; nothing in the tree was written except this report):
+Probes (executed; the scripts and their output are under `<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/rev12b-security/`; `LOCALAPPDATA` pointed there; nothing in the tree was written except this report):
 - `self_reads.py` (AST over the branch `app.py`): every `self.` attribute read or stored by the methods the 4 workers reach. The method closure starts at the worker roots and leaves out callables posted through `call_from_thread`.
 - `a2l_identity.py` → `a2l_identity.out.txt`: `parse_a2l_file` on 3 public fixtures (73 KB, 248 KB, 5.2 MB). Arms: branch with no callback, branch with a callback, and `main` (`git archive main s19_app` into `maintree/`). The result is JSON-dumped with sorted keys and hashed.
 - `probe_sr2.py` → `probe_sr2.out.txt`: `current_project` / `current_project_dir` name a folder that is not on disk, then `load_a2l_from_path(<fixture>.a2l)` runs. Arm 1 calls it directly. Arm 2 posts it as a deferred callback (`call_later`), the way the Load dialog and the Inc 10 `go` reach it.

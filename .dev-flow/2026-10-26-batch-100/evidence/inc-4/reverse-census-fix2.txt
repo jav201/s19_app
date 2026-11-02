@@ -1,7 +1,7 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py tests/test_b97_flow_execution.py tests/test_b97_key_bar.py tests/test_b99_s0.py tests/test_before_after_report.py tests/test_changes_apply.py tests/test_compare_engine.py tests/test_compare_service.py tests/test_crc_operation.py tests/test_entropy_service.py tests/test_hex_emit.py tests/test_legend_two_pane.py tests/test_map_click_chain.py tests/test_memmap_entropy_merge.py tests/test_patch_dual_entry.py tests/test_report_logging.py tests/test_segment_ops.py tests/test_segment_split_window.py tests/test_tui_app.py tests/test_tui_commandbar.py tests/test_tui_crc_surface.py tests/test_tui_diff_compare_realpath.py tests/test_tui_diff_screen.py tests/test_tui_directionb.py tests/test_tui_hostile_map.py tests/test_tui_legend.py tests/test_tui_map_big.py tests/test_tui_map_wrap.py tests/test_tui_report_filter_surface.py tests/test_tui_snapshot.py tests/test_undo_redo_ux.py tests/test_unload_feature.py
-tree: /c/Users/jjgh8/Github/s19_app-b100-inc4 (worktree at 24d5b7f + Inc 4 + fix pass 1 + fix pass 2, uncommitted)
+tree: <HOME>/Github/s19_app-b100-inc4 (worktree at 24d5b7f + Inc 4 + fix pass 1 + fix pass 2, uncommitted)
 app.py sha256: 77bb9aa6eae8f02d57e29caf8bc9d08f575ffec51dbba52ee8736a7f237e9f0a
-env: PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc4 ; NO_COLOR unset (env -u) ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+env: PYTHONPATH=<HOME>/Github/s19_app-b100-inc4 ; NO_COLOR unset (env -u) ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 
 ........................................................................ [  7%]
 .F...................................................................... [ 14%]
@@ -20,7 +20,7 @@ env: PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc4 ; NO_COLOR unset (env -u
 ================================== FAILURES ===================================
 ________ test_tc_b97_55_input_queued_during_a_run_starts_no_second_run ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29362/test_tc_b97_55_input_queued_du0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29362/test_tc_b97_55_input_queued_du0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000025EE46300D0>
 
     def test_tc_b97_55_input_queued_during_a_run_starts_no_second_run(tmp_path: Path, monkeypatch) -> None:
@@ -60,7 +60,7 @@ E       assert 2 == 1
 tests\test_b97_flow_execution.py:1164: AssertionError
 ____ test_at_061a_persistent_control_survives_then_writes_pair_and_clears _____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29362/test_at_061a_persistent_contro0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29362/test_at_061a_persistent_contro0')
 
     def test_at_061a_persistent_control_survives_then_writes_pair_and_clears(
         tmp_path: Path,
@@ -175,7 +175,7 @@ E       assert False
 tests\test_before_after_report.py:1182: AssertionError
 ______ test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29362/test_at_b78_03_the_palette_act0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29362/test_at_b78_03_the_palette_act0')
 
     def test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact(
         tmp_path: Path,
@@ -259,7 +259,7 @@ E         Use -v to get more diff
 tests\test_tui_commandbar.py:2704: AssertionError
 _______________ test_at_b78_32_app_bindings_block_is_untouched ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29362/test_at_b78_32_app_bindings_bl0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29362/test_at_b78_32_app_bindings_bl0')
 
     def test_at_b78_32_app_bindings_block_is_untouched(tmp_path: Path) -> None:
         """AT-B78-32 (PIN) -- Lane 1 does not disturb the App ``BINDINGS`` block.
@@ -357,7 +357,7 @@ E         ...Full output truncated (3 lines hidden), use '-vv' to show
 tests\test_tui_diff_screen.py:3912: AssertionError
 ________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29362/test_at_056e_a2b_diff_report_b0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29362/test_at_056e_a2b_diff_report_b0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000025EE70B9050>
 
     def test_at_056e_a2b_diff_report_byte_identical_despite_selection(

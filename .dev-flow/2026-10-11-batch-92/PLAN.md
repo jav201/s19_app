@@ -107,5 +107,5 @@ Kill the 6 of 7 layer inversions the radiography measured (US-92-5 OUT — opera
 
 | Suite / command | Last run | Result |
 |---|---|---|
-| `python -m pytest tests/ -q --tb=no` (worktree, committed HEAD) | 2026-10-11 | **22 collection errors** — `tests` shadowed by `C:\Users\jjgh8\Github\mapper\tests` (editable `_editable_impl_mapper.pth`); with `tests/__init__.py` copied: 6 `from conftest import` + 9 flat `test_*` import modules fail |
+| `python -m pytest tests/ -q --tb=no` (worktree, committed HEAD) | 2026-10-11 | **22 collection errors** — `tests` shadowed by `<HOME>\Github\mapper\tests` (editable `_editable_impl_mapper.pth`); with `tests/__init__.py` copied: 6 `from conftest import` + 9 flat `test_*` import modules fail |
 | `python -m pytest tests/ -q --co` (main checkout, batch-91's uncommitted tree) | 2026-10-11 | 2765 collected, 0 errors — batch-91's in-flight import unification fixes the environment |

@@ -2,9 +2,9 @@
 
 **Written:** 2026-08-01 · **From:** the session that ran Phases 0–2
 **To:** a fresh `/dev-flow` session with a full context window
-**Repo:** `C:\Users\jjgh8\Github\s19_app` — **NOT** the OneDrive path (the repo moved out of OneDrive)
+**Repo:** `<HOME>\Github\s19_app` — **NOT** the OneDrive path (the repo moved out of OneDrive)
 **Branch:** `claude/batch-77-memmap-variant-a`, cut off `origin/main` @ `f8747b8`
-**Run python as:** `PYTHONPATH=/c/Users/jjgh8/Github/s19_app python …` (`sys.path[0]` is the script dir otherwise)
+**Run python as:** `PYTHONPATH=<HOME>/Github/s19_app python …` (`sys.path[0]` is the script dir otherwise)
 
 ---
 

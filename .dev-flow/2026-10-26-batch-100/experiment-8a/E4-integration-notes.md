@@ -1,6 +1,6 @@
 # E4 — integration notes (batch-100 Inc 8a)
 
-Author: software-dev agent (E4 integration). Worktree `C:\Users\jjgh8\Github\s19_app-b100-inc8a`, branch `b100-inc8a`, base `dc3b314`. Nothing committed. Source edits only in `variant_execution_service.py` and `project_gather_service.py` (`app.py` and `manifest_writer.py` unchanged by integration); `workspace.py` and `prototypes/` untouched. CRLF kept in every touched file (checked after each edit).
+Author: software-dev agent (E4 integration). Worktree `<HOME>\Github\s19_app-b100-inc8a`, branch `b100-inc8a`, base `dc3b314`. Nothing committed. Source edits only in `variant_execution_service.py` and `project_gather_service.py` (`app.py` and `manifest_writer.py` unchanged by integration); `workspace.py` and `prototypes/` untouched. CRLF kept in every touched file (checked after each edit).
 
 ## 1. Orchestrator rulings applied
 

@@ -73,7 +73,7 @@ The P-59 premise counts 11 test *functions* in `test_open_folder_chips.py`. They
 |---|---|
 | Mutation applied | none to the source: the new tests run against the unchanged Inc-0 source (HEAD `42655eb`, `git diff -- s19_app` empty at the time) |
 | Instrument | pytest, one complete run |
-| Where it ran | the main worktree `C:\Users\jjgh8\Github\s19_app`, run by the `software-dev` sub-agent (the orchestrator may re-run it per §Phase 3) |
+| Where it ran | the main worktree `<HOME>\Github\s19_app`, run by the `software-dev` sub-agent (the orchestrator may re-run it per §Phase 3) |
 | Transcript | `evidence/inc-1/red.txt` — **19 failed, 3 passed** |
 | Restore proven by | n/a for the RED run (no source edit); restore hashes for the mutation battery are printed per arm in `mutations.txt` |
 | Bytecode cache | `PYTHONDONTWRITEBYTECODE=1`, `-p no:cacheprovider` |
@@ -113,13 +113,13 @@ The P-59 premise counts 11 test *functions* in `test_open_folder_chips.py`. They
 
 | Evidence artifact | Path — under `.dev-flow/2026-10-19-batch-97/evidence/inc-1/` | SHA-256 |
 |---|---|---|
-| RED transcript | `red.txt` | `545b6c9d29284acdffce3c6f0f2702a35d0b99e73d50077e16a29b07467d47b3` |
+| RED transcript | `red.txt` | `fbd718326e64970508f98d49582ed50056d63c01fe3dba20089620cce0f9e444` |
 | GREEN transcript (final tree, after gate fold) | `green.txt` | `ab941c0b1c5ec7bbd67bd8a2b54fee3ede671bfc3e5b4df0514e854b7e2449cf` |
 | Reverse-census greps | `census.txt` | `46e01f0f141f485dc4c9db37cef267a9adbe9013cc6576e9bdf9fb23a06d5117` |
-| Reverse-census run | `census-run.txt` | `b82059891bfe645b8afe86bfdd7223ed2dd74610ffb893b5b8b30c4c8285585a` |
+| Reverse-census run | `census-run.txt` | `d5506a899231bf0ac21ef09029057d3bcfae8ec22bde16922e63011bd58cacb2` |
 | Flake probe (2 census nodes ×5) | `flake-probe.txt` | `b10ce4df4418018f3f805eb53d8bb1207d55a4f900033a3b0a8c63b619fdaad8` |
 | Docs guard | `docs-canon.txt` | `27c18183445f87f090934c29e37790c2326e4a226b136e4547ea119b952daca2` |
-| Mutation battery transcript (3 runs) | `mutations.txt` | `9cd7fb5d4acafc0fe8c2c5edf6b6e8b849134bb9c834359549f099bed2e8be55` |
+| Mutation battery transcript (3 runs) | `mutations.txt` | `f4d3b47bad2bbb947d6a5899aff816de4e3b03ebda000e28c2f9e44903aab37a` |
 | Mutation battery script (with M11–M13) | `mutate.py` | `a8484cc39131400d190846286981e5b978fad01a2553b32782df03b08afde71e` |
 
 | Field | Value |

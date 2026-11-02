@@ -1,7 +1,7 @@
 # PR-MERGE QA REVIEW — batch-92 (PR #210, the merge gate)
 
 **Mode:** validation (the flow's merge gate; independent of the implementation).
-**Reviewed tree:** worktree `C:/Users/jjgh8/Github/s19_app-b92`, branch `kimi/batch-92-layer-inversions` merged with origin/main at `fe03fab` (batch commit `9a87038` + merge resolution).
+**Reviewed tree:** worktree `<HOME>/Github/s19_app-b92`, branch `kimi/batch-92-layer-inversions` merged with origin/main at `fe03fab` (batch commit `9a87038` + merge resolution).
 **Scope:** `git diff origin/main...HEAD` only — main-side carries (batch-91 closes, batch-93 seed/P1) are context, not this batch's diff.
 **Every executed result below was executed by me (qa-reviewer, this review) unless it names another executor.**
 

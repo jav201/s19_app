@@ -10,20 +10,20 @@ cc11018c2c457d2594211db7b9e40c5d3664f877e897bf5bc22f0247a7b8dd76 *s19_app/tui/wi
 FFFFFFFFFFF......F.F..................................F................. [ 78%]
 ....................                                                     [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:982: AssertionError: (2, 3, 'bold #e9e9e9')
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:863: AssertionError: (1, '0xeb40', ['#e9e9e9', '#e9e9e9', '#e9e9e9', '#e9e9e9', '#969aad', '#969aad', ...])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:693: AssertionError: ('draft · change', '6 entries · 00:00:02 · saved')
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:665: AssertionError: assert ('saved' == 'unsaved changes'
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:528: AssertionError: PASTE BUFFER · editable      0.3K / 64.0K
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:562: AssertionError: ('patch_json_view', '#003054')
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1060: AssertionError: [10, 11, 12]
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1060: AssertionError: [10, 11, 12]
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1125: AssertionError: ((118, 54), -2)
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1125: AssertionError: ((118, 53), -1)
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:420: AssertionError: ['#patch_variant_row', '#patch_execute_row', '#patch_variant_select_row', '#patch_doc_issues', '#patch_checks_results']
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_json.py:1094: AssertionError: _CLAIMED_HUES names hues no longer painted in s19_app/: ['#56e0d6']. A phantom claimant over-constrains the hue search and could push MAGENTA off its optimum for no reason
-C:\Users\jjgh8\Github\s19_app\tests\test_zz_prefold_window_usage_help.py:217: AssertionError: crc_designer: step not found verbatim in help_sections.md: '**Open templates/** (change 2) opens exactly that template library.'
-C:\Users\jjgh8\Github\s19_app\tests\test_zz_prefold_changes_file_notation_help.py:174: AssertionError: crc_designer: batch-95 step drifted from help_sections.md: '**Open templates/** (change 2) opens exactly that template library.'
+<HOME>\Github\s19_app\tests\test_b97_patch_editor.py:982: AssertionError: (2, 3, 'bold #e9e9e9')
+<HOME>\Github\s19_app\tests\test_b97_patch_editor.py:863: AssertionError: (1, '0xeb40', ['#e9e9e9', '#e9e9e9', '#e9e9e9', '#e9e9e9', '#969aad', '#969aad', ...])
+<HOME>\Github\s19_app\tests\test_b97_patch_editor.py:693: AssertionError: ('draft · change', '6 entries · 00:00:02 · saved')
+<HOME>\Github\s19_app\tests\test_b97_patch_editor.py:665: AssertionError: assert ('saved' == 'unsaved changes'
+<HOME>\Github\s19_app\tests\test_b97_patch_editor.py:528: AssertionError: PASTE BUFFER · editable      0.3K / 64.0K
+<HOME>\Github\s19_app\tests\test_b97_patch_editor.py:562: AssertionError: ('patch_json_view', '#003054')
+<HOME>\Github\s19_app\tests\test_b97_patch_editor.py:1060: AssertionError: [10, 11, 12]
+<HOME>\Github\s19_app\tests\test_b97_patch_editor.py:1060: AssertionError: [10, 11, 12]
+<HOME>\Github\s19_app\tests\test_b97_patch_editor.py:1125: AssertionError: ((118, 54), -2)
+<HOME>\Github\s19_app\tests\test_b97_patch_editor.py:1125: AssertionError: ((118, 53), -1)
+<HOME>\Github\s19_app\tests\test_b97_patch_editor.py:420: AssertionError: ['#patch_variant_row', '#patch_execute_row', '#patch_variant_select_row', '#patch_doc_issues', '#patch_checks_results']
+<HOME>\Github\s19_app\tests\test_tui_patch_json.py:1094: AssertionError: _CLAIMED_HUES names hues no longer painted in s19_app/: ['#56e0d6']. A phantom claimant over-constrains the hue search and could push MAGENTA off its optimum for no reason
+<HOME>\Github\s19_app\tests\test_zz_prefold_window_usage_help.py:217: AssertionError: crc_designer: step not found verbatim in help_sections.md: '**Open templates/** (change 2) opens exactly that template library.'
+<HOME>\Github\s19_app\tests\test_zz_prefold_changes_file_notation_help.py:174: AssertionError: crc_designer: batch-95 step drifted from help_sections.md: '**Open templates/** (change 2) opens exactly that template library.'
 =========================== short test summary info ===========================
 FAILED tests/test_b97_patch_editor.py::test_tc_b97_39_changed_bytes_and_count_paint_teal
 FAILED tests/test_b97_patch_editor.py::test_tc_b97_39_strip_follows_the_highlight
@@ -44,8 +44,8 @@ FAILED tests/test_zz_prefold_changes_file_notation_help.py::test_tc1802_nine_md_
 # re-run of TC-B97-40 capped-strip arm after moving its entry to 0xEB14 (9 aligned rows -> cap + note), still PRE-FOLD source
 FF                                                                       [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1127: AssertionError: ((118, 54), -1)
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1127: AssertionError: ((118, 53), 0)
+<HOME>\Github\s19_app\tests\test_b97_patch_editor.py:1127: AssertionError: ((118, 54), -1)
+<HOME>\Github\s19_app\tests\test_b97_patch_editor.py:1127: AssertionError: ((118, 53), 0)
 =========================== short test summary info ===========================
 FAILED tests/test_b97_patch_editor.py::test_tc_b97_40_capped_strip_chips_reachable[size0]
 FAILED tests/test_b97_patch_editor.py::test_tc_b97_40_capped_strip_chips_reachable[size1]

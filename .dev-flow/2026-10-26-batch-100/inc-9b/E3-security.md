@@ -8,7 +8,7 @@ No finding leaks a secret or crosses a trust boundary the requirements allow. Tw
 
 This clearance is not ship authority. S9b-1 and S9b-2 are `planned` mitigations, and I re-verify them at the increment gate.
 
-Code read on `C:/Users/jjgh8/Github/s19_app` at `8947666` (9a merged, identical to the 9a worktree for the slice). Textual 8.2.8, Python 3.11.15 (`s19env`). Probes are under `D/work/e3-security/` and import no repository code, except `probe_nul.py` and `probe_dirsuffix.py`, which call `S19TuiApp._typed_load_route` and `copy_into_workarea` on a scratch tree, read-only toward the repo.
+Code read on `<HOME>/Github/s19_app` at `8947666` (9a merged, identical to the 9a worktree for the slice). Textual 8.2.8, Python 3.11.15 (`s19env`). Probes are under `D/work/e3-security/` and import no repository code, except `probe_nul.py` and `probe_dirsuffix.py`, which call `S19TuiApp._typed_load_route` and `copy_into_workarea` on a scratch tree, read-only toward the repo.
 
 ## Findings
 
@@ -80,7 +80,7 @@ Code read on `C:/Users/jjgh8/Github/s19_app` at `8947666` (9a merged, identical 
 
 **Verdict: PASS-WITH-NOTES** — S9b-1 CLOSED, S9b-2 CLOSED; S9b-6 designed as proposed; S9b-7 security property met, but its refusal flow is inconsistent (MINOR). The fix introduced 3 MINOR and 3 NIT defects, none HIGH.
 
-Scope: S9b-1, S9b-2, the B-2 reversal (S9b-6 / A9b-05) and S9b-7, read against `E3-rulings.md` and the fix pass (`../fix9b2-pi.log`). Code at `C:/Users/jjgh8/Github/s19_app` `8947666`, read-only.
+Scope: S9b-1, S9b-2, the B-2 reversal (S9b-6 / A9b-05) and S9b-7, read against `E3-rulings.md` and the fix pass (`../fix9b2-pi.log`). Code at `<HOME>/Github/s19_app` `8947666`, read-only.
 
 ### Status of the round-1 rows
 

@@ -1,8 +1,8 @@
 # HANDOFF — batch-99 Increment 2 · review round 1 fixes (F1–F6)
 
-Worktree: `C:\Users\jjgh8\Github\s19_app-b99-inc2` (branch `b99-inc2`). No commit
+Worktree: `<HOME>\Github\s19_app-b99-inc2` (branch `b99-inc2`). No commit
 made. Worktree import proven: `s19_app.__file__` =
-`C:\Users\jjgh8\Github\s19_app-b99-inc2\s19_app\__init__.py`.
+`<HOME>\Github\s19_app-b99-inc2\s19_app\__init__.py`.
 
 ## What the review asked vs what was done
 

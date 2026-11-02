@@ -2,7 +2,7 @@ F...                                                                     [100%]
 ================================== FAILURES ===================================
 ____________ test_tc330_before_after_row_reveal_hide_state_machine ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-21061/test_tc330_before_after_row_re0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-21061/test_tc330_before_after_row_re0')
 
     def test_tc330_before_after_row_reveal_hide_state_machine(
         tmp_path: Path,
@@ -172,7 +172,7 @@ E                   textual.worker.WorkerFailed: Worker raised exception: NoMatc
 ..\..\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: WorkerFailed
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\Github\s19_app\s19_app\tui\app.py:13239 in set_status         
+│ <HOME>\Github\s19_app\s19_app\tui\app.py:13239 in set_status         
 │                                                                              
 │   13236 │   │   self.set_status(f"Goto 0x{addr:08X}")                        
 │   13237 │                                                                    
@@ -192,7 +192,7 @@ E                   textual.worker.WorkerFailed: Worker raised exception: NoMatc
 │ │           )                                                              │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app\s19_app\tui\app.py:13258 in _append_log_line   
+│ <HOME>\Github\s19_app\s19_app\tui\app.py:13258 in _append_log_line   
 │                                                                              
 │   13255 │   │   cap = max(50, getattr(self.size, "width", 0))                
 │   13256 │   │   line = trimmed[:cap]                                         
@@ -217,7 +217,7 @@ E                   textual.worker.WorkerFailed: Worker raised exception: NoMatc
 │ │           apply a change document'+34                                    │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app\s19_app\tui\app.py:13264 in _render_log_lines  
+│ <HOME>\Github\s19_app\s19_app\tui\app.py:13264 in _render_log_lines  
 │                                                                              
 │   13261 │   │   lines = list(self.log_lines)                                 
 │   13262 │   │   while len(lines) < 4:                                        

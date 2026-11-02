@@ -1,14 +1,14 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py
 mutant: R1_always_rehome
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc4 (worktree at 24d5b7f + Inc 4 + fix pass 1 + fix pass 2, mutant applied)
+tree: <HOME>\Github\s19_app-b100-inc4 (worktree at 24d5b7f + Inc 4 + fix pass 1 + fix pass 2, mutant applied)
 applied app.py sha256: 3e8ab50f76cc2d27863238a8336369523ce60b4a2b3605ba7af3c57165fba46d
-env: PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc4 ; NO_COLOR unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+env: PYTHONPATH=<HOME>\Github\s19_app-b100-inc4 ; NO_COLOR unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
 
 ...................F.F.FF......                                          [100%]
 ================================== FAILURES ===================================
 _________________ test_tc_b100_12_healthy_focus_is_not_moved __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29204/test_tc_b100_12_healthy_focus_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29204/test_tc_b100_12_healthy_focus_0')
 
     def test_tc_b100_12_healthy_focus_is_not_moved(tmp_path: Path) -> None:
         """The healthy-focus early return, in the shape that actually exercises
@@ -100,7 +100,7 @@ E             + files_list)
 tests\test_b100_focus.py:584: AssertionError
 _____________ test_tc_b100_12_visible_find_input_keeps_its_focus ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29204/test_tc_b100_12_visible_find_i0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29204/test_tc_b100_12_visible_find_i0')
 
     def test_tc_b100_12_visible_find_input_keeps_its_focus(tmp_path: Path) -> None:
         """LED .58 (c), the visible half: a VISIBLE text input in the ACTIVE
@@ -214,7 +214,7 @@ E             + files_list)
 tests\test_b100_focus.py:685: AssertionError
 ________________ test_tc_b100_12_palette_input_is_never_taken _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29204/test_tc_b100_12_palette_input_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29204/test_tc_b100_12_palette_input_0')
 
     def test_tc_b100_12_palette_input_is_never_taken(tmp_path: Path) -> None:
         """LED .57 (c): while the operator types in the command palette, a
@@ -327,7 +327,7 @@ E             + files_list)
 tests\test_b100_focus.py:772: AssertionError
 _________ test_tc_b100_12_modal_keeps_its_focus_while_a_load_finishes _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29204/test_tc_b100_12_modal_keeps_it0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29204/test_tc_b100_12_modal_keeps_it0')
 
     def test_tc_b100_12_modal_keeps_its_focus_while_a_load_finishes(
         tmp_path: Path,

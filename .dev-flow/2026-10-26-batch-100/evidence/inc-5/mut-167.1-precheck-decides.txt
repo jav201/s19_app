@@ -1,6 +1,6 @@
 # command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation 167.1-precheck-decides
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# tree: <HOME>\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation 167.1-precheck-decides
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
 # date: 2026-10-29T19:46:50+00:00
 # requirement: LLR-167.1
 # mutation: the pre-check decides copy: a false pre-check skips the comparison — file s19_app/tui/app.py
@@ -12,7 +12,7 @@
 ================================== FAILURES ===================================
 ____________________ test_tc_b100_14_unapplied_entry_emits ____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29956/test_tc_b100_14_unapplied_entr0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29956/test_tc_b100_14_unapplied_entr0')
 
     def test_tc_b100_14_unapplied_entry_emits(tmp_path: Path) -> None:
         """Only an unapplied change entry writing new bytes: the pre-check is
@@ -31,7 +31,7 @@ E         Use -v to get more diff
 tests\test_b100_save_image.py:357: AssertionError
 ____________ test_tc_b100_17_blocked_entry_refuses_the_whole_save _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29956/test_tc_b100_17_blocked_entry_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29956/test_tc_b100_17_blocked_entry_0')
 
     def test_tc_b100_17_blocked_entry_refuses_the_whole_save(tmp_path: Path) -> None:
         """A document with 1 blocked entry → 1 status naming it, 0 files,
@@ -50,13 +50,13 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         lines, project, _ = _save_session(tmp_path, scenario)
         refusal = lines[-1]
 >       assert "Project NOT saved: 1 blocked entry (0x8000007C)" in refusal, lines
-E       AssertionError: ['Loaded firmware.s19 (S19 only)', 'Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\L...emp\\pytest-of-jjgh8\\pytest-29956\\test_tc_b100_17_blocked_entry_0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"]
-E       assert 'Project NOT saved: 1 blocked entry (0x8000007C)' in "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-29956\\test_tc_b100_17_blocked_entry_0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
+E       AssertionError: ['Loaded firmware.s19 (S19 only)', 'Project saved + manifest verified', "Saved project to <HOME>\\AppData\\L...emp\\pytest-of-<USER>\\pytest-29956\\test_tc_b100_17_blocked_entry_0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"]
+E       assert 'Project NOT saved: 1 blocked entry (0x8000007C)' in "Saved project to <HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-29956\\test_tc_b100_17_blocked_entry_0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
 
 tests\test_b100_save_image.py:704: AssertionError
 _________________ test_tc_b100_59_refused_plan_writes_nothing _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29956/test_tc_b100_59_refused_plan_w0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29956/test_tc_b100_59_refused_plan_w0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002E592FCFD50>
 
     def test_tc_b100_59_refused_plan_writes_nothing(
@@ -76,13 +76,13 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002E592FCFD50>
 >       assert plan.rows == () and "1 blocked entry" in (plan.refusal or "")
 E       AssertionError: assert ((SavePlanRow(...action='new')) == ()
 E         
-E         Left contains 2 more items, first extra item: SavePlanRow(role='image', source=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29956/test_tc_b...emp/pytest-of-jjgh8/pytest-29956/test_tc_b100_59_refused_plan_w0/app/.s19tool/workarea/P1/firmware.s19'), action='new')
+E         Left contains 2 more items, first extra item: SavePlanRow(role='image', source=WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29956/test_tc_b...emp/pytest-of-<USER>/pytest-29956/test_tc_b100_59_refused_plan_w0/app/.s19tool/workarea/P1/firmware.s19'), action='new')
 E         Use -v to get more diff)
 
 tests\test_b100_save_image.py:996: AssertionError
 _________________ test_tc_b100_70_refused_save_keeps_the_flag _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29956/test_tc_b100_70_refused_save_k0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29956/test_tc_b100_70_refused_save_k0')
 
     def test_tc_b100_70_refused_save_keeps_the_flag(tmp_path: Path) -> None:
         """A refused Save project (a blocked document) → the flag is still set
@@ -90,8 +90,8 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         dirty_before, dirty_after, status = _dirty_after_save(tmp_path, blocked=True)
         assert dirty_before is True
 >       assert "blocked" in status, status
-E       AssertionError: Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-29956\test_tc_b100_70_refused_save_k0\app\.s19tool\workarea\P1 (variant 'firmware')
-E       assert 'blocked' in "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-29956\\test_tc_b100_70_refused_save_k0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
+E       AssertionError: Saved project to <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-29956\test_tc_b100_70_refused_save_k0\app\.s19tool\workarea\P1 (variant 'firmware')
+E       assert 'blocked' in "Saved project to <HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-29956\\test_tc_b100_70_refused_save_k0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
 
 tests\test_b100_save_image.py:1263: AssertionError
 =========================== short test summary info ===========================

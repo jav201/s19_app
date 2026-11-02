@@ -1,5 +1,5 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc4 (MUTANT FB-no-fallback)
+tree: <HOME>\Github\s19_app-b100-inc4 (MUTANT FB-no-fallback)
 started: 2026-10-27 08:28:24
 
 MUTANT FB-no-fallback APPLIED c2c9a12dbb7a1fc9d18473bd96e1114c9f4b8fbbfa705198726976b1916a038c
@@ -8,7 +8,7 @@ MUTANT FB-no-fallback APPLIED c2c9a12dbb7a1fc9d18473bd96e1114c9f4b8fbbfa70519872
 ================================== FAILURES ===================================
 ________________ test_tc_b100_12_empty_state_target_falls_back ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28935/test_tc_b100_12_empty_state_ta0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28935/test_tc_b100_12_empty_state_ta0')
 
     def test_tc_b100_12_empty_state_target_falls_back(tmp_path: Path) -> None:
         """LED .57 (b): in a bare session the Workspace window shows its empty

@@ -1,6 +1,6 @@
 # command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation 167.1-round2-rule
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# tree: <HOME>\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation 167.1-round2-rule
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
 # date: 2026-10-29T19:45:11+00:00
 # requirement: LLR-167.1
 # mutation: the round-2 rule: any document kind counts and emit whenever the document holds an entry (the data comparison removed) — file s19_app/tui/app.py
@@ -12,7 +12,7 @@
 ================================== FAILURES ===================================
 _______________________ test_tc_b100_14_same_bytes_copy _______________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29955/test_tc_b100_14_same_bytes_cop0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29955/test_tc_b100_14_same_bytes_cop0')
 
     def test_tc_b100_14_same_bytes_copy(tmp_path: Path) -> None:
         """An entry that writes the bytes already there → copy (P-38: the
@@ -34,7 +34,7 @@ E         Use -v to get more diff
 tests\test_b100_save_image.py:316: AssertionError
 ____________________ test_tc_b100_14_check_document_copies ____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29955/test_tc_b100_14_check_document0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29955/test_tc_b100_14_check_document0')
 
     def test_tc_b100_14_check_document_copies(tmp_path: Path) -> None:
         """A check document with entries never counts → copy, never a refusal
@@ -58,7 +58,7 @@ E         Use -v to get more diff
 tests\test_b100_save_image.py:331: AssertionError
 _________________ test_tc_b100_14_applied_then_undone_copies __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29955/test_tc_b100_14_applied_then_u0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29955/test_tc_b100_14_applied_then_u0')
 
     def test_tc_b100_14_applied_then_undone_copies(tmp_path: Path) -> None:
         """Applied, then the entry undone (the image still holds the applied
@@ -81,7 +81,7 @@ E         Use -v to get more diff
 tests\test_b100_save_image.py:346: AssertionError
 _________________ test_tc_b100_15_check_document_only_copies __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29955/test_tc_b100_15_check_document0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29955/test_tc_b100_15_check_document0')
 
     def test_tc_b100_15_check_document_only_copies(tmp_path: Path) -> None:
         """Check document only → byte copy (0 differing bytes) + the document
@@ -100,7 +100,7 @@ E        +  where True = any(<generator object test_tc_b100_15_check_document_on
 tests\test_b100_save_image.py:466: AssertionError
 __________________ test_tc_b100_15_unchanged_document_copies __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29955/test_tc_b100_15_unchanged_docu0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29955/test_tc_b100_15_unchanged_docu0')
 
     def test_tc_b100_15_unchanged_document_copies(tmp_path: Path) -> None:
         """A change entry that writes the bytes already there → byte copy,

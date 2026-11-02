@@ -3,9 +3,9 @@ requirement: LLR-172.2f
 target file: s19_app/tui/workspace.py
 edit: '    for component in PureWindowsPath(path).parts[1:]:' -> '    for component in PureWindowsPath(path).parts[-1:]:'
 sha256 before: a3342ed048ebe157423bd68446455b556604d05a3d7bbe3349800aaca3a4cc04
-cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a
+cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a
 command: pytest -q --tb=line tests/test_b100_recents.py::test_tc_b100_35_entry_path_checks_drop_entries[LLR-172.2f device names-refused1-accepted1]
-s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a\s19_app\__init__.py
+s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a\s19_app\__init__.py
 pytest summary: 1 failed in 0.35s
 verdict: KILLED
 restored = True

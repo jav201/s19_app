@@ -1,5 +1,5 @@
 import sys, asyncio, tempfile, pathlib
-sys.path.insert(0, r"C:\Users\jjgh8\Github\s19_app")
+sys.path.insert(0, r"<HOME>\Github\s19_app")
 from s19_app.tui.app import S19TuiApp
 async def run(size):
     app = S19TuiApp(base_dir=pathlib.Path(tempfile.mkdtemp()))

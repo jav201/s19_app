@@ -15,11 +15,11 @@ Method summary (full text in report.md):
 import json, re, sys, os, glob, collections
 from datetime import datetime, timezone, timedelta
 
-ROOT = "C:/Users/jjgh8/.claude/projects/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2"
+ROOT = "<HOME>/.claude/projects/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2"
 SUB = ROOT + "/subagents/"
 MAIN = ROOT + ".jsonl"
 EV = ""
-SCR = "C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/"
+SCR = "<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/"
 OUT = SCR + "timing8a/"
 
 AGENTS = [  # id, label, role, step

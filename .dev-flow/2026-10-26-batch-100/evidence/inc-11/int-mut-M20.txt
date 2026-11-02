@@ -1,9 +1,9 @@
 == head: 17474791bde5dfea48f379883c91fd69c34853c7 (worktree with uncommitted Inc 11 changes)
-== s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc11\s19_app\__init__.py
-== command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<scratchpad>/int11/lad/dx C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider --basetemp=<scratchpad>/int11/bt/dx -q --no-header -p no:randomly --tb=line tests/test_b100_save_dialog.py::test_tc_b100_65_save_before_the_preview_is_shown_repaints
+== s19_app.__file__: <HOME>\Github\s19_app-b100-inc11\s19_app\__init__.py
+== command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<scratchpad>/int11/lad/dx <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider --basetemp=<scratchpad>/int11/bt/dx -q --no-header -p no:randomly --tb=line tests/test_b100_save_dialog.py::test_tc_b100_65_save_before_the_preview_is_shown_repaints
 F                                                                        [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\Github\s19_app-b100-inc11\tests\test_b100_save_dialog.py:2378: AssertionError: ('fresh1', SavePlan(target=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4cc...'firmware.s19 unchanged copy', manifest_keys=(), refusal=None, folders=(), skipped_links=(), copies=(), total_bytes=0))
+<HOME>\Github\s19_app-b100-inc11\tests\test_b100_save_dialog.py:2378: AssertionError: ('fresh1', SavePlan(target=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4cc...'firmware.s19 unchanged copy', manifest_keys=(), refusal=None, folders=(), skipped_links=(), copies=(), total_bytes=0))
 =========================== short test summary info ===========================
 FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_save_before_the_preview_is_shown_repaints
 1 failed in 3.64s

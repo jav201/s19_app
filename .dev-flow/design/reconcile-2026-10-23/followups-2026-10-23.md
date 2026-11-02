@@ -7,7 +7,7 @@ Probes ran from a scratch directory with the s19env interpreter, `PYTHONDONTWRIT
 read-only imports of the repo. Nothing was written into the repo except this file.
 
 Scratch probes (not committed):
-`C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\q3\probe_a2l_addr.py`, `...\q3\probe2.py`, `...\q4\probe_checks.py`, `...\q4\probe_btn.py`, `...\q4\probe_run.py`.
+`<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\q3\probe_a2l_addr.py`, `...\q3\probe2.py`, `...\q4\probe_checks.py`, `...\q4\probe_btn.py`, `...\q4\probe_run.py`.
 
 ---
 
@@ -51,7 +51,7 @@ which was never run. R-010 tracks it.
 - `s19_app/tui/operations/crc_config.py:41-66` `DUMMY_CONFIG_TEXT` is the text the Operations modal pre-fills (`screens.py:2109`). It is byte-identical to `examples/crc_config.example.json`. Its ranges are dummies: `0x10000–0x20000 → 0x1FFFC`, `0x20000–0x30000 → 0x2FFFC`, group `0x30000–0x34000 + 0x40000–0x42000 → 0x42000`.
 - `s19_app/tui/operations/requirements/REQ-crc.md` is the co-located requirement for the op.
 - `docs/crc-algorithm-designer/01-requirements.md:122-158` (commit `84180b4`, 2026-07-20) holds the same algorithm as a Designer **template** (`CRC-32/ISO-HDLC`, `check 0xCBF43926`). Its **job** example uses illustrative ranges `0x8000–0x8008 + 0x8010–0x8018`, `join: fill`, `pad 0xFF`, output `0x8018`, `store_width 4`, `store_endianness little`. Those values are design examples, not the operator's.
-- `s19_app/tui/operations/crc_kernel.py:395-401` `PRESETS` holds the Designer's seed catalogue. CRC-32 and its siblings are there. There is no saved `.crc.json` of the Operations algorithm, and none exists in the repo or in `C:\Users\jjgh8\.s19tool`.
+- `s19_app/tui/operations/crc_kernel.py:395-401` `PRESETS` holds the Designer's seed catalogue. CRC-32 and its siblings are there. There is no saved `.crc.json` of the Operations algorithm, and none exists in the repo or in `<HOME>\.s19tool`.
 - `.dev-flow/BACKLOG-CODE.md:854` is charter S-10: "encode the modal's known CRC as a saved Designer `.crc.json` (width 32, poly `0x04C11DB7`, init/xorout `0xFFFFFFFF`, refin=refout=true)". It carries an **open decision**: the Operations config allows several regions with one output each, but the Designer serializes a single output.
 
 **Not found.** No message in the transcript harvest (1060 operator messages, 2026-07-14 → 10-23) gives
@@ -95,7 +95,7 @@ for X and Y. That is the information needed to cut a CURVE (1 axis) or MAP (2 ax
 It is not a mock-up of a screen. No other format was found. Checked: vault `assets/` (both Cambios
 files; no image assets present beside them), `design/`, the transcript harvest (grep
 `RECORD_LAYOUT|AXIS_PTS|CURVE|curva|curve|FNC_VALUES`: only a 2026-07-20 batch-56 brief about
-alignment padding), `C:\Users\jjgh8\Downloads` (no A2L or curve file since 2026-09-25), and
+alignment padding), `<HOME>\Downloads` (no A2L or curve file since 2026-09-25), and
 `prototypes/` (no A2L curve prototype). The verdict note on R-069 says "No, las curvas sirven, además
 entregué un formato". The note answers "are the tables enough?" and reads two ways: "no — drawn curves are useful"
 or "the (text) curves work". **Orchestrator: ambiguous; the operator is asked to confirm.**

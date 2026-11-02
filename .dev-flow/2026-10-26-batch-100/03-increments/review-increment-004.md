@@ -3,12 +3,12 @@
 | Field | Value |
 |---|---|
 | Reviewer | `code-reviewer`. I am independent of this code: Kimi K2.8 implemented it, not me. |
-| Tree reviewed | Worktree `C:\Users\jjgh8\Github\s19_app-b100-inc4`, detached at `24d5b7f`, with uncommitted changes. `app.py` sha256 is `af6da521ef2d…`, which equals the packet's `pre-mutation-hashes.txt` and `app-implemented.py.bak`. I never edited the worktree. My only command inside it was a read-only `devflow-evidence.py --root . --check`, and `git status` was unchanged afterwards. |
+| Tree reviewed | Worktree `<HOME>\Github\s19_app-b100-inc4`, detached at `24d5b7f`, with uncommitted changes. `app.py` sha256 is `af6da521ef2d…`, which equals the packet's `pre-mutation-hashes.txt` and `app-implemented.py.bak`. I never edited the worktree. My only command inside it was a read-only `devflow-evidence.py --root . --check`, and `git status` was unchanged afterwards. |
 | Contract | `01-requirements.md`: HLR-166, LLR-166.1 (the load-tail arms only), LLR-166.2, P-16. UX-03 (`design/P2-ux-r1.md`, closed in `P2-ux-r2.md`). `design/design-proposal-b100.md` §5.4. `kimi/BRIEF-inc-4.md`, `BRIEF-COMMON.md`. Precedents: `review-increment-00{1,2,3}.md`. |
 | Interpreter proof | s19env Python 3.11, Textual 8.2.8. I built these trees under `…\scratchpad\r4\`:<br>• `base\` = `git archive 24d5b7f` plus the new test file;<br>• `fixed\` = the archive plus the 3 changed files, with `app.py` hash-equal to the worktree;<br>• `mut\<id>\`, one tree per mutant.<br>Every transcript prints `s19_app.__file__` from its own tree. Runs used `PYTHONPATH` set to that tree, `NO_COLOR` unset (`env -u`), `PYTHONDONTWRITEBYTECODE=1` and `-p no:cacheprovider`. |
 | **Verdict** | **reject until fixed.** Recorded token: **`BLOCK — BLOCK-UNTIL: F1, F2`** (2 HIGH). This verdict authorises nothing. The increment does not advance until F1 and F2 are fixed and I have re-read the fixes on the diff and re-run the probe and mutant R1. F3–F5 (MAJOR) should land in the same corrective pass. F5 needs an orchestrator ruling first. |
 
-`…\scratchpad` = `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad`.
+`…\scratchpad` = `<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad`.
 
 ## BLUF
 
@@ -120,7 +120,7 @@ Notes (no finding):
 | Field | Value |
 |---|---|
 | Reviewer | `code-reviewer`, the same reviewer as round 1. I did not write the fix. |
-| Tree re-read | Worktree `C:\Users\jjgh8\Github\s19_app-b100-inc4` at `24d5b7f`, with Inc 4 and fix pass 1 uncommitted. `app.py` sha256 is `ac449a2e411b…` and `tests/test_b100_focus.py` is `ac42b2eb1c6d…`, matching HANDOFF §"Fix pass 1". It is still 1 SOURCE file: `git diff --name-only 24d5b7f` lists `app.py` and `test_id_registry.py`, plus the untracked test module. CRLF is consistent: `app.py` 14822/14822, the test 961/961. I did not edit the worktree. |
+| Tree re-read | Worktree `<HOME>\Github\s19_app-b100-inc4` at `24d5b7f`, with Inc 4 and fix pass 1 uncommitted. `app.py` sha256 is `ac449a2e411b…` and `tests/test_b100_focus.py` is `ac42b2eb1c6d…`, matching HANDOFF §"Fix pass 1". It is still 1 SOURCE file: `git diff --name-only 24d5b7f` lists `app.py` and `test_id_registry.py`, plus the untracked test module. CRLF is consistent: `app.py` 14822/14822, the test 961/961. I did not edit the worktree. |
 | Contract | Main `31eb572`: LED .57 (a)–(d) and `kimi/BRIEF-inc-4-fix1.md`. I also read batch-77 `01-requirements.md` LLR-116.1 and LLR-116.5, and HLR-115 (`RegionRow.on_key`, `screens_directionb.py:1449-1497`). |
 | Interpreter proof | `…\scratchpad\r4\fixed2\` = `git archive 24d5b7f` plus the 3 changed files, hash-equal to the worktree. `…\r4\base\` = the archive plus the fix-pass test module. `…\r4\mut2\<id>\` = one tree per mutant. Every transcript prints `s19_app.__file__` from its own tree. `NO_COLOR` unset (`env -u`), s19env 3.11, Textual 8.2.8. |
 | **Verdict** | **reject until fixed.** Recorded token: **`BLOCK — BLOCK-UNTIL: R2-1`** (1 HIGH, new in this round). **F1 and F2 are discharged**: I re-read both on the diff, re-ran the per-window probe (13 of 13 windows on target) and re-ran R1 (KILLED, 3 nodes). R2-1 is new. The fix pass's `_reassert_focus_target` breaks batch-77 LLR-116.5 on the Map window: after a load the arrow keys stop walking the regions. R2-2 (MAJOR) puts the code against LED .57 (c). |
@@ -206,7 +206,7 @@ Notes (no finding):
 | Field | Value |
 |---|---|
 | Reviewer | `code-reviewer`, the same reviewer as rounds 1 and 2. I did not write the fix. Kimi K2.8 wrote fix pass 2, a Sonnet agent finished its tail, and the orchestrator deleted one branch. Who implemented is a process fact; I judged the code. |
-| Tree re-read | Worktree `C:\Users\jjgh8\Github\s19_app-b100-inc4`. `app.py` sha256 is `79df3ae1c839…`, the orchestrator's tree. `tests/test_b100_focus.py` is `f85b49f5e3d3…`. Still 1 SOURCE file. CRLF is consistent: 14800/14800. Main `31eb572` and `24d5b7f` are identical under `s19_app/` and `tests/` (`git diff --stat` is empty), so diffing against either base gives the same result. I did not edit the worktree. |
+| Tree re-read | Worktree `<HOME>\Github\s19_app-b100-inc4`. `app.py` sha256 is `79df3ae1c839…`, the orchestrator's tree. `tests/test_b100_focus.py` is `f85b49f5e3d3…`. Still 1 SOURCE file. CRLF is consistent: 14800/14800. Main `31eb572` and `24d5b7f` are identical under `s19_app/` and `tests/` (`git diff --stat` is empty), so diffing against either base gives the same result. I did not edit the worktree. |
 | Contract | LED .58 (a)–(c) in main `6a1b8ee`; batch-77 LLR-116.5 and HLR-115. |
 | Interpreter proof | `…\scratchpad\r4\fixed3\` = `git archive 31eb572` plus the 3 changed files, hash-equal to the worktree. `…\r4\base3\` = the archive plus the final module. `…\r4\mut3\<id>\` = one tree per mutant. Every transcript prints `s19_app.__file__` from its own tree. `NO_COLOR` unset, s19env 3.11, Textual 8.2.8. |
 | **Verdict** | **approve-with-fixes.** Recorded token: **`PASS-WITH-NOTES`**. 0 HIGH is open. **R2-1 is discharged**: I re-ran the map arrow probe myself, and after a load on Map the focus is on the region row and `down` walks it. R7 is KILLED again. One MAJOR is new (R3-1). It does not block, but it should land before the commit, because the fix is deleting 2 lines. |

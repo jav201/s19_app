@@ -1,12 +1,12 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py::test_tc_b100_07_rollback_never_touches_junction_target  (MUTANT M-R3-1: walk_tree_no_links follows reparse points — the _is_reparse_point guard deleted)
-tree: C:/Users/jjgh8/Github/s19_app-b100-inc2 (detached 2edfee2, Inc 2 + fix passes 1-2 + fix pass 3 WITH THE MUTANT)
-env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc2 (NO_COLOR unset)
+tree: <HOME>/Github/s19_app-b100-inc2 (detached 2edfee2, Inc 2 + fix passes 1-2 + fix pass 3 WITH THE MUTANT)
+env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<HOME>/Github/s19_app-b100-inc2 (NO_COLOR unset)
 
 F                                                                        [100%]
 ================================== FAILURES ===================================
 ___________ test_tc_b100_07_rollback_never_touches_junction_target ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27604/test_tc_b100_07_rollback_never0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27604/test_tc_b100_07_rollback_never0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001E35D2BD250>
 
     def test_tc_b100_07_rollback_never_touches_junction_target(

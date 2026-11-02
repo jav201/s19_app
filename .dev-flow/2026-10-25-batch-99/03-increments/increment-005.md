@@ -116,7 +116,7 @@ first run, under three-way CPU contention, showed one dwell-timing flake,
 |---|---|
 | Mutation applied | two, one per LLR (see Mutation verdicts below): the empty-region refusal bypassed (the empty stream gets a CRC again) · the shared `temp/<name>` staging restored — both reverted by hash |
 | Instrument | project code: the implementer's own hand via the Edit tool, restore checked by SHA-256 |
-| Where it ran | this worktree (`C:\Users\jjgh8\Github\s19_app-b99-inc5`), run by the implementer |
+| Where it ran | this worktree (`<HOME>\Github\s19_app-b99-inc5`), run by the implementer |
 | Transcript | `evidence/inc-5/mut-LLR-159.1.txt` · `mut-LLR-155.8.txt` (each: node FAILED) |
 | Restore proven by | file hash returned to its pre-mutation value: crc.py → `ec932e16cabab0528863bc3eec6b43a15951b0e58cc6fa0153c50abe5bf5d3ba`; flow_execution_service.py untouched by the mutations (baseline `d0f69981d3b26a2239e0f4af01391b4bc14abcae9fac578741871e688f9859d2`) — both recorded in `baseline-hashes.txt` |
 | Bytecode cache | run with `PYTHONDONTWRITEBYTECODE=1` (C-46) |
@@ -165,8 +165,8 @@ All under `artifact_homes.evidence` = `.dev-flow/2026-10-25-batch-99/evidence/in
 |---|---|---|
 | AT-B99-10 ×8 (8 × `1 passed`), orchestrator after the Kimi fix session timed out | `stability-at10.txt` | `10bcddd86cddc5d87bcd745d449dcf5f72ab9973d2a0a80add166809b90f7393` |
 | affected sweep after the fixes (210 passed), orchestrator | `green-fix-sweep.txt` | `5016dde16b13383898bb2ab0cf44dbf4a8402b9bc9fa6083d06ac3237e96cd43` |
-| RED baseline, unmodified tree (5 failed) | `red-baseline.txt` | `2bff9c00fd113d49d3b3eda820f0765d6f9eeadd3353c3512d8903bdbac546c7` |
-| GREEN: the increment's module (5 passed) | `green-b99_crc_region.txt` | `8c3e20db2202dbc743e9775db3eae7b5fce7555cafc3413a4da592f4edfcb187` |
+| RED baseline, unmodified tree (5 failed) | `red-baseline.txt` | `f164b369605b639348ee94cd9c20e36cbd61e43823747f53de1dd4cb7104b954` |
+| GREEN: the increment's module (5 passed) | `green-b99_crc_region.txt` | `cffb294afa77b60040f31e56de53a478f38776cf7f4a0c757dc22d4669e2f2e8` |
 | GREEN: batch 1 — staging, registry, crc operation/engine, flow crc block (98 passed) | `green-batch1.txt` | `b45835ea80233faee375868d90077e76a402a1fc71fb57ddac881ec8d0c1c857` |
 | GREEN: batch 2 — ribbon, golden report, report wire, crc ui, a2b, persistence, operations, address census (107 passed) | `green-batch2.txt` | `035002a206cc8e70b9f765034b8cd5eb4835317125651f56177cfa328ef4e953` |
 | GREEN: batch 3 — TUI CRC surface + designer view (54 passed) | `green-batch3.txt` | `6a23dc6f6770cee970308ded2c1edd71c7cf3a66d2c04e245ad33d153a28cd22` |
@@ -174,8 +174,8 @@ All under `artifact_homes.evidence` = `.dev-flow/2026-10-25-batch-99/evidence/in
 | GREEN: batch 4 clean re-run — b97 FX execution, tui flow execution, chainset (94 passed) | `green-batch4.txt` | `f815727653358c741d3194bdb08244286a19affe1ee88da51a3bf0eeb4ad1b4d` |
 | GREEN: TC-B97-64 solo re-run (1 passed) | `green-b97_64-solo.txt` | `f1c95d14a4a43cca71ea4d463c81d2edb92f483e45973e672122c6a80c1d8e0b` |
 | GREEN: batch 5 — b97 flow builder (69 passed) | `green-batch5.txt` | `2267621ff7bf568466529e54314a9fb4bafd9caf60d77942e9c44ccb17db2bdb` |
-| Mutation LLR-159.1 (KILLED — TC-B99-26) | `mut-LLR-159.1.txt` | `28e5aea33fcb243f800fd02c2b11a57b334903e5fb7fdc9877272e127c210ce5` |
-| Mutation LLR-155.8 (KILLED — TC-B99-38 AND TC-B99-39) | `mut-LLR-155.8.txt` | `524cc10309d6cd7b48a45f16cbb5e58f49be039df43e17c456f4b0afa3c6f7d9` |
+| Mutation LLR-159.1 (KILLED — TC-B99-26) | `mut-LLR-159.1.txt` | `475bf8852b19a07f58942159642eea211cc318a72792cf3519fbc3a64fae1cb9` |
+| Mutation LLR-155.8 (KILLED — TC-B99-38 AND TC-B99-39) | `mut-LLR-155.8.txt` | `6bd02bc55d706a9e93c1a6c6f7ae0feb7885a15180f215e5a6749fc798907e6e` |
 | Reverse census probes | `reverse-census.txt` | `fbab3d05cf60c46d57a88c38db2caab58b7b7bf195f63790ea1ffb4f439c188d` |
 | Pre-mutation hashes (fixed tree) | `baseline-hashes.txt` | `524e12fef268bcf50973496462d8315f8f11bf5bbd81c33e8413e39a500b256d` |
 

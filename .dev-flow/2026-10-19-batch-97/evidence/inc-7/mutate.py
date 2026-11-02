@@ -17,7 +17,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-PY = r"C:\Users\jjgh8\anaconda3\envs\s19env\python.exe"
+PY = r"<HOME>\anaconda3\envs\s19env\python.exe"
 KB = "tests/test_b97_key_bar.py::"
 WD = "tests/test_b97_width.py::"
 SPLIT = "tests/test_segment_split_window.py::test_export_cues_name_the_bound_export_key"

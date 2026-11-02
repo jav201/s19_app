@@ -73,8 +73,8 @@ has walked through it yet.
 
 | File | Kind | Change |
 |---|---|---|
-| `C:\Users\jjgh8\.claude\docs\tools\devflow-validate.py` | source | `_v2_tokens` + V2 call-site and sentence constants; `_v6_blocks` + `_v6_outcome` pure cores + V6 pass sentence; `_v2_live_root` / `_v2_why`; **37** arms. `_tree_text` **deleted** — V2 was its only consumer |
-| `C:\Users\jjgh8\.claude\skills\dev-flow\scripts\devflow-validate.py` | build output | `--sync-bundle` mirror; `V15` reports *bundle identical* |
+| `<HOME>\.claude\docs\tools\devflow-validate.py` | source | `_v2_tokens` + V2 call-site and sentence constants; `_v6_blocks` + `_v6_outcome` pure cores + V6 pass sentence; `_v2_live_root` / `_v2_why`; **37** arms. `_tree_text` **deleted** — V2 was its only consumer |
+| `<HOME>\.claude\skills\dev-flow\scripts\devflow-validate.py` | build output | `--sync-bundle` mirror; `V15` reports *bundle identical* |
 
 | **SOURCE files** | **`1`** / 4 — the bundle is a declared build output, not an authored file |
 |---|---|
@@ -146,7 +146,7 @@ batch, in `V23`), or `tests/` gains the two nodes. **I changed neither the requi
 ### The mandatory battery — 16 kills, **0 survivors on the first arm set**
 
 Every mutant is a single coherent edit against a **COPY** under
-`C:\Users\jjgh8\.claude\jobs\c0c0fa47\tmp\`, asserted non-no-op at build time. For each one the
+`<HOME>\.claude\jobs\c0c0fa47\tmp\`, asserted non-no-op at build time. For each one the
 harness records all four things a crash can fake: **it imported · its arm count · its exit code ·
 which NAMED arm printed FAIL.** A kill with no named arm is scored as a crash. Harness: `kills4.py`.
 

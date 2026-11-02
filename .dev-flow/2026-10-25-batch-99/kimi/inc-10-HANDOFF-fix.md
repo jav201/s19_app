@@ -1,6 +1,6 @@
 # HANDOFF-fix — batch-99 Increment 10 · review round 1 (F1–F4 + LOWs)
 
-Worktree: `C:\Users\jjgh8\Github\s19_app-b99-inc10` (branch b99-inc10). Working
+Worktree: `<HOME>\Github\s19_app-b99-inc10` (branch b99-inc10). Working
 tree only — **no commit**, per the brief. The orchestrator commits.
 
 ## What the review found and what changed

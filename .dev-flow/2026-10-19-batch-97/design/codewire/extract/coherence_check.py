@@ -2,7 +2,7 @@
 Run from anywhere: python coherence_check.py. Uses the Code-Wire parser."""
 import sys, collections
 from pathlib import Path
-sys.path.insert(0, r"C:\Users\jjgh8\Github\code-wire\tools")
+sys.path.insert(0, r"<HOME>\Github\code-wire\tools")
 import codewire_extract as cw
 base = Path(__file__).resolve().parent.parent
 texts = [(base / f"{f}.md").read_text(encoding="utf-8") for f in

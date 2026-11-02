@@ -1,5 +1,5 @@
-cmd: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc2 (NO_COLOR unset)
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 1)
+cmd: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<HOME>\Github\s19_app-b100-inc2 (NO_COLOR unset)
+tree: <HOME>\Github\s19_app-b100-inc2 (fix pass 1)
 
 .............................................................F.........F [ 47%]
 ........................................................................ [ 94%]
@@ -7,7 +7,7 @@ tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 1)
 ================================== FAILURES ===================================
 ____________ test_at_b99_05_save_project_after_same_name_save_back ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27513/test_at_b99_05_save_project_af0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27513/test_at_b99_05_save_project_af0')
 
     def test_at_b99_05_save_project_after_same_name_save_back(tmp_path: Path) -> None:
         """Load -> patch -> save back as firmware.s19 -> Save project: the app is
@@ -132,10 +132,10 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         assert outcomes["work_copy_bytes"] == outcomes["pre_save_bytes"]
         assert outcomes["app_running"] is True
 >       assert outcomes["status"].startswith("Project saved"), outcomes["status"]
-E       AssertionError: Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-27513\test_at_b99_05_save_project_af0\.s19tool\workarea\proj (variant 'firmware')
+E       AssertionError: Saved project to <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-27513\test_at_b99_05_save_project_af0\.s19tool\workarea\proj (variant 'firmware')
 E       assert False
 E        +  where False = <built-in method startswith of str object at 0x00000177EAFFDB00>('Project saved')
-E        +    where <built-in method startswith of str object at 0x00000177EAFFDB00> = "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27513\\test_at_b99_05_save_project_af0\\.s19tool\\workarea\\proj (variant 'firmware')".startswith
+E        +    where <built-in method startswith of str object at 0x00000177EAFFDB00> = "Saved project to <HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27513\\test_at_b99_05_save_project_af0\\.s19tool\\workarea\\proj (variant 'firmware')".startswith
 
 tests\test_b99_staging.py:1431: AssertionError
 ___________ test_tc_b99_13_no_final_name_replace_outside_placement ____________

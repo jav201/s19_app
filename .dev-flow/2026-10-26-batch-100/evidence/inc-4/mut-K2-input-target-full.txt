@@ -1,5 +1,5 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc4 (MUTANT K2-input-target)
+tree: <HOME>\Github\s19_app-b100-inc4 (MUTANT K2-input-target)
 started: 2026-10-27 08:06:11
 
 MUTANT K2-input-target APPLIED 5eb7f34735af88fbb0398dd3d9ab898f22e4d94252e8ba503781383cf32ed853
@@ -8,7 +8,7 @@ FFFF..F............F...FFF.FF                                            [100%]
 ================================== FAILURES ===================================
 _______ test_tc_b100_12_focus_target_table_matches_the_window_registry ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28929/test_tc_b100_12_focus_target_t0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28929/test_tc_b100_12_focus_target_t0')
 
     def test_tc_b100_12_focus_target_table_matches_the_window_registry(
         tmp_path: Path,
@@ -88,7 +88,7 @@ E                +  where True = isinstance(OsClipboardInput(id='search_input'),
 tests\test_b100_focus.py:233: AssertionError
 ________________ test_tc_b100_12_load_file_tail_rehomes_focus _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28929/test_tc_b100_12_load_file_tail0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28929/test_tc_b100_12_load_file_tail0')
 
     def test_tc_b100_12_load_file_tail_rehomes_focus(tmp_path: Path) -> None:
         """Load file (the dialog route's tail): with the focus on the hidden
@@ -167,7 +167,7 @@ E       AssertionError: timed out waiting for the focus to settle on the window'
 tests\test_b100_focus.py:167: AssertionError
 _______________ test_tc_b100_12_load_project_tail_rehomes_focus _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28929/test_tc_b100_12_load_project_t0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28929/test_tc_b100_12_load_project_t0')
 
     def test_tc_b100_12_load_project_tail_rehomes_focus(tmp_path: Path) -> None:
         """Load project: the project install runs the same tail and re-homes
@@ -242,7 +242,7 @@ E       AssertionError: timed out waiting for the focus to settle on the window'
 tests\test_b100_focus.py:167: AssertionError
 ______________ test_tc_b100_12_workarea_files_pick_rehomes_focus ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28929/test_tc_b100_12_workarea_files0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28929/test_tc_b100_12_workarea_files0')
 
     def test_tc_b100_12_workarea_files_pick_rehomes_focus(tmp_path: Path) -> None:
         """Workarea Files pick: selecting a temp file in the workspace list
@@ -328,7 +328,7 @@ E       AssertionError: timed out waiting for the focus to settle on the window'
 tests\test_b100_focus.py:167: AssertionError
 ______ test_tc_b100_12_every_window_load_lands_on_its_target[workspace] _______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28929/test_tc_b100_12_every_window_l0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28929/test_tc_b100_12_every_window_l0')
 window_key = 'workspace'
 
     @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))
@@ -418,7 +418,7 @@ E       AssertionError: timed out waiting for the focus to settle on the window'
 tests\test_b100_focus.py:167: AssertionError
 __________ test_tc_b100_12_text_input_in_a_content_window_is_rehomed __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28929/test_tc_b100_12_text_input_in_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28929/test_tc_b100_12_text_input_in_0')
 
     def test_tc_b100_12_text_input_in_a_content_window_is_rehomed(
         tmp_path: Path,
@@ -509,7 +509,7 @@ E       AssertionError: timed out waiting for the focus to settle on the window'
 tests\test_b100_focus.py:167: AssertionError
 _________ test_tc_b100_12_bad_default_focus_is_rehomed_behind_a_modal _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28929/test_tc_b100_12_bad_default_fo0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28929/test_tc_b100_12_bad_default_fo0')
 
     def test_tc_b100_12_bad_default_focus_is_rehomed_behind_a_modal(
         tmp_path: Path,
@@ -597,7 +597,7 @@ E       AssertionError: timed out waiting for the Load project dialog
 tests\test_b100_focus.py:73: AssertionError
 _________________ test_tc_b100_12_rehome_lands_synchronously __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28929/test_tc_b100_12_rehome_lands_s0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28929/test_tc_b100_12_rehome_lands_s0')
 
     def test_tc_b100_12_rehome_lands_synchronously(tmp_path: Path) -> None:
         """The landing is a synchronous ``Screen.set_focus``, not
@@ -674,7 +674,7 @@ E            +    where query_one = S19TuiApp(title='Hex Edit Tool', classes={'-
 tests\test_b100_focus.py:749: AssertionError
 ___________________ test_tc_b100_13_a2l_tail_rehomes_focus ____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28929/test_tc_b100_13_a2l_tail_rehom0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28929/test_tc_b100_13_a2l_tail_rehom0')
 
     def test_tc_b100_13_a2l_tail_rehomes_focus(tmp_path: Path) -> None:
         """The A2L load tail applies the LLR-166.1 rule: with the focus on the
@@ -757,7 +757,7 @@ E       AssertionError: timed out waiting for the focus to settle on the window'
 tests\test_b100_focus.py:167: AssertionError
 ___ test_at_b100_04_focus_lands_and_single_keys_reach_their_screens[size0] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28929/test_at_b100_04_focus_lands_an0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28929/test_at_b100_04_focus_lands_an0')
 size = (118, 54)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
@@ -880,7 +880,7 @@ E       AssertionError: timed out waiting for the focus to settle on the window'
 tests\test_b100_focus.py:167: AssertionError
 ___ test_at_b100_04_focus_lands_and_single_keys_reach_their_screens[size1] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28929/test_at_b100_04_focus_lands_an1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28929/test_at_b100_04_focus_lands_an1')
 size = (220, 60)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])

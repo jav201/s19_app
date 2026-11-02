@@ -6,18 +6,18 @@
 #   |     if "\\" in text or ":" in text or _has_control_character(text):
 # edit 1 NEW:
 #   |     if "\\" in text or ":" in text:
-# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
+# cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
 # env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
-# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form tests/test_b100_document.py::test_tc_b100_28_writer_refuses_a_value_out_of_form
+# command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses tests/test_b100_document.py::test_tc_b100_28_reader_refuses_a_value_out_of_form tests/test_b100_document.py::test_tc_b100_28_writer_refuses_a_value_out_of_form
 # started 2026-10-30T23:13:47Z  finished 2026-10-30T23:13:49Z  rc=1
 ...................FFFF............F................F.                   [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:232: AssertionError: assert True is False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:232: AssertionError: assert True is False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:232: AssertionError: assert True is False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:232: AssertionError: assert True is False
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:336: AssertionError: []
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:418: assert '{\n  "schema_version": 1,\n  "active_variant": "firmware",\n  "batch": [],\n  "assignments": {},\n  "active_document": "patches/\\u001b]0;x\\u0007a.json"\n}' is None
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:232: AssertionError: assert True is False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:232: AssertionError: assert True is False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:232: AssertionError: assert True is False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:232: AssertionError: assert True is False
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:336: AssertionError: []
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:418: assert '{\n  "schema_version": 1,\n  "active_variant": "firmware",\n  "batch": [],\n  "assignments": {},\n  "active_document": "patches/\\u001b]0;x\\u0007a.json"\n}' is None
 =========================== short test summary info ===========================
 FAILED tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses['patches/\\x1b]0;x\\x07a.json']
 FAILED tests/test_b100_document.py::test_tc_b100_28_form_predicate_refuses['patches/a\\x85.json']

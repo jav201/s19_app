@@ -7,7 +7,7 @@
         )
 E       AssertionError: assert False
 E        +  where False = <function snap_compare.<locals>.compare at 0x00000271170AF880>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}), terminal_size=(120, 30), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000027116F5CCC0>)
-E        +    where <function _snapshot_run_before.<locals>.run_before at 0x0000027116F5CCC0> = _snapshot_run_before('patch', 'comfortable', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26950/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26950/snapshot_public0/snap.s19')})
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x0000027116F5CCC0> = _snapshot_run_before('patch', 'comfortable', {'a2l': WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26950/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26950/snapshot_public0/snap.s19')})
 
 tests\test_tui_snapshot.py:1220: AssertionError
 --------------------------- snapshot report summary ---------------------------
@@ -18,7 +18,7 @@ Textual Snapshot Report
 
 View the failure report.
 
-C:\Users\jjgh8\Github\s19_app-b99-inc13\snapshot_report.html
+<HOME>\Github\s19_app-b99-inc13\snapshot_report.html
 
 =========================== short test summary info ===========================
 FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]

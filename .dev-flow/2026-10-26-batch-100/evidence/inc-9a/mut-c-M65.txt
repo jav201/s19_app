@@ -4,8 +4,8 @@ mutant: M65
 description: LLR-172.5b: the route's listing step removed
 target file: s19_app/tui/app.py
 edit: '        try:\n            listed = self.list_projects()\n        except OSError:\n            return ("refuse", "unreadable")\n        name = next(\n            (\n                entry\n                for entry in listed\n                if os.path.normcase(entry) == os.path.normcase(typed_name)\n            ),\n            None,\n        )\n        if name is None:\n            return ("refuse", "not a project")\n\n        folder = self.workarea / name' -> '        name = typed_name\n\n        folder = self.workarea / name'
-cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt  (a copy of the worktree, never the worktree)
-s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt\s19_app\__init__.py
+cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt  (a copy of the worktree, never the worktree)
+s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt\s19_app\__init__.py
 sha256 before: bbf04117fbf0d3f5951e8c5a493bed65e66c4fe87a838b861ae606f71e5934cb
 env: env -u NO_COLOR LOCALAPPDATA=<scratchpad>/e5fix/lad/<run id> PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=.
 command: python -m pytest -p no:cacheprovider -q --tb=line -rA 'tests/test_b100_recents.py::test_tc_b100_38_route_matches_the_typed_folder_against_the_listing[temp]'
@@ -13,7 +13,7 @@ command: python -m pytest -p no:cacheprovider -q --tb=line -rA 'tests/test_b100_
 --- pytest per-node summary ---
 FAILED tests/test_b100_recents.py::test_tc_b100_38_route_matches_the_typed_folder_against_the_listing[temp]
 --- failure lines ---
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt\tests\test_b100_recents.py:2633: AssertionError: assert ('project', 'temp') == ('refuse', 'not a project')
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt\tests\test_b100_recents.py:2633: AssertionError: assert ('project', 'temp') == ('refuse', 'not a project')
 --- pytest tail ---
 =========================== short test summary info ===========================
 FAILED tests/test_b100_recents.py::test_tc_b100_38_route_matches_the_typed_folder_against_the_listing[temp]

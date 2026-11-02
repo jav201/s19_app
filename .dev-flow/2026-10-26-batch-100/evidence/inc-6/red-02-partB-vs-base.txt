@@ -1,12 +1,12 @@
 # command: python -m pytest -q -p no:cacheprovider -rA tests/test_b100_announce.py tests/test_b100_active_variant.py::test_at_b100_20_every_writer_carries_the_keys_it_does_not_own tests/test_b100_focus.py::test_tc_b100_12_panel_close_lands_on_the_windows_target tests/test_b100_focus.py::test_at_b100_04_focus_lands_and_single_keys_reach_their_screens tests/test_b100_save_image.py::test_at_b100_05_save_project_saves_the_patched_image
-# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/i6b (093a7c0 base; the Inc 6 test files copied in: test_b100_announce.py, test_b100_active_variant.py, support/b100_projects.py, and the re-pinned test_b100_focus.py / test_b100_save_image.py; 0 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/i6b ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/i6b (093a7c0 base; the Inc 6 test files copied in: test_b100_announce.py, test_b100_active_variant.py, support/b100_projects.py, and the re-pinned test_b100_focus.py / test_b100_save_image.py; 0 source paths modified)
+# PYTHONPATH=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/i6b ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-30T01:38:11Z
 FFFFFFFFFF.FFFFFFFFFFFFFFFFF                                             [100%]
 ================================== FAILURES ===================================
 _______________________ test_tc_b100_55_recorded_active _______________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_tc_b100_55_recorded_activ0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30149/test_tc_b100_55_recorded_activ0')
 
     def test_tc_b100_55_recorded_active(tmp_path: Path) -> None:
         service = _reasons()
@@ -23,7 +23,7 @@ kwargs = {}
 
     def _compose(*args, **kwargs):
 >       from s19_app.tui.services.variant_execution_service import compose_load_announcement
-E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
+E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
 
 tests\test_b100_announce.py:121: ImportError
 _________________ test_tc_b100_55_first_by_name_none_recorded _________________
@@ -42,7 +42,7 @@ kwargs = {}
 
     def _compose(*args, **kwargs):
 >       from s19_app.tui.services.variant_execution_service import compose_load_announcement
-E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
+E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
 
 tests\test_b100_announce.py:121: ImportError
 _______________ test_tc_b100_55_first_by_name_manifest_damaged ________________
@@ -66,7 +66,7 @@ kwargs = {}
 
     def _compose(*args, **kwargs):
 >       from s19_app.tui.services.variant_execution_service import compose_load_announcement
-E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
+E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
 
 tests\test_b100_announce.py:121: ImportError
 ________________ test_tc_b100_55_first_by_name_no_project_json ________________
@@ -85,7 +85,7 @@ kwargs = {}
 
     def _compose(*args, **kwargs):
 >       from s19_app.tui.services.variant_execution_service import compose_load_announcement
-E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
+E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
 
 tests\test_b100_announce.py:121: ImportError
 _________ test_tc_b100_55_next_valid_when_the_recorded_one_is_missing _________
@@ -107,7 +107,7 @@ kwargs = {}
 
     def _compose(*args, **kwargs):
 >       from s19_app.tui.services.variant_execution_service import compose_load_announcement
-E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
+E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
 
 tests\test_b100_announce.py:121: ImportError
 ____________ test_tc_b100_55_five_reasons_have_distinct_user_text _____________
@@ -146,12 +146,12 @@ kwargs = {}
 
     def _compose(*args, **kwargs):
 >       from s19_app.tui.services.variant_execution_service import compose_load_announcement
-E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
+E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
 
 tests\test_b100_announce.py:121: ImportError
 _____________ test_tc_b100_55_latest_never_comes_from_file_times ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_tc_b100_55_latest_never_c0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30149/test_tc_b100_55_latest_never_c0')
 
     def test_tc_b100_55_latest_never_comes_from_file_times(tmp_path: Path) -> None:
         """A touched (newer) file is never called latest: only the variant the
@@ -176,7 +176,7 @@ kwargs = {}
 
     def _compose(*args, **kwargs):
 >       from s19_app.tui.services.variant_execution_service import compose_load_announcement
-E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
+E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
 
 tests\test_b100_announce.py:121: ImportError
 _____________ test_tc_b100_55_boundaries_one_variant_and_no_image _____________
@@ -195,12 +195,12 @@ kwargs = {}
 
     def _compose(*args, **kwargs):
 >       from s19_app.tui.services.variant_execution_service import compose_load_announcement
-E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
+E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
 
 tests\test_b100_announce.py:121: ImportError
 _________ test_tc_b100_56_one_summary_line_and_the_final_status_text __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_tc_b100_56_one_summary_li0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30149/test_tc_b100_56_one_summary_li0')
 
     def test_tc_b100_56_one_summary_line_and_the_final_status_text(tmp_path: Path) -> None:
         base = tmp_path / "app"
@@ -218,12 +218,12 @@ _____ test_tc_b100_56_long_names_keep_the_details_key_inside_118_columns ______
     def test_tc_b100_56_long_names_keep_the_details_key_inside_118_columns() -> None:
         long_set = _variants("f" * 90 + ".s19", active="f" * 90)
 >       from s19_app.tui.services.variant_execution_service import compose_load_announcement
-E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
+E       ImportError: cannot import name 'compose_load_announcement' from 's19_app.tui.services.variant_execution_service' (<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\i6b\s19_app\tui\services\variant_execution_service.py)
 
 tests\test_b100_announce.py:321: ImportError
 ______ test_tc_b100_67_focus_starts_on_the_list_and_enter_keeps_it_open _______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_tc_b100_67_focus_starts_o0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30149/test_tc_b100_67_focus_starts_o0')
 
     def test_tc_b100_67_focus_starts_on_the_list_and_enter_keeps_it_open(tmp_path: Path) -> None:
         async def _scenario(pilot, app):
@@ -240,13 +240,13 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_announce.py:383: in _run_panel
     return asyncio.run(_drive())
            ^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_announce.py:380: in _drive
@@ -270,7 +270,7 @@ E       AssertionError: timed out waiting for the Load-result panel holding a fo
 tests\test_b100_announce.py:80: AssertionError
 _________________ test_tc_b100_67_the_shown_esc_key_closes_it _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_tc_b100_67_the_shown_esc_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30149/test_tc_b100_67_the_shown_esc_0')
 
     def test_tc_b100_67_the_shown_esc_key_closes_it(tmp_path: Path) -> None:
         async def _scenario(pilot, app):
@@ -287,13 +287,13 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_announce.py:383: in _run_panel
     return asyncio.run(_drive())
            ^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_announce.py:380: in _drive
@@ -317,7 +317,7 @@ E       AssertionError: timed out waiting for the Load-result panel holding a fo
 tests\test_b100_announce.py:80: AssertionError
 _____________ test_tc_b100_67_tab_reaches_close_and_enter_closes ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_tc_b100_67_tab_reaches_cl0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30149/test_tc_b100_67_tab_reaches_cl0')
 
     def test_tc_b100_67_tab_reaches_close_and_enter_closes(tmp_path: Path) -> None:
         async def _scenario(pilot, app):
@@ -336,13 +336,13 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_announce.py:383: in _run_panel
     return asyncio.run(_drive())
            ^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_announce.py:380: in _drive
@@ -366,7 +366,7 @@ E       AssertionError: timed out waiting for the Load-result panel holding a fo
 tests\test_b100_announce.py:80: AssertionError
 ________________ test_tc_b100_67_v_opens_the_variant_selector _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_tc_b100_67_v_opens_the_va0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30149/test_tc_b100_67_v_opens_the_va0')
 
     def test_tc_b100_67_v_opens_the_variant_selector(tmp_path: Path) -> None:
         async def _scenario(pilot, app):
@@ -386,13 +386,13 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_announce.py:383: in _run_panel
     return asyncio.run(_drive())
            ^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_announce.py:380: in _drive
@@ -416,7 +416,7 @@ E       AssertionError: timed out waiting for the Load-result panel holding a fo
 tests\test_b100_announce.py:80: AssertionError
 ______ test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_tc_b100_67_thirty_problem0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30149/test_tc_b100_67_thirty_problem0')
 
     def test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last(tmp_path: Path) -> None:
         async def _scenario(pilot, app):
@@ -436,13 +436,13 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_announce.py:383: in _run_panel
     return asyncio.run(_drive())
            ^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_announce.py:380: in _drive
@@ -466,7 +466,7 @@ E       AssertionError: timed out waiting for the Load-result panel holding a fo
 tests\test_b100_announce.py:80: AssertionError
 ___________ test_tc_b100_67_damaged_manifest_paints_user_terms_only ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_tc_b100_67_damaged_manife0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30149/test_tc_b100_67_damaged_manife0')
 
     def test_tc_b100_67_damaged_manifest_paints_user_terms_only(tmp_path: Path) -> None:
         base = tmp_path / "app"
@@ -485,13 +485,13 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 
 tests\test_b100_announce.py:464: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_announce.py:461: in _drive
@@ -515,7 +515,7 @@ E       AssertionError: timed out waiting for the Load-result panel holding a fo
 tests\test_b100_announce.py:80: AssertionError
 ______ test_at_b100_19_the_panel_names_the_opened_variant_and_why[size0] ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_at_b100_19_the_panel_name0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30149/test_at_b100_19_the_panel_name0')
 size = (118, 54)
 
     @pytest.mark.parametrize("size", SIZES)
@@ -575,13 +575,13 @@ size = (118, 54)
 
 tests\test_b100_announce.py:535: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_announce.py:513: in _reopen
@@ -608,7 +608,7 @@ E       AssertionError: timed out waiting for the Load-result panel holding a fo
 tests\test_b100_announce.py:80: AssertionError
 ______ test_at_b100_19_the_panel_names_the_opened_variant_and_why[size1] ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_at_b100_19_the_panel_name1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30149/test_at_b100_19_the_panel_name1')
 size = (220, 60)
 
     @pytest.mark.parametrize("size", SIZES)
@@ -668,13 +668,13 @@ size = (220, 60)
 
 tests\test_b100_announce.py:535: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_announce.py:513: in _reopen
@@ -701,7 +701,7 @@ E       AssertionError: timed out waiting for the Load-result panel holding a fo
 tests\test_b100_announce.py:80: AssertionError
 ____ test_at_b100_20_every_writer_carries_the_keys_it_does_not_own[size0] _____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_at_b100_20_every_writer_c0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30149/test_at_b100_20_every_writer_c0')
 size = (118, 54)
 
     @pytest.mark.parametrize("size", SIZES)
@@ -764,13 +764,13 @@ size = (118, 54)
 
 tests\test_b100_active_variant.py:657: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_active_variant.py:635: in _writers
@@ -794,7 +794,7 @@ E       AssertionError: timed out waiting for the Load-result panel
 tests\test_b100_active_variant.py:75: AssertionError
 ____ test_at_b100_20_every_writer_carries_the_keys_it_does_not_own[size1] _____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_at_b100_20_every_writer_c1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30149/test_at_b100_20_every_writer_c1')
 size = (220, 60)
 
     @pytest.mark.parametrize("size", SIZES)
@@ -857,13 +857,13 @@ size = (220, 60)
 
 tests\test_b100_active_variant.py:657: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_active_variant.py:635: in _writers
@@ -887,7 +887,7 @@ E       AssertionError: timed out waiting for the Load-result panel
 tests\test_b100_active_variant.py:75: AssertionError
 ________ test_tc_b100_12_panel_close_lands_on_the_windows_target[esc] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_tc_b100_12_panel_close_la0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30149/test_tc_b100_12_panel_close_la0')
 close_keys = ('escape',)
 
     @pytest.mark.parametrize(
@@ -929,13 +929,13 @@ close_keys = ('escape',)
 
 tests\test_b100_focus.py:1248: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_focus.py:1234: in _drive
@@ -960,7 +960,7 @@ E       AssertionError: timed out waiting for the status naming the loaded proje
 tests\test_b100_focus.py:78: AssertionError
 _____ test_tc_b100_12_panel_close_lands_on_the_windows_target[tab_enter] ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_tc_b100_12_panel_close_la1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30149/test_tc_b100_12_panel_close_la1')
 close_keys = ('tab', 'enter')
 
     @pytest.mark.parametrize(
@@ -1002,13 +1002,13 @@ close_keys = ('tab', 'enter')
 
 tests\test_b100_focus.py:1248: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_focus.py:1234: in _drive
@@ -1033,7 +1033,7 @@ E       AssertionError: timed out waiting for the status naming the loaded proje
 tests\test_b100_focus.py:78: AssertionError
 ___ test_at_b100_04_focus_lands_and_single_keys_reach_their_screens[size0] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_at_b100_04_focus_lands_an0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30149/test_at_b100_04_focus_lands_an0')
 size = (118, 54)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
@@ -1107,13 +1107,13 @@ size = (118, 54)
 
 tests\test_b100_focus.py:1210: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_focus.py:1175: in _drive
@@ -1140,7 +1140,7 @@ E       AssertionError: timed out waiting for the status naming the loaded proje
 tests\test_b100_focus.py:78: AssertionError
 ___ test_at_b100_04_focus_lands_and_single_keys_reach_their_screens[size1] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_at_b100_04_focus_lands_an1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30149/test_at_b100_04_focus_lands_an1')
 size = (220, 60)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
@@ -1214,13 +1214,13 @@ size = (220, 60)
 
 tests\test_b100_focus.py:1210: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_focus.py:1175: in _drive
@@ -1247,7 +1247,7 @@ E       AssertionError: timed out waiting for the status naming the loaded proje
 tests\test_b100_focus.py:78: AssertionError
 _________ test_at_b100_05_save_project_saves_the_patched_image[size0] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_at_b100_05_save_project_s0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30149/test_at_b100_05_save_project_s0')
 size = (118, 54)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
@@ -1370,13 +1370,13 @@ size = (118, 54)
 
 tests\test_b100_save_image.py:1756: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_save_image.py:1712: in _reopen_scene
@@ -1398,7 +1398,7 @@ E       AssertionError: timed out waiting for the Load-result panel
 tests\test_b100_save_image.py:152: AssertionError
 _________ test_at_b100_05_save_project_saves_the_patched_image[size1] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30149/test_at_b100_05_save_project_s1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30149/test_at_b100_05_save_project_s1')
 size = (220, 60)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
@@ -1521,13 +1521,13 @@ size = (220, 60)
 
 tests\test_b100_save_image.py:1756: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_save_image.py:1712: in _reopen_scene

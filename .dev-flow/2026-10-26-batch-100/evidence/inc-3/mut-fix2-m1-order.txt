@@ -1,6 +1,6 @@
 pre-mutation sha256: ddc64e1803eef450b1dd17d20bda1e518d027d89f59ea14b946ef1587710a20b
 mutant sha256: 0792ab871dd5246af57e1161fe4de481141b555408d97918a397431fb64249ce
-cmd: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py
+cmd: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py
  below starts with the rail key ``1``.
                 assert await pilot.click("#patch_tab_inspector"), (
                     "click missed #patch_tab_inspector"

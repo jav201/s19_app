@@ -11,7 +11,7 @@ so the spinner glyph and the elapsed time keep advancing.
 ## Selftest (118x54)
 
 ```
-s19_app: C:\Users\jjgh8\Github\s19_app-b100-inc12a\s19_app\__init__.py
+s19_app: <HOME>\Github\s19_app-b100-inc12a\s19_app\__init__.py
 screen: Screen
 status: []
 status_text: ⠴ Loading fw.s19  ·  step 2/3 Parse  ·  00:02

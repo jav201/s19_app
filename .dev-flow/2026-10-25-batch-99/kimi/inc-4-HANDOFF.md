@@ -32,7 +32,7 @@
   SHA-256 + `SHA256SUMS.txt`.
 - No commit made (orchestrator commits). Worktree import proven:
   `python -c "import s19_app; print(s19_app.__file__)"` →
-  `C:\Users\jjgh8\Github\s19_app-b99-inc4\s19_app\__init__.py`.
+  `<HOME>\Github\s19_app-b99-inc4\s19_app\__init__.py`.
 
 ## Declared interpretation (also in packet §6)
 

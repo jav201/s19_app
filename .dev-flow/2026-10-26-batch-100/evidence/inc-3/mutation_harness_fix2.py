@@ -24,13 +24,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[4]
 APP = ROOT / "s19_app" / "tui" / "app.py"
-PY = r"C:/Users/jjgh8/anaconda3/envs/s19env/python.exe"
+PY = r"<HOME>/anaconda3/envs/s19env/python.exe"
 ENV = {
     "PYTHONUTF8": "1",
     "PYTHONDONTWRITEBYTECODE": "1",
     "PYTHONIOENCODING": "utf-8",
     "PYTHONPATH": str(ROOT),
-    "PATH": r"C:\Windows\system32;C:\Windows;C:\Program Files\Git\bin;C:\Users\jjgh8\anaconda3\envs\s19env;C:\Users\jjgh8\anaconda3\envs\s19env\Scripts",
+    "PATH": r"C:\Windows\system32;C:\Windows;C:\Program Files\Git\bin;<HOME>\anaconda3\envs\s19env;<HOME>\anaconda3\envs\s19env\Scripts",
     "SYSTEMROOT": r"C:\Windows",
 }
 

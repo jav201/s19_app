@@ -2,7 +2,7 @@
 ================================== FAILURES ===================================
 ________________________ test_at077c_stale_provenance _________________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25916/test_at077c_stale_provenance0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25916/test_at077c_stale_provenance0')
 
     def test_at077c_stale_provenance(tmp_path: Path) -> None:
         """Mutating the document reverts every glyph to ``·`` — three ways.

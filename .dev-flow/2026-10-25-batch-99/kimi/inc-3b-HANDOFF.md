@@ -1,8 +1,8 @@
 # HANDOFF — batch-99 Increment 3b (HLR-155 D7 + D9)
 
-Worktree: `C:\Users\jjgh8\Github\s19_app-b99-inc3b` (branch `b99-inc3b`, base
+Worktree: `<HOME>\Github\s19_app-b99-inc3b` (branch `b99-inc3b`, base
 `f1ba70c`). No commit — all changes are in the working tree for the
-orchestrator. Interpreter `C:\Users\jjgh8\anaconda3\envs\s19env\python.exe`;
+orchestrator. Interpreter `<HOME>\anaconda3\envs\s19env\python.exe`;
 every run set `PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8`,
 `PYTHONPATH=<worktree>`, `env -u NO_COLOR`; worktree import proven
 (`s19_app.__file__` inside the worktree).

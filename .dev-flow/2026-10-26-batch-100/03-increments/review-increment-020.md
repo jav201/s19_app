@@ -8,7 +8,7 @@ Reviewer: `code-reviewer` (correctness, simplicity, reuse, conformance to the ap
 
 ## Scope reviewed
 
-- Tree `C:/Users/jjgh8/Github/s19_app-b100-inc11`, branch `b100-inc11` at `051f586`. Diff `git diff main..b100-inc11 -- s19_app tests`.
+- Tree `<HOME>/Github/s19_app-b100-inc11`, branch `b100-inc11` at `051f586`. Diff `git diff main..b100-inc11 -- s19_app tests`.
 - Read in full: `s19_app/tui/screens.py` (338 changed lines, the `SavePreview` / `SaveProjectPayload.plan` / `SaveProjectScreen` hunks), `s19_app/tui/styles.tcss` (+48), `s19_app/tui/services/project_gather_service.py` (+58, the Q10 document arm at `:1683`–`:1725`), `s19_app/tui/app.py` (+1155, every hunk: module data `:1729`–`:1880`, `action_save_project`, `check_action`, `_handle_save_dialog`, `_prepare_project_save`, `_save_session_inputs`, `_current_save_session`, `_save_dialog_preview`, `_compose_save_preview`, `_confirm_project_save`, the `_commit_project_save` head and the Q10 (d) hunk at `:11729`–`:11741`, `_plan_project_save`).
 - Tests: the test list of `tests/test_b100_save_dialog.py` (73 functions), the R2-02 / R3-01 / S11-10 tests read in full, and the mutant ledger `E4-mutant-candidates.md`.
 - Design, read against the code: `codewire/interfaces-11.md` (fixed, with the rulings), `codewire/proto-11-app.md` (the nodes, B11-01 … B11-89), `E3-rulings.md` (rounds 1–3), `E4-integration-notes.md` (F-1 … F-9, the deviations, SR-11-1 … SR-11-3 and their rulings).

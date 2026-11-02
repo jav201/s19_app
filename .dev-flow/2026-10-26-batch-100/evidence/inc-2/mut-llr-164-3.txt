@@ -4,7 +4,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 _________________ test_tc_b100_06_path_limit_met_and_exceeded _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27417/test_tc_b100_06_path_limit_met0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27417/test_tc_b100_06_path_limit_met0')
 
     def test_tc_b100_06_path_limit_met_and_exceeded(tmp_path: Path) -> None:
         """L = 150: a 55-character name gives 150 + 1 + 55 + 53 = 259 (saved);

@@ -1,9 +1,9 @@
-s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-fix1\s19_app\__init__.py
+s19_app.__file__ = <HOME>\Github\s19_app-b100-fix1\s19_app\__init__.py
 .FF                                                                      [100%]
 ================================== FAILURES ===================================
 ___________ test_e4_llr_171_1m_rebind_only_to_a_plan_entry[dot-dot] ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/fix1/bt/red11_1/test_e4_llr_171_1m_rebind_only1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/fix1/bt/red11_1/test_e4_llr_171_1m_rebind_only1')
 arm = 'dot-dot'
 
     @pytest.mark.parametrize("arm", ["skipped junction", "dot-dot", "outside P"])
@@ -47,7 +47,7 @@ arm = 'dot-dot'
         after, messages = projects.run_app(base, _scenario)
         assert _saved(messages), messages
 >       assert str(after) == str(planted), after
-E       AssertionError: WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/fix1/bt/red11_1/test_e4_llr_171_1m_rebind_only1/app/.s19tool/workarea/Q/patches/x.json')
+E       AssertionError: WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/fix1/bt/red11_1/test_e4_llr_171_1m_rebind_only1/app/.s19tool/workarea/Q/patches/x.json')
 E       assert 'C:\\Users\\j...tches\\x.json' == 'C:\\Users\\j...where\\x.json'
 E         
 E         Skipping 169 identical leading characters in diff, use -v to show
@@ -57,7 +57,7 @@ E         + \workarea\Q\patches\x.json
 tests\test_b100_project_homes.py:2120: AssertionError
 __________ test_e4_llr_171_1m_rebind_only_to_a_plan_entry[outside P] __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/fix1/bt/red11_1/test_e4_llr_171_1m_rebind_only2')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/fix1/bt/red11_1/test_e4_llr_171_1m_rebind_only2')
 arm = 'outside P'
 
     @pytest.mark.parametrize("arm", ["skipped junction", "dot-dot", "outside P"])
@@ -101,7 +101,7 @@ arm = 'outside P'
         after, messages = projects.run_app(base, _scenario)
         assert _saved(messages), messages
 >       assert str(after) == str(planted), after
-E       AssertionError: WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/fix1/bt/red11_1/test_e4_llr_171_1m_rebind_only2/app/.s19tool/workarea/Q/patches/x.json')
+E       AssertionError: WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/fix1/bt/red11_1/test_e4_llr_171_1m_rebind_only2/app/.s19tool/workarea/Q/patches/x.json')
 E       assert 'C:\\Users\\j...tches\\x.json' == 'C:\\Users\\j...tches\\x.json'
 E         
 E         Skipping 169 identical leading characters in diff, use -v to show

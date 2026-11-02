@@ -1,6 +1,6 @@
 # CHUNK — Kimi — batch-93 increment 003 (legend A — the spec sheet + the interlock arm)
 
-You implement batch-93's increment 003 in C:/Users/jjgh8/Github/s19_app. Read the
+You implement batch-93's increment 003 in <HOME>/Github/s19_app. Read the
 contract first: `.dev-flow/2026-10-11-batch-93/01-requirements.md` — HLR-132 (the
 map's `k`-legend rebuilt as a GROUPED SPEC SHEET with a live-sourced band key —
 legend A from the operator's 2026-08-06 ruling) and HLR-133 (the command-bar
@@ -9,7 +9,7 @@ build on them.
 
 ## SANDBOX
 - Never write outside the project tree. No git. House env:
-  `C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest ... -q -p no:cacheprovider`
+  `<HOME>/anaconda3/envs/s19env/python.exe -m pytest ... -q -p no:cacheprovider`
 
 ## THE WORK
 1. **HLR-132**: rebuild the `k`-legend (the classification legend the map

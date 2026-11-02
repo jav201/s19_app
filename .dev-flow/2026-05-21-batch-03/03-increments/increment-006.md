@@ -84,7 +84,7 @@ re-export stays an increment-7 item per the plan. `pyproject.toml` /
 
 ## 3. How to test
 
-Run from the repo root `C:\Users\jjgh8\Github\s19_app`:
+Run from the repo root `<HOME>\Github\s19_app`:
 
 ```
 python -m pytest -q tests/test_cdfx_writer.py tests/test_cdfx_w_rules.py

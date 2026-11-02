@@ -1,12 +1,12 @@
 # command: python -m pytest -q -p no:cacheprovider tests/test_b100_active_variant.py -rA
-# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/i6b (093a7c0 base + the new test module and tests/support/b100_projects.py copied in; 0 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/i6b ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/i6b (093a7c0 base + the new test module and tests/support/b100_projects.py copied in; 0 source paths modified)
+# PYTHONPATH=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/i6b ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-30T01:08:48Z
 FFFFFFF.FFFFFFFF                                                         [100%]
 ================================== FAILURES ===================================
 _______________ test_tc_b100_18_valid_gathered_is_an_equal_dict _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30131/test_tc_b100_18_valid_gathered0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30131/test_tc_b100_18_valid_gathered0')
 
     def test_tc_b100_18_valid_gathered_is_an_equal_dict(tmp_path: Path) -> None:
         """A valid ``gathered`` comes back as the same homes and entries,
@@ -36,7 +36,7 @@ E       AttributeError: 'ProjectManifest' object has no attribute 'gathered'
 tests\test_b100_active_variant.py:124: AttributeError
 _____________ test_tc_b100_18_list_instead_of_object_is_one_issue _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30131/test_tc_b100_18_list_instead_o0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30131/test_tc_b100_18_list_instead_o0')
 
     def test_tc_b100_18_list_instead_of_object_is_one_issue(tmp_path: Path) -> None:
         project_dir = tmp_path / "P"
@@ -52,7 +52,7 @@ E       AttributeError: 'ProjectManifest' object has no attribute 'gathered'
 tests\test_b100_active_variant.py:137: AttributeError
 _____________ test_tc_b100_18_home_value_not_a_list_is_one_issue ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30131/test_tc_b100_18_home_value_not0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30131/test_tc_b100_18_home_value_not0')
 
     def test_tc_b100_18_home_value_not_a_list_is_one_issue(tmp_path: Path) -> None:
         project_dir = tmp_path / "P"
@@ -72,7 +72,7 @@ E       AttributeError: 'ProjectManifest' object has no attribute 'gathered'
 tests\test_b100_active_variant.py:152: AttributeError
 __________ test_tc_b100_18_escaping_entry_is_one_issue_and_no_entry ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30131/test_tc_b100_18_escaping_entry0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30131/test_tc_b100_18_escaping_entry0')
 
     def test_tc_b100_18_escaping_entry_is_one_issue_and_no_entry(tmp_path: Path) -> None:
         project_dir = tmp_path / "P"
@@ -88,7 +88,7 @@ E       AttributeError: 'ProjectManifest' object has no attribute 'gathered'
 tests\test_b100_active_variant.py:163: AttributeError
 ______________ test_tc_b100_18_absent_key_is_empty_with_no_issue ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30131/test_tc_b100_18_absent_key_is_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30131/test_tc_b100_18_absent_key_is_0')
 
     def test_tc_b100_18_absent_key_is_empty_with_no_issue(tmp_path: Path) -> None:
         project_dir = tmp_path / "P"
@@ -101,7 +101,7 @@ E       AttributeError: 'ProjectManifest' object has no attribute 'gathered'
 tests\test_b100_active_variant.py:171: AttributeError
 ___________ test_tc_b100_19_save_back_becomes_the_active_variant[A] ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30131/test_tc_b100_19_save_back_beco0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30131/test_tc_b100_19_save_back_beco0')
 case = 'A'
 
     @pytest.mark.parametrize("case", ["A", "B"])
@@ -149,7 +149,7 @@ E         + firmware
 tests\test_b100_active_variant.py:253: AssertionError
 ___________ test_tc_b100_19_save_back_becomes_the_active_variant[B] ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30131/test_tc_b100_19_save_back_beco1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30131/test_tc_b100_19_save_back_beco1')
 case = 'B'
 
     @pytest.mark.parametrize("case", ["A", "B"])
@@ -196,7 +196,7 @@ E         + firmware
 tests\test_b100_active_variant.py:253: AssertionError
 _________________ test_tc_b100_20_save_back_carries_every_key _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30131/test_tc_b100_20_save_back_carr0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30131/test_tc_b100_20_save_back_carr0')
 
     def test_tc_b100_20_save_back_carries_every_key(tmp_path: Path) -> None:
         base = tmp_path / "app"
@@ -218,7 +218,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 tests\test_b100_active_variant.py:323: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30131/test_tc_b100_20_save_back_carr0/app/.s19tool/workarea/P')
+project_dir = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30131/test_tc_b100_20_save_back_carr0/app/.s19tool/workarea/P')
 before_bytes = b'{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"],"assignments":{"firmware":["checks/...start":2147483712,"end":2147483775}],"gathered":{"patches":["patches/cs_seed.json"],"checks":["checks/ck_seed.json"]}}'
 
     def _assert_carried(project_dir: Path, before_bytes: bytes) -> dict:
@@ -232,7 +232,7 @@ E       assert b'{"schema_version":1,"active_variant":"firmware","batch":["patch
 tests\test_b100_active_variant.py:302: AssertionError
 _______ test_tc_b100_20_variant_append_carries_every_key_and_activates ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30131/test_tc_b100_20_variant_append0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30131/test_tc_b100_20_variant_append0')
 
     def test_tc_b100_20_variant_append_carries_every_key_and_activates(tmp_path: Path) -> None:
         base = tmp_path / "app"
@@ -268,7 +268,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 tests\test_b100_active_variant.py:355: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30131/test_tc_b100_20_variant_append0/app/.s19tool/workarea/P')
+project_dir = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30131/test_tc_b100_20_variant_append0/app/.s19tool/workarea/P')
 before_bytes = b'{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"],"assignments":{"firmware":["checks/...start":2147483712,"end":2147483775}],"gathered":{"patches":["patches/cs_seed.json"],"checks":["checks/ck_seed.json"]}}'
 
     def _assert_carried(project_dir: Path, before_bytes: bytes) -> dict:
@@ -282,7 +282,7 @@ E       assert b'{"schema_version":1,"active_variant":"firmware","batch":["patch
 tests\test_b100_active_variant.py:302: AssertionError
 _________________ test_tc_b100_20_mac_sync_carries_every_key __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30131/test_tc_b100_20_mac_sync_carri0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30131/test_tc_b100_20_mac_sync_carri0')
 
     def test_tc_b100_20_mac_sync_carries_every_key(tmp_path: Path) -> None:
         base = tmp_path / "app"
@@ -307,13 +307,13 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 
 tests\test_b100_active_variant.py:380: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_active_variant.py:373: in _drive
@@ -335,7 +335,7 @@ E       AssertionError: timed out waiting for the MAC sync and its manifest rewr
 tests\test_b100_active_variant.py:75: AssertionError
 _________________ test_tc_b100_20_a2l_sync_carries_every_key __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30131/test_tc_b100_20_a2l_sync_carri0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30131/test_tc_b100_20_a2l_sync_carri0')
 
     def test_tc_b100_20_a2l_sync_carries_every_key(tmp_path: Path) -> None:
         base = tmp_path / "app"
@@ -360,13 +360,13 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 
 tests\test_b100_active_variant.py:404: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_active_variant.py:397: in _drive
@@ -388,7 +388,7 @@ E       AssertionError: timed out waiting for the A2L sync and its manifest rewr
 tests\test_b100_active_variant.py:75: AssertionError
 ________ test_at_b100_06_reopen_opens_the_saved_back_variant[size0-A] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30131/test_at_b100_06_reopen_opens_t0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30131/test_at_b100_06_reopen_opens_t0')
 size = (118, 54), case = 'A'
 
     @pytest.mark.parametrize("case", ["A", "B"])
@@ -435,13 +435,13 @@ size = (118, 54), case = 'A'
 
 tests\test_b100_active_variant.py:551: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_active_variant.py:537: in _save_scene
@@ -465,7 +465,7 @@ E           assert False
 tests\test_b100_active_variant.py:462: AssertionError
 ________ test_at_b100_06_reopen_opens_the_saved_back_variant[size0-B] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30131/test_at_b100_06_reopen_opens_t1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30131/test_at_b100_06_reopen_opens_t1')
 size = (118, 54), case = 'B'
 
     @pytest.mark.parametrize("case", ["A", "B"])
@@ -512,13 +512,13 @@ size = (118, 54), case = 'B'
 
 tests\test_b100_active_variant.py:551: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_active_variant.py:537: in _save_scene
@@ -546,7 +546,7 @@ E       assert False
 tests\test_b100_active_variant.py:465: AssertionError
 ________ test_at_b100_06_reopen_opens_the_saved_back_variant[size1-A] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30131/test_at_b100_06_reopen_opens_t2')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30131/test_at_b100_06_reopen_opens_t2')
 size = (220, 60), case = 'A'
 
     @pytest.mark.parametrize("case", ["A", "B"])
@@ -593,13 +593,13 @@ size = (220, 60), case = 'A'
 
 tests\test_b100_active_variant.py:551: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_active_variant.py:537: in _save_scene
@@ -623,7 +623,7 @@ E           assert False
 tests\test_b100_active_variant.py:462: AssertionError
 ________ test_at_b100_06_reopen_opens_the_saved_back_variant[size1-B] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30131/test_at_b100_06_reopen_opens_t3')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30131/test_at_b100_06_reopen_opens_t3')
 size = (220, 60), case = 'B'
 
     @pytest.mark.parametrize("case", ["A", "B"])
@@ -670,13 +670,13 @@ size = (220, 60), case = 'B'
 
 tests\test_b100_active_variant.py:551: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_active_variant.py:537: in _save_scene

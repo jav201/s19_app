@@ -1,6 +1,6 @@
 # command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_announce.py -k tc_b100_56
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree) with mutation 178.2-markup-on
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# tree: <HOME>\Github\s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree) with mutation 178.2-markup-on
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
 # date: 2026-10-30T01:47:17+00:00
 # requirement: LLR-178.2
 # mutation: the final #status_text line is painted with markup on — file s19_app/tui/app.py
@@ -12,7 +12,7 @@
 ================================== FAILURES ===================================
 ____________ test_tc_b100_56_hostile_variant_name_paints_no_markup ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30152/test_tc_b100_56_hostile_varian0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30152/test_tc_b100_56_hostile_varian0')
 
     def test_tc_b100_56_hostile_variant_name_paints_no_markup(tmp_path: Path) -> None:
         base = tmp_path / "app"

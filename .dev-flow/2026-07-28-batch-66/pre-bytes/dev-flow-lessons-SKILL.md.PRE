@@ -510,5 +510,5 @@ postmortem recommendations were actually adopted.
   (`bNN`) cite where in that corpus a control was earned; they reference the internal batch record
   and expose no private application internals.
 - Distilled catalog canonical (interactive HTML): `G:\My Drive\Courses\dev-flow-lessons\index.html`
-- Local HTML copy this skill was extracted from: `C:\Users\jjgh8\.claude\docs\dev-flow-lessons.html`
-- Raw postmortems: `C:\Users\jjgh8\OneDrive\Documents\Github\s19_app\.dev-flow\*\05-postmortem.md`
+- Local HTML copy this skill was extracted from: `<HOME>\.claude\docs\dev-flow-lessons.html`
+- Raw postmortems: `<HOME>\OneDrive\Documents\Github\s19_app\.dev-flow\*\05-postmortem.md`

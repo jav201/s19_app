@@ -13,7 +13,7 @@
 - **Method:** IEEE 830 + EARS. Every anchor below is `file:line` verified on disk at draft time;
   every design claim is backed by an **executed probe** (C-35), not analogy.
 - **Probe script (re-runnable):**
-  `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-OneDrive-Documents-Github-s19-app--claude-worktrees-upbeat-khorana-997280\dee40864-ca78-4cbc-b64b-c028cc6a2c2d\scratchpad\probe62.py`
+  `<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-OneDrive-Documents-Github-s19-app--claude-worktrees-upbeat-khorana-997280\dee40864-ca78-4cbc-b64b-c028cc6a2c2d\scratchpad\probe62.py`
   (run with `PYTHONPATH=<repo root>`; `markdown_it` 4.2.0)
 
 ---

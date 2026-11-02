@@ -11,7 +11,7 @@ not apply.
 Selftest: `screen: LoadDialog`, `SELFTEST OK scenario=ld-dialog close=False`.
 Capture: `DONE failures=0`, 3 PNGs (PrintWindow method, not nearly-black).
 
-LOCALAPPDATA guard: `C:/Users/jjgh8/AppData/Local/s19_app` does NOT exist
+LOCALAPPDATA guard: `<HOME>/AppData/Local/s19_app` does NOT exist
 before the run and does NOT exist after it. The runner points `LOCALAPPDATA`
 at `<base>/lad` (capture.ps1 does not set it), so the real store is never
 touched. No `E13-*` Windows Terminal window was left open after the run.

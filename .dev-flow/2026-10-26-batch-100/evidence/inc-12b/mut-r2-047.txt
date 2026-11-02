@@ -3,9 +3,9 @@ target file: s19_app/tui/app.py
 description: _install_prepared_project: remove the except BaseException _busy_fail guard
 old -> new: '                safe_text(announcement.summary_line()).plain,\n            )\n        except BaseException:\n            self._busy_fail("project_load", gen)\n            raise\n' -> '                safe_text(announcement.summary_line()).plain,\n            )\n        except BaseException:\n            raise\n'
 sha256 before: 46f7ee6aa8a0fbfbc6571b095bbf7d4c4661de5bd3f1ecf96e9b1347c424210d
-command: timeout 900 env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\lad C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=short --basetemp=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\bt\mut-047 "tests/test_b100_busy.py::test_tc_b100_50_project_deferred_install_raise_ends_the_run"
-cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mutc12b
-s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mutc12b\s19_app\__init__.py
+command: timeout 900 env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\lad <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=short --basetemp=<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b-r2\bt\mut-047 "tests/test_b100_busy.py::test_tc_b100_50_project_deferred_install_raise_ends_the_run"
+cwd: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mutc12b
+s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mutc12b\s19_app\__init__.py
 pytest summary: 1 failed in 39.52s
 elapsed: 40.5s
 verdict: KILLED
@@ -25,7 +25,7 @@ E     Right contains one more item: 'Loading project P failed'
 E     Use -v to get more diff
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4 
+│ <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4 
 │ ccb-86cf-122b894659b2\scratchpad\mutc12b\s19_app\tui\app.py:13684 in         
 │ _install_prepared_project                                                    
 │                                                                              
@@ -43,17 +43,17 @@ E     Use -v to get more diff
 │ │            │   variant=VariantDescriptor(                                │ 
 │ │            │   │   variant_id='firmware',                                │ 
 │ │            │   │                                                         │ 
-│ │            path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C… │ 
+│ │            path=WindowsPath('<HOME>/AppData/Local/Temp/claude/C… │ 
 │ │            │   │   file_type='s19'                                       │ 
 │ │            │   ),                                                        │ 
 │ │            │                                                             │ 
-│ │            mac=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C-… │ 
+│ │            mac=WindowsPath('<HOME>/AppData/Local/Temp/claude/C-… │ 
 │ │            │                                                             │ 
-│ │            a2l=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C-… │ 
+│ │            a2l=WindowsPath('<HOME>/AppData/Local/Temp/claude/C-… │ 
 │ │            )                                                             │ 
 │ │   loaded = LoadedFile(                                                   │ 
 │ │            │                                                             │ 
-│ │            path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C… │ 
+│ │            path=WindowsPath('<HOME>/AppData/Local/Temp/claude/C… │ 
 │ │            │   file_type='s19',                                          │ 
 │ │            │   mem_map={                                                 │ 
 │ │            │   │   2147483648: 83,                                       │ 
@@ -84,10 +84,10 @@ E     Use -v to get more diff
 │ │            │   range_validity=[True, True],                              │ 
 │ │            │   errors=[],                                                │ 
 │ │            │                                                             │ 
-│ │            a2l_path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/clau… │ 
+│ │            a2l_path=WindowsPath('<HOME>/AppData/Local/Temp/clau… │ 
 │ │            │   a2l_data={                                                │ 
 │ │            │   │   'path':                                               │ 
-│ │            'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
+│ │            '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
 │ │            │   │   'sections': [                                         │ 
 │ │            │   │   │   {                                                 │ 
 │ │            │   │   │   │   'name': 'PROJECT',                            │ 
@@ -362,7 +362,7 @@ E     Use -v to get more diff
 │ │            │   │   'compu_tabs_by_name': {}                              │ 
 │ │            │   },                                                        │ 
 │ │            │                                                             │ 
-│ │            mac_path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/clau… │ 
+│ │            mac_path=WindowsPath('<HOME>/AppData/Local/Temp/clau… │ 
 │ │            │   mac_records=[                                             │ 
 │ │            │   │   {                                                     │ 
 │ │            │   │   │   'line_number': 1,                                 │ 
@@ -409,16 +409,16 @@ E     Use -v to get more diff
 │ │            │   request=ProjectLoadRequest(                               │ 
 │ │            │   │   name='P',                                             │ 
 │ │            │   │                                                         │ 
-│ │            project_dir=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/c… │ 
+│ │            project_dir=WindowsPath('<HOME>/AppData/Local/Temp/c… │ 
 │ │            │   │   data_files=(                                          │ 
 │ │            │   │   │                                                     │ 
-│ │            WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Use… │ 
+│ │            WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Use… │ 
 │ │            │   │   │                                                     │ 
-│ │            WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Use… │ 
+│ │            WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Use… │ 
 │ │            │   │   ),                                                    │ 
 │ │            │   │   a2l_files=(                                           │ 
 │ │            │   │   │                                                     │ 
-│ │            WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Use… │ 
+│ │            WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Use… │ 
 │ │            │   │   ),                                                    │ 
 │ │            │   │   a2l_problem=None,                                     │ 
 │ │            │   │   a2l_cache=None,                                       │ 
@@ -432,7 +432,7 @@ E     Use -v to get more diff
 │ │            │   │   │   VariantDescriptor(                                │ 
 │ │            │   │   │   │   variant_id='firmware',                        │ 
 │ │            │   │   │   │                                                 │ 
-│ │            path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C… │ 
+│ │            path=WindowsPath('<HOME>/AppData/Local/Temp/claude/C… │ 
 │ │            │   │   │   │   file_type='s19'                               │ 
 │ │            │   │   │   ),                                                │ 
 │ │            │   │   ),                                                    │ 
@@ -451,13 +451,13 @@ E     Use -v to get more diff
 │ │            │   a2l_cache=(                                               │ 
 │ │            │   │   (                                                     │ 
 │ │            │   │   │                                                     │ 
-│ │            'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
+│ │            '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
 │ │            │   │   │   1793542573730216300,                              │ 
 │ │            │   │   │   1444                                              │ 
 │ │            │   │   ),                                                    │ 
 │ │            │   │   {                                                     │ 
 │ │            │   │   │   'path':                                           │ 
-│ │            'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
+│ │            '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
 │ │            │   │   │   'sections': [                                     │ 
 │ │            │   │   │   │   {                                             │ 
 │ │            │   │   │   │   │   'name': 'PROJECT',                        │ 
@@ -755,17 +755,17 @@ E     Use -v to get more diff
 │ │            │   │   variant=VariantDescriptor(                            │ 
 │ │            │   │   │   variant_id='firmware',                            │ 
 │ │            │   │   │                                                     │ 
-│ │            path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C… │ 
+│ │            path=WindowsPath('<HOME>/AppData/Local/Temp/claude/C… │ 
 │ │            │   │   │   file_type='s19'                                   │ 
 │ │            │   │   ),                                                    │ 
 │ │            │   │                                                         │ 
-│ │            mac=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C-… │ 
+│ │            mac=WindowsPath('<HOME>/AppData/Local/Temp/claude/C-… │ 
 │ │            │   │                                                         │ 
-│ │            a2l=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C-… │ 
+│ │            a2l=WindowsPath('<HOME>/AppData/Local/Temp/claude/C-… │ 
 │ │            │   ),                                                        │ 
 │ │            │   image=LoadedFile(                                         │ 
 │ │            │   │                                                         │ 
-│ │            path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C… │ 
+│ │            path=WindowsPath('<HOME>/AppData/Local/Temp/claude/C… │ 
 │ │            │   │   file_type='s19',                                      │ 
 │ │            │   │   mem_map={                                             │ 
 │ │            │   │   │   2147483648: 83,                                   │ 
@@ -796,10 +796,10 @@ E     Use -v to get more diff
 │ │            │   │   range_validity=[True, True],                          │ 
 │ │            │   │   errors=[],                                            │ 
 │ │            │   │                                                         │ 
-│ │            a2l_path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/clau… │ 
+│ │            a2l_path=WindowsPath('<HOME>/AppData/Local/Temp/clau… │ 
 │ │            │   │   a2l_data={                                            │ 
 │ │            │   │   │   'path':                                           │ 
-│ │            'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
+│ │            '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
 │ │            │   │   │   'sections': [                                     │ 
 │ │            │   │   │   │   {                                             │ 
 │ │            │   │   │   │   │   'name': 'PROJECT',                        │ 
@@ -1121,7 +1121,7 @@ E     Use -v to get more diff
 │ │            │   unreadable=(),                                            │ 
 │ │            │   mac=LoadedFile(                                           │ 
 │ │            │   │                                                         │ 
-│ │            path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C… │ 
+│ │            path=WindowsPath('<HOME>/AppData/Local/Temp/claude/C… │ 
 │ │            │   │   file_type='s19',                                      │ 
 │ │            │   │   mem_map={                                             │ 
 │ │            │   │   │   2147483648: 83,                                   │ 
@@ -1152,10 +1152,10 @@ E     Use -v to get more diff
 │ │            │   │   range_validity=[True, True],                          │ 
 │ │            │   │   errors=[],                                            │ 
 │ │            │   │                                                         │ 
-│ │            a2l_path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/clau… │ 
+│ │            a2l_path=WindowsPath('<HOME>/AppData/Local/Temp/clau… │ 
 │ │            │   │   a2l_data={                                            │ 
 │ │            │   │   │   'path':                                           │ 
-│ │            'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
+│ │            '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
 │ │            │   │   │   'sections': [                                     │ 
 │ │            │   │   │   │   {                                             │ 
 │ │            │   │   │   │   │   'name': 'PROJECT',                        │ 
@@ -1449,7 +1449,7 @@ E     Use -v to get more diff
 │ │            │   │   │   'compu_tabs_by_name': {}                          │ 
 │ │            │   │   },                                                    │ 
 │ │            │   │                                                         │ 
-│ │            mac_path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/clau… │ 
+│ │            mac_path=WindowsPath('<HOME>/AppData/Local/Temp/clau… │ 
 │ │            │   │   mac_records=[                                         │ 
 │ │            │   │   │   {                                                 │ 
 │ │            │   │   │   │   'line_number': 1,                             │ 
@@ -1499,16 +1499,16 @@ E     Use -v to get more diff
 │ │  request = ProjectLoadRequest(                                           │ 
 │ │            │   name='P',                                                 │ 
 │ │            │                                                             │ 
-│ │            project_dir=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/c… │ 
+│ │            project_dir=WindowsPath('<HOME>/AppData/Local/Temp/c… │ 
 │ │            │   data_files=(                                              │ 
 │ │            │   │                                                         │ 
-│ │            WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Use… │ 
+│ │            WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Use… │ 
 │ │            │   │                                                         │ 
-│ │            WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Use… │ 
+│ │            WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Use… │ 
 │ │            │   ),                                                        │ 
 │ │            │   a2l_files=(                                               │ 
 │ │            │   │                                                         │ 
-│ │            WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Use… │ 
+│ │            WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Use… │ 
 │ │            │   ),                                                        │ 
 │ │            │   a2l_problem=None,                                         │ 
 │ │            │   a2l_cache=None,                                           │ 
@@ -1522,7 +1522,7 @@ E     Use -v to get more diff
 │ │            )                                                             │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4 
+│ <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4 
 │ ccb-86cf-122b894659b2\scratchpad\mutc12b\tests\test_b100_busy.py:1330 in     
 │ _boom                                                                        
 │                                                                              
@@ -1543,7 +1543,7 @@ E     Use -v to get more diff
 │ │      │   │   │   VariantDescriptor(                                      │ 
 │ │      │   │   │   │   variant_id='firmware',                              │ 
 │ │      │   │   │   │                                                       │ 
-│ │      path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--User… │ 
+│ │      path=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--User… │ 
 │ │      │   │   │   │   file_type='s19'                                     │ 
 │ │      │   │   │   ),                                                      │ 
 │ │      │   │   ),                                                          │ 

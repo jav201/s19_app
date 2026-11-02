@@ -1,5 +1,5 @@
 cmd: pytest -q -p no:cacheprovider tests/test_b100_save_guards.py::test_tc_b100_07_failed_merge_removes_placed_files[open-case-AB-gather]  (MUTANT fix4-a, fix-pass-5 tree)
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 5, mutant fix4-a)
+tree: <HOME>\Github\s19_app-b100-inc2 (fix pass 5, mutant fix4-a)
 
 F                                                                        [100%]
 ================================== FAILURES ===================================

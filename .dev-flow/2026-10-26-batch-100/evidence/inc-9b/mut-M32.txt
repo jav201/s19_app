@@ -2,9 +2,9 @@ mutant: M32
 file: s19_app/tui/screens.py
 old -> new: '        return LoadChoice("path", t)' -> '        return LoadChoice("path", t.strip())'
 sha256 before: a7d9ed25e09de3ef56e9d1f9c6ffd624ffe1eca8408d04d5170a857696111424
-command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_load_dialog.py::test_tc_b100_40_path_choice_takes_the_typed_route tests/test_b100_load_dialog.py::test_tc_b100_40_recent_choice_loads_the_recorded_text_unchanged
-cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b
-s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b\s19_app\__init__.py
+command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_load_dialog.py::test_tc_b100_40_path_choice_takes_the_typed_route tests/test_b100_load_dialog.py::test_tc_b100_40_recent_choice_loads_the_recorded_text_unchanged
+cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b
+s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b\s19_app\__init__.py
 ---
 pytest: 2 passed in 7.87s
 verdict: SURVIVED

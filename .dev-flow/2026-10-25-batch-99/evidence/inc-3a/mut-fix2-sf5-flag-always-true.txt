@@ -1,7 +1,7 @@
 ============================= test session starts =============================
-platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- <HOME>\anaconda3\envs\s19env\python.exe
 cachedir: .pytest_cache
-rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc3a
+rootdir: <HOME>\Github\s19_app-b99-inc3a
 configfile: pyproject.toml
 plugins: textual-snapshot-1.1.0, syrupy-4.8.0
 collecting ... collected 23 items / 22 deselected / 1 selected
@@ -11,7 +11,7 @@ tests/test_b99_staging.py::test_tc_b99_14_preexisting_folder_survives_placement_
 ================================== FAILURES ===================================
 ________ test_tc_b99_14_preexisting_folder_survives_placement_failure _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26399/test_tc_b99_14_preexisting_fol0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26399/test_tc_b99_14_preexisting_fol0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001B062237710>
 
     def test_tc_b99_14_preexisting_folder_survives_placement_failure(
@@ -78,7 +78,7 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001B062237710>
 E       AssertionError: a pre-existing folder must survive the failure
 E       assert False
 E        +  where False = is_dir()
-E        +    where is_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26399/test_tc_b99_14_preexisting_fol0/.s19tool/workarea/proj').is_dir
+E        +    where is_dir = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26399/test_tc_b99_14_preexisting_fol0/.s19tool/workarea/proj').is_dir
 
 tests\test_b99_staging.py:1275: AssertionError
 =========================== short test summary info ===========================

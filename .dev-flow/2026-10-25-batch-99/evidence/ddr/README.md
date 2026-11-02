@@ -1,6 +1,6 @@
 # DDR fixes — evidence index (batch 2026-10-25-batch-99)
 
-Worktree `C:\Users\jjgh8\Github\s19_app-b99-ddr`, branch `b99-ddr` at `bab3bff`.
+Worktree `<HOME>\Github\s19_app-b99-ddr`, branch `b99-ddr` at `bab3bff`.
 Tests-only increment: no file under `s19_app/` was modified (verified with
 `git status --porcelain -- s19_app/` — empty). All runs use
 `env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8

@@ -105,7 +105,7 @@ The growth is **one-directional**: `if capacity > rows`. When the pane is shorte
 ## 3. How to test
 
 ```bash
-cd C:/Users/jjgh8/Github/s19_app
+cd <HOME>/Github/s19_app
 
 # the increment's own nodes
 python -m pytest tests/test_tui_diff_screen.py -k "b78_20 or b78_21 or b78_22 or b78_23 or b78_24 or b78_25 or b78_26 or b78_27 or b78_28 or b78_45" -q

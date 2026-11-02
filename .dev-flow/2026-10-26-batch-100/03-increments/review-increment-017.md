@@ -3,7 +3,7 @@ PASS-WITH-NOTES
 # Code Review — Increment 017 (batch-100 Inc 9a: recent-sources store, Workarea Files lister, typed-path load route)
 
 Reviewer: `code-reviewer` (independent; read-only toward the diff — no source or test edited).
-Worktree `C:\Users\jjgh8\Github\s19_app-b100-inc9a`, branch `b100-inc9a`, base `4fef292`, changes uncommitted.
+Worktree `<HOME>\Github\s19_app-b100-inc9a`, branch `b100-inc9a`, base `4fef292`, changes uncommitted.
 
 ## Verdict
 

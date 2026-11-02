@@ -1,11 +1,11 @@
 # batch-100 Inc 12a — E4 integration — diagA
 # head: 051f58613efa8fab6c9d477babfbe19a06f59f67 (branch b100-inc12a), working tree with the Inc 12a edits
-# s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc12a\s19_app\__init__.py
-# interpreter: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe (3.11.15 textual 8.2.8)
-# env: NO_COLOR unset, PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int12a/lad
+# s19_app.__file__: <HOME>\Github\s19_app-b100-inc12a\s19_app\__init__.py
+# interpreter: <HOME>/anaconda3/envs/s19env/python.exe (3.11.15 textual 8.2.8)
+# env: NO_COLOR unset, PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int12a/lad
 # app.py sha256[:16]: cc89cbcaa2c066cd  styles.tcss sha256[:16]: f7b4f75911b296a4
 # started: 2026-11-01T00:11:38-06:00
-# command: python -m pytest -p no:cacheprovider --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int12a/bt/diagA --tb=short -rfEs -q tests/test_b100_busy.py -k tc_b100_50
+# command: python -m pytest -p no:cacheprovider --basetemp=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int12a/bt/diagA --tb=short -rfEs -q tests/test_b100_busy.py -k tc_b100_50
 
 .......................................F.s..............                 [100%]
 ================================== FAILURES ===================================

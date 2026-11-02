@@ -396,7 +396,7 @@ BK=".dev-flow/2026-07-27-batch-64/backup-pre"
 mkdir -p "$BK"
 for f in "$HOME/.claude/commands/dev-flow.md" \
          "$HOME/.claude/skills/tui-design/VERIFY.md" \
-         "$HOME/.claude/projects/C--Users-jjgh8-OneDrive-Documents-Github-s19-app/memory/project_devflow_control_lineage.md"; do
+         "$HOME/.claude/projects/C--Users-<USER>-OneDrive-Documents-Github-s19-app/memory/project_devflow_control_lineage.md"; do
   cp -p "$f" "$BK/$(basename "$f")"
   printf "%s | %s | %s | %s\n" "$f" "$(wc -l < "$f")" "$(wc -c < "$f")" "$(sha256sum "$f" | cut -d' ' -f1)"
 done

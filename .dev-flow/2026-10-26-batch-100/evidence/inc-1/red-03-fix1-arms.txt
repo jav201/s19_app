@@ -1,11 +1,11 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py (RED first, fix pass 1 — new F1/F2/F3/F4/F5/F7 arms against the unfixed Inc 1 tree)
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 (detached e044112 + uncommitted Inc 1 + fix-pass-1 test arms, source NOT yet fixed)
+tree: <HOME>\Github\s19_app-b100-inc1 (detached e044112 + uncommitted Inc 1 + fix-pass-1 test arms, source NOT yet fixed)
 
 ..............FFFF..F...                                                 [100%]
 ================================== FAILURES ===================================
 _______ test_tc_b100_62_export_junction_unresolved_destination_refused ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27229/test_tc_b100_62_export_junctio0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27229/test_tc_b100_62_export_junctio0')
 
     def test_tc_b100_62_export_junction_unresolved_destination_refused(
         tmp_path: Path,
@@ -26,7 +26,7 @@ E           Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainm
 tests\test_b100_reuse.py:641: Failed
 ________ test_tc_b100_62_group_junction_unresolved_destination_refused ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27229/test_tc_b100_62_group_junction0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27229/test_tc_b100_62_group_junction0')
 
     def test_tc_b100_62_group_junction_unresolved_destination_refused(
         tmp_path: Path,
@@ -52,7 +52,7 @@ E       Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainmentE
 tests\test_b100_reuse.py:676: Failed
 _______ test_tc_b100_62_gather_junction_unresolved_destination_refused ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27229/test_tc_b100_62_gather_junctio0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27229/test_tc_b100_62_gather_junctio0')
 
     def test_tc_b100_62_gather_junction_unresolved_destination_refused(
         tmp_path: Path,
@@ -72,7 +72,7 @@ E       Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainmentE
 tests\test_b100_reuse.py:696: Failed
 ___________ test_tc_b100_62_explicit_root_refuses_another_workarea ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27229/test_tc_b100_62_explicit_root_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27229/test_tc_b100_62_explicit_root_0')
 
     def test_tc_b100_62_explicit_root_refuses_another_workarea(
         tmp_path: Path,
@@ -95,7 +95,7 @@ E           TypeError: place_into_workarea() got an unexpected keyword argument 
 tests\test_b100_reuse.py:719: TypeError
 __________ test_tc_b100_68_relative_destination_matches_placed_path ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27229/test_tc_b100_68_relative_desti0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27229/test_tc_b100_68_relative_desti0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001725F7EDBD0>
 
     def test_tc_b100_68_relative_destination_matches_placed_path(
@@ -121,12 +121,12 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001725F7EDBD0>
 >       assert predicted.path == placed.path, (
             f"predicted {predicted.path}, placed {placed.path}"
         )
-E       AssertionError: predicted .s19tool\workarea\target\firmware.s19, placed C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-27229\test_tc_b100_68_relative_desti0\.s19tool\workarea\target\firmware.s19
-E       assert WindowsPath('.s19tool/workarea/target/firmware.s19') == WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27229/test_tc_b100_68_relative_desti0/.s19tool/workarea/target/firmware.s19')
+E       AssertionError: predicted .s19tool\workarea\target\firmware.s19, placed <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-27229\test_tc_b100_68_relative_desti0\.s19tool\workarea\target\firmware.s19
+E       assert WindowsPath('.s19tool/workarea/target/firmware.s19') == WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27229/test_tc_b100_68_relative_desti0/.s19tool/workarea/target/firmware.s19')
 E        +  where WindowsPath('.s19tool/workarea/target/firmware.s19') = PlacementResult(path=WindowsPath('.s19tool/workarea/target/firmware.s19'), reused=False).path
-E        +  and   WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27229/test_tc_b100_68_relative_desti0/.s19tool/workarea/target/firmware.s19') = PlacementResult(path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27229/test_tc_b100_68_relative_desti0/.s19tool/workarea/target/firmware.s19'), reused=False).path
+E        +  and   WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27229/test_tc_b100_68_relative_desti0/.s19tool/workarea/target/firmware.s19') = PlacementResult(path=WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27229/test_tc_b100_68_relative_desti0/.s19tool/workarea/target/firmware.s19'), reused=False).path
 
-C:\Users\jjgh8\Github\s19_app-b100-inc1\tests\test_b100_reuse.py:796: AssertionError
+<HOME>\Github\s19_app-b100-inc1\tests\test_b100_reuse.py:796: AssertionError
 =========================== short test summary info ===========================
 FAILED tests/test_b100_reuse.py::test_tc_b100_62_export_junction_unresolved_destination_refused
 FAILED tests/test_b100_reuse.py::test_tc_b100_62_group_junction_unresolved_destination_refused

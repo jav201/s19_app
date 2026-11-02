@@ -1,7 +1,7 @@
 PQ-2(c) skip-claim-removal mutant re-run (DDR DQ-6)
 scratch extract of git archive HEAD (bab3bff) at /tmp/b99-mut2c; tests/test_b99_export.py overlaid from the DDR worktree (C-18 joined state)
 PYTHONPATH=/tmp/b99-mut2c; import probe:
-C:\Users\jjgh8\AppData\Local\Temp\b99-mut2c\s19_app\__init__.py
+<HOME>\AppData\Local\Temp\b99-mut2c\s19_app\__init__.py
 workspace.py sha256 before: 01eca67690b5b84e33c06a31f2ccd7a4b669ed4dce24d2a5cf4231af4657b533
 workspace.py sha256 mutant: 49bd7a06df952f4580fb1a51f668a478473b17e5ba2e822f986c8313ec5f12f3
 mutation: place_group_into_workarea PermissionError branch, 'if claims_owned:' -> 'if False:' (claims left behind)
@@ -10,7 +10,7 @@ mutation: place_group_into_workarea PermissionError branch, 'if claims_owned:' -
 ================================== FAILURES ===================================
 __________ test_tc_b99_31_forced_failure_rolls_back_every_own_claim ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26920/test_tc_b99_31_forced_failure_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26920/test_tc_b99_31_forced_failure_0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002724708DD10>
 
     def test_tc_b99_31_forced_failure_rolls_back_every_own_claim(

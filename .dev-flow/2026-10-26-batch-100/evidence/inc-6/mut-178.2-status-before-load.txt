@@ -1,6 +1,6 @@
 # command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_announce.py -k tc_b100_56
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree) with mutation 178.2-status-before-load
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# tree: <HOME>\Github\s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree) with mutation 178.2-status-before-load
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
 # date: 2026-10-30T01:47:25+00:00
 # requirement: LLR-178.2
 # mutation: the project + file line is written BEFORE the loads (not the final writer) — file s19_app/tui/app.py
@@ -12,7 +12,7 @@ F..                                                                      [100%]
 ================================== FAILURES ===================================
 _________ test_tc_b100_56_one_summary_line_and_the_final_status_text __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30153/test_tc_b100_56_one_summary_li0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30153/test_tc_b100_56_one_summary_li0')
 
     def test_tc_b100_56_one_summary_line_and_the_final_status_text(tmp_path: Path) -> None:
         base = tmp_path / "app"

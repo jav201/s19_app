@@ -4,8 +4,8 @@ old text:                 f"Variant file missing: {painted_names([descriptor.pat
 new text:                 f"Variant file missing: {descriptor.path.name}"
 sha256 before: 85ed4dabfc84d62fa65c01413c0e6256c38e19ccd490dd6cda685664ed1c8c75
 command: pytest -q --tb=line tests/test_b100_load_question.py::test_tc_b100_46_cancelled_variant_switch_keeps_the_pending_selection
-cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut10
-s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut10\s19_app\__init__.py
+cwd: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut10
+s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut10\s19_app\__init__.py
 pytest summary: 1 passed in 5.93s
 verdict: SURVIVED
 restored = True

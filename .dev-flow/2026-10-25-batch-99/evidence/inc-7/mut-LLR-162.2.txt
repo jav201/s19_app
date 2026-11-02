@@ -2,7 +2,7 @@
 ================================== FAILURES ===================================
 _______________ test_tc_b99_35_reserved_homes_are_not_projects ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26613/test_tc_b99_35_reserved_homes_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26613/test_tc_b99_35_reserved_homes_0')
 
     def test_tc_b99_35_reserved_homes_are_not_projects(tmp_path):
         """With P1, P2 and every RESERVED_WORKAREA_HOMES name present, the
@@ -22,7 +22,7 @@ E         Use -v to get more diff
 tests\test_b99_load_project.py:163: AssertionError
 ____________ test_at_b99_13_project_and_file_pickers_load_by_name _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26613/test_at_b99_13_project_and_fil0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26613/test_at_b99_13_project_and_fil0')
 
     def test_at_b99_13_project_and_file_pickers_load_by_name(tmp_path):
         """1. The dialog lists P1 and P2 only (the ``patches`` home is present).

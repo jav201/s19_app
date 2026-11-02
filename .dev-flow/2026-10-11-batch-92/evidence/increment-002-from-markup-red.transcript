@@ -1,4 +1,4 @@
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+<HOME>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -6,7 +6,7 @@ FFFF....F                                                                [100%]
 ================================== FAILURES ===================================
 _____ test_b77_hostile_symbol_is_literal_and_carries_no_span[size0-click] _____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18310/test_b77_hostile_symbol_is_lit0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-18310/test_b77_hostile_symbol_is_lit0')
 size = (80, 24), drive = 'click'
 
     @pytest.mark.parametrize("drive", _DRIVES)
@@ -45,7 +45,7 @@ E       assert False
 tests\test_tui_hostile_map.py:272: AssertionError
 __ test_b77_hostile_symbol_is_literal_and_carries_no_span[size0-autoselect] ___
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18310/test_b77_hostile_symbol_is_lit1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-18310/test_b77_hostile_symbol_is_lit1')
 size = (80, 24), drive = 'autoselect'
 
     @pytest.mark.parametrize("drive", _DRIVES)
@@ -84,7 +84,7 @@ E       assert False
 tests\test_tui_hostile_map.py:272: AssertionError
 _____ test_b77_hostile_symbol_is_literal_and_carries_no_span[size1-click] _____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18310/test_b77_hostile_symbol_is_lit2')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-18310/test_b77_hostile_symbol_is_lit2')
 size = (120, 30), drive = 'click'
 
     @pytest.mark.parametrize("drive", _DRIVES)
@@ -123,7 +123,7 @@ E       assert False
 tests\test_tui_hostile_map.py:272: AssertionError
 __ test_b77_hostile_symbol_is_literal_and_carries_no_span[size1-autoselect] ___
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18310/test_b77_hostile_symbol_is_lit3')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-18310/test_b77_hostile_symbol_is_lit3')
 size = (120, 30), drive = 'autoselect'
 
     @pytest.mark.parametrize("drive", _DRIVES)

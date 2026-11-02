@@ -1,5 +1,5 @@
 cmd: python -m pytest tests/test_b97_chips_help.py::test_at_b97_14_help_chip_opens_a_body_covering_the_screen tests/test_b97_width.py -p no:cacheprovider -q (output filtered to ^E/FAILED/summary)
-tree: C:/Users/jjgh8/Github/s19_app (main checkout) at 6d8631a, no fix | PYTHONPATH=C:/Users/jjgh8/Github/s19_app | NO_COLOR unset | run 2026-10-29 ~11:50 local, copied verbatim from the session task output
+tree: <HOME>/Github/s19_app (main checkout) at 6d8631a, no fix | PYTHONPATH=<HOME>/Github/s19_app | NO_COLOR unset | run 2026-10-29 ~11:50 local, copied verbatim from the session task output
 E           textual.css.query.NoMatches: No nodes match '#window_help_patch' on LoadGuardScreen()
 E       AssertionError: did not settle: Run focused
 E       AssertionError: did not settle: Run focused

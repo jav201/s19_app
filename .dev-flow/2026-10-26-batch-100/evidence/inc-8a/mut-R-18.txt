@@ -6,13 +6,13 @@
 #   |         {issue.code for issue in document.issues} & _DOCUMENT_FILE_FAULT_CODES
 # edit 1 NEW:
 #   |         {issue.code for issue in document.issues if issue.severity is ValidationSeverity.ERROR}
-# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b
+# cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b
 # env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
-# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_classifier_symbol_entry_is_ok_with_or_without_context
+# command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_classifier_symbol_entry_is_ok_with_or_without_context
 # started 2026-10-30T23:10:38Z  finished 2026-10-30T23:10:40Z  rc=1
 F                                                                        [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b\tests\test_b100_document.py:1049: AssertionError: assert 'unreadable' == 'ok'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b\tests\test_b100_document.py:1049: AssertionError: assert 'unreadable' == 'ok'
 =========================== short test summary info ===========================
 FAILED tests/test_b100_document.py::test_tc_b100_30_classifier_symbol_entry_is_ok_with_or_without_context
 1 failed in 0.61s

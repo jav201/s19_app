@@ -17,7 +17,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-PY = r"C:\Users\jjgh8\anaconda3\envs\s19env\python.exe"
+PY = r"<HOME>\anaconda3\envs\s19env\python.exe"
 KB = "tests/test_b97_key_bar.py::"
 WH, APP, CSS = "s19_app/tui/window_help.py", "s19_app/tui/app.py", "s19_app/tui/styles.tcss"
 

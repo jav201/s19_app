@@ -1,6 +1,6 @@
 # orchestrator gate re-run, tree: e044112 + Inc 1 working changes (worktree s19_app-b100-inc1)
 # started: 2026-10-26T17:08:33-06:00
-# s19_app from C:\Users\jjgh8\Github\s19_app-b100-inc1\s19_app\__init__.py
+# s19_app from <HOME>\Github\s19_app-b100-inc1\s19_app\__init__.py
 ## inc-1 files
 ....................................................                     [100%]
 124 passed in 267.29s (0:04:27)

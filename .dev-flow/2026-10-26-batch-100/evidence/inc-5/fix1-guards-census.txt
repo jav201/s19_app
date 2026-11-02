@@ -1,15 +1,15 @@
 # command: python -m pytest -q -p no:cacheprovider -k census tests
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree; corrective pass 1 applied)
+# tree: <HOME>\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree; corrective pass 1 applied)
 # source sha256 (16): app.py 8032dead73f7ee54 · apply.py 6d00f17fcefb704c · change_service.py 95da58bf3bcc27cd · project_gather_service.py 11697d6c85efb9e2 · test_b100_save_image.py 559768f390ded771
-# PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:56:20Z
-# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\__init__.py
+# s19_app.__file__ = <HOME>\Github\s19_app-b100-inc5\s19_app\__init__.py
 ........................................................................ [ 82%]
 .........F.....                                                          [100%]
 ================================== FAILURES ===================================
 ______________ test_at058b_id_census_and_wiring_survive_reparent ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30050/test_at058b_id_census_and_wiri0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30050/test_at058b_id_census_and_wiri0')
 
     def test_at058b_id_census_and_wiring_survive_reparent(tmp_path: Path) -> None:
         """AT-058b — every patch_* id + the run_checks wiring survive the reparent.

@@ -1,9 +1,9 @@
 # mutation: UX1-label-uncoloured — UX-1 (LLR-178.3): the problem label loses the warning colour
 # file: s19_app/tui/screens.py (sha256 before ea549ab4bd9d3ef4)
-# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=C:\Users\jjgh8\AppData\Local\Temp\f1mut-UX1-label-uncoloured tests/test_b100_announce.py -k colour
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (corrective pass 1, mutated in place, then restored)
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
-# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\__init__.py
+# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=<HOME>\AppData\Local\Temp\f1mut-UX1-label-uncoloured tests/test_b100_announce.py -k colour
+# tree: <HOME>\Github\s19_app-b100-inc6 (corrective pass 1, mutated in place, then restored)
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# s19_app.__file__ = <HOME>\Github\s19_app-b100-inc6\s19_app\__init__.py
 # date: 2026-10-30T03:35:25Z
 # --- old
 #           text.append_text(safe_text(f"{problem.label}: ", YELLOW))
@@ -13,7 +13,7 @@ F.                                                                       [100%]
 ================================== FAILURES ===================================
 ______ test_tc_b100_67_fallback_and_problems_paint_in_the_warning_colour ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-UX1-label-uncoloured/test_tc_b100_67_fallback_and_p0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-UX1-label-uncoloured/test_tc_b100_67_fallback_and_p0')
 
     def test_tc_b100_67_fallback_and_problems_paint_in_the_warning_colour(tmp_path: Path) -> None:
         """UX-1 (the P-E verdict B prototype): with a damaged manifest the

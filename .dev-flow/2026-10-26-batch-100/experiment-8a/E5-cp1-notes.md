@@ -3,13 +3,13 @@
 | Field | Value |
 |---|---|
 | Author | `software-dev` (spawned by the orchestrator). Not the reviewer of this code. |
-| Tree | Worktree `C:\Users\jjgh8\Github\s19_app-b100-inc8a`, branch `b100-inc8a`, base `dc3b314`, **uncommitted**. |
+| Tree | Worktree `<HOME>\Github\s19_app-b100-inc8a`, branch `b100-inc8a`, base `dc3b314`, **uncommitted**. |
 | Inputs | `03-increments/review-increment-008a.md` (F1–F9, §R20), `03-increments/security-increment-008a.md` (SEC8a-1…5), `evidence/inc-8a/review/test_r8a_probes.py` (Q1–Q6), `evidence/inc-8a/mutation-summary.md`, `experiment-8a/E3-rulings.md` (R20), the orchestrator's 11-item fix list. |
 | Snapshot | `…\scratchpad\cp8a-1\pre\` holds the 4 sources at the pre-cp1 hashes `8c627b717172ccd8` / `a638b23d2bb861b1` / `5f2ab3268d9cdc4d` / `6f2d419ea0d2ee56` (verified on copy) plus the rest of the package. RED runs use it with the cp1 tests copied in. |
 | Sources after cp1 (sha256[:16]) | `app.py` **ebc6dbf4d1b6aa98**, `manifest_writer.py` **254693df5dcdf38a**, `variant_execution_service.py` **699c38bd2cce77cd**, `project_gather_service.py` **bd6f926590c17abd**. CRLF kept in every edited file (checked: CRLF count = LF count). No fifth source; `workspace.py` and `prototypes/` untouched. |
 | Evidence | `evidence/inc-8a/cp1/` (`red-cp1-vs-pre.txt`, `red-cp1-vs-pre-supplement.txt`, `green-cp1.txt`, `green-cp1-supplement.txt`, `guards-cp1.txt`, `guards-cp1-run1-basetemp-artefact.txt`, `review-probes-cp1.txt`) and `evidence/inc-8a/mut-cp1-*.txt`. |
 
-`…\scratchpad` = `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad`.
+`…\scratchpad` = `<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad`.
 
 ## Per item
 

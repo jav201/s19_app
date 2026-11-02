@@ -1,5 +1,5 @@
 #!/bin/bash
-P=/mnt/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/fix3
+P=/mnt<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/fix3
 cd ~/s19fix3; unset NO_COLOR; export PYTHONDONTWRITEBYTECODE=1
 echo "== M-dwell: render_run without the restart arm"
 ~/s19venv/bin/python $P/mutate.py s19_app/tui/flow_screens.py "        self._rearm_attention(restart=True)" "        self._rearm_attention()"

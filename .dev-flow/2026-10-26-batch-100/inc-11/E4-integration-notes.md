@@ -1,6 +1,6 @@
 # Inc 11 — E4 integration notes (the Save project dialog)
 
-Stage E4, integration step. Inputs read: `E4-dialog-notes.md` (G-A), `E4-app-notes.md` (G-B), `E4-tester-notes.md`, `codewire/interfaces-11.md`, `codewire/proto-11-app.md`, `codewire/proto-11-dialog.md` (S6 / S9 / K21), `E3-rulings.md` (rounds 1–3), `E3-security.md` (S11-04), `E1-requirements-draft.md` (LLR-175.1, .1c, .1p, .4b). Worktree `C:/Users/jjgh8/Github/s19_app-b100-inc11` on `1747479` plus the uncommitted Inc 11 change. Evidence states use the seven words only.
+Stage E4, integration step. Inputs read: `E4-dialog-notes.md` (G-A), `E4-app-notes.md` (G-B), `E4-tester-notes.md`, `codewire/interfaces-11.md`, `codewire/proto-11-app.md`, `codewire/proto-11-dialog.md` (S6 / S9 / K21), `E3-rulings.md` (rounds 1–3), `E3-security.md` (S11-04), `E1-requirements-draft.md` (LLR-175.1, .1c, .1p, .4b). Worktree `<HOME>/Github/s19_app-b100-inc11` on `1747479` plus the uncommitted Inc 11 change. Evidence states use the seven words only.
 
 ## Result
 
@@ -70,7 +70,7 @@ Noted, not changed: in `test_tc_b100_47_name_cap_64_65_300` the 300 arm can read
 
 ## Final pass counts
 
-Each count is read from one complete run's own summary line. green-02 ran in parallel with guards run 1. green-01 (both runs) ran alone. No timing arm failed in any evidence run; F-8 is a stale-paint race, not a timing threshold. Every transcript prints `s19_app.__file__` = `C:\Users\jjgh8\Github\s19_app-b100-inc11\s19_app\__init__.py` at its top.
+Each count is read from one complete run's own summary line. green-02 ran in parallel with guards run 1. green-01 (both runs) ran alone. No timing arm failed in any evidence run; F-8 is a stale-paint race, not a timing threshold. Every transcript prints `s19_app.__file__` = `<HOME>\Github\s19_app-b100-inc11\s19_app\__init__.py` at its top.
 
 | Run | Transcript | Result | State |
 |---|---|---|---|

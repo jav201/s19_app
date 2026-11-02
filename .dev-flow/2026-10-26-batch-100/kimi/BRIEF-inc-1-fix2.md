@@ -1,11 +1,11 @@
 # Kimi brief — batch-100 Increment 1 · corrective pass 2
 
-Work in the same worktree as before, `C:\Users\jjgh8\Github\s19_app-b100-inc1`. It holds your Inc 1 changes and fix pass 1, uncommitted; keep them. `BRIEF-COMMON.md` still applies. The SOURCE files stay at 4: `workspace.py`, `segment_split_view.py`, `app.py`, `services/project_gather_service.py`.
+Work in the same worktree as before, `<HOME>\Github\s19_app-b100-inc1`. It holds your Inc 1 changes and fix pass 1, uncommitted; keep them. `BRIEF-COMMON.md` still applies. The SOURCE files stay at 4: `workspace.py`, `segment_split_view.py`, `app.py`, `services/project_gather_service.py`.
 
 **Read first.** Use the MAIN checkout, absolute paths:
-- `C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-10-26-batch-100\03-increments\security-increment-001.md`: SEC-1 (HIGH), SEC-2 and SEC-3, with the security probe that escaped. The probes are in the orchestrator's scratchpad, `...\scratchpad\probes\sec_inc1_probe*.py`, and you can copy their shapes.
-- `C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-10-26-batch-100\03-increments\review-increment-001.md`, "Round 2": N1 (MAJOR) and N2–N5.
-- `C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-10-26-batch-100\01-requirements-ledger.md`, LED .50. This is the ruling for this pass, and amended LLR-163.1 in `01-requirements.md` reflects it.
+- `<HOME>\Github\s19_app\.dev-flow\2026-10-26-batch-100\03-increments\security-increment-001.md`: SEC-1 (HIGH), SEC-2 and SEC-3, with the security probe that escaped. The probes are in the orchestrator's scratchpad, `...\scratchpad\probes\sec_inc1_probe*.py`, and you can copy their shapes.
+- `<HOME>\Github\s19_app\.dev-flow\2026-10-26-batch-100\03-increments\review-increment-001.md`, "Round 2": N1 (MAJOR) and N2–N5.
+- `<HOME>\Github\s19_app\.dev-flow\2026-10-26-batch-100\01-requirements-ledger.md`, LED .50. This is the ruling for this pass, and amended LLR-163.1 in `01-requirements.md` reflects it.
 
 **Fix (LED .50):**
 1. **App paths stay unresolved.**

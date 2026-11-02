@@ -1,6 +1,6 @@
 # command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation 167.8-inverse-clears-flag
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# tree: <HOME>\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation 167.8-inverse-clears-flag
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
 # date: 2026-10-29T19:59:10+00:00
 # requirement: LLR-167.8
 # mutation: INVERSE probe for the STOP item: Save project clears the panel's dirty flag unconditionally — file s19_app/tui/app.py
@@ -12,7 +12,7 @@
 ================================== FAILURES ===================================
 ______________ test_tc_b100_70_unwritten_document_keeps_the_flag ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29963/test_tc_b100_70_unwritten_docu0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29963/test_tc_b100_70_unwritten_docu0')
 
     def test_tc_b100_70_unwritten_document_keeps_the_flag(tmp_path: Path) -> None:
         """A Save project that emits the image but does NOT write the editor's

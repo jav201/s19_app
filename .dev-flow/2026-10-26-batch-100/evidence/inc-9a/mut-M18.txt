@@ -4,9 +4,9 @@ target file: s19_app/tui/app.py
 edit: '        if not contained_in_workarea(normalized, self.workarea):\n            if not record_recent_source(normalized):\n                self.logger.warning("Recent sources not updated: %r", str(normalized))\n        self.set_progress(50, f"Parsing {copied.name}...")' -> '        self.set_progress(50, f"Parsing {copied.name}...")'
 edit: '        temp_dir = self.workarea / WORKAREA_TEMP\n        self.set_progress(10, "Copying into workarea temp...")' -> '        if not contained_in_workarea(normalized, self.workarea):\n            if not record_recent_source(normalized):\n                self.logger.warning("Recent sources not updated: %r", str(normalized))\n        temp_dir = self.workarea / WORKAREA_TEMP\n        self.set_progress(10, "Copying into workarea temp...")'
 sha256 before: 62232011882325626771cb015ccfce4b34c15945e90b8432fd628c61fcf22d80
-cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a
+cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a
 command: pytest -q --tb=line tests/test_b100_recents.py::test_tc_b100_34_load_failing_before_its_copy_records_nothing
-s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a\s19_app\__init__.py
+s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a\s19_app\__init__.py
 pytest summary: 1 failed in 9.67s
 verdict: KILLED
 restored = True

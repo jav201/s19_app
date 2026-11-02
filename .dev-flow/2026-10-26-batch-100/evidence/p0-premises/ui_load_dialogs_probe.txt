@@ -1,9 +1,9 @@
 # command: S19_WT=<scratch>/snap1d677ba PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 (NO_COLOR unset) s19env/python.exe ui_load_dialogs_probe.py 
-# probe source: C:/Users/jjgh8/Github/s19_app/.dev-flow/2026-10-26-batch-100/evidence/p0-premises/ui_load_dialogs_probe.py
+# probe source: <HOME>/Github/s19_app/.dev-flow/2026-10-26-batch-100/evidence/p0-premises/ui_load_dialogs_probe.py
 # tree: 1d677ba (git archive)
 # started: 2026-10-26T06:48:21-06:00
 
-s19_app imported from: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\snap1d677ba\s19_app\__init__.py
+s19_app imported from: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\snap1d677ba\s19_app\__init__.py
 == S1 Load file dialog
 work-area temp before opening: ['.staging', 'firmware.s19', 'firmware_1.s19']
 `l` with no focus -> screen: LoadFileScreen
@@ -23,7 +23,7 @@ escape on LoadFileScreen -> screen: LoadFileScreen | stack: ['Screen', 'LoadFile
 == S2 Save project dialog
 ctrl+s -> screen: SaveProjectScreen
     Label#None Save project folder under:
-    OsClipboardInput#project_parent_path value='C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_7dvnj5yp\\.s19tool\\workarea' placeholder='C:\\path\\to\\parent\\folder'
+    OsClipboardInput#project_parent_path value='<HOME>\\AppData\\Local\\Temp\\projprobe_7dvnj5yp\\.s19tool\\workarea' placeholder='C:\\path\\to\\parent\\folder'
     Label#None Project name (new folder name):
     OsClipboardInput#project_name value='' placeholder='letters, numbers, - _'
 empty name Save click -> screen: SaveProjectScreen | new status: [] | new notices: []
@@ -54,10 +54,10 @@ Load project over patched image -> stack: ['Screen'] | image still patched? Fals
 
 == S6 reserved project names
 RESERVED_WORKAREA_HOMES: ('temp', 'patches', 'templates', 'logs', 'crc', 'flows', 'flowsets', 'splits', 'reports')
-dialog Save 'reports' -> status: ["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_0u56kzbg\\.s19tool\\workarea\\reports (variant 'firmware')", 'Project saved + manifest verified'] | current_project: reports
-handler Save 'crc' -> status: ["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_0u56kzbg\\.s19tool\\workarea\\crc (variant 'firmware')", 'Project saved + manifest verified'] | current_project: crc
-handler Save 'Splits' -> status: ["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_0u56kzbg\\.s19tool\\workarea\\Splits (variant 'firmware')", 'Project saved + manifest verified'] | current_project: Splits
-handler Save 'flows' -> status: ["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_0u56kzbg\\.s19tool\\workarea\\flows (variant 'firmware')", 'Project saved + manifest verified'] | current_project: flows
+dialog Save 'reports' -> status: ["Saved project to <HOME>\\AppData\\Local\\Temp\\projprobe_0u56kzbg\\.s19tool\\workarea\\reports (variant 'firmware')", 'Project saved + manifest verified'] | current_project: reports
+handler Save 'crc' -> status: ["Saved project to <HOME>\\AppData\\Local\\Temp\\projprobe_0u56kzbg\\.s19tool\\workarea\\crc (variant 'firmware')", 'Project saved + manifest verified'] | current_project: crc
+handler Save 'Splits' -> status: ["Saved project to <HOME>\\AppData\\Local\\Temp\\projprobe_0u56kzbg\\.s19tool\\workarea\\Splits (variant 'firmware')", 'Project saved + manifest verified'] | current_project: Splits
+handler Save 'flows' -> status: ["Saved project to <HOME>\\AppData\\Local\\Temp\\projprobe_0u56kzbg\\.s19tool\\workarea\\flows (variant 'firmware')", 'Project saved + manifest verified'] | current_project: flows
 workarea dirs: ['Splits', 'crc', 'flows', 'patches', 'reports', 'temp']
 list_projects(): ['Splits']
 

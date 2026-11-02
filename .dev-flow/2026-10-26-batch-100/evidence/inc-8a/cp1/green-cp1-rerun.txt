@@ -1,6 +1,6 @@
 # GREEN cp1 re-run of the 10 green-cp1 failures after the re-pins (PC25 x4, TC-59, TC-07 x2) — and the 3 environment failures (TC-61 timing under the concurrent guard/mutant runs; TC-06 x2 path depth from --basetemp) run alone
-# UTC: 2026-10-31T00:27:30Z  cwd: /c/Users/jjgh8/Github/s19_app-b100-inc8a  PYTHONPATH=<cwd>  NO_COLOR unset  (default pytest temp dir, nothing else running)
-# s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc8a\s19_app\__init__.py
+# UTC: 2026-10-31T00:27:30Z  cwd: <HOME>/Github/s19_app-b100-inc8a  PYTHONPATH=<cwd>  NO_COLOR unset  (default pytest temp dir, nothing else running)
+# s19_app.__file__: <HOME>\Github\s19_app-b100-inc8a\s19_app\__init__.py
 #   ebc6dbf4d1b6aa98 tui/app.py
 #   254693df5dcdf38a tui/services/manifest_writer.py
 #   699c38bd2cce77cd tui/services/variant_execution_service.py

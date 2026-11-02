@@ -2,8 +2,8 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 ______ test_tc_b99_12_directory_squatting_requested_name_takes_next_free ______
 
-source = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26218/test_tc_b99_12_directory_squat0/fw.s19')
-destination = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26218/test_tc_b99_12_directory_squat0/.s19tool/workarea/out')
+source = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26218/test_tc_b99_12_directory_squat0/fw.s19')
+destination = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26218/test_tc_b99_12_directory_squat0/.s19tool/workarea/out')
 max_size_bytes = 268435456
 
     def copy_into_workarea(
@@ -168,13 +168,13 @@ max_size_bytes = 268435456
 >                   claim_fd = os.open(
                         str(claim_path), os.O_CREAT | os.O_EXCL | os.O_WRONLY
                     )
-E                   PermissionError: [Errno 13] Permission denied: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-26218\\test_tc_b99_12_directory_squat0\\.s19tool\\workarea\\out\\fw.s19'
+E                   PermissionError: [Errno 13] Permission denied: '<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-26218\\test_tc_b99_12_directory_squat0\\.s19tool\\workarea\\out\\fw.s19'
 
 s19_app\tui\workspace.py:510: PermissionError
 
 The above exception was the direct cause of the following exception:
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26218/test_tc_b99_12_directory_squat0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26218/test_tc_b99_12_directory_squat0')
 
     def test_tc_b99_12_directory_squatting_requested_name_takes_next_free(
         tmp_path: Path,
@@ -200,8 +200,8 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 tests\test_b99_staging.py:390: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-source = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26218/test_tc_b99_12_directory_squat0/fw.s19')
-destination = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26218/test_tc_b99_12_directory_squat0/.s19tool/workarea/out')
+source = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26218/test_tc_b99_12_directory_squat0/fw.s19')
+destination = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26218/test_tc_b99_12_directory_squat0/.s19tool/workarea/out')
 max_size_bytes = 268435456
 
     def copy_into_workarea(
@@ -378,7 +378,7 @@ max_size_bytes = 268435456
                         f"Not saved: {claim_path.name} in {resolved_destination} "
                         f"could not be claimed: {exc}. Nothing written."
                     ) from exc
-E                   s19_app.tui.workspace.WorkareaPlacementError: Not saved: fw.s19 in C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-26218\test_tc_b99_12_directory_squat0\.s19tool\workarea\out could not be claimed: [Errno 13] Permission denied: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-26218\\test_tc_b99_12_directory_squat0\\.s19tool\\workarea\\out\\fw.s19'. Nothing written.
+E                   s19_app.tui.workspace.WorkareaPlacementError: Not saved: fw.s19 in <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-26218\test_tc_b99_12_directory_squat0\.s19tool\workarea\out could not be claimed: [Errno 13] Permission denied: '<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-26218\\test_tc_b99_12_directory_squat0\\.s19tool\\workarea\\out\\fw.s19'. Nothing written.
 
 s19_app\tui\workspace.py:521: WorkareaPlacementError
 =========================== short test summary info ===========================

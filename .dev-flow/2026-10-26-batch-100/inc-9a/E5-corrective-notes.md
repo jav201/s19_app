@@ -1,6 +1,6 @@
 # Inc 9a — E5 corrective-pass notes
 
-Scope: the rows marked **fix** in `E5-rulings.md` (code review CR9-*, security review SEC9-*, the 5 weak-test mutation survivors, the Linux CI failure). Worktree `C:\Users\jjgh8\Github\s19_app-b100-inc9a`, branch `b100-inc9a`, base `4fef292`, uncommitted. Author: `software-dev` sub-agent.
+Scope: the rows marked **fix** in `E5-rulings.md` (code review CR9-*, security review SEC9-*, the 5 weak-test mutation survivors, the Linux CI failure). Worktree `<HOME>\Github\s19_app-b100-inc9a`, branch `b100-inc9a`, base `4fef292`, uncommitted. Author: `software-dev` sub-agent.
 
 - **Source files touched:** `s19_app/tui/workspace.py` and `s19_app/tui/app.py`. That is 2 of the 2 allowed. CRLF line endings were kept.
 - **Tests touched:** `tests/test_b100_recents.py` (LF, kept), `tests/conftest.py` (CRLF), `tests/test_b100_project_homes.py` (CRLF).

@@ -1,7 +1,7 @@
 DDR fixes — full batch-99 green sweep
-worktree: C:\Users\jjgh8\Github\s19_app-b99-ddr (branch b99-ddr)
+worktree: <HOME>\Github\s19_app-b99-ddr (branch b99-ddr)
 Mon Oct 26 00:58:20 CSTM 2026
-C:\Users\jjgh8\Github\s19_app-b99-ddr\s19_app\__init__.py
+<HOME>\Github\s19_app-b99-ddr\s19_app\__init__.py
 ........................................................................ [ 41%]
 ........................................................................ [ 82%]
 ...............................                                          [100%]

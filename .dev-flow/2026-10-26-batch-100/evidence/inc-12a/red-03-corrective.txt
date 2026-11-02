@@ -1,10 +1,10 @@
 # red-03-corrective: Inc 12a E5 corrective test arms on the pre-corrective source (base12ac at 71376a3; the corrective test files copied in, source untouched; restored after).
 # Run 1: default basetemp (case-insensitive NTFS).
-# tree: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/base12ac
+# tree: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/base12ac
 # head: 71376a3
 # date: 2026-11-01T01:15:18-06:00
-s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12ac\s19_app\__init__.py
-# cmd: pytest -p no:cacheprovider -q -rs --tb=short --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12a/bt/red tests/test_b100_busy.py::test_tc_b100_50_names_paint_literally_through_load_from_path[bidi override] tests/test_b100_busy.py::test_tc_b100_50_names_paint_literally_through_load_from_path[ESC and BEL] tests/test_b100_busy.py::test_tc_b100_50_control_bytes_never_reach_the_status_log tests/test_b100_recents.py::test_tc_b100_38_one_project_match_prefers_the_exact_listed_name tests/test_b100_recents.py::test_tc_b100_38_picking_proj_loads_proj_when_proj_differs_by_case
+s19_app.__file__ = <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12ac\s19_app\__init__.py
+# cmd: pytest -p no:cacheprovider -q -rs --tb=short --basetemp=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12a/bt/red tests/test_b100_busy.py::test_tc_b100_50_names_paint_literally_through_load_from_path[bidi override] tests/test_b100_busy.py::test_tc_b100_50_names_paint_literally_through_load_from_path[ESC and BEL] tests/test_b100_busy.py::test_tc_b100_50_control_bytes_never_reach_the_status_log tests/test_b100_recents.py::test_tc_b100_38_one_project_match_prefers_the_exact_listed_name tests/test_b100_recents.py::test_tc_b100_38_picking_proj_loads_proj_when_proj_differs_by_case
 FsFFs                                                                    [100%]
 ================================== FAILURES ===================================
 _ test_tc_b100_50_names_paint_literally_through_load_from_path[bidi override] _
@@ -40,11 +40,11 @@ SKIPPED [1] tests\test_b100_recents.py:3574: the volume is case-insensitive: Pro
 # exit: 1
 
 # Run 2: SE5-12a-3 on-disk arm with --basetemp under a folder set case-sensitive (fsutil file setCaseSensitiveInfo <scratch>/corr12a/bt/csparent enable; new subfolders inherit it).
-# tree: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/base12ac
+# tree: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/base12ac
 # head: 71376a3
 # date: 2026-11-01T01:16:20-06:00
-s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12ac\s19_app\__init__.py
-# cmd: pytest -p no:cacheprovider -q -rs --tb=short --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12a/bt/csparent/red tests/test_b100_recents.py::test_tc_b100_38_picking_proj_loads_proj_when_proj_differs_by_case
+s19_app.__file__ = <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base12ac\s19_app\__init__.py
+# cmd: pytest -p no:cacheprovider -q -rs --tb=short --basetemp=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12a/bt/csparent/red tests/test_b100_recents.py::test_tc_b100_38_picking_proj_loads_proj_when_proj_differs_by_case
 F                                                                        [100%]
 ================================== FAILURES ===================================
 ______ test_tc_b100_38_picking_proj_loads_proj_when_proj_differs_by_case ______

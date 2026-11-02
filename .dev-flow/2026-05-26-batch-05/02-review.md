@@ -5,7 +5,7 @@
 ## 1. Findings (architect domain)
 
 Reviewer: independent architect (re-review of Phase-1 architect's HLR/LLR derivation).
-Scope: `.dev-flow/2026-05-26-batch-05/01-requirements.md` §§3–5, cross-checked against `C:/Users/jjgh8/.claude/plans/user-stories-the-quiet-alpaca.md` and the four code anchors named in §1.4.
+Scope: `.dev-flow/2026-05-26-batch-05/01-requirements.md` §§3–5, cross-checked against `<HOME>/.claude/plans/user-stories-the-quiet-alpaca.md` and the four code anchors named in §1.4.
 
 ### 1.0 Verdict summary
 - Blockers: 2

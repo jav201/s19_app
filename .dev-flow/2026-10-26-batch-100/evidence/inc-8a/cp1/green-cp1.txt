@@ -1,15 +1,15 @@
 # GREEN cp1 — new and touched requirements — batch-100 Inc 8a corrective pass 1
 # UTC start: 2026-10-30T23:56:35Z
-# cwd: /c/Users/jjgh8/Github/s19_app-b100-inc8a (branch b100-inc8a, base dc3b314, uncommitted tree)
-# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc8a
+# cwd: <HOME>/Github/s19_app-b100-inc8a (branch b100-inc8a, base dc3b314, uncommitted tree)
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc8a
 # NO_COLOR state: unset (env -u NO_COLOR)
-# s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc8a\s19_app\__init__.py
+# s19_app.__file__: <HOME>\Github\s19_app-b100-inc8a\s19_app\__init__.py
 # sources sha256[:16]:
 #   ebc6dbf4d1b6aa98 s19_app/tui/app.py
 #   254693df5dcdf38a s19_app/tui/services/manifest_writer.py
 #   699c38bd2cce77cd s19_app/tui/services/variant_execution_service.py
 #   bd6f926590c17abd s19_app/tui/services/project_gather_service.py
-# command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc8a C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=short -rfE tests/test_b100_document.py tests/test_b100_project_check.py tests/test_b100_save_image.py tests/test_b100_save_guards.py tests/test_b100_active_variant.py tests/test_b100_announce.py tests/test_variant_execution.py tests/test_manifest_writer.py tests/test_manifest_verify.py tests/test_project_gather.py tests/test_tui_manifest_save.py tests/test_b100_reuse.py tests/test_b99_staging.py tests/test_b100_session_reset.py tests/test_tui_variants.py tests/test_id_registry.py
+# command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<HOME>/Github/s19_app-b100-inc8a <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=short -rfE tests/test_b100_document.py tests/test_b100_project_check.py tests/test_b100_save_image.py tests/test_b100_save_guards.py tests/test_b100_active_variant.py tests/test_b100_announce.py tests/test_variant_execution.py tests/test_manifest_writer.py tests/test_manifest_verify.py tests/test_project_gather.py tests/test_tui_manifest_save.py tests/test_b100_reuse.py tests/test_b99_staging.py tests/test_b100_session_reset.py tests/test_tui_variants.py tests/test_id_registry.py
 
 ........................................................................ [ 10%]
 ........................................................................ [ 21%]
@@ -80,20 +80,20 @@ tests\test_b100_save_guards.py:727: in test_tc_b100_06_path_limit_met_and_exceed
            ^^^^^^^^^^^^^^^^^^^^^^
 tests\test_b100_save_guards.py:719: in _padded_base
     assert pad > 0, f"tmp_path too deep for the L = 150 enabler: {tail}"
-E   AssertionError: tmp_path too deep for the L = 150 enabler: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\bt\green\test_tc_b100_06_path_limit_met0\.s19tool\workarea
+E   AssertionError: tmp_path too deep for the L = 150 enabler: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\bt\green\test_tc_b100_06_path_limit_met0\.s19tool\workarea
 E   assert -25 > 0
 ___ test_tc_b100_07_rollback_keeps_the_previous_copy_unless_restored[held] ____
 tests\test_b100_save_guards.py:2114: in test_tc_b100_07_rollback_keeps_the_previous_copy_unless_restored
     assert len(keeps) == 2, keeps
-E   AssertionError: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/cp8a-1/bt/green/test_tc_b100_07_rollback_keeps2/app/.s19tool/workarea/P/project.json')]
+E   AssertionError: [WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/cp8a-1/bt/green/test_tc_b100_07_rollback_keeps2/app/.s19tool/workarea/P/project.json')]
 E   assert 1 == 2
-E    +  where 1 = len([WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/cp8a-1/bt/green/test_tc_b100_07_rollback_keeps2/app/.s19tool/workarea/P/project.json')])
+E    +  where 1 = len([WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/cp8a-1/bt/green/test_tc_b100_07_rollback_keeps2/app/.s19tool/workarea/P/project.json')])
 _ test_tc_b100_07_rollback_keeps_the_previous_copy_unless_restored[no-space] __
 tests\test_b100_save_guards.py:2114: in test_tc_b100_07_rollback_keeps_the_previous_copy_unless_restored
     assert len(keeps) == 2, keeps
-E   AssertionError: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/cp8a-1/bt/green/test_tc_b100_07_rollback_keeps3/app/.s19tool/workarea/P/project.json')]
+E   AssertionError: [WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/cp8a-1/bt/green/test_tc_b100_07_rollback_keeps3/app/.s19tool/workarea/P/project.json')]
 E   assert 1 == 2
-E    +  where 1 = len([WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/cp8a-1/bt/green/test_tc_b100_07_rollback_keeps3/app/.s19tool/workarea/P/project.json')])
+E    +  where 1 = len([WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/cp8a-1/bt/green/test_tc_b100_07_rollback_keeps3/app/.s19tool/workarea/P/project.json')])
 =========================== short test summary info ===========================
 FAILED tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
 FAILED tests/test_b100_project_check.py::test_tc_b100_25_missing_active_document_is_one_problem[with-record]

@@ -2,9 +2,9 @@ mutant: M75
 file: s19_app/tui/app.py
 old -> new: '        try:\n            data_files, a2l_files, error = self._list_project_files(project_dir)\n        except OSError:\n            self.set_status(\n                safe_text(\n                    f"Project NOT loaded: \'{painted_names([name])}\' could not be "\n                    "read — check that the folder can be opened, then load again."\n                ).plain\n            )\n            self.logger.warning("Project load refused (could not be read): %r", name)\n            return' -> '        data_files, a2l_files, error = self._list_project_files(project_dir)'
 sha256 before: ae3d1cd924c42a2a9e7a920cd95aab8b21f4d9b324afdfb627be86fdf36df9ab
-command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_load_dialog.py::test_tc_b100_40_unreadable_picked_project_paints_one_status_line
-cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b
-s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b\s19_app\__init__.py
+command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_load_dialog.py::test_tc_b100_40_unreadable_picked_project_paints_one_status_line
+cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b
+s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9b\s19_app\__init__.py
 ---
 pytest: 1 failed in 25.23s
 verdict: KILLED

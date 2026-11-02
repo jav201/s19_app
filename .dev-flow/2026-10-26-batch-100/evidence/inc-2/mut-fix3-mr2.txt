@@ -1,12 +1,12 @@
-cmd: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py -k tc_b100_07
-tree: C:/Users/jjgh8/Github/s19_app-b100-inc2 (detached 2edfee2, Inc 2 + fix passes 1-3)
-env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc2 (NO_COLOR unset)
+cmd: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py -k tc_b100_07
+tree: <HOME>/Github/s19_app-b100-inc2 (detached 2edfee2, Inc 2 + fix passes 1-3)
+env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<HOME>/Github/s19_app-b100-inc2 (NO_COLOR unset)
 
 .......FFFFF...F..                                                       [100%]
 ================================== FAILURES ===================================
 _____ test_tc_b100_07_failed_merge_removes_placed_files[exact-ab-gather] ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27636/test_tc_b100_07_failed_merge_r0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27636/test_tc_b100_07_failed_merge_r0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000284CDF0D410>
 target = 'exact', typed = 'ab', stage = 'gather'
 
@@ -79,7 +79,7 @@ E         Use -v to get more diff
 tests\test_b100_save_guards.py:1048: AssertionError
 _ test_tc_b100_07_failed_merge_removes_placed_files[exact-ab-manifest-refused] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27636/test_tc_b100_07_failed_merge_r1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27636/test_tc_b100_07_failed_merge_r1')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000284CC3F4250>
 target = 'exact', typed = 'ab', stage = 'manifest-refused'
 
@@ -152,7 +152,7 @@ E         Use -v to get more diff
 tests\test_b100_save_guards.py:1048: AssertionError
 ___ test_tc_b100_07_failed_merge_removes_placed_files[open-case-AB-gather] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27636/test_tc_b100_07_failed_merge_r2')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27636/test_tc_b100_07_failed_merge_r2')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000284CDF4A9D0>
 target = 'open-case', typed = 'AB', stage = 'gather'
 
@@ -225,7 +225,7 @@ E         Use -v to get more diff
 tests\test_b100_save_guards.py:1048: AssertionError
 ____ test_tc_b100_07_failed_save_removes_every_placed_path[merge-gathered] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27636/test_tc_b100_07_failed_save_re0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27636/test_tc_b100_07_failed_save_re0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000284CDBE3B10>
 case = 'merge-gathered'
 
@@ -305,7 +305,7 @@ E         Use -v to get more diff
 tests\test_b100_save_guards.py:1119: AssertionError
 _ test_tc_b100_07_failed_save_removes_every_placed_path[merge-gathered-reused] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27636/test_tc_b100_07_failed_save_re1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27636/test_tc_b100_07_failed_save_re1')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000284CEAD3590>
 case = 'merge-gathered-reused'
 
@@ -387,7 +387,7 @@ E         Use -v to get more diff
 tests\test_b100_save_guards.py:1119: AssertionError
 ___________ test_tc_b100_07_rollback_never_touches_junction_target ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27636/test_tc_b100_07_rollback_never0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27636/test_tc_b100_07_rollback_never0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000284CC6A0610>
 
     def test_tc_b100_07_rollback_never_touches_junction_target(

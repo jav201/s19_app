@@ -58,7 +58,7 @@
             "phase": 0,
             "date": "2026-05-26",
             "decision": "batch-05-created",
-            "notes": "Three hex-viewer UX defects surfaced from operator use of the batch-04 build: (a) search anchor stale after pagination, (b) MAC view hex pane width=40 too narrow, (c) goto handler silent on invalid/out-of-range addresses + no row marker. Plan approved (C:/Users/jjgh8/.claude/plans/user-stories-the-quiet-alpaca.md). Worktree: .claude/worktrees/tender-ride-3d090c."
+            "notes": "Three hex-viewer UX defects surfaced from operator use of the batch-04 build: (a) search anchor stale after pagination, (b) MAC view hex pane width=40 too narrow, (c) goto handler silent on invalid/out-of-range addresses + no row marker. Plan approved (<HOME>/.claude/plans/user-stories-the-quiet-alpaca.md). Worktree: .claude/worktrees/tender-ride-3d090c."
         },
         {
             "phase": 1,
@@ -190,7 +190,7 @@
             "phase": 6,
             "date": "2026-05-28",
             "decision": "synced-to-obsidian",
-            "notes": "Synced to canonical G: vault: G:\\My Drive\\ConsultIA\\Obsidian_Vaults\\AI-Consulting-Brain\\01 - Proyectos\\s19_app\\dev-flow-batches\\2026-05-26-batch-05\\ (copied 01/02/04/05 + 06-docs/ + generated 2026-05-26-batch-05-README.md index — matching the batch-04 vault convention; 03-increments not synced per convention). Resolved a path conflict: the /dev-flow-sync-en command hardcodes a stale C:\\Users\\jjgh8\\Obsidia_Vaults (typo, missing 'n') path; used the G: vault per global CLAUDE.md, which holds the real project + prior synced batches 01-04."
+            "notes": "Synced to canonical G: vault: G:\\My Drive\\ConsultIA\\Obsidian_Vaults\\AI-Consulting-Brain\\01 - Proyectos\\s19_app\\dev-flow-batches\\2026-05-26-batch-05\\ (copied 01/02/04/05 + 06-docs/ + generated 2026-05-26-batch-05-README.md index — matching the batch-04 vault convention; 03-increments not synced per convention). Resolved a path conflict: the /dev-flow-sync-en command hardcodes a stale <HOME>\\Obsidia_Vaults (typo, missing 'n') path; used the G: vault per global CLAUDE.md, which holds the real project + prior synced batches 01-04."
         }
     ],
     "obsidian_synced": true,

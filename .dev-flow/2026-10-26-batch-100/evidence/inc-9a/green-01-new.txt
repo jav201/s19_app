@@ -1,10 +1,10 @@
 # green-01: tests/test_b100_recents.py after integration (R14 added to list_projects)
 # date: 2026-10-31T03:23:20-06:00
-# cwd: C:/Users/jjgh8/Github/s19_app-b100-inc9a  branch: b100-inc9a base: 4fef292 (uncommitted worktree)
-# interpreter: C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+# cwd: <HOME>/Github/s19_app-b100-inc9a  branch: b100-inc9a base: 4fef292 (uncommitted worktree)
+# interpreter: <HOME>\anaconda3\envs\s19env\python.exe
 # env: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<worktree>
 # sha256[:16] workspace.py=a3342ed048ebe157 app.py=6223201188232562
-# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc9a\s19_app\__init__.py
+# s19_app.__file__ = <HOME>\Github\s19_app-b100-inc9a\s19_app\__init__.py
 # command: python -m pytest -p no:cacheprovider -q --tb=line tests/test_b100_recents.py -rfEs
 
 ........................................................................ [ 51%]

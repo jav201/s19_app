@@ -4,8 +4,8 @@ old text:         return self._dirty
 new text:         return False
 sha256 before: c53fd29b14f5c8eddb1db17e00e266cae279d7146bebda6dab83fb66cb9dde05
 command: pytest -q --tb=line tests/test_b100_load_question.py::test_tc_b100_44_patch_editor_reader_follows_its_writers tests/test_b100_load_question.py::test_tc_b100_44_twenty_four_cells_ask_by_kind
-cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut10
-s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut10\s19_app\__init__.py
+cwd: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut10
+s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut10\s19_app\__init__.py
 pytest summary: 2 failed in 10.21s
 verdict: KILLED
 restored = True

@@ -4,8 +4,8 @@ mutant: SEC9-3
 description: LLR-172.2k: the forbidden-character / category check removed from _recent_entry_ok
 target file: s19_app/tui/workspace.py
 edit: '    if any(ch in \'<>:"|?*\' for ch in path[2:]):\n        return None\n    if any(unicodedata.category(ch) in ("Cf", "Zl", "Zp", "Cs") for ch in path):\n        return None\n' -> ''
-cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt  (a copy of the worktree, never the worktree)
-s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt\s19_app\__init__.py
+cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt  (a copy of the worktree, never the worktree)
+s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt\s19_app\__init__.py
 sha256 before: 0af4b92489233ff2bd01412a78bef3addc4408b1b907ed4ba49e1955dc01702c
 env: env -u NO_COLOR LOCALAPPDATA=<scratchpad>/e5fix/lad/<run id> PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=.
 command: python -m pytest -p no:cacheprovider -q --tb=line -rA 'tests/test_b100_recents.py::test_tc_b100_35_entry_with_a_win32_forbidden_character_is_dropped' 'tests/test_b100_recents.py::test_tc_b100_34_source_with_a_win32_forbidden_character_is_not_recorded'
@@ -14,8 +14,8 @@ command: python -m pytest -p no:cacheprovider -q --tb=line -rA 'tests/test_b100_
 FAILED tests/test_b100_recents.py::test_tc_b100_35_entry_with_a_win32_forbidden_character_is_dropped
 FAILED tests/test_b100_recents.py::test_tc_b100_34_source_with_a_win32_forbidden_character_is_not_recorded
 --- failure lines ---
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt\tests\test_b100_recents.py:1617: AssertionError: [('C:\\x\\a.s19', 's19'), ('C:\\x\\a:b.s19', 's19'), ('C:\\x\\CON:.s19', 's19'), ('C:\\x\\a::$DATA.s19', 's19'), ('C:\\x\\a\u202eb.s19', 's19'), ('C:\\x\\a\u2028b.s19', 's19'), ...]
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt\tests\test_b100_recents.py:1267: AssertionError: {'NT prefix \\??\\': True, 'bidi override U+202E': True, 'device CON:': True, 'line separator U+2028': True, ...}
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt\tests\test_b100_recents.py:1617: AssertionError: [('C:\\x\\a.s19', 's19'), ('C:\\x\\a:b.s19', 's19'), ('C:\\x\\CON:.s19', 's19'), ('C:\\x\\a::$DATA.s19', 's19'), ('C:\\x\\a\u202eb.s19', 's19'), ('C:\\x\\a\u2028b.s19', 's19'), ...]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\e5fix\mutwt\tests\test_b100_recents.py:1267: AssertionError: {'NT prefix \\??\\': True, 'bidi override U+202E': True, 'device CON:': True, 'line separator U+2028': True, ...}
 --- pytest tail ---
 FAILED tests/test_b100_recents.py::test_tc_b100_35_entry_with_a_win32_forbidden_character_is_dropped
 FAILED tests/test_b100_recents.py::test_tc_b100_34_source_with_a_win32_forbidden_character_is_not_recorded

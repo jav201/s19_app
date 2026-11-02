@@ -7,7 +7,7 @@
 (as the co-delivered Phase-1 half) · against `01-requirements-rescoped.md` (operator scope ruling)
 and `00b-measurements-rescoped.md` (C-39 transcript).
 **Probe discipline:** every counterfactual executed in-process at the short root
-`C:/Users/jjgh8/AppData/Local/Temp/claude/b63/r1`, deleted at close. No fixture exceeded 8 000
+`<HOME>/AppData/Local/Temp/claude/b63/r1`, deleted at close. No fixture exceeded 8 000
 synthetic hits (~19 KB peak). `/b63/{a,b,qa,arch,archb,r2,r3}` untouched. **Zero production source
 edits; zero edits to the Phase-1 artifacts.**
 

@@ -1,6 +1,6 @@
 # Audit — Code-Wire lens on the s19_app user-interface flows (2026-10-23)
 
-**Tree:** `main` @ `9793fcd`, run in the detached worktree `C:\Users\jjgh8\Github\s19_app-cwaudit-ui` (kept). No source or test was edited. Nothing was staged or committed. The live tree (uncommitted batch-97 Inc-8 key bar) was not run. Its `git diff` replaces the Footer with a `KeyBar` and does not touch `screens.py`, the focus code or `refresh_window`, so the findings below apply to it too (code read).
+**Tree:** `main` @ `9793fcd`, run in the detached worktree `<HOME>\Github\s19_app-cwaudit-ui` (kept). No source or test was edited. Nothing was staged or committed. The live tree (uncommitted batch-97 Inc-8 key bar) was not run. Its `git diff` replaces the Footer with a `KeyBar` and does not touch `screens.py`, the focus code or `refresh_window`, so the findings below apply to it too (code read).
 **Method:** Code-Wire v2.6 (`code-wire` main `dd39f91`), reverse direction. The draft `docs/Notation-Grammar.md` (branch `e7`) was not used. App state is a `[Data]` entity (Q19 option A). A Textual message is a declared edge. A user key or button press is an `[Outside: …]` item. As the batch-97 annex advised, the work is thread-first: one literal thread for each node, recorded in a headless run.
 **Runs:** six probes, Textual `run_test`, Textual 8.2.8, interpreter `s19env`, real files from `examples/` (case_00 `prg.s19`, case_01 and case_02 `firmware.*`), plus the repo's own A.5 Flow Execution fixtures (`tests/b97_fixtures.py`). One process at a time, each in its own temp base dir. Keys go through `pilot.press`. Buttons are activated with `Button.press()` (the same `Pressed` message as a click; some buttons sit outside the 160x50 viewport).
 **Outputs:** `.dev-flow/design/codewire-audit-2026-10-23/ui/`. These are `graph-ui-flows.md` (29 nodes, 18 entities, format B), `probes/u01…u06_*.py` with their recorded outputs `probes/u0N.out.txt`, `probes/ucommon.py`, `probes/check_anchors.py` and `extract/` (coherence, anchor check, C17 output).
@@ -89,4 +89,4 @@ Not counted as findings, for the record:
 - **Requirement search.** It used `grep` over `REQUIREMENTS.md` and `.dev-flow/*/01-requirements*.md`. A "to trace" verdict means "not found by that search".
 - **History.** CW-U-1 was not bisected for when it broke, for example by a Textual upgrade. CW-U-2 was traced to `42b7bf4` by `git log -L` only.
 
-The worktree `C:\Users\jjgh8\Github\s19_app-cwaudit-ui` is kept (detached at `9793fcd`). The probe temp dirs (`%TEMP%\cwui_*`) are left for inspection.
+The worktree `<HOME>\Github\s19_app-cwaudit-ui` is kept (detached at `9793fcd`). The probe temp dirs (`%TEMP%\cwui_*`) are left for inspection.

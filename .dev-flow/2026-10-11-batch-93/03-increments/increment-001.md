@@ -90,16 +90,16 @@ the independent allocator derivation asserted to agree before the bytes were wri
 
 ```bash
 # the increment's own arms (the map module + the click family + the snapshot cells)
-C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest tests/test_tui_map_big.py \
+<HOME>/anaconda3/envs/s19env/python.exe -m pytest tests/test_tui_map_big.py \
   tests/test_map_click_chain.py tests/test_tui_directionb.py tests/test_tui_snapshot.py \
   -q -p no:cacheprovider
 
 # the pilot-measured thresholds + cockpit facts, re-rendered (the evidence probe)
-C:/Users/jjgh8/anaconda3/envs/s19env/python.exe \
+<HOME>/anaconda3/envs/s19env/python.exe \
   .dev-flow/2026-10-11-batch-93/evidence/inc001_render_check.py
 
 # the registry guard (the minted ids + the high-water)
-C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest tests/test_id_registry.py \
+<HOME>/anaconda3/envs/s19env/python.exe -m pytest tests/test_id_registry.py \
   -q -p no:cacheprovider
 ```
 
@@ -281,12 +281,12 @@ Increment 002 — the wrap audit + the responsive regimes (`HLR-130` · `HLR-131
 
 | Evidence artifact | Path — under `artifact_homes.evidence` | SHA-256 |
 |---|---|---|
-| the coordinator's brief (verbatim) | `.dev-flow/2026-10-11-batch-93/evidence/inc001-brief.md` | `c1d1c03ba97d16eb16b90a10c27ff2a1a2bf01d1c9da2566de0f88b8156233fa` |
+| the coordinator's brief (verbatim) | `.dev-flow/2026-10-11-batch-93/evidence/inc001-brief.md` | `4e47dacd34d4ff11fa69397bb25ea496685b3763eba11aa9d455090425c24080` |
 | the pilot measurements (C-29) | `.dev-flow/2026-10-11-batch-93/evidence/inc001-pilot-measurements.md` | `5e972866e2d768113796105bdfe8ecab441f0824c55a4c18c5e14a372f497d90` |
 | the cockpit-facts render probe | `.dev-flow/2026-10-11-batch-93/evidence/inc001_render_check.py` | `02c971c373812b07753580a06f6e10029eca82da3e868cafb4d8d639c3127e00` |
 | the 120×36 rendered capture | `.dev-flow/2026-10-11-batch-93/evidence/inc001-map-120x36.svg` | `e81f3a8cb8d62e298dcbc349ae1abe38743078b164a4241a2b40fb518b26b9a1` |
 | the 160×48 rendered capture | `.dev-flow/2026-10-11-batch-93/evidence/inc001-map-160x48.svg` | `3dd06d28e2f5821e72c46ab0035afd804bfcd815c2748a736ddda4842526b3ec` |
-| the increment's per-area run (302 passed / 27 failed — the tc016s CI-font census named in §4) | `.dev-flow/2026-10-11-batch-93/evidence/inc001-perarea-run.txt` | `9842852140df9be09fcbb48f5ae018f041d555acacd6ce25515def74387bf6cd` |
+| the increment's per-area run (302 passed / 27 failed — the tc016s CI-font census named in §4) | `.dev-flow/2026-10-11-batch-93/evidence/inc001-perarea-run.txt` | `a1db60b68085650007d76df0323c13781feecc33da0230917d01d8bdb061759d` |
 
 | Field | Value |
 |---|---|

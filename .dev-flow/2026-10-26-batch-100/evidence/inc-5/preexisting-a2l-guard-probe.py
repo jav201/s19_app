@@ -1,6 +1,6 @@
 import asyncio, shutil, sys, tempfile
 from pathlib import Path
-sys.path.insert(0, r"C:\Users\jjgh8\Github\s19_app-b100-inc5")
+sys.path.insert(0, r"<HOME>\Github\s19_app-b100-inc5")
 from tests.test_b100_save_image import *  # noqa
 from tests.test_b100_save_image import _load_project, _save, CASE01_DIR
 

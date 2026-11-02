@@ -151,7 +151,7 @@ and no `s19_app/` file was changed.
 ```
 
 Command: `timeout 900 python -m pytest tests/test_synth_release_case.py -q
---basetemp C:/Users/jjgh8/AppData/Local/Temp/s19rel/bt` (Python `s19env`,
+--basetemp <HOME>/AppData/Local/Temp/s19rel/bt` (Python `s19env`,
 `PYTHONPATH=.`, redirected `LOCALAPPDATA`).
 
 ## 9. Regeneration

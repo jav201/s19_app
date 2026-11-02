@@ -1,10 +1,10 @@
 # HANDOFF — batch-99 Increment 13 (P4 suite fixes, tests only)
 
-Worktree: `C:\Users\jjgh8\Github\s19_app-b99-inc13`, detached at `47d1973`.
-Interpreter: `C:\Users\jjgh8\anaconda3\envs\s19env\python.exe`; every run used
+Worktree: `<HOME>\Github\s19_app-b99-inc13`, detached at `47d1973`.
+Interpreter: `<HOME>\anaconda3\envs\s19env\python.exe`; every run used
 `env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8`
 with `PYTHONPATH` = this worktree. Import probe printed
-`C:\Users\jjgh8\Github\s19_app-b99-inc13\s19_app\__init__.py` (this worktree).
+`<HOME>\Github\s19_app-b99-inc13\s19_app\__init__.py` (this worktree).
 Nothing committed; changes left in the working tree.
 
 ## What was done

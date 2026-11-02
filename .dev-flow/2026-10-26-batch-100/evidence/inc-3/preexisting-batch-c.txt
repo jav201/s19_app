@@ -5,7 +5,7 @@ tree: BASE dad6423 via 'git show' — pre-existing check for the batch-C failure
 ================================== FAILURES ===================================
 ________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28650/test_at_056e_a2b_diff_report_b0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28650/test_at_056e_a2b_diff_report_b0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001AF8F54ADD0>
 
     def test_at_056e_a2b_diff_report_byte_identical_despite_selection(

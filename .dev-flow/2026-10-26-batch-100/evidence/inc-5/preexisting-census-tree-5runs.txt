@@ -1,12 +1,12 @@
 # command: python -m pytest -q -p no:cacheprovider tests/test_before_after_report.py::test_at_038b_declined_saveback_trigger_refuses_and_writes_nothing tests/test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection -rfE
-# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T20:57:46Z
 .FFFF                                                                    [100%]
 ================================== FAILURES ===================================
 _______________ test_at_b78_32_app_bindings_block_is_untouched ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29967/test_at_b78_32_app_bindings_bl0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29967/test_at_b78_32_app_bindings_bl0')
 
     def test_at_b78_32_app_bindings_block_is_untouched(tmp_path: Path) -> None:
         """AT-B78-32 (PIN) -- Lane 1 does not disturb the App ``BINDINGS`` block.
@@ -104,7 +104,7 @@ E         ...Full output truncated (3 lines hidden), use '-vv' to show
 tests\test_tui_diff_screen.py:3912: AssertionError
 ________ test_tc345_entry_edit_json_disabled_for_file_backed_document _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29967/test_tc345_entry_edit_json_dis0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29967/test_tc345_entry_edit_json_dis0')
 
     def test_tc345_entry_edit_json_disabled_for_file_backed_document(
         tmp_path: Path,
@@ -249,7 +249,7 @@ E           textual.css.query.NoMatches: No nodes match '#patch_editor_panel' on
 ..\..\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: NoMatches
 ______ test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29967/test_at_b78_03_the_palette_act0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29967/test_at_b78_03_the_palette_act0')
 
     def test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact(
         tmp_path: Path,
@@ -333,7 +333,7 @@ E         Use -v to get more diff
 tests\test_tui_commandbar.py:2704: AssertionError
 ________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29967/test_at_056e_a2b_diff_report_b0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29967/test_at_056e_a2b_diff_report_b0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002012B6D5FD0>
 
     def test_at_056e_a2b_diff_report_byte_identical_despite_selection(
@@ -403,14 +403,14 @@ FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byt
 4 failed, 1 passed in 21.93s
 # exit: 1
 # command: python -m pytest -q -p no:cacheprovider tests/test_before_after_report.py::test_at_038b_declined_saveback_trigger_refuses_and_writes_nothing tests/test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection -rfE
-# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T20:58:27Z
 .F.FF                                                                    [100%]
 ================================== FAILURES ===================================
 _______________ test_at_b78_32_app_bindings_block_is_untouched ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29971/test_at_b78_32_app_bindings_bl0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29971/test_at_b78_32_app_bindings_bl0')
 
     def test_at_b78_32_app_bindings_block_is_untouched(tmp_path: Path) -> None:
         """AT-B78-32 (PIN) -- Lane 1 does not disturb the App ``BINDINGS`` block.
@@ -508,7 +508,7 @@ E         ...Full output truncated (3 lines hidden), use '-vv' to show
 tests\test_tui_diff_screen.py:3912: AssertionError
 ______ test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29971/test_at_b78_03_the_palette_act0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29971/test_at_b78_03_the_palette_act0')
 
     def test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact(
         tmp_path: Path,
@@ -592,7 +592,7 @@ E         Use -v to get more diff
 tests\test_tui_commandbar.py:2704: AssertionError
 ________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29971/test_at_056e_a2b_diff_report_b0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29971/test_at_056e_a2b_diff_report_b0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002176C608610>
 
     def test_at_056e_a2b_diff_report_byte_identical_despite_selection(
@@ -661,14 +661,14 @@ FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byt
 3 failed, 2 passed in 20.27s
 # exit: 1
 # command: python -m pytest -q -p no:cacheprovider tests/test_before_after_report.py::test_at_038b_declined_saveback_trigger_refuses_and_writes_nothing tests/test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection -rfE
-# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T20:58:49Z
 .F.FF                                                                    [100%]
 ================================== FAILURES ===================================
 _______________ test_at_b78_32_app_bindings_block_is_untouched ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29973/test_at_b78_32_app_bindings_bl0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29973/test_at_b78_32_app_bindings_bl0')
 
     def test_at_b78_32_app_bindings_block_is_untouched(tmp_path: Path) -> None:
         """AT-B78-32 (PIN) -- Lane 1 does not disturb the App ``BINDINGS`` block.
@@ -766,7 +766,7 @@ E         ...Full output truncated (3 lines hidden), use '-vv' to show
 tests\test_tui_diff_screen.py:3912: AssertionError
 ______ test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29973/test_at_b78_03_the_palette_act0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29973/test_at_b78_03_the_palette_act0')
 
     def test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact(
         tmp_path: Path,
@@ -850,7 +850,7 @@ E         Use -v to get more diff
 tests\test_tui_commandbar.py:2704: AssertionError
 ________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29973/test_at_056e_a2b_diff_report_b0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29973/test_at_056e_a2b_diff_report_b0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000282B2446890>
 
     def test_at_056e_a2b_diff_report_byte_identical_despite_selection(
@@ -919,14 +919,14 @@ FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byt
 3 failed, 2 passed in 20.70s
 # exit: 1
 # command: python -m pytest -q -p no:cacheprovider tests/test_before_after_report.py::test_at_038b_declined_saveback_trigger_refuses_and_writes_nothing tests/test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection -rfE
-# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T20:59:11Z
 .F.FF                                                                    [100%]
 ================================== FAILURES ===================================
 _______________ test_at_b78_32_app_bindings_block_is_untouched ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29975/test_at_b78_32_app_bindings_bl0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29975/test_at_b78_32_app_bindings_bl0')
 
     def test_at_b78_32_app_bindings_block_is_untouched(tmp_path: Path) -> None:
         """AT-B78-32 (PIN) -- Lane 1 does not disturb the App ``BINDINGS`` block.
@@ -1024,7 +1024,7 @@ E         ...Full output truncated (3 lines hidden), use '-vv' to show
 tests\test_tui_diff_screen.py:3912: AssertionError
 ______ test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29975/test_at_b78_03_the_palette_act0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29975/test_at_b78_03_the_palette_act0')
 
     def test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact(
         tmp_path: Path,
@@ -1108,7 +1108,7 @@ E         Use -v to get more diff
 tests\test_tui_commandbar.py:2704: AssertionError
 ________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29975/test_at_056e_a2b_diff_report_b0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29975/test_at_056e_a2b_diff_report_b0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000028C461CB650>
 
     def test_at_056e_a2b_diff_report_byte_identical_despite_selection(
@@ -1177,14 +1177,14 @@ FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byt
 3 failed, 2 passed in 20.13s
 # exit: 1
 # command: python -m pytest -q -p no:cacheprovider tests/test_before_after_report.py::test_at_038b_declined_saveback_trigger_refuses_and_writes_nothing tests/test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection -rfE
-# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T20:59:33Z
 .F.FF                                                                    [100%]
 ================================== FAILURES ===================================
 _______________ test_at_b78_32_app_bindings_block_is_untouched ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29977/test_at_b78_32_app_bindings_bl0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29977/test_at_b78_32_app_bindings_bl0')
 
     def test_at_b78_32_app_bindings_block_is_untouched(tmp_path: Path) -> None:
         """AT-B78-32 (PIN) -- Lane 1 does not disturb the App ``BINDINGS`` block.
@@ -1282,7 +1282,7 @@ E         ...Full output truncated (3 lines hidden), use '-vv' to show
 tests\test_tui_diff_screen.py:3912: AssertionError
 ______ test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29977/test_at_b78_03_the_palette_act0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29977/test_at_b78_03_the_palette_act0')
 
     def test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact(
         tmp_path: Path,
@@ -1366,7 +1366,7 @@ E         Use -v to get more diff
 tests\test_tui_commandbar.py:2704: AssertionError
 ________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29977/test_at_056e_a2b_diff_report_b0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29977/test_at_056e_a2b_diff_report_b0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001A0B8EBDC10>
 
     def test_at_056e_a2b_diff_report_byte_identical_despite_selection(

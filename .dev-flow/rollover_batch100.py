@@ -9,8 +9,8 @@ import json
 import os
 import subprocess
 
-ROOT = r"C:\Users\jjgh8\Github\s19_app"
-BUNDLE = r"C:\Users\jjgh8\.claude\skills\dev-flow"
+ROOT = r"<HOME>\Github\s19_app"
+BUNDLE = r"<HOME>\.claude\skills\dev-flow"
 TODAY = "2026-10-26"
 OUTGOING = "2026-10-25-batch-99"
 BATCH = "2026-10-26-batch-100"

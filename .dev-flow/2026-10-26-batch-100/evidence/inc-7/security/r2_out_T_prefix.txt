@@ -1,4 +1,4 @@
-# s19_app import: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp7-1\pre\s19_app\__init__.py
+# s19_app import: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp7-1\pre\s19_app\__init__.py
 # NO_COLOR present: False | python 3.11.15
 [T2 load          ] {'bytes': 236860, 'longest path': 240, 'handler s': 7.59, 'click->panel s': 8.448, 'rows': 1, 'reads s': [7.536]}
 [T2 variant-append] {'bytes': 236860, 'longest path': 250, 'trigger->outcome s': 23.951, 'reads s': [7.621], 'outcome': 'Project saved + manifest verified'}

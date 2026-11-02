@@ -1,6 +1,6 @@
 # command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree + corrective pass 1) with mutation MB-mismatch-silenced
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree + corrective pass 1) with mutation MB-mismatch-silenced
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:41:36+00:00
 # finding: review F3 (LLR-163.7, LLR-167.6)
 # mutation: the plan-row landing check is silenced — file s19_app/tui/app.py
@@ -12,7 +12,7 @@
 ================================== FAILURES ===================================
 _____ test_tc_b100_59_landing_that_differs_from_its_row_rolls_back[emit] ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30042/test_tc_b100_59_landing_that_d0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30042/test_tc_b100_59_landing_that_d0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000224AAB14B90>
 patch = True
 
@@ -65,7 +65,7 @@ E       NameError: name 'lines' is not defined
 tests\test_b100_save_image.py:1295: NameError
 _____ test_tc_b100_59_landing_that_differs_from_its_row_rolls_back[copy] ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30042/test_tc_b100_59_landing_that_d1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30042/test_tc_b100_59_landing_that_d1')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000224ABD01A90>
 patch = False
 

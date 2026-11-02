@@ -1,15 +1,15 @@
-# command: python -m pytest -q -p no:cacheprovider -rfE --basetemp=C:/Users/jjgh8/AppData/Local/Temp/f1g1 tests/test_b100_active_variant.py tests/test_b100_announce.py tests/test_b100_focus.py tests/test_b100_save_image.py tests/test_b100_session_reset.py
-# tree: C:/Users/jjgh8/Github/s19_app-b100-inc6 (corrective pass 1 final), sources: 762d1a98c8a65903 *s19_app/tui/app.py;ea549ab4bd9d3ef4 *s19_app/tui/screens.py;395dcbde3b28851b *s19_app/tui/services/variant_execution_service.py;781f04ed2cc30897 *s19_app/tui/styles.tcss;
-# PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# command: python -m pytest -q -p no:cacheprovider -rfE --basetemp=<HOME>/AppData/Local/Temp/f1g1 tests/test_b100_active_variant.py tests/test_b100_announce.py tests/test_b100_focus.py tests/test_b100_save_image.py tests/test_b100_session_reset.py
+# tree: <HOME>/Github/s19_app-b100-inc6 (corrective pass 1 final), sources: 762d1a98c8a65903 *s19_app/tui/app.py;ea549ab4bd9d3ef4 *s19_app/tui/screens.py;395dcbde3b28851b *s19_app/tui/services/variant_execution_service.py;781f04ed2cc30897 *s19_app/tui/styles.tcss;
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-30T03:36:12Z
-# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\__init__.py
+# s19_app.__file__ = <HOME>\Github\s19_app-b100-inc6\s19_app\__init__.py
 .............................F.......................................... [ 46%]
 ...............................................................F........ [ 92%]
 ...........                                                              [100%]
 ================================== FAILURES ===================================
 ____ test_at_b100_20_every_writer_carries_the_keys_it_does_not_own[size0] _____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1g1/test_at_b100_20_every_writer_c0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1g1/test_at_b100_20_every_writer_c0')
 size = (118, 54)
 
     @pytest.mark.parametrize("size", SIZES)
@@ -97,7 +97,7 @@ E       assert 'Opened    firmware_1.s19' in ''
 tests\test_b100_active_variant.py:829: AssertionError
 _________ test_at_b100_05_save_project_saves_the_patched_image[size0] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1g1/test_at_b100_05_save_project_s0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1g1/test_at_b100_05_save_project_s0')
 size = (118, 54)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])

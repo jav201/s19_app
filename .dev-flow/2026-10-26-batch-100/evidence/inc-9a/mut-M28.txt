@@ -3,9 +3,9 @@ requirement: LLR-172.1i
 target file: s19_app/tui/workspace.py
 edit: '        except (ValueError, OSError) as exc:\n            logger.debug(\n                "recent_sources record: failed at abspath: %s",\n                type(exc).__name__,\n            )\n            return False' -> '        except OSError as exc:\n            logger.debug(\n                "recent_sources record: failed at abspath: %s",\n                type(exc).__name__,\n            )\n            return False'
 sha256 before: a3342ed048ebe157423bd68446455b556604d05a3d7bbe3349800aaca3a4cc04
-cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a
+cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a
 command: pytest -q --tb=line tests/test_b100_recents.py::test_tc_b100_34_record_with_an_embedded_nul_never_raises
-s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a\s19_app\__init__.py
+s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a\s19_app\__init__.py
 pytest summary: 1 passed in 0.32s
 verdict: SURVIVED
 restored = True

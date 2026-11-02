@@ -1,12 +1,12 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py -k "failed_merge_removes_placed_files and open-case" (MUTANT (a): the rollback removes the reused placements too)
-tree: C:/Users/jjgh8/Github/s19_app-b100-inc2 (detached 2edfee2, LED .53 redesign + mutant (a))
-env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc2 (NO_COLOR unset)
+tree: <HOME>/Github/s19_app-b100-inc2 (detached 2edfee2, LED .53 redesign + mutant (a))
+env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<HOME>/Github/s19_app-b100-inc2 (NO_COLOR unset)
 
 F                                                                        [100%]
 ================================== FAILURES ===================================
 ___ test_tc_b100_07_failed_merge_removes_placed_files[open-case-AB-gather] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28491/test_tc_b100_07_failed_merge_r0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28491/test_tc_b100_07_failed_merge_r0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000017D84FF2F90>
 target = 'open-case', typed = 'AB', stage = 'gather'
 

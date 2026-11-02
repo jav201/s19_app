@@ -4,52 +4,52 @@
 FFFFFFFFFFFFFFFFFFFFFFFFFF..FFFFFF.......FFFFF...F.........F............ [ 86%]
 ....FFFFFFF                                                              [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:184: AssertionError: {'check_apply_ghost': 23, 'check_fields_count': 26, 'check_validate_button': 23, 'check_write_button': 23}
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:184: AssertionError: {'check_apply_ghost': 23, 'check_fields_count': 26, 'check_validate_button': 23, 'check_write_button': 23}
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:69: AssertionError: #check_card_switcher: expected exactly 1 widget, found 0
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:249: AssertionError: the table scrolls horizontally: max_scroll_x 25
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:257: AssertionError: [(0, '0x00013', '0x00013A00'), (1, '0x00013', '0x00013A00'), (2, '0x00013', '0x00013A00'), (3, '0x00013', '0x00013A00'), (4, '0x00013', '0x00013A00')]
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:283: assert (None is not None)
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:347: assert 9 >= 42
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:347: assert 9 >= 42
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:395: AssertionError: {'check_mem_add_button': 3, 'check_mem_remove_button': 3, 'check_param_include_button': 3, 'check_preview_toggle_button': 3, ...}
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:69: AssertionError: #check_fields_lines: expected exactly 1 widget, found 0
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:499: AssertionError: the JSON tab must hold a JSON document
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:517: assert (None is not None)
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:565: AssertionError: ('check_mem_address_input', [])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:709: AssertionError: ('check_tab_fields', [0, 1, 1, 1, 0, 6, ...])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:756: AssertionError: ('check_tab_fields', [])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:825: AssertionError: the addendum toggle is mounted, not displayed
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:825: AssertionError: the addendum toggle is mounted, not displayed
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:875: AssertionError: 0 of 75 addresses painted in full
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:875: AssertionError: 0 of 75 addresses painted in full
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:899: AssertionError: ['A2L parameters', '▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎', '▊  filter parameters                  ...▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎', '✓  Parameter  Address  Fmt · Unit', '▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔', ...]
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:899: AssertionError: ['A2L parameters', '▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎', '▊  filter parameters                  ...▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎', '✓  Parameter  Address  Fmt · Unit', '▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔', ...]
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:69: AssertionError: #check_full_name_line: expected exactly 1 widget, found 0
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:968: AssertionError: 0 fields → report
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:1011: AssertionError: the JSON tab must hold a JSON document
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:55: assert None is not None
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:121: AssertionError: ((118, 54), 25)
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:208: AssertionError: ((118, 54), ['check_apply_ghost'])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:208: AssertionError: ((119, 54), ['check_apply_ghost'])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:208: AssertionError: ((120, 54), ['check_apply_ghost'])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:208: AssertionError: ((160, 56), ['check_apply_ghost'])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:208: AssertionError: ((220, 60), ['check_apply_ghost'])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:208: AssertionError: ((260, 70), ['check_apply_ghost'])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:278: AssertionError: {'nowrap-fields': 0, 'nowrap-heading': 0, 'nowrap-ledger': 0, 'nowrap-legend': 0}
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:278: AssertionError: {'nowrap-fields': 0, 'nowrap-heading': 0, 'nowrap-ledger': 0, 'nowrap-legend': 0}
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:334: assert None is not None
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:333: AssertionError: assert 9 >= 47
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:334: assert None is not None
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:401: AssertionError: ((80, 24), 'check_validate_button', 11)
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:324: AssertionError: the Check Editor chip is mounted once: Counter({'open_folder_patch': 1, 'open_folder_checks': 1, 'open_folder_templates': 1})
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:705: AssertionError: one folder chip and one help chip in the header: (0, 0)
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:746: AssertionError: a check_editor help section exists
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:801: AssertionError: the Check Editor's closed glyph vocabulary exists
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:876: AssertionError: ('no_a2l', [])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:876: AssertionError: ('nothing_included', [])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:876: AssertionError: ('write_dir', [])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:876: AssertionError: ('write_readonly', [])
+<HOME>\Github\s19_app\tests\test_b97_check_editor.py:184: AssertionError: {'check_apply_ghost': 23, 'check_fields_count': 26, 'check_validate_button': 23, 'check_write_button': 23}
+<HOME>\Github\s19_app\tests\test_b97_check_editor.py:184: AssertionError: {'check_apply_ghost': 23, 'check_fields_count': 26, 'check_validate_button': 23, 'check_write_button': 23}
+<HOME>\Github\s19_app\tests\test_b97_check_editor.py:69: AssertionError: #check_card_switcher: expected exactly 1 widget, found 0
+<HOME>\Github\s19_app\tests\test_b97_check_editor.py:249: AssertionError: the table scrolls horizontally: max_scroll_x 25
+<HOME>\Github\s19_app\tests\test_b97_check_editor.py:257: AssertionError: [(0, '0x00013', '0x00013A00'), (1, '0x00013', '0x00013A00'), (2, '0x00013', '0x00013A00'), (3, '0x00013', '0x00013A00'), (4, '0x00013', '0x00013A00')]
+<HOME>\Github\s19_app\tests\test_b97_check_editor.py:283: assert (None is not None)
+<HOME>\Github\s19_app\tests\test_b97_check_editor.py:347: assert 9 >= 42
+<HOME>\Github\s19_app\tests\test_b97_check_editor.py:347: assert 9 >= 42
+<HOME>\Github\s19_app\tests\test_b97_check_editor.py:395: AssertionError: {'check_mem_add_button': 3, 'check_mem_remove_button': 3, 'check_param_include_button': 3, 'check_preview_toggle_button': 3, ...}
+<HOME>\Github\s19_app\tests\test_b97_check_editor.py:69: AssertionError: #check_fields_lines: expected exactly 1 widget, found 0
+<HOME>\Github\s19_app\tests\test_b97_check_editor.py:499: AssertionError: the JSON tab must hold a JSON document
+<HOME>\Github\s19_app\tests\test_b97_check_editor.py:517: assert (None is not None)
+<HOME>\Github\s19_app\tests\test_b97_check_editor.py:565: AssertionError: ('check_mem_address_input', [])
+<HOME>\Github\s19_app\tests\test_b97_check_editor.py:709: AssertionError: ('check_tab_fields', [0, 1, 1, 1, 0, 6, ...])
+<HOME>\Github\s19_app\tests\test_b97_check_editor.py:756: AssertionError: ('check_tab_fields', [])
+<HOME>\Github\s19_app\tests\test_b97_check_editor.py:825: AssertionError: the addendum toggle is mounted, not displayed
+<HOME>\Github\s19_app\tests\test_b97_check_editor.py:825: AssertionError: the addendum toggle is mounted, not displayed
+<HOME>\Github\s19_app\tests\test_b97_check_editor.py:875: AssertionError: 0 of 75 addresses painted in full
+<HOME>\Github\s19_app\tests\test_b97_check_editor.py:875: AssertionError: 0 of 75 addresses painted in full
+<HOME>\Github\s19_app\tests\test_b97_check_editor.py:899: AssertionError: ['A2L parameters', '▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎', '▊  filter parameters                  ...▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎', '✓  Parameter  Address  Fmt · Unit', '▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔', ...]
+<HOME>\Github\s19_app\tests\test_b97_check_editor.py:899: AssertionError: ['A2L parameters', '▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎', '▊  filter parameters                  ...▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎', '✓  Parameter  Address  Fmt · Unit', '▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔', ...]
+<HOME>\Github\s19_app\tests\test_b97_check_editor.py:69: AssertionError: #check_full_name_line: expected exactly 1 widget, found 0
+<HOME>\Github\s19_app\tests\test_b97_check_editor.py:968: AssertionError: 0 fields → report
+<HOME>\Github\s19_app\tests\test_b97_check_editor.py:1011: AssertionError: the JSON tab must hold a JSON document
+<HOME>\Github\s19_app\tests\test_b97_width.py:55: assert None is not None
+<HOME>\Github\s19_app\tests\test_b97_width.py:121: AssertionError: ((118, 54), 25)
+<HOME>\Github\s19_app\tests\test_b97_width.py:208: AssertionError: ((118, 54), ['check_apply_ghost'])
+<HOME>\Github\s19_app\tests\test_b97_width.py:208: AssertionError: ((119, 54), ['check_apply_ghost'])
+<HOME>\Github\s19_app\tests\test_b97_width.py:208: AssertionError: ((120, 54), ['check_apply_ghost'])
+<HOME>\Github\s19_app\tests\test_b97_width.py:208: AssertionError: ((160, 56), ['check_apply_ghost'])
+<HOME>\Github\s19_app\tests\test_b97_width.py:208: AssertionError: ((220, 60), ['check_apply_ghost'])
+<HOME>\Github\s19_app\tests\test_b97_width.py:208: AssertionError: ((260, 70), ['check_apply_ghost'])
+<HOME>\Github\s19_app\tests\test_b97_width.py:278: AssertionError: {'nowrap-fields': 0, 'nowrap-heading': 0, 'nowrap-ledger': 0, 'nowrap-legend': 0}
+<HOME>\Github\s19_app\tests\test_b97_width.py:278: AssertionError: {'nowrap-fields': 0, 'nowrap-heading': 0, 'nowrap-ledger': 0, 'nowrap-legend': 0}
+<HOME>\Github\s19_app\tests\test_b97_width.py:334: assert None is not None
+<HOME>\Github\s19_app\tests\test_b97_width.py:333: AssertionError: assert 9 >= 47
+<HOME>\Github\s19_app\tests\test_b97_width.py:334: assert None is not None
+<HOME>\Github\s19_app\tests\test_b97_width.py:401: AssertionError: ((80, 24), 'check_validate_button', 11)
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:324: AssertionError: the Check Editor chip is mounted once: Counter({'open_folder_patch': 1, 'open_folder_checks': 1, 'open_folder_templates': 1})
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:705: AssertionError: one folder chip and one help chip in the header: (0, 0)
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:746: AssertionError: a check_editor help section exists
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:801: AssertionError: the Check Editor's closed glyph vocabulary exists
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:876: AssertionError: ('no_a2l', [])
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:876: AssertionError: ('nothing_included', [])
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:876: AssertionError: ('write_dir', [])
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:876: AssertionError: ('write_readonly', [])
 =========================== short test summary info ===========================
 FAILED tests/test_b97_check_editor.py::test_tc_b97_08_census_rows_and_one_docked_row[size0]
 FAILED tests/test_b97_check_editor.py::test_tc_b97_08_census_rows_and_one_docked_row[size1]

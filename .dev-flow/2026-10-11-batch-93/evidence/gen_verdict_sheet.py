@@ -13,7 +13,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-ROOT = Path("C:/Users/jjgh8/Github/s19_app")
+ROOT = Path("<HOME>/Github/s19_app")
 OUT = ROOT / ".dev-flow/2026-10-11-batch-93/evidence"
 FIXTURE = ROOT / "examples/case_07_stress_smoke"
 

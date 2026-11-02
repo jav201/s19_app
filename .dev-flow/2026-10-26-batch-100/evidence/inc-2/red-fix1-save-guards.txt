@@ -1,11 +1,11 @@
-cmd: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc2 (NO_COLOR unset) python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 1 RED — sources unfixed)
+cmd: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<HOME>\Github\s19_app-b100-inc2 (NO_COLOR unset) python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py
+tree: <HOME>\Github\s19_app-b100-inc2 (fix pass 1 RED — sources unfixed)
 
 ..FF.....F....FF..FFFFFFFFF                                              [100%]
 ================================== FAILURES ===================================
 ___________ test_tc_b100_04_device_names_refused_raw_and_sanitised ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27500/test_tc_b100_04_device_names_r0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27500/test_tc_b100_04_device_names_r0')
 
     def test_tc_b100_04_device_names_refused_raw_and_sanitised(tmp_path: Path) -> None:
         """``nul``, ``CON``, ``com1``, ``LPT¹`` (superscript), ``con.txt`` (raw
@@ -118,7 +118,7 @@ E            +  where False = is_windows_device_name('con.tar.gz')
 tests\test_b100_save_guards.py:348: AssertionError
 _____ test_tc_b100_05_open_project_case_variant_saves_under_on_disk_name ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27500/test_tc_b100_05_open_project_c0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27500/test_tc_b100_05_open_project_c0')
 
     def test_tc_b100_05_open_project_case_variant_saves_under_on_disk_name(
         tmp_path: Path,
@@ -158,7 +158,7 @@ E       assert 'Saved project' in 'Project saved + manifest verified'
 tests\test_b100_save_guards.py:532: AssertionError
 ________ test_tc_b100_07_ast_census_every_post_creation_return_removes ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27500/test_tc_b100_07_ast_census_eve0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27500/test_tc_b100_07_ast_census_eve0')
 
     def test_tc_b100_07_ast_census_every_post_creation_return_removes(
         tmp_path: Path,
@@ -237,7 +237,7 @@ E        +  where 0 = len([])
 tests\test_b100_save_guards.py:796: AssertionError
 _________ test_tc_b100_07_forced_oserror_leaves_no_folder[validation] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27500/test_tc_b100_07_forced_oserror0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27500/test_tc_b100_07_forced_oserror0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001A2FF60B110>
 stage = 'validation'
 
@@ -303,7 +303,7 @@ s19_app\tui\app.py:8652: in _handle_load_project
                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-args = (WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27500/test_tc_b100_07_forced_oserror0/app/.s19tool/workarea/pre'),)
+args = (WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27500/test_tc_b100_07_forced_oserror0/app/.s19tool/workarea/pre'),)
 kwargs = {}
 
     def _raiser(*args, **kwargs):
@@ -313,7 +313,7 @@ E       OSError: forced failure at the validation stage
 tests\test_b100_save_guards.py:837: OSError
 ___________ test_tc_b100_07_forced_oserror_leaves_no_folder[gather] ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27500/test_tc_b100_07_forced_oserror3')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27500/test_tc_b100_07_forced_oserror3')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001A2FF0AF950>
 stage = 'gather'
 
@@ -366,16 +366,16 @@ stage = 'gather'
             f"{stage}: the failed save left app state behind — "
             f"before {state_before!r}, after {state_after!r}"
         )
-E       AssertionError: gather: the failed save left app state behind — before (['a'], ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27500\\test_tc_b100_07_forced_oserror3\\app\\.s19tool\\workarea\\pre\\a.s19'], 'a', None, 'pre'), after (['a'], ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27500\\test_tc_b100_07_forced_oserror3\\app\\.s19tool\\workarea\\stage-gather\\a.s19'], 'a', None, 'pre')
+E       AssertionError: gather: the failed save left app state behind — before (['a'], ['<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27500\\test_tc_b100_07_forced_oserror3\\app\\.s19tool\\workarea\\pre\\a.s19'], 'a', None, 'pre'), after (['a'], ['<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27500\\test_tc_b100_07_forced_oserror3\\app\\.s19tool\\workarea\\stage-gather\\a.s19'], 'a', None, 'pre')
 E       assert (['a'], ['C:\..., None, 'pre') == (['a'], ['C:\..., None, 'pre')
 E         
-E         At index 1 diff: ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27500\\test_tc_b100_07_forced_oserror3\\app\\.s19tool\\workarea\\stage-gather\\a.s19'] != ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27500\\test_tc_b100_07_forced_oserror3\\app\\.s19tool\\workarea\\pre\\a.s19']
+E         At index 1 diff: ['<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27500\\test_tc_b100_07_forced_oserror3\\app\\.s19tool\\workarea\\stage-gather\\a.s19'] != ['<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27500\\test_tc_b100_07_forced_oserror3\\app\\.s19tool\\workarea\\pre\\a.s19']
 E         Use -v to get more diff
 
 tests\test_b100_save_guards.py:918: AssertionError
 __________ test_tc_b100_07_forced_oserror_leaves_no_folder[manifest] __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27500/test_tc_b100_07_forced_oserror4')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27500/test_tc_b100_07_forced_oserror4')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001A2FE22EBD0>
 stage = 'manifest'
 
@@ -428,16 +428,16 @@ stage = 'manifest'
             f"{stage}: the failed save left app state behind — "
             f"before {state_before!r}, after {state_after!r}"
         )
-E       AssertionError: manifest: the failed save left app state behind — before (['a'], ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27500\\test_tc_b100_07_forced_oserror4\\app\\.s19tool\\workarea\\pre\\a.s19'], 'a', None, 'pre'), after (['a'], ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27500\\test_tc_b100_07_forced_oserror4\\app\\.s19tool\\workarea\\stage-manifest\\a.s19'], 'a', None, 'pre')
+E       AssertionError: manifest: the failed save left app state behind — before (['a'], ['<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27500\\test_tc_b100_07_forced_oserror4\\app\\.s19tool\\workarea\\pre\\a.s19'], 'a', None, 'pre'), after (['a'], ['<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27500\\test_tc_b100_07_forced_oserror4\\app\\.s19tool\\workarea\\stage-manifest\\a.s19'], 'a', None, 'pre')
 E       assert (['a'], ['C:\..., None, 'pre') == (['a'], ['C:\..., None, 'pre')
 E         
-E         At index 1 diff: ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27500\\test_tc_b100_07_forced_oserror4\\app\\.s19tool\\workarea\\stage-manifest\\a.s19'] != ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27500\\test_tc_b100_07_forced_oserror4\\app\\.s19tool\\workarea\\pre\\a.s19']
+E         At index 1 diff: ['<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27500\\test_tc_b100_07_forced_oserror4\\app\\.s19tool\\workarea\\stage-manifest\\a.s19'] != ['<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27500\\test_tc_b100_07_forced_oserror4\\app\\.s19tool\\workarea\\pre\\a.s19']
 E         Use -v to get more diff
 
 tests\test_b100_save_guards.py:918: AssertionError
 ______ test_tc_b100_07_forced_oserror_leaves_no_folder[manifest-refused] ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27500/test_tc_b100_07_forced_oserror5')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27500/test_tc_b100_07_forced_oserror5')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001A281190690>
 stage = 'manifest-refused'
 
@@ -490,16 +490,16 @@ stage = 'manifest-refused'
             f"{stage}: the failed save left app state behind — "
             f"before {state_before!r}, after {state_after!r}"
         )
-E       AssertionError: manifest-refused: the failed save left app state behind — before (['a'], ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27500\\test_tc_b100_07_forced_oserror5\\app\\.s19tool\\workarea\\pre\\a.s19'], 'a', None, 'pre'), after (['a'], ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27500\\test_tc_b100_07_forced_oserror5\\app\\.s19tool\\workarea\\stage-manifest-refused\\a.s19'], 'a', None, 'pre')
+E       AssertionError: manifest-refused: the failed save left app state behind — before (['a'], ['<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27500\\test_tc_b100_07_forced_oserror5\\app\\.s19tool\\workarea\\pre\\a.s19'], 'a', None, 'pre'), after (['a'], ['<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27500\\test_tc_b100_07_forced_oserror5\\app\\.s19tool\\workarea\\stage-manifest-refused\\a.s19'], 'a', None, 'pre')
 E       assert (['a'], ['C:\..., None, 'pre') == (['a'], ['C:\..., None, 'pre')
 E         
-E         At index 1 diff: ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27500\\test_tc_b100_07_forced_oserror5\\app\\.s19tool\\workarea\\stage-manifest-refused\\a.s19'] != ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27500\\test_tc_b100_07_forced_oserror5\\app\\.s19tool\\workarea\\pre\\a.s19']
+E         At index 1 diff: ['<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27500\\test_tc_b100_07_forced_oserror5\\app\\.s19tool\\workarea\\stage-manifest-refused\\a.s19'] != ['<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27500\\test_tc_b100_07_forced_oserror5\\app\\.s19tool\\workarea\\pre\\a.s19']
 E         Use -v to get more diff
 
 tests\test_b100_save_guards.py:918: AssertionError
 _____ test_tc_b100_07_failed_merge_removes_placed_files[exact-ab-gather] ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27500/test_tc_b100_07_failed_merge_r0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27500/test_tc_b100_07_failed_merge_r0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001A2FEAD8A10>
 target = 'exact', typed = 'ab', stage = 'gather'
 
@@ -556,7 +556,7 @@ E       assert 'could not save' in 'Nothing to save: load a data file or A2L fir
 tests\test_b100_save_guards.py:971: AssertionError
 _ test_tc_b100_07_failed_merge_removes_placed_files[exact-ab-manifest-refused] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27500/test_tc_b100_07_failed_merge_r1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27500/test_tc_b100_07_failed_merge_r1')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001A2FDF5FB90>
 target = 'exact', typed = 'ab', stage = 'manifest-refused'
 
@@ -613,7 +613,7 @@ E       assert 'could not save' in 'Nothing to save: load a data file or A2L fir
 tests\test_b100_save_guards.py:971: AssertionError
 ___ test_tc_b100_07_failed_merge_removes_placed_files[open-case-AB-gather] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27500/test_tc_b100_07_failed_merge_r2')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27500/test_tc_b100_07_failed_merge_r2')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001A2FEB8EC10>
 target = 'open-case', typed = 'AB', stage = 'gather'
 
@@ -675,13 +675,13 @@ target = 'open-case', typed = 'AB', stage = 'gather'
 E       AssertionError: open-case/gather: the failed save left app state behind
 E       assert (['a'], ['C:\...', None, 'ab') == (['a'], ['C:\...', None, 'ab')
 E         
-E         At index 1 diff: ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27500\\test_tc_b100_07_failed_merge_r2\\app\\.s19tool\\workarea\\AB\\a.s19'] != ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27500\\test_tc_b100_07_failed_merge_r2\\app\\.s19tool\\workarea\\ab\\a.s19']
+E         At index 1 diff: ['<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27500\\test_tc_b100_07_failed_merge_r2\\app\\.s19tool\\workarea\\AB\\a.s19'] != ['<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27500\\test_tc_b100_07_failed_merge_r2\\app\\.s19tool\\workarea\\ab\\a.s19']
 E         Use -v to get more diff
 
 tests\test_b100_save_guards.py:977: AssertionError
 _____________ test_tc_b100_07_unreadable_workarea_folder_skipped ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27500/test_tc_b100_07_unreadable_wor0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27500/test_tc_b100_07_unreadable_wor0')
 
     def test_tc_b100_07_unreadable_workarea_folder_skipped(
         tmp_path: Path,
@@ -746,7 +746,7 @@ s19_app\tui\app.py:8217: in <genexpr>
     holds_project_file = (item / "project.json").is_file() or any(
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27500/test_tc_b100_07_unreadable_wor0/app/.s19tool/workarea/locked')
+self = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27500/test_tc_b100_07_unreadable_wor0/app/.s19tool/workarea/locked')
 
     def iterdir(self):
         """Iterate over the files in this directory.  Does not yield any
@@ -754,17 +754,17 @@ self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-275
         """
 >       for name in os.listdir(self):
                     ^^^^^^^^^^^^^^^^
-E       PermissionError: [WinError 5] Access is denied: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27500\\test_tc_b100_07_unreadable_wor0\\app\\.s19tool\\workarea\\locked'
+E       PermissionError: [WinError 5] Access is denied: '<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27500\\test_tc_b100_07_unreadable_wor0\\app\\.s19tool\\workarea\\locked'
 
 ..\..\anaconda3\envs\s19env\Lib\pathlib.py:931: PermissionError
 ---------------------------- Captured stdout call -----------------------------
-processed file: C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-27500\test_tc_b100_07_unreadable_wor0\app\.s19tool\workarea\locked
+processed file: <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-27500\test_tc_b100_07_unreadable_wor0\app\.s19tool\workarea\locked
 Successfully processed 1 files; Failed processing 0 files
-processed file: C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-27500\test_tc_b100_07_unreadable_wor0\app\.s19tool\workarea\locked
+processed file: <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-27500\test_tc_b100_07_unreadable_wor0\app\.s19tool\workarea\locked
 Successfully processed 1 files; Failed processing 0 files
 ________ test_at_b100_02_name_refusals_through_the_save_dialog[size0] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27500/test_at_b100_02_name_refusals_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27500/test_at_b100_02_name_refusals_0')
 size = (118, 54)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
@@ -888,7 +888,7 @@ E       AssertionError: did not settle: the P2 save success line
 tests\test_b100_save_guards.py:122: AssertionError
 ________ test_at_b100_02_name_refusals_through_the_save_dialog[size1] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27500/test_at_b100_02_name_refusals_1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27500/test_at_b100_02_name_refusals_1')
 size = (220, 60)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])

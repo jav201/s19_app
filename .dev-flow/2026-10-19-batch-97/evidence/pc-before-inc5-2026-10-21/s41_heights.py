@@ -1,7 +1,7 @@
 """Throwaway spike (PC before Inc-5): #flow_panel heights at HEAD + S4-1 path."""
 import asyncio, sys, tempfile, traceback
 from pathlib import Path
-REPO = Path(r"C:\Users\jjgh8\Github\s19_app")
+REPO = Path(r"<HOME>\Github\s19_app")
 sys.path.insert(0, str(REPO))
 from textual import events
 from textual.widgets import Input, Select, Button

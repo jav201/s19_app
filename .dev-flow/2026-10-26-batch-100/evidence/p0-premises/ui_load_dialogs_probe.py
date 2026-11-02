@@ -21,7 +21,7 @@ import os
 import sys
 from pathlib import Path
 
-sys.path.insert(0, r"C:\Users\jjgh8\Github\s19_app\.dev-flow\design\investigation-projects-2026-10-23")
+sys.path.insert(0, r"<HOME>\Github\s19_app\.dev-flow\design\investigation-projects-2026-10-23")
 from common import *  # noqa: E402,F401,F403
 
 C2 = EX / "case_02_gaps_and_patch_targets"

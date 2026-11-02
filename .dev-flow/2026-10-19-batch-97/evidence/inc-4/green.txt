@@ -12,22 +12,22 @@ GREEN gate set on the Inc-4 tree (HEAD 98f3c84 + working tree); files: tests/tes
 ................................F.......xxxxxxxxxxxxxxxxxxxxxxxxxxxxx... [ 93%]
 ............F..............................................              [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_diff_screen.py:523: AssertionError: the status must show both written report paths; status was 'Compared A.s19 vs B.s19: 1 runs.'
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_diff_screen.py:3882: AssertionError: the App BINDINGS block must be byte-for-byte the committed set. Added: [('d', 'a2l_describe_tag', 'Describe tag', False)]; removed: []
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_editor_v2.py:311: assert 0 == 1
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_editor_v2.py:1336: AssertionError: two saves must keep two files, found [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23481/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')]
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_editor_v2.py:1887: AssertionError: pressing the Checks button must still route run_checks (behavior unchanged)
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_editor_v2.py:2567: AssertionError: Apply: line must post
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#patch_editor_panel' on Screen(id='_default')
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_report_filter_surface.py:773: AssertionError: baseline wrote []
-C:\Users\jjgh8\Github\s19_app\tests\test_undo_redo_ux.py:201: AssertionError: the real Add must append 0x300, got ['0x200']
+<HOME>\Github\s19_app\tests\test_tui_diff_screen.py:523: AssertionError: the status must show both written report paths; status was 'Compared A.s19 vs B.s19: 1 runs.'
+<HOME>\Github\s19_app\tests\test_tui_diff_screen.py:3882: AssertionError: the App BINDINGS block must be byte-for-byte the committed set. Added: [('d', 'a2l_describe_tag', 'Describe tag', False)]; removed: []
+<HOME>\Github\s19_app\tests\test_tui_patch_editor_v2.py:311: assert 0 == 1
+<HOME>\Github\s19_app\tests\test_tui_patch_editor_v2.py:1336: AssertionError: two saves must keep two files, found [WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-23481/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')]
+<HOME>\Github\s19_app\tests\test_tui_patch_editor_v2.py:1887: AssertionError: pressing the Checks button must still route run_checks (behavior unchanged)
+<HOME>\Github\s19_app\tests\test_tui_patch_editor_v2.py:2567: AssertionError: Apply: line must post
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#patch_editor_panel' on Screen(id='_default')
+<HOME>\Github\s19_app\tests\test_tui_report_filter_surface.py:773: AssertionError: baseline wrote []
+<HOME>\Github\s19_app\tests\test_undo_redo_ux.py:201: AssertionError: the real Add must append 0x300, got ['0x200']
 [1;31mTextual Snapshot Report[0m
 
 [1;30;41m29[0m[30;41m mismatched snapshots[0m
 
-[1mView the [0m]8;id=10501654;file://C:\Users\jjgh8\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+[1mView the [0m]8;id=10501654;file://<HOME>\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
 
-[2mC:\Users\jjgh8\Github\s19_app\snapshot_report.html[0m
+[2m<HOME>\Github\s19_app\snapshot_report.html[0m
 
 =========================== short test summary info ===========================
 FAILED tests/test_tui_diff_screen.py::test_tc024_report_trigger_surfaces_paths

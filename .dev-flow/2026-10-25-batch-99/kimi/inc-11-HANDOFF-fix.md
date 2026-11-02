@@ -1,6 +1,6 @@
 # HANDOFF-fix — batch-99 Increment 11, review round 1 (code-reviewer F1–F3)
 
-Worktree: `C:\Users\jjgh8\Github\s19_app-b99-inc11` (branch b99-inc11). Nothing committed; all changes are in the working tree for the orchestrator.
+Worktree: `<HOME>\Github\s19_app-b99-inc11` (branch b99-inc11). Nothing committed; all changes are in the working tree for the orchestrator.
 
 ## What was done
 
@@ -15,7 +15,7 @@ Worktree: `C:\Users\jjgh8\Github\s19_app-b99-inc11` (branch b99-inc11). Nothing 
 - AT-B99-12 stability: 8/8 passed (`stability-at12.txt`).
 - C-40 mutation (F1's declared negative control): the `int(token, 16)` path without the fullmatch → TC-B99-32 KILLED (`+F` did not raise) — `mut-LLR-161.1-fix.txt`; restore proven byte-identical by SHA-256 (`baseline-hashes-fix.txt`).
 - RED kept on the new black-box shape: under the HEAD base-0-first grammar both TC-B99-32 and AT-B99-12 fail, the AT with `got [15, 10, 31, 20]` = `0F 0A 1F 14` — `mut-LLR-161.1-fix-headgrammar.txt`; both mutants reverted, no mutant left in place.
-- This-worktree import proof: `python -c "import s19_app; print(s19_app.__file__)"` → `C:\Users\jjgh8\Github\s19_app-b99-inc11\s19_app\__init__.py`.
+- This-worktree import proof: `python -c "import s19_app; print(s19_app.__file__)"` → `<HOME>\Github\s19_app-b99-inc11\s19_app\__init__.py`.
 
 ## Open items
 

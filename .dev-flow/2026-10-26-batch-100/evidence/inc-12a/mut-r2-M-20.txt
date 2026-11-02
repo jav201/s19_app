@@ -1,15 +1,15 @@
 mutant: M-20
 what: never-falls rule removed
-target: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\mutk\s19_app\tui\app.py
+target: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\mutk\s19_app\tui\app.py
 sha256 before: 15ffc7bdbb599615
 old occurrences: 1
 sha256 mutated: b1d86f8d90e517a0
-s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\mutk\s19_app\__init__.py
-command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line --basetemp=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\bt\mk-M-20 tests/test_b100_busy.py::test_tc_b100_50_a_falling_amount_never_lowers_the_bar
+s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\mutk\s19_app\__init__.py
+command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line --basetemp=<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\bt\mk-M-20 tests/test_b100_busy.py::test_tc_b100_50_a_falling_amount_never_lowers_the_bar
 pytest tail:
   F                                                                        [100%]
   ================================== FAILURES ===================================
-  C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\mutk\tests\test_b100_busy.py:2332: assert [50, 20, 80] == [50, 50, 80]
+  <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\mutk\tests\test_b100_busy.py:2332: assert [50, 20, 80] == [50, 50, 80]
   =========================== short test summary info ===========================
   FAILED tests/test_b100_busy.py::test_tc_b100_50_a_falling_amount_never_lowers_the_bar
   1 failed in 2.60s

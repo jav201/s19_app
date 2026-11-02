@@ -1,11 +1,11 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py::test_tc_b100_01_upper_case_suffix_name_is_reused_on_windows (MUTANT fold: case-folding replaced by identity in _reuse_candidate_names)
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 (fix pass 1 + mutant)
+tree: <HOME>\Github\s19_app-b100-inc1 (fix pass 1 + mutant)
 
 F                                                                        [100%]
 ================================== FAILURES ===================================
 _________ test_tc_b100_01_upper_case_suffix_name_is_reused_on_windows _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27237/test_tc_b100_01_upper_case_suf0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27237/test_tc_b100_01_upper_case_suf0')
 
     def test_tc_b100_01_upper_case_suffix_name_is_reused_on_windows(
         tmp_path: Path,
@@ -26,7 +26,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         result = place_into_workarea(source, destination)
 >       assert result.reused
 E       AssertionError: assert False
-E        +  where False = PlacementResult(path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27237/test_tc_b100_01_upper_case_suf0/.s19tool/workarea/target/staged.s19'), reused=False).reused
+E        +  where False = PlacementResult(path=WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27237/test_tc_b100_01_upper_case_suf0/.s19tool/workarea/target/staged.s19'), reused=False).reused
 
 tests\test_b100_reuse.py:255: AssertionError
 =========================== short test summary info ===========================

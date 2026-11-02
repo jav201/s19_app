@@ -1,6 +1,6 @@
 # HANDOFF — batch-99 Increment 11 (HLR-161, the Bytes field reads one base)
 
-Worktree: `C:\Users\jjgh8\Github\s19_app-b99-inc11` (branch b99-inc11). Nothing committed; all changes are in the working tree for the orchestrator.
+Worktree: `<HOME>\Github\s19_app-b99-inc11` (branch b99-inc11). Nothing committed; all changes are in the working tree for the orchestrator.
 
 ## What was done
 

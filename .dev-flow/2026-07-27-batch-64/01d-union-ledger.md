@@ -28,7 +28,7 @@ a0868db7ba0313876b67be3ba54fa0241cbf760cfdd02a2a25c556db92d3e129
 $ wc -l -c consolidated.snapshot.md
   441 55593
 $ ls -la --time-style=full-iso 01-requirements-consolidated.md
--rw-r--r-- 1 jjgh8 197609 55593 2026-07-27 15:50:02.360498800 -0600
+-rw-r--r-- 1 <USER> 197609 55593 2026-07-27 15:50:02.360498800 -0600
 ```
 
 **Consequence, and it is a deliberate design choice:** every `CARRIED` cell cites a **section**

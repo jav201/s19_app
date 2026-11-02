@@ -1,12 +1,12 @@
 # green-04-new-and-guards — batch-100 Inc 9b E5 corrective pass (after every source and test change): the new file + the three guards, worktree.
-# tree: C:/Users/jjgh8/Github/s19_app-b100-inc9b
+# tree: <HOME>/Github/s19_app-b100-inc9b
 # git: 741cc07
 # date: 2026-10-31T18:53:52-06:00
-# cmd: pytest tests/test_b100_load_dialog.py tests/test_id_registry.py tests/test_b99_staging.py tests/test_engine_unchanged.py -rfEs --tb=short --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr9b/bt-green4
-s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc9b\s19_app\__init__.py
+# cmd: pytest tests/test_b100_load_dialog.py tests/test_id_registry.py tests/test_b99_staging.py tests/test_engine_unchanged.py -rfEs --tb=short --basetemp=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr9b/bt-green4
+s19_app.__file__ = <HOME>\Github\s19_app-b100-inc9b\s19_app\__init__.py
 ============================= test session starts =============================
 platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
-rootdir: C:\Users\jjgh8\Github\s19_app-b100-inc9b
+rootdir: <HOME>\Github\s19_app-b100-inc9b
 configfile: pyproject.toml
 plugins: textual-snapshot-1.1.0, syrupy-4.8.0
 collected 201 items
@@ -19,9 +19,9 @@ tests\test_b99_staging.py ...............................                [ 99%]
 tests\test_engine_unchanged.py .                                         [100%]
 
 =========================== short test summary info ===========================
-SKIPPED [1] tests\test_b100_load_dialog.py:377: the volume refuses this name (reported not run): [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\corr9b\\bt-green4\\test_tc_b100_42_work_area_file6\\app\\.s19tool\\workarea\\temp\\nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.s19'
-SKIPPED [1] tests\test_b100_load_dialog.py:377: the volume refuses this name (reported not run): [WinError 3] The system cannot find the path specified: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\corr9b\\bt-green4\\test_tc_b100_64_list_rows_neve0\\b\\.s19tool\\workarea\\PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP'
-SKIPPED [1] tests\test_b100_load_dialog.py:377: the volume refuses this name (reported not run): [WinError 3] The system cannot find the path specified: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\corr9b\\bt-green4\\test_tc_b100_64_list_rows_neve1\\b\\.s19tool\\workarea\\PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP'
-SKIPPED [1] tests\test_b100_load_dialog.py:377: the volume refuses this name (reported not run): [WinError 3] The system cannot find the path specified: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\corr9b\\bt-green4\\test_tc_b100_64_list_rows_neve2\\b\\.s19tool\\workarea\\PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP'
+SKIPPED [1] tests\test_b100_load_dialog.py:377: the volume refuses this name (reported not run): [Errno 2] No such file or directory: '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\corr9b\\bt-green4\\test_tc_b100_42_work_area_file6\\app\\.s19tool\\workarea\\temp\\nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.s19'
+SKIPPED [1] tests\test_b100_load_dialog.py:377: the volume refuses this name (reported not run): [WinError 3] The system cannot find the path specified: '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\corr9b\\bt-green4\\test_tc_b100_64_list_rows_neve0\\b\\.s19tool\\workarea\\PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP'
+SKIPPED [1] tests\test_b100_load_dialog.py:377: the volume refuses this name (reported not run): [WinError 3] The system cannot find the path specified: '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\corr9b\\bt-green4\\test_tc_b100_64_list_rows_neve1\\b\\.s19tool\\workarea\\PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP'
+SKIPPED [1] tests\test_b100_load_dialog.py:377: the volume refuses this name (reported not run): [WinError 3] The system cannot find the path specified: '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\corr9b\\bt-green4\\test_tc_b100_64_list_rows_neve2\\b\\.s19tool\\workarea\\PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP'
 ================= 197 passed, 4 skipped in 938.89s (0:15:38) ==================
 # exit: 0

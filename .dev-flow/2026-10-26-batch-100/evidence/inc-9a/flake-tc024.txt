@@ -1,15 +1,15 @@
 # tc024 classification: tests/test_tui_diff_screen.py::test_tc024_report_trigger_surfaces_paths run alone 10x on the 9a worktree and 10x on the base tree scratchpad/base9a (4fef292 + the tester's conftest/registry/test file), alternating; prescribed env (see run.sh header lines below)
 # header (worktree)
 # date: 2026-10-31T04:48:50-06:00
-# cwd: C:/Users/jjgh8/Github/s19_app-b100-inc9a  branch: b100-inc9a base: 4fef292 (uncommitted worktree)
-# interpreter: C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+# cwd: <HOME>/Github/s19_app-b100-inc9a  branch: b100-inc9a base: 4fef292 (uncommitted worktree)
+# interpreter: <HOME>\anaconda3\envs\s19env\python.exe
 # env: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<worktree>
 # sha256[:16] workspace.py=a3342ed048ebe157 app.py=6223201188232562
-# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc9a\s19_app\__init__.py
+# s19_app.__file__ = <HOME>\Github\s19_app-b100-inc9a\s19_app\__init__.py
 # command: python -m pytest -p no:cacheprovider -q --tb=line --co -q tests/test_tui_diff_screen.py::test_tc024_report_trigger_surfaces_paths
 # exit: 0
 # sha256[:16] workspace.py=d9f361f3fb092ae2 app.py=87c7f9d74909138c
-# s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9a\s19_app\__init__.py
+# s19_app.__file__ = <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\base9a\s19_app\__init__.py
 worktree run 1: 1 passed in 1.82s
 base     run 1: 1 passed in 1.96s
 worktree run 2: 1 passed in 1.88s

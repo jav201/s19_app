@@ -1,6 +1,6 @@
 # command: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py::test_tc_b100_01_app_placements_name_the_workarea_root
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 with mutation: workarea_root dropped from app.py's emit_and_verify call (SEC-4 threading)
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset
+# tree: <HOME>\Github\s19_app-b100-inc5 with mutation: workarea_root dropped from app.py's emit_and_verify call (SEC-4 threading)
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc5 ; NO_COLOR=unset
 # pre 2f6b446594652dbc34ea05dc1be9f206791bff5e871e166306873d36e12bdf32
 # mutant 6bd766e3e194cf1fa43481296ce912d9daaf7463925f7e0bb92dffc0f9913046
 # restored 2f6b446594652dbc34ea05dc1be9f206791bff5e871e166306873d36e12bdf32

@@ -6,14 +6,14 @@
 #   |         return "holds a change document path this version cannot use"
 # edit 1 NEW:
 #   |         return None
-# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d
+# cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d
 # env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
-# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_save_guards.py::test_tc_b100_05_r5_refused_target_value_is_kept_aside_and_named tests/test_b100_document.py::test_tc_b100_28_refused_value_is_a_keep_reason
+# command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_save_guards.py::test_tc_b100_05_r5_refused_target_value_is_kept_aside_and_named tests/test_b100_document.py::test_tc_b100_28_refused_value_is_a_keep_reason
 # started 2026-10-30T23:11:22Z  finished 2026-10-30T23:11:26Z  rc=1
 FF                                                                       [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d\tests\test_b100_save_guards.py:2584: AssertionError: ['firmware.s19', 'patches', 'project.json']
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d\tests\test_b100_document.py:566: AssertionError: None
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d\tests\test_b100_save_guards.py:2584: AssertionError: ['firmware.s19', 'patches', 'project.json']
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d\tests\test_b100_document.py:566: AssertionError: None
 =========================== short test summary info ===========================
 FAILED tests/test_b100_save_guards.py::test_tc_b100_05_r5_refused_target_value_is_kept_aside_and_named
 FAILED tests/test_b100_document.py::test_tc_b100_28_refused_value_is_a_keep_reason

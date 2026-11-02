@@ -6,14 +6,14 @@
 #   |         label = document_problem_file(name)
 # edit 1 NEW:
 #   |         label = name
-# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1
+# cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1
 # env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
-# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_cp1_changed_document_row_is_labelled_as_the_change_document tests/test_b100_document.py::test_tc_b100_30_held_document_is_not_readable_and_stays_recorded
+# command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_cp1_changed_document_row_is_labelled_as_the_change_document tests/test_b100_document.py::test_tc_b100_30_held_document_is_not_readable_and_stays_recorded
 # started 2026-10-31T00:00:59Z  finished 2026-10-31T00:01:05Z  rc=1
 FF                                                                       [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_document.py:1886: AssertionError: [('changed on disk', 'patches/boost.json', 'saved 230 B, now 323 B - Save project records the new state')]
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_document.py:1215: AssertionError: [('not readable', 'patches/boost.json', 'could not be read - check that the file can be opened, then Load again'), ('n...able', 'change document patches/boost.json', 'could not be read - check that the file can be opened, then Load again')]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_document.py:1886: AssertionError: [('changed on disk', 'patches/boost.json', 'saved 230 B, now 323 B - Save project records the new state')]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_document.py:1215: AssertionError: [('not readable', 'patches/boost.json', 'could not be read - check that the file can be opened, then Load again'), ('n...able', 'change document patches/boost.json', 'could not be read - check that the file can be opened, then Load again')]
 =========================== short test summary info ===========================
 FAILED tests/test_b100_document.py::test_tc_b100_30_cp1_changed_document_row_is_labelled_as_the_change_document
 FAILED tests/test_b100_document.py::test_tc_b100_30_held_document_is_not_readable_and_stays_recorded

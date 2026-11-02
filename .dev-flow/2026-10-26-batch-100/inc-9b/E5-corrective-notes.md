@@ -1,6 +1,6 @@
 # Inc 9b — E5 corrective notes (increment 018, the one corrective pass)
 
-Tree: `C:/Users/jjgh8/Github/s19_app-b100-inc9b`, branch `b100-inc9b`, on `741cc07` plus the uncommitted changes below. Rulings: `E5-rulings.md`. Evidence: `../evidence/inc-9b/red-02-corrective.txt`, `green-03-corrective.txt`, `green-04-new-and-guards.txt`.
+Tree: `<HOME>/Github/s19_app-b100-inc9b`, branch `b100-inc9b`, on `741cc07` plus the uncommitted changes below. Rulings: `E5-rulings.md`. Evidence: `../evidence/inc-9b/red-02-corrective.txt`, `green-03-corrective.txt`, `green-04-new-and-guards.txt`.
 
 ## Outcome per id
 

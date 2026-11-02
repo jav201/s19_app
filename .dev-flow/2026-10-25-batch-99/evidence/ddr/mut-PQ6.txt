@@ -1,7 +1,7 @@
 PQ-6 help-arm mutant re-run (DDR DQ-6)
 scratch extract of git archive HEAD (bab3bff) at /tmp/b99-mut6; tests/test_b99_bytes_field.py overlaid from the DDR worktree (DQ-4 state)
 PYTHONPATH=/tmp/b99-mut6; import probe:
-C:\Users\jjgh8\AppData\Local\Temp\b99-mut6\s19_app\__init__.py
+<HOME>\AppData\Local\Temp\b99-mut6\s19_app\__init__.py
 window_help.py sha256 before: bb55a4e9104cd62ab8aa61b115ae2a54d2db2062a315066d8c6491247bebd41f
 window_help.py sha256 mutant: 92a7ad970ed714a01a75facd991a44b7e828de4a084e29aed1df7d8f5b5af28b
 mutation: Bytes help line reverted to the 5021bb6^ text ('a run of hex bytes, such as DE AD BE EF.')
@@ -10,7 +10,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 ______________ test_tc_b99_33_field_and_help_state_the_hex_rule _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26908/test_tc_b99_33_field_and_help_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26908/test_tc_b99_33_field_and_help_0')
 
     def test_tc_b99_33_field_and_help_state_the_hex_rule(tmp_path: Path) -> None:
         """TC-B99-33 (LLR-161.2): the placeholder contains ``hex``, fits the

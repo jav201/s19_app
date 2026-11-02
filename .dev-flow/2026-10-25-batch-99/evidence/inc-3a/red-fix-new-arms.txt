@@ -2,7 +2,7 @@ F.F.FFFF                                                                 [100%]
 ================================== FAILURES ===================================
 _____________ test_tc_b99_11_junction_at_staging_temp_is_refused ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26200/test_tc_b99_11_junction_at_sta0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26200/test_tc_b99_11_junction_at_sta0')
 
     def test_tc_b99_11_junction_at_staging_temp_is_refused(tmp_path: Path) -> None:
         """A junction/symlink at ``temp`` (the staging seam) is refused
@@ -28,13 +28,13 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         )
     
 >       assert target is None, f"the junction must refuse the write: {target}"
-E       AssertionError: the junction must refuse the write: C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-26200\test_tc_b99_11_junction_at_sta0\.s19tool\workarea\proj\firmware.s19
-E       assert WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26200/test_tc_b99_11_junction_at_sta0/.s19tool/workarea/proj/firmware.s19') is None
+E       AssertionError: the junction must refuse the write: <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-26200\test_tc_b99_11_junction_at_sta0\.s19tool\workarea\proj\firmware.s19
+E       assert WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26200/test_tc_b99_11_junction_at_sta0/.s19tool/workarea/proj/firmware.s19') is None
 
 tests\test_b99_staging.py:262: AssertionError
 _______ test_tc_b99_12_forced_oserror_in_replace_raises_placement_error _______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26200/test_tc_b99_12_forced_oserror_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26200/test_tc_b99_12_forced_oserror_0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000022F848D6CD0>
 
     def test_tc_b99_12_forced_oserror_in_replace_raises_placement_error(
@@ -53,7 +53,7 @@ E       assert None is not None
 tests\test_b99_staging.py:409: AssertionError
 _______________ test_tc_b99_13_zero_byte_target_is_never_reused _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26200/test_tc_b99_13_zero_byte_targe0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26200/test_tc_b99_13_zero_byte_targe0')
 
     def test_tc_b99_13_zero_byte_target_is_never_reused(tmp_path: Path) -> None:
         """A 0-byte target may be another writer's claim placeholder (C1(a))."""
@@ -71,7 +71,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         )
 E       AssertionError: a 0-byte target (another writer's claim) must never be reused
 E       assert 'empty.s19' != 'empty.s19'
-E        +  where 'empty.s19' = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26200/test_tc_b99_13_zero_byte_targe0/.s19tool/workarea/out/empty.s19').name
+E        +  where 'empty.s19' = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26200/test_tc_b99_13_zero_byte_targe0/.s19tool/workarea/out/empty.s19').name
 
 tests\test_b99_staging.py:511: AssertionError
 ____________ test_tc_b99_39_delete_calls_delete_only_owned_staging ____________
@@ -99,7 +99,7 @@ E         Use -v to get more diff
 tests\test_b99_staging.py:734: AssertionError
 ____________ test_tc_b99_40_change_document_stages_in_private_home ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26200/test_tc_b99_40_change_document0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26200/test_tc_b99_40_change_document0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000022F83324910>
 
     def test_tc_b99_40_change_document_stages_in_private_home(
@@ -130,7 +130,7 @@ E       AttributeError: module 's19_app.tui.workspace' has no attribute 'tempfil
 tests\test_b99_staging.py:781: AttributeError
 _____________ test_tc_b99_40_junction_at_staging_temp_is_refused ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26200/test_tc_b99_40_junction_at_sta0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26200/test_tc_b99_40_junction_at_sta0')
 
     def test_tc_b99_40_junction_at_staging_temp_is_refused(tmp_path: Path) -> None:
         """A junction/symlink at ``temp`` refuses the converted ``io.py`` write
@@ -148,8 +148,8 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         written_path, issues = write_change_document(_change_document(), tmp_path)
     
 >       assert written_path is None, f"the junction must refuse the write: {written_path}"
-E       AssertionError: the junction must refuse the write: C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-26200\test_tc_b99_40_junction_at_sta0\.s19tool\workarea\patches\changes.json
-E       assert WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26200/test_tc_b99_40_junction_at_sta0/.s19tool/workarea/patches/changes.json') is None
+E       AssertionError: the junction must refuse the write: <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-26200\test_tc_b99_40_junction_at_sta0\.s19tool\workarea\patches\changes.json
+E       assert WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26200/test_tc_b99_40_junction_at_sta0/.s19tool/workarea/patches/changes.json') is None
 
 tests\test_b99_staging.py:819: AssertionError
 =========================== short test summary info ===========================

@@ -5,7 +5,7 @@
 > **Authority:** `01-requirements.md` §7 (Inc-1 row), §5.1, §5.3, HLR-125 / LLR-125.1 / LLR-125.2
 > **Method:** every claim re-executed on a **throwaway copy** of the tree
 > (`…/scratchpad/wt`, `PYTHONPATH`-pinned to the copy, `PYTHONDONTWRITEBYTECODE=1`).
-> Nothing in `C:\Users\jjgh8\Github\s19_app` was written. No `git add -A`, no `git stash`.
+> Nothing in `<HOME>\Github\s19_app` was written. No `git add -A`, no `git stash`.
 > Fixed-tree `styles.tcss` SHA-256 independently reproduced as
 > `8523da931ae933560721e2f270470b9594a9f1b64a8c9c3d61cf8cda2e836ec5` — matches the packet.
 

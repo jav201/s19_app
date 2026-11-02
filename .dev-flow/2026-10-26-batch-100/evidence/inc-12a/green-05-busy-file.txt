@@ -1,9 +1,9 @@
 # green-05-busy-file: the whole new file tests/test_b100_busy.py once, after the targeted runs were green (brief: allowed once at the end).
-# tree: C:/Users/jjgh8/Github/s19_app-b100-inc12a
+# tree: <HOME>/Github/s19_app-b100-inc12a
 # head: 71376a3
 # date: 2026-11-01T01:25:23-06:00
-s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc12a\s19_app\__init__.py
-# cmd: pytest -p no:cacheprovider -q -rs --tb=short --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12a/bt/g05 tests/test_b100_busy.py
+s19_app.__file__ = <HOME>\Github\s19_app-b100-inc12a\s19_app\__init__.py
+# cmd: pytest -p no:cacheprovider -q -rs --tb=short --basetemp=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12a/bt/g05 tests/test_b100_busy.py
 .........................................s.............................. [ 87%]
 ..........                                                               [100%]
 =========================== short test summary info ===========================

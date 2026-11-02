@@ -1,9 +1,9 @@
 # mutation: UX2-entry-not-named — UX-2 (LLR-178.3): every manifest problem row names project.json instead of its entry
 # file: s19_app/tui/services/variant_execution_service.py (sha256 before 395dcbde3b28851b)
-# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=C:\Users\jjgh8\AppData\Local\Temp\f1mut-UX2-entry-not-named tests/test_b100_announce.py -k thirty
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (corrective pass 1, mutated in place, then restored)
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
-# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\__init__.py
+# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=<HOME>\AppData\Local\Temp\f1mut-UX2-entry-not-named tests/test_b100_announce.py -k thirty
+# tree: <HOME>\Github\s19_app-b100-inc6 (corrective pass 1, mutated in place, then restored)
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# s19_app.__file__ = <HOME>\Github\s19_app-b100-inc6\s19_app\__init__.py
 # date: 2026-10-30T03:35:16Z
 # --- old
 #                   issue.details.get(_ISSUE_ENTRY, PROJECT_MANIFEST_NAME),
@@ -13,7 +13,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 ______ test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-UX2-entry-not-named/test_tc_b100_67_thirty_problem0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-UX2-entry-not-named/test_tc_b100_67_thirty_problem0')
 
     def test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last(tmp_path: Path) -> None:
         async def _scenario(pilot, app):

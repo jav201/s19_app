@@ -219,7 +219,7 @@ Two Inc-4 full-suite failures (`test_tc078_4`, `test_tc080_5`) were artifacts of
 | `s19_app` | `prototypes/out/` (5+ baseline SVGs) | ⚠️ **untracked — REPORTED AS FOUND, never swept.** Pre-dates this session | Not batch-77's; unchanged from Phase-0 entry gate |
 | `s19_app` | `s19_app/__pycache__/*.pyc` ×8 | ⚠️ **tracked and dirty — REPORTED AS FOUND.** Tracked since `8533c72` "first commit" | Backlogged above; `.gitignore` already covers them |
 | `s19_app` | `stash@{0}` (WIP on the batch branch @ `fffb299`) | 📋 **in backlog — awaiting the operator.** Not dropped, not applied | Backlogged above |
-| `s19_app` | Worktree `C:\Users\jjgh8\bl77` (detached @ `f8747b8`, the re-derived baseline) | 🗑️ **discarded — verified removed.** `git worktree list` shows it gone and the path does not exist | Its figures are transcribed in `PLAN.md` §7 |
+| `s19_app` | Worktree `<HOME>\bl77` (detached @ `f8747b8`, the re-derived baseline) | 🗑️ **discarded — verified removed.** `git worktree list` shows it gone and the path does not exist | Its figures are transcribed in `PLAN.md` §7 |
 | `s19_app` | `.claude/worktrees/c3-d2-triage` @ `f8747b8`; five `.cursor/worktrees/*` | ⚠️ **REPORTED AS FOUND.** Pre-existing, not batch-77's | Left untouched |
 | `~/.claude` (auxiliary repo — commands / skills / templates) | — | ✅ **clean.** `git status --short` empty; `git log @{u}..HEAD` empty | Nothing owed. The `C-33` leg that lives here is **backlogged, not edited** |
 | Scratchpad | Throwaway probes outside the repo tree | 🗑️ discarded | All output transcribed into the artifacts |

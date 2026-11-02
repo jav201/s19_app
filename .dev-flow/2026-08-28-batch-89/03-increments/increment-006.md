@@ -151,7 +151,7 @@ Increment 001 built, used for the first time on a change it did not anticipate.*
 ```bash
 export PYTHONIOENCODING=utf-8
 python ~/.claude/docs/tools/devflow-validate.py --selftest            # 490 arms, SELFTEST PASSED
-python ~/.claude/docs/tools/devflow-validate.py "C:/Users/jjgh8/Github/s19_app" | grep -E "V27|V28"
+python ~/.claude/docs/tools/devflow-validate.py "<HOME>/Github/s19_app" | grep -E "V27|V28"
 ```
 
 > **⚠ The gate output changes with this batch's own record.** The `V27` transcript quoted in

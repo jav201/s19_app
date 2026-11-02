@@ -1,6 +1,6 @@
 ============================= test session starts =============================
 platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
-rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc3b
+rootdir: <HOME>\Github\s19_app-b99-inc3b
 configfile: pyproject.toml
 plugins: textual-snapshot-1.1.0, syrupy-4.8.0
 collected 31 items / 29 deselected / 2 selected
@@ -10,7 +10,7 @@ tests\test_b99_staging.py FF                                             [100%]
 ================================== FAILURES ===================================
 ______________ test_tc_b99_13_gather_drift_places_next_free_name ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26586/test_tc_b99_13_gather_drift_pl0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26586/test_tc_b99_13_gather_drift_pl0')
 
     def test_tc_b99_13_gather_drift_places_next_free_name(tmp_path: Path) -> None:
         """LLR-155.3 (LED .7): the gather's drift limb rides HLR-155's placement

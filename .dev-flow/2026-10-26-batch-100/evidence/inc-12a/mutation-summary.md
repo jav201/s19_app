@@ -1,7 +1,7 @@
 # Inc 12a — E5 mutation run summary
 
-Copy: `C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut12a`
-Interpreter: `C:/Users/jjgh8/anaconda3/envs/s19env/python.exe` (Python 3.11.15)
+Copy: `<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut12a`
+Interpreter: `<HOME>/anaconda3/envs/s19env/python.exe` (Python 3.11.15)
 
 Fingerprints before and after (sha256[:16], all unchanged):
 - `s19_app/tui/screens.py` dc988721ae7b6a87
@@ -9,7 +9,7 @@ Fingerprints before and after (sha256[:16], all unchanged):
 - `s19_app/tui/app.py` 2d1908b14236004f
 - `s19_app/tui/services/project_gather_service.py` e11a5e75d7346183
 
-`C:/Users/jjgh8/AppData/Local/s19_app` does NOT exist before and after (good).
+`<HOME>/AppData/Local/s19_app` does NOT exist before and after (good).
 
 ## Table
 

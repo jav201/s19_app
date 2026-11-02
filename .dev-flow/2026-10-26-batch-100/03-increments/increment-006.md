@@ -11,7 +11,7 @@
 | Agent | `software-dev` (Claude, replacing Kimi; briefs `kimi/BRIEF-COMMON.md`, `kimi/BRIEF-inc-6.md`) |
 | Date | `2026-10-29` |
 | Base | `main` `093a7c0` (Inc 1–5 + hotfix 3b merged) |
-| Import proof | `C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\__init__.py` — `.dev-flow/2026-10-26-batch-100/evidence/inc-6/import-proof.txt` |
+| Import proof | `<HOME>\Github\s19_app-b100-inc6\s19_app\__init__.py` — `.dev-flow/2026-10-26-batch-100/evidence/inc-6/import-proof.txt` |
 
 ---
 
@@ -143,7 +143,7 @@ BLUF: two more inputs that crashed Load and the writers are now findings: a mani
 ## 3 · How to test
 
 ```bash
-# interpreter: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe
+# interpreter: <HOME>/anaconda3/envs/s19env/python.exe
 env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=<worktree> \
   python -m pytest -q -p no:cacheprovider tests/test_b100_active_variant.py tests/test_b100_announce.py \
   tests/test_b100_focus.py tests/test_b100_save_image.py
@@ -199,8 +199,8 @@ Evidence home: `.dev-flow/2026-10-26-batch-100/evidence/inc-6/`. **Final source 
 | the panel's focus starts on `#result_ok` | 178.3 | `mut-178.3-focus-on-close.txt` | KILLED 3: TC-67 focus+enter, tab, thirty |
 | the list truncated at 10 rows | 178.3 | `mut-178.3-truncate-10.txt` | KILLED 1: TC-67 thirty (`20 problems missing`) |
 
-| MA (reviewer): `_handle_load_result` -> `if True: self.action_select_variant()` | LLR-166.1 (TC-B100-12 panel arms) | `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r6\mut-MA.txt` (sha256 `b481d97219603b29418e7c922299c3bac37895dba5da92a47e9ae4afae2905c8`) | KILLED 2: `tc_b100_12_panel_*` ×2 (`last painted focus: ListView#variant_list`) |
-| MB (reviewer): `self.screen.set_focus(None)` at the top of `_handle_load_result` | LLR-166.1 (TC-B100-12 panel arms) | `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r6\mut-MB.txt` (sha256 `7895551aec840c8230f5405f12ea7c78128d85878acdfd0a53b6e68b7175d30f`) | KILLED 2: `tc_b100_12_panel_*` ×2 (`last painted focus: OsClipboardInput#palette_input`) |
+| MA (reviewer): `_handle_load_result` -> `if True: self.action_select_variant()` | LLR-166.1 (TC-B100-12 panel arms) | `<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r6\mut-MA.txt` (sha256 `6425286e708a828eb670dfddc5907f5ba9de90175ac4eb0abe17030ed097ab3d`) | KILLED 2: `tc_b100_12_panel_*` ×2 (`last painted focus: ListView#variant_list`) |
+| MB (reviewer): `self.screen.set_focus(None)` at the top of `_handle_load_result` | LLR-166.1 (TC-B100-12 panel arms) | `<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r6\mut-MB.txt` (sha256 `590b9e59d65e77164327a214be5915bd77bd8efaed068c8cba782e3ceb5488f3`) | KILLED 2: `tc_b100_12_panel_*` ×2 (`last painted focus: OsClipboardInput#palette_input`) |
 
 Not run at Inc 6 (declared): TC-55's "first variant by name" arm (moves to Inc 7, ARCH-PDR-3, per the ledger entry for TC-B100-55). The TC-B100-12 panel arms are killed by the reviewer's mutants MA and MB above (transcripts in the reviewer's scratch, cited by path and digest; `_handle_load_result` is unchanged by corrective pass 1).
 
@@ -240,39 +240,39 @@ Scanned files: `222 = 219 − 0 + 3` (`test_b100_active_variant.py`, `test_b100_
 
 | Evidence artifact | Path — under `.dev-flow/2026-10-26-batch-100/evidence/inc-6/` | SHA-256 |
 |---|---|---|
-| census-base-b78_03.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/census-base-b78_03.txt | 387ea35e747fefa7df43b311a73da2c3986cb57f4175c6b5a53b6ba3c358a754 |
-| census-base-repinned-nodes-original-form.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/census-base-repinned-nodes-original-form.txt | a8e5247a471e5857f258b8f9725a7c016be1646cc705385d0239f73af57423c1 |
-| census-base-shard1-nodes.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/census-base-shard1-nodes.txt | dff79e18d2b9aa54a241d54f23502f35f76b6c10aaeb5ba1d5b5aea6306f88d6 |
-| census-tree-shard0.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/census-tree-shard0.txt | dfae896dfbf83fb422afa022b6e527dc1646bf1ed828a8f69c7ffff79be011ed |
-| census-tree-shard1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/census-tree-shard1.txt | fe99c49c3726d5dea876b337d9ba55e019f110799a2c41cb7f70895edca16ec8 |
-| census-tree-shard2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/census-tree-shard2.txt | bd5e14dc42a7ad4dfea40927f1114209cdd4b6e762011c32635eb5a90d876e12 |
-| census-tree-shard3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/census-tree-shard3.txt | be7be3c74af07732d531b874304bbe8c0a23a61d7814b770e7eccbb02bcd6f0a |
-| green-01-new-and-b100-modules.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/green-01-new-and-b100-modules.txt | 5d4220e10cc24ff3b454f7cafffa618e12fd46ee334a1c137a4d99e983e26118 |
-| green-02-repinned-b99-and-reuse.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/green-02-repinned-b99-and-reuse.txt | 90c60c1148f5b9a44c8f22665dd667b4ef7c448b3799d6204ebc88578273a88f |
-| guards-01-first-run.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/guards-01-first-run.txt | 8d71d806be07f9d038d52fa8de39f15cea529a9d1bf7139fb0032095cdd8dc01 |
-| guards-census.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/guards-census.txt | 7e44dcfde481b043b0fe154c89918213a97ff3b3b25b20a70d7417a08b80e23a |
-| guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/guards.txt | fe0f0f21fd7e45ee23f9ff1fe724c0ab8a16309fa4734128df67fcd0aa5687eb |
-| import-proof.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/import-proof.txt | df57a304bf2dd2a84aad9a38d5ecfc3ccfd34037841998579c272e1b2d85056c |
-| mut-168.1-ignore-gathered.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/mut-168.1-ignore-gathered.txt | 323bede1984b572e05b4175d650eeaf50468d65a488499fe85ced4c986e0a418 |
-| mut-168.2-saveback-not-activated.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/mut-168.2-saveback-not-activated.txt | 4556a8deeae72924398726f22f09141baedea63a0d03b6b2c845d16be90f052b |
-| mut-168.3-absolute-batch.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/mut-168.3-absolute-batch.txt | 87ec85d2c9f8b55431852316f5f65cf98eb0dbbd08f88bb87a2210be85a81eb5 |
-| mut-168.3-append-no-seam-call.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/mut-168.3-append-no-seam-call.txt | a3b994017e27c1232523592abca0ec6984bfb10f21bd7e24c2b2774806888ea3 |
-| mut-178.1-fallback-called-recorded.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/mut-178.1-fallback-called-recorded.txt | 4b04a9d92c7598bcef994c8955685946fe6cb365ca73c86639ae791f4a9ea57b |
-| mut-178.2-markup-on.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/mut-178.2-markup-on.txt | f853bea18edc1e6fd95dbc8334dacd0be72aee9b65f441d834af2ee3bf68616c |
-| mut-178.2-status-before-load.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/mut-178.2-status-before-load.txt | dfb0765b3b60b3e4e84db7e70590a43b12cdcc4e04f58a7d6a7688b369fa1013 |
-| mut-178.3-focus-on-close.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/mut-178.3-focus-on-close.txt | 34fe9dd2ed825884e2823e8087d2e5ed84e1b40932f9f69a5294dd7f50bb4a57 |
-| mut-178.3-truncate-10.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/mut-178.3-truncate-10.txt | 1ccae66d22aa5a3d903c463d16a69555c5a4d4b522e4ffa6818e9835435dbf72 |
-| mutation_harness.py | .dev-flow/2026-10-26-batch-100/evidence/inc-6/mutation_harness.py | 67af605fd77d5b21cbb7e7a56c52e8f8660a54a2ade0829f7cba3d9aac2d1cf0 |
-| red-01-active-variant-partA-vs-base.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/red-01-active-variant-partA-vs-base.txt | 72efac5cae6e615b3e3d12fdb5f4196f45e8ff5d5a0995567fc824d7935b6f80 |
-| red-02-partB-vs-base.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/red-02-partB-vs-base.txt | 15bfb6c45c4ee4452466eefee623dbdc4e1a2d1fc8a4f48ed64afda0f0b3afbb |
-| red-03-tc56-hostile-and-at20-vs-base.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/red-03-tc56-hostile-and-at20-vs-base.txt | 9326f33f74d576f0394cdc2c463053ffcbc8fe3d4deb7907a0e1dfa67db35d80 |
-| red-04-active-variant-final-vs-base.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/red-04-active-variant-final-vs-base.txt | cdce7e0212475513a60ef3b782f6b5e6cca5de4daad13eb6b097dfe4e7460987 |
+| census-base-b78_03.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/census-base-b78_03.txt | bdc2640103e4fa1420ef5fb169bd52c802e029d4580159f76bcbb224e2c4aa52 |
+| census-base-repinned-nodes-original-form.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/census-base-repinned-nodes-original-form.txt | 7215f3aab83475053a30ede3c891d348933e269a2b236ab82acddb9362bbc36a |
+| census-base-shard1-nodes.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/census-base-shard1-nodes.txt | 1f0b6cc05caf98494536d0de0fc9bb96040e022749172f90b855ca02ddcc356a |
+| census-tree-shard0.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/census-tree-shard0.txt | ff75c20f67fa70717ebb939d6635a7762ef0ec3ad56642d7f1987abdd5cdab0c |
+| census-tree-shard1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/census-tree-shard1.txt | 9d33cf6b5684d4f328fce02bc6e557f4707a76f63080ee82fedca6e2f343aee2 |
+| census-tree-shard2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/census-tree-shard2.txt | f5cc209de0c38f561ef37d055940d43f9a40a66e80c54c0039918c063736b841 |
+| census-tree-shard3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/census-tree-shard3.txt | 40d2f9dd7eb21677fe97bdff78a559e6b0258cc7bec415ce667253295d37bb6a |
+| green-01-new-and-b100-modules.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/green-01-new-and-b100-modules.txt | 157e5ccf0f2d5d6a00e2f8dc736fe5a749beae9e882f7d44317dd5ca45bb7e99 |
+| green-02-repinned-b99-and-reuse.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/green-02-repinned-b99-and-reuse.txt | 7c4b6efaf99bb1d7333f5573c401bfc3baa65050e01db1250217677a5972a029 |
+| guards-01-first-run.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/guards-01-first-run.txt | 0a9c43280ddd1d35500138364d83ec7e796f3d041553c7ecbbbd5bd0b5abda97 |
+| guards-census.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/guards-census.txt | 99b414eea223e94ff8b7d1fe51a84355ef7113e98711190588de251589ff4f00 |
+| guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/guards.txt | 9f9ac225f62a6e6d26c2f070ddad104fb6915036954745d4584854a944c8f608 |
+| import-proof.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/import-proof.txt | 2fef032297a0dbd89ba58787defebe12d790398cd890b42871555bbf4e654a53 |
+| mut-168.1-ignore-gathered.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/mut-168.1-ignore-gathered.txt | 3687efeadc22e29e35951e8946e8d5bd11c60a7c809f1221ae20f2cf24c51556 |
+| mut-168.2-saveback-not-activated.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/mut-168.2-saveback-not-activated.txt | 7c96746b1ebe70a0eb59e73641f1e4debfe983cd1c71af2a60a3ea85662f9c17 |
+| mut-168.3-absolute-batch.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/mut-168.3-absolute-batch.txt | 3a44cf53ca1b76aa3c195ff01f9ea0849c3b3eb1d2729a3b47b5bff1e8d199ba |
+| mut-168.3-append-no-seam-call.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/mut-168.3-append-no-seam-call.txt | 6535b1c1ac0e8dc3e2fd3fc8a11fbe59b3cdba4f16572323e32a7f9e43c9e313 |
+| mut-178.1-fallback-called-recorded.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/mut-178.1-fallback-called-recorded.txt | 995d998f4e30352f5d215f090c5f9fc2cbc48d962db95bd0f9d34d2b0d8c0528 |
+| mut-178.2-markup-on.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/mut-178.2-markup-on.txt | 92231521579bde6bc27b94d91567e7f4915c9a4a35664d629fb111ddaec968b6 |
+| mut-178.2-status-before-load.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/mut-178.2-status-before-load.txt | 77c8599087c7a1331c9e4f86e5a5b80a3a41bf69974e55406e13d2e7389228af |
+| mut-178.3-focus-on-close.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/mut-178.3-focus-on-close.txt | db5201860ebbd17dfe3180f903251ea7470b049e71bbc2d403ca2e154767bcfe |
+| mut-178.3-truncate-10.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/mut-178.3-truncate-10.txt | 52cbf32fa02c590e993f7a381240ad6b0678f281f209fce9064e3a2d764ad737 |
+| mutation_harness.py | .dev-flow/2026-10-26-batch-100/evidence/inc-6/mutation_harness.py | 456b17689ca6d30919f720ddd693d469853ebbd1deb522eeef315e324d9731e1 |
+| red-01-active-variant-partA-vs-base.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/red-01-active-variant-partA-vs-base.txt | af6e67c208c5431c8ded72f9e3374b486f0b8b04fa2d11e2e4f1e87af00d2d22 |
+| red-02-partB-vs-base.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/red-02-partB-vs-base.txt | 2213a7399d09c06f33fecc66682fb3c4bde60cdf5afb676b39731f61ea636ee4 |
+| red-03-tc56-hostile-and-at20-vs-base.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/red-03-tc56-hostile-and-at20-vs-base.txt | 23952a93dfc51befb91630383458c74c6e531773ddcc3b5f1dc313fb36deaf5d |
+| red-04-active-variant-final-vs-base.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/red-04-active-variant-final-vs-base.txt | 32f247e01517ead45eafb8268ced01eb27759e11c190b3543c2583b7b07f6520 |
 | reverse-census-grep.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/reverse-census-grep.txt | 3895cd0e39d6ce0dd9ffbbfc82174c925713263faa616bac8c3634c7c34598d6 |
-| orch-census-batch-a.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/orch-census-batch-a.txt | b06b42334ff63f9eb751c6ce0367358ab6390820aeb632a7545cec5445f533d7 |
-| orch-census-batch-b.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/orch-census-batch-b.txt | 3fa0de09183a1d7018f66098084d546aeaa64a151e29b16bb43fa976bd0143fc |
-| orch-census-k.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/orch-census-k.txt | d238207f95f940bd9eaaeda056f2b038fc42cb6f8bdacd8985e0457a4835c32d |
-| orch-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/orch-guards.txt | c925d5dc36229b3fab96052fa0105507cd4d8b8bfadbdb0635c4af41fd78a7a4 |
-| orch-isolation-rerun.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/orch-isolation-rerun.txt | ac87767faf2c08bbe993a53531d03a9513f3e4e085b28ea7897a8dce8e13f9e1 |
+| orch-census-batch-a.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/orch-census-batch-a.txt | 64f58b2666a40e6756af55d49091c013c8901e0d1382ca2d1b0e4bce4108d191 |
+| orch-census-batch-b.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/orch-census-batch-b.txt | c33c9e22541957553879babee64360f2f888619e46949864ba2e37dd11ae5d66 |
+| orch-census-k.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/orch-census-k.txt | ab96ea8ee8fd3fb46d81c15d9a16d01830aec925beb8755b0a07fcdfa4f6b248 |
+| orch-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/orch-guards.txt | 3e56c83c6f802e44089c6752d8862590d22d7773fa7443b58e3344c67ec32799 |
+| orch-isolation-rerun.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/orch-isolation-rerun.txt | fa40d9120236e3a43f73d6b04cd7ec61fec5224a3813846eb96194eb077ed082 |
 | pe-clean.118x54.png | .dev-flow/2026-10-26-batch-100/evidence/inc-6/e13/pe-clean.118x54.png | 09b1bffd8691917e3485089a110f50bed8efeb4327979522d73f40363c457ada |
 | pe-clean.220x60.png | .dev-flow/2026-10-26-batch-100/evidence/inc-6/e13/pe-clean.220x60.png | 30484bfd756ac475e7992844597c5c4d2da237a1b67619a2f9dd9ca106bd9ea7 |
 | pe-clean.99x54.png | .dev-flow/2026-10-26-batch-100/evidence/inc-6/e13/pe-clean.99x54.png | 8de6f847541e3c34d79c4bc76c20590ab9921b3fdfce0136e46c6b490bc76750 |
@@ -288,18 +288,18 @@ Scanned files: `222 = 219 − 0 + 3` (`test_b100_active_variant.py`, `test_b100_
 | pe-saveback.118x54.png | .dev-flow/2026-10-26-batch-100/evidence/inc-6/e13/pe-saveback.118x54.png | 29a353a06b6ba05d7f8927f6895a3145fecbe3fed4303e94523284a38d528a1c |
 | pe-saveback.220x60.png | .dev-flow/2026-10-26-batch-100/evidence/inc-6/e13/pe-saveback.220x60.png | 64b6b85f8941ec1e09b1c104bbdcd3c8ea0eb47afbdbe99d1c9f4bbc283dc213 |
 | pe-saveback.99x54.png | .dev-flow/2026-10-26-batch-100/evidence/inc-6/e13/pe-saveback.99x54.png | 403dc977e87c7ac230e6cfcb2f6e8bb2eb9fe9f0a5e22144fb74cc0262f0c324 |
-| green-fixed.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/review/green-fixed.txt | 0c427b90eee60f48c9579980ce2270f701a73772b7386947704e136f86301357 |
-| mut-MA.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/review/mut-MA.txt | b481d97219603b29418e7c922299c3bac37895dba5da92a47e9ae4afae2905c8 |
-| mut-MB.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/review/mut-MB.txt | 7895551aec840c8230f5405f12ea7c78128d85878acdfd0a53b6e68b7175d30f |
-| mut-MD.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/review/mut-MD.txt | 301c08a334cfd11ceb1fcdd7aaa1ad8f06575d37faf5f622b02f11d1dda10526 |
-| mut-ME.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/review/mut-ME.txt | 1281893e2b0dbbee0227a1a3c9f8ca712c8c7df01bd336bdcfa9b0c6c4d8d134 |
-| probe-p1-p3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/review/probe-p1-p3.txt | 8c679d14c0ef1e15dca65c71db9545d4bebccfcccc68d10702b082a2e06e33f7 |
-| r2-green-fixed2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/review/r2-green-fixed2.txt | aed809ee81c0a1043fcb70af02def3a949c318722706211cf01e131d0076be21 |
-| r2-id-registry.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/review/r2-id-registry.txt | d2b64c545330c1fde37c4fea8112cf4b2fb5d1b8b626a476d3c25c4995875f9c |
-| r2-mut-MA.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/review/r2-mut-MA.txt | 9c5310452021330b8842457fa8ff41c2b3598f51489b6513e51c2cfaa292b695 |
-| r2-mut-MB.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/review/r2-mut-MB.txt | 9db1e2ce857b7caf9ab4a6ada9b3687603d5a6d806e62934c11220bfebb431e1 |
-| r2-mut-MV.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/review/r2-mut-MV.txt | b7300d873b1311d9da3f3c828bf66294df61b4d640c7bc6183efb1fbdaf0ee38 |
-| r2-probe-p1-p3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/review/r2-probe-p1-p3.txt | 3ca1ed12c0dc7ccc465d97da7d29fd06b1ef8f8687b36ac07d4f9f00e1accca1 |
+| green-fixed.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/review/green-fixed.txt | 544d3c9672a40620968a5976048e0599ad9c87b903adef4a69b02989ac206d9e |
+| mut-MA.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/review/mut-MA.txt | 6425286e708a828eb670dfddc5907f5ba9de90175ac4eb0abe17030ed097ab3d |
+| mut-MB.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/review/mut-MB.txt | 590b9e59d65e77164327a214be5915bd77bd8efaed068c8cba782e3ceb5488f3 |
+| mut-MD.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/review/mut-MD.txt | 920cf72528f249455c2952c216f3eb944821e23d3cbef76185a7ac252bf6d209 |
+| mut-ME.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/review/mut-ME.txt | 89dc774489ba976af4a3545e5e542e1ad1d4dad6183a78f2a8b6ebcb1f8c88ac |
+| probe-p1-p3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/review/probe-p1-p3.txt | f6ecdf106f6ea23e106206a548366ce63ab7a19779d0c9b6bffd286c45cd42d8 |
+| r2-green-fixed2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/review/r2-green-fixed2.txt | b769e723a5a536053fcfd6f0e8d9f4d60e258441c4b20f66e1fa564bf57206d6 |
+| r2-id-registry.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/review/r2-id-registry.txt | a398c4ba653578cdc0bcbbe854d755faf151739b08e5d188dd99f8034496d83a |
+| r2-mut-MA.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/review/r2-mut-MA.txt | 50b9c469ee1956ddaafcbaff0a1c3a6e688c0bf26af95c50cc37ae73972e7788 |
+| r2-mut-MB.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/review/r2-mut-MB.txt | e6694792f4b106020f49c11803b76780f20ad00ba859c6eff6306df9657f7c96 |
+| r2-mut-MV.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/review/r2-mut-MV.txt | 8cc287cd00d4a06b80335aba5a91e3b35c529873ba90d9bbd423dd84a92b7096 |
+| r2-probe-p1-p3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/review/r2-probe-p1-p3.txt | 00bd6d3fce5db5a98aac2b0e71313a6c6bfbf5a46b21e56ef44dda648e1ac6a2 |
 | test_r6_probes.py | .dev-flow/2026-10-26-batch-100/evidence/inc-6/review/probes/test_r6_probes.py | 7c8a6a140bd6e4fb8cda497ef71eecbfd3de0e96aa9be0570d4ef5d0ac0d2bdc |
 
 ### Corrective pass 1 — test results (evidence state: `executed`)
@@ -339,22 +339,22 @@ Ordering note: `tests/support/b100_projects.py` gained `read_load_result_panel` 
 
 | Evidence artifact (corrective pass 1) | Path | SHA-256 |
 |---|---|---|
-| fix1-census-manifest-readers.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-census-manifest-readers.txt | 1852a93fcee7b830df4c4c1fbfed67a0a1f20f0fcd98a0de7cc19e16eee03a80 |
-| fix1-green-00-first-run-panel-read-before-paint.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-green-00-first-run-panel-read-before-paint.txt | b4f1e7940c83ee262915f5ccd7cbfd042c0370c1460def7ecdf0235e3b643bbd |
-| fix1-green-01-inc6-modules.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-green-01-inc6-modules.txt | b69fcd6113712e920c83d7ea49dd9112962a2cd82cb6e53116579720c47dbe22 |
-| fix1-green-02-repinned-files.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-green-02-repinned-files.txt | f93f0127c8463c4fd8cf0e166d34447c067824dbe4d5c1cf279c2f80f1fd9539 |
-| fix1-guards-census.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-guards-census.txt | 5ee5805d7d79516e3d8ebcd00c58112c37ba3b43ba7c4a52136c7e2d558353d6 |
-| fix1-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-guards.txt | 166d51e12f9196ffaf127954b70acd9d8aa0c906d14683d505a49536f9d9b381 |
-| fix1-mut-168.3-append-no-rewrite.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-mut-168.3-append-no-rewrite.txt | e78245ef3cd7584d0449f4d4a240e58918d232bdad14fef452f173b7b539dc90 |
-| fix1-mut-F1-no-damaged-check.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-mut-F1-no-damaged-check.txt | 41a4f12e9287212c2c0cfce001b00a9e86612cba74defb4d3131f892ed38f4b4 |
-| fix1-mut-F2-now-opens-unconditional.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-mut-F2-now-opens-unconditional.txt | 8a080e38f5338a63d01af37de3747dca3e16bcff1ca8c83edba718f14a0938c8 |
-| fix1-mut-F5b-scope-mark-ignored.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-mut-F5b-scope-mark-ignored.txt | 3884da0dbc674c6cca83eec2610f107e1e5e2f51edbd576ef8b811c8231b5fbe |
-| fix1-mut-SEC6-6-raw-active-variant.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-mut-SEC6-6-raw-active-variant.txt | f1933fc3a3affa7f0443b356957576451362b1324d84349444f11290e832c646 |
-| fix1-mut-UX1-label-uncoloured.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-mut-UX1-label-uncoloured.txt | 5f62001c0a84d42cf5ba03b3b558e454f57f60be09b5ff258f17724e9ef62293 |
-| fix1-mut-UX1-reason-always-ok.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-mut-UX1-reason-always-ok.txt | 8f7e8bb38e2d828b730696ff101e0373816efd1a7ffa170ae28171613ca20602 |
-| fix1-mut-UX2-entry-not-named.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-mut-UX2-entry-not-named.txt | c0e0e41590c2b9541e3527c71fa825f967cc3fa2e506cd195c7a191cce7ac1c4 |
-| fix1-red-01-new-arms-vs-reviewed-tree.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-red-01-new-arms-vs-reviewed-tree.txt | 4f6d1be933d1788e0cc3833870b07d1c7cbb7a3f75cc3ee1377b30a82c96922a |
-| fix1_mutation_harness.py | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1_mutation_harness.py | 8ba207c6f4fdd831fcf0a654358e12218deeea90b33d82649eba06e2352712ea |
+| fix1-census-manifest-readers.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-census-manifest-readers.txt | 7c5ca8a7c8ca28e6ece62b067183d879ab099241d4526a8f90554d6f59a9bf55 |
+| fix1-green-00-first-run-panel-read-before-paint.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-green-00-first-run-panel-read-before-paint.txt | 020cf1e0bdce356d3f2473151a747781dd99f5f4e009a5028414322b3a6e80d6 |
+| fix1-green-01-inc6-modules.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-green-01-inc6-modules.txt | bd5ebc456ae5a6a103f835a55ab0589cb70f5a96ec92d71a956f45cc41a2c62e |
+| fix1-green-02-repinned-files.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-green-02-repinned-files.txt | 74bc7cd6008bd298f5c83bb27134175d8398a937143f7392149f3e8e153c8e47 |
+| fix1-guards-census.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-guards-census.txt | 716ea74ab126999e0b975d9a501a7cd75e82b6445cfa7cf218c6bb63658064ec |
+| fix1-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-guards.txt | 882faee1103c4e31d605861c1e51f71f05e11663a135cd57b84b140bcd5126a4 |
+| fix1-mut-168.3-append-no-rewrite.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-mut-168.3-append-no-rewrite.txt | a4367f3d21fb321d34a63468dd2ba6e260780417a771b7f94d9dac3e19e44806 |
+| fix1-mut-F1-no-damaged-check.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-mut-F1-no-damaged-check.txt | a3bbd7a02b2ea95f8db465343fd38e94db8af095fcda2c79492bb1d55fd8c4c3 |
+| fix1-mut-F2-now-opens-unconditional.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-mut-F2-now-opens-unconditional.txt | c1efce418921d6553f3a7c0d4ccee39184d7dd2d47c21405081683c7d09e9f22 |
+| fix1-mut-F5b-scope-mark-ignored.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-mut-F5b-scope-mark-ignored.txt | 8335b3c9281e7aebe7ccddd6aac050ee46a2a6f862945bb90664dfbae53dc0b5 |
+| fix1-mut-SEC6-6-raw-active-variant.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-mut-SEC6-6-raw-active-variant.txt | 7120cbca81eb38512d9c021b339745dc560bf48f79a87fd8e2e842caf1d4e9bd |
+| fix1-mut-UX1-label-uncoloured.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-mut-UX1-label-uncoloured.txt | e9035a647d297fe7ce8c7d64aa21cc9650f99a272f264e8c9da965a1930e7e25 |
+| fix1-mut-UX1-reason-always-ok.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-mut-UX1-reason-always-ok.txt | 3d811252f0272a7d4306a44875880f7291df012fc50e17acc6bc090628f8f2e6 |
+| fix1-mut-UX2-entry-not-named.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-mut-UX2-entry-not-named.txt | dafdb059215b3e4a7f1b0bc1a4337bc9b13562e19323b9313a6cf0f88ed5f964 |
+| fix1-red-01-new-arms-vs-reviewed-tree.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1-red-01-new-arms-vs-reviewed-tree.txt | 221751a54bd77d95c2f5c4772810fcfe37e13552bacf574ce757cfef9e2553b6 |
+| fix1_mutation_harness.py | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix1_mutation_harness.py | 57f06288458a2e467bfb2e0780a46fe1a75f9312650f618d1aafa399a0dc53d8 |
 
 ### Corrective pass 2 — test results (evidence state: `executed`)
 
@@ -375,14 +375,14 @@ Test ledger, corrective pass 2: scanned files unchanged (222). New nodes 2. Chan
 
 | Evidence artifact (corrective pass 2) | Path | SHA-256 |
 |---|---|---|
-| fix2-census-manifest-readers.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix2-census-manifest-readers.txt | 189d321a52eb7dae8807fd3c3859695749be31db51f8c883e991c1d662124447 |
-| fix2-green-01-inc6-modules.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix2-green-01-inc6-modules.txt | 3cc11b33ee2fb04e9df0c96c641cef023f8a9ca17762845ae05c76c240dd3d38 |
-| fix2-green-02-repinned-files.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix2-green-02-repinned-files.txt | 94150c42f85f7d46ef7d06847fe0d50424c0e52a33c79661ba0426417667d770 |
-| fix2-guards-census.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix2-guards-census.txt | af9c577e513eac24c08fbdb8998c112bd0a01d007761e5ef2d19c55c61abfb9b |
-| fix2-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix2-guards.txt | abacc3c683dbe711916659659f4fb7376224fa303097f2a47ddb62fed1f22c02 |
-| fix2-mut-SEC6-7-no-resolve-catch.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix2-mut-SEC6-7-no-resolve-catch.txt | be46061cfab7d2a536d03f8c8a87d353baf5e6273534b673c85644b720e463a7 |
-| fix2-red-01-overlong-vs-pass1-tree.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix2-red-01-overlong-vs-pass1-tree.txt | e64faa1784271dd5ff48234aa948722aee592a6983b3fd0910e68204af88ea6f |
-| fix2_mutation_harness.py | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix2_mutation_harness.py | c7a1325fbadfbf3a464e5cb4b867125d37c5fa91b4327cd9649de882e8cf3121 |
+| fix2-census-manifest-readers.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix2-census-manifest-readers.txt | 47d09e587d71f474ad5c122ca37d67405af141cab654cb9ef70bb3474dcc5848 |
+| fix2-green-01-inc6-modules.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix2-green-01-inc6-modules.txt | 06855c78c54a4e5d3a841590315111566c07a2f16a5cab692a639919117edaf8 |
+| fix2-green-02-repinned-files.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix2-green-02-repinned-files.txt | 439a611391b5ee1ab0c3a995d5f471ed8c90ae3ebad7c23e81609bca7b31ff65 |
+| fix2-guards-census.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix2-guards-census.txt | a46bfb029640ccce45ba8a0062062abe36ca8a514f50aa8bcc0687a845b54ed6 |
+| fix2-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix2-guards.txt | b200b4b0c4b1364c153d7ecb3be55ad42c6a8b4380b6756d6a73188cc6b90681 |
+| fix2-mut-SEC6-7-no-resolve-catch.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix2-mut-SEC6-7-no-resolve-catch.txt | 563ca3d1f39670a9da89d614603d21ff8f2275f26f30921de806b73674f89221 |
+| fix2-red-01-overlong-vs-pass1-tree.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix2-red-01-overlong-vs-pass1-tree.txt | 2672d786d95ead12caffb128f31f8a050779bd61767849b0f257ef546be3af71 |
+| fix2_mutation_harness.py | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix2_mutation_harness.py | 85c3c2f0ece61fc1f6f79853f03e9969fbcf326b125a46c46e3270c450522938 |
 
 ### Corrective pass 3 — test results (evidence state: `executed`)
 
@@ -406,15 +406,15 @@ Test ledger, corrective pass 3: scanned files unchanged (222). New nodes 7. Chan
 
 | Evidence artifact (corrective pass 3) | Path | SHA-256 |
 |---|---|---|
-| fix3-census-manifest-readers.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix3-census-manifest-readers.txt | 2848f9d1813f58e6b24903740e274bcebeef52129c6d6aea493905e3715d1302 |
-| fix3-green-01-inc6-modules.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix3-green-01-inc6-modules.txt | 60fd8688aeaf0e2c53eb2f3cb2ec159af8b56d5b32e9ac661851055fb07c015c |
-| fix3-green-02-repinned-files.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix3-green-02-repinned-files.txt | de633b5fb48e47b3cf5df3d82dc8ff2023ad0efd98c28ae86de1f2f007f4a900 |
-| fix3-guards-census.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix3-guards-census.txt | 458cdd5c124809acd6ba2c47afa464daa03c9eb9efd502844895d82bea5df515 |
-| fix3-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix3-guards.txt | a393f8be72686f1762a8d2f31af3579d1dfbe10a245b9b055a8f1e40d192d476 |
-| fix3-mut-SEC6-7-loop-not-caught.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix3-mut-SEC6-7-loop-not-caught.txt | 14a8c53e12ba00afa1e401b43ccbaefd723880096920c31a74532c7af6d94ec0 |
-| fix3-mut-SEC6-8-plain-valueerror-not-caught.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix3-mut-SEC6-8-plain-valueerror-not-caught.txt | e2046c522a6bcbabd6b52bb26c40f76fead9700488bac05272669ab4fe5308cf |
-| fix3-red-01-loop-and-digits-vs-pass2-tree.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix3-red-01-loop-and-digits-vs-pass2-tree.txt | 05cad4f50aaecb93a4a54f09bb714346271877c7b406a682219198cbe785b34e |
-| fix3_mutation_harness.py | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix3_mutation_harness.py | 955fd13b05c15ed001f96451650c76b816ebdb079f679d4bfa40c8de1e0b4a5b |
+| fix3-census-manifest-readers.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix3-census-manifest-readers.txt | 507f72852118d2dca2cb09225567e5ad2acdc870d471a1b53b776ff30a7e4a79 |
+| fix3-green-01-inc6-modules.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix3-green-01-inc6-modules.txt | 485e08de18133e4b7255fbd70f852bbe6bac86e521a46189f8080ae224e379f0 |
+| fix3-green-02-repinned-files.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix3-green-02-repinned-files.txt | 49236673e03bcd6c5ebf585d601aaf98ba2c49b0c1ad1dd218d74cc154d12932 |
+| fix3-guards-census.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix3-guards-census.txt | 8f19f68fdf4158e3cee12a8ad0a319bc25ee37ed8b54b0837d2d7c524060f325 |
+| fix3-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix3-guards.txt | 7facd8dd17b1db0f9cbfac034cf082653c2d29fb0e8b50dbad2c20cbc3d50bbe |
+| fix3-mut-SEC6-7-loop-not-caught.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix3-mut-SEC6-7-loop-not-caught.txt | ac9dbaf9f66d7e3d7d14082dc6586b9fe5c57d1807f110222175137fdc9c124c |
+| fix3-mut-SEC6-8-plain-valueerror-not-caught.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix3-mut-SEC6-8-plain-valueerror-not-caught.txt | 1f1d002d7bb1906c3b6fbb5229551ffd22a8e04d0f7951917a7ed81285e7458e |
+| fix3-red-01-loop-and-digits-vs-pass2-tree.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix3-red-01-loop-and-digits-vs-pass2-tree.txt | 5c9a01b88baf00b1d4528eb431b73f4208b7249e82741694acc85bba482cc61b |
+| fix3_mutation_harness.py | .dev-flow/2026-10-26-batch-100/evidence/inc-6/fix3_mutation_harness.py | 27975766166002d1e7eb1acc9a66b39225a28a3ad1578fdbdec0155d3d6cb079 |
 
 ## 4b · Independent review
 

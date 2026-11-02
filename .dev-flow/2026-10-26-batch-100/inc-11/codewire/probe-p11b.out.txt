@@ -1,21 +1,21 @@
-import: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc-11-design\work\tree\s19_app\__init__.py
-== U1 fresh1 status ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\inc-11-design\\work\\p11b\\u1\\.s19tool\\workarea\\fresh1 (variant 'firmware')"]
+import: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc-11-design\work\tree\s19_app\__init__.py
+== U1 fresh1 status ['Project saved + manifest verified', "Saved project to <HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\inc-11-design\\work\\p11b\\u1\\.s19tool\\workarea\\fresh1 (variant 'firmware')"]
 == U1 counts {'_decide_project_image': 1, '_file_digest': 1, '_plan_project_save': 1, '_project_folder_refusal': 1, '_save_as_source_for': 2} handler_ms=26.2
 == U1 tree ['firmware.s19', 'project.json']
-== U2 open-project save status ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\inc-11-design\\work\\p11b\\u2\\.s19tool\\workarea\\P (variant 'firmware')"]
+== U2 open-project save status ['Project saved + manifest verified', "Saved project to <HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\inc-11-design\\work\\p11b\\u2\\.s19tool\\workarea\\P (variant 'firmware')"]
 == U2 counts {'_decide_project_image': 1, '_file_digest': 3, '_plan_project_save': 1, '_project_folder_refusal': 1, '_save_as_source_for': 2}
 == U2 save-as Q2 status ['Project saved + manifest verified']
 == U2 save-as counts {'_decide_project_image': 1, '_file_digest': 3, '_plan_project_save': 1, '_project_folder_refusal': 2, '_save_as_source_for': 2}
-== U3 status ['Project saved + manifest verified', 'Saved + verified: firmware.s19 — 0 entries applied before this save; includes 1 entry not applied before this save (0x80000010)', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\inc-11-design\\work\\p11b\\u3\\.s19tool\\workarea\\Q (variant 'firmware') — firmware.s19 + 1 change entry, 1 applied by this save"]
+== U3 status ['Project saved + manifest verified', 'Saved + verified: firmware.s19 — 0 entries applied before this save; includes 1 entry not applied before this save (0x80000010)', "Saved project to <HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\inc-11-design\\work\\p11b\\u3\\.s19tool\\workarea\\Q (variant 'firmware') — firmware.s19 + 1 change entry, 1 applied by this save"]
 == U3 plan rows [('image', 'firmware.s19', 'new'), ('document', 'changes.json', 'new'), ('manifest', 'project.json', 'new')]
 == U3 plan copies ['patches/changes_1.json']
 == U3 Q tree ['firmware.s19', 'patches/changes_1.json', 'project.json']
 == U3 Q active_document patches/changes_1.json
-== U3 document source_path C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc-11-design\work\p11b\u3\.s19tool\workarea\Q\patches\changes_1.json
+== U3 document source_path <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc-11-design\work\p11b\u3\.s19tool\workarea\Q\patches\changes_1.json
 == U4 file_type mac mem_map {'0x80000000': 0} ranges []
 == U4 entries 1 kind change
 == U4 decide emit False refusal None
-== U4 save status ['Project saved + manifest verified', 'Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\inc-11-design\\work\\p11b\\u4\\.s19tool\\workarea\\macsave']
+== U4 save status ['Project saved + manifest verified', 'Saved project to <HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\inc-11-design\\work\\p11b\\u4\\.s19tool\\workarea\\macsave']
 == U4 folder exists True
 == U5 status ['Nothing to save: load a data file or A2L first.'] folder False
 == U6 '' ['Project NOT saved: name is empty — type a project name.']

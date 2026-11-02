@@ -1,9 +1,9 @@
 # Kimi brief — batch-100 Increment 2 · corrective pass on the rollback redesign
 
-This pass happens in the same worktree, `C:\Users\jjgh8\Github\s19_app-b100-inc2`. It holds Inc 2, fix passes 1–3 and the LED .53 redesign, all uncommitted; keep every one of them. `BRIEF-COMMON.md` still applies. The SOURCE files are still 3: `app.py`, `workspace.py` and `project_gather_service.py`. The design stays as it is: a failed save removes exactly what it created. This pass only fixes its implementation.
+This pass happens in the same worktree, `<HOME>\Github\s19_app-b100-inc2`. It holds Inc 2, fix passes 1–3 and the LED .53 redesign, all uncommitted; keep every one of them. `BRIEF-COMMON.md` still applies. The SOURCE files are still 3: `app.py`, `workspace.py` and `project_gather_service.py`. The design stays as it is: a failed save removes exactly what it created. This pass only fixes its implementation.
 
 **Read first. These are in the MAIN checkout:**
-- `C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-10-26-batch-100\03-increments\security-increment-002.md` "Round 4": SEC2-7, SEC2-8, SEC2-9. The probe is `...\scratchpad\probes\sec_inc2_r4_probe.py`.
+- `<HOME>\Github\s19_app\.dev-flow\2026-10-26-batch-100\03-increments\security-increment-002.md` "Round 4": SEC2-7, SEC2-8, SEC2-9. The probe is `...\scratchpad\probes\sec_inc2_r4_probe.py`.
 - `...\03-increments\review-increment-002.md` "Round 5": R5-1, R5-2.
 
 **Fix:**

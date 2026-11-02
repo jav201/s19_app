@@ -1,11 +1,11 @@
-cmd: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc2 (NO_COLOR unset) python -m pytest -q -p no:cacheprovider 'tests/test_b100_save_guards.py::test_tc_b100_07_forced_oserror_leaves_no_folder[gather]' 'tests/test_b100_save_guards.py::test_tc_b100_07_forced_oserror_leaves_no_folder[manifest-refused]'
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (MUTANT M-F1 — the state restore removed from _abort_save)
+cmd: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<HOME>\Github\s19_app-b100-inc2 (NO_COLOR unset) python -m pytest -q -p no:cacheprovider 'tests/test_b100_save_guards.py::test_tc_b100_07_forced_oserror_leaves_no_folder[gather]' 'tests/test_b100_save_guards.py::test_tc_b100_07_forced_oserror_leaves_no_folder[manifest-refused]'
+tree: <HOME>\Github\s19_app-b100-inc2 (MUTANT M-F1 — the state restore removed from _abort_save)
 
 FF                                                                       [100%]
 ================================== FAILURES ===================================
 ___________ test_tc_b100_07_forced_oserror_leaves_no_folder[gather] ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27521/test_tc_b100_07_forced_oserror0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27521/test_tc_b100_07_forced_oserror0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000262ED5E4FD0>
 stage = 'gather'
 
@@ -60,16 +60,16 @@ stage = 'gather'
             f"{stage}: the failed save left app state behind — "
             f"before {state_before!r}, after {state_after!r}"
         )
-E       AssertionError: gather: the failed save left app state behind — before (['a'], ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27521\\test_tc_b100_07_forced_oserror0\\app\\.s19tool\\workarea\\pre\\a.s19'], 'a', None, 'pre'), after (['a'], ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27521\\test_tc_b100_07_forced_oserror0\\app\\.s19tool\\workarea\\stage-gather\\a.s19'], 'a', None, 'pre')
+E       AssertionError: gather: the failed save left app state behind — before (['a'], ['<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27521\\test_tc_b100_07_forced_oserror0\\app\\.s19tool\\workarea\\pre\\a.s19'], 'a', None, 'pre'), after (['a'], ['<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27521\\test_tc_b100_07_forced_oserror0\\app\\.s19tool\\workarea\\stage-gather\\a.s19'], 'a', None, 'pre')
 E       assert (['a'], ['C:\..., None, 'pre') == (['a'], ['C:\..., None, 'pre')
 E         
-E         At index 1 diff: ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27521\\test_tc_b100_07_forced_oserror0\\app\\.s19tool\\workarea\\stage-gather\\a.s19'] != ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27521\\test_tc_b100_07_forced_oserror0\\app\\.s19tool\\workarea\\pre\\a.s19']
+E         At index 1 diff: ['<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27521\\test_tc_b100_07_forced_oserror0\\app\\.s19tool\\workarea\\stage-gather\\a.s19'] != ['<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27521\\test_tc_b100_07_forced_oserror0\\app\\.s19tool\\workarea\\pre\\a.s19']
 E         Use -v to get more diff
 
 tests\test_b100_save_guards.py:936: AssertionError
 ______ test_tc_b100_07_forced_oserror_leaves_no_folder[manifest-refused] ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27521/test_tc_b100_07_forced_oserror1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27521/test_tc_b100_07_forced_oserror1')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000262EDD12690>
 stage = 'manifest-refused'
 
@@ -124,10 +124,10 @@ stage = 'manifest-refused'
             f"{stage}: the failed save left app state behind — "
             f"before {state_before!r}, after {state_after!r}"
         )
-E       AssertionError: manifest-refused: the failed save left app state behind — before (['a'], ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27521\\test_tc_b100_07_forced_oserror1\\app\\.s19tool\\workarea\\pre\\a.s19'], 'a', None, 'pre'), after (['a'], ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27521\\test_tc_b100_07_forced_oserror1\\app\\.s19tool\\workarea\\stage-manifest-refused\\a.s19'], 'a', None, 'pre')
+E       AssertionError: manifest-refused: the failed save left app state behind — before (['a'], ['<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27521\\test_tc_b100_07_forced_oserror1\\app\\.s19tool\\workarea\\pre\\a.s19'], 'a', None, 'pre'), after (['a'], ['<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27521\\test_tc_b100_07_forced_oserror1\\app\\.s19tool\\workarea\\stage-manifest-refused\\a.s19'], 'a', None, 'pre')
 E       assert (['a'], ['C:\..., None, 'pre') == (['a'], ['C:\..., None, 'pre')
 E         
-E         At index 1 diff: ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27521\\test_tc_b100_07_forced_oserror1\\app\\.s19tool\\workarea\\stage-manifest-refused\\a.s19'] != ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27521\\test_tc_b100_07_forced_oserror1\\app\\.s19tool\\workarea\\pre\\a.s19']
+E         At index 1 diff: ['<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27521\\test_tc_b100_07_forced_oserror1\\app\\.s19tool\\workarea\\stage-manifest-refused\\a.s19'] != ['<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27521\\test_tc_b100_07_forced_oserror1\\app\\.s19tool\\workarea\\pre\\a.s19']
 E         Use -v to get more diff
 
 tests\test_b100_save_guards.py:936: AssertionError

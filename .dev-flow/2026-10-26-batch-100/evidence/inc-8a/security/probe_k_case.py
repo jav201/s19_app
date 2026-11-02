@@ -2,7 +2,7 @@
 holding P and p (two projects whose names differ only in case)."""
 import os, subprocess, sys, time
 from pathlib import Path
-sys.path.insert(0, r"C:\Users\jjgh8\Github\s19_app-b100-inc8a")
+sys.path.insert(0, r"<HOME>\Github\s19_app-b100-inc8a")
 import s19_app; print("# s19_app import:", s19_app.__file__)
 from s19_app.tui.services import project_gather_service as G
 root = Path(__file__).resolve().parent / "runs" / f"K_{time.time_ns()}"

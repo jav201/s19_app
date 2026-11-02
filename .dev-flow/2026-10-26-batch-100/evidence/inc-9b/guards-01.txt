@@ -1,6 +1,6 @@
 # Inc 9b E4 integration - guards (id registry, b99 staging, frozen-engine guard)
-# worktree: /c/Users/jjgh8/Github/s19_app-b100-inc9b  HEAD: 89476669906b8e036c447970d88ba18af61e2d18
-# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc9b\s19_app\__init__.py
+# worktree: <HOME>/Github/s19_app-b100-inc9b  HEAD: 89476669906b8e036c447970d88ba18af61e2d18
+# s19_app.__file__ = <HOME>\Github\s19_app-b100-inc9b\s19_app\__init__.py
 # python 3.11.15 | textual 8.2.8
 # command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<scratch int9b/lad> python -m pytest -p no:cacheprovider -q -rfEs --tb=short tests/test_id_registry.py tests/test_b99_staging.py tests/test_engine_unchanged.py
 # started: 2026-10-31T17:53:46-06:00

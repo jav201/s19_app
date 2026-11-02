@@ -15,7 +15,7 @@ param(
   [int]$Cols = 118,
   [int]$Rows = 54,
   [int]$SettleSeconds = 9,
-  [string]$Python = "C:\Users\jjgh8\anaconda3\envs\s19env\python.exe"
+  [string]$Python = "$env:USERPROFILE\anaconda3\envs\s19env\python.exe"
 )
 
 $ErrorActionPreference = "Stop"

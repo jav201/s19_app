@@ -23,7 +23,7 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, r"C:\Users\jjgh8\Github\code-wire\tools")
+sys.path.insert(0, r"<HOME>\Github\code-wire\tools")
 import codewire_extract as cw  # noqa: E402
 
 PALETTE = ["#dbeafe", "#dcfce7", "#fef3c7", "#fce7f3", "#e0e7ff", "#ccfbf1", "#ffedd5", "#ede9fe", "#f1f5f9", "#ecfccb"]

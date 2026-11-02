@@ -6,7 +6,7 @@ Reviewer role: code-reviewer (correctness, simplicity, reuse, conformance to the
 
 ## Scope reviewed
 
-- Tree `C:/Users/jjgh8/Github/s19_app-b100-inc12b`, branch `b100-inc12b` at `81ac4c0` (merge of `main` after the Inc 12a close). Diff: `git diff main...b100-inc12b -- s19_app tests`. In `git diff -w`, the source part is `app.py` +1602/-1224 (hunks) and `a2l.py` +32. `styles.tcss` does not differ from the merge base.
+- Tree `<HOME>/Github/s19_app-b100-inc12b`, branch `b100-inc12b` at `81ac4c0` (merge of `main` after the Inc 12a close). Diff: `git diff main...b100-inc12b -- s19_app tests`. In `git diff -w`, the source part is `app.py` +1602/-1224 (hunks) and `a2l.py` +32. `styles.tcss` does not differ from the merge base.
 - I read these in full in the merged tree:
   - the seam `begin_busy` … `_progress_forwarder` (`app.py:20142`–`:20448`), plus the constants, the request and result dataclasses, and `_save_failure_outcome` (`:426`–`:590`);
   - `parse_a2l_cached` (`:877`);

@@ -1,6 +1,6 @@
 # E5 corrective notes — batch-100 Inc 10 (increment 019)
 
-Tree: `C:/Users/jjgh8/Github/s19_app-b100-inc10`, branch `b100-inc10`, HEAD `1747479` plus the working-tree edits below (not committed). Rulings: `E5-rulings.md`. Evidence (`.dev-flow/2026-10-26-batch-100/evidence/inc-10/`): `red-02-corrective.txt`, `green-03-merged.txt`, `green-04-corrective.txt`, `mut-c-<id>.txt` (21 files).
+Tree: `<HOME>/Github/s19_app-b100-inc10`, branch `b100-inc10`, HEAD `1747479` plus the working-tree edits below (not committed). Rulings: `E5-rulings.md`. Evidence (`.dev-flow/2026-10-26-batch-100/evidence/inc-10/`): `red-02-corrective.txt`, `green-03-merged.txt`, `green-04-corrective.txt`, `mut-c-<id>.txt` (21 files).
 
 Run environment, every pytest run: `env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<scratch>/c10/lad`, `-p no:cacheprovider`, `--basetemp=<scratch>/c10/bt`, interpreter `s19env` Python 3.11.15. The mutant runs used `<scratch>/c10/btm` and `<scratch>/c10/ladm` (same shape, own folders). No basetemp under the repo. Each transcript header records the HEAD sha, the `git status` of `s19_app` / `tests`, `s19_app.__file__` (always the tree under test) and the file shas. No whole module was run except the ones ruling CR10-02 names. The full suite is `not-run` (operator override, batch-end battery). No pytest process is left running.
 

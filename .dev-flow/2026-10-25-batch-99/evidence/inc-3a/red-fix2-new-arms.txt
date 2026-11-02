@@ -1,7 +1,7 @@
 ============================= test session starts =============================
-platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- <HOME>\anaconda3\envs\s19env\python.exe
 cachedir: .pytest_cache
-rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc3a
+rootdir: <HOME>\Github\s19_app-b99-inc3a
 configfile: pyproject.toml
 plugins: textual-snapshot-1.1.0, syrupy-4.8.0
 collecting ... collected 23 items / 19 deselected / 4 selected
@@ -14,7 +14,7 @@ tests/test_b99_staging.py::test_tc_b99_13_symlink_target_is_never_reused FAILED 
 ================================== FAILURES ===================================
 _________ test_tc_b99_11_dangling_junction_at_staging_temp_is_refused _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26282/test_tc_b99_11_dangling_juncti0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26282/test_tc_b99_11_dangling_juncti0')
 
     def test_tc_b99_11_dangling_junction_at_staging_temp_is_refused(
         tmp_path: Path,
@@ -69,15 +69,15 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 >       assert "symbolic link or reparse point" in str(excinfo.value), (
             f"the refusal must come from the reparse check itself: {excinfo.value}"
         )
-E       AssertionError: the refusal must come from the reparse check itself: Refusing to stage: staging home cannot be prepared: [WinError 183] Cannot create a file when that file already exists: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-26282\\test_tc_b99_11_dangling_juncti0\\.s19tool\\workarea\\temp'
-E       assert 'symbolic link or reparse point' in "Refusing to stage: staging home cannot be prepared: [WinError 183] Cannot create a file when that file already exists: 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-jjgh8\\\\pytest-26282\\\\test_tc_b99_11_dangling_juncti0\\\\.s19tool\\\\workarea\\\\temp'"
-E        +  where "Refusing to stage: staging home cannot be prepared: [WinError 183] Cannot create a file when that file already exists: 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-jjgh8\\\\pytest-26282\\\\test_tc_b99_11_dangling_juncti0\\\\.s19tool\\\\workarea\\\\temp'" = str(WorkareaContainmentError("Refusing to stage: staging home cannot be prepared: [WinError 183] Cannot create a file when that file already exists: 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-jjgh8\\\\pytest-26282\\\\test_tc_b99_11_dangling_juncti0\\\\.s19tool\\\\workarea\\\\temp'"))
-E        +    where WorkareaContainmentError("Refusing to stage: staging home cannot be prepared: [WinError 183] Cannot create a file when that file already exists: 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-jjgh8\\\\pytest-26282\\\\test_tc_b99_11_dangling_juncti0\\\\.s19tool\\\\workarea\\\\temp'") = <ExceptionInfo WorkareaContainmentError("Refusing to stage: staging home cannot be prepared: [WinError 183] Cannot create a file when...\Local\\\\Temp\\\\pytest-of-jjgh8\\\\pytest-26282\\\\test_tc_b99_11_dangling_juncti0\\\\.s19tool\\\\workarea\\\\temp'") tblen=3>.value
+E       AssertionError: the refusal must come from the reparse check itself: Refusing to stage: staging home cannot be prepared: [WinError 183] Cannot create a file when that file already exists: '<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-26282\\test_tc_b99_11_dangling_juncti0\\.s19tool\\workarea\\temp'
+E       assert 'symbolic link or reparse point' in "Refusing to stage: staging home cannot be prepared: [WinError 183] Cannot create a file when that file already exists: 'C:\\\\Users\\\\<USER>\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-<USER>\\\\pytest-26282\\\\test_tc_b99_11_dangling_juncti0\\\\.s19tool\\\\workarea\\\\temp'"
+E        +  where "Refusing to stage: staging home cannot be prepared: [WinError 183] Cannot create a file when that file already exists: 'C:\\\\Users\\\\<USER>\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-<USER>\\\\pytest-26282\\\\test_tc_b99_11_dangling_juncti0\\\\.s19tool\\\\workarea\\\\temp'" = str(WorkareaContainmentError("Refusing to stage: staging home cannot be prepared: [WinError 183] Cannot create a file when that file already exists: 'C:\\\\Users\\\\<USER>\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-<USER>\\\\pytest-26282\\\\test_tc_b99_11_dangling_juncti0\\\\.s19tool\\\\workarea\\\\temp'"))
+E        +    where WorkareaContainmentError("Refusing to stage: staging home cannot be prepared: [WinError 183] Cannot create a file when that file already exists: 'C:\\\\Users\\\\<USER>\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-<USER>\\\\pytest-26282\\\\test_tc_b99_11_dangling_juncti0\\\\.s19tool\\\\workarea\\\\temp'") = <ExceptionInfo WorkareaContainmentError("Refusing to stage: staging home cannot be prepared: [WinError 183] Cannot create a file when...\Local\\\\Temp\\\\pytest-of-<USER>\\\\pytest-26282\\\\test_tc_b99_11_dangling_juncti0\\\\.s19tool\\\\workarea\\\\temp'") tblen=3>.value
 
 tests\test_b99_staging.py:340: AssertionError
 ______ test_tc_b99_12_dangling_symlink_at_requested_name_takes_next_free ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26282/test_tc_b99_12_dangling_symlin0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26282/test_tc_b99_12_dangling_symlin0')
 
     def test_tc_b99_12_dangling_symlink_at_requested_name_takes_next_free(
         tmp_path: Path,
@@ -111,7 +111,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         placed = copy_into_workarea(src, dest)
     
 >       assert placed.name == "fw_1.s19", placed
-E       AssertionError: WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26282/test_tc_b99_12_dangling_symlin0/.s19tool/workarea/out/fw.s19')
+E       AssertionError: WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26282/test_tc_b99_12_dangling_symlin0/.s19tool/workarea/out/fw.s19')
 E       assert 'fw.s19' == 'fw_1.s19'
 E         
 E         - fw_1.s19
@@ -121,7 +121,7 @@ E         + fw.s19
 tests\test_b99_staging.py:539: AssertionError
 _____________ test_tc_b99_12_source_vanishes_mid_copy_is_wrapped ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26282/test_tc_b99_12_source_vanishes0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26282/test_tc_b99_12_source_vanishes0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000014626B57850>
 
     def test_tc_b99_12_source_vanishes_mid_copy_is_wrapped(
@@ -155,18 +155,18 @@ s19_app\tui\workspace.py:470: in copy_into_workarea
     shutil.copy2(resolved_source, staged_file)
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-source = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26282/test_tc_b99_12_source_vanishes0/fw.s19')
-target = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26282/test_tc_b99_12_source_vanishes0/.s19tool/workarea/temp/.staging/stage-4ttoisxm/fw.s19')
+source = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26282/test_tc_b99_12_source_vanishes0/fw.s19')
+target = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26282/test_tc_b99_12_source_vanishes0/.s19tool/workarea/temp/.staging/stage-4ttoisxm/fw.s19')
 args = (), kwargs = {}
 
     def _vanish(source, target, *args, **kwargs):
 >       raise FileNotFoundError(2, "source vanished mid-copy", str(source))
-E       FileNotFoundError: [Errno 2] source vanished mid-copy: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-26282\\test_tc_b99_12_source_vanishes0\\fw.s19'
+E       FileNotFoundError: [Errno 2] source vanished mid-copy: '<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-26282\\test_tc_b99_12_source_vanishes0\\fw.s19'
 
 tests\test_b99_staging.py:571: FileNotFoundError
 ________________ test_tc_b99_13_symlink_target_is_never_reused ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26282/test_tc_b99_13_symlink_target_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26282/test_tc_b99_13_symlink_target_0')
 
     def test_tc_b99_13_symlink_target_is_never_reused(tmp_path: Path) -> None:
         """B8 content dedup must SKIP a target that is a link or reparse point
@@ -199,7 +199,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         returned = copy_into_workarea(src, dest)
     
 >       assert returned.name == "fw_1.s19", returned
-E       AssertionError: WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26282/test_tc_b99_13_symlink_target_0/.s19tool/workarea/out/fw.s19')
+E       AssertionError: WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26282/test_tc_b99_13_symlink_target_0/.s19tool/workarea/out/fw.s19')
 E       assert 'fw.s19' == 'fw_1.s19'
 E         
 E         - fw_1.s19

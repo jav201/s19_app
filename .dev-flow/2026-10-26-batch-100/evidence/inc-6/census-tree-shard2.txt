@@ -1,6 +1,6 @@
-# command: python -m pytest -q -p no:cacheprovider -rfE --basetemp=C:/Users/jjgh8/AppData/Local/Temp/i6t2 tests/test_b100_reuse.py tests/test_b97_check_editor.py tests/test_b97_key_bar.py tests/test_b99_bytes_field.py tests/test_b99_patch_truth.py tests/test_id_registry.py tests/test_project_gather.py tests/test_tui_directionb.py tests/test_tui_report_seam.py tests/test_workspace_variants.py 
-# tree: C:/Users/jjgh8/Github/s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree incl. re-pins)
-# runner: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc6-impl/py.sh (sets PYTHONPATH to that tree; NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8)
+# command: python -m pytest -q -p no:cacheprovider -rfE --basetemp=<HOME>/AppData/Local/Temp/i6t2 tests/test_b100_reuse.py tests/test_b97_check_editor.py tests/test_b97_key_bar.py tests/test_b99_bytes_field.py tests/test_b99_patch_truth.py tests/test_id_registry.py tests/test_project_gather.py tests/test_tui_directionb.py tests/test_tui_report_seam.py tests/test_workspace_variants.py 
+# tree: <HOME>/Github/s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree incl. re-pins)
+# runner: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc6-impl/py.sh (sets PYTHONPATH to that tree; NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8)
 # date: 2026-10-30T01:48:43Z
 ....................................FF.................................. [ 18%]
 ..........................................................F..FF......... [ 37%]
@@ -11,7 +11,7 @@
 ================================== FAILURES ===================================
 ____ test_at_b100_01_repeated_loads_reuse_and_name_existing_variant[size0] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t2/test_at_b100_01_repeated_loads0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/i6t2/test_at_b100_01_repeated_loads0')
 size = (118, 54)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
@@ -117,7 +117,7 @@ E       AssertionError: did not settle: the Load file dialog
 tests\test_b100_reuse.py:104: AssertionError
 ____ test_at_b100_01_repeated_loads_reuse_and_name_existing_variant[size1] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t2/test_at_b100_01_repeated_loads1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/i6t2/test_at_b100_01_repeated_loads1')
 size = (220, 60)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
@@ -223,7 +223,7 @@ E       AssertionError: did not settle: the Load file dialog
 tests\test_b100_reuse.py:104: AssertionError
 ____________ test_tc_b99_18_lane_line_carries_patch_and_crc_riders ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t2/test_tc_b99_18_lane_line_carri0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/i6t2/test_tc_b99_18_lane_line_carri0')
 
     def test_tc_b99_18_lane_line_carries_patch_and_crc_riders(tmp_path: Path) -> None:
         """TC-B99-18 (DDR finding F-2, Phase-4 coverage gap): a lane whose PATCH
@@ -320,7 +320,7 @@ E       AssertionError: Flow Execution never painted
 tests\test_b99_patch_truth.py:755: AssertionError
 __________________ test_at_b99_06_flow_execution_patch_truth __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t2/test_at_b99_06_flow_execution_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/i6t2/test_at_b99_06_flow_execution_0')
 
     def test_at_b99_06_flow_execution_patch_truth(tmp_path: Path) -> None:
         """AT-B99-06 (HLR-156, black box): three lanes over `#fx_run` — all-outside
@@ -414,7 +414,7 @@ E       AssertionError: Flow Execution never painted
 tests\test_b99_patch_truth.py:755: AssertionError
 ____________ test_at_b99_07_hostile_symbol_name_renders_literally _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t2/test_at_b99_07_hostile_symbol_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/i6t2/test_at_b99_07_hostile_symbol_0')
 
     def test_at_b99_07_hostile_symbol_name_renders_literally(tmp_path: Path) -> None:
         """AT-B99-07 (HLR-156, UX-C10/PQ-7): a change document whose unresolved

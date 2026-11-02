@@ -7,15 +7,15 @@
 #   |     RecursionError,
 # edit 1 NEW:
 #   |     json.JSONDecodeError,
-# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b
+# cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b
 # env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
-# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-1MiB] tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-under-entries] tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[brackets-1MiB]
+# command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-1MiB] tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-under-entries] tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[brackets-1MiB]
 # started 2026-10-30T23:10:11Z  finished 2026-10-30T23:10:13Z  rc=1
 FFF                                                                      [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:353: RecursionError: maximum recursion depth exceeded while decoding a JSON array from a unicode string
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:353: RecursionError: maximum recursion depth exceeded while decoding a JSON array from a unicode string
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:353: RecursionError: maximum recursion depth exceeded while decoding a JSON array from a unicode string
+<HOME>\anaconda3\envs\s19env\Lib\json\decoder.py:353: RecursionError: maximum recursion depth exceeded while decoding a JSON array from a unicode string
+<HOME>\anaconda3\envs\s19env\Lib\json\decoder.py:353: RecursionError: maximum recursion depth exceeded while decoding a JSON array from a unicode string
+<HOME>\anaconda3\envs\s19env\Lib\json\decoder.py:353: RecursionError: maximum recursion depth exceeded while decoding a JSON array from a unicode string
 =========================== short test summary info ===========================
 FAILED tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-1MiB]
 FAILED tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-under-entries]

@@ -1,15 +1,15 @@
 mutant: M-69b
 what: CR12a-2 AST rule RED proof: validation-error abort arm's end_busy line removed
-target: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\mutk\s19_app\tui\app.py
+target: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\mutk\s19_app\tui\app.py
 sha256 before: 15ffc7bdbb599615
 old occurrences: 1
 sha256 mutated: 98878833b73b667c
-s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\mutk\s19_app\__init__.py
-command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line --basetemp=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\bt\mk-M-69b tests/test_b100_busy.py::test_tc_b100_51_every_save_abort_return_ends_its_run_first
+s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\mutk\s19_app\__init__.py
+command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line --basetemp=<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\bt\mk-M-69b tests/test_b100_busy.py::test_tc_b100_51_every_save_abort_return_ends_its_run_first
 pytest tail:
   F                                                                        [100%]
   ================================== FAILURES ===================================
-  C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\mutk\tests\test_b100_busy.py:2476: AssertionError: [(11335, False), (11360, True), (11441, True), (11467, True), (11501, True), (11687, True), ...]
+  <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12a\mutk\tests\test_b100_busy.py:2476: AssertionError: [(11335, False), (11360, True), (11441, True), (11467, True), (11501, True), (11687, True), ...]
   =========================== short test summary info ===========================
   FAILED tests/test_b100_busy.py::test_tc_b100_51_every_save_abort_return_ends_its_run_first
   1 failed in 0.70s

@@ -28,7 +28,7 @@ re-gated as revision 2. This batch executes **§8 Inc-0 … Inc-3**.
 | Branch | `claude/batch-76-r-tui-102-impl`, cut fresh off `origin/main` |
 | merge-base == tip | ✅ `291bb76` == `291bb76` |
 | Tree clean | ✅ tracked-clean; `prototypes/out/` untracked — **pre-existing, reported as found, not swept** (C-44) |
-| Repo path | `C:\Users\jjgh8\Github\s19_app` (moved out of OneDrive) |
+| Repo path | `<HOME>\Github\s19_app` (moved out of OneDrive) |
 | Batch number | **76 claimed** — verified free: no `.dev-flow/2026-*-batch-76`, no `origin/*batch-76*` branch |
 | Flow revision | `2026.07.28-rev1`, `flow_hash 0127a2767ff11c8a`, controls C-1…C-45 (inherited from batch-75's Phase-0 verdict: enforceable surface byte-exact; only the untracked `dev-flow-lessons` catalog diverges, non-blocking, already carried to Lane B) |
 | Toolchain entry gate | ✅ Python **3.14.4** · pytest **8.4.2** · ruff **0.15.17** |

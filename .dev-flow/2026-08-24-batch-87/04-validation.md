@@ -36,7 +36,7 @@ What is **not** in doubt, and is what keeps this from being a product blocker:
 - The batch's source-scope diff against merge-base is **empty, exit 0** (`s19_app/`, `tests/`,
   `tools/`, `pyproject.toml`), so `tests/` is byte-identical to `943e54a` and the batch has no
   mechanism by which it could redden any node.
-- `s19_app` imports from the working tree (`C:\Users\jjgh8\Github\s19_app\s19_app\__init__.py`),
+- `s19_app` imports from the working tree (`<HOME>\Github\s19_app\s19_app\__init__.py`),
   not from a stale install; `build/` is dated 2026-08-03 and is not on `sys.path`.
 - `pytest` runs with `plugins: textual-snapshot-1.1.0, syrupy-4.8.0` — **no `pytest-randomly`**,
   so collection order is deterministic and the run-to-run change in WHICH nodes fail is not an
@@ -108,7 +108,7 @@ and both agree.
 `conda run` — see the probe-incident note):
 
 ```
-PYTHONIOENCODING=utf-8 /c/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -q "<nodeid>"
+PYTHONIOENCODING=utf-8 <HOME>/anaconda3/envs/s19env/python.exe -m pytest -q "<nodeid>"
 ```
 
 **Verdicts are stated under the ADOPTED criterion** (`01b-qa-validation-plan.md` §7 AFTER):
@@ -239,7 +239,7 @@ assertions.
 `U+FFFD` (the replacement character) in at least one assertion diff, and the re-print dies:
 
 ```
-File "C:\Users\jjgh8\anaconda3\Lib\encodings\cp1252.py", line 19, in encode
+File "<HOME>\anaconda3\Lib\encodings\cp1252.py", line 19, in encode
   return codecs.charmap_encode(input,self.errors,encoding_table)[0]
 UnicodeEncodeError: 'charmap' codec can't encode character '\ufffd' in position 29589: character maps to <undefined>
 ```
@@ -253,7 +253,7 @@ working invocation, used for the re-run and for every isolated run in this artif
 environment's interpreter directly:
 
 ```
-PYTHONIOENCODING=utf-8 /c/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -q -m "not slow"
+PYTHONIOENCODING=utf-8 <HOME>/anaconda3/envs/s19env/python.exe -m pytest -q -m "not slow"
 ```
 
 **This supersedes the command printed in `01b-qa-validation-plan.md` §7**, which specifies

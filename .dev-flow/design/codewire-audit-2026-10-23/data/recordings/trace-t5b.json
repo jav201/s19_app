@@ -415,12 +415,12 @@
    "test": "cwaudit/test_t5_project.py::test_t5b_resave_without_a2l_drops_batch",
    "depth": 0,
    "in": {
-    "source": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\src\\firmware.s19",
-    "destination": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp"
+    "source": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\src\\firmware.s19",
+    "destination": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp"
    },
-   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19",
+   "out": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19",
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -431,7 +431,7 @@
      "S31580000070303132333435363738393A3B3C3D3E3F82",
      "S705800000007A"
     ],
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\src\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\src\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -448,12 +448,12 @@
    "test": "cwaudit/test_t5_project.py::test_t5b_resave_without_a2l_drops_batch",
    "depth": 1,
    "in": {
-    "source": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19",
-    "destination": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q"
+    "source": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19",
+    "destination": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q"
    },
-   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
+   "out": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -464,7 +464,7 @@
      "S31580000070303132333435363738393A3B3C3D3E3F82",
      "S705800000007A"
     ],
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -481,12 +481,12 @@
    "test": "cwaudit/test_t5_project.py::test_t5b_resave_without_a2l_drops_batch",
    "depth": 1,
    "in": {
-    "source": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19",
-    "destination": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q"
+    "source": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19",
+    "destination": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q"
    },
-   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
+   "out": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -497,7 +497,7 @@
      "S31580000070303132333435363738393A3B3C3D3E3F82",
      "S705800000007A"
     ],
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -514,12 +514,12 @@
    "test": "cwaudit/test_t5_project.py::test_t5b_resave_without_a2l_drops_batch",
    "depth": 1,
    "in": {
-    "source": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
-    "destination": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q"
+    "source": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
+    "destination": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q"
    },
-   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
+   "out": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -538,12 +538,12 @@
    "test": "cwaudit/test_t5_project.py::test_t5b_resave_without_a2l_drops_batch",
    "depth": 0,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19",
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19",
     "a2l_files": null
    },
    "out": {
     "LoadedFile": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19",
      "file_type": "s19",
      "mem_map": {
       "0x0": 67,
@@ -667,7 +667,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -684,12 +684,12 @@
    "test": "cwaudit/test_t5_project.py::test_t5b_resave_without_a2l_drops_batch",
    "depth": 1,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
     "a2l_files": []
    },
    "out": {
     "LoadedFile": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
      "file_type": "s19",
      "mem_map": {
       "0x0": 67,
@@ -813,7 +813,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -832,11 +832,11 @@
    "test": "cwaudit/test_t5_project.py::test_t5b_resave_without_a2l_drops_batch",
    "depth": 1,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19"
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19"
    },
    "out": {
     "S19File": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19",
      "records": [
       {
        "SRecord": {
@@ -1078,7 +1078,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -1095,11 +1095,11 @@
    "test": "cwaudit/test_t5_project.py::test_t5b_resave_without_a2l_drops_batch",
    "depth": 0,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19"
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19"
    },
    "out": {
     "S19File": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19",
      "records": [
       {
        "SRecord": {
@@ -1341,7 +1341,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -1358,11 +1358,11 @@
    "test": "cwaudit/test_t5_project.py::test_t5b_resave_without_a2l_drops_batch",
    "depth": 2,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19"
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19"
    },
    "out": {
     "S19File": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
      "records": [
       {
        "SRecord": {
@@ -1604,7 +1604,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -1621,11 +1621,11 @@
    "test": "cwaudit/test_t5_project.py::test_t5b_resave_without_a2l_drops_batch",
    "depth": 0,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19"
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19"
    },
    "out": {
     "S19File": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
      "records": [
       {
        "SRecord": {
@@ -1867,7 +1867,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -1886,10 +1886,10 @@
    "test": "cwaudit/test_t5_project.py::test_t5b_resave_without_a2l_drops_batch",
    "depth": 1,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19",
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19",
     "s19": {
      "S19File": {
-      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19",
+      "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19",
       "records": [
        {
         "SRecord": {
@@ -2135,7 +2135,7 @@
    },
    "out": {
     "LoadedFile": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19",
      "file_type": "s19",
      "mem_map": {
       "0x0": 67,
@@ -2259,7 +2259,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -2276,10 +2276,10 @@
    "test": "cwaudit/test_t5_project.py::test_t5b_resave_without_a2l_drops_batch",
    "depth": 2,
    "in": {
-    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
+    "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
     "s19": {
      "S19File": {
-      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
+      "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
       "records": [
        {
         "SRecord": {
@@ -2525,7 +2525,7 @@
    },
    "out": {
     "LoadedFile": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
      "file_type": "s19",
      "mem_map": {
       "0x0": 67,
@@ -2649,7 +2649,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -2670,7 +2670,7 @@
    "in": {
     "s19": {
      "S19File": {
-      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19",
+      "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19",
       "records": [
        {
         "SRecord": {
@@ -2962,7 +2962,7 @@
    "in": {
     "s19": {
      "S19File": {
-      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
+      "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
       "records": [
        {
         "SRecord": {
@@ -3296,7 +3296,7 @@
    "in": {
     "primary_loaded": {
      "LoadedFile": {
-      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19",
+      "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19",
       "file_type": "s19",
       "mem_map": {
        "0x0": 67,
@@ -3422,7 +3422,7 @@
    },
    "out": {
     "LoadedFile": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\temp\\firmware.s19",
      "file_type": "s19",
      "mem_map": {
       "0x0": 67,
@@ -3552,7 +3552,7 @@
    "in": {
     "primary_loaded": {
      "LoadedFile": {
-      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
+      "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
       "file_type": "s19",
       "mem_map": {
        "0x0": 67,
@@ -3678,7 +3678,7 @@
    },
    "out": {
     "LoadedFile": {
-     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
+     "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
      "file_type": "s19",
      "mem_map": {
       "0x0": 67,
@@ -3810,7 +3810,7 @@
    "in": {
     "payload": {
      "SaveProjectPayload": {
-      "parent_folder": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea",
+      "parent_folder": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea",
       "project_name": "Q",
       "batch": [],
       "assignments": {}
@@ -3825,7 +3825,7 @@
    "in": {
     "payload": {
      "SaveProjectPayload": {
-      "parent_folder": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea",
+      "parent_folder": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea",
       "project_name": "Q",
       "batch": [
        "patch.json"
@@ -3846,7 +3846,7 @@
    "in": {
     "payload": {
      "SaveProjectPayload": {
-      "parent_folder": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea",
+      "parent_folder": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea",
       "project_name": "Q",
       "batch": [],
       "assignments": {}
@@ -3868,7 +3868,7 @@
        {
         "VariantDescriptor": {
          "variant_id": "firmware",
-         "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
+         "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
          "file_type": "s19"
         }
        }
@@ -3876,19 +3876,19 @@
       "active_id": "firmware"
      }
     },
-    "project_root": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q",
-    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm",
+    "project_root": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q",
+    "base_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm",
     "batch": [],
     "assignments": {},
     "declared_regions": [],
     "gathered": {}
    },
    "out": [
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\project.json",
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\project.json",
     []
    ],
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\project.json": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\project.json": [
      "{",
      "  \"schema_version\": 1,",
      "  \"active_variant\": \"firmware\",",
@@ -3909,7 +3909,7 @@
        {
         "VariantDescriptor": {
          "variant_id": "firmware",
-         "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
+         "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
          "file_type": "s19"
         }
        }
@@ -3917,8 +3917,8 @@
       "active_id": "firmware"
      }
     },
-    "project_root": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q",
-    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm",
+    "project_root": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q",
+    "base_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm",
     "batch": [
      "patch.json"
     ],
@@ -3931,11 +3931,11 @@
     "gathered": {}
    },
    "out": [
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\project.json",
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\project.json",
     []
    ],
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\project.json": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\project.json": [
      "{",
      "  \"schema_version\": 1,",
      "  \"active_variant\": \"firmware\",",
@@ -3962,7 +3962,7 @@
        {
         "VariantDescriptor": {
          "variant_id": "firmware",
-         "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
+         "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
          "file_type": "s19"
         }
        }
@@ -3970,19 +3970,19 @@
       "active_id": "firmware"
      }
     },
-    "project_root": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q",
-    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm",
+    "project_root": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q",
+    "base_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm",
     "batch": [],
     "assignments": {},
     "declared_regions": [],
     "gathered": {}
    },
    "out": [
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\project.json",
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\project.json",
     []
    ],
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\project.json": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\project.json": [
      "{",
      "  \"schema_version\": 1,",
      "  \"active_variant\": \"firmware\",",
@@ -4005,7 +4005,7 @@
        {
         "VariantDescriptor": {
          "variant_id": "firmware",
-         "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
+         "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
          "file_type": "s19"
         }
        }
@@ -4013,7 +4013,7 @@
       "active_id": "firmware"
      }
     },
-    "project_root": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q",
+    "project_root": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q",
     "batch": [],
     "assignments": {},
     "declared_regions": [],
@@ -4036,7 +4036,7 @@
        {
         "VariantDescriptor": {
          "variant_id": "firmware",
-         "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
+         "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
          "file_type": "s19"
         }
        }
@@ -4044,7 +4044,7 @@
       "active_id": "firmware"
      }
     },
-    "project_root": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q",
+    "project_root": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q",
     "batch": [
      "patch.json"
     ],
@@ -4073,7 +4073,7 @@
        {
         "VariantDescriptor": {
          "variant_id": "firmware",
-         "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
+         "path": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\firmware.s19",
          "file_type": "s19"
         }
        }
@@ -4081,7 +4081,7 @@
       "active_id": "firmware"
      }
     },
-    "project_root": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q",
+    "project_root": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q",
     "batch": [],
     "assignments": {},
     "declared_regions": [],
@@ -4099,7 +4099,7 @@
    "test": "cwaudit/test_t5_project.py::test_t5b_resave_without_a2l_drops_batch",
    "depth": 1,
    "in": {
-    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q"
+    "project_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q"
    },
    "out": {
     "ProjectManifest": {
@@ -4116,18 +4116,18 @@
    "test": "cwaudit/test_t5_project.py::test_t5b_resave_without_a2l_drops_batch",
    "depth": 1,
    "in": {
-    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q"
+    "project_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q"
    },
    "out": {
     "ProjectManifest": {
      "schema_version": 1,
      "active_variant": "firmware",
      "batch": [
-      "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\patch.json"
+      "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\patch.json"
      ],
      "assignments": {
       "firmware": [
-       "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\patch.json"
+       "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\patch.json"
       ]
      },
      "declared_regions": [],
@@ -4139,18 +4139,18 @@
    "test": "cwaudit/test_t5_project.py::test_t5b_resave_without_a2l_drops_batch",
    "depth": 1,
    "in": {
-    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q"
+    "project_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q"
    },
    "out": {
     "ProjectManifest": {
      "schema_version": 1,
      "active_variant": "firmware",
      "batch": [
-      "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\patch.json"
+      "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\patch.json"
      ],
      "assignments": {
       "firmware": [
-       "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\patch.json"
+       "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q\\patch.json"
       ]
      },
      "declared_regions": [],
@@ -4162,7 +4162,7 @@
    "test": "cwaudit/test_t5_project.py::test_t5b_resave_without_a2l_drops_batch",
    "depth": 1,
    "in": {
-    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q"
+    "project_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_5ew9_2rm\\.s19tool\\workarea\\Q"
    },
    "out": {
     "ProjectManifest": {

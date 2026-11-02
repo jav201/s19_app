@@ -1,6 +1,6 @@
 # Kimi brief — batch-99 Increment 3a · review fixes (code-reviewer F1–F6)
 
-Read `BRIEF-COMMON.md` first. Same worktree, `C:\Users\jjgh8\Github\s19_app-b99-inc3a` (branch `b99-inc3a`, uncommitted changes on `a52e2be`). Do not commit. The contract was amended for F2 in LED-2026-10-25-batch-99.7 (LLR-155.3). Read the current LLR-155.3 and LED .7 from the MAIN checkout, `C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-10-25-batch-99\01-requirements.md` and `01-requirements-ledger.md`, because this worktree's copy is older.
+Read `BRIEF-COMMON.md` first. Same worktree, `<HOME>\Github\s19_app-b99-inc3a` (branch `b99-inc3a`, uncommitted changes on `a52e2be`). Do not commit. The contract was amended for F2 in LED-2026-10-25-batch-99.7 (LLR-155.3). Read the current LLR-155.3 and LED .7 from the MAIN checkout, `<HOME>\Github\s19_app\.dev-flow\2026-10-25-batch-99\01-requirements.md` and `01-requirements-ledger.md`, because this worktree's copy is older.
 
 The independent review returned **BLOCK** with three HIGH findings. Fix:
 

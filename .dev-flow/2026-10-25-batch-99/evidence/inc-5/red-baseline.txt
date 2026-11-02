@@ -1,7 +1,7 @@
 ============================= test session starts =============================
-platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- <HOME>\anaconda3\envs\s19env\python.exe
 cachedir: .pytest_cache
-rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc5
+rootdir: <HOME>\Github\s19_app-b99-inc5
 configfile: pyproject.toml
 plugins: textual-snapshot-1.1.0, syrupy-4.8.0
 collecting ... collected 5 items
@@ -15,7 +15,7 @@ tests/test_b99_crc_region.py::test_at_b99_10_flow_crc_region_pilot FAILED [100%]
 ================================== FAILURES ===================================
 ____________ test_tc_b99_26_empty_region_errors_and_writes_nothing ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26571/test_tc_b99_26_empty_region_er0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26571/test_tc_b99_26_empty_region_er0')
 
     def test_tc_b99_26_empty_region_errors_and_writes_nothing(tmp_path: Path) -> None:
         """``0x20000-0x30000`` on ``prg.s19`` → the CRC block errors, the flow
@@ -56,7 +56,7 @@ E         ...Full output truncated (6 lines hidden), use '-vv' to show
 tests\test_b99_crc_region.py:137: AssertionError
 ___________ test_tc_b99_27_partial_region_notices_name_absent_count ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26571/test_tc_b99_27_partial_region_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26571/test_tc_b99_27_partial_region_0')
 
     def test_tc_b99_27_partial_region_notices_name_absent_count(tmp_path: Path) -> None:
         """A legacy region over the 0xFA2E-0xFCB0 gap ends ``notices`` naming the
@@ -132,7 +132,7 @@ E       AttributeError: 'CrcRegionResult' object has no attribute 'absent_bytes'
 tests\test_b99_crc_region.py:236: AttributeError
 ____________ test_tc_b99_38_concurrent_crc_writes_of_the_same_stem ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26571/test_tc_b99_38_concurrent_crc_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26571/test_tc_b99_38_concurrent_crc_0')
 
     def test_tc_b99_38_concurrent_crc_writes_of_the_same_stem(tmp_path: Path) -> None:
         """Two concurrent writers of ``fw-crc.s19`` per trial, 20 trials: every
@@ -168,7 +168,7 @@ E         ...Full output truncated (20 lines hidden), use '-vv' to show
 tests\test_b99_crc_region.py:327: AssertionError
 ____________________ test_at_b99_10_flow_crc_region_pilot _____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26571/test_at_b99_10_flow_crc_region0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26571/test_at_b99_10_flow_crc_region0')
 
     def test_at_b99_10_flow_crc_region_pilot(tmp_path: Path) -> None:
         """Flow Execution, driven ONLY by keys and clicks: the empty-region lane

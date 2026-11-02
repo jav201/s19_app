@@ -1,12 +1,12 @@
 # Audit — Code-Wire lens on the information (data read/write) flows of s19_app (2026-10-23)
 
-**Tree:** `main` @ `9793fcd`, run in the detached worktree `C:\Users\jjgh8\Github\s19_app-cwaudit-data` (kept as evidence; it holds the `cwaudit/` thread tests and 35 `# node:` marks written by `codewire_marks.py`). The live tree was not touched. Nothing was committed or staged.
+**Tree:** `main` @ `9793fcd`, run in the detached worktree `<HOME>\Github\s19_app-cwaudit-data` (kept as evidence; it holds the `cwaudit/` thread tests and 35 `# node:` marks written by `codewire_marks.py`). The live tree was not touched. Nothing was committed or staged.
 **Method:** Code-Wire v2.6 (`code-wire` main `dd39f91`, exported to a scratch copy; the tools ran from that copy). `docs/Notation-Grammar.md` on branch `e7` was read as reference only. Reverse direction, thread-first variant (risk flows, literal threads on real `examples/` data, recordings with `cw_record_plugin.py`, C16 with `codewire_examples.py`). C15 (`codewire_extract.py`) and C2–C10 (`codewire_coherence.py`) ran once as lists, not as gates.
 **Scope:** six data flows. UI screens are out of scope (a sibling audit covers them), except where a data flow ends in a status line.
 **Inputs read:** `INVESTIGATION-read-write-integrity-2026-10-22.md` (cited as I-H-n / I-M-n), `INVESTIGATION-project-roundtrip-2026-10-23.md` (P-H-n / P-M-n), `AUDIT-spec-verification-gaps-2026-10-23.md`, the batch-97 PDR annex `CODEWIRE-PDR.md`, the pilot graph `piloto-s19-parche/grafo-parche.md`.
 **Resource rule:** only single thread-test files ran (7 runs, each < 12 s, no xdist, no full suite).
 
-All outputs: `C:\Users\jjgh8\Github\s19_app\.dev-flow\design\codewire-audit-2026-10-23\data\`.
+All outputs: `<HOME>\Github\s19_app\.dev-flow\design\codewire-audit-2026-10-23\data\`.
 
 ---
 
@@ -123,7 +123,7 @@ Severity follows the integrity investigation's rubric. HIGH = a silent wrong or 
 
 ## 6. Files
 
-| Path (under `C:\Users\jjgh8\Github\s19_app\.dev-flow\design\codewire-audit-2026-10-23\data\`) | Content |
+| Path (under `<HOME>\Github\s19_app\.dev-flow\design\codewire-audit-2026-10-23\data\`) | Content |
 |---|---|
 | `graph-f1-load.md` … `graph-f6-split-join.md` | 6 graphs, v2.6 format B, 35 nodes, with `## Findings` |
 | `examples-report.md` | C16 over all graphs and 7 recordings (53 lines, 0 drift) |
@@ -132,4 +132,4 @@ Severity follows the integrity investigation's rubric. HIGH = a silent wrong or 
 | `recordings/trace-t*.json`, `recordings/run-*.log` | recordings and run logs |
 | `threads/` | copies of the thread tests and helpers (they run from `s19_app-cwaudit-data/cwaudit/` with `run_rec.sh`) |
 
-Worktree (kept): `C:\Users\jjgh8\Github\s19_app-cwaudit-data` (detached at `9793fcd`, plus `cwaudit/` and 35 mark comments).
+Worktree (kept): `<HOME>\Github\s19_app-cwaudit-data` (detached at `9793fcd`, plus `cwaudit/` and 35 mark comments).

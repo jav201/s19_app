@@ -174,7 +174,7 @@ the 44-id pinned union passed, and no in-union node even flipped.
 |---|---|
 | Mutation applied | TC-651's own census: `tui/screens.py` import flipped back to the retired address `from .hexview import ...` + the old `s19_app/tui/hexview.py` restored byte-exact from `410cde5` (move-aside restore — no stash/staging used, C-20) |
 | Instrument | project code: my own hand (python edit); the restore proven by SHA-256, not `git status` |
-| Where it ran | **my own worktree** `C:/Users/jjgh8/Github/s19_app-b92` |
+| Where it ran | **my own worktree** `<HOME>/Github/s19_app-b92` |
 | Transcript | `evidence/increment-001-tc651-red.transcript` — `AssertionError: hexview importer set drifted from the measured set: extra=[] missing=['s19_app.tui.screens']` (the census went RED on the flipped consumer) |
 | Restore proven by | **file hash returned to its pre-mutation value**: `s19_app/tui/screens.py` `94003d51a83ffb955273f4203dfc42f330f8aa4bff162f75e124051c21f9d48c` (pre == post); the restored `tui/hexview.py` was deleted again (existence probe → 0) |
 | Bytecode cache | `PYTHONDONTWRITEBYTECODE=1` on every run (C-46) |
@@ -184,7 +184,7 @@ the 44-id pinned union passed, and no in-union node even flipped.
 
 | Field | Value |
 |---|---|
-| **RED counterfactual** | one consumer (`s19_app/tui/screens.py:34`) flipped back to `from .hexview import …` with the retired file restored from `410cde5` made THIS increment's own TC-651 census fail (`missing=['s19_app.tui.screens']`) · transcript `evidence/increment-001-tc651-red.transcript` (SHA-256 `b0d3defae4f67c1a742f238c7818905f225280edf5042b2e987aa2b3e13e0c65`) · restore digest `94003d51a83ffb955273f4203dfc42f330f8aa4bff162f75e124051c21f9d48c` |
+| **RED counterfactual** | one consumer (`s19_app/tui/screens.py:34`) flipped back to `from .hexview import …` with the retired file restored from `410cde5` made THIS increment's own TC-651 census fail (`missing=['s19_app.tui.screens']`) · transcript `evidence/increment-001-tc651-red.transcript` (SHA-256 `c3767e2bcec6ac0f4fa1af37d11f6056e1ab6ee0b7d7104c7f18ddda7b7f4e80`) · restore digest `94003d51a83ffb955273f4203dfc42f330f8aa4bff162f75e124051c21f9d48c` |
 
 | Field | Value |
 |---|---|
@@ -228,22 +228,22 @@ single-range window cannot satisfy the node.
 | Pinned pre-move report capture (7739 B) | `.dev-flow/2026-10-11-batch-92/evidence/at288-pre-move-report.bin` | `061ee94c07bbed51f5cb99962ba3ed4acbc0c7c6a4461168d1f596d5cdfa4c39` |
 | Capture digest record | `.dev-flow/2026-10-11-batch-92/evidence/at288-pre-move-report.sha256` | `c00f0c19f2c2e426cfe57b6b1de4af82500d9bee4c9ab01a356d10220898471d` |
 | Body-hash verification of the move | `.dev-flow/2026-10-11-batch-92/evidence/increment-001-body-hash.txt` | `fe0262982322d9814050cd9bd3345ee35876216bf7fa60804d9dc3f974c4d276` |
-| New TC modules run (3 passed) | `.dev-flow/2026-10-11-batch-92/evidence/increment-001-tc-modules.transcript` | `78747a66548fb5eded1ac1fd61754996195625e72bd8f3f5f44cedca56e6626e` |
-| Repointed test files run | `.dev-flow/2026-10-11-batch-92/evidence/increment-001-repointed-files-run2.transcript` | `a2d855f384d38680f96b37309352a843f59aba889b0f9cdffe7c1d5d79d24d29` |
-| Full directionb guard host run (183 passed) | `.dev-flow/2026-10-11-batch-92/evidence/increment-001-directionb-guard.transcript` | `151ae874bcc2082a5494fc5cc0c8a997940be5701502aca08eb85b1b8e6abf1d` |
-| AT-288 post-move run (1 passed) | `.dev-flow/2026-10-11-batch-92/evidence/increment-001-at288-post-move.transcript` | `ddf500f18602b83f77d91aa049f275516df4c06cdbd1b108c32fbe8507c4d04c` |
-| Frozen SOURCE guard TC-027 run (1 passed) | `.dev-flow/2026-10-11-batch-92/evidence/increment-001-dual-guard-source.transcript` | `e7e1207f0cc87925e1d6215c3f912d7e320f4610d6484644d4bd515cf926e740` |
-| Frozen TEST-file guard TC-031 pair + TC-032 run (3 passed) | `.dev-flow/2026-10-11-batch-92/evidence/increment-001-dual-guard-testfile.transcript` | `2d091a7f218d574f26b5e1482a2a6771e011684f78ea3e9ca53482985c8716e4` |
-| Cold-import probes (5/5) | `.dev-flow/2026-10-11-batch-92/evidence/increment-001-cold-probes.transcript` | `9622ad395e4c3ba0215811b9630b69d396b69a0e4335f35b24bc947146f4c3ae` |
-| TC-651 RED counterfactual | `.dev-flow/2026-10-11-batch-92/evidence/increment-001-tc651-red.transcript` | `b0d3defae4f67c1a742f238c7818905f225280edf5042b2e987aa2b3e13e0c65` |
-| TC-652 RED arm | `.dev-flow/2026-10-11-batch-92/evidence/increment-001-tc652-red.transcript` | `03cc5b62c4294413eb7d0088fb9d443113f1bb2e81cf99c24b7ffa5ac29bdd92` |
-| TC-655 RED arm | `.dev-flow/2026-10-11-batch-92/evidence/increment-001-tc655-red.transcript` | `5bf99d6ca666122a18d4a9c4d2f149f06f7f0ca321ac00b08a3033a2bde89fc1` |
-| AT-288 RED arm | `.dev-flow/2026-10-11-batch-92/evidence/increment-001-at288-red.transcript` | `f3561da8e693cccfe3ef024aed4794210fadbe4d500e77c128137cb9bdd40697` |
+| New TC modules run (3 passed) | `.dev-flow/2026-10-11-batch-92/evidence/increment-001-tc-modules.transcript` | `a8b0454e4e31f62099f333fa95e0d4214dc8d5d1209148222f60d95fb972c0df` |
+| Repointed test files run | `.dev-flow/2026-10-11-batch-92/evidence/increment-001-repointed-files-run2.transcript` | `6acf9d5a176d19856e03c1de1d89f3cc6a8ea53d72770e22ff0a066db6961e24` |
+| Full directionb guard host run (183 passed) | `.dev-flow/2026-10-11-batch-92/evidence/increment-001-directionb-guard.transcript` | `ed6e3f60b90086311c287ddcce6116404741be7d22543fcf1c94c39f9c580520` |
+| AT-288 post-move run (1 passed) | `.dev-flow/2026-10-11-batch-92/evidence/increment-001-at288-post-move.transcript` | `c7724b0130cb89e64289d25f8851c14133d659caa9f35dd650cd7a4b8884445f` |
+| Frozen SOURCE guard TC-027 run (1 passed) | `.dev-flow/2026-10-11-batch-92/evidence/increment-001-dual-guard-source.transcript` | `b78f48651fdb45002e3310d1e8eceb1ee5476ad06670be2c1b5ce2181085f607` |
+| Frozen TEST-file guard TC-031 pair + TC-032 run (3 passed) | `.dev-flow/2026-10-11-batch-92/evidence/increment-001-dual-guard-testfile.transcript` | `62ec35c4150dbf025bbca62e65013d881e0a38719d55169ab38da2995e5dc81e` |
+| Cold-import probes (5/5) | `.dev-flow/2026-10-11-batch-92/evidence/increment-001-cold-probes.transcript` | `c6c1ec2cf8ce656f02d24b44df5017d8f4788fa56e24a67e3df086c3abc0e633` |
+| TC-651 RED counterfactual | `.dev-flow/2026-10-11-batch-92/evidence/increment-001-tc651-red.transcript` | `c3767e2bcec6ac0f4fa1af37d11f6056e1ab6ee0b7d7104c7f18ddda7b7f4e80` |
+| TC-652 RED arm | `.dev-flow/2026-10-11-batch-92/evidence/increment-001-tc652-red.transcript` | `d5d5a0a768fcc148dbc934d6b215ff096695db03407be15c5f89ff9458758512` |
+| TC-655 RED arm | `.dev-flow/2026-10-11-batch-92/evidence/increment-001-tc655-red.transcript` | `09d42839ac036d5d97a91ebe74cf030abeccecc0106b6d353a29deca9b145a8d` |
+| AT-288 RED arm | `.dev-flow/2026-10-11-batch-92/evidence/increment-001-at288-red.transcript` | `e61a014e8284abedf39a98423d94fa9e9ecec414078bc4584cfb13d705b5d8b1` |
 | tui-free positive control | `.dev-flow/2026-10-11-batch-92/evidence/increment-001-tuifree-positive-control.txt` | `204048121506988528031514a9590fd0c095a21e1cd7032ae090041597752a43` |
 
 | Field | Value |
 |---|---|
-| **Evidence files** | 15 artifacts at the declared home, each cited with the digest of its stored bytes; `.gitattributes` marks `evidence/**` `-text` (mixed line endings stored verbatim). The first repointed-files run (`increment-001-repointed-files.transcript`, digest `7356482a41a9f81a2841733433094c6df2c17e0ea0937e49a07055f54ce80eaa`) is retained and dissected in §5 — its tc024 flip is the flaky node under analysis. |
+| **Evidence files** | 15 artifacts at the declared home, each cited with the digest of its stored bytes; `.gitattributes` marks `evidence/**` `-text` (mixed line endings stored verbatim). The first repointed-files run (`increment-001-repointed-files.transcript`, digest `e3531e2043d0d73bddc83bd46012058d9dce1c752930785e213c1620ae0acfaa`) is retained and dissected in §5 — its tc024 flip is the flaky node under analysis. |
 
 ### Load-bearing emptiness — what is this resting on that is only true today? (C-55)
 
@@ -313,7 +313,7 @@ against the moved tree, all 15 cited evidence artifacts re-hash to their recorde
 discipline holds (Inc-B set and frozen set: 0 diff entries). LOW notes only; the tc024 disposition
 is an orchestrator ruling, not an increment defect.
 
-Executed evidence (reviewer-run, 2026-10-12, worktree `C:/Users/jjgh8/Github/s19_app-b92`):
+Executed evidence (reviewer-run, 2026-10-12, worktree `<HOME>/Github/s19_app-b92`):
 
 - **Body hash recomputed independently** — `git show 410cde5:s19_app/tui/hexview.py` minus base
   lines 61–143 (3 wrappers + 2 trailing blanks) minus base lines 16–17 plus the single

@@ -1,6 +1,6 @@
 # command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_at058b_id_census_and_wiring_survive_reparent  (30 runs, alternating; runs 11-30 appended in a second loop base / tree, isolated)
-# base tree: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r5/base (git archive 8d6056f, the code-reviewer's copy)
-# fixed tree: C:/Users/jjgh8/Github/s19_app-b100-inc5 (base 8d6056f + Inc 5 + corrective pass 1); app.py 8032dead73f7ee54
+# base tree: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r5/base (git archive 8d6056f, the code-reviewer's copy)
+# fixed tree: <HOME>/Github/s19_app-b100-inc5 (base 8d6056f + Inc 5 + corrective pass 1); app.py 8032dead73f7ee54
 # PYTHONPATH=<the tree under test> ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:58:09Z
 run 1 base: 1 passed in 2.30s

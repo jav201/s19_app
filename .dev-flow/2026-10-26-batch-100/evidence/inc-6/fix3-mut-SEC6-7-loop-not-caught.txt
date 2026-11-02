@@ -1,9 +1,9 @@
 # mutation: SEC6-7-loop-not-caught — SEC6-7 remainder (LLR-168.1 / LLR-178.1): the resolver no longer catches RuntimeError (a junction that points to itself)
 # file: s19_app/tui/services/variant_execution_service.py (sha256 before 76b276077ded9717)
-# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=C:\Users\jjgh8\AppData\Local\Temp\f3mut-SEC6-7-loop-not-caught tests/test_b100_announce.py tests/test_b100_active_variant.py -k junction_loop
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (corrective pass 3, mutated in place, then restored)
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
-# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\__init__.py
+# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=<HOME>\AppData\Local\Temp\f3mut-SEC6-7-loop-not-caught tests/test_b100_announce.py tests/test_b100_active_variant.py -k junction_loop
+# tree: <HOME>\Github\s19_app-b100-inc6 (corrective pass 3, mutated in place, then restored)
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# s19_app.__file__ = <HOME>\Github\s19_app-b100-inc6\s19_app\__init__.py
 # date: 2026-10-30T05:15:01Z
 # --- old
 #       except (OSError, ValueError, RuntimeError) as exc:
@@ -41,7 +41,7 @@ tests\test_b100_announce.py:96: AssertionError
 
 During handling of the above exception, another exception occurred:
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-7-loop-not-caught/test_tc_b100_67_junction_loop_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f3mut-SEC6-7-loop-not-caught/test_tc_b100_67_junction_loop_0')
 
     def test_tc_b100_67_junction_loop_entry_is_a_skipped_row_not_a_crash(tmp_path: Path) -> None:
         """SEC6-7 remainder: ``gathered`` records ``loop/x.json`` where ``loop``
@@ -122,12 +122,12 @@ e = OSError(22, 'The name of the file cannot be resolved by the system')
         winerror = getattr(e, 'winerror', 0)
         if e.errno == ELOOP or winerror == _WINERROR_CANT_RESOLVE_FILENAME:
 >           raise RuntimeError("Symlink loop from %r" % e.filename)
-E           RuntimeError: Symlink loop from 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\f3mut-SEC6-7-loop-not-caught\\test_tc_b100_67_junction_loop_0\\app\\.s19tool\\workarea\\P\\loop\\x.json'
+E           RuntimeError: Symlink loop from '<HOME>\\AppData\\Local\\Temp\\f3mut-SEC6-7-loop-not-caught\\test_tc_b100_67_junction_loop_0\\app\\.s19tool\\workarea\\P\\loop\\x.json'
 
 ..\..\anaconda3\envs\s19env\Lib\pathlib.py:990: RuntimeError
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1003 in resolve          
+│ <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:1003 in resolve          
 │                                                                              
 │   1000 │   │   # Ensure we get an exception by calling stat()                
 │   1001 │   │   if not strict:                                                
@@ -138,13 +138,13 @@ E           RuntimeError: Symlink loop from 'C:\\Users\\jjgh8\\AppData\\Local\\T
 │   1006 │   │   return p                                                      
 │                                                                              
 │ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
-│ │      p = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-7-lo… │ 
-│ │      s = 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\f3mut-SEC6-7-loop-not… │ 
-│ │   self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-7-lo… │ 
+│ │      p = WindowsPath('<HOME>/AppData/Local/Temp/f3mut-SEC6-7-lo… │ 
+│ │      s = '<HOME>\\AppData\\Local\\Temp\\f3mut-SEC6-7-loop-not… │ 
+│ │   self = WindowsPath('<HOME>/AppData/Local/Temp/f3mut-SEC6-7-lo… │ 
 │ │ strict = False                                                           │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1013 in stat             
+│ <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:1013 in stat             
 │                                                                              
 │   1010 │   │   Return the result of the stat() system call on this path, lik 
 │   1011 │   │   os.stat() does.                                               
@@ -156,17 +156,17 @@ E           RuntimeError: Symlink loop from 'C:\\Users\\jjgh8\\AppData\\Local\\T
 │                                                                              
 │ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
 │ │ follow_symlinks = True                                                   │ 
-│ │            self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-… │ 
+│ │            self = WindowsPath('<HOME>/AppData/Local/Temp/f3mut-… │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 ╰──────────────────────────────────────────────────────────────────────────────
 OSError: [WinError 1921] The name of the file cannot be resolved by the system:
-'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\f3mut-SEC6-7-loop-not-caught\\test_tc_
+'<HOME>\\AppData\\Local\\Temp\\f3mut-SEC6-7-loop-not-caught\\test_tc_
 100_67_junction_loop_0\\app\\.s19tool\\workarea\\P\\loop\\x.json'
 
 During handling of the above exception, another exception occurred:
 
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\tui\app.py:7019 in           
+│ <HOME>\Github\s19_app-b100-inc6\s19_app\tui\app.py:7019 in           
 │ _route_load_project                                                          
 │                                                                              
 │    7016 │   │   │   │   - ``action_load_project`` (the dialog's dismiss call 
@@ -190,7 +190,7 @@ During handling of the above exception, another exception occurred:
 │ │          )                                    │                            
 │ ╰───────────────────────────────────────────────╯                            
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\tui\app.py:10141 in          
+│ <HOME>\Github\s19_app-b100-inc6\s19_app\tui\app.py:10141 in          
 │ _handle_load_project                                                         
 │                                                                              
 │   10138 │   │   # order of ``build_variant_set`` (with a status warning when 
@@ -205,14 +205,14 @@ During handling of the above exception, another exception occurred:
 │ │         a2l_files = []                                                   │ 
 │ │        data_files = [                                                    │ 
 │ │                     │                                                    │ 
-│ │                     WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mu… │ 
+│ │                     WindowsPath('<HOME>/AppData/Local/Temp/f3mu… │ 
 │ │                     │                                                    │ 
-│ │                     WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mu… │ 
+│ │                     WindowsPath('<HOME>/AppData/Local/Temp/f3mu… │ 
 │ │                     ]                                                    │ 
 │ │ discarded_unsaved = 0                                                    │ 
 │ │             error = None                                                 │ 
 │ │              name = 'P'                                                  │ 
-│ │       project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mu… │ 
+│ │       project_dir = WindowsPath('<HOME>/AppData/Local/Temp/f3mu… │ 
 │ │              self = S19TuiApp(                                           │ 
 │ │                     │   title='Hex Edit Tool',                           │ 
 │ │                     │   classes={'-dark-mode'},                          │ 
@@ -224,13 +224,13 @@ During handling of the above exception, another exception occurred:
 │ │                     │   │   VariantDescriptor(                           │ 
 │ │                     │   │   │   variant_id='firmware',                   │ 
 │ │                     │   │   │                                            │ 
-│ │                     path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp… │ 
+│ │                     path=WindowsPath('<HOME>/AppData/Local/Temp… │ 
 │ │                     │   │   │   file_type='s19'                          │ 
 │ │                     │   │   ),                                           │ 
 │ │                     │   │   VariantDescriptor(                           │ 
 │ │                     │   │   │   variant_id='firmware_1',                 │ 
 │ │                     │   │   │                                            │ 
-│ │                     path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp… │ 
+│ │                     path=WindowsPath('<HOME>/AppData/Local/Temp… │ 
 │ │                     │   │   │   file_type='s19'                          │ 
 │ │                     │   │   )                                            │ 
 │ │                     │   ),                                               │ 
@@ -238,7 +238,7 @@ During handling of the above exception, another exception occurred:
 │ │                     )                                                    │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\tui\services\variant_executi 
+│ <HOME>\Github\s19_app-b100-inc6\s19_app\tui\services\variant_executi 
 │ on_service.py:635 in read_project_manifest                                   
 │                                                                              
 │    632 │   │   │   │   continue                                              
@@ -270,24 +270,24 @@ During handling of the above exception, another exception occurred:
 │ │         gathered = {}                                                    │ 
 │ │     gathered_raw = {'patches': ['loop/x.json']}                          │ 
 │ │           handle = <_io.BufferedReader                                   │ 
-│ │                    name='C:\\Users\\jjgh8\\AppData\\Local\\Temp\\f3mut-… │ 
+│ │                    name='<HOME>\\AppData\\Local\\Temp\\f3mut-… │ 
 │ │             home = 'patches'                                             │ 
 │ │           issues = []                                                    │ 
-│ │    manifest_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut… │ 
+│ │    manifest_path = WindowsPath('<HOME>/AppData/Local/Temp/f3mut… │ 
 │ │          payload = {                                                     │ 
 │ │                    │   'schema_version': 1,                              │ 
 │ │                    │   'active_variant': 'firmware_1',                   │ 
 │ │                    │   'gathered': {'patches': ['loop/x.json']}          │ 
 │ │                    }                                                     │ 
-│ │      project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut… │ 
-│ │     project_root = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut… │ 
+│ │      project_dir = WindowsPath('<HOME>/AppData/Local/Temp/f3mut… │ 
+│ │     project_root = WindowsPath('<HOME>/AppData/Local/Temp/f3mut… │ 
 │ │ resolved_entries = []                                                    │ 
 │ │   schema_version = 1                                                     │ 
 │ │       size_bytes = 95                                                    │ 
 │ │       size_probe = None                                                  │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\tui\services\variant_executi 
+│ <HOME>\Github\s19_app-b100-inc6\s19_app\tui\services\variant_executi 
 │ on_service.py:325 in _resolve_manifest_entry                                 
 │                                                                              
 │    322 │   │   )                                                             
@@ -301,12 +301,12 @@ During handling of the above exception, another exception occurred:
 │ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
 │ │      context = "gathered['patches']"                                     │ 
 │ │       issues = []                                                        │ 
-│ │ project_root = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC… │ 
+│ │ project_root = WindowsPath('<HOME>/AppData/Local/Temp/f3mut-SEC… │ 
 │ │    raw_entry = 'loop/x.json'                                             │ 
 │ │         text = 'loop/x.json'                                             │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1005 in resolve          
+│ <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:1005 in resolve          
 │                                                                              
 │   1002 │   │   │   try:                                                      
 │   1003 │   │   │   │   p.stat()                                              
@@ -317,13 +317,13 @@ During handling of the above exception, another exception occurred:
 │   1008 │   def stat(self, *, follow_symlinks=True):                          
 │                                                                              
 │ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
-│ │      p = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-7-lo… │ 
-│ │      s = 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\f3mut-SEC6-7-loop-not… │ 
-│ │   self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-7-lo… │ 
+│ │      p = WindowsPath('<HOME>/AppData/Local/Temp/f3mut-SEC6-7-lo… │ 
+│ │      s = '<HOME>\\AppData\\Local\\Temp\\f3mut-SEC6-7-loop-not… │ 
+│ │   self = WindowsPath('<HOME>/AppData/Local/Temp/f3mut-SEC6-7-lo… │ 
 │ │ strict = False                                                           │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:990 in check_eloop       
+│ <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:990 in check_eloop       
 │                                                                              
 │    987 │   │   def check_eloop(e):                                           
 │    988 │   │   │   winerror = getattr(e, 'winerror', 0)                      
@@ -340,11 +340,11 @@ During handling of the above exception, another exception occurred:
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 ╰──────────────────────────────────────────────────────────────────────────────
 RuntimeError: Symlink loop from 
-'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\f3mut-SEC6-7-loop-not-caught\\test_tc_
+'<HOME>\\AppData\\Local\\Temp\\f3mut-SEC6-7-loop-not-caught\\test_tc_
 100_67_junction_loop_0\\app\\.s19tool\\workarea\\P\\loop\\x.json'
 __ test_tc_b100_20_variant_append_with_a_junction_loop_entry_does_not_crash ___
 
-self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-7-loop-not-caught/test_tc_b100_20_variant_append0/app/.s19tool/workarea/P/loop/x.json')
+self = WindowsPath('<HOME>/AppData/Local/Temp/f3mut-SEC6-7-loop-not-caught/test_tc_b100_20_variant_append0/app/.s19tool/workarea/P/loop/x.json')
 strict = False
 
     def resolve(self, strict=False):
@@ -374,7 +374,7 @@ strict = False
 ..\..\anaconda3\envs\s19env\Lib\pathlib.py:1003: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-7-loop-not-caught/test_tc_b100_20_variant_append0/app/.s19tool/workarea/P/loop/x.json')
+self = WindowsPath('<HOME>/AppData/Local/Temp/f3mut-SEC6-7-loop-not-caught/test_tc_b100_20_variant_append0/app/.s19tool/workarea/P/loop/x.json')
 
     def stat(self, *, follow_symlinks=True):
         """
@@ -383,13 +383,13 @@ self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-7-loop-not-caug
         """
 >       return os.stat(self, follow_symlinks=follow_symlinks)
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-E       OSError: [WinError 1921] The name of the file cannot be resolved by the system: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\f3mut-SEC6-7-loop-not-caught\\test_tc_b100_20_variant_append0\\app\\.s19tool\\workarea\\P\\loop\\x.json'
+E       OSError: [WinError 1921] The name of the file cannot be resolved by the system: '<HOME>\\AppData\\Local\\Temp\\f3mut-SEC6-7-loop-not-caught\\test_tc_b100_20_variant_append0\\app\\.s19tool\\workarea\\P\\loop\\x.json'
 
 ..\..\anaconda3\envs\s19env\Lib\pathlib.py:1013: OSError
 
 During handling of the above exception, another exception occurred:
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-7-loop-not-caught/test_tc_b100_20_variant_append0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f3mut-SEC6-7-loop-not-caught/test_tc_b100_20_variant_append0')
 
     def test_tc_b100_20_variant_append_with_a_junction_loop_entry_does_not_crash(
         tmp_path: Path,
@@ -455,7 +455,7 @@ e = OSError(22, 'The name of the file cannot be resolved by the system')
         winerror = getattr(e, 'winerror', 0)
         if e.errno == ELOOP or winerror == _WINERROR_CANT_RESOLVE_FILENAME:
 >           raise RuntimeError("Symlink loop from %r" % e.filename)
-E           RuntimeError: Symlink loop from 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\f3mut-SEC6-7-loop-not-caught\\test_tc_b100_20_variant_append0\\app\\.s19tool\\workarea\\P\\loop\\x.json'
+E           RuntimeError: Symlink loop from '<HOME>\\AppData\\Local\\Temp\\f3mut-SEC6-7-loop-not-caught\\test_tc_b100_20_variant_append0\\app\\.s19tool\\workarea\\P\\loop\\x.json'
 
 ..\..\anaconda3\envs\s19env\Lib\pathlib.py:990: RuntimeError
 =========================== short test summary info ===========================

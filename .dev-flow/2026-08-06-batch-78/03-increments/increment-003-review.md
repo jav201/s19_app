@@ -1,7 +1,7 @@
 # Code Review — batch-78 Increment 3 (`AT-B78-31`)
 
 > Independent `code-reviewer` lane. Reviewed commit **`c88b0ad`** against base **`aaa382d`**.
-> Repo `C:\Users\jjgh8\Github\s19_app`, branch `claude/batch-78-cmdbar-a2bdiff`.
+> Repo `<HOME>\Github\s19_app`, branch `claude/batch-78-cmdbar-a2bdiff`.
 > Every figure below was **re-executed in this review**, not read from the packet.
 
 ---

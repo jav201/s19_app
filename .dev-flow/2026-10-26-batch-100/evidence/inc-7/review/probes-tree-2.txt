@@ -1,10 +1,10 @@
 # cmd: python -m pytest -p no:cacheprovider -s -q -c pyproject.toml --rootdir . <r7>/probes/test_r7_probes.py -k 'pa_ or pb_ or import_proof' (cwd = worktree)
-# tree: C:/Users/jjgh8/Github/s19_app-b100-inc7  PYTHONPATH=same  NO_COLOR unset; nothing else running
+# tree: <HOME>/Github/s19_app-b100-inc7  PYTHONPATH=same  NO_COLOR unset; nothing else running
 # b3a8da7ae550bda5 s19_app/tui/services/manifest_writer.py
 # bd33c8be189d2c87 s19_app/tui/services/variant_execution_service.py
 # 0e29d80841fa3f38 s19_app/tui/app.py
 # e23ea8f72bc93153 s19_app/tui/screens.py
-s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+s19_app import: <HOME>\Github\s19_app-b100-inc7\s19_app\__init__.py
 .problems: (LoadProblem(label='not readable', file='firmware.s19', detail='not an S19 or HEX file - replace the file, or Save project to drop it', rank=2),)
 current_file: None
 log: ["Loaded project 'P' -> (no image) - 1 variants, 1 problem - details: p"]
@@ -13,7 +13,7 @@ F
 ================================== FAILURES ===================================
 ______________ test_pa_unreadable_a2l_is_not_blamed_on_the_image ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30293/test_pa_unreadable_a2l_is_not_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30293/test_pa_unreadable_a2l_is_not_0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001AD0C806290>
 
     def test_pa_unreadable_a2l_is_not_blamed_on_the_image(
@@ -57,10 +57,10 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001AD0C806290>
         ]
 E       AssertionError: assert ('not readable', 'firmware.s19') not in [('not readable', 'firmware.s19')]
 
-..\..\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r7\probes\test_r7_probes.py:250: AssertionError
+..\..\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r7\probes\test_r7_probes.py:250: AssertionError
 ________________ test_pb_files_records_at_the_cap_all_missing _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30293/test_pb_files_records_at_the_c0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30293/test_pb_files_records_at_the_c0')
 
     def test_pb_files_records_at_the_cap_all_missing(tmp_path: Path) -> None:
         import time
@@ -111,7 +111,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 E       AssertionError: 999
 E       assert 999 <= (((100 + 1) + 1) + 1)
 
-..\..\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r7\probes\test_r7_probes.py:311: AssertionError
+..\..\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r7\probes\test_r7_probes.py:311: AssertionError
 =========================== short test summary info ===========================
 FAILED ::test_pa_unreadable_a2l_is_not_blamed_on_the_image - AssertionError: ...
 FAILED ::test_pb_files_records_at_the_cap_all_missing - AssertionError: 999

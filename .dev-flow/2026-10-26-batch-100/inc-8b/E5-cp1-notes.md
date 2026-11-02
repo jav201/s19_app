@@ -4,7 +4,7 @@ Base `ebe6d0c`, branch `b100-inc8b`, uncommitted. Ledger: LED .80. **5 source fi
 
 ## Snapshot
 
-`…/scratchpad/cp8b-1/pre/` holds the package as it was before this pass (`s19_app/`, `tests/`, `examples/`, `setup.py`, `pyproject.toml`, `AT-TC-REGISTRY.jsonl`). The sha256[:16] values match the brief: `app.py` b75f9125c9eb12c1, `project_gather_service.py` 7f1ecfefde90ee6b, `workspace.py` d9f361f3fb092ae2, `screens_directionb.py` e94f8e764f950b1a; the 5th file, `variant_execution_service.py`, is 699c38bd2cce77cd in the snapshot (unchanged since `ebe6d0c`). RED ran in `…/cp8b-1/red/`, which is that snapshot plus this pass's `tests/test_b100_project_homes.py` and `tests/support/timing.py`. The snapshot itself was not changed. `…` = `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad`.
+`…/scratchpad/cp8b-1/pre/` holds the package as it was before this pass (`s19_app/`, `tests/`, `examples/`, `setup.py`, `pyproject.toml`, `AT-TC-REGISTRY.jsonl`). The sha256[:16] values match the brief: `app.py` b75f9125c9eb12c1, `project_gather_service.py` 7f1ecfefde90ee6b, `workspace.py` d9f361f3fb092ae2, `screens_directionb.py` e94f8e764f950b1a; the 5th file, `variant_execution_service.py`, is 699c38bd2cce77cd in the snapshot (unchanged since `ebe6d0c`). RED ran in `…/cp8b-1/red/`, which is that snapshot plus this pass's `tests/test_b100_project_homes.py` and `tests/support/timing.py`. The snapshot itself was not changed. `…` = `<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad`.
 
 ## Per item
 

@@ -2,7 +2,7 @@
 ================================== FAILURES ===================================
 ____________________________ test_save_back_prompt ____________________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25890/test_save_back_prompt0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25890/test_save_back_prompt0')
 
     def test_save_back_prompt(tmp_path: Path) -> None:
         """The post-apply prompt offers an editable suggestion; decline writes
@@ -111,7 +111,7 @@ E       assert None is not None
 tests\test_tui_patch_editor_v2.py:630: AssertionError
 ______________________ test_verify_loud_mismatch_notice _______________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25890/test_verify_loud_mismatch_noti0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25890/test_verify_loud_mismatch_noti0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000029A016C4310>
 
     def test_verify_loud_mismatch_notice(
@@ -179,7 +179,7 @@ E        +  where False = any(<generator object test_verify_loud_mismatch_notice
 tests\test_tui_patch_editor_v2.py:995: AssertionError
 ________________ test_at031b_two_saves_are_distinct_no_clobber ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25890/test_at031b_two_saves_are_dist0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25890/test_at031b_two_saves_are_dist0')
 
     def test_at031b_two_saves_are_distinct_no_clobber(tmp_path: Path) -> None:
         """AT-031b (idempotent boundary) — two saves keep both, distinct names.
@@ -214,14 +214,14 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
     
         saved = list(patches.glob("*.json"))
 >       assert len(saved) == 2, f"two saves must keep two files, found {saved}"
-E       AssertionError: two saves must keep two files, found [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25890/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')]
+E       AssertionError: two saves must keep two files, found [WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25890/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')]
 E       assert 1 == 2
-E        +  where 1 = len([WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25890/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')])
+E        +  where 1 = len([WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25890/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')])
 
 tests\test_tui_patch_editor_v2.py:1336: AssertionError
 __________ test_at030c_directly_dropped_file_is_listed_and_loadable ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25890/test_at030c_directly_dropped_f0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25890/test_at030c_directly_dropped_f0')
 
     def test_at030c_directly_dropped_file_is_listed_and_loadable(
         tmp_path: Path,
@@ -273,7 +273,7 @@ E       assert -1 == 768
 tests\test_tui_patch_editor_v2.py:1584: AssertionError
 ___________ test_at064c_edit_json_disabled_for_file_backed_document ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25890/test_at064c_edit_json_disabled0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25890/test_at064c_edit_json_disabled0')
 
     def test_at064c_edit_json_disabled_for_file_backed_document(
         tmp_path: Path,
@@ -368,7 +368,7 @@ E       assert False is True
 tests\test_tui_patch_editor_v2.py:3372: AssertionError
 ___________ test_tc344_undo_redo_disabled_for_file_backed_document ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25890/test_tc344_undo_redo_disabled_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25890/test_tc344_undo_redo_disabled_0')
 
     def test_tc344_undo_redo_disabled_for_file_backed_document(
         tmp_path: Path,

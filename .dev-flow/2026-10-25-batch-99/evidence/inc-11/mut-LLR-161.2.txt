@@ -1,7 +1,7 @@
 ============================= test session starts =============================
-platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- <HOME>\anaconda3\envs\s19env\python.exe
 cachedir: .pytest_cache
-rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc11
+rootdir: <HOME>\Github\s19_app-b99-inc11
 configfile: pyproject.toml
 plugins: textual-snapshot-1.1.0, syrupy-4.8.0
 collecting ... collected 3 items / 2 deselected / 1 selected
@@ -11,7 +11,7 @@ tests/test_b99_bytes_field.py::test_tc_b99_33_field_and_help_state_the_hex_rule 
 ================================== FAILURES ===================================
 ______________ test_tc_b99_33_field_and_help_state_the_hex_rule _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25893/test_tc_b99_33_field_and_help_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25893/test_tc_b99_33_field_and_help_0')
 
     def test_tc_b99_33_field_and_help_state_the_hex_rule(tmp_path: Path) -> None:
         """TC-B99-33 (LLR-161.2): the placeholder contains ``hex``, fits the

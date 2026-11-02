@@ -1,7 +1,7 @@
 ============================= test session starts =============================
-platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- <HOME>\anaconda3\envs\s19env\python.exe
 cachedir: .pytest_cache
-rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc10
+rootdir: <HOME>\Github\s19_app-b99-inc10
 configfile: pyproject.toml
 plugins: textual-snapshot-1.1.0, syrupy-4.8.0
 collecting ... collected 3 items
@@ -13,7 +13,7 @@ tests/test_tui_issues_triage_b94.py::test_tc_b94_18_curated_set_and_engine_freez
 ================================== FAILURES ===================================
 _______________ test_tc031_engine_modules_have_no_diff_vs_main ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25953/test_tc031_engine_modules_have0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25953/test_tc031_engine_modules_have0')
 
     def test_tc031_engine_modules_have_no_diff_vs_main(tmp_path: Path) -> None:
         """The engine / data-processing modules show zero diff vs ``main``.
@@ -50,7 +50,7 @@ E         +  2 files changed, 251 insertions(+), 107 deletions(-)
 tests\test_tui_directionb.py:7050: AssertionError
 __________ test_tc031_engine_modules_have_no_name_only_diff_vs_main ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25953/test_tc031_engine_modules_have1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25953/test_tc031_engine_modules_have1')
 
     def test_tc031_engine_modules_have_no_name_only_diff_vs_main(tmp_path: Path) -> None:
         """No engine module file appears in ``git diff --name-only main``.

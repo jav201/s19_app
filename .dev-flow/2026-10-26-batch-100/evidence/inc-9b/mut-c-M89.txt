@@ -6,11 +6,11 @@ edits (old -> new):
 sha256 before: d0cfd46e22c3f60ef85829bf5903d689b7e849d770fe428e65d4b1000d75b509
 sha256 after restore: d0cfd46e22c3f60ef85829bf5903d689b7e849d770fe428e65d4b1000d75b509
 restored = True
-command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE --basetemp=C:/Users/jjgh8/Github/s19_app-b100-inc9b/.dev-flow/2026-10-26-batch-100/evidence\bt-mutc-M89 tests/test_b100_load_dialog.py::test_tc_b100_63_typed_folder_that_cannot_be_read_is_explained[content listing]
-cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr9b/mut
-s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr9b\mut\s19_app\__init__.py
+command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE --basetemp=<HOME>/Github/s19_app-b100-inc9b/.dev-flow/2026-10-26-batch-100/evidence\bt-mutc-M89 tests/test_b100_load_dialog.py::test_tc_b100_63_typed_folder_that_cannot_be_read_is_explained[content listing]
+cwd: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr9b/mut
+s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr9b\mut\s19_app\__init__.py
 ---
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr9b\mut\tests\test_b100_load_dialog.py:2492: AssertionError: not a project — pick a project in the list
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr9b\mut\tests\test_b100_load_dialog.py:2492: AssertionError: not a project — pick a project in the list
 FAILED tests/test_b100_load_dialog.py::test_tc_b100_63_typed_folder_that_cannot_be_read_is_explained[content listing]
 pytest: 1 failed in 11.81s
 exit code: 1

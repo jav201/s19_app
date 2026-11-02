@@ -6,11 +6,11 @@ edits (old -> new):
 sha256 before: 120d39b9697fab0f8f9882d000ac9ff9e3f212c8bbc9e3f90d79c1b2347d71a2
 sha256 after restore: 120d39b9697fab0f8f9882d000ac9ff9e3f212c8bbc9e3f90d79c1b2347d71a2
 restored = True
-command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE --basetemp=C:/Users/jjgh8/Github/s19_app-b100-inc9b/.dev-flow/2026-10-26-batch-100/evidence\bt-mutc-M32 tests/test_b100_load_dialog.py::test_tc_b100_41_typed_text_reaches_the_verdict_verbatim
-cwd: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr9b/mut
-s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr9b\mut\s19_app\__init__.py
+command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE --basetemp=<HOME>/Github/s19_app-b100-inc9b/.dev-flow/2026-10-26-batch-100/evidence\bt-mutc-M32 tests/test_b100_load_dialog.py::test_tc_b100_41_typed_text_reaches_the_verdict_verbatim
+cwd: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr9b/mut
+s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr9b\mut\s19_app\__init__.py
 ---
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr9b\mut\tests\test_b100_load_dialog.py:1350: AssertionError: [LoadChoice(kind='path', value='C:\\t\\a.s19')]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr9b\mut\tests\test_b100_load_dialog.py:1350: AssertionError: [LoadChoice(kind='path', value='C:\\t\\a.s19')]
 FAILED tests/test_b100_load_dialog.py::test_tc_b100_41_typed_text_reaches_the_verdict_verbatim
 pytest: 1 failed in 3.16s
 exit code: 1

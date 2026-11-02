@@ -2,7 +2,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 __________ test_tc_b100_53_quit_question_emphasises_the_safe_answer ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/s19f2/bt/test_tc_b100_53_quit_question_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19f2/bt/test_tc_b100_53_quit_question_0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000021BDF5579D0>
 
     def test_tc_b100_53_quit_question_emphasises_the_safe_answer(

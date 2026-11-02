@@ -1,17 +1,17 @@
 == GREEN: workers + a2l_progress whole, save-rollback arms (-k tc_b100_07), quit arms, guards
-tree: C:/Users/jjgh8/Github/s19_app-b100-inc12b  (git HEAD 81ac4c0)
+tree: <HOME>/Github/s19_app-b100-inc12b  (git HEAD 81ac4c0)
 date: 2026-11-01T12:59:01Z
-s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc12b\s19_app\__init__.py
+s19_app.__file__: <HOME>\Github\s19_app-b100-inc12b\s19_app\__init__.py
 source sha256[:16]: app.py 46f7ee6aa8a0fbfb  a2l.py 73c3820fe0d6ecd2  styles.tcss f7b4f75911b296a4
-env: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12b/la
-cmd: pytest -p no:cacheprovider --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12b/bt/green04 -rA tests/test_b100_workers.py tests/test_b100_a2l_progress.py tests/test_b100_save_guards.py -k not save_guards or tc_b100_07 tests/test_b100_load_question.py::test_tc_b100_66_busy_line_and_quit_question_hold_no_decision_ids tests/test_b100_session_reset.py::test_tc_b100_09_twelve_b_adds_exactly_the_quit_flag tests/test_id_registry.py tests/test_b99_staging.py
+env: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12b/la
+cmd: pytest -p no:cacheprovider --basetemp=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12b/bt/green04 -rA tests/test_b100_workers.py tests/test_b100_a2l_progress.py tests/test_b100_save_guards.py -k not save_guards or tc_b100_07 tests/test_b100_load_question.py::test_tc_b100_66_busy_line_and_quit_question_hold_no_decision_ids tests/test_b100_session_reset.py::test_tc_b100_09_twelve_b_adds_exactly_the_quit_flag tests/test_id_registry.py tests/test_b99_staging.py
 ................................x....................................... [ 44%]
 ........................................................................ [ 88%]
 ...................E                                                     [100%]
 =================================== ERRORS ====================================
 ___ ERROR at teardown of test_tc_b99_ux_c10_d7_lane_name_renders_literally ____
 
-tmp_path_factory = TempPathFactory(_given_basetemp=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c24...clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12b/bt/green04'), _retention_count=3, _retention_policy='all')
+tmp_path_factory = TempPathFactory(_given_basetemp=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c24...clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12b/bt/green04'), _retention_count=3, _retention_policy='all')
 
     @pytest.fixture(scope="session", autouse=True)
     def _recent_store_session_guard(tmp_path_factory: pytest.TempPathFactory):
@@ -39,40 +39,40 @@ tests\conftest.py:74: AssertionError
 =================================== PASSES ====================================
 ____ test_tc_b100_73_no_report_without_a_file_and_none_without_a_callback _____
 ------------------------------ Captured log call ------------------------------
-WARNING  s19_app.tui.a2l:a2l.py:233 A2L section parse failed: path=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b\bt\green04\test_tc_b100_73_no_report_with0\missing.a2l reason=file_not_found
-WARNING  s19_app.tui.a2l:a2l.py:250 A2L section tree has structural errors: path=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b\bt\green04\test_tc_b100_73_no_report_with0\missing.a2l sample=File not found.
+WARNING  s19_app.tui.a2l:a2l.py:233 A2L section parse failed: path=<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b\bt\green04\test_tc_b100_73_no_report_with0\missing.a2l reason=file_not_found
+WARNING  s19_app.tui.a2l:a2l.py:250 A2L section tree has structural errors: path=<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b\bt\green04\test_tc_b100_73_no_report_with0\missing.a2l sample=File not found.
 ____________ test_tc_b100_73_a_failed_read_reports_no_final_total _____________
 ------------------------------ Captured log call ------------------------------
-ERROR    s19_app.tui.a2l:a2l.py:235 A2L section parse failed: path=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b\bt\green04\test_tc_b100_73_a_failed_read_0\six.a2l reason=os_error
+ERROR    s19_app.tui.a2l:a2l.py:235 A2L section parse failed: path=<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b\bt\green04\test_tc_b100_73_a_failed_read_0\six.a2l reason=os_error
 Traceback (most recent call last):
-  File "C:\Users\jjgh8\Github\s19_app-b100-inc12b\s19_app\tui\a2l.py", line 195, in build_section_tree
+  File "<HOME>\Github\s19_app-b100-inc12b\s19_app\tui\a2l.py", line 195, in build_section_tree
     for line_number, raw in enumerate(handle, 1):
-  File "C:\Users\jjgh8\Github\s19_app-b100-inc12b\tests\test_b100_a2l_progress.py", line 171, in __iter__
+  File "<HOME>\Github\s19_app-b100-inc12b\tests\test_b100_a2l_progress.py", line 171, in __iter__
     raise OSError(5, "synthetic read error")
 OSError: [Errno 5] synthetic read error
 _________________ test_tc_b100_73_no_fstat_without_a_callback _________________
 ------------------------------ Captured log call ------------------------------
-ERROR    s19_app.tui.a2l:a2l.py:235 A2L section parse failed: path=C:\Users\jjgh8\Github\s19_app-b100-inc12b\examples\case_01_basic_valid\firmware.a2l reason=os_error
+ERROR    s19_app.tui.a2l:a2l.py:235 A2L section parse failed: path=<HOME>\Github\s19_app-b100-inc12b\examples\case_01_basic_valid\firmware.a2l reason=os_error
 Traceback (most recent call last):
-  File "C:\Users\jjgh8\Github\s19_app-b100-inc12b\s19_app\tui\a2l.py", line 194, in build_section_tree
+  File "<HOME>\Github\s19_app-b100-inc12b\s19_app\tui\a2l.py", line 194, in build_section_tree
     total = os.fstat(handle.fileno()).st_size if progress is not None else 0
             ^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\jjgh8\Github\s19_app-b100-inc12b\tests\test_b100_a2l_progress.py", line 379, in fstat
+  File "<HOME>\Github\s19_app-b100-inc12b\tests\test_b100_a2l_progress.py", line 379, in fstat
     raise OSError(5, "synthetic fstat failure")
 OSError: [Errno 5] synthetic fstat failure
 ___________ test_tc_b100_07_rollback_keeps_denied_folder_content_r7 ___________
 ---------------------------- Captured stdout call -----------------------------
-processed file: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b\bt\green04\test_tc_b100_07_rollback_keeps0\app\.s19tool\workarea\ab\patches
+processed file: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b\bt\green04\test_tc_b100_07_rollback_keeps0\app\.s19tool\workarea\ab\patches
 Successfully processed 1 files; Failed processing 0 files
-processed file: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b\bt\green04\test_tc_b100_07_rollback_keeps0\app\.s19tool\workarea\ab\patches
+processed file: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b\bt\green04\test_tc_b100_07_rollback_keeps0\app\.s19tool\workarea\ab\patches
 Successfully processed 1 files; Failed processing 0 files
-processed file: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b\bt\green04\test_tc_b100_07_rollback_keeps0\app\.s19tool\workarea\ab\patches
+processed file: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b\bt\green04\test_tc_b100_07_rollback_keeps0\app\.s19tool\workarea\ab\patches
 Successfully processed 1 files; Failed processing 0 files
 _____________ test_tc_b100_07_unreadable_workarea_folder_skipped ______________
 ---------------------------- Captured stdout call -----------------------------
-processed file: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b\bt\green04\test_tc_b100_07_unreadable_wor0\app\.s19tool\workarea\locked
+processed file: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b\bt\green04\test_tc_b100_07_unreadable_wor0\app\.s19tool\workarea\locked
 Successfully processed 1 files; Failed processing 0 files
-processed file: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b\bt\green04\test_tc_b100_07_unreadable_wor0\app\.s19tool\workarea\locked
+processed file: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\corr12b\bt\green04\test_tc_b100_07_unreadable_wor0\app\.s19tool\workarea\locked
 Successfully processed 1 files; Failed processing 0 files
 =========================== short test summary info ===========================
 PASSED tests/test_b100_workers.py::test_tc_b100_53_project_load_refuses_cheaply_then_returns_before_the_install

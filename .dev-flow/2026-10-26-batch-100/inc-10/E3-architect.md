@@ -2,7 +2,7 @@ PASS-WITH-NOTES
 
 # Inc 10 — E3 architect review (round 1)
 
-Scope read: `E1-scope.md`, `E1-rulings.md`, `E2-rulings.md`, `E1-requirements-draft.md`, `codewire/interfaces-10.md`, `codewire/baseline-10.md`, `codewire/baseline-notes.md`, `codewire/proto-10-dialog.md` (G-A), `codewire/proto-10-app.md` (G-B); the 9b base (`inc-9b-design/E3-rulings.md`, `E3-architect.md`) and the 9b implementation in `C:\Users\jjgh8\Github\s19_app-b100-inc9b` (uncommitted, read only); Textual 8.2.8 sources in `s19env`. Code citations marked "9b:" are lines of the 9b worktree's `s19_app/tui/app.py` (they differ from `8947666` lines).
+Scope read: `E1-scope.md`, `E1-rulings.md`, `E2-rulings.md`, `E1-requirements-draft.md`, `codewire/interfaces-10.md`, `codewire/baseline-10.md`, `codewire/baseline-notes.md`, `codewire/proto-10-dialog.md` (G-A), `codewire/proto-10-app.md` (G-B); the 9b base (`inc-9b-design/E3-rulings.md`, `E3-architect.md`) and the 9b implementation in `<HOME>\Github\s19_app-b100-inc9b` (uncommitted, read only); Textual 8.2.8 sources in `s19env`. Code citations marked "9b:" are lines of the 9b worktree's `s19_app/tui/app.py` (they differ from `8947666` lines).
 
 Executed in this review (throwaway, under `work/e3-architect/`): a route census on the 9b worktree's tests (the E2 census ran on `8947666` tests only). See "Census on the 9b tests" below.
 

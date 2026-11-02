@@ -24,7 +24,7 @@ composed. The recent-sources store is redirected to `<base>/lad` (like
 ## Selftest
 
 ```
-s19_app: C:\Users\jjgh8\Github\s19_app-b100-inc10\s19_app\__init__.py
+s19_app: <HOME>\Github\s19_app-b100-inc10\s19_app\__init__.py
 screen: ConfirmQuestionScreen
 status: ['Patch Editor: entry added.', 'Apply: 1 applied, 0 skipped, 0 blocked']
 SELFTEST OK scenario=lq-question close=False
@@ -90,6 +90,6 @@ text clips. The two-line body at 118×54 and 99×54 is the designed soft-wrap
 
 ## `%LOCALAPPDATA%/s19_app` check
 
-`C:/Users/jjgh8/AppData/Local/s19_app` did not exist before the run and
+`<HOME>/AppData/Local/s19_app` did not exist before the run and
 does not exist after the selftest and the capture (the recent-sources store
 is redirected to the scratch `<base>/lad` for this scenario).

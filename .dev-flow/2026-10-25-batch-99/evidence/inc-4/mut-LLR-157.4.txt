@@ -2,7 +2,7 @@ FF                                                                       [100%]
 ================================== FAILURES ===================================
 ____________________ test_tc_b99_40_before_bytes_is_source ____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26315/test_tc_b99_40_before_bytes_is0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26315/test_tc_b99_40_before_bytes_is0')
 
     def test_tc_b99_40_before_bytes_is_source(tmp_path: Path) -> None:
         """After apply -> apply on 0xEB10, the record and the report show the
@@ -34,7 +34,7 @@ E         Use -v to get more diff
 tests\test_b99_editor_image.py:381: AssertionError
 ___________________ test_tc_b99_40_strip_shows_source_byte ____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26315/test_tc_b99_40_strip_shows_sou0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26315/test_tc_b99_40_strip_shows_sou0')
 
     def test_tc_b99_40_strip_shows_source_byte(tmp_path: Path) -> None:
         """The before/after strip paints the source byte as "was".

@@ -1,6 +1,6 @@
 # Kimi brief — batch-99 Increment 3b · review fixes (code-reviewer F1–F4)
 
-Read `BRIEF-COMMON.md` from the MAIN checkout (`C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-10-25-batch-99\kimi\BRIEF-COMMON.md`). Same worktree, `C:\Users\jjgh8\Github\s19_app-b99-inc3b` (uncommitted, on `f1ba70c`). Do not commit. Source budget: `flow_execution_service.py`, `project_gather_service.py`, `app.py` (3 of 4).
+Read `BRIEF-COMMON.md` from the MAIN checkout (`<HOME>\Github\s19_app\.dev-flow\2026-10-25-batch-99\kimi\BRIEF-COMMON.md`). Same worktree, `<HOME>\Github\s19_app-b99-inc3b` (uncommitted, on `f1ba70c`). Do not commit. Source budget: `flow_execution_service.py`, `project_gather_service.py`, `app.py` (3 of 4).
 
 - **F1 [HIGH] — after one drift, every unchanged re-save adds another copy** (`project_gather_service.py:300-309` compares only against `<name>`; the B8 reuse in `workspace.py:541` looks only at the requested name). The reviewer's probe: after one edit to the common copy, each unchanged re-save adds `boost_1`, then `_2`, `_3`, `_4`. That breaks LLR-138.4 (an unchanged re-save makes no `_<N>` duplicates).
   - Fix in `project_gather_service.py`: before placing, look for an existing `stem(_N)?suffix` file in the destination that already holds the same bytes, and if one exists, return it as reused (`copied=False`). Do not edit `workspace.py`: it belongs to Inc 6, which is in flight.

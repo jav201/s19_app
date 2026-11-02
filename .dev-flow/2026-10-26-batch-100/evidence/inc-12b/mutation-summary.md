@@ -1,8 +1,8 @@
 # Inc 12b — E5 mutation run summary
 
-Copy: `C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut12b`
-Interpreter: `C:/Users/jjgh8/anaconda3/envs/s19env/python.exe`
-sha256 before == after (app.py `6ada85782fdd80de…`, a2l.py `d70b17982f1cee30…`, styles.tcss `f7b4f75911b296a4…`). `C:/Users/jjgh8/AppData/Local/s19_app` does NOT exist before or after.
+Copy: `<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut12b`
+Interpreter: `<HOME>/anaconda3/envs/s19env/python.exe`
+sha256 before == after (app.py `6ada85782fdd80de…`, a2l.py `d70b17982f1cee30…`, styles.tcss `f7b4f75911b296a4…`). `<HOME>/AppData/Local/s19_app` does NOT exist before or after.
 
 Counts: **KILLED 85 / SURVIVED 30 / INVALID 0** (TIMEOUT 0, FLAKY-KILL 0).
 

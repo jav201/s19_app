@@ -1,5 +1,5 @@
 # command: S19_WT=<scratch>/snap1d677ba PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 (NO_COLOR unset) s19env/python.exe p07_variants_and_hex.py 
-# probe source: C:/Users/jjgh8/Github/s19_app/.dev-flow/design/investigation-projects-2026-10-23/p07_variants_and_hex.py
+# probe source: <HOME>/Github/s19_app/.dev-flow/design/investigation-projects-2026-10-23/p07_variants_and_hex.py
 # tree: 1d677ba (git archive)
 # started: 2026-10-26T06:44:23-06:00
 

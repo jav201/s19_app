@@ -2,7 +2,7 @@
 
 > Station: Phase 4 (Validation), evaluator role per `stations/p4-validation.md` (C-25: the orchestrator
 > owns the gate run; this review CONSUMES executed results and re-runs only cheap load-bearing probes).
-> Worktree: `C:/Users/jjgh8/Github/s19_app-b92` @ base `410cde5` (uncommitted batch diff).
+> Worktree: `<HOME>/Github/s19_app-b92` @ base `410cde5` (uncommitted batch diff).
 > Date: 2026-10-12. Reviewer: `qa-reviewer` (this agent).
 >
 > **Attribution key (who executed what):** `software-dev` = increment agent (packets 001/002) ·

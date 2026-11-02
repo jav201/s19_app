@@ -1,10 +1,10 @@
 cmd: pytest -q -p no:cacheprovider tests/test_b100_reuse.py -k gather_root  (RED: _gather_copy drops workarea_root)
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 — detached e044112 + inc1 + fix1 + fix2-with-red-09
+tree: <HOME>\Github\s19_app-b100-inc1 — detached e044112 + inc1 + fix1 + fix2-with-red-09
 F                                                                        [100%]
 ================================== FAILURES ===================================
 ____________ test_tc_b100_62_gather_root_refuses_another_workarea _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27269/test_tc_b100_62_gather_root_re0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27269/test_tc_b100_62_gather_root_re0')
 
     def test_tc_b100_62_gather_root_refuses_another_workarea(
         tmp_path: Path,

@@ -456,7 +456,7 @@ generated side.
 | `~/.claude` | ✅ clean `0/0` — rev40 `2c6b9b3`, rev41 `ca23e4f`, both **pushed** |
 | `~/.claude/skills` | ✅ clean `0/0` — `202cda5`, `98b8cc7`, **pushed**. `3892357` here is the mirror-first rev41 of §10.2 |
 | `~/kimi/agent-skills` | ✅ clean `0/0` — pulled to match |
-| `C:\Users\jjgh8\flow-diagrams-rescued-2026-08-18\` | 📋 staging, 50 MB. The 11 editable sources are safely in `claude-config` at `docs/diagrams/`, **verified byte-identical by md5 this session**. The PNGs + PDF are derivable. **Delete when satisfied** |
+| `<HOME>\flow-diagrams-rescued-2026-08-18\` | 📋 staging, 50 MB. The 11 editable sources are safely in `claude-config` at `docs/diagrams/`, **verified byte-identical by md5 this session**. The PNGs + PDF are derivable. **Delete when satisfied** |
 
 **Two PRs open and unmerged, deliberately: #198 and #199.**
 

@@ -160,9 +160,9 @@ result**, never a grep.
 
 ### F5 — Host paths and Windows account name ship to a PUBLIC repo, not only to the private vault  [Severity: LOW]
 
-- **What.** The committed artifacts carry `jjgh8` (Windows account),
+- **What.** The committed artifacts carry `<USER>` (Windows account),
   `G:/My Drive/Courses/textual/PENDING-UPDATES.md`,
-  `$HOME/.claude/projects/C--Users-jjgh8-OneDrive-Documents-Github-s19-app/memory/…`, and one pasted
+  `$HOME/.claude/projects/C--Users-<USER>-OneDrive-Documents-Github-s19-app/memory/…`, and one pasted
   `ls -l` line with uid `197609`.
 
 - **Where.** `01-requirements-architect.md:400`, `PLAN.md`, `01-requirements.md`,
@@ -173,14 +173,14 @@ result**, never a grep.
   third party receives these artifacts."* **That rationale was incomplete.** `gh repo view` returns
   `"visibility":"PUBLIC"`. `.dev-flow/` is committed and pushed to a public GitHub repo, so these
   strings are world-readable — the exact case my own Phase-2 recommendation named as the trigger
-  (*"if any batch artifact is ever routed to a client **or a public repo**, `jjgh8` and the `G:` paths
+  (*"if any batch artifact is ever routed to a client **or a public repo**, `<USER>` and the `G:` paths
   are the two strings to strip"*). The trigger was already true; I did not check it.
 
 - **Why it stays LOW and does not gate this merge.** No credential, token, key or client data — I
   scanned the full added diff for `sk-*`, `ghp_`/`gho_`/`github_pat_`, `AKIA`, `-----BEGIN`,
   `xox[baprs]-`, `AIza`, bearer tokens and `api_key`/`secret`/`password` assignments: **zero hits**.
   The exposure is a Windows username and a personal Drive folder name. It is also long-standing and
-  operator-known: `jjgh8` already appears in **38 files** and `My Drive` in **16** on `origin/main`,
+  operator-known: `<USER>` already appears in **38 files** and `My Drive` in **16** on `origin/main`,
   dating to batch-01. Batch-64 adds ~4 more of the same class. Blocking this batch for it would be
   theatre. The project's settled position (batch-62's D-11 redaction withdrawn after three integrity
   defects) also cuts against retroactive byte-substitution.
@@ -240,7 +240,7 @@ is in scope, so no CI oracle is affected. **Not a security finding.**
 
 **Data exposure in the travelling blocks (scope item 4) — CLEAR, and this is the half that matters.**
 I regex-scanned **every added line** of all four out-of-VCS destinations for
-`[A-Za-z]:\ | /Users/ | jjgh8 | jav201 | javgranados | OneDrive | AppData | G:\ | My Drive | ConsultIA | GRNDIA`.
+`[A-Za-z]:\ | /Users/ | <USER> | jav201 | javgranados | OneDrive | AppData | G:\ | My Drive | ConsultIA | GRNDIA`.
 Result: **NONE**, on every added line, in every file — including the two that load into every future
 session. Every path inside the blocks is repo-relative. My Phase-2 clearance of this lane holds
 without qualification; only the *committed-artifact* half needed the F5 correction.

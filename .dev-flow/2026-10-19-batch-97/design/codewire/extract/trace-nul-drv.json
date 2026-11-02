@@ -33,7 +33,7 @@
       }
      ]
     },
-    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20967\\test_security_battery_dict_dri0\\.s19tool\\workarea\\proj"
+    "project_dir": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20967\\test_security_battery_dict_dri0\\.s19tool\\workarea\\proj"
    },
    "out": [
     null,
@@ -60,7 +60,7 @@
    "test": "tests/test_flow_persistence.py::test_security_battery_dict[drive-rel]",
    "depth": 1,
    "in": {
-    "project_root": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20967\\test_security_battery_dict_dri0\\.s19tool\\workarea\\proj",
+    "project_root": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20967\\test_security_battery_dict_dri0\\.s19tool\\workarea\\proj",
     "raw_entry": "calib_patch.json",
     "context": "blocks[1].change_doc_ref",
     "issues": [
@@ -79,13 +79,13 @@
      }
     ]
    },
-   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20967\\test_security_battery_dict_dri0\\.s19tool\\workarea\\proj\\calib_patch.json"
+   "out": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20967\\test_security_battery_dict_dri0\\.s19tool\\workarea\\proj\\calib_patch.json"
   },
   {
    "test": "tests/test_flow_persistence.py::test_security_battery_dict[drive-rel]",
    "depth": 1,
    "in": {
-    "project_root": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20967\\test_security_battery_dict_dri0\\.s19tool\\workarea\\proj",
+    "project_root": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20967\\test_security_battery_dict_dri0\\.s19tool\\workarea\\proj",
     "raw_entry": "post_checks.json",
     "context": "blocks[2].check_doc_ref",
     "issues": [
@@ -104,13 +104,13 @@
      }
     ]
    },
-   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20967\\test_security_battery_dict_dri0\\.s19tool\\workarea\\proj\\post_checks.json"
+   "out": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20967\\test_security_battery_dict_dri0\\.s19tool\\workarea\\proj\\post_checks.json"
   },
   {
    "test": "tests/test_flow_persistence.py::test_security_battery_dict[drive-rel]",
    "depth": 1,
    "in": {
-    "project_root": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20967\\test_security_battery_dict_dri0\\.s19tool\\workarea\\proj",
+    "project_root": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20967\\test_security_battery_dict_dri0\\.s19tool\\workarea\\proj",
     "raw_entry": "crc32_blocks.json",
     "context": "blocks[3].config_ref",
     "issues": [
@@ -129,7 +129,7 @@
      }
     ]
    },
-   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20967\\test_security_battery_dict_dri0\\.s19tool\\workarea\\proj\\crc32_blocks.json"
+   "out": "<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-20967\\test_security_battery_dict_dri0\\.s19tool\\workarea\\proj\\crc32_blocks.json"
   }
  ]
 }

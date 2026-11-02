@@ -1,12 +1,12 @@
 # command: python -m pytest -q -p no:cacheprovider tests/test_b100_save_image.py tests/test_b99_staging.py::test_at_b99_05_save_project_after_same_name_save_back -rA
-# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base (8d6056f + working-tree changes: 0 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base (8d6056f + working-tree changes: 0 source paths modified)
+# PYTHONPATH=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T19:40:21Z
 FFFFFFFFF..FFFFFFFFFFFFFFFFFFF....FF.FFF                                 [100%]
 ================================== FAILURES ===================================
 _______________________ test_tc_b100_14_no_entry_copies _______________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_14_no_entry_copie0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_14_no_entry_copie0')
 
     def test_tc_b100_14_no_entry_copies(tmp_path: Path) -> None:
         """Empty document, unchanged image → copy (QC-3 empty)."""
@@ -22,13 +22,13 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_save_image.py:282: in _decide
     return asyncio.run(_drive())
            ^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -47,7 +47,7 @@ E           AttributeError: 'ChangeService' object has no attribute 'image_diffe
 tests\test_b100_save_image.py:276: AttributeError
 _______________________ test_tc_b100_14_new_bytes_emit ________________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_14_new_bytes_emit0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_14_new_bytes_emit0')
 
     def test_tc_b100_14_new_bytes_emit(tmp_path: Path) -> None:
         """A change entry writing new bytes, applied → emit."""
@@ -64,13 +64,13 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_save_image.py:282: in _decide
     return asyncio.run(_drive())
            ^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -89,7 +89,7 @@ E           AttributeError: 'ChangeService' object has no attribute 'image_diffe
 tests\test_b100_save_image.py:276: AttributeError
 _______________________ test_tc_b100_14_same_bytes_copy _______________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_14_same_bytes_cop0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_14_same_bytes_cop0')
 
     def test_tc_b100_14_same_bytes_copy(tmp_path: Path) -> None:
         """An entry that writes the bytes already there → copy (P-38: the
@@ -108,13 +108,13 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_save_image.py:282: in _decide
     return asyncio.run(_drive())
            ^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -133,7 +133,7 @@ E           AttributeError: 'ChangeService' object has no attribute 'image_diffe
 tests\test_b100_save_image.py:276: AttributeError
 ____________________ test_tc_b100_14_check_document_copies ____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_14_check_document0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_14_check_document0')
 
     def test_tc_b100_14_check_document_copies(tmp_path: Path) -> None:
         """A check document with entries never counts → copy, never a refusal
@@ -154,13 +154,13 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_save_image.py:282: in _decide
     return asyncio.run(_drive())
            ^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -179,7 +179,7 @@ E           AttributeError: 'ChangeService' object has no attribute 'image_diffe
 tests\test_b100_save_image.py:276: AttributeError
 _________________ test_tc_b100_14_applied_then_undone_copies __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_14_applied_then_u0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_14_applied_then_u0')
 
     def test_tc_b100_14_applied_then_undone_copies(tmp_path: Path) -> None:
         """Applied, then the entry undone (the image still holds the applied
@@ -200,13 +200,13 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_save_image.py:282: in _decide
     return asyncio.run(_drive())
            ^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -225,7 +225,7 @@ E           AttributeError: 'ChangeService' object has no attribute 'image_diffe
 tests\test_b100_save_image.py:276: AttributeError
 ____________________ test_tc_b100_14_unapplied_entry_emits ____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_14_unapplied_entr0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_14_unapplied_entr0')
 
     def test_tc_b100_14_unapplied_entry_emits(tmp_path: Path) -> None:
         """Only an unapplied change entry writing new bytes: the pre-check is
@@ -242,13 +242,13 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_save_image.py:282: in _decide
     return asyncio.run(_drive())
            ^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -267,7 +267,7 @@ E           AttributeError: 'ChangeService' object has no attribute 'image_diffe
 tests\test_b100_save_image.py:276: AttributeError
 _____________________ test_tc_b100_14_save_back_then_emit _____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_14_save_back_then0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_14_save_back_then0')
 
     def test_tc_b100_14_save_back_then_emit(tmp_path: Path) -> None:
         """Save-back, then the decision: pre-check true → emit."""
@@ -286,13 +286,13 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_save_image.py:282: in _decide
     return asyncio.run(_drive())
            ^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -311,7 +311,7 @@ E           AttributeError: 'ChangeService' object has no attribute 'image_diffe
 tests\test_b100_save_image.py:276: AttributeError
 ___________________ test_tc_b100_14_deciding_writes_nothing ___________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_14_deciding_write0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_14_deciding_write0')
 
     def test_tc_b100_14_deciding_writes_nothing(tmp_path: Path) -> None:
         """0 writes to the session map while deciding (the trap map is the
@@ -342,13 +342,13 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 
 tests\test_b100_save_image.py:397: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -367,7 +367,7 @@ E           AttributeError: 'S19TuiApp' object has no attribute '_decide_project
 tests\test_b100_save_image.py:394: AttributeError
 ___________________ test_tc_b100_15_patched_s19_is_emitted ____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_15_patched_s19_is0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_15_patched_s19_is0')
 
     def test_tc_b100_15_patched_s19_is_emitted(tmp_path: Path) -> None:
         """A patched S19 → the project image is source + document (0 differing
@@ -392,7 +392,7 @@ E         Use -v to get more diff
 tests\test_b100_save_image.py:446: AssertionError
 _____________ test_tc_b100_15_entry_removed_after_apply_is_absent _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_15_entry_removed_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_15_entry_removed_0')
 
     def test_tc_b100_15_entry_removed_after_apply_is_absent(tmp_path: Path) -> None:
         """Two entries applied, one removed → the saved image holds only the
@@ -416,7 +416,7 @@ E         Use -v to get more diff
 tests\test_b100_save_image.py:503: AssertionError
 ___________________ test_tc_b100_15_patched_hex_is_emitted ____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_15_patched_hex_is0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_15_patched_hex_is0')
 
     def test_tc_b100_15_patched_hex_is_emitted(tmp_path: Path) -> None:
         """A patched Intel HEX source → 0 differing addresses."""
@@ -462,7 +462,7 @@ E         Use -v to get more diff
 tests\test_b100_save_image.py:546: AssertionError
 ________________ test_tc_b100_15_mac_and_a2l_stay_byte_copies _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_15_mac_and_a2l_st0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_15_mac_and_a2l_st0')
 
     def test_tc_b100_15_mac_and_a2l_stay_byte_copies(tmp_path: Path) -> None:
         """A project holding S19 + MAC + A2L, patched and saved as another
@@ -503,7 +503,7 @@ E         Use -v to get more diff
 tests\test_b100_save_image.py:579: AssertionError
 _________ test_tc_b100_15_save_back_then_save_project_keeps_the_patch _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_15_save_back_then0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_15_save_back_then0')
 
     def test_tc_b100_15_save_back_then_save_project_keeps_the_patch(
         tmp_path: Path,
@@ -528,13 +528,13 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_save_image.py:429: in _save_session
     return asyncio.run(_drive())
            ^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_save_image.py:417: in _drive
@@ -557,7 +557,7 @@ E       AttributeError: 'ChangeService' object has no attribute 'differs_from_la
 tests\test_b100_save_image.py:593: AttributeError
 ___________ test_tc_b100_15_clashing_name_lands_as_the_next_variant ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_15_clashing_name_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_15_clashing_name_0')
 
     def test_tc_b100_15_clashing_name_lands_as_the_next_variant(tmp_path: Path) -> None:
         """The target already holds a DIFFERENT ``firmware.s19`` → the patched
@@ -585,7 +585,7 @@ E         Use -v to get more diff
 tests\test_b100_save_image.py:619: AssertionError
 ______________________ test_tc_b100_16_one_applied_entry ______________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_16_one_applied_en0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_16_one_applied_en0')
 
     def test_tc_b100_16_one_applied_entry(tmp_path: Path) -> None:
         """1 applied entry → the status carries 1 entry and 0 applied by this
@@ -599,13 +599,13 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         final = lines[-1]
         assert final.startswith("Saved project to"), lines
 >       assert "firmware.s19 + 1 change entry, 0 applied by this save" in final, final
-E       AssertionError: Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-29952\test_tc_b100_16_one_applied_en0\app\.s19tool\workarea\P1 (variant 'firmware')
-E       assert 'firmware.s19 + 1 change entry, 0 applied by this save' in "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-29952\\test_tc_b100_16_one_applied_en0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
+E       AssertionError: Saved project to <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-29952\test_tc_b100_16_one_applied_en0\app\.s19tool\workarea\P1 (variant 'firmware')
+E       assert 'firmware.s19 + 1 change entry, 0 applied by this save' in "Saved project to <HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-29952\\test_tc_b100_16_one_applied_en0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
 
 tests\test_b100_save_image.py:641: AssertionError
 _________________ test_tc_b100_16_entry_added_after_the_apply _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_16_entry_added_af0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_16_entry_added_af0')
 
     def test_tc_b100_16_entry_added_after_the_apply(tmp_path: Path) -> None:
         """1 applied + 1 added after the apply → 2 entries, 1 applied by this
@@ -619,13 +619,13 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         lines, project, _ = _save_session(tmp_path, scenario)
         final = lines[-1]
 >       assert "firmware.s19 + 2 change entries, 1 applied by this save" in final, final
-E       AssertionError: Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-29952\test_tc_b100_16_entry_added_af0\app\.s19tool\workarea\P1 (variant 'firmware')
-E       assert 'firmware.s19 + 2 change entries, 1 applied by this save' in "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-29952\\test_tc_b100_16_entry_added_af0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
+E       AssertionError: Saved project to <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-29952\test_tc_b100_16_entry_added_af0\app\.s19tool\workarea\P1 (variant 'firmware')
+E       assert 'firmware.s19 + 2 change entries, 1 applied by this save' in "Saved project to <HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-29952\\test_tc_b100_16_entry_added_af0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
 
 tests\test_b100_save_image.py:658: AssertionError
 ____________ test_tc_b100_17_blocked_entry_refuses_the_whole_save _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_17_blocked_entry_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_17_blocked_entry_0')
 
     def test_tc_b100_17_blocked_entry_refuses_the_whole_save(tmp_path: Path) -> None:
         """A document with 1 blocked entry → 1 status naming it, 0 files,
@@ -644,13 +644,13 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         lines, project, _ = _save_session(tmp_path, scenario)
         refusal = lines[-1]
 >       assert "Project NOT saved: 1 blocked entry (0x8000007C)" in refusal, lines
-E       AssertionError: ['Loaded firmware.s19 (S19 only)', 'Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\L...emp\\pytest-of-jjgh8\\pytest-29952\\test_tc_b100_17_blocked_entry_0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"]
-E       assert 'Project NOT saved: 1 blocked entry (0x8000007C)' in "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-29952\\test_tc_b100_17_blocked_entry_0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
+E       AssertionError: ['Loaded firmware.s19 (S19 only)', 'Project saved + manifest verified', "Saved project to <HOME>\\AppData\\L...emp\\pytest-of-<USER>\\pytest-29952\\test_tc_b100_17_blocked_entry_0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"]
+E       assert 'Project NOT saved: 1 blocked entry (0x8000007C)' in "Saved project to <HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-29952\\test_tc_b100_17_blocked_entry_0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
 
 tests\test_b100_save_image.py:704: AssertionError
 _______________ test_tc_b100_17_emit_refusal_writes_no_manifest _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_17_emit_refusal_w0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_17_emit_refusal_w0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001EBFDF15BD0>
 
     def test_tc_b100_17_emit_refusal_writes_no_manifest(
@@ -677,8 +677,8 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001EBFDF15BD0>
     
         lines, project, _ = _save_session(tmp_path, scenario)
 >       assert "the patched image was not written: forced emit refusal" in lines[-1], lines
-E       AssertionError: ['Loaded firmware.s19 (S19 only)', 'Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\L...emp\\pytest-of-jjgh8\\pytest-29952\\test_tc_b100_17_emit_refusal_w0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"]
-E       assert 'the patched image was not written: forced emit refusal' in "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-29952\\test_tc_b100_17_emit_refusal_w0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
+E       AssertionError: ['Loaded firmware.s19 (S19 only)', 'Project saved + manifest verified', "Saved project to <HOME>\\AppData\\L...emp\\pytest-of-<USER>\\pytest-29952\\test_tc_b100_17_emit_refusal_w0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"]
+E       assert 'the patched image was not written: forced emit refusal' in "Saved project to <HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-29952\\test_tc_b100_17_emit_refusal_w0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
 
 tests\test_b100_save_image.py:732: AssertionError
 ___________________ test_tc_b100_58_predicate_sequence_unit ___________________
@@ -696,7 +696,7 @@ E       AttributeError: 'ChangeService' object has no attribute 'mark_saved'
 tests\test_b100_save_image.py:747: AttributeError
 ____________ test_tc_b100_58_save_project_records_the_saved_state _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_58_save_project_r0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_58_save_project_r0')
 
     def test_tc_b100_58_save_project_records_the_saved_state(tmp_path: Path) -> None:
         """loaded → False; applied → True; applied → Save project → False."""
@@ -717,13 +717,13 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_save_image.py:804: in _predicate_after
     return asyncio.run(_drive())
            ^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -742,7 +742,7 @@ E           AttributeError: 'ChangeService' object has no attribute 'differs_fro
 tests\test_b100_save_image.py:790: AttributeError
 ______________ test_tc_b100_58_save_back_records_the_saved_state ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_58_save_back_reco0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_58_save_back_reco0')
 
     def test_tc_b100_58_save_back_records_the_saved_state(tmp_path: Path) -> None:
         """applied → save-back → False."""
@@ -759,13 +759,13 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_save_image.py:804: in _predicate_after
     return asyncio.run(_drive())
            ^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -784,7 +784,7 @@ E           AttributeError: 'ChangeService' object has no attribute 'differs_fro
 tests\test_b100_save_image.py:790: AttributeError
 ________________________ test_tc_b100_59_fresh_folder _________________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_59_fresh_folder0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_59_fresh_folder0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001EBF89BB210>
 
     def test_tc_b100_59_fresh_folder(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -807,7 +807,7 @@ E       AttributeError: module 's19_app.tui.app' has no attribute 'plan_project_
 tests\test_b100_save_image.py:838: AttributeError
 ___________________ test_tc_b100_59_open_project_unchanged ____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_59_open_project_u0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_59_open_project_u0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001EBFE0330D0>
 
     def test_tc_b100_59_open_project_unchanged(
@@ -833,7 +833,7 @@ E       AttributeError: module 's19_app.tui.app' has no attribute 'plan_project_
 tests\test_b100_save_image.py:838: AttributeError
 ______________ test_tc_b100_59_pending_patch_in_the_open_project ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_59_pending_patch_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_59_pending_patch_0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001EBFA1CC4D0>
 
     def test_tc_b100_59_pending_patch_in_the_open_project(
@@ -859,7 +859,7 @@ E       AttributeError: module 's19_app.tui.app' has no attribute 'plan_project_
 tests\test_b100_save_image.py:838: AttributeError
 _________________ test_tc_b100_59_refused_plan_writes_nothing _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_59_refused_plan_w0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_59_refused_plan_w0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001EBFA1CF350>
 
     def test_tc_b100_59_refused_plan_writes_nothing(
@@ -884,7 +884,7 @@ E       AttributeError: module 's19_app.tui.app' has no attribute 'plan_project_
 tests\test_b100_save_image.py:838: AttributeError
 ________ test_tc_b100_59_planning_writes_nothing_and_hashes_no_payload ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_59_planning_write0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_59_planning_write0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001EBFCF33390>
 
     def test_tc_b100_59_planning_writes_nothing_and_hashes_no_payload(
@@ -978,7 +978,7 @@ E       AttributeError: 'ChangeService' object has no attribute 'rederive_for_sa
 tests\test_b100_save_image.py:1099: AttributeError
 ______ test_tc_b100_69_sec4_junction_save_back_stages_in_this_work_area _______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_69_sec4_junction_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_69_sec4_junction_0')
 
     def test_tc_b100_69_sec4_junction_save_back_stages_in_this_work_area(
         tmp_path: Path,
@@ -1016,7 +1016,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 E       AssertionError: ("Loaded firmware.s19 (S19 only)
 E         Loaded project 'J' -> firmware.s19
 E         Patched image not saved - see issues
-E         [MF-WRITE-...on traverses a symbolic link or reparse point: C:\\Users\\jjgh8\\", ['T', 'T\\firmware.s19', 'temp', 'temp\\.staging'])
+E         [MF-WRITE-...on traverses a symbolic link or reparse point: <HOME>\\", ['T', 'T\\firmware.s19', 'temp', 'temp\\.staging'])
 E       assert ['T', 'T\\fir...mp\\.staging'] == ['T', 'T\\firmware.s19']
 E         
 E         Left contains 2 more items, first extra item: 'temp'
@@ -1025,7 +1025,7 @@ E         Use -v to get more diff
 tests\test_b100_save_image.py:1189: AssertionError
 _________________ test_tc_b100_70_refused_save_keeps_the_flag _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_tc_b100_70_refused_save_k0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_tc_b100_70_refused_save_k0')
 
     def test_tc_b100_70_refused_save_keeps_the_flag(tmp_path: Path) -> None:
         """A refused Save project (a blocked document) → the flag is still set
@@ -1033,13 +1033,13 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         dirty_before, dirty_after, status = _dirty_after_save(tmp_path, blocked=True)
         assert dirty_before is True
 >       assert "blocked" in status, status
-E       AssertionError: Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-29952\test_tc_b100_70_refused_save_k0\app\.s19tool\workarea\P1 (variant 'firmware')
-E       assert 'blocked' in "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-29952\\test_tc_b100_70_refused_save_k0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
+E       AssertionError: Saved project to <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-29952\test_tc_b100_70_refused_save_k0\app\.s19tool\workarea\P1 (variant 'firmware')
+E       assert 'blocked' in "Saved project to <HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-29952\\test_tc_b100_70_refused_save_k0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
 
 tests\test_b100_save_image.py:1263: AssertionError
 _________ test_at_b100_05_save_project_saves_the_patched_image[size0] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_at_b100_05_save_project_s0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_at_b100_05_save_project_s0')
 size = (118, 54)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
@@ -1121,13 +1121,13 @@ size = (118, 54)
 E       AssertionError: Patch Editor: entry added.
 E         Apply: 1 applied, 0 skipped, 0 blocked
 E         Project saved + manifest verified
-E         Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-29952\test_at_b100_05_save_project_s0\app\.s
-E       assert '1 entry applied before this save (0x8000007C)' in 'Patch Editor: entry added.\nApply: 1 applied, 0 skipped, 0 blocked\nProject saved + manifest verified\nSaved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-29952\\test_at_b100_05_save_project_s0\\app\\.s'
+E         Saved project to <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-29952\test_at_b100_05_save_project_s0\app\.s
+E       assert '1 entry applied before this save (0x8000007C)' in 'Patch Editor: entry added.\nApply: 1 applied, 0 skipped, 0 blocked\nProject saved + manifest verified\nSaved project to <HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-29952\\test_at_b100_05_save_project_s0\\app\\.s'
 
 tests\test_b100_save_image.py:1400: AssertionError
 _________ test_at_b100_05_save_project_saves_the_patched_image[size1] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_at_b100_05_save_project_s1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_at_b100_05_save_project_s1')
 size = (220, 60)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
@@ -1209,13 +1209,13 @@ size = (220, 60)
 E       AssertionError: Patch Editor: entry added.
 E         Apply: 1 applied, 0 skipped, 0 blocked
 E         Project saved + manifest verified
-E         Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-29952\test_at_b100_05_save_project_s1\app\.s19tool\workarea\P1 (variant 'firmware')
-E       assert '1 entry applied before this save (0x8000007C)' in "Patch Editor: entry added.\nApply: 1 applied, 0 skipped, 0 blocked\nProject saved + manifest verified\nSaved project ...Temp\\pytest-of-jjgh8\\pytest-29952\\test_at_b100_05_save_project_s1\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
+E         Saved project to <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-29952\test_at_b100_05_save_project_s1\app\.s19tool\workarea\P1 (variant 'firmware')
+E       assert '1 entry applied before this save (0x8000007C)' in "Patch Editor: entry added.\nApply: 1 applied, 0 skipped, 0 blocked\nProject saved + manifest verified\nSaved project ...Temp\\pytest-of-<USER>\\pytest-29952\\test_at_b100_05_save_project_s1\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
 
 tests\test_b100_save_image.py:1400: AssertionError
 ____________ test_at_b99_05_save_project_after_same_name_save_back ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29952/test_at_b99_05_save_project_af0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29952/test_at_b99_05_save_project_af0')
 
     def test_at_b99_05_save_project_after_same_name_save_back(tmp_path: Path) -> None:
         """Load -> patch -> save back as firmware.s19 -> Save project: the app is

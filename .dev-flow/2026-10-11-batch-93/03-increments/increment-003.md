@@ -92,17 +92,17 @@ and reports failure honestly at the bound.
 
 ```bash
 # the sheet + the interlock + the settled legend family
-C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest tests/test_legend_map_sheet.py \
+<HOME>/anaconda3/envs/s19env/python.exe -m pytest tests/test_legend_map_sheet.py \
   tests/test_command_bar_interlock.py tests/test_legend_n8.py \
   tests/test_legend_scope_and_logwidth.py tests/test_legend_two_pane.py \
   tests/test_tui_legend.py -q -p no:cacheprovider
 
 # the registry guard (the high-water + the scanned bound)
-C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest tests/test_id_registry.py \
+<HOME>/anaconda3/envs/s19env/python.exe -m pytest tests/test_id_registry.py \
   -q -p no:cacheprovider
 
 # the sheet probe (read-only; prints the box census + the floor budget)
-C:/Users/jjgh8/anaconda3/envs/s19env/python.exe \
+<HOME>/anaconda3/envs/s19env/python.exe \
   .dev-flow/2026-10-11-batch-93/evidence/inc003_sheet_probe.py
 ```
 
@@ -277,7 +277,7 @@ of `HLR-125..133` / `LLR-*.x` into `REQUIREMENTS.md`.
 
 | Evidence artifact | Path — under `artifact_homes.evidence` | SHA-256 |
 |---|---|---|
-| the coordinator's brief (verbatim) | `.dev-flow/2026-10-11-batch-93/evidence/inc003-brief.md` | `55b2fc289f261c4fbddec96abc67cba1bc37d46815775de87a1e4cc8da3aef2c` |
+| the coordinator's brief (verbatim) | `.dev-flow/2026-10-11-batch-93/evidence/inc003-brief.md` | `00de584bc30b6e497c1e8504f57999ba907c58e76110a8c9880f0aefe386ae59` |
 | the sheet box-census probe | `.dev-flow/2026-10-11-batch-93/evidence/inc003_sheet_probe.py` | `07bb72a4ff69a74db0d74b9113339694d30e00fdd9018c2ee70d2d667ced70ef` |
 | the sheet's emitted census (120×36 + 80×24, Esc limb) | `.dev-flow/2026-10-11-batch-93/evidence/inc003_sheet_probe.out.txt` | `1404ac2245c3a595554875651d1b33aebc33b9fac68da9fce38c395e10567d07` |
 | the other-views byte-identity hash probe | `.dev-flow/2026-10-11-batch-93/evidence/inc003_hash_probe.py` | `0631a824c7c872352552cca75d3cb725677fbfa3251821523f302721fe708727` |

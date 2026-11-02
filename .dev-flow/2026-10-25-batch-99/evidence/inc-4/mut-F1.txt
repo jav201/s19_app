@@ -2,7 +2,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 _______________ test_tc_b99_22_save_blocks_overlapping_entries ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26318/test_tc_b99_22_save_blocks_ove0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26318/test_tc_b99_22_save_blocks_ove0')
 
     def test_tc_b99_22_save_blocks_overlapping_entries(tmp_path: Path) -> None:
         """The save re-derive runs the same collision refresh as the apply, so

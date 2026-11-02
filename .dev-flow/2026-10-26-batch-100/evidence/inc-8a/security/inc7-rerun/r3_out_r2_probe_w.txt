@@ -1,4 +1,4 @@
-# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc8a\s19_app\__init__.py
+# s19_app import: <HOME>\Github\s19_app-b100-inc8a\s19_app\__init__.py
 # NO_COLOR present: False | python 3.11.15
 [W1 intermediate junction] issues: [('MANIFEST-PATH-ESCAPE', 'jdir/secret.json'), ('MANIFEST-PATH-ESCAPE', './jdir/secret.json'), ('MANIFEST-PATH-ESCAPE', 'real/../jdir/secret.json'), ('MANIFEST-PATH-ESCAPE', 'real\\..\\jdir\\secret.json'), ('MANIFEST-PATH-ESCAPE', 'JDIR/secret.json'), ('MANIFEST-PATH-ESCAPE', 'real/inner/secret.json'), ('MANIFEST-PATH-ESCAPE', 'real/./inner/secret.json'), ('MANIFEST-PATH-ESCAPE', 'jdir/secret.json'), ('MANIFEST-PATH-ESCAPE', 'real/inner/secret.json')]
    accepted: 'real\\a.json'                     INSIDE exists=True

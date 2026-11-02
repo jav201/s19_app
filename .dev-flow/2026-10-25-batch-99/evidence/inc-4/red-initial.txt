@@ -1,6 +1,6 @@
 ============================= test session starts =============================
 platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
-rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc4
+rootdir: <HOME>\Github\s19_app-b99-inc4
 configfile: pyproject.toml
 plugins: textual-snapshot-1.1.0, syrupy-4.8.0
 collected 5 items
@@ -10,7 +10,7 @@ tests\test_b99_editor_image.py FFFFF                                     [100%]
 ================================== FAILURES ===================================
 _____________ test_tc_b99_21_editor_image_is_source_plus_document _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26131/test_tc_b99_21_editor_image_is0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26131/test_tc_b99_21_editor_image_is0')
 
     def test_tc_b99_21_editor_image_is_source_plus_document(tmp_path: Path) -> None:
         """The p05 sequence writes source bytes at the undone entry's address.
@@ -48,7 +48,7 @@ E         Use -v to get more diff
 tests\test_b99_editor_image.py:186: AssertionError
 _____________ test_tc_b99_22_save_rederives_and_names_not_applied _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26131/test_tc_b99_22_save_rederives_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26131/test_tc_b99_22_save_rederives_0')
 
     def test_tc_b99_22_save_rederives_and_names_not_applied(tmp_path: Path) -> None:
         """The save re-derives the image from every entry currently in the
@@ -79,7 +79,7 @@ E         Use -v to get more diff
 tests\test_b99_editor_image.py:247: AssertionError
 ____________________ test_tc_b99_40_before_bytes_is_source ____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26131/test_tc_b99_40_before_bytes_is0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26131/test_tc_b99_40_before_bytes_is0')
 
     def test_tc_b99_40_before_bytes_is_source(tmp_path: Path) -> None:
         """After apply -> apply on 0xEB10, the record and the report show the
@@ -111,7 +111,7 @@ E         Use -v to get more diff
 tests\test_b99_editor_image.py:309: AssertionError
 ___________________ test_tc_b99_40a_strip_shows_source_byte ___________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26131/test_tc_b99_40a_strip_shows_so0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26131/test_tc_b99_40a_strip_shows_so0')
 
     def test_tc_b99_40a_strip_shows_source_byte(tmp_path: Path) -> None:
         """The before/after strip paints the source byte as "was".
@@ -167,7 +167,7 @@ E       assert '20 41 70 70' in '0000EB10 +0 +1 +2 +3 +4 +5 +6 +7\n  was    DE A
 tests\test_b99_editor_image.py:382: AssertionError
 _________________ test_at_b99_08_save_back_keeps_editor_image _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26131/test_at_b99_08_save_back_keeps0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26131/test_at_b99_08_save_back_keeps0')
 
     def test_at_b99_08_save_back_keeps_editor_image(tmp_path: Path) -> None:
         """Add / Apply / Undo / Add / Apply / save back: the written file holds

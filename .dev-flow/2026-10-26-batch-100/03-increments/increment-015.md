@@ -47,7 +47,7 @@ since the Inc 3 merge (run 40497466178), and red locally on `6d8631a`.
 ## 3 · How to test
 
 ```bash
-# interpreter: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe ; NO_COLOR unset ; PYTHONPATH=<tree>
+# interpreter: <HOME>/anaconda3/envs/s19env/python.exe ; NO_COLOR unset ; PYTHONPATH=<tree>
 python -m pytest tests/test_b100_session_reset.py -p no:cacheprovider -q
 python -m pytest tests/test_b97_chips_help.py tests/test_b97_width.py -p no:cacheprovider -q
 ```
@@ -96,19 +96,19 @@ compared node by node with the run before. Both are recorded in LED .60.
 
 | Evidence artifact | Path — under `.dev-flow/2026-10-26-batch-100/evidence/inc-3b/` | SHA-256 |
 |---|---|---|
-| green-01-session-reset.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-3b/green-01-session-reset.txt | f59c4e495e8ee12c6ae2bfce5a39a78a720491f0bdd996415e34a69fb6e0592b |
-| green-02-b97-chips-width.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-3b/green-02-b97-chips-width.txt | 7e044238b2acd0da5d37486b60ec45c954ba91753894f7f1f666b227ef639b97 |
-| green-03-session-reset-final.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-3b/green-03-session-reset-final.txt | 28bb90c4ac73bcfb4ba9425c6aa6c824e16517f2072b73d1399881bd25fb9280 |
-| green-04-reverse-census.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-3b/green-04-reverse-census.txt | d08e923ca5da973a5ad0881ec2e48b031e89a44d9e40d95689863871f27b42d6 |
-| green-05-at057b-x5-fix-and-base.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-3b/green-05-at057b-x5-fix-and-base.txt | c67adcbec36a95958d8fefebc08b19b680ad02cc7faed1c4571b2fabd69c26d9 |
-| green-06-final-reset-and-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-3b/green-06-final-reset-and-guards.txt | 08cde6ffe6f5c079723c0aa84c8500d2bbb5f0f95a1a498ddba19466cd51d387 |
-| guards-census.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-3b/guards-census.txt | 84f1ad79a71bdf813b9d6b173f8b1e166472ebf6cfe211b84c9c1eef5f365819 |
-| guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-3b/guards.txt | 71b26dc0c62f699684f39a18d7795ed98a5682502b548533b3ee3f4b4bfc874d |
-| mut-M1_no_prevent.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-3b/mut-M1_no_prevent.txt | d64ba90dac2b6a2f85906b536229f96ebad98d4ec11199c22c38382c3777c48c |
-| mut-M2_no_gauge_refresh.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-3b/mut-M2_no_gauge_refresh.txt | 4124683fbb8fb2a0054cab2b30d50aaf97b00b50c21763b8687b6bf10e64506f |
-| mut-M3_no_mark_loaded.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-3b/mut-M3_no_mark_loaded.txt | d49682592628f2dc8e8ad3b1bdb8c266b806f2acdec67e8f151ff9f14f89bf4e |
-| red-01-hotfix-arm-at-6d8631a.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-3b/red-01-hotfix-arm-at-6d8631a.txt | 7764b8365d094c0e6d8a6af0ceda5607c5ce7d6bc083cba49af5ff6355d0b54a |
-| red-02-b97-nodes-at-6d8631a.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-3b/red-02-b97-nodes-at-6d8631a.txt | ecefcb629897ad9b80b69afda8bb6b996d389cd47d2cbd93b484ee8700a2521c |
+| green-01-session-reset.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-3b/green-01-session-reset.txt | 39ed0189458cbf86031e0c61f1c54eeb273246866882e6349cdfcd05820becf3 |
+| green-02-b97-chips-width.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-3b/green-02-b97-chips-width.txt | 4975620d0017ac104af0366bc614a24058e843c81b6b4edce4cd8eb84aaca143 |
+| green-03-session-reset-final.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-3b/green-03-session-reset-final.txt | 06942d2a5e5a2381a3b98c66fad125d26f945a83b488e55c027b1acefba8f87d |
+| green-04-reverse-census.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-3b/green-04-reverse-census.txt | 7d126cfbd348c9cf7564dc35f20e9a349b5a6535d7001626245b0756b7ade58a |
+| green-05-at057b-x5-fix-and-base.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-3b/green-05-at057b-x5-fix-and-base.txt | e26b12b230fc362a22aa4eecf5e2ca98aa4cfe8c43ad6e6c954f991363b5ec52 |
+| green-06-final-reset-and-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-3b/green-06-final-reset-and-guards.txt | 5bf74d90846996fcea28a0669e932b92c8e31fb00c9c8c6bb5de4f4e7be78ba6 |
+| guards-census.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-3b/guards-census.txt | 544e91feeaafc3c05d7543a5009c10acbe762d61b968f3934121ebde10c75ebe |
+| guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-3b/guards.txt | 99e755c20451b940c03446a9a0a3d59c957b40156b3281c718dbf140472d93a1 |
+| mut-M1_no_prevent.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-3b/mut-M1_no_prevent.txt | dc55ff4e51a272affe343595f5a8e24e3b3d1d16d4ace18d6f8ecc54781659c4 |
+| mut-M2_no_gauge_refresh.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-3b/mut-M2_no_gauge_refresh.txt | 03f67964aca535a421aaa3c0fd91f86534ba8e710826555f66ff1b17c9899cd5 |
+| mut-M3_no_mark_loaded.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-3b/mut-M3_no_mark_loaded.txt | 00139371e2be6b6b7cb3e773bc31f49ad8682a1b8ee8494a5a81c20de6cdd593 |
+| red-01-hotfix-arm-at-6d8631a.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-3b/red-01-hotfix-arm-at-6d8631a.txt | 3cff5bc96611401fe732cd51367d6ff2395db59cef40454699c0275eb2464a19 |
+| red-02-b97-nodes-at-6d8631a.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-3b/red-02-b97-nodes-at-6d8631a.txt | cfc931e8725021f5dcd884bf75dcd35cd7462c99b06e60a553ad43baa2eae954 |
 
 | Field | Value |
 |---|---|

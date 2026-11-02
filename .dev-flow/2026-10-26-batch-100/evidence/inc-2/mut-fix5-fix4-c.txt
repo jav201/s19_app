@@ -1,5 +1,5 @@
 cmd: pytest -q -p no:cacheprovider tests/test_b100_save_guards.py -k "gather_reuse or case_variant"  (MUTANT fix4-c, fix-pass-5 tree)
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 5, mutant fix4-c)
+tree: <HOME>\Github\s19_app-b100-inc2 (fix pass 5, mutant fix4-c)
 
 .FFF                                                                     [100%]
 ================================== FAILURES ===================================

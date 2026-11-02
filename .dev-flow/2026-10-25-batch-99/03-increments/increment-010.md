@@ -149,7 +149,7 @@ test_help_toggle_and_a2l_panel.py` — **16 passed** (`green-a2l-pilot.txt`);
 |---|---|
 | Mutation applied | none for the baseline RED — the tests ran against the **unmodified** tree (`red-initial.txt`, 5 failed): TC-23 saw `effective_byte_order == "little"` (P-7); TC-24 saw raw 300 → `3000.0`-class wrong-direction values (P-17); TC-25 saw silent nearest/clamp `err=None flags=[]` (P-8); AT-09's painted row showed `112650.0` for `RAT_FUNC_SYM` (P-17) and no `n/a` cell existed (P-7/P-17) |
 | Instrument | project code: the implementer's own hand via the Edit tool; restore checked by SHA-256 |
-| Where it ran | this worktree (`C:\Users\jjgh8\Github\s19_app-b99-inc10`), run by the implementer |
+| Where it ran | this worktree (`<HOME>\Github\s19_app-b99-inc10`), run by the implementer |
 | Transcript | `red-initial.txt` (5 failed) · per-LLR mutations: `mut-LLR-158.1.txt` · `mut-LLR-158.2.txt` · `mut-LLR-158.3.txt` (each: the resolved node FAILED) |
 | Restore proven by | `s19_app/tui/a2l.py` returned to digest `3d88647a9c4c53a6b59a5799ba36d11aa22fdc48f701897c90f34ef61734ec85` after each mutation (`baseline-hashes.txt`, re-checked after the third revert) |
 | Bytecode cache | run with `PYTHONDONTWRITEBYTECODE=1` (C-46) |
@@ -197,14 +197,14 @@ file excluded from its own list)
 
 | Evidence artifact | Path | SHA-256 |
 |---|---|---|
-| Import proof (this worktree) | `import-proof.txt` | `9399a89d6ecf992b95c307334d525fe67ce65f212ced17045bc3193ee5e44040` |
-| RED baseline (unmodified tree) | `red-initial.txt` | `ee7063b0781a108cfb41972f18736b2d65f4988f1a61ac35003d5b508d192596` |
+| Import proof (this worktree) | `import-proof.txt` | `07d0770ca3805e457592bb2ec8efdf6d625643793c07bf29d28c2c00b42b3f2b` |
+| RED baseline (unmodified tree) | `red-initial.txt` | `e559d33293b3cade8d193d3b764dfee9733a5a5941dad6810942ee3cd04c9568` |
 | GREEN full run (5 passed) | `green-full.txt` | `bd40e8c7519b38ed6a5be29c233e55ef5645356b93fbc4493f5ccc3dbb873b55` |
-| GREEN TC-B99-23 | `green-tc_b99_23.txt` | `0f7610ecf362bc8aa97a9e30a90764b8fcf256c63c991e3e505a18856cf48663` |
-| GREEN TC-B99-24 | `green-tc_b99_24.txt` | `6adbb2afda277812b68b4b637419842cb27e23314d71d9b8a17a13c4767c2892` |
-| GREEN TC-B99-25 | `green-tc_b99_25.txt` | `c312e7495a4971dd61aea6488b8ffc2b9e0c925f20bab34c8e3c6e76983cefc2` |
-| GREEN AT-B99-09 | `green-at_b99_09.txt` | `8ce1a83fd2cc8bc6d15f971009caf3bd130cd9fab7e5355eb98513ffcc03f729` |
-| GREEN AT-B99-14 | `green-at_b99_14.txt` | `7a5ae4c961452666baafe2961b07c6a3eb70340b5b6ea8f2a071dbfaf37b7445` |
+| GREEN TC-B99-23 | `green-tc_b99_23.txt` | `f59e621e39b37ea171c1e651eb7cbb103e636a16a9c9db05bc0f8a1bddabfd31` |
+| GREEN TC-B99-24 | `green-tc_b99_24.txt` | `658b4f041da3fcbf3ccff8c955bec62240224e4ebdc6fa01209664d53f03866a` |
+| GREEN TC-B99-25 | `green-tc_b99_25.txt` | `aeeca38c4ebf7dfd070715302b0bce5901235b389b50e010f431e79429368864` |
+| GREEN AT-B99-09 | `green-at_b99_09.txt` | `763cad2fa691eaeb79024c80f9999df7cc9cfcbaf01a4a3009fec60d62ff3cf3` |
+| GREEN AT-B99-14 | `green-at_b99_14.txt` | `fbbc1a688e77b1d6aa7f3ea8fc83eaf1c1241aa3413f1497bba492b74936204a` |
 | GREEN affected files + census (158 passed) | `green-affected.txt` | `d53ec579ef6e8ad1b7a700b4eac5d8430edea19f5eb8a25c68345e183a9c7956` |
 | GREEN tests/test_tui_app.py (62 passed) | `green-tui-app.txt` | `ba253a7604f94f8d6ceaac1c33f0cb5b347d7e754742fdfbe59cbc9820b4c9bf` |
 | GREEN A2L pilot companions (16 passed) | `green-a2l-pilot.txt` | `6ce4354291bbb42e640db5ac663599dc7515d82e83c3c2eb0ba18b3e07108ad0` |
@@ -218,7 +218,7 @@ file excluded from its own list)
 | Pre-mutation hashes | `baseline-hashes.txt` | `bbcc7ddf472d0fd3297099d246863f110994a6eeb96617518c528acab22d3865` |
 
 Import proof (C-46/precondition): `python -c "import s19_app; print(s19_app.__file__)"`
-printed `C:\Users\jjgh8\Github\s19_app-b99-inc10\s19_app\__init__.py` — a path
+printed `<HOME>\Github\s19_app-b99-inc10\s19_app\__init__.py` — a path
 inside this worktree.
 
 | Field | Value |
@@ -322,20 +322,20 @@ Mutation verdicts (each applied, run, reverted; `a2l.py` restored to
 
 | Evidence artifact | Path | SHA-256 |
 |---|---|---|
-| RED engine-freeze guards (3, by-requirement) | `red-engine-freeze-guards.txt` | `8917f363e7fa1e947116984cafd592deb3c48ac0a91a108b04b3b03366d83be4` |
+| RED engine-freeze guards (3, by-requirement) | `red-engine-freeze-guards.txt` | `e7fb64656ccce10d950453de66486a4f9b8c537aa2a38597404d81c020a48cb5` |
 | Example impact measurement | `example-impact.txt` | `c87b7fa1677fb85c24ac52c8a72933dc325d57cdf13f995d95f243a2c7cb810c` |
 | Example impact script | `example_impact.py` | `1c428cf29b08aa49705fcef0d6a982ae4134b9ae2acf78cd2e5afb4f927464b6` |
 | Fix-round baseline hashes | `fix-baseline-hashes.txt` | `206d12eaecb9906aaf377fc9df16f1a5e9167d57ba319650283c53a8225a7a3f` |
-| GREEN whole affected set (238 passed) | `green-full.txt` | `4e70b5adc06a01b10d46d898b572a1a6d99013ca25d486bdb31de8658d423865` |
+| GREEN whole affected set (238 passed) | `green-full.txt` | `4c18755b72b21c0e9f699b4459bd0f8458d71cbd1d8872ce668f6ade39d8c52d` |
 | GREEN census companion (MOD_COMMON hit) | `green-alignment-sizing.txt` | `8588d83f8628d0e18495b9121b887f2c23c8b06ae591ef4f2042063d41b61495` |
-| GREEN new module (7 passed) | `green-fix-new-module.txt` | `34a2a1247c30374badf5a65b9d5f45632a3c1c2cba042f722e27fcd7b3a9a7cc` |
-| Mutation LLR-158.1 re-run (KILLED) | `mut-LLR-158.1.txt` | `ba0a31a51c50b616197760479aa5820e79915546255e2ad4dbca8b01be8b77db` |
-| Mutation LLR-158.2 re-run (KILLED) | `mut-LLR-158.2.txt` | `c2f5f505f2a227f1dcb0e0a2eac6b11f7a65de1f9a8d5d97b0c7a853924ec908` |
-| Mutation LLR-158.3 re-run (KILLED) | `mut-LLR-158.3.txt` | `1600c3fd9a58162bbfa3cdabeac91e3aeb99a2bb584aebd8ca9f02928a3d66af` |
-| Mutation F1 nearest-entry (KILLED) | `mut-F1-nearest-entry.txt` | `2763aef5bf22015952ee3a314580572f5720213fc0bfd6b7dc4de9c66db772b0` |
-| Mutation LOW-a first-module (KILLED) | `mut-LOWa-first-module-wins.txt` | `dbef9676ed14156243f07dfe77192800b8c197dd7210e692d227fcf14d7ca00a` |
-| Mutation LOW-b denominator (KILLED) | `mut-LOWb-denominator-check.txt` | `2dbd8937165715a614ead8bd77685302bcf750e8e23ee8fc292957e7fb1fe2a2` |
-| Mutation F2 clipping (KILLED) | `mut-F2-clipping.txt` | `2cf980fad176f6d18f3aa806513ef3d48faa0a67be4a3865a96f36d1fd1e106c` |
+| GREEN new module (7 passed) | `green-fix-new-module.txt` | `5a9f3de2cf7a43c744e9e068a7da0a904db1428f0a17688e9d70ab80f413a136` |
+| Mutation LLR-158.1 re-run (KILLED) | `mut-LLR-158.1.txt` | `3b37667137301d93b86e8cf04758e317930674142f2d6de8a003e1962603a7a5` |
+| Mutation LLR-158.2 re-run (KILLED) | `mut-LLR-158.2.txt` | `553e34fd172f056b4169b79bdf5198a025ec60f865dd91412c3459788cfb238f` |
+| Mutation LLR-158.3 re-run (KILLED) | `mut-LLR-158.3.txt` | `c327b64dbfee7f34868074991c862cb6ac29586dde08f7ffd50fb143c503456f` |
+| Mutation F1 nearest-entry (KILLED) | `mut-F1-nearest-entry.txt` | `54fa3f106d70b571107f4ddf369405c35b865f94574b773a0d9023bf2a6ebec8` |
+| Mutation LOW-a first-module (KILLED) | `mut-LOWa-first-module-wins.txt` | `a5f25b1bd5af93372540afe895050fd14e31755c991ec7da5afd6160534fb715` |
+| Mutation LOW-b denominator (KILLED) | `mut-LOWb-denominator-check.txt` | `4bead3352dd1265016c311320f443b8eb6880350fa10d53a5bc03368c16c6472` |
+| Mutation F2 clipping (KILLED) | `mut-F2-clipping.txt` | `0300b99b82d7fe870591e11dc0398ebfe62e8160c1ebd1a6807dcc172eb4ecbc` |
 | AT-B99-09 black-box flow probe (development aid) | `probe_at09_flow.py` | `41e1dd402524e541afbfefbd4f8c37871e0a1c3754b309267f60498c32cb799e` |
 
 Signed-balance test ledger after the fix round: `post = base − deleted + added`

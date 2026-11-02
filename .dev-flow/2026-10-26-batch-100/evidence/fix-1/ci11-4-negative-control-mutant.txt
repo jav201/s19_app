@@ -1,9 +1,9 @@
-s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-fix1\s19_app\__init__.py
+s19_app.__file__ = <HOME>\Github\s19_app-b100-fix1\s19_app\__init__.py
 F                                                                        [100%]
 ================================== FAILURES ===================================
 _________________ test_tc_b100_59_refused_plan_writes_nothing _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/fix1/bt/mut11_4/test_tc_b100_59_refused_plan_w0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/fix1/bt/mut11_4/test_tc_b100_59_refused_plan_w0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000179F45B6D10>
 
     def test_tc_b100_59_refused_plan_writes_nothing(
@@ -30,10 +30,10 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000179F45B6D10>
         lines, project, _ = _save_session(tmp_path, scenario)
         assert "Project NOT saved: 1 blocked entry (0x8000007C)" in lines[-1], lines
 >       assert plans == [], plans
-E       AssertionError: [SavePlan(target=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122...1 blocked entry (0x8000007C) — fix them in the Patch Editor.', folders=(), skipped_links=(), copies=(), total_bytes=0)]
+E       AssertionError: [SavePlan(target=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122...1 blocked entry (0x8000007C) — fix them in the Patch Editor.', folders=(), skipped_links=(), copies=(), total_bytes=0)]
 E       assert [SavePlan(tar...otal_bytes=0)] == []
 E         
-E         Left contains one more item: SavePlan(target=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b... 1 blocked entry (0x8000007C) — fix them in the Patch Editor.', folders=(), skipped_links=(), copies=(), total_bytes=0)
+E         Left contains one more item: SavePlan(target=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b... 1 blocked entry (0x8000007C) — fix them in the Patch Editor.', folders=(), skipped_links=(), copies=(), total_bytes=0)
 E         Use -v to get more diff
 
 tests\test_b100_save_image.py:1422: AssertionError

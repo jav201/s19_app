@@ -6,14 +6,14 @@
 #   |     if not isinstance(entries, list):
 # edit 1 NEW:
 #   |     if entries is None:
-# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b
+# cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b
 # env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
-# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-wide-object] tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-long-string]
+# command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-wide-object] tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-long-string]
 # started 2026-10-30T23:10:27Z  finished 2026-10-30T23:10:28Z  rc=1
 FF                                                                       [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b\tests\test_b100_document.py:959: AssertionError: ('entries-wide-object', 'too_large')
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b\tests\test_b100_document.py:959: AssertionError: ('entries-long-string', 'too_large')
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b\tests\test_b100_document.py:959: AssertionError: ('entries-wide-object', 'too_large')
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-b\tests\test_b100_document.py:959: AssertionError: ('entries-long-string', 'too_large')
 =========================== short test summary info ===========================
 FAILED tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-wide-object]
 FAILED tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-long-string]

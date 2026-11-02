@@ -1,6 +1,6 @@
 # Inc 9b E4 integration - rerun 1 of 3 of the one green-02 timing failure (SEC6-5 distinct folders), -s prints the timings
-# worktree: /c/Users/jjgh8/Github/s19_app-b100-inc9b  HEAD: 89476669906b8e036c447970d88ba18af61e2d18
-# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc9b\s19_app\__init__.py
+# worktree: <HOME>/Github/s19_app-b100-inc9b  HEAD: 89476669906b8e036c447970d88ba18af61e2d18
+# s19_app.__file__ = <HOME>\Github\s19_app-b100-inc9b\s19_app\__init__.py
 # python 3.11.15 | textual 8.2.8
 # command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<scratch int9b/lad> python -m pytest -p no:cacheprovider -q -rfEs --tb=short tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling -s
 # started: 2026-10-31T17:56:21-06:00
@@ -12,8 +12,8 @@ SEC6-5 timings (s): {'read': 0.238, 'load': 0.396, 'painted': 0.864, 'appended':
 # real %LOCALAPPDATA%\s19_app exists: no
 
 # Inc 9b E4 integration - rerun 2 of 3 of the one green-02 timing failure (SEC6-5 distinct folders), -s prints the timings
-# worktree: /c/Users/jjgh8/Github/s19_app-b100-inc9b  HEAD: 89476669906b8e036c447970d88ba18af61e2d18
-# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc9b\s19_app\__init__.py
+# worktree: <HOME>/Github/s19_app-b100-inc9b  HEAD: 89476669906b8e036c447970d88ba18af61e2d18
+# s19_app.__file__ = <HOME>\Github\s19_app-b100-inc9b\s19_app\__init__.py
 # python 3.11.15 | textual 8.2.8
 # command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<scratch int9b/lad> python -m pytest -p no:cacheprovider -q -rfEs --tb=short tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling -s
 # started: 2026-10-31T17:56:31-06:00
@@ -25,8 +25,8 @@ SEC6-5 timings (s): {'read': 0.235, 'load': 0.386, 'painted': 0.932, 'appended':
 # real %LOCALAPPDATA%\s19_app exists: no
 
 # Inc 9b E4 integration - rerun 3 of 3 of the one green-02 timing failure (SEC6-5 distinct folders), -s prints the timings
-# worktree: /c/Users/jjgh8/Github/s19_app-b100-inc9b  HEAD: 89476669906b8e036c447970d88ba18af61e2d18
-# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc9b\s19_app\__init__.py
+# worktree: <HOME>/Github/s19_app-b100-inc9b  HEAD: 89476669906b8e036c447970d88ba18af61e2d18
+# s19_app.__file__ = <HOME>\Github\s19_app-b100-inc9b\s19_app\__init__.py
 # python 3.11.15 | textual 8.2.8
 # command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<scratch int9b/lad> python -m pytest -p no:cacheprovider -q -rfEs --tb=short tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling -s
 # started: 2026-10-31T17:56:41-06:00

@@ -366,7 +366,7 @@ place bytes are made. No existing report golden moves.
 Per **C-39**: predicted thresholds false-fail correct implementations as readily as they pass wrong
 ones. Every number below is output. Probe discipline: bounded fixtures (E ≤ 8 000; the 200 000-hit /
 50 MB ceiling was never approached), counterfactuals in `git archive` exports at the short root
-`C:/Users/jjgh8/AppData/Local/Temp/claude/b63/{arch,archb}`, patch scripts written to a file and
+`<HOME>/AppData/Local/Temp/claude/b63/{arch,archb}`, patch scripts written to a file and
 invoked by path, temp trees deleted (§10).
 
 ### 6.1 D3 — the invariant, over a C-31-derived input set

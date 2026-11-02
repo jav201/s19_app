@@ -1,11 +1,11 @@
-cmd: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc2 (NO_COLOR unset) python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py::test_tc_b100_04_device_names_refused_raw_and_sanitised tests/test_b100_save_guards.py::test_tc_b100_04_device_predicate_stem_before_first_dot
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (MUTANT M-F3 — the predicate back to the LAST-dot split)
+cmd: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<HOME>\Github\s19_app-b100-inc2 (NO_COLOR unset) python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py::test_tc_b100_04_device_names_refused_raw_and_sanitised tests/test_b100_save_guards.py::test_tc_b100_04_device_predicate_stem_before_first_dot
+tree: <HOME>\Github\s19_app-b100-inc2 (MUTANT M-F3 — the predicate back to the LAST-dot split)
 
 FF                                                                       [100%]
 ================================== FAILURES ===================================
 ___________ test_tc_b100_04_device_names_refused_raw_and_sanitised ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27524/test_tc_b100_04_device_names_r0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27524/test_tc_b100_04_device_names_r0')
 
     def test_tc_b100_04_device_names_refused_raw_and_sanitised(tmp_path: Path) -> None:
         """``nul``, ``CON``, ``com1``, ``LPT¹`` (superscript), ``con.txt`` (raw
@@ -95,8 +95,8 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
                     f"{typed!r}: expected the device-name refusal, "
                     f"got {status!r}"
                 )
-E               AssertionError: 'con.tar.gz': expected the device-name refusal, got "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27524\\test_tc_b100_04_device_names_r0\\app\\.s19tool\\workarea\\contargz (variant 'firmware')"
-E               assert 'device name' in "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27524\\test_tc_b100_04_device_names_r0\\app\\.s19tool\\workarea\\contargz (variant 'firmware')"
+E               AssertionError: 'con.tar.gz': expected the device-name refusal, got "Saved project to <HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27524\\test_tc_b100_04_device_names_r0\\app\\.s19tool\\workarea\\contargz (variant 'firmware')"
+E               assert 'device name' in "Saved project to <HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-27524\\test_tc_b100_04_device_names_r0\\app\\.s19tool\\workarea\\contargz (variant 'firmware')"
 
 tests\test_b100_save_guards.py:313: AssertionError
 ___________ test_tc_b100_04_device_predicate_stem_before_first_dot ____________

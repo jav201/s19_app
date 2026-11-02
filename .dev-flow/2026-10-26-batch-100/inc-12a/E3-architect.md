@@ -4,7 +4,7 @@
 
 The seam works as designed. A begin always gets an end: each of the 7 actions holds a `finally` (or the kickoff's `except BaseException`), and a second end is a no-op. Generations increase for the whole app, so a stale `step_busy` / `end_busy` can never paint over a newer run. Inc 12b can use the seam with its signatures unchanged. The findings below are text errors that would mislead an implementer (A12a-01 … -03), two gaps in what gets logged and in the busy window, which the seam's own rules cause (A12a-04, -05), one simplification that removes a defect class (A12a-06), and one note for 12b (A12a-07).
 
-Code refs: `inc10` = `C:/Users/jjgh8/Github/s19_app-b100-inc10/s19_app/tui/app.py` at `1747479` (9b + 10 merged; the 11 worktree is at the same commit, so Inc 11 code does not exist yet). `main` = the checkout at `8947666`. The probes are under `work/e3-architect/`: `noapp2.py` and `refusal_census.py`, both read-only and run with `python -I`.
+Code refs: `inc10` = `<HOME>/Github/s19_app-b100-inc10/s19_app/tui/app.py` at `1747479` (9b + 10 merged; the 11 worktree is at the same commit, so Inc 11 code does not exist yet). `main` = the checkout at `8947666`. The probes are under `work/e3-architect/`: `noapp2.py` and `refusal_census.py`, both read-only and run with `python -I`.
 
 ## Findings
 

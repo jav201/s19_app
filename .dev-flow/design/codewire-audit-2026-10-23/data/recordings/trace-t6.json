@@ -5,11 +5,11 @@
    "test": "cwaudit/test_t6_split.py::test_t6a_split_by_ranges_case01",
    "depth": 0,
    "in": {
-    "path": "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19"
+    "path": "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19"
    },
    "out": {
     "S19File": {
-     "path": "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19",
+     "path": "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19",
      "records": [
       {
        "SRecord": {
@@ -251,7 +251,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19": [
+    "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -268,11 +268,11 @@
    "test": "cwaudit/test_t6_split.py::test_t6c_join_fill_two_real_ranges",
    "depth": 0,
    "in": {
-    "path": "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19"
+    "path": "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19"
    },
    "out": {
     "S19File": {
-     "path": "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19",
+     "path": "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19",
      "records": [
       {
        "SRecord": {
@@ -514,7 +514,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19": [
+    "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -533,10 +533,10 @@
    "test": "cwaudit/test_t6_split.py::test_t6a_split_by_ranges_case01",
    "depth": 0,
    "in": {
-    "path": "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19",
+    "path": "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19",
     "s19": {
      "S19File": {
-      "path": "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19",
+      "path": "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19",
       "records": [
        {
         "SRecord": {
@@ -782,7 +782,7 @@
    },
    "out": {
     "LoadedFile": {
-     "path": "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19",
+     "path": "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19",
      "file_type": "s19",
      "mem_map": {
       "0x0": 67,
@@ -906,7 +906,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19": [
+    "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -923,10 +923,10 @@
    "test": "cwaudit/test_t6_split.py::test_t6c_join_fill_two_real_ranges",
    "depth": 0,
    "in": {
-    "path": "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19",
+    "path": "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19",
     "s19": {
      "S19File": {
-      "path": "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19",
+      "path": "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19",
       "records": [
        {
         "SRecord": {
@@ -1172,7 +1172,7 @@
    },
    "out": {
     "LoadedFile": {
-     "path": "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19",
+     "path": "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19",
      "file_type": "s19",
      "mem_map": {
       "0x0": 67,
@@ -1296,7 +1296,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19": [
+    "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19": [
      "S00F00004341534530315F4241534943B2",
      "S31580000000533139544F4F4C5F4241534943000102AB",
      "S3158000001003000102030405060708090A0B0C0D0EEE",
@@ -1317,7 +1317,7 @@
    "in": {
     "s19": {
      "S19File": {
-      "path": "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19",
+      "path": "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19",
       "records": [
        {
         "SRecord": {
@@ -1609,7 +1609,7 @@
    "in": {
     "s19": {
      "S19File": {
-      "path": "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19",
+      "path": "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.s19",
       "records": [
        {
         "SRecord": {
@@ -2015,28 +2015,28 @@
     "pad_byte": 255,
     "fmt": "s19",
     "stem": "firmware",
-    "dest_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_7valg5re\\splits",
+    "dest_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_7valg5re\\splits",
     "zero_coverage_empty": true
    },
    "out": [
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_7valg5re\\splits\\firmware_range_00.s19",
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_7valg5re\\splits\\firmware_range_01.s19",
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_7valg5re\\splits\\firmware_range_02.s19"
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_7valg5re\\splits\\firmware_range_00.s19",
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_7valg5re\\splits\\firmware_range_01.s19",
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_7valg5re\\splits\\firmware_range_02.s19"
    ],
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_7valg5re\\splits\\firmware_range_02.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_7valg5re\\splits\\firmware_range_02.s19": [
      "S0030000FC",
      "S32580000040000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F2A",
      "S32580000060202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F0A",
      "S70500000000FA"
     ],
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_7valg5re\\splits\\firmware_range_01.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_7valg5re\\splits\\firmware_range_01.s19": [
      "S0030000FC",
      "S32580000000533139544F4F4C5F424153494300010203000102030405060708090A0B0C0D0E2F",
      "S306800000200F4A",
      "S70500000000FA"
     ],
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_7valg5re\\splits\\firmware_range_00.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_7valg5re\\splits\\firmware_range_00.s19": [
      "S0030000FC",
      "S10F00004341534530315F4241534943B2",
      "S9030000FC"
@@ -2065,14 +2065,14 @@
     "pad_byte": 255,
     "fmt": "s19",
     "stem": "firmware",
-    "dest_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_7f5bh54x\\splits",
+    "dest_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_7f5bh54x\\splits",
     "zero_coverage_empty": true
    },
    "out": [
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_7f5bh54x\\splits\\firmware_locality_00.s19"
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_7f5bh54x\\splits\\firmware_locality_00.s19"
    ],
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_7f5bh54x\\splits\\firmware_locality_00.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_7f5bh54x\\splits\\firmware_locality_00.s19": [
      "S0030000FC",
      "S306800000000079",
      "S70500000000FA"
@@ -2149,13 +2149,13 @@
     "pad_byte": 255,
     "fmt": "s19",
     "stem": "firmware",
-    "dest_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ykn7n6kv\\splits"
+    "dest_dir": "<HOME>\\AppData\\Local\\Temp\\cwaudit_ykn7n6kv\\splits"
    },
    "out": [
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ykn7n6kv\\splits\\firmware_joined.s19"
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ykn7n6kv\\splits\\firmware_joined.s19"
    ],
    "files": {
-    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_ykn7n6kv\\splits\\firmware_joined.s19": [
+    "<HOME>\\AppData\\Local\\Temp\\cwaudit_ykn7n6kv\\splits\\firmware_joined.s19": [
      "S0030000FC",
      "S32580000000533139544F4F4C5F424153494300010203000102030405060708090A0B0C0D0E2F",
      "S325800000200FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4A",
@@ -2892,10 +2892,10 @@
    "test": "cwaudit/test_t6_split.py::test_t6b_split_mac_only_manual_row",
    "depth": 0,
    "in": {
-    "path": "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.mac"
+    "path": "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.mac"
    },
    "out": {
-    "path": "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.mac",
+    "path": "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.mac",
     "records": [
      {
       "line_number": 1,
@@ -2919,7 +2919,7 @@
     ]
    },
    "files": {
-    "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.mac": [
+    "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_01_basic_valid\\firmware.mac": [
      "; Synthetic MAC",
      "BLOCK_A=80000000"
     ]

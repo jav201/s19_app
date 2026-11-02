@@ -57,7 +57,7 @@ the engine/parsers. The CDFX writer is hash-pinned by TC-030.
 ## 3. How to test
 
 ```
-# from repo root C:\Users\jjgh8\Github\s19_app
+# from repo root <HOME>\Github\s19_app
 python -m pytest -q tests/test_unified_export.py        # the new TC-028..031, TC-036
 python -m pytest -q                                     # full suite — baseline + new
 python -c "import s19_app.tui.cdfx"                      # package import

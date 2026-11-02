@@ -3,9 +3,9 @@ requirement: LLR-172.5h
 target file: s19_app/tui/app.py
 edit: '        text = str(path).strip().strip(\'"\')\n        if not Path(text).is_absolute():\n            normalized = resolve_input_path(path, self.base_dir)\n            if normalized is None:\n                return ("refuse", "not found")\n            if os.path.isdir(normalized):\n                return ("refuse", "not a supported file")\n            suffix = normalized.suffix.lower()\n            if suffix in A2L_EXTENSIONS:\n                return ("a2l", "")\n            if suffix in SUPPORTED_EXTENSIONS:\n                return ("data", "")\n            return ("refuse", "not a supported file")\n\n        normalized = resolve_input_path(path, self.base_dir)' -> '        text = str(path).strip().strip(\'"\')\n\n        normalized = resolve_input_path(path, self.base_dir)'
 sha256 before: 62232011882325626771cb015ccfce4b34c15945e90b8432fd628c61fcf22d80
-cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a
+cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a
 command: pytest -q --tb=line tests/test_b100_recents.py::test_tc_b100_38_typed_relative_folder_is_refused[relative found by the base fallback] tests/test_b100_recents.py::test_tc_b100_38_typed_relative_folder_is_refused[relative junction]
-s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a\s19_app\__init__.py
+s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a\s19_app\__init__.py
 pytest summary: 2 failed in 6.94s
 verdict: KILLED
 restored = True

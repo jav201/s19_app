@@ -1,6 +1,6 @@
 # Inc 9a — E4 integration notes (orchestrated integrator)
 
-Scope: bring G1 (`s19_app/tui/workspace.py`, DeepSeek v4 Pro) and G2 (`s19_app/tui/app.py`, DeepSeek v4 Pro) together with the independent tester's suite (`tests/test_b100_recents.py`, `tests/conftest.py`, `tests/test_id_registry.py`), to GREEN, and check both implementations against the approved graph (`codewire/proto-9a-workspace.md`, `codewire/proto-9a-app.md`, `codewire/interfaces-9a.md` "Applied after E3 r1", `E3-rulings.md` R1–R17, `01-requirements.md` HLR-172/172a/172b, LLR-172.*). Worktree `C:\Users\jjgh8\Github\s19_app-b100-inc9a`, branch `b100-inc9a`, base `4fef292`, uncommitted.
+Scope: bring G1 (`s19_app/tui/workspace.py`, DeepSeek v4 Pro) and G2 (`s19_app/tui/app.py`, DeepSeek v4 Pro) together with the independent tester's suite (`tests/test_b100_recents.py`, `tests/conftest.py`, `tests/test_id_registry.py`), to GREEN, and check both implementations against the approved graph (`codewire/proto-9a-workspace.md`, `codewire/proto-9a-app.md`, `codewire/interfaces-9a.md` "Applied after E3 r1", `E3-rulings.md` R1–R17, `01-requirements.md` HLR-172/172a/172b, LLR-172.*). Worktree `<HOME>\Github\s19_app-b100-inc9a`, branch `b100-inc9a`, base `4fef292`, uncommitted.
 
 Source files edited in integration: `s19_app/tui/app.py` only (1 of the 2-file cap). `workspace.py` unchanged from the G1 hand-off.
 

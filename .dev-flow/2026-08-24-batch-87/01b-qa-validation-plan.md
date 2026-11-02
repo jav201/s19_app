@@ -29,7 +29,7 @@
 > record — re-execute and paste the transcript.** The pre-state in §0 is a measurement at a
 > moment, recorded so the deltas have a floor; it is not a threshold.
 
-**Notation.** `W` = this worktree (`C:\Users\jjgh8\Github\s19_app`, branch
+**Notation.** `W` = this worktree (`<HOME>\Github\s19_app`, branch
 `claude/batch-87-ifc-reauthor-surface-3`) · `VAL = python ~/.claude/docs/tools/devflow-validate.py`
 · `T` = a `mktemp -d` COPY of `W` with `.git` removed. Method label for every criterion is
 **inspection (operator-local executed verification)**, never `test (integration)` — the validator
@@ -374,7 +374,7 @@ or file byte that flips it; none is a repo-wide statement.
 > ### AFTER — invocation (supersedes B-4; the prescribed command destroys the run)
 >
 > ```
-> PYTHONIOENCODING=utf-8 /c/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -q -m "not slow"
+> PYTHONIOENCODING=utf-8 <HOME>/anaconda3/envs/s19env/python.exe -m pytest -q -m "not slow"
 > ```
 >
 > **`conda run -n s19env` must never be used for a suite invocation on this corpus.** It buffers

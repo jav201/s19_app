@@ -33,7 +33,7 @@ rev54 `V8`'s three defects · rev55 `V30` derived environment contract + runtime
 
 ## 1 · PART A — the rev56 candidate
 
-**Location:** `C:\Users\jjgh8\kimi\dev-flow-rev56-candidate\` (25 files). Documentation-only,
+**Location:** `<HOME>\kimi\dev-flow-rev56-candidate\` (25 files). Documentation-only,
 produced from a standards review dated **2026-09-01**. Applies **P1–P7, P12**; declines **P8–P11**.
 
 ### 1.1 Provenance — settled, do not re-check

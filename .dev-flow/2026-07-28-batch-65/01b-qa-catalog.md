@@ -9,7 +9,7 @@ names the cut hit classes and variants).
 below carries a **slug**. The architect lane owns the binding; §9 is the hand-off table.
 
 **Where the numbers come from.** Every transcript in this file was executed against a pristine
-`git archive` export of `082ada9` at `C:/Users/jjgh8/AppData/Local/Temp/claude/b64` (batch-62 sec F5:
+`git archive` export of `082ada9` at `<HOME>/AppData/Local/Temp/claude/b64` (batch-62 sec F5:
 never take gate evidence from a tree another session is editing). Probe scripts live in the session
 scratchpad (`p1_rangeindex.py`, `p2_measure.py`, `p3_marginal.py`, `p4_predicates.py`,
 `p5_followups.py`, `p6_edges.py`) and are re-runnable with `python <probe>.py` from that export root.

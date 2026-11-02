@@ -1,6 +1,6 @@
 # Inc 10 E4 — integration notes
 
-The tree is GREEN on the targeted runs with **0 source edits at integration**: both implementers' code matched the graph, and the 4 failures met were all on the test side (3 test defects, 1 orchestrator ruling). Base `741cc07` plus the working tree of `b100-inc10`. `s19_app.__file__` = `C:\Users\jjgh8\Github\s19_app-b100-inc10\s19_app\__init__.py` in every transcript header. Every run used `env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=.` with `LOCALAPPDATA` set to a scratch folder. The real `%LOCALAPPDATA%\s19_app` was not created.
+The tree is GREEN on the targeted runs with **0 source edits at integration**: both implementers' code matched the graph, and the 4 failures met were all on the test side (3 test defects, 1 orchestrator ruling). Base `741cc07` plus the working tree of `b100-inc10`. `s19_app.__file__` = `<HOME>\Github\s19_app-b100-inc10\s19_app\__init__.py` in every transcript header. Every run used `env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=.` with `LOCALAPPDATA` set to a scratch folder. The real `%LOCALAPPDATA%\s19_app` was not created.
 
 ## 1. Failures met
 

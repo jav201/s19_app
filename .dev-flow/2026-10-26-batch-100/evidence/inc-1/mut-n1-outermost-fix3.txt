@@ -1,5 +1,5 @@
 cmd: pytest -q -p no:cacheprovider tests/test_b100_reuse.py -k nested_anchor  (MUTANT N1 re-run fix pass 3: outermost walk reverted to nearest)
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 — Inc 1 + fix1 + fix2 + fix3-with-mut-n1
+tree: <HOME>\Github\s19_app-b100-inc1 — Inc 1 + fix1 + fix2 + fix3-with-mut-n1
 
 E       Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainmentError'>
 

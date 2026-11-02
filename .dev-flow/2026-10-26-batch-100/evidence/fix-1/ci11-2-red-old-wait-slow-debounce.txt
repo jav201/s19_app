@@ -1,9 +1,9 @@
-s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-fix1\s19_app\__init__.py
+s19_app.__file__ = <HOME>\Github\s19_app-b100-fix1\s19_app\__init__.py
 FF                                                                       [100%]
 ================================== FAILURES ===================================
 ____ test_tc_b100_47_target_line_merge_and_existing_folder_kinds[shipped] _____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/fix1/bt/red11_2/test_tc_b100_47_target_line_me0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/fix1/bt/red11_2/test_tc_b100_47_target_line_me0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000028CB4287A50>
 debounce = 'shipped'
 
@@ -60,7 +60,7 @@ E            +  where False = _where_line_for_text('ef — new project in an exi
 tests\test_b100_save_dialog.py:585: AssertionError
 ___ test_tc_b100_47_target_line_merge_and_existing_folder_kinds[slow 0.6 s] ___
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/fix1/bt/red11_2/test_tc_b100_47_target_line_me1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/fix1/bt/red11_2/test_tc_b100_47_target_line_me1')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000028CB6F47890>
 debounce = 'slow 0.6 s'
 

@@ -1,17 +1,17 @@
 == Full tests/test_b100_busy.py once (allowed at the end; 35-min cap)
-tree: C:/Users/jjgh8/Github/s19_app-b100-inc12b  (git HEAD 81ac4c0)
+tree: <HOME>/Github/s19_app-b100-inc12b  (git HEAD 81ac4c0)
 date: 2026-11-01T13:26:28Z
-s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc12b\s19_app\__init__.py
+s19_app.__file__: <HOME>\Github\s19_app-b100-inc12b\s19_app\__init__.py
 source sha256[:16]: app.py 46f7ee6aa8a0fbfb  a2l.py 73c3820fe0d6ecd2  styles.tcss f7b4f75911b296a4
-env: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12b/la
-cmd: pytest -p no:cacheprovider --basetemp=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12b/bt/green06 -rA tests/test_b100_busy.py
+env: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12b/la
+cmd: pytest -p no:cacheprovider --basetemp=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/corr12b/bt/green06 -rA tests/test_b100_busy.py
 ........................................ss.............................. [ 64%]
 .......................................                                  [100%]
 =================================== PASSES ====================================
 ________ test_tc_b100_50_worker_raise_ends_the_action_first[file_load] ________
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\Github\s19_app-b100-inc12b\tests\test_b100_busy.py:1330 in    
+│ <HOME>\Github\s19_app-b100-inc12b\tests\test_b100_busy.py:1330 in    
 │ _boom                                                                        
 │                                                                              
 │   1327                                                                       
@@ -32,7 +32,7 @@ ________ test_tc_b100_50_worker_raise_ends_the_action_first[file_load] ________
 │ │      │   PreparedLoad(                                                   │ 
 │ │      │   │   loaded=LoadedFile(                                          │ 
 │ │      │   │   │                                                           │ 
-│ │      path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--User… │ 
+│ │      path=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--User… │ 
 │ │      │   │   │   file_type='s19',                                        │ 
 │ │      │   │   │   mem_map={                                               │ 
 │ │      │   │   │   │   2147483648: 83,                                     │ 
@@ -144,7 +144,7 @@ ________ test_tc_b100_50_worker_raise_ends_the_action_first[file_load] ________
 │ │      │   │   a2l_cache=None                                              │ 
 │ │      │   ),                                                              │ 
 │ │      │                                                                   │ 
-│ │      WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjg… │ 
+│ │      WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-jjg… │ 
 │ │      │   621208.6482636                                                  │ 
 │ │      )                                                                   │ 
 │ │ _k = {}                                                                  │ 
@@ -154,7 +154,7 @@ RuntimeError: forced
 _________ test_tc_b100_50_worker_raise_ends_the_action_first[report] __________
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:370 
+│ <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:370 
 │ in _run                                                                      
 │                                                                              
 │   367 │   │   │   self.state = WorkerState.RUNNING                           
@@ -183,7 +183,7 @@ _________ test_tc_b100_50_worker_raise_ends_the_action_first[report] __________
 │ │                 RuntimeError('forced')")                                 │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:354 
+│ <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:354 
 │ in run                                                                       
 │                                                                              
 │   351 │   │   Returns:                                                       
@@ -204,7 +204,7 @@ _________ test_tc_b100_50_worker_raise_ends_the_action_first[report] __________
 │ │        >                                                                 │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:326 
+│ <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:326 
 │ in _run_threaded                                                             
 │                                                                              
 │   323 │   │                                                                  
@@ -226,7 +226,7 @@ _________ test_tc_b100_50_worker_raise_ends_the_action_first[report] __________
 │ │        >                                                                 │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\concurrent\futures\thread.py:58 in  
+│ <HOME>\anaconda3\envs\s19env\Lib\concurrent\futures\thread.py:58 in  
 │ run                                                                          
 │                                                                              
 │    55 │   │   │   return                                                     
@@ -241,7 +241,7 @@ _________ test_tc_b100_50_worker_raise_ends_the_action_first[report] __________
 │ │ self = None │                                                              
 │ ╰─────────────╯                                                              
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:309 
+│ <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:309 
 │ in run_callable                                                              
 │                                                                              
 │   306 │   │   def run_callable(work: Callable[[], ResultType]) -> ResultType 
@@ -264,16 +264,16 @@ _________ test_tc_b100_50_worker_raise_ends_the_action_first[report] __________
 │ │        S19TuiApp._start_generate_report_worker at 0x00000269077C0220>,   │ 
 │ │        S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'},          │ 
 │ │        pseudo_classes={'dark', 'focus'}),                                │ 
-│ │        WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-j… │ 
+│ │        WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-j… │ 
 │ │        ProjectVariantSet(project_name='proj',                            │ 
 │ │        variants=(VariantDescriptor(variant_id='a',                       │ 
-│ │        path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Us… │ 
+│ │        path=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Us… │ 
 │ │        file_type='s19'), VariantDescriptor(variant_id='b',               │ 
-│ │        path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Us… │ 
+│ │        path=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Us… │ 
 │ │        file_type='s19')), active_id='a'), 64, None, [], (), None, gen=2) │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc12b\s19_app\tui\app.py:6313 in         
+│ <HOME>\Github\s19_app-b100-inc12b\s19_app\tui\app.py:6313 in         
 │ _start_generate_report_worker                                                
 │                                                                              
 │    6310 │   │   │   except Exception as exc:                                 
@@ -301,9 +301,9 @@ _________ test_tc_b100_50_worker_raise_ends_the_action_first[report] __________
 │ │                     │   declared_regions=(),                             │ 
 │ │                     │   report_filter=None                               │ 
 │ │                     )                                                    │ 
-│ │       project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/clau… │ 
+│ │       project_dir = WindowsPath('<HOME>/AppData/Local/Temp/clau… │ 
 │ │     report_filter = None                                                 │ 
-│ │       report_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/clau… │ 
+│ │       report_path = WindowsPath('<HOME>/AppData/Local/Temp/clau… │ 
 │ │           results = [                                                    │ 
 │ │                     │   VariantExecutionResult(                          │ 
 │ │                     │   │   variant_id='a',                              │ 
@@ -311,7 +311,7 @@ _________ test_tc_b100_50_worker_raise_ends_the_action_first[report] __________
 │ │                     │   │   change_summaries=[                           │ 
 │ │                     │   │   │   ChangeSummary(                           │ 
 │ │                     │   │   │   │                                        │ 
-│ │                     source_path=WindowsPath('C:/Users/jjgh8/AppData/Loc… │ 
+│ │                     source_path=WindowsPath('<HOME>/AppData/Loc… │ 
 │ │                     │   │   │   │   kind='change',                       │ 
 │ │                     │   │   │   │   encoding='utf-8',                    │ 
 │ │                     │   │   │   │   value_mode='text',                   │ 
@@ -340,7 +340,7 @@ _________ test_tc_b100_50_worker_raise_ends_the_action_first[report] __________
 │ │                     │   │   │   │   ],                                   │ 
 │ │                     │   │   │   │   issues=[],                           │ 
 │ │                     │   │   │   │                                        │ 
-│ │                     saved_path=WindowsPath('C:/Users/jjgh8/AppData/Loca… │ 
+│ │                     saved_path=WindowsPath('<HOME>/AppData/Loca… │ 
 │ │                     │   │   │   │   verify_result=None,                  │ 
 │ │                     │   │   │   │   source_image_path=None               │ 
 │ │                     │   │   │   )                                        │ 
@@ -367,13 +367,13 @@ _________ test_tc_b100_50_worker_raise_ends_the_action_first[report] __________
 │ │                     │   │   VariantDescriptor(                           │ 
 │ │                     │   │   │   variant_id='a',                          │ 
 │ │                     │   │   │                                            │ 
-│ │                     path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp… │ 
+│ │                     path=WindowsPath('<HOME>/AppData/Local/Temp… │ 
 │ │                     │   │   │   file_type='s19'                          │ 
 │ │                     │   │   ),                                           │ 
 │ │                     │   │   VariantDescriptor(                           │ 
 │ │                     │   │   │   variant_id='b',                          │ 
 │ │                     │   │   │                                            │ 
-│ │                     path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp… │ 
+│ │                     path=WindowsPath('<HOME>/AppData/Local/Temp… │ 
 │ │                     │   │   │   file_type='s19'                          │ 
 │ │                     │   │   )                                            │ 
 │ │                     │   ),                                               │ 
@@ -381,7 +381,7 @@ _________ test_tc_b100_50_worker_raise_ends_the_action_first[report] __________
 │ │                     )                                                    │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc12b\tests\test_b100_busy.py:1414 in    
+│ <HOME>\Github\s19_app-b100-inc12b\tests\test_b100_busy.py:1414 in    
 │ _log                                                                         
 │                                                                              
 │   1411 │   │                                                                 
@@ -397,7 +397,7 @@ _________ test_tc_b100_50_worker_raise_ends_the_action_first[report] __________
 │ │          │   'project',                                                  │ 
 │ │          │   'proj',                                                     │ 
 │ │          │                                                               │ 
-│ │          'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh… │ 
+│ │          '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-jjgh… │ 
 │ │          │   'ok'                                                        │ 
 │ │          )                                                               │ 
 │ │ kwargs = {'ok': True}                                                    │ 
@@ -412,7 +412,7 @@ RuntimeError: forced
 _______ test_tc_b100_50_worker_raise_ends_the_action_first[diff_report] _______
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:370 
+│ <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:370 
 │ in _run                                                                      
 │                                                                              
 │   367 │   │   │   self.state = WorkerState.RUNNING                           
@@ -442,7 +442,7 @@ _______ test_tc_b100_50_worker_raise_ends_the_action_first[diff_report] _______
 │ │                 RuntimeError('forced')")                                 │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:354 
+│ <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:354 
 │ in run                                                                       
 │                                                                              
 │   351 │   │   Returns:                                                       
@@ -464,7 +464,7 @@ _______ test_tc_b100_50_worker_raise_ends_the_action_first[diff_report] _______
 │ │        >                                                                 │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:326 
+│ <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:326 
 │ in _run_threaded                                                             
 │                                                                              
 │   323 │   │                                                                  
@@ -487,7 +487,7 @@ _______ test_tc_b100_50_worker_raise_ends_the_action_first[diff_report] _______
 │ │        >                                                                 │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\concurrent\futures\thread.py:58 in  
+│ <HOME>\anaconda3\envs\s19env\Lib\concurrent\futures\thread.py:58 in  
 │ run                                                                          
 │                                                                              
 │    55 │   │   │   return                                                     
@@ -504,7 +504,7 @@ _______ test_tc_b100_50_worker_raise_ends_the_action_first[diff_report] _______
 │ │        0x000002690BC01A10>                                               │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:309 
+│ <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:309 
 │ in run_callable                                                              
 │                                                                              
 │   306 │   │   def run_callable(work: Callable[[], ResultType]) -> ResultType 
@@ -546,7 +546,7 @@ _______ test_tc_b100_50_worker_raise_ends_the_action_first[diff_report] _______
 │ │        'check_spec_name': ''}, '-', gen=1)                               │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc12b\s19_app\tui\app.py:7619 in         
+│ <HOME>\Github\s19_app-b100-inc12b\s19_app\tui\app.py:7619 in         
 │ _start_diff_report_worker                                                    
 │                                                                              
 │    7616 │   │   │   │   self.call_from_thread(self.end_busy, "diff_report",  
@@ -562,7 +562,7 @@ _______ test_tc_b100_50_worker_raise_ends_the_action_first[diff_report] _______
 │ │         gen = 1                                                          │ 
 │ │        html = DiffReportResult(                                          │ 
 │ │               │                                                          │ 
-│ │               path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claud… │ 
+│ │               path=WindowsPath('<HOME>/AppData/Local/Temp/claud… │ 
 │ │               │   written=True,                                          │ 
 │ │               │   diagnostics=[]                                         │ 
 │ │               )                                                          │ 
@@ -578,7 +578,7 @@ _______ test_tc_b100_50_worker_raise_ends_the_action_first[diff_report] _______
 │ │               }                                                          │ 
 │ │          md = DiffReportResult(                                          │ 
 │ │               │                                                          │ 
-│ │               path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claud… │ 
+│ │               path=WindowsPath('<HOME>/AppData/Local/Temp/claud… │ 
 │ │               │   written=True,                                          │ 
 │ │               │   diagnostics=[]                                         │ 
 │ │               )                                                          │ 
@@ -649,7 +649,7 @@ _______ test_tc_b100_50_worker_raise_ends_the_action_first[diff_report] _______
 │ │               )                                                          │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc12b\tests\test_b100_busy.py:1414 in    
+│ <HOME>\Github\s19_app-b100-inc12b\tests\test_b100_busy.py:1414 in    
 │ _log                                                                         
 │                                                                              
 │   1411 │   │                                                                 
@@ -665,7 +665,7 @@ _______ test_tc_b100_50_worker_raise_ends_the_action_first[diff_report] _______
 │ │          │   'diff',                                                     │ 
 │ │          │   '-',                                                        │ 
 │ │          │                                                               │ 
-│ │          'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh… │ 
+│ │          '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-jjgh… │ 
 │ │          │   'ok'                                                        │ 
 │ │          )                                                               │ 
 │ │ kwargs = {'ok': True}                                                    │ 
@@ -680,7 +680,7 @@ RuntimeError: forced
 ______ test_tc_b100_50_worker_raise_ends_the_action_first[before_after] _______
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:370 
+│ <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:370 
 │ in _run                                                                      
 │                                                                              
 │   367 │   │   │   self.state = WorkerState.RUNNING                           
@@ -709,7 +709,7 @@ ______ test_tc_b100_50_worker_raise_ends_the_action_first[before_after] _______
 │ │                 RuntimeError('forced')")                                 │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:354 
+│ <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:354 
 │ in run                                                                       
 │                                                                              
 │   351 │   │   Returns:                                                       
@@ -730,7 +730,7 @@ ______ test_tc_b100_50_worker_raise_ends_the_action_first[before_after] _______
 │ │        >                                                                 │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:326 
+│ <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:326 
 │ in _run_threaded                                                             
 │                                                                              
 │   323 │   │                                                                  
@@ -752,7 +752,7 @@ ______ test_tc_b100_50_worker_raise_ends_the_action_first[before_after] _______
 │ │        >                                                                 │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\concurrent\futures\thread.py:58 in  
+│ <HOME>\anaconda3\envs\s19env\Lib\concurrent\futures\thread.py:58 in  
 │ run                                                                          
 │                                                                              
 │    55 │   │   │   return                                                     
@@ -769,7 +769,7 @@ ______ test_tc_b100_50_worker_raise_ends_the_action_first[before_after] _______
 │ │        0x000002690B35EA10>                                               │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:309 
+│ <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\worker.py:309 
 │ in run_callable                                                              
 │                                                                              
 │   306 │   │   def run_callable(work: Callable[[], ResultType]) -> ResultType 
@@ -794,7 +794,7 @@ ______ test_tc_b100_50_worker_raise_ends_the_action_first[before_after] _______
 │ │        None, None, '-', gen=1)                                           │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc12b\s19_app\tui\app.py:5528 in         
+│ <HOME>\Github\s19_app-b100-inc12b\s19_app\tui\app.py:5528 in         
 │ _start_before_after_worker                                                   
 │                                                                              
 │    5525 │   │   │   │   )                                                    
@@ -811,8 +811,8 @@ ______ test_tc_b100_50_worker_raise_ends_the_action_first[before_after] _______
 │ │   project_dir = None                                                     │ 
 │ │ report_filter = None                                                     │ 
 │ │        result = namespace(written=True,                                  │ 
-│ │                 md_path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
-│ │                 html_path=WindowsPath('C:/Users/jjgh8/AppData/Local/Tem… │ 
+│ │                 md_path=WindowsPath('<HOME>/AppData/Local/Temp/… │ 
+│ │                 html_path=WindowsPath('<HOME>/AppData/Local/Tem… │ 
 │ │                 diagnostics=[])                                          │ 
 │ │          self = S19TuiApp(                                               │ 
 │ │                 │   title='Hex Edit Tool',                               │ 
@@ -822,7 +822,7 @@ ______ test_tc_b100_50_worker_raise_ends_the_action_first[before_after] _______
 │ │   source_name = '-'                                                      │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc12b\tests\test_b100_busy.py:1414 in    
+│ <HOME>\Github\s19_app-b100-inc12b\tests\test_b100_busy.py:1414 in    
 │ _log                                                                         
 │                                                                              
 │   1411 │   │                                                                 
@@ -838,7 +838,7 @@ ______ test_tc_b100_50_worker_raise_ends_the_action_first[before_after] _______
 │ │          │   'before-after',                                             │ 
 │ │          │   '-',                                                        │ 
 │ │          │                                                               │ 
-│ │          'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh… │ 
+│ │          '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-jjgh… │ 
 │ │          │   'ok'                                                        │ 
 │ │          )                                                               │ 
 │ │ kwargs = {'ok': True}                                                    │ 
@@ -853,7 +853,7 @@ RuntimeError: forced
 _____________ test_tc_b100_50_project_raise_ends_the_action_first _____________
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\Github\s19_app-b100-inc12b\s19_app\tui\app.py:13678 in        
+│ <HOME>\Github\s19_app-b100-inc12b\s19_app\tui\app.py:13678 in        
 │ _install_prepared_project                                                    
 │                                                                              
 │   13675 │   │   │   self._variant_set = prepared.variant_set                 
@@ -870,25 +870,25 @@ _____________ test_tc_b100_50_project_raise_ends_the_action_first _____________
 │ │            │   variant=VariantDescriptor(                                │ 
 │ │            │   │   variant_id='firmware',                                │ 
 │ │            │   │                                                         │ 
-│ │            path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C… │ 
+│ │            path=WindowsPath('<HOME>/AppData/Local/Temp/claude/C… │ 
 │ │            │   │   file_type='s19'                                       │ 
 │ │            │   ),                                                        │ 
 │ │            │   mac=None,                                                 │ 
 │ │            │                                                             │ 
-│ │            a2l=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C-… │ 
+│ │            a2l=WindowsPath('<HOME>/AppData/Local/Temp/claude/C-… │ 
 │ │            )                                                             │ 
 │ │ prepared = PreparedProjectLoad(                                          │ 
 │ │            │   request=ProjectLoadRequest(                               │ 
 │ │            │   │   name='P',                                             │ 
 │ │            │   │                                                         │ 
-│ │            project_dir=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/c… │ 
+│ │            project_dir=WindowsPath('<HOME>/AppData/Local/Temp/c… │ 
 │ │            │   │   data_files=(                                          │ 
 │ │            │   │   │                                                     │ 
-│ │            WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Use… │ 
+│ │            WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Use… │ 
 │ │            │   │   ),                                                    │ 
 │ │            │   │   a2l_files=(                                           │ 
 │ │            │   │   │                                                     │ 
-│ │            WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Use… │ 
+│ │            WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Use… │ 
 │ │            │   │   ),                                                    │ 
 │ │            │   │   a2l_problem=None,                                     │ 
 │ │            │   │   a2l_cache=None,                                       │ 
@@ -902,7 +902,7 @@ _____________ test_tc_b100_50_project_raise_ends_the_action_first _____________
 │ │            │   │   │   VariantDescriptor(                                │ 
 │ │            │   │   │   │   variant_id='firmware',                        │ 
 │ │            │   │   │   │                                                 │ 
-│ │            path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C… │ 
+│ │            path=WindowsPath('<HOME>/AppData/Local/Temp/claude/C… │ 
 │ │            │   │   │   │   file_type='s19'                               │ 
 │ │            │   │   │   ),                                                │ 
 │ │            │   │   ),                                                    │ 
@@ -933,13 +933,13 @@ _____________ test_tc_b100_50_project_raise_ends_the_action_first _____________
 │ │            │   a2l_cache=(                                               │ 
 │ │            │   │   (                                                     │ 
 │ │            │   │   │                                                     │ 
-│ │            'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
+│ │            '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
 │ │            │   │   │   1793539716591557200,                              │ 
 │ │            │   │   │   1444                                              │ 
 │ │            │   │   ),                                                    │ 
 │ │            │   │   {                                                     │ 
 │ │            │   │   │   'path':                                           │ 
-│ │            'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
+│ │            '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
 │ │            │   │   │   'sections': [                                     │ 
 │ │            │   │   │   │   {                                             │ 
 │ │            │   │   │   │   │   'name': 'PROJECT',                        │ 
@@ -1237,16 +1237,16 @@ _____________ test_tc_b100_50_project_raise_ends_the_action_first _____________
 │ │            │   │   variant=VariantDescriptor(                            │ 
 │ │            │   │   │   variant_id='firmware',                            │ 
 │ │            │   │   │                                                     │ 
-│ │            path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C… │ 
+│ │            path=WindowsPath('<HOME>/AppData/Local/Temp/claude/C… │ 
 │ │            │   │   │   file_type='s19'                                   │ 
 │ │            │   │   ),                                                    │ 
 │ │            │   │   mac=None,                                             │ 
 │ │            │   │                                                         │ 
-│ │            a2l=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C-… │ 
+│ │            a2l=WindowsPath('<HOME>/AppData/Local/Temp/claude/C-… │ 
 │ │            │   ),                                                        │ 
 │ │            │   image=LoadedFile(                                         │ 
 │ │            │   │                                                         │ 
-│ │            path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C… │ 
+│ │            path=WindowsPath('<HOME>/AppData/Local/Temp/claude/C… │ 
 │ │            │   │   file_type='s19',                                      │ 
 │ │            │   │   mem_map={                                             │ 
 │ │            │   │   │   2147483648: 83,                                   │ 
@@ -1277,10 +1277,10 @@ _____________ test_tc_b100_50_project_raise_ends_the_action_first _____________
 │ │            │   │   range_validity=[True, True],                          │ 
 │ │            │   │   errors=[],                                            │ 
 │ │            │   │                                                         │ 
-│ │            a2l_path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/clau… │ 
+│ │            a2l_path=WindowsPath('<HOME>/AppData/Local/Temp/clau… │ 
 │ │            │   │   a2l_data={                                            │ 
 │ │            │   │   │   'path':                                           │ 
-│ │            'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
+│ │            '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
 │ │            │   │   │   'sections': [                                     │ 
 │ │            │   │   │   │   {                                             │ 
 │ │            │   │   │   │   │   'name': 'PROJECT',                        │ 
@@ -1606,14 +1606,14 @@ _____________ test_tc_b100_50_project_raise_ends_the_action_first _____________
 │ │  request = ProjectLoadRequest(                                           │ 
 │ │            │   name='P',                                                 │ 
 │ │            │                                                             │ 
-│ │            project_dir=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/c… │ 
+│ │            project_dir=WindowsPath('<HOME>/AppData/Local/Temp/c… │ 
 │ │            │   data_files=(                                              │ 
 │ │            │   │                                                         │ 
-│ │            WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Use… │ 
+│ │            WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Use… │ 
 │ │            │   ),                                                        │ 
 │ │            │   a2l_files=(                                               │ 
 │ │            │   │                                                         │ 
-│ │            WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Use… │ 
+│ │            WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Use… │ 
 │ │            │   ),                                                        │ 
 │ │            │   a2l_problem=None,                                         │ 
 │ │            │   a2l_cache=None,                                           │ 
@@ -1627,7 +1627,7 @@ _____________ test_tc_b100_50_project_raise_ends_the_action_first _____________
 │ │            )                                                             │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc12b\tests\test_b100_busy.py:1330 in    
+│ <HOME>\Github\s19_app-b100-inc12b\tests\test_b100_busy.py:1330 in    
 │ _boom                                                                        
 │                                                                              
 │   1327                                                                       
@@ -1647,7 +1647,7 @@ _____________ test_tc_b100_50_project_raise_ends_the_action_first _____________
 │ │      │   ),                                                              │ 
 │ │      │   LoadedFile(                                                     │ 
 │ │      │   │                                                               │ 
-│ │      path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--User… │ 
+│ │      path=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--User… │ 
 │ │      │   │   file_type='s19',                                            │ 
 │ │      │   │   mem_map={                                                   │ 
 │ │      │   │   │   2147483648: 83,                                         │ 
@@ -1678,10 +1678,10 @@ _____________ test_tc_b100_50_project_raise_ends_the_action_first _____________
 │ │      │   │   range_validity=[True, True],                                │ 
 │ │      │   │   errors=[],                                                  │ 
 │ │      │   │                                                               │ 
-│ │      a2l_path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--… │ 
+│ │      a2l_path=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--… │ 
 │ │      │   │   a2l_data={                                                  │ 
 │ │      │   │   │   'path':                                                 │ 
-│ │      'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-cl… │ 
+│ │      '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-cl… │ 
 │ │      │   │   │   'sections': [                                           │ 
 │ │      │   │   │   │   {                                                   │ 
 │ │      │   │   │   │   │   'name': 'PROJECT',                              │ 
@@ -1978,7 +1978,7 @@ _____________ test_tc_b100_50_project_raise_ends_the_action_first _____________
 │ │      │   │   entry_point=2147483648                                      │ 
 │ │      │   ),                                                              │ 
 │ │      │                                                                   │ 
-│ │      WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjg… │ 
+│ │      WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-jjg… │ 
 │ │      │   621224.8082834                                                  │ 
 │ │      )                                                                   │ 
 │ │ _k = {}                                                                  │ 
@@ -1988,7 +1988,7 @@ RuntimeError: forced
 ___ test_tc_b100_50_twelve_b_handler_raise_ends_the_run_first[project_load] ___
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\Github\s19_app-b100-inc12b\tests\test_b100_busy.py:1330 in    
+│ <HOME>\Github\s19_app-b100-inc12b\tests\test_b100_busy.py:1330 in    
 │ _boom                                                                        
 │                                                                              
 │   1327                                                                       
@@ -2010,16 +2010,16 @@ ___ test_tc_b100_50_twelve_b_handler_raise_ends_the_run_first[project_load] ___
 │ │      │   │   request=ProjectLoadRequest(                                 │ 
 │ │      │   │   │   name='P',                                               │ 
 │ │      │   │   │                                                           │ 
-│ │      project_dir=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/… │ 
+│ │      project_dir=WindowsPath('<HOME>/AppData/Local/Temp/claude/… │ 
 │ │      │   │   │   data_files=(                                            │ 
 │ │      │   │   │   │                                                       │ 
-│ │      WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjg… │ 
+│ │      WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-jjg… │ 
 │ │      │   │   │   │                                                       │ 
-│ │      WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjg… │ 
+│ │      WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-jjg… │ 
 │ │      │   │   │   ),                                                      │ 
 │ │      │   │   │   a2l_files=(                                             │ 
 │ │      │   │   │   │                                                       │ 
-│ │      WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjg… │ 
+│ │      WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-jjg… │ 
 │ │      │   │   │   ),                                                      │ 
 │ │      │   │   │   a2l_problem=None,                                       │ 
 │ │      │   │   │   a2l_cache=None,                                         │ 
@@ -2033,7 +2033,7 @@ ___ test_tc_b100_50_twelve_b_handler_raise_ends_the_run_first[project_load] ___
 │ │      │   │   │   │   VariantDescriptor(                                  │ 
 │ │      │   │   │   │   │   variant_id='firmware',                          │ 
 │ │      │   │   │   │   │                                                   │ 
-│ │      path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--User… │ 
+│ │      path=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--User… │ 
 │ │      │   │   │   │   │   file_type='s19'                                 │ 
 │ │      │   │   │   │   ),                                                  │ 
 │ │      │   │   │   ),                                                      │ 
@@ -2052,13 +2052,13 @@ ___ test_tc_b100_50_twelve_b_handler_raise_ends_the_run_first[project_load] ___
 │ │      │   │   a2l_cache=(                                                 │ 
 │ │      │   │   │   (                                                       │ 
 │ │      │   │   │   │                                                       │ 
-│ │      'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-cl… │ 
+│ │      '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-cl… │ 
 │ │      │   │   │   │   1793539876056066700,                                │ 
 │ │      │   │   │   │   1444                                                │ 
 │ │      │   │   │   ),                                                      │ 
 │ │      │   │   │   {                                                       │ 
 │ │      │   │   │   │   'path':                                             │ 
-│ │      'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-cl… │ 
+│ │      '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-cl… │ 
 │ │      │   │   │   │   'sections': [                                       │ 
 │ │      │   │   │   │   │   {                                               │ 
 │ │      │   │   │   │   │   │   'name': 'PROJECT',                          │ 
@@ -2341,17 +2341,17 @@ ___ test_tc_b100_50_twelve_b_handler_raise_ends_the_run_first[project_load] ___
 │ │      │   │   │   variant=VariantDescriptor(                              │ 
 │ │      │   │   │   │   variant_id='firmware',                              │ 
 │ │      │   │   │   │                                                       │ 
-│ │      path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--User… │ 
+│ │      path=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--User… │ 
 │ │      │   │   │   │   file_type='s19'                                     │ 
 │ │      │   │   │   ),                                                      │ 
 │ │      │   │   │                                                           │ 
-│ │      mac=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users… │ 
+│ │      mac=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users… │ 
 │ │      │   │   │                                                           │ 
-│ │      a2l=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users… │ 
+│ │      a2l=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users… │ 
 │ │      │   │   ),                                                          │ 
 │ │      │   │   image=LoadedFile(                                           │ 
 │ │      │   │   │                                                           │ 
-│ │      path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--User… │ 
+│ │      path=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--User… │ 
 │ │      │   │   │   file_type='s19',                                        │ 
 │ │      │   │   │   mem_map={                                               │ 
 │ │      │   │   │   │   2147483648: 83,                                     │ 
@@ -2382,10 +2382,10 @@ ___ test_tc_b100_50_twelve_b_handler_raise_ends_the_run_first[project_load] ___
 │ │      │   │   │   range_validity=[True, True],                            │ 
 │ │      │   │   │   errors=[],                                              │ 
 │ │      │   │   │                                                           │ 
-│ │      a2l_path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--… │ 
+│ │      a2l_path=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--… │ 
 │ │      │   │   │   a2l_data={                                              │ 
 │ │      │   │   │   │   'path':                                             │ 
-│ │      'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-cl… │ 
+│ │      '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-cl… │ 
 │ │      │   │   │   │   'sections': [                                       │ 
 │ │      │   │   │   │   │   {                                               │ 
 │ │      │   │   │   │   │   │   'name': 'PROJECT',                          │ 
@@ -2692,7 +2692,7 @@ ___ test_tc_b100_50_twelve_b_handler_raise_ends_the_run_first[project_load] ___
 │ │      │   │   unreadable=(),                                              │ 
 │ │      │   │   mac=LoadedFile(                                             │ 
 │ │      │   │   │                                                           │ 
-│ │      path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--User… │ 
+│ │      path=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--User… │ 
 │ │      │   │   │   file_type='s19',                                        │ 
 │ │      │   │   │   mem_map={                                               │ 
 │ │      │   │   │   │   2147483648: 83,                                     │ 
@@ -2723,10 +2723,10 @@ ___ test_tc_b100_50_twelve_b_handler_raise_ends_the_run_first[project_load] ___
 │ │      │   │   │   range_validity=[True, True],                            │ 
 │ │      │   │   │   errors=[],                                              │ 
 │ │      │   │   │                                                           │ 
-│ │      a2l_path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--… │ 
+│ │      a2l_path=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--… │ 
 │ │      │   │   │   a2l_data={                                              │ 
 │ │      │   │   │   │   'path':                                             │ 
-│ │      'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-cl… │ 
+│ │      '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-cl… │ 
 │ │      │   │   │   │   'sections': [                                       │ 
 │ │      │   │   │   │   │   {                                               │ 
 │ │      │   │   │   │   │   │   'name': 'PROJECT',                          │ 
@@ -3005,7 +3005,7 @@ ___ test_tc_b100_50_twelve_b_handler_raise_ends_the_run_first[project_load] ___
 │ │      │   │   │   │   'compu_tabs_by_name': {}                            │ 
 │ │      │   │   │   },                                                      │ 
 │ │      │   │   │                                                           │ 
-│ │      mac_path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--… │ 
+│ │      mac_path=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--… │ 
 │ │      │   │   │   mac_records=[                                           │ 
 │ │      │   │   │   │   {                                                   │ 
 │ │      │   │   │   │   │   'line_number': 1,                               │ 
@@ -3060,7 +3060,7 @@ RuntimeError: forced
 ___ test_tc_b100_50_twelve_b_handler_raise_ends_the_run_first[save_project] ___
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\Github\s19_app-b100-inc12b\tests\test_b100_busy.py:1330 in    
+│ <HOME>\Github\s19_app-b100-inc12b\tests\test_b100_busy.py:1330 in    
 │ _boom                                                                        
 │                                                                              
 │   1327                                                                       
@@ -3084,7 +3084,7 @@ ___ test_tc_b100_50_twelve_b_handler_raise_ends_the_run_first[save_project] ___
 │ │      │   │   │   │   typed_name='S3',                                    │ 
 │ │      │   │   │   │   cleaned='S3',                                       │ 
 │ │      │   │   │   │                                                       │ 
-│ │      project_dir=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/… │ 
+│ │      project_dir=WindowsPath('<HOME>/AppData/Local/Temp/claude/… │ 
 │ │      │   │   │   │   save_as_source=None,                                │ 
 │ │      │   │   │   │   source_gone=None,                                   │ 
 │ │      │   │   │   │   image_step=_ProjectImageStep(                       │ 
@@ -3105,22 +3105,22 @@ ___ test_tc_b100_50_twelve_b_handler_raise_ends_the_run_first[save_project] ___
 │ │      │   │   │   │   emitted_record=None,                                │ 
 │ │      │   │   │   │   plan=SavePlan(                                      │ 
 │ │      │   │   │   │   │                                                   │ 
-│ │      target=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Us… │ 
+│ │      target=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Us… │ 
 │ │      │   │   │   │   │   target_kind='new',                              │ 
 │ │      │   │   │   │   │   rows=(                                          │ 
 │ │      │   │   │   │   │   │   SavePlanRow(                                │ 
 │ │      │   │   │   │   │   │   │   role='image',                           │ 
 │ │      │   │   │   │   │   │   │                                           │ 
-│ │      source=WindowsPath('C:/Users/jjgh8/Github/s19_app-b100-inc12b/exam… │ 
+│ │      source=WindowsPath('<HOME>/Github/s19_app-b100-inc12b/exam… │ 
 │ │      │   │   │   │   │   │   │                                           │ 
-│ │      landing=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--U… │ 
+│ │      landing=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--U… │ 
 │ │      │   │   │   │   │   │   │   action='new'                            │ 
 │ │      │   │   │   │   │   │   ),                                          │ 
 │ │      │   │   │   │   │   │   SavePlanRow(                                │ 
 │ │      │   │   │   │   │   │   │   role='manifest',                        │ 
 │ │      │   │   │   │   │   │   │   source=None,                            │ 
 │ │      │   │   │   │   │   │   │                                           │ 
-│ │      landing=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--U… │ 
+│ │      landing=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--U… │ 
 │ │      │   │   │   │   │   │   │   action='new'                            │ 
 │ │      │   │   │   │   │   │   )                                           │ 
 │ │      │   │   │   │   │   ),                                              │ 
@@ -3144,7 +3144,7 @@ ___ test_tc_b100_50_twelve_b_handler_raise_ends_the_run_first[save_project] ___
 │ │      │   │   │   ),                                                      │ 
 │ │      │   │   │   payload=SaveProjectPayload(                             │ 
 │ │      │   │   │   │                                                       │ 
-│ │      parent_folder='C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--… │ 
+│ │      parent_folder='<HOME>\\AppData\\Local\\Temp\\claude\\C--… │ 
 │ │      │   │   │   │   project_name='S3',                                  │ 
 │ │      │   │   │   │   batch=(),                                           │ 
 │ │      │   │   │   │   assignments={},                                     │ 
@@ -3158,9 +3158,9 @@ ___ test_tc_b100_50_twelve_b_handler_raise_ends_the_run_first[save_project] ___
 │ │      │   │   │   declared_regions=(),                                    │ 
 │ │      │   │   │   active_template=None,                                   │ 
 │ │      │   │   │                                                           │ 
-│ │      workarea=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--… │ 
+│ │      workarea=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--… │ 
 │ │      │   │   │                                                           │ 
-│ │      base_dir=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--… │ 
+│ │      base_dir=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--… │ 
 │ │      │   │   │   gen=1                                                   │ 
 │ │      │   │   ),                                                          │ 
 │ │      │   │   committed=True,                                             │ 
@@ -3173,7 +3173,7 @@ ___ test_tc_b100_50_twelve_b_handler_raise_ends_the_run_first[save_project] ___
 │ │      │   │   │   │   VariantDescriptor(                                  │ 
 │ │      │   │   │   │   │   variant_id='firmware',                          │ 
 │ │      │   │   │   │   │                                                   │ 
-│ │      path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--User… │ 
+│ │      path=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--User… │ 
 │ │      │   │   │   │   │   file_type='s19'                                 │ 
 │ │      │   │   │   │   ),                                                  │ 
 │ │      │   │   │   ),                                                      │ 
@@ -3185,7 +3185,7 @@ ___ test_tc_b100_50_twelve_b_handler_raise_ends_the_run_first[save_project] ___
 │ │      │   │   │   drift=[],                                               │ 
 │ │      │   │   │   issues=[],                                              │ 
 │ │      │   │   │                                                           │ 
-│ │      written_path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude… │ 
+│ │      written_path=WindowsPath('<HOME>/AppData/Local/Temp/claude… │ 
 │ │      │   │   ),                                                          │ 
 │ │      │   │   emit_verify=None,                                           │ 
 │ │      │   │   document_source_path=None,                                  │ 
@@ -3205,7 +3205,7 @@ RuntimeError: forced
 _____ test_tc_b100_50_twelve_b_handler_raise_ends_the_run_first[a2l_load] _____
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\Github\s19_app-b100-inc12b\tests\test_b100_busy.py:1330 in    
+│ <HOME>\Github\s19_app-b100-inc12b\tests\test_b100_busy.py:1330 in    
 │ _boom                                                                        
 │                                                                              
 │   1327                                                                       
@@ -3226,28 +3226,28 @@ _____ test_tc_b100_50_twelve_b_handler_raise_ends_the_run_first[a2l_load] _____
 │ │      │   A2LAttachResult(                                                │ 
 │ │      │   │   request=A2LAttachRequest(                                   │ 
 │ │      │   │   │                                                           │ 
-│ │      source=WindowsPath('C:/Users/jjgh8/Github/s19_app-b100-inc12b/exam… │ 
+│ │      source=WindowsPath('<HOME>/Github/s19_app-b100-inc12b/exam… │ 
 │ │      │   │   │   copy=True,                                              │ 
 │ │      │   │   │                                                           │ 
-│ │      temp_dir=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--… │ 
+│ │      temp_dir=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--… │ 
 │ │      │   │   │                                                           │ 
-│ │      workarea=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--… │ 
+│ │      workarea=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--… │ 
 │ │      │   │   │   record_recent=True,                                     │ 
 │ │      │   │   │   a2l_cache=None,                                         │ 
 │ │      │   │   │   gen=1                                                   │ 
 │ │      │   │   ),                                                          │ 
 │ │      │   │                                                               │ 
-│ │      path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--User… │ 
+│ │      path=WindowsPath('<HOME>/AppData/Local/Temp/claude/C--User… │ 
 │ │      │   │   entry=(                                                     │ 
 │ │      │   │   │   (                                                       │ 
 │ │      │   │   │   │                                                       │ 
-│ │      'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-cl… │ 
+│ │      '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-cl… │ 
 │ │      │   │   │   │   1793516485581774400,                                │ 
 │ │      │   │   │   │   1444                                                │ 
 │ │      │   │   │   ),                                                      │ 
 │ │      │   │   │   {                                                       │ 
 │ │      │   │   │   │   'path':                                             │ 
-│ │      'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-cl… │ 
+│ │      '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-cl… │ 
 │ │      │   │   │   │   'sections': [                                       │ 
 │ │      │   │   │   │   │   {                                               │ 
 │ │      │   │   │   │   │   │   'name': 'PROJECT',                          │ 
@@ -3536,7 +3536,7 @@ RuntimeError: forced
 ___________ test_tc_b100_50_a2l_deferred_install_raise_ends_the_run ___________
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\Github\s19_app-b100-inc12b\s19_app\tui\app.py:15290 in        
+│ <HOME>\Github\s19_app-b100-inc12b\s19_app\tui\app.py:15290 in        
 │ _install_attached_a2l                                                        
 │                                                                              
 │   15287 │   │   │   │   self.current_file.a2l_path = copied                  
@@ -3548,16 +3548,16 @@ ___________ test_tc_b100_50_a2l_deferred_install_raise_ends_the_run ___________
 │   15293 │   │   │   │   self.logger.warning(                                 
 │                                                                              
 │ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
-│ │       copied = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C-… │ 
+│ │       copied = WindowsPath('<HOME>/AppData/Local/Temp/claude/C-… │ 
 │ │          gen = 1                                                         │ 
 │ │          req = A2LAttachRequest(                                         │ 
 │ │                │                                                         │ 
-│ │                source=WindowsPath('C:/Users/jjgh8/Github/s19_app-b100-i… │ 
+│ │                source=WindowsPath('<HOME>/Github/s19_app-b100-i… │ 
 │ │                │   copy=True,                                            │ 
 │ │                │                                                         │ 
-│ │                temp_dir=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │                temp_dir=WindowsPath('<HOME>/AppData/Local/Temp/… │ 
 │ │                │                                                         │ 
-│ │                workarea=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │                workarea=WindowsPath('<HOME>/AppData/Local/Temp/… │ 
 │ │                │   record_recent=True,                                   │ 
 │ │                │   a2l_cache=None,                                       │ 
 │ │                │   gen=1                                                 │ 
@@ -3565,28 +3565,28 @@ ___________ test_tc_b100_50_a2l_deferred_install_raise_ends_the_run ___________
 │ │       result = A2LAttachResult(                                          │ 
 │ │                │   request=A2LAttachRequest(                             │ 
 │ │                │   │                                                     │ 
-│ │                source=WindowsPath('C:/Users/jjgh8/Github/s19_app-b100-i… │ 
+│ │                source=WindowsPath('<HOME>/Github/s19_app-b100-i… │ 
 │ │                │   │   copy=True,                                        │ 
 │ │                │   │                                                     │ 
-│ │                temp_dir=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │                temp_dir=WindowsPath('<HOME>/AppData/Local/Temp/… │ 
 │ │                │   │                                                     │ 
-│ │                workarea=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │                workarea=WindowsPath('<HOME>/AppData/Local/Temp/… │ 
 │ │                │   │   record_recent=True,                               │ 
 │ │                │   │   a2l_cache=None,                                   │ 
 │ │                │   │   gen=1                                             │ 
 │ │                │   ),                                                    │ 
 │ │                │                                                         │ 
-│ │                path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/clau… │ 
+│ │                path=WindowsPath('<HOME>/AppData/Local/Temp/clau… │ 
 │ │                │   entry=(                                               │ 
 │ │                │   │   (                                                 │ 
 │ │                │   │   │                                                 │ 
-│ │                'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--User… │ 
+│ │                '<HOME>\\AppData\\Local\\Temp\\claude\\C--User… │ 
 │ │                │   │   │   1793516485581774400,                          │ 
 │ │                │   │   │   1444                                          │ 
 │ │                │   │   ),                                                │ 
 │ │                │   │   {                                                 │ 
 │ │                │   │   │   'path':                                       │ 
-│ │                'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--User… │ 
+│ │                '<HOME>\\AppData\\Local\\Temp\\claude\\C--User… │ 
 │ │                │   │   │   'sections': [                                 │ 
 │ │                │   │   │   │   {                                         │ 
 │ │                │   │   │   │   │   'name': 'PROJECT',                    │ 
@@ -3902,7 +3902,7 @@ ___________ test_tc_b100_50_a2l_deferred_install_raise_ends_the_run ___________
 │ │ view_started = 621398.673609                                             │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc12b\tests\test_b100_busy.py:1330 in    
+│ <HOME>\Github\s19_app-b100-inc12b\tests\test_b100_busy.py:1330 in    
 │ _boom                                                                        
 │                                                                              
 │   1327                                                                       
@@ -3931,7 +3931,7 @@ RuntimeError: forced
 _________ test_tc_b100_51_raise_after_the_commit_keeps_the_saved_line _________
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\Github\s19_app-b100-inc12b\s19_app\tui\app.py:12198 in        
+│ <HOME>\Github\s19_app-b100-inc12b\s19_app\tui\app.py:12198 in        
 │ _on_project_saved                                                            
 │                                                                              
 │   12195 │   │   │   │   self.current_file.variant_id = outcome.saved_variant 
@@ -3951,7 +3951,7 @@ _________ test_tc_b100_51_raise_after_the_commit_keeps_the_saved_line _________
 │ │                 │   │   │   typed_name='S3',                             │ 
 │ │                 │   │   │   cleaned='S3',                                │ 
 │ │                 │   │   │                                                │ 
-│ │                 project_dir=WindowsPath('C:/Users/jjgh8/AppData/Local/T… │ 
+│ │                 project_dir=WindowsPath('<HOME>/AppData/Local/T… │ 
 │ │                 │   │   │   save_as_source=None,                         │ 
 │ │                 │   │   │   source_gone=None,                            │ 
 │ │                 │   │   │   image_step=_ProjectImageStep(                │ 
@@ -3972,22 +3972,22 @@ _________ test_tc_b100_51_raise_after_the_commit_keeps_the_saved_line _________
 │ │                 │   │   │   emitted_record=None,                         │ 
 │ │                 │   │   │   plan=SavePlan(                               │ 
 │ │                 │   │   │   │                                            │ 
-│ │                 target=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/c… │ 
+│ │                 target=WindowsPath('<HOME>/AppData/Local/Temp/c… │ 
 │ │                 │   │   │   │   target_kind='new',                       │ 
 │ │                 │   │   │   │   rows=(                                   │ 
 │ │                 │   │   │   │   │   SavePlanRow(                         │ 
 │ │                 │   │   │   │   │   │   role='image',                    │ 
 │ │                 │   │   │   │   │   │                                    │ 
-│ │                 source=WindowsPath('C:/Users/jjgh8/Github/s19_app-b100-… │ 
+│ │                 source=WindowsPath('<HOME>/Github/s19_app-b100-… │ 
 │ │                 │   │   │   │   │   │                                    │ 
-│ │                 landing=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │                 landing=WindowsPath('<HOME>/AppData/Local/Temp/… │ 
 │ │                 │   │   │   │   │   │   action='new'                     │ 
 │ │                 │   │   │   │   │   ),                                   │ 
 │ │                 │   │   │   │   │   SavePlanRow(                         │ 
 │ │                 │   │   │   │   │   │   role='manifest',                 │ 
 │ │                 │   │   │   │   │   │   source=None,                     │ 
 │ │                 │   │   │   │   │   │                                    │ 
-│ │                 landing=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │                 landing=WindowsPath('<HOME>/AppData/Local/Temp/… │ 
 │ │                 │   │   │   │   │   │   action='new'                     │ 
 │ │                 │   │   │   │   │   )                                    │ 
 │ │                 │   │   │   │   ),                                       │ 
@@ -4011,7 +4011,7 @@ _________ test_tc_b100_51_raise_after_the_commit_keeps_the_saved_line _________
 │ │                 │   │   ),                                               │ 
 │ │                 │   │   payload=SaveProjectPayload(                      │ 
 │ │                 │   │   │                                                │ 
-│ │                 parent_folder='C:\\Users\\jjgh8\\AppData\\Local\\Temp\\… │ 
+│ │                 parent_folder='<HOME>\\AppData\\Local\\Temp\\… │ 
 │ │                 │   │   │   project_name='S3',                           │ 
 │ │                 │   │   │   batch=(),                                    │ 
 │ │                 │   │   │   assignments={},                              │ 
@@ -4025,9 +4025,9 @@ _________ test_tc_b100_51_raise_after_the_commit_keeps_the_saved_line _________
 │ │                 │   │   declared_regions=(),                             │ 
 │ │                 │   │   active_template=None,                            │ 
 │ │                 │   │                                                    │ 
-│ │                 workarea=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp… │ 
+│ │                 workarea=WindowsPath('<HOME>/AppData/Local/Temp… │ 
 │ │                 │   │                                                    │ 
-│ │                 base_dir=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp… │ 
+│ │                 base_dir=WindowsPath('<HOME>/AppData/Local/Temp… │ 
 │ │                 │   │   gen=1                                            │ 
 │ │                 │   ),                                                   │ 
 │ │                 │   committed=True,                                      │ 
@@ -4040,7 +4040,7 @@ _________ test_tc_b100_51_raise_after_the_commit_keeps_the_saved_line _________
 │ │                 │   │   │   VariantDescriptor(                           │ 
 │ │                 │   │   │   │   variant_id='firmware',                   │ 
 │ │                 │   │   │   │                                            │ 
-│ │                 path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/cla… │ 
+│ │                 path=WindowsPath('<HOME>/AppData/Local/Temp/cla… │ 
 │ │                 │   │   │   │   file_type='s19'                          │ 
 │ │                 │   │   │   ),                                           │ 
 │ │                 │   │   ),                                               │ 
@@ -4052,7 +4052,7 @@ _________ test_tc_b100_51_raise_after_the_commit_keeps_the_saved_line _________
 │ │                 │   │   drift=[],                                        │ 
 │ │                 │   │   issues=[],                                       │ 
 │ │                 │   │                                                    │ 
-│ │                 written_path=WindowsPath('C:/Users/jjgh8/AppData/Local/… │ 
+│ │                 written_path=WindowsPath('<HOME>/AppData/Local/… │ 
 │ │                 │   ),                                                   │ 
 │ │                 │   emit_verify=None,                                    │ 
 │ │                 │   document_source_path=None,                           │ 
@@ -4068,7 +4068,7 @@ _________ test_tc_b100_51_raise_after_the_commit_keeps_the_saved_line _________
 │ │                 │   typed_name='S3',                                     │ 
 │ │                 │   cleaned='S3',                                        │ 
 │ │                 │                                                        │ 
-│ │                 project_dir=WindowsPath('C:/Users/jjgh8/AppData/Local/T… │ 
+│ │                 project_dir=WindowsPath('<HOME>/AppData/Local/T… │ 
 │ │                 │   save_as_source=None,                                 │ 
 │ │                 │   source_gone=None,                                    │ 
 │ │                 │   image_step=_ProjectImageStep(                        │ 
@@ -4089,22 +4089,22 @@ _________ test_tc_b100_51_raise_after_the_commit_keeps_the_saved_line _________
 │ │                 │   emitted_record=None,                                 │ 
 │ │                 │   plan=SavePlan(                                       │ 
 │ │                 │   │                                                    │ 
-│ │                 target=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/c… │ 
+│ │                 target=WindowsPath('<HOME>/AppData/Local/Temp/c… │ 
 │ │                 │   │   target_kind='new',                               │ 
 │ │                 │   │   rows=(                                           │ 
 │ │                 │   │   │   SavePlanRow(                                 │ 
 │ │                 │   │   │   │   role='image',                            │ 
 │ │                 │   │   │   │                                            │ 
-│ │                 source=WindowsPath('C:/Users/jjgh8/Github/s19_app-b100-… │ 
+│ │                 source=WindowsPath('<HOME>/Github/s19_app-b100-… │ 
 │ │                 │   │   │   │                                            │ 
-│ │                 landing=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │                 landing=WindowsPath('<HOME>/AppData/Local/Temp/… │ 
 │ │                 │   │   │   │   action='new'                             │ 
 │ │                 │   │   │   ),                                           │ 
 │ │                 │   │   │   SavePlanRow(                                 │ 
 │ │                 │   │   │   │   role='manifest',                         │ 
 │ │                 │   │   │   │   source=None,                             │ 
 │ │                 │   │   │   │                                            │ 
-│ │                 landing=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │                 landing=WindowsPath('<HOME>/AppData/Local/Temp/… │ 
 │ │                 │   │   │   │   action='new'                             │ 
 │ │                 │   │   │   )                                            │ 
 │ │                 │   │   ),                                               │ 
@@ -4131,7 +4131,7 @@ _________ test_tc_b100_51_raise_after_the_commit_keeps_the_saved_line _________
 │ │                 │   │   typed_name='S3',                                 │ 
 │ │                 │   │   cleaned='S3',                                    │ 
 │ │                 │   │                                                    │ 
-│ │                 project_dir=WindowsPath('C:/Users/jjgh8/AppData/Local/T… │ 
+│ │                 project_dir=WindowsPath('<HOME>/AppData/Local/T… │ 
 │ │                 │   │   save_as_source=None,                             │ 
 │ │                 │   │   source_gone=None,                                │ 
 │ │                 │   │   image_step=_ProjectImageStep(                    │ 
@@ -4152,22 +4152,22 @@ _________ test_tc_b100_51_raise_after_the_commit_keeps_the_saved_line _________
 │ │                 │   │   emitted_record=None,                             │ 
 │ │                 │   │   plan=SavePlan(                                   │ 
 │ │                 │   │   │                                                │ 
-│ │                 target=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/c… │ 
+│ │                 target=WindowsPath('<HOME>/AppData/Local/Temp/c… │ 
 │ │                 │   │   │   target_kind='new',                           │ 
 │ │                 │   │   │   rows=(                                       │ 
 │ │                 │   │   │   │   SavePlanRow(                             │ 
 │ │                 │   │   │   │   │   role='image',                        │ 
 │ │                 │   │   │   │   │                                        │ 
-│ │                 source=WindowsPath('C:/Users/jjgh8/Github/s19_app-b100-… │ 
+│ │                 source=WindowsPath('<HOME>/Github/s19_app-b100-… │ 
 │ │                 │   │   │   │   │                                        │ 
-│ │                 landing=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │                 landing=WindowsPath('<HOME>/AppData/Local/Temp/… │ 
 │ │                 │   │   │   │   │   action='new'                         │ 
 │ │                 │   │   │   │   ),                                       │ 
 │ │                 │   │   │   │   SavePlanRow(                             │ 
 │ │                 │   │   │   │   │   role='manifest',                     │ 
 │ │                 │   │   │   │   │   source=None,                         │ 
 │ │                 │   │   │   │   │                                        │ 
-│ │                 landing=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/… │ 
+│ │                 landing=WindowsPath('<HOME>/AppData/Local/Temp/… │ 
 │ │                 │   │   │   │   │   action='new'                         │ 
 │ │                 │   │   │   │   )                                        │ 
 │ │                 │   │   │   ),                                           │ 
@@ -4191,7 +4191,7 @@ _________ test_tc_b100_51_raise_after_the_commit_keeps_the_saved_line _________
 │ │                 │   ),                                                   │ 
 │ │                 │   payload=SaveProjectPayload(                          │ 
 │ │                 │   │                                                    │ 
-│ │                 parent_folder='C:\\Users\\jjgh8\\AppData\\Local\\Temp\\… │ 
+│ │                 parent_folder='<HOME>\\AppData\\Local\\Temp\\… │ 
 │ │                 │   │   project_name='S3',                               │ 
 │ │                 │   │   batch=(),                                        │ 
 │ │                 │   │   assignments={},                                  │ 
@@ -4205,9 +4205,9 @@ _________ test_tc_b100_51_raise_after_the_commit_keeps_the_saved_line _________
 │ │                 │   declared_regions=(),                                 │ 
 │ │                 │   active_template=None,                                │ 
 │ │                 │                                                        │ 
-│ │                 workarea=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp… │ 
+│ │                 workarea=WindowsPath('<HOME>/AppData/Local/Temp… │ 
 │ │                 │                                                        │ 
-│ │                 base_dir=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp… │ 
+│ │                 base_dir=WindowsPath('<HOME>/AppData/Local/Temp… │ 
 │ │                 │   gen=1                                                │ 
 │ │                 )                                                        │ 
 │ │           run = _BusyRun(                                                │ 
@@ -4224,7 +4224,7 @@ _________ test_tc_b100_51_raise_after_the_commit_keeps_the_saved_line _________
 │ │                 │   started=621449.312                                   │ 
 │ │                 )                                                        │ 
 │ │    saved_line = 'Saved project to                                        │ 
-│ │                 C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--User… │ 
+│ │                 <HOME>\\AppData\\Local\\Temp\\claude\\C--User… │ 
 │ │ saved_painted = False                                                    │ 
 │ │          self = S19TuiApp(                                               │ 
 │ │                 │   title='Hex Edit Tool',                               │ 
@@ -4233,7 +4233,7 @@ _________ test_tc_b100_51_raise_after_the_commit_keeps_the_saved_line _________
 │ │                 )                                                        │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc12b\tests\test_b100_busy.py:1330 in    
+│ <HOME>\Github\s19_app-b100-inc12b\tests\test_b100_busy.py:1330 in    
 │ _boom                                                                        
 │                                                                              
 │   1327                                                                       
@@ -4256,7 +4256,7 @@ _________ test_tc_b100_51_raise_after_the_commit_keeps_the_saved_line _________
 │ │      │   │   drift=[],                                                   │ 
 │ │      │   │   issues=[],                                                  │ 
 │ │      │   │                                                               │ 
-│ │      written_path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude… │ 
+│ │      written_path=WindowsPath('<HOME>/AppData/Local/Temp/claude… │ 
 │ │      │   )                                                               │ 
 │ │      )                                                                   │ 
 │ │ _k = {}                                                                  │ 
@@ -4373,7 +4373,7 @@ PASSED tests/test_b100_busy.py::test_tc_b100_53_use_time_resolve_error_refuses_a
 PASSED tests/test_b100_busy.py::test_tc_b100_53_path_gone_under_the_load_question_keeps_the_app
 PASSED tests/test_b100_busy.py::test_tc_b100_51_raise_after_the_commit_keeps_the_saved_line
 PASSED tests/test_b100_busy.py::test_tc_b100_50_progress_bar_paints_no_eta
-SKIPPED [1] tests\test_b100_busy.py:1074: the volume refuses this name (reported not run): [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\corr12b\\bt\\green06\\n2\\nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.s19'
+SKIPPED [1] tests\test_b100_busy.py:1074: the volume refuses this name (reported not run): [Errno 2] No such file or directory: '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\corr12b\\bt\\green06\\n2\\nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.s19'
 SKIPPED [1] tests\test_b100_busy.py:1038: not run on Windows (the name cannot be created), never passed
 109 passed, 2 skipped in 357.52s (0:05:57)
 exit: 0

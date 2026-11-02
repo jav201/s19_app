@@ -14,6 +14,7 @@ review caught the original CommonMark-only escape set (bare URLs autolinked and
 
 from __future__ import annotations
 
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import List
@@ -369,8 +370,9 @@ def test_tc016b_exception_diagnostics_do_not_leak_absolute_paths() -> None:
 
     # TC-16b
     """
+    _home = os.environ.get("USERPROFILE") or str(Path.home())
     leaky = (r"FileExistsError: [WinError 183] Cannot create a file when that "
-             r"file already exists: 'C:\Users\jjgh8\AppData\Local\Temp\x\reports'")
+             rf"file already exists: '{_home}\AppData\Local\Temp\x\reports'")
     # BOTH channels: run_flow puts exception text in `diagnostics` (the real
     # vector — 5th positional of BlockResult), and a rule may put it in
     # `findings`. Redaction must hold on either.
@@ -381,7 +383,7 @@ def test_tc016b_exception_diagnostics_do_not_leak_absolute_paths() -> None:
     report = compose_flow_report(state, _AT)
     assert "(diagnostic)" in report          # the vector is actually rendered
     assert "Users" not in report
-    assert "jjgh8" not in report
+    assert os.environ.get("USERNAME", "") not in report
     assert "C:" not in report
     # The useful part survives — this is redaction, not deletion.
     assert "FileExistsError" in report and "reports" in report

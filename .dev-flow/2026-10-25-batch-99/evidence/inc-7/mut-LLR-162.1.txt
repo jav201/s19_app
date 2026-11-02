@@ -2,7 +2,7 @@ F.FF                                                                     [100%]
 ================================== FAILURES ===================================
 _______________ test_tc_b99_34_pick_loads_the_picked_file_name ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26606/test_tc_b99_34_pick_loads_the_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26606/test_tc_b99_34_pick_loads_the_0')
 
     def test_tc_b99_34_pick_loads_the_picked_file_name(tmp_path):
         """Picking ``a.s19`` — boundary: ``a b.s19``, a name with a space — in
@@ -52,7 +52,7 @@ E       AssertionError: did not settle: the list pick re-loads a.s19
 tests\test_b99_load_project.py:80: AssertionError
 _____________ test_tc_b99_36_workarea_files_reads_the_load_folder _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26606/test_tc_b99_36_workarea_files_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26606/test_tc_b99_36_workarea_files_0')
 
     def test_tc_b99_36_workarea_files_reads_the_load_folder(tmp_path):
         """No file loaded -> the list is empty. After one file load the list
@@ -106,7 +106,7 @@ E       AssertionError: did not settle: the list pick re-loads one.s19
 tests\test_b99_load_project.py:80: AssertionError
 ____________ test_at_b99_13_project_and_file_pickers_load_by_name _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26606/test_at_b99_13_project_and_fil0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26606/test_at_b99_13_project_and_fil0')
 
     def test_at_b99_13_project_and_file_pickers_load_by_name(tmp_path):
         """1. The dialog lists P1 and P2 only (the ``patches`` home is present).

@@ -1,13 +1,13 @@
 # HANDOFF — batch-99 DDR test fixes (increment 012)
 
-Worktree: `C:\Users\jjgh8\Github\s19_app-b99-ddr`, branch `b99-ddr` at `bab3bff`.
+Worktree: `<HOME>\Github\s19_app-b99-ddr`, branch `b99-ddr` at `bab3bff`.
 Tests-and-packets-only increment: **no file under `s19_app/` was changed**
 (`git status --porcelain -- s19_app/` is empty, re-verified at handoff).
 Nothing committed; all changes are in the working tree for the orchestrator.
 
 Import proof (before every test run):
 `python -c "import s19_app; print(s19_app.__file__)"` →
-`C:\Users\jjgh8\Github\s19_app-b99-ddr\s19_app\__init__.py` (inside the worktree).
+`<HOME>\Github\s19_app-b99-ddr\s19_app\__init__.py` (inside the worktree).
 
 ## What was done (per BRIEF-ddr-fix.md)
 
@@ -60,7 +60,7 @@ Import proof (before every test run):
 - Full sweep (`green-b99.txt`): `tests/test_b99_*.py` +
   `tests/test_address_census.py` + `tests/test_id_registry.py` →
   **175 passed in 502.86s, exit 0** (139 collected b99 nodes + census +
-  registry). sha256 `d3b08d72113129d05d55cd2c0cffb2f628fe2a44e7cd26a2c80bf6e1c28def20`.
+  registry). sha256 `f6715609cf316f55c772df024a1a08367ba15706f6850e63c227faff79a27698`.
 - Joined-AT stability: AT-03 8/8, AT-04 8/8, AT-11 8/8 (`green-at03/04/11-8x.txt`).
 - Per-file: truncation 24, staging 31, export 23, patch-truth 20, a2l 7,
   bytes 3 (all transcripts in `evidence/ddr/`).
@@ -75,7 +75,7 @@ Import proof (before every test run):
 
 | File | sha256 |
 |---|---|
-| green-b99.txt | d3b08d72113129d05d55cd2c0cffb2f628fe2a44e7cd26a2c80bf6e1c28def20 |
+| green-b99.txt | f6715609cf316f55c772df024a1a08367ba15706f6850e63c227faff79a27698 |
 | green-at03-8x.txt | d0e69effa0c118fb748546e12477db6d750a6c3df7b33deab898628e41810868 |
 | green-at04-8x.txt | 11be7af46692304327acb5b4be81b87eec9c5529ab72c8d58ec4bb86a22c06db |
 | green-at11-8x.txt | a95d62e819785a65b7edfb40c3627c7e600f5dbe1007fa074eb874e413f9059c |
@@ -86,8 +86,8 @@ Import proof (before every test run):
 | green-tc18-riders.txt | 87752365aa869046469b03bf329d6f5c14b5d82c1c8455b31d17b74f7e403922 |
 | green-a2l.txt | 3b6228ade0a9780c3651f3c8a774cdb00a83eda4b33452f3f1124a042894c9d3 |
 | green-bytes.txt | 2662339370e1e14fb0a3801efbe3b6617f5cc7ebced8f02f9c0a53034a1b4093 |
-| mut-PQ2c.txt | a191ae494f868d7f2cbbd5c183b1428871929f5459a65a7db5d16b2f9f329878 |
-| mut-PQ6.txt | 8446ed8ee0907702b8377fa12005fc7675fc7bab0b4d06e15f4ee5141b6f6f3d |
+| mut-PQ2c.txt | 95824cffb658ca2af21301dbfff33d89c91519afa8330dc303e42240f9605a2b |
+| mut-PQ6.txt | c535a5b5eebd75a23f19080a9d028d765d85d133daaecf5530192f53a2157a1e |
 
 ## Open questions / notes for the orchestrator
 

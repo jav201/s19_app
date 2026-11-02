@@ -12,8 +12,8 @@ import re
 import subprocess
 import sys
 
-ROOT = r"C:\Users\jjgh8\Github\s19_app"
-BUNDLE = r"C:\Users\jjgh8\.claude\skills\dev-flow"
+ROOT = r"<HOME>\Github\s19_app"
+BUNDLE = r"<HOME>\.claude\skills\dev-flow"
 TODAY = "2026-10-13"
 OUTGOING = "2026-10-11-batch-93"
 OBJECTIVE = ("Operator-feedback batch: the legend spec sheet's fourth box reads 'Keys' "

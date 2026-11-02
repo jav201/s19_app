@@ -1,12 +1,12 @@
 # command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document -rfE
-# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:01:07Z
 F                                                                        [100%]
 ================================== FAILURES ===================================
 ________ test_tc345_entry_edit_json_disabled_for_file_backed_document _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29999/test_tc345_entry_edit_json_dis0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29999/test_tc345_entry_edit_json_dis0')
 
     def test_tc345_entry_edit_json_disabled_for_file_backed_document(
         tmp_path: Path,
@@ -75,49 +75,49 @@ FAILED tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_fo
 1 failed in 1.98s
 # exit: 1
 # command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document -rfE
-# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:02:01Z
 .                                                                        [100%]
 1 passed in 2.03s
 # exit: 0
 # command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document -rfE
-# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:02:07Z
 .                                                                        [100%]
 1 passed in 1.98s
 # exit: 0
 # command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document -rfE
-# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:02:13Z
 .                                                                        [100%]
 1 passed in 2.00s
 # exit: 0
 # command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document -rfE
-# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:02:19Z
 .                                                                        [100%]
 1 passed in 1.97s
 # exit: 0
 # command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document -rfE
-# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:02:25Z
 .                                                                        [100%]
 1 passed in 1.98s
 # exit: 0
 # command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document -rfE
-# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:02:31Z
 F                                                                        [100%]
 ================================== FAILURES ===================================
 ________ test_tc345_entry_edit_json_disabled_for_file_backed_document _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30027/test_tc345_entry_edit_json_dis0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30027/test_tc345_entry_edit_json_dis0')
 
     def test_tc345_entry_edit_json_disabled_for_file_backed_document(
         tmp_path: Path,
@@ -265,56 +265,56 @@ FAILED tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_fo
 1 failed in 2.56s
 # exit: 1
 # command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document -rfE
-# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:01:13Z
 .                                                                        [100%]
 1 passed in 1.99s
 # exit: 0
 # command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document -rfE
-# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:01:18Z
 .                                                                        [100%]
 1 passed in 2.09s
 # exit: 0
 # command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document -rfE
-# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:01:25Z
 .                                                                        [100%]
 1 passed in 1.97s
 # exit: 0
 # command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document -rfE
-# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:01:30Z
 .                                                                        [100%]
 1 passed in 2.11s
 # exit: 0
 # command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document -rfE
-# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:01:37Z
 .                                                                        [100%]
 1 passed in 1.96s
 # exit: 0
 # command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document -rfE
-# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:01:43Z
 .                                                                        [100%]
 1 passed in 1.98s
 # exit: 0
 # command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document -rfE
-# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:01:49Z
 F                                                                        [100%]
 ================================== FAILURES ===================================
 ________ test_tc345_entry_edit_json_disabled_for_file_backed_document _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30013/test_tc345_entry_edit_json_dis0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30013/test_tc345_entry_edit_json_dis0')
 
     def test_tc345_entry_edit_json_disabled_for_file_backed_document(
         tmp_path: Path,
@@ -462,8 +462,8 @@ FAILED tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_fo
 1 failed in 2.47s
 # exit: 1
 # command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document -rfE
-# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:01:55Z
 .                                                                        [100%]
 1 passed in 2.01s

@@ -4,7 +4,7 @@ FF                                                                       [100%]
 ================================== FAILURES ===================================
 ________ test_tc_b100_07_ast_census_every_post_creation_return_removes ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27418/test_tc_b100_07_ast_census_eve0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27418/test_tc_b100_07_ast_census_eve0')
 
     def test_tc_b100_07_ast_census_every_post_creation_return_removes(
         tmp_path: Path,
@@ -57,7 +57,7 @@ E            +  where False = any(<generator object test_tc_b100_07_ast_census_e
 tests\test_b100_save_guards.py:576: AssertionError
 ___________ test_tc_b100_07_forced_oserror_leaves_no_folder[copies] ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27418/test_tc_b100_07_forced_oserror0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27418/test_tc_b100_07_forced_oserror0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023C8B527CD0>
 stage = 'copies'
 

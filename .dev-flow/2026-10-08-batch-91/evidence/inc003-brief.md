@@ -1,6 +1,6 @@
 # CHUNK — Kimi K2.7-code — batch-91 increment 003 (the registry hygiene)
 
-You implement batch-91's increment 003 in `C:/Users/jjgh8/Github/s19_app`:
+You implement batch-91's increment 003 in `<HOME>/Github/s19_app`:
 the registry's hygiene. Read the contract first:
 `.dev-flow/2026-10-08-batch-91/01-requirements.md` — HLR-124 / LLR-124.1/.2.
 

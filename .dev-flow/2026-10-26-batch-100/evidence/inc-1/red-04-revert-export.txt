@@ -1,11 +1,11 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py::test_tc_b100_62_export_junction_unresolved_destination_refused (RED proof: the export caller change reverted — pre-resolved home passed to the guard and the placements)
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 (fix pass 1 with ONLY the export caller change reverted)
+tree: <HOME>\Github\s19_app-b100-inc1 (fix pass 1 with ONLY the export caller change reverted)
 
 F                                                                        [100%]
 ================================== FAILURES ===================================
 _______ test_tc_b100_62_export_junction_unresolved_destination_refused ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27231/test_tc_b100_62_export_junctio0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27231/test_tc_b100_62_export_junctio0')
 
     def test_tc_b100_62_export_junction_unresolved_destination_refused(
         tmp_path: Path,

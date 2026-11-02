@@ -1,9 +1,9 @@
 # HANDOFF — batch-99 Increment 8 · review round 1 fixes (F1–F5)
 
-Worktree: `C:\Users\jjgh8\Github\s19_app-b99-inc8` (branch `b99-inc8`, base
-`c62c842`). Interpreter: `C:\Users\jjgh8\anaconda3\envs\s19env\python.exe`.
+Worktree: `<HOME>\Github\s19_app-b99-inc8` (branch `b99-inc8`, base
+`c62c842`). Interpreter: `<HOME>\anaconda3\envs\s19env\python.exe`.
 Import provenance: `python -c "import s19_app; print(s19_app.__file__)"` →
-`C:\Users\jjgh8\Github\s19_app-b99-inc8\s19_app\__init__.py` (this worktree).
+`<HOME>\Github\s19_app-b99-inc8\s19_app\__init__.py` (this worktree).
 
 ## What the fix round did
 

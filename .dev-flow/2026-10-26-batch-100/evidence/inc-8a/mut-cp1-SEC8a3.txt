@@ -9,13 +9,13 @@
 #   |         never promises a document row the write refuses."""
 #   |         return True
 #   |         try:
-# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1
+# cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1
 # env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
-# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_29_cp1_junctioned_home_gives_no_document_row
+# command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_29_cp1_junctioned_home_gives_no_document_row
 # started 2026-10-30T23:57:30Z  finished 2026-10-30T23:57:34Z  rc=1
 F                                                                        [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_document.py:1805: AssertionError: (SavePlanRow(role='image', source=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30706/test_tc_...emp/pytest-of-jjgh8/pytest-30706/test_tc_b100_29_cp1_junctioned0/app/.s19tool/workarea/P/project.json'), action='new'))
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp8a-1\mutcp1\tests\test_b100_document.py:1805: AssertionError: (SavePlanRow(role='image', source=WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30706/test_tc_...emp/pytest-of-<USER>/pytest-30706/test_tc_b100_29_cp1_junctioned0/app/.s19tool/workarea/P/project.json'), action='new'))
 =========================== short test summary info ===========================
 FAILED tests/test_b100_document.py::test_tc_b100_29_cp1_junctioned_home_gives_no_document_row
 1 failed in 2.99s

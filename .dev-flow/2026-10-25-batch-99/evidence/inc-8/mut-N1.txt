@@ -2,7 +2,7 @@ FF                                                                       [100%]
 ================================== FAILURES ===================================
 __________ test_tc_b99_17_diagnostics_name_every_non_applied_address __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26608/test_tc_b99_17_diagnostics_nam0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26608/test_tc_b99_17_diagnostics_nam0')
 
     def test_tc_b99_17_diagnostics_name_every_non_applied_address(tmp_path: Path) -> None:
         """TC-B99-17 (LLR-156.1, batch-99 Inc-8 review fix F3, re-pinned by review
@@ -31,7 +31,7 @@ E         Use -v to get more diff
 tests\test_b99_patch_truth.py:262: AssertionError
 _________________ test_tc_b99_17_notices_lines_paint_warning __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26608/test_tc_b99_17_notices_lines_p0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26608/test_tc_b99_17_notices_lines_p0')
 
     def test_tc_b99_17_notices_lines_paint_warning(tmp_path: Path) -> None:
         """TC-B99-17 (LLR-156.1, review round 2 fix N1): a ``notices`` PATCH arm's

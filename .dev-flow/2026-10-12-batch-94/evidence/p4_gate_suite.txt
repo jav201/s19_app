@@ -1,4 +1,4 @@
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+<HOME>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -77,7 +77,7 @@ E       assert not ["TC-337 is LIVE but its dash token occurs in none of ['tests
 tests\test_batch91_registry_hygiene.py:63: AssertionError
 ____ test_at_061a_persistent_control_survives_then_writes_pair_and_clears _____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20463/test_at_061a_persistent_contro0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-20463/test_at_061a_persistent_contro0')
 
     def test_at_061a_persistent_control_survives_then_writes_pair_and_clears(
         tmp_path: Path,
@@ -252,7 +252,7 @@ E         Use -v to get more diff
 tests\test_import_census.py:219: AssertionError
 _____________ test_at_b78_33_compaction_enlarges_the_result_area ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20463/test_at_b78_33_compaction_enla0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-20463/test_at_b78_33_compaction_enla0')
 
     def test_at_b78_33_compaction_enlarges_the_result_area(tmp_path: Path) -> None:
         """AT-B78-33 / TC-B78-35 - compaction actually gives rows to the results.
@@ -310,7 +310,7 @@ E       assert 5 > 7
 tests\test_tui_diff_screen.py:692: AssertionError
 ________ test_at_b78_31_written_report_is_complete_under_display_caps _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20463/test_at_b78_31_written_report_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-20463/test_at_b78_31_written_report_0')
 
     def test_at_b78_31_written_report_is_complete_under_display_caps(
         tmp_path: Path,
@@ -379,7 +379,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
 pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
-dest_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20463/test_at_b78_31_written_report_0/b78_report_dest')
+dest_dir = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-20463/test_at_b78_31_written_report_0/b78_report_dest')
 
     async def _b78_press_report(app, pilot, dest_dir: Path) -> tuple[Path, Path]:
         """Press the shipped Report button and wait for THIS press's worker to finish.
@@ -474,7 +474,7 @@ E               AssertionError: the report worker took a FAILURE arm, so no comp
 tests\test_tui_diff_screen.py:1818: AssertionError
 ______________ test_at_b78_23_no_wrapped_row_in_the_wide_regime _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20463/test_at_b78_23_no_wrapped_row_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-20463/test_at_b78_23_no_wrapped_row_0')
 
     def test_at_b78_23_no_wrapped_row_in_the_wide_regime(tmp_path: Path) -> None:
         """AT-B78-23 (GATE) - at 160x40 no emitted hex row wraps.
@@ -526,7 +526,7 @@ E       assert 0 >= (1 + 1)
 tests\test_tui_diff_screen.py:2878: AssertionError
 ____________ test_tc_b78_52_pagination_reaches_bytes_past_the_pane ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20463/test_tc_b78_52_pagination_reac0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-20463/test_tc_b78_52_pagination_reac0')
 
     def test_tc_b78_52_pagination_reaches_bytes_past_the_pane(tmp_path: Path) -> None:
         """TC-B78-52 - the selected run's bytes past the visible rows are reachable.
@@ -600,7 +600,7 @@ E           assert 0 > 0
 tests\test_tui_diff_screen.py:3336: AssertionError
 _____________ test_tc_b78_54_the_height_floor_delivers_a_hex_row ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20463/test_tc_b78_54_the_height_floo0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-20463/test_tc_b78_54_the_height_floo0')
 
     def test_tc_b78_54_the_height_floor_delivers_a_hex_row(tmp_path: Path) -> None:
         """TC-B78-54 - the height floor is only right if a HEX ROW is visible AT it.
@@ -693,7 +693,7 @@ E       assert 0 >= 1
 tests\test_tui_diff_screen.py:3498: AssertionError
 _______________ test_at_b78_32_app_bindings_block_is_untouched ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20463/test_at_b78_32_app_bindings_bl0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-20463/test_at_b78_32_app_bindings_bl0')
 
     def test_at_b78_32_app_bindings_block_is_untouched(tmp_path: Path) -> None:
         """AT-B78-32 (PIN) -- Lane 1 does not disturb the App ``BINDINGS`` block.
@@ -787,7 +787,7 @@ E         Use -v to get more diff
 tests\test_tui_diff_screen.py:3871: AssertionError
 ___________________________ test_tc078_3_both_sites ___________________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20463/test_tc078_3_both_sites0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-20463/test_tc078_3_both_sites0')
 
     def test_tc078_3_both_sites(tmp_path: Path) -> None:
         """Both app.py call sites pass the aggregates (the writer census).
@@ -826,7 +826,7 @@ E        +  where 3 = len([<ast.Call object at 0x000002421014F210>, <ast.Call ob
 tests\test_tui_patch_checks_strip.py:645: AssertionError
 ______________ test_at057b_regroup_wiring_and_binding_regression ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20463/test_at057b_regroup_wiring_and0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-20463/test_at057b_regroup_wiring_and0')
 
     def test_at057b_regroup_wiring_and_binding_regression(
         tmp_path: Path,
@@ -910,7 +910,7 @@ E       assert False is True
 tests\test_tui_patch_editor_v2.py:2554: AssertionError
 _____________________________ test_tc081_2_strip ______________________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20463/test_tc081_2_strip0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-20463/test_tc081_2_strip0')
 
     def test_tc081_2_strip(tmp_path: Path) -> None:
         """The strip resolves once, above its buttons, fed by a defaulted parameter.
@@ -1187,7 +1187,7 @@ E       assert 8 > 8
 tests\test_tui_patch_json.py:1467: AssertionError
 ________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20463/test_at_056e_a2b_diff_report_b0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-20463/test_at_056e_a2b_diff_report_b0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000024203C44380>
 
     def test_at_056e_a2b_diff_report_byte_identical_despite_selection(
@@ -1262,7 +1262,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     with self.open(mode='r', encoding=encoding, errors=errors) as f:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-self = WindowsPath('C:/Users/jjgh8/Github/s19_app-b94/prototypes/cambios_10_12_2026/help_sections.md')
+self = WindowsPath('<HOME>/Github/s19_app-b94/prototypes/cambios_10_12_2026/help_sections.md')
 mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
 
     def open(self, mode='r', buffering=-1, encoding=None,
@@ -1274,7 +1274,7 @@ mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
         if "b" not in mode:
             encoding = io.text_encoding(encoding)
 >       return io.open(self, mode, buffering, encoding, errors, newline)
-E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\Github\\s19_app-b94\\prototypes\\cambios_10_12_2026\\help_sections.md'
+E       FileNotFoundError: [Errno 2] No such file or directory: '<HOME>\\Github\\s19_app-b94\\prototypes\\cambios_10_12_2026\\help_sections.md'
 
 ..\..\anaconda3\Lib\pathlib.py:1013: FileNotFoundError
 __________________ test_tc707_numbering_generated_sequential __________________
@@ -1292,7 +1292,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     with self.open(mode='r', encoding=encoding, errors=errors) as f:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-self = WindowsPath('C:/Users/jjgh8/Github/s19_app-b94/prototypes/cambios_10_12_2026/help_sections.md')
+self = WindowsPath('<HOME>/Github/s19_app-b94/prototypes/cambios_10_12_2026/help_sections.md')
 mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
 
     def open(self, mode='r', buffering=-1, encoding=None,
@@ -1304,12 +1304,12 @@ mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
         if "b" not in mode:
             encoding = io.text_encoding(encoding)
 >       return io.open(self, mode, buffering, encoding, errors, newline)
-E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\Github\\s19_app-b94\\prototypes\\cambios_10_12_2026\\help_sections.md'
+E       FileNotFoundError: [Errno 2] No such file or directory: '<HOME>\\Github\\s19_app-b94\\prototypes\\cambios_10_12_2026\\help_sections.md'
 
 ..\..\anaconda3\Lib\pathlib.py:1013: FileNotFoundError
 ============================== warnings summary ===============================
 ..\..\anaconda3\Lib\site-packages\pytest_textual_snapshot.py:367
-  C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_textual_snapshot.py:367: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  <HOME>\anaconda3\Lib\site-packages\pytest_textual_snapshot.py:367: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
     now=datetime.utcnow(),
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
@@ -1317,9 +1317,9 @@ E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh
 
 [1;30;41m29[0m[30;41m mismatched snapshots[0m
 
-[1mView the [0m]8;id=8484161;file://C:\Users\jjgh8\Github\s19_app-b94\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+[1mView the [0m]8;id=8484161;file://<HOME>\Github\s19_app-b94\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
 
-[2mC:\Users\jjgh8\Github\s19_app-b94\snapshot_report.html[0m
+[2m<HOME>\Github\s19_app-b94\snapshot_report.html[0m
 
 =========================== short test summary info ===========================
 FAILED tests/test_batch91_registry_hygiene.py::test_at286_every_live_id_token_occurs_in_its_nodes_file

@@ -1,6 +1,6 @@
 # Inc 12b — E5 corrective notes (software-dev, the one corrective pass)
 
-Tree `C:/Users/jjgh8/Github/s19_app-b100-inc12b`, branch `b100-inc12b`, on `81ac4c0` (no commit made). Source edits: `s19_app/tui/app.py`, `s19_app/tui/a2l.py`. `styles.tcss` is untouched. Rows done: every "corrective" row of `E5-rulings.md` (CR12b-1, CR12b-2 = SE5-12b-2, CR12b-3, CR12b-4, SE5-12b-1). Rows not touched, as ruled: SE5-12b-3, SE5-12b-4 (close records), SR12b-6 and the two sync helpers (BACKLOG-CODE).
+Tree `<HOME>/Github/s19_app-b100-inc12b`, branch `b100-inc12b`, on `81ac4c0` (no commit made). Source edits: `s19_app/tui/app.py`, `s19_app/tui/a2l.py`. `styles.tcss` is untouched. Rows done: every "corrective" row of `E5-rulings.md` (CR12b-1, CR12b-2 = SE5-12b-2, CR12b-3, CR12b-4, SE5-12b-1). Rows not touched, as ruled: SE5-12b-3, SE5-12b-4 (close records), SR12b-6 and the two sync helpers (BACKLOG-CODE).
 
 ## Source sha256[:16] (after the pass)
 
@@ -32,7 +32,7 @@ Both refusals happen before any busy run begins.
 ## Evidence
 
 - `evidence/inc-12b/red-03-corrective.txt` — the 8 new test nodes on `base12bc` (detached clean tree at `81ac4c0`, source untouched, the three test files copied in); `s19_app.__file__` = `…\scratchpad\base12bc\s19_app\__init__.py`. Result: **8 failed**, each for its intended reason (listed above).
-- `evidence/inc-12b/green-03-corrective.txt` — the same 8 nodes in the worktree; `s19_app.__file__` = `C:\Users\jjgh8\Github\s19_app-b100-inc12b\s19_app\__init__.py`. Result: **8 passed in 38.13s**.
+- `evidence/inc-12b/green-03-corrective.txt` — the same 8 nodes in the worktree; `s19_app.__file__` = `<HOME>\Github\s19_app-b100-inc12b\s19_app\__init__.py`. Result: **8 passed in 38.13s**.
 - `evidence/inc-12b/green-04-new-and-guards.txt` — `tests/test_b100_workers.py` and `tests/test_b100_a2l_progress.py` whole, `tests/test_b100_save_guards.py -k tc_b100_07` (every save-rollback arm, the new CR12b-1 arm included), the quit arms outside workers (`test_b100_load_question.py::test_tc_b100_66_busy_line_and_quit_question_hold_no_decision_ids`, `test_b100_session_reset.py::test_tc_b100_09_twelve_b_adds_exactly_the_quit_flag`), and the guards `tests/test_id_registry.py`, `tests/test_b99_staging.py`. Result: **162 passed, 29 deselected (the non-TC-07 save_guards arms), 1 xfailed (the pre-existing `…a_source_that_vanished_under_the_dialog…`, design silent, Inc 11 O-1), 1 error in 1346.05s**. The one error is the session-teardown recent-store guard (`tests/conftest.py:74`), attributed to the last test. Cause, verified by timestamp: my debug script `corr12b/dbg_reuse.py` (for CI12a-1, run outside pytest, so outside the guard) wrote `recent_sources.json` under the shared scratch `LOCALAPPDATA` at 13:19:46Z, while this session ran (it began 12:59:01Z). No test failed. My error, not the product's.
 - `evidence/inc-12b/green-04b-guards-rerun.txt` — after removing that stray scratch file: `tests/test_id_registry.py` + `tests/test_b99_staging.py` alone → **44 passed in 94.51s**, no teardown error.
 - No timing arm failed in any run, so no timing re-run was needed.

@@ -2,13 +2,13 @@ mutation: llr-163-1 on s19_app/tui/workspace.py
 hash before: 305e197c1a8d2a94ef077ac6c893c83e0d5449268c43b28df6e73a800acb43d1
 hash mutated: e520f396d21b0555d589d63ce25add6a3ac1b289ba0dc2713cd9f28f8ae0dfc0
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py -k tc_b100_01
-tree: /c/Users/jjgh8/Github/s19_app-b100-inc1
+tree: <HOME>/Github/s19_app-b100-inc1
 
 F..                                                                      [100%]
 ================================== FAILURES ===================================
 _____________ test_tc_b100_01_s7_sequence_reuses_identical_files ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27181/test_tc_b100_01_s7_sequence_re0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27181/test_tc_b100_01_s7_sequence_re0')
 
     def test_tc_b100_01_s7_sequence_reuses_identical_files(tmp_path: Path) -> None:
         """The S7 sequence (case_01, case_02, case_02, case_01, case_02): names

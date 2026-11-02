@@ -3,12 +3,12 @@
 | Field | Value |
 |---|---|
 | Reviewer | `code-reviewer`. I am independent of this code: `software-dev` implemented it, not me. |
-| Tree reviewed | Worktree `C:\Users\jjgh8\Github\s19_app-b100-inc5`, base `8d6056f`, uncommitted. Source sha256 (16): `app.py` `2f6b446594652dbc`, `change_service.py` `3623a42e6d1cd13e`, `apply.py` `9cb482d5e2876f00`, `project_gather_service.py` `a0dae1342b64bc14`. These equal the packet §4 hashes. The new test module is `9745926223da4d9e`. CRLF is consistent in all 5 files (for example, `app.py` 15154/15154). I did not edit the worktree. My only commands inside it were `git diff`/`git status` and a read-only `devflow-evidence.py --check`, and `git status` was unchanged afterwards. |
+| Tree reviewed | Worktree `<HOME>\Github\s19_app-b100-inc5`, base `8d6056f`, uncommitted. Source sha256 (16): `app.py` `2f6b446594652dbc`, `change_service.py` `3623a42e6d1cd13e`, `apply.py` `9cb482d5e2876f00`, `project_gather_service.py` `a0dae1342b64bc14`. These equal the packet §4 hashes. The new test module is `9745926223da4d9e`. CRLF is consistent in all 5 files (for example, `app.py` 15154/15154). I did not edit the worktree. My only commands inside it were `git diff`/`git status` and a read-only `devflow-evidence.py --check`, and `git status` was unchanged afterwards. |
 | Contract | `01-requirements.md`: HLR-167, LLR-167.1–167.8, LLR-163.7 and the B100-I15/I17/I18 rows. Ledger LED .45, .53 and .56 (worktree), and LED .61 (main checkout, uncommitted). `PROJECT_RULES.md` (docstring contract). Precedent: `review-increment-004.md`. |
 | Interpreter proof | s19env Python 3.11. I built these trees under `…\scratchpad\r5\`:<br>• `base\` = `git archive 8d6056f`;<br>• `fixed\` = base plus the 8 changed files, hash-equal to the worktree;<br>• `mut\<id>\` = one tree per reviewer mutant.<br>Every transcript prints `s19_app.__file__` from its own tree. Runs used `PYTHONPATH` set to that tree, `NO_COLOR` unset (`env -u`), `PYTHONDONTWRITEBYTECODE=1` and `-p no:cacheprovider`. |
 | **Verdict** | **FAIL (reject until fixed).** Recorded token: **`BLOCK — BLOCK-UNTIL: F1, F2`** (2 HIGH). This verdict authorises nothing. The increment does not advance until F1 and F2 are fixed and I have re-read the fixes on the diff and re-run probes P1 and P2b and mutant MC. F3 and F4 (MAJOR) should land in the same corrective pass. |
 
-`…\scratchpad` = `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad`.
+`…\scratchpad` = `<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad`.
 
 ## BLUF
 
@@ -170,7 +170,7 @@ Rulings: the B100-I15 additive parameters are justified, so re-freeze them. The 
 | Field | Value |
 |---|---|
 | Reviewer | `code-reviewer`, the same reviewer as round 1. I did not write the fix. |
-| Tree re-read | Worktree `C:\Users\jjgh8\Github\s19_app-b100-inc5`, base `8d6056f`, uncommitted. Source sha256 (16): `app.py` `8032dead73f7ee54`, `apply.py` `6d00f17fcefb704c`, `change_service.py` `95da58bf3bcc27cd`, `project_gather_service.py` `11697d6c85efb9e2`. The test module is `559768f390ded771`. These equal the packet's "Corrective pass 1" hashes. It is still 4 SOURCE files. I diffed the round-1 tree (`…\r5\fixed\`) against this tree, file by file. I did not edit the worktree. |
+| Tree re-read | Worktree `<HOME>\Github\s19_app-b100-inc5`, base `8d6056f`, uncommitted. Source sha256 (16): `app.py` `8032dead73f7ee54`, `apply.py` `6d00f17fcefb704c`, `change_service.py` `95da58bf3bcc27cd`, `project_gather_service.py` `11697d6c85efb9e2`. The test module is `559768f390ded771`. These equal the packet's "Corrective pass 1" hashes. It is still 4 SOURCE files. I diffed the round-1 tree (`…\r5\fixed\`) against this tree, file by file. I did not edit the worktree. |
 | Interpreter proof | `…\r5\fixed2\` = `git archive 8d6056f` plus the 8 changed files, hash-equal to the worktree. `…\r5\mut\<id>\` = one tree per mutant. Every transcript prints `s19_app.__file__` from its own tree. `NO_COLOR` unset, s19env 3.11. |
 | **Verdict** | **PASS-WITH-NOTES** (0 HIGH open). **F1 and F2 are discharged**: I re-read both fixes on the diff, re-ran P1 and P2b, and re-ran MC (KILLED). F3–F9 are closed. F10 is withdrawn with the implementer's reason. One MINOR (R2-1) and three NITs are new; none blocks. |
 

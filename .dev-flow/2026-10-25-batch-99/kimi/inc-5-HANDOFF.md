@@ -42,7 +42,7 @@
 
 ## Verification (the exact commands)
 - `python -c "import s19_app; print(s19_app.__file__)"` →
-  `C:\Users\jjgh8\Github\s19_app-b99-inc5\s19_app\__init__.py` (in-worktree).
+  `<HOME>\Github\s19_app-b99-inc5\s19_app\__init__.py` (in-worktree).
 - `pytest tests/test_b99_crc_region.py -v` → 5 passed.
 - `pytest tests/test_b99_staging.py tests/test_id_registry.py
   tests/test_crc_operation.py tests/test_crc_engine.py

@@ -1,13 +1,13 @@
-# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/mut/MV
-# command: python -m pytest -q -p no:cacheprovider -rfE --basetemp=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV tests/test_b100_announce.py tests/test_b100_active_variant.py tests/test_b100_save_image.py -k tc_b100_67 or at_b100_19 or at_b100_20 or at_b100_05
+# tree: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/mut/MV
+# command: python -m pytest -q -p no:cacheprovider -rfE --basetemp=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV tests/test_b100_announce.py tests/test_b100_active_variant.py tests/test_b100_save_image.py -k tc_b100_67 or at_b100_19 or at_b100_20 or at_b100_05
 # date: 2026-10-30T04:17:24Z
-# s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r6\mut\MV\s19_app\__init__.py
+# s19_app.__file__ = <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r6\mut\MV\s19_app\__init__.py
 # python 3.11.15
 ....FF..FFFFFFF                                                          [100%]
 ================================== FAILURES ===================================
 ______ test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_tc_b100_67_thirty_problem0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_tc_b100_67_thirty_problem0')
 
     def test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last(tmp_path: Path) -> None:
         async def _scenario(pilot, app):
@@ -31,7 +31,7 @@ E        +    where {''} = set(['', '', '', '', '', '', ...])
 tests\test_b100_announce.py:501: AssertionError
 ___________ test_tc_b100_67_damaged_manifest_paints_user_terms_only ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_tc_b100_67_damaged_manife0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_tc_b100_67_damaged_manife0')
 
     def test_tc_b100_67_damaged_manifest_paints_user_terms_only(tmp_path: Path) -> None:
         base = tmp_path / "app"
@@ -53,7 +53,7 @@ E       assert 'Manifest damaged: project.json' in ''
 tests\test_b100_announce.py:523: AssertionError
 ____________ test_tc_b100_67_wrapped_lines_hang_under_their_column ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_tc_b100_67_wrapped_lines_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_tc_b100_67_wrapped_lines_0')
 
     def test_tc_b100_67_wrapped_lines_hang_under_their_column(tmp_path: Path) -> None:
         """UX-2 / UX-3 at 99x54: the fallback reason wraps and its continuation
@@ -77,7 +77,7 @@ E       StopIteration
 tests\test_b100_announce.py:601: StopIteration
 ______ test_at_b100_19_the_panel_names_the_opened_variant_and_why[size0] ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_at_b100_19_the_panel_name0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_at_b100_19_the_panel_name0')
 size = (118, 54)
 
     @pytest.mark.parametrize("size", SIZES)
@@ -140,7 +140,7 @@ E       assert 'Opened    firmware-patched.s19' in ''
 tests\test_b100_announce.py:677: AssertionError
 ______ test_at_b100_19_the_panel_names_the_opened_variant_and_why[size1] ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_at_b100_19_the_panel_name1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_at_b100_19_the_panel_name1')
 size = (220, 60)
 
     @pytest.mark.parametrize("size", SIZES)
@@ -203,7 +203,7 @@ E       assert 'Opened    firmware-patched.s19' in ''
 tests\test_b100_announce.py:677: AssertionError
 ____ test_at_b100_20_every_writer_carries_the_keys_it_does_not_own[size0] _____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_at_b100_20_every_writer_c0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_at_b100_20_every_writer_c0')
 size = (118, 54)
 
     @pytest.mark.parametrize("size", SIZES)
@@ -291,7 +291,7 @@ E       assert 'Opened    firmware_1.s19' in ''
 tests\test_b100_active_variant.py:829: AssertionError
 ____ test_at_b100_20_every_writer_carries_the_keys_it_does_not_own[size1] _____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_at_b100_20_every_writer_c1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_at_b100_20_every_writer_c1')
 size = (220, 60)
 
     @pytest.mark.parametrize("size", SIZES)
@@ -379,7 +379,7 @@ E       assert 'Opened    firmware_1.s19' in ''
 tests\test_b100_active_variant.py:829: AssertionError
 _________ test_at_b100_05_save_project_saves_the_patched_image[size0] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_at_b100_05_save_project_s0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_at_b100_05_save_project_s0')
 size = (118, 54)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
@@ -503,7 +503,7 @@ E       assert 'Opened    firmware.s19' in ''
 tests\test_b100_save_image.py:1756: AssertionError
 _________ test_at_b100_05_save_project_saves_the_patched_image[size1] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_at_b100_05_save_project_s1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_at_b100_05_save_project_s1')
 size = (220, 60)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])

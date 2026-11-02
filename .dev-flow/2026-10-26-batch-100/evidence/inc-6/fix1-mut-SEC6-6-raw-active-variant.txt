@@ -1,9 +1,9 @@
 # mutation: SEC6-6-raw-active-variant — SEC6-6 (LLR-178.2): the recorded active_variant reaches the status log unscrubbed
 # file: s19_app/tui/app.py (sha256 before 762d1a98c8a65903)
-# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=C:\Users\jjgh8\AppData\Local\Temp\f1mut-SEC6-6-raw-active-variant tests/test_b100_announce.py -k control_bytes
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (corrective pass 1, mutated in place, then restored)
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
-# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\__init__.py
+# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=<HOME>\AppData\Local\Temp\f1mut-SEC6-6-raw-active-variant tests/test_b100_announce.py -k control_bytes
+# tree: <HOME>\Github\s19_app-b100-inc6 (corrective pass 1, mutated in place, then restored)
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# s19_app.__file__ = <HOME>\Github\s19_app-b100-inc6\s19_app\__init__.py
 # date: 2026-10-30T03:35:08Z
 # --- old
 #                   self.set_status(
@@ -21,7 +21,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 _______ test_tc_b100_56_recorded_variant_with_control_bytes_paints_none _______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-SEC6-6-raw-active-variant/test_tc_b100_56_recorded_varia0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-SEC6-6-raw-active-variant/test_tc_b100_56_recorded_varia0')
 
     def test_tc_b100_56_recorded_variant_with_control_bytes_paints_none(tmp_path: Path) -> None:
         """A recorded ``active_variant`` is any JSON string: one holding an ESC

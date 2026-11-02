@@ -1,20 +1,20 @@
 # Inc 12b E4 integration — RED of the integration arms (SE5-12a-4, CR12a-1, OBS-12a-1)
-# tree: scratch worktree C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int12b/redwt at ef0cdb8; tests/test_b100_busy.py copied in from the integrated worktree
+# tree: scratch worktree <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int12b/redwt at ef0cdb8; tests/test_b100_busy.py copied in from the integrated worktree
 # run 1: ef0cdb8 source unchanged; run 2: ef0cdb8 + the F-1 fix only (prepared.target_carry), CR12a-1 node
-# env: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int12b/lad/red1, --basetemp under C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int12b/bt
+# env: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int12b/lad/red1, --basetemp under <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/int12b/bt
 # RED of the integration arms on ef0cdb8 (scratch worktree redwt, test file copied in)
-# s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int12b\redwt\s19_app\__init__.py
+# s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int12b\redwt\s19_app\__init__.py
 FFFFFFFFF                                                                [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int12b\redwt\tests\test_b100_busy.py:2934: AssertionError: PermissionError(13, 'injected: access denied')
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int12b\redwt\tests\test_b100_busy.py:2934: AssertionError: ValueError('injected')
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int12b\redwt\tests\test_b100_busy.py:2934: AssertionError: RuntimeError('injected')
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int12b\redwt\tests\test_b100_busy.py:2934: AssertionError: PermissionError(13, 'injected: access denied')
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int12b\redwt\tests\test_b100_busy.py:2934: AssertionError: ValueError('injected')
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int12b\redwt\tests\test_b100_busy.py:2934: AssertionError: RuntimeError('injected')
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int12b\redwt\tests\test_b100_busy.py:2967: PermissionError: [Errno 13] injected: access denied: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\int12b\\bt\\red1\\test_tc_b100_53_path_gone_unde0\\src\\fw.s19'
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int12b\redwt\tests\test_b100_busy.py:3038: AssertionError: [namespace(key='save_project', gen=1, outcome='Project NOT saved: could not save — an unexpected error stopped the save. check the folder.', result=True, timers=0, status='Loaded firmware.s19 (S19 only)')]
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int12b\redwt\tests\test_b100_busy.py:3069: AssertionError: ((1, ['━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--']), (1, ['━━━━━━━━━━━━━━━━╺━━━━━━━━━━━━━━━  50% 00:00:02'], '⠋ R  ·  step 2/2 b  ·  00:00'))
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int12b\redwt\tests\test_b100_busy.py:2934: AssertionError: PermissionError(13, 'injected: access denied')
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int12b\redwt\tests\test_b100_busy.py:2934: AssertionError: ValueError('injected')
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int12b\redwt\tests\test_b100_busy.py:2934: AssertionError: RuntimeError('injected')
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int12b\redwt\tests\test_b100_busy.py:2934: AssertionError: PermissionError(13, 'injected: access denied')
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int12b\redwt\tests\test_b100_busy.py:2934: AssertionError: ValueError('injected')
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int12b\redwt\tests\test_b100_busy.py:2934: AssertionError: RuntimeError('injected')
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int12b\redwt\tests\test_b100_busy.py:2967: PermissionError: [Errno 13] injected: access denied: '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<USER>-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scratchpad\\int12b\\bt\\red1\\test_tc_b100_53_path_gone_unde0\\src\\fw.s19'
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int12b\redwt\tests\test_b100_busy.py:3038: AssertionError: [namespace(key='save_project', gen=1, outcome='Project NOT saved: could not save — an unexpected error stopped the save. check the folder.', result=True, timers=0, status='Loaded firmware.s19 (S19 only)')]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int12b\redwt\tests\test_b100_busy.py:3069: AssertionError: ((1, ['━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--']), (1, ['━━━━━━━━━━━━━━━━╺━━━━━━━━━━━━━━━  50% 00:00:02'], '⠋ R  ·  step 2/2 b  ·  00:00'))
 =========================== short test summary info ===========================
 FAILED tests/test_b100_busy.py::test_tc_b100_53_use_time_resolve_error_refuses_and_keeps_the_app[load_from_path-OSError]
 FAILED tests/test_b100_busy.py::test_tc_b100_53_use_time_resolve_error_refuses_and_keeps_the_app[load_from_path-ValueError]
@@ -28,10 +28,10 @@ FAILED tests/test_b100_busy.py::test_tc_b100_50_progress_bar_paints_no_eta - ...
 9 failed in 31.10s
 # exit: 1
 # RED of CR12a-1 on ef0cdb8 + the F-1 fix only (redwt)
-# s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int12b\redwt\s19_app\__init__.py
+# s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int12b\redwt\s19_app\__init__.py
 F                                                                        [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int12b\redwt\tests\test_b100_busy.py:3038: AssertionError: [namespace(key='save_project', gen=1, outcome='Saving project S3 failed', result=True, timers=0, status='Loaded firmware.s19 (S19 only)')]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\int12b\redwt\tests\test_b100_busy.py:3038: AssertionError: [namespace(key='save_project', gen=1, outcome='Saving project S3 failed', result=True, timers=0, status='Loaded firmware.s19 (S19 only)')]
 =========================== short test summary info ===========================
 FAILED tests/test_b100_busy.py::test_tc_b100_51_raise_after_the_commit_keeps_the_saved_line
 1 failed in 3.93s

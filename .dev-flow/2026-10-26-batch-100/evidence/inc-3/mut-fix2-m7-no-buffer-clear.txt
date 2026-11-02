@@ -1,6 +1,6 @@
 pre-mutation sha256: ddc64e1803eef450b1dd17d20bda1e518d027d89f59ea14b946ef1587710a20b
 mutant sha256: c5a99a8ed808a1c54941d01c7602d0f5ef34c32a367d23a48aba85f27d0474d6
-cmd: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py
+cmd: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py
  paste_buffer.text, repr(paste_buffer.text)
                 # Back to the Inspector tab: the TextArea holds the keyboard,
                 # and the load-over below starts with the rail key ``1``.

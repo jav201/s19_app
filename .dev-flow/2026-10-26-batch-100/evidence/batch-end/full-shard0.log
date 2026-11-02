@@ -1,5 +1,5 @@
 9e4dd3b
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\s19_app\__init__.py
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\s19_app\__init__.py
 s..................................................................s.... [  6%]
 ........................................................................ [ 13%]
 ........................................................................ [ 20%]
@@ -16,11 +16,11 @@ s..................................................................s.... [  6%]
 ...........................................................F............ [ 96%]
 ................x...................                                     [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b99_load_project.py:90: AssertionError: did not settle: the list pick re-loads a.s19
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b99_load_project.py:90: AssertionError: did not settle: the list pick re-loads one.s19
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b99_load_project.py:90: AssertionError: did not settle: the list pick re-loads a.s19
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_patch_big.py:409: AssertionError: after adding a 4th entry the SCRIPT subtitle must read 4; got '3 entries ●' (a static subtitle passes a 'subtitle exists' check and fails here)
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_undo_redo_ux.py:145: AssertionError: Redo must clear the stale Checks panel (AC-1.2); got 1 stale rows
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b99_load_project.py:90: AssertionError: did not settle: the list pick re-loads a.s19
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b99_load_project.py:90: AssertionError: did not settle: the list pick re-loads one.s19
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_b99_load_project.py:90: AssertionError: did not settle: the list pick re-loads a.s19
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_tui_patch_big.py:409: AssertionError: after adding a 4th entry the SCRIPT subtitle must read 4; got '3 entries ●' (a static subtitle passes a 'subtitle exists' check and fails here)
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\full\tests\test_undo_redo_ux.py:145: AssertionError: Redo must clear the stale Checks panel (AC-1.2); got 1 stale rows
 =========================== short test summary info ===========================
 FAILED tests/test_b99_load_project.py::test_tc_b99_34_pick_loads_the_picked_file_name
 FAILED tests/test_b99_load_project.py::test_tc_b99_36_workarea_files_reads_the_load_folder

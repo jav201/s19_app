@@ -2,7 +2,7 @@ F
 ================================== FAILURES ===================================
 _______________ test_tc_b99_34_pick_loads_the_picked_file_name ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/s19f2/bt/test_tc_b99_34_pick_loads_the_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19f2/bt/test_tc_b99_34_pick_loads_the_0')
 
     def test_tc_b99_34_pick_loads_the_picked_file_name(tmp_path):
         """Picking ``a.s19`` — boundary: ``a b.s19``, a name with a space — in

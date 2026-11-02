@@ -1,12 +1,12 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py -k "r7 or r8" (MUTANT (b): the rollback back to the snapshot-difference tree walk)
-tree: C:/Users/jjgh8/Github/s19_app-b100-inc2 (detached 2edfee2, LED .53 redesign + mutant (b))
-env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc2 (NO_COLOR unset)
+tree: <HOME>/Github/s19_app-b100-inc2 (detached 2edfee2, LED .53 redesign + mutant (b))
+env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<HOME>/Github/s19_app-b100-inc2 (NO_COLOR unset)
 
 FF                                                                       [100%]
 ================================== FAILURES ===================================
 ___________ test_tc_b100_07_rollback_keeps_denied_folder_content_r7 ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28494/test_tc_b100_07_rollback_keeps0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28494/test_tc_b100_07_rollback_keeps0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000018EB7BD1F90>
 
     def test_tc_b100_07_rollback_keeps_denied_folder_content_r7(
@@ -77,15 +77,15 @@ E         Use -v to get more diff
 
 tests\test_b100_save_guards.py:1194: AssertionError
 ---------------------------- Captured stdout call -----------------------------
-processed file: C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-28494\test_tc_b100_07_rollback_keeps0\app\.s19tool\workarea\ab\patches
+processed file: <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-28494\test_tc_b100_07_rollback_keeps0\app\.s19tool\workarea\ab\patches
 Successfully processed 1 files; Failed processing 0 files
-processed file: C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-28494\test_tc_b100_07_rollback_keeps0\app\.s19tool\workarea\ab\patches
+processed file: <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-28494\test_tc_b100_07_rollback_keeps0\app\.s19tool\workarea\ab\patches
 Successfully processed 1 files; Failed processing 0 files
-processed file: C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-28494\test_tc_b100_07_rollback_keeps0\app\.s19tool\workarea\ab\patches
+processed file: <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-28494\test_tc_b100_07_rollback_keeps0\app\.s19tool\workarea\ab\patches
 Successfully processed 1 files; Failed processing 0 files
 __________ test_tc_b100_07_rollback_keeps_concurrent_writer_file_r8 ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28494/test_tc_b100_07_rollback_keeps1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28494/test_tc_b100_07_rollback_keeps1')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000018EB640B650>
 
     def test_tc_b100_07_rollback_keeps_concurrent_writer_file_r8(
@@ -147,7 +147,7 @@ tests\test_b100_save_guards.py:1237: in _drive
          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28494/test_tc_b100_07_rollback_keeps1/app/.s19tool/workarea/ab/notes.txt')
+self = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28494/test_tc_b100_07_rollback_keeps1/app/.s19tool/workarea/ab/notes.txt')
 mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
 
     def open(self, mode='r', buffering=-1, encoding=None,
@@ -160,7 +160,7 @@ mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
             encoding = io.text_encoding(encoding)
 >       return io.open(self, mode, buffering, encoding, errors, newline)
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-28494\\test_tc_b100_07_rollback_keeps1\\app\\.s19tool\\workarea\\ab\\notes.txt'
+E       FileNotFoundError: [Errno 2] No such file or directory: '<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-28494\\test_tc_b100_07_rollback_keeps1\\app\\.s19tool\\workarea\\ab\\notes.txt'
 
 ..\..\anaconda3\envs\s19env\Lib\pathlib.py:1044: FileNotFoundError
 =========================== short test summary info ===========================

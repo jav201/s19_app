@@ -1,5 +1,5 @@
 4dfb5a1 batch-100 Inc 12a: regenerate the 29 density snapshots for the Load / Projects labels (snapshot-regen run 41290253513)
-C:\Users\jjgh8\AppData\Local\Temp\s19f2\base4dfb\s19_app\__init__.py
+<HOME>\AppData\Local\Temp\s19f2\base4dfb\s19_app\__init__.py
 save-project: trigger -> outcome 0.786 s; ['Project saved + manifest verified']
 1 passed in 3.75s
 save-project: trigger -> outcome 0.728 s; ['Project saved + manifest verified']

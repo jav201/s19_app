@@ -100,15 +100,15 @@ note at `tests/test_id_registry.py:73-79`.
 
 ```bash
 # the guard + the batch's hygiene acceptance
-C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest \
+<HOME>/anaconda3/envs/s19env/python.exe -m pytest \
   tests/test_id_registry.py tests/test_batch91_registry_hygiene.py -q -p no:cacheprovider
 
 # the invisible-list re-derivation (prints the AT-043 derivation and the residual count)
-C:/Users/jjgh8/anaconda3/envs/s19env/python.exe \
+<HOME>/anaconda3/envs/s19env/python.exe \
   .dev-flow/2026-10-08-batch-91/evidence/inc003_invisible.py
 
 # the executed RED counterfactuals (in-memory mutations; shipped bytes hash-pinned)
-PYTHONDONTWRITEBYTECODE=1 C:/Users/jjgh8/anaconda3/envs/s19env/python.exe \
+PYTHONDONTWRITEBYTECODE=1 <HOME>/anaconda3/envs/s19env/python.exe \
   .dev-flow/2026-10-08-batch-91/evidence/inc003_counterfactuals.py
 ```
 
@@ -272,7 +272,7 @@ The `C-25` suite verdict and the close — both the coordinator's.
 
 | Evidence artifact | Path — under `artifact_homes.evidence` | SHA-256 |
 |---|---|---|
-| the coordinator's brief (verbatim) | `.dev-flow/2026-10-08-batch-91/evidence/inc003-brief.md` | `472ea4f935f1b54d4b4220ab15c5edd66f163776b4ec8be1b77d2d9bad91ff3b` |
+| the coordinator's brief (verbatim) | `.dev-flow/2026-10-08-batch-91/evidence/inc003-brief.md` | `1cf708a6290f5b99a9e5e95610c0a01d8048f8c17ff7ce1cbac1f55b2c75cbf1` |
 | the failed opencode launch | `.dev-flow/2026-10-08-batch-91/evidence/inc003-run.log` | `418935dfa1cad1f8eacca319ae4e5ae7c80adc3ee16ec66509a62d85933b9021` |
 | the 44-id adoption list (id → file, one line each) | `.dev-flow/2026-10-08-batch-91/evidence/inc003_adoption_list.md` | `4abe616f5e604267cb8604f3c7449589bd954bac259911098cd269b22a40422b` |
 | the derivation probe (AT-043 nodes + the token-exact invisible list) | `.dev-flow/2026-10-08-batch-91/evidence/inc003_invisible.py` | `5861242d843bcdd8359025ef12089e7c46d3f7d3c39e458b6aec6d1116efcfd4` |

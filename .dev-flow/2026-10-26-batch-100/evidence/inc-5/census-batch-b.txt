@@ -1,6 +1,6 @@
 # command: python -m pytest -q -p no:cacheprovider tests/test_flow_execution_service.py tests/test_id_registry.py tests/test_loadfilescreen_input.py tests/test_project_gather.py tests/test_report_logging.py tests/test_report_progress.py tests/test_tui_app.py tests/test_tui_commandbar.py tests/test_tui_diff_screen.py tests/test_tui_directionb.py tests/test_tui_evidence_packs.py tests/test_tui_flow_execution_b94.py tests/test_tui_manifest_save.py tests/test_tui_patch_card.py tests/test_tui_patch_editor_v2.py tests/test_tui_patch_history_strip.py tests/test_tui_patch_layout.py tests/test_tui_patch_variant.py tests/test_tui_report_filter_surface.py tests/test_tui_report_seam.py tests/test_tui_report_view.py tests/test_tui_variants.py tests/test_variant_execution.py -rfE
-# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T20:01:06Z
 ........................................................................ [ 11%]
 .....................................................................x.. [ 22%]
@@ -14,7 +14,7 @@
 ================================== FAILURES ===================================
 ______ test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29965/test_at_b78_03_the_palette_act0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29965/test_at_b78_03_the_palette_act0')
 
     def test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact(
         tmp_path: Path,
@@ -98,7 +98,7 @@ E         Use -v to get more diff
 tests\test_tui_commandbar.py:2704: AssertionError
 _______________ test_at_b78_32_app_bindings_block_is_untouched ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29965/test_at_b78_32_app_bindings_bl0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29965/test_at_b78_32_app_bindings_bl0')
 
     def test_at_b78_32_app_bindings_block_is_untouched(tmp_path: Path) -> None:
         """AT-B78-32 (PIN) -- Lane 1 does not disturb the App ``BINDINGS`` block.
@@ -196,7 +196,7 @@ E         ...Full output truncated (3 lines hidden), use '-vv' to show
 tests\test_tui_diff_screen.py:3912: AssertionError
 ________ test_tc345_entry_edit_json_disabled_for_file_backed_document _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29965/test_tc345_entry_edit_json_dis0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29965/test_tc345_entry_edit_json_dis0')
 
     def test_tc345_entry_edit_json_disabled_for_file_backed_document(
         tmp_path: Path,
@@ -341,7 +341,7 @@ E           textual.css.query.NoMatches: No nodes match '#patch_editor_panel' on
 ..\..\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: NoMatches
 ________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29965/test_at_056e_a2b_diff_report_b0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29965/test_at_056e_a2b_diff_report_b0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000219C66F9750>
 
     def test_at_056e_a2b_diff_report_byte_identical_despite_selection(

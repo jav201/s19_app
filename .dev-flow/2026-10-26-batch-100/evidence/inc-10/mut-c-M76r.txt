@@ -11,15 +11,15 @@ new text:             kind = "image"
 sha256 before: 5a9550c493ab6ad161b4a4d5e79f41681a3a964d4a2310751f81ff8441e925b7
 occurrences of old text: 1
 command: pytest -q --tb=line -p no:cacheprovider --basetemp=<scratch>/c10/btm tests/test_b100_load_question.py::test_tc_b100_72_typed_path_takes_its_kind_from_the_classification tests/test_b100_load_question.py::test_tc_b100_44_attach_asks_nothing_and_keeps_the_patch
-cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\c10\mutc
-s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\c10\mutc\s19_app\__init__.py
+cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\c10\mutc
+s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\c10\mutc\s19_app\__init__.py
 pytest exit code: 1
 pytest summary: 2 failed in 33.44s
 verdict: KILLED
 restored = True
 
 --- pytest output (failure lines) ---
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\c10\mutc\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for reset the MAC
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\c10\mutc\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the MAC attach
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\c10\mutc\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for reset the MAC
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\c10\mutc\tests\support\b100_load_dialog.py:77: AssertionError: timed out waiting for the MAC attach
 FAILED tests/test_b100_load_question.py::test_tc_b100_72_typed_path_takes_its_kind_from_the_classification
 FAILED tests/test_b100_load_question.py::test_tc_b100_44_attach_asks_nothing_and_keeps_the_patch

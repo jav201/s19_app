@@ -1,10 +1,10 @@
 cmd: pytest -q -p no:cacheprovider tests/test_b100_reuse.py -k group_word_compares  (RED: casefold removed)
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 — detached e044112 + inc1 + fix1 + fix2-with-red-13
+tree: <HOME>\Github\s19_app-b100-inc1 — detached e044112 + inc1 + fix1 + fix2-with-red-13
 F                                                                        [100%]
 ================================== FAILURES ===================================
 _______________ test_tc_b100_57_group_word_compares_case_folded _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27284/test_tc_b100_57_group_word_com0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27284/test_tc_b100_57_group_word_com0')
 
     def test_tc_b100_57_group_word_compares_case_folded(
         tmp_path: Path,
@@ -44,7 +44,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 >       assert all(p.action == "reused" for p in again), (
             f"a case-only rename must not read as 'wrote': {again}"
         )
-E       AssertionError: a case-only rename must not read as 'wrote': [PlacedExport(path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27284/test_tc_b100_57_group_word_com0/.s19tool/workarea/splits/t_isle.bin'), action='wrote'), PlacedExport(path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27284/test_tc_b100_57_group_word_com0/.s19tool/workarea/splits/t_isle.addr'), action='wrote')]
+E       AssertionError: a case-only rename must not read as 'wrote': [PlacedExport(path=WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27284/test_tc_b100_57_group_word_com0/.s19tool/workarea/splits/t_isle.bin'), action='wrote'), PlacedExport(path=WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27284/test_tc_b100_57_group_word_com0/.s19tool/workarea/splits/t_isle.addr'), action='wrote')]
 E       assert False
 E        +  where False = all(<generator object test_tc_b100_57_group_word_compares_case_folded.<locals>.<genexpr> at 0x000001EC53D94450>)
 

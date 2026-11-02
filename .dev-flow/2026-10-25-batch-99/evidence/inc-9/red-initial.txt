@@ -62,7 +62,7 @@ E        +  where 0 = len([])
 tests\test_b99_truncation.py:154: AssertionError
 _________________ test_tc_b99_08_junk_tail_counted_not_parsed _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25982/test_tc_b99_08_junk_tail_count0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25982/test_tc_b99_08_junk_tail_count0')
 
     def test_tc_b99_08_junk_tail_counted_not_parsed(tmp_path):
         """A 100 000-line junk tail after the terminator: ONE notice stating the
@@ -84,7 +84,7 @@ E        +  where 100000 = len([{'error': 'Invalid byte count hex: JU', 'line': 
 tests\test_b99_truncation.py:193: AssertionError
 ___________________ test_tc_b99_08_wide_s6_image_no_notice ____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25982/test_tc_b99_08_wide_s6_image_n0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25982/test_tc_b99_08_wide_s6_image_n0')
 
     def test_tc_b99_08_wide_s6_image_no_notice(tmp_path):
         """An S6-counted image of MORE than 65 535 data records: the S5 width
@@ -149,7 +149,7 @@ E        +  where 0 = len([])
 tests\test_b99_truncation.py:245: AssertionError
 _________________ test_tc_b99_09_junk_tail_counted_not_parsed _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25982/test_tc_b99_09_junk_tail_count0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25982/test_tc_b99_09_junk_tail_count0')
 
     def test_tc_b99_09_junk_tail_counted_not_parsed(tmp_path):
         """A 100 000-line junk tail after the EOF: ONE notice stating the count,
@@ -171,7 +171,7 @@ E        +  where 0 = len([])
 tests\test_b99_truncation.py:277: AssertionError
 _ test_tc_b99_10_source_error_no_file[synth_no_terminator.s19-s19-S19-NO-TERMINATOR] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25982/test_tc_b99_10_source_error_no0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25982/test_tc_b99_10_source_error_no0')
 name = 'synth_no_terminator.s19', file_type = 's19', code = 'S19-NO-TERMINATOR'
 
     @pytest.mark.parametrize("name,file_type,code", _FLOW_DEFECTS)
@@ -205,7 +205,7 @@ E         + ok
 tests\test_b99_truncation.py:322: AssertionError
 _ test_tc_b99_10_source_error_no_file[synth_wrong_s5.s19-s19-S19-COUNT-MISMATCH] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25982/test_tc_b99_10_source_error_no1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25982/test_tc_b99_10_source_error_no1')
 name = 'synth_wrong_s5.s19', file_type = 's19', code = 'S19-COUNT-MISMATCH'
 
     @pytest.mark.parametrize("name,file_type,code", _FLOW_DEFECTS)
@@ -239,7 +239,7 @@ E         + ok
 tests\test_b99_truncation.py:322: AssertionError
 _ test_tc_b99_10_source_error_no_file[synth_after_terminator.s19-s19-S19-AFTER-TERMINATOR] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25982/test_tc_b99_10_source_error_no2')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25982/test_tc_b99_10_source_error_no2')
 name = 'synth_after_terminator.s19', file_type = 's19'
 code = 'S19-AFTER-TERMINATOR'
 
@@ -274,7 +274,7 @@ E         + ok
 tests\test_b99_truncation.py:322: AssertionError
 __ test_tc_b99_10_source_error_no_file[synth_hex_no_eof.hex-hex-HEX-NO-EOF] ___
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25982/test_tc_b99_10_source_error_no3')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25982/test_tc_b99_10_source_error_no3')
 name = 'synth_hex_no_eof.hex', file_type = 'hex', code = 'HEX-NO-EOF'
 
     @pytest.mark.parametrize("name,file_type,code", _FLOW_DEFECTS)
@@ -308,7 +308,7 @@ E         + ok
 tests\test_b99_truncation.py:322: AssertionError
 _ test_tc_b99_10_source_error_no_file[synth_hex_after_eof.hex-hex-HEX-AFTER-EOF] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25982/test_tc_b99_10_source_error_no4')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25982/test_tc_b99_10_source_error_no4')
 name = 'synth_hex_after_eof.hex', file_type = 'hex', code = 'HEX-AFTER-EOF'
 
     @pytest.mark.parametrize("name,file_type,code", _FLOW_DEFECTS)
@@ -342,7 +342,7 @@ E         + ok
 tests\test_b99_truncation.py:322: AssertionError
 ___________________ test_at_b99_03_pilot_status_and_issues ____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25982/test_at_b99_03_pilot_status_an0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25982/test_at_b99_03_pilot_status_an0')
 
     def test_at_b99_03_pilot_status_and_issues(tmp_path):
         """Load file (``l``) of the cut S19: the status line leads with
@@ -414,7 +414,7 @@ E       AssertionError: did not settle: load status line
 tests\test_b99_truncation.py:367: AssertionError
 ________________ test_at_b99_03_hostile_name_renders_literally ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25982/test_at_b99_03_hostile_name_re0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25982/test_at_b99_03_hostile_name_re0')
 
     def test_at_b99_03_hostile_name_renders_literally(tmp_path):
         """A hostile file name in the integrity-notice path renders literally:
@@ -475,7 +475,7 @@ E       AssertionError: did not settle: load status line
 tests\test_b99_truncation.py:367: AssertionError
 ___________________ test_at_b99_03_pilot_flow_source_fails ____________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25982/test_at_b99_03_pilot_flow_sour0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25982/test_at_b99_03_pilot_flow_sour0')
 
     def test_at_b99_03_pilot_flow_source_fails(tmp_path):
         """Flow Execution ``#fx_run`` over the cut S19: the lane log names the

@@ -65,17 +65,17 @@ holes in the *evidence*, which is what this station is for.
 
 ```bash
 export PYTHONIOENCODING=utf-8
-C:/Users/jjgh8/anaconda3/envs/s19env/python.exe \
-  ~/.claude/docs/tools/devflow-validate.py C:/Users/jjgh8/Github/s19_app
+<HOME>/anaconda3/envs/s19env/python.exe \
+  ~/.claude/docs/tools/devflow-validate.py <HOME>/Github/s19_app
 ```
 
 **Preflight (the three lines increment 5 shipped, printed above the first verdict):**
 
 ```
-devflow-validate · C:\Users\jjgh8\Github\s19_app
+devflow-validate · <HOME>\Github\s19_app
   git · 2.49.0, at or above the 2.28.0 floor
   stdout · encoding `utf-8`, errors `backslashreplace` -- every finding is emitted verbatim
-  filesystem · FOLDS CASE -- probed at C:\Users\jjgh8\AppData\Local\Temp, on the same volume as the tree under check
+  filesystem · FOLDS CASE -- probed at <HOME>\AppData\Local\Temp, on the same volume as the tree under check
 ```
 
 **Result line:**
@@ -296,7 +296,7 @@ from this batch's pytest suite, and the two were counted separately.
 | **CI on the unmerged tail** | **ABSENT — no run exists** | `gh run list` shows the newest `tui-ci` run at `a2a2534`, 2026-08-31T03:10:34Z. **None of `a679ee6`, `c4e6fe5`, `ed03b10`, `c118f6e`, `cf24e29`, `976476d` has ever been through CI.** They are pushed to the branch with **no PR open**, so no `pull_request` run was triggered either |
 
 **The local run, executed for this close.** `pytest -q -m "not slow"` on
-`C:/Users/jjgh8/anaconda3/envs/s19env/python.exe` (3.11.15), 2026-09-03. **pytest's own summary
+`<HOME>/anaconda3/envs/s19env/python.exe` (3.11.15), 2026-09-03. **pytest's own summary
 line, verbatim:**
 
 ```

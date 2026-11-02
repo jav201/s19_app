@@ -7,7 +7,7 @@
 **Constraint honoured:** audit only — `git status --porcelain` shows `M .dev-flow/state.json` +
 `?? .dev-flow/2026-07-26-batch-63/` and nothing else; `git diff --numstat origin/main -- s19_app/`
 is **empty**. Counterfactuals ran in a `git archive HEAD s19_app` export at the short root
-`C:/Users/jjgh8/AppData/Local/Temp/claude/b63/g2`; `/b63/{a,b,g1,qa,r3}` untouched. Bounded probes:
+`<HOME>/AppData/Local/Temp/claude/b63/g2`; `/b63/{a,b,g1,qa,r3}` untouched. Bounded probes:
 max V=3, max 400 entries/class, K=200, R=50; **peak observed 0.32 MB**; the declared-domain D1
 fixture was **never built**; every temp tree removed in a `finally`.
 

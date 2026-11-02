@@ -13,7 +13,7 @@ The open rows below are not trust-boundary breaks:
 
 This clearance is not ship authority and not the operator's authorization.
 
-Scope: `git diff 8947666..741cc07 -- s19_app tests` on `C:/Users/jjgh8/Github/s19_app-b100-inc9b` (branch `b100-inc9b`, commit `741cc07`). Source files: `s19_app/tui/app.py`, `screens.py`, `styles.tcss`, `__init__.py`. Design read: `inc-9b/E3-security.md`, `E3-rulings.md` (round-3 addenda), `E4-integration-notes.md` (SR-1 … SR-7), `E4-app-notes.md`, `codewire/proto-9b-app.md`, `E1-requirements-draft.md`.
+Scope: `git diff 8947666..741cc07 -- s19_app tests` on `<HOME>/Github/s19_app-b100-inc9b` (branch `b100-inc9b`, commit `741cc07`). Source files: `s19_app/tui/app.py`, `screens.py`, `styles.tcss`, `__init__.py`. Design read: `inc-9b/E3-security.md`, `E3-rulings.md` (round-3 addenda), `E4-integration-notes.md` (SR-1 … SR-7), `E4-app-notes.md`, `codewire/proto-9b-app.md`, `E1-requirements-draft.md`.
 
 Environment: Python 3.11.15, Textual 8.2.8 (`s19env`), on Windows. Probes are under the session scratchpad (`rev9b-security/`), with `LOCALAPPDATA` pointed at the scratchpad. The tree was not edited.
 

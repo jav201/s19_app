@@ -23,7 +23,7 @@ F....................................................................... [ 93%]
 ...............................                                          [100%]
 ============================== warnings summary ===============================
 ..\..\anaconda3\Lib\site-packages\pytest_textual_snapshot.py:367
-  C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_textual_snapshot.py:367: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  <HOME>\anaconda3\Lib\site-packages\pytest_textual_snapshot.py:367: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
     now=datetime.utcnow(),
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
@@ -35,7 +35,7 @@ Textual Snapshot Report
 
 View the failure report.
 
-C:\Users\jjgh8\Github\s19_app\snapshot_report.html
+<HOME>\Github\s19_app\snapshot_report.html
 
 =========================== short test summary info ===========================
 FAILED tests/test_report_field_census.py::test_a16_canonicaliser_residue_guard_can_actually_fire

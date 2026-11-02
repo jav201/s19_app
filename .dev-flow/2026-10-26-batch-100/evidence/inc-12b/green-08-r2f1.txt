@@ -1,4 +1,4 @@
 R2-F1 fix (app.py routed install: no LoadResultScreen when a quit is confirmed); xfail mark removed
-C:\Users\jjgh8\Github\s19_app-b100-inc12b\s19_app\__init__.py
+<HOME>\Github\s19_app-b100-inc12b\s19_app\__init__.py
 ........                                                                 [100%]
 8 passed in 111.15s (0:01:51)

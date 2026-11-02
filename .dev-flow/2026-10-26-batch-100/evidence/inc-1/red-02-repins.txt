@@ -1,11 +1,11 @@
 cmd: python -m pytest -q -p no:cacheprovider <re-pinned nodes>
-tree: /c/Users/jjgh8/Github/s19_app-b100-inc1 (detached main, pre-change)
+tree: <HOME>/Github/s19_app-b100-inc1 (detached main, pre-change)
 
 ..F.                                                                     [100%]
 ================================== FAILURES ===================================
 ____________ test_tc_b99_31_changed_bytes_take_the_next_free_name _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27156/test_tc_b99_31_changed_bytes_t0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27156/test_tc_b99_31_changed_bytes_t0')
 
     def test_tc_b99_31_changed_bytes_take_the_next_free_name(tmp_path: Path) -> None:
         from s19_app.tui import segment_split_view as ssv

@@ -18,7 +18,7 @@
 ## 0 · Verify the ground before trusting anything here
 
 ```bash
-cd <repo-root>                                            # C:\Users\jjgh8\Github\s19_app, branch main
+cd <repo-root>                                            # <HOME>\Github\s19_app, branch main
 python ~/.claude/docs/tools/devflow-validate.py .         # expect: 4 block · 284 notice · 14 n/a  ← see §5
 #   V20 lines: 4 × "committed copy differs" — the flow rev bumped, NOT a corpus change
 #   V22 line : "276 of 544 batch-declared ids are not reflected in the living canon"

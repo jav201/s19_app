@@ -5,10 +5,10 @@
    "test": "cwaudit/test_t4_a2l_encode.py::test_t4a_rat_func_encode_demo",
    "depth": 0,
    "in": {
-    "path": "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_00_public\\ASAP2_Demo_V161.a2l"
+    "path": "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_00_public\\ASAP2_Demo_V161.a2l"
    },
    "out": {
-    "path": "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_00_public\\ASAP2_Demo_V161.a2l",
+    "path": "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_00_public\\ASAP2_Demo_V161.a2l",
     "sections": [
      {
       "name": "PROJECT",
@@ -2084,7 +2084,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_00_public\\ASAP2_Demo_V161.a2l": [
+    "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_00_public\\ASAP2_Demo_V161.a2l": [
      "ASAP2_VERSION 1 61",
      "/begin PROJECT ASAP2_Example \"\"",
      "",
@@ -2492,10 +2492,10 @@
    "test": "cwaudit/test_t4_a2l_encode.py::test_t4b_rat_func_decode_demo",
    "depth": 0,
    "in": {
-    "path": "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_00_public\\ASAP2_Demo_V161.a2l"
+    "path": "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_00_public\\ASAP2_Demo_V161.a2l"
    },
    "out": {
-    "path": "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_00_public\\ASAP2_Demo_V161.a2l",
+    "path": "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_00_public\\ASAP2_Demo_V161.a2l",
     "sections": [
      {
       "name": "PROJECT",
@@ -4571,7 +4571,7 @@
     }
    },
    "files": {
-    "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_00_public\\ASAP2_Demo_V161.a2l": [
+    "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_00_public\\ASAP2_Demo_V161.a2l": [
      "ASAP2_VERSION 1 61",
      "/begin PROJECT ASAP2_Example \"\"",
      "",
@@ -4979,10 +4979,10 @@
    "test": "cwaudit/test_t4_a2l_encode.py::test_t4c_case03_msb_first_encode",
    "depth": 0,
    "in": {
-    "path": "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_03_overlapping_records\\firmware.a2l"
+    "path": "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_03_overlapping_records\\firmware.a2l"
    },
    "out": {
-    "path": "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_03_overlapping_records\\firmware.a2l",
+    "path": "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_03_overlapping_records\\firmware.a2l",
     "sections": [
      {
       "name": "PROJECT",
@@ -5131,7 +5131,7 @@
     "compu_tabs_by_name": {}
    },
    "files": {
-    "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_03_overlapping_records\\firmware.a2l": [
+    "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_03_overlapping_records\\firmware.a2l": [
      "/begin PROJECT CASE03 \"Synthetic project for S19Tool stress testing\"",
      "  /begin HEADER",
      "    VERSION \"1.0\"",
@@ -9463,7 +9463,7 @@
     "symbol_text": "ASAM.C.SCALAR.SWORD.RAT_FUNC_DIV_10",
     "value_text": "30",
     "a2l_data": {
-     "path": "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_00_public\\ASAP2_Demo_V161.a2l",
+     "path": "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_00_public\\ASAP2_Demo_V161.a2l",
      "sections": [
       {
        "name": "PROJECT",
@@ -11565,7 +11565,7 @@
     "symbol_text": "ASAM.C.SCALAR.SWORD.RAT_FUNC_DIV_10",
     "value_text": "25",
     "a2l_data": {
-     "path": "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_00_public\\ASAP2_Demo_V161.a2l",
+     "path": "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_00_public\\ASAP2_Demo_V161.a2l",
      "sections": [
       {
        "name": "PROJECT",
@@ -13669,7 +13669,7 @@
     "symbol_text": "ASAM.C.SCALAR.SWORD.LINEAR_MUL_2",
     "value_text": "30",
     "a2l_data": {
-     "path": "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_00_public\\ASAP2_Demo_V161.a2l",
+     "path": "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_00_public\\ASAP2_Demo_V161.a2l",
      "sections": [
       {
        "name": "PROJECT",
@@ -20157,7 +20157,7 @@
    "depth": 0,
    "in": {
     "a2l_data": {
-     "path": "C:\\Users\\jjgh8\\Github\\s19_app-cwaudit-data\\examples\\case_00_public\\ASAP2_Demo_V161.a2l",
+     "path": "<HOME>\\Github\\s19_app-cwaudit-data\\examples\\case_00_public\\ASAP2_Demo_V161.a2l",
      "sections": [
       {
        "name": "PROJECT",

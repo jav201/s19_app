@@ -6,55 +6,55 @@ fd5c696021bd6972466ab96aa33b53ac55b2be20874a21bceeaf90ab7ad6f621 *s19_app/tui/ap
 6ceb4f9bb2525e44ebe4ac2eb8ef0ba0f4389a5d67b3fe5f61689eb98cdfb558 *s19_app/tui/open_folder_chip.py
 .FFFFF.F.F.FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.FFFFF.                  [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:842: AttributeError: 'PipelineLayout' object has no attribute 'spare'
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:842: AttributeError: 'PipelineLayout' object has no attribute 'spare'
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:842: AttributeError: 'PipelineLayout' object has no attribute 'spare'
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:842: AttributeError: 'PipelineLayout' object has no attribute 'spare'
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:842: AttributeError: 'PipelineLayout' object has no attribute 'spare'
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1011: AssertionError: ((163, 56), 3, 1)
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1011: AssertionError: ((223, 60), 3, 1)
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1073: AssertionError: ((118, 54), 'before_run', [], [17, 19, 20])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1073: AssertionError: ((118, 53), 'before_run', [], [17, 19, 20])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1073: AssertionError: ((220, 60), 'before_run', [], [17, 19, 20])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1073: AssertionError: ((118, 54), 'after_run', [], [17, 19, 20])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1073: AssertionError: ((118, 53), 'after_run', [], [17, 19, 20])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1073: AssertionError: ((220, 60), 'after_run', [], [17, 19, 20])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:270: TypeError: sequence index must be integer, not 'slice'
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:321: AssertionError: (['📂 Open flows/: no active project — load a project first.'], ['📂 Open flows/: no active project — load a project first.'])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:695: TypeError: sequence index must be integer, not 'slice'
-C:\Users\jjgh8\Github\s19_app\tests\test_open_folder_chips.py:490: TypeError: sequence index must be integer, not 'slice'
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1033: AssertionError: Flow: demo  ✓  LOAD → PATCH                                                               session C:/w/proj1
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1068: AssertionError:  Flow: patch_chain  ✓  LOAD → PATCH → CHECK → WRITE-OUT            session …n_paints_s0\.s19tool\workarea\proj1
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1117: AssertionError: []
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1117: AssertionError: []
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1117: AssertionError: []
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] source image_ref carries a NUL character - not a path']
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] patch change_doc_ref carries a NUL character - not a path']
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] check check_doc_ref carries a NUL character - not a path']
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] crc config_ref carries a NUL character - not a path']
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] write_out output_name carries a NUL character - not a path']
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] a2b image_a.ref carries a NUL character - not a path']
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] a2b image_b.ref carries a NUL character - not a path']
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] external_step log_ref carries a NUL character - not a path']
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] external_step output_path carries a NUL character - not a path']
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1537: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] write_out output_name carries a NUL character - not a path']
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1162: AssertionError:   ISSUES
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1436: AssertionError:   ISSUES
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1436: AssertionError:   ISSUES
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_flow_persistence_ui.py:145: AssertionError: assert ('· saved' in 'Flow: flow  ✓                              session (no active project)')
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_flow_persistence_ui.py:321: AssertionError: assert '· unsaved' in 'Flow: flow  ●  LOAD                        session (no active project)'
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_flow_persistence_ui.py:423: AssertionError: assert ('· saved' in 'Flow: other  ✓  LOAD                       session (no active project)')
-C:\Users\jjgh8\Github\s19_app\tests\test_tui_flow_builder_b94.py:319: AssertionError: assert ('chain1' in 'Flow: chain1  ✓  LOAD → PATCH                                      session (no active project)' and '· saved' in 'Flow: chain1  ✓  LOAD → PATCH                                      session (no active project)')
-C:\Users\jjgh8\Github\s19_app\tests\test_flow_builder_render.py:287: AssertionError: assert 'ISSUES' == 'NOTICES'
+<HOME>\Github\s19_app\tests\test_b97_width.py:842: AttributeError: 'PipelineLayout' object has no attribute 'spare'
+<HOME>\Github\s19_app\tests\test_b97_width.py:842: AttributeError: 'PipelineLayout' object has no attribute 'spare'
+<HOME>\Github\s19_app\tests\test_b97_width.py:842: AttributeError: 'PipelineLayout' object has no attribute 'spare'
+<HOME>\Github\s19_app\tests\test_b97_width.py:842: AttributeError: 'PipelineLayout' object has no attribute 'spare'
+<HOME>\Github\s19_app\tests\test_b97_width.py:842: AttributeError: 'PipelineLayout' object has no attribute 'spare'
+<HOME>\Github\s19_app\tests\test_b97_width.py:1011: AssertionError: ((163, 56), 3, 1)
+<HOME>\Github\s19_app\tests\test_b97_width.py:1011: AssertionError: ((223, 60), 3, 1)
+<HOME>\Github\s19_app\tests\test_b97_width.py:1073: AssertionError: ((118, 54), 'before_run', [], [17, 19, 20])
+<HOME>\Github\s19_app\tests\test_b97_width.py:1073: AssertionError: ((118, 53), 'before_run', [], [17, 19, 20])
+<HOME>\Github\s19_app\tests\test_b97_width.py:1073: AssertionError: ((220, 60), 'before_run', [], [17, 19, 20])
+<HOME>\Github\s19_app\tests\test_b97_width.py:1073: AssertionError: ((118, 54), 'after_run', [], [17, 19, 20])
+<HOME>\Github\s19_app\tests\test_b97_width.py:1073: AssertionError: ((118, 53), 'after_run', [], [17, 19, 20])
+<HOME>\Github\s19_app\tests\test_b97_width.py:1073: AssertionError: ((220, 60), 'after_run', [], [17, 19, 20])
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:270: TypeError: sequence index must be integer, not 'slice'
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:321: AssertionError: (['📂 Open flows/: no active project — load a project first.'], ['📂 Open flows/: no active project — load a project first.'])
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:695: TypeError: sequence index must be integer, not 'slice'
+<HOME>\Github\s19_app\tests\test_open_folder_chips.py:490: TypeError: sequence index must be integer, not 'slice'
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1033: AssertionError: Flow: demo  ✓  LOAD → PATCH                                                               session C:/w/proj1
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1068: AssertionError:  Flow: patch_chain  ✓  LOAD → PATCH → CHECK → WRITE-OUT            session …n_paints_s0\.s19tool\workarea\proj1
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1117: AssertionError: []
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1117: AssertionError: []
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1117: AssertionError: []
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] source image_ref carries a NUL character - not a path']
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] patch change_doc_ref carries a NUL character - not a path']
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] check check_doc_ref carries a NUL character - not a path']
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] crc config_ref carries a NUL character - not a path']
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] write_out output_name carries a NUL character - not a path']
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] a2b image_a.ref carries a NUL character - not a path']
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] a2b image_b.ref carries a NUL character - not a path']
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] external_step log_ref carries a NUL character - not a path']
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] external_step output_path carries a NUL character - not a path']
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1537: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] write_out output_name carries a NUL character - not a path']
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1162: AssertionError:   ISSUES
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1436: AssertionError:   ISSUES
+<HOME>\Github\s19_app\tests\test_b97_flow_builder.py:1436: AssertionError:   ISSUES
+<HOME>\Github\s19_app\tests\test_tui_flow_persistence_ui.py:145: AssertionError: assert ('· saved' in 'Flow: flow  ✓                              session (no active project)')
+<HOME>\Github\s19_app\tests\test_tui_flow_persistence_ui.py:321: AssertionError: assert '· unsaved' in 'Flow: flow  ●  LOAD                        session (no active project)'
+<HOME>\Github\s19_app\tests\test_tui_flow_persistence_ui.py:423: AssertionError: assert ('· saved' in 'Flow: other  ✓  LOAD                       session (no active project)')
+<HOME>\Github\s19_app\tests\test_tui_flow_builder_b94.py:319: AssertionError: assert ('chain1' in 'Flow: chain1  ✓  LOAD → PATCH                                      session (no active project)' and '· saved' in 'Flow: chain1  ✓  LOAD → PATCH                                      session (no active project)')
+<HOME>\Github\s19_app\tests\test_flow_builder_render.py:287: AssertionError: assert 'ISSUES' == 'NOTICES'
 =========================== short test summary info ===========================
 FAILED tests/test_b97_width.py::test_tc_b97_38_pipeline_spare_cells_go_to_the_cables[2]
 FAILED tests/test_b97_width.py::test_tc_b97_38_pipeline_spare_cells_go_to_the_cables[3]
@@ -111,10 +111,10 @@ FAILED tests/test_flow_builder_render.py::test_at085a_notices_load_shows_warning
 6ceb4f9bb2525e44ebe4ac2eb8ef0ba0f4389a5d67b3fe5f61689eb98cdfb558 *s19_app/tui/open_folder_chip.py
 FFFF                                                                     [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:290: AssertionError: ('reports', ['📂 Open reports/: no active project — load a project first.'])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:326: AssertionError: (['📂 Open flows/: no active project — load a project first.'], ['📂 Open flows/: no active project — load a project first.'])
-C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:717: AssertionError: ['📂 Open session: no active project — load a project first.']
-C:\Users\jjgh8\Github\s19_app\tests\test_open_folder_chips.py:506: AssertionError: no status line at mount (LED-…97.24)
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:290: AssertionError: ('reports', ['📂 Open reports/: no active project — load a project first.'])
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:326: AssertionError: (['📂 Open flows/: no active project — load a project first.'], ['📂 Open flows/: no active project — load a project first.'])
+<HOME>\Github\s19_app\tests\test_b97_chips_help.py:717: AssertionError: ['📂 Open session: no active project — load a project first.']
+<HOME>\Github\s19_app\tests\test_open_folder_chips.py:506: AssertionError: no status line at mount (LED-…97.24)
 =========================== short test summary info ===========================
 FAILED tests/test_b97_chips_help.py::test_tc_b97_29_no_project_chips_disabled_with_their_own_reason
 FAILED tests/test_b97_chips_help.py::test_tc_b97_29_no_status_line_at_startup_without_a_project

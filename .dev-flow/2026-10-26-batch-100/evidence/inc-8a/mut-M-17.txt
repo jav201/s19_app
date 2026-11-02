@@ -6,14 +6,14 @@
 #   |                     records_document or carried_active_document is not None
 # edit 1 NEW:
 #   |                     records_document
-# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c
+# cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c
 # env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
-# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_save_image.py::test_tc_b100_59_open_project_carry_sets_the_keys
+# command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_save_image.py::test_tc_b100_59_open_project_carry_sets_the_keys
 # started 2026-10-30T23:10:06Z  finished 2026-10-30T23:10:19Z  rc=1
 F..F                                                                     [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c\tests\test_b100_save_image.py:1633: AssertionError: (('schema_version', 'active_variant', 'batch', 'assignments', 'files', 'active_document'), ('schema_version', 'active_variant', 'batch', 'assignments', 'files'))
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c\tests\test_b100_save_image.py:1633: AssertionError: (('schema_version', 'active_variant', 'batch', 'assignments', 'files', 'active_document'), ('schema_version', 'active_variant', 'batch', 'assignments', 'files'))
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c\tests\test_b100_save_image.py:1633: AssertionError: (('schema_version', 'active_variant', 'batch', 'assignments', 'files', 'active_document'), ('schema_version', 'active_variant', 'batch', 'assignments', 'files'))
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-c\tests\test_b100_save_image.py:1633: AssertionError: (('schema_version', 'active_variant', 'batch', 'assignments', 'files', 'active_document'), ('schema_version', 'active_variant', 'batch', 'assignments', 'files'))
 =========================== short test summary info ===========================
 FAILED tests/test_b100_save_image.py::test_tc_b100_59_open_project_carry_sets_the_keys[present]
 FAILED tests/test_b100_save_image.py::test_tc_b100_59_open_project_carry_sets_the_keys[too-large]

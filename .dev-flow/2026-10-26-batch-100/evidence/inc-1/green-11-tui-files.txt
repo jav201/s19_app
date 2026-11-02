@@ -1,12 +1,12 @@
 cmd: pytest -q -p no:cacheprovider tests/test_unified_write.py tests/test_tui_patch_editor_v2.py tests/test_tui_variants.py tests/test_manifest_writer.py tests/test_open_folder_chips.py tests/test_crc_designer_view.py  (fix pass 2 — remaining reverse-census files)
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 — detached e044112 + inc1 + fix1 + fix2
+tree: <HOME>\Github\s19_app-b100-inc1 — detached e044112 + inc1 + fix1 + fix2
 ........................F..................F..............F........F.... [ 47%]
 ........................................................................ [ 95%]
 .......                                                                  [100%]
 ================================== FAILURES ===================================
 ____________________________ test_save_back_prompt ____________________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27310/test_save_back_prompt0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27310/test_save_back_prompt0')
 
     def test_save_back_prompt(tmp_path: Path) -> None:
         """The post-apply prompt offers an editable suggestion; decline writes
@@ -108,7 +108,7 @@ E       assert False is True
 tests\test_tui_patch_editor_v2.py:623: AssertionError
 ______________ test_at032b_clarity_added_action_wiring_unchanged ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27310/test_at032b_clarity_added_acti0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27310/test_at032b_clarity_added_acti0')
 
     def test_at032b_clarity_added_action_wiring_unchanged(tmp_path: Path) -> None:
         """AT-032b (regression) — clarity added; the run_checks wiring unchanged.
@@ -189,7 +189,7 @@ E       assert False is True
 tests\test_tui_patch_editor_v2.py:1898: AssertionError
 _____________ test_at_batch41_escape_cancels_changeset_json_popup _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27310/test_at_batch41_escape_cancels0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27310/test_at_batch41_escape_cancels0')
 
     def test_at_batch41_escape_cancels_changeset_json_popup(tmp_path: Path) -> None:
         """Escape dismisses the ChangeSetJsonScreen popup as a Cancel (batch-41).
@@ -314,7 +314,7 @@ E           textual.css.query.NoMatches: No nodes match '#changeset_json_text' o
 ..\..\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: NoMatches
 _________ test_at068b_per_entry_json_popup_edits_only_selected_entry __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27310/test_at068b_per_entry_json_pop0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27310/test_at068b_per_entry_json_pop0')
 
     def test_at068b_per_entry_json_popup_edits_only_selected_entry(
         tmp_path: Path,

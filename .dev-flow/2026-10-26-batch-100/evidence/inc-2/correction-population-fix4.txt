@@ -1,5 +1,5 @@
 cmd: grep -rln "_handle_save_dialog\|list_projects\|sanitize_project_name\|_abort_save\|is_windows_device_name\|_write_and_verify_manifest\|walk_tree_no_links\|gather_project_artifacts\|GatherOutcome\|created_homes" tests/ --include=*.py
-tree: C:/Users/jjgh8/Github/s19_app-b100-inc2 (detached 2edfee2, Inc 2 + fix passes 1-3 + LED .53 redesign)
+tree: <HOME>/Github/s19_app-b100-inc2 (detached 2edfee2, Inc 2 + fix passes 1-3 + LED .53 redesign)
 
 tests/test_b100_reuse.py
 tests/test_b100_save_guards.py

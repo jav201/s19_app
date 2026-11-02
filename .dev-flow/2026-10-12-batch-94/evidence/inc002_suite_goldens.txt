@@ -1,4 +1,4 @@
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+<HOME>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -6,7 +6,7 @@ The event loop scope for asynchronous fixtures will default to the fixture cachi
 ================================== FAILURES ===================================
 ____________ test_tc330_before_after_row_reveal_hide_state_machine ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19131/test_tc330_before_after_row_re0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-19131/test_tc330_before_after_row_re0')
 
     def test_tc330_before_after_row_reveal_hide_state_machine(
         tmp_path: Path,
@@ -172,7 +172,7 @@ E                   textual.worker.WorkerFailed: Worker raised exception: NoMatc
 ..\..\anaconda3\Lib\site-packages\textual\app.py:2218: WorkerFailed
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────╮
-│ C:\Users\jjgh8\Github\s19_app-b94\s19_app\tui\app.py:12631 in set_status     │
+│ <HOME>\Github\s19_app-b94\s19_app\tui\app.py:12631 in set_status     │
 │                                                                              │
 │   12628 │   │   self.set_status(f"Goto 0x{addr:08X}")                        │
 │   12629 │                                                                    │
@@ -192,7 +192,7 @@ E                   textual.worker.WorkerFailed: Worker raised exception: NoMatc
 │ │           )                                                              │ │
 │ ╰──────────────────────────────────────────────────────────────────────────╯ │
 │                                                                              │
-│ C:\Users\jjgh8\Github\s19_app-b94\s19_app\tui\app.py:12650 in                │
+│ <HOME>\Github\s19_app-b94\s19_app\tui\app.py:12650 in                │
 │ _append_log_line                                                             │
 │                                                                              │
 │   12647 │   │   cap = max(50, getattr(self.size, "width", 0))                │
@@ -218,7 +218,7 @@ E                   textual.worker.WorkerFailed: Worker raised exception: NoMatc
 │ │           apply a change document'+34                                    │ │
 │ ╰──────────────────────────────────────────────────────────────────────────╯ │
 │                                                                              │
-│ C:\Users\jjgh8\Github\s19_app-b94\s19_app\tui\app.py:12656 in                │
+│ <HOME>\Github\s19_app-b94\s19_app\tui\app.py:12656 in                │
 │ _render_log_lines                                                            │
 │                                                                              │
 │   12653 │   │   lines = list(self.log_lines)                                 │
@@ -249,7 +249,7 @@ NoMatches: No nodes match '#log_line_1' on Screen(id='_default')
 FAILED tests/test_before_after_report.py::test_tc330_before_after_row_reveal_hide_state_machine
 1 failed, 14 passed in 20.12s
 exit=1 (before_after)
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+<HOME>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))

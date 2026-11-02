@@ -187,7 +187,7 @@ Regression companion: `tests/test_address_census.py` — 23 passed.
 |---|---|
 | Mutation applied | three (one per LLR), each applied, shown RED, reverted and the file hash returned to baseline |
 | Instrument | project code: the implementer's own hand via the Edit tool; restore checked by SHA-256 against `baseline-hashes.txt` |
-| Where it ran | this worktree (`C:\Users\jjgh8\Github\s19_app-b99-inc3b`), run by the implementer |
+| Where it ran | this worktree (`<HOME>\Github\s19_app-b99-inc3b`), run by the implementer |
 | Transcript | `evidence/inc-3b/mut-LLR-155.5.txt` · `mut-LLR-155.6.txt` · `mut-LLR-155.3.txt` (each: target nodes FAILED) |
 | Restore proven by | `flow_execution_service.py` → `262b233c…85b557` and `project_gather_service.py` → `04f30496…4b0f5` both RESTORED (post-revert hash check, same transcript as `baseline-hashes.txt`) |
 | Bytecode cache | run with `PYTHONDONTWRITEBYTECODE=1` (C-46) |
@@ -235,26 +235,26 @@ All under `artifact_homes.evidence` = `.dev-flow/2026-10-25-batch-99/evidence/in
 
 | Evidence artifact | Path | SHA-256 |
 |---|---|---|
-| RED baseline TC-B99-15/16 | `red-tc15-16.txt` | `c40ef15ba9af8cf9bfe943d8e5dbb68e51d95549c2b6427cbf3cd7e706f2e7ac` |
-| RED baseline census + gather | `red-census-gather.txt` | `7fb985f71cb620bb2da73d55a12571059efd295c86828fb5123af9e853f0ddb7` |
-| RED baseline AT + UX-C10 | `red-at04-uxc10.txt` | `5ffd6243009e3ca6de8074c8b06bbf7cc35b01fa48e7d4e432623aab7f05d0e3` |
-| GREEN TC-B99-15/16 + TC-B99-13 arms + UX-C10 (7 passed) | `green-tc15-16-census.txt` | `41bc27c68c67093313cb2d72bb0221a4559ef5406cc3717a154620b4e81111e5` |
-| GREEN AT-B99-04 duplicate arm | `green-at04-dup.txt` | `18f0f9ca631da8f751daee09281d3f693683c10f6fe697de9bc1813bcda51e9b` |
+| RED baseline TC-B99-15/16 | `red-tc15-16.txt` | `a30a4ff0214f4b51650502213674da17fdb963e0f42ac8069b5f4719967a83e9` |
+| RED baseline census + gather | `red-census-gather.txt` | `b221209648a85694147bea25b4872f875b1ffbab738c5101a09e7b6f2eeb19bf` |
+| RED baseline AT + UX-C10 | `red-at04-uxc10.txt` | `2de90520fde3a5a3e25682bbfbd45935004e96cfa2b55038082e8951a56087aa` |
+| GREEN TC-B99-15/16 + TC-B99-13 arms + UX-C10 (7 passed) | `green-tc15-16-census.txt` | `68647642096d12e86903dd80e7138749f9390359441be2a0fffa119148b0658c` |
+| GREEN AT-B99-04 duplicate arm | `green-at04-dup.txt` | `ad8a4eff263c52c6f923b13401694fbeec98d4731fe6275181afc3f55d60b595` |
 | GREEN full staging + address census (54 passed) | `green-full-staging.txt` | `59dc5a61cf434af7142f6443e75aeea5ef6deddb8545e3f1029bb33ea07df70e` |
-| Mutation LLR-155.5 (KILLED) | `mut-LLR-155.5.txt` | `9a37aea0f9d64d1ec8abf31e5a845c09099e66201e7becf391dc7580cd0f621c` |
-| Mutation LLR-155.6 (KILLED) | `mut-LLR-155.6.txt` | `9fe9960a5ab4f415cc5df04b3ca7b1371fe7ede460e0585af188cc8c501a33f8` |
-| Mutation LLR-155.3 (KILLED) | `mut-LLR-155.3.txt` | `cf6474f6c2f394888afdfb4302846d8526f6bfe081af960f0fa48786a29b395d` |
+| Mutation LLR-155.5 (KILLED) | `mut-LLR-155.5.txt` | `f97393b704c3c7835e51e9df1939c1d90c838022e57b0363ae6f6e7ca44d2d99` |
+| Mutation LLR-155.6 (KILLED) | `mut-LLR-155.6.txt` | `e35da1760d9d6db76f34b7d49baffbde0c1cd0fb549d138e9acb830a6561125b` |
+| Mutation LLR-155.3 (KILLED) | `mut-LLR-155.3.txt` | `d46df7884289388d7d5b1cb692fe11dd4127382925f7b73cff6dd26e43303f86` |
 | Pre-mutation hashes (baseline tree) | `baseline-hashes.txt` | `a8d48a1ea955f57bed44a48ffe22275f1586e9fecd321952b6ea0d55c4d4b3c8` |
 | Reverse census probe | `reverse-census.txt` | `eeb520a876ae33783bc8415e44e87d959a1a10012c6236c9bf14b18687c7f09b` |
-| Census batch 1 (discovery run: 9 re-pins found, 57 other nodes passed) | `green-census-flows.txt` | `e89fbab33f6d8d8c6f5bf54a90f7abf6b1f62ce800de165f5e6f8d3e7ec0252d` |
+| Census batch 1 (discovery run: 9 re-pins found, 57 other nodes passed) | `green-census-flows.txt` | `7220aeeed55f30f9171770bac389bfb3769fd8fe27489c07cd2d7b9284374289` |
 | Census batch 1 re-run after the re-pins (34 passed) | `green-repin.txt` | `60ad208a45461a4395b297058a9cfc638c64df7e63b3dfd32c0d5dfd2a14ece8` |
-| Census batch 2: b97/verify/gather files (discovery run: 31 THREE-set nodes flagged, 184 other nodes passed) | `green-census-b97.txt` | `3024393a6e73d3735c65abee28e9a100c9b7b5acc9a9170bef8eacb138a6e438` |
+| Census batch 2: b97/verify/gather files (discovery run: 31 THREE-set nodes flagged, 184 other nodes passed) | `green-census-b97.txt` | `87010ef30e1abc941fdfc9e0fd0af851bbebf898bb2d48b654fc556437508a9f` |
 | Census batch 2 re-pin spot checks (11 passed then 8 passed) | `green-repin-b97-spot.txt` · `green-repin-b97-spot2.txt` | `819addf77f64c9b69b5d95a6582ffe6dafb4949248cc733c4c384a02dcd3168b` · `819addf77f64c9b69b5d95a6582ffe6dafb4949248cc733c4c384a02dcd3168b` |
-| Census batch 2 full re-run (153 passed + 1 load-flaky dwell-timing node, see below) | `green-repin-b97-full.txt` | `e85c2713f7d10f9626edfb371fd878b02e8ef3952488379b5635677e8753db9d` |
+| Census batch 2 full re-run (153 passed + 1 load-flaky dwell-timing node, see below) | `green-repin-b97-full.txt` | `141172901d87b1157fa99c09cefcb04979d13ca94fc7b21a59140513fdfe9b04` |
 | The flaky node's isolated re-run (1 passed) | `green-repin-b97-burst.txt` | `bf872aa7f69c36d06538a612d0b385d960a1f8a8d16906c04b0a2d54cec36f5d` |
-| Census batch 3 (**FULL run, not a timeout**: 5 failed, 500 passed in 2459.16s — description corrected in review round 1; the 5 failures classified against the baseline ledger in §6) | `green-census-batch3.txt` | `96acb69e8942a75d7d7354f78913b7bbe507e5379e06cdba7b5c38051a387a22` |
-| Census batch 3 re-run: the remaining files (359 passed + 1 pre-existing base-RED, see §6) | `green-census-batch3-rest.txt` | `51eb6acdd6afafd6c5bbd5d6243a1921dc85a9cf27d69f8861da91c892c42016` |
-| The pre-existing node's re-observation (deterministic base-RED, unchanged by this increment) | `green-batch3-at031b.txt` | `8481582be93451e6c16678734e2a692981113545e6f8f096d1371046f797caad` |
+| Census batch 3 (**FULL run, not a timeout**: 5 failed, 500 passed in 2459.16s — description corrected in review round 1; the 5 failures classified against the baseline ledger in §6) | `green-census-batch3.txt` | `67473fee88847a33edaabc52fd8f33f80dcf10af585739ac3982a5ca486440a3` |
+| Census batch 3 re-run: the remaining files (359 passed + 1 pre-existing base-RED, see §6) | `green-census-batch3-rest.txt` | `29ad5f4b031a99658b9cd364d3f7e2d7eb3162d15d7b359754798ee96b5c862e` |
+| The pre-existing node's re-observation (deterministic base-RED, unchanged by this increment) | `green-batch3-at031b.txt` | `8dae666fd8c19588570878cae43ac85abb8c8c065109c35790f96aa347869552` |
 | Census batch 3 re-run: `test_b97_width.py` (145 passed) | `green-census-batch3-width.txt` | `79539abcbb10e8669bca6490e12b66de306807048209ec2847787dba233931b2` |
 | GREEN final tree, the increment's nodes against the finished worktree (11 passed) | `green-final-nodes.txt` | `7be6abfacc3a1a922acdca6844ef098f13651fc3812ce19defa9fdaa430ea4af` |
 | Review round 1 — pre-fix baseline hashes (the 4 files the round edits) | `baseline-hashes-fix.txt` | `8d687bc3cbb9d0c2ce824c0dc6a235c64f984742898a2448edbb60af275c3faf` |
@@ -266,7 +266,7 @@ All under `artifact_homes.evidence` = `.dev-flow/2026-10-25-batch-99/evidence/in
 | Review round 1 — GREEN: AT-B99-04 (extended) + distinct-names guard + UX-C10 (3 passed) | `green-f2-at04-status.txt` | `2ccf515e9e9b4215b64cf752246e4f6352472f9ce419eb332fe5246eb53135e2` |
 | Review round 1 — RED probe: the F4a `write_text` census limb vs the pre-F4a dispositions (7 sites) | `red-f4a-census.txt` | `c95099203318b5c98839ced22a3737bcf754d7100db1d37967807a9c02c5f2de` |
 | Review round 1 — GREEN: the census arm (extended) + both gather arms (3 passed) | `green-f4a-census.txt` | `6237cdc6a4b90a34ebd06641ede6055ab4ac997c936c5fb485cc990946de99f0` |
-| Review round 1 — GREEN: the UX-C10 D7 painted-text rewrite through the pilot (1 passed) | `green-f4b-uxc10.txt` | `5c1214166dc09f67219629c42ebcb9cdfc1224f56f69275f2a13c7ab4714bb75` |
+| Review round 1 — GREEN: the UX-C10 D7 painted-text rewrite through the pilot (1 passed) | `green-f4b-uxc10.txt` | `27b82d9d6b0751008764e92dd67ea2ad7f8c7f5f33b69c75284440e9b6447bad` |
 | Review round 1 — GREEN: AT-B99-04 ×8 stability runs (8 passed) | `green-at04-x8.txt` | `e2e66923956442409cc9d11b2622b33d557fabc26b836105de728c08b6386505` |
 | Review round 1 — GREEN: staging + address census + id registry (68 passed) | `green-fix-staging-census-registry.txt` | `37337a137db6e8a8e3ed36af96b2ff5a8aeb66b0f5b7af7fc25036685ca1793c` |
 | Review round 1 — GREEN: project gather + chainset b94 (23 passed, F4c comment) | `green-fix-gather-chainset.txt` | `259df932368bd40162e16e52462c4bb6df236c446e3912e792167736be071676` |

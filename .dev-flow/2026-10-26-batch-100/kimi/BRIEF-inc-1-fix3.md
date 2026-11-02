@@ -1,10 +1,10 @@
 # Kimi brief — batch-100 Increment 1 · corrective pass 3 (bounded)
 
-Work in the same worktree, `C:\Users\jjgh8\Github\s19_app-b100-inc1`. It holds your Inc 1 changes plus fix passes 1 and 2, uncommitted; keep all of them. `BRIEF-COMMON.md` still applies. The SOURCE files stay at the same 4.
+Work in the same worktree, `<HOME>\Github\s19_app-b100-inc1`. It holds your Inc 1 changes plus fix passes 1 and 2, uncommitted; keep all of them. `BRIEF-COMMON.md` still applies. The SOURCE files stay at the same 4.
 
 **This pass is BOUNDED.** It is the operator's decision at the iteration cap. Change only what is listed here. If you find anything else, write it in `HANDOFF.md` and do not fix it.
 
-**Read first** (MAIN checkout): `C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-10-26-batch-100\03-increments\review-increment-001.md`, section "Round 3" (R3-1..R3-4). The reviewer's probe is `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\probe\r3_export_junctioned_base.py`.
+**Read first** (MAIN checkout): `<HOME>\Github\s19_app\.dev-flow\2026-10-26-batch-100\03-increments\review-increment-001.md`, section "Round 3" (R3-1..R3-4). The reviewer's probe is `<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\probe\r3_export_junctioned_base.py`.
 
 **Fix:**
 1. **R3-1 (HIGH, regression of fix pass 2).** At `segment_split_view.py` ≈842, `home, workarea_root = _guarded_destination(dest_dir, workarea_root)` overwrites the caller's root with the resolved one. Keep the caller's root for the two placement calls (≈947, ≈969), and use the resolved value only for the staging home. Use two distinct variables.

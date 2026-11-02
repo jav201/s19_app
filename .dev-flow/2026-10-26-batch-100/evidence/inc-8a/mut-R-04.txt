@@ -13,14 +13,14 @@
 #   |     DOCUMENT_UNREADABLE: "the file is not a change or check document the app can read",
 #   |     DOCUMENT_TOO_LARGE: "the file is too large",
 #   | }
-# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d
+# cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d
 # env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
-# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second tests/test_b100_save_image.py::test_tc_b100_59_open_project_carry_sets_the_keys[too-large]
+# command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second tests/test_b100_save_image.py::test_tc_b100_59_open_project_carry_sets_the_keys[too-large]
 # started 2026-10-30T23:11:26Z  finished 2026-10-30T23:11:32Z  rc=1
 FF                                                                       [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d\tests\test_b100_save_guards.py:2524: AssertionError: {'active_variant': 'firmware', 'assignments': {}, 'batch': [], 'files': {'firmware.s19': {'sha256': '8a35f3808f25ff85a9ce1100bbce23783a7031b82c6f3d14cc1f749a0df40e51', 'size': 358}}, ...}
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d\tests\test_b100_save_image.py:1632: AssertionError: {'active_variant': 'firmware', 'assignments': {}, 'batch': [], 'files': {'firmware.s19': {'sha256': '8a35f3808f25ff85a9ce1100bbce23783a7031b82c6f3d14cc1f749a0df40e51', 'size': 358}}, ...}
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d\tests\test_b100_save_guards.py:2524: AssertionError: {'active_variant': 'firmware', 'assignments': {}, 'batch': [], 'files': {'firmware.s19': {'sha256': '8a35f3808f25ff85a9ce1100bbce23783a7031b82c6f3d14cc1f749a0df40e51', 'size': 358}}, ...}
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a-d\tests\test_b100_save_image.py:1632: AssertionError: {'active_variant': 'firmware', 'assignments': {}, 'batch': [], 'files': {'firmware.s19': {'sha256': '8a35f3808f25ff85a9ce1100bbce23783a7031b82c6f3d14cc1f749a0df40e51', 'size': 358}}, ...}
 =========================== short test summary info ===========================
 FAILED tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
 FAILED tests/test_b100_save_image.py::test_tc_b100_59_open_project_carry_sets_the_keys[too-large]

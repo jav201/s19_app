@@ -1,8 +1,8 @@
 # started (UTC): 2026-10-31T05:58:37Z
-# cwd: /c/Users/jjgh8/Github/s19_app-b100-inc8b
+# cwd: <HOME>/Github/s19_app-b100-inc8b
 # HEAD: ebe6d0ccecfb89a2ec9d8a01efcf0c6b6a850783 (uncommitted Inc 8b + E5 corrective pass 1 work on top)
 # sources sha256[:16]: app.py=87c7f9d74909138c project_gather_service.py=524c3409037cae26 workspace.py=d9f361f3fb092ae2 screens_directionb.py=e94f8e764f950b1a variant_execution_service.py=8a38dde7fcd14211 
-# s19_app.__file__: C:\Users\jjgh8\Github\s19_app-b100-inc8b\s19_app\__init__.py
+# s19_app.__file__: <HOME>\Github\s19_app-b100-inc8b\s19_app\__init__.py
 # python: Python 3.11.15
 # env: NO_COLOR unset, PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=.
 # command: python -m pytest -p no:cacheprovider -q --tb=short -rfE tests/test_b100_project_homes.py tests/test_b100_save_image.py tests/test_b100_save_guards.py tests/test_b100_document.py tests/test_b99_load_project.py tests/test_project_gather.py tests/test_tui_workspace.py tests/test_tui_workspace_insight.py tests/test_tui_workspace_layout.py tests/test_workspace_variants.py tests/test_tui_app.py tests/test_b100_reuse.py tests/test_b99_staging.py tests/test_id_registry.py tests/test_b100_active_variant.py tests/test_b100_announce.py tests/test_b100_focus.py tests/test_b100_project_check.py tests/test_b100_session_reset.py tests/test_b97_load_project_dialog.py tests/test_b99_patch_truth.py tests/test_report_progress.py tests/test_tui_commandbar.py tests/test_tui_helpers.py tests/test_tui_manifest_save.py tests/test_tui_patch_variant.py tests/test_tui_report_filter_surface.py tests/test_tui_report_seam.py tests/test_tui_report_view.py tests/test_tui_variants.py tests/test_variant_execution.py

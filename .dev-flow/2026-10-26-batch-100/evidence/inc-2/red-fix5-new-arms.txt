@@ -1,11 +1,11 @@
 cmd: pytest -q -p no:cacheprovider tests/test_b100_save_guards.py -k "reuse or case_variant or failed_verify or copy_fails or preexisting_home" (RED, pre-pass tree)
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 5, pre-pass reconstruction)
+tree: <HOME>\Github\s19_app-b100-inc2 (fix pass 5, pre-pass reconstruction)
 
 ..FFFFFF.                                                                [100%]
 ================================== FAILURES ===================================
 _____________ test_tc_b100_07_gather_reuse_never_ends_in_written ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28616/test_tc_b100_07_gather_reuse_n0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28616/test_tc_b100_07_gather_reuse_n0')
 
     def test_tc_b100_07_gather_reuse_never_ends_in_written(tmp_path: Path) -> None:
         """SEC2-7 (security round 4) census arm: the placement's ``reused``
@@ -45,16 +45,16 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
             f"a reused byte-identical file must never be recorded as written: "
             f"{reused.written}"
         )
-E       AssertionError: a reused byte-identical file must never be recorded as written: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28616/test_tc_b100_07_gather_reuse_n0/.s19tool/workarea/proj/patches/BOOST.json')]
+E       AssertionError: a reused byte-identical file must never be recorded as written: [WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28616/test_tc_b100_07_gather_reuse_n0/.s19tool/workarea/proj/patches/BOOST.json')]
 E       assert [WindowsPath(.../BOOST.json')] == []
 E         
-E         Left contains one more item: WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28616/test_tc_b100_07_gather_reuse_n0/.s19tool/workarea/proj/patches/BOOST.json')
+E         Left contains one more item: WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28616/test_tc_b100_07_gather_reuse_n0/.s19tool/workarea/proj/patches/BOOST.json')
 E         Use -v to get more diff
 
 tests\test_b100_save_guards.py:1552: AssertionError
 __ test_tc_b100_07_case_variant_reused_file_survives_failed_save[BOOST.json] __
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28616/test_tc_b100_07_case_variant_r0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28616/test_tc_b100_07_case_variant_r0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001AFD8471510>
 case_variant = 'BOOST.json'
 
@@ -119,7 +119,7 @@ E        +    where <built-in method encode of str object at 0x000001AFD538B310>
 tests\test_b100_save_guards.py:1616: AssertionError
 __ test_tc_b100_07_case_variant_reused_file_survives_failed_save[boost.JSON] __
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28616/test_tc_b100_07_case_variant_r1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28616/test_tc_b100_07_case_variant_r1')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001AFD7FA68D0>
 case_variant = 'boost.JSON'
 
@@ -184,7 +184,7 @@ E        +    where <built-in method encode of str object at 0x000001AFD538B310>
 tests\test_b100_save_guards.py:1616: AssertionError
 ____________ test_tc_b100_07_failed_verify_leaves_no_folder_fresh _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28616/test_tc_b100_07_failed_verify_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28616/test_tc_b100_07_failed_verify_0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001AFD8507A50>
 
     def test_tc_b100_07_failed_verify_leaves_no_folder_fresh(
@@ -232,7 +232,7 @@ E       assert 'freshv' not in ['freshv', 'patches', 'temp']
 tests\test_b100_save_guards.py:1664: AssertionError
 __________ test_tc_b100_07_failed_verify_restores_previous_manifest ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28616/test_tc_b100_07_failed_verify_1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28616/test_tc_b100_07_failed_verify_1')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001AFD6B72F10>
 
     def test_tc_b100_07_failed_verify_restores_previous_manifest(
@@ -293,7 +293,7 @@ E         Use -v to get more diff
 tests\test_b100_save_guards.py:1715: AssertionError
 _____ test_tc_b100_07_gather_home_created_then_copy_fails_no_folder_left ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28616/test_tc_b100_07_gather_home_cr0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28616/test_tc_b100_07_gather_home_cr0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001AFD7541610>
 
     def test_tc_b100_07_gather_home_created_then_copy_fails_no_folder_left(
@@ -372,7 +372,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 >           monkeypatch.setattr(
                 gather_module, "place_into_workarea", _mkdir_home_then_raise
             )
-E           AttributeError: <module 's19_app.tui.services.project_gather_service' from 'C:\\Users\\jjgh8\\Github\\s19_app-b100-inc2\\s19_app\\tui\\services\\project_gather_service.py'> has no attribute 'place_into_workarea'
+E           AttributeError: <module 's19_app.tui.services.project_gather_service' from '<HOME>\\Github\\s19_app-b100-inc2\\s19_app\\tui\\services\\project_gather_service.py'> has no attribute 'place_into_workarea'
 
 tests\test_b100_save_guards.py:1751: AttributeError
 =========================== short test summary info ===========================

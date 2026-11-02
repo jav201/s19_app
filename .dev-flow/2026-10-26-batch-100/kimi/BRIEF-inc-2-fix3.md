@@ -1,10 +1,10 @@
 # Kimi brief — batch-100 Increment 2 · corrective pass 3 (bounded)
 
-Work in the same worktree, `C:\Users\jjgh8\Github\s19_app-b100-inc2`. It holds Inc 2 plus fix passes 1 and 2, uncommitted; keep all of them. `BRIEF-COMMON.md` still applies. SOURCE files stay at 2: `app.py` and `workspace.py`.
+Work in the same worktree, `<HOME>\Github\s19_app-b100-inc2`. It holds Inc 2 plus fix passes 1 and 2, uncommitted; keep all of them. `BRIEF-COMMON.md` still applies. SOURCE files stay at 2: `app.py` and `workspace.py`.
 
 **This pass is BOUNDED**: the operator decided this at the iteration cap. Change only what is listed below. If you find anything else, write it in `HANDOFF.md` and leave it unfixed.
 
-**Read first** (MAIN checkout): `C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-10-26-batch-100\03-increments\review-increment-002.md`, §"Round 3", for R3-1 and R3-2. The reviewer's probes are in `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\fix2\tests\test_zz_review_r3.py`.
+**Read first** (MAIN checkout): `<HOME>\Github\s19_app\.dev-flow\2026-10-26-batch-100\03-increments\review-increment-002.md`, §"Round 3", for R3-1 and R3-2. The reviewer's probes are in `<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\fix2\tests\test_zz_review_r3.py`.
 
 **Fix:**
 1. **R3-1 (HIGH): the rollback walks into junctions.** On Python 3.11, `Path.rglob` treats a junction as a plain folder, so the snapshot and the removal walk both go into it.

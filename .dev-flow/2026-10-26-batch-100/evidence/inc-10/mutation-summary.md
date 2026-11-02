@@ -1,7 +1,7 @@
 # Inc 10 E5 — mutation summary
 
-Copy: `C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut10`
-Interpreter: `C:/Users/jjgh8/anaconda3/envs/s19env/python.exe` (LOCALAPPDATA redirected to the scratch folder on every run).
+Copy: `<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/mut10`
+Interpreter: `<HOME>/anaconda3/envs/s19env/python.exe` (LOCALAPPDATA redirected to the scratch folder on every run).
 `s19_app.__file__` resolved inside the copy.
 
 ## Table

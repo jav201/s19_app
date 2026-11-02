@@ -299,20 +299,20 @@ All paths are under `.dev-flow/2026-10-19-batch-97/evidence/inc-8/`.
 
 | Evidence artifact | Path | SHA-256 |
 |---|---|---|
-| RED (38 failed / 2 passed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/red.txt` | `a1f419a071609894069c124f3ba9b62059552d6c0b5622590b4c7135c218b3fb` |
-| RED re-run after the PC-11 reorders (7 failed at their clause) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/red-rerun.txt` | `23049c4df594ef038061d85690eb7352e5be659a42ddc91645fa01427a235d70` |
+| RED (38 failed / 2 passed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/red.txt` | `09677bf19ff1104b3b4648e06ada447fefdac1d63b346291736a17da4e8d854b` |
+| RED re-run after the PC-11 reorders (7 failed at their clause) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/red-rerun.txt` | `4ef9010e045241d5d6e8d5805f9315a5e360b649d9bd9407eedf52fc607101ac` |
 | Gate file list (64) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/gate-files.txt` | `0ad7f46b9ada4446968cc97c519bd25f43d6a827f4669f01c0ff82a03751ac06` |
-| GREEN gate (1593 passed / 29 xf / 19 failed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/green.txt` | `9d781e8263a4c5566eec995e2ea0c5a79a435b1c9744878191215d5bea274a1c` |
-| Gate fold (128 passed / 29 xf / 5 failed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/green-fold.txt` | `89199631664b8bd31b14c2fefa48e595f93ed5168fb770911e575334c7f78700` |
-| Non-baseline re-runs (tc024 ×5 on both trees; the guard arm after its line update) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/rerun-nonbaseline.txt` | `88efde2f9d5c883413eb4e5081a8231f0030b7762dcd620c86174400ababc6ba` |
-| Mutations (27 mutants, 34 arms: 30 / 4 / 0) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/mutations.txt` | `dd6b1f5d6547768a621d09c27fe4f18cd6b9c3681f78d737ec73bf7feb39421b` |
+| GREEN gate (1593 passed / 29 xf / 19 failed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/green.txt` | `f1e5a9d2ef3aaacff5b61f440cea771c84d5b4ac7b5bae219e3375bfc809e99b` |
+| Gate fold (128 passed / 29 xf / 5 failed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/green-fold.txt` | `8701e73bb1be9fbade3887839435bdcc1d10da7b53ab548e2249559818148e5b` |
+| Non-baseline re-runs (tc024 ×5 on both trees; the guard arm after its line update) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/rerun-nonbaseline.txt` | `cfa3314d90c10a54f24f15b8b37a154f7d7f45257b6e1059046a7c25642e7e82` |
+| Mutations (27 mutants, 34 arms: 30 / 4 / 0) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/mutations.txt` | `19e6561926ca8c6b8a2a44b2a7884a854ce99ced5c778d424fb54add6f12976d` |
 | Mutations after the test fold (6 arms: 5 / 1 / 0) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/mutations-fold.txt` | `9e9071b20e025a7d8b48952d286e1c7ce0dbf792049278a9ec2f8e009f275ed0` |
-| Mutation script | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/mutate.py` | `be2902a90766eceda7f130686d4954c8d78f77c38856f85baf9035713ac84d6b` |
+| Mutation script | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/mutate.py` | `ffe647c22eb2aad19ccd486ba60bcdba50b886e847b11b6f10a0e7f8adad69f9` |
 | Frames script | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/frames.py` | `c29b39f04d3ce3a86bcdbea69f89fa1f9f9b7ee3dbd3e6dafb6037a4f627e34b` |
-| Frames Inc-8 @118x54 / 220x60 | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/frames-inc8.txt` | `b8664a6ab7beb24fbe1d0da1a51dfc1a1db50b00a7ed86483b91a949e0f3dd9f` |
-| Frames 9793fcd @118x53 / 220x59 (= Inc-8) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/frames-9793fcd.txt` | `b8664a6ab7beb24fbe1d0da1a51dfc1a1db50b00a7ed86483b91a949e0f3dd9f` |
+| Frames Inc-8 @118x54 / 220x60 | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/frames-inc8.txt` | `ae307dfb9346205ad79563510fedb5fe53362a1d62baddc2b001049e27647492` |
+| Frames 9793fcd @118x53 / 220x59 (= Inc-8) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/frames-9793fcd.txt` | `ae307dfb9346205ad79563510fedb5fe53362a1d62baddc2b001049e27647492` |
 | Frames diff (empty) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/frames-diff.txt` | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
-| Frames 9793fcd @118x54 / 220x60 (control) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/frames-9793fcd-same-size.txt` | `c3d4a76d79bc66b384c6dd6d1a6f3957d7f281a7bb71c2c9158b1ab05dd4b385` |
+| Frames 9793fcd @118x54 / 220x60 (control) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/frames-9793fcd-same-size.txt` | `69e1db995d73bb66e366d4ca7cb500a1988370ee0066a4f5ee296c14b520d81a` |
 | Frames control diff (14 rows) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/frames-diff-control.txt` | `79cc0cd7be6ee5e4899523245743d5ebd658d9bae5a34d05dfeeeea4f20bcdbf` |
 | Snapshot cells Inc-8 | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/cells-inc8.txt` | `b2658ff133437186a1561da4f964fc508241781c70393763d56a3d39f2e242a6` |
 | Snapshot cells 9793fcd | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/cells-9793fcd.txt` | `4db98ec843e6165205c833d881c92284bf29ec3d183027021441684771b7ca2a` |
@@ -334,11 +334,11 @@ All paths are under `.dev-flow/2026-10-19-batch-97/evidence/inc-8/`.
 | WT CRC Designer | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/png/impl.keybar.crc_designer.png` | `96ac3ce9f3b2b0481971a309b67cd0da03df76987523e56519e5ae3e897e26e5` |
 | WT Split / Join / Export 118x54 | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/png/impl.keybar.split_join.png` | `54ab4fca7981c3b68f10ee859a389f806a0a32b4b21f8663e4bd8e0df255cc06` |
 | WT Split / Join / Export 220x60 | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/png/impl.keybar.split_join.220.png` | `83fe1ed1d748ea47f3927e4095bb6b5411760af089f57ff141aeb0335b778b47` |
-| Fold RED (14 failed / 1 passed, pre-fold tree) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/red-fold.txt` | `ff264b49f14f43cdfe8c16146243d056638b40bbe2d5052b73115c2bcddbe8fd` |
-| Fold GREEN, 64-file gate set (1605 passed / 29 xf / 4 failed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/green-fold2.txt` | `3b413b39ccd94c2a9e59e6fc0b70424977934a55c52a8d05f28d9372a1af0b3f` |
-| Full suite (8 failed / 3574 passed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/suite-full.txt` | `c5fb6cd492ad9d0aadb9b8de2aa8817af8dafce6d1cf21a48f17b259c28413e0` |
+| Fold RED (14 failed / 1 passed, pre-fold tree) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/red-fold.txt` | `6f1be5a4647dfe5fb47d484a5902c4b861736c8ab82d6f7834e80d8e0702bfce` |
+| Fold GREEN, 64-file gate set (1605 passed / 29 xf / 4 failed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/green-fold2.txt` | `72257462ebb03ef07559144412841eb99fd70933efb10b12529f6006fb08c2db` |
+| Full suite (8 failed / 3574 passed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/suite-full.txt` | `f65e8955d813db187cfa3abff3668390e1881e3a98c7a374349389626d640405` |
 | Full-suite non-baseline re-run (2 passed; modules 62 passed / 1 baseline failed) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/rerun-nonbaseline-suite.txt` | `92938aa12d5a31b5a0120de63eaafa7e09e4563f0abbbc27c2244dbc153109e9` |
-| Fold mutations (12 arms: 11 / 1 / 0) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/mutations-fold2.txt` | `adb1803eb07dec982155525d2ab00dc17ca33d060b4a55af0ba225e209bd4057` |
+| Fold mutations (12 arms: 11 / 1 / 0) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/mutations-fold2.txt` | `44aa046dcd4b47ea683a9046c275d5e9bf8cb14fc7e4b970ef16ab752b07ba48` |
 | Fold non-baseline re-runs (tc_b77_22 ×8, map_big module) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/rerun-nonbaseline-fold2.txt` | `b0cb50b9eee38c62bb4248cdceea0705a33c85ec2b0a0998d621822a052e13f4` |
 | WT Split / Join / Export, focus on the rail (owned tokens dim) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/png/impl.keybar.split_join.rail.png` | `bd9c2158ec7481f3361f4f2ecc10cde51ae54c6f82255687eb2a8a034a6ccf5c` |
 | WT Memory Map 120x30 (one row + scrollbar) | `.dev-flow/2026-10-19-batch-97/evidence/inc-8/png/impl.keybar.map.120x30.png` | `13355d33892da6282c17999d3f39eff3d43fbb1be283ddde0dd72b959736f8c4` |

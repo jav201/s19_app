@@ -1,6 +1,6 @@
 # HANDOFF — batch-99 Increment 2 (HLR-153 · S0 is not image data)
 
-Worktree: `C:\Users\jjgh8\Github\s19_app-b99-inc2` (detached at e4c4324). No commits made; all changes are in the working tree for the orchestrator.
+Worktree: `<HOME>\Github\s19_app-b99-inc2` (detached at e4c4324). No commits made; all changes are in the working tree for the orchestrator.
 
 ## What was done
 

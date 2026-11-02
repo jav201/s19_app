@@ -14,7 +14,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-REPO = Path(r"C:\Users\jjgh8\Github\s19_app")
+REPO = Path(r"<HOME>\Github\s19_app")
 sys.path.insert(0, str(REPO))
 
 from rich.text import Text

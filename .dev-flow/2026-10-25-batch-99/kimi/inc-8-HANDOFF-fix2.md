@@ -1,12 +1,12 @@
 # HANDOFF — batch-99 Increment 8 · review round 2 fix (N1)
 
-Date: 2026-10-25 · Worktree: `C:\Users\jjgh8\Github\s19_app-b99-inc8` (branch b99-inc8) · Interpreter: `C:\Users\jjgh8\anaconda3\envs\s19env\python.exe` (3.11)
+Date: 2026-10-25 · Worktree: `<HOME>\Github\s19_app-b99-inc8` (branch b99-inc8) · Interpreter: `<HOME>\anaconda3\envs\s19env\python.exe` (3.11)
 
 ## Worktree proof
 
 ```
 python -c "import s19_app; print(s19_app.__file__)"
--> C:\Users\jjgh8\Github\s19_app-b99-inc8\s19_app\__init__.py
+-> <HOME>\Github\s19_app-b99-inc8\s19_app\__init__.py
 ```
 
 ## What the finding was

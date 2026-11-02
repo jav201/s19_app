@@ -2,7 +2,7 @@
 
 > Phase 4 artifact. Written by the orchestrator from the increments' packets and the
 > close-out probes. **The ONE complete gate-suite run is the coordinator's (`C-25`),
-> in flight under the house env (`C:/Users/jjgh8/anaconda3/envs/s19env/python.exe`)
+> in flight under the house env (`<HOME>/anaconda3/envs/s19env/python.exe`)
 > as this file is written; every figure owed by that run is a marked
 > `<suite at close>` placeholder the coordinator injects at the end.** No number in
 > this file is stitched from per-area runs into a fake full-suite figure.

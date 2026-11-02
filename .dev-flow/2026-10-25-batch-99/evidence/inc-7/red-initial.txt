@@ -2,7 +2,7 @@ FFFF                                                                     [100%]
 ================================== FAILURES ===================================
 _______________ test_tc_b99_34_pick_loads_the_picked_file_name ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26584/test_tc_b99_34_pick_loads_the_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26584/test_tc_b99_34_pick_loads_the_0')
 
     def test_tc_b99_34_pick_loads_the_picked_file_name(tmp_path):
         """Picking ``a.s19`` — boundary: ``a b.s19``, a name with a space — in
@@ -52,18 +52,18 @@ E             Use -v to get more diff
 tests\test_b99_load_project.py:141: AssertionError
 _______________ test_tc_b99_35_reserved_homes_are_not_projects ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26584/test_tc_b99_35_reserved_homes_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26584/test_tc_b99_35_reserved_homes_0')
 
     def test_tc_b99_35_reserved_homes_are_not_projects(tmp_path):
         """With P1, P2 and every RESERVED_WORKAREA_HOMES name present, the
         project list holds P1 and P2 only; reserved-only -> empty list."""
 >       from s19_app.tui.workspace import RESERVED_WORKAREA_HOMES
-E       ImportError: cannot import name 'RESERVED_WORKAREA_HOMES' from 's19_app.tui.workspace' (C:\Users\jjgh8\Github\s19_app-b99-inc7\s19_app\tui\workspace.py)
+E       ImportError: cannot import name 'RESERVED_WORKAREA_HOMES' from 's19_app.tui.workspace' (<HOME>\Github\s19_app-b99-inc7\s19_app\tui\workspace.py)
 
 tests\test_b99_load_project.py:156: ImportError
 _____________ test_tc_b99_36_workarea_files_reads_the_load_folder _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26584/test_tc_b99_36_workarea_files_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26584/test_tc_b99_36_workarea_files_0')
 
     def test_tc_b99_36_workarea_files_reads_the_load_folder(tmp_path):
         """No file loaded -> the list is empty. After one file load the list
@@ -118,7 +118,7 @@ E             Use -v to get more diff
 tests\test_b99_load_project.py:188: AssertionError
 ____________ test_at_b99_13_project_and_file_pickers_load_by_name _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26584/test_at_b99_13_project_and_fil0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26584/test_at_b99_13_project_and_fil0')
 
     def test_at_b99_13_project_and_file_pickers_load_by_name(tmp_path):
         """1. The dialog lists P1 and P2 only (the ``patches`` home is present).

@@ -73,7 +73,7 @@ the `origin/main` tip, not a stale tree.
 the main checkout, so the import was proven rather than assumed:
 
 ```
-C:\Users\jjgh8\Github\s19_app-wt-batch90\s19_app\__init__.py
+<HOME>\Github\s19_app-wt-batch90\s19_app\__init__.py
 3.11.15 | packaged by Anaconda, Inc.
 ```
 

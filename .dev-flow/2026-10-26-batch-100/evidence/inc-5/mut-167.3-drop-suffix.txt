@@ -1,6 +1,6 @@
 # command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation 167.3-drop-suffix
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# tree: <HOME>\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation 167.3-drop-suffix
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
 # date: 2026-10-29T19:49:57+00:00
 # requirement: LLR-167.3
 # mutation: the success line drops the entry-count clause — file s19_app/tui/app.py
@@ -12,7 +12,7 @@
 ================================== FAILURES ===================================
 ______________________ test_tc_b100_16_one_applied_entry ______________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29958/test_tc_b100_16_one_applied_en0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29958/test_tc_b100_16_one_applied_en0')
 
     def test_tc_b100_16_one_applied_entry(tmp_path: Path) -> None:
         """1 applied entry → the status carries 1 entry and 0 applied by this
@@ -26,13 +26,13 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         final = lines[-1]
         assert final.startswith("Saved project to"), lines
 >       assert "firmware.s19 + 1 change entry, 0 applied by this save" in final, final
-E       AssertionError: Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-29958\test_tc_b100_16_one_applied_en0\app\.s19tool\workarea\P1 (variant 'firmware')
-E       assert 'firmware.s19 + 1 change entry, 0 applied by this save' in "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-29958\\test_tc_b100_16_one_applied_en0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
+E       AssertionError: Saved project to <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-29958\test_tc_b100_16_one_applied_en0\app\.s19tool\workarea\P1 (variant 'firmware')
+E       assert 'firmware.s19 + 1 change entry, 0 applied by this save' in "Saved project to <HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-29958\\test_tc_b100_16_one_applied_en0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
 
 tests\test_b100_save_image.py:641: AssertionError
 _________________ test_tc_b100_16_entry_added_after_the_apply _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29958/test_tc_b100_16_entry_added_af0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29958/test_tc_b100_16_entry_added_af0')
 
     def test_tc_b100_16_entry_added_after_the_apply(tmp_path: Path) -> None:
         """1 applied + 1 added after the apply → 2 entries, 1 applied by this
@@ -46,13 +46,13 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
         lines, project, _ = _save_session(tmp_path, scenario)
         final = lines[-1]
 >       assert "firmware.s19 + 2 change entries, 1 applied by this save" in final, final
-E       AssertionError: Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-29958\test_tc_b100_16_entry_added_af0\app\.s19tool\workarea\P1 (variant 'firmware')
-E       assert 'firmware.s19 + 2 change entries, 1 applied by this save' in "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-29958\\test_tc_b100_16_entry_added_af0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
+E       AssertionError: Saved project to <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-29958\test_tc_b100_16_entry_added_af0\app\.s19tool\workarea\P1 (variant 'firmware')
+E       assert 'firmware.s19 + 2 change entries, 1 applied by this save' in "Saved project to <HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pytest-29958\\test_tc_b100_16_entry_added_af0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
 
 tests\test_b100_save_image.py:658: AssertionError
 _________ test_at_b100_05_save_project_saves_the_patched_image[size1] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29958/test_at_b100_05_save_project_s1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29958/test_at_b100_05_save_project_s1')
 size = (220, 60)
 
     @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
@@ -142,8 +142,8 @@ size = (220, 60)
 E           AssertionError: Apply: 1 applied, 0 skipped, 0 blocked
 E             Project saved + manifest verified
 E             Saved + verified: firmware.s19 — 1 entry applied before this save (0x8000007C)
-E             Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-29958\test_at_b100_05_save_project_s1\app\.s19tool\workarea\P1 (variant 'firmware')
-E           assert '1 change entry, 0 applied by this save' in "Apply: 1 applied, 0 skipped, 0 blocked\nProject saved + manifest verified\nSaved + verified: firmware.s19 — 1 entry a...Temp\\pytest-of-jjgh8\\pytest-29958\\test_at_b100_05_save_project_s1\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
+E             Saved project to <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-29958\test_at_b100_05_save_project_s1\app\.s19tool\workarea\P1 (variant 'firmware')
+E           assert '1 change entry, 0 applied by this save' in "Apply: 1 applied, 0 skipped, 0 blocked\nProject saved + manifest verified\nSaved + verified: firmware.s19 — 1 entry a...Temp\\pytest-of-<USER>\\pytest-29958\\test_at_b100_05_save_project_s1\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
 
 tests\test_b100_save_image.py:1408: AssertionError
 =========================== short test summary info ===========================

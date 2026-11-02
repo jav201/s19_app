@@ -2,13 +2,13 @@ mutation: llr-163-6 on s19_app/tui/segment_split_view.py
 hash before: 6dacb71d11718a5256c8b1378ef91218c4c3d6ccf8749fcc015a0af5d7fe324b
 hash mutated: 3cbf238758156664d9f7bf729270c86044ce6b35c536514a415bbf971daf278e
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py -k tc_b100_57
-tree: /c/Users/jjgh8/Github/s19_app-b100-inc1
+tree: <HOME>/Github/s19_app-b100-inc1
 
 F.                                                                       [100%]
 ================================== FAILURES ===================================
 _______ test_tc_b100_57_identical_reexport_to_existing_suffix_is_reused _______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27185/test_tc_b100_57_identical_reex0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27185/test_tc_b100_57_identical_reex0')
 
     def test_tc_b100_57_identical_reexport_to_existing_suffix_is_reused(
         tmp_path: Path,

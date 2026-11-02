@@ -2,7 +2,7 @@
 
 Integration step of batch-100 Inc 9b (the unified Load dialog). Inputs: `E4-dialog-notes.md` (G-A), `E4-app-notes.md` (G-B), `E4-tester-notes.md`, `codewire/interfaces-9b.md`, both prototypes, `E3-rulings.md` (rounds 1–3; the Round 3 addenda bind) and `E1-requirements-draft.md`.
 
-Run environment: `C:/Users/jjgh8/anaconda3/envs/s19env/python.exe` (Python 3.11.15, textual 8.2.8), `env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<scratch int9b/lad>`. Every transcript prints `s19_app.__file__` (the worktree) in its header and, in its footer, whether the real `%LOCALAPPDATA%\s19_app` exists (it does not, in every run).
+Run environment: `<HOME>/anaconda3/envs/s19env/python.exe` (Python 3.11.15, textual 8.2.8), `env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<scratch int9b/lad>`. Every transcript prints `s19_app.__file__` (the worktree) in its header and, in its footer, whether the real `%LOCALAPPDATA%\s19_app` exists (it does not, in every run).
 
 Scope of runs (operator override 2026-10-31): the new test file, the re-pinned nodes and the guards only. The whole touched modules and the full suite are `not-run` here; they belong to the batch-end battery.
 

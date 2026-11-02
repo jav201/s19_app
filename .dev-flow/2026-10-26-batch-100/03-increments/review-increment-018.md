@@ -3,7 +3,7 @@ PASS-WITH-NOTES
 # Code Review — Increment 018 (batch-100 Inc 9b: the unified Load dialog), stage E5
 
 Reviewer: `code-reviewer`. I worked independently of the authors and read the tree only. I edited no source or test file.
-Tree: `C:/Users/jjgh8/Github/s19_app-b100-inc9b`, branch `b100-inc9b`, commit `741cc07`. Diff reviewed: `git diff 8947666..741cc07 -- s19_app tests`.
+Tree: `<HOME>/Github/s19_app-b100-inc9b`, branch `b100-inc9b`, commit `741cc07`. Diff reviewed: `git diff 8947666..741cc07 -- s19_app tests`.
 
 ## Verdict
 
@@ -112,7 +112,7 @@ PASS-WITH-NOTES. Counts: 0 HIGH, 1 MAJOR, 3 MINOR, 2 NIT.
 | Full suite / touched modules | `not-run` (out of lane; batch-end battery) |
 | Security lens | `n/a — security-reviewer's lane` |
 
-Probe folder: `C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/rev9b-cr/`.
+Probe folder: `<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/rev9b-cr/`.
 
 ## Evidence checklist
 

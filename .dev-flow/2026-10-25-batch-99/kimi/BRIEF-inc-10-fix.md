@@ -1,6 +1,6 @@
 # Kimi brief — batch-99 Increment 10 · review fixes (code-reviewer F1–F4 + LOWs)
 
-Read `BRIEF-COMMON.md` first. Same worktree, `C:\Users\jjgh8\Github\s19_app-b99-inc10` (branch `b99-inc10`, uncommitted changes on `e00f2f2`). Do not commit.
+Read `BRIEF-COMMON.md` first. Same worktree, `<HOME>\Github\s19_app-b99-inc10` (branch `b99-inc10`, uncommitted changes on `e00f2f2`). Do not commit.
 
 The independent review returned **Block** with two HIGH findings. Fix:
 

@@ -1,5 +1,5 @@
 cmd: grep -rln "_handle_save_dialog\|list_projects\|sanitize_project_name\|_remove_created_project_dir\|_abort_save\|is_windows_device_name\|_write_and_verify_manifest" tests/ --include=*.py
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 2)
+tree: <HOME>\Github\s19_app-b100-inc2 (fix pass 2)
 
 tests/test_b100_reuse.py
 tests/test_b100_save_guards.py

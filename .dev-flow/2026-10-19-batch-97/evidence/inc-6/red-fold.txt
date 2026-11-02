@@ -3,7 +3,7 @@ a2afd60ab61a0da6f44606c80d85decd5cc15c22bd3525b64d11fee424313896 *s19_app/tui/fl
 6f32fbaea12f68d865ac71f0162e78c9b91b1131c00786734e2f493f1855402e *s19_app/tui/app.py
 f91bd8698e62046c3203040b682e03513487ce860d0e696447a9c339bc614496 *s19_app/tui/styles.tcss
 303be19ea83453bd36062ee60f10581b8a47c65debcc89d223646c761444757f *s19_app/tui/window_help.py
-# s19_app from: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\prefold6\s19_app\__init__.py
+# s19_app from: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\prefold6\s19_app\__init__.py
 FFFF.F.F                                                                 [100%]
 ================================== FAILURES ===================================
 tests\test_b97_flow_execution.py:1713: AssertionError: ["Loaded project 'proj1' -> prg.s19", 'Confirmed flash_chain — the run continues.']

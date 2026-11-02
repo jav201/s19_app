@@ -1,5 +1,5 @@
 import sys, asyncio, tempfile, pathlib
-sys.path.insert(0, sys.argv[1]); sys.path.insert(1, r"C:\Users\jjgh8\Github\s19_app")
+sys.path.insert(0, sys.argv[1]); sys.path.insert(1, r"<HOME>\Github\s19_app")
 from s19_app.tui.app import S19TuiApp
 from textual.containers import Container
 async def main():

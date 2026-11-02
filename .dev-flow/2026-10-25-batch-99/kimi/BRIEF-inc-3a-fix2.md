@@ -1,6 +1,6 @@
 # Kimi brief — batch-99 Increment 3a · review round 2 fixes (security S-F1..F6, code F6a + LOWs)
 
-Read `BRIEF-COMMON.md` first: re-read it from the MAIN checkout (`C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-10-25-batch-99\kimi\BRIEF-COMMON.md`), because it gained a test-id rule. Same worktree, `C:\Users\jjgh8\Github\s19_app-b99-inc3a`. Do not commit.
+Read `BRIEF-COMMON.md` first: re-read it from the MAIN checkout (`<HOME>\Github\s19_app\.dev-flow\2026-10-25-batch-99\kimi\BRIEF-COMMON.md`), because it gained a test-id rule. Same worktree, `<HOME>\Github\s19_app-b99-inc3a`. Do not commit.
 
 security-reviewer (round 2) — `changes required`:
 - **S-F1 [MEDIUM] — a dangling file symlink at the final name is written through** (`workspace.py:511`): the `O_EXCL` claim followed the link and created a 0-byte file outside the work area, then `os.replace` replaced the link.

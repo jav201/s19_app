@@ -1,5 +1,5 @@
 === probe 1: import s19_app.render.hexview ===
-tree: C:\Users\jjgh8\Github\s19_app-b92\s19_app\__init__.py
+tree: <HOME>\Github\s19_app-b92\s19_app\__init__.py
 ok 16
 === probe 2: from s19_app.render.hexview import render_hex_view ===
 ok True

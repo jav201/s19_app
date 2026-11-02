@@ -5,7 +5,7 @@ F.FF                                                                     [100%]
 ================================== FAILURES ===================================
 ___________________________ test_at078b_zero_total ____________________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28649/test_at078b_zero_total0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28649/test_at078b_zero_total0')
 
     def test_at078b_zero_total(tmp_path: Path) -> None:
         """A 0-entry run renders 0/0/0 with a 0-filled bar and does not crash.
@@ -54,7 +54,7 @@ E         - ░░░░░░░░
 tests\test_tui_patch_checks_strip.py:370: AssertionError
 __________ test_at030c_directly_dropped_file_is_listed_and_loadable ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28649/test_at030c_directly_dropped_f0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28649/test_at030c_directly_dropped_f0')
 
     def test_at030c_directly_dropped_file_is_listed_and_loadable(
         tmp_path: Path,
@@ -106,7 +106,7 @@ E       assert -1 == 768
 tests\test_tui_patch_editor_v2.py:1595: AssertionError
 ________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28649/test_at_056e_a2b_diff_report_b0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28649/test_at_056e_a2b_diff_report_b0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001F561593490>
 
     def test_at_056e_a2b_diff_report_byte_identical_despite_selection(

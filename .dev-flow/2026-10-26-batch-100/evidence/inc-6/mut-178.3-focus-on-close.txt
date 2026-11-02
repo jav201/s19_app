@@ -1,6 +1,6 @@
 # command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_announce.py -k tc_b100_67
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree) with mutation 178.3-focus-on-close
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# tree: <HOME>\Github\s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree) with mutation 178.3-focus-on-close
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
 # date: 2026-10-30T01:47:56+00:00
 # requirement: LLR-178.3
 # mutation: the panel's focus starts on #result_ok — file s19_app/tui/screens.py
@@ -12,7 +12,7 @@ F.F.F.                                                                   [100%]
 ================================== FAILURES ===================================
 ______ test_tc_b100_67_focus_starts_on_the_list_and_enter_keeps_it_open _______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30154/test_tc_b100_67_focus_starts_o0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30154/test_tc_b100_67_focus_starts_o0')
 
     def test_tc_b100_67_focus_starts_on_the_list_and_enter_keeps_it_open(tmp_path: Path) -> None:
         async def _scenario(pilot, app):
@@ -33,7 +33,7 @@ E         ?         ^
 tests\test_b100_announce.py:395: AssertionError
 _____________ test_tc_b100_67_tab_reaches_close_and_enter_closes ______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30154/test_tc_b100_67_tab_reaches_cl0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30154/test_tc_b100_67_tab_reaches_cl0')
 
     def test_tc_b100_67_tab_reaches_close_and_enter_closes(tmp_path: Path) -> None:
         async def _scenario(pilot, app):
@@ -83,7 +83,7 @@ E       AssertionError: timed out waiting for the panel closed by enter
 tests\test_b100_announce.py:80: AssertionError
 ______ test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30154/test_tc_b100_67_thirty_problem0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30154/test_tc_b100_67_thirty_problem0')
 
     def test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last(tmp_path: Path) -> None:
         async def _scenario(pilot, app):

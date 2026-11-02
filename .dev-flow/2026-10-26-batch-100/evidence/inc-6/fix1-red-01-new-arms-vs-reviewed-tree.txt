@@ -1,13 +1,13 @@
-# command: python -m pytest -q -p no:cacheprovider -rfE --basetemp=C:/Users/jjgh8/AppData/Local/Temp/f1red tests/test_b100_active_variant.py tests/test_b100_announce.py -k damaged_manifest_is_never or now_opens_only or control_bytes or thirty or warning_colour or ok_colour or hang_under
-# tree: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc6-fix1/pre (the reviewed Inc 6 tree d37ee857 rebuilt by reversing corrective pass 1 (hash-verified), with the corrective-pass-1 tests copied in), sources: d37ee857f64b202d *s19_app/tui/app.py;a957b576658777b0 *s19_app/tui/screens.py;8e2e8cf059eb48aa *s19_app/tui/services/variant_execution_service.py;781f04ed2cc30897 *s19_app/tui/styles.tcss;
-# PYTHONPATH=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc6-fix1/pre ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# command: python -m pytest -q -p no:cacheprovider -rfE --basetemp=<HOME>/AppData/Local/Temp/f1red tests/test_b100_active_variant.py tests/test_b100_announce.py -k damaged_manifest_is_never or now_opens_only or control_bytes or thirty or warning_colour or ok_colour or hang_under
+# tree: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc6-fix1/pre (the reviewed Inc 6 tree d37ee857 rebuilt by reversing corrective pass 1 (hash-verified), with the corrective-pass-1 tests copied in), sources: d37ee857f64b202d *s19_app/tui/app.py;a957b576658777b0 *s19_app/tui/screens.py;8e2e8cf059eb48aa *s19_app/tui/services/variant_execution_service.py;781f04ed2cc30897 *s19_app/tui/styles.tcss;
+# PYTHONPATH=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc6-fix1/pre ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-30T03:36:33Z
-# s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc6-fix1\pre\s19_app\__init__.py
+# s19_app.__file__ = <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc6-fix1\pre\s19_app\__init__.py
 FFFFFFFFFFFFFFFFFF                                                       [100%]
 ================================== FAILURES ===================================
 ___ test_tc_b100_20_damaged_manifest_is_never_rewritten[save-back-not-json] ___
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000294D3FA9950>
 writer = 'save-back', damage = 'not-json'
 
@@ -42,7 +42,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:521: AssertionError
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[save-back-not-an-object] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife1')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000294D4DFA750>
 writer = 'save-back', damage = 'not-an-object'
 
@@ -77,7 +77,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:521: AssertionError
 ___ test_tc_b100_20_damaged_manifest_is_never_rewritten[save-back-over-cap] ___
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife2')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife2')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000294D40705D0>
 writer = 'save-back', damage = 'over-cap'
 
@@ -112,7 +112,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:521: AssertionError
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-not-json] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife3')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife3')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000294D5900490>
 writer = 'variant-append', damage = 'not-json'
 
@@ -147,7 +147,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:521: AssertionError
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-not-an-object] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife4')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife4')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000294D52E6CD0>
 writer = 'variant-append', damage = 'not-an-object'
 
@@ -182,7 +182,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:521: AssertionError
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-over-cap] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife5')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife5')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000294D4AF2AD0>
 writer = 'variant-append', damage = 'over-cap'
 
@@ -217,7 +217,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:521: AssertionError
 ___ test_tc_b100_20_damaged_manifest_is_never_rewritten[mac-sync-not-json] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife6')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife6')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000294D515BED0>
 writer = 'mac-sync', damage = 'not-json'
 
@@ -252,7 +252,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:521: AssertionError
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[mac-sync-not-an-object] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife7')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife7')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000294D4616990>
 writer = 'mac-sync', damage = 'not-an-object'
 
@@ -287,7 +287,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:521: AssertionError
 ___ test_tc_b100_20_damaged_manifest_is_never_rewritten[mac-sync-over-cap] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife8')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife8')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000294D56DD3D0>
 writer = 'mac-sync', damage = 'over-cap'
 
@@ -322,7 +322,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:521: AssertionError
 ___ test_tc_b100_20_damaged_manifest_is_never_rewritten[a2l-sync-not-json] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife9')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife9')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000294D500A110>
 writer = 'a2l-sync', damage = 'not-json'
 
@@ -357,7 +357,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:521: AssertionError
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[a2l-sync-not-an-object] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife10')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife10')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000294D4DCAB50>
 writer = 'a2l-sync', damage = 'not-an-object'
 
@@ -392,7 +392,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:521: AssertionError
 ___ test_tc_b100_20_damaged_manifest_is_never_rewritten[a2l-sync-over-cap] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife11')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1red/test_tc_b100_20_damaged_manife11')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000294D56376D0>
 writer = 'a2l-sync', damage = 'over-cap'
 
@@ -427,7 +427,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:521: AssertionError
 _________ test_tc_b100_20_append_says_now_opens_only_after_the_write __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_20_append_says_no0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1red/test_tc_b100_20_append_says_no0')
 
     def test_tc_b100_20_append_says_now_opens_only_after_the_write(tmp_path: Path) -> None:
         """A real write failure (``project.json`` read-only, review probe P2):
@@ -459,7 +459,7 @@ E       assert not ["Project 'P' now opens firmware_1.s19"]
 tests\test_b100_active_variant.py:557: AssertionError
 _______ test_tc_b100_56_recorded_variant_with_control_bytes_paints_none _______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_56_recorded_varia0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1red/test_tc_b100_56_recorded_varia0')
 
     def test_tc_b100_56_recorded_variant_with_control_bytes_paints_none(tmp_path: Path) -> None:
         """A recorded ``active_variant`` is any JSON string: one holding an ESC
@@ -500,7 +500,7 @@ E         Use -v to get more diff
 tests\test_b100_announce.py:366: AssertionError
 ______ test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_67_thirty_problem0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1red/test_tc_b100_67_thirty_problem0')
 
     def test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last(tmp_path: Path) -> None:
         async def _scenario(pilot, app):
@@ -524,7 +524,7 @@ E        +    where {'! Manifest entry skipped: project.json a recorded entry po
 tests\test_b100_announce.py:501: AssertionError
 ______ test_tc_b100_67_fallback_and_problems_paint_in_the_warning_colour ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_67_fallback_and_p0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1red/test_tc_b100_67_fallback_and_p0')
 
     def test_tc_b100_67_fallback_and_problems_paint_in_the_warning_colour(tmp_path: Path) -> None:
         """UX-1 (the P-E verdict B prototype): with a damaged manifest the
@@ -556,7 +556,7 @@ E         Use -v to get more diff
 tests\test_b100_announce.py:565: AssertionError
 ___________ test_tc_b100_67_recorded_reason_paints_in_the_ok_colour ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_67_recorded_reaso0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1red/test_tc_b100_67_recorded_reaso0')
 
     def test_tc_b100_67_recorded_reason_paints_in_the_ok_colour(tmp_path: Path) -> None:
         """UX-1: the recorded active variant's reason paints in the OK colour,
@@ -581,7 +581,7 @@ E         Use -v to get more diff
 tests\test_b100_announce.py:583: AssertionError
 ____________ test_tc_b100_67_wrapped_lines_hang_under_their_column ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1red/test_tc_b100_67_wrapped_lines_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1red/test_tc_b100_67_wrapped_lines_0')
 
     def test_tc_b100_67_wrapped_lines_hang_under_their_column(tmp_path: Path) -> None:
         """UX-2 / UX-3 at 99x54: the fallback reason wraps and its continuation

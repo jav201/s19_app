@@ -1,5 +1,5 @@
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc4 (MUTANT R1-always-rehome)
+tree: <HOME>\Github\s19_app-b100-inc4 (MUTANT R1-always-rehome)
 started: 2026-10-27 08:19:12
 
 MUTANT R1-always-rehome APPLIED 4a05cb20b8cbe14378ddc879a31478ecce084d8884fdf0fe95c50eae4c5cbdc0
@@ -8,7 +8,7 @@ MUTANT R1-always-rehome APPLIED 4a05cb20b8cbe14378ddc879a31478ecce084d8884fdf0fe
 ================================== FAILURES ===================================
 _________________ test_tc_b100_12_healthy_focus_is_not_moved __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28932/test_tc_b100_12_healthy_focus_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28932/test_tc_b100_12_healthy_focus_0')
 
     def test_tc_b100_12_healthy_focus_is_not_moved(tmp_path: Path) -> None:
         """The healthy-focus early return, in the shape that actually exercises
@@ -100,7 +100,7 @@ E             + files_list)
 tests\test_b100_focus.py:475: AssertionError
 ________________ test_tc_b100_12_palette_input_is_never_taken _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28932/test_tc_b100_12_palette_input_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28932/test_tc_b100_12_palette_input_0')
 
     def test_tc_b100_12_palette_input_is_never_taken(tmp_path: Path) -> None:
         """LED .57 (c): while the operator types in the command palette, a
@@ -213,7 +213,7 @@ E             + files_list)
 tests\test_b100_focus.py:587: AssertionError
 _________ test_tc_b100_12_modal_keeps_its_focus_while_a_load_finishes _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28932/test_tc_b100_12_modal_keeps_it0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-28932/test_tc_b100_12_modal_keeps_it0')
 
     def test_tc_b100_12_modal_keeps_its_focus_while_a_load_finishes(
         tmp_path: Path,

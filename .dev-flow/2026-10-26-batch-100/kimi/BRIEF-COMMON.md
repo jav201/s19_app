@@ -1,6 +1,6 @@
 # Kimi brief — common rules for every batch-100 increment
 
-You are the IMPLEMENTER (`software-dev` role, `C:\Users\jjgh8\.claude\skills\dev-flow\agents\software-dev.md`) for one increment of dev-flow batch `2026-10-26-batch-100` of `s19_app` ("Load + projects"). Model: Kimi K2.8. An orchestrator plans the work and gates each increment. An independent reviewer checks your work afterwards. You never review your own work, and you never decide a requirement.
+You are the IMPLEMENTER (`software-dev` role, `<HOME>\.claude\skills\dev-flow\agents\software-dev.md`) for one increment of dev-flow batch `2026-10-26-batch-100` of `s19_app` ("Load + projects"). Model: Kimi K2.8. An orchestrator plans the work and gates each increment. An independent reviewer checks your work afterwards. You never review your own work, and you never decide a requirement.
 
 ## What to read for your increment
 - Your increment brief, `kimi/BRIEF-inc-<N>.md`.
@@ -10,7 +10,7 @@ You are the IMPLEMENTER (`software-dev` role, `C:\Users\jjgh8\.claude\skills\dev
 
 ## Where you work
 - An isolated git worktree is your current directory. It is a detached checkout of `main` at the commit your increment brief names.
-- Interpreter: `C:\Users\jjgh8\anaconda3\envs\s19env\python.exe` (Python 3.11, Textual 8.2.8).
+- Interpreter: `<HOME>\anaconda3\envs\s19env\python.exe` (Python 3.11, Textual 8.2.8).
 - In every shell call, set `PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8` and `PYTHONPATH=<this worktree>`, and **unset `NO_COLOR`** (`env -u NO_COLOR …`). Your shell exports `NO_COLOR=1`, and that breaks Textual colour and snapshot tests.
 - Before the first test run, prove that you import THIS worktree: `python -c "import s19_app; print(s19_app.__file__)"` must print a path inside the worktree. Paste that line into the packet.
 

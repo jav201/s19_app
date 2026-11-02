@@ -61,7 +61,7 @@ OBS-11 list: (empty).
 
 ## Environment checks
 
-- `C:/Users/jjgh8/AppData/Local/s19_app` — absent before the capture and
+- `<HOME>/AppData/Local/s19_app` — absent before the capture and
   absent after (the `sd-dialog` scenario never touches the recent-sources
   store; the selftest pointed `LOCALAPPDATA` at the scratch `lad` folder).
 - No Windows Terminal window left open after the capture (`Get-Process wt`

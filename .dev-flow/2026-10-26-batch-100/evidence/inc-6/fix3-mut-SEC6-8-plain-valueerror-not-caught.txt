@@ -1,9 +1,9 @@
 # mutation: SEC6-8-plain-valueerror-not-caught — SEC6-8 (LLR-178.1, SEC6-1 skip path): the manifest parse no longer catches a plain ValueError (an integer over the digit limit)
 # file: s19_app/tui/services/variant_execution_service.py (sha256 before 76b276077ded9717)
-# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=C:\Users\jjgh8\AppData\Local\Temp\f3mut-SEC6-8-plain-valueerror-not-caught tests/test_b100_announce.py tests/test_b100_active_variant.py -k digit_limit or int-over-digit-limit
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (corrective pass 3, mutated in place, then restored)
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
-# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\__init__.py
+# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=<HOME>\AppData\Local\Temp\f3mut-SEC6-8-plain-valueerror-not-caught tests/test_b100_announce.py tests/test_b100_active_variant.py -k digit_limit or int-over-digit-limit
+# tree: <HOME>\Github\s19_app-b100-inc6 (corrective pass 3, mutated in place, then restored)
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# s19_app.__file__ = <HOME>\Github\s19_app-b100-inc6\s19_app\__init__.py
 # date: 2026-10-30T05:15:27Z
 # --- old
 #           json.JSONDecodeError,
@@ -44,7 +44,7 @@ tests\test_b100_announce.py:96: AssertionError
 
 During handling of the above exception, another exception occurred:
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-8-plain-valueerror-not-caught/test_tc_b100_67_integer_over_t0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f3mut-SEC6-8-plain-valueerror-not-caught/test_tc_b100_67_integer_over_t0')
 
     def test_tc_b100_67_integer_over_the_digit_limit_reads_as_damaged(tmp_path: Path) -> None:
         """SEC6-8: ``project.json`` holds a 5 000-digit integer (``json.load``
@@ -131,7 +131,7 @@ E           ValueError: Exceeds the limit (4300 digits) for integer string conve
 ..\..\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\tui\app.py:7019 in           
+│ <HOME>\Github\s19_app-b100-inc6\s19_app\tui\app.py:7019 in           
 │ _route_load_project                                                          
 │                                                                              
 │    7016 │   │   │   │   - ``action_load_project`` (the dialog's dismiss call 
@@ -155,7 +155,7 @@ E           ValueError: Exceeds the limit (4300 digits) for integer string conve
 │ │          )                                    │                            
 │ ╰───────────────────────────────────────────────╯                            
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\tui\app.py:10141 in          
+│ <HOME>\Github\s19_app-b100-inc6\s19_app\tui\app.py:10141 in          
 │ _handle_load_project                                                         
 │                                                                              
 │   10138 │   │   # order of ``build_variant_set`` (with a status warning when 
@@ -170,14 +170,14 @@ E           ValueError: Exceeds the limit (4300 digits) for integer string conve
 │ │         a2l_files = []                                                   │ 
 │ │        data_files = [                                                    │ 
 │ │                     │                                                    │ 
-│ │                     WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mu… │ 
+│ │                     WindowsPath('<HOME>/AppData/Local/Temp/f3mu… │ 
 │ │                     │                                                    │ 
-│ │                     WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mu… │ 
+│ │                     WindowsPath('<HOME>/AppData/Local/Temp/f3mu… │ 
 │ │                     ]                                                    │ 
 │ │ discarded_unsaved = 0                                                    │ 
 │ │             error = None                                                 │ 
 │ │              name = 'P'                                                  │ 
-│ │       project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mu… │ 
+│ │       project_dir = WindowsPath('<HOME>/AppData/Local/Temp/f3mu… │ 
 │ │              self = S19TuiApp(                                           │ 
 │ │                     │   title='Hex Edit Tool',                           │ 
 │ │                     │   classes={'-dark-mode'},                          │ 
@@ -189,13 +189,13 @@ E           ValueError: Exceeds the limit (4300 digits) for integer string conve
 │ │                     │   │   VariantDescriptor(                           │ 
 │ │                     │   │   │   variant_id='firmware',                   │ 
 │ │                     │   │   │                                            │ 
-│ │                     path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp… │ 
+│ │                     path=WindowsPath('<HOME>/AppData/Local/Temp… │ 
 │ │                     │   │   │   file_type='s19'                          │ 
 │ │                     │   │   ),                                           │ 
 │ │                     │   │   VariantDescriptor(                           │ 
 │ │                     │   │   │   variant_id='firmware_1',                 │ 
 │ │                     │   │   │                                            │ 
-│ │                     path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp… │ 
+│ │                     path=WindowsPath('<HOME>/AppData/Local/Temp… │ 
 │ │                     │   │   │   file_type='s19'                          │ 
 │ │                     │   │   )                                            │ 
 │ │                     │   ),                                               │ 
@@ -203,7 +203,7 @@ E           ValueError: Exceeds the limit (4300 digits) for integer string conve
 │ │                     )                                                    │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\tui\services\variant_executi 
+│ <HOME>\Github\s19_app-b100-inc6\s19_app\tui\services\variant_executi 
 │ on_service.py:515 in read_project_manifest                                   
 │                                                                              
 │    512 │   │   return empty                                                  
@@ -225,15 +225,15 @@ E           ValueError: Exceeds the limit (4300 digits) for integer string conve
 │ │                 │   issues=[]                                            │ 
 │ │                 )                                                        │ 
 │ │        handle = <_io.BufferedReader                                      │ 
-│ │                 name='C:\\Users\\jjgh8\\AppData\\Local\\Temp\\f3mut-SEC… │ 
+│ │                 name='<HOME>\\AppData\\Local\\Temp\\f3mut-SEC… │ 
 │ │        issues = []                                                       │ 
-│ │ manifest_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SE… │ 
-│ │   project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SE… │ 
+│ │ manifest_path = WindowsPath('<HOME>/AppData/Local/Temp/f3mut-SE… │ 
+│ │   project_dir = WindowsPath('<HOME>/AppData/Local/Temp/f3mut-SE… │ 
 │ │    size_bytes = 5030                                                     │ 
 │ │    size_probe = None                                                     │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\__init__.py:293 in load        
+│ <HOME>\anaconda3\envs\s19env\Lib\json\__init__.py:293 in load        
 │                                                                              
 │   290 │   To use a custom ``JSONDecoder`` subclass, specify it with the ``cl 
 │   291 │   kwarg; otherwise ``JSONDecoder`` is used.                          
@@ -246,7 +246,7 @@ E           ValueError: Exceeds the limit (4300 digits) for integer string conve
 │ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
 │ │               cls = None                                                 │ 
 │ │                fp = <_io.BufferedReader                                  │ 
-│ │                     name='C:\\Users\\jjgh8\\AppData\\Local\\Temp\\f3mut… │ 
+│ │                     name='<HOME>\\AppData\\Local\\Temp\\f3mut… │ 
 │ │                kw = {}                                                   │ 
 │ │       object_hook = None                                                 │ 
 │ │ object_pairs_hook = None                                                 │ 
@@ -255,7 +255,7 @@ E           ValueError: Exceeds the limit (4300 digits) for integer string conve
 │ │         parse_int = None                                                 │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\__init__.py:346 in loads       
+│ <HOME>\anaconda3\envs\s19env\Lib\json\__init__.py:346 in loads       
 │                                                                              
 │   343 │   if (cls is None and object_hook is None and                        
 │   344 │   │   │   parse_int is None and parse_float is None and              
@@ -277,7 +277,7 @@ E           ValueError: Exceeds the limit (4300 digits) for integer string conve
 │ │                     999999999999999999999999999999999999999999999999999… │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:337 in decode       
+│ <HOME>\anaconda3\envs\s19env\Lib\json\decoder.py:337 in decode       
 │                                                                              
 │   334 │   │   containing a JSON document).                                   
 │   335 │   │                                                                  
@@ -295,7 +295,7 @@ E           ValueError: Exceeds the limit (4300 digits) for integer string conve
 │ │ self = <json.decoder.JSONDecoder object at 0x000001BE82E0B6D0>           │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\json\decoder.py:353 in raw_decode   
+│ <HOME>\anaconda3\envs\s19env\Lib\json\decoder.py:353 in raw_decode   
 │                                                                              
 │   350 │   │                                                                  
 │   351 │   │   """                                                            
@@ -316,7 +316,7 @@ ValueError: Exceeds the limit (4300 digits) for integer string conversion: valu
 has 5000 digits; use sys.set_int_max_str_digits() to increase the limit
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[save-back-int-over-digit-limit] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-8-plain-valueerror-not-caught/test_tc_b100_20_damaged_manife0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f3mut-SEC6-8-plain-valueerror-not-caught/test_tc_b100_20_damaged_manife0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001BE8A070650>
 writer = 'save-back', damage = 'int-over-digit-limit'
 
@@ -394,7 +394,7 @@ E           ValueError: Exceeds the limit (4300 digits) for integer string conve
 ..\..\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-int-over-digit-limit] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-8-plain-valueerror-not-caught/test_tc_b100_20_damaged_manife1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f3mut-SEC6-8-plain-valueerror-not-caught/test_tc_b100_20_damaged_manife1')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001BE88B74050>
 writer = 'variant-append', damage = 'int-over-digit-limit'
 
@@ -472,7 +472,7 @@ E           ValueError: Exceeds the limit (4300 digits) for integer string conve
 ..\..\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[mac-sync-int-over-digit-limit] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-8-plain-valueerror-not-caught/test_tc_b100_20_damaged_manife2')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f3mut-SEC6-8-plain-valueerror-not-caught/test_tc_b100_20_damaged_manife2')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001BE8962BE10>
 writer = 'mac-sync', damage = 'int-over-digit-limit'
 
@@ -550,7 +550,7 @@ E           ValueError: Exceeds the limit (4300 digits) for integer string conve
 ..\..\anaconda3\envs\s19env\Lib\json\decoder.py:353: ValueError
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[a2l-sync-int-over-digit-limit] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-8-plain-valueerror-not-caught/test_tc_b100_20_damaged_manife3')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f3mut-SEC6-8-plain-valueerror-not-caught/test_tc_b100_20_damaged_manife3')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001BE88940950>
 writer = 'a2l-sync', damage = 'int-over-digit-limit'
 

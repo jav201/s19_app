@@ -69,7 +69,7 @@ from tests.support.b100_load_dialog import bare_path_dialog, is_load_dialog
 # The single character we DO NOT include is ``q`` (which fires
 # ``action_quit`` and would tear down the test harness).
 _COLLIDING_PATH = (
-    "C:\\Users\\jjgh8\\OneDrive\\Documents\\Github\\s19_app"
+    "<HOME>\\OneDrive\\Documents\\Github\\s19_app"
     "\\examples\\case_01_basic_valid\\firmware.s19"
 )
 

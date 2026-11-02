@@ -1,6 +1,6 @@
 pre-mutation sha256: 18ee4d450529d0cb0fb7f33a274cd7295d9051cbc620414c22bb4c3868201c1e
 mutant sha256: d91fe3c41fe5ee82429e02fd960d196bc8434b333d360ec66255278f054e26ea
-cmd: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py
+cmd: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py
               await pilot.press(*"0x8000007C")
                 assert await pilot.click("#patch_entry_bytes_input"), (
                     "click missed #patch_entry_bytes_input"

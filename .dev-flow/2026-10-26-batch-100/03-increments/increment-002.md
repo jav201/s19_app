@@ -239,7 +239,7 @@ disk-full shape) and
 ## 3 · How to test
 
 ```bash
-# interpreter: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe
+# interpreter: <HOME>/anaconda3/envs/s19env/python.exe
 export PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<this worktree>
 unset NO_COLOR
 python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py
@@ -436,7 +436,7 @@ d2137e1d5b5d… verified for BOTH files after the last revert
 |---|---|
 | Mutation applied | 4 live mutants (one per LLR, the proposal table's mutations), each applied by hand via the editor, run, and reverted — details per row above |
 | Instrument | project code, own hand via targeted edits; restore verified by SHA-256 against `pre-mutation-hashes.txt` |
-| Where it ran | this worktree (`C:\Users\jjgh8\Github\s19_app-b100-inc2`), implementer agent |
+| Where it ran | this worktree (`<HOME>\Github\s19_app-b100-inc2`), implementer agent |
 | Transcript | `evidence/inc-2/mut-llr-164-{1,2,3,4}.txt` |
 | Restore proven by | `pre-mutation-hashes.txt` + the post-restore `sha256sum` checks |
 | Bytecode cache | `PYTHONDONTWRITEBYTECODE=1` in every run (C-46) |
@@ -514,70 +514,70 @@ d2137e1d5b5d… verified for BOTH files after the last revert
 
 | Evidence artifact | Path — under `artifact_homes.evidence` | SHA-256 |
 |---|---|---|
-| correction-population-fix2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/correction-population-fix2.txt | a2b6e507e46ff952196e8d40876ca2a8ca273c00fa162d4a4dbf6f9fb268f8a3 |
-| correction-population-fix3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/correction-population-fix3.txt | 98a10bce09cd44d3ccb2c30c097cb26b47212c262070d469512cef9784026c31 |
-| correction-population-fix4.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/correction-population-fix4.txt | f5811b3d797805a749408410755094a873073fe50f81f7d9e37ab5d2469d735e |
+| correction-population-fix2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/correction-population-fix2.txt | 0034cf15dd6b1875a6ad46d05e4e6e699f5c2864f0ad87ed37c8dbbd52f31937 |
+| correction-population-fix3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/correction-population-fix3.txt | e3590890303e920667cd70c01730136e292f7896940f4c380fabb2ff3be412ca |
+| correction-population-fix4.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/correction-population-fix4.txt | 04c6a2d9ee505c19606b31fd817da2fbadba6115c5a0ac2b1cab1d78413b8ca3 |
 | correction-population-fix5.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/correction-population-fix5.txt | 37f783b090ef9fcc511bd491bfa6f7608a19ea193b262fe665d36c720cc69508 |
 | correction-population.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/correction-population.txt | 8b52e57bdffc637dc39f98af9c375ce5bb0d601044de9757e5edc6d9608d6598 |
-| green-01-save-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-01-save-guards.txt | dab6b2cae3b68209dc22708dafbf0768c1549c85539ffded4d548b7d9c5e4d75 |
+| green-01-save-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-01-save-guards.txt | 808182a0c468e855446633fc167ba414feccf174cecd9f5f378f6f079acf1ae0 |
 | green-02-a09-variant.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-02-a09-variant.txt | 778f16d6bfdd78a2c34e3fac916ffed353f46ee17fb49636a6f8030b14711975 |
-| green-03-save-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-03-save-guards.txt | e65d032aa0e142f467e60f10ddd1930e021d47c7c0bf379849825ef134156777 |
-| green-04-save-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-04-save-guards.txt | a22ab542d31ef3ee064cfc44770d77cbb044b211159f719972b35cf58a42961b |
-| green-fix1-a09-variant.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-fix1-a09-variant.txt | 6e160a5625da461c93b5a0e7b76879e15f8acab1b2f5eb3d882bbfc5becf23fc |
-| green-fix1-save-guards-iter1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-fix1-save-guards-iter1.txt | da6f7f5ee6492a935fabd6b16b66d2f0219c5f5737793f378ea918e65527c8b2 |
-| green-fix1-save-guards-iter2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-fix1-save-guards-iter2.txt | f7a2c56ae7b5e5e89fabc5dae587203ff90a879620cc245db42a8c57b946f99d |
-| green-fix1-save-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-fix1-save-guards.txt | fcf112e19728661db1cbdfe7706353197aca6dfcde0372b9f9e63bbb9576c856 |
-| green-fix2-guards-nodes.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-fix2-guards-nodes.txt | c87e4605bd59734109098c9b82cb3eb73cae6d102fb74022118a8f71dce5d1a5 |
-| green-fix2-save-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-fix2-save-guards.txt | fd246d58eac0ba60cc402d708303d20c542f89f2c7b8e861aa882ce51612229c |
-| green-fix3-guards-nodes.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-fix3-guards-nodes.txt | be69edfb27276df20f545f0a961fbad7fbbf54e5d5e27d0dbdd65b52f52d60c4 |
-| green-fix3-save-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-fix3-save-guards.txt | f611b911e54bad913a59dcb61d52c9d0272ad04fd4de89ad396fb0158c03620c |
-| green-fix4-save-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-fix4-save-guards.txt | 69e7e1a93c99ddfe38c19910c9f787e85a5bfa1a0f93a62d7d310ce4f2abfbac |
-| green-fix5-save-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-fix5-save-guards.txt | cf4fc40d423a9a9b0c83fe50a09dfe54eb1ef31f4b8f6cae5885107204704570 |
-| guards-census-fix1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/guards-census-fix1.txt | 79b1f6754a0548398cd29cb38f3be2d0dc1d0cbdf31799532fada33909815f6d |
-| guards-census-fix2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/guards-census-fix2.txt | 83afed2840759294d875c54e2aa8718b4c4870e56dd57aeeaccbd8a71ac03581 |
-| guards-census-fix3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/guards-census-fix3.txt | d8b1bdab02c1ade4ae81954e56742e7ddc4cfe0962bbc7a4b737b79f1d8cf82e |
-| guards-census-fix4.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/guards-census-fix4.txt | ce7b0cced894b672c931ce822731e099e3060a6aebe79a63083bb6d639001ffb |
+| green-03-save-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-03-save-guards.txt | c89b18021b5f59cc68967efbb6b10e056264c020423c8882d9a345add5a93a7e |
+| green-04-save-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-04-save-guards.txt | 7eff31fc827d073bf0bde6c5ed5d99b7d1917483f32d0bb49fef4e7f0b0dd542 |
+| green-fix1-a09-variant.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-fix1-a09-variant.txt | ccd96321315fd6d09f00d288c6efb9ed5e85ae175a57bdc6e68b7ba97b4933c8 |
+| green-fix1-save-guards-iter1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-fix1-save-guards-iter1.txt | 50dc65d419eaa831257e2d2469c8266c7d45000c81995bdc693a84321814c7da |
+| green-fix1-save-guards-iter2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-fix1-save-guards-iter2.txt | 2355402b4b4219d4ee8b9ab1279e0e287d5bb8a2d19ec1a9454fd555475ee679 |
+| green-fix1-save-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-fix1-save-guards.txt | d646511dda91bd4643b7e0e41897a20f85a0b7e6c2d382869bbdb6a8467a5545 |
+| green-fix2-guards-nodes.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-fix2-guards-nodes.txt | 5b49e35844af2eed9b2ff6bce8bda9fb71a33d5e984e99dbc52dbd9b07356f09 |
+| green-fix2-save-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-fix2-save-guards.txt | 79b3ae34f29bf8c3c37ef440731c32b54656f905350b657af2b098af9e8f7465 |
+| green-fix3-guards-nodes.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-fix3-guards-nodes.txt | c863d6d893b85457be3e9a83277bbed09331eb8fa3cd7ac84d2e2d6ea26254b7 |
+| green-fix3-save-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-fix3-save-guards.txt | 5793cbe7ffd02ed3fab3f120049b6cb35aae3d5f1c839d1bcf40969abeab629f |
+| green-fix4-save-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-fix4-save-guards.txt | 74b0e1ef71a4a191b04f068d2ffc64390786ae69a45a6d07fe039f0e30a8374e |
+| green-fix5-save-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/green-fix5-save-guards.txt | 4947264e29f8a10045363407d790b139ebcec9c33eb4019168cc75047163f05e |
+| guards-census-fix1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/guards-census-fix1.txt | aebd9946518dfad9fa739423127a97c054e8928aa252b2c2545c2db8aabbc3b2 |
+| guards-census-fix2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/guards-census-fix2.txt | 4414ac237bd3f2d1c164a7e53fc11fedf5a037b77f659fc801f8c2d14b20c03a |
+| guards-census-fix3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/guards-census-fix3.txt | ca6e8c5a0ee6637b2a667c74452bab3a77b4415787ecdcdb8a0a6cbf1d9446ea |
+| guards-census-fix4.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/guards-census-fix4.txt | 7aa0c99d937095cc933f50ffff1f02db3996612e88369b66ef00c4fb3e4f1d5a |
 | guards-census-fix5.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/guards-census-fix5.txt | f6784ffa816ceac37ce2fd57f9edf28c32f953735efff9d316708b96f7053837 |
-| guards-census.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/guards-census.txt | 49b3e6982b626b3462a3737e79e4e10b0f4f1ef85551d86413078a4598068d63 |
-| guards-fix1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/guards-fix1.txt | 71e12d58563202b8bc22503d304625875c87ba1c034b15e28d5a2915a45d6610 |
-| guards-fix2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/guards-fix2.txt | d7a338dd115cd4178fb1cba5dbe8044b7f52bbba908007c6d724602093968704 |
-| guards-fix3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/guards-fix3.txt | 1678846009380e9fd1dc66ec3e84ac12b8625557aad71496a00b5a90cab66a2e |
-| guards-fix4.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/guards-fix4.txt | ed2dc0d6ebf531de6dc54deea2be1aaafbc7c50b719fa9fe861ef07b0c7889d7 |
+| guards-census.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/guards-census.txt | 4c6c788c15a8eb7282e1303a3542c378bc85db85ba793081dea11307ade82693 |
+| guards-fix1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/guards-fix1.txt | c4bbdb8c2b4810d80695d1774d56e6be834436a3d017a8bf97bb8d8f8500d7cf |
+| guards-fix2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/guards-fix2.txt | f1e28e4e08b8b5d0a772596363287b34c69adc02027269dcd8df93187f48bcac |
+| guards-fix3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/guards-fix3.txt | 99db0e22994fa50c6f0450598ef0a62b6ad639439cc7b0fcb4d22cffb2c1c369 |
+| guards-fix4.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/guards-fix4.txt | e1576236e18da4fcee1924a7aed0b28887e023a79636f815c6e85766be4275e2 |
 | guards-fix5.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/guards-fix5.txt | 5379f37616eb6bcec703f9c624c8c42f14faccd9ac0379f345653b324cd4d80e |
-| guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/guards.txt | 2c380395fc4971d547f0fafc423e2fb4c6a09141c126a7d00f0bb6bbd3a660ef |
-| import-proof-fix1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/import-proof-fix1.txt | 8813a367a85965da10d019dc06a5f317e64bae943020551887bd77f85475791c |
-| import-proof-fix2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/import-proof-fix2.txt | 1af71df5b7795a32e5acab43a5ef0e0d9aaebdcd5bf69f0310c0e4ec4d7cfb26 |
-| import-proof-fix4.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/import-proof-fix4.txt | ff75d54a8ed73ac2c3b09376228c814c7f3a57484d9bd0e5b2639c5dcf9b0bd9 |
-| import-proof-fix5.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/import-proof-fix5.txt | c581be5d6533f9eca0b05a79d4f2d5f70daca2583d4edba2ee7ac84c62d670cc |
-| import-proof.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/import-proof.txt | a693903c7bc3c213a016824c144ebeaa48c897c6f60dc7f45e72760b2636c3b6 |
-| mut-fix1-f1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix1-f1.txt | 76cbae6e8e5c7fb3dc3c54a7810e6d0af499c3cd4584de2639d3e8805a11ec53 |
-| mut-fix1-f3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix1-f3.txt | 78346f32261aaf7f6daf27900c4e1d0203ffae7afce7edb299f7a22d46c53a21 |
-| mut-fix1-f4.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix1-f4.txt | 4f0877a6281d0facda1c50dfee5075f32d73d1fd0738471d59464fe1f0828eca |
-| mut-fix1-f5.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix1-f5.txt | 3a1d531087e0b7c913b0a1628561803ecb453d28cff398d1dc4054a3c99f3b99 |
-| mut-fix1-m6.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix1-m6.txt | ad21ed28575fc2a73d9fd5fc2268d0b0d0740ed451a200ac61642940b63019c7 |
-| mut-fix1-m7.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix1-m7.txt | a046d9f0f6d67b68b9726a33dc77f0fd427fcd18d0aadaa6722d9b144184ec77 |
-| mut-fix2-f6a.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix2-f6a.txt | ecda7161d7d9966ed7bd2bffc68770125bcfda91e174e2c9e8519055631231f8 |
-| mut-fix2-r21.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix2-r21.txt | 60ed36bdd5e27371ccedd353a5d177e5af91b5cfc8ac417073eb79cff59850c3 |
-| mut-fix2-r24.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix2-r24.txt | 41d846a743fad2bd25a400791814e2c6597437faa9fae84b1cfe15d078623e46 |
-| mut-fix2-r25.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix2-r25.txt | 3c2ff24e565f0eb413a1556272476ceb2ae1445f5c297de5737c6e59e03170a2 |
-| mut-fix2-sf5.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix2-sf5.txt | b9fe8619120707f7ed3e60c17472b3e215c9a7b795118b8debe2837bcc1f08e7 |
-| mut-fix3-mr1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix3-mr1.txt | 9e04f96d953a05a510fc34e1aea5e8ec4d2a73de7d8b1c76a6d5ab998f6fcb71 |
-| mut-fix3-mr2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix3-mr2.txt | 6e4b20ab936e939e0f9232e68a4adc5adaad76f0510f5298e91fc4e99e92dfb4 |
-| mut-fix3-mr3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix3-mr3.txt | 43c0409b9cac215b804012c7f439cc01ba4a967bd7dd1f14c1fe37873548dfa7 |
-| mut-fix3-r31.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix3-r31.txt | 871860c345494583055b375aa7d8c34f80e4f1473d4f79a2922c07fb8e44450e |
-| mut-fix4-a.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix4-a.txt | 928f9a51b63f69a13ff96fe1cb3640d4a57fbb71e43620f8fe59b10472d779b1 |
-| mut-fix4-b.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix4-b.txt | b7c8fcf286d44777bd3fdf0020bb75dde3efd5a97cc67df4ef5943e82bb834e7 |
-| mut-fix4-c.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix4-c.txt | 2ec9b401abaff367fb36d5862a6f755877f6ffb684cb4ba5bfb8e43e348e93b3 |
-| mut-fix5-fix4-a.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix5-fix4-a.txt | ae6764c0555a5734fce5fe350c1e1c5684e69366327369ad5d198de0ae872b5c |
-| mut-fix5-fix4-c.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix5-fix4-c.txt | 6ee6434dc4ba783fdc5e114ba1e5aa47c6858e40f128673dc6981f7263b90c62 |
-| mut-fix5-mf.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix5-mf.txt | 24671325d46f9d33d9558b5a4b240a7bfe63865ba7ec56ec0058330cb520a202 |
-| mut-fix5-r5-1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix5-r5-1.txt | 32646f6888683cdeb8677e56edb9f64bc548925a5b4fb6692e2d510cbd4295df |
-| mut-fix5-sec2-8.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix5-sec2-8.txt | 7e5ae6e2b4b386ec615177e8f74b2ca3c863aa4aad2d0185daddf0a5c9555125 |
-| mut-fix5-sec2-9.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix5-sec2-9.txt | f5ea9b01b2779b573be8cb62e527839fc2b7db0e9bf9d26b6180a0017155939c |
-| mut-llr-164-1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-llr-164-1.txt | 3b63e2afd40fae8eca23832fbbf3486c93d626d1bab4a8ef378dfa19eb87c99c |
-| mut-llr-164-2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-llr-164-2.txt | a347369b785e3c154b9745201e0e106e40ef8c24b78ded3ab410359b20b6a913 |
-| mut-llr-164-3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-llr-164-3.txt | 31dffd21cf045b63f29d7cfd6c2851978b4bd64ea44e75bc3ea021977943de3c |
-| mut-llr-164-4.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-llr-164-4.txt | dbffaab9dbad8dbde87b66f3cf9ec4707f42ef403784452501c05d69c32759d0 |
+| guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/guards.txt | 2a40889416c2a6d539f585744823a5f9b7c21594471d9dba4622c9177ceba170 |
+| import-proof-fix1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/import-proof-fix1.txt | 5f1c4c216cfabf43a7a1311c111c315083f90ea315800e8165d2ba47070e60bd |
+| import-proof-fix2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/import-proof-fix2.txt | f6e8707b4442a94fc55afad602b38b1b8e3575f5a8943b54839d28053207e505 |
+| import-proof-fix4.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/import-proof-fix4.txt | 1d4caa11cff1452aca682102a9389ca1be4cc1a6ee9e166dc85ff4579e52bd8d |
+| import-proof-fix5.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/import-proof-fix5.txt | c9d2b4646107058dbb25775cf975f391cb82c4777d5448e0b37ad92381b5caae |
+| import-proof.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/import-proof.txt | 7a462eb0362105734205ce5d68ba59a5df6e0e4c54cd8915311a3aa8c51548f3 |
+| mut-fix1-f1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix1-f1.txt | c2fa4b755e441a751869966bbb3fec7b02058a77e8eee82fddba006e4d3c9605 |
+| mut-fix1-f3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix1-f3.txt | f54def7fe6ae3da8026c2e0d081b0460d4b7fee73963252a35ba0bd1d0293ba4 |
+| mut-fix1-f4.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix1-f4.txt | 57ecd01d3f3380e85674c32ab1d7e6d295d53106c14d7a94ad14bcd1d6c07315 |
+| mut-fix1-f5.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix1-f5.txt | 6c69ac6365d9b04d85f0b31120a929eb3c2760698ef01ed89443947678be26ca |
+| mut-fix1-m6.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix1-m6.txt | 78ca002abb68239b82e1a096fa3a8f785a38a1d9b4929959b5046809fbda8f72 |
+| mut-fix1-m7.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix1-m7.txt | b8be7eb8e7dbff31cc08605f6c33dd580f5faf05e19134add0c6fe1269761013 |
+| mut-fix2-f6a.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix2-f6a.txt | 56613dad320ce6a589a556da8637a16bded5fd4d6de84392239962a1b5d8284d |
+| mut-fix2-r21.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix2-r21.txt | 1a5e0a864c84c811e3f469bd2df30d1373c0ef23e941073141a51bc7a3b7814b |
+| mut-fix2-r24.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix2-r24.txt | 0edfa00600f36bdd7f1fa31484bfe6242c23ef10bbde193023ef88893b6e6890 |
+| mut-fix2-r25.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix2-r25.txt | ce7227d17fdfa0c581f5957c5e5d437fe72946ad88cb0a46e5860ca9290aff24 |
+| mut-fix2-sf5.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix2-sf5.txt | 7106bc66d59506a7a949d76931e6e038b2409b10ef7afe4505d9f84e0211879f |
+| mut-fix3-mr1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix3-mr1.txt | 1d9cb354c6fd60751fbde18061651c7da27d144de937e5c8a7eb2ae0be4b5e41 |
+| mut-fix3-mr2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix3-mr2.txt | 68fc340127546657fb23f3c2dcde3dc84e8ebb0f7b3f774cf56a7392642a4cad |
+| mut-fix3-mr3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix3-mr3.txt | 092cb6253df9b1c19d3a541237d3be306c7bb772e4e37be51ee8d254d6b35179 |
+| mut-fix3-r31.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix3-r31.txt | 78e2b24508341cc0fbb4b62e1ed55e15c7d2fc6de1022802cfd84823350bf759 |
+| mut-fix4-a.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix4-a.txt | 177dc1e893c4d4386704296bca5aa449b67608825ac23fff3a1ee7a2e8af6c68 |
+| mut-fix4-b.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix4-b.txt | 9dd1469180c089dacacf46b7d475c5b98600907b904d3e5aae6d00bf69b2bf17 |
+| mut-fix4-c.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix4-c.txt | 57b2451b4d51c12489418c3ffe7155f2d01eae82e90912e154738ad17502e801 |
+| mut-fix5-fix4-a.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix5-fix4-a.txt | ff9bba581a9a82a63142d61a83e6ee23c44085041bff9b42026e478e809f263f |
+| mut-fix5-fix4-c.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix5-fix4-c.txt | d7bc61f3c1f581528a9c65a71bfca8e5bd70bcaa61f0e602eb4ebe6c64650f8f |
+| mut-fix5-mf.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix5-mf.txt | 3466730bfca014e83978e3c6552b4f8ff573d551ecfc8112c5187cf44ece4566 |
+| mut-fix5-r5-1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix5-r5-1.txt | c8c7e8cfa6aa8c3bb8fe8f95286afdcd868b71c3bd4f11bc9c82c5bffb88a04f |
+| mut-fix5-sec2-8.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix5-sec2-8.txt | 894ba3a7503e602e727fe3019624e63afab3f3540d9eab662bf8738d32bd76b2 |
+| mut-fix5-sec2-9.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-fix5-sec2-9.txt | f2a1661ac2ea8422f4f79b6387aa78a24c303c16cb89a04f0461bb057ab00ff5 |
+| mut-llr-164-1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-llr-164-1.txt | 687462d199bd708d891b94410357d27f9d3a11b06cc0b7fbf86858879395026a |
+| mut-llr-164-2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-llr-164-2.txt | 2d452992ea601fea081ffbfd0f3387590325d1cea8d7d8c2f6317885f4bd022c |
+| mut-llr-164-3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-llr-164-3.txt | 4808cc89d260d0c96cd151d9556068709391a370ed29e7720e724a6875e4d6b5 |
+| mut-llr-164-4.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/mut-llr-164-4.txt | dd6eccee85ac5ee92935c82afb629838bb29ece9fac51572cd217e6008b99f4d |
 | pre-mutation-hashes-fix1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/pre-mutation-hashes-fix1.txt | 27bcb71931a2d4ba3a1e04a48739cb7e30b4365438926790955ccb94b033b793 |
 | pre-mutation-hashes-fix2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/pre-mutation-hashes-fix2.txt | a4c9f9e7bdba2c568c76ba8a3545b22a6f0f22ad52f5e87ec3b38d8e713f6c3b |
 | pre-mutation-hashes-fix3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/pre-mutation-hashes-fix3.txt | 5fb4a5869c6bac917d3e8dd064a8e2afb6881c34579c381aedb9c6b8f8fb47e0 |
@@ -585,37 +585,37 @@ d2137e1d5b5d… verified for BOTH files after the last revert
 | pre-mutation-hashes-fix5-mutants.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/pre-mutation-hashes-fix5-mutants.txt | cfcf64bb7ffc91b2d968e5d81adfdd3d977b283cbbc65b72eabdeccc07c75386 |
 | pre-mutation-hashes-fix5.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/pre-mutation-hashes-fix5.txt | 8b7d6b588ffcd0df69cabdf5925f71c5157fded96f20e545481ea3fd1291b8d0 |
 | pre-mutation-hashes.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/pre-mutation-hashes.txt | 7723161657925ee90d1e6585ca4f1f5bc2864cb389bfccfd04eae40351c6a31f |
-| red-01-save-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/red-01-save-guards.txt | d7a356fb7c732437f537ddbbec9a621ed44cb4b0382e63117568909b636f4808 |
-| red-fix1-save-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/red-fix1-save-guards.txt | c2ab567235a373fb4303b7b9b71dd23198de6ae477db8a92c6d7c6a86609f534 |
-| red-fix2-naive-trap.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/red-fix2-naive-trap.txt | e24068832d2b32c711588a2dafc405855b40d1ee5ee548a130eb1557281beb66 |
-| red-fix2-save-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/red-fix2-save-guards.txt | dec3c553ccebd8b7c197e128ad2392c294af55e623b1fb3cf17f151301fd8602 |
-| red-fix3-save-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/red-fix3-save-guards.txt | 55bf798e87d55fa08a2622781424e418b526db127a3302728155a3eb2ea86c29 |
-| red-fix4-r7-r8.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/red-fix4-r7-r8.txt | e4383ed65890d1652170053cd82d84cf4b1ed5c5a0996f684316c1337945e7e1 |
-| red-fix5-census57.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/red-fix5-census57.txt | 865458d2cb85a76f67cf5d2add320066bd3cb74bf3fee0e529d49d2d60cc8539 |
-| red-fix5-new-arms.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/red-fix5-new-arms.txt | db1f10761bcf40ef56068ebe77265f472a79b89a3aa9bed53efe552b79101ad5 |
-| red-fix5-r5-1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/red-fix5-r5-1.txt | c4617ed4660712b03910ec79df7ae4f7d073d5cf5626caed72878771415a2a94 |
-| repin-b99-staging.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/repin-b99-staging.txt | 75c5349981e212ae1a4c951d140ce8fa29f4db792c1ff1cdbf7edae93f537e9f |
+| red-01-save-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/red-01-save-guards.txt | f72ea56e48f0a2c849ede68c047276795520e348247b9cc9416d0d23bf02976d |
+| red-fix1-save-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/red-fix1-save-guards.txt | f1c4ac422eb57f9b27b7c70ff6dc1a405d5f664d03be4c876ea618e6146c9526 |
+| red-fix2-naive-trap.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/red-fix2-naive-trap.txt | b68cbce13f0afce43a8989d862ac329166ff55ba9818acc48bbcb2309f2cce5e |
+| red-fix2-save-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/red-fix2-save-guards.txt | 06c82c0a76e0ea95c7ba8c3340a66ea4c18a267126fdfbbda7bb911090bc80dc |
+| red-fix3-save-guards.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/red-fix3-save-guards.txt | 81b46a5579b7b2b6e1ffcad4b7abf3260a0dce0df930851c05c7d16ef9ec3e25 |
+| red-fix4-r7-r8.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/red-fix4-r7-r8.txt | 9cfe101fc6f7f0a0e40f9b6d9b74fa38a807425d0707e9fce1e3a1148b8f8ec5 |
+| red-fix5-census57.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/red-fix5-census57.txt | bed4a359166e8e3dda9ed9139c2e7ce68d63e7ade622de6fd643f0f3c1f0b8bf |
+| red-fix5-new-arms.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/red-fix5-new-arms.txt | fc54e988a2c76749b2e8358b41dfd9bef66e8992b3df2ce5ff41ea98b6c9d8bc |
+| red-fix5-r5-1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/red-fix5-r5-1.txt | cdeb0d3ed2bba545a08b40e86a89b5770099b6d841e90f16f2885c76dc232048 |
+| repin-b99-staging.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/repin-b99-staging.txt | c825040b555d14928a5653380612f34567772a9388cf7b467c5f955cbf3399cd |
 | restore-fix2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/restore-fix2.txt | dcaff7ca07095a23a9fb6c3ce513d565796478a3281e5584b0cdf49487ac1892 |
-| restore-fix3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/restore-fix3.txt | 5b832cb812451cea4bd39167e1d86d2ff2d820f103124c1742e756096f7fcd61 |
-| restore-fix4.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/restore-fix4.txt | d31022037afa9d94309b9fe503c398baed7be61844b3bf2aebd8a3000daaff7d |
-| reverse-census-1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-1.txt | b126fbdf6aba1a7089b986780c32393f2df6bbb2e1bc524d594745f0ba7d611f |
-| reverse-census-2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-2.txt | 950befbcab31aa0d498329d3a87781a46c7274bf54d93f9a6d85845c9c1b1087 |
-| reverse-census-3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-3.txt | 81832fa16d6ba690756165d31fdc92d5aa312274ddf4d2c29a4636904c503bdf |
-| reverse-census-fix1-1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-fix1-1.txt | 09682dd091e52d7e37d1196178c2d3c04e04a22ffb0db89efc0fb523bf05dcb8 |
-| reverse-census-fix1-2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-fix1-2.txt | 715fc53217d4fcb626cabbc5a777fb81d2d32c2f7b6c6cfab1c98792b5d89078 |
-| reverse-census-fix1-3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-fix1-3.txt | df7fd7b30ed3a4be4b28a8f3d01c90d532c8b840305aecc2a53864ffa9b579a9 |
-| reverse-census-fix2-1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-fix2-1.txt | 27590dd5679036c45247bb943debb67303a8f8f5a4c930cb42b8bf462703de83 |
-| reverse-census-fix2-2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-fix2-2.txt | 50bcaeb94085e2949f503245b0e38961f88ad3f28359bbc0c1ab91682af3dbb1 |
-| reverse-census-fix2-3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-fix2-3.txt | df00257350b8437a19ea905e04d8731635540ee26d0d4602ca82b6ce3b15d4ab |
-| reverse-census-fix3-1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-fix3-1.txt | 02291eb4f326a71a2e7acab8e3ad6138b0dbab4500b4092a113aae85fb9ed154 |
-| reverse-census-fix3-2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-fix3-2.txt | 8e603a546cee42a9df3d082518de6ce419b13d172bf18c4d59b3b2ae17ffa1f6 |
-| reverse-census-fix3-3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-fix3-3.txt | bc95585647aeb4e2645a33dc089a01a0f69d7b9fc59471f8d7086ee8698c9d5d |
-| reverse-census-fix4-1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-fix4-1.txt | 3e3c5968bcc5f79bf1bae48c1657f2645a34513a96d8fb054cd153e266fe62f4 |
-| reverse-census-fix4-2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-fix4-2.txt | 35e3a62438b452cc59325468c435647198496b92c1638598b7ad84736bcfd883 |
+| restore-fix3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/restore-fix3.txt | 1a2179d69fee27a040adda899c9ded7f031d098d3bd47e1f7a220851e9b1bf86 |
+| restore-fix4.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/restore-fix4.txt | 2c5ccdc793d8bfbf76384bbe59907ca68cbcca7f4e95d367902bc0d7c0f67aae |
+| reverse-census-1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-1.txt | 0d969dc3e615c63e4c15340d573b995f263572f0270ca6ddb884e8aa879256cb |
+| reverse-census-2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-2.txt | 5a4007bb3b6294f312305df13fb595ca130d192b276ba826ea2e9250e17f6548 |
+| reverse-census-3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-3.txt | 7bec78b8ba86fee5e568345602e36696f8c227b20f4a61d0df0ab544fea2845a |
+| reverse-census-fix1-1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-fix1-1.txt | 83c13aadc6ce2a8c23084e6ddd74b36cd51a0f68719c79e95b78050922f640ff |
+| reverse-census-fix1-2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-fix1-2.txt | f9b37e6562f321de835961b456086f7af3143a42b02b4a658a167a3e548c7326 |
+| reverse-census-fix1-3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-fix1-3.txt | 7d6ae7121e4c3796e11a64db9a14bc2d5bbaff9abdee7d8626e9bf165891da0f |
+| reverse-census-fix2-1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-fix2-1.txt | 1e841e7dd7f72b0806340001e644445a2a28a2750cdff748e10d6eab49828a43 |
+| reverse-census-fix2-2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-fix2-2.txt | 9b7ba5880923320cbe8fb1bec4f5c9d9fbb26cfa5e3e355f1c8fd8f5352dc058 |
+| reverse-census-fix2-3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-fix2-3.txt | 637dedfa60985a3331fbab381fb06914c446c96a50ccd32c1e0f05a2fa0a2ffb |
+| reverse-census-fix3-1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-fix3-1.txt | 03906eb02c6aa1f296a0f3090a28c66b363ba405dfe01fc96588a0e76b1d6c45 |
+| reverse-census-fix3-2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-fix3-2.txt | d39d8ab4bad112fb594a50aec1aa4fc686fcf3b618a1c5d5fad54cd7a23c6233 |
+| reverse-census-fix3-3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-fix3-3.txt | bffa8289c5328b9c38a7ede2434f474e59d304636891e61b815804a2513035b5 |
+| reverse-census-fix4-1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-fix4-1.txt | 764dbb8ea0360a33a91de5d9cf0e275c91da97c582306d9265ead57bf663aec4 |
+| reverse-census-fix4-2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-fix4-2.txt | 3ec9a7df25314d357263c269f2519c7d349a8f6b3e63c83aba613857d5082ae0 |
 | reverse-census-fix5-1.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-fix5-1.txt | bee156066a69f8b3b0bd5807157da017d9b2195179fd4a88646843efdd86415f |
 | reverse-census-fix5-2.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-fix5-2.txt | 28fe934a1e19b00386bdee1e20fb9049df9ecce555e09d65d836ef70590fd9a5 |
 | reverse-census-fix5-3.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/reverse-census-fix5-3.txt | d1f553fabe65dfc2ecbd5c72fb3e6125d0aec7c404f15cafcac8db70bc2e112e |
-| orchestrator-gate.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/orchestrator-gate.txt | eeeb12f17409b0578bdb6411cfee2172740ddc63df79529076f982393ac269c4 |
+| orchestrator-gate.txt | .dev-flow/2026-10-26-batch-100/evidence/inc-2/orchestrator-gate.txt | 55074d05fa0e014f077fb1daba171a86a040269e166ea01489b3f2cb779b571e |
 
 | Field | Value |
 |---|---|

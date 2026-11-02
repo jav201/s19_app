@@ -10,13 +10,13 @@
 #   |     if False and (
 #   |         refused_document is not None
 #   |         and raw_key == refused_document
-# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
+# cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
 # env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
-# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_linked_document_is_one_not_readable_row
+# command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_document.py::test_tc_b100_30_linked_document_is_one_not_readable_row
 # started 2026-10-30T23:13:58Z  finished 2026-10-30T23:14:04Z  rc=1
 F.                                                                       [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:1263: AssertionError: [('manifest damaged', 'patches/boost.json', 'a recorded entry has the wrong shape - Save project rewrites it')]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_document.py:1263: AssertionError: [('manifest damaged', 'patches/boost.json', 'a recorded entry has the wrong shape - Save project rewrites it')]
 =========================== short test summary info ===========================
 FAILED tests/test_b100_document.py::test_tc_b100_30_linked_document_is_one_not_readable_row[recorded]
 1 failed, 1 passed in 4.82s

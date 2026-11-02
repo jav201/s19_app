@@ -1,7 +1,7 @@
-devflow-validate · C:\Users\jjgh8\Github\s19_app
+devflow-validate · <HOME>\Github\s19_app
   git · 2.49.0, at or above the 2.28.0 floor
   stdout · encoding `cp1252`, errors `backslashreplace` -- the `·` and the em-dashes in these findings are TRANSLITERATED on this stream, not lost; set PYTHONIOENCODING=utf-8 to read them as written
-  filesystem · FOLDS CASE -- probed at C:\Users\jjgh8\AppData\Local\Temp, on the same volume as the tree under check
+  filesystem · FOLDS CASE -- probed at <HOME>\AppData\Local\Temp, on the same volume as the tree under check
 
 6 block · 489 notice · 52 not applicable
   [x] V2   tests/: AT-B97-15 has no node on disk

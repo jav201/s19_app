@@ -1,6 +1,6 @@
 # command: python -m pytest -q -p no:cacheprovider tests/test_b100_save_image.py tests/test_b100_focus.py tests/test_b100_reuse.py tests/test_b100_save_guards.py tests/test_b100_session_reset.py tests/test_b97_check_editor.py tests/test_b97_chips_help.py tests/test_b97_flow_builder.py tests/test_b97_flow_execution.py tests/test_b97_key_bar.py tests/test_b97_load_project_dialog.py tests/test_b97_patch_editor.py tests/test_b97_width.py tests/test_b99_bytes_field.py tests/test_b99_crc_region.py tests/test_b99_editor_image.py tests/test_b99_export.py tests/test_b99_patch_truth.py tests/test_b99_s0.py tests/test_b99_staging.py tests/test_b99_truncation.py tests/test_before_after_report.py tests/test_change_service.py tests/test_changes_apply.py tests/test_flow_execution.py -rfE
-# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
-# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
+# PYTHONPATH=<HOME>/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T20:01:06Z
 ........................................................................ [  8%]
 .................F...................................................... [ 16%]
@@ -48,7 +48,7 @@ E        +  where 7 = len([<ast.Call object at 0x0000024469A4F7C0>, <ast.Call ob
 tests\test_b100_reuse.py:788: AssertionError
 ______ test_at_038b_declined_saveback_trigger_refuses_and_writes_nothing ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29966/test_at_038b_declined_saveback0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-29966/test_at_038b_declined_saveback0')
 
     def test_at_038b_declined_saveback_trigger_refuses_and_writes_nothing(
         tmp_path: Path,

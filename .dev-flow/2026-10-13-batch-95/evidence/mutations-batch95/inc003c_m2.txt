@@ -6,7 +6,7 @@
 # Replacement:
                 markup=True,
 # Claim: turning Rich markup parsing ON lets **/backtick metacharacters in the operator copy be interpreted — TC-706's markup_off assertion (8/8 windows) must redden
-# Command: PYTHONUTF8=1 C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest tests/test_window_usage_help.py::test_tc706_affordance_opens_window_section_modal -q -p no:cacheprovider
+# Command: PYTHONUTF8=1 <HOME>/anaconda3/envs/s19env/python.exe -m pytest tests/test_window_usage_help.py::test_tc706_affordance_opens_window_section_modal -q -p no:cacheprovider
 # sha256 before mutation: 0b4dbc172285a65338fa5731d2a9d8103d3f36882334f459d64c2f74d526067b
 # sha256 after restore:   0b4dbc172285a65338fa5731d2a9d8103d3f36882334f459d64c2f74d526067b
 # restore verified: True
@@ -24,7 +24,7 @@ FFFFFFFF                                                                 [100%]
 ================================== FAILURES ===================================
 _ test_tc706_affordance_opens_window_section_modal[patch-#window_help_patch-patch] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19102/test_tc706_affordance_opens_wi0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-19102/test_tc706_affordance_opens_wi0')
 window_key = 'patch', chip_id = '#window_help_patch', screen_key = 'patch'
 
     @pytest.mark.parametrize("window_key,chip_id,screen_key", _SEATS)
@@ -67,7 +67,7 @@ E       assert False
 tests\test_window_usage_help.py:284: AssertionError
 _ test_tc706_affordance_opens_window_section_modal[checks-#window_help_checks-checks] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19102/test_tc706_affordance_opens_wi1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-19102/test_tc706_affordance_opens_wi1')
 window_key = 'checks', chip_id = '#window_help_checks', screen_key = 'checks'
 
     @pytest.mark.parametrize("window_key,chip_id,screen_key", _SEATS)
@@ -110,7 +110,7 @@ E       assert False
 tests\test_window_usage_help.py:284: AssertionError
 _ test_tc706_affordance_opens_window_section_modal[crc_designer-#window_help_crc_designer-crc_designer] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19102/test_tc706_affordance_opens_wi2')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-19102/test_tc706_affordance_opens_wi2')
 window_key = 'crc_designer', chip_id = '#window_help_crc_designer'
 screen_key = 'crc_designer'
 
@@ -154,7 +154,7 @@ E       assert False
 tests\test_window_usage_help.py:284: AssertionError
 _ test_tc706_affordance_opens_window_section_modal[map-#window_help_map-map] __
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19102/test_tc706_affordance_opens_wi3')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-19102/test_tc706_affordance_opens_wi3')
 window_key = 'map', chip_id = '#window_help_map', screen_key = 'map'
 
     @pytest.mark.parametrize("window_key,chip_id,screen_key", _SEATS)
@@ -197,7 +197,7 @@ E       assert False
 tests\test_window_usage_help.py:284: AssertionError
 _ test_tc706_affordance_opens_window_section_modal[flow-#window_help_flow-flow] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19102/test_tc706_affordance_opens_wi4')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-19102/test_tc706_affordance_opens_wi4')
 window_key = 'flow', chip_id = '#window_help_flow', screen_key = 'flow'
 
     @pytest.mark.parametrize("window_key,chip_id,screen_key", _SEATS)
@@ -240,7 +240,7 @@ E       assert False
 tests\test_window_usage_help.py:284: AssertionError
 _ test_tc706_affordance_opens_window_section_modal[a2l-#window_help_a2l-a2l] __
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19102/test_tc706_affordance_opens_wi5')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-19102/test_tc706_affordance_opens_wi5')
 window_key = 'a2l', chip_id = '#window_help_a2l', screen_key = 'a2l'
 
     @pytest.mark.parametrize("window_key,chip_id,screen_key", _SEATS)
@@ -283,7 +283,7 @@ E       assert False
 tests\test_window_usage_help.py:284: AssertionError
 _ test_tc706_affordance_opens_window_section_modal[workspace-#window_help_workspace-workspace] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19102/test_tc706_affordance_opens_wi6')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-19102/test_tc706_affordance_opens_wi6')
 window_key = 'workspace', chip_id = '#window_help_workspace'
 screen_key = 'workspace'
 
@@ -327,7 +327,7 @@ E       assert False
 tests\test_window_usage_help.py:284: AssertionError
 _ test_tc706_affordance_opens_window_section_modal[reports-#window_help_reports-reports] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19102/test_tc706_affordance_opens_wi7')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-19102/test_tc706_affordance_opens_wi7')
 window_key = 'reports', chip_id = '#window_help_reports', screen_key = 'reports'
 
     @pytest.mark.parametrize("window_key,chip_id,screen_key", _SEATS)

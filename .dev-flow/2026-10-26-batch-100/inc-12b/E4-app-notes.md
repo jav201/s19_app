@@ -6,7 +6,7 @@ Final `sha256[:16]` of `s19_app/tui/app.py` = `89b2d043c60f3a2f`.
 ## Scope
 
 Work order followed: G-C1 first, then G-A, then G-B, then G-C2; compiled after each group
-(`C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m py_compile s19_app/tui/app.py`). Test suite NOT run.
+(`<HOME>/anaconda3/envs/s19env/python.exe -m py_compile s19_app/tui/app.py`). Test suite NOT run.
 
 ## Functions / classes / data added
 

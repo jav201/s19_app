@@ -1,4 +1,4 @@
-s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-fix1\s19_app\__init__.py
+s19_app.__file__ = <HOME>\Github\s19_app-b100-fix1\s19_app\__init__.py
 == CI9b-3: store entry check (LLR-172.2e, host-neutral regex) ==
 '/tmp/pytest-of-runner/pytest-0/x/src/here.s19'              kept=False
 '/tmp/pytest-of-runner/pytest-0/x/missing/gone.s19'          kept=False

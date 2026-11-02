@@ -2,7 +2,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 _____________ test_tc_b99_21_editor_image_is_source_plus_document _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26312/test_tc_b99_21_editor_image_is0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26312/test_tc_b99_21_editor_image_is0')
 
     def test_tc_b99_21_editor_image_is_source_plus_document(tmp_path: Path) -> None:
         """The p05 sequence writes source bytes at the undone entry's address.

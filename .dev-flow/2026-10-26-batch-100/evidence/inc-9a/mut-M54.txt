@@ -3,9 +3,9 @@ requirement: LLR-172.3 (R-9)
 target file: s19_app/tui/services/manifest_writer.py
 edit: '    if active_document is not None:\n        envelope["active_document"] = active_document\n    return json.dumps(envelope, indent=2), []' -> '    if active_document is not None:\n        envelope["active_document"] = active_document\n    from s19_app.tui.workspace import read_recent_sources\n\n    envelope["recent_sources"] = [\n        {"path": entry.path, "kind": entry.kind}\n        for entry in read_recent_sources().entries\n    ]\n    return json.dumps(envelope, indent=2), []'
 sha256 before: 254693df5dcdf38a5045f40e321862c130fad80865b98217fba4436642de58b4
-cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a
+cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a
 command: pytest -q --tb=line tests/test_b100_recents.py::test_tc_b100_36_seeded_recent_entries_never_reach_the_base_folder tests/test_b100_recents.py::test_tc_b100_36_loaded_source_path_stays_out_of_project_files
-s19_app.__file__: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a\s19_app\__init__.py
+s19_app.__file__: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut9a\s19_app\__init__.py
 pytest summary: 2 failed in 6.99s
 verdict: KILLED
 restored = True

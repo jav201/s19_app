@@ -1,5 +1,5 @@
 # command: S19_WT=<scratch>/snap1d677ba PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 (NO_COLOR unset) s19env/python.exe p03_load_over_open_project.py 
-# probe source: C:/Users/jjgh8/Github/s19_app/.dev-flow/design/investigation-projects-2026-10-23/p03_load_over_open_project.py
+# probe source: <HOME>/Github/s19_app/.dev-flow/design/investigation-projects-2026-10-23/p03_load_over_open_project.py
 # tree: 1d677ba (git archive)
 # started: 2026-10-26T06:43:50-06:00
 
@@ -16,7 +16,7 @@ P2 warm: {'file': 'prg.s19', 'file_dir': 'P2', 'mem': '3968B/e00adf014daa', 'mac
   LEAK change_entries: cold=0  after-P1=1
 status: ['Apply: 1 applied, 0 skipped, 0 blocked', "Loaded project 'P2' -> prg.s19"] notices: []
 P2 files after re-save: ['firmware.a2l', 'firmware.mac', 'prg.s19', 'project.json']
-re-save status: ["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_6f0lkoyd\\.s19tool\\workarea\\P2 (variant 'prg')", 'Project saved + manifest verified']
+re-save status: ["Saved project to <HOME>\\AppData\\Local\\Temp\\projprobe_6f0lkoyd\\.s19tool\\workarea\\P2 (variant 'prg')", 'Project saved + manifest verified']
 
 # exit: 0
 # finished: 2026-10-26T06:44:12-06:00

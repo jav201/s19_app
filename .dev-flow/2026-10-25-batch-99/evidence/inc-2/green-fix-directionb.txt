@@ -4,7 +4,7 @@
 ================================== FAILURES ===================================
 _______________ test_tc031_engine_modules_have_no_diff_vs_main ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25812/test_tc031_engine_modules_have0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25812/test_tc031_engine_modules_have0')
 
     def test_tc031_engine_modules_have_no_diff_vs_main(tmp_path: Path) -> None:
         """The engine / data-processing modules show zero diff vs ``main``.
@@ -39,7 +39,7 @@ E         +  1 file changed, 24 insertions(+)
 tests\test_tui_directionb.py:7051: AssertionError
 __________ test_tc031_engine_modules_have_no_name_only_diff_vs_main ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25812/test_tc031_engine_modules_have1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-25812/test_tc031_engine_modules_have1')
 
     def test_tc031_engine_modules_have_no_name_only_diff_vs_main(tmp_path: Path) -> None:
         """No engine module file appears in ``git diff --name-only main``.

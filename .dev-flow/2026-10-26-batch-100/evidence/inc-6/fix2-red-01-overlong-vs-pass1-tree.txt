@@ -1,8 +1,8 @@
 # command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_announce.py tests/test_b100_active_variant.py -k overlong
-# tree: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc6-fix2/pass1 (the corrective-pass-1 tree (395dcbde) copied before pass 2, with the pass-2 tests copied in), sources: 762d1a98c8a65903 *s19_app/tui/app.py;ea549ab4bd9d3ef4 *s19_app/tui/screens.py;395dcbde3b28851b *s19_app/tui/services/variant_execution_service.py;781f04ed2cc30897 *s19_app/tui/styles.tcss;
-# PYTHONPATH=C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc6-fix2/pass1 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc6-fix2/pass1 (the corrective-pass-1 tree (395dcbde) copied before pass 2, with the pass-2 tests copied in), sources: 762d1a98c8a65903 *s19_app/tui/app.py;ea549ab4bd9d3ef4 *s19_app/tui/screens.py;395dcbde3b28851b *s19_app/tui/services/variant_execution_service.py;781f04ed2cc30897 *s19_app/tui/styles.tcss;
+# PYTHONPATH=<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc6-fix2/pass1 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-30T04:39:29Z
-# s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc6-fix2\pass1\s19_app\__init__.py
+# s19_app.__file__ = <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc6-fix2\pass1\s19_app\__init__.py
 FF                                                                       [100%]
 ================================== FAILURES ===================================
 ________ test_tc_b100_67_overlong_entries_are_skipped_rows_not_a_crash ________
@@ -35,7 +35,7 @@ tests\test_b100_announce.py:93: AssertionError
 
 During handling of the above exception, another exception occurred:
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30185/test_tc_b100_67_overlong_entri0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30185/test_tc_b100_67_overlong_entri0')
 
     def test_tc_b100_67_overlong_entries_are_skipped_rows_not_a_crash(tmp_path: Path) -> None:
         """SEC6-7: a recorded 40 000-character entry in ``batch``,
@@ -74,27 +74,27 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest
 
 tests\test_b100_announce.py:652: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_announce.py:646: in _drive
     async with app.run_test(size=(118, 54), notifications=True) as pilot:
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\contextlib.py:231: in __aexit__
+<HOME>\anaconda3\envs\s19env\Lib\contextlib.py:231: in __aexit__
     await self.gen.athrow(typ, value, traceback)
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: in run_test
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: in run_test
     raise self._exception
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:702: in _flush_next_callbacks
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:702: in _flush_next_callbacks
     await invoke(callback.callback)
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:96: in invoke
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:96: in invoke
     return await _invoke(callback, *params)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:56: in _invoke
+<HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:56: in _invoke
     result = callback(*params[:parameter_count])
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 s19_app\tui\app.py:7019: in _route_load_project
@@ -107,11 +107,11 @@ s19_app\tui\services\variant_execution_service.py:536: in read_project_manifest
 s19_app\tui\services\variant_execution_service.py:308: in _resolve_manifest_entry
     resolved = (project_root / text).resolve()
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1003: in resolve
+<HOME>\anaconda3\envs\s19env\Lib\pathlib.py:1003: in resolve
     p.stat()
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30185/test_tc_b100_67_overlong_entri0/app/.s19to...qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq')
+self = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30185/test_tc_b100_67_overlong_entri0/app/.s19to...qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq')
 
     def stat(self, *, follow_symlinks=True):
         """
@@ -122,10 +122,10 @@ self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-301
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 E       ValueError: stat: path too long for Windows
 
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1013: ValueError
+<HOME>\anaconda3\envs\s19env\Lib\pathlib.py:1013: ValueError
 ---------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────
-│ C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4 
+│ <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4 
 │ ccb-86cf-122b894659b2\scratchpad\inc6-fix2\pass1\s19_app\tui\app.py:7019 in  
 │ _route_load_project                                                          
 │                                                                              
@@ -150,7 +150,7 @@ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1013: ValueError
 │ │          )                                    │                            
 │ ╰───────────────────────────────────────────────╯                            
 │                                                                              
-│ C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4 
+│ <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4 
 │ ccb-86cf-122b894659b2\scratchpad\inc6-fix2\pass1\s19_app\tui\app.py:10141 in 
 │ _handle_load_project                                                         
 │                                                                              
@@ -166,14 +166,14 @@ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1013: ValueError
 │ │         a2l_files = []                                                   │ 
 │ │        data_files = [                                                    │ 
 │ │                     │                                                    │ 
-│ │                     WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pyte… │ 
+│ │                     WindowsPath('<HOME>/AppData/Local/Temp/pyte… │ 
 │ │                     │                                                    │ 
-│ │                     WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pyte… │ 
+│ │                     WindowsPath('<HOME>/AppData/Local/Temp/pyte… │ 
 │ │                     ]                                                    │ 
 │ │ discarded_unsaved = 0                                                    │ 
 │ │             error = None                                                 │ 
 │ │              name = 'P'                                                  │ 
-│ │       project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pyte… │ 
+│ │       project_dir = WindowsPath('<HOME>/AppData/Local/Temp/pyte… │ 
 │ │              self = S19TuiApp(                                           │ 
 │ │                     │   title='Hex Edit Tool',                           │ 
 │ │                     │   classes={'-dark-mode'},                          │ 
@@ -185,13 +185,13 @@ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1013: ValueError
 │ │                     │   │   VariantDescriptor(                           │ 
 │ │                     │   │   │   variant_id='firmware',                   │ 
 │ │                     │   │   │                                            │ 
-│ │                     path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp… │ 
+│ │                     path=WindowsPath('<HOME>/AppData/Local/Temp… │ 
 │ │                     │   │   │   file_type='s19'                          │ 
 │ │                     │   │   ),                                           │ 
 │ │                     │   │   VariantDescriptor(                           │ 
 │ │                     │   │   │   variant_id='firmware_1',                 │ 
 │ │                     │   │   │                                            │ 
-│ │                     path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp… │ 
+│ │                     path=WindowsPath('<HOME>/AppData/Local/Temp… │ 
 │ │                     │   │   │   file_type='s19'                          │ 
 │ │                     │   │   )                                            │ 
 │ │                     │   ),                                               │ 
@@ -199,7 +199,7 @@ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1013: ValueError
 │ │                     )                                                    │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4 
+│ <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4 
 │ ccb-86cf-122b894659b2\scratchpad\inc6-fix2\pass1\s19_app\tui\services\varian 
 │ t_execution_service.py:536 in read_project_manifest                          
 │                                                                              
@@ -230,9 +230,9 @@ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1013: ValueError
 │ │                  )                                                       │ 
 │ │          entry = 'qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq… │ 
 │ │         handle = <_io.BufferedReader                                     │ 
-│ │                  name='C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-o… │ 
+│ │                  name='<HOME>\\AppData\\Local\\Temp\\pytest-o… │ 
 │ │         issues = []                                                      │ 
-│ │  manifest_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-… │ 
+│ │  manifest_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-… │ 
 │ │        payload = {                                                       │ 
 │ │                  │   'schema_version': 1,                                │ 
 │ │                  │   'active_variant': 'firmware_1',                     │ 
@@ -253,14 +253,14 @@ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1013: ValueError
 │ │                  │   │   ]                                               │ 
 │ │                  │   }                                                   │ 
 │ │                  }                                                       │ 
-│ │    project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-… │ 
-│ │   project_root = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-… │ 
+│ │    project_dir = WindowsPath('<HOME>/AppData/Local/Temp/pytest-… │ 
+│ │   project_root = WindowsPath('<HOME>/AppData/Local/Temp/pytest-… │ 
 │ │ schema_version = 1                                                       │ 
 │ │     size_bytes = 120134                                                  │ 
 │ │     size_probe = None                                                    │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4 
+│ <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4 
 │ ccb-86cf-122b894659b2\scratchpad\inc6-fix2\pass1\s19_app\tui\services\varian 
 │ t_execution_service.py:308 in _resolve_manifest_entry                        
 │                                                                              
@@ -275,12 +275,12 @@ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1013: ValueError
 │ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
 │ │      context = 'batch'                                                   │ 
 │ │       issues = []                                                        │ 
-│ │ project_root = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of… │ 
+│ │ project_root = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of… │ 
 │ │    raw_entry = 'qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq… │ 
 │ │         text = 'qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq… │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1003 in resolve          
+│ <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:1003 in resolve          
 │                                                                              
 │   1000 │   │   # Ensure we get an exception by calling stat()                
 │   1001 │   │   if not strict:                                                
@@ -291,13 +291,13 @@ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1013: ValueError
 │   1006 │   │   return p                                                      
 │                                                                              
 │ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
-│ │      p = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8… │ 
-│ │      s = 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pyte… │ 
-│ │   self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8… │ 
+│ │      p = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>… │ 
+│ │      s = '<HOME>\\AppData\\Local\\Temp\\pytest-of-<USER>\\pyte… │ 
+│ │   self = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>… │ 
 │ │ strict = False                                                           │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 │                                                                              
-│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1013 in stat             
+│ <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:1013 in stat             
 │                                                                              
 │   1010 │   │   Return the result of the stat() system call on this path, lik 
 │   1011 │   │   os.stat() does.                                               
@@ -309,13 +309,13 @@ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1013: ValueError
 │                                                                              
 │ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
 │ │ follow_symlinks = True                                                   │ 
-│ │            self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest… │ 
+│ │            self = WindowsPath('<HOME>/AppData/Local/Temp/pytest… │ 
 │ ╰──────────────────────────────────────────────────────────────────────────╯ 
 ╰──────────────────────────────────────────────────────────────────────────────
 ValueError: stat: path too long for Windows
 _______ test_tc_b100_20_a2l_sync_with_an_overlong_entry_does_not_crash ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30185/test_tc_b100_20_a2l_sync_with_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30185/test_tc_b100_20_a2l_sync_with_0')
 
     def test_tc_b100_20_a2l_sync_with_an_overlong_entry_does_not_crash(tmp_path: Path) -> None:
         """SEC6-7: the manifest records a 40 000-character entry in ``batch``,
@@ -345,13 +345,13 @@ tests\test_b100_active_variant.py:557:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_active_variant.py:500: in _run_writer
     asyncio.run(_drive())
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
     return self._loop.run_until_complete(task)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
 tests\test_b100_active_variant.py:475: in _drive
@@ -366,11 +366,11 @@ s19_app\tui\services\variant_execution_service.py:536: in read_project_manifest
 s19_app\tui\services\variant_execution_service.py:308: in _resolve_manifest_entry
     resolved = (project_root / text).resolve()
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1003: in resolve
+<HOME>\anaconda3\envs\s19env\Lib\pathlib.py:1003: in resolve
     p.stat()
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30185/test_tc_b100_20_a2l_sync_with_0/app/.s19to...qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq')
+self = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30185/test_tc_b100_20_a2l_sync_with_0/app/.s19to...qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq')
 
     def stat(self, *, follow_symlinks=True):
         """
@@ -381,7 +381,7 @@ self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-301
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 E       ValueError: stat: path too long for Windows
 
-C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1013: ValueError
+<HOME>\anaconda3\envs\s19env\Lib\pathlib.py:1013: ValueError
 =========================== short test summary info ===========================
 FAILED tests/test_b100_announce.py::test_tc_b100_67_overlong_entries_are_skipped_rows_not_a_crash
 FAILED tests/test_b100_active_variant.py::test_tc_b100_20_a2l_sync_with_an_overlong_entry_does_not_crash

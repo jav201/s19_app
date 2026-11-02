@@ -1,9 +1,9 @@
-# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed
-# command: python -m pytest -q -p no:cacheprovider -s -rfE /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/probes/test_r6_probes.py
+# tree: <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed
+# command: python -m pytest -q -p no:cacheprovider -s -rfE <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/probes/test_r6_probes.py
 # date: 2026-10-30T03:00:03Z
-# s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r6\fixed\s19_app\__init__.py
+# s19_app.__file__ = <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r6\fixed\s19_app\__init__.py
 # python 3.11.15
-s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r6\fixed\s19_app\__init__.py
+s19_app.__file__ = <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r6\fixed\s19_app\__init__.py
 
 [P1 unparseable / a2l_sync] placed file kept: True
 [P1 unparseable / a2l_sync] project.json replaced: True
@@ -44,7 +44,7 @@ F
 ================================== FAILURES ===================================
 _________ test_p1_damaged_manifest_and_a_writer[a2l_sync-unparseable] _________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30171/test_p1_damaged_manifest_and_a0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30171/test_p1_damaged_manifest_and_a0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001C5E993C390>
 kind = 'unparseable', writer = 'a2l_sync'
 
@@ -102,7 +102,7 @@ E         Use -v to get more diff
 ..\probes\test_r6_probes.py:109: AssertionError
 ________ test_p1_damaged_manifest_and_a_writer[a2l_sync-toplevel_list] ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30171/test_p1_damaged_manifest_and_a1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30171/test_p1_damaged_manifest_and_a1')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001C5E993DED0>
 kind = 'toplevel_list', writer = 'a2l_sync'
 
@@ -160,7 +160,7 @@ E         Use -v to get more diff
 ..\probes\test_r6_probes.py:109: AssertionError
 __________ test_p1_damaged_manifest_and_a_writer[a2l_sync-oversize] ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30171/test_p1_damaged_manifest_and_a2')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30171/test_p1_damaged_manifest_and_a2')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001C5E993C310>
 kind = 'oversize', writer = 'a2l_sync'
 
@@ -218,7 +218,7 @@ E         Use -v to get more diff
 ..\probes\test_r6_probes.py:109: AssertionError
 ______ test_p1_damaged_manifest_and_a_writer[variant_append-unparseable] ______
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30171/test_p1_damaged_manifest_and_a3')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30171/test_p1_damaged_manifest_and_a3')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001C5ED4C3D10>
 kind = 'unparseable', writer = 'variant_append'
 
@@ -276,7 +276,7 @@ E         Use -v to get more diff
 ..\probes\test_r6_probes.py:109: AssertionError
 _____ test_p1_damaged_manifest_and_a_writer[variant_append-toplevel_list] _____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30171/test_p1_damaged_manifest_and_a4')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30171/test_p1_damaged_manifest_and_a4')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001C5ED2E1890>
 kind = 'toplevel_list', writer = 'variant_append'
 
@@ -334,7 +334,7 @@ E         Use -v to get more diff
 ..\probes\test_r6_probes.py:109: AssertionError
 _______ test_p1_damaged_manifest_and_a_writer[variant_append-oversize] ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30171/test_p1_damaged_manifest_and_a5')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30171/test_p1_damaged_manifest_and_a5')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001C5EE0BEDD0>
 kind = 'oversize', writer = 'variant_append'
 
@@ -392,7 +392,7 @@ E         Use -v to get more diff
 ..\probes\test_r6_probes.py:109: AssertionError
 __________________ test_p2_manifest_write_fails_after_append __________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30171/test_p2_manifest_write_fails_a0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30171/test_p2_manifest_write_fails_a0')
 
     def test_p2_manifest_write_fails_after_append(tmp_path: Path) -> None:
         """A read-only project.json (real trigger): the seam's write fails, yet

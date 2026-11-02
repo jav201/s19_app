@@ -1,9 +1,9 @@
 # mutation: 168.3-append-no-rewrite — LLR-168.3: the variant append no longer rewrites project.json
 # file: s19_app/tui/app.py (sha256 before 762d1a98c8a65903)
-# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=C:\Users\jjgh8\AppData\Local\Temp\f1mut-168.3-append-no-rewrite tests/test_b100_active_variant.py -k tc_b100_20
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (corrective pass 1, mutated in place, then restored)
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
-# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\__init__.py
+# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=<HOME>\AppData\Local\Temp\f1mut-168.3-append-no-rewrite tests/test_b100_active_variant.py -k tc_b100_20
+# tree: <HOME>\Github\s19_app-b100-inc6 (corrective pass 1, mutated in place, then restored)
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# s19_app.__file__ = <HOME>\Github\s19_app-b100-inc6\s19_app\__init__.py
 # date: 2026-10-30T03:35:02Z
 # --- old
 #                           if self._rewrite_project_manifest(project_dir, saved):
@@ -13,7 +13,7 @@
 ================================== FAILURES ===================================
 _______ test_tc_b100_20_variant_append_carries_every_key_and_activates ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-168.3-append-no-rewrite/test_tc_b100_20_variant_append0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-168.3-append-no-rewrite/test_tc_b100_20_variant_append0')
 
     def test_tc_b100_20_variant_append_carries_every_key_and_activates(tmp_path: Path) -> None:
         base = tmp_path / "app"
@@ -49,7 +49,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-168.3-append-no-
 tests\test_b100_active_variant.py:361: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-168.3-append-no-rewrite/test_tc_b100_20_variant_append0/app/.s19tool/workarea/P')
+project_dir = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-168.3-append-no-rewrite/test_tc_b100_20_variant_append0/app/.s19tool/workarea/P')
 before_bytes = b'{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"],"assignments":{"firmware":["checks/...start":2147483712,"end":2147483775}],"gathered":{"patches":["patches/cs_seed.json"],"checks":["checks/ck_seed.json"]}}'
 
     def _assert_carried(project_dir: Path, before_bytes: bytes) -> dict:
@@ -63,7 +63,7 @@ E       assert b'{"schema_version":1,"active_variant":"firmware","batch":["patch
 tests\test_b100_active_variant.py:308: AssertionError
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-not-json] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-168.3-append-no-rewrite/test_tc_b100_20_damaged_manife3')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-168.3-append-no-rewrite/test_tc_b100_20_damaged_manife3')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002200B5FF390>
 writer = 'variant-append', damage = 'not-json'
 
@@ -103,7 +103,7 @@ E        +    where <built-in method count of list object at 0x000002200B755480>
 tests\test_b100_active_variant.py:529: AssertionError
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-not-an-object] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-168.3-append-no-rewrite/test_tc_b100_20_damaged_manife4')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-168.3-append-no-rewrite/test_tc_b100_20_damaged_manife4')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002200C46F510>
 writer = 'variant-append', damage = 'not-an-object'
 
@@ -143,7 +143,7 @@ E        +    where <built-in method count of list object at 0x000002200B740440>
 tests\test_b100_active_variant.py:529: AssertionError
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-over-cap] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-168.3-append-no-rewrite/test_tc_b100_20_damaged_manife5')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-168.3-append-no-rewrite/test_tc_b100_20_damaged_manife5')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002200C4DF510>
 writer = 'variant-append', damage = 'over-cap'
 
@@ -183,7 +183,7 @@ E        +    where <built-in method count of list object at 0x000002200CB6C880>
 tests\test_b100_active_variant.py:529: AssertionError
 _________ test_tc_b100_20_append_says_now_opens_only_after_the_write __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-168.3-append-no-rewrite/test_tc_b100_20_append_says_no0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-168.3-append-no-rewrite/test_tc_b100_20_append_says_no0')
 
     def test_tc_b100_20_append_says_now_opens_only_after_the_write(tmp_path: Path) -> None:
         """A real write failure (``project.json`` read-only, review probe P2):

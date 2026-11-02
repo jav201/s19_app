@@ -7,13 +7,13 @@
 #   |         return _walk_manifest_entry(walk, text, context, issues)
 # edit 1 NEW:
 #   | <deleted>
-# cwd: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
+# cwd: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a
 # env: NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=<cwd>
-# command: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_project_check.py::test_tc_b100_24_files_key_of_the_active_document_is_read
+# command: <HOME>/anaconda3/envs/s19env/python.exe -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_project_check.py::test_tc_b100_24_files_key_of_the_active_document_is_read
 # started 2026-10-30T23:13:26Z  finished 2026-10-30T23:13:27Z  rc=1
 F                                                                        [100%]
 ================================== FAILURES ===================================
-C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_project_check.py:1611: AssertionError: [ValidationIssue(code='MANIFEST-BAD-STRUCTURE', severity=<ValidationSeverity.ERROR: 'error'>, message="manifest files ...manifest', symbol=None, address=None, line_number=None, related_artifacts=[], details={'entry': 'patches/boost.json'})]
+<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\mut8a\tests\test_b100_project_check.py:1611: AssertionError: [ValidationIssue(code='MANIFEST-BAD-STRUCTURE', severity=<ValidationSeverity.ERROR: 'error'>, message="manifest files ...manifest', symbol=None, address=None, line_number=None, related_artifacts=[], details={'entry': 'patches/boost.json'})]
 =========================== short test summary info ===========================
 FAILED tests/test_b100_project_check.py::test_tc_b100_24_files_key_of_the_active_document_is_read
 1 failed in 0.60s

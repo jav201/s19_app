@@ -4,7 +4,7 @@ F                                                                        [100%]
 ================================== FAILURES ===================================
 ___________ test_tc_b100_04_device_names_refused_raw_and_sanitised ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27410/test_tc_b100_04_device_names_r0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27410/test_tc_b100_04_device_names_r0')
 
     def test_tc_b100_04_device_names_refused_raw_and_sanitised(tmp_path: Path) -> None:
         """``nul``, ``CON``, ``com1``, ``LPT¹`` (superscript), ``con.txt`` (raw

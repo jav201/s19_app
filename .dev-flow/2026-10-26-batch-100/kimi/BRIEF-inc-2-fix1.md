@@ -1,9 +1,9 @@
 # Kimi brief — batch-100 Increment 2 · corrective pass 1
 
-You work in the same worktree, `C:\Users\jjgh8\Github\s19_app-b100-inc2`. It already holds your Inc 2 changes, uncommitted; keep them. `BRIEF-COMMON.md` still applies. The SOURCE files stay at 2: `app.py` and `workspace.py`.
+You work in the same worktree, `<HOME>\Github\s19_app-b100-inc2`. It already holds your Inc 2 changes, uncommitted; keep them. `BRIEF-COMMON.md` still applies. The SOURCE files stay at 2: `app.py` and `workspace.py`.
 
 **Read first, from the MAIN checkout (absolute paths):**
-- `C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-10-26-batch-100\03-increments\review-increment-002.md` (code-reviewer, F1–F11);
+- `<HOME>\Github\s19_app\.dev-flow\2026-10-26-batch-100\03-increments\review-increment-002.md` (code-reviewer, F1–F11);
 - `...\03-increments\security-increment-002.md` (SEC2-1..3);
 - `...\01-requirements-ledger.md` LED .52 (orchestrator rulings on F4, F5, F7).
 

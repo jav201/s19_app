@@ -1,4 +1,4 @@
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+<HOME>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -48,7 +48,7 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxx............................................. [ 91%]
 ================================== FAILURES ===================================
 ____ test_at_061a_persistent_control_survives_then_writes_pair_and_clears _____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20766/test_at_061a_persistent_contro0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-20766/test_at_061a_persistent_contro0')
 
     def test_at_061a_persistent_control_survives_then_writes_pair_and_clears(
         tmp_path: Path,
@@ -163,7 +163,7 @@ E       assert False
 tests\test_before_after_report.py:1182: AssertionError
 _________ test_saveback_width_32_packs_wide_records_and_populates_s0 __________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20766/test_saveback_width_32_packs_w0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-20766/test_saveback_width_32_packs_w0')
 
     def test_saveback_width_32_packs_wide_records_and_populates_s0(
         tmp_path: Path,
@@ -192,7 +192,7 @@ E       assert None is not None
 tests\test_tui_patch_editor_v2.py:1129: AssertionError
 ________________________ test_at077c_stale_provenance _________________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20766/test_at077c_stale_provenance0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-20766/test_at077c_stale_provenance0')
 
     def test_at077c_stale_provenance(tmp_path: Path) -> None:
         """Mutating the document reverts every glyph to ``·`` — three ways.
@@ -301,7 +301,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     with self.open(mode='r', encoding=encoding, errors=errors) as f:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-self = WindowsPath('C:/Users/jjgh8/Github/s19_app-b94/prototypes/cambios_10_12_2026/help_sections.md')
+self = WindowsPath('<HOME>/Github/s19_app-b94/prototypes/cambios_10_12_2026/help_sections.md')
 mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
 
     def open(self, mode='r', buffering=-1, encoding=None,
@@ -313,7 +313,7 @@ mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
         if "b" not in mode:
             encoding = io.text_encoding(encoding)
 >       return io.open(self, mode, buffering, encoding, errors, newline)
-E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\Github\\s19_app-b94\\prototypes\\cambios_10_12_2026\\help_sections.md'
+E       FileNotFoundError: [Errno 2] No such file or directory: '<HOME>\\Github\\s19_app-b94\\prototypes\\cambios_10_12_2026\\help_sections.md'
 
 ..\..\anaconda3\Lib\pathlib.py:1013: FileNotFoundError
 __________________ test_tc707_numbering_generated_sequential __________________
@@ -331,7 +331,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     with self.open(mode='r', encoding=encoding, errors=errors) as f:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-self = WindowsPath('C:/Users/jjgh8/Github/s19_app-b94/prototypes/cambios_10_12_2026/help_sections.md')
+self = WindowsPath('<HOME>/Github/s19_app-b94/prototypes/cambios_10_12_2026/help_sections.md')
 mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
 
     def open(self, mode='r', buffering=-1, encoding=None,
@@ -343,12 +343,12 @@ mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
         if "b" not in mode:
             encoding = io.text_encoding(encoding)
 >       return io.open(self, mode, buffering, encoding, errors, newline)
-E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\Github\\s19_app-b94\\prototypes\\cambios_10_12_2026\\help_sections.md'
+E       FileNotFoundError: [Errno 2] No such file or directory: '<HOME>\\Github\\s19_app-b94\\prototypes\\cambios_10_12_2026\\help_sections.md'
 
 ..\..\anaconda3\Lib\pathlib.py:1013: FileNotFoundError
 ============================== warnings summary ===============================
 ..\..\anaconda3\Lib\site-packages\pytest_textual_snapshot.py:367
-  C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_textual_snapshot.py:367: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  <HOME>\anaconda3\Lib\site-packages\pytest_textual_snapshot.py:367: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
     now=datetime.utcnow(),
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
@@ -356,9 +356,9 @@ E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh
 
 [1;30;41m29[0m[30;41m mismatched snapshots[0m
 
-[1mView the [0m]8;id=10665722;file://C:\Users\jjgh8\Github\s19_app-b94\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+[1mView the [0m]8;id=10665722;file://<HOME>\Github\s19_app-b94\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
 
-[2mC:\Users\jjgh8\Github\s19_app-b94\snapshot_report.html[0m
+[2m<HOME>\Github\s19_app-b94\snapshot_report.html[0m
 
 =========================== short test summary info ===========================
 FAILED tests/test_before_after_report.py::test_at_061a_persistent_control_survives_then_writes_pair_and_clears

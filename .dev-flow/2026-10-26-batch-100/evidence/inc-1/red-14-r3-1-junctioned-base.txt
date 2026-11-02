@@ -1,4 +1,4 @@
-RED fix-pass-3 arms — tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 (Inc 1 + fix passes 1-2, uncommitted, fixes NOT yet applied)
+RED fix-pass-3 arms — tree: <HOME>\Github\s19_app-b100-inc1 (Inc 1 + fix passes 1-2, uncommitted, fixes NOT yet applied)
 cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py::test_tc_b100_62_export_junctioned_base_app_root_writes tests/test_b100_reuse.py::test_tc_b100_62_gather_requires_workarea_root
 
 FF                                                                       [100%]
@@ -265,8 +265,8 @@ s19_app\tui\workspace.py:1069: in place_into_workarea
     resolved_destination, resolved_root = _guarded_destination(
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-destination = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27350/test_tc_b100_62_export_junctio0/linked_home/.s19tool/workarea/P/exports')
-workarea_root = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27350/test_tc_b100_62_export_junctio0/real_home/.s19tool/workarea')
+destination = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27350/test_tc_b100_62_export_junctio0/linked_home/.s19tool/workarea/P/exports')
+workarea_root = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27350/test_tc_b100_62_export_junctio0/real_home/.s19tool/workarea')
 
     def _guarded_destination(
         destination: Path,
@@ -363,13 +363,13 @@ workarea_root = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/p
                 "Refusing to place: destination traverses a symbolic link or "
                 f"reparse point: {textual_destination}"
             )
-E           s19_app.tui.workspace.WorkareaContainmentError: Refusing to place: destination traverses a symbolic link or reparse point: C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-27350\test_tc_b100_62_export_junctio0\linked_home\.s19tool\workarea\P\exports
+E           s19_app.tui.workspace.WorkareaContainmentError: Refusing to place: destination traverses a symbolic link or reparse point: <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-27350\test_tc_b100_62_export_junctio0\linked_home\.s19tool\workarea\P\exports
 
 s19_app\tui\workspace.py:652: WorkareaContainmentError
 
 The above exception was the direct cause of the following exception:
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27350/test_tc_b100_62_export_junctio0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27350/test_tc_b100_62_export_junctio0')
 
     def test_tc_b100_62_export_junctioned_base_app_root_writes(
         tmp_path: Path,
@@ -703,12 +703,12 @@ rows = [SegRow(name='isle', kind='manual', base=4096, size=8)]
                         detail,
                         written=[p.path for p in placed if p.action == "wrote"],
                     ) from exc
-E                   s19_app.tui.segment_split_view.ExportWriteError: Export stopped: Refusing to place: destination traverses a symbolic link or reparse point: C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-27350\test_tc_b100_62_export_junctio0\linked_home\.s19tool\workarea\P\exports. Already written: nothing
+E                   s19_app.tui.segment_split_view.ExportWriteError: Export stopped: Refusing to place: destination traverses a symbolic link or reparse point: <HOME>\AppData\Local\Temp\pytest-of-<USER>\pytest-27350\test_tc_b100_62_export_junctio0\linked_home\.s19tool\workarea\P\exports. Already written: nothing
 
 s19_app\tui\segment_split_view.py:987: ExportWriteError
 ________________ test_tc_b100_62_gather_requires_workarea_root ________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27350/test_tc_b100_62_gather_require0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27350/test_tc_b100_62_gather_require0')
 
     def test_tc_b100_62_gather_requires_workarea_root(
         tmp_path: Path,

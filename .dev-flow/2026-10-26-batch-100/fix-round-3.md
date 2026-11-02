@@ -1,9 +1,9 @@
 # Batch-100 — batch-end fix round 3: the 4 new failures of CI 41338318239
 
-- **Branch / worktree:** `b100-fix3` = `main` 570b4b5 (fix rounds 1 and 2 merged), `C:/Users/jjgh8/Github/s19_app-b100-fix3`. Nothing committed.
+- **Branch / worktree:** `b100-fix3` = `main` 570b4b5 (fix rounds 1 and 2 merged), `<HOME>/Github/s19_app-b100-fix3`. Nothing committed.
 - **Input:** CI run 41338318239 on main 570b4b5 (ubuntu, Python 3.11.17, textual 8.2.8, rich 15.0.0, pytest 9.2.0): 9 failed / 5030 passed / 211 skipped / 4 xfailed. Five are the known pre-existing failures (tc1802, tc707 ×2, 056e_a2b, b78_03) and were left alone. The four new ones are below. Excerpts: `evidence/fix-3/ci-41338318239-excerpts.txt`.
 - **Linux reproduction:** WSL Ubuntu, a copy of the tree with LF line endings (`git -c core.autocrlf=false archive HEAD`, extracted to `~/s19fix3`; edited files synced with `sed 's/\r$//'`, `evidence/fix-3/sync.sh`), venv `~/s19venv` with **Python 3.12.7** (no 3.11 on the distro or in the WSL conda; the same textual 8.2.8 / rich 15.0.0 / pytest 9.2.0 as CI), `pip install -e .`. `s19_app.__file__` = `/home/jav201/s19fix3/s19_app/__init__.py`. Runner `evidence/fix-3/run4.sh` (`NO_COLOR` unset, `-p no:cacheprovider`, `timeout 1800`).
-- **Windows runs:** `s19env` (Python 3.11.15), env `env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=C:/Users/jjgh8/AppData/Local/Temp/s19f3/la`, `--basetemp C:/Users/jjgh8/AppData/Local/Temp/s19f3/bt`, `timeout 1800`; `s19_app.__file__` printed first = this worktree. The real `%LOCALAPPDATA%\s19_app` was not created (checked: absent).
+- **Windows runs:** `s19env` (Python 3.11.15), env `env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<HOME>/AppData/Local/Temp/s19f3/la`, `--basetemp <HOME>/AppData/Local/Temp/s19f3/bt`, `timeout 1800`; `s19_app.__file__` printed first = this worktree. The real `%LOCALAPPDATA%\s19_app` was not created (checked: absent).
 - **Runs:** only the 4 nodes and their 4 modules (no full suite). Evidence folder: `evidence/fix-3/`. Evidence states use the seven words.
 
 ## Summary

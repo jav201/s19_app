@@ -1,9 +1,9 @@
 # mutation: F1-no-damaged-check — F1 / SEC6-1 (LLR-168.3, OQ-1 (b)): the rewrite helper drops the damaged-manifest check
 # file: s19_app/tui/app.py (sha256 before 762d1a98c8a65903)
-# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=C:\Users\jjgh8\AppData\Local\Temp\f1mut-F1-no-damaged-check tests/test_b100_active_variant.py -k damaged_manifest_is_never
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (corrective pass 1, mutated in place, then restored)
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
-# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\__init__.py
+# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=<HOME>\AppData\Local\Temp\f1mut-F1-no-damaged-check tests/test_b100_active_variant.py -k damaged_manifest_is_never
+# tree: <HOME>\Github\s19_app-b100-inc6 (corrective pass 1, mutated in place, then restored)
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# s19_app.__file__ = <HOME>\Github\s19_app-b100-inc6\s19_app\__init__.py
 # date: 2026-10-30T03:33:29Z
 # --- old
 #           if manifest is not None and manifest_is_damaged(manifest):
@@ -13,7 +13,7 @@ FFFFFFFFFFFF                                                             [100%]
 ================================== FAILURES ===================================
 ___ test_tc_b100_20_damaged_manifest_is_never_rewritten[save-back-not-json] ___
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-F1-no-damaged-check/test_tc_b100_20_damaged_manife0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-F1-no-damaged-check/test_tc_b100_20_damaged_manife0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002B8DBB416D0>
 writer = 'save-back', damage = 'not-json'
 
@@ -48,7 +48,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:521: AssertionError
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[save-back-not-an-object] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-F1-no-damaged-check/test_tc_b100_20_damaged_manife1')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-F1-no-damaged-check/test_tc_b100_20_damaged_manife1')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002B8DBB41E90>
 writer = 'save-back', damage = 'not-an-object'
 
@@ -83,7 +83,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:521: AssertionError
 ___ test_tc_b100_20_damaged_manifest_is_never_rewritten[save-back-over-cap] ___
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-F1-no-damaged-check/test_tc_b100_20_damaged_manife2')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-F1-no-damaged-check/test_tc_b100_20_damaged_manife2')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002B8DD120ED0>
 writer = 'save-back', damage = 'over-cap'
 
@@ -118,7 +118,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:521: AssertionError
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-not-json] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-F1-no-damaged-check/test_tc_b100_20_damaged_manife3')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-F1-no-damaged-check/test_tc_b100_20_damaged_manife3')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002B8DDD3B8D0>
 writer = 'variant-append', damage = 'not-json'
 
@@ -153,7 +153,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:521: AssertionError
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-not-an-object] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-F1-no-damaged-check/test_tc_b100_20_damaged_manife4')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-F1-no-damaged-check/test_tc_b100_20_damaged_manife4')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002B8DE381310>
 writer = 'variant-append', damage = 'not-an-object'
 
@@ -188,7 +188,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:521: AssertionError
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-over-cap] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-F1-no-damaged-check/test_tc_b100_20_damaged_manife5')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-F1-no-damaged-check/test_tc_b100_20_damaged_manife5')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002B8DA3AE750>
 writer = 'variant-append', damage = 'over-cap'
 
@@ -223,7 +223,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:521: AssertionError
 ___ test_tc_b100_20_damaged_manifest_is_never_rewritten[mac-sync-not-json] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-F1-no-damaged-check/test_tc_b100_20_damaged_manife6')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-F1-no-damaged-check/test_tc_b100_20_damaged_manife6')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002B8DA3AF8D0>
 writer = 'mac-sync', damage = 'not-json'
 
@@ -258,7 +258,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:521: AssertionError
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[mac-sync-not-an-object] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-F1-no-damaged-check/test_tc_b100_20_damaged_manife7')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-F1-no-damaged-check/test_tc_b100_20_damaged_manife7')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002B8DE656510>
 writer = 'mac-sync', damage = 'not-an-object'
 
@@ -293,7 +293,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:521: AssertionError
 ___ test_tc_b100_20_damaged_manifest_is_never_rewritten[mac-sync-over-cap] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-F1-no-damaged-check/test_tc_b100_20_damaged_manife8')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-F1-no-damaged-check/test_tc_b100_20_damaged_manife8')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002B8DDEFBF10>
 writer = 'mac-sync', damage = 'over-cap'
 
@@ -328,7 +328,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:521: AssertionError
 ___ test_tc_b100_20_damaged_manifest_is_never_rewritten[a2l-sync-not-json] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-F1-no-damaged-check/test_tc_b100_20_damaged_manife9')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-F1-no-damaged-check/test_tc_b100_20_damaged_manife9')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002B8DEF7EF90>
 writer = 'a2l-sync', damage = 'not-json'
 
@@ -363,7 +363,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:521: AssertionError
 _ test_tc_b100_20_damaged_manifest_is_never_rewritten[a2l-sync-not-an-object] _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-F1-no-damaged-check/test_tc_b100_20_damaged_manife10')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-F1-no-damaged-check/test_tc_b100_20_damaged_manife10')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002B8DCFF0290>
 writer = 'a2l-sync', damage = 'not-an-object'
 
@@ -398,7 +398,7 @@ E         Use -v to get more diff
 tests\test_b100_active_variant.py:521: AssertionError
 ___ test_tc_b100_20_damaged_manifest_is_never_rewritten[a2l-sync-over-cap] ____
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-F1-no-damaged-check/test_tc_b100_20_damaged_manife11')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/f1mut-F1-no-damaged-check/test_tc_b100_20_damaged_manife11')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002B8DA6FE490>
 writer = 'a2l-sync', damage = 'over-cap'
 

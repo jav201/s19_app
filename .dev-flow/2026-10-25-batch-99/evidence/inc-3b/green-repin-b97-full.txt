@@ -4,7 +4,7 @@
 ================================== FAILURES ===================================
 ___________ test_tc_b97_64_burst_on_two_waiting_lanes_confirms_one ____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26649/test_tc_b97_64_burst_on_two_wa0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-26649/test_tc_b97_64_burst_on_two_wa0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FEDA68CF10>
 
     def test_tc_b97_64_burst_on_two_waiting_lanes_confirms_one(tmp_path: Path, monkeypatch) -> None:

@@ -1,10 +1,10 @@
 cmd: pytest -q -p no:cacheprovider tests/test_b100_reuse.py -k short_name_anchor  (RED: short-name fallback removed)
-tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 — detached e044112 + inc1 + fix1 + fix2-with-red-12
+tree: <HOME>\Github\s19_app-b100-inc1 — detached e044112 + inc1 + fix1 + fix2-with-red-12
 F                                                                        [100%]
 ================================== FAILURES ===================================
 __________ test_tc_b100_62_short_name_anchor_is_accepted_on_windows ___________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27281/test_tc_b100_62_short_name_anc0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-27281/test_tc_b100_62_short_name_anc0')
 
     def test_tc_b100_62_short_name_anchor_is_accepted_on_windows(
         tmp_path: Path,
@@ -34,7 +34,7 @@ s19_app\tui\workspace.py:1069: in place_into_workarea
     resolved_destination, resolved_root = _guarded_destination(
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-destination = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/PYTEST~1/PY6FD9~1/TEST_T~1/base/S19TOO~1/workarea/target')
+destination = WindowsPath('<HOME>/AppData/Local/Temp/PYTEST~1/PY6FD9~1/TEST_T~1/base/S19TOO~1/workarea/target')
 workarea_root = None
 
     def _guarded_destination(
@@ -124,7 +124,7 @@ workarea_root = None
                     "Refusing to place: destination is not contained inside "
                     f"<base>/{WORKAREA_DIRNAME}/{WORKAREA_SUBDIR}/: {textual_destination}"
                 )
-E               s19_app.tui.workspace.WorkareaContainmentError: Refusing to place: destination is not contained inside <base>/.s19tool/workarea/: C:\Users\jjgh8\AppData\Local\Temp\PYTEST~1\PY6FD9~1\TEST_T~1\base\S19TOO~1\workarea\target
+E               s19_app.tui.workspace.WorkareaContainmentError: Refusing to place: destination is not contained inside <base>/.s19tool/workarea/: <HOME>\AppData\Local\Temp\PYTEST~1\PY6FD9~1\TEST_T~1\base\S19TOO~1\workarea\target
 
 s19_app\tui\workspace.py:644: WorkareaContainmentError
 =========================== short test summary info ===========================

@@ -3,11 +3,11 @@ Builds an n-entry document by replicating the 6-entry fixture's parsed entries
 (serialisation does not re-validate), then times serialize -> decode -> cap,
 next to service.rows(None), which every refresh_entries site already pays."""
 import sys, json, time, statistics
-sys.path.insert(0, r"C:\Users\jjgh8\Github\s19_app")
+sys.path.insert(0, r"<HOME>\Github\s19_app")
 from s19_app.tui.services.change_service import ChangeService
 from s19_app.tui.changes.io import serialize_change_document
 from s19_app.tui.screens_directionb import cap_json_lines
-FX = r"C:\Users\jjgh8\Github\s19_app\prototypes\b94_polish\demo_project\.s19tool\workarea\patches\calib_hotfix.json"
+FX = r"<HOME>\Github\s19_app\prototypes\b94_polish\demo_project\.s19tool\workarea\patches\calib_hotfix.json"
 svc = ChangeService(); svc.load_text(open(FX, encoding="utf-8").read())
 six = list(svc.document.entries); assert len(six) == 6, len(six)
 def med(fn, reps):

@@ -1,13 +1,13 @@
-s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc8b\s19_app\__init__.py
+s19_app.__file__ = <HOME>\Github\s19_app-b100-inc8b\s19_app\__init__.py
 .SAVE P: ['Project NOT saved: source file missing: firmware.s19 — reload it or remove it from the project.']
 SAVE Q: ['Project NOT saved: source file missing: firmware.s19 — reload it or remove it from the project.']
 FBEFORE has file: True AFTER file: None project: P LINES: ["Loaded project 'P' -> (no image) - 0 variants, 1 problem - details: p"]
-FBEFORE: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r8b\bt\test_probe_i2_unload_of_an_a2l0\app\.s19tool\workarea\P\firmware.a2l AFTER: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r8b\bt\test_probe_i2_unload_of_an_a2l0\app\.s19tool\workarea\P\firmware.a2l LINES: ['Nothing to unload.']
+FBEFORE: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r8b\bt\test_probe_i2_unload_of_an_a2l0\app\.s19tool\workarea\P\firmware.a2l AFTER: <HOME>\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r8b\bt\test_probe_i2_unload_of_an_a2l0\app\.s19tool\workarea\P\firmware.a2l LINES: ['Nothing to unload.']
 .
 ================================== FAILURES ===================================
 _______________ test_probe_missing_source_blocks_every_new_save _______________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r8b/bt/test_probe_missing_source_bloc0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r8b/bt/test_probe_missing_source_bloc0')
 
     def test_probe_missing_source_blocks_every_new_save(tmp_path):
         """The open project folder is removed after the load (renamed away in
@@ -31,10 +31,10 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-
 E       assert False
 E        +  where False = any(<generator object test_probe_missing_source_blocks_every_new_save.<locals>.<genexpr> at 0x0000027163976190>)
 
-..\..\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r8b\test_r8b_probes2.py:34: AssertionError
+..\..\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r8b\test_r8b_probes2.py:34: AssertionError
 ________ test_probe_r7_unparseable_a2l_only_project_resets_the_session ________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r8b/bt/test_probe_r7_unparseable_a2l_0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r8b/bt/test_probe_r7_unparseable_a2l_0')
 
     def test_probe_r7_unparseable_a2l_only_project_resets_the_session(tmp_path):
         """R-7: an A2L-only folder whose A2L does not parse passes the new
@@ -64,7 +64,7 @@ tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-
 E       assert False
 E        +  where False = any(<generator object test_probe_r7_unparseable_a2l_only_project_resets_the_session.<locals>.<genexpr> at 0x000002716731AE90>)
 
-..\..\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r8b\test_r8b_probes2.py:64: AssertionError
+..\..\AppData\Local\Temp\claude\C--Users-<USER>-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r8b\test_r8b_probes2.py:64: AssertionError
 =========================== short test summary info ===========================
 FAILED ::test_probe_missing_source_blocks_every_new_save - assert False
 FAILED ::test_probe_r7_unparseable_a2l_only_project_resets_the_session - asse...

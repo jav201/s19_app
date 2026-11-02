@@ -2,7 +2,7 @@
 
 > Every number below is executed output. Method + transcript per measurement.
 >
-> **Run context.** Worktree `C:\Users\jjgh8\OneDrive\Documents\Github\s19_app\.claude\worktrees\next-batch-backlog-8a6c43`,
+> **Run context.** Worktree `<HOME>\OneDrive\Documents\Github\s19_app\.claude\worktrees\next-batch-backlog-8a6c43`,
 > branch `claude/batch-72-design-defect-634a67` @ `b556e35`, date **2026-07-30**,
 > Python 3.14.4, textual **8.2.8**.
 > All probes are throwaway scripts in the session scratchpad; **no repo file other than this

@@ -1,6 +1,6 @@
 # command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
-# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree + corrective pass 1) with mutation ME-adopt-before-folder
-# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# tree: <HOME>\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree + corrective pass 1) with mutation ME-adopt-before-folder
+# PYTHONPATH=<HOME>\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
 # date: 2026-10-29T21:45:39+00:00
 # finding: review F4 (LLR-167.2, LLR-167.4)
 # mutation: the re-derived image is adopted before the project folder exists — file s19_app/tui/app.py
@@ -12,7 +12,7 @@
 ================================== FAILURES ===================================
 _________________ test_tc_b100_16_entry_added_after_the_apply _________________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30044/test_tc_b100_16_entry_added_af0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30044/test_tc_b100_16_entry_added_af0')
 
     def test_tc_b100_16_entry_added_after_the_apply(tmp_path: Path) -> None:
         """1 applied + 1 added after the apply → 2 entries, 1 applied by this
@@ -37,7 +37,7 @@ E        +  where False = any(<generator object test_tc_b100_16_entry_added_afte
 tests\test_b100_save_image.py:662: AssertionError
 ____________ test_tc_b100_17_failed_manifest_write_adopts_nothing _____________
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30044/test_tc_b100_17_failed_manifes0')
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/pytest-of-<USER>/pytest-30044/test_tc_b100_17_failed_manifes0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000018A8EA5E0D0>
 
     def test_tc_b100_17_failed_manifest_write_adopts_nothing(

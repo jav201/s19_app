@@ -1,9 +1,9 @@
 # Kimi brief — batch-100 Increment 4 · corrective pass 2
 
-Keep working in the same worktree, `C:\Users\jjgh8\Github\s19_app-b100-inc4`. It holds Inc 4 plus fix pass 1, uncommitted; keep both. `BRIEF-COMMON.md` still applies. There is 1 SOURCE file: `app.py`.
+Keep working in the same worktree, `<HOME>\Github\s19_app-b100-inc4`. It holds Inc 4 plus fix pass 1, uncommitted; keep both. `BRIEF-COMMON.md` still applies. There is 1 SOURCE file: `app.py`.
 
 **Read first (MAIN checkout):**
-- `C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-10-26-batch-100\03-increments\review-increment-004.md` "Round 2" (R2-1 to R2-4). The reviewer's probe is `...\scratchpad\r4\probe-map-arrows.txt`, with its scripts in the same folder.
+- `<HOME>\Github\s19_app\.dev-flow\2026-10-26-batch-100\03-increments\review-increment-004.md` "Round 2" (R2-1 to R2-4). The reviewer's probe is `...\scratchpad\r4\probe-map-arrows.txt`, with its scripts in the same folder.
 - `01-requirements-ledger.md` LED .58 (the rulings).
 
 **Fix:**
