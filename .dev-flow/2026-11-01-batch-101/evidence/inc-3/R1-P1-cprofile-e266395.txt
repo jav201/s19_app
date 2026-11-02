@@ -1,0 +1,184 @@
+# R1-P1 cProfile, Windows, tree e266395, 2026-11-02T15:22:36Z
+s19_app from <HOME>\Github\s19_app-b101-inc3\s19_app\__init__.py
+profile  {'handler_return': 0.409, 'worker_start': 0.424, 'worker_end': 1.905, 'commit_start': 1.905, 'status': 1.905, 'commit_end': 1.93} ['Project saved + manifest verified']
+===== cProfile main (handler + commit on the main thread / worker step) =====
+         1173429 function calls (1172931 primitive calls) in 0.432 seconds
+
+   Ordered by: cumulative time
+   List reduced from 699 to 45 due to restriction <45>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.409    0.409 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\app.py:10630(_handle_save_dialog)
+        1    0.000    0.000    0.400    0.400 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\app.py:10720(_prepare_project_save)
+        1    0.002    0.002    0.287    0.287 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\variant_execution_service.py:1438(read_project_manifest)
+     3001    0.002    0.000    0.284    0.000 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\variant_execution_service.py:823(_resolve_manifest_entry)
+    10072    0.010    0.000    0.170    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:484(_parse_args)
+     3001    0.009    0.000    0.161    0.000 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\variant_execution_service.py:651(_entry_text)
+    10072    0.097    0.000    0.157    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:56(parse_parts)
+     3001    0.019    0.000    0.121    0.000 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\variant_execution_service.py:758(_walk_manifest_entry)
+        1    0.000    0.000    0.109    0.109 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\app.py:14340(_manifest_carry)
+        3    0.000    0.000    0.109    0.036 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\app.py:14382(_relative)
+        3    0.002    0.001    0.109    0.036 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\app.py:14383(<listcomp>)
+     6002    0.002    0.000    0.104    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:469(__new__)
+     6023    0.004    0.000    0.102    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:504(_from_parts)
+     3001    0.009    0.000    0.098    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:703(relative_to)
+     3001    0.036    0.000    0.089    0.000 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\variant_execution_service.py:619(check)
+     3001    0.013    0.000    0.076    0.000 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\variant_execution_service.py:499(_manifest_key_refusal)
+     1032    0.001    0.000    0.040    0.000 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\variant_execution_service.py:575(_lstat_state)
+        1    0.000    0.000    0.040    0.040 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\app.py:14387(<dictcomp>)
+     1042    0.034    0.000    0.039    0.000 {built-in method nt.lstat}
+        1    0.000    0.000    0.030    0.030 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\app.py:14392(<dictcomp>)
+     9004    0.004    0.000    0.028    0.000 <HOME>\anaconda3\envs\s19env\Lib\re\__init__.py:198(split)
+    46129    0.025    0.000    0.025    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:147(splitroot)
+        1    0.000    0.000    0.025    0.025 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\app.py:12168(_on_project_saved)
+     3001    0.013    0.000    0.022    0.000 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\variant_execution_service.py:553(_climbs_above_root)
+        1    0.000    0.000    0.020    0.020 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\app.py:19540(update_project_labels)
+     6008    0.002    0.000    0.019    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:189(casefold_parts)
+     9004    0.019    0.000    0.019    0.000 {method 'split' of 're.Pattern' objects}
+     6008    0.012    0.000    0.017    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:190(<listcomp>)
+   229212    0.017    0.000    0.017    0.000 {built-in method sys.intern}
+   349306    0.016    0.000    0.016    0.000 {method 'append' of 'list' objects}
+        2    0.000    0.000    0.013    0.006 <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\css\query.py:115(nodes)
+        1    0.000    0.000    0.013    0.013 <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\css\query.py:144(__iter__)
+        2    0.000    0.000    0.011    0.006 <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\css\query.py:124(<listcomp>)
+      977    0.000    0.000    0.011    0.000 {built-in method builtins.all}
+     1824    0.000    0.000    0.011    0.000 <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\css\query.py:127(<genexpr>)
+     7106    0.007    0.000    0.011    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:536(__str__)
+      917    0.000    0.000    0.011    0.000 <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\css\match.py:11(match)
+      929    0.000    0.000    0.010    0.000 {built-in method builtins.any}
+     1834    0.000    0.000    0.010    0.000 <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\css\match.py:21(<genexpr>)
+     6007    0.003    0.000    0.010    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:549(as_posix)
+4142/4141    0.002    0.000    0.008    0.000 {method 'join' of 'str' objects}
+        1    0.000    0.000    0.008    0.008 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\app.py:11442(_commit_project_save)
+     1048    0.000    0.000    0.007    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:765(__truediv__)
+        1    0.000    0.000    0.006    0.006 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\app.py:16868(_refresh_loaded_panel)
+     1048    0.001    0.000    0.006    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:530(_make_child)
+
+
+
+===== cProfile main by tottime =====
+         1173429 function calls (1172931 primitive calls) in 0.432 seconds
+
+   Ordered by: internal time
+   List reduced from 699 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+    10072    0.097    0.000    0.157    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:56(parse_parts)
+     3001    0.036    0.000    0.089    0.000 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\variant_execution_service.py:619(check)
+     1042    0.034    0.000    0.039    0.000 {built-in method nt.lstat}
+    46129    0.025    0.000    0.025    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:147(splitroot)
+     3001    0.019    0.000    0.121    0.000 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\variant_execution_service.py:758(_walk_manifest_entry)
+     9004    0.019    0.000    0.019    0.000 {method 'split' of 're.Pattern' objects}
+   229212    0.017    0.000    0.017    0.000 {built-in method sys.intern}
+   349306    0.016    0.000    0.016    0.000 {method 'append' of 'list' objects}
+     3001    0.013    0.000    0.022    0.000 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\variant_execution_service.py:553(_climbs_above_root)
+     3001    0.013    0.000    0.076    0.000 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\variant_execution_service.py:499(_manifest_key_refusal)
+     6008    0.012    0.000    0.017    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:190(<listcomp>)
+    10072    0.010    0.000    0.170    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:484(_parse_args)
+     3001    0.009    0.000    0.161    0.000 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\variant_execution_service.py:651(_entry_text)
+     3001    0.009    0.000    0.098    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:703(relative_to)
+     7106    0.007    0.000    0.011    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:536(__str__)
+    99746    0.006    0.000    0.006    0.000 {method 'get' of 'dict' objects}
+    84108    0.006    0.000    0.006    0.000 {method 'lower' of 'str' objects}
+    52172    0.005    0.000    0.005    0.000 {method 'replace' of 'str' objects}
+     6023    0.004    0.000    0.102    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:504(_from_parts)
+    39108    0.004    0.000    0.004    0.000 {built-in method builtins.isinstance}
+     1058    0.004    0.000    0.006    0.000 <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\css\match.py:27(_check_selectors)
+     9004    0.004    0.000    0.028    0.000 <HOME>\anaconda3\envs\s19env\Lib\re\__init__.py:198(split)
+     9004    0.003    0.000    0.005    0.000 <HOME>\anaconda3\envs\s19env\Lib\re\__init__.py:272(_compile)
+     6007    0.003    0.000    0.010    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:549(as_posix)
+        3    0.002    0.001    0.109    0.036 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\app.py:14383(<listcomp>)
+
+
+
+===== cProfile worker (handler + commit on the main thread / worker step) =====
+         2043530 function calls (2042475 primitive calls) in 1.481 seconds
+
+   Ordered by: cumulative time
+   List reduced from 351 to 45 due to restriction <45>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    1.481    1.481 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\app.py:11542(_save_project_files)
+        1    0.001    0.001    0.717    0.717 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\app.py:12305(_write_manifest_for_save)
+        1    0.005    0.005    0.715    0.715 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\project_gather_service.py:525(gather_project_artifacts)
+     2019    0.005    0.000    0.581    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:981(resolve)
+     4001    0.003    0.000    0.559    0.000 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\variant_execution_service.py:823(_resolve_manifest_entry)
+        1    0.001    0.001    0.402    0.402 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\manifest_writer.py:785(verify_written_manifest)
+     2023    0.009    0.000    0.387    0.000 <frozen ntpath>:633(realpath)
+     4046    0.351    0.000    0.351    0.000 {built-in method nt._getfinalpathname}
+    18141    0.031    0.000    0.337    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:484(_parse_args)
+        1    0.000    0.000    0.313    0.313 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\manifest_writer.py:526(write_project_manifest)
+        1    0.001    0.001    0.306    0.306 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\manifest_writer.py:260(serialize_manifest)
+     2001    0.001    0.000    0.301    0.000 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\manifest_writer.py:208(_reject_unsafe_entry)
+    18141    0.189    0.000    0.299    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:56(parse_parts)
+     4002    0.030    0.000    0.297    0.000 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\variant_execution_service.py:758(_walk_manifest_entry)
+    12054    0.010    0.000    0.269    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:504(_from_parts)
+        1    0.002    0.002    0.267    0.267 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\variant_execution_service.py:1438(read_project_manifest)
+     4002    0.014    0.000    0.259    0.000 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\variant_execution_service.py:651(_entry_text)
+     4002    0.059    0.000    0.247    0.000 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\variant_execution_service.py:619(check)
+     4064    0.002    0.000    0.230    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:1008(stat)
+     4072    0.218    0.000    0.228    0.000 {built-in method nt.stat}
+     8004    0.003    0.000    0.170    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:469(__new__)
+     2064    0.004    0.000    0.164    0.000 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\variant_execution_service.py:575(_lstat_state)
+     2089    0.148    0.000    0.160    0.000 {built-in method nt.lstat}
+     4002    0.020    0.000    0.123    0.000 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\variant_execution_service.py:499(_manifest_key_refusal)
+        2    0.000    0.000    0.102    0.051 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\manifest_writer.py:747(_resolve_intended_entries)
+     2011    0.002    0.000    0.098    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:1261(is_file)
+     6084    0.002    0.000    0.096    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:765(__truediv__)
+     6084    0.008    0.000    0.094    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:530(_make_child)
+        2    0.002    0.001    0.092    0.046 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\manifest_writer.py:782(<listcomp>)
+   562587    0.052    0.000    0.052    0.000 {built-in method sys.intern}
+        1    0.000    0.000    0.051    0.051 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\manifest_writer.py:883(<dictcomp>)
+     2031    0.001    0.000    0.046    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:868(__new__)
+    12008    0.006    0.000    0.043    0.000 <HOME>\anaconda3\envs\s19env\Lib\re\__init__.py:198(split)
+   720961    0.037    0.000    0.037    0.000 {method 'append' of 'list' objects}
+    10223    0.005    0.000    0.035    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:546(__fspath__)
+     4002    0.020    0.000    0.033    0.000 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\variant_execution_service.py:553(_climbs_above_root)
+     2016    0.002    0.000    0.032    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:578(__eq__)
+     4034    0.003    0.000    0.030    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:569(_cparts)
+    10227    0.019    0.000    0.030    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:536(__str__)
+    12008    0.029    0.000    0.029    0.000 {method 'split' of 're.Pattern' objects}
+     3026    0.001    0.000    0.027    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:189(casefold_parts)
+     3026    0.017    0.000    0.026    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:190(<listcomp>)
+        4    0.000    0.000    0.026    0.007 <HOME>\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:1788(call_from_thread)
+     4035    0.003    0.000    0.020    0.000 <frozen ntpath>:495(normpath)
+       13    0.016    0.001    0.016    0.001 {built-in method nt.mkdir}
+
+
+
+===== cProfile worker by tottime =====
+         2043530 function calls (2042475 primitive calls) in 1.481 seconds
+
+   Ordered by: internal time
+   List reduced from 351 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+     4046    0.351    0.000    0.351    0.000 {built-in method nt._getfinalpathname}
+     4072    0.218    0.000    0.228    0.000 {built-in method nt.stat}
+    18141    0.189    0.000    0.299    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:56(parse_parts)
+     2089    0.148    0.000    0.160    0.000 {built-in method nt.lstat}
+     4002    0.059    0.000    0.247    0.000 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\variant_execution_service.py:619(check)
+   562587    0.052    0.000    0.052    0.000 {built-in method sys.intern}
+   720961    0.037    0.000    0.037    0.000 {method 'append' of 'list' objects}
+    18141    0.031    0.000    0.337    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:484(_parse_args)
+     4002    0.030    0.000    0.297    0.000 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\variant_execution_service.py:758(_walk_manifest_entry)
+    12008    0.029    0.000    0.029    0.000 {method 'split' of 're.Pattern' objects}
+     4002    0.020    0.000    0.123    0.000 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\variant_execution_service.py:499(_manifest_key_refusal)
+     4002    0.020    0.000    0.033    0.000 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\variant_execution_service.py:553(_climbs_above_root)
+    10227    0.019    0.000    0.030    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:536(__str__)
+     3026    0.017    0.000    0.026    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:190(<listcomp>)
+       13    0.016    0.001    0.016    0.001 {built-in method nt.mkdir}
+        4    0.015    0.004    0.015    0.004 {method 'send' of '_socket.socket' objects}
+    18294    0.015    0.000    0.015    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:147(splitroot)
+     4002    0.014    0.000    0.259    0.000 <HOME>\Github\s19_app-b101-inc3\s19_app\tui\services\variant_execution_service.py:651(_entry_text)
+        6    0.011    0.002    0.011    0.002 {method 'acquire' of '_thread.lock' objects}
+    12054    0.010    0.000    0.269    0.000 <HOME>\anaconda3\envs\s19env\Lib\pathlib.py:504(_from_parts)
+   135338    0.010    0.000    0.010    0.000 {method 'lower' of 'str' objects}
+   128028    0.009    0.000    0.009    0.000 {method 'get' of 'dict' objects}
+     2023    0.009    0.000    0.387    0.000 <frozen ntpath>:633(realpath)
+    16028    0.009    0.000    0.009    0.000 {method 'split' of 'str' objects}
+    68550    0.008    0.000    0.008    0.000 {built-in method builtins.isinstance}
+
+
+
+exit=0

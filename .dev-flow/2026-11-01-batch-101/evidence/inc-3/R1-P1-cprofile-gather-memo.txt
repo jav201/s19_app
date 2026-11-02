@@ -1,0 +1,45 @@
+# R1-P1 cProfile with R1P1_EXP=gather,memo, tree e266395
+s19_app from <HOME>\Github\s19_app-b101-inc3\s19_app\__init__.py
+profile  {'handler_return': 0.253, 'worker_start': 0.273, 'worker_end': 1.164, 'commit_start': 1.165, 'status': 1.165, 'commit_end': 1.189} ['Project saved + manifest verified']
+## top of the worker step by cumulative time
+Mon Nov  2 09:27:40 2026    p3-worker.prof
+
+         1342545 function calls (1341490 primitive calls) in 0.892 seconds
+
+   Ordered by: cumulative time
+   List reduced from 354 to 30 due to restriction <30>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.892    0.892 s19_app\tui\app.py:11542(_save_project_files)
+        1    0.001    0.001    0.551    0.551 s19_app\tui\app.py:12305(_write_manifest_for_save)
+     4001    0.005    0.000    0.403    0.000 .dev-flow\2026-11-01-batch-101\evidence\inc-3\R1-P1-profile-script.py:40(_resolve_once)
+     2001    0.002    0.000    0.397    0.000 s19_app\tui\services\variant_execution_service.py:823(_resolve_manifest_entry)
+        1    0.000    0.000    0.377    0.377 s19_app\tui\services\manifest_writer.py:785(verify_written_manifest)
+        1    0.000    0.000    0.314    0.314 .dev-flow\2026-11-01-batch-101\evidence\inc-3\R1-P1-profile-script.py:32(_gather_once)
+        1    0.002    0.002    0.314    0.314 s19_app\tui\services\project_gather_service.py:525(gather_project_artifacts)
+     2002    0.013    0.000    0.272    0.000 s19_app\tui\services\variant_execution_service.py:758(_walk_manifest_entry)
+     1019    0.003    0.000    0.271    0.000 pathlib.py:981(resolve)
+     2002    0.027    0.000    0.251    0.000 s19_app\tui\services\variant_execution_service.py:619(check)
+        1    0.001    0.001    0.248    0.248 s19_app\tui\services\variant_execution_service.py:1438(read_project_manifest)
+     2064    0.003    0.000    0.205    0.000 s19_app\tui\services\variant_execution_service.py:575(_lstat_state)
+    12141    0.015    0.000    0.205    0.000 pathlib.py:484(_parse_args)
+     2089    0.194    0.000    0.202    0.000 {built-in method nt.lstat}
+     1023    0.004    0.000    0.200    0.000 <frozen ntpath>:633(realpath)
+    12141    0.117    0.000    0.186    0.000 pathlib.py:56(parse_parts)
+     2046    0.183    0.000    0.183    0.000 {built-in method nt._getfinalpathname}
+        1    0.000    0.000    0.172    0.172 s19_app\tui\services\manifest_writer.py:526(write_project_manifest)
+        1    0.001    0.001    0.167    0.167 s19_app\tui\services\manifest_writer.py:260(serialize_manifest)
+     2001    0.001    0.000    0.164    0.000 s19_app\tui\services\manifest_writer.py:208(_reject_unsafe_entry)
+     7054    0.006    0.000    0.152    0.000 pathlib.py:504(_from_parts)
+     2002    0.009    0.000    0.123    0.000 s19_app\tui\services\variant_execution_service.py:651(_entry_text)
+        2    0.000    0.000    0.103    0.052 s19_app\tui\services\manifest_writer.py:747(_resolve_intended_entries)
+        2    0.002    0.001    0.099    0.049 s19_app\tui\services\manifest_writer.py:782(<listcomp>)
+     4004    0.002    0.000    0.079    0.000 pathlib.py:469(__new__)
+     5084    0.002    0.000    0.072    0.000 pathlib.py:765(__truediv__)
+     5084    0.006    0.000    0.070    0.000 pathlib.py:530(_make_child)
+     2064    0.001    0.000    0.069    0.000 pathlib.py:1008(stat)
+     2072    0.063    0.000    0.068    0.000 {built-in method nt.stat}
+     2002    0.009    0.000    0.064    0.000 s19_app\tui\services\variant_execution_service.py:499(_manifest_key_refusal)
+
+
+
