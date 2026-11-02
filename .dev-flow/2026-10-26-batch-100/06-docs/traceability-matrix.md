@@ -457,7 +457,7 @@
 | TC pending | `0` |
 | Acceptance tests | `21` ids (AT-B100-01…21); every one resolves to `test_at_b100_NN_*` functions on the current tree |
 
-> The pass/pending figures rest on the increment packets' executed transcripts and the two batch-end fix rounds (`fix-round-1.md`, `fix-round-2.md`). The final full-suite CI gate on `main` is still running at this writing; its result belongs on the `Gate run` line of `04-validation.md` (not owned by this artifact). `<!-- CI-FINAL -->`
+> The pass/pending figures rest on the increment packets' executed transcripts and the two batch-end fix rounds (`fix-round-1.md`, `fix-round-2.md`). The gate is the orchestrator's full Linux run on `f72eef1` (fix rounds 1–3 included): 18 failed / 5,027 passed / 205 skipped / 4 xfailed, the 18 being the 5 known pre-existing failures and 13 timing arms under parallel load that pass serially; its record is the `Gate run` line of `04-validation.md` (not owned by this artifact). GitHub CI 41372953464 on `f72eef1` is a post-close confirmation, deferred by the operator.
 
 ## 3. Detected gaps
 
@@ -467,7 +467,7 @@
 |----|------|-------------|-----------------|
 | R-1 | record note | LLR-163.3 / LLR-163.4 (G-005) carry no `TC-B100` id — they re-pin pre-batch nodes (`test_tc018_…`, `test_at031b_…`, `test_tc_b99_31_…` and the b94 re-pins). Both re-pinned functions exist and are named in §1. | — |
 | R-2 | record note | Two LLRs are retired: LLR-171.4d (withdrawn, merged into LLR-171.4c) and LLR-171.2e (retired, superseded by LLR-173.4a in Inc 9b). Both are listed in §1c, not live. | — |
-| R-3 | record note | The final full-suite CI gate on `main` is still running. | `<!-- CI-FINAL -->` — its result lands on `04-validation.md`'s `Gate run` line. |
+| R-3 | record note | The full-suite gate ran on Linux on `f72eef1`; GitHub CI 41372953464 confirms after the close (deferred). | `04-validation.md` `Gate run`: `PASS-WITH-NOTES`. |
 | R-4 | record note | The batch-end battery (local, 4 shards on `9e4dd3b`) and the two fix rounds are the local evidence; the Linux posix arms of CI9b-3 / CI11-3 / CI11-1 are confirmed only by the next CI run (`fix-round-1.md` §Pending). | — |
 
 **A worked example — text to read, never rows of your record:**
@@ -543,5 +543,5 @@ The remaining `tests/test_b100_*.py` files and `tests/support/b100_*.py` helpers
 | Batch ID | `2026-10-26-batch-100` |
 | Closing date | written 2026-11-01 (P5 commit `570b4b5` on `main`) |
 | Total iterations (sum of phases) | from the record: P0 · ARQ · P1 · P2 (3 rounds) · PDR · a prototype round · 16 increment packets (001–007, 008a, 015, 008b, 009a, 009b, 010, 011, 012a, 012b) · two batch-end fix rounds |
-| Validation passed | the final full-suite CI gate is still running — `<!-- CI-FINAL -->` |
+| Validation passed | `PASS-WITH-NOTES` on the Linux gate (`04-validation.md`); GitHub CI 41372953464 deferred to after the close |
 | Synced to Obsidian | no — the operator commits, pushes and runs `/dev-flow-sync` |

@@ -46,6 +46,16 @@
 | `tests/test_b100_project_homes.py` | test | LLR-173.4n | TC-B100-32 `[link]` and `test_e4_llr_171_2g_…_never_parsed` re-pinned to the 9b outcome; new `test_tc_b100_32_a2l_admission_refuses_any_reparse_point` |
 | `tests/test_b100_project_check.py` | test | LLR-173.1e (SR-3) | the paint clock starts when the load returns (`_paint_clock_start`) |
 | re-pins | test | HLR-173 | `test_tui_app.py`, `test_tui_helpers.py`, `test_b99_load_project.py`, `test_tui_directionb.py`, `test_b97_load_project_dialog.py`, `test_loadfilescreen_input.py`, `test_b100_active_variant.py`, `test_b100_announce.py`, `test_b100_reuse.py`, `test_b99_crc_region.py`, `test_b99_export.py`, `test_b99_patch_truth.py`, `test_b99_staging.py`, `test_b99_truncation.py`, `test_clipboard_tk_singleton.py`, `test_b100_document.py`, `test_b100_save_guards.py`, `test_b100_save_image.py`, `test_b100_session_reset.py` |
+| `tests/support/b100_load_dialog.py` | test | HLR-173 | NEW: the Load dialog drive helpers — 741cc07 |
+| `tests/test_b97_load_project_dialog.py` | test | HLR-173 | re-pin (741cc07) |
+| `tests/test_b99_crc_region.py` | test | HLR-173 | re-pin (741cc07) |
+| `tests/test_b99_load_project.py` | test | HLR-173 | re-pin (741cc07) |
+| `tests/test_b99_patch_truth.py` | test | HLR-173 | re-pin (741cc07) |
+| `tests/test_b99_truncation.py` | test | HLR-173 | re-pin (741cc07) |
+| `tests/test_clipboard_tk_singleton.py` | test | HLR-173 | re-pin (741cc07) |
+| `tests/test_tui_app.py` | test | HLR-173 | re-pin (741cc07) |
+| `tests/test_tui_directionb.py` | test | HLR-173 | re-pin (741cc07) |
+| `tests/test_tui_helpers.py` | test | HLR-173 | re-pin (741cc07) |
 | `tests/test_id_registry.py` | config | HLR-173 | `EXPECTED_SCANNED_TEST_FILES` 228 → 230 (measured, F2) |
 | `REQUIREMENTS.md` · `docs/architecture.md` | doc | CR9b-04 | LLR-151.1 marked superseded; the `LoadFileScreen` / `LoadProjectScreen` references re-pointed to `LoadDialog` |
 | `.dev-flow/2026-10-26-batch-100/01-requirements.md` | doc | HLR-173 … HLR-173e · LLR-172.1n | E1 / E3 / E5 edits (LED .86–.88) |

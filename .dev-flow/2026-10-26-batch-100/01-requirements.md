@@ -528,7 +528,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-171 — Save as copies the whole project
 - **Traceability:** US-161
 - **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.22, LED-2026-10-26-batch-100.42, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77, LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.79, LED-2026-10-26-batch-100.81
-- **Statement (EARS event):** When Save project saves the open project into a new project folder, the system shall make the new project hold every regular file of the open project, at the top level and in its sub-folders, that is not reached through a link or junction and that the save does not write itself, other than `project.json` backups (`project.json.previous-*`).
+- **Statement:** (EARS event) When Save project saves the open project into a new project folder, the system shall make the new project hold every regular file of the open project, at the top level and in its sub-folders, that is not reached through a link or junction and that the save does not write itself, other than `project.json` backups (`project.json.previous-*`).
 - **Decomposition:** LLR-171.1, LLR-171.1a … LLR-171.1m, LLR-171.5, LLR-171.6, LLR-171.6a, LLR-171.6b, LLR-171.7, LLR-171.7a, LLR-171.7b; the plan rows LLR-167.6a, LLR-167.6b, LLR-167.6g. The split of the former compound HLR-171 (save as, A2L-only, containment) into HLR-171, HLR-171a and HLR-171b is LED .76; the top-level files, the ceilings, the unreadable entries, the session switch, the carried `batch` rule and the painted names are LED .78.
 - **Rationale (informative):** "save as" leaves flows, patches and reports behind (P-9); a junction inside a sub-folder copies an outside tree (S-03, security R2-06); a large copy can fill the disk (S-15).
 - **Validation:** `test`
@@ -545,7 +545,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-171a — An A2L-only project opens
 - **Traceability:** US-161
 - **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77, LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.81
-- **Statement (EARS event):** When a project folder that holds one A2L file and no data file is loaded, the system shall open that project with its A2L attached.
+- **Statement:** (EARS event) When a project folder that holds one A2L file and no data file is loaded, the system shall open that project with its A2L attached.
 - **Decomposition:** LLR-171.2, LLR-171.2a … LLR-171.2g (LLR-171.2f and .2g, the A2L link and cap guard of both load branches, are LED .78).
 - **Rationale (informative):** an A2L-only project saves and then cannot be loaded (P-12).
 - **Validation:** `test`
@@ -562,7 +562,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-171b — Only folders inside this work area are listed, loaded or written as projects
 - **Traceability:** US-161
 - **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77, LED-2026-10-26-batch-100.81
-- **Statement (EARS ubiquitous):** The system shall treat a folder as a project only when that folder is not a link or junction and resolves inside this work area.
+- **Statement:** (EARS ubiquitous) The system shall treat a folder as a project only when that folder is not a link or junction and resolves inside this work area.
 - **Decomposition:** LLR-171.3, LLR-171.3a, LLR-171.4, LLR-171.4a, .4b, .4c, .4e … .4h (listing, load, Save project's target and parent, and the 8 named writers each have their own LLR). LLR-171.4d is withdrawn into .4c; LLR-171.4i and .4j (SEC-5) are routed out of 8b to the LED .50 backlog item (LED .77).
 - **Rationale (informative):** a save elsewhere is never listed (P-11); a junction in the work area escapes every containment check (S-02, security R2-01); a junction `flows/` sends a saved flow outside (SEC-5, `security-increment-001.md`).
 - **Validation:** `test`
@@ -579,7 +579,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-172 — Recent sources are remembered per user
 - **Traceability:** US-162
 - **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.21, LED-2026-10-26-batch-100.30, LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83, LED-2026-10-26-batch-100.84, LED-2026-10-26-batch-100.85, LED-2026-10-26-batch-100.86
-- **Statement (EARS event):** When Load copies a data or A2L file from outside this work area into the work area, the system shall record that file's absolute path in the per-user recent-sources store.
+- **Statement:** (EARS event) When Load copies a data or A2L file from outside this work area into the work area, the system shall record that file's absolute path in the per-user recent-sources store.
 - **Decomposition:** LLR-172.1, LLR-172.1a … LLR-172.1n (… LLR-172.1n leaves out a source found only through the relative fallback, CR9-1) (the write; LLR-172.1k, LLR-172.1l and LLR-172.1m's entry-that-cannot-fit arm are the three declared exceptions to the record — an unreadable store is left unchanged, a path the store read would drop is not recorded, and a single entry that cannot fit is not recorded — and LLR-172.1m also bounds the file the writer produces); LLR-172.2, LLR-172.2a … LLR-172.2j, LLR-172.2k (the read; LLR-172.2k is also the record's entry check, LLR-172.1l); LLR-172.3. The split of the former compound HLR-172 (store, read, lister, typed path, literal names) into HLR-172, HLR-172a and HLR-172b is LED .82.
 - **Rationale (informative):** the unified dialog needs its recent sources (ARQ §6); store entries could reach the network or carry control characters (S-06, S-07, S-12). The operator's S-16 decision moves the store per user, which also removes the planted-store route S-07 started from.
 - **Validation:** `test`
@@ -597,7 +597,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-172a — A typed project path opens the project
 - **Traceability:** US-162
 - **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
-- **Statement (EARS event):** When the absolute path typed into Load names a project folder of this work area or that folder's `project.json`, the system shall load that project.
+- **Statement:** (EARS event) When the absolute path typed into Load names a project folder of this work area or that folder's `project.json`, the system shall load that project.
 - **Decomposition:** LLR-172.5, LLR-172.5a … LLR-172.5h. "Absolute" is `Path.is_absolute()` on the typed text (on Windows a drive and a root; `\x` and `C:x` are relative); a relative typed path keeps the file route and never reaches the project route, so the base-folder fallback of `resolve_input_path` never runs for it (LLR-172.5h).
 - **Rationale (informative):** L-2 (P-15); `temp` loads as a project (S-01).
 - **Validation:** `test`
@@ -615,7 +615,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-172b — Work-area file names render literally
 - **Traceability:** US-162
 - **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.84
-- **Statement (EARS ubiquitous):** The system shall show each file name of the Workarea Files list as named on disk, with no markup applied and every control character removed.
+- **Statement:** (EARS ubiquitous) The system shall show each file name of the Workarea Files list as named on disk, with no markup applied and every control character removed.
 - **Decomposition:** LLR-172.4, LLR-172.4a, LLR-172.4b, LLR-172.4c, LLR-172.4d, LLR-172.6, LLR-172.6a.
 - **Rationale (informative):** file names are parsed as markup (P-24); the unified dialog needs one work-area lister (ARQ §6).
 - **Validation:** `test`
@@ -633,7 +633,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-173 — One Load dialog lists everything that can be loaded
 - **Traceability:** US-163
 - **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.18, LED-2026-10-26-batch-100.36, LED-2026-10-26-batch-100.40, LED-2026-10-26-batch-100.86, LED-2026-10-26-batch-100.88
-- **Statement (EARS event):** When the engineer opens Load, the system shall show one dialog that holds a typed-path field, one list of this work area's projects, the work-area files and the recent sources, and a preview pane of the highlighted row.
+- **Statement:** (EARS event) When the engineer opens Load, the system shall show one dialog that holds a typed-path field, one list of this work area's projects, the work-area files and the recent sources, and a preview pane of the highlighted row.
 - **Decomposition:**
   - LLR-173.1, LLR-173.1e, LLR-173.1g: the dialog's one result and its one router.
   - LLR-173.2, LLR-173.2a, LLR-173.2b, LLR-173.2c, LLR-173.2d, LLR-173.2e, LLR-173.2j: opening, focus, keys, clicks.
@@ -673,7 +673,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-173a — The preview marks the set a load installs
 - **Traceability:** US-163
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS ubiquitous):** The system shall mark with `●`, in the Load dialog's preview, exactly the image variant, MAC and A2L files that loading the highlighted project or work-area file installs.
+- **Statement:** (EARS ubiquitous) The system shall mark with `●`, in the Load dialog's preview, exactly the image variant, MAC and A2L files that loading the highlighted project or work-area file installs.
 - **Decomposition:** LLR-173.6, LLR-173.6a, LLR-173.6b, LLR-173.6c, LLR-173.4n.
 - **Rationale (informative):** the operator's P-A note ("the symbol for the set that will be used as the active files"); UX-36.
 - **Validation:** `test`
@@ -693,7 +693,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-173b — A recent source reopens from the dialog
 - **Traceability:** US-163
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS event):** When the engineer loads a recent row of the Load dialog, the system shall load the file at that row's recorded path.
+- **Statement:** (EARS event) When the engineer loads a recent row of the Load dialog, the system shall load the file at that row's recorded path.
 - **Decomposition:** LLR-173.1f, LLR-173.4h, LLR-173.4i, LLR-173.4j, LLR-173.4k.
 - **Rationale (informative):** the consume half of AT-B100-12's chain (9a recorded the source; 9b reopens it). A recent entry may name a network or removable drive, so nothing touches it before Enter (S-07; §6 "Known gap").
 - **Validation:** `test`
@@ -713,7 +713,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-173c — Enter loads what has the focus
 - **Traceability:** US-163
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS event):** When the engineer asks the Load dialog to load, the system shall load the highlighted row if `#load_list` held the focus more recently than `#load_path`, and the typed path otherwise.
+- **Statement:** (EARS event) When the engineer asks the Load dialog to load, the system shall load the highlighted row if `#load_list` held the focus more recently than `#load_path`, and the typed path otherwise.
 - **Decomposition:** LLR-173.1a, LLR-173.1b, LLR-173.1c, LLR-173.2f, LLR-173.2g.
 - **Rationale (informative):** P-19: Enter with a typed path loads nothing today. VS-PA-2: Enter loads and a click only selects. "Asks to load" means `enter`, `alt+l` or `#load_ok`.
 - **Validation:** `test`
@@ -731,7 +731,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-173d — An empty or refused Load is explained inside the dialog
 - **Traceability:** US-163
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS unwanted):** If the engineer asks the Load dialog to load while nothing is highlighted and nothing is typed, or while the typed path is refused, then the system shall keep the dialog open with the typed text unchanged and paint the reason and the next step in `#load_reason`.
+- **Statement:** (EARS unwanted) If the engineer asks the Load dialog to load while nothing is highlighted and nothing is typed, or while the typed path is refused, then the system shall keep the dialog open with the typed text unchanged and paint the reason and the next step in `#load_reason`.
 - **Decomposition:** LLR-173.2h, LLR-173.2i, LLR-173.5, LLR-173.5a, LLR-173.5b, LLR-173.5c, LLR-173.5d, LLR-173.5e.
 - **Rationale (informative):** CW-U-13 (P-19: an empty Load says nothing). UX-06: a refused path is explained where it was typed.
 - **Validation:** `test`
@@ -752,7 +752,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-173e — `escape` closes the dialog and changes nothing
 - **Traceability:** US-163
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS event):** When the engineer presses `escape` in the Load dialog, the system shall close the dialog and leave the session unchanged.
+- **Statement:** (EARS event) When the engineer presses `escape` in the Load dialog, the system shall close the dialog and leave the session unchanged.
 - **Decomposition:** LLR-173.2k, LLR-173.2l. The focus after the close is LLR-166.1 (TC-B100-12, Inc 9b arms).
 - **Rationale (informative):** CW-U-12 (P-18).
 - **Validation:** `test`
@@ -770,7 +770,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-174 — One question before an image-replacing route replaces unsaved work
 - **Traceability:** US-164
 - **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.3, LED-2026-10-26-batch-100.17, LED-2026-10-26-batch-100.89, LED-2026-10-26-batch-100.91
-- **Statement (EARS event):** When an image-replacing route requests a load while unsaved work it would replace or move to another project exists (D for an image replacement; D, W or F for a project load), the system shall ask the engineer one question before the load changes the session.
+- **Statement:** (EARS event) When an image-replacing route requests a load while unsaved work it would replace or move to another project exists (D for an image replacement; D, W or F for a project load), the system shall ask the engineer one question before the load changes the session.
 - **Decomposition:**
   - LLR-174.1, LLR-174.1a, LLR-174.1b, LLR-174.1c: when the guard asks (the 24-cell table) and the public reader of the Patch Editor flag.
   - LLR-174.2, LLR-174.2a, LLR-174.2b, LLR-174.2c, LLR-174.2d, LLR-174.2e, LLR-174.2f, LLR-174.2g, LLR-174.2h, LLR-174.2j, LLR-174.2r, LLR-174.2s, LLR-174.2t: the modal, its focus, its keys, its layout, and the two unwanted-behaviour guards (a second answer; the Patch Editor's change-file dropdown).
@@ -800,7 +800,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-174a — A load that would replace or move no unsaved work does not ask
 - **Traceability:** US-164
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS event):** When an image-replacing route requests a load and no unsaved work it would replace or move to another project exists (D for an image replacement; D, W or F for a project load), the system shall load without the question.
+- **Statement:** (EARS event) When an image-replacing route requests a load and no unsaved work it would replace or move to another project exists (D for an image replacement; D, W or F for a project load), the system shall load without the question.
 - **Decomposition:** LLR-174.1, LLR-174.1a, LLR-174.1b (the cells that load).
 - **Rationale (informative):** QA R2-02 (an attach loses nothing); UX-27 (Save project clears the document flag, LLR-167.8). The `pb_A` prototype asked whenever a project was open; HLR-174's approved text overrides it ("whether or not a project is open"), and this split keeps that.
 - **Validation:** `test`
@@ -828,7 +828,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-174b — Replace continues the load
 - **Traceability:** US-164
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS event):** When the engineer answers the question with replace, the system shall run the load that asked.
+- **Statement:** (EARS event) When the engineer answers the question with replace, the system shall run the load that asked.
 - **Decomposition:** LLR-174.2c, LLR-174.2e, LLR-174.2f, LLR-174.3.
 - **Rationale (informative):** VS-PB-1; `y` replaces.
 - **Validation:** `test`
@@ -846,7 +846,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-174c — Cancel keeps everything
 - **Traceability:** US-164
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS event):** When the engineer cancels the question, the system shall leave the session and the kept work unchanged.
+- **Statement:** (EARS event) When the engineer cancels the question, the system shall leave the session and the kept work unchanged.
 - **Decomposition:** LLR-174.2b, LLR-174.2d, LLR-174.2e, LLR-174.3a. The focus after the close is LLR-166.1 (TC-B100-12, Inc 10 arm).
 - **Rationale (informative):** "Cancel" means `n`, `escape`, `enter` on the initial focus, or a click on `#confirm_no`.
 - **Validation:** `test`
@@ -864,7 +864,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-174d — The question names every unsaved item
 - **Traceability:** US-164
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS ubiquitous):** The system shall name in one question every unsaved item that made the guard ask.
+- **Statement:** (EARS ubiquitous) The system shall name in one question every unsaved item that made the guard ask.
 - **Decomposition:** LLR-174.2i, LLR-174.2k, LLR-174.2l, LLR-174.2m, LLR-174.2n, LLR-174.2o, LLR-174.2p, LLR-174.2q.
 - **Rationale (informative):** "name what would be lost, all items in one question" (HLR-174 as approved). The Flow Builder item is named as holding unsaved changes; whether a project load clears it is ruling Q1.
 - **Validation:** `test`
@@ -882,7 +882,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-175 — The Save project dialog shows exactly what the save will do
 - **Traceability:** US-165
 - **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.4, LED-2026-10-26-batch-100.15, LED-2026-10-26-batch-100.31, LED-2026-10-26-batch-100.37, LED-2026-10-26-batch-100.92, LED-2026-10-26-batch-100.94
-- **Statement (EARS state):** While the Save project dialog is open, the system shall paint in `#save_summary` the plan for the typed name at the plan's granularity, with the target folder and its kind in `#save_where`.
+- **Statement:** (EARS state) While the Save project dialog is open, the system shall paint in `#save_summary` the plan for the typed name at the plan's granularity, with the target folder and its kind in `#save_where`.
 - **Decomposition:**
   - LLR-175.1: the target line (sanitised folder, kind).
   - LLR-175.4, LLR-175.4c, LLR-175.4d, LLR-175.4e, LLR-175.4f, LLR-175.4g, LLR-175.4j: the summary's rows, the image line, the pending line, the links row, the merge's active-variant row, literal names, one line per row.
@@ -910,7 +910,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-175a — Save writes exactly the plan the dialog painted
 - **Traceability:** US-165
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS event):** When the engineer confirms Save in the Save project dialog, the system shall write exactly the files the painted plan's rows name; the active CRC template and the batch and assignment documents are copied outside the plan and are not named by its rows.
+- **Statement:** (EARS event) When the engineer confirms Save in the Save project dialog, the system shall write exactly the files the painted plan's rows name; the active CRC template and the batch and assignment documents are copied outside the plan and are not named by its rows.
 - **Decomposition:** LLR-175.3c, LLR-175.4a, LLR-175.4b, LLR-175.4k, LLR-175.4l.
 - **Rationale (informative):** R-PC; the operator's P-C note. Without LLR-175.4b, a Save pressed within the 150 ms recompute window (LLR-175.5a) would save a plan nobody saw.
 - **Validation:** `test`
@@ -930,7 +930,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-175b — A refused name is explained in the dialog before Save
 - **Traceability:** US-165
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS unwanted):** If the save for the typed name would be refused, then the system shall paint the refusal's reason token and next-step token in the Save project dialog before Save is confirmed.
+- **Statement:** (EARS unwanted) If the save for the typed name would be refused, then the system shall paint the refusal's reason token and next-step token in the Save project dialog before Save is confirmed.
 - **Decomposition:** LLR-175.1a, LLR-175.1b, LLR-175.1c, LLR-175.1d, LLR-175.1e, LLR-175.1f, LLR-175.1g, LLR-175.1h, LLR-175.1i, LLR-175.1j, LLR-175.1k, LLR-175.1l, LLR-175.1m, LLR-175.1o, LLR-175.1p, LLR-175.3f, LLR-175.6.
 - **Rationale (informative):** O-9 ("Inc 11's dialog shows the clash before Save"); M-4; HLR-164 refusals were painted only after the dialog closed.
 - **Validation:** `test`
@@ -951,7 +951,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-175c — `escape` closes the dialog and saves nothing
 - **Traceability:** US-165
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS event):** When the engineer presses `escape` in the Save project dialog, the system shall close the dialog and save nothing.
+- **Statement:** (EARS event) When the engineer presses `escape` in the Save project dialog, the system shall close the dialog and save nothing.
 - **Decomposition:** LLR-175.3, LLR-175.3a.
 - **Rationale (informative):** CW-U-12 (P-18).
 - **Validation:** `test`
@@ -969,7 +969,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-175d — An empty Save is explained in the dialog
 - **Traceability:** US-165
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS unwanted):** If the engineer confirms Save while the name field holds no character other than spaces, then the system shall keep the dialog open and paint `name is empty` and `type a project name`.
+- **Statement:** (EARS unwanted) If the engineer confirms Save while the name field holds no character other than spaces, then the system shall keep the dialog open and paint `name is empty` and `type a project name`.
 - **Decomposition:** LLR-175.3b.
 - **Rationale (informative):** CW-U-13 (P-19: an empty Save says nothing).
 - **Validation:** `test`
@@ -987,7 +987,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-175e — The dialog saves only into this work area
 - **Traceability:** US-165
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS ubiquitous):** The system shall save every project named in the Save project dialog as a direct folder of this work area.
+- **Statement:** (EARS ubiquitous) The system shall save every project named in the Save project dialog as a direct folder of this work area.
 - **Decomposition:** LLR-175.2, LLR-175.2a.
 - **Rationale (informative):** D7 = `solo_workarea`, the dialog half (the handler half is LLR-171.3). P-11.
 - **Validation:** `test`
@@ -1005,7 +1005,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-175f — Save project opens one dialog with the name, the summary and two buttons
 - **Traceability:** US-165
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS event):** When the engineer asks Save project with a data file or an A2L loaded, the system shall open one dialog that holds `#project_name`, `#save_where`, `#save_summary`, `#save_ok` and `#save_cancel`.
+- **Statement:** (EARS event) When the engineer asks Save project with a data file or an A2L loaded, the system shall open one dialog that holds `#project_name`, `#save_where`, `#save_summary`, `#save_ok` and `#save_cancel`.
 - **Decomposition:** LLR-175.3d, LLR-175.3e, LLR-175.3g, LLR-175.3h, LLR-175.3i, LLR-175.3j, LLR-175.4h, LLR-175.4i, LLR-175.5b.
 - **Rationale (informative):** VS-PC-3; UX-05 (focus); §3 preface "Keys" (`alt+<letter>` in a modal with a text field). Ruling Q6 of Inc 9b routes the priority-key exposure of this dialog here (LLR-175.3g).
 - **Validation:** `test`
@@ -1025,7 +1025,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-176 — A long action shows a progress line when it begins
 - **Traceability:** US-166
 - **Ledger:** LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.11, LED-2026-10-26-batch-100.19, LED-2026-10-26-batch-100.35, LED-2026-10-26-batch-100.39, LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.97
-- **Statement (EARS event):** When a long action begins, the system shall paint in `#status_text` one progress line that holds a spinner glyph, the action's label, the step `n/m` with the step's name, and the elapsed time.
+- **Statement:** (EARS event) When a long action begins, the system shall paint in `#status_text` one progress line that holds a spinner glyph, the action's label, the step `n/m` with the step's name, and the elapsed time.
 - **Decomposition:** LLR-176.1, LLR-176.1a, LLR-176.1g, LLR-176.1n, LLR-176.1p, LLR-176.1r, LLR-176.2, LLR-176.2a, LLR-176.2b.
   - The compound HLR-176 (8 obligation clauses, about 14 behaviours) is split into HLR-176 … HLR-176d (LED .95).
   - Its A2L parse callback clause and its main-thread freeze clause move with LLR-176.4 and LLR-176.3 to Inc 12b (ruling Q1).
@@ -1049,7 +1049,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-176a — The spinner and the elapsed time advance while a worker runs
 - **Traceability:** US-166
 - **Ledger:** LED-2026-10-26-batch-100.95
-- **Statement (EARS state):** While a long action runs its worker, the system shall advance the spinner glyph and the elapsed time of the progress line.
+- **Statement:** (EARS state) While a long action runs its worker, the system shall advance the spinner glyph and the elapsed time of the progress line.
 - **Decomposition:** LLR-176.1e, LLR-176.1f, LLR-176.1g, LLR-176.1q.
 - **Rationale (informative):** "so that I do not think the app froze" (US-166). Declared limit at 12a: the three main-thread actions (A2L load, project load, Save project) block the event loop, so nothing advances between their begin and end; Inc 12b moves them to workers (HLR-177).
 - **Validation:** `test`
@@ -1064,7 +1064,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-176b — The bar moves within a step that reports its progress
 - **Traceability:** US-166
 - **Ledger:** LED-2026-10-26-batch-100.95
-- **Statement (EARS event):** When a running step reports how much of its work is done, the system shall advance the progress bar within that step.
+- **Statement:** (EARS event) When a running step reports how much of its work is done, the system shall advance the progress bar within that step.
 - **Decomposition:** LLR-176.1b, LLR-176.1c, LLR-176.1d.
 - **Rationale (informative):** the operator's condition, "asumiendo que la barra de progreso realmente hace su trabajo" (UX-30, R-PD). At 12a no shipped action reports a done-of-total amount; the seam carries it, and the first shipped reporter is the A2L parse callback at Inc 12b (LLR-176.4). The old HLR named "bytes copied, read or parsed"; copy and read have no callback inside the 12a+12b files (ruling Q5).
 - **Validation:** `test`
@@ -1077,7 +1077,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-176c — The end of a long action removes the indicator and shows the outcome
 - **Traceability:** US-166
 - **Ledger:** LED-2026-10-26-batch-100.95
-- **Statement (EARS event):** When a long action ends, by success, failure or exception, the system shall replace its progress indicator with the action's outcome.
+- **Statement:** (EARS event) When a long action ends, by success, failure or exception, the system shall replace its progress indicator with the action's outcome.
 - **Decomposition:** LLR-176.1i, LLR-176.1j, LLR-176.1k, LLR-176.1l, LLR-176.1m, LLR-176.1o, LLR-176.1s, LLR-176.2c, LLR-176.2d.
 - **Rationale (informative):** the old text said "never left at a stale `100%`" and "one final writer … paint[s], in this order, the outcome, then the project and file line, then the file state". `#status_text` is one row, so three paints in order leave only the last; that contradicted HLR-176's own threshold and LLR-178.2 (the project and file line stays). The order is replaced by a precedence (LLR-176.1j, ruling Q4).
 - **Validation:** `test`
@@ -1090,7 +1090,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-176d — `#status_text` has one owner while a long action runs
 - **Traceability:** US-166
 - **Ledger:** LED-2026-10-26-batch-100.95
-- **Statement (EARS state):** While a long action runs, the system shall keep `#status_text` for the progress line.
+- **Statement:** (EARS state) While a long action runs, the system shall keep `#status_text` for the progress line.
 - **Decomposition:** LLR-176.1h, LLR-176.1j.
 - **Rationale (informative):** UX-29 / B-11. P12a-2 shows the file state painted over the status line while the action still runs (bar at 50).
 - **Validation:** `test`
@@ -1103,7 +1103,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-177 — Project load, Save project and the A2L parse do their heavy work on worker threads
 - **Traceability:** US-167
 - **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.11, LED-2026-10-26-batch-100.19, LED-2026-10-26-batch-100.38, LED-2026-10-26-batch-100.98
-- **Statement (EARS ubiquitous):** The system shall run the reading and parsing of a project load, the writing of Save project and the copy and parse of an A2L attach on worker threads.
+- **Statement:** (EARS ubiquitous) The system shall run the reading and parsing of a project load, the writing of Save project and the copy and parse of an A2L attach on worker threads.
 - **Decomposition:**
   - LLR-177.1, LLR-177.1a, LLR-177.1b, LLR-177.1k, LLR-177.1c: the three worker steps, the work-area image pick on the existing file-load worker, and the event loop staying free.
   - LLR-177.1d, LLR-177.1e: the session is written only on the main thread, and a worker reads only its request.
@@ -1138,7 +1138,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-177a — A second request is refused while a session action runs
 - **Traceability:** US-167
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS unwanted):** If the engineer asks for an action that replaces or changes the image, the change document or the project while a session action runs, then the system shall refuse it with the busy line naming the running action.
+- **Statement:** (EARS unwanted) If the engineer asks for an action that replaces or changes the image, the change document or the project while a session action runs, then the system shall refuse it with the busy line naming the running action.
 - **Decomposition:** LLR-177.3, LLR-177.3a, LLR-177.3b, LLR-177.3c, LLR-177.3d, LLR-177.3e, LLR-177.3f, LLR-177.3g, LLR-177.3h, LLR-177.3i.
 - **Variant slots:** VS-PD-3 = refuse (P-D verdict A; Q-6 at round 1).
 - **Rationale (informative):**
@@ -1161,7 +1161,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-177b — Quit asks first while a session action runs
 - **Traceability:** US-167
 - **Ledger:** LED-2026-10-26-batch-100.98, LED-2026-10-26-batch-100.100
-- **Statement (EARS event):** When the engineer asks to quit while a session action runs, the system shall ask the quit question before exiting.
+- **Statement:** (EARS event) When the engineer asks to quit while a session action runs, the system shall ask the quit question before exiting.
 - **Decomposition:** LLR-177.4, LLR-177.4a, LLR-177.4b, LLR-177.4d.
 - **Rationale (informative):** UX-34. The question reuses the Inc 10 modal with its own texts (C-UX-4, ARCH-PDR-4); the modal starts on its No button (LLR-174.2b).
 - **Validation:** `test`
@@ -1179,7 +1179,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### HLR-177c — A confirmed quit leaves no partial save
 - **Traceability:** US-167
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS event):** When the engineer confirms the quit question, the system shall exit only after the running session action has finished or rolled back.
+- **Statement:** (EARS event) When the engineer confirms the quit question, the system shall exit only after the running session action has finished or rolled back.
 - **Decomposition:** LLR-177.4c, LLR-177.4e.
 - **Rationale (informative):** UX-34; backlog row "the 2 000-file save-as runs on the main thread … closing the app mid-copy leaves a partial Q", moved to 12b without its cancel by 12a ruling Q2 (R12's "rollback on close"). Exiting at once is unsafe: after `App.exit()` a thread worker's later `call_from_thread` still runs its callback, on an app that is no longer running (P12b-3: `landed: [('late', …)] | … app running: False`). A confirmed quit is withdrawn when a successful Save leaves in-memory work unsaved (LLR-177.4e, SE5-12b-1).
 - **Validation:** `test`
@@ -1453,7 +1453,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-167.6a — The save-as plan has one row per sub-folder with its file count
 - **Traceability:** HLR-167, HLR-171 · trace: `plan_project_save`, `SavePlanRow` (`project_gather_service.py`), `_plan_project_save` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
-- **Statement (EARS event):** When Save project computes the plan for a save as, the system shall include one row for each top-level sub-folder of the open project, holding the count of files LLR-171.1 copies under it.
+- **Statement:** (EARS event) When Save project computes the plan for a save as, the system shall include one row for each top-level sub-folder of the open project, holding the count of files LLR-171.1 copies under it.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-59 — `pytest tests/test_b100_save_image.py -k tc_b100_59`
 - **Numeric pass threshold:** P with the 7 sub-folders of LLR-171.1 → 7 sub-folder rows, each count equal to the files written under that sub-folder (0 differences, `reports` = 2 with the nested file); P with no sub-folder → 0 sub-folder rows; a sub-folder holding only a junction → 1 row with 0 files (orchestrator ruling Q9, LED .77); computing the plan writes 0 bytes.
@@ -1463,7 +1463,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-167.6b — The save-as plan lists each skipped link
 - **Traceability:** HLR-167, HLR-171 · trace: `plan_project_save` (`project_gather_service.py`), `_plan_project_save` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
-- **Statement (EARS event):** When Save project computes the plan for a save as, the system shall list in the plan each link or junction that the save-as enumeration skips.
+- **Statement:** (EARS event) When Save project computes the plan for a save as, the system shall list in the plan each link or junction that the save-as enumeration skips.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-59 — `pytest tests/test_b100_save_image.py -k tc_b100_59`
 - **Numeric pass threshold:** the 3 links of LLR-171.1a and LLR-171.1b → 3 skipped-link entries in the plan, equal to the 3 paths LLR-171.1c names in the status (0 differences); 0 links → 0 entries; the junction of a links-only sub-folder is listed against that sub-folder's 0-file row (orchestrator ruling Q9, LED .77).
@@ -1473,7 +1473,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-167.6c — A second MAC file is refused in the plan
 - **Traceability:** HLR-167 · trace: `_plan_project_save`, `_handle_save_dialog` (`app.py`) — LED .63 (b), LED .66
 - **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.78
-- **Statement (EARS unwanted):** If the target project folder holds a MAC file and the session holds a MAC file other than it, then the system shall put the `already has a MAC file` refusal into the save plan.
+- **Statement:** (EARS unwanted) If the target project folder holds a MAC file and the session holds a MAC file other than it, then the system shall put the `already has a MAC file` refusal into the save plan.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-59 — `pytest tests/test_b100_save_image.py -k tc_b100_59`
 - **Numeric pass threshold:** a merge target holding `a.mac` and a session MAC `b.mac` → the plan carries the refusal and 0 rows; 0 `mkdir` calls on the target (a spy: the decision is taken before any folder creation is attempted), 0 bytes written, 0 rollback runs; 1 status line holding `already has a MAC file` and `choose another name`. "Other than it" means not the same path (compared as text) and not the same name with the same bytes, the A2L rule of LLR-167.6d / .6f (pre-ruling 5, E3-architect A3-4, Code-Wire DR-6): a session MAC `a.mac` with other bytes than the target's `a.mac` → refused; with the same bytes → not refused; a target MAC that is a link → never the session's own (E3-security S3-8). A new target folder cannot hold a MAC file, so this arm is a merge or open-project target (Code-Wire note).
@@ -1483,7 +1483,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-167.6d — A second A2L file is refused in the plan
 - **Traceability:** HLR-167 · trace: `_plan_project_save`, `_handle_save_dialog` (`app.py`) — LED .63 (b), LED .66
 - **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
-- **Statement (EARS unwanted):** If the target project folder holds an A2L file and the session holds an A2L file other than it, then the system shall put the `already has an A2L file` refusal into the save plan.
+- **Statement:** (EARS unwanted) If the target project folder holds an A2L file and the session holds an A2L file other than it, then the system shall put the `already has an A2L file` refusal into the save plan.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-59 — `pytest tests/test_b100_save_image.py -k tc_b100_59`
 - **Numeric pass threshold:** a merge target holding `a.a2l` and a session A2L `b.a2l` → the plan carries the refusal and 0 rows; 0 `mkdir` calls on the target (spy), 0 bytes written, 0 rollback runs; 1 status line holding `already has an A2L file`. "Other than it" means not the same path and not the same name with the same bytes; the exemption is LLR-167.6f (orchestrator ruling Q3, LED .77; Code-Wire C3).
@@ -1493,7 +1493,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-167.6e — One plan row per landing path
 - **Traceability:** HLR-167, HLR-171 · trace: `plan_project_save` (`project_gather_service.py`), `_plan_project_save` (`app.py`) — Code-Wire C5
 - **Ledger:** LED-2026-10-26-batch-100.76
-- **Statement (EARS ubiquitous):** The system shall give each landing path of a Save project at most one plan row.
+- **Statement:** (EARS ubiquitous) The system shall give each landing path of a Save project at most one plan row.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-59 — `pytest tests/test_b100_save_image.py -k tc_b100_59`
 - **Numeric pass threshold:** P open with the Patch Editor document `P/patches/boost.json`, saved as Q → 1 plan row for `Q/patches/boost.json`, whose action equals what the tree shows (0 differences); every landing path of the plan appears once (0 duplicates). Which row owns that landing (the document row or the sub-folder copy) is a design seam for E2.
@@ -1503,7 +1503,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-167.6f — The open project's own A2L is not refused
 - **Traceability:** HLR-167, HLR-171a · trace: `_plan_project_save` (`app.py`) — orchestrator ruling Q3 (LED .77), Code-Wire C3
 - **Ledger:** LED-2026-10-26-batch-100.77
-- **Statement (EARS event):** When Save project plans a save into a target project folder whose A2L file is the session's A2L file (the same path, or the same name with the same bytes), the system shall plan the save without the `already has an A2L file` refusal.
+- **Statement:** (EARS event) When Save project plans a save into a target project folder whose A2L file is the session's A2L file (the same path, or the same name with the same bytes), the system shall plan the save without the `already has an A2L file` refusal.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-59 — `pytest tests/test_b100_save_image.py -k tc_b100_59`
 - **Numeric pass threshold:** the A2L-only project `p04` 10 loaded and saved into itself twice → 2 saves, 0 refusals, 1 A2L file in P (0 `_1` copies); a project with an image and an A2L loaded and saved into itself → saved, 0 refusals; a target A2L with the same name and different bytes → refused (LLR-167.6d).
@@ -1513,7 +1513,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-167.6g — A file over the per-file cap is refused in the plan
 - **Traceability:** HLR-167, HLR-171 · trace: `_plan_project_save` (`app.py`), `DEFAULT_COPY_SIZE_CAP_BYTES` (`workspace.py`, read, not changed) — orchestrator ruling Q10 (LED .77), Code-Wire C6
 - **Ledger:** LED-2026-10-26-batch-100.77
-- **Statement (EARS unwanted):** If a file the save would copy is larger than the placement's per-file size cap, then the system shall put a refusal naming that file into the save plan.
+- **Statement:** (EARS unwanted) If a file the save would copy is larger than the placement's per-file size cap, then the system shall put a refusal naming that file into the save plan.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-59 — `pytest tests/test_b100_save_image.py -k tc_b100_59`
 - **Numeric pass threshold:** with the cap lowered for the test (the shipped cap is 256 MiB), `P/splits/big.bin` at cap + 1 bytes → the plan carries a refusal naming `splits/big.bin`, 0 rows, 0 `mkdir` calls (spy), 0 bytes written; at exactly the cap → saved.
@@ -1703,7 +1703,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.1 — Save as copies each file of the open project to the same path
 - **Traceability:** HLR-171 · trace: `_handle_save_dialog`, `_copy_project_subfolders` (NEW) (`app.py`), `inventory_project_tree`, `plan_project_save` (`project_gather_service.py`), `walk_tree_no_links` (`workspace.py`), `place_into_workarea` (every copy places through it, LLR-171.4a)
 - **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.44, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.79
-- **Statement (EARS event):** When Save project saves the open project into a new project folder, the system shall copy each regular file of the open project that the save does not write itself, other than `project.json` backups (`project.json.previous-*`), at the top level and at every depth of its sub-folders, to the same project-relative path in the new project folder.
+- **Statement:** (EARS event) When Save project saves the open project into a new project folder, the system shall copy each regular file of the open project that the save does not write itself, other than `project.json` backups (`project.json.previous-*`), at the top level and at every depth of its sub-folders, to the same project-relative path in the new project folder.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
 - **Numeric pass threshold:** P with `flows/`, `flowsets/`, `patches/`, `checks/`, `reports/`, `templates/`, `splits/` (one file each) and a nested `reports/2026/r2.md`, the expected set derived from P's link-free listing → 100 % of the expected set present in Q (0 missing), 0 files with a differing SHA-256; P with the top-level `a.json`, `other.s19` (a second variant) and `notes.txt` beside the session's image, A2L and `project.json` → `a.json`, `other.s19` and `notes.txt` present in Q byte-equal at the same names, the session's image and A2L written once by their rows, Q's `project.json` written by the save, 0 `_1` copies (orchestrator ruling R3, E3-architect A3-2); P with no sub-folder and no other top-level file → 0 copied files in Q and the save completes; a fresh session with no open project → no enumeration, 0 copied files (the trigger needs an open project). The files the save writes itself are `project.json`, the files of the image, MAC and A2L rows, and, when the session plans a MAC or an A2L row, every other MAC or A2L file of P (Q holds one of each, LED .63 (b) / .66; Code-Wire F-7); P's `project.json.previous-*` backups are not copied (R10): P with `project.json.previous-20261030T000000Z` beside `a.json` → Q holds `a.json` and 0 files whose name, compared with `normcase`, starts `project.json.previous-`. A save into an existing project copies no sub-folder (LLR-171.1g, orchestrator ruling Q2). The sub-folder copy runs right after the project folder is created, before the first home placement; the top-level copy runs after the image, MAC and A2L rows are placed and before the gather (orchestrator rulings R2, R11). P holding `firmware.s19` (the session image) and `firmware_1.s19` byte-identical to the image this save emits → saved, Q holds both names, 0 lines holding `the plan named`.
@@ -1713,7 +1713,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.1a — The save-as enumeration never descends into a directory link
 - **Traceability:** HLR-171 · trace: `walk_tree_no_links`, `_is_reparse_point` (`workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.76
-- **Statement (EARS state):** While the system enumerates the open project's sub-folders for a save as, the system shall not descend into a directory that is a symbolic link or junction.
+- **Statement:** (EARS state) While the system enumerates the open project's sub-folders for a save as, the system shall not descend into a directory that is a symbolic link or junction.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
 - **Numeric pass threshold:** a top-level directory junction (`P/linked` → an outside folder holding `secret.txt`) and a nested junction (`P/reports/j` → the same) → 0 files of the outside folder in Q; a junction cycle `P/flows/loop` → `P` → the save completes in under 5 s with 0 files copied through the cycle.
@@ -1723,7 +1723,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.1b — The save-as copy skips a file link
 - **Traceability:** HLR-171 · trace: `walk_tree_no_links`, `_is_reparse_point` (`workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.76
-- **Statement (EARS state):** While the system enumerates the open project's sub-folders for a save as, the system shall not copy a file that is a symbolic link.
+- **Statement:** (EARS state) While the system enumerates the open project's sub-folders for a save as, the system shall not copy a file that is a symbolic link.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
 - **Numeric pass threshold:** `P/patches/l.json`, a symbolic link to an outside file → 0 files at `Q/patches/l.json`, the link's target 0 bytes changed. Feasibility: creating a file symbolic link on Windows needs Developer Mode or the create-symlink privilege; when the test cannot create one it is reported as not run, never as passed.
@@ -1733,7 +1733,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.1c — Each skipped link is named in the status
 - **Traceability:** HLR-171 · trace: `_handle_save_dialog` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.78
-- **Statement (EARS event):** When the save-as enumeration skips a link or junction, the system shall name that link's project-relative path in the Save project status, within the 10-name limit of LLR-171.7a.
+- **Statement:** (EARS event) When the save-as enumeration skips a link or junction, the system shall name that link's project-relative path in the Save project status, within the 10-name limit of LLR-171.7a.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
 - **Numeric pass threshold:** the three links of LLR-171.1a and LLR-171.1b → 3 of 3 project-relative paths named in the full `set_status` message (read whole, as TC-B100-16 does, because the status log clips at the terminal width, LED .64), with `links or junctions not copied` and `copy those files into the project if it needs them`; 0 links → 0 skip clauses; 25 links → 1 line naming 10 and holding `and 15 more` (orchestrator ruling R6, E3-security S3-4).
@@ -1743,7 +1743,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.1d — Bytes behind a link do not count toward the save-as total
 - **Traceability:** HLR-171 · trace: `_handle_save_dialog` (`app.py`), `walk_tree_no_links` (`workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
-- **Statement (EARS ubiquitous):** The system shall exclude every byte reached through a link or junction from the save-as size total.
+- **Statement:** (EARS ubiquitous) The system shall exclude every byte reached through a link or junction from the save-as size total.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
 - **Numeric pass threshold:** the save-as total is T bytes (LLR-171.1i) and a junction in P reaches a 10 MiB outside file; with the work area's free space simulated at exactly T → the save completes (0 refusals).
@@ -1753,7 +1753,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.1e — A save as larger than the free space is refused before any folder exists
 - **Traceability:** HLR-171 · trace: `_handle_save_dialog` (`app.py`), `shutil.disk_usage`
 - **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77, LED-2026-10-26-batch-100.78
-- **Statement (EARS unwanted):** If the save-as size total exceeds the free space of the work area's volume, then the system shall refuse the save, with the `not enough free space` tokens, before creating the project folder.
+- **Statement:** (EARS unwanted) If the save-as size total exceeds the free space of the work area's volume, then the system shall refuse the save, with the `not enough free space` tokens, before creating the project folder.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
 - **Numeric pass threshold:** with T the total of LLR-171.1i (each file rounded up to a multiple of 4 096 bytes, plus 65 536 bytes; orchestrator ruling R7), free space simulated at T − 1 → 1 status line holding `not enough free space` and `free disk space or remove files from the project`, 0 folders created, 0 bytes written; free space simulated at exactly T → the save completes.
@@ -1763,7 +1763,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.1f — Save as leaves the open project unchanged
 - **Traceability:** HLR-171 · trace: `_handle_save_dialog` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.76
-- **Statement (EARS ubiquitous):** The system shall not modify, add or remove any file of the open project when it saves that project into a new project folder.
+- **Statement:** (EARS ubiquitous) The system shall not modify, add or remove any file of the open project when it saves that project into a new project folder.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
 - **Numeric pass threshold:** P's (path, SHA-256) set before and after the save as → 0 changed, 0 added, 0 removed.
@@ -1773,7 +1773,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.1g — A save into an existing project copies no sub-folder of the open project
 - **Traceability:** HLR-171 · trace: `_handle_save_dialog`, `_plan_project_save` (`app.py`) — orchestrator ruling Q2 (LED .77)
 - **Ledger:** LED-2026-10-26-batch-100.77
-- **Statement (EARS state):** While the Save project target is an existing project folder, the system shall not copy the open project's sub-folders into it.
+- **Statement:** (EARS state) While the Save project target is an existing project folder, the system shall not copy the open project's sub-folders into it.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
 - **Numeric pass threshold:** P open with the 7 sub-folders of LLR-171.1, saved into an existing project R (a merge) → 0 files of P's sub-folders in R other than the rows the gather places (the Patch Editor document, the composition documents, the CRC template), 0 sub-folder rows in the plan; P saved into itself → 0 sub-folder copies, P's tree unchanged apart from the gather's rows.
@@ -1783,7 +1783,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.1h — Save as carries the open project's records into the new project.json
 - **Traceability:** HLR-171 · trace: `_handle_save_dialog`, `_manifest_carry`, `_write_and_verify_manifest` (`app.py`) — orchestrator ruling Q7 (LED .77)
 - **Ledger:** LED-2026-10-26-batch-100.77, LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.80
-- **Statement (EARS event):** When Save project saves the open project into a new project folder, the system shall write the open project's `batch`, `assignments`, `declared_regions`, `gathered`, `active_document` and `derived_from` records, as project-relative paths, into the new project's `project.json`.
+- **Statement:** (EARS event) When Save project saves the open project into a new project folder, the system shall write the open project's `batch`, `assignments`, `declared_regions`, `gathered`, `active_document` and `derived_from` records, as project-relative paths, into the new project's `project.json`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
 - **Numeric pass threshold:** P holding the top-level `a.json` and `c.json`, whose `project.json` (written by the shipped Save project, so in the dialog's form: `batch` `["a.json"]`, `assignments` naming `c.json`) sets all 6 records, with no Patch Editor document in the session and nothing selected in the dialog, saved as Q → 6 of 6 records in Q's `project.json` equal to P's as project-relative strings, every file they name present in Q (copied with the top level and the tree, LLR-171.1), `gathered` = P's rows plus this save's rows (0 dropped); Q's `files` keeps its scope (top-level data and A2L files plus the active document, LLR-169.2); Load of Q → 0 `missing` problems. `batch` and `assignments` follow LLR-171.6 / .6a (a non-empty dialog selection wins). `derived_from` carries only the records whose key names a top-level data file Q holds after the save; a record for a variant file P no longer holds → not carried; when the image is emitted, its key holds this save's record (pre-ruling 9, E3-architect A3-8). A session that holds a Patch Editor document records its own landing as `active_document` (HLR-170), not P's value.
@@ -1794,7 +1794,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.1i — The save-as total counts every byte the save writes
 - **Traceability:** HLR-171 · trace: `_plan_project_save`, `_handle_save_dialog` (`app.py`) — orchestrator ruling Q8 (LED .77)
 - **Ledger:** LED-2026-10-26-batch-100.77, LED-2026-10-26-batch-100.78
-- **Statement (EARS ubiquitous):** The system shall count in the save-as size total every file the save as copies or writes — the top-level files, the emitted image and the sub-folder files — each rounded up to a multiple of 4 096 bytes, plus 65 536 bytes for `project.json` and the folders.
+- **Statement:** (EARS ubiquitous) The system shall count in the save-as size total every file the save as copies or writes — the top-level files, the emitted image and the sub-folder files — each rounded up to a multiple of 4 096 bytes, plus 65 536 bytes for `project.json` and the folders.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
 - **Numeric pass threshold:** P with `firmware.s19` of 4 000 bytes, `firmware.a2l` of 1 200 bytes and 8 sub-folder files of 100 bytes, saved as Q with a pending patch (the emitted image is 5 000 bytes) → T = 8 192 + 4 096 + 8 × 4 096 + 65 536 = 110 592 bytes; free space simulated at 110 591 → refused (LLR-171.1e); at 110 592 → saved; files of 0, 1, 4 096 and 4 097 bytes count 0, 4 096, 4 096 and 8 192 (orchestrator ruling R7, E3-security S3-9: NTFS allocates per 4 KiB cluster, and `project.json` was not counted).
@@ -1804,7 +1804,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.1j — A save as with too many files or too deep a tree is refused before any folder exists
 - **Traceability:** HLR-171 · trace: `inventory_project_tree`, `plan_project_save` (`project_gather_service.py`), `walk_tree_no_links` (`workspace.py`, `max_entries`), `_handle_save_dialog` (`app.py`) — orchestrator rulings R1, R13 (`inc-8b/E3-rulings.md`), E3-security S3-1, S3R2-1
 - **Ledger:** LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.79
-- **Statement (EARS unwanted):** If the files a save as would copy from the open project number more than 2 000, the save-as enumeration walks more than 10 000 entries of the open project's tree, or an entry of that tree lies more than 32 path components deep, then the system shall refuse the save, naming the limit, before creating the project folder.
+- **Statement:** (EARS unwanted) If the files a save as would copy from the open project number more than 2 000, the save-as enumeration walks more than 10 000 entries of the open project's tree, or an entry of that tree lies more than 32 path components deep, then the system shall refuse the save, naming the limit, before creating the project folder.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
 - **Numeric pass threshold:** a copy list of 2 000 files (1 999 one-byte files under `reports/` plus the top-level `a.json`; `project.json` and the session's image are not in it) → saved, 2 000 copied files in Q; 2 001 → 1 status line holding `too many files to copy` and `move files out of the project, then save again`, 0 `mkdir` calls (spy), 0 bytes written; a file at 32 path components → saved; at 33 → 1 status line holding `nested too deep`, 0 `mkdir` calls; a walk of exactly 10 000 entries (folders, links, unreadable entries and files all count; `project.json`, `firmware.s19`, `reports/` and 9 997 empty folders under it) → saved; 10 001 entries with 0 files to copy → 1 status line holding `too many files to copy` and `over 10 000 entries`, 0 `mkdir` calls, the refusal painted in under 2 s; one folder of 50 000 files → refused with at most 10 001 entries read and no folder of more than 10 001 names sorted (R13, the ceiling read at call time). The time of the 2 000-file save is measured at E4 and reported, not gated: a background copy with progress and cancel stays with Inc 12a (R1).
@@ -1814,7 +1814,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.1k — An unreadable part of the open project refuses the save as before any folder exists
 - **Traceability:** HLR-171 · trace: `walk_tree_no_links` (`workspace.py`), `inventory_project_tree`, `plan_project_save`, `painted_names` (`project_gather_service.py`) — orchestrator ruling R8, E3-architect A3-5, E3-security S3-2, S3R2-6, pre-ruling 6
 - **Ledger:** LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.79
-- **Statement (EARS unwanted):** If the save-as enumeration cannot list a sub-folder of the open project or cannot classify one of its entries, then the system shall refuse the save, naming each such entry, before creating the project folder.
+- **Statement:** (EARS unwanted) If the save-as enumeration cannot list a sub-folder of the open project or cannot classify one of its entries, then the system shall refuse the save, naming each such entry, before creating the project folder.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
 - **Numeric pass threshold:** `P/reports/locked` that cannot be listed → 1 status line holding `reports/locked`, `could not be read` and `check that they can be opened, then save again`, 0 `mkdir` calls (spy), 0 bytes written; `P/flows/x.json.` (a name ending in a dot), alone and beside `P/flows/x.json` → the same refusal naming `flows/x.json.`; 12 such entries → 10 named and `and 2 more` (LLR-171.7a); 0 such entries → 0 such lines and the save goes on; the open project folder itself cannot be listed → the refusal names `'P'` (the project's name), never `.`; `P/NUL.txt` made through the `\\?\` form → the refusal names `NUL.txt` (reported as not run where the platform refuses to create the name). "Cannot classify" means `lstat` fails, the entry is neither a regular file, a folder nor a link, its name ends in a dot or a space, or its stem (case-insensitive, before the first dot) is a reserved device name: `CON`, `PRN`, `AUX`, `NUL`, `COM1`–`COM9`, `LPT1`–`LPT9`, `CONIN$`, `CONOUT$` (S3R2-6).
@@ -1824,7 +1824,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.1l — After a save as, the Flow panels use the new project folder
 - **Traceability:** HLR-171 · trace: `_handle_save_dialog`, `_publish_flow_session_dir` (`app.py`) — orchestrator ruling R9, E3-architect A3-11
 - **Ledger:** LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.81
-- **Statement (EARS event):** When a save as completes, the system shall make the new project folder the Flow panels' session folder.
+- **Statement:** (EARS event) When a save as completes, the system shall make the new project folder the Flow panels' session folder.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
 - **Numeric pass threshold:** P open, saved as Q → 1 session strip naming Q, 0 naming P, and the session folder equals `workarea/Q` (unresolved); a refused or failed save as → 0 changes to the session folder (it stays `workarea/P`).
@@ -1834,7 +1834,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.1m — After a save as, a Patch Editor document from the previous project is bound to its copy
 - **Traceability:** HLR-171, HLR-170 · trace: `_handle_save_dialog` (`app.py`) — orchestrator ruling R9, E3-architect A3-11, E3-security S3R2-5
 - **Ledger:** LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.79, LED-2026-10-26-batch-100.80
-- **Statement (EARS event):** When a save as completes, the system shall bind a Patch Editor document whose file lies inside the previous project folder to that file's copy in the new project folder.
+- **Statement:** (EARS event) When a save as completes, the system shall bind a Patch Editor document whose file lies inside the previous project folder to that file's copy in the new project folder.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
 - **Numeric pass threshold:** P open with the file-backed Patch Editor document `P/patches/boost.json`, saved as Q → the document's file is `workarea/Q/patches/boost.json` (unresolved, the 8a R12 spelling); an edit, then Save project → P's files 0 bytes changed; a document from outside P (the common folder) → its binding unchanged; the document is bound only to a file this save copied (an entry of the copy list) or to the document row's landing, never to a path whose part relative to P holds `..`: `workarea/P/../R/x.json` → binding unchanged and 0 writes under `workarea/R` on the next Save project; a document under a skipped junction of P → binding unchanged (S3R2-5). P records `patches/changes.json` and also holds a byte-identical `patches/changes_1.json` (E5 F5 (b), LED-2026-10-26-batch-100.80) → saved; the document is bound to the file the gather placed or reused in Q (the one Q's `active_document` names, which exists and holds the document's bytes), never to the planned name the gather did not write; pre snapshot: bound to `workarea/Q/patches/changes.json`, which does not exist → RED.
@@ -1844,7 +1844,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.1n — A save to a new folder while the open project folder is gone saves the session
 - **Traceability:** HLR-171, HLR-164 · trace: `_handle_save_dialog`, `_save_as_source_for`, `_plan_project_save` (`app.py`) — E5 code review F1 (MAJOR, design-gap)
 - **Ledger:** LED-2026-10-26-batch-100.80
-- **Statement (EARS unwanted):** If the open project's folder does not exist when Save project saves to a folder that does not exist, then the system shall save the session's files to that folder without a copy from the open project and paint one status line naming the missing folder.
+- **Statement:** (EARS unwanted) If the open project's folder does not exist when Save project saves to a folder that does not exist, then the system shall save the session's files to that folder without a copy from the open project and paint one status line naming the missing folder.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k open_project_folder_gone`
 - **Numeric pass threshold:** P open, the session image loaded from outside P, `workarea/P` moved away outside the app; Save project under P's own name and as Q → each: `Saved project to`, the target holds the session image byte-equal, the open project is the target, 1 status line holding `The open project folder 'P' was not found`, `its other files were not copied` and `copy them into '<target>' if you still have them`, 0 lines holding `could not be read`. P still present, save as Q → P is copied (LLR-171.1) and 0 such lines.
@@ -1854,7 +1854,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.1o — The save-as copy refuses when a folder above a copied file becomes a link
 - **Traceability:** HLR-171, HLR-171b · trace: `_copy_project_subfolders` (`app.py`), `_path_traverses_reparse_point` (`workspace.py`) — E5 security SEC8b-2
 - **Ledger:** LED-2026-10-26-batch-100.80
-- **Statement (EARS unwanted):** If a folder from the work area down to a file the save-as copy reads, the open project folder included, is a link or junction when the copy reads that file, then the system shall refuse the save with a status line holding `changed while saving`.
+- **Statement:** (EARS unwanted) If a folder from the work area down to a file the save-as copy reads, the open project folder included, is a link or junction when the copy reads that file, then the system shall refuse the save with a status line holding `changed while saving`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k p_itself_becomes_a_junction`
 - **Numeric pass threshold:** P open; between the plan and the copy, `workarea/P` replaced by a junction to a look-alike folder outside every work area (same names, other bytes) → 1 line holding `changed while saving`, Q absent (the rollback, LLR-171.7b), 0 saved files; no swap → saved (every other save-as node).
@@ -1864,7 +1864,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.2 — An A2L-only project attaches its A2L
 - **Traceability:** HLR-171a · trace: `_handle_load_project` (`app.py`), `_load_a2l_data_with_cache` (in place; not `load_a2l_from_path`)
 - **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.24, LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
-- **Statement (EARS event):** When a project folder that holds one A2L file and no data file is loaded, the system shall attach that project's A2L file, in place, to the session.
+- **Statement:** (EARS event) When a project folder that holds one A2L file and no data file is loaded, the system shall attach that project's A2L file, in place, to the session.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-32 — `pytest tests/test_b100_project_homes.py -k tc_b100_32`
 - **Numeric pass threshold:** `p04` 10 → 3 A2L tags, the Loaded panel names `firmware.a2l`, 0 status lines holding `No supported files`, 0 status lines holding `already has an A2L file`; the session's A2L path is the project's file (`workarea/P/firmware.a2l`, unresolved) and 0 files are created under `workarea/temp` (orchestrator ruling Q4, LED .77; Code-Wire C4).
@@ -1874,7 +1874,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.2a — Loading an A2L-only project clears the previous data file
 - **Traceability:** HLR-171a · trace: `_handle_load_project`, `_reset_project_session` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.76
-- **Statement (EARS event):** When a project folder that holds one A2L file and no data file is loaded, the system shall remove the previously loaded data file from the session.
+- **Statement:** (EARS event) When a project folder that holds one A2L file and no data file is loaded, the system shall remove the previously loaded data file from the session.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-32 — `pytest tests/test_b100_project_homes.py -k tc_b100_32`
 - **Numeric pass threshold:** a data file loaded, then `p04` 10 loaded → 0 data files in the session (`current_file` is None), 0 images shown.
@@ -1884,7 +1884,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.2b — An A2L-only project becomes the open project
 - **Traceability:** HLR-171a · trace: `_handle_load_project` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.76
-- **Statement (EARS event):** When a project folder that holds one A2L file and no data file is loaded, the system shall make that folder the open project.
+- **Statement:** (EARS event) When a project folder that holds one A2L file and no data file is loaded, the system shall make that folder the open project.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-32 — `pytest tests/test_b100_project_homes.py -k tc_b100_32`
 - **Numeric pass threshold:** `p04` 10 → the open project is `P` (1 project label naming P), its folder the unresolved `workarea/P`.
@@ -1894,7 +1894,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.2c — A data file loaded into an open A2L-only project is recorded
 - **Traceability:** HLR-171a · trace: the variant append (`app.py`), `build_variant_set` (A-14)
 - **Ledger:** LED-2026-10-26-batch-100.76
-- **Statement (EARS state):** While an A2L-only project is open, the system shall record a data file loaded into it in that project's `project.json`.
+- **Statement:** (EARS state) While an A2L-only project is open, the system shall record a data file loaded into it in that project's `project.json`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-32 — `pytest tests/test_b100_project_homes.py -k tc_b100_32`
 - **Numeric pass threshold:** `p04` 10 open, then Load file `firmware.s19` → `project.json` rewritten, 1 variant recorded, `active_variant` = `firmware`.
@@ -1904,7 +1904,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.2d — A project with neither a data file nor an A2L is refused with its tokens
 - **Traceability:** HLR-171a · trace: `_handle_load_project` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.78
-- **Statement (EARS unwanted):** If a project folder that holds a `project.json` holds neither a data file nor an A2L file, then the system shall refuse the load with the `no data or A2L file` tokens.
+- **Statement:** (EARS unwanted) If a project folder that holds a `project.json` holds neither a data file nor an A2L file, then the system shall refuse the load with the `no data or A2L file` tokens.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-32 — `pytest tests/test_b100_project_homes.py -k tc_b100_32`
 - **Numeric pass threshold:** such a folder → 1 status line holding `no data or A2L file` and `load a file and Save project` (UX-22), 0 session resets, the open project unchanged; the same folder whose `project.json` records the absent `firmware.s19` → the same 1 line, 0 resets (E3-architect A3-6: one line for both arms; the `missing` problem names absent records once a project loads, and the next step is true in both because the save rebuilds `files`).
@@ -1915,7 +1915,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 - **Traceability:** HLR-171a · trace: `_handle_load_project` (`app.py`), `PROBLEM_NO_MANIFEST` (`variant_execution_service.py`)
 - **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.86
 - **Status:** retired — superseded by LLR-173.4a (Inc 9b, Q7).
-- **Statement (EARS unwanted):** If a folder given to the project load has no `project.json` and holds neither a data file nor an A2L file, then the system shall refuse the load with the `no project.json` tokens.
+- **Statement:** (EARS unwanted) If a folder given to the project load has no `project.json` and holds neither a data file nor an A2L file, then the system shall refuse the load with the `no project.json` tokens.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-32 — `pytest tests/test_b100_project_homes.py -k tc_b100_32`
 - **Numeric pass threshold:** such a folder (passed by name to the project load) → 1 status line holding `no project.json`, 0 session resets.
@@ -1925,7 +1925,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.2f — An A2L-only project whose A2L is a link or over the cap is refused before the session is reset
 - **Traceability:** HLR-171a · trace: `_handle_load_project` (`app.py`), `DEFAULT_COPY_SIZE_CAP_BYTES` (`workspace.py`, read at call time) — orchestrator ruling R5, E3-security S3-3
 - **Ledger:** LED-2026-10-26-batch-100.78
-- **Statement (EARS unwanted):** If the A2L file of a project folder that holds no data file is a link or junction or is larger than the placement's per-file size cap, then the system shall refuse the load, with the `link or junction` or `too large to open` tokens, before resetting the session.
+- **Statement:** (EARS unwanted) If the A2L file of a project folder that holds no data file is a link or junction or is larger than the placement's per-file size cap, then the system shall refuse the load, with the `link or junction` or `too large to open` tokens, before resetting the session.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-32 — `pytest tests/test_b100_project_homes.py -k tc_b100_32`
 - **Numeric pass threshold:** `workarea/P/firmware.a2l` a file symbolic link to an outside A2L, no data file → 1 status line holding `link or junction` and `replace the A2L file, then Load again`, 0 session resets, 0 parses of the outside file, the open project unchanged; with the cap lowered for the test, an A2L of cap + 1 bytes → 1 status line holding `too large to open`, 0 resets; an A2L of exactly the cap → the project opens with its A2L (3 tags). When the test cannot create a file link, that arm is reported as not run, never as passed (LLR-171.1b feasibility).
@@ -1935,7 +1935,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.2g — A project's linked or over-cap A2L beside a data file is left out and listed
 - **Traceability:** HLR-171a, HLR-169 · trace: `_handle_load_project` (`app.py`) — orchestrator ruling R5, E3-security S3-3, S3R2-3
 - **Ledger:** LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.79, LED-2026-10-26-batch-100.80
-- **Statement (EARS unwanted):** If the A2L file of a project folder that holds a data file is a link or junction or is larger than the placement's per-file size cap, then the system shall open the project without that A2L file and list it as a `not readable` problem.
+- **Statement:** (EARS unwanted) If the A2L file of a project folder that holds a data file is a link or junction or is larger than the placement's per-file size cap, then the system shall open the project without that A2L file and list it as a `not readable` problem.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-32 — `pytest tests/test_b100_project_homes.py -k tc_b100_32`
 - **Numeric pass threshold:** `firmware.s19` and a linked `firmware.a2l` → the project opens with its image, 0 A2L tags, the session holds no A2L, 1 `not readable` problem naming `firmware.a2l` with `link or junction` and `replace the A2L file, then Load again`; an A2L of cap + 1 bytes (cap lowered) → the same with `too large to open`; an A2L of exactly the cap → attached; `firmware.mac` and a linked `firmware.a2l` → the project opens with the MAC, 0 calls of the A2L parse with that path (spy on `_load_a2l_data_with_cache` and `parse_a2l_file`), the session holds no A2L, 1 `not readable` problem naming `firmware.a2l` (S3R2-3).
@@ -1946,7 +1946,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.2h — The A2L unload of a session with no data file detaches the A2L
 - **Traceability:** HLR-171a · trace: `_apply_unload` (`app.py`), the Loaded panel's A2L slot (`screens_directionb.py`, ruling D-5) — E5 code review F3 (I-2)
 - **Ledger:** LED-2026-10-26-batch-100.80
-- **Statement (EARS event):** When the A2L unload is chosen in a session that holds an A2L file and no data file, the system shall detach that A2L file from the session.
+- **Statement:** (EARS event) When the A2L unload is chosen in a session that holds an A2L file and no data file, the system shall detach that A2L file from the session.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-32 — `pytest tests/test_b100_project_homes.py -k unload_of_an_a2l_only_session`
 - **Numeric pass threshold:** an A2L-only project P open (3 A2L tags, no data file) → the A2L unload → the session holds no A2L, 0 tags, the status `Unloaded A2L.`, 0 lines `Nothing to unload.`; no A2L and no data file → `Nothing to unload.` (unchanged).
@@ -1956,7 +1956,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.3 — Save project refuses a parent other than this work area
 - **Traceability:** HLR-171b · trace: `_handle_save_dialog` (`app.py`), `SaveProjectPayload.parent_folder` (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.76
-- **Statement (EARS unwanted):** If the Save project parent folder does not resolve to this work area, then the system shall refuse the save before creating any folder.
+- **Statement:** (EARS unwanted) If the Save project parent folder does not resolve to this work area, then the system shall refuse the save before creating any folder.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-33 — `pytest tests/test_b100_project_homes.py -k tc_b100_33`
 - **Numeric pass threshold:** parent = another `.s19tool/workarea` → 1 status line starting `Project NOT saved` and 0 `mkdir` calls (a spy on folder creation, because the rollback already leaves 0 folders net); a parent outside any work area → the same; a parent below this work area (`workarea/patches`) → the same. The refusal's token row is drafted in E2 and confirmed in E3 (orchestrator ruling Q5).
@@ -1966,7 +1966,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.3a — The work area under another spelling is accepted as the parent
 - **Traceability:** HLR-171b · trace: `_handle_save_dialog` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.76
-- **Statement (EARS event):** When the Save project parent folder resolves to this work area under a different spelling, the system shall save the project into this work area.
+- **Statement:** (EARS event) When the Save project parent folder resolves to this work area under a different spelling, the system shall save the project into this work area.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-33 — `pytest tests/test_b100_project_homes.py -k tc_b100_33`
 - **Numeric pass threshold:** the work area with a trailing separator, in mixed case (Windows) and through a `..` segment → 3 of 3 saved, each listed once by the project list.
@@ -1976,7 +1976,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.4 — Inside this work area means inside its resolved root
 - **Traceability:** HLR-171b · trace: `contained_in_workarea` (`workspace.py`, B100-I14)
 - **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.28, LED-2026-10-26-batch-100.44, LED-2026-10-26-batch-100.50, LED-2026-10-26-batch-100.65, LED-2026-10-26-batch-100.66, LED-2026-10-26-batch-100.68, LED-2026-10-26-batch-100.76
-- **Statement (EARS ubiquitous):** The system shall judge a path inside this work area only when the path, with every link and junction resolved, equals the work area's resolved root or lies below it.
+- **Statement:** (EARS ubiquitous) The system shall judge a path inside this work area only when the path, with every link and junction resolved, equals the work area's resolved root or lies below it.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-62 — `pytest tests/test_b100_reuse.py -k tc_b100_62_containment_predicate` (Inc 1)
 - **Numeric pass threshold:** written at Inc 1: a junction into another work area → outside; a plain outside folder → outside; the work area itself and a child → inside; a resolution `OSError` → outside (5 of 5).
@@ -1986,7 +1986,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.4a — A placement outside this work area is refused
 - **Traceability:** HLR-171b · trace: `place_into_workarea` (LLR-163.1), which every placing writer uses
 - **Ledger:** LED-2026-10-26-batch-100.76
-- **Statement (EARS unwanted):** If a placement's destination is not inside this work area, then the system shall refuse the placement.
+- **Statement:** (EARS unwanted) If a placement's destination is not inside this work area, then the system shall refuse the placement.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-62 — `pytest tests/test_b100_reuse.py -k tc_b100_62` (Inc 1)
 - **Numeric pass threshold:** written at Inc 1: a destination through a junction into another work area and through one to a plain outside folder → 2 refusals, 0 bytes written.
@@ -1996,7 +1996,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.4b — A manifest write outside this work area is refused
 - **Traceability:** HLR-171b · trace: `write_project_manifest`, `_check_destination_contained` (`manifest_writer.py`)
 - **Ledger:** LED-2026-10-26-batch-100.76
-- **Statement (EARS unwanted):** If the `project.json` destination is not inside this work area, then the system shall refuse the manifest write.
+- **Statement:** (EARS unwanted) If the `project.json` destination is not inside this work area, then the system shall refuse the manifest write.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_check.py -k tc_b100_62` (Inc 1 / LED .28)
 - **Numeric pass threshold:** a project swapped for a junction into another work area → 0 bytes of `project.json` written outside.
@@ -2006,7 +2006,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.4c — A link or junction folder is not listed as a project
 - **Traceability:** HLR-171b · trace: `list_projects` (`app.py`), `_is_reparse_point` (`workspace.py`); absorbs the withdrawn LLR-171.4d's arm (orchestrator ruling Q6, LED .77)
 - **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
-- **Statement (EARS unwanted):** If a folder of the work area is a link or junction, then the system shall leave that folder out of the project list.
+- **Statement:** (EARS unwanted) If a folder of the work area is a link or junction, then the system shall leave that folder out of the project list.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_homes.py -k tc_b100_62`
 - **Numeric pass threshold:** `workarea/evil` (a junction into another work area's project) → 0 rows; `workarea/alias` (a junction to `workarea/P`) → 0 rows while `P` is listed once; a junction to a plain outside folder → 0 rows; a normal project → 1 row.
@@ -2017,11 +2017,12 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 - **Traceability:** HLR-171b
 - **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
 - **Status:** withdrawn at Inc 8b E1 by orchestrator ruling Q6 (LED .77). It had no independent RED: a direct child of the work area resolves outside only through a link or junction, which LLR-171.4c drops. Its arm (`workarea/evil` → 0 rows) is LLR-171.4c's first arm. The id is kept and not reused.
+- **Statement:** (withdrawn; kept for the canon, merged into LLR-171.4c) If a direct child of the work area resolves outside the work area, then the system shall leave it out of the project list. (corrected at close: the block carried no Statement line)
 
 ### LLR-171.4e — A link or junction project folder is not loaded
 - **Traceability:** HLR-171b · trace: `_handle_load_project` (`app.py`), `_is_reparse_point` (`workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.82
-- **Statement (EARS unwanted):** If a project folder to be loaded is a link or junction, then the system shall refuse the load.
+- **Statement:** (EARS unwanted) If a project folder to be loaded is a link or junction, then the system shall refuse the load.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_homes.py -k tc_b100_62`
 - **Numeric pass threshold:** `evil` and `alias`, each picked from a list built before the junction appeared (the picked arm, the only load path at 8b: `_route_load_project`) → 0 loads, 0 session resets, 1 status line each. The typed arm is LLR-172.5d's, at Inc 9a. The refusal's token row is drafted in E2 and confirmed in E3 (orchestrator ruling Q5).
@@ -2031,7 +2032,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.4f — A project folder resolving outside this work area is not loaded
 - **Traceability:** HLR-171b · trace: `_handle_load_project` (`app.py`), `contained_in_workarea` (`workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.80, LED-2026-10-26-batch-100.82
-- **Statement (EARS unwanted):** If a project folder to be loaded is not one direct child folder of this work area or resolves outside this work area, then the system shall refuse the load.
+- **Statement:** (EARS unwanted) If a project folder to be loaded is not one direct child folder of this work area or resolves outside this work area, then the system shall refuse the load.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_homes.py -k tc_b100_62`
 - **Numeric pass threshold:** a picked name with `..` segments that reaches another work area's project (no link involved) → 0 loads, 0 session resets, 1 status line holding `outside the work area`; a picked name `sub/P` with `workarea/sub` a junction to `workarea/R` → 0 loads, 0 resets (E3-security S3-7); `evil` → 0 loads. The typed arms are LLR-172.5c's (outside the work area) and LLR-172.5d's (through a link or junction), at Inc 9a. `lstat` of the picked folder fails with a permission error (E5 F7(a), LED-2026-10-26-batch-100.80) → refused with 1 line holding `could not be read` and `check that the folder can be opened, then load again` (the Save project target: `then save again`), 0 lines holding `outside the work area` or `is not the work area folder`; pre snapshot: the `outside` texts → RED; a mutation mapping the error to `outside` → RED.
@@ -2041,7 +2042,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.4g — A Save project target that is a link or junction is refused before it is resolved
 - **Traceability:** HLR-171b · trace: `_handle_save_dialog` (`app.py`, the HLR-164(f) check), `_is_reparse_point` (`workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.76
-- **Statement (EARS unwanted):** If the Save project target folder is a link or junction, then the system shall refuse the save, with the `link or junction` tokens, before resolving the target.
+- **Statement:** (EARS unwanted) If the Save project target folder is a link or junction, then the system shall refuse the save, with the `link or junction` tokens, before resolving the target.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_homes.py -k tc_b100_62`
 - **Numeric pass threshold:** typing `evil` (new name) and typing it while it is a merge target → 2 status lines holding `link or junction` and `choose another name`, 0 folders created, 0 bytes written outside this work area.
@@ -2051,7 +2052,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.4h — Eight writers write nothing outside this work area
 - **Traceability:** HLR-171b · trace: `place_into_workarea` (LLR-171.4a) and `write_project_manifest` (LLR-171.4b), reached by the writers below
 - **Ledger:** LED-2026-10-26-batch-100.76
-- **Statement (EARS ubiquitous):** The system shall write 0 bytes outside this work area through Save project (new name, merge and emit), the save-back, the variant append, the MAC sync, the A2L sync and the manifest seam.
+- **Statement:** (EARS ubiquitous) The system shall write 0 bytes outside this work area through Save project (new name, merge and emit), the save-back, the variant append, the MAC sync, the A2L sync and the manifest seam.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_homes.py -k tc_b100_62`
 - **Numeric pass threshold:** for each of the 8 writers, with the open or target project folder swapped for a junction into another work area's project, and again for a junction to a plain outside folder → 0 bytes written outside (16 of 16 arms); a normal project → each writer writes inside (8 of 8).
@@ -2061,7 +2062,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.4i — A flow is not saved outside this work area
 - **Traceability:** HLR-171b · trace: `save_flow_json` (`flow_persistence_service.py`), reached from `on_flow_builder_panel_save_requested` (`app.py`) — SEC-5, Code-Wire C1. **Not in Inc 8b:** routed to the LED .50 backlog item and `.dev-flow/BACKLOG-CODE.md` by orchestrator ruling Q1 (LED .77).
 - **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
-- **Statement (EARS unwanted):** If the folder a flow is saved into is not inside this work area, then the system shall refuse to save the flow.
+- **Statement:** (EARS unwanted) If the folder a flow is saved into is not inside this work area, then the system shall refuse to save the flow.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_homes.py -k tc_b100_62`
 - **Numeric pass threshold:** `P/flows` a junction to an outside folder → 0 files in the outside folder, 1 refusal; a normal `P/flows` → the flow saved.
@@ -2071,7 +2072,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.4j — A flowset is not saved outside this work area
 - **Traceability:** HLR-171b · trace: `save_chain_set` / the flowset writer (`flow_persistence_service.py`), reached from `on_flow_execution_panel_save_requested` (`app.py`) — SEC-5, Code-Wire C1. **Not in Inc 8b:** routed to the LED .50 backlog item and `.dev-flow/BACKLOG-CODE.md` by orchestrator ruling Q1 (LED .77).
 - **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.77
-- **Statement (EARS unwanted):** If the folder a flowset is saved into is not inside this work area, then the system shall refuse to save the flowset.
+- **Statement:** (EARS unwanted) If the folder a flowset is saved into is not inside this work area, then the system shall refuse to save the flowset.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_homes.py -k tc_b100_62`
 - **Numeric pass threshold:** `P/flowsets` a junction to an outside folder → 0 files in the outside folder, 1 refusal; a normal `P/flowsets` → the flowset saved.
@@ -2081,7 +2082,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.5 — A copied file project.json cannot record is named in the status
 - **Traceability:** HLR-171 · trace: `gather_project_artifacts` (`project_gather_service.py`, the review F1 device-stem guard), `_handle_save_dialog` (`app.py`) — BACKLOG-CODE R2-1
 - **Ledger:** LED-2026-10-26-batch-100.76, LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.80
-- **Statement (EARS unwanted):** If Save project copies into the project a file whose project-relative path `project.json` cannot record, then the system shall paint one status line naming that file.
+- **Statement:** (EARS unwanted) If Save project copies into the project a file whose project-relative path `project.json` cannot record, then the system shall paint one status line naming that file.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
 - **Numeric pass threshold:** the active CRC template is a file outside the project whose name `project.json` cannot record (`con.json`, created where the platform allows it; otherwise reported as not run) → the save completes, 1 status line naming `templates/con.json` with `copied but not recorded`, `Windows reserves that name` and `rename it in the common folder, select the new name, then Save project`, 0 raises; no such file → 0 such lines. The 10-line cap (12 rows → 10 lines and 1 line holding `and 2 more`, LLR-171.7a) is verified at the painting seam with `GatherOutcome.unrecorded` injected, because one save gathers at most one template; a row refused for another reason than a device stem → `the name is not one project.json records` (no length rule exists; E5 F4, LED-2026-10-26-batch-100.80). A dialog `batch` entry with a device stem fails the whole save at the manifest writer (pre-existing, backlog), so it is not this requirement's example. The active document keeps its own Inc 8a finding and never gets a second line (pre-ruling 7). The save-as tree copy records nothing in `project.json`, so it adds no line here.
@@ -2091,7 +2092,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.6 — Save project keeps the carried batch when the dialog selects none
 - **Traceability:** HLR-171, HLR-164 · trace: `_handle_save_dialog` (`app.py`), `SaveProjectPayload.batch` (`screens.py`) — orchestrator ruling R4, E3-architect A3-3 (C-7 confirmed)
 - **Ledger:** LED-2026-10-26-batch-100.78
-- **Statement (EARS event):** When Save project writes the target's `project.json`, the system shall record as `batch` the Save dialog's batch selection when that selection is non-empty, and otherwise the carried `batch` value.
+- **Statement:** (EARS event) When Save project writes the target's `project.json`, the system shall record as `batch` the Save dialog's batch selection when that selection is non-empty, and otherwise the carried `batch` value.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
 - **Numeric pass threshold:** the carried value is the open project's for a save as, the target's for a save into the open project or a merge, and none for a fresh session's new folder. P with `batch` `["a.json"]` (written by the shipped Save project) loaded, Save project into P with nothing selected → P's `batch` `["a.json"]` (0 changed); then save as Q with nothing selected → Q's `batch` `["a.json"]` and Q holds `a.json` (LLR-171.1); a merge into R whose `batch` is `["r.json"]`, nothing selected → R's `batch` `["r.json"]`; a selection `["b.json"]` → `batch` `["b.json"]` for each of the three targets. An empty selection cannot clear a `batch`: an untouched dialog and an empty selection cannot be told apart (A3-3, G1 R-10).
@@ -2101,7 +2102,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.6a — Save project keeps the carried assignments when the dialog selects none
 - **Traceability:** HLR-171, HLR-164 · trace: `_handle_save_dialog` (`app.py`), `SaveProjectPayload.assignments` (`screens.py`) — orchestrator ruling R4, E3-architect A3-3
 - **Ledger:** LED-2026-10-26-batch-100.78
-- **Statement (EARS event):** When Save project writes the target's `project.json`, the system shall record as `assignments` the Save dialog's assignment selection when that selection is non-empty, and otherwise the carried `assignments` value.
+- **Statement:** (EARS event) When Save project writes the target's `project.json`, the system shall record as `assignments` the Save dialog's assignment selection when that selection is non-empty, and otherwise the carried `assignments` value.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
 - **Numeric pass threshold:** the carried value as in LLR-171.6. P with `assignments` naming `c.json` for `firmware` loaded, Save project into P with nothing selected → P's `assignments` unchanged; then save as Q with nothing selected → Q's `assignments` equal P's and Q holds `c.json`; a merge into R with nothing selected → R's `assignments` unchanged; a selection → the selection for each of the three targets.
@@ -2111,7 +2112,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.6b — The gather takes the composition documents from the recorded batch and assignments
 - **Traceability:** HLR-171, HLR-164 · trace: `_handle_save_dialog` (`app.py`), `gather_project_artifacts` (`project_gather_service.py`, unchanged) — orchestrator ruling R4, E3-architect A3-3, A3R2-3, A3R2-4
 - **Ledger:** LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.79
-- **Statement (EARS event):** When Save project gathers the composition documents, the system shall take their names from the `batch` value that LLR-171.6 records plus the names in the `assignments` value that LLR-171.6a records.
+- **Statement:** (EARS event) When Save project gathers the composition documents, the system shall take their names from the `batch` value that LLR-171.6 records plus the names in the `assignments` value that LLR-171.6a records.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
 - **Numeric pass threshold:** P with `batch` `["a.json"]`, P's top-level `a.json` and `patches/a.json` removed, the common library holding `a.json`, Save project into P with nothing selected → the `composition_names` passed to the gather hold `a.json` (spy) and `P/patches/a.json` is present (gathered this save); the same P with `assignments` naming `c.json` for `firmware`, P's top-level `c.json` and `patches/c.json` removed, the common library holding `c.json` → the `composition_names` hold `a.json` and `c.json` and `P/patches/c.json` is present (LLR-138.1 kept).
@@ -2121,7 +2122,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.7 — Names from the open project's tree are painted scrubbed and clipped
 - **Traceability:** HLR-171 · trace: `painted_names` (NEW, `project_gather_service.py`), `_handle_save_dialog`, `_copy_project_subfolders` (`app.py`) — orchestrator ruling R6, E3-security S3-4, S3R2-4, SEC8a-4
 - **Ledger:** LED-2026-10-26-batch-100.78, LED-2026-10-26-batch-100.79
-- **Statement (EARS ubiquitous):** The system shall paint each name taken from the open project's tree without characters of the Unicode categories Cc, Cf, Zl and Zp, with each unpaired surrogate replaced by U+FFFD, and clipped to 120 characters.
+- **Statement:** (EARS ubiquitous) The system shall paint each name taken from the open project's tree without characters of the Unicode categories Cc, Cf, Zl and Zp, with each unpaired surrogate replaced by U+FFFD, and clipped to 120 characters.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
 - **Numeric pass threshold:** a skipped junction named `patches/` + U+202E + `osj.exe.json` → the painted line holds `patches/osj.exe.json` and 0 characters of the categories Cc, Cf, Zl or Zp (U+0000–U+001F, U+007F–U+009F, U+200B–U+200F, U+202A–U+202E, U+2066–U+2069 among them); names holding U+061C, U+2028 and the unpaired surrogate U+DC80 → painted without U+061C and U+2028 and with U+FFFD in place of U+DC80, 0 raises in the paint or the log, the log holding each name in its escaped (`%r`) form; a name of 300 characters → painted as 120 characters ending in `…`; a plain name → painted unchanged. The rule covers every Inc 8b line that names an entry of P's tree: rows 7, 8 and 11 and the refusals that name a file.
@@ -2131,7 +2132,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.7a — A status list names at most 10 entries of the open project's tree
 - **Traceability:** HLR-171 · trace: `painted_names` (NEW, `project_gather_service.py`), `_handle_save_dialog` (`app.py`) — orchestrator ruling R6, E3-security S3-4
 - **Ledger:** LED-2026-10-26-batch-100.78
-- **Statement (EARS event):** When Save project would name more than 10 entries of the open project's tree in one status list, the system shall paint the first 10 entries followed by `and K more`, K being the number of entries not named.
+- **Statement:** (EARS event) When Save project would name more than 10 entries of the open project's tree in one status list, the system shall paint the first 10 entries followed by `and K more`, K being the number of entries not named.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
 - **Numeric pass threshold:** 25 skipped junctions → 1 line naming 10 and holding `and 15 more`; 12 unrecorded gathered rows → 10 lines and 1 line holding `and 2 more`; 12 unreadable entries → the refusal names 10 and holds `and 2 more`; exactly 10 entries → 10 named, 0 `more`.
@@ -2141,7 +2142,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.7b — A failed save-as copy is reported in user terms
 - **Traceability:** HLR-171 · trace: `_copy_project_subfolders` (NEW), `_handle_save_dialog`, `_abort_save` (`app.py`) — orchestrator ruling R6, E3-security S3-4, S3-5
 - **Ledger:** LED-2026-10-26-batch-100.78
-- **Statement (EARS unwanted):** If a save-as copy fails after the project folder is created, then the system shall paint the `could not save` and `check the folder` tokens naming the file, with no exception text.
+- **Statement:** (EARS unwanted) If a save-as copy fails after the project folder is created, then the system shall paint the `could not save` and `check the folder` tokens naming the file, with no exception text.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
 - **Numeric pass threshold:** the 4th of 8 copies raising `PermissionError` → 1 status line holding `could not save`, the file's project-relative path and `check the folder`, 0 lines holding `WinError` or `Refusing`, Q absent and P 0 bytes changed (LLR-164.4, LLR-171.1f); `P/reports` swapped for a junction after the plan → the same line holding `changed while saving`.
@@ -2151,7 +2152,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-171.7c — The rollback of a failed save never removes a file through a changed folder
 - **Traceability:** HLR-164, HLR-171 · trace: `_abort_save`, `_PlacedFiles` (`app.py`), `_path_traverses_reparse_point` (`workspace.py`) — E5 security SEC8b-1 (the mechanism is from Inc 2, LED .53; save as widens it)
 - **Ledger:** LED-2026-10-26-batch-100.80
-- **Statement (EARS unwanted):** If a failed Save project's rollback finds a file it recorded under a folder that is now a link or junction, or a file whose `(st_dev, st_ino)` differs from the one recorded when the save wrote it, then the system shall keep that file and paint one status line naming it.
+- **Statement:** (EARS unwanted) If a failed Save project's rollback finds a file it recorded under a folder that is now a link or junction, or a file whose `(st_dev, st_ino)` differs from the one recorded when the save wrote it, then the system shall keep that file and paint one status line naming it.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k rollback_never_deletes`
 - **Numeric pass threshold:** a save as fails right after its last `reports` copy, once `Q/reports` (a) is replaced by a junction to another project's `R/reports` holding files of the same names → R's 7 files unchanged; (b) is replaced by a junction to Q's own moved folder → the 7 copies kept; (c) holds a user's file moved over Q's first copy → that file kept with its bytes; each arm: 1 line holding `Not removed after the failed save` and `a folder changed while saving`, 0 lines holding `WinError`. No change → every file the save wrote is removed and Q is absent (LLR-171.7b).
@@ -2161,7 +2162,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.1 — The recent-sources store lives in the per-user local profile
 - **Traceability:** HLR-172 · trace: `recent_store_path` (NEW, `workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.21, LED-2026-10-26-batch-100.30, LED-2026-10-26-batch-100.41, LED-2026-10-26-batch-100.82
-- **Statement (EARS ubiquitous):** The system shall keep the recent-sources store at `%LOCALAPPDATA%\s19_app\recent_sources.json`, in the per-user profile folder that does not roam.
+- **Statement:** (EARS ubiquitous) The system shall keep the recent-sources store at `%LOCALAPPDATA%\s19_app\recent_sources.json`, in the per-user profile folder that does not roam.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`; an autouse fixture in `tests/conftest.py` points `LOCALAPPDATA` at `tmp_path` for every test (Inc 9a)
 - **Numeric pass threshold:** `LOCALAPPDATA` = `<tmp>/lad`, 1 outside load → 1 file at `<tmp>/lad/s19_app/recent_sources.json` and 0 files named `recent_sources.json` under the base folder (`.s19tool` included); the real `%LOCALAPPDATA%\s19_app\recent_sources.json` → its SHA-256 (or its absence) unchanged after a full test run (1 guard, LED .41).
@@ -2171,7 +2172,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.1a — A source loaded from outside the work area is recorded first
 - **Traceability:** HLR-172 · trace: `record_recent_source` (NEW, `workspace.py`); `load_from_path`, `load_a2l_from_path` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
-- **Statement (EARS event):** When Load copies a data or A2L file from outside this work area into the work area, the system shall put that file's absolute path and its kind first in the recent-sources store.
+- **Statement:** (EARS event) When Load copies a data or A2L file from outside this work area into the work area, the system shall put that file's absolute path and its kind first in the recent-sources store.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
 - **Numeric pass threshold:** the absolute path is the lexical form `os.path.abspath` gives (`.` and `..` folded, no link resolved, no network call), so a mapped network drive keeps its letter. `examples/case_01_basic_valid/firmware.s19` typed into Load → the store reads `{"schema_version": 1, "sources": [{"path": <the absolute path>, "kind": "s19"}]}` (1 entry); a relative `firmware.s19` found in the working folder `<src>` → `<src>\firmware.s19`; `<tmp>/j/x.s19` with `<tmp>/j` a junction to `<tmp>/real` → `<tmp>\j\x.s19` (Windows only; reported not run, never passed, when no junction can be made); then an outside `.a2l`, `.mac` and `.hex` → 4 entries, newest first, kinds `hex`, `mac`, `a2l`, `s19`. The kind follows the suffix, case-folded: `.s19` and `.srec` → `s19`, `.hex` and `.ihex` → `hex`, `.mac` → `mac`, `.a2l` → `a2l` (the load's own sets, `workspace.py:107-110`); `<tmp>/A.SREC` → kind `s19`. The entry is written once the copy into `workarea/temp` succeeds (Q1).
@@ -2181,7 +2182,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.1b — A source already in the store keeps one entry
 - **Traceability:** HLR-172 · trace: `record_recent_source` (NEW, `workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
-- **Statement (EARS event):** When the system records a source whose absolute path is already in the recent-sources store, the system shall keep one entry for that path, in first place.
+- **Statement:** (EARS event) When the system records a source whose absolute path is already in the recent-sources store, the system shall keep one entry for that path, in first place.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
 - **Numeric pass threshold:** paths are compared with `os.path.normcase` after `os.path.abspath` (stored texts are not re-normalised). The same file twice → 1 entry; the same file spelled in another case (`<d>\A.s19`, then `<D>\a.S19`) → 1 entry, its text the second call's; `<d>\sub\..\A.s19` after `<d>\A.s19` → 1 entry; A, then B, then A → 2 entries, A first. Two link spellings of one file make two entries (declared; the list is a convenience). The case arm is Windows only (`normcase` folds case only there), reported not run on the Linux CI.
@@ -2191,7 +2192,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.1c — The store holds at most 20 entries
 - **Traceability:** HLR-172 · trace: `record_recent_source` (NEW, `workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82
-- **Statement (EARS ubiquitous):** The system shall keep at most 20 entries in the recent-sources store, dropping the oldest entry first.
+- **Statement:** (EARS ubiquitous) The system shall keep at most 20 entries in the recent-sources store, dropping the oldest entry first.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
 - **Numeric pass threshold:** 20 distinct sources recorded → 20 entries, source 1 last; the 21st → 20 entries, source 1 gone, source 21 first; 25 → 20 entries, entry 1 = source 25, entry 20 = source 6.
@@ -2201,7 +2202,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.1d — A load that fails before its copy records nothing
 - **Traceability:** HLR-172 · trace: `load_from_path`, `load_a2l_from_path` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.84
-- **Statement (EARS unwanted):** If a Load fails before its copy into the work area completes, then the system shall leave the recent-sources store unchanged.
+- **Statement:** (EARS unwanted) If a Load fails before its copy into the work area completes, then the system shall leave the recent-sources store unchanged.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
 - **Numeric pass threshold:** a store holding 1 entry, then: a path that does not exist, a file with an unsupported suffix, an outside source over the placement's per-file cap (the cap lowered in the test; `Cannot load file:`), and an outside A2L while the open project already holds an A2L (`Project already has an A2L file.`) → the store's SHA-256 unchanged after each of the 4 arms. A data file that copies and then fails to parse is recorded (Q1, declared).
@@ -2211,7 +2212,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.1e — A source inside this work area is not recorded
 - **Traceability:** HLR-172 · trace: `load_from_path`, `load_a2l_from_path` (`app.py`); `contained_in_workarea` (`workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82
-- **Statement (EARS unwanted):** If the source a load copies lies inside this work area, then the system shall not record that source in the recent-sources store.
+- **Statement:** (EARS unwanted) If the source a load copies lies inside this work area, then the system shall not record that source in the recent-sources store.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
 - **Numeric pass threshold:** typed `<workarea>/ab/firmware.s19`, a Workarea Files pick of an `.a2l` work copy (`_load_from_item` → `load_a2l_from_path`) and a variant switch (`_handle_select_variant` → `load_from_path` with the project's variant) → 0 entries for each of the 3 arms. "Inside" is §1.3's (`contained_in_workarea`).
@@ -2221,7 +2222,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.1f — No usable `LOCALAPPDATA`, no store file
 - **Traceability:** HLR-172 · trace: `recent_store_path`, `record_recent_source` (NEW, `workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
-- **Statement (EARS unwanted):** If `LOCALAPPDATA` is unset, is empty, does not start with a drive letter followed by a root, or names a folder that does not exist, then the system shall write no recent-sources store file.
+- **Statement:** (EARS unwanted) If `LOCALAPPDATA` is unset, is empty, does not start with a drive letter followed by a root, or names a folder that does not exist, then the system shall write no recent-sources store file.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
 - **Numeric pass threshold:** the drive-and-root test is the text test `^[A-Za-z]:[\/]` on every platform. `LOCALAPPDATA` unset, `""`, `relative\lad`, `/tmp/lad` (a POSIX absolute path) and `<tmp>/absent` (drive-rooted, no such folder; only the `s19_app` folder is ever created, never its parents), the process working folder set to `<tmp>` → 0 files named `recent_sources.json` under `<tmp>` and the base folder, 0 folders created, the image installed, 0 raises (5 of 5 arms). Tester note: every fixture value derives from `tmp_path`, never a literal drive path (off Windows a `C:\…` text passes the test and names a relative folder).
@@ -2231,7 +2232,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.1g — A linked store folder is not written
 - **Traceability:** HLR-172 · trace: `record_recent_source` (NEW), `_is_reparse_point` (`workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82
-- **Statement (EARS unwanted):** If the store folder `%LOCALAPPDATA%\s19_app` is a link or junction, then the system shall not write the recent-sources store.
+- **Statement:** (EARS unwanted) If the store folder `%LOCALAPPDATA%\s19_app` is a link or junction, then the system shall not write the recent-sources store.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
 - **Numeric pass threshold:** `<tmp>/lad/s19_app` a junction to `<tmp>/elsewhere` → 0 files in `<tmp>/elsewhere` after an outside load, the image installed, 0 raises.
@@ -2241,7 +2242,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.1h — The store is replaced through a uniquely named staging file
 - **Traceability:** HLR-172 · trace: `record_recent_source` (NEW, `workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
-- **Statement (EARS ubiquitous):** The system shall write the recent-sources store through a staging file with a unique name in the store folder and then replace the store in one step.
+- **Statement:** (EARS ubiquitous) The system shall write the recent-sources store through a staging file with a unique name in the store folder and then replace the store in one step.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
 - **Numeric pass threshold:** 100 records → 100 distinct staging names (a spy on the staging creation), each in `%LOCALAPPDATA%\s19_app`, 100 `os.replace` calls onto `recent_sources.json`, 0 staging files left; a read of the store file after each of the 100 records → it parses as version 1 each time, 0 partial files (S-12: a reader sees the old or the new file). Every record runs on the UI thread, so no two writers of one process exist; two app instances are last-writer-wins, never a broken file (accepted, E3 A9-4).
@@ -2251,7 +2252,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.1i — A failed store write never fails the load
 - **Traceability:** HLR-172 · trace: `record_recent_source` (NEW, `workspace.py`); `load_from_path`, `load_a2l_from_path` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.84
-- **Statement (EARS unwanted):** If writing the recent-sources store fails, then the system shall complete the load with the store left as it was.
+- **Statement:** (EARS unwanted) If writing the recent-sources store fails, then the system shall complete the load with the store left as it was.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
 - **Numeric pass threshold:** `os.replace` raising `PermissionError` and the staging creation raising `OSError` (2 injected arms), for a data file and for an A2L → the file installed as without the store, 0 raises out of the load, the store's SHA-256 unchanged, 0 staging files left, 1 log warning and 0 status lines about the store (Q5) — 4 of 4.
@@ -2261,7 +2262,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.1j — Recording writes back only the entries the store read accepts
 - **Traceability:** HLR-172 · trace: `record_recent_source`, `read_recent_sources` (NEW, `workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
-- **Statement (EARS event):** When the system writes the recent-sources store, the system shall carry over only those existing entries that the store read (LLR-172.2) returns.
+- **Statement:** (EARS event) When the system writes the recent-sources store, the system shall carry over only those existing entries that the store read (LLR-172.2) returns.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
 - **Numeric pass threshold:** a store holding 2 accepted entries and 3 refused ones (`\\host\share\x.s19`, `kind: exe`, a path holding `\x1b[2J`) → after 1 record: 3 entries, 0 refused; an unparseable store and a 65 537-byte store → after 1 record: 1 entry each. A store the read reports `could not be read` is not written (LLR-172.1k), and a source the read would drop is not recorded (LLR-172.1l).
@@ -2271,7 +2272,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.1k — An unreadable store is left unchanged by a record
 - **Traceability:** HLR-172 · trace: `record_recent_source`, `read_recent_sources` (NEW, `workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.83
-- **Statement (EARS unwanted):** If the store read reports `could not be read` while the system records a source, then the system shall leave the recent-sources store unchanged.
+- **Statement:** (EARS unwanted) If the store read reports `could not be read` while the system records a source, then the system shall leave the recent-sources store unchanged.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
 - **Numeric pass threshold:** a store holding 3 accepted entries, then 1 record of an outside `<src>\n.s19` with (1) the store open raising `PermissionError` (injected, as a transient sharing violation) and (2) the store read raising `OSError` (injected) → the store's SHA-256 unchanged, `record_recent_source` returns `False`, 0 staging files, 0 raises (2 of 2). Through Load the image is installed as without the store.
@@ -2281,7 +2282,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.1l — A source the store read would drop is not recorded
 - **Traceability:** HLR-172 · trace: `record_recent_source`, `_recent_entry_ok` (NEW, `workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.83
-- **Statement (EARS unwanted):** If the absolute path of the source to record fails an entry check of the store read (LLR-172.2e, LLR-172.2f or LLR-172.2g), then the system shall not record that source.
+- **Statement:** (EARS unwanted) If the absolute path of the source to record fails an entry check of the store read (LLR-172.2e, LLR-172.2f or LLR-172.2g), then the system shall not record that source.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
 - **Numeric pass threshold:** a store holding 1 accepted entry, then 3 records: `\\host\share\x.s19` (UNC; `abspath` keeps it), `<src>\a` + U+009B + `.s19` (a control character) and `C:\CON\a.s19` (a device component) → `False` each, the store's SHA-256 unchanged, 0 staging files, 0 raises (3 of 3); `<src>\b.s19` → `True`, 2 entries (control arm). A typed UNC source loads but is not remembered (declared); a mapped drive letter is remembered (LLR-172.1a).
@@ -2291,7 +2292,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.1m — The store file the writer produces fits the read's size cap
 - **Traceability:** HLR-172 · trace: `record_recent_source`, `_encode_recent_store` (NEW, `workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.83
-- **Statement (EARS ubiquitous):** The system shall keep each recent-sources store file it writes at most 65 536 bytes long, dropping the oldest entries first.
+- **Statement:** (EARS ubiquitous) The system shall keep each recent-sources store file it writes at most 65 536 bytes long, dropping the oldest entries first.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
 - **Numeric pass threshold:** (unit arms; the record reads no source, so the paths need not exist) 20 entries `C:\` + 3 240 × `p` + `.s19` → 65 492 bytes, 20 entries kept; 20 entries of 3 245 × `p` → 19 entries kept, 62 314 bytes, the oldest dropped; 1 new entry `C:\` + 11 000 × `é` + `.s19` (its path alone 66 008 bytes escaped) → 0 writes, the store's SHA-256 unchanged, `False` (3 of 3).
@@ -2302,7 +2303,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.1n — A source found only through the relative fallback is not recorded (CR9-1)
 - **Traceability:** HLR-172 · trace: `load_from_path`, `load_a2l_from_path` (`app.py`); `resolve_input_path` (`workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS unwanted):** If a Load copies a source that the path resolver found only through its base-folder or repository-root fallback, then the system shall leave the recent-sources store unchanged.
+- **Statement:** (EARS unwanted) If a Load copies a source that the path resolver found only through its base-folder or repository-root fallback, then the system shall leave the recent-sources store unchanged.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
 - **Numeric pass threshold:** 4 of 4 — "found only through the fallback" means the typed text is relative and does not exist relative to the working folder. Arms:
@@ -2317,7 +2318,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.2 — The store read returns the accepted entries in order
 - **Traceability:** HLR-172 · trace: `read_recent_sources`, `RecentSources` (NEW, `workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.21, LED-2026-10-26-batch-100.82
-- **Statement (EARS event):** When the recent-sources store is read, the system shall return, in stored order, at most the first 20 entries that pass the entry checks of LLR-172.2e … LLR-172.2i.
+- **Statement:** (EARS event) When the recent-sources store is read, the system shall return, in stored order, at most the first 20 entries that pass the entry checks of LLR-172.2e … LLR-172.2i.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-35 — `pytest tests/test_b100_recents.py -k tc_b100_35`
 - **Numeric pass threshold:** 1 000 distinct accepted entries (`C:\NNN.s19`, about 41 KB) → exactly the first 20, in order; 5 accepted entries with 2 refused ones between them → the 5, in order; the problem is `None` in both arms.
@@ -2327,7 +2328,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.2a — An oversized store reads as empty with `too large`
 - **Traceability:** HLR-172 · trace: `read_recent_sources` (NEW, `workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82
-- **Statement (EARS unwanted):** If the recent-sources store file is larger than 65 536 bytes, then the system shall return no entries with the problem `too large`.
+- **Statement:** (EARS unwanted) If the recent-sources store file is larger than 65 536 bytes, then the system shall return no entries with the problem `too large`.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-35 — `pytest tests/test_b100_recents.py -k tc_b100_35`
 - **Numeric pass threshold:** exactly 65 536 bytes of valid store → parsed; 65 537 bytes → 0 entries, problem `too large`; 1 read of at most 65 537 bytes (a spy on the read size, S-12).
@@ -2337,7 +2338,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.2b — A store of the wrong shape reads as empty
 - **Traceability:** HLR-172 · trace: `read_recent_sources` (NEW, `workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82
-- **Statement (EARS unwanted):** If the recent-sources store file is not a JSON object holding `schema_version` 1 and a `sources` list, then the system shall return no entries.
+- **Statement:** (EARS unwanted) If the recent-sources store file is not a JSON object holding `schema_version` 1 and a `sources` list, then the system shall return no entries.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-35 — `pytest tests/test_b100_recents.py -k tc_b100_35`
 - **Numeric pass threshold:** `{not json`, bytes that are not UTF-8, a top-level list, `schema_version: 2`, `sources` a string → 0 entries, problem `None`, 0 raises (5 of 5).
@@ -2347,7 +2348,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.2c — An unreadable store reads as empty with `could not be read`
 - **Traceability:** HLR-172 · trace: `read_recent_sources` (NEW, `workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
-- **Statement (EARS unwanted):** If the recent-sources store file exists but cannot be opened or read, or the file or its folder is a link or junction, then the system shall return no entries with the problem `could not be read`.
+- **Statement:** (EARS unwanted) If the recent-sources store file exists but cannot be opened or read, or the file or its folder is a link or junction, then the system shall return no entries with the problem `could not be read`.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-35 — `pytest tests/test_b100_recents.py -k tc_b100_35`
 - **Numeric pass threshold:** the open raising `PermissionError` (injected), a directory at the store path, the store file a symbolic link to a valid store `<tmp>/other.json`, and the store folder a junction to `<tmp>/elsewhere` holding a valid store → 0 entries, problem `could not be read`, 0 raises, 0 bytes read through a link (a spy on the open: 0 opens of the link arms) (4 of 4) (Q6; E3 S9-4). The file-link arm is reported not run, never passed, when the platform refuses to create a file symbolic link.
@@ -2357,7 +2358,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.2d — A missing store reads as empty with no problem
 - **Traceability:** HLR-172 · trace: `read_recent_sources`, `recent_store_path` (NEW, `workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82
-- **Statement (EARS unwanted):** If the recent-sources store file does not exist or `LOCALAPPDATA` is not usable (LLR-172.1f), then the system shall return no entries and no problem.
+- **Statement:** (EARS unwanted) If the recent-sources store file does not exist or `LOCALAPPDATA` is not usable (LLR-172.1f), then the system shall return no entries and no problem.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-35 — `pytest tests/test_b100_recents.py -k tc_b100_35`
 - **Numeric pass threshold:** no store file → 0 entries, problem `None`; `LOCALAPPDATA` unset → 0 entries, problem `None`, 0 files or folders created (2 of 2).
@@ -2367,7 +2368,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.2e — An entry not rooted at a drive is dropped
 - **Traceability:** HLR-172 · trace: `read_recent_sources` (NEW, `workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82
-- **Statement (EARS unwanted):** If the path of a store entry is not a drive letter followed by a root, then the system shall drop that entry.
+- **Statement:** (EARS unwanted) If the path of a store entry is not a drive letter followed by a root, then the system shall drop that entry.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-35 — `pytest tests/test_b100_recents.py -k tc_b100_35`
 - **Numeric pass threshold:** `x.s19`, `C:x.s19`, `\x.s19`, `\\host\share\x.s19`, `\\?\GLOBALROOT\x.s19` and `\\.\C:\x.s19` → 0 returned (6 of 6); `C:\x\a.s19` → returned. A mapped network drive letter cannot be told from a local one by syntax; the guard against touching it is that a recent is never touched before Enter (LLR-173.4).
@@ -2377,7 +2378,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.2f — An entry naming a device is dropped
 - **Traceability:** HLR-172 · trace: `read_recent_sources` (NEW), `is_windows_device_name` (`workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82
-- **Statement (EARS unwanted):** If a component of a store entry's path is a Windows device name, then the system shall drop that entry.
+- **Statement:** (EARS unwanted) If a component of a store entry's path is a Windows device name, then the system shall drop that entry.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-35 — `pytest tests/test_b100_recents.py -k tc_b100_35`
 - **Numeric pass threshold:** `C:\x\NUL.s19`, `C:\CON\a.s19` and `C:\x\com1.s19` → 0 returned (3 of 3); `C:\x\console.s19` → returned.
@@ -2387,7 +2388,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.2g — An entry holding a control character is dropped
 - **Traceability:** HLR-172 · trace: `read_recent_sources` (NEW, `workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82
-- **Statement (EARS unwanted):** If the path of a store entry holds a control character (U+0000–U+001F or U+007F–U+009F), then the system shall drop that entry.
+- **Statement:** (EARS unwanted) If the path of a store entry holds a control character (U+0000–U+001F or U+007F–U+009F), then the system shall drop that entry.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-35 — `pytest tests/test_b100_recents.py -k tc_b100_35`
 - **Numeric pass threshold:** a NUL, `\x1b[2J`, U+007F and U+009B in a path → 0 returned (4 of 4).
@@ -2397,7 +2398,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.2h — An entry whose kind does not match its suffix is dropped
 - **Traceability:** HLR-172 · trace: `read_recent_sources` (NEW, `workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82
-- **Statement (EARS unwanted):** If a store entry's `kind` is not the kind that LLR-172.1a maps its path's suffix to, then the system shall drop that entry.
+- **Statement:** (EARS unwanted) If a store entry's `kind` is not the kind that LLR-172.1a maps its path's suffix to, then the system shall drop that entry.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-35 — `pytest tests/test_b100_recents.py -k tc_b100_35`
 - **Numeric pass threshold:** `kind: exe`; `C:\x\a.s19` with `kind: a2l`; `C:\x\a.s19:ads` (a stream) with `s19`; `C:\x\a.s19.` (a trailing dot) with `s19`; `C:\x\a.exe` with `s19` → 0 returned (5 of 5); `C:\x\A.SREC` with `s19` → returned.
@@ -2407,7 +2408,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.2i — A malformed entry is dropped
 - **Traceability:** HLR-172 · trace: `read_recent_sources` (NEW, `workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82
-- **Statement (EARS unwanted):** If a store entry is not an object holding a string `path` and a string `kind`, then the system shall drop that entry.
+- **Statement:** (EARS unwanted) If a store entry is not an object holding a string `path` and a string `kind`, then the system shall drop that entry.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-35 — `pytest tests/test_b100_recents.py -k tc_b100_35`
 - **Numeric pass threshold:** `null`, `"C:\\x.s19"`, `{"path": 7, "kind": "s19"}` and `{"path": "C:\\x.s19"}` between 2 accepted entries → the 2 accepted entries returned, 0 of the 4, 0 raises.
@@ -2417,7 +2418,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.2j — The store read never raises
 - **Traceability:** HLR-172 · trace: `read_recent_sources` (NEW, `workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82
-- **Statement (EARS ubiquitous):** The system shall return from every read of the recent-sources store without raising.
+- **Statement:** (EARS ubiquitous) The system shall return from every read of the recent-sources store without raising.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-35 — `pytest tests/test_b100_recents.py -k tc_b100_35`
 - **Numeric pass threshold:** the stores of LLR-172.2a … LLR-172.2i and 200 seeded random byte strings of 0 to 70 000 bytes → 0 raises.
@@ -2427,7 +2428,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.2k — A store path holding a character no Win32 file name can hold is dropped and never recorded
 - **Traceability:** HLR-172 · trace: `_recent_entry_ok` (`workspace.py`), the one entry check shared by `read_recent_sources` and `record_recent_source` (LLR-172.1l)
 - **Ledger:** LED-2026-10-26-batch-100.84
-- **Statement (EARS unwanted):** If a store entry's path holds any of `<>:"|?*` after its 2-character drive prefix, or a character of Unicode category Cf, Zl, Zp or Cs, then the system shall drop that entry when it reads the store and refuse to record that path.
+- **Statement:** (EARS unwanted) If a store entry's path holds any of `<>:"|?*` after its 2-character drive prefix, or a character of Unicode category Cf, Zl, Zp or Cs, then the system shall drop that entry when it reads the store and refuse to record that path.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-35 (read) and TC-B100-34 (record) — `pytest tests/test_b100_recents.py -k win32_forbidden_character`
 - **Numeric pass threshold:** (read) a store of `C:\x\a.s19`, the 6 entries `C:\x\a:b.s19`, `C:\x\CON:.s19`, `C:\x\a::$DATA.s19` and `C:\x\a` + U+202E / U+2028 / U+DC80 + `b.s19`, then `C:/x/../TEMPLA~1/b.s19` → the 2 valid entries, in order, problem none (a `..` segment and an 8.3 spelling stay legal); (record) a store of 2 accepted entries, then records of the same 6 names under `<src>` and of the typed `\??\<src>\x.s19` (which `os.path.abspath` turns into `C:\??\C:\…`, E5 SEC9-4) → False each (7 of 7), the store's SHA-256 unchanged, 0 staging files; control `<src>\c.s19` → True, 3 entries. The record half is Windows only (LLR-172.1f), reported not run on the Linux CI.
@@ -2437,7 +2438,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.3 — Recent paths stay out of every file under the base folder
 - **Traceability:** HLR-172 · trace: the `project.json`, report and gather writers (`manifest_writer.py`, `project_gather_service.py`, the report writers in `app.py`); none of them changes at Inc 9a
 - **Ledger:** LED-2026-10-26-batch-100.21, LED-2026-10-26-batch-100.82
-- **Statement (EARS ubiquitous):** The system shall not copy an entry of the recent-sources store into any file under the base folder.
+- **Statement:** (EARS ubiquitous) The system shall not copy an entry of the recent-sources store into any file under the base folder.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-36 — `pytest tests/test_b100_recents.py -k tc_b100_36`
 - **Numeric pass threshold:** (1) a store seeded with 3 entries under the marker folder `<tmp>/m4rk3r-9a/`, never loaded in the session, then an outside load of another file, Save project and a report → 0 occurrences of `m4rk3r-9a` in any file under the base folder, the log included; (2) an outside load from `<tmp>/m4rk3r-9b/firmware.s19`, Save project and a report → 0 occurrences of `m4rk3r-9b` in any file under the base folder other than `.s19tool/logs/` (the log records the load's own source path, §6.3).
@@ -2447,7 +2448,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.4 — One function enumerates the work-area temp folder
 - **Traceability:** HLR-172b · trace: `list_workarea_files` (NEW, `workspace.py`); `refresh_files` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82
-- **Statement (EARS ubiquitous):** The system shall enumerate the work-area temp folder for a file list in exactly one function.
+- **Statement:** (EARS ubiquitous) The system shall enumerate the work-area temp folder for a file list in exactly one function.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-37 — `pytest tests/test_b100_recents.py -k tc_b100_37` (an AST census of `s19_app/`)
 - **Numeric pass threshold:** the census (calls of `iterdir`, `glob`, `rglob`, `scandir`, `listdir` or `walk` on a path built from `WORKAREA_TEMP`) → 1 function, `list_workarea_files` in `workspace.py`, and 0 in `app.py`.
@@ -2457,7 +2458,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.4a — The Workarea Files list shows each regular file of the temp folder
 - **Traceability:** HLR-172b · trace: `list_workarea_files` (NEW, `workspace.py`); `refresh_files` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.84
-- **Statement (EARS event):** When the Workarea Files list is refreshed, the system shall show one row per regular file directly in the work-area temp folder, sorted by name.
+- **Statement:** (EARS event) When the Workarea Files list is refreshed, the system shall show one row per regular file directly in the work-area temp folder, sorted by name.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-37 — `pytest tests/test_b100_recents.py -k tc_b100_37`
 - **Numeric pass threshold:** `b.s19`, `a.hex`, `c.a2l` → 3 rows `a.hex`, `b.s19`, `c.a2l`, equal to `list_workarea_files` (0 differences); the private `.staging` folder holding 1 file and a sub-folder `sub/x.s19` → 0 rows for them; an empty temp folder → 0 rows.
@@ -2467,7 +2468,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.4b — A file link in the temp folder is not listed
 - **Traceability:** HLR-172b · trace: `list_workarea_files` (NEW), `_is_reparse_point` (`workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82
-- **Statement (EARS unwanted):** If an entry of the work-area temp folder is a symbolic link or reparse point, then the system shall leave that entry out of the Workarea Files list.
+- **Statement:** (EARS unwanted) If an entry of the work-area temp folder is a symbolic link or reparse point, then the system shall leave that entry out of the Workarea Files list.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-37 — `pytest tests/test_b100_recents.py -k tc_b100_37`
 - **Numeric pass threshold:** `temp/l.s19`, a file symbolic link to an outside file → 0 rows for it, and the other files listed. Feasibility: when the test cannot create a file symbolic link it is reported not run, never passed (as LLR-171.1b).
@@ -2477,7 +2478,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.4c — A temp folder that cannot be listed gives an empty list
 - **Traceability:** HLR-172b · trace: `list_workarea_files` (NEW, `workspace.py`); `refresh_files` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
-- **Statement (EARS unwanted):** If the work-area temp folder is missing, is a link or junction, or cannot be listed, then the system shall show an empty Workarea Files list.
+- **Statement:** (EARS unwanted) If the work-area temp folder is missing, is a link or junction, or cannot be listed, then the system shall show an empty Workarea Files list.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-37 — `pytest tests/test_b100_recents.py -k tc_b100_37`
 - **Numeric pass threshold:** the temp folder removed → 0 rows, 0 raises; the listing raising `PermissionError` (injected) → 0 rows, 0 raises; `temp` a junction to `<tmp>/elsewhere` holding `z.s19` → 0 rows, 0 raises (3 of 3). The junction arm is reported not run, never passed, when no junction can be made.
@@ -2487,7 +2488,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.4d — A temp file whose name ends in a dot or a space is not listed
 - **Traceability:** HLR-172b · trace: `list_workarea_files` (`workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.84
-- **Statement (EARS unwanted):** If a regular file in the work-area temp folder has a name that ends in a dot or a space, then the system shall leave that file out of the Workarea Files list.
+- **Statement:** (EARS unwanted) If a regular file in the work-area temp folder has a name that ends in a dot or a space, then the system shall leave that file out of the Workarea Files list.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-37 — `pytest tests/test_b100_recents.py -k tc_b100_37_lister_skips_a_name_ending_in_a_dot_or_space`
 - **Numeric pass threshold:** `a.s19.` and `b.s19 ` (each made through a `\?\` path, one arm each) beside the regular file `c.s19` → the lister returns `[temp/c.s19]` and the list shows 1 row `c.s19`, 0 rows naming either (2 of 2 arms). Win32 opens `a.s19.` as `a.s19`, so a pick of that row would load another file (E5 SEC9-1, probe G). The arms are Windows only (the `\?\` spelling), reported not run on the Linux CI.
@@ -2497,7 +2498,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.4e — A project folder ending in a dot or a space is not listed on any platform (CR9-9 addendum)
 - **Traceability:** HLR-172b · trace: `list_projects` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95
-- **Statement (EARS unwanted):** If a folder in the work area has a name that ends in a dot or a space, then the system shall leave it out of the project list on every operating system.
+- **Statement:** (EARS unwanted) If a folder in the work area has a name that ends in a dot or a space, then the system shall leave it out of the project list on every operating system.
 - **Rationale (informative):** the lister skip (LLR-172.4d) has no platform gate; the project-list skip has `os.name == "nt"`. Removing the gate makes both rules the same (backlog disposition B7: prefer removal over a new helper in `workspace.py`).
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-37 — `pytest tests/test_b100_recents.py -k tc_b100_37_project_list_skips_a_trailing_dot_on_every_platform`
@@ -2508,7 +2509,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.4f — The Workarea Files list holds only loadable files (C7)
 - **Traceability:** HLR-172b · trace: `refresh_files`; the loadable-suffix predicate shared with `_load_dialog_rows` (Inc 9b, LLR-173.4b) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95
-- **Statement (EARS unwanted):** If a file in the work-area temp folder does not have a loadable suffix, then the system shall leave it out of the Workarea Files list.
+- **Statement:** (EARS unwanted) If a file in the work-area temp folder does not have a loadable suffix, then the system shall leave it out of the Workarea Files list.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-37 — `pytest tests/test_b100_recents.py -k tc_b100_37_files_list_shows_loadable_suffixes_only`
 - **Numeric pass threshold:** temp holds `a.s19`, `b.hex`, `c.mac`, `d.a2l`, `d.a2l.json` and `e.txt` → 4 rows (`a.s19`, `b.hex`, `c.mac`, `d.a2l`), 0 rows for `d.a2l.json` or `e.txt` (1 list equality); an AST check → 1 loadable-suffix predicate, read by `refresh_files` and by the Load dialog's files section (1 assertion).
@@ -2518,7 +2519,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.5 — A typed project folder path loads the project (L-2)
 - **Traceability:** HLR-172a · trace: `_load_path_from_user_input`, `_route_load_project`, `_handle_load_project`, `_project_folder_refusal` (`app.py`); `resolve_input_path` (`workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83, LED-2026-10-26-batch-100.84
-- **Statement (EARS event):** When the absolute path typed into Load names a project folder of this work area, the system shall load that project.
+- **Statement:** (EARS event) When the absolute path typed into Load names a project folder of this work area, the system shall load that project.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-38 — `pytest tests/test_b100_recents.py -k tc_b100_38`
 - **Numeric pass threshold:** project `ab` (a `project.json` and `firmware.s19`): `<workarea>/ab`, `<workarea>/temp/../ab`, `<workarea>` spelled in upper case followed by `/ab`, and `<workarea>/AB` → 4 loads of `ab` (`current_project == "ab"`, the on-disk name, 1 line naming `ab` loaded each). A project folder is §1.3's Project; the typed path is normalised lexically, and no link is followed before the link check (LLR-172.5d). The folder is matched by listing, not by spelling: the typed last component must equal (on Windows after `os.path.normcase`) the name of a folder the project list (`list_projects`) lists, and the load uses that on-disk name. The two case arms are Windows only (case-insensitive file system), reported not run on the Linux CI.
@@ -2528,7 +2529,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.5a — A typed `project.json` path loads its project
 - **Traceability:** HLR-172a · trace: `_load_path_from_user_input` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
-- **Statement (EARS event):** When the absolute path typed into Load names the `project.json` of a project folder of this work area, the system shall load that project.
+- **Statement:** (EARS event) When the absolute path typed into Load names the `project.json` of a project folder of this work area, the system shall load that project.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-38 — `pytest tests/test_b100_recents.py -k tc_b100_38`
 - **Numeric pass threshold:** `<workarea>/ab/project.json` and `<workarea>/ab/PROJECT.JSON` → 2 loads of `ab`; `<workarea>/ab/flows/project.json` → 0 loads, 1 line holding `not a project` (its folder is not a project folder). The `PROJECT.JSON` arm is Windows only (case-insensitive file system), reported not run on the Linux CI.
@@ -2538,7 +2539,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.5b — A typed folder inside the work area that is not a project is refused (S-01)
 - **Traceability:** HLR-172a · trace: `_load_path_from_user_input` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83, LED-2026-10-26-batch-100.84
-- **Statement (EARS unwanted):** If the absolute path typed into Load names a folder inside this work area that is not a project folder, then the system shall load nothing and paint the `not a project` and `pick a project in the list` tokens.
+- **Statement:** (EARS unwanted) If the absolute path typed into Load names a folder inside this work area that is not a project folder, then the system shall load nothing and paint the `not a project` and `pick a project in the list` tokens.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-38 — `pytest tests/test_b100_recents.py -k tc_b100_38`
 - **Numeric pass threshold:** a folder is matched by listing, not by spelling (LLR-172.5): a typed last component that equals no name the project list lists is not a project folder, and the project list never lists a reserved home. `<workarea>/temp`, `<workarea>/TEMP` and `<workarea>/patches` (reserved homes; `temp` holding a work copy), `<workarea>/temp::$INDEX_ALLOCATION` (a stream spelling of `temp`), `<workarea>/TEMPLA~1` (the 8.3 name of `templates`, holding a file), `<workarea>/temp.` (a trailing dot), an empty folder `<workarea>/empty`, the sub-folder `<workarea>/ab/flows` and `<workarea>` itself → 0 project loads, 0 files written, 1 line holding both tokens each (9 of 9) (Q9; E3 S9-1). The `TEMP`, stream, 8.3 and trailing-dot arms are Windows only (case-insensitive file system, Win32 name rules); the 8.3 arm is reported not run when the volume makes no 8.3 names; each is reported not run on the Linux CI. A project typed by its 8.3 name is refused the same way (declared: fail closed).
@@ -2548,7 +2549,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.5c — A typed folder outside the work area is refused
 - **Traceability:** HLR-172a · trace: `_load_path_from_user_input`, `_project_folder_refusal` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
-- **Statement (EARS unwanted):** If the absolute path typed into Load names a folder outside this work area, or the `project.json` of such a folder, then the system shall load nothing and paint the `outside the work area` and `copy the folder into the work area` tokens.
+- **Statement:** (EARS unwanted) If the absolute path typed into Load names a folder outside this work area, or the `project.json` of such a folder, then the system shall load nothing and paint the `outside the work area` and `copy the folder into the work area` tokens.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-38 — `pytest tests/test_b100_recents.py -k tc_b100_38`
 - **Numeric pass threshold:** `<tmp>/elsewhere/P` holding a `project.json` and an image, that folder's `project.json`, another work area's project `<tmp>/other/.s19tool/workarea/R`, and the base folder → 0 project loads, 0 files written, 1 line holding both tokens each (4 of 4). This is LLR-171.4f's typed arm.
@@ -2558,7 +2559,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.5d — A typed folder path through a link or junction is refused
 - **Traceability:** HLR-172a · trace: `_load_path_from_user_input`, `_project_folder_refusal` (`app.py`); `_is_reparse_point` (`workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
-- **Statement (EARS unwanted):** If the absolute folder or `project.json` path typed into Load passes through a symbolic link or junction inside this work area, then the system shall load nothing and paint the `link or junction` and `pick a project in the list` tokens.
+- **Statement:** (EARS unwanted) If the absolute folder or `project.json` path typed into Load passes through a symbolic link or junction inside this work area, then the system shall load nothing and paint the `link or junction` and `pick a project in the list` tokens.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-38 — `pytest tests/test_b100_recents.py -k tc_b100_38`
 - **Numeric pass threshold:** `<workarea>/alias` (a junction to `<workarea>/ab`), `<workarea>/alias/project.json`, and `<workarea>/sub/P` with `<workarea>/sub` a junction to another work area → 0 project loads, 0 session resets, 1 line holding both tokens each (3 of 3). This is LLR-171.4e's typed arm.
@@ -2568,7 +2569,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.5e — A typed file with no or an unsupported suffix is refused
 - **Traceability:** HLR-172a · trace: `_load_path_from_user_input` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.84
-- **Statement (EARS unwanted):** If the path typed into Load names a file whose suffix is missing or is not a supported data or A2L suffix, then the system shall load nothing and paint the `not a supported file` and `check the path` tokens.
+- **Statement:** (EARS unwanted) If the path typed into Load names a file whose suffix is missing or is not a supported data or A2L suffix, then the system shall load nothing and paint the `not a supported file` and `check the path` tokens.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-38 — `pytest tests/test_b100_recents.py -k tc_b100_38`
 - **Numeric pass threshold:** `<tmp>/firmware` (no suffix), `<tmp>/notes.txt` and `<tmp>/x.json` → 0 loads, 0 files copied into `temp/`, 1 line holding both tokens each (3 of 3).
@@ -2578,7 +2579,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.5f — A typed path that does not exist is refused
 - **Traceability:** HLR-172a · trace: `_load_path_from_user_input` (`app.py`); `resolve_input_path` (`workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82
-- **Statement (EARS unwanted):** If the path typed into Load does not exist, then the system shall load nothing and paint the `not found` and `check the path` tokens.
+- **Statement:** (EARS unwanted) If the path typed into Load does not exist, then the system shall load nothing and paint the `not found` and `check the path` tokens.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-38 — `pytest tests/test_b100_recents.py -k tc_b100_38`
 - **Numeric pass threshold:** `<tmp>/missing.s19` and `<workarea>/nope` → 0 loads, 1 line holding both tokens each (2 of 2).
@@ -2588,7 +2589,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.5g — A project load of a name the project list does not list is refused (S-01)
 - **Traceability:** HLR-172a · trace: `_handle_load_project`, `list_projects` (`app.py`); `RESERVED_WORKAREA_HOMES` (`workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
-- **Statement (EARS unwanted):** If a project load is asked for a name that equals no name the project list of this work area lists, then the system shall refuse the load.
+- **Statement:** (EARS unwanted) If a project load is asked for a name that equals no name the project list of this work area lists, then the system shall refuse the load.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-38 — `pytest tests/test_b100_recents.py -k tc_b100_38`
 - **Numeric pass threshold:** names are compared on Windows after `os.path.normcase`; a match loads the listed on-disk name. The project list (`list_projects`, `app.py:12057` at `4fef292`) skips every entry whose case-folded name is in `RESERVED_WORKAREA_HOMES`, so no reserved home is ever listed. `_handle_load_project("temp")`, `("TEMP")`, `("patches")`, `("temp::$INDEX_ALLOCATION")`, `("TEMPLA~1")` (the 8.3 name of `templates`, holding a file) and `("temp.")`, with a work copy in `temp/` → 0 project loads, 0 session resets, 0 files written (`temp/project.json` and `templates/project.json` absent), 1 line holding `not a project` and `pick a project in the list` each (6 of 6); `("AB")` for the project `ab` → 1 load, `current_project == "ab"` (control). The refusal comes after the existing link, outside, unreadable and not-found refusals (LLR-171.4e, LLR-171.4f), so their tokens are unchanged. Every arm except `temp` and `patches` is Windows only (case-insensitive file system, Win32 name rules), reported not run on the Linux CI; the 8.3 arm is reported not run when the volume makes no 8.3 names.
@@ -2598,7 +2599,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.5h — A typed relative folder path is refused
 - **Traceability:** HLR-172a · trace: `_load_path_from_user_input` (`app.py`); `resolve_input_path` (`workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.83
-- **Statement (EARS unwanted):** If a relative path typed into Load names a folder, then the system shall load nothing and paint the `not a supported file` and `check the path` tokens.
+- **Statement:** (EARS unwanted) If a relative path typed into Load names a folder, then the system shall load nothing and paint the `not a supported file` and `check the path` tokens.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-38 — `pytest tests/test_b100_recents.py -k tc_b100_38`
 - **Numeric pass threshold:** "relative" is `not Path(text).is_absolute()` on the typed text (stripped as `resolve_input_path` strips it). With a working folder other than the base folder: `.s19tool/workarea/ab` (found by the base-folder fallback), `.s19tool/workarea/alias` (a junction to `ab`, which the fallback's `resolve()` follows), and the root-relative `\…\.s19tool\workarea\ab` (no drive) → 0 project loads, 0 session resets, 0 files copied into `temp/`, 1 line holding both tokens each (3 of 3). The root-relative and junction arms are Windows only, reported not run on the Linux CI; the junction arm is reported not run when no junction can be made.
@@ -2608,7 +2609,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.5i — A typed path the operating system refuses is refused (CR9-8)
 - **Traceability:** HLR-172a · trace: `_typed_load_route`, `_load_path_from_user_input`; `_load_dialog_verdict` (Inc 9b) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95
-- **Statement (EARS unwanted):** If the text typed into Load holds a character that the operating system's path calls refuse, such as NUL, or names a path whose existence check the operating system refuses, then the system shall load nothing and paint the `not found` and `check the path` tokens.
+- **Statement:** (EARS unwanted) If the text typed into Load holds a character that the operating system's path calls refuse, such as NUL, or names a path whose existence check the operating system refuses, then the system shall load nothing and paint the `not found` and `check the path` tokens.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-38 — `pytest tests/test_b100_recents.py -k tc_b100_38_nul_in_typed_path_is_refused`
 - **Numeric pass threshold:** a typed text whose `Path.exists` is monkeypatched to raise `PermissionError` (EACCES) and one to raise `OSError(ENAMETOOLONG)`, each through the status-line route and through the Load dialog's `#load_reason` (4 arms) → 0 exceptions, 0 loads, the token pair painted (4 of 4). Regression arms, GREEN on the post-9b base: the relative and absolute NUL texts (4 arms) → the same token pair, 0 exceptions.
@@ -2618,7 +2619,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.5j — A name is matched to the project list in one place (CR9-7, match)
 - **Traceability:** HLR-172a · trace: `_listed_project_name` (NEW); `_handle_load_project`, `_typed_load_route` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.96
-- **Statement (EARS ubiquitous):** The system shall decide whether a name matches a listed project in one function.
+- **Statement:** (EARS ubiquitous) The system shall decide whether a name matches a listed project in one function.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-38 — `pytest tests/test_b100_recents.py -k tc_b100_38_one_project_match` (AST), plus every TC-B100-38 arm kept green
 - **Numeric pass threshold:** an AST check → exactly 1 function compares a name against the `list_projects()` result (1 assertion); that function returns the exact listed name first, then the first case-insensitive (`normcase`) match — `["Proj", "proj"]` → `proj` → `proj`, `Proj` → `Proj`, `PROJ` → `Proj` on Windows (SE5-12a-3); the TC-B100-38 and TC-B100-40 arms → 0 failures.
@@ -2628,7 +2629,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.5k — The shared project refusals are worded from one table (CR9-7, wording)
 - **Traceability:** HLR-172a · trace: `_TYPED_REFUSAL_TOKENS` (Inc 9b), `_load_path_from_user_input`, `_handle_load_project`, `_typed_load_route` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.96
-- **Statement (EARS ubiquitous):** The system shall word the `could not be read` and `not a project` project refusals of the status line and of the Load dialog from one table.
+- **Statement:** (EARS ubiquitous) The system shall word the `could not be read` and `not a project` project refusals of the status line and of the Load dialog from one table.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-38 (AST), plus TC-B100-63 kept green
 - **Numeric pass threshold:** an AST check → the two token pairs are defined once, and every painted Load refusal sentence reads one of the two pairs (0 string literals of either reason outside the table, docstrings excluded); no exact site count is asserted, because the count breaks on every future site (A12a-01) (2 assertions).
@@ -2638,7 +2639,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.6 — Workarea Files rows paint names literally (C8)
 - **Traceability:** HLR-172b · trace: `refresh_files` (`app.py`); `painted_names` (`project_gather_service.py:965`); `safe_text` (`utils.py:44`)
 - **Ledger:** LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
-- **Statement (EARS ubiquitous):** The system shall paint the file name of each Workarea Files row with no markup applied, every character of Unicode category Cc, Cf, Zl or Zp removed and every unpaired surrogate replaced by U+FFFD.
+- **Statement:** (EARS ubiquitous) The system shall paint the file name of each Workarea Files row with no markup applied, every character of Unicode category Cc, Cf, Zl or Zp removed and every unpaired surrogate replaced by U+FFFD.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-39 — `pytest tests/test_b100_recents.py -k tc_b100_39`
 - **Numeric pass threshold:** the label is the project's one category scrub, `painted_names([name])` (8b S3R2-4; clipped to 120 characters ending in `…`), painted with markup off. `[bold]x.s19`, `[link=x]a.s19`, `[@click=app.bell]x.s19`, a name holding U+009B, `x` + U+202E + `gpj.s19` (a bidi override) and `a` + U+DC80 + `b.s19` (an unpaired surrogate) → 6 rows whose plain text equals the name with those characters removed (the surrogate as U+FFFD), 0 spans, 0 characters of category Cc, Cf or Cs, 0 raises; a 130-character name → a label of 120 characters ending in `…` (7 of 7). The surrogate arm is reported not run, never passed, where the test cannot create that name.
@@ -2648,7 +2649,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.6a — A picked Workarea Files row loads the file as named on disk
 - **Traceability:** HLR-172b · trace: `refresh_files`, `_load_from_item` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.82, LED-2026-10-26-batch-100.83
-- **Statement (EARS event):** When the engineer picks a Workarea Files row, the system shall load the file whose exact on-disk name that row holds.
+- **Statement:** (EARS event) When the engineer picks a Workarea Files row, the system shall load the file whose exact on-disk name that row holds.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-39 — `pytest tests/test_b100_recents.py -k tc_b100_39`
 - **Numeric pass threshold:** picking the `[bold]x.s19` row, the U+009B row, the U+202E row and the 130-character row (its label clipped) → `current_file.path.name` equals each on-disk name (4 of 4); the row's data is the on-disk name, never the painted label (`painted_names`, LLR-172.6).
@@ -2658,7 +2659,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.6b — A Workarea Files pick that is no longer a regular file loads nothing (SEC9-2)
 - **Traceability:** HLR-172b · trace: `_load_workarea_file` (Inc 9b G1), `_load_from_item` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.96
-- **Statement (EARS unwanted):** If the picked work-area entry is not a regular file when it is picked, a link or another reparse point included, then the system shall load nothing and paint the `not a regular file` and `pick another file` tokens.
+- **Statement:** (EARS unwanted) If the picked work-area entry is not a regular file when it is picked, a link or another reparse point included, then the system shall load nothing and paint the `not a regular file` and `pick another file` tokens.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-39 — `pytest tests/test_b100_recents.py -k tc_b100_39_pick_rechecks_the_entry`
 - **Numeric pass threshold:** list `fw.s19`, then replace it before the pick with (a) a folder `fw.s19`, (b) a junction `fw.s19`, (c) a file symbolic link to a file outside the work area (3 arms; arm (c) needs the symbolic-link privilege and is reported not run, never passed, where the platform cannot make it) → 0 parses (spy on the parse), the token pair painted, the session digest unchanged; through the Workarea Files list and through the Load dialog's `workarea` choice (2 routes; 6 arms in all).
@@ -2668,7 +2669,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-172.6c — A Workarea Files pick larger than the copy cap loads nothing (SEC9-2)
 - **Traceability:** HLR-172b · trace: `_load_workarea_file` (Inc 9b G1); `DEFAULT_COPY_SIZE_CAP_BYTES` (`workspace.py`, read only) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.96
-- **Statement (EARS unwanted):** If the picked work-area file is larger than the work-area copy size cap when it is picked, then the system shall load nothing and paint the `too large to open` token with the file name and the `load a smaller file` token.
+- **Statement:** (EARS unwanted) If the picked work-area file is larger than the work-area copy size cap when it is picked, then the system shall load nothing and paint the `too large to open` token with the file name and the `load a smaller file` token.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-39 — `pytest tests/test_b100_recents.py -k tc_b100_39_pick_over_cap_is_refused`
 - **Numeric pass threshold:** the cap read at call time, patched to 1 024 bytes → a 1 025-byte `big.s19` → 0 parses, the tokens painted; a 1 024-byte `edge.s19` → loaded (2 arms).
@@ -2678,7 +2679,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.1 — The dialog closes with one `LoadChoice`
 - **Traceability:** HLR-173 · trace: `LoadChoice` (NEW, B100-I8), the Load dialog class (NEW, `screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.12, LED-2026-10-26-batch-100.86
-- **Statement (EARS ubiquitous):** The system shall close the Load dialog with either no result or one `LoadChoice(kind, value)` whose `kind` is one of `project`, `workarea`, `recent` and `path`.
+- **Statement:** (EARS ubiquitous) The system shall close the Load dialog with either no result or one `LoadChoice(kind, value)` whose `kind` is one of `project`, `workarea`, `recent` and `path`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-40 — `pytest tests/test_b100_load_dialog.py -k tc_b100_40`
 - **Numeric pass threshold:** A load from each section and from the path field → 4 dismiss values, each a `LoadChoice` of the matching kind, `value` the on-disk project name, the on-disk work-area file name, the recorded path text or the typed text respectively (4 of 4).
@@ -2689,7 +2690,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.1a — A project choice opens the project through the project route
 - **Traceability:** HLR-173c · trace: `_handle_load_dialog`, `_route_load_project` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS event):** When the Load dialog closes with a `project` choice, the system shall load that project through the route that opens the Load-result panel.
+- **Statement:** (EARS event) When the Load dialog closes with a `project` choice, the system shall load that project through the route that opens the Load-result panel.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-40 — `pytest tests/test_b100_load_dialog.py -k tc_b100_40`
 - **Numeric pass threshold:** `LoadChoice("project", "ab")` → `current_project == "ab"` and 1 `LoadResultScreen` on the stack (2 of 2).
@@ -2699,7 +2700,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.1b — A work-area choice loads that file as the list pick does
 - **Traceability:** HLR-173c · trace: `_handle_load_dialog`, `_load_from_item`, `load_selected_file`, `load_a2l_from_path` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS event):** When the Load dialog closes with a `workarea` choice, the system shall load the named file of `workarea/temp` as the Workarea Files list's pick of that name loads it.
+- **Statement:** (EARS event) When the Load dialog closes with a `workarea` choice, the system shall load the named file of `workarea/temp` as the Workarea Files list's pick of that name loads it.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-40 — `pytest tests/test_b100_load_dialog.py -k tc_b100_40`
 - **Numeric pass threshold:** `LoadChoice("workarea", "x.s19")` → `current_file.path == <workarea>/temp/x.s19`, 0 calls to `copy_into_workarea` (spy, the data arm only), and the set of names in `temp/` unchanged.
@@ -2712,7 +2713,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.1c — A path choice takes the typed-path route
 - **Traceability:** HLR-173c · trace: `_handle_load_dialog`, `_load_path_from_user_input`, `_typed_load_route` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS event):** When the Load dialog closes with a `path` choice, the system shall load the typed text through the typed-path route.
+- **Statement:** (EARS event) When the Load dialog closes with a `path` choice, the system shall load the typed text through the typed-path route.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-40 — `pytest tests/test_b100_load_dialog.py -k tc_b100_40`
 - **Numeric pass threshold:** typed `<tmp>/a.s19`, `<tmp>/b.a2l` and `<workarea>/ab` (absolute) → 1 data load, 1 A2L attach and 1 project load of `ab` (3 of 3).
@@ -2722,7 +2723,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.1e — One router receives every Load dialog result
 - **Traceability:** HLR-173 · trace: `_handle_load_dialog`, `action_load_file`, `action_load_project` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS ubiquitous):** The system shall pass every Load dialog result to one app handler.
+- **Statement:** (EARS ubiquitous) The system shall pass every Load dialog result to one app handler.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-40 — `pytest tests/test_b100_load_dialog.py -k tc_b100_40`
 - **Numeric pass threshold:** AST census of `s19_app/tui/app.py`: every `push_screen` call whose first argument constructs the Load dialog passes `self._handle_load_dialog` as its callback. That gives 2 sites (`action_load_file`, `action_load_project`), 2 of 2, and 0 other callbacks.
@@ -2735,7 +2736,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.1f — A recent choice loads the recorded path unchanged
 - **Traceability:** HLR-173b · trace: `_handle_load_dialog`, `_load_path_from_user_input`, `load_from_path`, `load_a2l_from_path` (`app.py`); `resolve_input_path` (`workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86, LED-2026-10-26-batch-100.87
-- **Statement (EARS event):** When the Load dialog closes with a `recent` choice, the system shall load the recorded path text, with no change, through the typed-path route.
+- **Statement:** (EARS event) When the Load dialog closes with a `recent` choice, the system shall load the recorded path text, with no change, through the typed-path route.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-40 — `pytest tests/test_b100_load_dialog.py -k tc_b100_40`
 - **Numeric pass threshold:** A recent `C:\…\src\fw.s19` → 1 data load, and `fw.s19`'s work copy is installed.
@@ -2749,7 +2750,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.1g — An unreadable picked project paints one status line and does not crash
 - **Traceability:** HLR-173 · trace: `_handle_load_project`, `_list_project_files` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86, LED-2026-10-26-batch-100.87
-- **Statement (EARS unwanted):** If the picked project cannot be read (`OSError`), then the system shall paint one status line with `could not be read`, keep the session unchanged, and not crash.
+- **Statement:** (EARS unwanted) If the picked project cannot be read (`OSError`), then the system shall paint one status line with `could not be read`, keep the session unchanged, and not crash.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-40 — `pytest tests/test_b100_load_dialog.py -k tc_b100_40`
 - **Numeric pass threshold:** `PermissionError` injected into `_list_project_files` of a listed project, then `enter` → 1 status line holding `could not be read`, 0 raises, the session digest unchanged (1 of 1).
@@ -2759,7 +2760,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.2 — `l` and `ctrl+l` open the dialog on the path field
 - **Traceability:** HLR-173 · trace: `action_load_file`, `BINDINGS` (`app.py`); the Load dialog (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.18, LED-2026-10-26-batch-100.36, LED-2026-10-26-batch-100.86
-- **Statement (EARS event):** When the engineer presses `l` or `ctrl+l` on the main screen, the system shall open the Load dialog with the focus on `#load_path`.
+- **Statement:** (EARS event) When the engineer presses `l` or `ctrl+l` on the main screen, the system shall open the Load dialog with the focus on `#load_path`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
 - **Numeric pass threshold:** `l` → the dialog open and `focused.id == "load_path"`; `ctrl+l` → the same (2 of 2); `#load_list` exists in that dialog (1).
@@ -2771,7 +2772,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.2a — `p` opens the dialog on the list
 - **Traceability:** HLR-173 · trace: `action_load_project`, `on_button_pressed` (`#ws_load_project_button`) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS event):** When the engineer presses `p` on the main screen or activates `#ws_load_project_button`, the system shall open the Load dialog with the focus on `#load_list`.
+- **Statement:** (EARS event) When the engineer presses `p` on the main screen or activates `#ws_load_project_button`, the system shall open the Load dialog with the focus on `#load_list`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
 - **Numeric pass threshold:** `p` → `focused.id == "load_list"`; the button → the same; `p` in a work area with 0 projects → the dialog opens and the projects section paints `no projects` (3 of 3).
@@ -2783,7 +2784,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.2b — The list opens on the open project
 - **Traceability:** HLR-173 · trace: the Load dialog `on_mount` (`screens.py`); `current_project` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS event):** When the Load dialog opens with the focus on `#load_list`, the system shall highlight the open project's row, or the first project row when no project is open.
+- **Statement:** (EARS event) When the Load dialog opens with the focus on `#load_list`, the system shall highlight the open project's row, or the first project row when no project is open.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
 - **Numeric pass threshold:** 3 of 3 — Projects `A`, `P`, `Z` with `P` open, then `p` → `P`'s row highlighted.
@@ -2795,7 +2796,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.2c — `tab` order
 - **Traceability:** HLR-173 · trace: the Load dialog compose order and focus chain (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS event):** When the engineer presses `tab` in the Load dialog, the system shall move the focus along `#load_path`, `#load_list`, `#load_preview`, `#load_ok`, `#load_cancel` and back to `#load_path`.
+- **Statement:** (EARS event) When the engineer presses `tab` in the Load dialog, the system shall move the focus along `#load_path`, `#load_list`, `#load_preview`, `#load_ok`, `#load_cancel` and back to `#load_path`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
 - **Numeric pass threshold:** from `#load_path`, 5 `tab` presses → the focused ids in that order, ending on `#load_path` (5 of 5); `shift+tab` → the reverse order (5 of 5).
@@ -2805,7 +2806,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.2d — A printable key in the list types into the path field
 - **Traceability:** HLR-173 · trace: the Load dialog `on_key` (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS event):** When the engineer types a printable character while `#load_list` has the focus, the system shall move the focus to `#load_path` and append that character to its text.
+- **Statement:** (EARS event) When the engineer types a printable character while `#load_list` has the focus, the system shall move the focus to `#load_path` and append that character to its text.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
 - **Numeric pass threshold:** 6 of 6 — Each of `p`, `l`, `q`, `s`, `r` and `?` pressed with the list focused and the field empty → `#load_path` holds that one character and has the focus.
@@ -2819,7 +2820,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.2e — App priority keys are inert while the dialog is open
 - **Traceability:** HLR-173 · trace: `BINDINGS` (`priority=True` entries), `check_action` or the four actions (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86, LED-2026-10-26-batch-100.87
-- **Statement (EARS unwanted):** If the engineer presses `ctrl+l`, `ctrl+s`, `ctrl+k` or `ctrl+d` while the Load dialog is open, then the system shall run no app action for that key.
+- **Statement:** (EARS unwanted) If the engineer presses `ctrl+l`, `ctrl+s`, `ctrl+k` or `ctrl+d` while the Load dialog is open, then the system shall run no app action for that key.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
 - **Numeric pass threshold:** each of the 4 keys pressed with the dialog open → the screen stack stays the main screen plus the Load dialog (depth 2), the focus is inside the dialog, and the density and palette are unchanged (4 of 4); `ctrl+p` over the dialog (the command palette opens over it), then `ctrl+s` and `ctrl+l` → 0 Save pushes and 0 second dialogs (the guard reads the whole screen stack, S9b-1) (2 of 2).
@@ -2829,7 +2830,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.2f — A load asked with the list last loads the highlighted row
 - **Traceability:** HLR-173c · trace: the Load dialog `action_load`, `on_button_pressed`, focus tracking (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS event):** When the engineer presses `enter` or `alt+l`, or activates `#load_ok`, while `#load_list` held the focus more recently than `#load_path`, the system shall close the Load dialog with the highlighted row's choice.
+- **Statement:** (EARS event) When the engineer presses `enter` or `alt+l`, or activates `#load_ok`, while `#load_list` held the focus more recently than `#load_path`, the system shall close the Load dialog with the highlighted row's choice.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
 - **Numeric pass threshold:** The 3 triggers × a project, a work-area file and a recent row highlighted → 9 dismisses with the matching `LoadChoice` (9 of 9).
@@ -2840,7 +2841,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.2g — A load asked with the path field last loads the typed text
 - **Traceability:** HLR-173c · trace: the Load dialog `action_load`, `on_input_submitted` (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS event):** When the engineer presses `enter` or `alt+l`, or activates `#load_ok`, while `#load_path` held the focus more recently than `#load_list` and holds a path the typed-path route accepts, the system shall close the Load dialog with a `path` choice of that text.
+- **Statement:** (EARS event) When the engineer presses `enter` or `alt+l`, or activates `#load_ok`, while `#load_path` held the focus more recently than `#load_list` and holds a path the typed-path route accepts, the system shall close the Load dialog with a `path` choice of that text.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
 - **Numeric pass threshold:** a valid typed file path with a row highlighted → the 3 triggers give 3 `path` choices of the text (3 of 3).
@@ -2850,7 +2851,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.2h — An empty typed text is explained
 - **Traceability:** HLR-173d · trace: the Load dialog `action_load` (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS unwanted):** If a load is asked while `#load_path` held the focus more recently than `#load_list` and its text is empty or only spaces, then the system shall keep the Load dialog open and paint `nothing selected` and `pick a row or type a path` in `#load_reason`.
+- **Statement:** (EARS unwanted) If a load is asked while `#load_path` held the focus more recently than `#load_list` and its text is empty or only spaces, then the system shall keep the Load dialog open and paint `nothing selected` and `pick a row or type a path` in `#load_reason`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
 - **Numeric pass threshold:** `""` and `"   "` → 2 token pairs, 0 dismisses, the field text unchanged (2 of 2).
@@ -2860,7 +2861,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.2i — A load with no highlighted row is explained
 - **Traceability:** HLR-173d · trace: the Load dialog `action_load` (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS unwanted):** If a load is asked while `#load_list` held the focus more recently than `#load_path` and no loadable row is highlighted, then the system shall keep the Load dialog open and paint `nothing selected` and `pick a row or type a path` in `#load_reason`.
+- **Statement:** (EARS unwanted) If a load is asked while `#load_list` held the focus more recently than `#load_path` and no loadable row is highlighted, then the system shall keep the Load dialog open and paint `nothing selected` and `pick a row or type a path` in `#load_reason`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
 - **Numeric pass threshold:** An empty work area, an empty temp folder and no store → `p`, then `enter` → 1 token pair, 0 dismisses.
@@ -2871,7 +2872,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.2j — A click selects and never loads
 - **Traceability:** HLR-173 · trace: the Load dialog list message handlers (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS event):** When the engineer clicks a row of `#load_list`, the system shall highlight that row and keep the Load dialog open.
+- **Statement:** (EARS event) When the engineer clicks a row of `#load_list`, the system shall highlight that row and keep the Load dialog open.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
 - **Numeric pass threshold:** 1 click on the second project row → that row highlighted, 0 dismisses; 2 clicks within 300 ms (a double-click) → 0 dismisses (2 of 2).
@@ -2881,7 +2882,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.2k — `escape` closes with no result
 - **Traceability:** HLR-173e · trace: the Load dialog `BINDINGS` / `action_cancel` (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS event):** When the engineer presses `escape` in the Load dialog, the system shall close it with no result.
+- **Statement:** (EARS event) When the engineer presses `escape` in the Load dialog, the system shall close it with no result.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
 - **Numeric pass threshold:** `escape` from `#load_path`, `#load_list`, `#load_preview` and `#load_ok` → 4 dismisses with `None`, the session digest unchanged and the store bytes unchanged (4 of 4).
@@ -2891,7 +2892,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.2l — `#load_cancel` closes with no result
 - **Traceability:** HLR-173e · trace: the Load dialog `on_button_pressed` (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS event):** When the engineer activates `#load_cancel`, the system shall close the Load dialog with no result.
+- **Statement:** (EARS event) When the engineer activates `#load_cancel`, the system shall close the Load dialog with no result.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
 - **Numeric pass threshold:** a click and `enter` on `#load_cancel` → 2 dismisses with `None`, the session digest unchanged (2 of 2).
@@ -2901,7 +2902,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.2m — The key bar and the palette name the two actions "Load" and "Projects"
 - **Traceability:** HLR-173 · trace: `BINDINGS`, `_build_palette_entries` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95
-- **Statement (EARS ubiquitous):** The system shall label the load-file action "Load" and the load-project action "Projects" in the key bar and in the command palette.
+- **Statement:** (EARS ubiquitous) The system shall label the load-file action "Load" and the load-project action "Projects" in the key bar and in the command palette.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41_labels`; `pytest tests/test_b97_key_bar.py`; `pytest tests/test_tui_snapshot.py -m snapshot`
 - **Numeric pass threshold:** 6 assertions, the key-bar re-pins and the 29 snapshot rebaselines (29 of 29; 35 cells):
@@ -2916,7 +2917,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.3 — Project rows are painted literally (C8)
 - **Traceability:** HLR-173 · trace: the dialog rows builder (NEW, `app.py`); `painted_names` (`project_gather_service.py`); `safe_text` (`utils.py`)
 - **Ledger:** LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.86
-- **Statement (EARS ubiquitous):** The system shall paint each project row of the Load dialog literally.
+- **Statement:** (EARS ubiquitous) The system shall paint each project row of the Load dialog literally.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-42 — `pytest tests/test_b100_load_dialog.py -k tc_b100_42`
 - **Numeric pass threshold:** projects named `[b]P`, `[@click=app.bell]Q`, `x` + U+202E + `R` and `a` + U+009B + `S` → 4 rows whose plain text equals the name with the Cc / Cf characters removed, 0 spans, 0 characters of category Cc, Cf or Cs, 0 raises (4 of 4). The U+009B arm is reported not run where the volume refuses that folder name.
@@ -2926,7 +2927,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.3a — Work-area file rows are painted literally (C8)
 - **Traceability:** HLR-173 · trace: the dialog rows builder (NEW, `app.py`); `painted_names`; `safe_text`
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS ubiquitous):** The system shall paint each work-area file row of the Load dialog literally.
+- **Statement:** (EARS ubiquitous) The system shall paint each work-area file row of the Load dialog literally.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-42 — `pytest tests/test_b100_load_dialog.py -k tc_b100_42`
 - **Numeric pass threshold:** The six hostile names of LLR-172.6 (each given a loadable suffix) → 6 literal rows, 0 spans, 0 Cc / Cf / Cs characters.
@@ -2937,7 +2938,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.3b — Recent rows are painted literally (C8)
 - **Traceability:** HLR-173 · trace: the dialog rows builder (NEW, `app.py`); `painted_names`; `safe_text`
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS ubiquitous):** The system shall paint each recent row of the Load dialog literally.
+- **Statement:** (EARS ubiquitous) The system shall paint each recent row of the Load dialog literally.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-42 — `pytest tests/test_b100_load_dialog.py -k tc_b100_42`
 - **Numeric pass threshold:** store entries `C:\x\[bold]a.s19`, `C:\x\[link=y]b.hex` and `C:\x\[@click=app.bell]c.a2l` (each accepted by the 9a read) → 3 rows with 0 spans whose plain text holds the literal file name (3 of 3).
@@ -2947,7 +2948,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.3c — Preview lines are painted literally (C8)
 - **Traceability:** HLR-173 · trace: the preview builder (NEW, `app.py`); the Load dialog preview pane (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS ubiquitous):** The system shall paint literally every file, variant and problem name shown in the Load dialog's preview.
+- **Statement:** (EARS ubiquitous) The system shall paint literally every file, variant and problem name shown in the Load dialog's preview.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-42 — `pytest tests/test_b100_load_dialog.py -k tc_b100_42`
 - **Numeric pass threshold:** project `P` holding `[b]v.s19`, `[i]m.mac` and `[u]c.a2l` → the preview's plain text holds the 3 literal names and 0 spans come from them; a recent `C:\x\[bold]a.s19` previewed → 0 spans (4 of 4).
@@ -2957,7 +2958,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.3d — A picked row loads the on-disk name, never the label
 - **Traceability:** HLR-173 · trace: the dialog rows builder (NEW, `app.py`); the Load dialog row data (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS event):** When the engineer loads a project or work-area file row, the system shall load the exact on-disk name that row holds.
+- **Statement:** (EARS event) When the engineer loads a project or work-area file row, the system shall load the exact on-disk name that row holds.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-42 — `pytest tests/test_b100_load_dialog.py -k tc_b100_42`
 - **Numeric pass threshold:** the `[b]P` project → `current_project == "[b]P"`; the U+009B file and the 130-character file (label clipped) → `current_file.path.name` equals each on-disk name (3 of 3).
@@ -2967,7 +2968,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.4 — The projects section is the project list
 - **Traceability:** HLR-173 · trace: `list_projects`, the dialog rows builder (NEW) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.18, LED-2026-10-26-batch-100.40, LED-2026-10-26-batch-100.86
-- **Statement (EARS event):** When the Load dialog opens, the system shall list in its projects section exactly the names the project list of this work area returns, in that order.
+- **Statement:** (EARS event) When the Load dialog opens, the system shall list in its projects section exactly the names the project list of this work area returns, in that order.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
 - **Numeric pass threshold:** projects `ab` and `cd`, the reserved folders `temp` and `patches`, and a junction folder `jx` → 2 project rows, `ab` then `cd`. The junction arm is Windows only and is reported not run when no junction can be made.
@@ -2977,7 +2978,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.4a — A folder that is not a project is not listed (§1.3; 9a C4, Q9)
 - **Traceability:** HLR-173 · trace: `list_projects`, `validate_project_files` (`app.py`, `workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS unwanted):** If a direct child folder of this work area holds no `project.json`, no data file and no A2L file, then the system shall leave it out of the Load dialog's projects section.
+- **Statement:** (EARS unwanted) If a direct child folder of this work area holds no `project.json`, no data file and no A2L file, then the system shall leave it out of the Load dialog's projects section.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
 - **Numeric pass threshold:** An empty folder `e` and a folder `n` holding only `notes.txt` → 0 rows.
@@ -2989,7 +2990,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.4b — The files section is the one lister, filtered to loadable files (CR9-11, 9a C7)
 - **Traceability:** HLR-173 · trace: `list_workarea_files`, `recent_kind` (`workspace.py`); the dialog rows builder (NEW, `app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS event):** When the Load dialog opens, the system shall list in its work-area files section each file `list_workarea_files` returns whose suffix maps to a load kind.
+- **Statement:** (EARS event) When the Load dialog opens, the system shall list in its work-area files section each file `list_workarea_files` returns whose suffix maps to a load kind.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`; TC-B100-37 (the census, widened) — `pytest tests/test_b100_recents.py -k tc_b100_37`
 - **Numeric pass threshold:** `temp/` holding `a.s19`, `b.hex`, `c.a2l`, `d.a2l.json`, `e.txt` and the folder `.staging/` → 3 rows, `a.s19`, `b.hex`, `c.a2l`, in the lister's order.
@@ -3004,7 +3005,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.4c — The recents section is the store read
 - **Traceability:** HLR-173 · trace: `read_recent_sources` (`workspace.py`); the dialog rows builder (NEW, `app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS event):** When the Load dialog opens, the system shall list in its recents section each entry the recent-sources read returns, in the returned order.
+- **Statement:** (EARS event) When the Load dialog opens, the system shall list in its recents section each entry the recent-sources read returns, in the returned order.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
 - **Numeric pass threshold:** a store of 3 entries → 3 rows in stored order; a store of 20 → 20 rows; a store of 2 valid entries among 3 the read refuses → 2 rows (3 of 3).
@@ -3014,7 +3015,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.4d — An empty projects section paints its tokens
 - **Traceability:** HLR-173 · trace: the dialog rows builder (NEW, `app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS unwanted):** If the project list returns no name, then the system shall paint `no projects` and `ctrl+s saves a project` in the Load dialog's projects section.
+- **Statement:** (EARS unwanted) If the project list returns no name, then the system shall paint `no projects` and `ctrl+s saves a project` in the Load dialog's projects section.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
 - **Numeric pass threshold:** 0 projects → 1 line holding both tokens, and that line cannot be loaded (LLR-173.2i) (1 of 1).
@@ -3024,7 +3025,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.4e — An empty files section paints its tokens
 - **Traceability:** HLR-173 · trace: the dialog rows builder (NEW, `app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS unwanted):** If the work-area files section has no row, then the system shall paint `no work-area files` and `l loads a file` in it.
+- **Statement:** (EARS unwanted) If the work-area files section has no row, then the system shall paint `no work-area files` and `l loads a file` in it.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
 - **Numeric pass threshold:** an empty `temp/`, and a `temp/` holding only `d.a2l.json` → 1 token line each (2 of 2).
@@ -3034,7 +3035,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.4f — An empty recents section paints its token
 - **Traceability:** HLR-173 · trace: the dialog rows builder (NEW, `app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS unwanted):** If the recent-sources read returns no entry and no problem, then the system shall paint `no recent sources` in the Load dialog's recents section.
+- **Statement:** (EARS unwanted) If the recent-sources read returns no entry and no problem, then the system shall paint `no recent sources` in the Load dialog's recents section.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
 - **Numeric pass threshold:** no store file; and a `LOCALAPPDATA` that is unset → 1 line holding `no recent sources` each (2 of 2).
@@ -3044,7 +3045,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.4g — A store problem is painted in the recents section
 - **Traceability:** HLR-173 · trace: `read_recent_sources` (`RecentSources.problem`) (`workspace.py`); the dialog rows builder (NEW, `app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS unwanted):** If the recent-sources read reports a problem, then the system shall paint that problem word and its next-step token in the Load dialog's recents section.
+- **Statement:** (EARS unwanted) If the recent-sources read reports a problem, then the system shall paint that problem word and its next-step token in the Load dialog's recents section.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
 - **Numeric pass threshold:** A 65 537-byte store → 1 line holding `too large` and `the next load starts a new list`.
@@ -3056,7 +3057,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.4h — A recent row shows the recorded file name and kind only
 - **Traceability:** HLR-173b · trace: the dialog rows builder (NEW, `app.py`); `RecentEntry` (`workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS ubiquitous):** The system shall paint each recent row as the recorded path's file name followed by the recorded kind.
+- **Statement:** (EARS ubiquitous) The system shall paint each recent row as the recorded path's file name followed by the recorded kind.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
 - **Numeric pass threshold:** `C:\cal\v2\fw.s19` (kind `s19`) → plain text `fw.s19` then `s19`, 0 `●` (1); a 300-character recorded path → a row of 1 line (LLR-173.6n).
@@ -3066,7 +3067,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.4i — A highlighted recent previews the store's facts and nothing else
 - **Traceability:** HLR-173b · trace: the preview builder (NEW, `app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86, LED-2026-10-26-batch-100.87
-- **Statement (EARS event):** When a recent row is highlighted, the system shall paint in the preview its full recorded path, its kind and `checked when loaded`, with no `●`.
+- **Statement:** (EARS event) When a recent row is highlighted, the system shall paint in the preview its full recorded path, its kind and `checked when loaded`, with no `●`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
 - **Numeric pass threshold:** 3 recents highlighted in turn → 3 previews, each holding the full recorded path (the preview's content text, not the clipped painted strip — S9b-8 governs the paint), the kind and `checked when loaded`, 0 `●` (3 of 3).
@@ -3076,7 +3077,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.4j — No filesystem call touches a recent before it is loaded
 - **Traceability:** HLR-173b · trace: the dialog rows builder, the preview builder (NEW, `app.py`); the Load dialog (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS ubiquitous):** The system shall make no filesystem call on a recent entry's path before the engineer loads that row.
+- **Statement:** (EARS ubiquitous) The system shall make no filesystem call on a recent entry's path before the engineer loads that row.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
 - **Numeric pass threshold:** the dialog opened and 3 recents highlighted (one present, one missing, one on an unassigned drive letter `Q:`) → 0 calls naming any of the 3 paths among `os.stat`, `os.lstat`, `os.scandir`, `os.listdir`, `open`, `os.path.exists` and `Path.exists` / `is_file` / `resolve` (a counting spy).
@@ -3086,7 +3087,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.4k — A recent missing on pick is explained inside the dialog
 - **Traceability:** HLR-173b · trace: the dialog verdict callback (NEW), `_typed_load_route` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS unwanted):** If a recent row the engineer loads names a path that does not exist, then the system shall keep the Load dialog open and paint `not found` and `check the path` in `#load_reason`.
+- **Statement:** (EARS unwanted) If a recent row the engineer loads names a path that does not exist, then the system shall keep the Load dialog open and paint `not found` and `check the path` in `#load_reason`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
 - **Numeric pass threshold:** a recent whose file was deleted, then `enter` → 1 token pair, 0 dismisses, 0 loads, the store bytes unchanged (the entry stays; ruling Q3) (1 of 1).
@@ -3096,7 +3097,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.4l — The list order is projects, files, recents
 - **Traceability:** HLR-173 · trace: the Load dialog compose (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS ubiquitous):** The system shall order the Load dialog's list as the projects section, then the work-area files section, then the recents section, each under a heading that cannot be loaded.
+- **Statement:** (EARS ubiquitous) The system shall order the Load dialog's list as the projects section, then the work-area files section, then the recents section, each under a heading that cannot be loaded.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
 - **Numeric pass threshold:** 1 item per section → 6 list lines in the order heading, project, heading, file, heading, recent (6 of 6); the headings read "Projects", "Work area" and "Recent".
@@ -3106,7 +3107,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.4m — An unreadable project list says so in the projects section
 - **Traceability:** HLR-173 · trace: the dialog rows builder (NEW, `app.py`); `list_projects` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS unwanted):** If the project list cannot be read, then the system shall paint `could not be read` and `check that the folder can be opened, then load again` in the Load dialog's projects section, and the other sections still load.
+- **Statement:** (EARS unwanted) If the project list cannot be read, then the system shall paint `could not be read` and `check that the folder can be opened, then load again` in the Load dialog's projects section, and the other sections still load.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
 - **Numeric pass threshold:** `PermissionError` injected into `list_projects` → 1 token line in the projects section, the files and recents sections built as usual, 0 raises, the dialog open (1 of 1).
@@ -3116,7 +3117,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.4n — A linked file in a project folder is neither listed in the Load dialog preview nor installed by a project load
 - **Traceability:** HLR-173a · trace: `_list_project_files`, `_handle_load_project` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86, LED-2026-10-26-batch-100.87
-- **Statement (EARS unwanted):** If a file in a project folder is a link, then the system shall neither list it in the Load dialog preview nor install it in a project load.
+- **Statement:** (EARS unwanted) If a file in a project folder is a link, then the system shall neither list it in the Load dialog preview nor install it in a project load.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-64 — `pytest tests/test_b100_load_dialog.py -k tc_b100_64`
 - **Numeric pass threshold:** a project `P` holding `a.s19` and a symlink `b.s19` (to a regular file), with `active_variant` `b` → 1 preview row (`a.s19`), 1 `●`, and after `enter` 1 install (`a.s19`) and 0 opens of the link target (1 of 1).
@@ -3126,7 +3127,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.5 — A typed path not found is explained inside the dialog (UX-06)
 - **Traceability:** HLR-173d · trace: the dialog verdict callback (NEW), `_typed_load_route` (`app.py`); the Load dialog (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.86, LED-2026-10-26-batch-100.87
-- **Statement (EARS unwanted):** If the engineer asks the Load dialog to load a typed path that does not exist, then the system shall keep the dialog open with the typed text unchanged and paint `not found` and `check the path` in `#load_reason`.
+- **Statement:** (EARS unwanted) If the engineer asks the Load dialog to load a typed path that does not exist, then the system shall keep the dialog open with the typed text unchanged and paint `not found` and `check the path` in `#load_reason`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-63 — `pytest tests/test_b100_load_dialog.py -k tc_b100_63`
 - **Numeric pass threshold:** `<tmp>/missing.s19` and `<workarea>/nope` → 1 token pair each, 0 dismisses, 0 status lines, the field text unchanged (2 of 2). SEC9b-1 (ruling B: refused, not truncated): an over-long paste (40 000 characters, over `#load_path`'s 4096 `max_length`) → the field unchanged and the app stays up; a `resolve_input_path` `ValueError`/`RuntimeError` → `not found` / `check the path`.
@@ -3136,7 +3137,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.5a — A typed unsupported file or relative folder is explained inside the dialog
 - **Traceability:** HLR-173d · trace: the dialog verdict callback (NEW), `_typed_load_route` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86, LED-2026-10-26-batch-100.87
-- **Statement (EARS unwanted):** If the engineer asks the Load dialog to load a typed path that the typed-path route refuses as not a supported file, then the system shall keep the dialog open with the typed text unchanged and paint `not a supported file` and `check the path` in `#load_reason`.
+- **Statement:** (EARS unwanted) If the engineer asks the Load dialog to load a typed path that the typed-path route refuses as not a supported file, then the system shall keep the dialog open with the typed text unchanged and paint `not a supported file` and `check the path` in `#load_reason`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-63 — `pytest tests/test_b100_load_dialog.py -k tc_b100_63`
 - **Numeric pass threshold:** `<tmp>/notes.txt`, `<tmp>/fw.s19.` (trailing dot, CR9-3) and the relative `.s19tool/workarea/ab` → 1 token pair each, 0 dismisses, the field text unchanged (3 of 3).
@@ -3146,7 +3147,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.5b — A typed folder that is not a project is explained inside the dialog
 - **Traceability:** HLR-173d · trace: the dialog verdict callback (NEW), `_typed_load_route` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS unwanted):** If the engineer asks the Load dialog to load a typed folder of this work area that is not a project, then the system shall keep the dialog open with the typed text unchanged and paint `not a project` and `pick a project in the list` in `#load_reason`.
+- **Statement:** (EARS unwanted) If the engineer asks the Load dialog to load a typed folder of this work area that is not a project, then the system shall keep the dialog open with the typed text unchanged and paint `not a project` and `pick a project in the list` in `#load_reason`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-63 — `pytest tests/test_b100_load_dialog.py -k tc_b100_63`
 - **Numeric pass threshold:** `<workarea>/temp`, `<workarea>/TEMP`, an empty `<workarea>/e` and `<workarea>/ab/flows` → 1 token pair each, 0 dismisses, 0 session resets (4 of 4). The `TEMP` arm is Windows only.
@@ -3156,7 +3157,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.5c — A typed folder outside the work area is explained inside the dialog
 - **Traceability:** HLR-173d · trace: the dialog verdict callback (NEW), `_typed_load_route` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS unwanted):** If the engineer asks the Load dialog to load a typed folder, or a typed `project.json`, outside this work area, then the system shall keep the dialog open with the typed text unchanged and paint `outside the work area` and `copy the folder into the work area` in `#load_reason`.
+- **Statement:** (EARS unwanted) If the engineer asks the Load dialog to load a typed folder, or a typed `project.json`, outside this work area, then the system shall keep the dialog open with the typed text unchanged and paint `outside the work area` and `copy the folder into the work area` in `#load_reason`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-63 — `pytest tests/test_b100_load_dialog.py -k tc_b100_63`
 - **Numeric pass threshold:** `<tmp>/P` and `<tmp>/P/project.json` → 1 token pair each, 0 dismisses (2 of 2).
@@ -3166,7 +3167,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.5d — A typed path through a link or junction is explained inside the dialog
 - **Traceability:** HLR-173d · trace: the dialog verdict callback (NEW), `_typed_load_route` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS unwanted):** If the engineer asks the Load dialog to load a typed work-area folder path that passes through a link or junction, then the system shall keep the dialog open with the typed text unchanged and paint `link or junction` and `pick a project in the list` in `#load_reason`.
+- **Statement:** (EARS unwanted) If the engineer asks the Load dialog to load a typed work-area folder path that passes through a link or junction, then the system shall keep the dialog open with the typed text unchanged and paint `link or junction` and `pick a project in the list` in `#load_reason`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-63 — `pytest tests/test_b100_load_dialog.py -k tc_b100_63`
 - **Numeric pass threshold:** `<workarea>/jx` (a junction to `ab`) and `<workarea>/jx/project.json` → 1 token pair each, 0 dismisses, 0 resets (2 of 2). Windows only; reported not run when no junction can be made.
@@ -3176,7 +3177,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.5e — A typed folder that cannot be read is explained inside the dialog
 - **Traceability:** HLR-173d · trace: the dialog verdict callback (NEW), `_typed_load_route` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS unwanted):** If the engineer asks the Load dialog to load a typed work-area folder that cannot be inspected, then the system shall keep the dialog open with the typed text unchanged and paint `could not be read` and `check that the folder can be opened, then load again` in `#load_reason`.
+- **Statement:** (EARS unwanted) If the engineer asks the Load dialog to load a typed work-area folder that cannot be inspected, then the system shall keep the dialog open with the typed text unchanged and paint `could not be read` and `check that the folder can be opened, then load again` in `#load_reason`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-63 — `pytest tests/test_b100_load_dialog.py -k tc_b100_63`
 - **Numeric pass threshold:** `PermissionError` injected into `os.lstat` of a walk prefix, and separately into `list_projects` → 1 token pair each, 0 dismisses, 0 raises (2 of 2). These are the CR9-6 arms painted in the dialog.
@@ -3186,7 +3187,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.6 — A project row's preview marks what `choose_install_set` installs
 - **Traceability:** HLR-173a · trace: `choose_install_set`, `build_variant_set`, `read_project_manifest`, `manifest_is_damaged`, the project preview builder (NEW) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.18, LED-2026-10-26-batch-100.34, LED-2026-10-26-batch-100.40, LED-2026-10-26-batch-100.46, LED-2026-10-26-batch-100.86
-- **Statement (EARS event):** When a project row is highlighted, the system shall mark with `●` in the preview the variant, MAC and A2L that the project-load install rule selects for that project with no variant known to be unreadable.
+- **Statement:** (EARS event) When a project row is highlighted, the system shall mark with `●` in the preview the variant, MAC and A2L that the project-load install rule selects for that project with no variant known to be unreadable.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-64 — `pytest tests/test_b100_load_dialog.py -k tc_b100_64`
 - **Numeric pass threshold:** 4 projects: clean; after a save-back (recorded active ≠ first by name); recorded active missing; A2L-only. Each highlighted, then `enter` → the `●` rows equal the Loaded panel's image, MAC and A2L paths (4 of 4). The A2L-only project marks the A2L only.
@@ -3196,7 +3197,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.6a — A load that installs another variant than the one marked names it
 - **Traceability:** HLR-173a · trace: `_handle_load_project`, `choose_install_set` (`unreadable`), the Load-result composition (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS unwanted):** If a project load installs a variant other than the one the preview marked, then the system shall name the opened variant and the reason in the Load-result panel.
+- **Statement:** (EARS unwanted) If a project load installs a variant other than the one the preview marked, then the system shall name the opened variant and the reason in the Load-result panel.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-64 — `pytest tests/test_b100_load_dialog.py -k tc_b100_64`
 - **Numeric pass threshold:** a project whose recorded active variant is a 0-byte file → the preview marks it (no image is read before Enter); after `enter` the Load-result panel names the next valid variant and `not readable` on the marked one (2 of 2).
@@ -3208,7 +3209,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.6b — A file row's preview marks the file and what the session keeps
 - **Traceability:** HLR-173a · trace: the file preview builder (NEW), the install of a data or A2L load (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS event):** When a work-area file row is highlighted, the system shall mark with `●` in the preview that file and the MAC and A2L the session keeps after loading it.
+- **Statement:** (EARS event) When a work-area file row is highlighted, the system shall mark with `●` in the preview that file and the MAC and A2L the session keeps after loading it.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-64 — `pytest tests/test_b100_load_dialog.py -k tc_b100_64`
 - **Numeric pass threshold:** each case highlighted, then `enter` → the `●` rows equal the Loaded panel's image, MAC and A2L paths:
@@ -3223,7 +3224,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.6c — With a project open, a file row's preview says it becomes the active variant
 - **Traceability:** HLR-173a · trace: the file preview builder (NEW), `current_project` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS state):** While a project is open, the system shall paint, in the preview of a highlighted data-file row, a note that the file becomes that project's active variant.
+- **Statement:** (EARS state) While a project is open, the system shall paint, in the preview of a highlighted data-file row, a note that the file becomes that project's active variant.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-64 — `pytest tests/test_b100_load_dialog.py -k tc_b100_64`
 - **Numeric pass threshold:** project `P` open, S19 row → 1 note naming `P` (painted literally); no project open → 0 notes; project `P` open, A2L row → 0 notes (3 of 3).
@@ -3233,7 +3234,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.6d — A project row's preview lists its variants
 - **Traceability:** HLR-173 · trace: `build_variant_set`, the project preview builder (NEW) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS event):** When a project row's preview read completes, the system shall list every variant of that project in the preview in `build_variant_set` order.
+- **Statement:** (EARS event) When a project row's preview read completes, the system shall list every variant of that project in the preview in `build_variant_set` order.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-64 — `pytest tests/test_b100_load_dialog.py -k tc_b100_64`
 - **Numeric pass threshold:** a project with `b.s19`, `a.s19` and `c.hex` → 3 variant lines in `build_variant_set` order, exactly one carrying `●` (1 of 1).
@@ -3243,7 +3244,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.6f — A project row's preview states the manifest
 - **Traceability:** HLR-173 · trace: `read_project_manifest`, `manifest_is_damaged` (`variant_execution_service.py`, called from `app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS event):** When a project row's preview read completes, the system shall paint the state of that project's `project.json` as `ok`, `no project.json` or `manifest damaged`.
+- **Statement:** (EARS event) When a project row's preview read completes, the system shall paint the state of that project's `project.json` as `ok`, `no project.json` or `manifest damaged`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-64 — `pytest tests/test_b100_load_dialog.py -k tc_b100_64`
 - **Numeric pass threshold:** a valid manifest → `ok`; none → `no project.json`; a 1 MiB + 1 byte manifest → `manifest damaged` (3 of 3).
@@ -3253,7 +3254,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.6k — A project preview that cannot be read says so
 - **Traceability:** HLR-173 · trace: the project preview builder (NEW) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS unwanted):** If a project's preview read raises an `OSError`, then the system shall paint `could not be read` and `check that the folder can be opened, then load again` in the preview, with no `●`.
+- **Statement:** (EARS unwanted) If a project's preview read raises an `OSError`, then the system shall paint `could not be read` and `check that the folder can be opened, then load again` in the preview, with no `●`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-64 — `pytest tests/test_b100_load_dialog.py -k tc_b100_64`
 - **Numeric pass threshold:** `PermissionError` injected into the folder listing and, separately, into the manifest read → 1 token pair each, 0 `●`, 0 raises, the dialog open (2 of 2).
@@ -3263,7 +3264,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.6l — The dialog reads nothing itself
 - **Traceability:** HLR-173 · trace: the Load dialog (`screens.py`); its callables (NEW, `app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS ubiquitous):** The system shall give the Load dialog its rows, its previews and its typed-path verdicts only through callables from `app.py`.
+- **Statement:** (EARS ubiquitous) The system shall give the Load dialog its rows, its previews and its typed-path verdicts only through callables from `app.py`.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-64 — `pytest tests/test_b100_load_dialog.py -k tc_b100_64`
 - **Numeric pass threshold:** AST census: the Load dialog class references 0 names bound by imports from `s19_app.tui.services.*`, `s19_app.tui.workspace` or `os` / `pathlib` filesystem calls.
@@ -3275,7 +3276,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.6m — The panes stack below 100 columns
 - **Traceability:** HLR-173 · trace: the Load dialog `on_resize` (`screens.py`); `#load_dialog` rules (`styles.tcss`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS state):** While the terminal is narrower than 100 columns, the system shall place the Load dialog's preview below its list.
+- **Statement:** (EARS state) While the terminal is narrower than 100 columns, the system shall place the Load dialog's preview below its list.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-64 — `pytest tests/test_b100_load_dialog.py -k tc_b100_64`
 - **Numeric pass threshold:** at 99 columns → the preview's region starts below the list's region (`preview.y >= list.y + list.height`); at 100 and 118 → the preview's region starts right of the list (`preview.x >= list.x + list.width`) (3 of 3); a resize from 118 to 99 with the dialog open → stacked (1).
@@ -3285,7 +3286,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.6n — A list row never wraps
 - **Traceability:** HLR-173 · trace: the Load dialog rows (`screens.py`); `#load_list` rules (`styles.tcss`)
 - **Ledger:** LED-2026-10-26-batch-100.86
-- **Statement (EARS ubiquitous):** The system shall paint each row of `#load_list` on one terminal line.
+- **Statement:** (EARS ubiquitous) The system shall paint each row of `#load_list` on one terminal line.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-64 — `pytest tests/test_b100_load_dialog.py -k tc_b100_64`
 - **Numeric pass threshold:** a 120-character project name, a 130-character file name and a 300-character recent path, at 99, 100 and 118 columns → every row's region height is 1 (9 of 9).
@@ -3295,7 +3296,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-173.7 — Painted text carries no internal decision id
 - **Traceability:** HLR-173
 - **Ledger:** LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.86, LED-2026-10-26-batch-100.89, LED-2026-10-26-batch-100.92, LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.98
-- **Statement (EARS ubiquitous):** No string painted by a surface this batch adds or changes — the Load dialog, the load question, the Save dialog, the busy indicator, the Load-result panel and the refusal tokens — shall carry an internal decision id (`D<n>`, `O-<n>`, `VS-…`, `LLR-…`, `HLR-…`).
+- **Statement:** (EARS ubiquitous) No string painted by a surface this batch adds or changes — the Load dialog, the load question, the Save dialog, the busy indicator, the Load-result panel and the refusal tokens — shall carry an internal decision id (`D<n>`, `O-<n>`, `VS-…`, `LLR-…`, `HLR-…`).
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-66 — `pytest tests/test_b100_load_dialog.py -k tc_b100_66` (renders each surface at 118×54 and greps its painted text)
 - **Numeric pass threshold:** Written at Inc 9b: the Load dialog in 6 scenarios (each section highlighted, the empty Load, a refused path, a store problem), the Load-result panel and the refusal-token constants → 0 matches of `\bD\d+\b`, `\bO-\d+`, `VS-`, `LLR-`, `HLR-`.
@@ -3306,7 +3307,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.1 — An image replacement asks exactly when the image is unsaved
 - **Traceability:** HLR-174, HLR-174a · trace: `_confirm_then_load` (NEW, B100-I20), the load guard (NEW, `app.py`); `ChangeService.differs_from_last_saved` (`change_service.py`)
 - **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.3, LED-2026-10-26-batch-100.17, LED-2026-10-26-batch-100.89
-- **Statement (EARS event):** When a route requests an image replacement, the system shall ask the question if and only if the loaded image differs from the copy last loaded or written.
+- **Statement:** (EARS event) When a route requests an image replacement, the system shall ask the question if and only if the loaded image differs from the copy last loaded or written.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-44 — `pytest tests/test_b100_load_question.py -k tc_b100_44`
 - **Numeric pass threshold:** 14 of 14 arms:
@@ -3322,7 +3323,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.1a — An attach never asks
 - **Traceability:** HLR-174a · trace: the load guard (NEW, `app.py`); `_merge_mac_with_existing_primary`, `load_a2l_from_path` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS event):** When a route requests a MAC or A2L attach, the system shall attach the file without the question.
+- **Statement:** (EARS event) When a route requests a MAC or A2L attach, the system shall attach the file without the question.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-44 — `pytest tests/test_b100_load_question.py -k tc_b100_44`
 - **Numeric pass threshold:** 10 of 10 arms:
@@ -3336,7 +3337,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.1b — A project load asks when any of the three flags is set
 - **Traceability:** HLR-174, HLR-174a · trace: the load guard (NEW, `app.py`); `ChangeService.differs_from_last_saved`; `FlowBuilderPanel.is_dirty` (`flow_screens.py`, unchanged); `PatchEditorPanel.is_dirty` (NEW, LLR-174.1c)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS event):** When a route requests a project load, the system shall ask the question if and only if the image is unsaved, the Flow Builder is dirty or the Patch Editor is dirty.
+- **Statement:** (EARS event) When a route requests a project load, the system shall ask the question if and only if the image is unsaved, the Flow Builder is dirty or the Patch Editor is dirty.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-44 — `pytest tests/test_b100_load_question.py -k tc_b100_44`
 - **Numeric pass threshold:** 10 of 10 arms:
@@ -3351,7 +3352,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.1c — The Patch Editor flag is read through a public reader
 - **Traceability:** HLR-174 · trace: `PatchEditorPanel.is_dirty` (NEW, `screens_directionb.py`); `_handle_save_dialog` (`app.py`, the E3 R1 read at the 9a tree's `:10576`); the load guard (NEW)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS ubiquitous):** The system shall read the Patch Editor panel's dirty flag only through a public reader of that panel.
+- **Statement:** (EARS ubiquitous) The system shall read the Patch Editor panel's dirty flag only through a public reader of that panel.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-44 — `pytest tests/test_b100_load_question.py -k tc_b100_44`
 - **Numeric pass threshold:** 6 of 6 arms:
@@ -3364,7 +3365,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.2 — One modal with exactly two buttons
 - **Traceability:** HLR-174 · trace: the question modal (NEW, `screens.py`); `_confirm_then_load` (NEW, `app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.3, LED-2026-10-26-batch-100.38, LED-2026-10-26-batch-100.89
-- **Statement (EARS event):** When the guard asks, the system shall show one modal question holding exactly the two buttons `#confirm_yes` and `#confirm_no`.
+- **Statement:** (EARS event) When the guard asks, the system shall show one modal question holding exactly the two buttons `#confirm_yes` and `#confirm_no`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
 - **Numeric pass threshold:** one guarded data load with D → the screen stack grows by 1, the top screen holds 2 `Button` widgets with ids `confirm_yes` and `confirm_no`, 0 other buttons and 0 `Input` / `TextArea` widgets; while it is open, the question itself pushes 0 screens (VS-PB-2, no "save first" key) (4 of 4).
@@ -3374,7 +3375,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.2a — The modal takes its text and labels as parameters
 - **Traceability:** HLR-174 · trace: the question modal `__init__` (NEW, `screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS ubiquitous):** The system shall build the question modal from a title, a question text and two button labels passed to it as parameters.
+- **Statement:** (EARS ubiquitous) The system shall build the question modal from a title, a question text and two button labels passed to it as parameters.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
 - **Numeric pass threshold:** the modal built with the title `Quit?`, the text `A save is running.` and the labels `Quit (y)` / `Stay (n)` → those 4 strings painted, 0 painted `Replace`; `y` → the replace answer and `n` → the cancel answer (6 of 6).
@@ -3384,7 +3385,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.2b — The focus starts on Cancel
 - **Traceability:** HLR-174c · trace: the question modal `AUTO_FOCUS` (NEW, `screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS event):** When the question opens, the system shall put the focus on `#confirm_no`.
+- **Statement:** (EARS event) When the question opens, the system shall put the focus on `#confirm_no`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
 - **Numeric pass threshold:** the question pushed → `focused.id == "confirm_no"` (1 of 1; Q1-2).
@@ -3394,7 +3395,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.2c — `y` answers replace
 - **Traceability:** HLR-174b · trace: the question modal `BINDINGS` (NEW, `screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS event):** When the engineer presses `y` in the question, the system shall close the question with the replace answer.
+- **Statement:** (EARS event) When the engineer presses `y` in the question, the system shall close the question with the replace answer.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
 - **Numeric pass threshold:** `y` with the focus on `#confirm_no` and with the focus on `#confirm_yes` → the replace answer each time (2 of 2).
@@ -3404,7 +3405,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.2d — `n` and `escape` answer cancel
 - **Traceability:** HLR-174c · trace: the question modal `BINDINGS` (NEW, `screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS event):** When the engineer presses `n` or `escape` in the question, the system shall close the question with the cancel answer.
+- **Statement:** (EARS event) When the engineer presses `n` or `escape` in the question, the system shall close the question with the cancel answer.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
 - **Numeric pass threshold:** `n` and `escape`, each with the focus on each button → the cancel answer 4 times (4 of 4).
@@ -3414,7 +3415,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.2e — `enter` acts on the focused button
 - **Traceability:** HLR-174b, HLR-174c · trace: Textual `Button` (`enter` → press); the question modal `on_button_pressed` (NEW, `screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS event):** When the engineer presses `enter` in the question, the system shall give the answer of the focused button.
+- **Statement:** (EARS event) When the engineer presses `enter` in the question, the system shall give the answer of the focused button.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
 - **Numeric pass threshold:** an immediate `enter` → cancel; `tab`, then `enter` → replace; `tab`, `tab`, then `enter` → cancel (3 of 3).
@@ -3424,7 +3425,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.2f — A click answers with the clicked button
 - **Traceability:** HLR-174b, HLR-174c · trace: the question modal `on_button_pressed` (NEW, `screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS event):** When the engineer clicks `#confirm_yes` or `#confirm_no`, the system shall close the question with that button's answer.
+- **Statement:** (EARS event) When the engineer clicks `#confirm_yes` or `#confirm_no`, the system shall close the question with that button's answer.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
 - **Numeric pass threshold:** a click on `#confirm_yes` → replace; a click on `#confirm_no` → cancel (2 of 2).
@@ -3434,7 +3435,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.2g — Any other key leaves the question open
 - **Traceability:** HLR-174 · trace: the question modal `BINDINGS` (NEW, `screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS unwanted):** If the engineer presses a key that no priority binding holds, other than `y`, `n`, `escape`, `enter`, `tab` or `shift+tab`, while the question is open, then the system shall keep the question open with the session unchanged.
+- **Statement:** (EARS unwanted) If the engineer presses a key that no priority binding holds, other than `y`, `n`, `escape`, `enter`, `tab` or `shift+tab`, while the question is open, then the system shall keep the question open with the session unchanged.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
 - **Numeric pass threshold:** `a`, `l`, `p`, `s`, `q` and `space` → the question still the top screen and the session digest unchanged (6 of 6).
@@ -3445,7 +3446,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.2h — The priority keys are inert under the question
 - **Traceability:** HLR-174 · trace: `S19TuiApp.check_action` (`app.py`; the 9b guard `_LOAD_DIALOG_INERT_ACTIONS`); `BINDINGS` (`ctrl+k`, `ctrl+d`, `ctrl+l`, `ctrl+s`, `priority=True`)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS unwanted):** If the engineer presses `ctrl+l`, `ctrl+s`, `ctrl+k` or `ctrl+d` while the question is open, then the system shall keep the question as the top screen and run no app action.
+- **Statement:** (EARS unwanted) If the engineer presses `ctrl+l`, `ctrl+s`, `ctrl+k` or `ctrl+d` while the question is open, then the system shall keep the question as the top screen and run no app action.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
 - **Numeric pass threshold:** each of the 4 keys → the stack depth unchanged, the question on top, 0 calls of `action_load_file`, `action_save_project`, `action_focus_palette` and `action_cycle_density` (spies) (4 of 4).
@@ -3455,7 +3456,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.2i — Names are painted literally
 - **Traceability:** HLR-174d · trace: the question text composer (NEW, `app.py`); `painted_names` (`project_gather_service.py`); the question modal widgets with markup off (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS ubiquitous):** The system shall paint every name in the question literally.
+- **Statement:** (EARS ubiquitous) The system shall paint every name in the question literally.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
 - **Numeric pass threshold:** a loaded image `[b]x.s19`, a flow named `[red]f`, a project `[i]P` as the open project and as the target, and an image name holding U+202E → each painted name equals `painted_names([name])` and the painted text has 0 markup spans (5 of 5).
@@ -3465,7 +3466,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.2j — The Patch Editor's own load keeps its guard
 - **Traceability:** HLR-174 · trace: `LoadGuardScreen`, `PatchEditorPanel.DirtyLoadRequested` (`screens_directionb.py`, unchanged); `on_patch_editor_panel_dirty_load_requested` (`app.py`, unchanged)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS ubiquitous):** The system shall guard the Patch Editor's own document load with its existing dirty-load warning, not with the load question.
+- **Statement:** (EARS ubiquitous) The system shall guard the Patch Editor's own document load with its existing dirty-load warning, not with the load question.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
 - **Numeric pass threshold:** a dirty Patch Editor, then its Load button → 1 `LoadGuardScreen`, 0 load questions (1 of 1).
@@ -3475,7 +3476,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.2k — The title names what is replaced
 - **Traceability:** HLR-174d · trace: the question text composer (NEW, `app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS ubiquitous):** The system shall title the load question `Replace <current>?`, where `<current>` is the open project's name, else the loaded image's file name, else `the current session`.
+- **Statement:** (EARS ubiquitous) The system shall title the load question `Replace <current>?`, where `<current>` is the open project's name, else the loaded image's file name, else `the current session`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
 - **Numeric pass threshold:** project P open → `Replace P?`; no project, image `fw.s19` loaded → `Replace fw.s19?`; neither, a dirty Flow Builder, then a project load → `Replace the current session?` (3 of 3).
@@ -3485,7 +3486,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.2l — The unsaved image is named by its file name
 - **Traceability:** HLR-174d · trace: the question text composer (NEW, `app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS event):** When the guard asks while the image is unsaved, the system shall name the loaded image's file name in the question.
+- **Statement:** (EARS event) When the guard asks while the image is unsaved, the system shall name the loaded image's file name in the question.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
 - **Numeric pass threshold:** D with `fw.s19` loaded → the question text holds `fw.s19`, for a data load and for a project load (2 of 2).
@@ -3495,7 +3496,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.2m — Unsaved Patch Editor work is named
 - **Traceability:** HLR-174d · trace: the question text composer (NEW, `app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS event):** When the guard asks for a project load while the Patch Editor is dirty, the system shall name `Patch Editor entries` in the question.
+- **Statement:** (EARS event) When the guard asks for a project load while the Patch Editor is dirty, the system shall name `Patch Editor entries` in the question.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
 - **Numeric pass threshold:** W only → `Patch Editor entries` present; D only → absent (2 of 2).
@@ -3505,7 +3506,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.2n — Unsaved Flow Builder edits are named
 - **Traceability:** HLR-174d · trace: the question text composer (NEW, `app.py`); `FlowBuilderPanel.current_flow`, `FlowBuilderPanel.is_dirty` (`flow_screens.py`, unchanged)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS event):** When the guard asks for a project load while the Flow Builder is dirty, the system shall name `flow <flow name>` in the question.
+- **Statement:** (EARS event) When the guard asks for a project load while the Flow Builder is dirty, the system shall name `flow <flow name>` in the question.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
 - **Numeric pass threshold:** F with the flow `patch_chain` → `flow patch_chain` present; F with an unnamed flow → `flow flow` (the panel's default name) present; D only → no `flow ` item (3 of 3).
@@ -3515,7 +3516,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.2o — The load target is named
 - **Traceability:** HLR-174d · trace: the question text composer (NEW, `app.py`); `_confirm_then_load` (NEW)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS ubiquitous):** The system shall end the load question with `Load <target> anyway?`, where `<target>` is `project <name>` for a project load and the file name of the requested file otherwise.
+- **Statement:** (EARS ubiquitous) The system shall end the load question with `Load <target> anyway?`, where `<target>` is `project <name>` for a project load and the file name of the requested file otherwise.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
 - **Numeric pass threshold:** a project row `Q` → `Load project Q anyway?`; a typed `<tmp>/b.s19` → `Load b.s19 anyway?`; a Workarea pick `x.hex` → `Load x.hex anyway?`; `v` to `firmware_b` → `Load firmware_b.s19 anyway?` (4 of 4).
@@ -3525,7 +3526,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.2p — The load question's buttons say Replace and Cancel
 - **Traceability:** HLR-174b, HLR-174c · trace: `_confirm_then_load` (NEW, `app.py`); the question modal (NEW, `screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS ubiquitous):** The system shall label the load question's buttons `Replace (y)` on `#confirm_yes` and `Cancel (n)` on `#confirm_no`.
+- **Statement:** (EARS ubiquitous) The system shall label the load question's buttons `Replace (y)` on `#confirm_yes` and `Cancel (n)` on `#confirm_no`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
 - **Numeric pass threshold:** 2 labels painted, each on its id (2 of 2); each shown key pressed acts (the "every shown key is verified" rule, §3 preface) (2 of 2).
@@ -3535,7 +3536,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.2q — The question says the items hold unsaved changes, in two sentences
 - **Traceability:** HLR-174d · trace: the question text composer (NEW, `app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS ubiquitous):** The system shall state in the load question, in at most two sentences, that the named items hold unsaved changes.
+- **Statement:** (EARS ubiquitous) The system shall state in the load question, in at most two sentences, that the named items hold unsaved changes.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
 - **Numeric pass threshold:** with 1, 2 and 3 items → the body holds the token `unsaved changes` once and at most 2 sentence ends (`.` or `?` outside names) (3 of 3).
@@ -3545,7 +3546,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.2r — Both buttons and the body stay on screen
 - **Traceability:** HLR-174 · trace: the question modal box rules (`styles.tcss`); the question modal (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS ubiquitous):** The system shall keep both buttons and the body of the question fully visible: each of the three regions equals its clipped region and lies inside the screen region.
+- **Statement:** (EARS ubiquitous) The system shall keep both buttons and the body of the question fully visible: each of the three regions equals its clipped region and lies inside the screen region.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
 - **Numeric pass threshold:** 3 items whose names are 120 characters long, at 99×54, 118×54 and 220×60 → both buttons and the body fully visible (each region equals its clipped region and lies inside the screen region) (3 of 3); the same at 118×54 with 1 short item (1).
@@ -3555,7 +3556,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.2s — A second answer is ignored
 - **Traceability:** HLR-174 · trace: the question modal `_close` `_dismissed` guard (NEW, `screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS unwanted):** If a second answer reaches the question after the first, then the system shall ignore it.
+- **Statement:** (EARS unwanted) If a second answer reaches the question after the first, then the system shall ignore it.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
 - **Numeric pass threshold:** Q5-1 (`_close(True); _close(False)` in one tick) → 1 callback `True`, 1 pop, 0 exceptions; Q5-2 (`y` then `n` queued) → 1 answer; Q5-3 (the `_dismissed` flag, `escape` returns) → `CB == [False]` (3 of 3).
@@ -3565,7 +3566,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.2t — The Patch Editor's change-file dropdown keeps the guard
 - **Traceability:** HLR-174 · trace: `PatchEditorPanel.ChangeFileSelected`; `on_patch_editor_panel_change_file_selected` (`app.py`); `LoadGuardScreen` (`screens_directionb.py`, unchanged)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS unwanted):** If the engineer picks a change file in the Patch Editor's dropdown while the panel holds unsaved entries, then the system shall show the Patch Editor's load guard before replacing them.
+- **Statement:** (EARS unwanted) If the engineer picks a change file in the Patch Editor's dropdown while the panel holds unsaved entries, then the system shall show the Patch Editor's load guard before replacing them.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-45 — `pytest tests/test_b100_load_question.py -k tc_b100_45`
 - **Numeric pass threshold:** dirty + pick → 1 `LoadGuardScreen`, 0 loads, the entry count and the flag unchanged; clean + pick → 0 guards and the file loads (2 of 2).
@@ -3575,7 +3576,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.3 — The answer comes before the project-session reset
 - **Traceability:** HLR-174b · trace: `_confirm_then_load` (NEW); `_route_load_project`, `_handle_load_project`, `_reset_project_session` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS event):** When the engineer confirms a project load, the system shall run the project-session reset after the answer.
+- **Statement:** (EARS event) When the engineer confirms a project load, the system shall run the project-session reset after the answer.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-46 — `pytest tests/test_b100_load_question.py -k tc_b100_46`
 - **Numeric pass threshold:** `y` on a project load with W → 1 reset call, recorded after the question closed (an order spy on the dismiss and the reset); the same for re-loading the open project (2 of 2).
@@ -3585,7 +3586,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.3a — A cancelled project load runs no reset
 - **Traceability:** HLR-174c · trace: `_confirm_then_load` (NEW); `_reset_project_session` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS unwanted):** If the engineer cancels the question of a project load, then the system shall not run the project-session reset.
+- **Statement:** (EARS unwanted) If the engineer cancels the question of a project load, then the system shall not run the project-session reset.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-46 — `pytest tests/test_b100_load_question.py -k tc_b100_46`
 - **Numeric pass threshold:** `n`, `escape` and an immediate `enter` on a project load with D, F and W → 0 reset calls, the Patch Editor entry count unchanged and the Flow Builder blocks unchanged (3 of 3).
@@ -3595,7 +3596,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.3b — The project-load handler asks nothing
 - **Traceability:** HLR-174 · trace: `_handle_load_project` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS ubiquitous):** The system shall ask no question from inside the project-load handler.
+- **Statement:** (EARS ubiquitous) The system shall ask no question from inside the project-load handler.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-46 — `pytest tests/test_b100_load_question.py -k tc_b100_46`
 - **Numeric pass threshold:** 2 of 2 arms:
@@ -3607,7 +3608,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.3c — A confirmed project load that is then refused keeps the work
 - **Traceability:** HLR-174b, HLR-174c · trace: `_confirm_then_load` (NEW); `_handle_load_project` (`app.py`, the refusals before the reset)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS unwanted):** If a project load that the engineer confirmed is refused before the project-session reset, then the system shall keep the unsaved work.
+- **Statement:** (EARS unwanted) If a project load that the engineer confirmed is refused before the project-session reset, then the system shall keep the unsaved work.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-46 — `pytest tests/test_b100_load_question.py -k tc_b100_46`
 - **Numeric pass threshold:** a listed project `M2` holding 1 data file and 2 MAC files (listed by §1.3; refused by `_list_project_files`), with D and W → `y` → 1 refusal line, 0 reset calls, the session digest unchanged, D still true, the Patch Editor entry count and W unchanged (5 of 5); an A2L-only project `A2LONLY` whose one A2L cannot be read (an ACL deny-read or a lock) → `y` → 1 refusal line `No supported files in project: A2LONLY`, 0 reset calls, `current_file` unchanged, the entry count unchanged and the flag unchanged (5 of 5; probe_sec_refuse).
@@ -3617,7 +3618,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.3d — A cancelled variant switch leaves the pending selection unchanged
 - **Traceability:** HLR-174c · trace: `_handle_select_variant` (`app.py`); `_pending_variant_id`
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS unwanted):** If the engineer cancels the question of a variant switch, then the system shall leave the pending variant selection unchanged.
+- **Statement:** (EARS unwanted) If the engineer cancels the question of a variant switch, then the system shall leave the pending variant selection unchanged.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-46 — `pytest tests/test_b100_load_question.py -k tc_b100_46`
 - **Numeric pass threshold:** `n` on the C40 switch → `_pending_variant_id is None` and `0` `load_from_path` calls; then a `#files_list` pick of `other.s19` answered `y` → after the install `current_file.variant_id is None` and `_variant_set.active_id == "firmware_a"` (2 of 2; C42).
@@ -3627,7 +3628,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.4 — One load seam for every image-replacing route
 - **Traceability:** HLR-174 · trace: `_confirm_then_load` (NEW, B100-I20); `_handle_load_dialog`, `_load_workarea_file`, `_load_from_item`, `_handle_select_variant`, `_route_load_project`, `_load_path_from_user_input` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.17, LED-2026-10-26-batch-100.27, LED-2026-10-26-batch-100.89, LED-2026-10-26-batch-100.98
-- **Statement (EARS ubiquitous):** The system shall pass every image-replacing route through one load guard before the route changes the session.
+- **Statement:** (EARS ubiquitous) The system shall pass every image-replacing route through one load guard before the route changes the session.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-72 — `pytest tests/test_b100_load_question.py -k tc_b100_72`
 - **Numeric pass threshold:** 8 of 8 arms plus the census:
@@ -3640,7 +3641,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.4a — One question per load request
 - **Traceability:** HLR-174 · trace: `_confirm_then_load` (NEW); `_handle_load_dialog`, `_load_path_from_user_input`, `_route_load_project` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS event):** When one load request passes the load guard, the system shall ask at most one question for that request.
+- **Statement:** (EARS event) When one load request passes the load guard, the system shall ask at most one question for that request.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-72 — `pytest tests/test_b100_load_question.py -k tc_b100_72`
 - **Numeric pass threshold:** with D and W: a typed absolute project folder (the router, the typed-path route, then the project route) → 1 question; a recent data path → 1; a project row → 1 (3 of 3). After `y`, 0 further questions until the load ends.
@@ -3650,7 +3651,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.4b — A typed or recent path takes its load kind from the resolved path
 - **Traceability:** HLR-174, HLR-174a · trace: `_load_path_from_user_input`, `_typed_load_route` (`app.py`); `_confirm_then_load` (NEW); `resolve_input_path` (`workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.89, LED-2026-10-26-batch-100.90
-- **Statement (EARS event):** When the Load dialog closes with a `path` or `recent` choice, the system shall take the load kind from the path the typed-path route resolves, not from the typed text: an attach only when the resolved suffix is a MAC suffix and equals the typed suffix, else an image (fail closed).
+- **Statement:** (EARS event) When the Load dialog closes with a `path` or `recent` choice, the system shall take the load kind from the path the typed-path route resolves, not from the typed text: an attach only when the resolved suffix is a MAC suffix and equals the typed suffix, else an image (fail closed).
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-72 — `pytest tests/test_b100_load_question.py -k tc_b100_72`
 - **Numeric pass threshold:** with D and W: typed `.mac` → 0 questions (attach); typed `.a2l` → 0; typed `.s19` → 1 question (image); typed `<W>/P` → 1 question naming `Patch Editor entries` (project); a typed file removed after the dialog's verdict (the classification refuses `not found`) → 0 questions and 1 refusal line; a relative `cal.mac` that is a symlink to a `.s19` → 1 question (the resolved suffix differs, fail closed to image, CR10-01); a plain relative `.mac` → 0 questions and the attach keeps D (CR10-01) (7 of 7).
@@ -3660,7 +3661,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-174.4c — A work-area file takes its load kind from its suffix
 - **Traceability:** HLR-174, HLR-174a · trace: `_load_workarea_file` (9b G1), `_load_from_item` (`app.py`); `_confirm_then_load` (NEW)
 - **Ledger:** LED-2026-10-26-batch-100.89
-- **Statement (EARS event):** When the engineer picks a work-area file, the system shall treat a MAC or A2L file as an attach and any other file as an image replacement.
+- **Statement:** (EARS event) When the engineer picks a work-area file, the system shall treat a MAC or A2L file as an attach and any other file as an image replacement.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-72 — `pytest tests/test_b100_load_question.py -k tc_b100_72`
 - **Numeric pass threshold:** with D: `x.mac`, `c.a2l`, `x.s19` and `x.hex`, from the Load dialog's `workarea` rows and from the Workarea Files list → 0, 0, 1 and 1 questions on each surface (8 of 8).
@@ -3670,7 +3671,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.1 — The target line names the sanitised folder and its kind
 - **Traceability:** HLR-175 · trace: `SaveProjectScreen` name-change handler (`screens.py`); `_prepare_project_save` (NEW), `_save_dialog_preview` (NEW) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.5, LED-2026-10-26-batch-100.92, LED-2026-10-26-batch-100.93
-- **Statement (EARS event):** When the name in the Save project dialog changes, the system shall paint in `#save_where` the sanitised folder name and one kind of `new folder`, `updates the open project`, `merges into an existing project` and `new project in an existing folder`.
+- **Statement:** (EARS event) When the name in the Save project dialog changes, the system shall paint in `#save_where` the sanitised folder name and one kind of `new folder`, `updates the open project`, `merges into an existing project` and `new project in an existing folder`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-47 — `pytest tests/test_b100_save_dialog.py -k tc_b100_47`
 - **Numeric pass threshold:** 7 of 7 target lines:
@@ -3685,7 +3686,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.1a — A reserved name is refused in the dialog
 - **Traceability:** HLR-175b · trace: `_prepare_project_save` (NEW, the HLR-164 reserved rule moved out of `_handle_save_dialog`)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS unwanted):** If the typed name's sanitised form equals a reserved work-area home compared case-folded, then the system shall paint `reserved name` and `choose another name` in the Save project dialog.
+- **Statement:** (EARS unwanted) If the typed name's sanitised form equals a reserved work-area home compared case-folded, then the system shall paint `reserved name` and `choose another name` in the Save project dialog.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-47 — `pytest tests/test_b100_save_dialog.py -k tc_b100_47`
 - **Numeric pass threshold:** `reports`, `CRC`, `Splits`, `FLOWS`, `Temp` → 5 token pairs in the dialog, 0 dismisses on `alt+s`, 0 new paths (5 of 5).
@@ -3695,7 +3696,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.1b — A device name is refused in the dialog
 - **Traceability:** HLR-175b · trace: `_prepare_project_save` (NEW; `is_windows_device_name`, `workspace.py`)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS unwanted):** If the typed name, one of its path components or its sanitised form is a Windows device name compared case-folded, then the system shall paint `device name` and `choose another name` in the Save project dialog.
+- **Statement:** (EARS unwanted) If the typed name, one of its path components or its sanitised form is a Windows device name compared case-folded, then the system shall paint `device name` and `choose another name` in the Save project dialog.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-47 — `pytest tests/test_b100_save_dialog.py -k tc_b100_47`
 - **Numeric pass threshold:** `nul`, `CON`, `com1`, `LPT¹`, `con.txt`, `C O N` → 6 token pairs, 0 dismisses on `alt+s`, 0 new paths (6 of 6).
@@ -3705,7 +3706,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.1c — A disguised clash is refused in the dialog, naming both names
 - **Traceability:** HLR-175b · trace: `_prepare_project_save` (NEW)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS unwanted):** If the typed name's sanitised form equals, compared case-folded, the folder name of a project that is not open while the typed name differs from that folder name, then the system shall paint `already a project`, both names and `choose another name` in the Save project dialog.
+- **Statement:** (EARS unwanted) If the typed name's sanitised form equals, compared case-folded, the folder name of a project that is not open while the typed name differs from that folder name, then the system shall paint `already a project`, both names and `choose another name` in the Save project dialog.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-47 — `pytest tests/test_b100_save_dialog.py -k tc_b100_47`
 - **Numeric pass threshold:** F-merge with another project open: `a b` → 1 line holding `already a project`, `a b`, `ab` and `choose another name`; `AB` → the same tokens naming `AB` and `ab`; `ab` exactly → no refusal and `merges into an existing project` (3 of 3); 0 new paths and the `ab` folder's file digests unchanged after `alt+s` on each refused arm.
@@ -3715,7 +3716,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.1d — A name over 64 characters is refused in the dialog
 - **Traceability:** HLR-175b · trace: `_prepare_project_save` (NEW; `PROJECT_NAME_MAX_CHARS`)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS unwanted):** If the typed name's sanitised form is longer than 64 characters, then the system shall paint `name too long` and `shorten the name` in the Save project dialog.
+- **Statement:** (EARS unwanted) If the typed name's sanitised form is longer than 64 characters, then the system shall paint `name too long` and `shorten the name` in the Save project dialog.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-47 — `pytest tests/test_b100_save_dialog.py -k tc_b100_47`
 - **Numeric pass threshold:** 64 characters → no refusal; 65 and 300 → 2 token pairs, the app running, 0 new paths (3 of 3).
@@ -3725,7 +3726,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.1e — A name that makes the path too long is refused in the dialog
 - **Traceability:** HLR-175b · trace: `_prepare_project_save` (NEW; `_SAVE_FULL_PATH_LIMIT`, `_SAVE_REPORT_SUFFIX_CHARS`)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS unwanted):** If the typed name would make a project file path longer than the path limit, then the system shall paint `path too long` and `shorten the name` in the Save project dialog.
+- **Statement:** (EARS unwanted) If the typed name would make a project file path longer than the path limit, then the system shall paint `path too long` and `shorten the name` in the Save project dialog.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-47 — `pytest tests/test_b100_save_dialog.py -k tc_b100_47`
 - **Numeric pass threshold:** a base path sized so that a name of length L meets the limit exactly → no refusal; length L + 1 → 1 token pair (2 of 2).
@@ -3735,7 +3736,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.1f — A target that is a link or junction is refused in the dialog
 - **Traceability:** HLR-175b · trace: `_prepare_project_save` (NEW; `_project_folder_refusal`)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS unwanted):** If the folder the typed name selects exists as a link or junction, then the system shall paint `link or junction` and `choose another name` in the Save project dialog.
+- **Statement:** (EARS unwanted) If the folder the typed name selects exists as a link or junction, then the system shall paint `link or junction` and `choose another name` in the Save project dialog.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-47 — `pytest tests/test_b100_save_dialog.py -k tc_b100_47`
 - **Numeric pass threshold:** a directory junction `W/jt` (made with `_winapi.CreateJunction`) and `jt` typed → 1 token pair, 0 files written through the junction after `alt+s` (1 of 1; Windows-only arm, counted).
@@ -3745,7 +3746,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.1g — A target that cannot be inspected is refused in the dialog
 - **Traceability:** HLR-175b · trace: `_prepare_project_save` (NEW; `_project_folder_refusal`)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS unwanted):** If the folder the typed name selects cannot be inspected, then the system shall paint `could not be read` and `check that the folder can be opened, then save again` in the Save project dialog.
+- **Statement:** (EARS unwanted) If the folder the typed name selects cannot be inspected, then the system shall paint `could not be read` and `check that the folder can be opened, then save again` in the Save project dialog.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-47 — `pytest tests/test_b100_save_dialog.py -k tc_b100_47`
 - **Numeric pass threshold:** `os.lstat` raising `PermissionError` for the target (the TC-B100-62 fixture pattern) → 1 token pair, 0 dismisses on `alt+s` (1 of 1).
@@ -3755,7 +3756,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.1h — A name with no usable character is refused in the dialog
 - **Traceability:** HLR-175b · trace: `_prepare_project_save` (NEW; `sanitize_project_name`)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS unwanted):** If the typed name holds a character other than a space but its sanitised form is empty, then the system shall paint `name is empty` and `type a project name` in the Save project dialog.
+- **Statement:** (EARS unwanted) If the typed name holds a character other than a space but its sanitised form is empty, then the system shall paint `name is empty` and `type a project name` in the Save project dialog.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-47 — `pytest tests/test_b100_save_dialog.py -k tc_b100_47`
 - **Numeric pass threshold:** `!!!`, `..`, `/` → 3 token pairs painted before Save, 0 dismisses on `alt+s` (3 of 3).
@@ -3765,7 +3766,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.1i — A plan refusal is painted in the dialog
 - **Traceability:** HLR-175b · trace: `_prepare_project_save` (NEW), `_plan_project_save`, `plan_project_save` (`SavePlan.refusal`)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS unwanted):** If the plan for the typed name is refused, then the system shall paint the plan's refusal text, with its reason token and next-step token, in the Save project dialog in place of the summary rows.
+- **Statement:** (EARS unwanted) If the plan for the typed name is refused, then the system shall paint the plan's refusal text, with its reason token and next-step token, in the Save project dialog in place of the summary rows.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-47 — `pytest tests/test_b100_save_dialog.py -k tc_b100_47`
 - **Numeric pass threshold:** a target holding a second MAC file → `already has a MAC file` and `choose another name`; a target holding a second A2L file → `already has an A2L file` and `choose another name`; a save as over 2 000 files → `too many files to copy` and `move files out of the project, then save again` (3 of 3); 0 summary rows painted and 0 new paths after `alt+s` on each.
@@ -3775,7 +3776,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.1j — Too little free space is refused in the dialog
 - **Traceability:** HLR-175b · trace: `_prepare_project_save` (NEW; the free-space check moved out of `_handle_save_dialog`)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS unwanted):** If a save to a new folder needs more bytes than the work area's volume has free, then the system shall paint `not enough free space` and `free disk space or remove files from the project` in the Save project dialog.
+- **Statement:** (EARS unwanted) If a save to a new folder needs more bytes than the work area's volume has free, then the system shall paint `not enough free space` and `free disk space or remove files from the project` in the Save project dialog.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-47 — `pytest tests/test_b100_save_dialog.py -k tc_b100_47`
 - **Numeric pass threshold:** `shutil.disk_usage` stubbed (TC only) to report `plan.total_bytes − 1` free → 1 token pair, 0 dismisses on `alt+s`; exactly `plan.total_bytes` free → no refusal (2 of 2).
@@ -3785,7 +3786,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.1k — A missing source file is refused in the dialog
 - **Traceability:** HLR-175b · trace: `_save_session_inputs` (NEW), `_prepare_project_save` (NEW)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS unwanted):** If a file the session would save no longer exists, then the system shall paint `source file missing`, the file's name and `reload it or remove it from the project` in the Save project dialog.
+- **Statement:** (EARS unwanted) If a file the session would save no longer exists, then the system shall paint `source file missing`, the file's name and `reload it or remove it from the project` in the Save project dialog.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-47 — `pytest tests/test_b100_save_dialog.py -k tc_b100_47`
 - **Numeric pass threshold:** F-fresh with the loaded work copy deleted, then `ctrl+s` → 1 line with the tokens and the name, 0 dismisses on `alt+s`, 0 new paths (1 of 1).
@@ -3795,7 +3796,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.1l — An unreadable source file is refused in the dialog
 - **Traceability:** HLR-175b · trace: `_save_session_inputs` (NEW; `_file_digest`)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS unwanted):** If a file the session would save cannot be read, then the system shall paint `could not be read`, the file's name and `check that the file can be opened, then save again` in the Save project dialog.
+- **Statement:** (EARS unwanted) If a file the session would save cannot be read, then the system shall paint `could not be read`, the file's name and `check that the file can be opened, then save again` in the Save project dialog.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-47 — `pytest tests/test_b100_save_dialog.py -k tc_b100_47`
 - **Numeric pass threshold:** `_file_digest` raising `PermissionError` for the MAC (TC stub) → 1 line with the tokens and the name, 0 dismisses on `alt+s`, the app running (1 of 1).
@@ -3805,7 +3806,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.1m — Blocked document entries are refused in the dialog
 - **Traceability:** HLR-175b · trace: `_decide_project_image` (called once per open by `_save_session_inputs`, NEW)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS unwanted):** If the re-derive of the change document blocks an entry, then the system shall paint the blocked-entries reason token, the blocked addresses and the next-step token in the Save project dialog.
+- **Statement:** (EARS unwanted) If the re-derive of the change document blocks an entry, then the system shall paint the blocked-entries reason token, the blocked addresses and the next-step token in the Save project dialog.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-47 — `pytest tests/test_b100_save_dialog.py -k tc_b100_47`
 - **Numeric pass threshold:** the 1-blocked-entry document of TC-B100-57 (`0x8000007C`) → 1 line holding the reason token, `0x8000007C` and the next-step token; 0 dismisses on `alt+s`; 0 new paths (1 of 1). The tokens are those of the amended §3 row (ruling Q11).
@@ -3815,7 +3816,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.1o — A work area that cannot be listed is refused in the dialog
 - **Traceability:** HLR-175b · trace: `_prepare_project_save` (NEW, the F-1 / P-5 arm)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS unwanted):** If the work area cannot be listed while the Save project dialog prepares a save, then the system shall paint `could not be read` and `check that the folder can be opened, then save again` in the Save project dialog.
+- **Statement:** (EARS unwanted) If the work area cannot be listed while the Save project dialog prepares a save, then the system shall paint `could not be read` and `check that the folder can be opened, then save again` in the Save project dialog.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-47 — `pytest tests/test_b100_save_dialog.py -k tc_b100_47`
 - **Numeric pass threshold:** `os.listdir` (the `Path.iterdir` listing) raising `PermissionError` for the work area → 1 token pair, 0 dismisses on `alt+s`, the app running, 0 new paths (1 of 1).
@@ -3825,7 +3826,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.1p — A case-folded match that is not the open project is a disguised clash
 - **Traceability:** HLR-175b · trace: `_prepare_project_save` (G10, the file-identity test), `_plan_project_save` (the `open` kind test)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS unwanted):** If the typed name's sanitised form equals, compared case-folded, the folder name of a project folder that is not the open project's folder by file identity, while the typed name differs from that folder name, then the system shall paint `already a project`, both names and `choose another name` in the Save project dialog.
+- **Statement:** (EARS unwanted) If the typed name's sanitised form equals, compared case-folded, the folder name of a project folder that is not the open project's folder by file identity, while the typed name differs from that folder name, then the system shall paint `already a project`, both names and `choose another name` in the Save project dialog.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-47 — `pytest tests/test_b100_save_dialog.py -k tc_b100_47`
 - **Numeric pass threshold:** `strasse` open with `straße` present, `strasse` typed → 1 token pair naming both names, 0 dismisses on `alt+s`, 0 files written, `straße/project.json` unchanged (1 of 1; Windows arm).
@@ -3835,7 +3836,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.2 — No parent field
 - **Traceability:** HLR-175e · trace: `SaveProjectScreen.compose` (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.92
-- **Statement (EARS ubiquitous):** The Save project dialog shall compose no `#project_parent_path` widget and no `#save_browse` widget.
+- **Statement:** (EARS ubiquitous) The Save project dialog shall compose no `#project_parent_path` widget and no `#save_browse` widget.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-48 — `pytest tests/test_b100_save_dialog.py -k tc_b100_48`
 - **Numeric pass threshold:** 0 widgets with either id, at both reference sizes (2 of 2).
@@ -3845,7 +3846,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.2a — The dialog's payload names this work area as the parent
 - **Traceability:** HLR-175e · trace: `SaveProjectScreen` save action (`screens.py`), `SaveProjectPayload.parent_folder`
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS event):** When the Save project dialog closes with a payload, the system shall set the payload's parent folder to this work area.
+- **Statement:** (EARS event) When the Save project dialog closes with a payload, the system shall set the payload's parent folder to this work area.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-48 — `pytest tests/test_b100_save_dialog.py -k tc_b100_48`
 - **Numeric pass threshold:** a save through the dialog under a base path of 150 characters → `Path(payload.parent_folder)` equals `app.workarea` (1 equality) and the new folder's parent equals `app.workarea` (2 of 2).
@@ -3855,7 +3856,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.3 — `escape` closes the dialog with no result
 - **Traceability:** HLR-175c · trace: `SaveProjectScreen.BINDINGS`, the cancel action (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.92
-- **Statement (EARS event):** When the engineer presses `escape` in the Save project dialog, the system shall dismiss the dialog with no result.
+- **Statement:** (EARS event) When the engineer presses `escape` in the Save project dialog, the system shall dismiss the dialog with no result.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-49 — `pytest tests/test_b100_save_dialog.py -k tc_b100_49`
 - **Numeric pass threshold:** `escape` from each of the 4 focus positions → 4 dismisses with `None`, 0 new paths, the session digest unchanged (4 of 4).
@@ -3865,7 +3866,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.3a — Cancel closes the dialog with no result
 - **Traceability:** HLR-175c · trace: `SaveProjectScreen.on_button_pressed` (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS event):** When the engineer presses `#save_cancel`, the system shall dismiss the Save project dialog with no result.
+- **Statement:** (EARS event) When the engineer presses `#save_cancel`, the system shall dismiss the Save project dialog with no result.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-49 — `pytest tests/test_b100_save_dialog.py -k tc_b100_49`
 - **Numeric pass threshold:** a click and a focused `enter` on `#save_cancel`, each with a valid name typed → 2 dismisses with `None`, 0 new paths (2 of 2).
@@ -3875,7 +3876,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.3b — An empty Save keeps the dialog open and says why
 - **Traceability:** HLR-175d · trace: `SaveProjectScreen` save action (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS unwanted):** If the engineer confirms Save while the name field holds no character other than spaces, then the system shall keep the Save project dialog open and paint `name is empty` and `type a project name` in `#save_where`.
+- **Statement:** (EARS unwanted) If the engineer confirms Save while the name field holds no character other than spaces, then the system shall keep the Save project dialog open and paint `name is empty` and `type a project name` in `#save_where`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-49 — `pytest tests/test_b100_save_dialog.py -k tc_b100_49`
 - **Numeric pass threshold:** `""` and `"   "`, each with `alt+s`, `#save_ok` and `enter` → 6 token pairs, 0 dismisses, 0 new paths (6 of 6).
@@ -3885,7 +3886,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.3c — Confirming Save closes the dialog and runs the save
 - **Traceability:** HLR-175a · trace: `SaveProjectScreen.BINDINGS` (`alt+s`), the save action, `on_input_submitted`, `on_button_pressed` (`screens.py`); `_handle_save_dialog` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS event):** When the engineer confirms Save while the painted plan is the plan for the typed name and is not refused, the system shall close the Save project dialog and run the save.
+- **Statement:** (EARS event) When the engineer confirms Save while the painted plan is the plan for the typed name and is not refused, the system shall close the Save project dialog and run the save.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-49 — `pytest tests/test_b100_save_dialog.py -k tc_b100_49`
 - **Numeric pass threshold:** F-fresh, `fresh1` typed, the summary painted, then each of `alt+s`, a `#save_ok` click and `enter` in `#project_name` (3 fresh apps) → 1 dismiss each and 1 folder `fresh1` holding the plan's files (3 of 3).
@@ -3895,7 +3896,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.3d — The dialog opens with the focus in the name field
 - **Traceability:** HLR-175f · trace: `SaveProjectScreen.AUTO_FOCUS` / `on_mount` (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS event):** When the Save project dialog opens, the system shall place the focus on `#project_name`.
+- **Statement:** (EARS event) When the Save project dialog opens, the system shall place the focus on `#project_name`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-49 — `pytest tests/test_b100_save_dialog.py -k tc_b100_49`
 - **Numeric pass threshold:** `ctrl+s` and the palette entry → `app.focused.id == "project_name"` (2 of 2).
@@ -3905,7 +3906,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.3e — Plain letters stay in the name field
 - **Traceability:** HLR-175f · trace: `SaveProjectScreen.BINDINGS` (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS ubiquitous):** The system shall deliver every printable key pressed while `#project_name` has the focus to the name field.
+- **Statement:** (EARS ubiquitous) The system shall deliver every printable key pressed while `#project_name` has the focus to the name field.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-49 — `pytest tests/test_b100_save_dialog.py -k tc_b100_49`
 - **Numeric pass threshold:** `s`, `q`, `l`, `p`, `v`, `y` typed → the field holds `sqlpvy`, the stack depth stays 2, 0 status lines added (1 of 1).
@@ -3915,7 +3916,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.3f — Save during a refusal keeps the dialog open
 - **Traceability:** HLR-175b · trace: `SaveProjectScreen` save action (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS unwanted):** If the engineer confirms Save while the plan for the typed name is refused, then the system shall keep the Save project dialog open with `#save_ok` focusable and the refusal's token pair painted.
+- **Statement:** (EARS unwanted) If the engineer confirms Save while the plan for the typed name is refused, then the system shall keep the Save project dialog open with `#save_ok` focusable and the refusal's token pair painted.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-49 — `pytest tests/test_b100_save_dialog.py -k tc_b100_49`
 - **Numeric pass threshold:** a disguised clash, then `alt+s`, then `tab` to `#save_ok` and `enter` → 0 dismisses, `#save_ok.can_focus` is true and `#save_ok` gains the focus, the pair painted after each press, 0 new paths (1 of 1).
@@ -3925,7 +3926,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.3g — App priority keys are inert while the dialog is open
 - **Traceability:** HLR-175f · trace: `S19TuiApp.check_action` (`app.py`; the Inc 9b guard, S-g, widened by one screen class)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS unwanted):** If the engineer presses `ctrl+l`, `ctrl+s`, `ctrl+k` or `ctrl+d` while the Save project dialog is open, then the system shall run no app action for that key.
+- **Statement:** (EARS unwanted) If the engineer presses `ctrl+l`, `ctrl+s`, `ctrl+k` or `ctrl+d` while the Save project dialog is open, then the system shall run no app action for that key.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-49 — `pytest tests/test_b100_save_dialog.py -k tc_b100_49`
 - **Numeric pass threshold:** each of the 4 keys pressed with the dialog open → the screen stack stays the main screen plus the Save dialog (depth 2), the focus stays inside the dialog, the `#workspace_body` density class is unchanged and the palette stays closed (4 of 4). Declared: `ctrl+k` and `ctrl+d` then reach the name field's own line-editing bindings (Textual 8.2.8 `Input`: delete to the end, delete right), which is the field's behaviour, not an app action.
@@ -3935,7 +3936,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.3h — The open project's name is offered, selected
 - **Traceability:** HLR-175f · trace: `SaveProjectScreen.on_mount` (`screens.py`); `action_save_project` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS state):** While a project is open, the system shall open the Save project dialog with that project's on-disk name in `#project_name`, all of it selected.
+- **Statement:** (EARS state) While a project is open, the system shall open the Save project dialog with that project's on-disk name in `#project_name`, all of it selected.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-49 — `pytest tests/test_b100_save_dialog.py -k tc_b100_49`
 - **Numeric pass threshold:** F-open → the field holds `P`, the selection covers all of it, `#save_where` says `updates the open project`; typing `x` → the field holds `x`; F-fresh → the field is empty (3 of 3).
@@ -3945,7 +3946,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.3i — The buttons show their keys
 - **Traceability:** HLR-175f · trace: `SaveProjectScreen.compose` (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS ubiquitous):** The Save project dialog shall label `#save_ok` with `alt+s` and `#save_cancel` with `esc`.
+- **Statement:** (EARS ubiquitous) The Save project dialog shall label `#save_ok` with `alt+s` and `#save_cancel` with `esc`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-49 — `pytest tests/test_b100_save_dialog.py -k tc_b100_49`
 - **Numeric pass threshold:** each label holds its key, and each shown key pressed by key performs its button's action (2 of 2; §3 preface "every shown key is verified by pressing it").
@@ -3955,7 +3956,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.3j — Save project with nothing loaded opens no dialog
 - **Traceability:** HLR-175f · trace: `action_save_project` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS unwanted):** If the engineer asks Save project while no data file and no A2L is loaded, then the system shall open no dialog and paint `Nothing to save` and `load a data file or A2L first` in the status log.
+- **Statement:** (EARS unwanted) If the engineer asks Save project while no data file and no A2L is loaded, then the system shall open no dialog and paint `Nothing to save` and `load a data file or A2L first` in the status log.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-49 — `pytest tests/test_b100_save_dialog.py -k tc_b100_49`
 - **Numeric pass threshold:** a fresh app, `ctrl+s` and the palette entry → stack depth 1, 1 status line with both tokens each, 0 new paths (2 of 2).
@@ -3965,7 +3966,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.4 — The summary rows are the plan's rows
 - **Traceability:** HLR-175 · trace: `_save_dialog_preview` (NEW, `app.py`); `SaveProjectScreen` paint method (`screens.py`); `plan_project_save` (LLR-167.6)
 - **Ledger:** LED-2026-10-26-batch-100.4, LED-2026-10-26-batch-100.15, LED-2026-10-26-batch-100.26, LED-2026-10-26-batch-100.31, LED-2026-10-26-batch-100.37, LED-2026-10-26-batch-100.43, LED-2026-10-26-batch-100.92
-- **Statement (EARS ubiquitous):** The system shall paint in `#save_summary` one row per file row of the painted plan, one row per planned sub-folder with its file count and one row for `project.json`, each with its landing name (and its source name when the two differ) and its action word.
+- **Statement:** (EARS ubiquitous) The system shall paint in `#save_summary` one row per file row of the painted plan, one row per planned sub-folder with its file count and one row for `project.json`, each with its landing name (and its source name when the two differ) and its action word.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-65 — `pytest tests/test_b100_save_dialog.py -k tc_b100_65`
 - **Numeric pass threshold:** 7 of 7 scenarios:
@@ -3978,7 +3979,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.4a — Save executes the painted plan
 - **Traceability:** HLR-175a · trace: `_handle_save_dialog`, `_prepare_project_save` (NEW) (`app.py`); `SaveProjectScreen` save action (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS event):** When the Save project dialog closes with a payload, the system shall execute the plan the dialog painted, with no file row added, removed or renamed; the active CRC template and the batch and assignment documents are copied outside the plan and are not part of its rows.
+- **Statement:** (EARS event) When the Save project dialog closes with a payload, the system shall execute the plan the dialog painted, with no file row added, removed or renamed; the active CRC template and the batch and assignment documents are copied outside the plan and are not part of its rows.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-65 — `pytest tests/test_b100_save_dialog.py -k tc_b100_65`
 - **Numeric pass threshold:** for the 7 scenarios, the plan the handler executes (a spy on the commit step) equals `SaveProjectScreen.plan` read after `alt+s` (dataclass equality, 7 of 7), and the written tree equals that plan by full path and action (0 differences). The document arm: `P` records `patches/changes.json` beside an identical `patches/changes_1.json`; save as `Q` → the painted document row `patches/changes_1.json — keep` equals the tree (base RED: `changes.json new`). The AT-B100-21 oracle excludes the gather homes (the active CRC template and the batch and assignment documents) by name.
@@ -3988,7 +3989,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.4b — A summary out of date at Save is shown again, not saved
 - **Traceability:** HLR-175a · trace: `SaveProjectScreen` save action (`screens.py`); `_prepare_project_save` (NEW, `app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.92, LED-2026-10-26-batch-100.93
-- **Statement (EARS unwanted):** If the engineer confirms Save while the plan for the typed name differs from the painted plan, then the system shall keep the Save project dialog open, paint the current plan and paint `the summary changed` and `check it, then save again`.
+- **Statement:** (EARS unwanted) If the engineer confirms Save while the plan for the typed name differs from the painted plan, then the system shall keep the Save project dialog open, paint the current plan and paint `the summary changed` and `check it, then save again`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-65 — `pytest tests/test_b100_save_dialog.py -k tc_b100_65`
 - **Numeric pass threshold:** 3 of 3 arms:
@@ -4002,7 +4003,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.4c — The image line says emit or copy
 - **Traceability:** HLR-175 · trace: `_plan_project_save` (`SavePlan.image`), `_save_dialog_preview` (NEW)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS ubiquitous):** The system shall paint the painted plan's image description in `#save_summary`: the source plus N change entries with K applied by this save, or an unchanged copy.
+- **Statement:** (EARS ubiquitous) The system shall paint the painted plan's image description in `#save_summary`: the source plus N change entries with K applied by this save, or an unchanged copy.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-65 — `pytest tests/test_b100_save_dialog.py -k tc_b100_65`
 - **Numeric pass threshold:** F-pending (1 entry applied, 0 not applied) → `firmware.s19 + 1 change entry, 0 applied by this save`; F-document (1 pasted entry, not applied) → `+ 1 change entry, 1 applied by this save`; F-fresh → `firmware.s19 unchanged copy` (3 of 3).
@@ -4012,7 +4013,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.4d — The pending line marks unsaved changes
 - **Traceability:** HLR-175 · trace: `_save_dialog_preview` (NEW); `ChangeService.differs_from_last_saved` (B100-I18)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS state):** While the session image differs from the copy last loaded or saved, the system shall paint one line holding `unsaved changes` and the image's name in `#save_summary`.
+- **Statement:** (EARS state) While the session image differs from the copy last loaded or saved, the system shall paint one line holding `unsaved changes` and the image's name in `#save_summary`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-65 — `pytest tests/test_b100_save_dialog.py -k tc_b100_65`
 - **Numeric pass threshold:** F-pending → 1 line; the same session after a Save project → 0 lines; F-fresh → 0 lines; patched, saved, patched again → 1 line (4 of 4).
@@ -4022,7 +4023,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.4e — Skipped links get one row
 - **Traceability:** HLR-175 · trace: `_save_dialog_preview` (NEW); `SavePlan.skipped_links`
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS event):** When the painted plan skips links or junctions, the system shall paint one row holding `links or junctions not copied` and the first 10 of their paths, followed by `and K more` when there are more.
+- **Statement:** (EARS event) When the painted plan skips links or junctions, the system shall paint one row holding `links or junctions not copied` and the first 10 of their paths, followed by `and K more` when there are more.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-65 — `pytest tests/test_b100_save_dialog.py -k tc_b100_65`
 - **Numeric pass threshold:** a save as of P holding 1 directory junction → 1 row naming it; 12 junctions → 1 row naming 10 and `and 2 more` (2 of 2; Windows-only arms, counted).
@@ -4032,7 +4033,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.4f — A merge names the active variant it sets
 - **Traceability:** HLR-175 · trace: `_save_dialog_preview` (NEW; the target's recorded `active_variant` read in the preparation, the image row's landing)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS event):** When the painted plan's target is a merge with an image row, the system shall paint one row holding `active variant`, the variant the save makes active and the variant the target recorded before.
+- **Statement:** (EARS event) When the painted plan's target is a merge with an image row, the system shall paint one row holding `active variant`, the variant the save makes active and the variant the target recorded before.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-65 — `pytest tests/test_b100_save_dialog.py -k tc_b100_65`
 - **Numeric pass threshold:** F-merge where `ab` records `firmware` and the image lands as `firmware_1.s19` → 1 row naming `firmware_1` and `firmware`; after `alt+s`, `ab/project.json` records `active_variant == "firmware_1"` (2 of 2); a merge whose target records no active variant → 1 row naming `none recorded` (1).
@@ -4042,7 +4043,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.4g — Names in the dialog are painted literally
 - **Traceability:** HLR-175 · trace: `_save_dialog_preview` (NEW; `painted_names`), the dialog's widgets with markup off (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.92, LED-2026-10-26-batch-100.93
-- **Statement (EARS ubiquitous):** The system shall paint every name read from disk or typed by the engineer in the Save project dialog literally.
+- **Statement:** (EARS ubiquitous) The system shall paint every name read from disk or typed by the engineer in the Save project dialog literally.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-65 — `pytest tests/test_b100_save_dialog.py -k tc_b100_65`
 - **Numeric pass threshold:** a loaded file named `[b]x.s19`, a sub-folder file `flows/[i]f.json`, a typed name `[red]a` (sanitised `reda`) and a disguised clash typed `[b]a b` against project `bab` → the plain text of each painted line holds the name exactly as `painted_names` returns it, with 0 markup spans; a name holding U+202E → the character absent from the painted text (5 of 5).
@@ -4052,7 +4053,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.4h — Save and Cancel stay visible under a long summary
 - **Traceability:** HLR-175f · trace: the dialog's layout rules (`styles.tcss`); `SaveProjectScreen.compose` (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS state):** While the summary holds more rows than its region shows, the system shall keep `#save_ok` and `#save_cancel` inside the visible screen region.
+- **Statement:** (EARS state) While the summary holds more rows than its region shows, the system shall keep `#save_ok` and `#save_cancel` inside the visible screen region.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-65 — `pytest tests/test_b100_save_dialog.py -k tc_b100_65`
 - **Numeric pass threshold:** a save-as plan of 300 rows (TC builder) at 118×54 and at 220×60 → both buttons' regions inside the screen and of height ≥ 1 (2 of 2).
@@ -4062,7 +4063,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.4i — The last summary row is reachable by keyboard
 - **Traceability:** HLR-175f · trace: `#save_summary` (focusable scroll region, `screens.py`); the focus order
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS ubiquitous):** The system shall let the engineer scroll `#save_summary` to its last row with the keyboard alone.
+- **Statement:** (EARS ubiquitous) The system shall let the engineer scroll `#save_summary` to its last row with the keyboard alone.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-65 — `pytest tests/test_b100_save_dialog.py -k tc_b100_65`
 - **Numeric pass threshold:** the 300-row plan at 118×54: `tab` from `#project_name` gives the focus to `#save_summary`, then `end` → the last row's region is visible (1 of 1); `tab` order `#project_name` → `#save_summary` → `#save_ok` → `#save_cancel` → `#project_name` and the reverse with `shift+tab` (2 of 2).
@@ -4072,7 +4073,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.4j — A summary row never wraps
 - **Traceability:** HLR-175 · trace: `_save_dialog_preview` (NEW); `#save_summary` rules (`styles.tcss`)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS ubiquitous):** The system shall paint each summary row on one line, a cut row ending with `…`.
+- **Statement:** (EARS ubiquitous) The system shall paint each summary row on one line, a cut row ending with `…`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-65 — `pytest tests/test_b100_save_dialog.py -k tc_b100_65`
 - **Numeric pass threshold:** the save-as scenario with a 120-character sub-folder file name at 118×54 → each row's region has height 1 and the cut row's text ends with `…` (all rows; 1 assertion per row).
@@ -4082,7 +4083,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.4k — The painted plan is exposed read-only
 - **Traceability:** HLR-175a · trace: `SaveProjectScreen.plan` (NEW, read-only property, `screens.py`); `SavePlan` (frozen, `project_gather_service.py`)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS ubiquitous):** The system shall expose the painted plan as `SaveProjectScreen.plan`, an immutable value.
+- **Statement:** (EARS ubiquitous) The system shall expose the painted plan as `SaveProjectScreen.plan`, an immutable value.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-65 — `pytest tests/test_b100_save_dialog.py -k tc_b100_65`
 - **Numeric pass threshold:** assigning `plan.rows`, assigning `screen.plan` and appending to `plan.rows` → 3 errors (`FrozenInstanceError`, `AttributeError`, `AttributeError` on a tuple) (3 of 3); `plan` is `None` while no plan is painted (1).
@@ -4092,7 +4093,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.4l — A payload built without the dialog is saved through the same preparation
 - **Traceability:** HLR-175a · trace: `_handle_save_dialog`, `_prepare_project_save` (NEW) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS event):** When `_handle_save_dialog` receives a payload the Save project dialog did not prepare, the system shall prepare the plan for that payload's name and execute it.
+- **Statement:** (EARS event) When `_handle_save_dialog` receives a payload the Save project dialog did not prepare, the system shall prepare the plan for that payload's name and execute it.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-65 — `pytest tests/test_b100_save_dialog.py -k tc_b100_65`, plus the 58 direct calls in 11 test files (§5.4)
 - **Numeric pass threshold:** the same name through the dialog and through a direct `SaveProjectPayload` call on a twin fixture → equal written trees and equal session digests (1 of 1); the 58 direct calls in 11 test files pass unchanged (0 new failures against the gate baseline).
@@ -4102,7 +4103,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.4m — A session built before a load landed is rebuilt
 - **Traceability:** HLR-175a · trace: `_SaveSession.image_generation` (NEW), `_current_save_session`, `_prepare_project_save`, the router (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.93
-- **Statement (EARS event):** When a load lands while the Save project dialog is open, the system shall rebuild the per-open session before any plan or confirm reuse, recording the image generation the session was computed for.
+- **Statement:** (EARS event) When a load lands while the Save project dialog is open, the system shall rebuild the per-open session before any plan or confirm reuse, recording the image generation the session was computed for.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-65 — `pytest tests/test_b100_save_dialog.py -k tc_b100_65`
 - **Numeric pass threshold:** 2 layouts — a load of a same-layout image and of a different-layout image landing under the dialog → the first Save repaints `the summary changed` with the fresh image decision, and the second Save writes an image whose `derived_from.base` names the new file (same ranges) or an unchanged copy of the new file (other ranges), the app running (2 of 2) (SE5-11-1).
@@ -4112,7 +4113,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.5 — The session's image decision and digests are computed once per open
 - **Traceability:** HLR-175 · trace: `_save_session_inputs` (NEW), `action_save_project` (`app.py`); `_decide_project_image`, `_file_digest`
 - **Ledger:** LED-2026-10-26-batch-100.92, LED-2026-10-26-batch-100.93
-- **Statement (EARS event):** When the Save project dialog opens, the system shall compute the image decision and the digests of the session's files once.
+- **Statement:** (EARS event) When the Save project dialog opens, the system shall compute the image decision and the digests of the session's files once.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-65 — `pytest tests/test_b100_save_dialog.py -k tc_b100_65`
 - **Numeric pass threshold:**
@@ -4124,7 +4125,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.5a — The plan is recomputed at most once per 150 ms of typing
 - **Traceability:** HLR-175 · trace: `SaveProjectScreen` name-change handler and its timer (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS event):** When the name in the Save project dialog changes, the system shall recompute the plan no sooner than 150 ms after the previous recomputation and once after the last change.
+- **Statement:** (EARS event) When the name in the Save project dialog changes, the system shall recompute the plan no sooner than 150 ms after the previous recomputation and once after the last change.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-65 — `pytest tests/test_b100_save_dialog.py -k tc_b100_65`
 - **Numeric pass threshold:** 20 keystrokes 10 ms apart → ≤ 3 recomputations, each keystroke echoed in `#project_name` within one frame, and the plan for the final name painted within 300 ms of the last keystroke (3 assertions). A 4 MiB emitting image (any applied entry): each recompute echoes the keystroke within one frame and the final paint ≤ 300 ms — the `emitted_record` is computed once per open, not per recompute (1 of 1).
@@ -4134,7 +4135,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.5b — The dialog appears before the session is computed
 - **Traceability:** HLR-175f · trace: `action_save_project`, `_save_session_inputs` (NEW) (`app.py`); `SaveProjectScreen.on_mount` (`screens.py`)
 - **Ledger:** LED-2026-10-26-batch-100.92
-- **Statement (EARS event):** When the engineer asks Save project, the system shall render the dialog's first frame before it computes the image decision.
+- **Statement:** (EARS event) When the engineer asks Save project, the system shall render the dialog's first frame before it computes the image decision.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-65 — `pytest tests/test_b100_save_dialog.py -k tc_b100_65`
 - **Numeric pass threshold:** a spy on `_decide_project_image` records, at its first call, that `app.screen` is a mounted `SaveProjectScreen` that has completed 1 refresh (1 of 1).
@@ -4144,7 +4145,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-175.6 — One preparation decides what the dialog shows and what the save does
 - **Traceability:** HLR-175b · trace: `_prepare_project_save` (NEW), its two callers (`_save_dialog_preview`, `_handle_save_dialog`) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.92, LED-2026-10-26-batch-100.93
-- **Statement (EARS ubiquitous):** The system shall decide the Save project dialog's refusal and plan and the save's refusal and plan for a name with one function.
+- **Statement:** (EARS ubiquitous) The system shall decide the Save project dialog's refusal and plan and the save's refusal and plan for a name with one function.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-47 — `pytest tests/test_b100_save_dialog.py -k tc_b100_47`
 - **Numeric pass threshold:** 16 of 16 names:
@@ -4157,7 +4158,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.1 — The begin paints the first progress line
 - **Traceability:** HLR-176 · trace: `begin_busy` (NEW), `_busy_line` (NEW, guess) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.11, LED-2026-10-26-batch-100.19, LED-2026-10-26-batch-100.35, LED-2026-10-26-batch-100.39, LED-2026-10-26-batch-100.95
-- **Statement (EARS event):** When a long action begins, the system shall paint in `#status_text` the progress line with the first glyph, the action's label, `step 1/<m>` with the first step's name, and `00:00`.
+- **Statement:** (EARS event) When a long action begins, the system shall paint in `#status_text` the progress line with the first glyph, the action's label, `step 1/<m>` with the first step's name, and `00:00`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-50 — `pytest tests/test_b100_busy.py -k tc_b100_50`
 - **Numeric pass threshold:** a begin with label `Loading x.s19` and steps `Copy into the work area`, `Parse`, `Install` → `#status_text` equals `⠋ Loading x.s19  ·  step 1/3 Copy into the work area  ·  00:00` (1 equality), read in the same frame as the begin.
@@ -4167,7 +4168,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.1a — The begin shows the bar from 0
 - **Traceability:** HLR-176 · trace: `begin_busy`, `set_progress` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95
-- **Statement (EARS event):** When a long action begins, the system shall set `#progress_bar` to 0 of 100.
+- **Statement:** (EARS event) When a long action begins, the system shall set `#progress_bar` to 0 of 100.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-50
 - **Numeric pass threshold:** the bar at 40 before a begin (set by a prior call) → 0 of 100 after it (1 equality).
@@ -4177,7 +4178,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.1b — A step without an amount sets the bar from its index
 - **Traceability:** HLR-176b · trace: `step_busy` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95
-- **Statement (EARS event):** When a running action reaches step `n` of `m` without reporting an amount, the system shall paint `step n/m` with that step's name and set the bar to `floor(100 × (n − 1) / m)`.
+- **Statement:** (EARS event) When a running action reaches step `n` of `m` without reporting an amount, the system shall paint `step n/m` with that step's name and set the bar to `floor(100 × (n − 1) / m)`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-50
 - **Numeric pass threshold:** 4 steps reached in order → `step 1/4` … `step 4/4` painted and the bar at 0, 25, 50, 75 (4 of 4).
@@ -4187,7 +4188,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.1c — A step with an amount moves the bar within the step
 - **Traceability:** HLR-176b · trace: `step_busy` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95
-- **Statement (EARS event):** When a running action's step `n` of `m` reports `done` of `total`, the system shall set the bar to `floor(100 × (n − 1 + done / total) / m)`.
+- **Statement:** (EARS event) When a running action's step `n` of `m` reports `done` of `total`, the system shall set the bar to `floor(100 × (n − 1 + done / total) / m)`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-50
 - **Numeric pass threshold:** step 2 of 2 reporting 1, 2, 3, 4 MiB of 4 MiB → 62, 75, 87, 100 (4 of 4, strictly rising).
@@ -4197,7 +4198,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.1d — Out-of-range step data is clamped
 - **Traceability:** HLR-176b · trace: `step_busy` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95
-- **Statement (EARS unwanted):** If a running action reports a step outside `1 … m`, a `total` of 0 or less, or a `done` outside `0 … total`, then the system shall clamp the step to `1 … m` and the fraction to `0 … 1` without raising.
+- **Statement:** (EARS unwanted) If a running action reports a step outside `1 … m`, a `total` of 0 or less, or a `done` outside `0 … total`, then the system shall clamp the step to `1 … m` and the fraction to `0 … 1` without raising.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-50
 - **Numeric pass threshold:** step 0, step `m + 1`, `total = 0`, `total = −1`, `done = −5`, `done = total + 1` (6 arms) → 0 exceptions, the painted step within `1 … m`, the bar within 0 … 100 and never below the previous value of the same step (6 of 6).
@@ -4207,7 +4208,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.1e — One timer advances the line while an action runs
 - **Traceability:** HLR-176a · trace: `begin_busy`, `_busy_tick` (NEW) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.96
-- **Statement (EARS state):** While at least one long action runs, the system shall keep exactly one 0.1-second interval timer that advances the glyph by one frame and repaints the elapsed time.
+- **Statement:** (EARS state) While at least one long action runs, the system shall keep exactly one 0.1-second interval timer that advances the glyph by one frame and repaints the elapsed time.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-50
 - **Numeric pass threshold:** a synthetic worker action of 1.2 s → at least 5 distinct glyphs and the elapsed text `00:00` then `00:01` (2 assertions); 2 overlapping actions → 1 active timer (the app's timer count rises by 1, not 2).
@@ -4217,7 +4218,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.1f — The timer stops when no action runs
 - **Traceability:** HLR-176a · trace: `end_busy` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.96
-- **Statement (EARS event):** When the last running long action ends, the system shall stop the progress timer.
+- **Statement:** (EARS event) When the last running long action ends, the system shall stop the progress timer.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-50
 - **Numeric pass threshold:** after the last end → 0 progress timers active, and 0.5 s later `#status_text` unchanged (2 assertions).
@@ -4227,7 +4228,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.1g — Elapsed time is minutes and seconds since the begin
 - **Traceability:** HLR-176, HLR-176a · trace: `_busy_line` (guess) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95
-- **Statement (EARS ubiquitous):** The system shall paint the elapsed time of a progress line as `mm:ss` counted from that action's begin, with the minutes not capped at 59.
+- **Statement:** (EARS ubiquitous) The system shall paint the elapsed time of a progress line as `mm:ss` counted from that action's begin, with the minutes not capped at 59.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-50
 - **Numeric pass threshold:** a clock injected at 0, 59.9, 60, 3 599 and 4 503 s → `00:00`, `00:59`, `01:00`, `59:59`, `75:03` (5 of 5).
@@ -4237,7 +4238,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.1h — The file state waits while an action runs
 - **Traceability:** HLR-176d · trace: `set_file_status` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95
-- **Statement (EARS state):** While a long action runs, the system shall store a file state written for `#status_text` as the one stored file-state line instead of painting it.
+- **Statement:** (EARS state) While a long action runs, the system shall store a file state written for `#status_text` as the one stored file-state line instead of painting it.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-50
 - **Numeric pass threshold:** 2 file-state writes during an action → 0 changes to `#status_text` before the end, and the second write kept as the stored file state (2 assertions).
@@ -4247,7 +4248,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.1i — The end writes the outcome to the status log
 - **Traceability:** HLR-176c · trace: `end_busy`, `set_status` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95
-- **Statement (EARS event):** When a long action ends with a non-empty outcome, the system shall append that outcome as one status-log line.
+- **Statement:** (EARS event) When a long action ends with a non-empty outcome, the system shall append that outcome as one status-log line.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-50
 - **Numeric pass threshold:** an end with outcome `Loaded x.s19` → the log's last line is `Loaded x.s19` and the line count rose by 1; an end with an empty outcome → the count unchanged (2 arms).
@@ -4257,7 +4258,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.1j — The last end paints the stored file state
 - **Traceability:** HLR-176c, HLR-176d · trace: `end_busy`, `set_file_status` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95
-- **Statement (EARS event):** When the last running long action ends, the system shall set `#status_text` to the one stored file-state line (the last text a file-state write stored, `Ready.` until the first write).
+- **Statement:** (EARS event) When the last running long action ends, the system shall set `#status_text` to the one stored file-state line (the last text a file-state write stored, `Ready.` until the first write).
 - **Rationale (informative):** A12a-06: one stored `file_state` replaces the three hand-back slots `restore` / `pending` / `final_line`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-50; TC-B100-56 (Inc 12a extension, the project load's file state)
@@ -4268,7 +4269,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.1k — The last end clears the bar
 - **Traceability:** HLR-176c · trace: `end_busy`, `set_progress` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.96
-- **Statement (EARS event):** When the last running long action ends, the system shall clear the progress bar.
+- **Statement:** (EARS event) When the last running long action ends, the system shall clear the progress bar.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-50; re-pinned `tests/test_report_progress.py::test_report_generation_drives_progress_bar_then_clears_it`
 - **Numeric pass threshold:** an action whose last step reported 100 → after the end, progress 0 of total 100 (1 equality); the rendered bar row equals the start-up idle render (1 string comparison).
@@ -4278,7 +4279,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.1l — An exception still ends the indicator
 - **Traceability:** HLR-176c · trace: the 7 actions' bodies (try / finally), `end_busy` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.98
-- **Statement (EARS unwanted):** If a long action raises before its end, then the system shall end that action's progress with a failure outcome before the exception leaves the action.
+- **Statement:** (EARS unwanted) If a long action raises before its end, then the system shall end that action's progress with a failure outcome before the exception leaves the action.
 - **Rationale (informative):** at 12a the app's survival of a raising worker is not claimed; LLR-177.2 (Inc 12b) keeps the app running (ruling Q8).
 - **Note (informative):** Inc 12b (TC-B100-50 arm per worker): the exception exit now also covers the three new worker bodies — a worker-step failure ends its run through its failure handler (the end is the handler's last statement); `_busy_fail` is posted only after a main-thread handler raises, before the worker re-raises.
 - **Validation:** `test (integration)`
@@ -4290,7 +4291,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.1m — A step or an end from an unknown or replaced run leaves the indicator unchanged
 - **Traceability:** HLR-176c · trace: `step_busy`, `end_busy` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95
-- **Statement (EARS unwanted):** If a step or an end names a key that is not running, or comes from a run that a later begin of the same key replaced, then the system shall leave the progress line, the bar and the timer unchanged, while an end with a non-empty outcome still appends that outcome to the status log.
+- **Statement:** (EARS unwanted) If a step or an end names a key that is not running, or comes from a run that a later begin of the same key replaced, then the system shall leave the progress line, the bar and the timer unchanged, while an end with a non-empty outcome still appends that outcome to the status log.
 - **Rationale (informative):** the load, report, diff-report and before/after workers are `exclusive=True` per group, so a second request replaces the first worker while the first thread can still post its end. The log is history, not indicator state (A12a-04).
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-50
@@ -4301,7 +4302,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.1n — A second action begun while one runs is the one shown
 - **Traceability:** HLR-176 · trace: `begin_busy` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95
-- **Statement (EARS unwanted):** If a long action begins while another long action runs, then the system shall show the newer action's progress line and bar.
+- **Statement:** (EARS unwanted) If a long action begins while another long action runs, then the system shall show the newer action's progress line and bar.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-50
 - **Numeric pass threshold:** a report running, then a file load begun → `#status_text` holds the load's progress line and the bar the load's value (2 assertions); the report's later steps change neither (1 assertion).
@@ -4311,7 +4312,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.1o — When a shown action ends, the newest one still running is shown
 - **Traceability:** HLR-176c · trace: `end_busy` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95
-- **Statement (EARS event):** When a running long action ends while another long action still runs, the system shall show the progress line and bar of the most recently begun action still running.
+- **Statement:** (EARS event) When a running long action ends while another long action still runs, the system shall show the progress line and bar of the most recently begun action still running.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-50
 - **Numeric pass threshold:** report begun, load begun, load ends → the report's progress line and bar shown, the load's outcome in the log, the timer still active (3 assertions); then the report ends → LLR-176.1j applies (1 assertion).
@@ -4321,7 +4322,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.1p — A begin under a running key restarts that key's line
 - **Traceability:** HLR-176 · trace: `begin_busy` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95
-- **Statement (EARS unwanted):** If a long action begins under the key of an action that is already running, then the system shall restart that key's progress line at `step 1/<m>` and `00:00`.
+- **Statement:** (EARS unwanted) If a long action begins under the key of an action that is already running, then the system shall restart that key's progress line at `step 1/<m>` and `00:00`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-50
 - **Numeric pass threshold:** a file load at `step 2/3`, `00:01`, then a second file load → `step 1/3` and `00:00`, 1 entry for the key (2 assertions).
@@ -4331,7 +4332,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.1q — Progress widgets are written only on the main thread
 - **Traceability:** HLR-176a · trace: the seam; the 4 worker bodies (`call_from_thread`) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.98
-- **Statement (EARS ubiquitous):** The system shall write `#status_text` and `#progress_bar` only on the main thread.
+- **Statement:** (EARS ubiquitous) The system shall write `#status_text` and `#progress_bar` only on the main thread.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-50
 - **Numeric pass threshold:** a thread-id probe on `#status_text` and `#progress_bar` updates during the 7 worker actions (the 12a four plus the three 12b workers, TC-B100-50) → 0 writes off the main thread (7 of 7).
@@ -4341,7 +4342,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.1r — Names in a progress line are painted literally
 - **Traceability:** HLR-176 · trace: `_busy_begin_action`, `painted_names` (`project_gather_service.py`), `_paint_status_text` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.96
-- **Statement (EARS ubiquitous):** The system shall paint a file or project name inside a progress line, and write the end's outcome line, through the batch's one name scrub and the one `safe_text` choke point, with markup off.
+- **Statement:** (EARS ubiquitous) The system shall paint a file or project name inside a progress line, and write the end's outcome line, through the batch's one name scrub and the one `safe_text` choke point, with markup off.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-50
 - **Numeric pass threshold:** driven through `load_from_path` (the real entry): `[b]x.s19`, `fw` + U+202E + `gpj.s19`, a 130-character name, and `a` + ESC + `]0;x` + BEL + `.s19` → 0 markup spans, 0 U+202E characters, the long name clipped to 120 characters ending in `…`, and the painted line and the end's outcome log line hold no `\x1b` / `\x07` (4 of 4). AST: `begin_busy(` is called only inside `_busy_begin_action` (1 call site).
@@ -4351,7 +4352,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.1s — The bar keeps its row when idle
 - **Traceability:** HLR-176c · trace: `compose` (`#progress_bar`), `styles.tcss` `#progress_bar`
 - **Ledger:** LED-2026-10-26-batch-100.95
-- **Statement (EARS ubiquitous):** The system shall keep the progress bar's row height and the status log's vertical position the same whether or not a long action runs.
+- **Statement:** (EARS ubiquitous) The system shall keep the progress bar's row height and the status log's vertical position the same whether or not a long action runs.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-50
 - **Numeric pass threshold:** at 118×54 and 80×24, idle and during an action → `#progress_bar` region height equal and `#log_line_1` region `y` equal (2 sizes × 2 assertions).
@@ -4361,7 +4362,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.1t — Every status-log line goes through the one control-byte choke point (SE5-12a-1)
 - **Traceability:** HLR-176 · trace: `_append_log_line`, `safe_text` (`utils.py`) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.96
-- **Statement (EARS ubiquitous):** The system shall write every status-log line through `safe_text(...).plain`, so no control code point reaches `log_lines` or the four painted log rows.
+- **Statement:** (EARS ubiquitous) The system shall write every status-log line through `safe_text(...).plain`, so no control code point reaches `log_lines` or the four painted log rows.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-50 — `pytest tests/test_b100_busy.py -k tc_b100_50_control_bytes_never_reach_the_status_log`
 - **Numeric pass threshold:** `_format_coexistence_status` patched to return `Loaded a` + ESC + `]0;x` + BEL + `.s19 (S19 only)`, then a real `load_from_path` → 0 C0/C1 code points in `app.log_lines`, `#log_line_1..4` and `#status_text`, and the scrubbed line `Loaded a]0;x.s19 (S19 only)` arrives; a direct `_append_log_line` of a text holding U+009B and NUL → `direct 2J line` (2 arms).
@@ -4371,7 +4372,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.2 — Every progress-bar write maps to one action (C-31)
 - **Traceability:** HLR-176 · trace: the action table `_BUSY_ACTIONS` (NEW, data); the 12 functions of P-29 (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.11, LED-2026-10-26-batch-100.19, LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.98
-- **Statement (EARS ubiquitous):** Every site that set the progress bar at the Inc 12a baseline shall map to exactly one long action's begin, step or end in the action table.
+- **Statement:** (EARS ubiquitous) Every site that set the progress bar at the Inc 12a baseline shall map to exactly one long action's begin, step or end in the action table.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-51 — `pytest tests/test_b100_busy.py -k tc_b100_51` (an AST derivation over the baseline's `app.py`, stored as a fixture list at E2)
 - **Numeric pass threshold:** the derivation maps 24 of 24 sites (P-29, re-derived at the E2 baseline after Inc 9b, 10 and 11; at least 24) to exactly one begin, step or end (24 of 24, 0 sites mapped twice).
@@ -4382,7 +4383,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.2a — Only the seam sets the bar
 - **Traceability:** HLR-176 · trace: `set_progress`, the seam (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95
-- **Statement (EARS ubiquitous):** The system shall set the progress bar only from inside the progress seam.
+- **Statement:** (EARS ubiquitous) The system shall set the progress bar only from inside the progress seam.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-51 (AST over `app.py`)
 - **Numeric pass threshold:** calls of `set_progress` outside `begin_busy`, `step_busy` and `end_busy`, direct or through `call_from_thread` → 0; `#progress_bar` query sites outside `set_progress` and `compose` → 0 (2 assertions).
@@ -4392,7 +4393,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.2b — The action table names the seven long actions
 - **Traceability:** HLR-176 · trace: `_BUSY_ACTIONS` (NEW) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.96
-- **Statement (EARS ubiquitous):** The action table shall hold one entry, with an English label and at least one named step, for each of file load, A2L load, project load, Save project, report, diff report and before/after.
+- **Statement:** (EARS ubiquitous) The action table shall hold one entry, with an English label and at least one named step, for each of file load, A2L load, project load, Save project, report, diff report and before/after.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-51
 - **Numeric pass threshold:** 7 keys, each with a non-empty label and at least 1 step name (7 of 7); TC-B100-66 finds 0 decision ids in the 7 labels and their step names.
@@ -4402,7 +4403,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.2c — Each action ends on every success and failure exit
 - **Traceability:** HLR-176c · trace: the 7 actions' exits; `_handle_load_error`, `report_failed` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.96, LED-2026-10-26-batch-100.98
-- **Statement (EARS ubiquitous):** Each long action of the action table shall end its progress on every success exit and every failure exit.
+- **Statement:** (EARS ubiquitous) Each long action of the action table shall end its progress on every success exit and every failure exit.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-51
 - **Numeric pass threshold:** per action, 1 success and 1 forced failure (7 × 2 = 14 arms: for example a file that is not found, an A2L of an unsupported type, a project that cannot be read, a placement failure after the save begins, a report write that fails, a diff report on a missing file, a before/after on a missing file; E2 lists the reachable arm per action) → exactly 1 begin and 1 end per arm, 0 indicators left (14 of 14).
@@ -4412,7 +4413,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.2d — Save project reports its phases as steps (Inc 11 ruling Q2, the indicator half)
 - **Traceability:** HLR-176c · trace: `_handle_save_dialog`, `_prepare_project_save` (Inc 11) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.95, LED-2026-10-26-batch-100.96, LED-2026-10-26-batch-100.98
-- **Statement (EARS event):** When Save project runs, the system shall report each save phase named in the action table as one step of its progress line, in order.
+- **Statement:** (EARS event) When Save project runs, the system shall report each save phase named in the action table as one step of its progress line, in order.
 - **Rationale (informative):** Inc 11 ruling Q2 moved "the save runs on a worker with real progress" to 12a+12b. The indicator half is here: the Save project entry, its step reports and its end. Inc 12b moves the save onto a worker (HLR-177), and only then does the line show between the begin and the end. A refused save is refused in the dialog (Inc 11 ruling Q5), so it never begins.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-51
@@ -4423,7 +4424,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.3 — A main-thread step paints its name before its work
 - **Traceability:** HLR-176 · trace: `step_busy` (12a), the `call_after_refresh` idiom (`app.py:8708`); the A2L tag-table build (`update_a2l_view`) and the install steps of the four session actions (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.11, LED-2026-10-26-batch-100.98
-- **Statement (EARS event):** When a long action reaches a step that runs on the main thread, the system shall paint that step's name before the step's work starts.
+- **Statement:** (EARS event) When a long action reaches a step that runs on the main thread, the system shall paint that step's name before the step's work starts.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-52 — `pytest tests/test_b100_a2l_progress.py -k tc_b100_52`
 - **Numeric pass threshold:** the case_06 A2L attach's tag-table step and the case_06 project load's install step → the step text read in a `call_after_refresh` callback scheduled before each step starts equals that step's name (2 equalities); a step on a 1-byte image → 1 equality.
@@ -4434,7 +4435,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.4 — The A2L parser reports the bytes it has consumed
 - **Traceability:** HLR-176 · trace: `parse_a2l_file`, `build_section_tree` (`s19_app/tui/a2l.py`; a named frozen-engine crossing, `docs/ARCHITECTURE.md` §7, chosen by the operator at the PDR gate, C-UX-1 / C-QA-1)
 - **Ledger:** LED-2026-10-26-batch-100.35, LED-2026-10-26-batch-100.98
-- **Statement (EARS ubiquitous):** The system shall report, to an optional progress callback of the A2L parse entry point, the bytes consumed and the total bytes as the parser consumes its input.
+- **Statement:** (EARS ubiquitous) The system shall report, to an optional progress callback of the A2L parse entry point, the bytes consumed and the total bytes as the parser consumes its input.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-73 — `pytest tests/test_b100_a2l_progress.py -k tc_b100_73`
 - **Numeric pass threshold:** the case_06 A2L → ≥ 2 calls, the consumed values non-decreasing, the last equal to the file size (3 of 3); an A2L smaller than one progress chunk → ≥ 1 call, the last equal to the size.
@@ -4444,7 +4445,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.4a — The parse result does not depend on the callback
 - **Traceability:** HLR-176 · trace: `parse_a2l_file` (`s19_app/tui/a2l.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS ubiquitous):** The system shall parse an A2L file to the same result with a progress callback as without one.
+- **Statement:** (EARS ubiquitous) The system shall parse an A2L file to the same result with a progress callback as without one.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-73 — `pytest tests/test_b100_a2l_progress.py -k tc_b100_73`
 - **Numeric pass threshold:** the case_06 A2L parsed with and without a callback → identical results: tag count and every parsed field equal (1 comparison); the same for `examples/case_01_basic_valid/firmware.a2l`.
@@ -4455,7 +4456,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-176.4b — `a2l.py` is frozen again after the increment
 - **Traceability:** HLR-176 · trace: `tests/test_engine_unchanged.py::_ENGINE_PATHS`, TC-027
 - **Ledger:** LED-2026-10-26-batch-100.98, LED-2026-10-26-batch-100.100
-- **Statement (EARS ubiquitous):** The system shall list `s19_app/tui/a2l.py` in the frozen-engine guard's paths.
+- **Statement:** (EARS ubiquitous) The system shall list `s19_app/tui/a2l.py` in the frozen-engine guard's paths.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-73 — `pytest tests/test_b100_a2l_progress.py -k tc_b100_73`; `pytest tests/test_engine_unchanged.py` after the increment merges
 - **Numeric pass threshold:** `_ENGINE_PATHS` contains `s19_app/tui/a2l.py` (1 assertion); after the merge, TC-027 reports 0 changed engine paths against `main`.
@@ -4466,7 +4467,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.1 — The project load reads and parses on a worker
 - **Traceability:** HLR-177 · trace: `_handle_load_project` (changed), the project-load worker (NEW, `@work(thread=True)`), `check_project_files`, `read_project_manifest`, `build_variant_set`, `parse_a2l_file`, `_parse_loaded_file`, `recorded_document_state` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.11, LED-2026-10-26-batch-100.19, LED-2026-10-26-batch-100.38, LED-2026-10-26-batch-100.98
-- **Statement (EARS ubiquitous):** The system shall read and parse a project's files for a project load on a worker thread.
+- **Statement:** (EARS ubiquitous) The system shall read and parse a project's files for a project load on a worker thread.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`
 - **Numeric pass threshold:** a project with data, MAC, A2L and a recorded change document, loaded from the Load dialog → the calls that read the files (the digest check, the manifest read, the A2L parse, each image parse, the document read) each record a thread id other than the main thread's (spies, 5 of 5). The refusals that need no file content (a link, outside, not listed, no data or A2L file) still paint in the frame of the request, before any worker starts (4 of 4).
@@ -4476,7 +4477,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.1a — Save project writes on a worker
 - **Traceability:** HLR-177 · trace: `_handle_save_dialog` (changed: the commit half), the Save worker (NEW, `@work(thread=True)`), `_save_project_files`, `save_patched_image`, `verify_written_image`, `_write_manifest_for_save`, `_abort_save` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS ubiquitous):** The system shall create the project folder, place the files, write the emitted image and write and verify `project.json` for Save project on a worker thread.
+- **Statement:** (EARS ubiquitous) The system shall create the project folder, place the files, write the emitted image and write and verify `project.json` for Save project on a worker thread.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`
 - **Numeric pass threshold:** a patched session saved as a new project → the folder creation, each placement, the image emit and the manifest write record a thread id other than the main thread's (spies, 4 of 4). Every refusal of the Inc 11 preparation (empty, device, reserved, too long, path, clash, link, missing source, plan, free space) paints before any worker starts and creates 0 folders (10 of 10).
@@ -4486,7 +4487,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.1b — Every A2L attach copies and parses on a worker
 - **Traceability:** HLR-177 · trace: `load_a2l_from_path` (changed), `_load_workarea_file` (9b G1, its A2L arm), the A2L worker (NEW, `@work(thread=True)`), `copy_into_workarea`, `parse_a2l_cached` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS ubiquitous):** The system shall copy an attached A2L file into the work area and parse it on a worker thread, on every A2L attach route.
+- **Statement:** (EARS ubiquitous) The system shall copy an attached A2L file into the work area and parse it on a worker thread, on every A2L attach route.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`
 - **Numeric pass threshold:** a typed `.a2l` path, a recent `.a2l` entry, a Workarea Files pick of an `.a2l` file (in place, parse only) and the start-up `load_path` of an `.a2l` → the parse records a thread id other than the main thread's (4 of 4); the three copying routes → the copy records a non-main thread id (3 of 3).
@@ -4496,7 +4497,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.1c — The event loop keeps running during a worker step
 - **Traceability:** HLR-177 · trace: the three workers (NEW); Textual `set_interval` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS state):** While a worker step of the three 12b actions runs, the system shall keep running the main thread's timers.
+- **Statement:** (EARS state) While a worker step of the three 12b actions runs, the system shall keep running the main thread's timers.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`
 - **Numeric pass threshold:** a 0.1 s interval timer started before the request → ≥ 10 ticks between the worker's start and the install for the case_06 project load, and ≥ 10 ticks during the case_06 A2L attach's worker step; a Save project held at a forced slow step for 1.5 s → ≥ 10 ticks (3 of 3).
@@ -4506,7 +4507,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.1d — The session is written only on the main thread
 - **Traceability:** HLR-177 · trace: the three workers and their main-thread install handlers (NEW); `call_from_thread`; `parse_a2l_cached` / `_store_a2l_cache` (the cache write), `_write_manifest_for_save` / `_write_and_verify_manifest` (the `_last_manifest_verify_result` write), `_abort_save` (its session restore), `ChangeService.record_save_entries` / `adopt_rederived` / `mark_saved` (`app.py`, `change_service.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS ubiquitous):** The system shall write the session only on the main thread.
+- **Statement:** (EARS ubiquitous) The system shall write the session only on the main thread.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`
 - **Numeric pass threshold:** a probe that records the thread of every attribute write on the app object (a test subclass overriding `__setattr__`) and of every `ChangeService` method that changes its state, during a project load, a Save project (emitting), an A2L attach and one forced failure of each → 0 writes from a thread other than the main thread (6 runs, 0 off-main writes).
@@ -4516,7 +4517,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.1e — A worker reads only its request
 - **Traceability:** HLR-177 · trace: the three workers (NEW); their request values (NEW, frozen dataclasses) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS ubiquitous):** The system shall give each worker of the three 12b actions everything it reads from the session in an immutable request built on the main thread before the worker starts.
+- **Statement:** (EARS ubiquitous) The system shall give each worker of the three 12b actions everything it reads from the session in an immutable request built on the main thread before the worker starts.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53` (an AST census)
 - **Numeric pass threshold:** AST census of `s19_app/tui/app.py`: the body of each worker function, and of every `app.py` method it calls, holds 0 reads of `self.current_file`, `self.current_project`, `self.current_project_dir`, `self.current_a2l_path`, `self.current_a2l_data`, `self._variant_set` and `self._change_service` (3 workers, 0 reads); each worker takes one request argument whose class is a frozen dataclass (3 of 3).
@@ -4526,7 +4527,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.1f — A project loaded on a worker equals a cold load
 - **Traceability:** HLR-177 · trace: the project-load worker and its install handler (NEW); `_session_snapshot` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS event):** When a project load's worker step completes, the system shall install a session equal to a cold load of that project.
+- **Statement:** (EARS event) When a project load's worker step completes, the system shall install a session equal to a cold load of that project.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`; TC-B100-09 (its P2-over-P1 arm, on the worker path)
 - **Numeric pass threshold:** 3 of 3:
@@ -4540,7 +4541,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.1g — The project session resets after the worker read, before the first install
 - **Traceability:** HLR-177 · trace: `_reset_project_session` (caller moves), the project-load install handler (NEW) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS event):** When a project load's worker step completes, the system shall reset the project session on the main thread before the first install.
+- **Statement:** (EARS event) When a project load's worker step completes, the system shall reset the project session on the main thread before the first install.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`; TC-B100-08 (its one-call-site census, re-pinned to the install handler)
 - **Numeric pass threshold:** call-order spy on a project load → worker step end, then 1 reset on the main thread, then the first install (order 3 of 3); a forced worker failure → 0 resets.
@@ -4550,7 +4551,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.1h — The Load-result panel opens after the install
 - **Traceability:** HLR-177, HLR-178 · trace: `_route_load_project` (changed), the project-load install handler (NEW), `LoadResultScreen` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS event):** When a project load started from a load route completes its install, the system shall open the Load-result panel.
+- **Statement:** (EARS event) When a project load started from a load route completes its install, the system shall open the Load-result panel.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`
 - **Numeric pass threshold:** a project row of the Load dialog, `enter` → 0 `LoadResultScreen` while the worker step is held, 1 after the install (2 of 2); a typed absolute project path → 1 panel after the install; a direct `_handle_load_project` call → 0 panels (LLR-174.3b).
@@ -4560,7 +4561,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.1i — Save project re-derives the image on the main thread before its worker
 - **Traceability:** HLR-177 · trace: `_decide_project_image`, `ChangeService.rederive_for_save`, `render_patched_image` (Inc 11: called by `_prepare_project_save` / the per-open session inputs) (`app.py`, `change_service.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS ubiquitous):** The system shall re-derive and render the image Save project emits on the main thread before the Save worker starts.
+- **Statement:** (EARS ubiquitous) The system shall re-derive and render the image Save project emits on the main thread before the Save worker starts.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`
 - **Numeric pass threshold:** an emitting save → `rederive_for_save` and `render_patched_image` each record the main thread's id, and both calls precede the worker start (order spy, 2 + 2).
@@ -4570,7 +4571,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.1j — Save project adopts the re-derived image after the save commits
 - **Traceability:** HLR-177 · trace: the Save commit handler (NEW), `ChangeService.adopt_rederived` / `mark_saved` (`app.py`, `change_service.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS event):** When the Save worker reports a committed save, the system shall adopt the re-derived image on the main thread.
+- **Statement:** (EARS event) When the Save worker reports a committed save, the system shall adopt the re-derived image on the main thread.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`; `pytest tests/test_b100_save_image.py -k "failed_manifest_write_adopts_nothing"` (re-pinned to wait for the worker)
 - **Numeric pass threshold:** an emitting save that commits → 1 `adopt_rederived` call on the main thread, after `project.json` is on disk; a forced manifest-write failure → 0 adopt calls and the session map still holds the source bytes at the entry (review F4) (3 of 3).
@@ -4580,7 +4581,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.1k — A data file picked from the work area is parsed on a worker
 - **Traceability:** HLR-177 · trace: `_load_workarea_file` (9b G1; its data arm), `_start_load_worker` (existing, key `file_load`), `load_selected_file` (no longer called by the pick) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS event):** When the engineer picks a data file from the work area, the system shall parse it on the file-load worker, in place.
+- **Statement:** (EARS event) When the engineer picks a data file from the work area, the system shall parse it on the file-load worker, in place.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`
 - **Numeric pass threshold:** a Workarea Files pick and a Load dialog `workarea` row of a generated S19 holding 8 MiB of data → the parse records a thread id other than the main thread's, ≥ 10 ticks of a 0.1 s timer pass during it, 0 `copy_into_workarea` calls (spy), and the session digest equals that of the base's synchronous pick on a twin fixture (4 of 4 per surface).
@@ -4591,7 +4592,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.2 — A project load whose worker raises keeps the session
 - **Traceability:** HLR-177 · trace: the project-load worker and its failure handler (NEW); `end_busy` (12a) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS unwanted):** If a project load's worker step raises, then the system shall paint the `could not be read` line for that project and keep the session and the app as they were before the load.
+- **Statement:** (EARS unwanted) If a project load's worker step raises, then the system shall paint the `could not be read` line for that project and keep the session and the app as they were before the load.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-54 — `pytest tests/test_b100_workers.py -k tc_b100_54`
 - **Numeric pass threshold:** a `PermissionError` and a `ValueError` forced into the worker's manifest read → each: 1 status line holding `could not be read` and `check that the folder can be opened, then load again`, the session digest unchanged, 0 resets, the app running, the indicator ended with the failure (2 × 4 checks).
@@ -4601,7 +4602,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.2a — A Save project whose worker raises rolls back and reports
 - **Traceability:** HLR-177, HLR-164 · trace: the Save worker (NEW), `_abort_save`, `_remove_created_project_dir`, the Save failure handler (NEW) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS unwanted):** If the Save worker raises an exception that is not an `OSError`, then the system shall remove what this save created, paint the `could not save` line and keep the app running.
+- **Statement:** (EARS unwanted) If the Save worker raises an exception that is not an `OSError`, then the system shall remove what this save created, paint the `could not save` line and keep the app running.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-54 — `pytest tests/test_b100_workers.py -k tc_b100_54`; `pytest tests/test_b100_save_image.py -k non_os_error_after_the_emit` (re-pinned: reported, not raised)
 - **Numeric pass threshold:** a `ValueError` forced into the image verify after the emit → the target folder absent, the work-area tree digest unchanged, 1 status line holding `could not save` and `check the folder`, 1 logged traceback, the app running, the session digest unchanged (6 of 6).
@@ -4612,7 +4613,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.2b — An A2L attach whose worker raises keeps the session
 - **Traceability:** HLR-177 · trace: the A2L worker and its failure handler (NEW) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS unwanted):** If an A2L attach's worker step raises, then the system shall paint the `could not be read` line for that A2L file and keep the session and the app as they were before the attach.
+- **Statement:** (EARS unwanted) If an A2L attach's worker step raises, then the system shall paint the `could not be read` line for that A2L file and keep the session and the app as they were before the attach.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-54 — `pytest tests/test_b100_workers.py -k tc_b100_54`
 - **Numeric pass threshold:** a `ValueError` forced into the parse and a `PermissionError` forced into the copy → each: 1 status line holding `could not be read` and `check that the file can be opened, then load again`, `current_a2l_path` and `current_a2l_data` unchanged, the app running (2 × 3 checks).
@@ -4623,7 +4624,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.2c — An A2L attach whose folder or file is gone at the use-time look is refused (CR12b-2 / SE5-12b-2)
 - **Traceability:** HLR-177 · trace: `load_a2l_from_path` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.99
-- **Statement (EARS unwanted):** If an A2L attach's open-project folder cannot be read or its source file's size cannot be read before any busy run begins, then the system shall paint the existing refusal line and begin no run.
+- **Statement:** (EARS unwanted) If an A2L attach's open-project folder cannot be read or its source file's size cannot be read before any busy run begins, then the system shall paint the existing refusal line and begin no run.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-54 — `pytest tests/test_b100_workers.py -k tc_b100_54`
 - **Numeric pass threshold:** the open project's folder renamed away, and the A2L file's size read forced to raise → each: 1 status line, 0 begins, no run, the app running, nothing raised (2 arms). The two lines: `validate_project_files` `OSError` → `A2L NOT loaded: project '<name>' could not be read — check that the folder can be opened, then load again.`; the size `stat()` `OSError` → `A2L file not found: <path>` (the same form as the use-time look).
@@ -4633,7 +4634,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.3 — Load requests are refused while a session action runs
 - **Traceability:** HLR-177a · trace: `action_load_file`, `action_load_project`, the busy check (NEW) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS unwanted):** If the engineer asks to open Load while a session action runs, then the system shall paint the busy line and open no Load dialog.
+- **Statement:** (EARS unwanted) If the engineer asks to open Load while a session action runs, then the system shall paint the busy line and open no Load dialog.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`
 - **Numeric pass threshold:** during a project load held at a forced slow step: `l`, `ctrl+l`, `p`, a click on `#ws_load_project_button` and the palette entries `load_file` and `load_project` → 6 busy lines, 0 `LoadDialog` on the stack (6 of 6).
@@ -4643,7 +4644,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.3a — The load guard refuses before it asks
 - **Traceability:** HLR-177a, HLR-174 · trace: `_confirm_then_load` (Inc 10, B100-I20), the busy check (NEW) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98, LED-2026-10-26-batch-100.100
-- **Statement (EARS unwanted):** If an image-replacing route reaches the load guard while a session action runs, then the system shall paint the busy line without asking the load question.
+- **Statement:** (EARS unwanted) If an image-replacing route reaches the load guard while a session action runs, then the system shall paint the busy line without asking the load question.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-72 — `pytest tests/test_b100_load_question.py -k tc_b100_72`
 - **Numeric pass threshold:** with an unsaved patch and an A2L attach held at a forced slow step: a Workarea Files pick of `x.s19` and the variant selector's pick → 2 busy lines, 0 load questions, the session digest unchanged (2 of 2).
@@ -4653,7 +4654,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.3b — The variant selector is refused while a session action runs
 - **Traceability:** HLR-177a · trace: `action_select_variant`, `_handle_load_result`, the busy check (NEW) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS unwanted):** If the engineer asks for the variant selector while a session action runs, then the system shall paint the busy line and open no variant selector.
+- **Statement:** (EARS unwanted) If the engineer asks for the variant selector while a session action runs, then the system shall paint the busy line and open no variant selector.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`
 - **Numeric pass threshold:** during a Save project held at a forced slow step: `v` and the palette entry `select_variant` → 2 busy lines, 0 `SelectVariantScreen` (2 of 2).
@@ -4663,7 +4664,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.3c — An unload is refused while a session action runs
 - **Traceability:** HLR-177a · trace: `action_unload_all`, `on_loaded_artifacts_panel_unload_requested`, the busy check (NEW) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS unwanted):** If the engineer asks to unload while a session action runs, then the system shall paint the busy line and unload nothing.
+- **Statement:** (EARS unwanted) If the engineer asks to unload while a session action runs, then the system shall paint the busy line and unload nothing.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`
 - **Numeric pass threshold:** during a Save project held at a forced slow step: `U` and a Loaded panel `[u]` on the A2L slot → 2 busy lines, the session digest unchanged (2 of 2).
@@ -4673,7 +4674,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.3d — Save project is refused while a session action runs
 - **Traceability:** HLR-177a · trace: `action_save_project`, the busy check (NEW) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS unwanted):** If the engineer asks for Save project while a session action runs, then the system shall paint the busy line and open no Save project dialog.
+- **Statement:** (EARS unwanted) If the engineer asks for Save project while a session action runs, then the system shall paint the busy line and open no Save project dialog.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`
 - **Numeric pass threshold:** during a project load held at a forced slow step: `ctrl+s`, `s` and the palette entry `save_project` → 3 busy lines, 0 `SaveProjectScreen`; during a Save project, `ctrl+s` → 1 busy line (4 of 4).
@@ -4683,7 +4684,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.3e — Patch Editor changes are refused while a session action runs
 - **Traceability:** HLR-177a · trace: `on_patch_editor_panel_action_requested`, `on_patch_editor_panel_save_back_decision`, `on_patch_editor_panel_undo_requested`, `on_patch_editor_panel_redo_requested`, `action_patch_undo`, `action_patch_redo`, `on_patch_editor_panel_edit_json_requested`, `on_patch_editor_panel_entry_edit_json_requested`, `on_patch_editor_panel_change_file_selected`, `on_patch_editor_panel_dirty_load_requested`, `_apply_changeset_json_edit`, `_apply_entry_json_edit`, the two `LoadGuardScreen` accept arms, the busy check (NEW) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS unwanted):** If the engineer asks the Patch Editor for an action that changes the image or the change document while a session action runs, then the system shall paint the busy line and leave the image and the document unchanged.
+- **Statement:** (EARS unwanted) If the engineer asks the Patch Editor for an action that changes the image or the change document while a session action runs, then the system shall paint the busy line and leave the image and the document unchanged.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`
 - **Numeric pass threshold:** during a Save project held at a forced slow step: the 11 dispatcher actions `apply_doc`, `add_entry`, `edit_entry`, `remove_entry`, `load_doc`, `parse_paste`, `refresh_doc`, `validate_doc`, `run_checks`, `save_doc`, `execute_scope`; the `UndoRequested` and `RedoRequested` handlers; a save-back decision; an edit-JSON request and an entry edit-JSON request → 16 busy lines; the image SHA-256 and the document's serialised entries unchanged after each (16 of 16). The four continuations — the `ChangeSetJsonScreen` result, the `EntryJsonScreen` result, and the accept arm of the two `LoadGuardScreen` paths — also refuse, dropping the JSON the user typed, with the busy line (4 of 4).
@@ -4693,7 +4694,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.3f — The busy line names the running action
 - **Traceability:** HLR-177a · trace: the busy check (NEW); 12a's run state and action-table label (12a S-b, S-c) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS ubiquitous):** The system shall word each busy refusal as `busy: <label> is running — wait for it to finish.`, where `<label>` is the running action's label.
+- **Statement:** (EARS ubiquitous) The system shall word each busy refusal as `busy: <label> is running — wait for it to finish.`, where `<label>` is the running action's label.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`; TC-B100-66 (no decision id)
 - **Numeric pass threshold:** a refusal during each of the three 12b actions → 1 status-log line each, holding `busy`, that action's label and `wait for it to finish` (3 of 3); a project named `[b]P` → the label paints `[b]P` with 0 markup spans; 0 decision ids (`D<n>`, `O-<n>`, `VS-…`, `LLR-…`) in the line.
@@ -4703,7 +4704,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.3g — A refusal changes nothing
 - **Traceability:** HLR-177a · trace: the busy check (NEW) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS ubiquitous):** The system shall leave the session, the focus and the screen stack unchanged when it refuses a request as busy.
+- **Statement:** (EARS ubiquitous) The system shall leave the session, the focus and the screen stack unchanged when it refuses a request as busy.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`
 - **Numeric pass threshold:** for each refusal of LLR-177.3 … LLR-177.3e → the session digest, `app.focused` and the screen-stack depth equal their values before the request (3 checks per refusal).
@@ -4713,7 +4714,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.3h — Refusals stop when the session action ends
 - **Traceability:** HLR-177a · trace: the busy check (NEW); `end_busy` (12a) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS event):** When a session action ends by success, failure or exception, the system shall accept the requests it refused while that action ran.
+- **Statement:** (EARS event) When a session action ends by success, failure or exception, the system shall accept the requests it refused while that action ran.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`
 - **Numeric pass threshold:** a project load ending by success, by a reported failure and by a forced exception → after each, `l` opens the Load dialog (3 of 3).
@@ -4723,7 +4724,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.3i — The report viewer stores its regions only while no session action runs (CR12b-3)
 - **Traceability:** HLR-177a · trace: `on_report_viewer_screen_generate_requested` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.99
-- **Statement (EARS state):** While a session action runs, the system shall leave the session's declared regions unchanged when the report viewer's Generate stores regions; the report itself still runs.
+- **Statement:** (EARS state) While a session action runs, the system shall leave the session's declared regions unchanged when the report viewer's Generate stores regions; the report itself still runs.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`
 - **Numeric pass threshold:** a Save held at a forced slow step, the report viewer's Generate asked with regions `R` → the regions unchanged after the request, the report still generated with the user's regions; idle → the regions stored (2 of 2).
@@ -4733,7 +4734,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.4 — Quit during a session action opens the quit question
 - **Traceability:** HLR-177b · trace: `action_quit` (NEW override), the question modal (Inc 10) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98, LED-2026-10-26-batch-100.100
-- **Statement (EARS event):** When the engineer asks to quit while a session action runs, the system shall open the quit question with the focus on its Stay button.
+- **Statement:** (EARS event) When the engineer asks to quit while a session action runs, the system shall open the quit question with the focus on its Stay button.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`
 - **Numeric pass threshold:** during a Save project held at a forced slow step: `q`, `ctrl+q` and the palette entry `quit` → 1 quit question each, `focused.id == "confirm_no"`, the app running (3 × 3).
@@ -4743,7 +4744,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.4a — The quit question names the running action
 - **Traceability:** HLR-177b · trace: the quit question texts (NEW), the question modal `__init__(title, body, yes_label, no_label)` (Inc 10, LLR-174.2a) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98, LED-2026-10-26-batch-100.100
-- **Statement (EARS ubiquitous):** The system shall build the quit question with the title `Quit?`, the text `still working: <label> — wait, or quit after it finishes` and the button labels `Quit (y)` and `Stay (n)`.
+- **Statement:** (EARS ubiquitous) The system shall build the quit question with the title `Quit?`, the text `still working: <label> — wait, or quit after it finishes` and the button labels `Quit (y)` and `Stay (n)`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`; TC-B100-66 (no decision id)
 - **Numeric pass threshold:** the question during a Save project of `P1` → the 4 strings painted, the label naming Save project; 0 painted `Replace`; 0 decision ids (6 of 6).
@@ -4753,7 +4754,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.4b — Stay keeps the session action running
 - **Traceability:** HLR-177b · trace: the quit-answer handler (NEW) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS event):** When the engineer answers the quit question with Stay, the system shall keep the app and the session action running.
+- **Statement:** (EARS event) When the engineer answers the quit question with Stay, the system shall keep the app and the session action running.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`
 - **Numeric pass threshold:** `n`, `escape` and an immediate `enter` → the question closed, the app running, and after the held step is released the save completes and its success line paints (3 of 3).
@@ -4763,7 +4764,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.4c — Confirmed quit waits for the session action's end
 - **Traceability:** HLR-177c · trace: the quit-answer handler (NEW), the end handlers of the three actions (NEW) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98, LED-2026-10-26-batch-100.99
-- **Statement (EARS event):** When the engineer answers the quit question with Quit, the system shall exit after the running session action's end handler has run on the main thread.
+- **Statement:** (EARS event) When the engineer answers the quit question with Quit, the system shall exit after the running session action's end handler has run on the main thread.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`
 - **Numeric pass threshold:** 5 of 5:
@@ -4779,7 +4780,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.4d — Quit with no session action exits at once
 - **Traceability:** HLR-177b · trace: `action_quit` (NEW override) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS event):** When the engineer asks to quit while no session action runs, the system shall exit without a question.
+- **Statement:** (EARS event) When the engineer asks to quit while no session action runs, the system shall exit without a question.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`
 - **Numeric pass threshold:** idle `q` and idle `ctrl+q` → the app exits, 0 questions (2 of 2); `q` while the Inc 10 load question is open and idle → the question keeps the key (LLR-174.2g), 0 exits.
@@ -4789,7 +4790,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.4e — A confirmed quit is withdrawn when a committed Save leaves in-memory work unsaved (SE5-12b-1)
 - **Traceability:** HLR-177c · trace: `_on_project_saved` (committed arm), `end_busy` → `_exit_if_quit_pending` (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.99
-- **Statement (EARS event):** When a Save commits while a quit is confirmed and leaves in-memory work unsaved — a change-document line was painted or the "has unsaved edits" line was added — the system shall withdraw the confirmed quit and stay open after the Save ends.
+- **Statement:** (EARS event) When a Save commits while a quit is confirmed and leaves in-memory work unsaved — a change-document line was painted or the "has unsaved edits" line was added — the system shall withdraw the confirmed quit and stay open after the Save ends.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`
 - **Numeric pass threshold:** `q`, `y` during a held Save that commits with a pasted-document line (scenario B) and with the "has unsaved edits" line (scenario A) → the app stays open after the Save ends, the line is `log_lines[-1]`, the entries / the panel's dirty state are kept (2 of 2).
@@ -4800,7 +4801,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.5 — The A2L parse step reports its bytes from the worker
 - **Traceability:** HLR-177, HLR-176 · trace: the A2L worker and the project-load worker (NEW); the parser's progress callback (LLR-176.4, moved to 12b by 12a ruling Q1) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS event):** When an A2L parse runs on a worker, the system shall pass the parser's consumed-byte reports to the indicator's current step.
+- **Statement:** (EARS event) When an A2L parse runs on a worker, the system shall pass the parser's consumed-byte reports to the indicator's current step.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`; AT-B100-17
 - **Numeric pass threshold:** the case_06 A2L attach and the case_06 project load → `#progress_bar`'s value increases ≥ 2 times within the parse step, read on the main thread (2 of 2).
@@ -4811,7 +4812,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 ### LLR-177.5a — The Save worker advances the bar per file placed
 - **Traceability:** HLR-177, HLR-176 · trace: the Save worker (NEW), its placement loop over the plan rows; `step_busy(key, gen, n, done, total)` (12a) (`app.py`)
 - **Ledger:** LED-2026-10-26-batch-100.98
-- **Statement (EARS event):** When the Save worker finishes placing one file of the save plan, the system shall advance the indicator's bar within the placement step.
+- **Statement:** (EARS event) When the Save worker finishes placing one file of the save plan, the system shall advance the indicator's bar within the placement step.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`
 - **Numeric pass threshold:** a Save project placing 4 files → `#progress_bar`'s value increases ≥ 4 times within the placement step, read on the main thread; a save-as placing 2 000 files → the value increases ≥ 10 times within that step (2 of 2).

@@ -28,7 +28,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "s19tool"
-version = "0.1.0"
+version = "1.0.0rc1"
 description = "A CLI tool for visualizing and patching Motorola S19 files"
 authors = [
     { name = "Your Name", email = "your.email@example.com" }
