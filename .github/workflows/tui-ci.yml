@@ -49,7 +49,7 @@ jobs:
       - name: Run lean test suite (pull requests)
         if: github.event_name == 'pull_request'
         timeout-minutes: 120
-        run: pytest -v -rs -n auto --dist loadfile -m "not slow and not serial_timing"
+        run: pytest -v -rs -n auto -m "not slow and not serial_timing"
 
       - name: Run timing arms (pull requests)
         if: github.event_name == 'pull_request' && !cancelled() && steps.install.outcome == 'success'
@@ -59,7 +59,7 @@ jobs:
       - name: Run full test suite (pushes)
         if: github.event_name == 'push'
         timeout-minutes: 180
-        run: pytest -v -rs -n auto --dist loadfile -m "not serial_timing"
+        run: pytest -v -rs -n auto -m "not serial_timing"
 
       - name: Run timing arms (pushes)
         if: github.event_name == 'push' && !cancelled() && steps.install.outcome == 'success'

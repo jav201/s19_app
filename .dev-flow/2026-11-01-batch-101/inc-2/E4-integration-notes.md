@@ -21,7 +21,7 @@ Open items for E5 are in §8.
 
 | # | Failure | Who disagreed with the approved design | Cause | Fix |
 |---|---|---|---|---|
-| F-1 | `test_r_tst_001_serial_timing_marker_is_registered`: `pytest --markers` printed `@pytest.mark.serial_timing: a wall-clock timing arm; …` | the **implementation** | R-TST-001 gives the description as `serial_timing: a wall-clock timing arm; run apart and serially (-m serial_timing)`. The graph example (`graph-inc2.md:336`) and case R-TST-001/1 both pin the printed line `@pytest.mark.serial_timing: serial_timing: a wall-clock timing arm; …`. The implementation registered the description without its leading `serial_timing: ` (following the `slow:`/`snapshot:` style) | `pyproject.toml:114` now registers `"serial_timing: serial_timing: a wall-clock timing arm; run apart and serially (-m serial_timing)"`, the design's literal text (see seam note S-1) |
+| F-1 | `test_r_tst_001_serial_timing_marker_is_registered`: `pytest --markers` printed `@pytest.mark.serial_timing: a wall-clock timing arm; …` | the **implementation** | R-TST-001 gives the description as `serial_timing: a wall-clock timing arm; run apart and serially (-m serial_timing)`. The graph example (`graph-inc2.md:336`) and case R-TST-001/1 both pin the printed line `@pytest.mark.serial_timing: serial_timing: a wall-clock timing arm; …`. The implementation registered the description without its leading `serial_timing: ` (following the `slow:`/`snapshot:` style) | First pass: `pyproject.toml:114` followed the doubled design text. **Superseded by orchestrator ruling S-1 (§10):** the doubled text was a requirement defect; the records were corrected to the plain form and `pyproject.toml:114` is back to `"serial_timing: a wall-clock timing arm; run apart and serially (-m serial_timing)"` |
 | F-2 | `test_r_tst_031_032_post_press_and_dwell_arms_keep_their_forms`: `assert "held_save_scene" in quit_body` | the **test** | Case R-TST-031/1 pins "installs `Hold` on `place_into_workarea`". The arm (unchanged since `d460190`) does that inline: `Hold(monkeypatch, app_module, "place_into_workarea")`. It never used the `held_save_scene` helper. The tester assumed the helper name (`E4-tester-notes.md` row 031). The next line checked the `Hold` text over the **whole file**, where `held_save_scene` already satisfied it | `tests/test_suite_hygiene.py:1123`: the `Hold(…, "place_into_workarea"` check now runs on the **function body**, and the helper-name check is gone. This is stricter than before. Negative control: removing the arm's `Hold` line makes the new check false, while the old file-wide check stayed true |
 | F-3 | same test: `assert 'Spy(monkeypatch, S19TuiApp, "step_busy")' in parse_body` | the **test** | Case R-TST-031/2 pins "wraps `app.step_busy`". The arm reads `applied = app.step_busy` and reassigns `app.step_busy = step_busy` on the instance. The `Spy` form was the tester's assumption | `tests/test_suite_hygiene.py:1129`: asserts the body both reads (`= app.step_busy`) and reassigns (`app.step_busy = `) the hook. Negative control: removing the reassignment makes it false |
 
@@ -31,12 +31,11 @@ function.
 
 ### Seam rulings
 
-- **S-1 (F-1, design literal kept).** R-TST-001, the graph example and case 001/1 all pin
-  the doubled prefix, so the implementation follows them. The result is a redundant
-  description beside `slow:`/`snapshot:`. If the operator prefers the conventional
-  `serial_timing: a wall-clock …` form, R-TST-001, `graph-inc2.md:336`, case 001/1,
-  `MARKER_LINE` (`tests/test_suite_hygiene.py:53`) and `pyproject.toml:114` change together
-  in one design edit. Not done here: E4 does not change requirements.
+- **S-1 (F-1).** First pass: R-TST-001, the graph example and case 001/1 all pinned the
+  doubled prefix, so the implementation followed them and the conflict was raised. The
+  orchestrator ruled it a requirement defect. R-TST-001, `graph-inc2.md:336`, case 001/1,
+  `MARKER_LINE` and `pyproject.toml:114` were corrected together to the plain form, each
+  record line marked `[S-1, corrected at E4]` (§10, `E3-rulings.md` "Seam rulings at E4").
 - **S-2 (redaction rule on Inc 2's own files).** After the rebase,
   `codewire/graph-inc2.md:3` still named the local account folder in the Code-Wire
   notation path. It now reads `<HOME>/Github/code-wire/...`, matching main's redaction.
@@ -299,9 +298,10 @@ record which part was verified. Rows changed: 72. Of these, **56 are `verified (
 ## 8. Left for E5
 
 1. **R-TST-008/009 gate evidence.** Two consecutive gate runs on the LAN host with the
-   documented command (`pytest -n 8 -m "not serial_timing"`, then
-   `pytest -m serial_timing`), with `USERNAME` set and the default basetemp. This run is
-   one data point with the CI form (§5).
+   one gate form (G-1: `pytest -n 8 -m "not serial_timing"`, then `pytest -m serial_timing`),
+   with `USERNAME` set and the default basetemp. R-TST-008's evidence stays owed until
+   Inc 3 has settled item 2 (ruling R-3). §5 holds a `loadfile` run and §10 a plain-form run;
+   neither is the gate evidence.
 2. **Bimodal `painted` intervals and the `sec6_5 appended` / `TC-B100-20 save-project`
    arms near 1.0 s.** These are pre-existing and identical with base's waits (§4). In the
    four Linux serial runs before the gate, 2 had one such arm over its bound (base1,
@@ -310,12 +310,15 @@ record which part was verified. Rows changed: 72. Of these, **56 are `verified (
    does not guarantee. The ~1 s step has no obvious product timer behind it (the busy tick
    is 0.1 s, `s19_app/tui/app.py:364`). It needs a diagnosis: a product paint delay, or
    the clock-start rule `_paint_clock_start` (`tests/test_b100_project_check.py:774`).
-   That is a design decision outside this E4 (no bound raised).
+   **Routed to Inc 3 (R1-P1, profile first) by orchestrator ruling R-3**, as a product /
+   test-clock diagnosis. No bound raised.
 3. **Two environment-fragile tests.** `test_tc016b` (needs `USERNAME`) and `test_tc016s`
-   (needs a pytest-named basetemp). They are pre-existing, and the gate procedure should
-   name both conditions (or a backlog row should fix the tests).
-4. **`test_tc_b97_23[wait_third_6-size0]` under `-n 8`.** A local count-bounded `poll`. It
-   is a backlog candidate for the same treatment R-TST-020 gave the shared waits.
+   (needs a pytest-named basetemp). They are pre-existing. A proposed BACKLOG-CODE row text
+   went to the orchestrator with the corrective report; BACKLOG-CODE itself is not edited here.
+4. **`test_tc_b97_23[wait_third_6-size0]` under `-n 8`.** A local count-bounded `poll`
+   (`tests/test_b97_flow_execution.py:303`). The plain-form run (§10) hit a second
+   instance, the 400-pause loop in `_save_project_from` (`tests/test_b100_save_dialog.py:190`).
+   A proposed BACKLOG-CODE row text covering both went to the orchestrator in the same way.
 5. Census base-tree halves (R-TST-005/5, R-TST-040/1's 37-count, R-TST-040/4's base
    list) re-run on `b3bf42e`. The CI/PR evidence rows (R-TST-014/1, 018/2, 090/1, 091/1)
    and the three parallel-lane 3/3 runs of R-TST-031/032 are as listed in
@@ -339,3 +342,65 @@ record which part was verified. Rows changed: 72. Of these, **56 are `verified (
       `tests/test_suite_hygiene.py`. Docs are `codewire/graph-inc2.md` (redaction), this
       file and `02-test-cases.md`.
 - [x] Review packet: this file, plus the final report to the orchestrator.
+
+## 10. Corrective pass (orchestrator rulings S-1, G-1, R-3)
+
+Applied as one corrective commit on `b101-inc2`; rulings recorded in `E3-rulings.md`
+("Seam rulings at E4"). Every edited record line carries `[S-1, corrected at E4]` or
+`[G-1, corrected at E4]`.
+
+- **S-1 (marker text).** Plain registration form everywhere. The edited records are
+  R-TST-001, case 001/1 and the graph example. The edited code is `MARKER_LINE` and
+  `pyproject.toml:114`. `pytest --markers` now prints
+  `@pytest.mark.serial_timing: a wall-clock timing arm; run apart and serially (-m serial_timing)`.
+- **G-1 (one gate form).** Plain xdist load distribution: `-n 8` on the LAN host, `-n auto`
+  on CI. `--dist loadfile` is dropped from:
+  - R-TST-010 and R-TST-011, including R-TST-011's note "each test file on one worker";
+  - cases 010/1 and 011/1;
+  - `graph-inc2.md` (I-9, the workflow sequence, the 010/1 and 011/1 examples, the O-2
+    decision line);
+  - `E1-slice.md` (the summary row and the two lane rows);
+  - both lane-1 steps of `.github/workflows/tui-ci.yml`;
+  - `PR_LANE_1` and `PUSH_LANE_1` in `tests/test_suite_hygiene.py`.
+
+  R-TST-007 and `docs/engineering-rules.md:199` already gave the plain `-n 8` form and are
+  unchanged. No test needs file grouping, for two reasons:
+  - the 7 module- or session-scoped fixtures (`tests/conftest.py:66`,
+    `test_address_origin.py:60`, `test_b100_recents.py:395`, `test_id_registry.py:328`,
+    `test_report_field_census.py:327/332`, `test_synth_release_case.py:74`,
+    `test_tui_snapshot.py:118`) are per-worker caches or guards built from
+    `tmp_path_factory` or the repository;
+  - no test uses ordering, `xdist_group` or `worker_id`.
+
+  Plain-form LAN run, as evidence for the change. It used the tree before these text
+  edits, with `USERNAME` set and the default basetemp (`int-linux-plain-lane1.txt`,
+  `int-linux-plain-lane2.txt`, `int-linux-plain-recheck.txt`):
+
+  | Lane | Result | Wall |
+  |---|---|---:|
+  | 1, `pytest -n 8 -m "not serial_timing"` | 6 failed, 5055 passed, 205 skipped, 4 xfailed | 66:54 |
+  | 2, `pytest -m serial_timing` | 1 failed (`TC-B100-61 all-bad painted` 1.127 s, the R-3 step), 57 passed, 2 skipped; QC-TM 72 bounds, 4 under 20 % | 5:06 |
+  | total | | 72:00 |
+
+  - **Lane-1 failures:** the 5 known ones, plus
+    `tests/test_b100_save_dialog.py::test_tc_b100_65_merge_names_the_active_variant_it_sets`.
+    That test failed with `Save project ab did not land`, raised by the file-local
+    400-pause count-bounded loop in `_save_project_from` (`tests/test_b100_save_dialog.py:190`).
+  - **Not a file-grouping dependency:** the test builds its own project under `tmp_path`.
+    Re-check: the file alone under plain `-n 8` gives 154 passed, 9 skipped, and the node
+    passes 3/3 serially. It is the same class of under-load flake as `tc_b97_23` (§5, §8
+    item 4).
+  - **The two run-environment failures of §5 do not occur** with `USERNAME` set and the
+    default basetemp. `tc_b97_23` passed in this run.
+  - **Measured speed, against G-1's premise:** the per-module gain is real
+    (`test_b97_flow_execution.py` takes 2:02 under plain `-n 8` against 8:51 under
+    `loadfile`). The whole lane does not gain, though: plain 66:54 against `loadfile`
+    64:18 on the same host. G-1 still holds on its other ground, that no test needs file
+    grouping. The speed claim is corrected in `E3-rulings.md`.
+- **R-3 (painted ~1 s step).** Routed to Inc 3 (R1-P1, profile first). R-TST-008's
+  evidence stays owed (§8 items 1–2).
+- **Re-run after the edits (Windows).** `tests/test_suite_hygiene.py` plus the Inc 1 guards
+  (`test_id_registry`, `test_batch91_registry_hygiene`, `test_requirements_canon`): **79
+  passed** in 2:22 (`int-win-final2.txt`, run after every corrective evidence file was written). Cases 001/1, 010/1 and 011/1 were re-verified
+  on Windows against the corrected text. The Linux runs in §5 and above ran the
+  pre-correction text of those three records, so their result cells now name Windows only.

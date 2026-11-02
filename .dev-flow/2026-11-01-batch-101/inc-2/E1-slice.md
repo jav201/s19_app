@@ -7,7 +7,7 @@ Base `b3bf42e`; Inc 2 is rebased onto main (Inc 1 merged) before E4. 0 files und
 | Group | Files | Functions / entries | Rows |
 |---|---:|---:|---|
 | Config: marker registration | 1 (`pyproject.toml`) | 1 marker line | R-TST-001 |
-| CI workflow | 1 (`.github/workflows/tui-ci.yml`) | job `tui-ci`: 1 checkout step changed, the install step gains `python -m pip install "pytest-xdist==3.8.0"` [R2], 2 steps split into 4 (lane 1 parallel: `-n auto --dist loadfile`), `timeout-minutes` on the job (240) and on each lane (lane 1: 180 push / 120 PR; lane 2: 45 / 30) [E3A-4, R2, N-3] | R-TST-010 … 018 |
+| CI workflow | 1 (`.github/workflows/tui-ci.yml`) | job `tui-ci`: 1 checkout step changed, the install step gains `python -m pip install "pytest-xdist==3.8.0"` [R2], 2 steps split into 4 (lane 1 parallel: `-n auto` [G-1, corrected at E4]), `timeout-minutes` on the job (240) and on each lane (lane 1: 180 push / 120 PR; lane 2: 45 / 30) [E3A-4, R2, N-3] | R-TST-010 … 018 |
 | Test infrastructure, timing (`tests/support/timing.py`) | 1 | 3 new functions (`wait_until`, `report_margin`, `qc_tm_summary_lines`) + 1 new drain function (`qc_tm_drain`) + 3 constants; `timing_bound` unchanged | R-TST-020 … 022, 024, 040, 042 … 046 |
 | Test infrastructure, census (`tests/support/suite_census.py`, new, not a `test_*.py`) | 1 | 4 new functions (`timing_arms`, `unreported_upper_bounds`, `newest_line_waits`, `shared_wait_bodies`) + 2 constants (`SAMPLED_TIMING_ARMS`, `NEWEST_LINE_BASELINE`) | R-TST-002 … 006, 020, 021, 040, 041, 051 |
 | Session hooks (`tests/conftest.py`) | 1 | 2 new hooks (`pytest_runtest_makereport` hookwrapper that drains into `item.user_properties` **before** its `yield` for the call phase [E3A-1]; `pytest_terminal_summary` reading call-phase reports only); `canonical_report_bytes` puts the package version in place of `<TOOL-VERSION>` + 1 constant `TOOL_VERSION_TOKEN` [US-TST-5] | R-TST-042 … 046, 081, 082 |
@@ -87,8 +87,8 @@ Prints an interval but asserts none (not a timing arm): `tests/test_b100_project
 |---|---|---|
 | `tui-ci` › `Check out repository` (`:27-28`) | `actions/checkout@v4` | `with: fetch-depth: 0` |
 | `Install dependencies` (`:35-41`) | `pip install pytest` | also `python -m pip install "pytest-xdist==3.8.0"` [R2] |
-| `Run lean test suite (pull requests)` (`:43-45`) | `pytest -q -m "not slow"` | lane 1 (`timeout-minutes: 120`) [R2]: `pytest -v -rs -n auto --dist loadfile -m "not slow and not serial_timing"`; lane 2 (new step, `if: github.event_name == 'pull_request' && !cancelled()`): `pytest -q -rs -m "serial_timing and not slow"` |
-| `Run full test suite (pushes)` (`:47-49`) | `pytest -q` | lane 1 (`timeout-minutes: 180`) [E3A-4, R2]: `pytest -v -rs -n auto --dist loadfile -m "not serial_timing"`; lane 2 (new step, `if: github.event_name == 'push' && !cancelled()`): `pytest -q -rs -m serial_timing` |
+| `Run lean test suite (pull requests)` (`:43-45`) | `pytest -q -m "not slow"` | lane 1 (`timeout-minutes: 120`) [R2]: `pytest -v -rs -n auto -m "not slow and not serial_timing"`; lane 2 (new step, `if: github.event_name == 'pull_request' && !cancelled()`): `pytest -q -rs -m "serial_timing and not slow"` [G-1, corrected at E4] |
+| `Run full test suite (pushes)` (`:47-49`) | `pytest -q` | lane 1 (`timeout-minutes: 180`) [E3A-4, R2]: `pytest -v -rs -n auto -m "not serial_timing"`; lane 2 (new step, `if: github.event_name == 'push' && !cancelled()`): `pytest -q -rs -m serial_timing` [G-1, corrected at E4] |
 | job `tui-ci` | no `timeout-minutes` (default 360) | `timeout-minutes: 240` [E3A-4, R2]; lane-2 steps `timeout-minutes` 45 (push) / 30 (PR) [N-3] |
 | `snapshot` job | unchanged | — (E3S-3's `persist-credentials: false` is an E4 addendum) |
 

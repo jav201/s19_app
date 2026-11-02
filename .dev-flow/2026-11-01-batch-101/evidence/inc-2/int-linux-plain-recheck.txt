@@ -1,0 +1,13 @@
+# batch-101 Inc 2 E4 corrective — LAN Linux host: re-check of the plain lane-1 failure test_tc_b100_65_merge_names_the_active_variant_it_sets
+# env: PYTHONDONTWRITEBYTECODE=1 PYTHONUTF8=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. USERNAME set, default basetemp, NO_COLOR unset; Python 3.11.18, pytest 9.2.0, xdist 3.8.0
+# tree: as int-linux-plain-lane1.txt
+
+### tests/test_b100_save_dialog.py under plain -n 8 (file alone)
+154 passed, 9 skipped in 340.47s (0:05:40)
+### tests/test_b100_save_dialog.py::test_tc_b100_65_merge_names_the_active_variant_it_sets serial run 1
+1 passed in 18.34s
+### tests/test_b100_save_dialog.py::test_tc_b100_65_merge_names_the_active_variant_it_sets serial run 2
+1 passed in 17.96s
+### tests/test_b100_save_dialog.py::test_tc_b100_65_merge_names_the_active_variant_it_sets serial run 3
+1 passed in 16.88s
+DONE

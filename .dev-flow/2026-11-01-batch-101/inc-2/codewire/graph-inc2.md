@@ -25,7 +25,7 @@ Groups for E4 (file ownership) and the interfaces they share — pinned here, ch
 | I-3 the marker | name `serial_timing`; registered line of R-TST-001 | G4 → G1 (guard), G3 (decorators) |
 | I-4 the sampled-arm list | `SAMPLED_TIMING_ARMS: frozenset[str] = {"tests/test_b100_busy.py::test_at_b100_17_worker_load_of_an_8_mib_s19_by_keys"}` in `suite_census.py` | G1 → G3 |
 | I-5 the property | key `qc_tm`, value `<label>\|<measured:.3f>\|<bound:.3f>\|<margin:.1f>`, appended to `item.user_properties` before the call report is built [E3A-1], so the call report, the teardown report and junit (written from the teardown report) carry it | G1 (drain) → G1 (summary, call reports only), junit, Inc 1's TC-record generator (reads junit; ignores unknown properties) |
-| I-9 CI parallel lane [R2] | `python -m pip install "pytest-xdist==3.8.0"` in the `tui-ci` install step; lane 1 `-n auto --dist loadfile`; lane 2 serial | G4 → CI |
+| I-9 CI parallel lane [R2] | `python -m pip install "pytest-xdist==3.8.0"` in the `tui-ci` install step; lane 1 `-n auto`; lane 2 serial [G-1, corrected at E4] | G4 → CI |
 | I-8 the tool-version token | `TOOL_VERSION_TOKEN = b"<TOOL-VERSION>"` in `tests/conftest.py`; `canonical_report_bytes` replaces it with `s19_app.version.__version__` | G5 → the 7 golden tests |
 | I-6 the newest-line baseline | `NEWEST_LINE_BASELINE: dict[str, int]` pinned from the census on `b3bf42e` (E1 probe: 87 sites in 18 files; the exact dict is produced by the E4 detector on the base tree, not typed by hand) | G1 only |
 | I-7 shared-wait signatures | each of the 7 keeps its `b3bf42e` positional parameters; `timeout: float` is added keyword-only | G2 → 159 direct call sites (unchanged) |
@@ -333,17 +333,17 @@ desc: the product's install callback, wrapped on the instance by `load_project` 
 desc: `[tool.pytest.ini_options] markers` in `pyproject.toml` (`:111-114`); gains the `serial_timing` line (I-3)
 
 ### Examples — pyproject markers (R-TST-001)
-- (R-TST-001/1) `pytest --markers` → a line "@pytest.mark.serial_timing: serial_timing: a wall-clock timing arm; run apart and serially (-m serial_timing)". Base (B): only `slow` and `snapshot` lines.
+- (R-TST-001/1) `pytest --markers` → a line "@pytest.mark.serial_timing: a wall-clock timing arm; run apart and serially (-m serial_timing)". Base (B): only `slow` and `snapshot` lines. [S-1, corrected at E4]
 
 [I/O: tui-ci workflow]
 desc: `.github/workflows/tui-ci.yml`, job `tui-ci` (the `snapshot` job is unchanged)
 sequence:
-  pull_request: checkout (fetch-depth 0) → install (+ pytest-xdist 3.8.0) → lane 1 `pytest -v -rs -n auto --dist loadfile -m "not slow and not serial_timing"` (120 min) → lane 2 `pytest -q -rs -m "serial_timing and not slow"` (30 min; runs when lane 1 is red: `!cancelled()`)
-  push: checkout (fetch-depth 0) → install (+ pytest-xdist 3.8.0) → lane 1 `pytest -v -rs -n auto --dist loadfile -m "not serial_timing"` (180 min) → lane 2 `pytest -q -rs -m serial_timing` (45 min; `!cancelled()`); the job stops at 240 min
+  pull_request: checkout (fetch-depth 0) → install (+ pytest-xdist 3.8.0) → lane 1 `pytest -v -rs -n auto -m "not slow and not serial_timing"` (120 min) → lane 2 `pytest -q -rs -m "serial_timing and not slow"` (30 min; runs when lane 1 is red: `!cancelled()`) [G-1, corrected at E4]
+  push: checkout (fetch-depth 0) → install (+ pytest-xdist 3.8.0) → lane 1 `pytest -v -rs -n auto -m "not serial_timing"` (180 min) → lane 2 `pytest -q -rs -m serial_timing` (45 min; `!cancelled()`); the job stops at 240 min [G-1, corrected at E4]
 
 ### Examples — tui-ci workflow (R-TST-010 … 018, 090, 091)
-- (R-TST-010/1) PR steps after install → 2 `run:` lines exactly `pytest -v -rs -n auto --dist loadfile -m "not slow and not serial_timing"`, then `pytest -q -rs -m "serial_timing and not slow"`. Base (B): 1 step `pytest -q -m "not slow"` (`:45`).
-- (R-TST-011/1) push steps → `pytest -v -rs -n auto --dist loadfile -m "not serial_timing"`, then `pytest -q -rs -m serial_timing`. Base: `pytest -q` (`:49`). With `-v` every node's outcome line is printed as it runs, so a lane stopped at its limit still names the failures before the stop [E3A-4].
+- (R-TST-010/1) PR steps after install → 2 `run:` lines exactly `pytest -v -rs -n auto -m "not slow and not serial_timing"`, then `pytest -q -rs -m "serial_timing and not slow"`. Base (B): 1 step `pytest -q -m "not slow"` (`:45`). [G-1, corrected at E4]
+- (R-TST-011/1) push steps → `pytest -v -rs -n auto -m "not serial_timing"`, then `pytest -q -rs -m serial_timing`. Base: `pytest -q` (`:49`). With `-v` every node's outcome line is printed as it runs, so a lane stopped at its limit still names the failures before the stop [E3A-4]. [G-1, corrected at E4]
 - (R-TST-012/1) each lane-2 step's `if:` → "github.event_name == 'pull_request' && !cancelled()" and "github.event_name == 'push' && !cancelled()"; on a run where lane 1 has 1 failure, lane 2 shows `completed` and the job `failure`.
 - (R-TST-013/1) the `tui-ci` checkout → `with: fetch-depth: 0`. Base: no `with:` (`:28`).
 - (R-TST-014/1) Inc 2's own pull-request run, lane-1 `-rs` summary [E3A-4] → no line "git or commit b514b07 unavailable", "… 9c7beaf unavailable", "… 09e44de unavailable"; the 6 history arms passed.
@@ -405,7 +405,7 @@ finding F-4 CI wall time
 anchor: CI runs 41290452101 (202 min), 41338318239 (230 min); 41372953464 at 4 h 14 min at E1
 seen: the push lane ran serially for 4 h 53 min on run 41372953464 (17 595 s, `../../evidence/ci/41372953464.txt`) against GitHub's 6 h job limit; pushes queue full runs with no `concurrency` group.
 effect: before E3, a run that hit the limit gave no FAILED set. Now `-v` on lane 1 (R-TST-011) names every outcome as it runs, the timeouts of R-TST-015 … 017 leave room for lane 2, and lane 1 runs in parallel (R-TST-018).
-decision: operator decision on O-2 (E3 round 2): YES — pytest-xdist 3.8.0 in CI, lane 1 `-n auto --dist loadfile`; CI time measured by R-TST-090 (PR run) and R-TST-091 (first post-merge push) [N-2].
+decision: operator decision on O-2 (E3 round 2): YES — pytest-xdist 3.8.0 in CI, lane 1 `-n auto` [G-1, corrected at E4]; CI time measured by R-TST-090 (PR run) and R-TST-091 (first post-merge push) [N-2].
 
 finding F-5 E3 round 1 corrections
 anchor: ../E3-architect.md, ../E3-security.md, ../E3-rulings.md

@@ -111,5 +111,5 @@ pythonpath = ["."]
 markers = [
     "slow: marks tests as slow perf smoke tests (deselect with -m 'not slow')",
     "snapshot: marks pytest-textual-snapshot layout-drift tests (deselect with -m 'not snapshot')",
-    "serial_timing: serial_timing: a wall-clock timing arm; run apart and serially (-m serial_timing)",
+    "serial_timing: a wall-clock timing arm; run apart and serially (-m serial_timing)",
 ]

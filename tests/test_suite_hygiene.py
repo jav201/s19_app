@@ -51,13 +51,13 @@ CONVENTIONS_PATH = REPO_ROOT / "docs" / "engineering-rules.md"
 EVIDENCE_ROOT = REPO_ROOT / ".dev-flow" / "2026-11-01-batch-101" / "evidence"
 
 MARKER_LINE = (
-    "@pytest.mark.serial_timing: serial_timing: a wall-clock timing arm; "
+    "@pytest.mark.serial_timing: a wall-clock timing arm; "
     "run apart and serially (-m serial_timing)"
 )
 
-PR_LANE_1 = 'pytest -v -rs -n auto --dist loadfile -m "not slow and not serial_timing"'
+PR_LANE_1 = 'pytest -v -rs -n auto -m "not slow and not serial_timing"'
 PR_LANE_2 = 'pytest -q -rs -m "serial_timing and not slow"'
-PUSH_LANE_1 = 'pytest -v -rs -n auto --dist loadfile -m "not serial_timing"'
+PUSH_LANE_1 = 'pytest -v -rs -n auto -m "not serial_timing"'
 PUSH_LANE_2 = "pytest -q -rs -m serial_timing"
 
 LANE_2_IF_PR = (
