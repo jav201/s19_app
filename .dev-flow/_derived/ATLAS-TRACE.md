@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 76 requirement files | corpus digest: 37e3ce4eae256b39 -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 77 requirement files | corpus digest: 2ab9bb8e4cf9c086 -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -3869,7 +3869,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `US-less` | batches |
 | `US-nnn` | batches |
 
-## family R — 178 unique id(s)
+## family R — 184 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -3897,6 +3897,10 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `R-CHG-004` | canon |
 | `R-CHK-001` | batches, canon |
 | `R-CHK-002` | batches, canon |
+| `R-CHKED-010` | batches |
+| `R-CHKED-025` | batches |
+| `R-CHKED-031` | batches |
+| `R-CHKS-001` | batches |
 | `R-CMP-001` | batches, canon |
 | `R-CMP-002` | canon |
 | `R-CMP-003` | canon |
@@ -3917,6 +3921,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `R-HEX-003` | batches, canon |
 | `R-HEX-004` | batches |
 | `R-HEX-012` | batches |
+| `R-LEGEND-011` | batches |
 | `R-MAC-001` | batches |
 | `R-MEM-001` | batches, canon |
 | `R-MEM-002` | canon |
@@ -3925,7 +3930,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `R-MEM-005` | batches, canon |
 | `R-NEW-1` | batches |
 | `R-OPS-001` | canon |
-| `R-OPS-002` | canon |
+| `R-OPS-002` | batches, canon |
 | `R-OPS-003` | canon |
 | `R-PARSE-001` | batches, canon |
 | `R-PARSE-002` | batches, canon |
@@ -4048,6 +4053,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `R-TUI-115` | batches, canon |
 | `R-VAL-001` | batches, canon |
 | `R-VAL-002` | batches, canon |
+| `R-VAL-032` | batches |
 | `R-VAR-001` | batches, canon |
 | `R-VAR-002` | batches, canon |
 | `R-VAR-003` | batches |
