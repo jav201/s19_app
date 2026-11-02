@@ -149,6 +149,64 @@ flows on the same document: `tune_b` (`BOOST = 11 22 33 44`, `MODE = 2`, output
 *and* the variables, so each flow is built from the start. Chapter 18.8 runs the three
 flows side by side.
 
+### 17.11 Run a terminal command and use its output
+
+**What the EXT-STEP block does, from the code** (`flow_model.ExternalStepBlock`,
+`flow_execution_service.run_flow`):
+
+- It has a **mode**: *Terminal* (the default; the text field is a **command**) or
+  *Manual* (the field is an **instruction** for a person). The two modes behave the same
+  way at run time; the mode only changes the wording.
+- **The app never runs the command.** It shows it, and the run **pauses** at the block
+  (*paused - waiting for a human: command '…'*). A person runs the command in a
+  terminal of their own.
+- The **log** file is mandatory evidence; the **output file** is the file the step
+  must leave behind (an absolute path is preferred, because it is usually outside the
+  project). Both are checked only when the step is confirmed.
+- The run can only go on in **Flow Execution** (Chapter 18.9): **Confirm** / `c`
+  re-runs the lane from that block. The Flow Builder shows the pause but has no
+  Confirm (finding F-50).
+- On confirm the app checks that the log exists, then that the output exists, copies
+  the output into the session folder (the open project's folder; a name already taken
+  by a different file gets the next free `_1`, `_2`, …), lists the copy under *Written
+  files* of the run, and continues with the next block. The image passes through the
+  step unchanged.
+- **Using the output in a later block:** there is no wiring for it — no `#n` reference,
+  no binding and no `${NAME}` variable points at an external step's output. A later
+  block can only name the copy **by its file name**, relative to the project, as any
+  other ref (finding F-48). That works for the first run; when a later run produces a
+  different output, the copy is stored as `<name>_1…` but the later block still reads
+  the first copy (finding F-49).
+
+**The demo: a command that writes a change document, which the next block applies.**
+In project `demo`, with a folder `C:\Users\Public\s19demo\bench` for the bench files:
+
+1. `8` (Flow Builder). **LOAD**, image file `firmware.s19`, **+ Add**.
+2. **EXT-STEP**. *mode* stays **Terminal**. Fill the three fields:
+   - *command* — one line of PowerShell that writes a one-entry change document and a
+     log:
+
+     ```powershell
+     '{"format":"s19app-changeset","version":"2.0","kind":"change","encoding":"utf-8","value_mode":"text","entries":[{"type":"string","address":"0x00C001B0","value":"BENCH=OK"}]}' | Set-Content C:\Users\Public\s19demo\bench\step_patch.changes.json; 'step done' | Set-Content C:\Users\Public\s19demo\bench\step.log
+     ```
+
+   - *log* — `C:\Users\Public\s19demo\bench\step.log`
+   - *output file* — `C:\Users\Public\s19demo\bench\step_patch.changes.json`
+
+   ![Terminal step fields](img/ch17-17-terminal-step-fields.png)
+
+   **+ Add**.
+3. **PATCH**, change doc `step_patch.changes.json` — the *file name* the copy will have
+   in the project folder, not the bench path. **+ Add**.
+4. **WRITE-OUT**, output file `terminal_out.s19`, **+ Add**.
+5. **Run**. The run stops at block 2 with **PAUSED – WAITING FOR A HUMAN**; the
+   verdict repeats the command, the log and the output that are pending; PATCH and
+   WRITE-OUT are *skipped (waiting on external step)*.
+
+   ![Builder run paused](img/ch17-18-terminal-step-builder-run.png)
+
+6. **Save…** as `terminal_step`, then continue in Flow Execution (Chapter 18.9).
+
 ## Features of these windows
 
 | Feature | How | Capture |
@@ -159,6 +217,7 @@ flows side by side.
 | External step: mode, instruction, log, output | select, type | 17.9 |
 | Variables editor | Variables, + Add var | 17.4, 17.10 |
 | Variables in a change document (`${NAME}`), undeclared-variable notice | Run | 17.10 |
+| External step, Terminal mode: command, log, output, pause | EXT-STEP, Run | 17.11 |
 | Copy / Paste a block | buttons | 17.7 |
 | Run + per-block verdicts | button | 17.5 |
 | Save… / Load… / Import… / Discard | buttons | 17.6, 17.8 |

@@ -1,6 +1,6 @@
 # s19tui user guide — dossier
 
-Status: **Phase C done — chapter text and real captures, for review** (Phase C added the funnel and parallel-lanes demo to Chapters 17 and 18, and Chapter 21 on the reports). No slides yet:
+Status: **Phase C done — chapter text and real captures, for review** (Phase C added the funnel and parallel-lanes demo to Chapters 17 and 18 and Chapter 21 on the reports; Phase D added the external step in Terminal mode, 17.11 and 18.9). No slides yet:
 slides are built only after this dossier is approved.
 
 - Product state: branch `b100-release-assets` at `9fd3638` (main `570b4b5` plus the
@@ -20,10 +20,10 @@ slides are built only after this dossier is approved.
 | Count | What |
 |---|---|
 | **21** | chapters (one file each, `ch01-…md` to `ch21-…md`) |
-| **174** | captures in `img/` (168 Windows Terminal, 6 headless Microsoft Edge renders of HTML reports) |
+| **181** | captures in `img/` (175 Windows Terminal, 6 headless Microsoft Edge renders of HTML reports) |
 | **32** | user-reachable windows (1 app shell, 13 views, 18 modal dialogs) |
 | **372** | features inventoried from the code (§4) |
-| **47** | findings for the release fix (§5) |
+| **51** | findings for the release fix (§5) |
 
 ## 2. Chapters
 
@@ -45,8 +45,8 @@ slides are built only after this dossier is approved.
 | 14 | [ch14-split-join-export.md](ch14-split-join-export.md) — Split / Join / Export | Split / Join / Export (W21) | 12 |
 | 15 | [ch15-save-project.md](ch15-save-project.md) — Save the project and switch variants | Save project (W22), Select variant (W23) | 5 |
 | 16 | [ch16-reports.md](ch16-reports.md) — Reports | Reports viewer (W24) | 3 |
-| 17 | [ch17-flow-builder.md](ch17-flow-builder.md) — Flow Builder | Flow Builder (W25), Save flow as (W26), Load flow (W27), Discard unsaved flow edits? (W28) | 16 |
-| 18 | [ch18-flow-execution.md](ch18-flow-execution.md) — Flow Execution | Flow Execution (W29) | 13 |
+| 17 | [ch17-flow-builder.md](ch17-flow-builder.md) — Flow Builder | Flow Builder (W25), Save flow as (W26), Load flow (W27), Discard unsaved flow edits? (W28) | 18 |
+| 18 | [ch18-flow-execution.md](ch18-flow-execution.md) — Flow Execution | Flow Execution (W29) | 18 |
 | 19 | [ch19-help-palettes-settings.md](ch19-help-palettes-settings.md) — Help, palettes and settings | app shell (W00): help panel, command palette, Textual palette, Viewer settings, density; Window help (W30) | 9 |
 | 20 | [ch20-quit.md](ch20-quit.md) — Quit | app shell (`q`), Quit? question (W31) | 2 |
 | 21 | [ch21-html-reports.md](ch21-html-reports.md) — HTML reports: review what was modified, checked and compared | Patch Editor (W11), A2B Diff (W17), Flow Builder (W25), Reports viewer (W24); the report files | 13 |
@@ -754,6 +754,10 @@ app during the captures; "code" = read in the code.
 | F-45 | defect, live | After **Confirm** of an external step in a parallel run, the re-run writes a second chain-set report for that lane alone that records *Mode: sequential*, *Chains: 1*. | `reports\<time>-chain-set-report.md` of the Chapter 18.8 run |
 | F-46 | defect, live | A flow saved after **Clear** keeps the previous flow's name inside its file (`flows\tune_b.json` holds `"name": "tune_a"`, `tune_c.json` holds `tune_b`); lanes use the file name, so the stale name is only cosmetic so far. | saved flow files of the Chapter 17.10 run |
 | F-47 | to investigate, live | In the Chapter 17.10 / 18.8 run the log tail shows *Before/after report refused: No applied change summary…* right after start, before any key the driver sent that maps to `b`; the trigger is not identified. | ch17-13 … ch18-09 |
+| F-48 | gap, code + live | A later block cannot reference an external step's output: there is no `#n` reference, binding or `${NAME}` for it. The only way is to type the copy's file name as an ordinary project-relative ref (17.11). The block's docstring says "downstream blocks reference THAT copy". | `flow_model.ExternalStepBlock`, `flow_execution_service.run_flow` (`ExternalStepBlock` branch); ch18-17 |
+| F-49 | defect, live | When a later run's external output differs, the copy is stored as `<name>_1.<ext>` (no overwrite) but a later block that names the copy still reads the first file: `terminal_out.s19` kept `BENCH=OK` after the step produced `BENCH=V2`. | driver log of the 18.9 run (`step_patch.changes_1.json` written, `terminal_out.s19` unchanged) |
+| F-50 | limitation, live + code | The Flow Builder pauses at an external step (*PAUSED – WAITING FOR A HUMAN*) but offers no Confirm; the run can only continue from Flow Execution. In Terminal mode the app never runs the command and does not see its exit code — only the existence of the log and output files is checked. | `app.py:on_flow_builder_panel_run_requested` (`FlowContext` without confirmations); ch17-18, ch18-16 |
+| F-51 | usability, live | `esc` does not close the Reports viewer; only **Close** does (its bindings hold `?` only). | `screens.py:ReportViewerScreen.BINDINGS`; driver log of the 18.9 run |
 
 ## 6. Live checks requested
 
