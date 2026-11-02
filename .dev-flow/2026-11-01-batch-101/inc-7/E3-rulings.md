@@ -40,3 +40,10 @@ Round 1 reviews at `137424b`: architect PASS-WITH-NOTES (`E3-architect.md`, MAJO
 - **A-6 [S-3 (a)]** E4 measures one ~4 MiB fully changed worst case, as a manual A↔B report and as a before/after report: wall time, peak RSS and both file sizes, with the transcript in `evidence/inc-7/`. Record the numbers beside OBS-7-4. If the work runs on the UI thread for several seconds, check that the worker paths have no UI-thread join.
 - **A-7 [S-4]** Before commit, check that goldens, evidence logs and captures hold only `<RUN-ROOT>` or `tmp_path` forms and no real home folder.
 - **A-8 [security D-2 note]** No code mutates `mac_records`, `_a2l_enriched_tags` or `current_a2l_data` in place: the architect confirmed this by grep (`E3-architect.md`, App wiring). E4 repeats the grep and records it.
+
+## Round 2 (2026-11-02)
+
+Re-review (E3-r2.md): PASS-WITH-NOTES — F-E3-1..3 and S-1..S-3 closed. E4 addenda added:
+- N-1: the write helper starts its cleanup only after the exclusive open of `<name>.part` succeeds, and removes it after closing; a pre-existing `.part` stays in place and `FileExistsError` propagates (new sub-case).
+- L-1: fix the E1-rulings scope table (the `(key 7)` string is in scope).
+- Private `_normalise` import accepted: docstring note (A-1), a test `_strip_ctl(v) == _normalise(v)` over the S-2 inputs, and a backlog row for a public alias.
