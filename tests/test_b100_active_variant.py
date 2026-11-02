@@ -86,6 +86,7 @@ from tests.support.b100_load_dialog import highlight_row
 from tests.support.b100_load_dialog import is_load_dialog
 from tests.support.b100_load_dialog import load_choice_cls
 from tests.support.independent_reader import read_s19
+from tests.support.timing import report_margin
 from tests.support.timing import timing_bound
 
 SIZES = [(118, 54), (220, 60)]
@@ -644,6 +645,7 @@ def test_tc_b100_20_variant_append_with_a_junction_loop_entry_does_not_crash(
 WRITER_OUTCOMES = ("manifest verified", "not rewritten", "Manifest write failed", "Saved project", "NOT saved")
 
 
+@pytest.mark.serial_timing
 @pytest.mark.parametrize(
     "writer", ["variant-append", "mac-sync", "a2l-sync", "save-back", "save-project"]
 )
@@ -735,7 +737,7 @@ def test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second(
     outcomes = [s for s in statuses if any(o in s for o in WRITER_OUTCOMES)]
     print(f"{writer}: trigger -> outcome {took:.3f} s; {outcomes[:1]}")
     assert "manifest verified" in outcomes[0], outcomes
-    assert took < timing_bound(1.0), took
+    assert took < report_margin(f"TC-B100-20 {writer}", took, timing_bound(1.0)), took
 
 
 def test_tc_b100_20_append_says_now_opens_only_after_the_write(tmp_path: Path) -> None:

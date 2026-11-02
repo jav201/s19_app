@@ -24,6 +24,8 @@ from __future__ import annotations
 import time
 from pathlib import Path
 
+import pytest
+
 from s19_app.tui.a2l import (
     ALL_AXIS_KINDS,
     MAX_A2L_DECODE_BYTES,
@@ -36,6 +38,7 @@ from s19_app.tui.a2l import (
 from s19_app.tui.services.a2l_service import enrich_tags_and_render
 from s19_app.tui.app import _a2l_tag_row_severity
 from s19_app.validation.model import ValidationSeverity
+from tests.support.timing import report_margin
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 _DEMO_A2L = _REPO_ROOT / "examples" / "case_00_public" / "ASAP2_Demo_V161.a2l"
@@ -335,6 +338,7 @@ def test_tc137_scalar_value_unchanged(tmp_path: Path) -> None:
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.serial_timing
 def test_tc138_dos_clamp_pure_arithmetic() -> None:
     """A huge axis count clamps to None via a MAX_A2L_DECODE_BYTES compare, in <1s.
 
@@ -349,7 +353,7 @@ def test_tc138_dos_clamp_pure_arithmetic() -> None:
     )
     elapsed = time.perf_counter() - started
     assert huge is None
-    assert elapsed < 1.0
+    assert elapsed < report_margin("TC138", elapsed, 1.0)
     # a span exactly at the cap is admitted; one over is refused
     assert _record_layout_full_span({"lines": ["FNC_VALUES 1 UBYTE"]}, [MAX_A2L_DECODE_BYTES]) == MAX_A2L_DECODE_BYTES
     assert _record_layout_full_span({"lines": ["FNC_VALUES 1 UBYTE"]}, [MAX_A2L_DECODE_BYTES + 1]) is None
@@ -548,6 +552,7 @@ def test_at110_malformed_curve_fail_closed(tmp_path: Path) -> None:
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.serial_timing
 def test_at111_oversized_axis_clamps_to_none(tmp_path: Path) -> None:
     """A CURVE with a ~10M MaxAxisPoints parses fast to length None (clamped by the cap).
 
@@ -564,4 +569,4 @@ def test_at111_oversized_axis_clamps_to_none(tmp_path: Path) -> None:
     )
     elapsed = time.perf_counter() - started
     assert tag["length"] is None
-    assert elapsed < 2.0
+    assert elapsed < report_margin("AT111", elapsed, 2.0)

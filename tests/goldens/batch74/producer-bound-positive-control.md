@@ -2,7 +2,7 @@
 
 - Project: proj
 - Generated (UTC): 2026-07-31T12:00:00+00:00
-- Tool version: 1.0.0rc1
+- Tool version: <TOOL-VERSION>
 - Context bytes: 64
 - Execution mode: batch
 - Assignment source: default

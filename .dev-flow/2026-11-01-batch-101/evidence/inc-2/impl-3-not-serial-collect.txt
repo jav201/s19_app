@@ -1,0 +1,2 @@
+s19_app.__file__ + collect-only -m 'not serial_timing' (run 3)
+995/1054 tests collected (59 deselected) in 2.71s

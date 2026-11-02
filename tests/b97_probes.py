@@ -11,6 +11,7 @@ from __future__ import annotations
 from typing import Optional
 
 from s19_app.tui.open_folder_chip import OpenFolderChip
+from tests.support.timing import wait_until
 
 #: The terminal the chip tests run at: wide enough that a status line naming a
 #: full ``tmp_path`` target is not clipped by the status cap (``app.py``
@@ -311,13 +312,21 @@ def span_colours(app, widget, region=None) -> list:
     return runs
 
 
-async def settled(pilot, predicate, description: str, attempts: int = 60) -> None:
+async def settled(
+    pilot, predicate, description: str, attempts: int = 60, *, timeout: float = 60.0
+) -> None:
     """Bounded pump-until (the ``_settled`` idiom of
     ``tests/test_tui_patch_editor_v2.py``): ``pilot.pause()`` until
     ``predicate()`` holds, then fail loudly with ``description``. Never one
-    fixed pause before an assertion that waits for a render."""
-    for _ in range(attempts):
-        await pilot.pause()
-        if predicate():
-            return
-    raise AssertionError(f"did not settle: {description}")
+    fixed pause before an assertion that waits for a render.
+
+    ``attempts`` is accepted and ignored: it is kept for the existing call
+    sites and no longer bounds anything; the bound is ``timeout`` seconds of
+    wall time."""
+    await wait_until(
+        pilot,
+        predicate,
+        f"did not settle: {description}",
+        timeout=timeout,
+        pause_first=True,
+    )

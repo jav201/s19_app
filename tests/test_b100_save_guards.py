@@ -95,6 +95,7 @@ from s19_app.tui.workspace import is_windows_device_name
 
 from tests.support import b100_links
 from tests.support import b100_save_dialog as sd
+from tests.support.timing import report_margin
 from tests.support.timing import timing_bound
 from tests.support.b100_load_dialog import highlight_row, is_load_dialog
 from tests.support.b100_workers import settle_workers
@@ -2508,6 +2509,7 @@ def test_tc_b100_05_merge_drops_a_faulty_carried_document_with_one_line(
     _clean(_doc_lines(messages))
 
 
+@pytest.mark.serial_timing
 def test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second(tmp_path: Path) -> None:
     """E3 R10 / R8 refined: ``ab`` (never loaded) records a 20 000-entry
     document → Save project completes under 1 s, the record kept, 0 lines
@@ -2524,7 +2526,9 @@ def test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second(tmp_path: 
     assert _doc_lines(messages) == [], messages
     assert elapsed is not None, "the save never reached its commit"
     print(f"Save project request -> commit end {elapsed:.3f} s")
-    assert elapsed < timing_bound(1.0), f"Save project took {elapsed:.3f} s"
+    assert elapsed < report_margin(
+        "TC-B100-05 merge", elapsed, timing_bound(1.0)
+    ), f"Save project took {elapsed:.3f} s"
 
 
 def test_tc_b100_05_merge_keeps_a_held_document_with_one_line(tmp_path: Path) -> None:

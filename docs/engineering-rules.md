@@ -190,3 +190,19 @@ C-32 and C-37 answer *which render layer holds the fact* for a **widget** — ge
 
 ## C-34 — render-increment full-guard-host run (Phase 3, extends C-19)
 An increment that changes any **TUI render module** (`app.py` compose/render methods, `issues_view.py`, `checks_view.py`, `screens_directionb.py`, `hexview.py`, `styles.tcss`, the rail) MUST run the **FULL `tests/test_tui_directionb.py`** at its gate — not a `-k` subset — because that file is the **cross-cutting guard host**: the markup-safety source scans (`test_tc_042_10`: `assert "from_markup" not in <render_module>_source`), the rail/screen-count census (`== 9`, `EXPECTED_RAIL`, positional/digit-string routing), the shared-chrome/footer binding census, and the command-bar-label invariants all live there and fire on render/rail/chrome changes that a story-scoped `-k` run never touches. A render increment's per-gate evidence run therefore includes the whole file (~3 min at the current size) plus the frozen dual-guard; a `-k`-subset-only gate is a C-19 partial-run violation in its render-specific form. (Origin: batch-49 — Inc-1 (Issues MID) added a docstring literal `Text.from_markup`; `test_tc_042_10`'s source scan tripped, but Inc-1's gates ran only `-k` subsets + the new file, so the escape surfaced two increments later when Inc-3 ran the full `test_tui_directionb.py`. Also the rail-count census (`== 8`→`== 9`) only fully validates under the whole-file run. Extends C-19: "one complete run, evidence read from its own output" — here the *scope* of "complete" for a render increment is the full guard host, not a story-scoped selector.)
+
+
+## Test timing, waits and oracles (batch-101 Inc 2)
+Six rules, each binding for any test that measures time, waits on the app or
+asserts an observable:
+
+1. Release gate: the gate is the parallel lane `pytest -n 8 -m "not serial_timing"` followed by the serial lane `pytest -m serial_timing`, both on the LAN Linux host.
+2. Post-press: An arm that checks the state a key press leaves while a real worker runs holds the worker at a forced slow step or records the state at the product hook; it never samples after the press.
+3. Clock stop: A timing arm stops its clock at a stamp the product emits (a commit handler, a painted line, an install callback), never when a poll notices.
+4. Margin finding: A margin under 20 % in the serial lane's QC-TM section is a gate finding; the finding gives the base tree's time beside it.
+5. Painted-outcome oracle: A test that waits on a painted outcome collects the lines painted since its trigger (StatusLog.since(mark)) and asserts the one it needs; it never waits on the newest line alone.
+6. Observable census: When an increment changes the order or the source of an observable, its gate greps tests/ for every node that asserts that observable and runs them, whatever module they sit in.
+
+(Origin: batch-101 Inc 2 — the serial/parallel lane split, the QC-TM margin
+section, and the timing-arm census; requirements R-TST-007, 030, 047, 048,
+052, 060 and the wait/hook rows R-TST-020 … 046.)

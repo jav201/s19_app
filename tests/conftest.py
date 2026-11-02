@@ -22,6 +22,13 @@ from typing import TYPE_CHECKING, Optional
 
 import pytest
 
+pytest_plugins = ["pytester"]
+
+from tests.support.timing import (  # noqa: E402
+    pytest_runtest_makereport,
+    pytest_terminal_summary,
+)
+
 if TYPE_CHECKING:
     from s19_app.tui.changes import ChangeDocument
     from s19_app.tui.models import LoadedFile
@@ -1027,6 +1034,11 @@ def make_deeply_nested_unified_file(path: Path, *, depth: int = 120_000) -> Path
 #: inside canonical report bytes (LLR-054.4/055.3 canonical form).
 RUN_ROOT_TOKEN = b"<RUN-ROOT>"
 
+#: Placeholder a report golden holds in place of the tool version
+#: (batch-101 Inc 2, US-TST-5): canonicalization puts the package's
+#: version, as ``s19_app.version`` gives it at call time, in its place.
+TOOL_VERSION_TOKEN = b"<TOOL-VERSION>"
+
 #: A run-root path span: the token plus its path remainder, stopping at the
 #: delimiters the reports place around paths (whitespace, backtick, quote,
 #: pipe, closing paren/bracket) — separator normalization applies ONLY
@@ -1083,6 +1095,9 @@ def canonical_report_bytes(raw: bytes, run_root: Optional[Path] = None) -> bytes
     )
     if run_root is not None:
         _assert_no_host_path_residue(data, run_root)
+    from s19_app.version import __version__ as _tool_version
+
+    data = data.replace(TOOL_VERSION_TOKEN, _tool_version.encode("utf-8"))
     return data
 
 

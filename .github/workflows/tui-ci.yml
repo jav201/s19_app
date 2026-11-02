@@ -23,9 +23,13 @@ permissions:
 jobs:
   tui-ci:
     runs-on: ubuntu-latest
+    timeout-minutes: 240
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -33,20 +37,34 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
+        id: install
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
           python -m pip install pytest
+          python -m pip install "pytest-xdist==3.8.0"
           python -m pip install -e ".[evidence]"
           python -c "from PIL import Image, ImageDraw, ImageFont, features; import PIL; assert features.check('freetype2'), 'freetype2 unavailable'; print(PIL.__version__)"
 
       - name: Run lean test suite (pull requests)
         if: github.event_name == 'pull_request'
-        run: pytest -q -m "not slow"
+        timeout-minutes: 120
+        run: pytest -v -rs -n auto --dist loadfile -m "not slow and not serial_timing"
+
+      - name: Run timing arms (pull requests)
+        if: github.event_name == 'pull_request' && !cancelled() && steps.install.outcome == 'success'
+        timeout-minutes: 30
+        run: pytest -q -rs -m "serial_timing and not slow"
 
       - name: Run full test suite (pushes)
         if: github.event_name == 'push'
-        run: pytest -q
+        timeout-minutes: 180
+        run: pytest -v -rs -n auto --dist loadfile -m "not serial_timing"
+
+      - name: Run timing arms (pushes)
+        if: github.event_name == 'push' && !cancelled() && steps.install.outcome == 'success'
+        timeout-minutes: 45
+        run: pytest -q -rs -m serial_timing
 
   # Non-blocking layout-drift oracle (batch-25). Runs the pytest-textual-snapshot
   # suite that the main tui-ci job cannot (it never installs the [dev] extra, so
@@ -61,6 +79,9 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v5

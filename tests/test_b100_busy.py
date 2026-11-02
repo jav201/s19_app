@@ -2303,6 +2303,7 @@ def test_tc_b100_51_before_after_ends_once_and_logs_its_outcome(
 # ===========================================================================
 
 
+@pytest.mark.serial_timing
 def test_at_b100_17_worker_load_of_an_8_mib_s19_by_keys(tmp_path: Path) -> None:
     """AT-B100-17, 12a half (HLR-176, HLR-176a, HLR-176c, HLR-176d): in a
     scratch work area, ``l`` opens Load on the path field, the absolute path
