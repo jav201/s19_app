@@ -256,6 +256,11 @@
       "station": "P3",
       "date": "2026-11-01",
       "decision": "batch-100 batch-end fix rounds 1 and 2 merged on main (b100-fix1 at 677435e): battery failures CI11-1 (product), tc_b100_59, R-1..R-3 fixed or re-pinned; SE5-12b-2 guards, OBS-12b-1/2, A12-51 closed; R1-P1, SR12b-7, OBS-F2-1, R2-CI routed to BACKLOG-CODE; full suite deferred to CI."
+    },
+    {
+      "station": "P3",
+      "date": "2026-11-01",
+      "decision": "batch-100 batch-end fix round 3 merged on main (b100-fix3): the 4 new Linux failures of CI 41338318239 plus AT-B100-17 were test races/platform assumptions, product unchanged; verified on a Linux host on Python 3.11; SR12b-7b routed."
     }
   ],
   "obsidian_synced": false,
