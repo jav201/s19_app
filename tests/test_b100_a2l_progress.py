@@ -107,15 +107,19 @@ def test_tc_b100_73_case06_reports_bytes_and_parses_the_same(tmp_path: Path) -> 
 
 def test_tc_b100_73_small_a2l_reports_once_and_parses_the_same(tmp_path: Path) -> None:
     """LLR-176.4 boundary, LLR-176.4a (D12b-02, D12b-04): case_01's A2L
-    (1 444 bytes, 53 lines — smaller than one progress chunk) → exactly one
-    report ``(1444, 1444)``; the result equals the parse with no callback.
+    (53 lines — smaller than one progress chunk) → exactly one report
+    ``(size, size)``, ``size`` the file's size on disk; the result equals the
+    parse with no callback.
 
     Why: a small A2L must still finish its step (the bar's final report).
     Negative control: no final report → 0 calls → RED; base: no callback →
-    RED."""
+    RED. Fix round 3: the size is read from disk, not pinned — the checkout
+    decides it (1 444 bytes with CRLF on Windows, 1 391 with LF on the Linux
+    CI)."""
+    size = CASE01_A2L.stat().st_size
     seen, progress = _recorder()
     with_cb = _parse_with(CASE01_A2L, progress)
-    assert seen == [(1444, 1444)], seen
+    assert seen == [(size, size)], seen
     assert with_cb == a2l_module.parse_a2l_file(CASE01_A2L)
 
 

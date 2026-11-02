@@ -1,0 +1,20 @@
+==== MAIN
+INFO     s19tui:app.py:7957 Workarea refreshed. files=0
+=========================== short test summary info ============================
+FAILED tests/test_b100_a2l_progress.py::test_tc_b100_73_small_a2l_reports_once_and_parses_the_same
+FAILED tests/test_b100_busy.py::test_tc_b100_51_a2l_load_ends_once_on_success
+FAILED tests/test_b100_workers.py::test_at_b100_18_quit_confirm_half_slow_save_as_leaves_no_partial_folder
+3 failed, 1 passed in 32.22s
+ M tests/test_b100_a2l_progress.py
+ M tests/test_b100_busy.py
+ M tests/test_b100_workers.py
+ M tests/test_b97_flow_execution.py
+==== FIX3
+....                                                                     [100%]
+4 passed in 30.78s
+==== FIX3-MODULES
+python -m pytest: error: unrecognized arguments: -n
+  inifile: /home/javierg/work/s19_app/pyproject.toml
+  rootdir: /home/javierg/work/s19_app
+
+exit=0

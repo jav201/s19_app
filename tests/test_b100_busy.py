@@ -1833,10 +1833,12 @@ def test_tc_b100_51_a2l_load_ends_once_on_success(tmp_path: Path, monkeypatch: p
 
     (bar, added, final, timers, begins), refused = _run(tmp_path / "app", scenario)
     # Inc 12b (C12b-30): step 2 after the copy, the parser's one byte report
-    # (1444, 1444) at the end of step 2, step 3, the end.
+    # (size, size) at the end of step 2, step 3, the end. Fix round 3: size is
+    # the A2L's size on disk (the copy is byte-equal), not a pinned literal.
+    size = (CASE01 / "firmware.a2l").stat().st_size
     assert bar == [0, 33, 66, 66, 0], bar
     assert [(n, d, t) for _k, _g, n, d, t in seam.steps if _k == "a2l_load"] == [
-        (2, None, None), (2, 1444, 1444), (3, None, None)
+        (2, None, None), (2, size, size), (3, None, None)
     ], seam.steps
     assert [b[:3] for b in begins] == [("a2l_load", "Loading firmware.a2l", A2L_STEPS)], begins
     assert added == ["A2L loaded: firmware.a2l"], added
@@ -1892,7 +1894,7 @@ def test_tc_b100_51_project_load_ends_once_on_success(tmp_path: Path, monkeypatc
         return log.since(mark), _status(app), len(_busy_timers(app))
 
     added, final, timers = _run(base, scenario)
-    # Inc 12b (P1-21): the A2L parse's final byte report (1444, 1444) fills
+    # Inc 12b (P1-21): the A2L parse's final byte report (size, size) fills
     # step 2 before step 3.
     assert seam.bar == [0, 25, 50, 50, 75, 0], seam.bar
     assert [b[:3] for b in seam.begins] == [("project_load", "Loading project P", PROJECT_STEPS)], seam.begins

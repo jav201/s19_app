@@ -1,0 +1,8 @@
+1 passed in 11.75s
+E       AssertionError: ([(1, 2)], None)
+1 failed in 16.39s
+1 passed in 11.95s
+1 passed in 14.17s
+1 passed in 12.07s
+1 passed in 14.05s
+done
