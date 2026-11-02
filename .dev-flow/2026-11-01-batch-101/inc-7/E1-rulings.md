@@ -1,0 +1,70 @@
+# Inc 7 — E1 rulings: scope, decisions and reasons
+
+Base `e266395`. Records: `01-requirements.md` (15 rows: 7 new, 1 withdrawn by split, 7 canon rows in scope unchanged), `E1-slice.md`, `02-test-cases.md`, `codewire/graph-inc7.md`. Model: Opus. Every claim of the Kimi triage row F-42 (`p0/triage-A-editors-checks-reports.md:30`) was re-checked against the code; its line numbers hold at `e266395`.
+
+## 1. Scope list
+
+| Item | Source | In / out | Rows |
+|---|---|---|---|
+| F-42 title: "Diff report" in both files of the before/after report | DOSSIER §5 F-42; ch21.1 line 42; capture ch21-02 | in | R-BEFORE-AFTER-REPORT-001.32, .33, .34; guard R-CMP-004.1 |
+| F-42 header: `a2l=absent; mac=absent` with the A2L loaded | F-42; `before_after_service.py:328-339` (compare gets no artifact) | in | R-BEFORE-AFTER-REPORT-001.35; R-CMP-003.2 |
+| F-42 Symbols column `-` (= CODE-CHANGES D14-15) | F-42; `before_after_service.py:349-357` (generators get no `a2l_records` / `mac_records`) | in | R-BEFORE-AFTER-REPORT-001.24; R-CMP-004.5 |
+| F6-1 — every written hex window cut at 512 rows | BACKLOG-CODE F6-1 (HIGH); `diff_report_service.py:1283` | in: Markdown blocks (diff, A, B) and the HTML only-A / only-B windows of every diff report (manual A↔B, before/after, flow A2B) | R-CMP-004.14 |
+| D14-10 — Markdown diff report does not escape labels, paths, symbol names | CODE-CHANGES D14-10; PLAN.md P0 ruling (joins Inc 7) | in: every label field and path field (Definitions), including the filter file name (closes the "D-8 deferral" recorded in `tests/test_tui_report_filter_surface.py:952-959`) | R-CMP-004.9 → .9.1, .9.2; guards R-CMP-004.8, R-BEFORE-AFTER-REPORT-001.21, .22 |
+| Check-spec name in the `## Checks` addendum (`md_safe` inside a code span, `:1512-1517`) | found at E1 | **out → backlog (OBS-7-2)** | — |
+| F-42 extent half: a run inside a tag's extent but not holding its address stays `-` (ch21 run `0x00800080` would still read `-` while the linkage names `VAL_BLK_0001`) | found at E1 | **out → decision O-4** | R-CMP-004.5 kept |
+| D14-14 refusal text `(screen 7)` → `(key 7)` (R-BEFORE-AFTER-REPORT-001.11) | CODE-CHANGES D14-14, routed to Inc 6 | **out → decision O-3** (the string lives in this increment's file) | — |
+| ch21 guide text that describes F-42 (ch21-html-reports.md:42, :53-55) | docs | out: the guide pass after the batch (Inc 14 or the batch doc pass) | — |
+
+## 2. Decisions
+
+| Id | Decision | Reason | What would change it |
+|---|---|---|---|
+| D-1 | **The before/after title is derived from the provenance input**: both generators write "Before/after report" when `provenance` is given, "Diff report" otherwise. No new generator parameter. | CTX-BEFOREAFTER defines the before/after report as the diff report that carries the provenance section; `provenance=` has exactly one caller, the before/after composer (grep at `e266395`). Deriving keeps the composer→generator keyword set that TC-311 (`test_tc311_no_filter_generator_kwargs_shape_is_todays`) pins, so that node stays unchanged. An explicit `report_title` kwarg was the alternative: clearer at the call site, but one more input that a caller can get wrong and a pinned test to re-pin | a second caller passes provenance for a report that is not a before/after report |
+| D-2 | **The A2L and MAC reach the composer as three keyword inputs** (`a2l_data`, `a2l_records`, `mac_records`), gathered by the app on the UI thread and forwarded: `a2l_data` + `mac_records` to the compare (artifact lines), `a2l_records` + `mac_records` to both generators (Symbols), the latter two only when not `None` (the `report_filter` pattern). | Mirrors the manual A↔B path exactly (`app.py:7288-7294` compare, `:7501-7509` generators), so both reports annotate the same way. Gathering on the UI thread follows the N5 rule already in `_start_before_after_worker` (`source_name` is resolved there because a worker reading `current_file` races a load). `_compute_a2l_enriched_tags()` is the cached tag list the A↔B report and the filter path already use on the UI thread | the composer is given the `LoadedFile` itself (a wider interface) |
+| D-3 | **"No MAC loaded" = `LoadedFile.mac_path is None`**, and the app then forwards `mac_records=None`. | A loaded image without a MAC file holds `mac_records=[]` (`load_service.py:80`); forwarding `[]` makes the compare report `mac=unused (0/0)`, against R-CMP-003.2. The A↔B path has this defect today (OBS-7-1) | — |
+| D-4 | **F6-1: the report renders its own window rows** in `_window_rows` (the same row format), instead of calling the screen's `render_hex_view` with a larger `max_rows`. | `render_hex_view` has two caps: 512 rows (`MAX_HEX_ROWS`) and 65,536 mapped bytes (`MAX_HEX_BYTES`, `hexview.py:243-244`). Raising `max_rows` alone still cuts any window over 64 KiB (negative control (b) of R-CMP-004.14). Changing `render/hexview.py` would touch the screen path every TUI view uses. The row format is 3 lines; `_html_hex_row` already renders its own rows the same way. `MAX_HEX_ROWS` stays the screen cap; `HEX_WIDTH` still comes from `render.hexview`, so the consumer census of `tests/test_render_hexview.py:44-52` holds | a shared "uncapped rows" function appears in `render/hexview.py` for another caller |
+| D-5 | **One escaping rule at the sink for D14-10**: label fields → report-safe text, path fields → path text (S12 CTX-RPT-TEXT; the `markdown_safety` truth table: no run root / not a path → Mode A; a path outside a table cell → Mode B), each of the control-stripped value; field limit 512 (S12's "every other field"). | One rule per field kind, the project report's (S12) rule; the control strip first keeps R-BEFORE-AFTER-REPORT-001.21 true in both files (the HTML side strips the same set). Mode B keeps ordinary paths byte-identical, so the `<RUN-ROOT>` canonicaliser of the goldens still matches. A symbol list in the Runs cell is escaped name by name, so the 512 limit never hides a name | — |
+| D-6 | **The flow-A2B producer stops pre-escaping** (`flow_execution_service.py:984` `md_safe(path.stem, limit=120)`, `:986` `md_code(str(path))` → `path.stem`, `str(path)`). | With D-5 the generator escapes at the sink; a pre-escaped label would be escaped twice (`\\[red\\]`), breaking AT-B94-18 (`test_at_b94_18_hostile_names_render_literally`), which expects one escape. The two lines' own comment says they are identity on clean values. This adds `flow_execution_service.py` to the slice (decision O-2) | O-2 rules the line out of Inc 7 |
+| D-7 | **Which existing values stay on `_md_cell`**: linkage Type, Disposition, Linkage; flow-attribution disposition, refusal code and message; provenance Applied (UTC). | They are not label or path fields (classification tokens and messages), and their own rows (R-BEFORE-AFTER-REPORT-001.21/.22, R-DIFF-FLOWCHG.3/.7) are met today. Widening D14-10 to messages is a separate decision | a hostile message is shown to break the report |
+| D-8 | **No new test file**: new cases go into `tests/test_before_after_report.py` and `tests/test_diff_report_service.py`; `EXPECTED_SCANNED_TEST_FILES` is unchanged. | Both files already host the before/after and diff-report cases | — |
+
+## 3. Golden and pinned-text changes (requirement-level; each listed with its row)
+
+| File / node | Change | Row |
+|---|---|---|
+| `tests/goldens/batch35/at054b-before-after-report.md` | line 1 `# Diff report` → `# Before/after report`; line 5 `img.s19` → `img\.s19`; line 6 `img-patched.s19` → `img-patched\.s19` (labels only; paths, artifact lines, linkage unchanged) | R-BEFORE-AFTER-REPORT-001.32; R-CMP-004.9.1 |
+| `tests/goldens/batch35/at054b-before-after-report.html` | `<title>Diff report</title>` → `<title>Before/after report</title>`; `<h1>Diff report</h1>` → `<h1>Before/after report</h1>` | .33, .34 |
+| `tests/test_diff_report_service.py` `_PRE_CHANGE_MD_TEMPLATE` (used by `test_default_kwargs_output_byte_identical_pre_change_golden`, `test_tc313_no_filter_output_byte_identical_todays`) | `- Image A: A.s19` → `A\.s19`, `- Image B: B.s19` → `B\.s19`. The HTML template is unchanged (R-CMP-004.8) | R-CMP-004.9.1 |
+| Other pinned strings (node list in `E1-slice.md` §4) | escaped spellings of labels, symbols and filter names; the before/after title in AT-053b; `patch\.out` in TC-B94-24 | .9.1, .32, .34 |
+
+**Interaction with Inc 2 (PR #212, not on `e266395`):** Inc 2 rewrites the same two goldens to `Tool version: <TOOL-VERSION>`. Inc 7 must be rebased on main after Inc 2 merges, before E4 edits the goldens; the two edits touch different lines.
+
+**Vacuity hazard for E4 testers:** after D-5 every symbol with `_` is written escaped, so a negative assertion on the raw spelling (`"OUTSIDE_SYM" not in text`, `"OTHER_DROP" not in md_text`, `"MID_DROP" not in md_text`, `"CAL_KEEP" not in md_text`) passes whether or not the name leaked. Each such assertion is re-pinned to the escaped spelling (or to both spellings). Sites: `tests/test_diff_report_service.py:434`, `:1268`, `:1323`, `:1347`.
+
+## 4. Decisions needed from the orchestrator
+
+| Id | Question | Recommendation |
+|---|---|---|
+| O-1 | F-42's A2L/MAC half needs `tui/app.py` (`action_before_after_report`, `_start_before_after_worker`): the composer cannot see the session's A2L. The plan named 2 files. Inc 6 (F-47 instrumentation of `action_before_after_report`, F-05) and Inc 3–5 own `app.py`. | Inc 7 takes the two `app.py` functions (≈ 10 changed lines); merge order Inc 7 before Inc 6, or Inc 6 rebases. Alternative: Inc 7 ships the composer inputs with `None` defaults and Inc 6 wires the app — then AT R-BEFORE-AFTER-REPORT-001.24/3 and .35/2 stay RED until Inc 6 |
+| O-2 | D14-10 needs `flow_execution_service.run_flow` (2 lines, D-6), a file Inc 8 and Inc 9 own; with it Inc 7 is at the 4-file cap. | Inc 7 takes the 2 lines (they must land with the sink escaper, or AT-B94-18 turns RED); Inc 8 rebases (different lines of `run_flow`). Alternative: drop image labels from R-CMP-004.9.1 in Inc 7 and route them with the 2 lines to Inc 8 |
+| O-3 | D14-14's text half (`(screen 7)` → `(key 7)`, R-BEFORE-AFTER-REPORT-001.11) is a string in `before_after_service.py:318`, Inc 7's file; Inc 6 owns D14-14. | Inc 7 takes the one string (no new file for Inc 6); Inc 6 keeps the offer half |
+| O-4 | Symbols by address (canon CTX-DIFFREPORT) leave a run inside a tag's extent at `-` (ch21: run `0x00800080`–`0x00800088` in `VAL_BLK_0001`). Overlap by extent would change every diff report (R-CMP-004.5). | Keep the canon in Inc 7; record a backlog row proposing extent overlap for the Symbols column (needs a ruling on the extent source) |
+| O-5 | Filter file name (S6) is in D14-10's scope here although it is a document name; it changes 3 pinned assertions (`test_tc312_audit_header_first_block_fixed_format`, `test_tc318_hostile_filter_name_sanitized_md_html`, AT-053b). | Keep it in: the AT-053b comment records it as deferred "to a later batch"; striking it leaves those 3 assertions unchanged |
+
+## 5. Observations for the backlog (not fixed here)
+
+- **OBS-7-1** (code read, not observed live): the manual A↔B compare forwards `loaded.mac_records` (`app.py:7287`), `[]` when no MAC is loaded, so its artifact lines (screen and report) read `mac=unused (0/0)` instead of `mac=absent` (R-CMP-003.2). Same fix as D-3, in the A↔B handlers.
+- **OBS-7-2**: the `## Checks` addendum writes the check-spec name as report-safe text inside a code span (`diff_report_service.py:1512-1517`): the escapes show as backslashes and a backtick in the name closes the span. Canon R-DIFF-CHK.9 writes `- Check spec: <name>` with no code span. The HTML twin reads the Markdown lines back (`_md_unescape`), so the fix needs its own design.
+- **OBS-7-3**: `_strip_ctl` removes C0 and DEL but not C1 controls (U+0080 … U+009F), although R-BEFORE-AFTER-REPORT-001.21 says "control characters". After D-5 a C1 character becomes `�` in the Markdown file and stays raw (escaped) in the HTML file.
+- **OBS-7-4** (cost of completeness, G-9): a fully changed 1 MiB run writes 4 Markdown blocks of 65,540 rows (≈ 20 MB); the HTML side-by-side pane is already uncapped today.
+
+## Orchestrator rulings after E1/E2 (2026-11-02)
+
+- O-1 accepted: Inc 7 takes `action_before_after_report` and `_start_before_after_worker` in app.py. app.py merges stay serial: Inc 7 and Inc 3 touch different functions; whichever merges second rebases; Inc 6 (F-47, same function) rebases on Inc 7.
+- O-2 accepted: Inc 7 takes the two lines of `flow_execution_service.run_flow` (A2B arm) and merges before Inc 8; Inc 8 rebases (its `run_flow` change is in another arm). Inc 7 is at the 4-file cap.
+- O-3 accepted: the `(screen 7)` → `(key 7)` string (D14-14) is in Inc 7.
+- O-4 accepted: symbols stay matched by address as the canon says; extent matching goes to the backlog.
+- O-5 accepted: escaping the filter file name stays in (closes the D-8 deferral); the three pinned assertions change with their rows.
+- OBS-7-1 … OBS-7-4 and the guide ch21 text update go to the backlog / Inc 14 (docs).
+- Inc 7 rebases onto main after Inc 2 (PR #212) merges and before E4 (Inc 2 rewrites the same goldens).
