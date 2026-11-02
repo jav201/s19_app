@@ -1,0 +1,32 @@
+# CI run 41372953464 (tui-ci workflow, push of f72eef1) — batch-100 deferred confirmation (R-TST-070, R-TST-072)
+# Source: gh run view 41372953464 (jobs) and the job logs; only the FAILED lines and the summary lines are copied (E3S-2).
+# Classification: known = one of the 5 known failures of batch-100's Linux gate (01-requirements.md, Definitions); new = anything else.
+
+## jobs
+tui-ci   125047120573  failure  2026-11-02T01:31:52Z -> 2026-11-02T06:25:32Z  (4 h 53 min serial)
+snapshot 125047120795  success  2026-11-02T01:31:52Z -> 2026-11-02T01:33:53Z
+
+## tui-ci FAILED lines (verbatim, timestamps kept)
+2026-11-02T06:25:26.2126939Z FAILED tests/test_changes_file_notation_help.py::test_tc1802_nine_md_sections_intact_tenth_section_added - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/s19_app/s19_app/prototypes/cambios_10_12_2026/help_sections.md'
+2026-11-02T06:25:26.2129136Z FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact - AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+2026-11-02T06:25:26.2149850Z FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection - AssertionError: baseline wrote []
+2026-11-02T06:25:26.2156193Z FAILED tests/test_window_usage_help.py::test_tc707_copy_matches_help_sections_md_verbatim - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/s19_app/s19_app/prototypes/cambios_10_12_2026/help_sections.md'
+2026-11-02T06:25:26.2158627Z FAILED tests/test_window_usage_help.py::test_tc707_numbering_generated_sequential - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/s19_app/s19_app/prototypes/cambios_10_12_2026/help_sections.md'
+
+## tui-ci summary line
+2026-11-02T06:25:26.2160022Z 5 failed, 5034 passed, 211 skipped, 4 xfailed in 17595.11s (4:53:15)
+
+## classification
+known  tests/test_changes_file_notation_help.py::test_tc1802_nine_md_sections_intact_tenth_section_added
+known  tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+known  tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+known  tests/test_window_usage_help.py::test_tc707_copy_matches_help_sections_md_verbatim
+known  tests/test_window_usage_help.py::test_tc707_numbering_generated_sequential
+new    (none)
+
+## snapshot job summary lines (verbatim)
+2026-11-02T01:33:50.2688403Z 29 snapshots passed.
+2026-11-02T01:33:50.2688615Z 29 passed, 4 deselected in 97.81s (0:01:37)
+
+## verdict
+FAILED set of the tui-ci job = the 5 known failures; 0 new. snapshot job: success, 29 of 29 snapshot cells passed (the 29 density cells of LLR-173.2m; the -q run names no cell, so each cell's result is read from the 29/29 count).
