@@ -263,24 +263,28 @@
       "decision": "batch-100 batch-end fix round 3 merged on main (b100-fix3): the 4 new Linux failures of CI 41338318239 plus AT-B100-17 were test races/platform assumptions, product unchanged; verified on a Linux host on Python 3.11; SR12b-7b routed."
     },
     {
-      "station": "P3",
-      "date": "2026-11-01",
-      "decision": "DDR discharged per increment: from Inc 8a each increment ran a code-free design review (E3, Code-Wire graph + architect/security, 1-2 rounds) before code; records in inc-*/E3-*.md and packets 008/016-022."
-    },
-    {
       "station": "DDR",
       "date": "2026-11-01",
-      "decision": "P4 validation PASS-WITH-NOTES under the standing authorization: Linux gate on f72eef1 (5 known + 13 timing arms under parallel load, serial re-run clean); expert UX inspection PASS-WITH-NOTES (G-001 discharged); GitHub CI 41372953464 deferred by operator ruling 2026-11-01 (post-close confirmation)."
+      "decision": "DDR discharged per increment: from Inc 8a each increment ran a code-free design review (E3, Code-Wire graph + architect/security, 1-2 rounds) before code; records in inc-*/E3-*.md and packets 008/016-022.",
+      "notes": "station label corrected at close (the script logs the station being left)"
     },
     {
       "station": "P4",
       "date": "2026-11-01",
-      "decision": "P5 post-mortem and close record approved: design-first moved defects to E3; the per-increment test-scope override cost 3 batch-end fix rounds; worker races in tests are the new failure family (SR12b-7/7b, G-015); release decision v1.0.0-rc1 with batch-101 release hardening."
+      "decision": "P4 validation PASS-WITH-NOTES under the standing authorization: Linux gate on f72eef1 (5 known + 13 timing arms under parallel load, serial re-run clean); expert UX inspection PASS-WITH-NOTES (G-001 discharged); GitHub CI 41372953464 deferred by operator ruling 2026-11-01 (post-close confirmation).",
+      "notes": "station label corrected at close (the script logs the station being left)"
     },
     {
       "station": "P5",
       "date": "2026-11-01",
-      "decision": "P6 docs approved (executive summary, functionality, traceability matrix, 3 diagrams); canon folded (393 ids); merge to main, tag v1.0.0-rc1, then /dev-flow-sync."
+      "decision": "P5 post-mortem and close record approved: design-first moved defects to E3; the per-increment test-scope override cost 3 batch-end fix rounds; worker races in tests are the new failure family (SR12b-7/7b, G-015); release decision v1.0.0-rc1 with batch-101 release hardening.",
+      "notes": "station label corrected at close (the script logs the station being left)"
+    },
+    {
+      "station": "P6",
+      "date": "2026-11-01",
+      "decision": "P6 docs approved (executive summary, functionality, traceability matrix, 3 diagrams); canon folded (393 ids); merge to main, tag v1.0.0-rc1, then /dev-flow-sync.",
+      "notes": "station label corrected at close (the script logs the station being left)"
     }
   ],
   "obsidian_synced": false,
