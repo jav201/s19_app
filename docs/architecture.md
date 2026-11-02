@@ -175,7 +175,7 @@ Every feature batch follows GRNDIA's six-phase V-model dev-flow:
 5. **Post-mortem** — what worked, what didn't, follow-up batches scoped.
 6. **Docs** — executive summary, functionality orientation, traceability matrix, architecture diagrams.
 
-Per-batch artefacts are archived under `.dev-flow/<YYYY-MM-DD>-batch-NN/`. The repo-root [REQUIREMENTS.md](../REQUIREMENTS.md) is the living `R-*` index that absorbs each batch's stable requirements.
+Per-batch artefacts are archived under `.dev-flow/<YYYY-MM-DD>-batch-NN/`. The repo-root [REQUIREMENTS.md](../REQUIREMENTS.md) holds the strict EARS requirement rows (`| Id | Form | Requirement |`) per module S0–S17 and absorbs each batch's stable requirements. The rationale is in [requirements/review/](./requirements/review/), the earlier canon in [requirements/history/](./requirements/history/). Ids are kept stable; test ids live in `AT-TC-REGISTRY.jsonl`, not in the canon.
 
 ---
 

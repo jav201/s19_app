@@ -1,7 +1,7 @@
 """Batch-91 registry hygiene — AT-286.
 
 HLR-124's acceptance: every LIVE registry id greps to its verifier, and AT-043
-is one thing in the registry. Three arms:
+is one thing in the registry. Two arms:
 
 (a) every LIVE entry's dash-form token occurs — as a token, per the library's
     maximal-munch TOKEN_RE, not as a substring — in at least one file its
@@ -12,9 +12,6 @@ is one thing in the registry. Three arms:
 (b) AT-043's entry exists and carries a status the grammar accepts
     (LLR-124.1 — resolved LIVE: the declaration in REQUIREMENTS.md's batch-29
     US-043 update describes shipped behavior the verifier pins).
-(c) the cross-artifact census: no id declared in REQUIREMENTS.md is absent
-    from the registry — every governed token cited there has a registry entry
-    under its normalized key, in some status.
 
 The generic guard (``tests/test_id_registry.py``) enforces the rules over the
 whole corpus; this module is the batch's own acceptance that the hygiene
@@ -33,7 +30,6 @@ from tools.id_registry import (
     read_text,
     registry_path,
     repo_root,
-    requirements_path,
 )
 
 ROOT = repo_root(Path(__file__))
@@ -72,19 +68,4 @@ def test_at286_at043_is_resolved_with_a_grammar_valid_status() -> None:
     )
     assert entries[0].status in STATUSES, (
         f"AT-043's status {entries[0].status!r} is not one of {STATUSES}"
-    )
-
-
-def test_at286_no_declared_id_is_absent_from_the_registry() -> None:
-    """AT-286 (c) — the REQUIREMENTS.md <-> registry cross-artifact census."""
-    registry = load_registry(registry_path(ROOT))
-    known = set(registry.by_key())
-    problems: List[str] = []
-    for token, line in iter_tokens(read_text(requirements_path(ROOT))):
-        if not token.governed or token.key is None:
-            continue
-        if token.key not in known:
-            problems.append(f"{token.raw} declared at REQUIREMENTS.md:{line} is not registered")
-    assert not problems, "declared-but-unregistered ids:\n  - " + "\n  - ".join(
-        sorted(set(problems))
     )

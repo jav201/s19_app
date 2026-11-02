@@ -1,9 +1,9 @@
 """
 Recorded counterfactual evidence for the AT/TC registry guard (spec §5.5).
 
-Runs one targeted mutation per rule G1..G7 and prints, for each, **the value it
-substituted** and whether the rule went red. The same seven mutations are
-executed in CI by ``tests/test_id_registry.py::test_at281_every_guard_rule_can_fail``;
+Runs one targeted mutation per rule G1..G3 and G5..G7 and prints, for each,
+**the value it substituted** and whether the rule went red. The same six
+mutations are executed in CI by ``tests/test_id_registry.py::test_at281_every_guard_rule_can_fail``;
 this script exists so the evidence can be regenerated and pasted into a review
 packet without reading pytest internals::
 
@@ -35,7 +35,6 @@ from tests.test_id_registry import (  # noqa: E402
     g1_named_nodes_are_registered,
     g2_live_entries_have_nodes,
     g3_citations_are_registered,
-    g4_requirement_citations_are_live,
     g5_grammar_holds,
     g6_keys_are_unique,
     g7_no_stem_exceeds_high_water,
@@ -89,20 +88,6 @@ def main() -> int:
         reg.entries = [e for e in reg.entries if e.key != key]
         return g3_citations_are_registered
 
-    def m4(reg):
-        exempt = {str(a).strip().lstrip("#").strip()
-                  for a in reg.meta.get("g4_exempt_anchors", [])}
-        victim = next(
-            e for e in reg.entries
-            if e.status == "LIVE" and e.key in corpus.requirement_citations
-            and any(corpus.asserts_verifier.get(line, False)
-                    and corpus.sections.get(line, "") not in exempt
-                    for _, line in corpus.requirement_citations[e.key])
-        )
-        m4.value = f"{victim.id}.status -> 'RETIRED' (was 'LIVE')"
-        victim.status = "RETIRED"
-        return g4_requirement_citations_are_live
-
     def m5(reg):
         victim = next(e for e in reg.entries
                       if not e.conforming and e.id in corpus.nonconforming)
@@ -126,7 +111,7 @@ def main() -> int:
         reg.meta["high_water"]["TC"] = 1
         return g7_no_stem_exceeds_high_water
 
-    for name, mutate in (("G1", m1), ("G2", m2), ("G3", m3), ("G4", m4),
+    for name, mutate in (("G1", m1), ("G2", m2), ("G3", m3),
                          ("G5", m5), ("G6", m6), ("G7", m7)):
         case(name, "", mutate)
         rows[-1] = (name, mutate.value, rows[-1][2], rows[-1][3])
@@ -146,7 +131,7 @@ def main() -> int:
     if failed:
         print(f"\nVACUOUS: {failed} did not go red under a mutation that should break them.")
         return 1
-    print("\nAll seven rules went RED under their mutation; none is vacuous.")
+    print("\nAll six rules went RED under their mutation; none is vacuous.")
     return 0
 
 

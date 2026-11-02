@@ -1,0 +1,493 @@
+# Negative controls: each declared mutant is applied to a fresh COPY of the GREEN mirror (scratch); the worktree is never touched
+# date (UTC): 2026-11-02T05:56:28Z
+# test file sha256: 79d654e4e6dd91b39571e39954408b33ab953fc9779beac32a4bca8d60053590
+# mutations are applied by scratchpad/mutate.py (python, exact-text replacement asserted to occur once); runner: scratchpad/run_mutants.sh
+# --tb=short is added to the pytest command shape so the offender list shows in the transcript
+
+==================================================================
+## M1-rename-canon  (row R-DOC-CANON.1)  rename REQUIREMENTS.md
+mutant M1-rename-canon applied to <scratch>\mutant-work
+$ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
+FFFFFF.FF.F                                                              [100%]
+================================== FAILURES ===================================
+______________________ test_canon_is_one_file_with_rows _______________________
+tests\test_requirements_canon.py:189: in test_canon_is_one_file_with_rows
+    assert CANON.is_file(), f"{CANON} is missing: the requirements live in one file at the repository root"
+E   AssertionError: <scratch>\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
+E   assert False
+E    +  where False = is_file()
+E    +    where is_file = WindowsPath('<scratch>/mutant-work/REQUIREMENTS.md').is_file
+____________________ test_canon_rows_have_id_form_sentence ____________________
+tests\test_requirements_canon.py:201: in test_canon_rows_have_id_form_sentence
+    rows = _rows()
+           ^^^^^^^
+tests\test_requirements_canon.py:161: in _rows
+    rows = _canon().rows
+           ^^^^^^^^
+tests\test_requirements_canon.py:156: in _canon
+    return parse_canon(canon_text())
+                       ^^^^^^^^^^^^
+tests\test_requirements_canon.py:98: in canon_text
+    pytest.fail(f"{CANON} is missing: the requirements live in one file at the repository root")
+E   Failed: <scratch>\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
+____________________ test_canon_rows_open_with_their_form _____________________
+tests\test_requirements_canon.py:225: in test_canon_rows_open_with_their_form
+    rows = _rows()
+           ^^^^^^^
+tests\test_requirements_canon.py:161: in _rows
+    rows = _canon().rows
+           ^^^^^^^^
+tests\test_requirements_canon.py:156: in _canon
+    return parse_canon(canon_text())
+                       ^^^^^^^^^^^^
+tests\test_requirements_canon.py:98: in canon_text
+    pytest.fail(f"{CANON} is missing: the requirements live in one file at the repository root")
+E   Failed: <scratch>\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
+________________ test_canon_rows_hold_the_obligation_word_once ________________
+tests\test_requirements_canon.py:242: in test_canon_rows_hold_the_obligation_word_once
+    rows = _rows()
+           ^^^^^^^
+tests\test_requirements_canon.py:161: in _rows
+    rows = _canon().rows
+           ^^^^^^^^
+tests\test_requirements_canon.py:156: in _canon
+    return parse_canon(canon_text())
+                       ^^^^^^^^^^^^
+tests\test_requirements_canon.py:98: in canon_text
+    pytest.fail(f"{CANON} is missing: the requirements live in one file at the repository root")
+E   Failed: <scratch>\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
+________________________ test_canon_row_ids_are_unique ________________________
+tests\test_requirements_canon.py:257: in test_canon_row_ids_are_unique
+    rows = _rows()
+           ^^^^^^^
+tests\test_requirements_canon.py:161: in _rows
+    rows = _canon().rows
+           ^^^^^^^^
+tests\test_requirements_canon.py:156: in _canon
+    return parse_canon(canon_text())
+                       ^^^^^^^^^^^^
+tests\test_requirements_canon.py:98: in canon_text
+    pytest.fail(f"{CANON} is missing: the requirements live in one file at the repository root")
+E   Failed: <scratch>\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
+__________________ test_canon_modules_are_s0_to_s17_in_order __________________
+tests\test_requirements_canon.py:275: in test_canon_modules_are_s0_to_s17_in_order
+    canon = _canon()
+            ^^^^^^^^
+tests\test_requirements_canon.py:156: in _canon
+    return parse_canon(canon_text())
+                       ^^^^^^^^^^^^
+tests\test_requirements_canon.py:98: in canon_text
+    pytest.fail(f"{CANON} is missing: the requirements live in one file at the repository root")
+E   Failed: <scratch>\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
+___________________ test_canon_s0_table_cites_existing_rows ___________________
+tests\test_requirements_canon.py:362: in test_canon_s0_table_cites_existing_rows
+    text = canon_text()
+           ^^^^^^^^^^^^
+tests\test_requirements_canon.py:98: in canon_text
+    pytest.fail(f"{CANON} is missing: the requirements live in one file at the repository root")
+E   Failed: <scratch>\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
+____________________ test_review_files_hold_the_decisions _____________________
+tests\test_requirements_canon.py:391: in test_review_files_hold_the_decisions
+    links = set(_REVIEW_LINK_RE.findall(canon_text()))
+                                        ^^^^^^^^^^^^
+tests\test_requirements_canon.py:98: in canon_text
+    pytest.fail(f"{CANON} is missing: the requirements live in one file at the repository root")
+E   Failed: <scratch>\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
+______________________ test_canon_rows_are_one_sentence _______________________
+tests\test_requirements_canon.py:465: in test_canon_rows_are_one_sentence
+    rows = _rows()
+           ^^^^^^^
+tests\test_requirements_canon.py:161: in _rows
+    rows = _canon().rows
+           ^^^^^^^^
+tests\test_requirements_canon.py:156: in _canon
+    return parse_canon(canon_text())
+                       ^^^^^^^^^^^^
+tests\test_requirements_canon.py:98: in canon_text
+    pytest.fail(f"{CANON} is missing: the requirements live in one file at the repository root")
+E   Failed: <scratch>\mutant-work\REQUIREMENTS.md is missing: the requirements live in one file at the repository root
+=========================== short test summary info ===========================
+FAILED tests/test_requirements_canon.py::test_canon_is_one_file_with_rows - A...
+FAILED tests/test_requirements_canon.py::test_canon_rows_have_id_form_sentence
+FAILED tests/test_requirements_canon.py::test_canon_rows_open_with_their_form
+FAILED tests/test_requirements_canon.py::test_canon_rows_hold_the_obligation_word_once
+FAILED tests/test_requirements_canon.py::test_canon_row_ids_are_unique - Fail...
+FAILED tests/test_requirements_canon.py::test_canon_modules_are_s0_to_s17_in_order
+FAILED tests/test_requirements_canon.py::test_canon_s0_table_cites_existing_rows
+FAILED tests/test_requirements_canon.py::test_review_files_hold_the_decisions
+FAILED tests/test_requirements_canon.py::test_canon_rows_are_one_sentence - F...
+9 failed, 2 passed in 0.41s
+RESULT M1-rename-canon: target test_canon_is_one_file_with_rows -> RED; 9 test(s) RED: test_canon_is_one_file_with_rows test_canon_rows_have_id_form_sentence test_canon_rows_open_with_their_form test_canon_rows_hold_the_obligation_word_once test_canon_row_ids_are_unique test_canon_modules_are_s0_to_s17_in_order test_canon_s0_table_cites_existing_rows test_review_files_hold_the_decisions test_canon_rows_are_one_sentence ; 2 passed
+
+==================================================================
+## M2a-form-Shall  (row R-DOC-CANON.2)  form Shall on R-DOC-README.1
+mutant M2a-form-Shall applied to <scratch>\mutant-work
+$ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
+.F.........                                                              [100%]
+================================== FAILURES ===================================
+____________________ test_canon_rows_have_id_form_sentence ____________________
+tests\test_requirements_canon.py:215: in test_canon_rows_have_id_form_sentence
+    _report("R-DOC-CANON.2 a row lacks a well-formed id, form or sentence", offenders, len(rows))
+tests\test_requirements_canon.py:175: in _report
+    pytest.fail(f"{rule}: {len(offenders)} offending ({checked} checked)\n  {shown}{more}")
+E   Failed: R-DOC-CANON.2 a row lacks a well-formed id, form or sentence: 1 offending (2623 checked)
+E     line 119 R-DOC-README.1: form 'Shall' is not one of U, When, While, If, Where
+=========================== short test summary info ===========================
+FAILED tests/test_requirements_canon.py::test_canon_rows_have_id_form_sentence
+1 failed, 10 passed in 0.39s
+RESULT M2a-form-Shall: target test_canon_rows_have_id_form_sentence -> RED; 1 test(s) RED: test_canon_rows_have_id_form_sentence ; 10 passed
+
+==================================================================
+## M2b-fourth-cell  (row R-DOC-CANON.2)  a 4th cell on R-DOC-README.1
+mutant M2b-fourth-cell applied to <scratch>\mutant-work
+$ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
+.F.........                                                              [100%]
+================================== FAILURES ===================================
+____________________ test_canon_rows_have_id_form_sentence ____________________
+tests\test_requirements_canon.py:215: in test_canon_rows_have_id_form_sentence
+    _report("R-DOC-CANON.2 a row lacks a well-formed id, form or sentence", offenders, len(rows))
+tests\test_requirements_canon.py:175: in _report
+    pytest.fail(f"{rule}: {len(offenders)} offending ({checked} checked)\n  {shown}{more}")
+E   Failed: R-DOC-CANON.2 a row lacks a well-formed id, form or sentence: 1 offending (2623 checked)
+E     line 119 R-DOC-README.1: 4 cells (want 3)
+=========================== short test summary info ===========================
+FAILED tests/test_requirements_canon.py::test_canon_rows_have_id_form_sentence
+1 failed, 10 passed in 0.42s
+RESULT M2b-fourth-cell: target test_canon_rows_have_id_form_sentence -> RED; 1 test(s) RED: test_canon_rows_have_id_form_sentence ; 10 passed
+
+==================================================================
+## M3-when-row-opens-U  (row R-DOC-CANON.3)  R-DOC-README.1 filed under When, sentence opens 'The system shall'
+mutant M3-when-row-opens-U applied to <scratch>\mutant-work
+$ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
+..F........                                                              [100%]
+================================== FAILURES ===================================
+____________________ test_canon_rows_open_with_their_form _____________________
+tests\test_requirements_canon.py:233: in test_canon_rows_open_with_their_form
+    _report("R-DOC-CANON.3 a sentence does not open with the words of its form", offenders, len(rows))
+tests\test_requirements_canon.py:175: in _report
+    pytest.fail(f"{rule}: {len(offenders)} offending ({checked} checked)\n  {shown}{more}")
+E   Failed: R-DOC-CANON.3 a sentence does not open with the words of its form: 1 offending (2623 checked)
+E     line 119 R-DOC-README.1: form When but the sentence opens 'The system shall include a README that gives the steps to in'
+=========================== short test summary info ===========================
+FAILED tests/test_requirements_canon.py::test_canon_rows_open_with_their_form
+1 failed, 10 passed in 0.40s
+RESULT M3-when-row-opens-U: target test_canon_rows_open_with_their_form -> RED; 1 test(s) RED: test_canon_rows_open_with_their_form ; 10 passed
+
+==================================================================
+## M4-two-shall  (row R-DOC-CANON.4)  a second 'shall' in R-DOC-README.1
+mutant M4-two-shall applied to <scratch>\mutant-work
+$ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
+...F.......                                                              [100%]
+================================== FAILURES ===================================
+________________ test_canon_rows_hold_the_obligation_word_once ________________
+tests\test_requirements_canon.py:248: in test_canon_rows_hold_the_obligation_word_once
+    _report("R-DOC-CANON.4 the obligation word is not used exactly once", offenders, len(rows))
+tests\test_requirements_canon.py:175: in _report
+    pytest.fail(f"{rule}: {len(offenders)} offending ({checked} checked)\n  {shown}{more}")
+E   Failed: R-DOC-CANON.4 the obligation word is not used exactly once: 1 offending (2623 checked)
+E     line 119 R-DOC-README.1: 'shall' appears 2 times
+=========================== short test summary info ===========================
+FAILED tests/test_requirements_canon.py::test_canon_rows_hold_the_obligation_word_once
+1 failed, 10 passed in 0.39s
+RESULT M4-two-shall: target test_canon_rows_hold_the_obligation_word_once -> RED; 1 test(s) RED: test_canon_rows_hold_the_obligation_word_once ; 10 passed
+
+==================================================================
+## M5-copied-row  (row R-DOC-CANON.5)  R-DOC-README.1 copied below itself
+mutant M5-copied-row applied to <scratch>\mutant-work
+$ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
+....F......                                                              [100%]
+================================== FAILURES ===================================
+________________________ test_canon_row_ids_are_unique ________________________
+tests\test_requirements_canon.py:265: in test_canon_row_ids_are_unique
+    _report("R-DOC-CANON.5 an id is used by more than one row", offenders, len(rows))
+tests\test_requirements_canon.py:175: in _report
+    pytest.fail(f"{rule}: {len(offenders)} offending ({checked} checked)\n  {shown}{more}")
+E   Failed: R-DOC-CANON.5 an id is used by more than one row: 1 offending (2624 checked)
+E     R-DOC-README.1: lines 119 and 120
+=========================== short test summary info ===========================
+FAILED tests/test_requirements_canon.py::test_canon_row_ids_are_unique - Fail...
+1 failed, 10 passed in 0.39s
+RESULT M5-copied-row: target test_canon_row_ids_are_unique -> RED; 1 test(s) RED: test_canon_row_ids_are_unique ; 10 passed
+
+==================================================================
+## M6-swap-module-headings  (row R-DOC-CANON.6)  headings of S2 and S3 swapped
+mutant M6-swap-module-headings applied to <scratch>\mutant-work
+$ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
+.....F.....                                                              [100%]
+================================== FAILURES ===================================
+__________________ test_canon_modules_are_s0_to_s17_in_order __________________
+tests\test_requirements_canon.py:277: in test_canon_modules_are_s0_to_s17_in_order
+    assert found == MODULES, (
+E   AssertionError: the '## S<n> · ' headings of <scratch>\mutant-work\REQUIREMENTS.md read ['S0', 'S1', 'S3', 'S2', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11', 'S12', 'S13', 'S14', 'S15', 'S16', 'S17'], want ['S0', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11', 'S12', 'S13', 'S14', 'S15', 'S16', 'S17'] (lines [59, 261, 500, 998, 1255, 1531, 1951, 2358, 2828, 3230, 3468, 3796, 4703, 5285, 5717, 6045, 6382, 6673])
+E   assert ['S0', 'S1', ...4', 'S5', ...] == ['S0', 'S1', ...4', 'S5', ...]
+E     
+E     At index 2 diff: 'S3' != 'S2'
+E     Use -v to get more diff
+=========================== short test summary info ===========================
+FAILED tests/test_requirements_canon.py::test_canon_modules_are_s0_to_s17_in_order
+1 failed, 10 passed in 0.38s
+RESULT M6-swap-module-headings: target test_canon_modules_are_s0_to_s17_in_order -> RED; 1 test(s) RED: test_canon_modules_are_s0_to_s17_in_order ; 10 passed
+
+==================================================================
+## M7-history-one-byte  (row R-DOC-CANON.7)  one byte of the history file flipped (offset 100)
+mutant M7-history-one-byte applied to <scratch>\mutant-work
+$ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
+......F....                                                              [100%]
+================================== FAILURES ===================================
+__________________ test_canon_history_is_the_committed_blob ___________________
+tests\test_requirements_canon.py:305: in test_canon_history_is_the_committed_blob
+    assert digest == HISTORY_SHA256, (
+E   AssertionError: REQUIREMENTS-legacy-e273181.md has sha256 10afa7f1150743d23e3db6c50d1626d5685732257a9af73c33c5802e7051e67c, want 4411f41b9a8d87ca6fb57e3740e6ac32fd6c8bbb320674404d0fd2e2b41b2899, the blob of REQUIREMENTS.md at e273181
+E   assert '10afa7f11507...5802e7051e67c' == '4411f41b9a8d...fd2e2b41b2899'
+E     
+E     - 4411f41b9a8d87ca6fb57e3740e6ac32fd6c8bbb320674404d0fd2e2b41b2899
+E     + 10afa7f1150743d23e3db6c50d1626d5685732257a9af73c33c5802e7051e67c
+=========================== short test summary info ===========================
+FAILED tests/test_requirements_canon.py::test_canon_history_is_the_committed_blob
+1 failed, 10 passed in 0.40s
+RESULT M7-history-one-byte: target test_canon_history_is_the_committed_blob -> RED; 1 test(s) RED: test_canon_history_is_the_committed_blob ; 10 passed
+
+==================================================================
+## M7b-history-crlf  (row R-DOC-CANON.7)  history file with CRLF line endings
+mutant M7b-history-crlf applied to <scratch>\mutant-work
+$ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
+......F....                                                              [100%]
+================================== FAILURES ===================================
+__________________ test_canon_history_is_the_committed_blob ___________________
+tests\test_requirements_canon.py:305: in test_canon_history_is_the_committed_blob
+    assert digest == HISTORY_SHA256, (
+E   AssertionError: REQUIREMENTS-legacy-e273181.md has sha256 984e092ca1be51d606f9f0b004fddf01f7d9fffde86283e609bbf1281cbd64db, want 4411f41b9a8d87ca6fb57e3740e6ac32fd6c8bbb320674404d0fd2e2b41b2899, the blob of REQUIREMENTS.md at e273181 (the bytes are the committed ones with CRLF line endings: check .gitattributes 'docs/requirements/history/** -text')
+E   assert '984e092ca1be...bf1281cbd64db' == '4411f41b9a8d...fd2e2b41b2899'
+E     
+E     - 4411f41b9a8d87ca6fb57e3740e6ac32fd6c8bbb320674404d0fd2e2b41b2899
+E     + 984e092ca1be51d606f9f0b004fddf01f7d9fffde86283e609bbf1281cbd64db
+=========================== short test summary info ===========================
+FAILED tests/test_requirements_canon.py::test_canon_history_is_the_committed_blob
+1 failed, 10 passed in 0.39s
+RESULT M7b-history-crlf: target test_canon_history_is_the_committed_blob -> RED; 1 test(s) RED: test_canon_history_is_the_committed_blob ; 10 passed
+
+==================================================================
+## M8a-nope-id-in-absorbing-cell  (row R-DOC-CANON.8)  R-NOPE.1 in the absorbing cell of HLR-001
+mutant M8a-nope-id-in-absorbing-cell applied to <scratch>\mutant-work
+$ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
+.......F...                                                              [100%]
+================================== FAILURES ===================================
+___________________ test_canon_s0_table_cites_existing_rows ___________________
+tests\test_requirements_canon.py:372: in test_canon_s0_table_cites_existing_rows
+    pytest.fail("R-DOC-CANON.8 " + "\n".join(problems))
+E   Failed: R-DOC-CANON.8 1 of 474 cited ids are not rows of the canon:
+E     line 130: R-NOPE.1
+=========================== short test summary info ===========================
+FAILED tests/test_requirements_canon.py::test_canon_s0_table_cites_existing_rows
+1 failed, 10 passed in 0.40s
+RESULT M8a-nope-id-in-absorbing-cell: target test_canon_s0_table_cites_existing_rows -> RED; 1 test(s) RED: test_canon_s0_table_cites_existing_rows ; 10 passed
+
+==================================================================
+## M8b-unresolved-abbreviation  (row R-DOC-CANON.8)  abbreviation R-TUI-052.1 ... .99 in HLR-008
+mutant M8b-unresolved-abbreviation applied to <scratch>\mutant-work
+$ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
+.......F...                                                              [100%]
+================================== FAILURES ===================================
+___________________ test_canon_s0_table_cites_existing_rows ___________________
+tests\test_requirements_canon.py:372: in test_canon_s0_table_cites_existing_rows
+    pytest.fail("R-DOC-CANON.8 " + "\n".join(problems))
+E   Failed: R-DOC-CANON.8 1 of 473 cited ids are not rows of the canon:
+E     line 137: R-TUI-052.99
+=========================== short test summary info ===========================
+FAILED tests/test_requirements_canon.py::test_canon_s0_table_cites_existing_rows
+1 failed, 10 passed in 0.38s
+RESULT M8b-unresolved-abbreviation: target test_canon_s0_table_cites_existing_rows -> RED; 1 test(s) RED: test_canon_s0_table_cites_existing_rows ; 10 passed
+
+==================================================================
+## M8c-parser-sees-zero-ids  (row R-DOC-CANON.8)  every '| HLR-' line of S0.2 unreadable (0 ids)
+(M8c rewrote 104 S0.2 lines)
+mutant M8c-parser-sees-zero-ids applied to <scratch>\mutant-work
+$ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
+.......F...                                                              [100%]
+================================== FAILURES ===================================
+___________________ test_canon_s0_table_cites_existing_rows ___________________
+tests\test_requirements_canon.py:372: in test_canon_s0_table_cites_existing_rows
+    pytest.fail("R-DOC-CANON.8 " + "\n".join(problems))
+E   Failed: R-DOC-CANON.8 only 0 ids were checked, below the bound of 473: the S0.2 table is not being read
+=========================== short test summary info ===========================
+FAILED tests/test_requirements_canon.py::test_canon_s0_table_cites_existing_rows
+1 failed, 10 passed in 0.40s
+RESULT M8c-parser-sees-zero-ids: target test_canon_s0_table_cites_existing_rows -> RED; 1 test(s) RED: test_canon_s0_table_cites_existing_rows ; 10 passed
+
+==================================================================
+## M9a-remove-review-file  (row R-DOC-CANON.9)  S7-ears-strict.md removed
+mutant M9a-remove-review-file applied to <scratch>\mutant-work
+$ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
+........F..                                                              [100%]
+================================== FAILURES ===================================
+____________________ test_review_files_hold_the_decisions _____________________
+tests\test_requirements_canon.py:405: in test_review_files_hold_the_decisions
+    _report("R-DOC-CANON.9 a module's decisions are not kept where the canon says", offenders, len(MODULES))
+tests\test_requirements_canon.py:175: in _report
+    pytest.fail(f"{rule}: {len(offenders)} offending ({checked} checked)\n  {shown}{more}")
+E   Failed: R-DOC-CANON.9 a module's decisions are not kept where the canon says: 2 offending (18 checked)
+E     docs/requirements/review/S7-ears-strict.md: the file does not exist
+E     docs/requirements/review/S7-ears-strict.md: linked from REQUIREMENTS.md but the file does not exist
+=========================== short test summary info ===========================
+FAILED tests/test_requirements_canon.py::test_review_files_hold_the_decisions
+1 failed, 10 passed in 0.39s
+RESULT M9a-remove-review-file: target test_review_files_hold_the_decisions -> RED; 1 test(s) RED: test_review_files_hold_the_decisions ; 10 passed
+
+==================================================================
+## M9b-break-module-table-link  (row R-DOC-CANON.9)  S7 module-table link points at a missing file
+mutant M9b-break-module-table-link applied to <scratch>\mutant-work
+$ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
+........F..                                                              [100%]
+================================== FAILURES ===================================
+____________________ test_review_files_hold_the_decisions _____________________
+tests\test_requirements_canon.py:405: in test_review_files_hold_the_decisions
+    _report("R-DOC-CANON.9 a module's decisions are not kept where the canon says", offenders, len(MODULES))
+tests\test_requirements_canon.py:175: in _report
+    pytest.fail(f"{rule}: {len(offenders)} offending ({checked} checked)\n  {shown}{more}")
+E   Failed: R-DOC-CANON.9 a module's decisions are not kept where the canon says: 2 offending (18 checked)
+E     S7: the canon holds no link '](docs/requirements/review/S7-ears-strict.md)'
+E     docs/requirements/review/S7-ears-strikt.md: linked from REQUIREMENTS.md but the file does not exist
+=========================== short test summary info ===========================
+FAILED tests/test_requirements_canon.py::test_review_files_hold_the_decisions
+1 failed, 10 passed in 0.37s
+RESULT M9b-break-module-table-link: target test_review_files_hold_the_decisions -> RED; 1 test(s) RED: test_review_files_hold_the_decisions ; 10 passed
+
+==================================================================
+## M9c-no-decisions-heading  (row R-DOC-CANON.9)  S5 review file: the Decisions heading renamed
+mutant M9c-no-decisions-heading applied to <scratch>\mutant-work
+$ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
+........F..                                                              [100%]
+================================== FAILURES ===================================
+____________________ test_review_files_hold_the_decisions _____________________
+tests\test_requirements_canon.py:405: in test_review_files_hold_the_decisions
+    _report("R-DOC-CANON.9 a module's decisions are not kept where the canon says", offenders, len(MODULES))
+tests\test_requirements_canon.py:175: in _report
+    pytest.fail(f"{rule}: {len(offenders)} offending ({checked} checked)\n  {shown}{more}")
+E   Failed: R-DOC-CANON.9 a module's decisions are not kept where the canon says: 1 offending (18 checked)
+E     docs/requirements/review/S5-ears-strict.md: no heading names 'Decisions'
+=========================== short test summary info ===========================
+FAILED tests/test_requirements_canon.py::test_review_files_hold_the_decisions
+1 failed, 10 passed in 0.39s
+RESULT M9c-no-decisions-heading: target test_review_files_hold_the_decisions -> RED; 1 test(s) RED: test_review_files_hold_the_decisions ; 10 passed
+
+==================================================================
+## M10-phantom-test-name  (row R-DOC-CANON.10)  test_does_not_exist cited in S2-ears-strict.md
+mutant M10-phantom-test-name applied to <scratch>\mutant-work
+$ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
+.........F.                                                              [100%]
+================================== FAILURES ===================================
+_________________ test_review_files_name_only_existing_tests __________________
+tests\test_requirements_canon.py:449: in test_review_files_name_only_existing_tests
+    pytest.fail("R-DOC-CANON.10 " + "\n".join(problems))
+E   Failed: R-DOC-CANON.10 1 of 1110 cited test names are not defined:
+E     S2-ears-strict.md:636: `test_does_not_exist` is not a def test_ or class Test under tests/
+=========================== short test summary info ===========================
+FAILED tests/test_requirements_canon.py::test_review_files_name_only_existing_tests
+1 failed, 10 passed in 0.43s
+RESULT M10-phantom-test-name: target test_review_files_name_only_existing_tests -> RED; 1 test(s) RED: test_review_files_name_only_existing_tests ; 10 passed
+
+==================================================================
+## M11-two-sentences  (row R-DOC-CANON.11)  R-DOC-README.1 with a second sentence
+mutant M11-two-sentences applied to <scratch>\mutant-work
+$ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
+..........F                                                              [100%]
+================================== FAILURES ===================================
+______________________ test_canon_rows_are_one_sentence _______________________
+tests\test_requirements_canon.py:472: in test_canon_rows_are_one_sentence
+    _report("R-DOC-CANON.11 a sentence holds a second sentence", offenders, len(rows))
+tests\test_requirements_canon.py:175: in _report
+    pytest.fail(f"{rule}: {len(offenders)} offending ({checked} checked)\n  {shown}{more}")
+E   Failed: R-DOC-CANON.11 a sentence holds a second sentence: 1 offending (2623 checked)
+E     line 119 R-DOC-README.1: a second sentence starts after 'that starts the TUI.. Then it stops'
+=========================== short test summary info ===========================
+FAILED tests/test_requirements_canon.py::test_canon_rows_are_one_sentence - F...
+1 failed, 10 passed in 0.38s
+RESULT M11-two-sentences: target test_canon_rows_are_one_sentence -> RED; 1 test(s) RED: test_canon_rows_are_one_sentence ; 10 passed
+
+==================================================================
+## M12-canon-shrunk-to-3-rows  (row R-DOC-CANONfloor)  canon cut to 3 rows (blind-parser control)
+mutant M12-canon-shrunk-to-3-rows applied to <scratch>\mutant-work
+$ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --tb=short --rootdir <copy> tests/test_requirements_canon.py
+.FFFFF.F..F                                                              [100%]
+================================== FAILURES ===================================
+____________________ test_canon_rows_have_id_form_sentence ____________________
+tests\test_requirements_canon.py:201: in test_canon_rows_have_id_form_sentence
+    rows = _rows()
+           ^^^^^^^
+tests\test_requirements_canon.py:163: in _rows
+    pytest.fail(
+E   Failed: the parser found 3 canon rows in <scratch>\mutant-work\REQUIREMENTS.md, below the floor of 2623: rows were lost, or the tables no longer carry the header '| Id | Form | Requirement |'
+____________________ test_canon_rows_open_with_their_form _____________________
+tests\test_requirements_canon.py:225: in test_canon_rows_open_with_their_form
+    rows = _rows()
+           ^^^^^^^
+tests\test_requirements_canon.py:163: in _rows
+    pytest.fail(
+E   Failed: the parser found 3 canon rows in <scratch>\mutant-work\REQUIREMENTS.md, below the floor of 2623: rows were lost, or the tables no longer carry the header '| Id | Form | Requirement |'
+________________ test_canon_rows_hold_the_obligation_word_once ________________
+tests\test_requirements_canon.py:242: in test_canon_rows_hold_the_obligation_word_once
+    rows = _rows()
+           ^^^^^^^
+tests\test_requirements_canon.py:163: in _rows
+    pytest.fail(
+E   Failed: the parser found 3 canon rows in <scratch>\mutant-work\REQUIREMENTS.md, below the floor of 2623: rows were lost, or the tables no longer carry the header '| Id | Form | Requirement |'
+________________________ test_canon_row_ids_are_unique ________________________
+tests\test_requirements_canon.py:257: in test_canon_row_ids_are_unique
+    rows = _rows()
+           ^^^^^^^
+tests\test_requirements_canon.py:163: in _rows
+    pytest.fail(
+E   Failed: the parser found 3 canon rows in <scratch>\mutant-work\REQUIREMENTS.md, below the floor of 2623: rows were lost, or the tables no longer carry the header '| Id | Form | Requirement |'
+__________________ test_canon_modules_are_s0_to_s17_in_order __________________
+tests\test_requirements_canon.py:277: in test_canon_modules_are_s0_to_s17_in_order
+    assert found == MODULES, (
+E   AssertionError: the '## S<n> · ' headings of <scratch>\mutant-work\REQUIREMENTS.md read ['S0'], want ['S0', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11', 'S12', 'S13', 'S14', 'S15', 'S16', 'S17'] (lines [59])
+E   assert ['S0'] == ['S0', 'S1', ...4', 'S5', ...]
+E     
+E     Right contains 17 more items, first extra item: 'S1'
+E     Use -v to get more diff
+___________________ test_canon_s0_table_cites_existing_rows ___________________
+tests\test_requirements_canon.py:364: in test_canon_s0_table_cites_existing_rows
+    cited = s0_citations(text)
+            ^^^^^^^^^^^^^^^^^^
+tests\test_requirements_canon.py:330: in s0_citations
+    pytest.fail("S0.2 (the heading '^#+ S0.2') or S0.3 is missing from the canon: the table of retired ids is gone")
+E   Failed: S0.2 (the heading '^#+ S0.2') or S0.3 is missing from the canon: the table of retired ids is gone
+______________________ test_canon_rows_are_one_sentence _______________________
+tests\test_requirements_canon.py:465: in test_canon_rows_are_one_sentence
+    rows = _rows()
+           ^^^^^^^
+tests\test_requirements_canon.py:163: in _rows
+    pytest.fail(
+E   Failed: the parser found 3 canon rows in <scratch>\mutant-work\REQUIREMENTS.md, below the floor of 2623: rows were lost, or the tables no longer carry the header '| Id | Form | Requirement |'
+=========================== short test summary info ===========================
+FAILED tests/test_requirements_canon.py::test_canon_rows_have_id_form_sentence
+FAILED tests/test_requirements_canon.py::test_canon_rows_open_with_their_form
+FAILED tests/test_requirements_canon.py::test_canon_rows_hold_the_obligation_word_once
+FAILED tests/test_requirements_canon.py::test_canon_row_ids_are_unique - Fail...
+FAILED tests/test_requirements_canon.py::test_canon_modules_are_s0_to_s17_in_order
+FAILED tests/test_requirements_canon.py::test_canon_s0_table_cites_existing_rows
+FAILED tests/test_requirements_canon.py::test_canon_rows_are_one_sentence - F...
+7 failed, 4 passed in 0.40s
+RESULT M12-canon-shrunk-to-3-rows: target (every per-row test) -> RED; 7 test(s) RED: test_canon_rows_have_id_form_sentence test_canon_rows_open_with_their_form test_canon_rows_hold_the_obligation_word_once test_canon_row_ids_are_unique test_canon_modules_are_s0_to_s17_in_order test_canon_s0_table_cites_existing_rows test_canon_rows_are_one_sentence ; 4 passed
+
+==================================================================
+## SUMMARY (generated from the runs above)
+M1-rename-canon                .1     test_canon_is_one_file_with_rows               RED  9  test_canon_is_one_file_with_rows test_canon_rows_have_id_form_sentence test_canon_rows_open_with_their_form test_canon_rows_hold_the_obligation_word_once test_canon_row_ids_are_unique test_canon_modules_are_s0_to_s17_in_order test_canon_s0_table_cites_existing_rows test_review_files_hold_the_decisions test_canon_rows_are_one_sentence 
+M2a-form-Shall                 .2     test_canon_rows_have_id_form_sentence          RED  1  test_canon_rows_have_id_form_sentence 
+M2b-fourth-cell                .2     test_canon_rows_have_id_form_sentence          RED  1  test_canon_rows_have_id_form_sentence 
+M3-when-row-opens-U            .3     test_canon_rows_open_with_their_form           RED  1  test_canon_rows_open_with_their_form 
+M4-two-shall                   .4     test_canon_rows_hold_the_obligation_word_once  RED  1  test_canon_rows_hold_the_obligation_word_once 
+M5-copied-row                  .5     test_canon_row_ids_are_unique                  RED  1  test_canon_row_ids_are_unique 
+M6-swap-module-headings        .6     test_canon_modules_are_s0_to_s17_in_order      RED  1  test_canon_modules_are_s0_to_s17_in_order 
+M7-history-one-byte            .7     test_canon_history_is_the_committed_blob       RED  1  test_canon_history_is_the_committed_blob 
+M7b-history-crlf               .7     test_canon_history_is_the_committed_blob       RED  1  test_canon_history_is_the_committed_blob 
+M8a-nope-id-in-absorbing-cell  .8     test_canon_s0_table_cites_existing_rows        RED  1  test_canon_s0_table_cites_existing_rows 
+M8b-unresolved-abbreviation    .8     test_canon_s0_table_cites_existing_rows        RED  1  test_canon_s0_table_cites_existing_rows 
+M8c-parser-sees-zero-ids       .8     test_canon_s0_table_cites_existing_rows        RED  1  test_canon_s0_table_cites_existing_rows 
+M9a-remove-review-file         .9     test_review_files_hold_the_decisions           RED  1  test_review_files_hold_the_decisions 
+M9b-break-module-table-link    .9     test_review_files_hold_the_decisions           RED  1  test_review_files_hold_the_decisions 
+M9c-no-decisions-heading       .9     test_review_files_hold_the_decisions           RED  1  test_review_files_hold_the_decisions 
+M10-phantom-test-name          .10    test_review_files_name_only_existing_tests     RED  1  test_review_files_name_only_existing_tests 
+M11-two-sentences              .11    test_canon_rows_are_one_sentence               RED  1  test_canon_rows_are_one_sentence 
+M12-canon-shrunk-to-3-rows     floor  (every per-row test)                           RED  7  test_canon_rows_have_id_form_sentence test_canon_rows_open_with_their_form test_canon_rows_hold_the_obligation_word_once test_canon_row_ids_are_unique test_canon_modules_are_s0_to_s17_in_order test_canon_s0_table_cites_existing_rows test_canon_rows_are_one_sentence 

@@ -1,0 +1,10 @@
+s19_app from <repo>\s19_app\__init__.py
+e273181aaa7692eaf6a1e40141120a92dad5097e
+E             At index 101 diff: b'1' != b'0'
+E             Use -v to get more diff
+
+tests\test_report_addendum_bound.py:1423: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_report_addendum_bound.py::test_at196_below_bound_report_is_byte_identical_to_the_inc1_golden
+FAILED tests/test_report_addendum_bound.py::test_tc491_golden_capture_harness_is_deterministic
+2 failed, 84 passed in 36.74s

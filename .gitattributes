@@ -54,3 +54,7 @@ AT-TC-REGISTRY.jsonl text eol=lf
 tests/fixtures/synth/** -text
 .dev-flow/2026-10-26-batch-100/evidence/** -text
 .dev-flow/2026-11-01-batch-101/evidence/** -text
+# The earlier requirements canon is kept byte for byte (batch-101 Inc 1,
+# R-DOC-CANON.7 pins its sha256). Evidence bytes, so -text in BOTH directions:
+# a CRLF checkout on Windows would change the hash the guard compares.
+docs/requirements/history/** -text

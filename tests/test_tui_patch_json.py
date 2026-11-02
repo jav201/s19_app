@@ -1013,7 +1013,8 @@ def test_tc079_5_magenta_hue_distance() -> None:
         f"{optimum_hue:.2f}deg reaches {optimum_distance:.2f}deg. Re-pick MAGENTA "
         f"at ~{optimum_hue:.2f}deg (keep sat ~45% / val ~96% so it stays in the "
         f"pastel band), then update insight_style.MAGENTA's comment and "
-        f"REQUIREMENTS.md §6.5 Amendment F-1 with the NEW measured distance. Do "
+        f"record the new colour and the NEW measured distance with the decision D3-26 "
+        f"(docs/requirements/review/S3-ears-strict.md). Do "
         f"not relax this tolerance to make it pass. Full measurement: {measurement}"
     )
 

@@ -46,14 +46,16 @@ returned three different answers, and that disagreement is what the registry exi
 | How do I take one? | Append `RESERVED` rows with `reserved_by` and a one-sentence `statement`, **and merge that to `main` on its own small PR before the batch's work**. A reservation on an unmerged branch prevents nothing — that is verbatim the batch-64/65 collision. |
 | Can I fill a gap or reuse a retired id? | **No.** Allocation is monotonic; every status is permanently spent. Gaps are how "free space" becomes a matter of opinion. |
 | Does my new test need a global id? | Prefer a **batch-scoped** id (`AT-B76-01`, `AT-N9-03`). Those cannot collide across batches by construction and the global pool never has to carry them. |
-| Who checks? | `tests/test_id_registry.py`, rules G1–G7, in the PR lane. It is not marked `slow`. |
+| Who checks? | `tests/test_id_registry.py`, rules G1–G3 and G5–G7, in the PR lane. It is not marked `slow`. |
 
 **When the guard goes red, the registry is usually right.** G1 means you minted an id without
-registering it; G2 means a node was renamed or deleted under a registered id; G4 means
-`REQUIREMENTS.md` is advertising a verifier that does not exist. Fix the cause, not the threshold.
+registering it; G2 means a node was renamed or deleted under a registered id. Fix the cause, not
+the threshold. (G4, which checked that `REQUIREMENTS.md` did not advertise a dead verifier, was
+retired in batch-101: the canon holds no test ids; `tests/test_requirements_canon.py` checks that
+every test the review files name exists.)
 
 Full design rationale, the id grammar, and the status semantics: `.dev-flow/AT-TC-REGISTRY-SPEC.md`
-(allocation rule in its §4). Retired ids are listed in `REQUIREMENTS.md` under `## Retired ids`.
+(allocation rule in its §4). Retired ids are the `RETIRED` rows of the registry.
 
 ⚠ **`R-*`, `LLR-*` and `US-*` are NOT covered** (operator scoping ruling 2026-07-31) and have
 demonstrably collided — batch-63 re-used live `R-TUI-079/080/081`. That gap is registered separately

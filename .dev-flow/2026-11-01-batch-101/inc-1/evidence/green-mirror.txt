@@ -1,0 +1,26 @@
+# GREEN on the new canon: tests/test_requirements_canon.py run in a temporary mirror (scratch), not in the worktree
+# mirror root: <scratch>\mirror
+# date (UTC): 2026-11-02T05:58:20Z
+# mirror contents: REQUIREMENTS.md = s19w/canon/REQUIREMENTS.md; docs/requirements/history/REQUIREMENTS-legacy-e273181.md = git show e273181:REQUIREMENTS.md; docs/requirements/review/ = s19w/review/S*-ears-strict.md (18 files); tests/ = copy of the worktree tests tree
+# sha256 REQUIREMENTS.md: 0709ab3f03483665b5f6eecb909a41ee2d9467832ab030330392a3f8420a8e99
+# sha256 history file:    4411f41b9a8d87ca6fb57e3740e6ac32fd6c8bbb320674404d0fd2e2b41b2899
+# sha256 test file:       79d654e4e6dd91b39571e39954408b33ab953fc9779beac32a4bca8d60053590
+# review files: 18; tests/*.py: 239
+$ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --rootdir <mirror> --collect-only tests/test_requirements_canon.py
+tests/test_requirements_canon.py::test_canon_is_one_file_with_rows
+tests/test_requirements_canon.py::test_canon_rows_have_id_form_sentence
+tests/test_requirements_canon.py::test_canon_rows_open_with_their_form
+tests/test_requirements_canon.py::test_canon_rows_hold_the_obligation_word_once
+tests/test_requirements_canon.py::test_canon_row_ids_are_unique
+tests/test_requirements_canon.py::test_canon_modules_are_s0_to_s17_in_order
+tests/test_requirements_canon.py::test_canon_history_is_the_committed_blob
+tests/test_requirements_canon.py::test_canon_s0_table_cites_existing_rows
+tests/test_requirements_canon.py::test_review_files_hold_the_decisions
+tests/test_requirements_canon.py::test_review_files_name_only_existing_tests
+tests/test_requirements_canon.py::test_canon_rows_are_one_sentence
+
+11 tests collected in 0.08s
+$ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 python.exe -m pytest -q -p no:cacheprovider --rootdir <mirror> tests/test_requirements_canon.py
+...........                                                              [100%]
+11 passed in 0.30s
+# exit code: 0

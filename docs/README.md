@@ -19,7 +19,7 @@ This `docs/` directory holds the **general** documentation that sits above the p
 | Document | Role |
 |---|---|
 | [../README.md](../README.md) | install + CLI + TUI usage |
-| [../REQUIREMENTS.md](../REQUIREMENTS.md) | living `R-*` traceability — engine, batch-02 `R-TUI-021..037`, batch-03 `R-CDFX-001..018`, batch-04 `R-MEM-001..005` |
+| [../REQUIREMENTS.md](../REQUIREMENTS.md) | the requirements canon: strict EARS rows (`\| Id \| Form \| Requirement \|`) per module S0–S17; rationale in [requirements/review/](requirements/review/), earlier canon in [requirements/history/](requirements/history/) |
 | [../CLAUDE.md](../CLAUDE.md) | coding conventions, common commands, file-layer rules, the docstring / type-hint contract |
 
 ## Per-batch archives
