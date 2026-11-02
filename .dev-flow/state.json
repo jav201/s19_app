@@ -54,7 +54,7 @@
       "reason": "batch 2026-11-01-batch-101 opened by rollover from 2026-10-26-batch-100 (closed at P6, synced, tag v1.0.0-rc1); mode full by the operator's standing rule and the release decision of 2026-11-01"
     }
   ],
-  "current_station": "ARQ",
+  "current_station": "P3",
   "phase_status": "not-started",
   "stations_active": [
     "P0",
@@ -132,6 +132,26 @@
       "station": "P0",
       "date": "2026-11-01",
       "decision": "P0 approved under the standing authorization (operator commission 2026-11-01): Kimi K2.8 triage of 78 rows verified by the architect; plan of 14 increments with no prototype round; the 37 UI rows are known failed checks (KF-101-*) by operator ruling; Inc 1 canon swap by the requirements re-write session (b101-canon); D13-20 into Inc 8, D14-10 into Inc 7."
+    },
+    {
+      "station": "ARQ",
+      "date": "2026-11-02",
+      "decision": "ARQ approved: 14 increments, file ownership and the serial app.py chain in PLAN.md; Inc 1 delivered by the requirements re-write session on b101-canon."
+    },
+    {
+      "station": "P1",
+      "date": "2026-11-02",
+      "decision": "P1 discharged per increment (design-first E1 per increment); the requirements base is the strict-EARS canon merged as Inc 1 (6a4eadb)."
+    },
+    {
+      "station": "P2",
+      "date": "2026-11-02",
+      "decision": "P2 discharged per increment (E3 code-free review per increment: architect + security, rounds until PASS/PASS-WITH-NOTES)."
+    },
+    {
+      "station": "PDR",
+      "date": "2026-11-02",
+      "decision": "PDR discharged per increment (no prototype round in batch-101: the 37 UI rows are known failed checks by operator ruling)."
     }
   ],
   "obsidian_synced": false,

@@ -179,3 +179,8 @@ _No entries yet. The first amendment to the live contract writes the first one, 
 shape the field guide's §7 shows (`req-template.part2.md` in the guide directory init prints), and nothing
 above this line is ever edited._
 ```
+
+
+## Batch-101 increments — requirement homes
+
+- **Inc 1 (canon swap):** US-101.1 and R-DOC-CANON.1 … R-DOC-CANON.11, recorded in `inc-1/01-requirements.md` and folded into the strict-EARS canon `REQUIREMENTS.md` (group S0.3) by the increment itself. From Inc 1 on, every increment writes its rows straight into `REQUIREMENTS.md` in the strict format and keeps its increment-level record in `inc-<n>/01-requirements.md`.

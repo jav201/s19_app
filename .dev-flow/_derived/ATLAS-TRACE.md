@@ -1,9 +1,9 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 77 requirement files | corpus digest: 2ab9bb8e4cf9c086 -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 78 requirement files | corpus digest: e656a8a70ec3e72f -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
-registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
+registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 
 | id | status | origin | provenance |
 |---|---|---|---|
@@ -1300,7 +1300,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-494` | LIVE | seed |  |
 | `TC-495` | LIVE | seed |  |
 | `TC-496` | RETIRED | seed |  |
-| `TC-497` | LIVE | seed |  |
+| `TC-497` | RETIRED | seed |  |
 | `TC-498` | LIVE | seed |  |
 | `TC-499` | LIVE | seed |  |
 | `TC-500` | LIVE | seed |  |
@@ -1403,7 +1403,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-600` | LIVE | at-tc-registry-lane-a |  |
 | `TC-601` | LIVE | at-tc-registry-lane-a |  |
 | `TC-602` | LIVE | at-tc-registry-lane-a |  |
-| `TC-603` | LIVE | at-tc-registry-lane-a |  |
+| `TC-603` | RETIRED | at-tc-registry-lane-a |  |
 | `TC-604` | LIVE | at-tc-registry-lane-a |  |
 | `TC-605` | LIVE | at-tc-registry-lane-a |  |
 | `TC-606` | LIVE | at-tc-registry-lane-a |  |
@@ -1522,7 +1522,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 2342 unique id(s)
+## family US/HLR/LLR — 2341 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -1563,36 +1563,36 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `HLR-019` | batches, canon, tests |
 | `HLR-020` | batches, canon, tests |
 | `HLR-021` | batches, canon, tests |
-| `HLR-022` | batches, canon |
-| `HLR-023` | batches, canon |
-| `HLR-024` | batches, canon, tests |
-| `HLR-025` | batches, canon, tests |
-| `HLR-026` | batches, canon |
-| `HLR-027` | batches, canon, tests |
-| `HLR-028` | batches, canon, tests |
-| `HLR-029` | batches, canon, tests |
-| `HLR-030` | batches, canon, tests |
-| `HLR-031` | batches, canon, tests |
-| `HLR-032` | batches, canon, tests |
-| `HLR-033` | batches, canon |
+| `HLR-022` | batches |
+| `HLR-023` | batches |
+| `HLR-024` | batches, tests |
+| `HLR-025` | batches, tests |
+| `HLR-026` | batches |
+| `HLR-027` | batches, tests |
+| `HLR-028` | batches, tests |
+| `HLR-029` | batches, tests |
+| `HLR-030` | batches, tests |
+| `HLR-031` | batches, tests |
+| `HLR-032` | batches, tests |
+| `HLR-033` | batches |
 | `HLR-033.1` | batches |
 | `HLR-033.2` | batches |
 | `HLR-033.3` | batches |
 | `HLR-033.4` | batches |
 | `HLR-033.5` | batches |
-| `HLR-034` | batches, canon |
+| `HLR-034` | batches |
 | `HLR-034.1` | batches, tests |
 | `HLR-034.2` | batches |
 | `HLR-034.3` | batches |
-| `HLR-035` | batches, canon, tests |
-| `HLR-036` | batches, canon, tests |
-| `HLR-037` | batches, canon, tests |
-| `HLR-038` | batches, canon, tests |
+| `HLR-035` | batches, tests |
+| `HLR-036` | batches, tests |
+| `HLR-037` | batches, tests |
+| `HLR-038` | batches, tests |
 | `HLR-038.a` | batches |
 | `HLR-038.b` | batches |
-| `HLR-039.a` | batches, canon |
+| `HLR-039.a` | batches |
 | `HLR-039.b` | batches |
-| `HLR-040.a` | batches, canon |
+| `HLR-040.a` | batches |
 | `HLR-040.b` | batches |
 | `HLR-040.c` | batches |
 | `HLR-041` | batches |
@@ -1602,8 +1602,8 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `HLR-042.c` | batches |
 | `HLR-042.d` | batches |
 | `HLR-042.x` | batches |
-| `HLR-043.R1-retire` | batches, canon |
-| `HLR-044.1-clip` | batches, canon |
+| `HLR-043.R1-retire` | batches |
+| `HLR-044.1-clip` | batches |
 | `HLR-045A` | batches |
 | `HLR-045A..D` | batches |
 | `HLR-045B` | batches |
@@ -1613,48 +1613,48 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `HLR-051` | batches |
 | `HLR-052` | batches |
 | `HLR-053` | batches, tests |
-| `HLR-053..HLR-056` | batches, canon |
+| `HLR-053..HLR-056` | batches |
 | `HLR-053..HLR-057` | batches |
 | `HLR-054` | batches, tests |
 | `HLR-055` | batches, tests |
 | `HLR-056` | batches, tests |
-| `HLR-057` | batches, canon, tests |
-| `HLR-058` | batches, canon |
-| `HLR-059` | batches, canon |
-| `HLR-060` | batches, canon |
-| `HLR-061` | batches, canon, tests |
-| `HLR-062` | batches, canon |
-| `HLR-063` | batches, canon, tests |
-| `HLR-064` | batches, canon, tests |
-| `HLR-064a` | batches, canon |
-| `HLR-064b` | batches, canon |
-| `HLR-065` | batches, canon, tests |
+| `HLR-057` | batches, tests |
+| `HLR-058` | batches |
+| `HLR-059` | batches |
+| `HLR-060` | batches |
+| `HLR-061` | batches, tests |
+| `HLR-062` | batches |
+| `HLR-063` | batches, tests |
+| `HLR-064` | batches, tests |
+| `HLR-064a` | batches |
+| `HLR-064b` | batches |
+| `HLR-065` | batches, tests |
 | `HLR-065..074` | batches |
-| `HLR-066` | batches, canon, tests |
-| `HLR-067` | batches, canon, tests |
-| `HLR-068` | batches, canon, tests |
-| `HLR-068a` | batches, canon |
-| `HLR-068b` | batches, canon |
-| `HLR-069` | batches, canon |
-| `HLR-070` | batches, canon, tests |
-| `HLR-071` | batches, canon |
-| `HLR-072` | batches, canon, tests |
-| `HLR-072-1` | batches, canon, tests |
+| `HLR-066` | batches, tests |
+| `HLR-067` | batches, tests |
+| `HLR-068` | batches, tests |
+| `HLR-068a` | batches |
+| `HLR-068b` | batches |
+| `HLR-069` | batches |
+| `HLR-070` | batches, tests |
+| `HLR-071` | batches |
+| `HLR-072` | batches, tests |
+| `HLR-072-1` | batches, tests |
 | `HLR-072-1..7` | batches |
 | `HLR-072-2` | batches, tests |
 | `HLR-072-3` | batches, tests |
 | `HLR-072-4` | batches |
-| `HLR-072-5` | batches, canon, tests |
-| `HLR-072-6` | batches, canon, tests |
-| `HLR-072-7` | batches, canon, tests |
+| `HLR-072-5` | batches, tests |
+| `HLR-072-6` | batches, tests |
+| `HLR-072-7` | batches, tests |
 | `HLR-072-8` | batches, tests |
-| `HLR-073` | batches, canon |
-| `HLR-074` | batches, canon |
-| `HLR-075` | batches, canon, tests |
-| `HLR-076` | batches, canon, tests |
+| `HLR-073` | batches |
+| `HLR-074` | batches |
+| `HLR-075` | batches, tests |
+| `HLR-076` | batches, tests |
 | `HLR-077` | batches, tests |
 | `HLR-078` | batches, tests |
-| `HLR-079` | batches, canon, tests |
+| `HLR-079` | batches, tests |
 | `HLR-080` | batches, tests |
 | `HLR-081` | batches, tests |
 | `HLR-082` | batches, tests |
@@ -1670,31 +1670,31 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `HLR-092` | batches |
 | `HLR-093` | batches |
 | `HLR-094` | batches |
-| `HLR-095` | batches, canon |
+| `HLR-095` | batches |
 | `HLR-096` | batches |
 | `HLR-097` | batches |
 | `HLR-098` | batches |
 | `HLR-099` | batches |
 | `HLR-100` | batches |
 | `HLR-101` | batches |
-| `HLR-102` | batches, canon, tests |
-| `HLR-103` | batches, canon, tests |
-| `HLR-104` | batches, canon |
-| `HLR-105` | batches, canon, tests |
-| `HLR-106` | batches, canon, tests |
+| `HLR-102` | batches, tests |
+| `HLR-103` | batches, tests |
+| `HLR-104` | batches |
+| `HLR-105` | batches, tests |
+| `HLR-106` | batches, tests |
 | `HLR-107` | batches |
 | `HLR-108` | batches, tests |
 | `HLR-109` | batches, tests |
 | `HLR-11` | batches |
 | `HLR-110` | batches, tests |
-| `HLR-111` | batches, canon, tests |
-| `HLR-112` | batches, canon, tests |
-| `HLR-113` | batches, canon, tests |
-| `HLR-114` | batches, canon, tests |
-| `HLR-115` | batches, canon, tests |
-| `HLR-116` | batches, canon, tests |
-| `HLR-116.2` | batches, canon |
-| `HLR-117` | batches, canon, tests |
+| `HLR-111` | batches, tests |
+| `HLR-112` | batches, tests |
+| `HLR-113` | batches, tests |
+| `HLR-114` | batches, tests |
+| `HLR-115` | batches, tests |
+| `HLR-116` | batches, tests |
+| `HLR-116.2` | batches |
+| `HLR-117` | batches, tests |
 | `HLR-118` | batches, tests |
 | `HLR-119` | batches, tests |
 | `HLR-120` | batches, tests |
@@ -1811,17 +1811,17 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `HLR-178` | batches, canon, tests |
 | `HLR-6` | batches |
 | `HLR-64` | batches |
-| `HLR-85.1` | batches, canon |
-| `HLR-85.2` | batches, canon |
-| `HLR-85.3` | batches, canon |
-| `HLR-85.4` | batches, canon |
+| `HLR-85.1` | batches |
+| `HLR-85.2` | batches |
+| `HLR-85.3` | batches |
+| `HLR-85.4` | batches |
 | `HLR-86` | batches |
-| `HLR-86.1` | batches, canon |
-| `HLR-86.2` | batches, canon |
-| `HLR-86.3` | batches, canon |
-| `HLR-87.1` | batches, canon |
-| `HLR-87.2` | batches, canon |
-| `HLR-87.3` | batches, canon |
+| `HLR-86.1` | batches |
+| `HLR-86.2` | batches |
+| `HLR-86.3` | batches |
+| `HLR-87.1` | batches |
+| `HLR-87.2` | batches |
+| `HLR-87.3` | batches |
 | `HLR-88.1` | batches |
 | `HLR-88.2` | batches |
 | `HLR-88.3` | batches |
@@ -1855,7 +1855,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `HLR-L1` | batches, tests |
 | `HLR-L1..L5` | batches |
 | `HLR-L2` | batches, tests |
-| `HLR-L3` | batches, canon |
+| `HLR-L3` | batches |
 | `HLR-L4` | batches, tests |
 | `HLR-L5` | batches, tests |
 | `HLR-LLR` | batches |
@@ -1900,11 +1900,11 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-001.1..003.6` | batches |
 | `LLR-001.1..4` | batches |
 | `LLR-001.1..LLR-003.6` | batches |
-| `LLR-001.2` | batches, canon, tests |
-| `LLR-001.3` | batches, canon, tests |
+| `LLR-001.2` | batches, tests |
+| `LLR-001.3` | batches, tests |
 | `LLR-001.3b` | batches |
-| `LLR-001.4` | batches, canon, tests |
-| `LLR-001.5` | batches, canon, tests |
+| `LLR-001.4` | batches, tests |
+| `LLR-001.5` | batches, tests |
 | `LLR-001.6` | batches, tests |
 | `LLR-001.7` | batches, tests |
 | `LLR-001.8` | batches, tests |
@@ -1914,12 +1914,12 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-002.1..002.3` | batches |
 | `LLR-002.1..002.4` | batches |
 | `LLR-002.1..002.6` | batches |
-| `LLR-002.2` | batches, canon, tests |
-| `LLR-002.3` | batches, canon, tests |
-| `LLR-002.4` | batches, canon, tests |
-| `LLR-002.5` | batches, canon, tests |
+| `LLR-002.2` | batches, tests |
+| `LLR-002.3` | batches, tests |
+| `LLR-002.4` | batches, tests |
+| `LLR-002.5` | batches, tests |
 | `LLR-002.6` | batches, tests |
-| `LLR-002.7` | batches, canon, tests |
+| `LLR-002.7` | batches, tests |
 | `LLR-002.8` | batches, tests |
 | `LLR-002.8-local` | batches |
 | `LLR-002.9` | batches |
@@ -1932,11 +1932,11 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-003.1..003.6` | batches, tests |
 | `LLR-003.1..6` | batches |
 | `LLR-003.1..LLR-003.6` | batches |
-| `LLR-003.2` | batches, canon, tests |
-| `LLR-003.3` | batches, canon, tests |
+| `LLR-003.2` | batches, tests |
+| `LLR-003.3` | batches, tests |
 | `LLR-003.3b` | batches |
 | `LLR-003.4` | batches, tests |
-| `LLR-003.5` | batches, canon, tests |
+| `LLR-003.5` | batches, tests |
 | `LLR-003.6` | batches, tests |
 | `LLR-003.7` | batches |
 | `LLR-003.x` | batches |
@@ -1950,41 +1950,41 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-004.1..004.7` | batches |
 | `LLR-004.1..004.8` | batches |
 | `LLR-004.1..004.9` | batches |
-| `LLR-004.2` | batches, canon, tests |
-| `LLR-004.3` | batches, canon, tests |
-| `LLR-004.4` | batches, canon, tests |
-| `LLR-004.5` | batches, canon, tests |
-| `LLR-004.6` | batches, canon, tests |
+| `LLR-004.2` | batches, tests |
+| `LLR-004.3` | batches, tests |
+| `LLR-004.4` | batches, tests |
+| `LLR-004.5` | batches, tests |
+| `LLR-004.6` | batches, tests |
 | `LLR-004.6-resolved` | batches |
-| `LLR-004.7` | batches, canon, tests |
-| `LLR-004.8` | batches, canon |
-| `LLR-004.9` | batches, canon |
+| `LLR-004.7` | batches, tests |
+| `LLR-004.8` | batches |
+| `LLR-004.9` | batches |
 | `LLR-004.x` | batches |
 | `LLR-005` | batches |
 | `LLR-005.1` | batches, canon, tests |
 | `LLR-005.1..005.4` | batches |
 | `LLR-005.1..005.6` | batches |
 | `LLR-005.1..5` | batches |
-| `LLR-005.2` | batches, canon, tests |
-| `LLR-005.3` | batches, canon, tests |
-| `LLR-005.4` | batches, canon, tests |
-| `LLR-005.5` | batches, canon, tests |
-| `LLR-005.6` | batches, canon, tests |
+| `LLR-005.2` | batches, tests |
+| `LLR-005.3` | batches, tests |
+| `LLR-005.4` | batches, tests |
+| `LLR-005.5` | batches, tests |
+| `LLR-005.6` | batches, tests |
 | `LLR-005.x` | batches |
 | `LLR-006` | batches |
 | `LLR-006.1` | batches, canon, tests |
 | `LLR-006.1..006.5` | batches |
 | `LLR-006.1..006.6` | batches |
 | `LLR-006.1..006.8` | batches |
-| `LLR-006.2` | batches, canon, tests |
+| `LLR-006.2` | batches, tests |
 | `LLR-006.2-8` | batches |
 | `LLR-006.2..006.8` | batches |
-| `LLR-006.3` | batches, canon, tests |
-| `LLR-006.4` | batches, canon, tests |
-| `LLR-006.5` | batches, canon, tests |
-| `LLR-006.6` | batches, canon, tests |
-| `LLR-006.7` | batches, canon |
-| `LLR-006.8` | batches, canon |
+| `LLR-006.3` | batches, tests |
+| `LLR-006.4` | batches, tests |
+| `LLR-006.5` | batches, tests |
+| `LLR-006.6` | batches, tests |
+| `LLR-006.7` | batches |
+| `LLR-006.8` | batches |
 | `LLR-006.x` | batches |
 | `LLR-007.1` | batches, canon, tests |
 | `LLR-007.1..007.4` | batches |
@@ -1994,21 +1994,21 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-007.1..007.8` | batches |
 | `LLR-007.1..LLR-007.5` | batches |
 | `LLR-007.1..LLR-007.6` | batches |
-| `LLR-007.2` | batches, canon, tests |
-| `LLR-007.3` | batches, canon, tests |
-| `LLR-007.4` | batches, canon, tests |
-| `LLR-007.5` | batches, canon, tests |
+| `LLR-007.2` | batches, tests |
+| `LLR-007.3` | batches, tests |
+| `LLR-007.4` | batches, tests |
+| `LLR-007.5` | batches, tests |
 | `LLR-007.5-local` | batches |
-| `LLR-007.6` | batches, canon, tests |
-| `LLR-007.7` | batches, canon, tests |
+| `LLR-007.6` | batches, tests |
+| `LLR-007.7` | batches, tests |
 | `LLR-007.8` | batches, tests |
 | `LLR-007.x` | batches |
 | `LLR-008` | batches |
 | `LLR-008.1` | batches, canon, tests |
 | `LLR-008.1..008.3` | batches |
 | `LLR-008.1..008.5` | batches |
-| `LLR-008.2` | batches, canon, tests |
-| `LLR-008.3` | batches, canon, tests |
+| `LLR-008.2` | batches, tests |
+| `LLR-008.3` | batches, tests |
 | `LLR-008.4` | batches, tests |
 | `LLR-008.5` | batches, tests |
 | `LLR-008.x` | batches |
@@ -2016,34 +2016,34 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-009.1` | batches, canon, tests |
 | `LLR-009.1..009.3` | batches |
 | `LLR-009.1..LLR-009.3` | batches |
-| `LLR-009.2` | batches, canon, tests |
-| `LLR-009.3` | batches, canon, tests |
+| `LLR-009.2` | batches, tests |
+| `LLR-009.3` | batches, tests |
 | `LLR-009.x` | batches |
 | `LLR-010` | batches |
 | `LLR-010.1` | batches, canon, tests |
 | `LLR-010.2` | batches, canon, tests |
 | `LLR-011` | batches |
 | `LLR-011.1` | batches, canon, tests |
-| `LLR-011.2` | batches, canon, tests |
-| `LLR-011.3` | batches, canon, tests |
+| `LLR-011.2` | batches, tests |
+| `LLR-011.3` | batches, tests |
 | `LLR-012.1` | batches, canon, tests |
-| `LLR-012.2` | batches, canon, tests |
-| `LLR-012.3` | batches, canon, tests |
-| `LLR-012.4` | batches, canon, tests |
+| `LLR-012.2` | batches, tests |
+| `LLR-012.3` | batches, tests |
+| `LLR-012.4` | batches, tests |
 | `LLR-013` | batches |
 | `LLR-013.1` | batches, canon, tests |
-| `LLR-013.2` | batches, canon, tests |
+| `LLR-013.2` | batches, tests |
 | `LLR-013.3` | batches, canon, tests |
 | `LLR-013.x` | batches |
 | `LLR-014` | batches |
 | `LLR-014.1` | batches, canon, tests |
 | `LLR-014.2` | batches, canon, tests |
-| `LLR-014.3` | batches, canon, tests |
+| `LLR-014.3` | batches, tests |
 | `LLR-014.x` | batches |
 | `LLR-015` | batches |
 | `LLR-015.1` | batches, canon, tests |
 | `LLR-015.2` | batches, canon, tests |
-| `LLR-015.3` | batches, canon, tests |
+| `LLR-015.3` | batches, tests |
 | `LLR-015.4` | batches |
 | `LLR-015.5` | batches |
 | `LLR-015.x` | batches |
@@ -2053,8 +2053,8 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-016.3` | batches |
 | `LLR-017` | batches |
 | `LLR-017.1` | batches, canon, tests |
-| `LLR-017.2` | batches, canon, tests |
-| `LLR-017.3` | batches, canon, tests |
+| `LLR-017.2` | batches, tests |
+| `LLR-017.3` | batches, tests |
 | `LLR-017.4` | batches, tests |
 | `LLR-018.1` | batches, canon, tests |
 | `LLR-018.2` | batches, canon, tests |
@@ -2066,55 +2066,55 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-021` | batches |
 | `LLR-021.1` | batches, canon, tests |
 | `LLR-021.2` | batches, canon |
-| `LLR-022.1` | batches, canon, tests |
-| `LLR-022.2` | batches, canon |
-| `LLR-023.1` | batches, canon |
+| `LLR-022.1` | batches, tests |
+| `LLR-022.2` | batches |
+| `LLR-023.1` | batches |
 | `LLR-023.2` | batches |
-| `LLR-023.3` | batches, canon |
-| `LLR-024.1` | batches, canon, tests |
-| `LLR-024.2` | batches, canon, tests |
+| `LLR-023.3` | batches |
+| `LLR-024.1` | batches, tests |
+| `LLR-024.2` | batches, tests |
 | `LLR-024.3` | batches |
-| `LLR-025.1` | batches, canon, tests |
-| `LLR-026.1` | batches, canon, tests |
-| `LLR-027.1` | batches, canon, tests |
+| `LLR-025.1` | batches, tests |
+| `LLR-026.1` | batches, tests |
+| `LLR-027.1` | batches, tests |
 | `LLR-027.2` | batches, tests |
 | `LLR-027.3` | batches |
 | `LLR-027.4` | batches, tests |
-| `LLR-028.1` | batches, canon, tests |
+| `LLR-028.1` | batches, tests |
 | `LLR-028.2` | batches, tests |
 | `LLR-028.3` | batches |
 | `LLR-028.4` | batches, tests |
-| `LLR-029.1` | batches, canon, tests |
+| `LLR-029.1` | batches, tests |
 | `LLR-029.2` | batches |
 | `LLR-029.3` | batches, tests |
 | `LLR-029.4` | batches |
-| `LLR-030.1` | batches, canon |
+| `LLR-030.1` | batches |
 | `LLR-030.2` | batches |
 | `LLR-030.3` | batches, tests |
-| `LLR-031.1` | batches, canon, tests |
+| `LLR-031.1` | batches, tests |
 | `LLR-031.2` | batches, tests |
-| `LLR-032.1` | batches, canon |
+| `LLR-032.1` | batches |
 | `LLR-032.2` | batches |
-| `LLR-033.1` | batches, canon |
+| `LLR-033.1` | batches |
 | `LLR-033.1-033.4` | batches |
 | `LLR-033.2` | batches |
 | `LLR-033.3` | batches |
 | `LLR-033.3b` | batches |
 | `LLR-033.4` | batches |
 | `LLR-033.5` | batches |
-| `LLR-034.1` | batches, canon |
+| `LLR-034.1` | batches |
 | `LLR-034.2` | batches |
 | `LLR-034.3` | batches |
-| `LLR-035.1` | batches, canon, tests |
+| `LLR-035.1` | batches, tests |
 | `LLR-035.1..LLR-035.5` | batches, tests |
 | `LLR-035.2` | batches, tests |
 | `LLR-035.3` | batches, tests |
 | `LLR-035.4` | batches, tests |
 | `LLR-035.5` | batches, tests |
 | `LLR-035.6` | batches, tests |
-| `LLR-035.7` | batches, canon, tests |
+| `LLR-035.7` | batches, tests |
 | `LLR-035.N` | batches |
-| `LLR-036.1` | batches, canon, tests |
+| `LLR-036.1` | batches, tests |
 | `LLR-036.1..036.6` | batches |
 | `LLR-036.1..6` | batches |
 | `LLR-036.2` | batches, tests |
@@ -2122,46 +2122,46 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-036.4` | batches |
 | `LLR-036.5` | batches |
 | `LLR-036.6` | batches |
-| `LLR-037.1` | batches, canon, tests |
+| `LLR-037.1` | batches, tests |
 | `LLR-037.1-.3` | batches |
 | `LLR-037.1..037.3` | tests |
 | `LLR-037.1..3` | batches |
-| `LLR-037.2` | batches, canon, tests |
-| `LLR-037.3` | batches, canon, tests |
-| `LLR-037.4` | batches, canon, tests |
+| `LLR-037.2` | batches, tests |
+| `LLR-037.3` | batches, tests |
+| `LLR-037.4` | batches, tests |
 | `LLR-037.4-fixed` | batches |
-| `LLR-038.1` | batches, canon, tests |
-| `LLR-038.2` | batches, canon, tests |
-| `LLR-038.3` | batches, canon, tests |
+| `LLR-038.1` | batches, tests |
+| `LLR-038.2` | batches, tests |
+| `LLR-038.3` | batches, tests |
 | `LLR-038.4` | batches, tests |
 | `LLR-038.5` | batches, tests |
 | `LLR-041` | batches |
-| `LLR-041.1` | batches, canon, tests |
+| `LLR-041.1` | batches, tests |
 | `LLR-041.1..041.11` | batches |
 | `LLR-041.1..11` | batches |
-| `LLR-041.10` | batches, canon, tests |
-| `LLR-041.11` | batches, canon, tests |
+| `LLR-041.10` | batches, tests |
+| `LLR-041.11` | batches, tests |
 | `LLR-041.2` | batches, tests |
 | `LLR-041.3` | batches, tests |
 | `LLR-041.4` | batches, tests |
 | `LLR-041.5` | batches, tests |
 | `LLR-041.6` | batches |
-| `LLR-041.7` | batches, canon, tests |
+| `LLR-041.7` | batches, tests |
 | `LLR-041.8` | batches, tests |
-| `LLR-041.9` | batches, canon, tests |
+| `LLR-041.9` | batches, tests |
 | `LLR-041.x` | batches |
 | `LLR-042` | batches |
-| `LLR-042.1` | batches, canon, tests |
+| `LLR-042.1` | batches, tests |
 | `LLR-042.10` | batches, tests |
-| `LLR-042.11` | batches, canon |
-| `LLR-042.12` | batches, canon, tests |
+| `LLR-042.11` | batches |
+| `LLR-042.12` | batches, tests |
 | `LLR-042.13` | batches |
 | `LLR-042.2` | batches, tests |
-| `LLR-042.3` | batches, canon, tests |
+| `LLR-042.3` | batches, tests |
 | `LLR-042.4` | batches, tests |
 | `LLR-042.5` | batches, tests |
 | `LLR-042.6` | batches, tests |
-| `LLR-042.7` | batches, canon, tests |
+| `LLR-042.7` | batches, tests |
 | `LLR-042.8` | batches, tests |
 | `LLR-042.9` | batches, tests |
 | `LLR-042.9-pinned` | batches |
@@ -2180,45 +2180,42 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-043.R5` | batches |
 | `LLR-043.R6` | batches, tests |
 | `LLR-043.R7` | batches |
-| `LLR-043.R8` | batches, canon, tests |
-| `LLR-044.1` | batches, canon, tests |
+| `LLR-043.R8` | batches, tests |
+| `LLR-044.1` | batches, tests |
 | `LLR-044.2` | batches, tests |
 | `LLR-044.3` | batches, tests |
 | `LLR-044.4` | batches, tests |
 | `LLR-044.5` | batches |
-| `LLR-044.6` | batches, canon |
+| `LLR-044.6` | batches |
 | `LLR-044.x` | batches |
 | `LLR-045` | batches |
-| `LLR-045A` | canon |
 | `LLR-045A.1` | batches |
-| `LLR-045A.2` | batches, canon, tests |
+| `LLR-045A.2` | batches, tests |
 | `LLR-045A.2..045A.6` | tests |
 | `LLR-045A.3` | batches, tests |
 | `LLR-045A.4` | batches, tests |
-| `LLR-045A.5` | batches, canon |
+| `LLR-045A.5` | batches |
 | `LLR-045A.6` | batches |
 | `LLR-045B` | batches, tests |
-| `LLR-045B.1` | batches, canon, tests |
-| `LLR-045B.2` | batches, canon, tests |
-| `LLR-045B.3` | batches, canon, tests |
+| `LLR-045B.1` | batches, tests |
+| `LLR-045B.2` | batches, tests |
+| `LLR-045B.3` | batches, tests |
 | `LLR-045C` | batches, tests |
-| `LLR-045C.1` | batches, canon, tests |
+| `LLR-045C.1` | batches, tests |
 | `LLR-045C.2` | batches |
-| `LLR-045C.3` | batches, canon, tests |
-| `LLR-045D` | canon |
+| `LLR-045C.3` | batches, tests |
 | `LLR-045D.1` | batches |
 | `LLR-045D.2` | batches |
-| `LLR-045D.3` | batches, canon |
+| `LLR-045D.3` | batches |
 | `LLR-045D.4` | batches |
 | `LLR-050.1` | batches |
-| `LLR-050.1-.4` | batches, canon |
+| `LLR-050.1-.4` | batches |
 | `LLR-050.2` | batches |
 | `LLR-050.3` | batches |
 | `LLR-050.4` | batches |
 | `LLR-051.1` | batches |
-| `LLR-051.1-.8` | canon |
 | `LLR-051.2` | batches |
-| `LLR-051.3` | batches, canon, tests |
+| `LLR-051.3` | batches, tests |
 | `LLR-051.4` | batches |
 | `LLR-051.4-.8` | batches |
 | `LLR-051.5` | batches, tests |
@@ -2226,141 +2223,141 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-051.7` | batches |
 | `LLR-051.8` | batches, tests |
 | `LLR-052.1` | batches |
-| `LLR-052.1-.2` | batches, canon |
+| `LLR-052.1-.2` | batches |
 | `LLR-052.2` | batches |
 | `LLR-052.3` | batches |
-| `LLR-053.1` | batches, canon, tests |
+| `LLR-053.1` | batches, tests |
 | `LLR-053.2` | batches, tests |
 | `LLR-053.3` | batches, tests |
 | `LLR-053.4` | batches, tests |
 | `LLR-053.5` | batches, tests |
 | `LLR-053.6` | batches, tests |
 | `LLR-053.7` | batches, tests |
-| `LLR-054.1` | batches, canon, tests |
+| `LLR-054.1` | batches, tests |
 | `LLR-054.2` | batches, tests |
 | `LLR-054.3` | batches, tests |
 | `LLR-054.4` | batches, tests |
 | `LLR-054.5` | batches, tests |
-| `LLR-055.1` | batches, canon, tests |
+| `LLR-055.1` | batches, tests |
 | `LLR-055.2` | batches, tests |
 | `LLR-055.3` | batches, tests |
 | `LLR-055.4` | batches, tests |
-| `LLR-056.1` | batches, canon, tests |
+| `LLR-056.1` | batches, tests |
 | `LLR-056.2` | batches, tests |
 | `LLR-056.3` | batches, tests |
 | `LLR-056.4` | batches, tests |
 | `LLR-056.5` | batches, tests |
-| `LLR-057.1` | batches, canon, tests |
+| `LLR-057.1` | batches, tests |
 | `LLR-057.1-.4` | batches |
 | `LLR-057.2` | batches |
 | `LLR-057.3` | batches, tests |
 | `LLR-057.4` | batches |
-| `LLR-058.1` | batches, canon |
+| `LLR-058.1` | batches |
 | `LLR-058.2` | batches |
 | `LLR-058.3` | batches, tests |
 | `LLR-058.4` | batches, tests |
-| `LLR-059.1` | batches, canon, tests |
+| `LLR-059.1` | batches, tests |
 | `LLR-059.2` | batches |
 | `LLR-059.3` | batches, tests |
-| `LLR-060.1` | batches, canon, tests |
+| `LLR-060.1` | batches, tests |
 | `LLR-060.2` | batches, tests |
 | `LLR-060.3` | batches, tests |
 | `LLR-060.4` | batches |
 | `LLR-060.5` | batches |
-| `LLR-061.1` | batches, canon, tests |
+| `LLR-061.1` | batches, tests |
 | `LLR-061.1-.3` | tests |
 | `LLR-061.2` | batches |
 | `LLR-061.3` | batches, tests |
-| `LLR-062.1` | batches, canon |
+| `LLR-062.1` | batches |
 | `LLR-062.2` | batches |
 | `LLR-062.3` | batches |
-| `LLR-063.1` | batches, canon, tests |
+| `LLR-063.1` | batches, tests |
 | `LLR-063.1-063.4` | batches |
 | `LLR-063.2` | batches |
 | `LLR-063.3` | batches |
-| `LLR-063.4` | batches, canon, tests |
+| `LLR-063.4` | batches, tests |
 | `LLR-063.5` | batches |
-| `LLR-064.1` | batches, canon, tests |
+| `LLR-064.1` | batches, tests |
 | `LLR-064.2` | batches |
 | `LLR-064.3` | batches |
-| `LLR-064a.1` | batches, canon, tests |
+| `LLR-064a.1` | batches, tests |
 | `LLR-064a.2` | batches, tests |
-| `LLR-064b.1` | batches, canon, tests |
+| `LLR-064b.1` | batches, tests |
 | `LLR-064b.2` | batches |
 | `LLR-064b.3` | batches, tests |
 | `LLR-064b.4` | batches, tests |
-| `LLR-065.1` | batches, canon, tests |
+| `LLR-065.1` | batches, tests |
 | `LLR-065.2` | batches, tests |
-| `LLR-065.3` | batches, canon, tests |
-| `LLR-065.4` | batches, canon, tests |
-| `LLR-066.1` | batches, canon, tests |
+| `LLR-065.3` | batches, tests |
+| `LLR-065.4` | batches, tests |
+| `LLR-066.1` | batches, tests |
 | `LLR-066.2` | batches, tests |
 | `LLR-066.3` | batches, tests |
 | `LLR-066.4` | batches, tests |
 | `LLR-066.5` | batches, tests |
 | `LLR-066.6` | batches |
-| `LLR-066.7` | batches, canon, tests |
-| `LLR-067.1` | batches, canon, tests |
+| `LLR-066.7` | batches, tests |
+| `LLR-067.1` | batches, tests |
 | `LLR-067.2` | batches |
-| `LLR-067.3` | batches, canon |
+| `LLR-067.3` | batches |
 | `LLR-067.4` | batches |
-| `LLR-068.1` | batches, canon, tests |
+| `LLR-068.1` | batches, tests |
 | `LLR-068.2` | batches, tests |
 | `LLR-068.3` | batches |
 | `LLR-068a` | batches |
-| `LLR-068a.1` | batches, canon, tests |
+| `LLR-068a.1` | batches, tests |
 | `LLR-068a.1-3` | batches |
 | `LLR-068a.2` | batches, tests |
 | `LLR-068a.3` | batches, tests |
 | `LLR-068a.4` | batches, tests |
-| `LLR-068b.1` | batches, canon, tests |
+| `LLR-068b.1` | batches, tests |
 | `LLR-068b.1-3` | batches |
 | `LLR-068b.2` | batches |
 | `LLR-068b.3` | batches, tests |
 | `LLR-068b.4` | batches, tests |
-| `LLR-069.1` | batches, canon, tests |
+| `LLR-069.1` | batches, tests |
 | `LLR-069.2` | batches |
 | `LLR-069.3` | batches |
 | `LLR-069.4` | batches |
 | `LLR-070` | batches, tests |
-| `LLR-070.1` | batches, canon, tests |
+| `LLR-070.1` | batches, tests |
 | `LLR-070.2` | batches |
-| `LLR-071.1` | batches, canon, tests |
+| `LLR-071.1` | batches, tests |
 | `LLR-071.2` | batches |
 | `LLR-072` | batches, tests |
-| `LLR-072-1.1` | batches, canon, tests |
+| `LLR-072-1.1` | batches, tests |
 | `LLR-072-1.2` | batches, tests |
 | `LLR-072-2.1` | batches, tests |
 | `LLR-072-2.2` | batches, tests |
 | `LLR-072-2.3` | batches, tests |
 | `LLR-072-2.4` | batches, tests |
-| `LLR-072-5.1` | batches, canon |
-| `LLR-072-5.2` | batches, canon |
+| `LLR-072-5.1` | batches |
+| `LLR-072-5.2` | batches |
 | `LLR-072-6.1` | batches, tests |
 | `LLR-072-6.2` | batches, tests |
 | `LLR-072-7.1` | batches, tests |
 | `LLR-072-8.1` | batches, tests |
-| `LLR-072.1` | batches, canon, tests |
+| `LLR-072.1` | batches, tests |
 | `LLR-072.2` | batches, tests |
 | `LLR-072.3` | batches, tests |
 | `LLR-072.4` | batches |
 | `LLR-072.x` | batches |
 | `LLR-073` | tests |
-| `LLR-073.1` | batches, canon |
+| `LLR-073.1` | batches |
 | `LLR-073.2` | batches |
 | `LLR-073.3` | batches |
 | `LLR-074` | tests |
-| `LLR-074.1` | batches, canon |
+| `LLR-074.1` | batches |
 | `LLR-074.2` | batches |
-| `LLR-074.3` | batches, canon |
+| `LLR-074.3` | batches |
 | `LLR-075` | batches |
-| `LLR-075.1` | batches, canon, tests |
+| `LLR-075.1` | batches, tests |
 | `LLR-075.2` | batches, tests |
 | `LLR-075.3` | batches, tests |
 | `LLR-075.4` | batches, tests |
 | `LLR-075.5` | batches |
 | `LLR-075.6` | batches, tests |
-| `LLR-076.1` | batches, canon, tests |
+| `LLR-076.1` | batches, tests |
 | `LLR-076.2` | batches, tests |
 | `LLR-076.3` | batches |
 | `LLR-076.4` | batches |
@@ -2375,10 +2372,10 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-078.3` | batches, tests |
 | `LLR-078.4` | batches, tests |
 | `LLR-078.5` | batches |
-| `LLR-079.1` | batches, canon, tests |
+| `LLR-079.1` | batches, tests |
 | `LLR-079.2` | batches |
-| `LLR-079.3` | batches, canon, tests |
-| `LLR-079.4` | batches, canon |
+| `LLR-079.3` | batches, tests |
+| `LLR-079.4` | batches |
 | `LLR-079.5` | batches |
 | `LLR-079.x` | batches |
 | `LLR-080.1` | batches, tests |
@@ -2505,7 +2502,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-101.2` | batches |
 | `LLR-101.3` | batches |
 | `LLR-101.4` | batches |
-| `LLR-102.1` | batches, canon, tests |
+| `LLR-102.1` | batches, tests |
 | `LLR-102.1-.4` | batches |
 | `LLR-102.1..4` | batches |
 | `LLR-102.2` | batches, tests |
@@ -2514,33 +2511,33 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-102.5` | batches |
 | `LLR-102.6` | batches |
 | `LLR-102.x` | batches |
-| `LLR-103.1` | batches, canon, tests |
-| `LLR-103.2` | batches, canon, tests |
-| `LLR-103.3` | batches, canon, tests |
-| `LLR-103.4` | batches, canon, tests |
-| `LLR-103.5` | batches, canon, tests |
-| `LLR-103.6` | batches, canon, tests |
+| `LLR-103.1` | batches, tests |
+| `LLR-103.2` | batches, tests |
+| `LLR-103.3` | batches, tests |
+| `LLR-103.4` | batches, tests |
+| `LLR-103.5` | batches, tests |
+| `LLR-103.6` | batches, tests |
 | `LLR-103.x` | batches, tests |
-| `LLR-104.1` | batches, canon |
-| `LLR-104.2` | batches, canon |
+| `LLR-104.1` | batches |
+| `LLR-104.2` | batches |
 | `LLR-104.3` | batches |
 | `LLR-104.4` | batches |
 | `LLR-104.5` | batches |
-| `LLR-104.6` | batches, canon, tests |
-| `LLR-104.7` | batches, canon |
-| `LLR-105.1` | batches, canon, tests |
-| `LLR-105.2` | batches, canon, tests |
+| `LLR-104.6` | batches, tests |
+| `LLR-104.7` | batches |
+| `LLR-105.1` | batches, tests |
+| `LLR-105.2` | batches, tests |
 | `LLR-105.3` | batches, tests |
-| `LLR-105.4` | batches, canon, tests |
-| `LLR-105.5` | batches, canon, tests |
+| `LLR-105.4` | batches, tests |
+| `LLR-105.5` | batches, tests |
 | `LLR-105.6` | batches, tests |
-| `LLR-105.7` | batches, canon, tests |
+| `LLR-105.7` | batches, tests |
 | `LLR-105.9` | batches |
 | `LLR-105.x` | tests |
 | `LLR-106` | batches |
-| `LLR-106.1` | batches, canon, tests |
+| `LLR-106.1` | batches, tests |
 | `LLR-106.2` | batches, tests |
-| `LLR-106.3` | batches, canon, tests |
+| `LLR-106.3` | batches, tests |
 | `LLR-106.4` | batches, tests |
 | `LLR-106.x` | batches, tests |
 | `LLR-107` | batches |
@@ -2577,36 +2574,36 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-111.6` | batches, tests |
 | `LLR-111.7` | batches, tests |
 | `LLR-111.8` | batches |
-| `LLR-111.9` | batches, canon, tests |
+| `LLR-111.9` | batches, tests |
 | `LLR-111.x` | batches |
-| `LLR-112.1` | batches, canon |
+| `LLR-112.1` | batches |
 | `LLR-112.2` | batches, tests |
-| `LLR-112.3` | batches, canon, tests |
+| `LLR-112.3` | batches, tests |
 | `LLR-112.x` | batches |
-| `LLR-113.1` | batches, canon, tests |
+| `LLR-113.1` | batches, tests |
 | `LLR-113.1-.2` | tests |
 | `LLR-113.2` | batches |
 | `LLR-113.x` | batches |
-| `LLR-114.1` | batches, canon |
+| `LLR-114.1` | batches |
 | `LLR-114.1-.2` | tests |
 | `LLR-114.2` | batches |
 | `LLR-114.x` | batches |
 | `LLR-115.1` | batches |
-| `LLR-115.2` | batches, canon, tests |
+| `LLR-115.2` | batches, tests |
 | `LLR-115.3` | batches, tests |
-| `LLR-115.4` | batches, canon, tests |
+| `LLR-115.4` | batches, tests |
 | `LLR-115.x` | batches |
 | `LLR-116` | batches |
-| `LLR-116.1` | batches, canon, tests |
+| `LLR-116.1` | batches, tests |
 | `LLR-116.2` | batches, tests |
 | `LLR-116.3` | batches, tests |
 | `LLR-116.4` | batches, tests |
 | `LLR-116.5` | batches, tests |
-| `LLR-116.6` | batches, canon, tests |
-| `LLR-116.7` | batches, canon, tests |
+| `LLR-116.6` | batches, tests |
+| `LLR-116.7` | batches, tests |
 | `LLR-116.x` | batches |
 | `LLR-117` | batches |
-| `LLR-117.1` | batches, canon, tests |
+| `LLR-117.1` | batches, tests |
 | `LLR-117.2` | batches, tests |
 | `LLR-117.x` | batches |
 | `LLR-118` | batches |
@@ -2633,10 +2630,10 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-121.x` | batches |
 | `LLR-122.1` | batches, canon, tests |
 | `LLR-122.1..122.5` | batches, tests |
-| `LLR-122.2` | batches, canon, tests |
-| `LLR-122.3` | batches, canon, tests |
+| `LLR-122.2` | batches, tests |
+| `LLR-122.3` | batches, tests |
 | `LLR-122.4` | batches, canon, tests |
-| `LLR-122.5` | batches, canon, tests |
+| `LLR-122.5` | batches, tests |
 | `LLR-122.x` | batches |
 | `LLR-123.1` | batches, tests |
 | `LLR-123.1-.3` | tests |
@@ -2646,55 +2643,55 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-124` | batches |
 | `LLR-124.1` | batches, canon, tests |
 | `LLR-124.1-.4` | tests |
-| `LLR-124.2` | batches, canon, tests |
+| `LLR-124.2` | batches, tests |
 | `LLR-124.3` | batches, tests |
 | `LLR-124.4` | batches, tests |
 | `LLR-124.x` | batches |
 | `LLR-125.1` | batches, canon, tests |
 | `LLR-125.1..133.1` | batches |
-| `LLR-125.2` | batches, canon, tests |
+| `LLR-125.2` | batches, tests |
 | `LLR-125.x` | batches |
 | `LLR-126.1` | batches, canon, tests |
-| `LLR-126.2` | batches, canon, tests |
-| `LLR-126.3` | batches, canon, tests |
-| `LLR-126.4` | batches, canon |
+| `LLR-126.2` | batches, tests |
+| `LLR-126.3` | batches, tests |
+| `LLR-126.4` | batches |
 | `LLR-126.x` | batches |
 | `LLR-127.1` | batches, canon, tests |
-| `LLR-127.2` | batches, canon, tests |
-| `LLR-127.3` | batches, canon, tests |
-| `LLR-127.4` | batches, canon |
+| `LLR-127.2` | batches, tests |
+| `LLR-127.3` | batches, tests |
+| `LLR-127.4` | batches |
 | `LLR-128.1` | batches, canon, tests |
 | `LLR-129.1` | batches, canon, tests |
-| `LLR-129.2` | batches, canon, tests |
-| `LLR-129.3` | batches, canon, tests |
+| `LLR-129.2` | batches, tests |
+| `LLR-129.3` | batches, tests |
 | `LLR-130` | tests |
 | `LLR-130.1` | batches, canon, tests |
-| `LLR-130.2` | batches, canon, tests |
+| `LLR-130.2` | batches, tests |
 | `LLR-131.1` | batches, canon, tests |
 | `LLR-131.1-.3` | tests |
-| `LLR-131.2` | batches, canon, tests |
-| `LLR-131.3` | batches, canon, tests |
+| `LLR-131.2` | batches, tests |
+| `LLR-131.3` | batches, tests |
 | `LLR-132.1` | batches, canon, tests |
 | `LLR-132.1-.4` | tests |
-| `LLR-132.2` | batches, canon, tests |
-| `LLR-132.3` | batches, canon, tests |
-| `LLR-132.4` | batches, canon, tests |
+| `LLR-132.2` | batches, tests |
+| `LLR-132.3` | batches, tests |
+| `LLR-132.4` | batches, tests |
 | `LLR-133.1` | batches, canon, tests |
 | `LLR-135` | batches, tests |
 | `LLR-135.1` | batches, canon, tests |
 | `LLR-135.1..135.7` | tests |
 | `LLR-135.1..140.2` | batches |
-| `LLR-135.2` | batches, canon, tests |
-| `LLR-135.3` | batches, canon, tests |
-| `LLR-135.4` | batches, canon, tests |
+| `LLR-135.2` | batches, tests |
+| `LLR-135.3` | batches, tests |
+| `LLR-135.4` | batches, tests |
 | `LLR-135.5` | batches, canon, tests |
 | `LLR-135.6` | batches, canon, tests |
 | `LLR-135.7` | batches, canon, tests |
 | `LLR-136` | tests |
 | `LLR-136.1` | batches, canon, tests |
 | `LLR-136.1..136.6` | tests |
-| `LLR-136.2` | batches, canon, tests |
-| `LLR-136.3` | batches, canon, tests |
+| `LLR-136.2` | batches, tests |
+| `LLR-136.3` | batches, tests |
 | `LLR-136.4` | batches, canon, tests |
 | `LLR-136.5` | batches, canon, tests |
 | `LLR-136.6` | batches, canon, tests |
@@ -2702,110 +2699,112 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-137.1` | batches, canon, tests |
 | `LLR-137.1-137.3` | batches |
 | `LLR-137.1..137.4` | tests |
-| `LLR-137.2` | batches, canon, tests |
-| `LLR-137.3` | batches, canon, tests |
+| `LLR-137.2` | batches, tests |
+| `LLR-137.3` | batches, tests |
 | `LLR-137.4` | batches, canon, tests |
 | `LLR-138.1` | batches, canon, tests |
 | `LLR-138.1-138.3` | batches |
 | `LLR-138.1..138.4` | tests |
-| `LLR-138.2` | batches, canon, tests |
-| `LLR-138.3` | batches, canon, tests |
-| `LLR-138.4` | batches, canon, tests |
+| `LLR-138.2` | batches, tests |
+| `LLR-138.3` | batches, tests |
+| `LLR-138.4` | batches, tests |
 | `LLR-138.4.txt` | batches |
 | `LLR-139.1` | batches, canon, tests |
 | `LLR-139.1..139.3` | tests |
-| `LLR-139.2` | batches, canon, tests |
-| `LLR-139.3` | batches, canon, tests |
+| `LLR-139.2` | batches, tests |
+| `LLR-139.3` | batches, tests |
+| `LLR-139.x` | canon |
 | `LLR-140.1` | batches, canon, tests |
 | `LLR-140.1..140.2` | tests |
-| `LLR-140.2` | batches, canon, tests |
+| `LLR-140.2` | batches, tests |
 | `LLR-141` | batches |
 | `LLR-141.1` | batches, canon, tests |
 | `LLR-141.1..143.2` | batches |
 | `LLR-141.2` | batches, canon, tests |
 | `LLR-142.1` | batches, canon, tests |
-| `LLR-142.2` | batches, canon, tests |
+| `LLR-142.2` | batches, tests |
 | `LLR-143.1` | batches, canon, tests |
 | `LLR-143.2` | batches, canon, tests |
 | `LLR-144.1` | batches, canon, tests |
 | `LLR-144.1..144.12` | tests |
-| `LLR-144.10` | batches, canon, tests |
-| `LLR-144.11` | batches, canon, tests |
-| `LLR-144.12` | batches, canon, tests |
-| `LLR-144.2` | batches, canon, tests |
-| `LLR-144.3` | batches, canon, tests |
-| `LLR-144.4` | batches, canon, tests |
-| `LLR-144.5` | batches, canon, tests |
-| `LLR-144.6` | batches, canon, tests |
-| `LLR-144.7` | batches, canon, tests |
-| `LLR-144.8` | batches, canon, tests |
-| `LLR-144.9` | batches, canon, tests |
+| `LLR-144.10` | batches, tests |
+| `LLR-144.11` | batches, tests |
+| `LLR-144.12` | batches, tests |
+| `LLR-144.2` | batches, tests |
+| `LLR-144.3` | batches, tests |
+| `LLR-144.4` | batches, tests |
+| `LLR-144.5` | batches, tests |
+| `LLR-144.6` | batches, tests |
+| `LLR-144.7` | batches, tests |
+| `LLR-144.8` | batches, tests |
+| `LLR-144.9` | batches, tests |
 | `LLR-145` | batches |
 | `LLR-145.1` | batches, canon, tests |
 | `LLR-145.1..145.10` | tests |
-| `LLR-145.10` | batches, canon, tests |
-| `LLR-145.2` | batches, canon, tests |
-| `LLR-145.3` | batches, canon, tests |
-| `LLR-145.4` | batches, canon, tests |
-| `LLR-145.5` | batches, canon, tests |
-| `LLR-145.6` | batches, canon, tests |
-| `LLR-145.7` | batches, canon, tests |
-| `LLR-145.8` | batches, canon, tests |
-| `LLR-145.9` | batches, canon, tests |
+| `LLR-145.10` | batches, tests |
+| `LLR-145.2` | batches, tests |
+| `LLR-145.3` | batches, tests |
+| `LLR-145.4` | batches, tests |
+| `LLR-145.5` | batches, tests |
+| `LLR-145.6` | batches, tests |
+| `LLR-145.7` | batches, tests |
+| `LLR-145.8` | batches, tests |
+| `LLR-145.9` | batches, tests |
 | `LLR-146.1` | batches, canon, tests |
-| `LLR-146.10` | batches, canon, tests |
-| `LLR-146.11` | batches, canon, tests |
-| `LLR-146.12` | batches, canon, tests |
-| `LLR-146.13` | batches, canon, tests |
-| `LLR-146.14` | batches, canon, tests |
+| `LLR-146.10` | batches, tests |
+| `LLR-146.11` | batches, tests |
+| `LLR-146.12` | batches, tests |
+| `LLR-146.13` | batches, tests |
+| `LLR-146.14` | batches, tests |
 | `LLR-146.2` | batches, canon, tests |
-| `LLR-146.3` | batches, canon, tests |
-| `LLR-146.4` | batches, canon, tests |
-| `LLR-146.5` | batches, canon, tests |
-| `LLR-146.6` | batches, canon, tests |
-| `LLR-146.7` | batches, canon, tests |
-| `LLR-146.8` | batches, canon, tests |
-| `LLR-146.9` | batches, canon, tests |
+| `LLR-146.3` | batches, tests |
+| `LLR-146.4` | batches, tests |
+| `LLR-146.5` | batches, tests |
+| `LLR-146.6` | batches, tests |
+| `LLR-146.7` | batches, tests |
+| `LLR-146.8` | batches, tests |
+| `LLR-146.9` | batches, tests |
 | `LLR-147.1` | batches, canon, tests |
-| `LLR-147.10` | batches, canon, tests |
-| `LLR-147.11` | batches, canon, tests |
-| `LLR-147.12` | batches, canon, tests |
-| `LLR-147.13` | batches, canon, tests |
+| `LLR-147.10` | batches, tests |
+| `LLR-147.11` | batches, tests |
+| `LLR-147.12` | batches, tests |
+| `LLR-147.13` | batches, tests |
 | `LLR-147.2` | batches, canon, tests |
 | `LLR-147.3` | batches, canon, tests |
-| `LLR-147.4` | batches, canon, tests |
-| `LLR-147.5` | batches, canon, tests |
-| `LLR-147.6` | batches, canon, tests |
-| `LLR-147.7` | batches, canon, tests |
-| `LLR-147.8` | batches, canon, tests |
-| `LLR-147.9` | batches, canon, tests |
+| `LLR-147.4` | batches, tests |
+| `LLR-147.5` | batches, tests |
+| `LLR-147.6` | batches, tests |
+| `LLR-147.7` | batches, tests |
+| `LLR-147.8` | batches, tests |
+| `LLR-147.9` | batches, tests |
 | `LLR-148.1` | batches, canon, tests |
 | `LLR-148.1..148.3` | batches |
-| `LLR-148.10` | batches, canon, tests |
-| `LLR-148.2` | batches, canon, tests |
-| `LLR-148.3` | batches, canon, tests |
-| `LLR-148.4` | batches, canon, tests |
-| `LLR-148.5` | batches, canon, tests |
-| `LLR-148.6` | batches, canon, tests |
+| `LLR-148.10` | batches, tests |
+| `LLR-148.2` | batches, tests |
+| `LLR-148.3` | batches, tests |
+| `LLR-148.4` | batches, tests |
+| `LLR-148.5` | batches, tests |
+| `LLR-148.6` | batches, tests |
 | `LLR-148.7` | batches, canon, tests |
-| `LLR-148.8` | batches, canon, tests |
-| `LLR-148.9` | batches, canon, tests |
+| `LLR-148.8` | batches, tests |
+| `LLR-148.9` | batches, tests |
+| `LLR-148.x` | canon |
 | `LLR-149.1` | batches, canon, tests |
 | `LLR-149.1-149.3` | batches |
-| `LLR-149.2` | batches, canon, tests |
-| `LLR-149.3` | batches, canon, tests |
-| `LLR-149.4` | batches, canon, tests |
-| `LLR-149.5` | batches, canon, tests |
-| `LLR-149.6` | batches, canon, tests |
+| `LLR-149.2` | batches, tests |
+| `LLR-149.3` | batches, tests |
+| `LLR-149.4` | batches, tests |
+| `LLR-149.5` | batches, tests |
+| `LLR-149.6` | batches, tests |
 | `LLR-150` | batches |
 | `LLR-150.1` | batches, canon, tests |
 | `LLR-150.1..150.7` | batches, tests |
-| `LLR-150.2` | batches, canon, tests |
-| `LLR-150.3` | batches, canon, tests |
-| `LLR-150.4` | batches, canon, tests |
-| `LLR-150.5` | batches, canon, tests |
-| `LLR-150.6` | batches, canon, tests |
-| `LLR-150.7` | batches, canon, tests |
+| `LLR-150.2` | batches, tests |
+| `LLR-150.3` | batches, tests |
+| `LLR-150.4` | batches, tests |
+| `LLR-150.5` | batches, tests |
+| `LLR-150.6` | batches, tests |
+| `LLR-150.7` | batches, tests |
 | `LLR-151.1` | batches, canon, tests |
 | `LLR-152` | batches |
 | `LLR-152.1` | batches, canon, tests |
@@ -2813,24 +2812,24 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-152.1..162.3` | batches |
 | `LLR-152.1..3` | batches |
 | `LLR-152.1.txt` | batches |
-| `LLR-152.2` | batches, canon, tests |
+| `LLR-152.2` | batches, tests |
 | `LLR-152.2.txt` | batches |
-| `LLR-152.3` | batches, canon, tests |
+| `LLR-152.3` | batches, tests |
 | `LLR-152.3.txt` | batches |
 | `LLR-153.1` | batches, canon, tests |
 | `LLR-153.1..153.4` | batches |
 | `LLR-153.1.txt` | batches |
-| `LLR-153.2` | batches, canon, tests |
-| `LLR-153.3` | batches, canon, tests |
+| `LLR-153.2` | batches, tests |
+| `LLR-153.3` | batches, tests |
 | `LLR-153.3-consistent` | batches |
-| `LLR-153.4` | batches, canon, tests |
+| `LLR-153.4` | batches, tests |
 | `LLR-153.5` | batches |
 | `LLR-153.x` | batches |
 | `LLR-154` | batches |
 | `LLR-154.1` | batches, canon, tests |
 | `LLR-154.1..154.3` | batches |
 | `LLR-154.1.txt` | batches |
-| `LLR-154.2` | batches, canon, tests |
+| `LLR-154.2` | batches, tests |
 | `LLR-154.2.txt` | batches |
 | `LLR-154.3` | batches, canon, tests |
 | `LLR-154.3.txt` | batches |
@@ -2838,22 +2837,22 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-154.x` | batches |
 | `LLR-155.1` | batches, canon, tests |
 | `LLR-155.1..3` | batches |
-| `LLR-155.2` | batches, canon, tests |
-| `LLR-155.3` | batches, canon, tests |
+| `LLR-155.2` | batches, tests |
+| `LLR-155.3` | batches, tests |
 | `LLR-155.3.txt` | batches |
-| `LLR-155.4` | batches, canon, tests |
+| `LLR-155.4` | batches, tests |
 | `LLR-155.5` | batches, canon, tests |
 | `LLR-155.5.txt` | batches |
 | `LLR-155.6` | batches, canon, tests |
 | `LLR-155.6.txt` | batches |
-| `LLR-155.7` | batches, canon, tests |
+| `LLR-155.7` | batches, tests |
 | `LLR-155.8` | batches, canon, tests |
 | `LLR-155.8.txt` | batches |
 | `LLR-155.x` | batches |
 | `LLR-156.1` | batches, canon, tests |
 | `LLR-156.1..156.4` | batches, tests |
 | `LLR-156.1.txt` | batches |
-| `LLR-156.2` | batches, canon, tests |
+| `LLR-156.2` | batches, tests |
 | `LLR-156.2.txt` | batches |
 | `LLR-156.3` | batches, canon, tests |
 | `LLR-156.4` | batches, canon, tests |
@@ -2862,20 +2861,20 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-157.1` | batches, canon, tests |
 | `LLR-157.1-alias.txt` | batches |
 | `LLR-157.1.txt` | batches |
-| `LLR-157.2` | batches, canon, tests |
+| `LLR-157.2` | batches, tests |
 | `LLR-157.2.txt` | batches |
-| `LLR-157.3` | batches, canon |
-| `LLR-157.4` | batches, canon, tests |
+| `LLR-157.3` | batches |
+| `LLR-157.4` | batches, tests |
 | `LLR-157.4.txt` | batches |
 | `LLR-157.x` | batches |
 | `LLR-158` | batches |
 | `LLR-158.1` | batches, canon, tests |
-| `LLR-158.1..158.3` | batches, canon |
+| `LLR-158.1..158.3` | batches |
 | `LLR-158.1..3` | batches |
 | `LLR-158.1.txt` | batches |
-| `LLR-158.2` | batches, canon, tests |
+| `LLR-158.2` | batches, tests |
 | `LLR-158.2.txt` | batches |
-| `LLR-158.3` | batches, canon, tests |
+| `LLR-158.3` | batches, tests |
 | `LLR-158.3.txt` | batches |
 | `LLR-158.x` | batches |
 | `LLR-159` | batches |
@@ -2887,13 +2886,13 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-160` | batches |
 | `LLR-160.1` | batches, canon, tests |
 | `LLR-160.1.txt` | batches |
-| `LLR-160.2` | batches, canon, tests |
+| `LLR-160.2` | batches, tests |
 | `LLR-160.2.txt` | batches |
 | `LLR-160.3` | batches, canon, tests |
 | `LLR-160.3.txt` | batches |
-| `LLR-160.4` | batches, canon, tests |
+| `LLR-160.4` | batches, tests |
 | `LLR-160.4.txt` | batches |
-| `LLR-160.5` | batches, canon, tests |
+| `LLR-160.5` | batches, tests |
 | `LLR-160.5.txt` | batches |
 | `LLR-160.N.txt` | batches |
 | `LLR-160.x` | batches |
@@ -2901,14 +2900,14 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-161.1-fix-headgrammar.txt` | batches |
 | `LLR-161.1-fix.txt` | batches |
 | `LLR-161.1.txt` | batches |
-| `LLR-161.2` | batches, canon, tests |
+| `LLR-161.2` | batches, tests |
 | `LLR-161.2.txt` | batches |
 | `LLR-161.x` | batches |
 | `LLR-162.1` | batches, canon, tests |
 | `LLR-162.1.txt` | batches |
-| `LLR-162.2` | batches, canon, tests |
+| `LLR-162.2` | batches, tests |
 | `LLR-162.2.txt` | batches |
-| `LLR-162.3` | batches, canon, tests |
+| `LLR-162.3` | batches, tests |
 | `LLR-162.3.txt` | batches |
 | `LLR-162.x` | batches |
 | `LLR-163` | batches |
@@ -2917,427 +2916,427 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-163.1..163.7` | batches |
 | `LLR-163.2` | batches, canon, tests |
 | `LLR-163.3` | batches, canon, tests |
-| `LLR-163.4` | batches, canon, tests |
+| `LLR-163.4` | batches, tests |
 | `LLR-163.5` | batches, canon, tests |
-| `LLR-163.6` | batches, canon, tests |
+| `LLR-163.6` | batches, tests |
 | `LLR-163.7` | batches, canon, tests |
 | `LLR-164.1` | batches, canon, tests |
 | `LLR-164.1..164.4` | batches |
-| `LLR-164.2` | batches, canon, tests |
-| `LLR-164.3` | batches, canon, tests |
+| `LLR-164.2` | batches, tests |
+| `LLR-164.3` | batches, tests |
 | `LLR-164.4` | batches, canon, tests |
 | `LLR-164.x` | batches |
 | `LLR-165.1` | batches, canon, tests |
 | `LLR-165.1..165.4` | batches |
-| `LLR-165.2` | batches, canon, tests |
-| `LLR-165.3` | batches, canon, tests |
+| `LLR-165.2` | batches, tests |
+| `LLR-165.3` | batches, tests |
 | `LLR-165.4` | batches, canon, tests |
 | `LLR-165.x` | batches |
 | `LLR-166.1` | batches, canon, tests |
 | `LLR-166.2` | batches, canon, tests |
 | `LLR-166.x` | batches |
 | `LLR-167.1` | batches, canon, tests |
-| `LLR-167.2` | batches, canon, tests |
-| `LLR-167.3` | batches, canon, tests |
-| `LLR-167.4` | batches, canon, tests |
-| `LLR-167.5` | batches, canon, tests |
-| `LLR-167.6` | batches, canon, tests |
-| `LLR-167.6a` | batches, canon, tests |
-| `LLR-167.6b` | batches, canon, tests |
-| `LLR-167.6c` | batches, canon, tests |
-| `LLR-167.6d` | batches, canon |
-| `LLR-167.6e` | batches, canon, tests |
-| `LLR-167.6f` | batches, canon, tests |
-| `LLR-167.6g` | batches, canon, tests |
+| `LLR-167.2` | batches, tests |
+| `LLR-167.3` | batches, tests |
+| `LLR-167.4` | batches, tests |
+| `LLR-167.5` | batches, tests |
+| `LLR-167.6` | batches, tests |
+| `LLR-167.6a` | batches, tests |
+| `LLR-167.6b` | batches, tests |
+| `LLR-167.6c` | batches, tests |
+| `LLR-167.6d` | batches |
+| `LLR-167.6e` | batches, tests |
+| `LLR-167.6f` | batches, tests |
+| `LLR-167.6g` | batches, tests |
 | `LLR-167.7` | batches, canon, tests |
 | `LLR-167.8` | batches, canon, tests |
 | `LLR-168.1` | batches, canon, tests |
-| `LLR-168.2` | batches, canon, tests |
-| `LLR-168.3` | batches, canon, tests |
-| `LLR-168.4` | batches, canon, tests |
+| `LLR-168.2` | batches, tests |
+| `LLR-168.3` | batches, tests |
+| `LLR-168.4` | batches, tests |
 | `LLR-168.4.txt` | batches |
 | `LLR-169.1` | batches, canon, tests |
 | `LLR-169.1-169.9` | batches |
 | `LLR-169.1.txt` | batches |
-| `LLR-169.2` | batches, canon, tests |
+| `LLR-169.2` | batches, tests |
 | `LLR-169.2-s19only.txt` | batches |
 | `LLR-169.2-walk.txt` | batches |
-| `LLR-169.3` | batches, canon, tests |
+| `LLR-169.3` | batches, tests |
 | `LLR-169.3.txt` | batches |
-| `LLR-169.4` | batches, canon, tests |
+| `LLR-169.4` | batches, tests |
 | `LLR-169.4-bool.txt` | batches |
 | `LLR-169.4-cap` | batches |
 | `LLR-169.4-cap.txt` | batches |
-| `LLR-169.5` | batches, canon, tests |
+| `LLR-169.5` | batches, tests |
 | `LLR-169.5.txt` | batches |
-| `LLR-169.6` | batches, canon, tests |
+| `LLR-169.6` | batches, tests |
 | `LLR-169.6.txt` | batches |
-| `LLR-169.7` | batches, canon, tests |
+| `LLR-169.7` | batches, tests |
 | `LLR-169.7.txt` | batches |
-| `LLR-169.8` | batches, canon, tests |
+| `LLR-169.8` | batches, tests |
 | `LLR-169.8-P41` | batches |
 | `LLR-169.8-P41.txt` | batches |
 | `LLR-169.8.txt` | batches |
-| `LLR-169.9` | batches, canon, tests |
+| `LLR-169.9` | batches, tests |
 | `LLR-169.9-code.txt` | batches |
 | `LLR-169.9-keep-all` | batches |
 | `LLR-169.9-keep-all.txt` | batches |
 | `LLR-169.9-last-wins` | batches |
 | `LLR-169.9-last-wins.txt` | batches |
 | `LLR-170.1` | batches, canon, tests |
-| `LLR-170.2` | batches, canon, tests |
-| `LLR-170.3` | batches, canon, tests |
+| `LLR-170.2` | batches, tests |
+| `LLR-170.3` | batches, tests |
 | `LLR-171.1` | batches, canon, tests |
-| `LLR-171.1a` | batches, canon, tests |
-| `LLR-171.1b` | batches, canon |
-| `LLR-171.1c` | batches, canon, tests |
-| `LLR-171.1d` | batches, canon, tests |
-| `LLR-171.1e` | batches, canon, tests |
-| `LLR-171.1f` | batches, canon, tests |
-| `LLR-171.1g` | batches, canon, tests |
-| `LLR-171.1h` | batches, canon, tests |
-| `LLR-171.1i` | batches, canon, tests |
-| `LLR-171.1j` | batches, canon, tests |
-| `LLR-171.1k` | batches, canon, tests |
+| `LLR-171.1a` | batches, tests |
+| `LLR-171.1b` | batches |
+| `LLR-171.1c` | batches, tests |
+| `LLR-171.1d` | batches, tests |
+| `LLR-171.1e` | batches, tests |
+| `LLR-171.1f` | batches, tests |
+| `LLR-171.1g` | batches, tests |
+| `LLR-171.1h` | batches, tests |
+| `LLR-171.1i` | batches, tests |
+| `LLR-171.1j` | batches, tests |
+| `LLR-171.1k` | batches, tests |
 | `LLR-171.1l` | batches, canon, tests |
-| `LLR-171.1m` | batches, canon, tests |
-| `LLR-171.1n` | batches, canon, tests |
-| `LLR-171.1o` | batches, canon |
+| `LLR-171.1m` | batches, tests |
+| `LLR-171.1n` | batches, tests |
+| `LLR-171.1o` | batches |
 | `LLR-171.2` | batches, canon, tests |
-| `LLR-171.2a` | batches, canon, tests |
-| `LLR-171.2b` | batches, canon |
-| `LLR-171.2c` | batches, canon, tests |
-| `LLR-171.2d` | batches, canon, tests |
+| `LLR-171.2a` | batches, tests |
+| `LLR-171.2b` | batches |
+| `LLR-171.2c` | batches, tests |
+| `LLR-171.2d` | batches, tests |
 | `LLR-171.2e` | batches, canon, tests |
-| `LLR-171.2f` | batches, canon, tests |
-| `LLR-171.2g` | batches, canon, tests |
+| `LLR-171.2f` | batches, tests |
+| `LLR-171.2g` | batches, tests |
 | `LLR-171.2h` | batches, canon |
 | `LLR-171.3` | batches, canon, tests |
-| `LLR-171.3a` | batches, canon, tests |
-| `LLR-171.4` | batches, canon, tests |
-| `LLR-171.4a` | batches, canon |
-| `LLR-171.4b` | batches, canon |
-| `LLR-171.4c` | batches, canon, tests |
+| `LLR-171.3a` | batches, tests |
+| `LLR-171.4` | batches, tests |
+| `LLR-171.4a` | batches |
+| `LLR-171.4b` | batches |
+| `LLR-171.4c` | batches, tests |
 | `LLR-171.4d` | batches, canon |
-| `LLR-171.4e` | batches, canon, tests |
-| `LLR-171.4f` | batches, canon, tests |
-| `LLR-171.4g` | batches, canon, tests |
-| `LLR-171.4h` | batches, canon, tests |
+| `LLR-171.4e` | batches, tests |
+| `LLR-171.4f` | batches, tests |
+| `LLR-171.4g` | batches, tests |
+| `LLR-171.4h` | batches, tests |
 | `LLR-171.4i` | batches, canon |
 | `LLR-171.4j` | batches, canon |
 | `LLR-171.5` | batches, canon, tests |
-| `LLR-171.6` | batches, canon, tests |
-| `LLR-171.6a` | batches, canon |
-| `LLR-171.6b` | batches, canon, tests |
-| `LLR-171.7` | batches, canon, tests |
-| `LLR-171.7a` | batches, canon, tests |
-| `LLR-171.7b` | batches, canon, tests |
-| `LLR-171.7c` | batches, canon |
+| `LLR-171.6` | batches, tests |
+| `LLR-171.6a` | batches |
+| `LLR-171.6b` | batches, tests |
+| `LLR-171.7` | batches, tests |
+| `LLR-171.7a` | batches, tests |
+| `LLR-171.7b` | batches, tests |
+| `LLR-171.7c` | batches |
 | `LLR-171.x` | batches |
 | `LLR-172` | batches |
 | `LLR-172.1` | batches, canon, tests |
-| `LLR-172.1a` | batches, canon, tests |
-| `LLR-172.1b` | batches, canon, tests |
-| `LLR-172.1c` | batches, canon, tests |
-| `LLR-172.1d` | batches, canon, tests |
-| `LLR-172.1e` | batches, canon, tests |
-| `LLR-172.1f` | batches, canon, tests |
-| `LLR-172.1g` | batches, canon, tests |
-| `LLR-172.1h` | batches, canon, tests |
-| `LLR-172.1i` | batches, canon, tests |
-| `LLR-172.1j` | batches, canon, tests |
-| `LLR-172.1k` | batches, canon, tests |
-| `LLR-172.1l` | batches, canon, tests |
-| `LLR-172.1m` | batches, canon, tests |
-| `LLR-172.1n` | batches, canon, tests |
-| `LLR-172.2` | batches, canon, tests |
-| `LLR-172.2a` | batches, canon, tests |
-| `LLR-172.2b` | batches, canon, tests |
-| `LLR-172.2c` | batches, canon, tests |
-| `LLR-172.2d` | batches, canon, tests |
-| `LLR-172.2e` | batches, canon, tests |
-| `LLR-172.2f` | batches, canon, tests |
-| `LLR-172.2g` | batches, canon, tests |
-| `LLR-172.2h` | batches, canon, tests |
-| `LLR-172.2i` | batches, canon, tests |
-| `LLR-172.2j` | batches, canon, tests |
-| `LLR-172.2k` | batches, canon, tests |
-| `LLR-172.3` | batches, canon, tests |
+| `LLR-172.1a` | batches, tests |
+| `LLR-172.1b` | batches, tests |
+| `LLR-172.1c` | batches, tests |
+| `LLR-172.1d` | batches, tests |
+| `LLR-172.1e` | batches, tests |
+| `LLR-172.1f` | batches, tests |
+| `LLR-172.1g` | batches, tests |
+| `LLR-172.1h` | batches, tests |
+| `LLR-172.1i` | batches, tests |
+| `LLR-172.1j` | batches, tests |
+| `LLR-172.1k` | batches, tests |
+| `LLR-172.1l` | batches, tests |
+| `LLR-172.1m` | batches, tests |
+| `LLR-172.1n` | batches, tests |
+| `LLR-172.2` | batches, tests |
+| `LLR-172.2a` | batches, tests |
+| `LLR-172.2b` | batches, tests |
+| `LLR-172.2c` | batches, tests |
+| `LLR-172.2d` | batches, tests |
+| `LLR-172.2e` | batches, tests |
+| `LLR-172.2f` | batches, tests |
+| `LLR-172.2g` | batches, tests |
+| `LLR-172.2h` | batches, tests |
+| `LLR-172.2i` | batches, tests |
+| `LLR-172.2j` | batches, tests |
+| `LLR-172.2k` | batches, tests |
+| `LLR-172.3` | batches, tests |
 | `LLR-172.4` | batches, canon, tests |
-| `LLR-172.4a` | batches, canon, tests |
-| `LLR-172.4b` | batches, canon, tests |
-| `LLR-172.4c` | batches, canon, tests |
-| `LLR-172.4d` | batches, canon, tests |
+| `LLR-172.4a` | batches, tests |
+| `LLR-172.4b` | batches, tests |
+| `LLR-172.4c` | batches, tests |
+| `LLR-172.4d` | batches, tests |
 | `LLR-172.4e` | batches, canon, tests |
-| `LLR-172.4f` | batches, canon, tests |
+| `LLR-172.4f` | batches, tests |
 | `LLR-172.5` | batches, canon, tests |
-| `LLR-172.5a` | batches, canon, tests |
-| `LLR-172.5b` | batches, canon, tests |
-| `LLR-172.5c` | batches, canon, tests |
-| `LLR-172.5d` | batches, canon, tests |
-| `LLR-172.5e` | batches, canon, tests |
-| `LLR-172.5f` | batches, canon, tests |
-| `LLR-172.5g` | batches, canon, tests |
-| `LLR-172.5h` | batches, canon, tests |
-| `LLR-172.5i` | batches, canon, tests |
+| `LLR-172.5a` | batches, tests |
+| `LLR-172.5b` | batches, tests |
+| `LLR-172.5c` | batches, tests |
+| `LLR-172.5d` | batches, tests |
+| `LLR-172.5e` | batches, tests |
+| `LLR-172.5f` | batches, tests |
+| `LLR-172.5g` | batches, tests |
+| `LLR-172.5h` | batches, tests |
+| `LLR-172.5i` | batches, tests |
 | `LLR-172.5j` | batches, canon, tests |
-| `LLR-172.5k` | batches, canon, tests |
-| `LLR-172.6` | batches, canon, tests |
-| `LLR-172.6a` | batches, canon, tests |
-| `LLR-172.6b` | batches, canon, tests |
-| `LLR-172.6c` | batches, canon, tests |
+| `LLR-172.5k` | batches, tests |
+| `LLR-172.6` | batches, tests |
+| `LLR-172.6a` | batches, tests |
+| `LLR-172.6b` | batches, tests |
+| `LLR-172.6c` | batches, tests |
 | `LLR-172.x` | batches |
 | `LLR-173` | batches |
 | `LLR-173.1` | batches, canon, tests |
 | `LLR-173.1a` | batches, canon, tests |
-| `LLR-173.1b` | batches, canon, tests |
-| `LLR-173.1c` | batches, canon, tests |
+| `LLR-173.1b` | batches, tests |
+| `LLR-173.1c` | batches, tests |
 | `LLR-173.1d` | batches, tests |
-| `LLR-173.1e` | batches, canon, tests |
+| `LLR-173.1e` | batches, tests |
 | `LLR-173.1f` | batches, canon, tests |
-| `LLR-173.1g` | batches, canon, tests |
-| `LLR-173.2` | batches, canon, tests |
-| `LLR-173.2a` | batches, canon, tests |
-| `LLR-173.2b` | batches, canon, tests |
-| `LLR-173.2c` | batches, canon, tests |
-| `LLR-173.2d` | batches, canon, tests |
-| `LLR-173.2e` | batches, canon, tests |
-| `LLR-173.2f` | batches, canon, tests |
-| `LLR-173.2g` | batches, canon, tests |
+| `LLR-173.1g` | batches, tests |
+| `LLR-173.2` | batches, tests |
+| `LLR-173.2a` | batches, tests |
+| `LLR-173.2b` | batches, tests |
+| `LLR-173.2c` | batches, tests |
+| `LLR-173.2d` | batches, tests |
+| `LLR-173.2e` | batches, tests |
+| `LLR-173.2f` | batches, tests |
+| `LLR-173.2g` | batches, tests |
 | `LLR-173.2h` | batches, canon, tests |
-| `LLR-173.2i` | batches, canon, tests |
-| `LLR-173.2j` | batches, canon, tests |
+| `LLR-173.2i` | batches, tests |
+| `LLR-173.2j` | batches, tests |
 | `LLR-173.2k` | batches, canon, tests |
-| `LLR-173.2l` | batches, canon, tests |
+| `LLR-173.2l` | batches, tests |
 | `LLR-173.2m` | batches, canon, tests |
-| `LLR-173.3` | batches, canon, tests |
-| `LLR-173.3a` | batches, canon, tests |
-| `LLR-173.3b` | batches, canon, tests |
-| `LLR-173.3c` | batches, canon, tests |
-| `LLR-173.3d` | batches, canon, tests |
-| `LLR-173.4` | batches, canon, tests |
+| `LLR-173.3` | batches, tests |
+| `LLR-173.3a` | batches, tests |
+| `LLR-173.3b` | batches, tests |
+| `LLR-173.3c` | batches, tests |
+| `LLR-173.3d` | batches, tests |
+| `LLR-173.4` | batches, tests |
 | `LLR-173.4a` | batches, canon, tests |
-| `LLR-173.4b` | batches, canon, tests |
-| `LLR-173.4c` | batches, canon, tests |
-| `LLR-173.4d` | batches, canon, tests |
-| `LLR-173.4e` | batches, canon, tests |
-| `LLR-173.4f` | batches, canon, tests |
-| `LLR-173.4g` | batches, canon, tests |
-| `LLR-173.4h` | batches, canon, tests |
-| `LLR-173.4i` | batches, canon, tests |
-| `LLR-173.4j` | batches, canon, tests |
-| `LLR-173.4k` | batches, canon, tests |
-| `LLR-173.4l` | batches, canon, tests |
-| `LLR-173.4m` | batches, canon, tests |
+| `LLR-173.4b` | batches, tests |
+| `LLR-173.4c` | batches, tests |
+| `LLR-173.4d` | batches, tests |
+| `LLR-173.4e` | batches, tests |
+| `LLR-173.4f` | batches, tests |
+| `LLR-173.4g` | batches, tests |
+| `LLR-173.4h` | batches, tests |
+| `LLR-173.4i` | batches, tests |
+| `LLR-173.4j` | batches, tests |
+| `LLR-173.4k` | batches, tests |
+| `LLR-173.4l` | batches, tests |
+| `LLR-173.4m` | batches, tests |
 | `LLR-173.4n` | batches, canon, tests |
-| `LLR-173.5` | batches, canon, tests |
-| `LLR-173.5a` | batches, canon, tests |
-| `LLR-173.5b` | batches, canon, tests |
-| `LLR-173.5c` | batches, canon, tests |
-| `LLR-173.5d` | batches, canon, tests |
-| `LLR-173.5e` | batches, canon, tests |
+| `LLR-173.5` | batches, tests |
+| `LLR-173.5a` | batches, tests |
+| `LLR-173.5b` | batches, tests |
+| `LLR-173.5c` | batches, tests |
+| `LLR-173.5d` | batches, tests |
+| `LLR-173.5e` | batches, tests |
 | `LLR-173.6` | batches, canon, tests |
 | `LLR-173.6a` | batches, canon, tests |
-| `LLR-173.6b` | batches, canon, tests |
+| `LLR-173.6b` | batches, tests |
 | `LLR-173.6c` | batches, canon, tests |
-| `LLR-173.6d` | batches, canon, tests |
+| `LLR-173.6d` | batches, tests |
 | `LLR-173.6e` | batches |
-| `LLR-173.6f` | batches, canon, tests |
+| `LLR-173.6f` | batches, tests |
 | `LLR-173.6g` | batches |
 | `LLR-173.6h` | batches |
 | `LLR-173.6i` | batches |
 | `LLR-173.6j` | batches |
-| `LLR-173.6k` | batches, canon, tests |
-| `LLR-173.6l` | batches, canon, tests |
-| `LLR-173.6m` | batches, canon, tests |
-| `LLR-173.6n` | batches, canon, tests |
-| `LLR-173.7` | batches, canon, tests |
+| `LLR-173.6k` | batches, tests |
+| `LLR-173.6l` | batches, tests |
+| `LLR-173.6m` | batches, tests |
+| `LLR-173.6n` | batches, tests |
+| `LLR-173.7` | batches, tests |
 | `LLR-173.x` | batches |
 | `LLR-174` | batches |
 | `LLR-174.1` | batches, canon, tests |
-| `LLR-174.1a` | batches, canon, tests |
-| `LLR-174.1b` | batches, canon, tests |
+| `LLR-174.1a` | batches, tests |
+| `LLR-174.1b` | batches, tests |
 | `LLR-174.1c` | batches, canon, tests |
-| `LLR-174.2` | batches, canon, tests |
-| `LLR-174.2a` | batches, canon, tests |
+| `LLR-174.2` | batches, tests |
+| `LLR-174.2a` | batches, tests |
 | `LLR-174.2b` | batches, canon, tests |
 | `LLR-174.2c` | batches, canon, tests |
-| `LLR-174.2d` | batches, canon, tests |
-| `LLR-174.2e` | batches, canon, tests |
-| `LLR-174.2f` | batches, canon, tests |
-| `LLR-174.2g` | batches, canon, tests |
-| `LLR-174.2h` | batches, canon, tests |
+| `LLR-174.2d` | batches, tests |
+| `LLR-174.2e` | batches, tests |
+| `LLR-174.2f` | batches, tests |
+| `LLR-174.2g` | batches, tests |
+| `LLR-174.2h` | batches, tests |
 | `LLR-174.2i` | batches, canon, tests |
 | `LLR-174.2j` | batches, canon, tests |
-| `LLR-174.2k` | batches, canon, tests |
-| `LLR-174.2l` | batches, canon, tests |
-| `LLR-174.2m` | batches, canon, tests |
-| `LLR-174.2n` | batches, canon, tests |
-| `LLR-174.2o` | batches, canon, tests |
-| `LLR-174.2p` | batches, canon, tests |
-| `LLR-174.2q` | batches, canon, tests |
-| `LLR-174.2r` | batches, canon, tests |
-| `LLR-174.2s` | batches, canon, tests |
-| `LLR-174.2t` | batches, canon, tests |
+| `LLR-174.2k` | batches, tests |
+| `LLR-174.2l` | batches, tests |
+| `LLR-174.2m` | batches, tests |
+| `LLR-174.2n` | batches, tests |
+| `LLR-174.2o` | batches, tests |
+| `LLR-174.2p` | batches, tests |
+| `LLR-174.2q` | batches, tests |
+| `LLR-174.2r` | batches, tests |
+| `LLR-174.2s` | batches, tests |
+| `LLR-174.2t` | batches, tests |
 | `LLR-174.3` | batches, canon, tests |
-| `LLR-174.3a` | batches, canon, tests |
-| `LLR-174.3b` | batches, canon, tests |
-| `LLR-174.3c` | batches, canon, tests |
-| `LLR-174.3d` | batches, canon, tests |
-| `LLR-174.4` | batches, canon, tests |
-| `LLR-174.4a` | batches, canon, tests |
-| `LLR-174.4b` | batches, canon, tests |
-| `LLR-174.4c` | batches, canon, tests |
+| `LLR-174.3a` | batches, tests |
+| `LLR-174.3b` | batches, tests |
+| `LLR-174.3c` | batches, tests |
+| `LLR-174.3d` | batches, tests |
+| `LLR-174.4` | batches, tests |
+| `LLR-174.4a` | batches, tests |
+| `LLR-174.4b` | batches, tests |
+| `LLR-174.4c` | batches, tests |
 | `LLR-174.x` | batches |
 | `LLR-175` | batches |
 | `LLR-175.1` | batches, canon, tests |
 | `LLR-175.1a` | batches, canon, tests |
-| `LLR-175.1b` | batches, canon, tests |
-| `LLR-175.1c` | batches, canon, tests |
-| `LLR-175.1d` | batches, canon, tests |
-| `LLR-175.1e` | batches, canon, tests |
-| `LLR-175.1f` | batches, canon, tests |
-| `LLR-175.1g` | batches, canon |
-| `LLR-175.1h` | batches, canon, tests |
-| `LLR-175.1i` | batches, canon, tests |
-| `LLR-175.1j` | batches, canon, tests |
-| `LLR-175.1k` | batches, canon, tests |
-| `LLR-175.1l` | batches, canon, tests |
-| `LLR-175.1m` | batches, canon, tests |
+| `LLR-175.1b` | batches, tests |
+| `LLR-175.1c` | batches, tests |
+| `LLR-175.1d` | batches, tests |
+| `LLR-175.1e` | batches, tests |
+| `LLR-175.1f` | batches, tests |
+| `LLR-175.1g` | batches |
+| `LLR-175.1h` | batches, tests |
+| `LLR-175.1i` | batches, tests |
+| `LLR-175.1j` | batches, tests |
+| `LLR-175.1k` | batches, tests |
+| `LLR-175.1l` | batches, tests |
+| `LLR-175.1m` | batches, tests |
 | `LLR-175.1n` | batches |
-| `LLR-175.1o` | batches, canon |
-| `LLR-175.1p` | batches, canon, tests |
+| `LLR-175.1o` | batches |
+| `LLR-175.1p` | batches, tests |
 | `LLR-175.2` | batches, canon, tests |
-| `LLR-175.2a` | batches, canon, tests |
+| `LLR-175.2a` | batches, tests |
 | `LLR-175.3` | batches, canon, tests |
-| `LLR-175.3a` | batches, canon, tests |
+| `LLR-175.3a` | batches, tests |
 | `LLR-175.3b` | batches, canon, tests |
 | `LLR-175.3c` | batches, canon, tests |
 | `LLR-175.3d` | batches, canon, tests |
-| `LLR-175.3e` | batches, canon, tests |
-| `LLR-175.3f` | batches, canon, tests |
-| `LLR-175.3g` | batches, canon, tests |
-| `LLR-175.3h` | batches, canon, tests |
-| `LLR-175.3i` | batches, canon, tests |
-| `LLR-175.3j` | batches, canon, tests |
-| `LLR-175.4` | batches, canon, tests |
-| `LLR-175.4a` | batches, canon, tests |
-| `LLR-175.4b` | batches, canon, tests |
-| `LLR-175.4c` | batches, canon, tests |
-| `LLR-175.4d` | batches, canon, tests |
-| `LLR-175.4e` | batches, canon, tests |
-| `LLR-175.4f` | batches, canon, tests |
-| `LLR-175.4g` | batches, canon, tests |
-| `LLR-175.4h` | batches, canon, tests |
-| `LLR-175.4i` | batches, canon, tests |
-| `LLR-175.4j` | batches, canon, tests |
+| `LLR-175.3e` | batches, tests |
+| `LLR-175.3f` | batches, tests |
+| `LLR-175.3g` | batches, tests |
+| `LLR-175.3h` | batches, tests |
+| `LLR-175.3i` | batches, tests |
+| `LLR-175.3j` | batches, tests |
+| `LLR-175.4` | batches, tests |
+| `LLR-175.4a` | batches, tests |
+| `LLR-175.4b` | batches, tests |
+| `LLR-175.4c` | batches, tests |
+| `LLR-175.4d` | batches, tests |
+| `LLR-175.4e` | batches, tests |
+| `LLR-175.4f` | batches, tests |
+| `LLR-175.4g` | batches, tests |
+| `LLR-175.4h` | batches, tests |
+| `LLR-175.4i` | batches, tests |
+| `LLR-175.4j` | batches, tests |
 | `LLR-175.4k` | batches, canon, tests |
-| `LLR-175.4l` | batches, canon, tests |
-| `LLR-175.4m` | batches, canon |
-| `LLR-175.5` | batches, canon, tests |
-| `LLR-175.5a` | batches, canon, tests |
+| `LLR-175.4l` | batches, tests |
+| `LLR-175.4m` | batches |
+| `LLR-175.5` | batches, tests |
+| `LLR-175.5a` | batches, tests |
 | `LLR-175.5b` | batches, canon, tests |
 | `LLR-175.6` | batches, canon, tests |
 | `LLR-175.x` | batches |
 | `LLR-176.1` | batches, canon, tests |
-| `LLR-176.1a` | batches, canon, tests |
+| `LLR-176.1a` | batches, tests |
 | `LLR-176.1b` | batches, canon, tests |
-| `LLR-176.1c` | batches, canon, tests |
-| `LLR-176.1d` | batches, canon, tests |
+| `LLR-176.1c` | batches, tests |
+| `LLR-176.1d` | batches, tests |
 | `LLR-176.1e` | batches, canon, tests |
-| `LLR-176.1f` | batches, canon, tests |
-| `LLR-176.1g` | batches, canon, tests |
+| `LLR-176.1f` | batches, tests |
+| `LLR-176.1g` | batches, tests |
 | `LLR-176.1h` | batches, canon, tests |
 | `LLR-176.1i` | batches, canon, tests |
-| `LLR-176.1j` | batches, canon, tests |
-| `LLR-176.1k` | batches, canon, tests |
-| `LLR-176.1l` | batches, canon, tests |
-| `LLR-176.1m` | batches, canon, tests |
-| `LLR-176.1n` | batches, canon, tests |
-| `LLR-176.1o` | batches, canon, tests |
-| `LLR-176.1p` | batches, canon, tests |
-| `LLR-176.1q` | batches, canon, tests |
-| `LLR-176.1r` | batches, canon, tests |
-| `LLR-176.1s` | batches, canon, tests |
-| `LLR-176.1t` | batches, canon |
+| `LLR-176.1j` | batches, tests |
+| `LLR-176.1k` | batches, tests |
+| `LLR-176.1l` | batches, tests |
+| `LLR-176.1m` | batches, tests |
+| `LLR-176.1n` | batches, tests |
+| `LLR-176.1o` | batches, tests |
+| `LLR-176.1p` | batches, tests |
+| `LLR-176.1q` | batches, tests |
+| `LLR-176.1r` | batches, tests |
+| `LLR-176.1s` | batches, tests |
+| `LLR-176.1t` | batches |
 | `LLR-176.1x` | batches |
 | `LLR-176.2` | batches, canon, tests |
-| `LLR-176.2a` | batches, canon, tests |
-| `LLR-176.2b` | batches, canon, tests |
+| `LLR-176.2a` | batches, tests |
+| `LLR-176.2b` | batches, tests |
 | `LLR-176.2c` | batches, canon, tests |
-| `LLR-176.2d` | batches, canon, tests |
+| `LLR-176.2d` | batches, tests |
 | `LLR-176.2x` | batches |
 | `LLR-176.3` | batches, canon, tests |
-| `LLR-176.4` | batches, canon, tests |
+| `LLR-176.4` | batches, tests |
 | `LLR-176.4a` | batches, canon, tests |
-| `LLR-176.4b` | batches, canon, tests |
+| `LLR-176.4b` | batches, tests |
 | `LLR-176.4x` | batches |
 | `LLR-177` | batches |
 | `LLR-177.1` | batches, canon, tests |
-| `LLR-177.1a` | batches, canon, tests |
+| `LLR-177.1a` | batches, tests |
 | `LLR-177.1b` | batches, canon, tests |
-| `LLR-177.1c` | batches, canon, tests |
-| `LLR-177.1d` | batches, canon, tests |
-| `LLR-177.1e` | batches, canon, tests |
-| `LLR-177.1f` | batches, canon, tests |
-| `LLR-177.1g` | batches, canon, tests |
-| `LLR-177.1h` | batches, canon, tests |
-| `LLR-177.1i` | batches, canon, tests |
-| `LLR-177.1j` | batches, canon, tests |
-| `LLR-177.1k` | batches, canon, tests |
-| `LLR-177.2` | batches, canon, tests |
-| `LLR-177.2a` | batches, canon, tests |
-| `LLR-177.2b` | batches, canon, tests |
-| `LLR-177.2c` | batches, canon |
+| `LLR-177.1c` | batches, tests |
+| `LLR-177.1d` | batches, tests |
+| `LLR-177.1e` | batches, tests |
+| `LLR-177.1f` | batches, tests |
+| `LLR-177.1g` | batches, tests |
+| `LLR-177.1h` | batches, tests |
+| `LLR-177.1i` | batches, tests |
+| `LLR-177.1j` | batches, tests |
+| `LLR-177.1k` | batches, tests |
+| `LLR-177.2` | batches, tests |
+| `LLR-177.2a` | batches, tests |
+| `LLR-177.2b` | batches, tests |
+| `LLR-177.2c` | batches |
 | `LLR-177.3` | batches, canon, tests |
-| `LLR-177.3a` | batches, canon, tests |
-| `LLR-177.3b` | batches, canon, tests |
-| `LLR-177.3c` | batches, canon, tests |
-| `LLR-177.3d` | batches, canon, tests |
+| `LLR-177.3a` | batches, tests |
+| `LLR-177.3b` | batches, tests |
+| `LLR-177.3c` | batches, tests |
+| `LLR-177.3d` | batches, tests |
 | `LLR-177.3e` | batches, canon, tests |
-| `LLR-177.3f` | batches, canon, tests |
-| `LLR-177.3g` | batches, canon, tests |
-| `LLR-177.3h` | batches, canon, tests |
+| `LLR-177.3f` | batches, tests |
+| `LLR-177.3g` | batches, tests |
+| `LLR-177.3h` | batches, tests |
 | `LLR-177.3i` | batches, canon |
 | `LLR-177.4` | batches, canon, tests |
-| `LLR-177.4a` | batches, canon, tests |
-| `LLR-177.4b` | batches, canon, tests |
+| `LLR-177.4a` | batches, tests |
+| `LLR-177.4b` | batches, tests |
 | `LLR-177.4c` | batches, canon, tests |
-| `LLR-177.4d` | batches, canon, tests |
-| `LLR-177.4e` | batches, canon |
-| `LLR-177.5` | batches, canon, tests |
-| `LLR-177.5a` | batches, canon, tests |
+| `LLR-177.4d` | batches, tests |
+| `LLR-177.4e` | batches |
+| `LLR-177.5` | batches, tests |
+| `LLR-177.5a` | batches, tests |
 | `LLR-177.x` | batches |
 | `LLR-178.1` | batches, canon, tests |
 | `LLR-178.1-first-by-name.txt` | batches |
-| `LLR-178.2` | batches, canon, tests |
+| `LLR-178.2` | batches, tests |
 | `LLR-178.3` | batches, canon, tests |
-| `LLR-85.1` | batches, canon |
-| `LLR-85.2` | batches, canon |
-| `LLR-85.3` | batches, canon |
-| `LLR-85.4` | batches, canon |
-| `LLR-85.5` | batches, canon |
-| `LLR-85.6` | batches, canon |
-| `LLR-85.7` | batches, canon |
+| `LLR-85.1` | batches |
+| `LLR-85.2` | batches |
+| `LLR-85.3` | batches |
+| `LLR-85.4` | batches |
+| `LLR-85.5` | batches |
+| `LLR-85.6` | batches |
+| `LLR-85.7` | batches |
 | `LLR-86` | batches |
-| `LLR-86.1` | batches, canon |
-| `LLR-86.2` | batches, canon |
-| `LLR-86.3` | batches, canon |
-| `LLR-86.4` | batches, canon |
-| `LLR-86.5` | batches, canon |
-| `LLR-86.6` | batches, canon |
-| `LLR-86.7` | batches, canon |
-| `LLR-86.8` | batches, canon |
+| `LLR-86.1` | batches |
+| `LLR-86.2` | batches |
+| `LLR-86.3` | batches |
+| `LLR-86.4` | batches |
+| `LLR-86.5` | batches |
+| `LLR-86.6` | batches |
+| `LLR-86.7` | batches |
+| `LLR-86.8` | batches |
 | `LLR-86.99` | batches |
 | `LLR-87` | batches |
-| `LLR-87.1` | batches, canon |
-| `LLR-87.2` | batches, canon |
-| `LLR-87.3` | batches, canon |
-| `LLR-87.4` | batches, canon |
-| `LLR-87.5` | batches, canon |
-| `LLR-87.6` | batches, canon |
-| `LLR-87.7` | batches, canon |
-| `LLR-87.8` | batches, canon |
+| `LLR-87.1` | batches |
+| `LLR-87.2` | batches |
+| `LLR-87.3` | batches |
+| `LLR-87.4` | batches |
+| `LLR-87.5` | batches |
+| `LLR-87.6` | batches |
+| `LLR-87.7` | batches |
+| `LLR-87.8` | batches |
 | `LLR-88.1` | batches |
 | `LLR-88.10` | batches |
 | `LLR-88.11` | batches |
@@ -3381,7 +3380,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-A56.3` | batches, tests |
 | `LLR-A56.4` | batches, tests |
 | `LLR-A56.5` | batches, tests |
-| `LLR-A56.6` | batches, canon, tests |
+| `LLR-A56.6` | batches, tests |
 | `LLR-A56.n` | batches |
 | `LLR-A56.x` | batches |
 | `LLR-AC` | batches |
@@ -3435,7 +3434,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-E6.2` | batches, tests |
 | `LLR-E6.3` | batches, tests |
 | `LLR-F841.1` | batches |
-| `LLR-GRP-001.1` | batches, canon |
+| `LLR-GRP-001.1` | batches |
 | `LLR-GRP-001.10` | batches |
 | `LLR-GRP-001.11` | batches, tests |
 | `LLR-GRP-001.12` | batches, tests |
@@ -3455,7 +3454,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-L1.4` | batches, tests |
 | `LLR-L2.1` | batches, tests |
 | `LLR-L2.2` | batches, tests |
-| `LLR-L2.3` | batches, canon |
+| `LLR-L2.3` | batches |
 | `LLR-L2.4` | batches |
 | `LLR-L3.1` | batches |
 | `LLR-L4.1` | batches |
@@ -3481,7 +3480,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-N8-2.1` | batches, tests |
 | `LLR-N8-2.2` | batches, tests |
 | `LLR-N8-3.1` | batches |
-| `LLR-N8-3.2` | batches, canon, tests |
+| `LLR-N8-3.2` | batches, tests |
 | `LLR-N8-3.3` | batches |
 | `LLR-N8-4.1` | batches, tests |
 | `LLR-N8-4.2` | batches, tests |
@@ -3499,7 +3498,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-P1b.4` | batches, tests |
 | `LLR-P1b.5` | batches, tests |
 | `LLR-P1b.6` | batches, tests |
-| `LLR-P1b.7` | batches, canon, tests |
+| `LLR-P1b.7` | batches, tests |
 | `LLR-P2.1` | batches |
 | `LLR-P2.2` | batches |
 | `LLR-P2b.1` | batches |
@@ -3528,7 +3527,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-V6.x` | batches |
 | `LLR-V7.1` | batches, tests |
 | `LLR-V8.1` | batches, tests |
-| `LLR-WID-001.1` | batches, canon, tests |
+| `LLR-WID-001.1` | batches, tests |
 | `LLR-WID-001.1..6` | batches |
 | `LLR-WID-001.2` | tests |
 | `LLR-WID-001.3` | batches |
@@ -3552,118 +3551,118 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-spec` | batches |
 | `LLR-traced` | batches |
 | `LLR-verify` | batches |
-| `US-001` | batches, canon, tests |
+| `US-001` | batches, tests |
 | `US-001..005` | batches |
 | `US-001..006` | batches |
 | `US-001..US-005` | batches |
 | `US-001..US-006` | batches |
 | `US-001..US-007` | batches |
 | `US-001..US-014` | batches |
-| `US-002` | batches, canon, tests |
+| `US-002` | batches, tests |
 | `US-002..005` | batches |
 | `US-002..US-005` | batches |
-| `US-003` | batches, canon, tests |
-| `US-004` | batches, canon, tests |
-| `US-005` | batches, canon |
-| `US-006` | batches, canon, tests |
+| `US-003` | batches, tests |
+| `US-004` | batches, tests |
+| `US-005` | batches |
+| `US-006` | batches, tests |
 | `US-006..US-009` | batches |
-| `US-007` | batches, canon, tests |
-| `US-008` | batches, canon, tests |
-| `US-009` | batches, canon |
-| `US-01` | batches, canon, tests |
-| `US-010` | batches, canon |
-| `US-011` | batches, canon |
-| `US-012` | batches, canon |
-| `US-013` | batches, canon, tests |
+| `US-007` | batches, tests |
+| `US-008` | batches, tests |
+| `US-009` | batches |
+| `US-01` | batches, tests |
+| `US-010` | batches |
+| `US-011` | batches |
+| `US-012` | batches |
+| `US-013` | batches, tests |
 | `US-013-a` | batches |
 | `US-013-b` | batches |
 | `US-013-c` | batches |
-| `US-014` | batches, canon, tests |
+| `US-014` | batches, tests |
 | `US-014-a` | batches |
 | `US-014-b` | batches |
 | `US-014-c` | batches |
 | `US-014-d` | batches |
-| `US-015` | batches, canon, tests |
-| `US-016` | batches, canon, tests |
-| `US-017` | batches, canon |
-| `US-018` | batches, canon, tests |
-| `US-019` | batches, canon, tests |
-| `US-02` | batches, canon |
+| `US-015` | batches, tests |
+| `US-016` | batches, tests |
+| `US-017` | batches |
+| `US-018` | batches, tests |
+| `US-019` | batches, tests |
+| `US-02` | batches |
 | `US-020` | batches |
-| `US-020a` | batches, canon, tests |
-| `US-020b` | batches, canon |
-| `US-020c` | batches, canon, tests |
-| `US-020d` | batches, canon, tests |
-| `US-022` | batches, canon, tests |
+| `US-020a` | batches, tests |
+| `US-020b` | batches |
+| `US-020c` | batches, tests |
+| `US-020d` | batches, tests |
+| `US-022` | batches, tests |
 | `US-022c` | batches |
-| `US-023` | batches, canon, tests |
-| `US-024` | batches, canon, tests |
-| `US-025` | batches, canon, tests |
-| `US-026` | batches, canon, tests |
+| `US-023` | batches, tests |
+| `US-024` | batches, tests |
+| `US-025` | batches, tests |
+| `US-026` | batches, tests |
 | `US-026-F1` | batches |
-| `US-027` | batches, canon, tests |
-| `US-028` | batches, canon, tests |
-| `US-029` | batches, canon, tests |
-| `US-03` | batches, canon, tests |
-| `US-030` | batches, canon, tests |
-| `US-031` | batches, canon, tests |
-| `US-032` | batches, canon, tests |
-| `US-033` | batches, canon, tests |
-| `US-034` | batches, canon, tests |
-| `US-035` | batches, canon, tests |
+| `US-027` | batches, tests |
+| `US-028` | batches, tests |
+| `US-029` | batches, tests |
+| `US-03` | batches, tests |
+| `US-030` | batches, tests |
+| `US-031` | batches, tests |
+| `US-032` | batches, tests |
+| `US-033` | batches, tests |
+| `US-034` | batches, tests |
+| `US-035` | batches, tests |
 | `US-036` | batches, tests |
 | `US-037` | batches, tests |
-| `US-038` | batches, canon, tests |
-| `US-039` | batches, canon, tests |
-| `US-040` | batches, canon, tests |
+| `US-038` | batches, tests |
+| `US-039` | batches, tests |
+| `US-040` | batches, tests |
 | `US-040a` | batches |
 | `US-040b` | batches, tests |
 | `US-041` | batches |
-| `US-042` | batches, canon, tests |
-| `US-043` | batches, canon, tests |
-| `US-044` | batches, canon |
+| `US-042` | batches, tests |
+| `US-043` | batches, tests |
+| `US-044` | batches |
 | `US-044..047` | batches |
-| `US-045` | batches, canon |
-| `US-045a` | batches, canon, tests |
-| `US-045b` | batches, canon |
-| `US-045c` | batches, canon |
+| `US-045` | batches |
+| `US-045a` | batches, tests |
+| `US-045b` | batches |
+| `US-045c` | batches |
 | `US-045d` | batches |
-| `US-046` | batches, canon |
-| `US-047` | batches, canon |
-| `US-050` | batches, canon, tests |
-| `US-051` | batches, canon |
-| `US-052` | batches, canon |
-| `US-053` | batches, canon |
+| `US-046` | batches |
+| `US-047` | batches |
+| `US-050` | batches, tests |
+| `US-051` | batches |
+| `US-052` | batches |
+| `US-053` | batches |
 | `US-053..US-057` | batches |
-| `US-054` | batches, canon |
-| `US-055` | batches, canon |
-| `US-056` | batches, canon |
-| `US-057` | batches, canon, tests |
-| `US-058` | batches, canon, tests |
-| `US-059` | batches, canon, tests |
-| `US-060` | batches, canon, tests |
-| `US-061` | batches, canon, tests |
-| `US-062` | batches, canon |
+| `US-054` | batches |
+| `US-055` | batches |
+| `US-056` | batches |
+| `US-057` | batches, tests |
+| `US-058` | batches, tests |
+| `US-059` | batches, tests |
+| `US-060` | batches, tests |
+| `US-061` | batches, tests |
+| `US-062` | batches |
 | `US-062-1` | batches |
 | `US-062-2` | batches |
 | `US-062-3` | batches |
 | `US-062-N` | batches |
-| `US-063` | batches, canon |
+| `US-063` | batches |
 | `US-064` | batches |
 | `US-064-adjacent` | batches |
-| `US-064a` | batches, canon, tests |
-| `US-064b` | batches, canon, tests |
+| `US-064a` | batches, tests |
+| `US-064b` | batches, tests |
 | `US-064c` | batches |
-| `US-065` | batches, canon, tests |
+| `US-065` | batches, tests |
 | `US-065..068` | batches |
-| `US-066` | batches, canon, tests |
-| `US-067` | batches, canon, tests |
+| `US-066` | batches, tests |
+| `US-067` | batches, tests |
 | `US-068` | batches |
-| `US-068a` | batches, canon, tests |
-| `US-068b` | batches, canon, tests |
-| `US-072-1` | batches, canon |
-| `US-072-2` | batches, canon, tests |
-| `US-072-3` | batches, canon |
+| `US-068a` | batches, tests |
+| `US-068b` | batches, tests |
+| `US-072-1` | batches |
+| `US-072-2` | batches, tests |
+| `US-072-3` | batches |
 | `US-082` | batches, tests |
 | `US-083` | batches, tests |
 | `US-085` | batches, tests |
@@ -3672,6 +3671,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `US-086` | batches, tests |
 | `US-087` | batches, tests |
 | `US-088` | batches, tests |
+| `US-101.1` | batches |
 | `US-102` | batches |
 | `US-102..104` | batches |
 | `US-103` | batches |
@@ -3735,13 +3735,12 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `US-166` | batches, tests |
 | `US-167` | batches, tests |
 | `US-168` | batches |
-| `US-77` | canon |
 | `US-77-1` | batches |
-| `US-77-2` | batches, canon |
+| `US-77-2` | batches |
 | `US-77-3` | batches |
 | `US-77-4` | batches |
-| `US-77-5` | batches, canon |
-| `US-77-6` | batches, canon |
+| `US-77-5` | batches |
+| `US-77-6` | batches |
 | `US-77-7` | batches |
 | `US-77-8` | batches |
 | `US-78-1` | batches |
@@ -3757,9 +3756,9 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `US-85-2` | batches |
 | `US-85-3` | batches |
 | `US-85-4` | batches |
-| `US-86-1` | batches, canon |
-| `US-87-1` | batches, canon |
-| `US-87-2` | batches, canon |
+| `US-86-1` | batches |
+| `US-87-1` | batches |
+| `US-87-2` | batches |
 | `US-88-1` | batches |
 | `US-88-2` | batches |
 | `US-90.1` | batches |
@@ -3772,13 +3771,13 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `US-92-5` | batches |
 | `US-92-6` | batches |
 | `US-A` | batches |
-| `US-A2L` | batches, canon, tests |
+| `US-A2L` | batches, tests |
 | `US-A56` | batches, tests |
 | `US-ALIGN` | batches |
 | `US-B` | batches |
-| `US-B2` | batches, canon, tests |
+| `US-B2` | batches, tests |
 | `US-B62` | batches |
-| `US-B62-1` | batches, canon, tests |
+| `US-B62-1` | batches, tests |
 | `US-B62-2` | batches, tests |
 | `US-B62-3` | batches, tests |
 | `US-B63-1` | batches |
@@ -3786,20 +3785,20 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `US-B63-3` | batches |
 | `US-B63-D1` | batches |
 | `US-B63-D2` | batches |
-| `US-B63-D3` | batches, canon |
-| `US-B64-1` | batches, canon, tests |
+| `US-B63-D3` | batches |
+| `US-B64-1` | batches, tests |
 | `US-B64-1..3` | batches |
-| `US-B64-2` | batches, canon, tests |
+| `US-B64-2` | batches, tests |
 | `US-B64-2-over-optimisation` | batches |
 | `US-B64-3` | batches |
 | `US-B64-4` | batches |
 | `US-B64-5` | batches |
 | `US-B64-6` | batches |
-| `US-B74-1` | batches, canon, tests |
-| `US-B74-2` | batches, canon, tests |
+| `US-B74-1` | batches, tests |
+| `US-B74-2` | batches, tests |
 | `US-B74-3` | batches |
 | `US-B75-1` | batches |
-| `US-B75-2` | batches, canon |
+| `US-B75-2` | batches |
 | `US-B75-3` | batches |
 | `US-C` | batches |
 | `US-C52-1` | batches |
@@ -3821,9 +3820,9 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `US-E5` | batches |
 | `US-E6` | batches |
 | `US-F841` | batches, tests |
-| `US-FBP2-1` | batches, canon |
+| `US-FBP2-1` | batches |
 | `US-FBP2-2` | batches |
-| `US-FND` | batches, canon, tests |
+| `US-FND` | batches, tests |
 | `US-H` | batches |
 | `US-I` | batches |
 | `US-J` | batches |
@@ -3831,11 +3830,11 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `US-L1` | batches |
 | `US-L1..L5` | batches |
 | `US-L2` | batches |
-| `US-L3` | batches, canon |
+| `US-L3` | batches |
 | `US-L4` | batches |
 | `US-L5` | batches |
-| `US-MAC` | batches, canon, tests |
-| `US-MAP` | batches, canon, tests |
+| `US-MAC` | batches, tests |
+| `US-MAP` | batches, tests |
 | `US-ML1` | batches |
 | `US-ML2` | batches |
 | `US-N-N` | batches |
@@ -3846,16 +3845,16 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `US-N8-4` | batches |
 | `US-N8-5` | batches |
 | `US-NNN` | batches |
-| `US-P1` | batches, canon, tests |
+| `US-P1` | batches, tests |
 | `US-P1b` | batches |
 | `US-P2` | batches, tests |
 | `US-P2b` | batches |
 | `US-P2b56` | batches |
 | `US-P3` | batches, tests |
-| `US-P4` | batches, canon, tests |
+| `US-P4` | batches, tests |
 | `US-P5` | batches, tests |
 | `US-P6` | batches, tests |
-| `US-U8` | batches, canon, tests |
+| `US-U8` | batches, tests |
 | `US-V1` | batches |
 | `US-V1..V8` | batches |
 | `US-V2` | batches |
@@ -3865,49 +3864,105 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `US-V6` | batches |
 | `US-V7` | batches |
 | `US-V8` | batches, tests |
-| `US-WS` | batches, canon, tests |
+| `US-WS` | batches, tests |
 | `US-less` | batches |
 | `US-nnn` | batches |
 
-## family R — 184 unique id(s)
+## family R — 478 unique id(s)
 
 | id | seen in |
 |---|---|
-| `R-CDFX-001` | batches, canon |
-| `R-CDFX-002` | canon |
-| `R-CDFX-003` | canon |
-| `R-CDFX-004` | batches, canon |
-| `R-CDFX-005` | batches, canon |
-| `R-CDFX-006` | canon |
-| `R-CDFX-007` | canon |
-| `R-CDFX-008` | canon |
-| `R-CDFX-009` | canon |
-| `R-CDFX-010` | canon |
-| `R-CDFX-011` | canon |
-| `R-CDFX-012` | canon |
-| `R-CDFX-013` | canon |
-| `R-CDFX-014` | canon |
-| `R-CDFX-015` | canon |
-| `R-CDFX-016` | batches, canon |
-| `R-CDFX-017` | canon |
-| `R-CDFX-018` | batches, canon |
+| `R-CDFX-001` | batches |
+| `R-CDFX-004` | batches |
+| `R-CDFX-005` | batches |
+| `R-CDFX-016` | batches |
+| `R-CDFX-018` | batches |
 | `R-CHG-001` | canon |
 | `R-CHG-002` | batches, canon, tests |
 | `R-CHG-003` | batches, canon |
 | `R-CHG-004` | canon |
+| `R-CHIP-001` | canon |
 | `R-CHK-001` | batches, canon |
 | `R-CHK-002` | batches, canon |
-| `R-CHKED-010` | batches |
-| `R-CHKED-025` | batches |
-| `R-CHKED-031` | batches |
-| `R-CHKS-001` | batches |
+| `R-CHKED-001` | canon |
+| `R-CHKED-002` | canon |
+| `R-CHKED-003` | canon |
+| `R-CHKED-004` | canon |
+| `R-CHKED-005` | canon |
+| `R-CHKED-006` | canon |
+| `R-CHKED-007` | canon |
+| `R-CHKED-008` | canon |
+| `R-CHKED-009` | canon |
+| `R-CHKED-010` | batches, canon |
+| `R-CHKED-011` | canon |
+| `R-CHKED-012` | canon |
+| `R-CHKED-013` | canon |
+| `R-CHKED-014` | canon |
+| `R-CHKED-015` | canon |
+| `R-CHKED-016` | canon |
+| `R-CHKED-017` | canon |
+| `R-CHKED-018` | canon |
+| `R-CHKED-019` | canon |
+| `R-CHKED-020` | canon |
+| `R-CHKED-021` | canon |
+| `R-CHKED-022` | canon |
+| `R-CHKED-023` | canon |
+| `R-CHKED-024` | canon |
+| `R-CHKED-025` | batches, canon |
+| `R-CHKED-026` | canon |
+| `R-CHKED-027` | canon |
+| `R-CHKED-028` | canon |
+| `R-CHKED-029` | canon |
+| `R-CHKED-030` | canon |
+| `R-CHKED-031` | batches, canon |
+| `R-CHKED-032` | canon |
+| `R-CHKED-033` | canon |
+| `R-CHKED-034` | canon |
+| `R-CHKED-035` | canon |
+| `R-CHKED-036` | canon |
+| `R-CHKED-037` | canon |
+| `R-CHKED-038` | canon |
+| `R-CHKED-039` | canon |
+| `R-CHKED-040` | canon |
+| `R-CHKED-041` | canon |
+| `R-CHKED-042` | canon |
+| `R-CHKED-043` | canon |
+| `R-CHKED-044` | canon |
+| `R-CHKED-045` | canon |
+| `R-CHKED-046` | canon |
+| `R-CHKED-047` | canon |
+| `R-CHKED-048` | canon |
+| `R-CHKED-049` | canon |
+| `R-CHKED-050` | canon |
+| `R-CHKED-051` | canon |
+| `R-CHKED-052` | canon |
+| `R-CHKED-053` | canon |
+| `R-CHKS-001` | batches, canon |
+| `R-CHKS-002` | canon |
+| `R-CHKS-003` | canon |
+| `R-CHKS-004` | canon |
+| `R-CHKS-005` | canon |
+| `R-CHKS-006` | canon |
+| `R-CHKS-007` | canon |
+| `R-CHKS-008` | canon |
+| `R-CHKS-009` | canon |
+| `R-CHKS-010` | canon |
+| `R-CHKS-011` | canon |
+| `R-CHKS-012` | canon |
+| `R-CHKS-013` | canon |
+| `R-CHKS-014` | canon |
 | `R-CMP-001` | batches, canon |
 | `R-CMP-002` | canon |
 | `R-CMP-003` | canon |
 | `R-CMP-004` | batches, canon |
 | `R-CMP-005` | canon |
 | `R-CMP-006` | canon |
-| `R-DOC-001` | batches, canon |
+| `R-DOC-001` | batches |
+| `R-ENT-001` | canon |
+| `R-ENT-002` | canon |
+| `R-ENT-003` | canon |
+| `R-ENT-004` | canon |
+| `R-ENT-005` | canon |
 | `R-GA-1` | batches |
 | `R-GA-3` | batches |
 | `R-GA-4` | batches |
@@ -3919,17 +3974,79 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `R-HEX-001` | batches, canon |
 | `R-HEX-002` | batches, canon |
 | `R-HEX-003` | batches, canon |
-| `R-HEX-004` | batches |
+| `R-HEX-004` | batches, canon |
+| `R-HEX-005` | canon |
+| `R-HEX-006` | canon |
+| `R-HEX-007` | canon |
+| `R-HEX-008` | canon |
+| `R-HEX-009` | canon |
 | `R-HEX-012` | batches |
-| `R-LEGEND-011` | batches |
-| `R-MAC-001` | batches |
-| `R-MEM-001` | batches, canon |
-| `R-MEM-002` | canon |
-| `R-MEM-003` | canon |
-| `R-MEM-004` | batches, canon |
-| `R-MEM-005` | batches, canon |
+| `R-IMG-001` | canon |
+| `R-IMG-002` | canon |
+| `R-IMG-003` | canon |
+| `R-IMG-004` | canon |
+| `R-IMG-005` | canon |
+| `R-IMG-006` | canon |
+| `R-LEGEND-010` | canon |
+| `R-LEGEND-011` | batches, canon |
+| `R-LOADQ-001` | canon |
+| `R-LOADQ-002` | canon |
+| `R-LOADQ-003` | canon |
+| `R-LOADQ-004` | canon |
+| `R-LOADQ-005` | canon |
+| `R-LOADQ-006` | canon |
+| `R-LOADRES-1` | canon |
+| `R-LOADRES-10` | canon |
+| `R-LOADRES-11` | canon |
+| `R-LOADRES-12` | canon |
+| `R-LOADRES-13` | canon |
+| `R-LOADRES-14` | canon |
+| `R-LOADRES-15` | canon |
+| `R-LOADRES-16` | canon |
+| `R-LOADRES-17` | canon |
+| `R-LOADRES-18` | canon |
+| `R-LOADRES-2` | canon |
+| `R-LOADRES-3` | canon |
+| `R-LOADRES-4` | canon |
+| `R-LOADRES-5` | canon |
+| `R-LOADRES-6` | canon |
+| `R-LOADRES-7` | canon |
+| `R-LOADRES-8` | canon |
+| `R-LOADRES-9` | canon |
+| `R-LOG-001` | canon |
+| `R-MAC-001` | batches, canon |
+| `R-MAC-002` | canon |
+| `R-MAC-003` | canon |
+| `R-MAC-004` | canon |
+| `R-MAC-005` | canon |
+| `R-MAC-006` | canon |
+| `R-MAC-007` | canon |
+| `R-MAC-008` | canon |
+| `R-MAC-009` | canon |
+| `R-MAC-010` | canon |
+| `R-MAC-011` | canon |
+| `R-MAC-030` | canon |
+| `R-MAC-031` | canon |
+| `R-MAC-032` | canon |
+| `R-MAC-033` | canon |
+| `R-MAC-034` | canon |
+| `R-MAC-035` | canon |
+| `R-MAC-040` | canon |
+| `R-MAC-041` | canon |
+| `R-MAC-042` | canon |
+| `R-MAC-043` | canon |
+| `R-MAC-044` | canon |
+| `R-MAC-050` | canon |
+| `R-MAC-051` | canon |
+| `R-MAC-052` | canon |
+| `R-MAC-053` | canon |
+| `R-MAC-054` | canon |
+| `R-MAC-055` | canon |
+| `R-MAC-056` | canon |
+| `R-MEM-001` | batches |
+| `R-MEM-004` | batches |
+| `R-MEM-005` | batches |
 | `R-NEW-1` | batches |
-| `R-OPS-001` | canon |
 | `R-OPS-002` | batches, canon |
 | `R-OPS-003` | canon |
 | `R-PARSE-001` | batches, canon |
@@ -3937,14 +4054,152 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `R-PARSE-003` | batches, canon |
 | `R-PARSE-004` | batches, canon |
 | `R-PARSE-005` | batches, canon |
+| `R-PARSE-006` | canon |
+| `R-PE-001` | canon |
+| `R-PE-002` | canon |
+| `R-PE-003` | canon |
+| `R-PE-004` | canon |
+| `R-PE-005` | canon |
+| `R-PE-010` | canon |
+| `R-PE-011` | canon |
+| `R-PE-012` | canon |
+| `R-PE-013` | canon |
+| `R-PE-014` | canon |
+| `R-PE-015` | canon |
+| `R-PE-016` | canon |
+| `R-PE-017` | canon |
+| `R-PE-018` | canon |
+| `R-PE-019` | canon |
+| `R-PE-020` | canon |
+| `R-PE-021` | canon |
+| `R-PE-022` | canon |
+| `R-PE-023` | canon |
+| `R-PE-024` | canon |
+| `R-PE-025` | canon |
+| `R-PE-026` | canon |
+| `R-PE-027` | canon |
+| `R-PE-028` | canon |
+| `R-PE-029` | canon |
+| `R-PE-030` | canon |
+| `R-PE-031` | canon |
+| `R-PE-032` | canon |
+| `R-PE-033` | canon |
+| `R-PE-034` | canon |
+| `R-PE-035` | canon |
+| `R-PE-036` | canon |
+| `R-PE-037` | canon |
+| `R-PE-038` | canon |
+| `R-PE-039` | canon |
+| `R-PE-040` | canon |
+| `R-PE-041` | canon |
+| `R-PE-042` | canon |
+| `R-PE-043` | canon |
+| `R-PE-044` | canon |
+| `R-PE-045` | canon |
+| `R-PE-046` | canon |
+| `R-PE-050` | canon |
+| `R-PE-051` | canon |
+| `R-PE-052` | canon |
+| `R-PE-053` | canon |
+| `R-PE-054` | canon |
+| `R-PE-055` | canon |
+| `R-PE-056` | canon |
+| `R-PE-057` | canon |
+| `R-PE-058` | canon |
+| `R-PE-059` | canon |
+| `R-PE-060` | canon |
+| `R-PE-070` | canon |
+| `R-PE-071` | canon |
+| `R-PE-072` | canon |
+| `R-PE-073` | canon |
+| `R-PE-074` | canon |
+| `R-PE-075` | canon |
+| `R-PE-080` | canon |
+| `R-PE-081` | canon |
+| `R-PE-093` | canon |
+| `R-PE-100` | canon |
+| `R-PE-101` | canon |
+| `R-PE-102` | canon |
+| `R-PE-110` | canon |
+| `R-PE-111` | canon |
 | `R-PROJ-001` | batches, canon, tests |
 | `R-PROJ-002` | batches, canon |
+| `R-PROJCHK-1` | canon |
+| `R-PROJCHK-10` | canon |
+| `R-PROJCHK-11` | canon |
+| `R-PROJCHK-12` | canon |
+| `R-PROJCHK-13` | canon |
+| `R-PROJCHK-14` | canon |
+| `R-PROJCHK-15` | canon |
+| `R-PROJCHK-16` | canon |
+| `R-PROJCHK-17` | canon |
+| `R-PROJCHK-18` | canon |
+| `R-PROJCHK-2` | canon |
+| `R-PROJCHK-3` | canon |
+| `R-PROJCHK-4` | canon |
+| `R-PROJCHK-5` | canon |
+| `R-PROJCHK-6` | canon |
+| `R-PROJCHK-7` | canon |
+| `R-PROJCHK-8` | canon |
+| `R-PROJCHK-9` | canon |
 | `R-READ-001` | batches, canon |
+| `R-READ-002` | canon |
+| `R-READ-003` | canon |
+| `R-READ-004` | canon |
+| `R-READ-005` | canon |
+| `R-READ-006` | canon |
+| `R-READ-007` | canon |
+| `R-READ-008` | canon |
+| `R-RECENT-001` | canon |
+| `R-RECENT-002` | canon |
+| `R-RECENT-003` | canon |
 | `R-RPT-001` | canon |
 | `R-RPT-002` | batches, canon |
+| `R-SAVEAS-1` | canon |
+| `R-SAVEAS-10` | canon |
+| `R-SAVEAS-11` | canon |
+| `R-SAVEAS-12` | canon |
+| `R-SAVEAS-13` | canon |
+| `R-SAVEAS-14` | canon |
+| `R-SAVEAS-2` | canon |
+| `R-SAVEAS-3` | canon |
+| `R-SAVEAS-4` | canon |
+| `R-SAVEAS-5` | canon |
+| `R-SAVEAS-6` | canon |
+| `R-SAVEAS-7` | canon |
+| `R-SAVEAS-8` | canon |
+| `R-SAVEAS-9` | canon |
+| `R-SAVEDLG-1` | canon |
+| `R-SAVEDLG-10` | canon |
+| `R-SAVEDLG-11` | canon |
+| `R-SAVEDLG-12` | canon |
+| `R-SAVEDLG-13` | canon |
+| `R-SAVEDLG-14` | canon |
+| `R-SAVEDLG-15` | canon |
+| `R-SAVEDLG-16` | batches, canon |
+| `R-SAVEDLG-17` | canon |
+| `R-SAVEDLG-18` | canon |
+| `R-SAVEDLG-19` | canon |
+| `R-SAVEDLG-2` | canon |
+| `R-SAVEDLG-20` | canon |
+| `R-SAVEDLG-21` | canon |
+| `R-SAVEDLG-22` | canon |
+| `R-SAVEDLG-23` | canon |
+| `R-SAVEDLG-24` | batches, canon |
+| `R-SAVEDLG-25` | canon |
+| `R-SAVEDLG-26` | canon |
+| `R-SAVEDLG-27` | canon |
+| `R-SAVEDLG-28` | canon |
+| `R-SAVEDLG-3` | canon |
+| `R-SAVEDLG-4` | canon |
+| `R-SAVEDLG-5` | canon |
+| `R-SAVEDLG-6` | canon |
+| `R-SAVEDLG-7` | canon |
+| `R-SAVEDLG-8` | canon |
+| `R-SAVEDLG-9` | canon |
 | `R-TUI-001` | batches, canon |
 | `R-TUI-002` | batches, canon |
-| `R-TUI-003` | batches, canon |
+| `R-TUI-003` | batches |
 | `R-TUI-004` | batches, canon |
 | `R-TUI-005` | batches, canon |
 | `R-TUI-006` | batches, canon |
@@ -3967,15 +4222,15 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `R-TUI-023` | batches, canon |
 | `R-TUI-024` | batches, canon |
 | `R-TUI-025` | batches, canon |
-| `R-TUI-026` | batches, canon, tests |
-| `R-TUI-027` | batches, canon |
-| `R-TUI-028` | batches, canon |
+| `R-TUI-026` | batches, tests |
+| `R-TUI-027` | batches |
+| `R-TUI-028` | batches |
 | `R-TUI-029` | batches, canon |
 | `R-TUI-030` | batches, canon |
 | `R-TUI-031` | batches, canon |
-| `R-TUI-032` | batches, canon |
+| `R-TUI-032` | batches |
 | `R-TUI-033` | batches, canon |
-| `R-TUI-034` | batches, canon |
+| `R-TUI-034` | batches |
 | `R-TUI-035` | batches, canon |
 | `R-TUI-036` | batches, canon |
 | `R-TUI-037` | batches, canon |
@@ -3986,18 +4241,18 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `R-TUI-042` | batches, canon, tests |
 | `R-TUI-043` | batches, canon, tests |
 | `R-TUI-044` | batches, canon, tests |
-| `R-TUI-045` | batches, canon |
+| `R-TUI-045` | batches |
 | `R-TUI-046` | batches, canon, tests |
 | `R-TUI-047` | batches, canon |
-| `R-TUI-048` | batches, canon |
+| `R-TUI-048` | batches |
 | `R-TUI-049` | batches, canon |
-| `R-TUI-050` | batches, canon, tests |
-| `R-TUI-051` | batches, canon |
+| `R-TUI-050` | batches, tests |
+| `R-TUI-051` | batches |
 | `R-TUI-052` | batches, canon |
 | `R-TUI-053` | batches, canon |
 | `R-TUI-054` | batches, canon, tests |
-| `R-TUI-055` | batches, canon |
-| `R-TUI-056` | batches, canon |
+| `R-TUI-055` | batches |
+| `R-TUI-056` | batches |
 | `R-TUI-057` | batches, canon |
 | `R-TUI-058` | batches, canon |
 | `R-TUI-059` | batches, canon, tests |
@@ -4017,9 +4272,9 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `R-TUI-073` | batches, canon |
 | `R-TUI-074` | batches, canon |
 | `R-TUI-075` | batches, tests |
-| `R-TUI-076` | batches, canon, tests |
+| `R-TUI-076` | batches, tests |
 | `R-TUI-077` | batches, canon, tests |
-| `R-TUI-078` | batches, canon, tests |
+| `R-TUI-078` | batches, tests |
 | `R-TUI-079` | batches, tests |
 | `R-TUI-080` | batches |
 | `R-TUI-081` | batches, tests |
@@ -4040,23 +4295,61 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `R-TUI-096` | batches |
 | `R-TUI-097` | batches, canon, tests |
 | `R-TUI-098` | batches, canon, tests |
-| `R-TUI-099` | batches, canon, tests |
+| `R-TUI-099` | batches, tests |
 | `R-TUI-100` | batches, canon |
 | `R-TUI-101` | batches, canon, tests |
 | `R-TUI-102` | batches, canon |
 | `R-TUI-103` | batches, canon, tests |
-| `R-TUI-104` | batches, canon |
-| `R-TUI-111` | batches, canon |
-| `R-TUI-112` | batches, canon |
-| `R-TUI-113` | batches, canon |
-| `R-TUI-114` | batches, canon |
-| `R-TUI-115` | batches, canon |
+| `R-TUI-104` | batches |
+| `R-TUI-111` | batches |
+| `R-TUI-112` | batches |
+| `R-TUI-113` | batches |
+| `R-TUI-114` | batches |
+| `R-TUI-115` | batches |
 | `R-VAL-001` | batches, canon |
 | `R-VAL-002` | batches, canon |
-| `R-VAL-032` | batches |
+| `R-VAL-010` | canon |
+| `R-VAL-011` | canon |
+| `R-VAL-012` | canon |
+| `R-VAL-013` | canon |
+| `R-VAL-014` | canon |
+| `R-VAL-015` | canon |
+| `R-VAL-016` | canon |
+| `R-VAL-017` | canon |
+| `R-VAL-018` | canon |
+| `R-VAL-020` | canon |
+| `R-VAL-021` | canon |
+| `R-VAL-022` | canon |
+| `R-VAL-023` | canon |
+| `R-VAL-024` | canon |
+| `R-VAL-025` | canon |
+| `R-VAL-030` | canon |
+| `R-VAL-031` | canon |
+| `R-VAL-032` | batches, canon |
+| `R-VAL-033` | canon |
+| `R-VAL-034` | canon |
+| `R-VAL-035` | canon |
+| `R-VAL-036` | canon |
+| `R-VAL-037` | canon |
+| `R-VAL-038` | canon |
+| `R-VAL-040` | canon |
+| `R-VAL-041` | canon |
+| `R-VAL-042` | canon |
+| `R-VAL-043` | canon |
+| `R-VAL-044` | canon |
+| `R-VAL-045` | canon |
+| `R-VAL-046` | canon |
+| `R-VAL-047` | canon |
+| `R-VAL-048` | canon |
+| `R-VAL-050` | canon |
+| `R-VAL-051` | canon |
+| `R-VAL-052` | canon |
+| `R-VAL-053` | canon |
+| `R-VAL-054` | canon |
 | `R-VAR-001` | batches, canon |
 | `R-VAR-002` | batches, canon |
 | `R-VAR-003` | batches |
+| `R-VER-001` | canon |
 
 ## family AT/TC — 2004 unique id(s)
 
@@ -4080,90 +4373,90 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `AT-013` | batches |
 | `AT-014` | batches |
 | `AT-015` | batches |
-| `AT-015.1` | batches, canon, tests |
-| `AT-015.2` | batches, canon, tests |
-| `AT-015.3` | batches, canon, tests |
+| `AT-015.1` | batches, tests |
+| `AT-015.2` | batches, tests |
+| `AT-015.3` | batches, tests |
 | `AT-016` | batches, tests |
-| `AT-016.1` | batches, canon, tests |
-| `AT-016.2` | batches, canon, tests |
-| `AT-016.3` | batches, canon, tests |
-| `AT-016.4` | batches, canon, tests |
+| `AT-016.1` | batches, tests |
+| `AT-016.2` | batches, tests |
+| `AT-016.3` | batches, tests |
+| `AT-016.4` | batches, tests |
 | `AT-017` | batches |
-| `AT-017.1` | batches, canon, tests |
-| `AT-017.2` | batches, canon, tests |
-| `AT-017.3` | batches, canon, tests |
-| `AT-017.4` | batches, canon, tests |
-| `AT-017.5` | batches, canon, tests |
-| `AT-018` | batches, canon, tests |
+| `AT-017.1` | batches, tests |
+| `AT-017.2` | batches, tests |
+| `AT-017.3` | batches, tests |
+| `AT-017.4` | batches, tests |
+| `AT-017.5` | batches, tests |
+| `AT-018` | batches, tests |
 | `AT-019a` | batches |
-| `AT-019b` | batches, canon, tests |
+| `AT-019b` | batches, tests |
 | `AT-02` | batches |
-| `AT-020a` | batches, canon, tests |
-| `AT-021` | batches, canon, tests |
-| `AT-022a` | batches, canon, tests |
-| `AT-022b` | batches, canon, tests |
+| `AT-020a` | batches, tests |
+| `AT-021` | batches, tests |
+| `AT-022a` | batches, tests |
+| `AT-022b` | batches, tests |
 | `AT-023` | batches |
-| `AT-023a` | batches, canon, tests |
+| `AT-023a` | batches, tests |
 | `AT-023b` | batches, tests |
 | `AT-023c` | batches, tests |
 | `AT-023d` | batches, tests |
 | `AT-023e` | batches, tests |
 | `AT-023f` | batches, tests |
-| `AT-024a` | batches, canon, tests |
-| `AT-024b` | batches, canon, tests |
-| `AT-024c` | batches, canon, tests |
-| `AT-025a` | batches, canon, tests |
-| `AT-025b` | batches, canon, tests |
-| `AT-026a` | batches, canon, tests |
-| `AT-027a` | batches, canon, tests |
-| `AT-027b` | batches, canon, tests |
-| `AT-027c` | batches, canon, tests |
-| `AT-028a` | batches, canon, tests |
-| `AT-028b` | batches, canon, tests |
-| `AT-029a` | batches, canon, tests |
-| `AT-029b` | batches, canon, tests |
-| `AT-029c` | batches, canon, tests |
-| `AT-029d` | batches, canon, tests |
+| `AT-024a` | batches, tests |
+| `AT-024b` | batches, tests |
+| `AT-024c` | batches, tests |
+| `AT-025a` | batches, tests |
+| `AT-025b` | batches, tests |
+| `AT-026a` | batches, tests |
+| `AT-027a` | batches, tests |
+| `AT-027b` | batches, tests |
+| `AT-027c` | batches, tests |
+| `AT-028a` | batches, tests |
+| `AT-028b` | batches, tests |
+| `AT-029a` | batches, tests |
+| `AT-029b` | batches, tests |
+| `AT-029c` | batches, tests |
+| `AT-029d` | batches, tests |
 | `AT-03` | batches |
 | `AT-030` | tests |
-| `AT-030a` | batches, canon, tests |
-| `AT-030b` | batches, canon, tests |
-| `AT-030c` | batches, canon, tests |
+| `AT-030a` | batches, tests |
+| `AT-030b` | batches, tests |
+| `AT-030c` | batches, tests |
 | `AT-031` | tests |
-| `AT-031a` | batches, canon, tests |
-| `AT-031b` | batches, canon, tests |
+| `AT-031a` | batches, tests |
+| `AT-031b` | batches, tests |
 | `AT-032` | tests |
-| `AT-032a` | batches, canon, tests |
-| `AT-032b` | batches, canon, tests |
-| `AT-033a` | batches, canon |
-| `AT-033b` | batches, canon |
-| `AT-033c` | batches, canon |
+| `AT-032a` | batches, tests |
+| `AT-032b` | batches, tests |
+| `AT-033a` | batches |
+| `AT-033b` | batches |
+| `AT-033c` | batches |
 | `AT-033x` | batches |
 | `AT-034` | batches |
-| `AT-034a` | batches, canon, tests |
-| `AT-034b` | batches, canon, tests |
+| `AT-034a` | batches, tests |
+| `AT-034b` | batches, tests |
 | `AT-035` | batches, tests |
-| `AT-035a` | batches, canon, tests |
-| `AT-035b` | batches, canon, tests |
-| `AT-035c` | batches, canon, tests |
+| `AT-035a` | batches, tests |
+| `AT-035b` | batches, tests |
+| `AT-035c` | batches, tests |
 | `AT-035d` | batches, tests |
 | `AT-035e` | batches, tests |
 | `AT-036` | batches |
-| `AT-036a` | batches, canon, tests |
-| `AT-036b` | batches, canon, tests |
-| `AT-036c` | batches, canon, tests |
+| `AT-036a` | batches, tests |
+| `AT-036b` | batches, tests |
+| `AT-036c` | batches, tests |
 | `AT-036d` | batches |
 | `AT-036e` | batches, tests |
 | `AT-036f` | batches, tests |
 | `AT-036g` | batches |
 | `AT-037` | batches, tests |
-| `AT-037a` | batches, canon, tests |
-| `AT-037b` | batches, canon, tests |
+| `AT-037a` | batches, tests |
+| `AT-037b` | batches, tests |
 | `AT-038` | batches |
-| `AT-038a` | batches, canon, tests |
-| `AT-038b` | batches, canon, tests |
-| `AT-038c` | batches, canon, tests |
-| `AT-038d` | batches, canon, tests |
+| `AT-038a` | batches, tests |
+| `AT-038b` | batches, tests |
+| `AT-038c` | batches, tests |
+| `AT-038d` | batches, tests |
 | `AT-038e` | batches |
 | `AT-038f` | batches |
 | `AT-039` | batches |
@@ -4185,7 +4478,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `AT-041c` | batches |
 | `AT-041d` | batches |
 | `AT-042a` | batches, tests |
-| `AT-042b` | batches, canon, tests |
+| `AT-042b` | batches, tests |
 | `AT-042c` | batches, tests |
 | `AT-042d` | batches, tests |
 | `AT-042e` | batches, tests |
@@ -4194,118 +4487,118 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `AT-043a` | batches, tests |
 | `AT-043b` | batches, tests |
 | `AT-043c` | batches, tests |
-| `AT-044a` | batches, canon, tests |
-| `AT-044b` | batches, canon, tests |
+| `AT-044a` | batches, tests |
+| `AT-044b` | batches, tests |
 | `AT-044c` | batches, tests |
-| `AT-044d` | batches, canon, tests |
+| `AT-044d` | batches, tests |
 | `AT-044e` | batches, tests |
 | `AT-045` | batches |
-| `AT-045a` | batches, canon, tests |
+| `AT-045a` | batches, tests |
 | `AT-045b` | batches, tests |
-| `AT-045c` | batches, canon, tests |
+| `AT-045c` | batches, tests |
 | `AT-045d` | batches, tests |
 | `AT-045e` | batches, tests |
 | `AT-045f` | batches, tests |
 | `AT-046` | batches |
-| `AT-046a` | batches, canon, tests |
-| `AT-046b` | batches, canon, tests |
-| `AT-046c` | batches, canon, tests |
-| `AT-046d` | batches, canon, tests |
-| `AT-047a` | batches, canon, tests |
+| `AT-046a` | batches, tests |
+| `AT-046b` | batches, tests |
+| `AT-046c` | batches, tests |
+| `AT-046d` | batches, tests |
+| `AT-047a` | batches, tests |
 | `AT-047b` | batches, tests |
 | `AT-047c` | batches, tests |
 | `AT-047d` | batches, tests |
-| `AT-047e` | batches, canon, tests |
+| `AT-047e` | batches, tests |
 | `AT-047f` | batches, tests |
 | `AT-047g` | batches, tests |
-| `AT-047h` | batches, canon, tests |
+| `AT-047h` | batches, tests |
 | `AT-05` | batches |
-| `AT-050a` | batches, canon, tests |
+| `AT-050a` | batches, tests |
 | `AT-050b` | batches, tests |
 | `AT-050c` | batches, tests |
 | `AT-050d` | batches, tests |
-| `AT-051a` | batches, canon, tests |
-| `AT-051b` | batches, canon, tests |
-| `AT-051c` | batches, canon, tests |
+| `AT-051a` | batches, tests |
+| `AT-051b` | batches, tests |
+| `AT-051c` | batches, tests |
 | `AT-051d` | batches, tests |
-| `AT-051e` | batches, canon, tests |
-| `AT-051f` | batches, canon, tests |
-| `AT-052a` | batches, canon, tests |
+| `AT-051e` | batches, tests |
+| `AT-051f` | batches, tests |
+| `AT-052a` | batches, tests |
 | `AT-052b` | batches, tests |
-| `AT-053a` | batches, canon, tests |
-| `AT-053b` | batches, canon, tests |
+| `AT-053a` | batches, tests |
+| `AT-053b` | batches, tests |
 | `AT-053c` | batches |
-| `AT-054a` | batches, canon, tests |
-| `AT-054b` | batches, canon, tests |
-| `AT-054c` | batches, canon, tests |
+| `AT-054a` | batches, tests |
+| `AT-054b` | batches, tests |
+| `AT-054c` | batches, tests |
 | `AT-054d` | batches |
-| `AT-055a` | batches, canon, tests |
-| `AT-055b` | batches, canon, tests |
-| `AT-055c` | batches, canon, tests |
-| `AT-056a` | batches, canon, tests |
+| `AT-055a` | batches, tests |
+| `AT-055b` | batches, tests |
+| `AT-055c` | batches, tests |
+| `AT-056a` | batches, tests |
 | `AT-056b` | batches, tests |
 | `AT-056c` | batches, tests |
 | `AT-056d` | batches, tests |
 | `AT-056e` | batches, tests |
 | `AT-057` | tests |
-| `AT-057a` | batches, canon, tests |
-| `AT-057b` | batches, canon, tests |
+| `AT-057a` | batches, tests |
+| `AT-057b` | batches, tests |
 | `AT-058` | tests |
-| `AT-058a` | batches, canon |
-| `AT-058b` | batches, canon, tests |
+| `AT-058a` | batches |
+| `AT-058b` | batches, tests |
 | `AT-058x` | batches |
-| `AT-059a` | batches, canon, tests |
-| `AT-059b` | batches, canon, tests |
+| `AT-059a` | batches, tests |
+| `AT-059b` | batches, tests |
 | `AT-059x` | batches |
 | `AT-06` | batches |
 | `AT-060` | batches |
-| `AT-060a` | batches, canon, tests |
+| `AT-060a` | batches, tests |
 | `AT-060b` | batches |
 | `AT-060x` | batches |
-| `AT-061a` | batches, canon, tests |
+| `AT-061a` | batches, tests |
 | `AT-061x` | batches |
-| `AT-062a` | batches, canon, tests |
-| `AT-062b` | batches, canon |
+| `AT-062a` | batches |
+| `AT-062b` | batches |
 | `AT-062x` | batches |
-| `AT-063a` | batches, canon, tests |
-| `AT-063b` | batches, canon, tests |
-| `AT-063c` | batches, canon, tests |
+| `AT-063a` | batches, tests |
+| `AT-063b` | batches, tests |
+| `AT-063c` | batches, tests |
 | `AT-064` | batches |
-| `AT-064a` | batches, canon, tests |
-| `AT-064b` | batches, canon, tests |
-| `AT-064c` | batches, canon, tests |
+| `AT-064a` | batches, tests |
+| `AT-064b` | batches, tests |
+| `AT-064c` | batches, tests |
 | `AT-064x` | batches |
 | `AT-065` | batches |
-| `AT-065a` | batches, canon, tests |
-| `AT-065b` | batches, canon, tests |
-| `AT-065c` | batches, canon, tests |
+| `AT-065a` | batches, tests |
+| `AT-065b` | batches, tests |
+| `AT-065c` | batches, tests |
 | `AT-066` | batches |
-| `AT-066a` | batches, canon, tests |
-| `AT-066b` | batches, canon, tests |
-| `AT-066c` | batches, canon, tests |
-| `AT-066d` | batches, canon, tests |
-| `AT-067` | batches, canon, tests |
-| `AT-067a` | batches, canon, tests |
-| `AT-068` | batches, canon, tests |
-| `AT-068a` | batches, canon, tests |
-| `AT-068b` | batches, canon, tests |
-| `AT-069` | batches, canon, tests |
-| `AT-069b` | batches, canon, tests |
-| `AT-069c` | batches, canon, tests |
+| `AT-066a` | batches, tests |
+| `AT-066b` | batches, tests |
+| `AT-066c` | batches, tests |
+| `AT-066d` | batches, tests |
+| `AT-067` | batches, tests |
+| `AT-067a` | batches, tests |
+| `AT-068` | batches, tests |
+| `AT-068a` | batches, tests |
+| `AT-068b` | batches, tests |
+| `AT-069` | batches, tests |
+| `AT-069b` | batches, tests |
+| `AT-069c` | batches, tests |
 | `AT-07` | batches |
-| `AT-070` | batches, canon, tests |
-| `AT-070b` | batches, canon, tests |
-| `AT-070c` | batches, canon, tests |
-| `AT-070d` | batches, canon, tests |
-| `AT-071` | batches, canon, tests |
+| `AT-070` | batches, tests |
+| `AT-070b` | batches, tests |
+| `AT-070c` | batches, tests |
+| `AT-070d` | batches, tests |
+| `AT-071` | batches, tests |
 | `AT-071b` | batches, tests |
 | `AT-072` | batches, tests |
-| `AT-072a` | batches, canon, tests |
-| `AT-072b` | batches, canon, tests |
-| `AT-073` | batches, canon, tests |
+| `AT-072a` | batches, tests |
+| `AT-072b` | batches, tests |
+| `AT-073` | batches, tests |
 | `AT-073b` | batches, tests |
-| `AT-074` | batches, canon, tests |
-| `AT-075` | batches, canon, tests |
+| `AT-074` | batches, tests |
+| `AT-075` | batches, tests |
 | `AT-075a` | batches, tests |
 | `AT-075b` | batches, tests |
 | `AT-075c` | batches, tests |
@@ -4326,8 +4619,8 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `AT-078b` | batches, tests |
 | `AT-078c` | batches, tests |
 | `AT-079a` | batches, tests |
-| `AT-079b` | batches, canon, tests |
-| `AT-079c` | batches, canon, tests |
+| `AT-079b` | batches, tests |
+| `AT-079c` | batches, tests |
 | `AT-079d` | batches, tests |
 | `AT-08` | batches |
 | `AT-080a` | batches, tests |
@@ -4439,14 +4732,14 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `AT-154` | batches |
 | `AT-155` | batches |
 | `AT-156` | batches |
-| `AT-157` | batches, canon, tests |
-| `AT-158` | batches, canon, tests |
-| `AT-159` | batches, canon, tests |
+| `AT-157` | batches, tests |
+| `AT-158` | batches, tests |
+| `AT-159` | batches, tests |
 | `AT-16` | batches |
-| `AT-160` | batches, canon, tests |
-| `AT-161` | batches, canon, tests |
-| `AT-162` | batches, canon, tests |
-| `AT-163` | batches, canon, tests |
+| `AT-160` | batches, tests |
+| `AT-161` | batches, tests |
+| `AT-162` | batches, tests |
+| `AT-163` | batches, tests |
 | `AT-164` | batches |
 | `AT-165` | batches, tests |
 | `AT-166` | batches |
@@ -4456,13 +4749,13 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `AT-17` | batches |
 | `AT-170` | batches |
 | `AT-171` | batches |
-| `AT-172` | batches, canon, tests |
+| `AT-172` | batches, tests |
 | `AT-172b` | batches, tests |
-| `AT-173` | batches, canon, tests |
+| `AT-173` | batches, tests |
 | `AT-173b` | batches, tests |
-| `AT-174` | batches, canon, tests |
+| `AT-174` | batches, tests |
 | `AT-174b` | batches, tests |
-| `AT-175` | batches, canon, tests |
+| `AT-175` | batches, tests |
 | `AT-176` | batches |
 | `AT-177` | batches |
 | `AT-178` | batches |
@@ -4481,47 +4774,47 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `AT-190` | batches |
 | `AT-191` | batches |
 | `AT-192` | batches |
-| `AT-193` | batches, canon, tests |
-| `AT-193b` | batches, canon, tests |
-| `AT-194` | batches, canon, tests |
-| `AT-195` | batches, canon |
-| `AT-196` | batches, canon, tests |
-| `AT-197` | batches, canon, tests |
-| `AT-198` | batches, canon, tests |
-| `AT-199` | batches, canon, tests |
+| `AT-193` | batches, tests |
+| `AT-193b` | batches, tests |
+| `AT-194` | batches, tests |
+| `AT-195` | batches |
+| `AT-196` | batches, tests |
+| `AT-197` | batches, tests |
+| `AT-198` | batches, tests |
+| `AT-199` | batches, tests |
 | `AT-2` | batches |
 | `AT-20` | batches |
-| `AT-200` | batches, canon, tests |
-| `AT-201` | batches, canon, tests |
-| `AT-202` | batches, canon, tests |
-| `AT-203` | batches, canon, tests |
+| `AT-200` | batches, tests |
+| `AT-201` | batches, tests |
+| `AT-202` | batches, tests |
+| `AT-203` | batches, tests |
 | `AT-204` | batches |
-| `AT-205` | batches, canon, tests |
-| `AT-206` | batches, canon, tests |
-| `AT-207` | batches, canon, tests |
-| `AT-208` | batches, canon, tests |
-| `AT-209` | batches, canon, tests |
+| `AT-205` | batches, tests |
+| `AT-206` | batches, tests |
+| `AT-207` | batches, tests |
+| `AT-208` | batches, tests |
+| `AT-209` | batches, tests |
 | `AT-21` | batches |
-| `AT-210` | batches, canon, tests |
-| `AT-211` | batches, canon, tests |
-| `AT-212` | batches, canon, tests |
-| `AT-213` | batches, canon, tests |
-| `AT-214` | batches, canon, tests |
-| `AT-215` | batches, canon, tests |
-| `AT-216` | batches, canon, tests |
+| `AT-210` | batches, tests |
+| `AT-211` | batches, tests |
+| `AT-212` | batches, tests |
+| `AT-213` | batches, tests |
+| `AT-214` | batches, tests |
+| `AT-215` | batches, tests |
+| `AT-216` | batches, tests |
 | `AT-216.2` | batches |
 | `AT-216.3` | batches |
-| `AT-217` | batches, canon, tests |
+| `AT-217` | batches, tests |
 | `AT-217.1` | batches |
 | `AT-217.2` | batches |
 | `AT-217.3` | batches |
-| `AT-218` | batches, canon, tests |
-| `AT-219` | batches, canon, tests |
+| `AT-218` | batches, tests |
+| `AT-219` | batches, tests |
 | `AT-22` | batches |
-| `AT-220` | batches, canon, tests |
-| `AT-221` | batches, canon, tests |
-| `AT-222` | batches, canon, tests |
-| `AT-223` | batches, canon, tests |
+| `AT-220` | batches, tests |
+| `AT-221` | batches, tests |
+| `AT-222` | batches, tests |
+| `AT-223` | batches, tests |
 | `AT-224` | batches |
 | `AT-224b` | batches |
 | `AT-225` | batches |
@@ -4534,39 +4827,39 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `AT-24` | batches |
 | `AT-240` | batches, tests |
 | `AT-241` | batches, tests |
-| `AT-241b` | batches, canon, tests |
+| `AT-241b` | batches, tests |
 | `AT-242` | batches, tests |
 | `AT-242b` | batches, tests |
 | `AT-243` | batches, tests |
 | `AT-244` | batches, tests |
 | `AT-245` | batches, tests |
-| `AT-246` | batches, canon, tests |
+| `AT-246` | batches, tests |
 | `AT-247` | batches, tests |
 | `AT-248` | batches, tests |
 | `AT-249` | batches, tests |
 | `AT-25` | batches |
-| `AT-250` | batches, canon, tests |
-| `AT-251` | batches, canon, tests |
-| `AT-252` | batches, canon, tests |
-| `AT-253` | batches, canon, tests |
-| `AT-254` | batches, canon, tests |
-| `AT-255` | batches, canon, tests |
-| `AT-256` | batches, canon, tests |
-| `AT-257` | batches, canon, tests |
-| `AT-258` | batches, canon, tests |
-| `AT-259` | batches, canon, tests |
+| `AT-250` | batches, tests |
+| `AT-251` | batches, tests |
+| `AT-252` | batches, tests |
+| `AT-253` | batches, tests |
+| `AT-254` | batches, tests |
+| `AT-255` | batches, tests |
+| `AT-256` | batches, tests |
+| `AT-257` | batches, tests |
+| `AT-258` | batches, tests |
+| `AT-259` | batches, tests |
 | `AT-26` | batches |
-| `AT-260` | batches, canon, tests |
-| `AT-261` | batches, canon, tests |
-| `AT-262` | batches, canon, tests |
-| `AT-263` | batches, canon, tests |
-| `AT-264` | batches, canon, tests |
+| `AT-260` | batches, tests |
+| `AT-261` | batches, tests |
+| `AT-262` | batches, tests |
+| `AT-263` | batches, tests |
+| `AT-264` | batches, tests |
 | `AT-279` | batches |
 | `AT-280` | batches, tests |
 | `AT-281` | batches, tests |
 | `AT-282` | batches |
 | `AT-283` | batches |
-| `AT-284` | batches, canon, tests |
+| `AT-284` | batches, tests |
 | `AT-285` | batches, tests |
 | `AT-286` | batches, tests |
 | `AT-287` | batches |
@@ -4591,7 +4884,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `AT-303` | batches |
 | `AT-304` | batches |
 | `AT-40` | batches, tests |
-| `AT-43` | batches, canon |
+| `AT-43` | batches |
 | `AT-65` | batches |
 | `AT-65b` | batches, tests |
 | `AT-80` | batches, tests |
@@ -4619,9 +4912,9 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `AT-B100-21` | batches, tests |
 | `AT-B59-01` | batches, tests |
 | `AT-B59-02` | batches, tests |
-| `AT-B59-03` | batches, canon, tests |
+| `AT-B59-03` | batches, tests |
 | `AT-B59-04` | batches, tests |
-| `AT-B59-05` | batches, canon, tests |
+| `AT-B59-05` | batches, tests |
 | `AT-B59-06` | batches, tests |
 | `AT-B59-07` | batches |
 | `AT-B59-08` | batches, tests |
@@ -4640,29 +4933,29 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `AT-B64-10` | batches |
 | `AT-B64-11` | batches |
 | `AT-B76-01` | batches |
-| `AT-B77-01` | batches, canon, tests |
-| `AT-B77-02` | batches, canon, tests |
-| `AT-B77-03` | batches, canon, tests |
-| `AT-B77-04` | batches, canon, tests |
-| `AT-B77-05` | batches, canon, tests |
-| `AT-B77-06` | batches, canon, tests |
-| `AT-B77-07` | batches, canon, tests |
-| `AT-B77-08` | batches, canon, tests |
-| `AT-B77-09` | batches, canon, tests |
-| `AT-B77-10` | batches, canon, tests |
+| `AT-B77-01` | batches, tests |
+| `AT-B77-02` | batches, tests |
+| `AT-B77-03` | batches, tests |
+| `AT-B77-04` | batches, tests |
+| `AT-B77-05` | batches, tests |
+| `AT-B77-06` | batches, tests |
+| `AT-B77-07` | batches, tests |
+| `AT-B77-08` | batches, tests |
+| `AT-B77-09` | batches, tests |
+| `AT-B77-10` | batches, tests |
 | `AT-B77-10a` | batches |
 | `AT-B77-10b` | batches |
-| `AT-B77-11` | batches, canon, tests |
-| `AT-B77-12` | batches, canon, tests |
-| `AT-B77-13` | batches, canon, tests |
-| `AT-B77-14` | batches, canon, tests |
+| `AT-B77-11` | batches, tests |
+| `AT-B77-12` | batches, tests |
+| `AT-B77-13` | batches, tests |
+| `AT-B77-14` | batches, tests |
 | `AT-B77-15` | batches |
-| `AT-B77-15a` | batches, canon, tests |
-| `AT-B77-15b` | batches, canon, tests |
-| `AT-B77-16` | batches, canon, tests |
-| `AT-B77-17` | batches, canon, tests |
-| `AT-B77-18` | batches, canon, tests |
-| `AT-B77-19` | batches, canon, tests |
+| `AT-B77-15a` | batches, tests |
+| `AT-B77-15b` | batches, tests |
+| `AT-B77-16` | batches, tests |
+| `AT-B77-17` | batches, tests |
+| `AT-B77-18` | batches, tests |
+| `AT-B77-19` | batches, tests |
 | `AT-B78-01` | batches, tests |
 | `AT-B78-02` | batches, tests |
 | `AT-B78-03` | batches, tests |
@@ -4804,130 +5097,130 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `AT-B99-12` | batches, tests |
 | `AT-B99-13` | batches, tests |
 | `AT-B99-14` | batches, tests |
-| `TC-001` | batches, canon, tests |
+| `TC-001` | batches, tests |
 | `TC-001a` | batches, tests |
 | `TC-001b` | batches, tests |
 | `TC-001c` | batches, tests |
 | `TC-001d` | batches, tests |
 | `TC-001e` | batches, tests |
 | `TC-001u` | batches, tests |
-| `TC-002` | batches, canon, tests |
+| `TC-002` | batches, tests |
 | `TC-002a` | batches, tests |
 | `TC-002b` | batches, tests |
 | `TC-002c` | batches, tests |
-| `TC-003` | batches, canon, tests |
+| `TC-003` | batches, tests |
 | `TC-003a` | batches, tests |
 | `TC-003b` | batches, tests |
 | `TC-003c` | batches, tests |
-| `TC-004` | batches, canon, tests |
+| `TC-004` | batches, tests |
 | `TC-004a` | batches, tests |
 | `TC-004b` | batches, tests |
-| `TC-005` | batches, canon, tests |
-| `TC-006` | batches, canon, tests |
-| `TC-007` | batches, canon, tests |
-| `TC-008` | batches, canon, tests |
+| `TC-005` | batches, tests |
+| `TC-006` | batches, tests |
+| `TC-007` | batches, tests |
+| `TC-008` | batches, tests |
 | `TC-008u` | batches |
-| `TC-009` | batches, canon, tests |
+| `TC-009` | batches, tests |
 | `TC-009a` | batches, tests |
 | `TC-009b` | batches, tests |
 | `TC-01` | batches |
-| `TC-010` | batches, canon, tests |
-| `TC-011` | batches, canon, tests |
+| `TC-010` | batches, tests |
+| `TC-011` | batches, tests |
 | `TC-011a` | batches, tests |
 | `TC-011b` | batches, tests |
-| `TC-012` | batches, canon, tests |
-| `TC-013` | batches, canon, tests |
+| `TC-012` | batches, tests |
+| `TC-013` | batches, tests |
 | `TC-013a` | batches, tests |
 | `TC-013b` | batches, tests |
-| `TC-014` | batches, canon, tests |
-| `TC-015` | batches, canon, tests |
-| `TC-016` | batches, canon, tests |
+| `TC-014` | batches, tests |
+| `TC-015` | batches, tests |
+| `TC-016` | batches, tests |
 | `TC-016s` | batches |
-| `TC-017` | batches, canon, tests |
-| `TC-018` | batches, canon, tests |
+| `TC-017` | batches, tests |
+| `TC-018` | batches, tests |
 | `TC-018.1` | batches |
-| `TC-019` | batches, canon, tests |
+| `TC-019` | batches, tests |
 | `TC-019.1` | batches, tests |
 | `TC-019.2` | batches, tests |
-| `TC-019a` | batches, canon |
+| `TC-019a` | batches |
 | `TC-019b` | batches |
 | `TC-019c` | batches |
-| `TC-019d` | batches, canon |
+| `TC-019d` | batches |
 | `TC-019e` | batches |
 | `TC-019f` | batches |
 | `TC-019g` | batches |
-| `TC-019h` | batches, canon |
+| `TC-019h` | batches |
 | `TC-02` | batches |
-| `TC-020` | batches, canon, tests |
-| `TC-021` | batches, canon, tests |
+| `TC-020` | batches, tests |
+| `TC-021` | batches, tests |
 | `TC-021.1` | batches |
-| `TC-022` | batches, canon, tests |
+| `TC-022` | batches, tests |
 | `TC-022.1` | batches, tests |
 | `TC-022.2` | batches, tests |
-| `TC-023` | batches, canon, tests |
+| `TC-023` | batches, tests |
 | `TC-023.1` | batches, tests |
 | `TC-023.2` | batches, tests |
 | `TC-023.3` | batches |
-| `TC-024` | batches, canon, tests |
+| `TC-024` | batches, tests |
 | `TC-024.1` | batches |
 | `TC-024.2` | batches |
 | `TC-024.3` | batches, tests |
-| `TC-024.4` | batches, canon, tests |
-| `TC-024.5` | batches, canon, tests |
-| `TC-024.6` | batches, canon, tests |
-| `TC-025` | batches, canon, tests |
-| `TC-025.1` | batches, canon, tests |
-| `TC-026` | batches, canon, tests |
-| `TC-026.1` | batches, canon, tests |
-| `TC-026.2` | batches, canon, tests |
-| `TC-027` | batches, canon, tests |
-| `TC-027.1` | batches, canon, tests |
-| `TC-027.2` | batches, canon, tests |
-| `TC-027.3` | batches, canon, tests |
-| `TC-027a` | batches, canon |
-| `TC-027b` | batches, canon |
-| `TC-028` | batches, canon, tests |
-| `TC-028.1` | batches, canon, tests |
-| `TC-028.2` | batches, canon, tests |
-| `TC-029` | batches, canon, tests |
-| `TC-029.1` | batches, canon, tests |
-| `TC-029.2` | batches, canon, tests |
+| `TC-024.4` | batches, tests |
+| `TC-024.5` | batches, tests |
+| `TC-024.6` | batches, tests |
+| `TC-025` | batches, tests |
+| `TC-025.1` | batches, tests |
+| `TC-026` | batches, tests |
+| `TC-026.1` | batches, tests |
+| `TC-026.2` | batches, tests |
+| `TC-027` | batches, tests |
+| `TC-027.1` | batches, tests |
+| `TC-027.2` | batches, tests |
+| `TC-027.3` | batches, tests |
+| `TC-027a` | batches |
+| `TC-027b` | batches |
+| `TC-028` | batches, tests |
+| `TC-028.1` | batches, tests |
+| `TC-028.2` | batches, tests |
+| `TC-029` | batches, tests |
+| `TC-029.1` | batches, tests |
+| `TC-029.2` | batches, tests |
 | `TC-03` | batches |
-| `TC-030` | batches, canon, tests |
-| `TC-031` | batches, canon, tests |
-| `TC-032` | batches, canon, tests |
-| `TC-033` | batches, canon, tests |
-| `TC-034` | batches, canon, tests |
-| `TC-035` | batches, canon, tests |
-| `TC-035.1` | batches, canon, tests |
-| `TC-035.2` | batches, canon, tests |
-| `TC-035.3` | batches, canon, tests |
-| `TC-035.4` | batches, canon, tests |
-| `TC-035.5` | batches, canon, tests |
-| `TC-035.6` | batches, canon, tests |
-| `TC-035.7` | batches, canon, tests |
+| `TC-030` | batches, tests |
+| `TC-031` | batches, tests |
+| `TC-032` | batches, tests |
+| `TC-033` | batches, tests |
+| `TC-034` | batches, tests |
+| `TC-035` | batches, tests |
+| `TC-035.1` | batches, tests |
+| `TC-035.2` | batches, tests |
+| `TC-035.3` | batches, tests |
+| `TC-035.4` | batches, tests |
+| `TC-035.5` | batches, tests |
+| `TC-035.6` | batches, tests |
+| `TC-035.7` | batches, tests |
 | `TC-035a` | batches |
-| `TC-036` | batches, canon, tests |
-| `TC-036.1` | batches, canon, tests |
-| `TC-036.2` | batches, canon, tests |
-| `TC-036.3` | batches, canon, tests |
-| `TC-036.4` | batches, canon, tests |
+| `TC-036` | batches, tests |
+| `TC-036.1` | batches, tests |
+| `TC-036.2` | batches, tests |
+| `TC-036.3` | batches, tests |
+| `TC-036.4` | batches, tests |
 | `TC-036.5` | batches |
 | `TC-036.5b` | batches |
 | `TC-036a` | batches |
-| `TC-037` | batches, canon, tests |
-| `TC-037.1` | batches, canon, tests |
-| `TC-037.2` | batches, canon, tests |
-| `TC-037.3` | batches, canon, tests |
-| `TC-037.4` | batches, canon, tests |
-| `TC-038` | batches, canon, tests |
-| `TC-038.1` | batches, canon, tests |
-| `TC-038.2` | batches, canon, tests |
-| `TC-038.3` | batches, canon, tests |
-| `TC-038.4` | batches, canon, tests |
-| `TC-038.5` | batches, canon, tests |
+| `TC-037` | batches, tests |
+| `TC-037.1` | batches, tests |
+| `TC-037.2` | batches, tests |
+| `TC-037.3` | batches, tests |
+| `TC-037.4` | batches, tests |
+| `TC-038` | batches, tests |
+| `TC-038.1` | batches, tests |
+| `TC-038.2` | batches, tests |
+| `TC-038.3` | batches, tests |
+| `TC-038.4` | batches, tests |
+| `TC-038.5` | batches, tests |
 | `TC-038.6` | batches, tests |
-| `TC-039` | batches, canon, tests |
+| `TC-039` | batches, tests |
 | `TC-04` | batches |
 | `TC-040` | batches |
 | `TC-041` | batches, tests |
@@ -4973,15 +5266,15 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-049` | batches, tests |
 | `TC-05` | batches |
 | `TC-050` | batches |
-| `TC-050.1` | batches, canon, tests |
+| `TC-050.1` | batches, tests |
 | `TC-050.2` | batches, tests |
 | `TC-050.3` | batches |
 | `TC-051` | batches, tests |
-| `TC-051.1` | batches, canon, tests |
+| `TC-051.1` | batches, tests |
 | `TC-051.2` | batches |
 | `TC-051.3` | batches |
-| `TC-051.4` | batches, canon, tests |
-| `TC-051.5` | batches, canon, tests |
+| `TC-051.4` | batches, tests |
+| `TC-051.5` | batches, tests |
 | `TC-052` | batches, tests |
 | `TC-052.1` | batches |
 | `TC-053` | batches |
@@ -4998,8 +5291,8 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-063.1` | batches |
 | `TC-064` | batches, tests |
 | `TC-065` | batches, tests |
-| `TC-065.1` | batches, canon, tests |
-| `TC-065.2` | batches, canon, tests |
+| `TC-065.1` | batches, tests |
+| `TC-065.2` | batches, tests |
 | `TC-065.2b` | batches, tests |
 | `TC-065.3` | batches, tests |
 | `TC-065.4` | batches, tests |
@@ -5192,7 +5485,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-139` | batches, tests |
 | `TC-14` | batches |
 | `TC-140` | batches |
-| `TC-141` | batches, canon, tests |
+| `TC-141` | batches, tests |
 | `TC-142` | batches |
 | `TC-143` | batches, tests |
 | `TC-144` | batches, tests |
@@ -5204,7 +5497,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-15` | batches |
 | `TC-150` | batches, tests |
 | `TC-151` | batches |
-| `TC-152` | batches, canon, tests |
+| `TC-152` | batches, tests |
 | `TC-153` | batches |
 | `TC-16` | batches |
 | `TC-16b` | batches, tests |
@@ -5229,12 +5522,12 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-1822` | tests |
 | `TC-19` | batches |
 | `TC-20` | batches |
-| `TC-201` | batches, canon, tests |
+| `TC-201` | batches, tests |
 | `TC-201.1` | batches, tests |
 | `TC-201.2` | batches, tests |
 | `TC-201.3` | batches, tests |
 | `TC-201.4` | batches, tests |
-| `TC-202` | batches, canon, tests |
+| `TC-202` | batches, tests |
 | `TC-202.1` | tests |
 | `TC-202.10` | tests |
 | `TC-202.11` | batches, tests |
@@ -5245,8 +5538,8 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-202.6` | tests |
 | `TC-202.7` | tests |
 | `TC-202.8` | batches, tests |
-| `TC-202.9` | batches, canon, tests |
-| `TC-203` | batches, canon, tests |
+| `TC-202.9` | batches, tests |
+| `TC-203` | batches, tests |
 | `TC-203.1` | batches, tests |
 | `TC-203.10` | tests |
 | `TC-203.11` | tests |
@@ -5258,21 +5551,21 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-203.7` | tests |
 | `TC-203.8` | tests |
 | `TC-203.9` | tests |
-| `TC-204` | batches, canon, tests |
+| `TC-204` | batches, tests |
 | `TC-204.1` | tests |
 | `TC-204.2` | tests |
-| `TC-205` | batches, canon, tests |
+| `TC-205` | batches, tests |
 | `TC-205.1` | tests |
 | `TC-205.2` | tests |
 | `TC-205.3` | tests |
 | `TC-205.4` | tests |
-| `TC-206` | batches, canon, tests |
-| `TC-207` | batches, canon, tests |
-| `TC-208` | batches, canon, tests |
-| `TC-209` | batches, canon, tests |
+| `TC-206` | batches, tests |
+| `TC-207` | batches, tests |
+| `TC-208` | batches, tests |
+| `TC-209` | batches, tests |
 | `TC-21` | batches |
-| `TC-210` | batches, canon, tests |
-| `TC-211` | batches, canon, tests |
+| `TC-210` | batches, tests |
+| `TC-211` | batches, tests |
 | `TC-212` | batches, tests |
 | `TC-213` | batches, tests |
 | `TC-214` | batches, tests |
@@ -5303,55 +5596,55 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-2xx` | batches |
 | `TC-3` | batches |
 | `TC-30` | batches |
-| `TC-301` | batches, canon, tests |
-| `TC-302` | batches, canon, tests |
+| `TC-301` | batches, tests |
+| `TC-302` | batches, tests |
 | `TC-303` | batches, tests |
-| `TC-304` | batches, canon, tests |
-| `TC-305` | batches, canon, tests |
-| `TC-306` | batches, canon, tests |
-| `TC-307` | batches, canon, tests |
-| `TC-308` | batches, canon, tests |
-| `TC-309` | batches, canon, tests |
+| `TC-304` | batches, tests |
+| `TC-305` | batches, tests |
+| `TC-306` | batches, tests |
+| `TC-307` | batches, tests |
+| `TC-308` | batches, tests |
+| `TC-309` | batches, tests |
 | `TC-31` | batches |
-| `TC-310` | batches, canon, tests |
-| `TC-311` | batches, canon, tests |
-| `TC-312` | batches, canon, tests |
-| `TC-313` | batches, canon, tests |
-| `TC-314` | batches, canon, tests |
-| `TC-315` | batches, canon, tests |
-| `TC-316` | batches, canon, tests |
-| `TC-317` | batches, canon, tests |
-| `TC-318` | batches, canon, tests |
-| `TC-319` | batches, canon |
+| `TC-310` | batches, tests |
+| `TC-311` | batches, tests |
+| `TC-312` | batches, tests |
+| `TC-313` | batches, tests |
+| `TC-314` | batches, tests |
+| `TC-315` | batches, tests |
+| `TC-316` | batches, tests |
+| `TC-317` | batches, tests |
+| `TC-318` | batches, tests |
+| `TC-319` | batches |
 | `TC-32` | batches |
-| `TC-320` | batches, canon |
-| `TC-321` | batches, canon, tests |
-| `TC-322` | batches, canon, tests |
-| `TC-323` | batches, canon, tests |
-| `TC-324` | batches, canon, tests |
-| `TC-325` | batches, canon |
-| `TC-326` | batches, canon |
-| `TC-327` | batches, canon |
-| `TC-328` | batches, canon, tests |
-| `TC-329` | batches, canon, tests |
+| `TC-320` | batches |
+| `TC-321` | batches, tests |
+| `TC-322` | batches, tests |
+| `TC-323` | batches, tests |
+| `TC-324` | batches |
+| `TC-325` | batches |
+| `TC-326` | batches |
+| `TC-327` | batches |
+| `TC-328` | batches, tests |
+| `TC-329` | batches, tests |
 | `TC-33` | batches |
-| `TC-330` | batches, canon, tests |
-| `TC-331` | batches, canon, tests |
-| `TC-332` | batches, canon, tests |
-| `TC-333` | batches, canon, tests |
-| `TC-334` | batches, canon, tests |
-| `TC-335` | batches, canon, tests |
-| `TC-336` | batches, canon, tests |
-| `TC-337` | batches, canon, tests |
-| `TC-338` | batches, canon, tests |
-| `TC-339` | batches, canon, tests |
+| `TC-330` | batches, tests |
+| `TC-331` | batches, tests |
+| `TC-332` | batches, tests |
+| `TC-333` | batches, tests |
+| `TC-334` | batches, tests |
+| `TC-335` | batches, tests |
+| `TC-336` | batches, tests |
+| `TC-337` | batches, tests |
+| `TC-338` | batches, tests |
+| `TC-339` | batches, tests |
 | `TC-34` | batches |
 | `TC-340` | batches |
-| `TC-341` | batches, canon, tests |
-| `TC-342` | batches, canon, tests |
-| `TC-343` | batches, canon, tests |
-| `TC-344` | batches, canon, tests |
-| `TC-345` | batches, canon, tests |
+| `TC-341` | batches, tests |
+| `TC-342` | batches, tests |
+| `TC-343` | batches, tests |
+| `TC-344` | batches, tests |
+| `TC-345` | batches, tests |
 | `TC-346` | batches, tests |
 | `TC-346b` | batches, tests |
 | `TC-347` | batches, tests |
@@ -5451,7 +5744,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-458` | batches |
 | `TC-459` | batches |
 | `TC-46.1` | batches, tests |
-| `TC-46.2` | batches, canon, tests |
+| `TC-46.2` | batches, tests |
 | `TC-46.3` | batches |
 | `TC-46.4` | batches |
 | `TC-46.5` | batches |
@@ -5479,61 +5772,61 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-478` | batches |
 | `TC-479` | batches |
 | `TC-48` | batches |
-| `TC-480` | batches, canon, tests |
-| `TC-481` | batches, canon, tests |
-| `TC-482` | batches, canon, tests |
-| `TC-483` | batches, canon, tests |
-| `TC-484` | batches, canon, tests |
-| `TC-485` | batches, canon, tests |
-| `TC-486` | batches, canon, tests |
-| `TC-487` | batches, canon, tests |
-| `TC-488` | batches, canon, tests |
-| `TC-489` | batches, canon, tests |
+| `TC-480` | batches, tests |
+| `TC-481` | batches, tests |
+| `TC-482` | batches, tests |
+| `TC-483` | batches, tests |
+| `TC-484` | batches, tests |
+| `TC-485` | batches, tests |
+| `TC-486` | batches, tests |
+| `TC-487` | batches, tests |
+| `TC-488` | batches, tests |
+| `TC-489` | batches, tests |
 | `TC-49` | batches |
-| `TC-490` | batches, canon, tests |
-| `TC-491` | batches, canon, tests |
-| `TC-492` | batches, canon, tests |
-| `TC-493` | batches, canon, tests |
-| `TC-494` | batches, canon, tests |
-| `TC-495` | batches, canon, tests |
-| `TC-496` | batches, canon |
-| `TC-497` | batches, canon, tests |
-| `TC-498` | batches, canon, tests |
-| `TC-499` | batches, canon, tests |
+| `TC-490` | batches, tests |
+| `TC-491` | batches, tests |
+| `TC-492` | batches, tests |
+| `TC-493` | batches, tests |
+| `TC-494` | batches, tests |
+| `TC-495` | batches, tests |
+| `TC-496` | batches |
+| `TC-497` | batches |
+| `TC-498` | batches, tests |
+| `TC-499` | batches, tests |
 | `TC-50` | batches |
-| `TC-500` | batches, canon, tests |
-| `TC-501` | batches, canon, tests |
+| `TC-500` | batches, tests |
+| `TC-501` | batches, tests |
 | `TC-501b` | batches, tests |
-| `TC-502` | batches, canon, tests |
-| `TC-503` | batches, canon, tests |
+| `TC-502` | batches, tests |
+| `TC-503` | batches, tests |
 | `TC-503b` | batches, tests |
-| `TC-504` | batches, canon, tests |
+| `TC-504` | batches, tests |
 | `TC-504b` | batches, tests |
-| `TC-505` | batches, canon, tests |
+| `TC-505` | batches, tests |
 | `TC-505b` | batches, tests |
 | `TC-505c` | batches, tests |
-| `TC-506` | batches, canon, tests |
-| `TC-507` | batches, canon, tests |
-| `TC-508` | batches, canon, tests |
-| `TC-509` | batches, canon, tests |
-| `TC-509b` | batches, canon, tests |
+| `TC-506` | batches, tests |
+| `TC-507` | batches, tests |
+| `TC-508` | batches, tests |
+| `TC-509` | batches, tests |
+| `TC-509b` | batches, tests |
 | `TC-51` | batches |
-| `TC-510` | batches, canon, tests |
-| `TC-511` | batches, canon, tests |
-| `TC-512` | batches, canon, tests |
-| `TC-513` | batches, canon, tests |
-| `TC-514` | batches, canon, tests |
-| `TC-515` | batches, canon, tests |
-| `TC-516` | batches, canon, tests |
-| `TC-517` | batches, canon, tests |
-| `TC-518` | batches, canon, tests |
+| `TC-510` | batches, tests |
+| `TC-511` | batches, tests |
+| `TC-512` | batches, tests |
+| `TC-513` | batches, tests |
+| `TC-514` | batches, tests |
+| `TC-515` | batches, tests |
+| `TC-516` | batches, tests |
+| `TC-517` | batches, tests |
+| `TC-518` | batches, tests |
 | `TC-519` | batches, tests |
 | `TC-52` | batches |
-| `TC-520` | batches, canon, tests |
-| `TC-521` | batches, canon, tests |
-| `TC-522` | canon, tests |
-| `TC-523` | batches, canon, tests |
-| `TC-524` | batches, canon, tests |
+| `TC-520` | batches, tests |
+| `TC-521` | batches, tests |
+| `TC-522` | tests |
+| `TC-523` | batches, tests |
+| `TC-524` | batches, tests |
 | `TC-53` | batches |
 | `TC-531` | batches |
 | `TC-54` | batches |
@@ -5545,7 +5838,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-545` | batches, tests |
 | `TC-545b` | batches, tests |
 | `TC-546` | batches, tests |
-| `TC-546b` | batches, canon, tests |
+| `TC-546b` | batches, tests |
 | `TC-547` | batches, tests |
 | `TC-547b` | batches, tests |
 | `TC-548` | batches, tests |
@@ -5555,29 +5848,29 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-550` | batches, tests |
 | `TC-551` | batches, tests |
 | `TC-552` | batches, tests |
-| `TC-553` | batches, canon, tests |
+| `TC-553` | batches, tests |
 | `TC-554` | batches, tests |
-| `TC-555` | batches, canon, tests |
-| `TC-556` | batches, canon, tests |
+| `TC-555` | batches, tests |
+| `TC-556` | batches, tests |
 | `TC-556b` | batches |
 | `TC-557` | batches, tests |
 | `TC-558` | batches, tests |
-| `TC-559` | batches, canon, tests |
+| `TC-559` | batches, tests |
 | `TC-56` | batches |
 | `TC-560` | batches, tests |
 | `TC-561` | batches, tests |
-| `TC-562` | batches, canon, tests |
+| `TC-562` | batches, tests |
 | `TC-563` | batches, tests |
-| `TC-564` | batches, canon, tests |
-| `TC-565` | batches, canon, tests |
-| `TC-566` | batches, canon, tests |
-| `TC-567` | batches, canon, tests |
-| `TC-568` | batches, canon, tests |
-| `TC-569` | batches, canon, tests |
-| `TC-570` | batches, canon, tests |
-| `TC-571` | batches, canon, tests |
-| `TC-572` | batches, canon, tests |
-| `TC-573` | batches, canon, tests |
+| `TC-564` | batches, tests |
+| `TC-565` | batches, tests |
+| `TC-566` | batches, tests |
+| `TC-567` | batches, tests |
+| `TC-568` | batches, tests |
+| `TC-569` | batches, tests |
+| `TC-570` | batches, tests |
+| `TC-571` | batches, tests |
+| `TC-572` | batches, tests |
+| `TC-573` | batches, tests |
 | `TC-574` | batches, tests |
 | `TC-575` | batches, tests |
 | `TC-576` | batches, tests |
@@ -5591,64 +5884,64 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-600` | batches, tests |
 | `TC-601` | tests |
 | `TC-602` | tests |
-| `TC-603` | tests |
+| `TC-603` | batches |
 | `TC-604` | tests |
 | `TC-605` | tests |
 | `TC-606` | tests |
 | `TC-607` | batches, tests |
 | `TC-608` | tests |
-| `TC-609` | tests |
+| `TC-609` | batches, tests |
 | `TC-61` | batches |
 | `TC-610` | batches, tests |
-| `TC-611` | batches, canon, tests |
-| `TC-612` | batches, canon, tests |
+| `TC-611` | batches, tests |
+| `TC-612` | batches, tests |
 | `TC-613` | batches |
 | `TC-614` | batches |
 | `TC-615` | batches |
 | `TC-616` | batches |
-| `TC-617` | batches, canon, tests |
-| `TC-618` | batches, canon, tests |
-| `TC-619` | batches, canon, tests |
+| `TC-617` | batches, tests |
+| `TC-618` | batches, tests |
+| `TC-619` | batches, tests |
 | `TC-62` | batches |
-| `TC-620` | batches, canon, tests |
-| `TC-621` | batches, canon, tests |
-| `TC-622` | batches, canon, tests |
-| `TC-623` | batches, canon, tests |
-| `TC-624` | batches, canon, tests |
-| `TC-625` | batches, canon, tests |
-| `TC-626` | batches, canon, tests |
-| `TC-627` | batches, canon, tests |
-| `TC-628` | batches, canon, tests |
-| `TC-629` | batches, canon, tests |
+| `TC-620` | batches, tests |
+| `TC-621` | batches, tests |
+| `TC-622` | batches, tests |
+| `TC-623` | batches, tests |
+| `TC-624` | batches, tests |
+| `TC-625` | batches, tests |
+| `TC-626` | batches, tests |
+| `TC-627` | batches, tests |
+| `TC-628` | batches, tests |
+| `TC-629` | batches, tests |
 | `TC-63` | batches |
-| `TC-630` | batches, canon, tests |
-| `TC-631` | batches, canon, tests |
-| `TC-632` | batches, canon, tests |
-| `TC-633` | batches, canon, tests |
-| `TC-634` | batches, canon, tests |
-| `TC-635` | batches, canon, tests |
-| `TC-636` | batches, canon, tests |
-| `TC-637` | batches, canon, tests |
-| `TC-638` | batches, canon, tests |
-| `TC-639` | batches, canon, tests |
+| `TC-630` | batches, tests |
+| `TC-631` | batches, tests |
+| `TC-632` | batches, tests |
+| `TC-633` | batches, tests |
+| `TC-634` | batches, tests |
+| `TC-635` | batches, tests |
+| `TC-636` | batches, tests |
+| `TC-637` | batches, tests |
+| `TC-638` | batches, tests |
+| `TC-639` | batches, tests |
 | `TC-64` | batches |
-| `TC-640` | batches, canon, tests |
-| `TC-641` | batches, canon, tests |
-| `TC-642` | batches, canon, tests |
-| `TC-643` | batches, canon, tests |
-| `TC-644` | batches, canon, tests |
-| `TC-645` | batches, canon, tests |
-| `TC-646` | batches, canon, tests |
-| `TC-647` | batches, canon, tests |
-| `TC-648` | batches, canon, tests |
+| `TC-640` | batches, tests |
+| `TC-641` | batches, tests |
+| `TC-642` | batches, tests |
+| `TC-643` | batches, tests |
+| `TC-644` | batches, tests |
+| `TC-645` | batches, tests |
+| `TC-646` | batches, tests |
+| `TC-647` | batches, tests |
+| `TC-648` | batches, tests |
 | `TC-649` | batches, tests |
 | `TC-65` | batches |
 | `TC-650` | batches |
-| `TC-651` | batches, canon, tests |
+| `TC-651` | batches, tests |
 | `TC-652` | batches, tests |
-| `TC-653` | batches, canon, tests |
-| `TC-654` | batches, canon, tests |
-| `TC-655` | batches, canon, tests |
+| `TC-653` | batches, tests |
+| `TC-654` | batches, tests |
+| `TC-655` | batches, tests |
 | `TC-656` | batches, tests |
 | `TC-657` | batches, tests |
 | `TC-658` | batches, tests |
@@ -5723,7 +6016,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-B100-09` | batches, tests |
 | `TC-B100-10` | batches, tests |
 | `TC-B100-11` | batches, tests |
-| `TC-B100-12` | batches, canon, tests |
+| `TC-B100-12` | batches, tests |
 | `TC-B100-13` | batches, tests |
 | `TC-B100-14` | batches, tests |
 | `TC-B100-15` | batches, tests |
@@ -5795,12 +6088,12 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-B77-07` | batches, tests |
 | `TC-B77-08` | batches, tests |
 | `TC-B77-09` | batches, tests |
-| `TC-B77-10` | batches, canon, tests |
-| `TC-B77-11` | batches, canon, tests |
-| `TC-B77-12` | batches, canon, tests |
-| `TC-B77-13` | batches, canon, tests |
-| `TC-B77-14` | batches, canon, tests |
-| `TC-B77-15` | batches, canon, tests |
+| `TC-B77-10` | batches, tests |
+| `TC-B77-11` | batches, tests |
+| `TC-B77-12` | batches, tests |
+| `TC-B77-13` | batches, tests |
+| `TC-B77-14` | batches, tests |
+| `TC-B77-15` | batches, tests |
 | `TC-B77-16` | batches, tests |
 | `TC-B77-17` | batches, tests |
 | `TC-B77-18` | batches, tests |
@@ -5810,15 +6103,15 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-B77-22` | batches, tests |
 | `TC-B77-23` | batches, tests |
 | `TC-B77-24` | batches, tests |
-| `TC-B77-25` | batches, canon, tests |
-| `TC-B77-26` | batches, canon, tests |
+| `TC-B77-25` | batches, tests |
+| `TC-B77-26` | batches, tests |
 | `TC-B77-27` | batches |
 | `TC-B77-28` | batches |
 | `TC-B77-29` | batches, tests |
 | `TC-B77-30` | batches, tests |
 | `TC-B77-31` | batches, tests |
-| `TC-B77-32` | batches, canon, tests |
-| `TC-B77-33` | batches, canon, tests |
+| `TC-B77-32` | batches, tests |
+| `TC-B77-33` | batches, tests |
 | `TC-B78-01` | batches |
 | `TC-B78-02` | batches |
 | `TC-B78-03` | batches |
@@ -5882,7 +6175,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-B85-02` | batches |
 | `TC-B85-05` | batches |
 | `TC-B85-06` | batches |
-| `TC-B85-07` | batches, canon |
+| `TC-B85-07` | batches |
 | `TC-B85-08` | batches |
 | `TC-B85-09` | batches |
 | `TC-B85-09b` | batches |
@@ -6057,7 +6350,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-B99-34` | batches, tests |
 | `TC-B99-35` | batches, tests |
 | `TC-B99-36` | batches, tests |
-| `TC-B99-37` | batches, canon |
+| `TC-B99-37` | batches |
 | `TC-B99-38` | batches, tests |
 | `TC-B99-39` | batches, tests |
 | `TC-B99-40` | batches, tests |
