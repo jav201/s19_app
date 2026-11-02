@@ -38,7 +38,8 @@ Total: **3 source files** (cap 4).
 | C-1 · R-FLOW-CRC.1, .3, .4 | "template" → "CRC config file" (`.1`: "from the CRC config file the block names, read as S13 CTX-CRCCONFIG"; `.3`: "If the CRC config file is refused or does not exist"; `.4`: "If the CRC config file is not a valid CRC config"). Behaviour unchanged. | CTX-DESIGNER defines *template* as a CRC Designer algorithm, and CTX-CRC says a template is not a CRC config. The rows used the same word for the CRC config file — the ambiguity (ISO/IEC/IEEE 29148 "unambiguous") that F-28 shows a user falling into. |
 | C-2 · CTX-CRCCONFIG | Adds *required field*, *number field*, `<name>`, `<value>`, *Designer template shape* and the template rule text. | R-CRC-CONFIG-001.10/.11 named `<name>` and `<value>` without a definition; "a required field" had no list. Terms only (E6). |
 | C-3 · CTX-CRC | Adds *KAT message* and *bit-symmetric init*. | Terms the D13-20 rows and cases use. |
-| C-4 · CTX-FLOW | Adds *output file name*, *the copy*, *names*, *in place of*. | Terms of R-FLOW-EXT.9 … .11. |
+| C-4 · CTX-FLOW | Adds *output file name*, *the copy*, *names*, *in place of*; E3 round 1 adds *run*, *read suffix*, *climbs above* (and CTX-CRCCONFIG *nesting too deep*). | Terms of R-FLOW-EXT.9 … .14. |
+| C-5 · CTX-CRCCONFIG [A-6] | In the same C-2 edit, the existing line "rule texts — The <rule text> of R-CRC-CONFIG-001.10" (`REQUIREMENTS.md:5398`) points at **R-CRC-CONFIG-001.9**, the row that uses `<rule text>`. | Wrong cross-reference found at E3. |
 
 No canon row's behaviour is weakened. R-CRC-ENGINE-001.1, R-CRC-CONFIG-001.10, .11 and R-FLOW-EXT.2 keep their text; the code is brought to them.
 
@@ -68,7 +69,7 @@ Risks of rebind: (1) a file opened by hand outside the flow under the output fil
 
 **D-4 · D13-23: the CRC template reader's half is deferred.** CODE-CHANGES D13-23 names "CRC config and CRC template readers". The template reader (`crc_designer_model.parse_template` / `_build_algorithm`) has no canon row with a fixed text (CTX-DESIGNER gives only `CRC template is structurally invalid: <rule>`), its message reaches the Designer's Load / Save status, and it is a fourth file. Kept out; backlog BL-I8-4 (D13-23 status: "partly done: config reader, batch-101 Inc 8").
 
-**D-5 · D15-17: a relative output path is joined, not contained.** The output is joined under the project folder exactly as the log is (`:1090-1091`); `..` is not refused. An absolute output path anywhere is already accepted by design (the output lives outside the project, `flow_model.py:483`), the file is only read, and the copy's destination keeps the placement guard. A containment check would refuse less than an absolute path can already do.
+**D-5 · D15-17: a relative output path is joined, not contained.** The output is joined under the project folder exactly as the log is (`:1090-1091`); `..` is not refused. An absolute output path anywhere is already accepted by design (the output lives outside the project, `flow_model.py:483`), the file is only read, and the copy's destination keeps the placement guard. A containment check would refuse less than an absolute path can already do. **Superseded at E3 round 1 [S-3]:** a relative log or output path that climbs above the project folder is refused (R-FLOW-EXT.14); an absolute path stays the explicit way to name an outside file (`E3-rulings.md`).
 
 **D-6 · D13-20: one-line seed fix, not delegation to the Designer engine.** `crc32_stream` keeps its zlib fast path and its loop; only the seed changes (`reg = init & 0xFFFFFFFF` in both branches). Delegating to `crc_kernel.crc_lut` would single-source the two engines (and speed up non-default parameters) but touches a hot path for no requirement; R-CRC-ENGINE-002.2 holds the two engines together by test instead.
 
@@ -94,9 +95,10 @@ Risks of rebind: (1) a file opened by hand outside the flow under the output fil
 
 - **BL-I8-1** — Flow CRC block that uses a CRC Designer template's algorithm with regions from a CRC config or the block (D-1 B/C); needs a prototype round.
 - **BL-I8-2** — Flow Builder field label `CRC template` and help line `window_help.py:234` say "template" for a CRC config file (UI text; known-failed family KF-101).
-- **BL-I8-3** — user guide ch17.11 / ch18.9 text: "the later block still reads the first copy" becomes "reads this run's copy"; remove the workaround sentence (docs).
+- **BL-I8-3** — user guide ch17.11 / ch18.9 text: "the later block still reads the first copy" becomes "reads this run's copy" (and the block summary's read suffix); remove the workaround sentence (docs). [A-7] Also `docs/user-guide/ch17-flow-builder.md:62` (the F-28 base text `… structurally invalid: 'reverse'`) and `docs/user-guide/DOSSIER.md:737`, `:758` (F-28 / F-49 listed as live).
 - **BL-I8-4** — D13-23 template-reader half (`crc_designer_model._build_algorithm`): name the field in "missing" / "not a number"; needs a CTX-DESIGNER row.
-- **BL-I8-5** — O-1: Flow CRC block reads its config through `read_crc_config_text` (read limit, decode error as a reason).
+- **BL-I8-5** — O-1: Flow CRC block reads its config through `read_crc_config_text` (read limit, decode error as a reason). **E3 round 1 [S-5]: the read-limit half is folded into Inc 8 (R-FLOW-CRC.9); the decode-error half stays here.**
+- **BL-I8-6** [A-4] — the CRC config's number grammar is lenient: `_parse_int` = `int(s, 16)` reads `" 10 "`, `"+10"`, `"1_0"`, `"0x_1"` and `"-1"` as numbers, against CTX-CRCCONFIG "hexadecimal digits with or without 0x". Joins the D13-21 / D13-22 / D13-24 family (CRC config rules).
 
 ## Orchestrator rulings after E1/E2 (2026-11-02)
 

@@ -17,18 +17,20 @@ How to read it:
 
 | Group | Files | Owns nodes |
 |---|---|---|
-| G1 CRC | `s19_app/tui/operations/crc.py`, `s19_app/tui/operations/crc_config.py`; tests `tests/test_b101_crc_model_and_reasons.py` | `crc32_stream`, `_required_field`, `_number_field`, `_build_config`, `_build_group` |
-| G2 Flow | `s19_app/tui/services/flow_execution_service.py`; tests `tests/test_b101_flow_ext_copy.py` | `run_flow`, `_resolve_block_ref` |
+| G1 CRC | `s19_app/tui/operations/crc.py`, `s19_app/tui/operations/crc_config.py`; tests `tests/test_b101_crc_model_and_reasons.py` | `crc32_stream`, `_required_field`, `_number_field`, `_build_config`, `_build_group`, `parse_crc_config` |
+| G2 Flow | `s19_app/tui/services/flow_execution_service.py`, `s19_app/tui/services/flow_model.py` [S-2]; tests `tests/test_b101_flow_ext_copy.py` | `run_flow`, `_resolve_block_ref`, `run_chain_set`, `compose_chain_set_report`, `[Data: FlowRunResult.in_place_reads]`, `[Data: ChainRunOutcome.in_place_inputs]` |
 
 | Interface | Pinned form | Producer → consumers |
 |---|---|---|
-| I-1 template reason | `crc_config.DESIGNER_TEMPLATE_RULE = "a CRC Designer template is not a CRC config - it has no regions or groups"`; reaches callers as `CRC config is structurally invalid: <rule>` through the unchanged `parse_crc_config` | G1 → G2 (R-FLOW-CRC.4 cause), the Operations dialog |
-| I-2 named-field reasons | `field '<key>' is missing`; `field '<key>' is not a number: <json.dumps(value)>` (raised as `ValueError`) | G1 → G2, the Operations dialog |
+| I-1 template reason | `crc_config.DESIGNER_TEMPLATE_RULE = "a CRC Designer template is not a CRC config - it has no regions or groups"`; reaches callers as `CRC config is structurally invalid: <rule>` through `parse_crc_config` | G1 → G2 (R-FLOW-CRC.4 cause), the Operations dialog |
+| I-2 named-field reasons | `field '<key>' is missing`; `field '<key>' is not a number: <clip>` with `<clip>` = `json.dumps(value)` cut to 64 characters + `…` when longer (`crc_config.VALUE_CLIP = 64`) [S-1]; `CRC config is not valid JSON: nesting too deep` [S-6] | G1 → G2, the Operations dialog |
 | I-3 engine call form | `crc32_stream(data, *, polynomial, init, reverse, final_xor) -> int` unchanged; only its value changes | G1 → `compute_region_crc`, `compute_group_crc` (Operations check / write, Flow CRC block) |
-| I-4 change-record value | `FlowChangeRecord.change_doc_ref` / `FlowRefusal.change_doc_ref` = the copy's file name (`copy.name`) when the PATCH ref was read in place, else the block's ref as typed | G2 → flow report, chain-set report (Inc 9 edits `run_chain_set` / `write_chain_set_report` after Inc 8), flow-A2B change census (`diff_report_service.py`, Inc 7) |
+| I-4 change-record values [A-1] | `FlowChangeRecord.change_doc_ref` / `FlowRefusal.change_doc_ref` = the copy's file name (`copy.name`) when the PATCH document was read in place, else the block's ref as typed; `FlowChangeRecord.a2l_ref` / `FlowRefusal.a2l_ref` = the copy's file name when the effective A2L (the PATCH's own `a2l_ref`, or the LOAD's it inherits) was read in place, else as today (`block.a2l_ref or source_a2l_ref`) | G2 → flow report (Change document and A2L reference columns, `flow_report_service.py:355`), chain-set report (Inc 9 edits `run_chain_set` / `write_chain_set_report` after Inc 8), flow-A2B change census (`diff_report_service.py`, Inc 7) |
 | I-5 placement | `copy_into_workarea(source, destination) -> Path` unchanged (D-2: no rename, no overwrite) | `workspace.py` (not edited) → G2 |
+| I-6 in-place reads [S-2] | `FlowRunResult.in_place_reads: List[Tuple[int, str, str, Path]]` — (block index, resolution label such as `SourceBlock.image_ref`, typed ref, copy), default `[]`, in read order; `ChainRunOutcome.in_place_inputs: Dict[int, str]` — 1-based input index → copy file name, default `{}` | `run_flow` → the summary suffix (same function), `run_chain_set._run_one` → `compose_chain_set_report`. Inc 9 works in `run_chain_set` / `write_chain_set_report` after Inc 8 and must keep both fields |
+| I-7 read suffix [A-1, A-2, S-2] | `" · read " + copy.name + " in place of " + ref` (ref as typed), appended to the block's summary once per in-place read | G2 → every surface that paints a block summary (lane terminal line, run log, flow report Pipeline ledger) |
 
-Order inside E4: G1 and G2 in parallel; G2's R-FLOW-CRC.4 tests need G1's I-1 / I-2 at integration.
+Order inside E4: G1 and G2 in parallel; G2's R-FLOW-CRC.4 / .9 tests need G1's I-1 / I-2 at integration.
 
 ## Nodes
 
@@ -93,7 +95,7 @@ _number_field
 req: R-CRC-CONFIG-001.10, R-CRC-CONFIG-001.11
 in: dict container; str key
 out: int value
-func: new. `raw = _required_field(container, key)`; returns `_parse_int(raw)` (unchanged: bool refused, int as is, str as hexadecimal); a `ValueError` from `_parse_int` becomes `ValueError(f"field '{key}' is not a number: {json.dumps(raw)}")`.
+func: new. `raw = _required_field(container, key)`; returns `_parse_int(raw)` (unchanged: bool refused, int as is, str as hexadecimal); a `ValueError` from `_parse_int` becomes `ValueError(f"field '{key}' is not a number: {clip}")`, `text = json.dumps(raw)`, `clip = text if len(text) <= VALUE_CLIP else text[:VALUE_CLIP] + "…"`, `VALUE_CLIP = 64` [S-1].
 module: s19_app/tui/operations/crc_config.py
 examples: (R-CRC-CONFIG-001.11/1) {"init": "zz"}, key "init" → raises ValueError "field 'init' is not a number: \"zz\"" (base text: "invalid literal for int() with base 16: 'zz'", B)
 examples: (R-CRC-CONFIG-001.11/2) {"init": true}, key "init" → raises ValueError "field 'init' is not a number: true" (base: "expected an integer, got a boolean", B)
@@ -101,6 +103,9 @@ examples: (R-CRC-CONFIG-001.11/3) {"polynomial": 1.5}, key "polynomial" → rais
 examples: (R-CRC-CONFIG-001.11/4) {"final_xor": null}, key "final_xor" → raises ValueError "field 'final_xor' is not a number: null"
 examples: (R-CRC-CONFIG-001.10/3) {} , key "init" → raises ValueError "field 'init' is missing"
 examples: (R-CRC-CONFIG-001.11/1 pos) {"init": "0x12345678"}, key "init" → value `305419896`; {"start": 4096}, key "start" → value `4096`
+examples: (R-CRC-CONFIG-001.11/7) {"init": 1 000 000 × "a"}, key "init" → raises ValueError "field 'init' is not a number: " + `"` + 63 × "a" + "…" (base: CPython's own 200-character clip inside "invalid literal …", security probe)
+examples: (R-CRC-CONFIG-001.11/7) {"polynomial": [0] × 10 000}, key "polynomial" → raises ValueError "field 'polynomial' is not a number: " + the first `64` characters of "[0, 0, 0, …" + "…"
+examples: (R-CRC-CONFIG-001.11/8) {"init": "[/]"}, key "init" → raises ValueError "field 'init' is not a number: \"[/]\"" (shown as plain text by the Operations result area, `screens.py:2887` `markup=False`)
 
 _build_config
 req: R-CRC-CONFIG-001.10, R-CRC-CONFIG-001.11, R-CRC-CONFIG-001.16
@@ -128,14 +133,15 @@ examples: (R-CRC-CONFIG-001.11/6) index `0`, {"regions": [{"start": "x", "end": 
 examples: (test_at044d_parse_rejections_one_named_error[output_bytes_nonint], holds on base) "output_bytes": "four" → raises ValueError "group 1: 'output_bytes' must be one of [1, 2, 4, 8], got 'four'"
 
 parse_crc_config
-req: R-CRC-CONFIG-001.10, R-CRC-CONFIG-001.11, R-CRC-CONFIG-001.16
+req: R-CRC-CONFIG-001.10, R-CRC-CONFIG-001.11, R-CRC-CONFIG-001.16, R-CRC-CONFIG-001.17
 in: str text
 out: tuple(CrcConfig? config, list[str] errors)
-func: unchanged. `json.loads` (→ `CRC config is not valid JSON: …`), object guard, `_build_config` inside `except (KeyError, TypeError, ValueError)` → `CRC config is structurally invalid: <exc>`. The new reasons pass through it unchanged.
+func: changed [S-6]. was: `json.loads` inside `except (JSONDecodeError, UnicodeDecodeError)` (→ `CRC config is not valid JSON: …`); a `RecursionError` escapes to the caller (the Operations Execute handler, `screens.py:3113`, does not catch it). / now: `RecursionError` is also caught and gives `CRC config is not valid JSON: nesting too deep`. Then the object guard and `_build_config` inside `except (KeyError, TypeError, ValueError)` → `CRC config is structurally invalid: <exc>`, unchanged; the new reasons pass through it.
 module: s19_app/tui/operations/crc_config.py
 examples: (R-CRC-CONFIG-001.16/1) text = `emit_template(seed_template())` → config `None`; errors ["CRC config is structurally invalid: a CRC Designer template is not a CRC config - it has no regions or groups"] (base ["CRC config is structurally invalid: 'reverse'"], B)
 examples: (R-CRC-CONFIG-001.10/1) Config V without "reverse" → errors ["CRC config is structurally invalid: field 'reverse' is missing"]
 examples: (R-CRC-CONFIG-001.11/1) Config V with "init": "zz" → errors ["CRC config is structurally invalid: field 'init' is not a number: \"zz\""]
+examples: (R-CRC-CONFIG-001.17/1) text "[" × 100 000 → config `None`; errors ["CRC config is not valid JSON: nesting too deep"] (base: raises RecursionError, security probe)
 
 emit_template
 req: R-CRC-CONFIG-001.16, R-FLOW-CRC.4
@@ -146,35 +152,69 @@ module: s19_app/tui/operations/crc_designer_model.py
 examples: (R-CRC-CONFIG-001.16/1) `seed_template()` → text holds "\"algorithm\": {" and no "polynomial"
 
 run_flow
-req: R-FLOW-CRC.1, R-FLOW-CRC.3, R-FLOW-CRC.4, R-FLOW-EXT.2, R-FLOW-EXT.9, R-FLOW-EXT.10, R-FLOW-EXT.11, R-CRC-ENGINE-001.1
+req: R-FLOW-CRC.1, R-FLOW-CRC.3, R-FLOW-CRC.4, R-FLOW-CRC.9, R-FLOW-EXT.2, R-FLOW-EXT.9, R-FLOW-EXT.10, R-FLOW-EXT.11, R-FLOW-EXT.12, R-FLOW-EXT.14, R-CRC-ENGINE-001.1
 in: Flow flow; FlowContext ctx
 out: FlowRunResult result
-func: changed. was: each block branch resolves its refs with `_resolve_manifest_entry`; the PATCH branch records `change_doc_ref=block.change_doc_ref`; the external-step branch joins a relative log under `ctx.project_dir` but reads a relative output as given (working directory), copies it with `copy_into_workarea` and records the copy only in `written_paths`. / now: (1) a per-run `rebinds: dict[str, Path]` starts empty; (2) the 7 block-branch resolutions (LOAD image and A2L, PATCH document and A2L, CHECK document, CRC config, A2B file inputs) go through `_resolve_block_ref(..., rebinds)`; (3) the PATCH branch records `change_doc_ref = path.name` when its document was read in place, else `block.change_doc_ref`; (4) the external-step branch joins a relative output under `ctx.project_dir` like the log, and after the copy sets `rebinds[os.path.normcase(str(copied.parent / Path(source_path).resolve().name))] = copied`. Every summary and cause text unchanged.
+func: changed. was: each block branch resolves its refs with `_resolve_manifest_entry`; the PATCH branch records `change_doc_ref=block.change_doc_ref` and `a2l_ref=effective_a2l_ref` (`block.a2l_ref or source_a2l_ref`, `:366`, `:497`); the CRC branch reads its config with `path.read_text` (no limit, `:810-812`); the external-step branch joins a relative log under `ctx.project_dir` but reads a relative output as given (working directory), copies it with `copy_into_workarea` and records the copy only in `written_paths`. / now: (1) a per-run `rebinds: dict[str, Path]` starts empty; (2) the 7 block-branch resolutions (LOAD image and A2L, PATCH document and A2L, CHECK document, CRC config, A2B file inputs) go through `_resolve_block_ref(..., rebinds)`; each in-place read is appended to `result.in_place_reads` as `(index, label, ref, copy)` [S-2]; (3) the PATCH branch records `change_doc_ref = path.name` when its document was read in place, else `block.change_doc_ref`, and `a2l_ref` = the copy's name when the effective A2L was read in place — the PATCH's own (`:448`) or the LOAD's, kept as `source_a2l_ref = copy.name` at `:366` — else as today [A-1]; (4) the external-step branch first refuses a relative log, then a relative output, that climbs above the project folder (summary `external step refused`, cause `<log or output> '<path as given>' climbs above the project folder - give an absolute path for a file outside the project`, checked by text: `os.path.normpath` of the joined path must stay under `os.path.normpath(project_dir)`) [S-3]; it joins a relative output under `ctx.project_dir` like the log, and after the copy sets `rebinds[os.path.normcase(str(copied.parent / Path(source_path).resolve().name))] = copied`; (5) the CRC branch reads its config with `read_crc_config_text(str(path), ctx.project_dir)`; a read error becomes the R-FLOW-CRC.4 / .9 summary `config malformed` and cause `crc config invalid: <reason>`, else `parse_crc_config(text)` as today [S-5]; (6) once per block, whatever path ended it (normal end, `continue`, the per-block `except`), the block's `BlockResult.summary` gets `" · read " + copy.name + " in place of " + ref` for each of its `in_place_reads`, in read order [A-1, A-2, S-2]. Every other summary and cause text unchanged.
 module: s19_app/tui/services/flow_execution_service.py
-modify: [Data: run_flow.rebinds] (replace); result (append)
+modify: [Data: run_flow.rebinds] (replace); [Data: FlowRunResult.in_place_reads] (append); result (append)
 examples: (R-FLOW-CRC.4/1) LOAD "firmware.s19" → CRC "templates/demo-crc32.crc.json" (the Designer's saved file) → WRITE-OUT "out.s19" → block 1 status "error", summary "config malformed", cause "crc config invalid: CRC config is structurally invalid: a CRC Designer template is not a CRC config - it has no regions or groups"; block 2 summary "skipped (upstream error)"; status "error"; written_paths [] (base cause "crc config invalid: CRC config is structurally invalid: 'reverse'", guide ch17-05)
 examples: (R-FLOW-CRC.4/2) a config without "reverse" → summary "config malformed", cause "crc config invalid: CRC config is structurally invalid: field 'reverse' is missing"
 examples: (R-FLOW-CRC.3/1) CRC "crc.json" absent → summary "config unresolved", cause "crc config not found or not inside the project" (holds on base)
 examples: (R-CRC-ENGINE-001.1/7) LOAD "k.s19" (KAT at 0x1000) → CRC "templates/k.json" (Config K) → WRITE-OUT "out.s19" → CRC block summary "injected 1 CRC region"; out.s19 bytes 0x1010 … 0x1013 = 0x31 0x74 0x8B 0x0F
 examples: (R-FLOW-EXT.2/2) flow X with output "bench/rel.changes.json" under <proj>, working directory <tmp> → EXT summary "log 'step.log' received · output copied to rel.changes.json (session)" (base: cause "output 'bench/rel.changes.json' does not exist - run the external step before confirming", B)
-examples: (R-FLOW-EXT.9/1) flow X, run 1 Doc("AA") done; run 2 Doc("BB") → EXT summary "log 'step.log' received · output copied to step.changes_1.json (session)"; PATCH summary "applied 1 entry"; out.s19 data record "S1071000424203045D" (base "S1071000414103045F", B)
+examples: (R-FLOW-EXT.9/1) flow X, run 1 Doc("AA") done; run 2 Doc("BB") → EXT summary "log 'step.log' received · output copied to step.changes_1.json (session)"; PATCH summary "applied 1 entry · read step.changes_1.json in place of step.changes.json" [A-1]; result.in_place_reads [(`2`, "PatchBlock.change_doc_ref", "step.changes.json", <proj>/step.changes_1.json)]; out.s19 data record "S1071000424203045D" (base "S1071000414103045F", B)
 examples: (R-FLOW-EXT.9/3) run 3 Doc("AA") → EXT summary "… output copied to step.changes.json (session)" (reused); out.s19 "S1071000414103045F" (B: the reuse lands on the output file name)
 examples: (R-FLOW-EXT.9/9) LOAD → PATCH "step.changes.json" → EXT → PATCH "step.changes.json" → WRITE-OUT, run 2 Doc("BB") → change records: block 1 after-bytes 0x41 0x41, block 3 after-bytes 0x42 0x42; out.s19 "S1071000424203045D"
 examples: (R-FLOW-EXT.10/1) flow X + REPORT, run 2 → change record change_doc_ref "step.changes_1.json"; the flow report's Change attribution row names "step.changes_1.json"
 examples: (R-FLOW-EXT.10/3) PATCH ref "./step.changes.json", run 1 → change_doc_ref "./step.changes.json" (as typed)
 examples: (R-FLOW-EXT.11/1) after run 2 → <proj>/step.changes.json holds Doc("AA") bytes; folder entries "base.s19", "out.s19", "step.changes.json", "step.changes_1.json"
+examples: (R-FLOW-EXT.9/13) <proj>/step.changes.json holds Doc("CC") before any run; run 1 Doc("AA") → EXT summary "… output copied to step.changes_1.json (session)"; PATCH summary "applied 1 entry · read step.changes_1.json in place of step.changes.json"; out.s19 "S1071000414103045F" (base "S1071000434303045B", the file that was there) [A-2]
+examples: (R-FLOW-EXT.10/4) LOAD → EXT (output "cal.a2l") → PATCH (a2l_ref "cal.a2l") → REPORT, run 2 with A2L v2 → change record a2l_ref "cal_1.a2l"; flow report A2L reference cell "cal_1.a2l" (base "cal.a2l") [A-1]
+examples: (R-FLOW-EXT.10/5) EXT (output "cal.a2l") → LOAD (a2l_ref "cal.a2l") → PATCH (no a2l_ref) → REPORT, run 2 → PATCH change record a2l_ref "cal_1.a2l"; LOAD summary ends " · read cal_1.a2l in place of cal.a2l" [A-1]
+examples: (R-FLOW-EXT.12/3) the 9/5 flow, run 2 → CRC summary "injected 1 CRC region · read step_1.crc.json in place of step.crc.json"
+examples: (R-FLOW-EXT.12/6) the 9/5 flow, run 2 with a bench config without "reverse" → CRC summary "config malformed · read step_1.crc.json in place of step.crc.json"; cause "crc config invalid: CRC config is structurally invalid: field 'reverse' is missing"
+examples: (R-FLOW-EXT.12/7) EXT1 (cal.a2l) → LOAD → EXT2 (step.changes.json) → PATCH (both refs), run 2 → PATCH summary "applied 1 entry · read step.changes_1.json in place of step.changes.json · read cal_1.a2l in place of cal.a2l"
+examples: (R-FLOW-EXT.12/8) flow X, run 1 into an empty folder → PATCH summary "applied 1 entry"; result.in_place_reads []
+examples: (R-FLOW-EXT.14/1) log "../step.log" → EXT status "error", summary "external step refused", cause "log '../step.log' climbs above the project folder - give an absolute path for a file outside the project"; written_paths [] [S-3]
+examples: (R-FLOW-EXT.14/2) output "bench/../../x.json" → summary "external step refused", cause "output 'bench/../../x.json' climbs above the project folder - give an absolute path for a file outside the project"; no file added to <proj> [S-3]
+examples: (R-FLOW-EXT.14/3) output "bench/../rel.changes.json" → EXT summary "log 'step.log' received · output copied to rel.changes.json (session)"
+examples: (R-FLOW-CRC.9/1) read cap lowered to 16, a 32-byte "crc.json" → CRC summary "config malformed", cause "crc config invalid: CRC config file is 32 bytes, over the 16-byte read cap — the file was not read" [S-5]
+examples: (R-FLOW-EXT.9/15) run 2 with PATCH ref "<proj>/step.changes.json" (absolute) → PATCH summary "change doc unresolved", cause "change document not found or not inside the project", one [MANIFEST-PATH-ESCAPE] finding (the guard runs before the rebind lookup) [S-4]
 
 _resolve_block_ref
-req: R-FLOW-EXT.9, R-FLOW-EXT.10
+req: R-FLOW-EXT.9, R-FLOW-EXT.10, R-FLOW-EXT.12
 in: Path project_dir; str ref; str label; list[ValidationIssue] issues; dict[str, Path] rebinds
 out: tuple(Path? path, bool in_place)
-func: new. `path = _resolve_manifest_entry(project_dir, ref, label, issues)`; `None` → `(None, False)`; `copy = rebinds.get(os.path.normcase(str(path)))`; when `copy` is not `None` and `os.path.normcase(str(copy)) != os.path.normcase(str(path))` → `(copy, True)`; else `(path, False)`. Never raises beyond what `_resolve_manifest_entry` raises (nothing).
+func: new. `path = _resolve_manifest_entry(project_dir, ref, label, issues)` on the typed ref **first** (so an absolute, escaping or linked ref is refused before any rebind) [S-4]; `None` → `(None, False)`; `copy = rebinds.get(os.path.normcase(str(path)))`; when `copy` is not `None` and `os.path.normcase(str(copy)) != os.path.normcase(str(path))`: `checked = _resolve_manifest_entry(project_dir, copy.name, label, issues)` (the same per-read link check every ref gets; the copy lies in the project folder) [S-4] — `None` → `(None, False)`, else `(checked, True)`; otherwise `(path, False)`. Never raises beyond what `_resolve_manifest_entry` raises (nothing).
 module: s19_app/tui/services/flow_execution_service.py
 examples: (R-FLOW-EXT.9/1) ref "step.changes.json", rebinds {normcase("<proj>/step.changes.json"): <proj>/step.changes_1.json} → path "<proj>/step.changes_1.json", in_place `True`
 examples: (R-FLOW-EXT.9/2) ref "step.changes.json", rebinds {normcase("<proj>/step.changes.json"): <proj>/step.changes.json} → path "<proj>/step.changes.json", in_place `False`
 examples: (R-FLOW-EXT.9/8) ref "patches/other.changes.json", the same rebinds → path "<proj>/patches/other.changes.json", in_place `False`
 examples: (R-FLOW-EXT.9/10, Windows) ref "STEP.CHANGES.JSON", rebinds of /1 → path "<proj>/step.changes_1.json", in_place `True`
 examples: (R-FLOW-CRC.3/1 family) ref "C:/elsewhere/x.json" (absolute) → path `None`, in_place `False`; issues gets one [MANIFEST-PATH-ESCAPE] finding (as `_resolve_manifest_entry` on base)
+examples: (R-FLOW-EXT.9/15) ref "<proj>/step.changes.json" (absolute), rebinds of /1 → path `None`, in_place `False`; one [MANIFEST-PATH-ESCAPE] finding [S-4]
+examples: (R-FLOW-EXT.9/15) ref "jl/step.changes.json" where "jl" is a junction to <proj>, rebinds of /1 → path `None`, in_place `False`; one [MANIFEST-PATH-ESCAPE] finding [S-4]
+examples: (R-FLOW-EXT.9/15 neg) mutant: rebinds looked up by the typed text before the guard → the absolute ref returns the copy → RED
+
+run_chain_set
+req: R-FLOW-EXT.13, R-FLOW-EXT.9
+in: Sequence[ChainSpec] chains; FlowContext ctx; str mode = CHAIN_RUN_SEQUENTIAL; str set_name = "chain-set"; (Callable) Flow,FlowContext->FlowRunResult run_one = None; (Callable) ->float clock = None
+out: ChainSetRunRecord record
+func: changed [S-2] (nested `_run_one` only). was: `inputs = _chain_inputs(ctx, blocks)` before `execute`, copied into `ChainRunOutcome.inputs`. / now: after `execute`, for the j-th LOAD block (1-based input index j, block index b) with an entry `(b, "SourceBlock.image_ref", ref, copy)` in `result.in_place_reads`, `inputs[j-1] = (ref, str(copy))` and `in_place_inputs[j] = copy.name`; every other input as before. Each chain is its own run: no rebind crosses chains [A-8].
+module: s19_app/tui/services/flow_execution_service.py
+modify: [Data: ChainRunOutcome.in_place_inputs] (replace)
+examples: (R-FLOW-EXT.13/1) one chain EXT (output fw.s19) → LOAD "fw.s19" → WRITE-OUT, run 2 (copy fw_1.s19) → outcome.inputs [("fw.s19", "<proj>/fw_1.s19")]; outcome.in_place_inputs {`1`: "fw_1.s19"}
+examples: (R-FLOW-EXT.9/14) chain A copies step.changes_1.json; chain B's PATCH "step.changes.json" → chain B summary "applied 1 entry" (no suffix); b.s19 "S1071000414103045F" [A-8]
+
+compose_chain_set_report
+req: R-FLOW-EXT.13
+in: ChainSetRunRecord record; str set_name; datetime generated_at
+out: str markdown
+func: changed [S-2]. was: one Input provenance line per input, "- Chain <name> input <j>: <ref> [bound] path=`<resolved>`". / now: the same line, ending with " · read " + md_safe(copy) + " in place of " + md_safe(ref) when j is in `outcome.in_place_inputs`. Every other line unchanged.
+module: s19_app/tui/services/flow_execution_service.py
+examples: (R-FLOW-EXT.13/1) the /1 outcome → line "- Chain <name> input 1: fw.s19 [bound] path=`<proj>/fw_1.s19` · read fw_1.s19 in place of fw.s19"
+examples: (R-FLOW-EXT.13/2, holds on base) an outcome with in_place_inputs {} → line "- Chain <name> input 1: base.s19 [bound] path=`<proj>/base.s19`" (TC-B94-30 form)
 
 _resolve_manifest_entry
 req: R-FLOW-EXT.9
@@ -202,17 +242,33 @@ desc: one per `run_flow` call, empty at its start; key = `os.path.normcase` of "
 sequence:
   confirmedRun: run_flow (EXT branch) wins → _resolve_block_ref (each later block)
 
+[Data: FlowRunResult.in_place_reads]
+in: List[Tuple[int, str, str, Path]]
+desc: [S-2] new field of `FlowRunResult` (`flow_model.py:748`), default `[]`: one entry per in-place read of the run — (block index, resolution label, typed ref, copy) — in read order. Read by the summary suffix step of `run_flow` and by `run_chain_set._run_one`.
+sequence:
+  blockRead: _resolve_block_ref → run_flow (append) wins → run_flow (summary suffix) → run_chain_set (provenance)
+
+[Data: ChainRunOutcome.in_place_inputs]
+in: Dict[int, str]
+desc: [S-2] new field of `ChainRunOutcome` (`flow_execution_service.py:1587`), default `{}`: 1-based input index → the copy's file name for a LOAD input read in place. `inputs` keeps its `(ref, path)` 2-tuples.
+
 [I/O: project folder]
 desc: `<project>/`, the copy destination of an external step (`copy_into_workarea(source, ctx.project_dir)`). Placed files are immutable (LLR-155.3): a differing output gets the lowest free `_<N>`; an identical one reuses the file.
 
 [I/O: external output]
-desc: the file the human produced, outside the project as a rule (absolute path preferred); a relative path is joined under the project folder (D15-17). Read only.
+desc: the file the human produced, outside the project as a rule (absolute path preferred); a relative path is joined under the project folder (D15-17), and refused when it climbs above it (R-FLOW-EXT.14) [S-3]. Read only.
 
 [I/O: CRC config file]
-desc: the file a CRC block names (`CrcBlock.config_ref`), read with `path.read_text` and `parse_crc_config`; a CRC Designer template file is refused with R-CRC-CONFIG-001.16.
+desc: the file a CRC block names (`CrcBlock.config_ref`), read with `read_crc_config_text` (256 MiB read limit) [S-5] and `parse_crc_config`; a CRC Designer template file is refused with R-CRC-CONFIG-001.16.
 
 [Interface: flow report Change document column]
-desc: Change attribution, Not applied and Refusals of the flow report; Not applied and Refusals of the chain-set report; the flow-A2B change census. Each prints `FlowChangeRecord.change_doc_ref` / `FlowRefusal.change_doc_ref` (I-4).
+desc: Change attribution, Not applied and Refusals of the flow report; Not applied and Refusals of the chain-set report; the flow-A2B change census. Each prints `FlowChangeRecord.change_doc_ref` / `FlowRefusal.change_doc_ref`, and the flow report's A2L reference column prints `FlowChangeRecord.a2l_ref` (I-4) [A-1].
+
+[Interface: block summary]
+desc: [A-1, A-2, S-2] the lane terminal line, the run log and the flow report Pipeline ledger paint `BlockResult.summary`; a block that read a copy in place ends it with the read suffix (I-7).
+
+[Interface: chain-set Input provenance]
+desc: [S-2] one line per LOAD input of each chain; a rebound input names the copy's path and ends with the read suffix (R-FLOW-EXT.13).
 
 ## Edges
 
@@ -223,9 +279,16 @@ run_flow ──▶ [Interface: flow report Change document column]
 [I/O: external output] ──▶ place_into_workarea
 place_into_workarea ──▶ [I/O: project folder]
 [I/O: CRC config file] ──▶ parse_crc_config
+run_flow ──▶ [Data: FlowRunResult.in_place_reads]
+[Data: FlowRunResult.in_place_reads] ──▶ run_chain_set
+run_chain_set ──▶ [Data: ChainRunOutcome.in_place_inputs]
+[Data: ChainRunOutcome.in_place_inputs] ──▶ compose_chain_set_report
+run_flow ──▶ [Interface: block summary]
+compose_chain_set_report ──▶ [Interface: chain-set Input provenance]
 
 ## Findings
 
-> E2-1 (for E3). `run_flow` reads the CRC config file without the 256 MiB read limit and decodes UTF-8 inside the block's `try` (`flow_execution_service.py:810-812`); the Operations dialog uses `read_crc_config_text`. Out of scope (`E1-rulings.md` O-1, BL-I8-5).
+> E2-1 (for E3). `run_flow` reads the CRC config file without the 256 MiB read limit and decodes UTF-8 inside the block's `try` (`flow_execution_service.py:810-812`); the Operations dialog uses `read_crc_config_text`. **E3 round 1 [S-5]: folded in** — the CRC branch now reads through `read_crc_config_text` (R-FLOW-CRC.9); the decode half stays with BL-I8-5 (per-block isolation catches it).
+> E3 round 1 coverage additions: R-CRC-CONFIG-001.17 (`parse_crc_config`); R-FLOW-CRC.9, R-FLOW-EXT.12, R-FLOW-EXT.14 (`run_flow`); R-FLOW-EXT.13 (`run_chain_set`, `compose_chain_set_report`); R-FLOW-EXT.10 widened to the A2L (`run_flow` examples /4, /5).
 > E2-2 (for E3). Rebind is by name: the key is the copy folder plus the output file name as the placement asks for it (`resolved_source.name`, `workspace.py:1201`, `:1231`). A ref that names `<stem>_1<suffix>` explicitly is not rebound (R-FLOW-EXT.9/8 family). E3 rules D-2 against rotate / overwrite.
 > E2-3. Coverage of the requirement → node map: every row of `01-requirements.md` has at least one example above (R-CRC-ENGINE-001.1: `crc32_stream`, `check_regions`, `inject_crcs`, `run_flow`; R-CRC-ENGINE-002.2: `crc32_stream`, `crc_stream`; R-CRC-DESIGNER-001.1: `crc_stream`; R-CRC-CONFIG-001.10 / .11: `_required_field`, `_number_field`, `_build_config`, `_build_group`, `parse_crc_config`; R-CRC-CONFIG-001.16: `_build_config`, `parse_crc_config`, `emit_template`; R-FLOW-CRC.1 / .3 / .4, R-FLOW-EXT.2 / .9 / .10 / .11: `run_flow`, `_resolve_block_ref`, `place_into_workarea`).
