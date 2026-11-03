@@ -1,3 +1,7 @@
 2026-11-03T09:28:08-06:00 E0 start — branch batch-102-hotfixes from 2f2f932; scope = five hot-fixes commissioned by operator; model orchestrator Kimi K2.8
 2026-11-03T09:28:08-06:00 E0 split approved under operator standing authorization — five increments; Inc 1/2 parallel-safe; Inc 3 base for 4/5
 2026-11-03T09:45:00-06:00 E1 done draft — inc-1 clipboard requirements/test cases; inc-2 A2L refresh requirements/test cases
+2026-11-03T10:12:00-06:00 E2 complete — Code-Wire graphs lint clean for inc-1 (10 nodes) and inc-2 (8 nodes)
+2026-11-03T10:30:00-06:00 E3 round 1 — architect NO PASS on inc-2 blocker; security PASS-WITH-NOTES
+2026-11-03T10:55:00-06:00 E3 corrected — write cascade Win32/Tk/PowerShell, async copy/cut, real timeout tests, generation+image cache key, PreparedLoad snapshots, single empty-message writer
+2026-11-03T11:05:00-06:00 E3 round 2 — PASS-WITH-NOTES both; minor findings routed to E4 addenda in design/E3-rulings-inc1-inc2.md
