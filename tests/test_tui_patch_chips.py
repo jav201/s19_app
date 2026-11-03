@@ -111,6 +111,10 @@ _GROUP_BY_CONTAINER = {
     # entry-actions (blue)
     "patch_doc_entry_buttons": "patch-chip-entry",  # LLR-076.2 (named)
     "patch_history_controls": "patch-chip-entry",  # resolved `assumed`
+    # batch-102 Inc 5: the A2L picker pager and the Use-parameter row are
+    # entry-context actions, so they ride the entry group like their Check twin.
+    "patch_param_controls": "patch-chip-entry",
+    "patch_param_use_row": "patch-chip-entry",
     # apply-path (green)
     "patch_doc_controls": "patch-chip-apply",  # LLR-076.2 (named)
     "patch_saveback_buttons": "patch-chip-apply",  # LLR-076.2 (named)

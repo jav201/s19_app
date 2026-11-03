@@ -578,7 +578,9 @@ def test_tc_b97_35_patch_no_horizontal_overflow(tmp_path: Path, size) -> None:
 
     async def body(app, pilot, panel):
         found = []
-        for chip in ("patch_tab_inspector", "patch_tab_json", "patch_tab_checks"):
+        # batch-102 Inc 5 (E3 ruling 8): the A2L tab joins the census; the
+        # query guard keeps this green on the pre-integration tree.
+        for chip in ("patch_tab_inspector", "patch_tab_json", "patch_tab_checks", "patch_tab_a2l"):
             if panel.query(f"#{chip}"):
                 panel.query_one(f"#{chip}").press()
                 await settle(pilot, 3)

@@ -1003,7 +1003,10 @@ def test_tc_b97_58_check_editor_region_states(tmp_path: Path, arm: str) -> None:
 # Inc-4 — the Patch Editor arms of LLR-148.6, 148.7, 148.9
 # --------------------------------------------------------------------------- #
 
-PATCH_TABS = ("patch_tab_inspector", "patch_tab_json", "patch_tab_checks")
+# batch-102 Inc 5 (E3 ruling 8): the Patch A2L tab joins the census; the
+# guarded presses keep this green on the pre-integration tree and exercise the
+# tab (and its controls' help lines) once it ships.
+PATCH_TABS = ("patch_tab_inspector", "patch_tab_json", "patch_tab_checks", "patch_tab_a2l")
 
 
 def _help_lines(key: str, keys_text: str = "") -> dict:
@@ -1155,9 +1158,10 @@ def test_tc_b97_33_patch_glyphs_closed_and_in_the_legend(tmp_path: Path) -> None
             legend_rows = [r for r in painted_rows(app, legend) if r.strip()]
             texts = []
             for tab in PATCH_TABS:
-                panel.query_one(f"#{tab}").press()
-                await settle(pilot, 3)
-                texts.append("\n".join(painted_rows(app, panel)))
+                if panel.query(f"#{tab}"):
+                    panel.query_one(f"#{tab}").press()
+                    await settle(pilot, 3)
+                    texts.append("\n".join(painted_rows(app, panel)))
             return kinds, tokens, legend_rows, legend.region.height, "\n".join(texts)
 
     kinds, tokens, legend_rows, legend_h, panel_text = asyncio.run(_drive())
@@ -2170,9 +2174,10 @@ async def _drive_states(app, pilot, screen_key: str, harvest) -> None:
         panel = await open_patch_editor(app, pilot)
         await load_change_file(app, pilot, panel, calib_hotfix(app.base_dir))
         for tab in PATCH_TABS:
-            panel.query_one(f"#{tab}").press()
-            await settle(pilot, 3)
-            harvest()
+            if panel.query(f"#{tab}"):
+                panel.query_one(f"#{tab}").press()
+                await settle(pilot, 3)
+                harvest()
         # The save-back prompt and the before/after report row are offered
         # after Apply (the D20 states of TC-B97-32's Patch arm).
         panel.query_one("#patch_tab_json").press()

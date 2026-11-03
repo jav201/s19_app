@@ -17,6 +17,16 @@ one pass, emitting the same ``SelectionChanged`` contract (E3 ruling 4/5).
 Every file-derived string reaches the screen as a literal ``Text`` built by
 :func:`s19_app.utils.safe_text` — no markup path exists here (R-B102-SEL-007).
 
+Batch-102 Inc 5 (US-102-05) parameterizes the component so the Patch Editor
+embeds the same selector beside the Check Editor without id collisions
+(R-B102-PE-002): ``id_prefix`` rebuilds every child id and internal event
+route, a ``layout_provider`` carries the host's proportional widths, and
+``mode="highlight"`` turns the ledger into a read-only highlighter — no
+include/bulk controls, no ``space``/``enter`` include bindings, no
+``SelectionChanged`` — whose current row the host reads through
+:meth:`A2LParameterPicker.highlighted_parameter`. The Check Editor keeps the
+default public ids and pick mode.
+
 The Check Editor cell helpers (:func:`clip_param`, :func:`clip_tail`,
 :func:`_clip_fmt_unit`, :func:`_tail_cells`) moved here with the ledger so
 the picker stays import-cycle-free; :func:`_clip_to_cells` is duplicated
@@ -28,6 +38,7 @@ of ``S19TuiApp._clip_to``), and ``screens_directionb`` re-imports
 from __future__ import annotations
 
 from math import ceil
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Callable, NamedTuple, Optional, Protocol, Sequence, runtime_checkable
 
 from rich.cells import cell_len, set_cell_size
@@ -215,14 +226,66 @@ class IncludeTable(DataTable):
         self.post_message(self.IncludeToggled())
 
 
+@dataclass(frozen=True)
+class _PickerIds:
+    """The picker's child ids, all derived from the caller's ``id_prefix``.
+
+    Every internal query, event-route comparison and repaint helper reads
+    this map — nothing is hardcoded to ``check_param_*`` outside the default
+    public Check ids (batch-102 Inc 5, E3 ruling 3). The ONE carve-out is
+    the full-name line: the Check Editor shipped ``#check_full_name_line``
+    before Inc 3 (TC-B97-58 / AT-B97-04 read it), so the default prefix
+    keeps that exact id; any other prefix derives
+    ``{prefix}_full_name_line``.
+    """
+
+    filter: str
+    table: str
+    full_name: str
+    status: str
+    controls: str
+    page_prev: str
+    page_next: str
+    page_label: str
+    include: str
+    bulk: str
+
+
+#: The default public prefix — the Check Editor's shipped ids.
+DEFAULT_ID_PREFIX = "check_param"
+
+#: The one legacy id the default prefix keeps (see :class:`_PickerIds`).
+_LEGACY_FULL_NAME_ID = "check_full_name_line"
+
+
+def _build_ids(id_prefix: str) -> _PickerIds:
+    """Derive every child id from ``id_prefix`` (E3 ruling 3)."""
+    return _PickerIds(
+        filter=f"{id_prefix}_filter",
+        table=f"{id_prefix}_table",
+        full_name=(
+            _LEGACY_FULL_NAME_ID
+            if id_prefix == DEFAULT_ID_PREFIX
+            else f"{id_prefix}_full_name_line"
+        ),
+        status=f"{id_prefix}_status",
+        controls=f"{id_prefix}_controls",
+        page_prev=f"{id_prefix}_page_prev_button",
+        page_next=f"{id_prefix}_page_next_button",
+        page_label=f"{id_prefix}_page_label",
+        include=f"{id_prefix}_include_button",
+        bulk=f"{id_prefix}_bulk_button",
+    )
+
+
 @runtime_checkable
 class PickerLayout(Protocol):
     """The width slice the picker paints from (the host's ``CheckLayout``).
 
-    The host (the Check Editor) injects a ``layout_provider`` returning its
-    derived layout, so the picker never imports the host — no import cycle,
-    and no call cycle either: the provider reads cached scalars, never picker
-    entry points.
+    The host (the Check Editor, the Patch Editor at Inc 5) injects a
+    ``layout_provider`` returning its derived layout, so the picker never
+    imports the host — no import cycle, and no call cycle either: the
+    provider reads cached scalars, never picker entry points.
     """
 
     param: int
@@ -242,15 +305,19 @@ _DEFAULT_LAYOUT = _DefaultLayout()
 
 
 class A2LParameterPicker(Vertical):
-    """The shared A2L parameter selector (US-102-03).
+    """The shared A2L parameter selector (US-102-03, US-102-05).
 
     Composes the filter input (``#check_param_filter``), the paged ledger
-    (``#check_param_table``, an :class:`IncludeTable`), the highlighted row's
-    full-name line (``#check_full_name_line``), the separate count / status
-    line (``#check_param_status``) and the docked control row (``#check_param_page_prev_button``,
-    ``#check_param_page_label``, ``#check_param_page_next_button``,
-    ``#check_param_include_button``). The shipped ids are conserved so help,
-    tests and the key bar keep working.
+    (``#check_param_table``, an :class:`IncludeTable` in pick mode, a plain
+    ``DataTable`` in highlight mode), the highlighted row's full-name line
+    (``#check_full_name_line``), the separate count / status line
+    (``#check_param_status``) and the docked control row
+    (``#check_param_page_prev_button``, ``#check_param_page_label``,
+    ``#check_param_page_next_button``, ``#check_param_include_button``,
+    ``#check_param_bulk_button``). The shipped ids are conserved so help,
+    tests and the key bar keep working; any other ``id_prefix`` derives its
+    whole id family from the prefix (E3 ruling 3), so two pickers mount
+    side by side without duplicates (R-B102-PE-002).
 
     Population is keyed by the caller-provided ``signature`` (the app's safe
     ``_a2l_enriched_key``): an unchanged signature is a no-op that preserves
@@ -258,16 +325,28 @@ class A2LParameterPicker(Vertical):
     signature never short-circuits — the no-op arm only applies to a real,
     matching key — so a bare ``set_parameters(rows)`` always repopulates.
 
+    Modes:
+
+    - ``mode="pick"`` (the default, the Check Editor): ``space``/``enter``
+      toggle the highlighted row's inclusion; ``SelectionChanged`` carries
+      the picked-name tuple; the include and bulk controls paint.
+    - ``mode="highlight"`` (the Patch Editor, batch-102 Inc 5): the ledger
+      is a read-only highlighter — the include/bulk controls, the include
+      bindings and every ``SelectionChanged`` are disabled (E3 ruling 2) —
+      and the host reads the current row through
+      :meth:`highlighted_parameter` (R-B102-PE-003).
+
     Events:
         ``SelectionChanged``: the picked-name tuple changed (one row toggled
             or a bulk include landed); the host repaints its
             collected-fields previews on it. It stays the single "picks
-            changed" contract (E3 ruling 4).
+            changed" contract (E3 ruling 4). Pick mode only.
         ``ViewChanged``: the rendered page changed (populate, filter applied,
             page turned); carries ``shown`` / ``total`` / ``page`` /
             ``page_count`` for observers.
         ``BulkAddRequested``: the operator activated the bulk-add control;
             the host pushes the bulk modal for this picker (R-B102-BULK-001).
+            Pick mode only.
     """
 
     class SelectionChanged(Message, namespace="a2l_parameter_picker"):
@@ -317,11 +396,28 @@ class A2LParameterPicker(Vertical):
     def __init__(
         self,
         *,
+        id_prefix: str = DEFAULT_ID_PREFIX,
+        mode: str = "pick",
+        show_include_button: bool = True,
+        show_bulk_button: bool = True,
         layout_provider: Optional[Callable[[], PickerLayout]] = None,
         page_size: int = PAGE_SIZE,
         id: Optional[str] = None,
     ) -> None:
         super().__init__(id=id)
+        if not id_prefix:
+            raise ValueError("id_prefix must be a non-empty string")
+        if mode not in ("pick", "highlight"):
+            raise ValueError(f"unknown picker mode: {mode!r}")
+        #: The mode: ``pick`` includes rows; ``highlight`` only exposes the
+        #: highlighted row (batch-102 Inc 5, E3 ruling 2).
+        self._mode = mode
+        #: Every child id, derived from ``id_prefix`` (E3 ruling 3).
+        self._ids = _build_ids(id_prefix)
+        #: The include/bulk controls paint only in pick mode — highlight
+        #: mode is a read-only highlighter regardless of the flags.
+        self._show_include_button = show_include_button and mode == "pick"
+        self._show_bulk_button = show_bulk_button and mode == "pick"
         #: The host's width provider; ``None`` reads the 118-column default.
         self._layout_provider = layout_provider
         #: One ledger page — at most this many rows are mounted per rebuild.
@@ -381,6 +477,48 @@ class A2LParameterPicker(Vertical):
         """The current 1-based page."""
         return self._page
 
+    @property
+    def highlighted_parameter(self) -> Optional[dict]:
+        """The highlighted ledger row's source record (highlight mode).
+
+        Summary:
+            Batch-102 Inc 5's read model for the Patch Editor's
+            ``Use parameter`` action (R-B102-PE-003): the record under the
+            ledger cursor — ``{"name", "address", "size", "fmt_unit"}`` —
+            or ``None`` when there is no visible row or the cursor is out
+            of range. The ``address`` is the normalized integer the picker
+            stored (``None`` when the source row had no integer address);
+            hosts must treat a non-integer address as a non-usable row and
+            must not format it as ``0x%08X`` (E3 ruling 9).
+
+        Returns:
+            Optional[dict]: The highlighted row's record, or ``None``.
+
+        Example:
+            >>> picker = A2LParameterPicker()
+            >>> picker.set_parameters(
+            ...     [{"name": "TorqueMax", "address": 0x1000, "byte_size": 4}]
+            ... )
+            True
+            >>> picker.highlighted_parameter is None  # not mounted
+            True
+        """
+        if not self.is_mounted or not self._visible_params:
+            return None
+        table = self.query_one(f"#{self._ids.table}", DataTable)
+        cursor = table.cursor_row
+        if not 0 <= cursor < len(self._visible_params):
+            return None
+        name = self._visible_params[cursor]
+        address, size, fmt_unit = self._param_rows[name]
+        return {
+            "name": name,
+            "address": address,
+            "size": size,
+            "fmt_unit": fmt_unit,
+        }
+
+
     # ------------------------------------------------------------------
     # Population
     # ------------------------------------------------------------------
@@ -423,7 +561,7 @@ class A2LParameterPicker(Vertical):
         self._page = 1
         self._cancel_filter_timer()
         if self.is_mounted:
-            filter_input = self.query_one("#check_param_filter", Input)
+            filter_input = self.query_one(f"#{self._ids.filter}", Input)
             if filter_input.value:
                 # The queued Input.Changed sees the already-reset filter text
                 # and schedules no rebuild.
@@ -459,54 +597,62 @@ class A2LParameterPicker(Vertical):
     def compose(self) -> ComposeResult:
         """The filter row, the ledger, the two status lines and the control row.
 
-        Every shipped id is conserved (``#check_param_filter``,
-        ``#check_param_table``, ``#check_full_name_line``,
-        ``#check_param_include_button``); the count line and the page chips are
-        the increment's additions.
+        Every shipped id is conserved for the default ``check_param``
+        prefix (``#check_param_filter``, ``#check_param_table``,
+        ``#check_full_name_line``, ``#check_param_include_button``); the
+        count line and the page chips are the increment's additions. In
+        ``highlight`` mode the ledger is a plain ``DataTable`` (no include
+        bindings) and the include/bulk controls plus the include hint are
+        omitted (E3 ruling 2).
         """
+        ids = self._ids
         with Horizontal(classes="ce-row"):
             yield Label("Filter", classes="ce-label")
             yield OsClipboardInput(
                 placeholder="filter parameters",
-                id="check_param_filter",
+                id=ids.filter,
                 compact=True,
             )
-        yield IncludeTable(
-            id="check_param_table",
+        table_cls = DataTable if self._mode == "highlight" else IncludeTable
+        yield table_cls(
+            id=ids.table,
             zebra_stripes=True,
             cursor_type="row",
             classes="nowrap-ledger",
         )
-        yield Static("", id="check_full_name_line", classes="nowrap-heading")
-        status = Static("", id="check_param_status")
+        yield Static("", id=ids.full_name, classes="nowrap-heading")
+        status = Static("", id=ids.status)
         status.display = False
         yield status
         with Horizontal(
-            id="check_param_controls",
+            id=ids.controls,
             classes="patch-docked-row patch-chip-entry",
         ):
-            yield Button("Prev", id="check_param_page_prev_button", classes="patch-chip")
-            yield Static("Page 1/1", id="check_param_page_label")
-            yield Button("Next", id="check_param_page_next_button", classes="patch-chip")
-            yield Button(
-                "Include parameter",
-                id="check_param_include_button",
-                classes="patch-chip",
-            )
-            yield Button(
-                "Add list",
-                id="check_param_bulk_button",
-                classes="patch-chip",
-            )
-            yield Static(
-                "space also toggles ✓ on the highlighted row",
-                classes="ce-hint",
-            )
+            yield Button("Prev", id=ids.page_prev, classes="patch-chip")
+            yield Static("Page 1/1", id=ids.page_label)
+            yield Button("Next", id=ids.page_next, classes="patch-chip")
+            if self._show_include_button:
+                yield Button(
+                    "Include parameter",
+                    id=ids.include,
+                    classes="patch-chip",
+                )
+            if self._show_bulk_button:
+                yield Button(
+                    "Add list",
+                    id=ids.bulk,
+                    classes="patch-chip",
+                )
+            if self._mode == "pick":
+                yield Static(
+                    "space also toggles ✓ on the highlighted row",
+                    classes="ce-hint",
+                )
 
     def on_mount(self) -> None:
         """Add the ledger's columns once, at the pre-measure widths."""
         layout = self._layout()
-        table = self.query_one("#check_param_table", DataTable)
+        table = self.query_one(f"#{self._ids.table}", DataTable)
         table.add_column("✓", width=1, key="mark")
         table.add_column("Parameter", width=layout.param, key="param")
         table.add_column("Address", width=10, key="address")
@@ -535,7 +681,7 @@ class A2LParameterPicker(Vertical):
         ledger stays consistent with the filter text at every instant (the
         pre-Inc-3 behavior small parameter sets always had).
         """
-        if event.input.id != "check_param_filter":
+        if event.input.id != self._ids.filter:
             return
         event.stop()
         needle = event.value.strip().lower()
@@ -553,20 +699,21 @@ class A2LParameterPicker(Vertical):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Route the control row: page chips and the include button."""
+        ids = self._ids
         button_id = event.button.id or ""
-        if button_id == "check_param_page_prev_button":
+        if button_id == ids.page_prev:
             event.stop()
             self._turn_page(-1)
             return
-        if button_id == "check_param_page_next_button":
+        if button_id == ids.page_next:
             event.stop()
             self._turn_page(1)
             return
-        if button_id == "check_param_include_button":
+        if button_id == ids.include:
             event.stop()
             self._toggle_highlighted()
             return
-        if button_id == "check_param_bulk_button":
+        if button_id == ids.bulk:
             event.stop()
             self.post_message(self.BulkAddRequested())
             return
@@ -578,7 +725,7 @@ class A2LParameterPicker(Vertical):
         self._toggle_highlighted()
 
     def on_data_table_row_highlighted(self, event: DataTable.RowHighlighted) -> None:
-        if event.data_table.id == "check_param_table":
+        if event.data_table.id == self._ids.table:
             self._refresh_full_name()
 
     # ------------------------------------------------------------------
@@ -647,7 +794,7 @@ class A2LParameterPicker(Vertical):
         if not self.is_mounted:
             return
         self._cancel_filter_timer()
-        table = self.query_one("#check_param_table", DataTable)
+        table = self.query_one(f"#{self._ids.table}", DataTable)
         layout = self._layout()
         needle = self._filter_text
         names = [
@@ -681,8 +828,8 @@ class A2LParameterPicker(Vertical):
         """
         if not self.is_mounted:
             return
-        line = self.query_one("#check_full_name_line", Static)
-        table = self.query_one("#check_param_table", DataTable)
+        line = self.query_one(f"#{self._ids.full_name}", Static)
+        table = self.query_one(f"#{self._ids.table}", DataTable)
         if not self._visible_params:
             empty = _EMPTY_LEDGER if not self._param_rows else _EMPTY_FILTER
             line.update(Text(empty, style=DGRAY))
@@ -702,20 +849,19 @@ class A2LParameterPicker(Vertical):
 
     def _refresh_status(self) -> None:
         """Paint the separate count line (R-B102-SEL-002): ``<shown> of
-        <total> shown``, with `` — refine filter.`` when a FILTER is active
-        and its result exceeds one page (the suffix is the filter instruction;
-        an unfiltered ledger paints the bare count). Hidden in the two empty
-        states — the full-name line carries those messages."""
+        <total> shown``, with `` — refine filter.`` whenever the filtered
+        result exceeds the mounted page. Hidden in the two empty states —
+        the full-name line carries those messages."""
         if not self.is_mounted:
             return
-        status = self.query_one("#check_param_status", Static)
+        status = self.query_one(f"#{self._ids.status}", Static)
         total = len(self._filtered_params)
         if not self._param_rows or not total:
             status.display = False
             return
         status.display = True
         text = f"{len(self._visible_params)} of {total} shown"
-        if self._filter_text and total > self._page_size:
+        if total > len(self._visible_params):
             text += " — refine filter."
         status.update(Text(text, style=DGRAY))
 
@@ -724,13 +870,13 @@ class A2LParameterPicker(Vertical):
         if not self.is_mounted:
             return
         page_count = self._page_count()
-        self.query_one("#check_param_page_prev_button", Button).disabled = (
+        self.query_one(f"#{self._ids.page_prev}", Button).disabled = (
             self._page <= 1
         )
-        self.query_one("#check_param_page_next_button", Button).disabled = (
+        self.query_one(f"#{self._ids.page_next}", Button).disabled = (
             self._page >= page_count
         )
-        self.query_one("#check_param_page_label", Static).update(
+        self.query_one(f"#{self._ids.page_label}", Static).update(
             Text(f"Page {self._page}/{page_count}", style=DGRAY)
         )
 
@@ -738,11 +884,15 @@ class A2LParameterPicker(Vertical):
         """Include or exclude the highlighted ledger row (R-B102-SEL-003).
 
         Toggles only that row's mark cell and posts ``SelectionChanged`` — the
-        ledger is never rebuilt here.
+        ledger is never rebuilt here. Pick mode only: highlight mode composes
+        no include control and binds no include key, so this is unreachable
+        there (E3 ruling 2).
         """
+        if self._mode != "pick":
+            return
         if not self._visible_params or not self.is_mounted:
             return
-        table = self.query_one("#check_param_table", DataTable)
+        table = self.query_one(f"#{self._ids.table}", DataTable)
         cursor = table.cursor_row
         if not 0 <= cursor < len(self._visible_params):
             return
@@ -804,6 +954,16 @@ class A2LParameterPicker(Vertical):
             >>> picker.picked_params
             ['Alpha', 'Beta']
         """
+        if self._mode != "pick":
+            # Highlight mode exposes the cursor row instead of a picked set
+            # (E3 ruling 2) — nothing may join it or post SelectionChanged.
+            return {
+                "parsed_unique": 0,
+                "included": 0,
+                "already_included": 0,
+                "not_found": 0,
+                "first_missing": None,
+            }
         source = self._param_rows
         picked_now = set(self._picked_params)
         included: list = []
@@ -850,7 +1010,7 @@ class A2LParameterPicker(Vertical):
         fresh = set(included)
         if not any(name in fresh for name in self._visible_params):
             return
-        table = self.query_one("#check_param_table", DataTable)
+        table = self.query_one(f"#{self._ids.table}", DataTable)
         layout = self._layout()
         for index, name in enumerate(self._visible_params):
             if name in fresh:

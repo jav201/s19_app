@@ -6942,6 +6942,27 @@ class S19TuiApp(App):
         ]
         panel.set_a2l_parameters(measurable, self._a2l_enriched_key)
 
+    def _prefill_patch_editor(self) -> None:
+        """Populate the Patch Editor's A2L picker on screen entry
+        (batch-102 Inc 5, R-B102-PE-001, R-B102-PE-005).
+
+        Hands the loaded A2L's measurable parameters to the picker's
+        highlight-mode ledger with the safe Inc-2 ``_a2l_enriched_key``
+        signature: re-entering the screen with the same A2L and image is a
+        no-op that preserves the filter, the page and the highlight
+        (R-B102-PE-005). A not-yet-mounted panel (headless unit path) is
+        tolerated as a no-op, matching ``_prefill_check_editor``.
+        """
+        try:
+            panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+        except Exception:
+            return
+        tags = self._compute_a2l_enriched_tags()
+        measurable = [
+            tag for tag in tags if isinstance(tag.get("address"), int)
+        ]
+        panel.set_a2l_parameters(measurable, self._a2l_enriched_key)
+
     def _check_items_to_document(
         self, items: Sequence[dict]
     ) -> tuple[ChangeDocument, int]:
@@ -9236,6 +9257,10 @@ class S19TuiApp(App):
             self._prefill_diff_check_files()
         elif screen_key == "patch":
             self._prefill_patch_change_files()
+            # batch-102 Inc 5 (R-B102-PE-001): the A2L picker populates on
+            # entry — the ``_prefill_check_editor`` idiom; the signature
+            # keeps the filter/page/highlight across re-entries.
+            self._prefill_patch_editor()
         elif screen_key == "check_editor":
             # batch-94 (LLR-001.2): the collector is populated on entry — the
             # suffix-distinguished spec dropdown from the folder scan, and the
@@ -16889,6 +16914,19 @@ class S19TuiApp(App):
             # enrichment key unreachable and whose cache clear empties
             # the tag rows the render below repaints.
             self._replace_current_a2l(None, None)
+        if kind in ("primary", "all"):
+            # batch-102 Inc 5 (E3 ruling 4): dropping the primary image
+            # drops the memory map the Patch panel retained — push ``None``
+            # so the before/after strip and the A2L tab's ``Use parameter``
+            # read "no image" instead of the unloaded image's stale bytes.
+            try:
+                panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+            except Exception:
+                # App not mounted (headless unit path) — the same tolerance
+                # the load install tail documents.
+                pass
+            else:
+                panel.set_image_mem_map(None)
         # Mirror the load-path install: the MAC cache is keyed on the previous
         # records, and the empty-state panels key on `current_file is None`.
         self._invalidate_mac_view_cache()

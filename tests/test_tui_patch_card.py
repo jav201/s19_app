@@ -412,6 +412,7 @@ _BUTTON_HOMES = (
     "patch_pane_inspector",
     "patch_win_json",
     "patch_win_checks",
+    "patch_win_a2l",
     "patch_doc_file_row",
     "patch_doc_controls",
 )

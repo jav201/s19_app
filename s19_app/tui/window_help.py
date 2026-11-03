@@ -71,14 +71,20 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
         "steps": (
             "Edit a change-set: the PATCH SCRIPT ledger on the left lists its "
             "entries; the inspector on the right shows the highlighted entry "
-            "and holds the Inspector, JSON and Checks tabs. Load an S19/HEX "
-            "image first (`^L`) to see the bytes an entry replaces.",
+            "and holds the Inspector, JSON, Checks and A2L tabs. Load an "
+            "S19/HEX image first (`^L`) to see the bytes an entry replaces.",
             "Inspector — shows the highlighted entry's BEFORE → AFTER bytes, "
             "the entry form and the DOCUMENT tally.",
             "JSON — shows the loaded document as read-only JSON under its "
             "stamp, and the editable paste buffer.",
             "Checks — shows the declaration faults and the check results, "
             "with Run checks.",
+            "A2L — lists the loaded A2L's measurable parameters (filter, "
+            "one 200-row page at a time); the highlighted row's full name "
+            "and address sit under the ledger.",
+            "Use parameter — on the A2L tab, copies the highlighted "
+            "parameter's address and the loaded image's current bytes into "
+            "the entry form; the document changes only through Add or Edit.",
             "Address — the entry's start address, `0x…` hex.",
             "String — a text value, written in the document's encoding.",
             "Bytes — every token is a hex byte (1–2 digits, `0x` optional); "

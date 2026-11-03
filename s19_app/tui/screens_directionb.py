@@ -89,6 +89,7 @@ from textual.widgets import (
     TextArea,
 )
 
+from .a2l import MAX_A2L_DECODE_BYTES
 from .a2l_parameter_picker import (
     A2LParameterPicker,
     IncludeTable,
@@ -4446,11 +4447,14 @@ class PatchEditorPanel(ScrollableContainer):
     #: The Checks tab's state line before any run (LLR-148.9).
     CHECKS_NO_RUN_TEXT = "No check run yet: press Run checks."
 
-    #: The inspector's three tabs: (chip id, label, pane id, border title).
+    #: The inspector's four tabs: (chip id, label, pane id, border title).
+    #: The A2L tab (batch-102 Inc 5, US-102-05) embeds the shared parameter
+    #: picker in highlight mode beside the Check Editor's pick-mode one.
     _TABS = (
         ("patch_tab_inspector", "Inspector", "patch_pane_inspector", "INSPECTOR"),
         ("patch_tab_json", "JSON", "patch_win_json", "JSON"),
         ("patch_tab_checks", "Checks", "patch_win_checks", "CHECKS"),
+        ("patch_tab_a2l", "A2L", "patch_win_a2l", "A2L"),
     )
 
 
@@ -4804,6 +4808,27 @@ class PatchEditorPanel(ScrollableContainer):
 
     def __init__(self) -> None:
         super().__init__(id="patch_editor_panel")
+        #: The A2L parameter picker (batch-102 Inc 5, US-102-05): the shared
+        #: selector in highlight mode, namespaced ``patch_param_*`` so it
+        #: mounts beside the Check Editor's ``check_param_*`` picker without
+        #: duplicate ids (R-B102-PE-002). The panel stays the host: it
+        #: injects the A2L tab's width derivation as ``layout_provider``
+        #: (a one-way call — the provider reads cached scalars, never picker
+        #: entry points) and transfers the highlighted row into the entry
+        #: form on ``Use parameter`` (R-B102-PE-003).
+        self._a2l_picker = A2LParameterPicker(
+            id_prefix="patch_param",
+            mode="highlight",
+            show_include_button=False,
+            show_bulk_button=False,
+            layout_provider=self._a2l_widths,
+        )
+        #: The last derived A2L-tab widths; ``None`` until the tab is measured.
+        self._a2l_layout: Optional[CheckLayout] = None
+        #: The last ``Use parameter`` outcome line painted on
+        #: ``#patch_param_use_status`` (the single status surface, E3
+        #: ruling 7); empty until the first use.
+        self._a2l_use_status: str = ""
         #: The execution scope the selector currently shows (LLR-006.6) —
         #: cycled by ``#patch_execute_scope_button``; carried on the
         #: ``execute_scope`` ``ActionRequested``.
@@ -4904,14 +4929,15 @@ class PatchEditorPanel(ScrollableContainer):
         Summary:
             The batch-97 composition (design §3, Patch Editor tree): an
             identity ribbon; the full-height PATCH SCRIPT ledger (``3fr``)
-            beside the inspector (``2fr``) whose Inspector / JSON / Checks tab
-            chips switch one ``ContentSwitcher``; then the file row, the
-            document controls and the glyph legend, one terminal row each.
-            Every shipped id is kept (LLR-144.1) and each ``patch_win_*`` /
-            ``patch_saveback_row`` / ``patch_before_after_row`` /
-            ``patch_checks_results`` id keeps its ``Container`` type. Geometry
-            lives in ``styles.tcss`` (one scoped section, D23); Python sizes
-            only the ledger columns and the strip's bytes per row (D21).
+            beside the inspector (``2fr``) whose Inspector / JSON / Checks /
+            A2L tab chips switch one ``ContentSwitcher``; then the file row,
+            the document controls and the glyph legend, one terminal row
+            each. Every shipped id is kept (LLR-144.1) and each
+            ``patch_win_*`` / ``patch_saveback_row`` /
+            ``patch_before_after_row`` / ``patch_checks_results`` id keeps
+            its ``Container`` type. Geometry lives in ``styles.tcss`` (one
+            scoped section, D23); Python sizes only the ledger columns and
+            the strip's bytes per row (D21).
 
         Returns:
             ComposeResult: The widget tree.
@@ -5180,6 +5206,29 @@ class PatchEditorPanel(ScrollableContainer):
                                 id="patch_checks_help",
                                 classes="patch-field-label",
                             )
+                    # batch-102 Inc 5 (US-102-05): the A2L tab hosts the shared
+                    # picker in highlight mode; ``Use parameter`` transfers the
+                    # highlighted row into the entry form without touching the
+                    # document (R-B102-PE-003).
+                    with Container(id="patch_win_a2l"):
+                        yield self._a2l_picker
+                        with Horizontal(
+                            id="patch_param_use_row",
+                            classes="patch-docked-row patch-chip-entry",
+                        ):
+                            yield Button(
+                                "Use parameter",
+                                id="patch_param_use_button",
+                                classes="patch-chip",
+                            )
+                        use_status = Static(
+                            "",
+                            id="patch_param_use_status",
+                            classes="patch-field-label",
+                            markup=False,
+                        )
+                        use_status.display = False
+                        yield use_status
         with Horizontal(id="patch_doc_file_row", classes="patch-docked-row"):
             yield Label("File", classes="pe-label")
             with Horizontal(id="patch_doc_file_line1"):
@@ -5316,6 +5365,176 @@ class PatchEditorPanel(ScrollableContainer):
         )
 
     # ------------------------------------------------------------------
+    # A2L tab (batch-102 Inc 5, US-102-05 — the shared picker in highlight mode)
+    # ------------------------------------------------------------------
+
+    def set_a2l_parameters(
+        self, rows: Sequence[dict], signature: object = None
+    ) -> None:
+        """Populate the A2L picker (R-B102-PE-001, R-B102-PE-005).
+
+        Delegates rows and the app's safe ``_a2l_enriched_key`` signature to
+        the embedded picker: it mounts at most one 200-row page and preserves
+        the filter, the page and the highlight while the signature is
+        unchanged, in which case this shim returns without touching the
+        layout. On a real (re)population the cached ``Fmt · Unit`` width may
+        change, so the derived widths are invalidated and re-derived on the
+        next layout pass.
+        """
+        if not self._a2l_picker.set_parameters(rows, signature):
+            return
+        self._a2l_layout = None
+        self.call_after_refresh(self._apply_a2l_layout)
+
+    def set_image_mem_map(self, mem_map: Optional[Mapping[int, int]]) -> None:
+        """Replace the retained image map (batch-102 Inc 5, E3 ruling 4).
+
+        The app pushes ``None`` here when the primary image is unloaded, so
+        a later ``Use parameter`` seeds Bytes from no map and paints the
+        ``image bytes unavailable`` line instead of the unloaded image's
+        stale bytes. Tolerates a not-yet-mounted tree (headless unit path).
+        """
+        self._mem_map = mem_map
+
+    def _a2l_widths(self) -> "CheckLayout":
+        """The A2L tab's current layout, or the pre-measure reading of the
+        118-column regime before the tab is first measured (E3 ruling 1:
+        never the picker's built-in 118-column default — this derivation
+        follows the Patch inspector's real width)."""
+        if self._a2l_layout is not None:
+            return self._a2l_layout
+        return check_layout(39, 41, self._a2l_fmt_longest())
+
+    def _a2l_fmt_longest(self) -> int:
+        """The cached longest ``Fmt · Unit`` cell (recomputed per population)."""
+        return self._a2l_picker.fmt_longest
+
+    def _apply_a2l_layout(self) -> None:
+        """Re-derive the A2L tab widths and repaint the picker's ledger.
+
+        Reads the measured content width of ``#patch_param_table`` (the
+        picker's ledger fills the A2L pane inside the inspector — never the
+        terminal width). A hidden tab measures 0 and repaints nothing; the
+        cache is kept, so showing the tab re-derives nothing it already
+        knows. An unchanged layout repaints nothing. Otherwise it sets each
+        column's width and rewrites the Parameter and ``Fmt · Unit`` cells
+        with ``update_cell`` (the public repaint path, D21/PC-8); it never
+        adds a column. The ledger rows themselves belong to the picker.
+        """
+        table = self.query_one("#patch_param_table", DataTable)
+        if table.content_region.width == 0:
+            return
+        layout = check_layout(
+            table.content_region.width,
+            self.query_one("#patch_inspector").content_region.width,
+            self._a2l_fmt_longest(),
+        )
+        if layout == self._a2l_layout:
+            return
+        self._a2l_layout = layout
+        columns = table.ordered_columns
+        for column, width in zip(columns, (1, layout.param, 10, layout.fmt)):
+            column.width = width
+            column.auto_width = False
+        columns[3].label = Text(layout.fmt_label)
+        keys = [column.key for column in columns]
+        if not self._a2l_picker.visible_params:
+            # D21 (5): with no rows the pass is ``clear()`` (rows only).
+            table.clear()
+        for index, name in enumerate(self._a2l_picker.visible_params):
+            cells = self._a2l_picker.row_cells(name, layout)
+            table.update_cell(name, keys[1], cells[1], update_width=(index == 0))
+            table.update_cell(name, keys[3], cells[3])
+        self._a2l_picker.refresh_full_name()
+
+    def _use_highlighted_parameter(self) -> None:
+        """Transfer the highlighted A2L row into the entry form
+        (R-B102-PE-003, R-B102-PE-004; E3 rulings 4/5/6/9).
+
+        Reads the picker's ``highlighted_parameter``: with no usable row (or
+        a non-integer address, E3 ruling 9) it paints ``No parameter
+        highlighted.`` and touches nothing else. Otherwise it writes the
+        Address input as ``0x%08X`` and the Bytes input with the panel-
+        retained current image bytes for the parameter size — every byte of
+        ``[address, address + size)`` must be mapped, and the size must not
+        exceed ``MAX_A2L_DECODE_BYTES`` (E3 ruling 5: no giant range is
+        iterated, no silent truncation); on either miss Bytes is left empty
+        and ``Parameter address loaded; image bytes unavailable.`` paints.
+        No document action is posted and the dirty state is unchanged — the
+        document changes only through Add / Edit. Every painted line is an
+        author-fixed string through ``safe_text`` (E3 ruling 7); no parameter
+        name, image byte or path is logged (E3 ruling 10).
+        """
+        parameter = self._a2l_picker.highlighted_parameter
+        address = parameter.get("address") if parameter else None
+        if parameter is None or not isinstance(address, int) or address < 0:
+            self._paint_a2l_use_status("No parameter highlighted.")
+            return
+        size = int(parameter.get("size") or 1)
+        self.query_one("#patch_entry_address_input", Input).value = (
+            f"0x{address:08X}"
+        )
+        bytes_text = ""
+        status = ""
+        if size > MAX_A2L_DECODE_BYTES:
+            status = (
+                f"Parameter size {size} bytes over the "
+                f"{MAX_A2L_DECODE_BYTES}-byte decode cap — Bytes not prefilled."
+            )
+        else:
+            mem_map = self._mem_map
+            data: Optional[List[int]] = []
+            if mem_map is not None:
+                for offset in range(size):
+                    byte = mem_map.get(address + offset)
+                    if byte is None:
+                        # Partial map: any missing byte means unavailable —
+                        # zero-fill is prohibited (E3 ruling 6).
+                        data = None
+                        break
+                    data.append(int(byte))
+            if mem_map is None or data is None:
+                status = "Parameter address loaded; image bytes unavailable."
+            else:
+                bytes_text = " ".join(f"{byte:02X}" for byte in data)
+        self.query_one("#patch_entry_bytes_input", Input).value = bytes_text
+        if status:
+            self._paint_a2l_use_status(status)
+        else:
+            self._clear_a2l_use_status()
+
+    def _paint_a2l_use_status(self, line: str) -> None:
+        """Paint one author-fixed outcome line on the A2L tab's single status
+        surface ``#patch_param_use_status`` (E3 ruling 7), tolerating a
+        not-yet-mounted tree."""
+        self._a2l_use_status = line
+        holders = self.query("#patch_param_use_status")
+        if not holders:
+            return
+        holder = holders.first(Static)
+        holder.update(safe_text(line))
+        holder.display = True
+
+    def _clear_a2l_use_status(self) -> None:
+        """Hide the use-status surface (a fully successful use paints no line)."""
+        self._a2l_use_status = ""
+        holders = self.query("#patch_param_use_status")
+        if holders:
+            holders.first(Static).display = False
+
+    def _on_a2l_parameter_picker_view_changed(
+        self, event: A2LParameterPicker.ViewChanged
+    ) -> None:
+        """The A2L ledger re-rendered (populate, filter, page turn):
+        re-assert the host's use-status surface and re-derive the tab widths
+        (the measured table width exists only while the tab is shown). The
+        document rows and the entry inputs are never touched here
+        (R-B102-PE-005, R-B102-PE-006)."""
+        self._apply_a2l_layout()
+        if self._a2l_use_status:
+            self._paint_a2l_use_status(self._a2l_use_status)
+
+    # ------------------------------------------------------------------
     # Width derivation (D21: mount, resize, show)
     # ------------------------------------------------------------------
 
@@ -5380,6 +5599,8 @@ class PatchEditorPanel(ScrollableContainer):
                 )
         self._render_before_after_card()
         self._refresh_ribbon()
+        # batch-102 Inc 5: the A2L tab's ledger follows the same D21 pass.
+        self._apply_a2l_layout()
 
     def on_resize(self, event: events.Resize) -> None:
         self.call_after_refresh(self._apply_layout)
@@ -5417,6 +5638,10 @@ class PatchEditorPanel(ScrollableContainer):
             if selected:
                 self.query_one("#patch_tab_switcher", ContentSwitcher).current = pane
                 self.query_one("#patch_inspector").border_title = title
+                if pane == "patch_win_a2l":
+                    # The A2L ledger measures only while its tab is shown
+                    # (batch-102 Inc 5, E3 ruling 1).
+                    self.call_after_refresh(self._apply_a2l_layout)
         self._refresh_inspector_subtitle()
 
     def _refresh_ribbon(self) -> None:
@@ -5689,6 +5914,12 @@ class PatchEditorPanel(ScrollableContainer):
         if any(button_id == tab[0] for tab in self._TABS):
             event.stop()
             self._show_tab(button_id)
+            return
+        if button_id == "patch_param_use_button":
+            # batch-102 Inc 5 (R-B102-PE-003): transfer the highlighted A2L
+            # row into the entry form — the document is not touched.
+            event.stop()
+            self._use_highlighted_parameter()
             return
         if button_id == "patch_saveback_width_button":
             # Selector state only — cycle the save-back record width and

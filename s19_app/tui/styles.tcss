@@ -3021,11 +3021,80 @@ ModalScreen {
 /* The JSON tab: LOADED DOCUMENT (read-only) over the PASTE BUFFER, then the
  * paste, history and execute rows; the two text areas share the height. */
 #patch_editor_panel #patch_win_json,
-#patch_editor_panel #patch_win_checks {
+#patch_editor_panel #patch_win_checks,
+#patch_editor_panel #patch_win_a2l {
     height: 100%;
     layout: vertical;
     /* Below the range (LLR-149.6) the tab's rows outgrow it: it scrolls. */
     overflow-y: auto;
+}
+
+/* --- Patch A2L tab (batch-102 Inc 5, US-102-05 / R-B102-PE-001..006) ---
+ * The shared picker mounts inside the inspector with patch_param_* ids; the
+ * grammar mirrors the Check Editor's picker (filter, ledger, full-name and
+ * count lines, page chips), scoped to the patch panel. */
+#patch_editor_panel #patch_win_a2l .ce-row {
+    layout: horizontal;
+    height: 1;
+    padding: 0;
+}
+
+#patch_editor_panel #patch_win_a2l .ce-label {
+    width: auto;
+    height: 1;
+    padding: 0 1 0 0;
+    color: #969aad;                   /* insight_style.DGRAY */
+}
+
+#patch_editor_panel #patch_param_filter {
+    width: 1fr;
+}
+
+#patch_editor_panel #patch_param_table {
+    height: 1fr;
+    scrollbar-gutter: stable;
+    scrollbar-size-vertical: 1;
+}
+
+#patch_editor_panel #patch_param_full_name_line,
+#patch_editor_panel #patch_param_status,
+#patch_editor_panel #patch_param_use_status {
+    height: 1;
+    padding: 0 1;
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
+}
+
+#patch_editor_panel #patch_param_status,
+#patch_editor_panel #patch_param_use_status {
+    color: #969aad;                   /* insight_style.DGRAY */
+}
+
+#patch_editor_panel #patch_param_use_status {
+    width: 1fr;
+    min-width: 1;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+#patch_editor_panel #patch_param_use_row {
+    width: 1fr;
+    overflow: hidden;
+}
+
+#patch_editor_panel #patch_param_page_label {
+    width: auto;
+    height: 1;
+    padding: 0 1;
+    margin-right: 1;
+    color: #969aad;                   /* insight_style.DGRAY */
+}
+
+#patch_editor_panel #patch_param_controls,
+#patch_editor_panel #patch_param_use_row {
+    layout: horizontal;
+    height: 1;
+    padding: 0;
 }
 
 #patch_editor_panel #patch_json_view,
