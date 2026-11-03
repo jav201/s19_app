@@ -7,3 +7,5 @@
 2026-11-03T11:05:00-06:00 E3 round 2 — PASS-WITH-NOTES both; minor findings routed to E4 addenda in design/E3-rulings-inc1-inc2.md
 2026-11-03T11:10:00-06:00 E4 start — separate tester and implementer worktrees for inc-1 and inc-2 from cb51fc8
 2026-11-03T11:35:00-06:00 E4 integrated inc-1/inc-2 — RED transcripts copied; targeted GREEN 145 passed (evidence/green-targeted.txt); operator added Flow Builder scope as Inc 6/7
+2026-11-03T12:20:00-06:00 E1-E2 inc-3 complete — picker requirements, tests, prototype, Code-Wire graph lint clean (8 nodes)
+2026-11-03T12:40:00-06:00 E3 inc-3 — PASS-WITH-NOTES architect/security; mandatory rulings written to design/E3-rulings-inc3.md
