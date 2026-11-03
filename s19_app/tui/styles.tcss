@@ -2595,6 +2595,7 @@ ModalScreen {
 #check_legend,
 #check_status,
 #check_apply_hint,
+#check_param_status,
 #check_editor_panel .ce-hint {
     text-wrap: nowrap;
     text-overflow: ellipsis;
@@ -2603,6 +2604,26 @@ ModalScreen {
 #check_full_name_line {
     height: 1;
     padding: 0 1;
+}
+
+/* The picker's separate count line (batch-102 Inc 3, R-B102-SEL-002):
+ * ``<shown> of <total> shown`` (+ `` — refine filter.`` when a filter is
+ * active and its result exceeds one page). Dim secondary information; hidden
+ * in the two empty states, where #check_full_name_line carries the message
+ * (R-B102-SEL-006). */
+#check_param_status {
+    height: 1;
+    padding: 0 1;
+    color: #969aad;                   /* insight_style.DGRAY */
+}
+
+/* The pagination chip pair's page read-out, one row beside Prev/Next. */
+#check_param_page_label {
+    width: auto;
+    height: 1;
+    padding: 0 1;
+    margin-right: 1;
+    color: #969aad;                   /* insight_style.DGRAY */
 }
 
 #check_param_controls,

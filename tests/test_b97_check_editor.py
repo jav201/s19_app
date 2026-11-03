@@ -154,6 +154,18 @@ async def click_if(pilot, panel, selector: str) -> None:
         await settle(pilot, 2)
 
 
+async def _settled_delay(pilot, predicate, description: str, attempts: int = 120, delay: float = 0.02) -> None:
+    """Bounded REAL-delay pump-until (batch-102 Inc 3, E3 ruling 7): the shared
+    picker's 150 ms filter debounce elapses on the wall clock, so each round
+    carries a real delay; on the synchronous base tree the predicate already
+    holds at round one and no time passes."""
+    for _ in range(attempts):
+        await pilot.pause(delay)
+        if predicate():
+            return
+    raise AssertionError(f"did not settle: {description}")
+
+
 # --------------------------------------------------------------------------- #
 # TC-B97-08 — LLR-145.1
 # --------------------------------------------------------------------------- #
@@ -161,7 +173,8 @@ async def click_if(pilot, panel, selector: str) -> None:
 
 @pytest.mark.parametrize("size", [(118, 54), (118, 53)])
 def test_tc_b97_08_census_rows_and_one_docked_row(tmp_path: Path, size) -> None:
-    """TC-B97-08 (LLR-145.1): the 31 shipped ids stay, the ledger holds the 75
+    """TC-B97-08 (LLR-145.1): the 35 shipped ids stay (31 of 9c7beaf plus the
+    four batch-102 Inc 3 picker ids, E3 ruling 6), the ledger holds the 75
     A2L rows, and Validate, Write, the APPLY ghost and the field count share
     ONE row inside the panel; no apply action exists. The 118x53 arm is the
     body height 118x54 keeps once the two-row key bar lands (PC-24).
@@ -180,7 +193,7 @@ def test_tc_b97_08_census_rows_and_one_docked_row(tmp_path: Path, size) -> None:
         )
 
     ids, rows, docked, panel_region, applies = run(tmp_path, size, body)
-    assert len(CE_IDS_9C7BEAF) == 31
+    assert len(CE_IDS_9C7BEAF) == 35
     assert CE_IDS_9C7BEAF - ids == set(), sorted(CE_IDS_9C7BEAF - ids)
     assert rows == 75
     assert len({r.y for r in docked.values()}) == 1, {i: r.y for i, r in docked.items()}
@@ -694,6 +707,11 @@ GROUPS_BY_TAB = {
     "check_tab_json": ("check_pane_json",),
     "check_tab_addendum": ("check_pane_addendum",),
 }
+#: The batch-102 Inc 3 pagination controls (E3 ruling 6). With the 75-parameter
+#: demo A2L the ledger fits one page, so both ship DISABLED and stay out of the
+#: focus chain (R-B102-SEL-005: previous disabled on the first page, next on
+#: the last) — the order check counts them, the membership check excepts them.
+PAGE_GROUP = ("check_param_page_prev_button", "check_param_page_next_button")
 
 
 def _groups(tab: str) -> list:
@@ -702,6 +720,7 @@ def _groups(tab: str) -> list:
         ("check_param_filter",),
         ("check_param_table",),
         ("check_param_include_button",),
+        PAGE_GROUP,
         tuple(c for c, _p in TABS),
         GROUPS_BY_TAB[tab],
         ("check_spec_file_select", "check_file_name_input"),
@@ -735,7 +754,10 @@ def test_tc_b97_45_keyboard_order_enter_space_and_chip_states(tmp_path: Path) ->
     ``enter`` acts on one member of each button group; ``space`` on a
     highlighted ledger row includes it (N+1) and again excludes it (N); a
     focused chip paints differently from an unfocused one and a tab chip's
-    unfocused, focused and selected styles are pairwise distinct.
+    unfocused, focused and selected styles are pairwise distinct. The
+    batch-102 Inc 3 pagination controls ship in the chain's slot after
+    Include; with the one-page demo ledger both are disabled and out of the
+    chain (R-B102-SEL-005).
 
     RED on main (P-33, P-43): no header chip and no tab chip in the chain;
     ``DataTable`` binds no ``space``. Mutation: ``can_focus = False`` on a
@@ -820,13 +842,29 @@ def test_tc_b97_45_keyboard_order_enter_space_and_chip_states(tmp_path: Path) ->
             json_chip.focus()
             await settle(pilot, 2)
             states["check_tab_json"].append(chip_style(app, json_chip))
-        return report, enters, spaces, states
+        # batch-102 Inc 3 (R-B102-SEL-005): with the one-page demo ledger both
+        # pagination controls ship disabled and out of the focus chain. Absent
+        # on the pre-integration tree, so the clause is conditional (PC-11).
+        page_state = None
+        if panel.query("#check_param_page_prev_button"):
+            chain_ids = {w.id for w in app.screen.focus_chain}
+            page_state = (
+                panel.query_one("#check_param_page_prev_button", Button).disabled,
+                panel.query_one("#check_param_page_next_button", Button).disabled,
+                sorted(chain_ids & set(PAGE_GROUP)),
+            )
+        return report, enters, spaces, states, page_state
 
-    report, enters, spaces, states = run(tmp_path, (118, 54), body)
+    report, enters, spaces, states, page_state = run(tmp_path, (118, 54), body)
     for tab, (seq, members) in report["order"].items():
-        assert all(n >= 1 for n in members), (tab, members)
+        for group, n in zip(_groups(tab), members):
+            if set(group) == set(PAGE_GROUP):
+                continue  # disabled on the one-page demo ledger: 0 members by design
+            assert n >= 1, (tab, group, members)
         assert seq == sorted(seq), (tab, seq)
         assert report["missing"][tab] == [], (tab, report["missing"][tab])
+    if page_state is not None:
+        assert page_state == (True, True, []), page_state
     assert enters["include"].startswith("1 field "), enters
     assert enters["tab"] == "check_pane_json", enters
     assert enters["add"] == 1, enters
@@ -912,7 +950,12 @@ def test_tc_b97_46_one_filled_element(tmp_path: Path) -> None:
 # --------------------------------------------------------------------------- #
 
 HOMES = {
-    "check_left_column": (("check_param_filter", "check_param_table", "check_param_include_button"), (), None),
+    "check_left_column": (
+        ("check_param_filter", "check_param_table", "check_param_include_button",
+         "check_param_page_prev_button", "check_param_page_next_button"),
+        ("check_param_status", "check_param_page_label"),
+        None,
+    ),
     "check_pane_fields": (
         ("check_mem_table", "check_mem_address_input", "check_mem_label_input",
          "check_mem_size_input", "check_mem_add_button", "check_mem_remove_button"),
@@ -930,9 +973,10 @@ HOMES = {
 def test_tc_b97_61_every_control_displayed_in_its_home(tmp_path: Path, size) -> None:
     """TC-B97-61 (LLR-145.10): per tab state each control and read-out of the
     table is displayed inside its home when its condition holds, every
-    displayed control is in the focus chain (15 controls, 6 read-outs), every
-    control-typed shipped id but the toggle is in the table (13), and
-    ``#check_preview_toggle_button`` is mounted and not displayed.
+    displayed, enabled control is in the focus chain (17 controls counting the
+    two disabled page controls, 8 read-outs), every control-typed shipped id
+    but the toggle is in the table (15), and ``#check_preview_toggle_button``
+    is mounted and not displayed.
 
     RED on main: the toggle is displayed. Mutation: a control left under a
     hidden pane; a shipped control dropped from the table.
@@ -971,7 +1015,10 @@ def test_tc_b97_61_every_control_displayed_in_its_home(tmp_path: Path, size) -> 
                         problems.append((chip_id, home_id, wid, w.region, home.region))
                     if wid in controls:
                         seen_controls.add(wid)
-                        if wid not in chain:
+                        # batch-102 Inc 3: a disabled control is out of the
+                        # focus chain by design (the one-page demo ledger
+                        # disables both pagination controls).
+                        if not w.disabled and wid not in chain:
                             problems.append((chip_id, wid, "not in focus chain"))
                     else:
                         seen_readouts.add(wid)
@@ -980,10 +1027,10 @@ def test_tc_b97_61_every_control_displayed_in_its_home(tmp_path: Path, size) -> 
     toggle_displayed, typed, controls, readouts, problems = run(tmp_path, size, body)
     assert toggle_displayed is False, "the addendum toggle is mounted, not displayed"
     assert problems == [], problems[:5]
-    assert len(controls) == 15 and len(readouts) == 6, (len(controls), len(readouts))
+    assert len(controls) == 17 and len(readouts) == 8, (len(controls), len(readouts))
     column = {c for home in HOMES.values() for c in home[0]}
     shipped = typed - {"check_preview_toggle_button"}
-    assert len(shipped) == 13 and shipped <= column, sorted(shipped - column)
+    assert len(shipped) == 15 and shipped <= column, sorted(shipped - column)
 
 
 # --------------------------------------------------------------------------- #
@@ -1064,6 +1111,8 @@ def test_at_b97_05_hostile_parameter_reads_literally(tmp_path: Path) -> None:
     markup error, no styled span from the payload, no control character.
 
     RED: the mutation renders the ledger cell with ``Text.from_markup``.
+    The filter wait is a real-delay pump-until (batch-102 Inc 3 debounce,
+    E3 ruling 7); on the synchronous base tree it returns at round one.
     """
 
     async def body(app, pilot, panel):
@@ -1071,7 +1120,11 @@ def test_at_b97_05_hostile_parameter_reads_literally(tmp_path: Path) -> None:
         await settle(pilot, 4)
         await _focus_by_tab(app, pilot, "check_param_filter")
         await pilot.press(*"b97")
-        await settle(pilot, 3)
+        await _settled_delay(
+            pilot,
+            lambda: panel._visible_params == [HOSTILE_CONTENT],
+            "the filter isolates the hostile parameter",
+        )
         await pilot.click("#check_param_include_button")
         await settle(pilot, 3)
         out = {
@@ -1097,7 +1150,8 @@ def test_at_b97_18_first_task_from_the_keyboard(tmp_path: Path) -> None:
     ledger, ``down``, ``space`` includes the row (its Fields line appears), tab
     to Write, ``enter`` — and the written ``.chk.json`` parses to that address.
 
-    RED on main (P-43): ``space`` does nothing on the ledger.
+    RED on main (P-43): ``space`` does nothing on the ledger. The filter wait
+    is a real-delay pump-until (batch-102 Inc 3 debounce, E3 ruling 7).
     """
 
     async def body(app, pilot, panel):
@@ -1105,7 +1159,11 @@ def test_at_b97_18_first_task_from_the_keyboard(tmp_path: Path) -> None:
         await settle(pilot, 4)
         assert await _focus_by_tab(app, pilot, "check_param_filter")
         await pilot.press(*"UWORD.IDENTICAL")
-        await settle(pilot, 3)
+        await _settled_delay(
+            pilot,
+            lambda: len(panel._visible_params) == 7,
+            "the filter narrows the ledger to the seven UWORD.IDENTICAL parameters",
+        )
         assert await _focus_by_tab(app, pilot, "check_param_table")
         await pilot.press("down")
         await settle(pilot, 2)
@@ -1135,7 +1193,9 @@ def test_at_b97_21_six_shared_address_fields_and_the_written_file(tmp_path: Path
     included fields with six distinct names, the JSON tab holds the written
     file's addresses, and the Addendum tab shows its preview.
 
-    RED on main: no Fields tab; the JSON preview is not a JSON document.
+    RED on main: no Fields tab; the JSON preview is not a JSON document. The
+    filter waits are real-delay pump-untils (batch-102 Inc 3 debounce, E3
+    ruling 7); on the synchronous base tree they return at round one.
     """
 
     async def body(app, pilot, panel):
@@ -1144,13 +1204,21 @@ def test_at_b97_21_six_shared_address_fields_and_the_written_file(tmp_path: Path
         filt = panel.query_one("#check_param_filter", Input)
         for name in SIX_13A00:
             filt.value = name
-            await settle(pilot, 2)
+            await _settled_delay(
+                pilot,
+                lambda name=name: panel._visible_params == [name],
+                f"the filter isolates {name}",
+            )
             exact = [i for i, n in enumerate(panel._visible_params) if n == name]
             panel.query_one("#check_param_table", DataTable).move_cursor(row=exact[0])
             await pilot.click("#check_param_include_button")
             await settle(pilot, 2)
         filt.value = ""
-        await settle(pilot, 2)
+        await _settled_delay(
+            pilot,
+            lambda: len(panel._visible_params) == 75,
+            "the cleared filter lists all 75 parameters again",
+        )
         await _add_memory_row(panel, pilot, "0x13A01", "probe", "1")
         await click_if(pilot, panel, "#check_tab_fields")
         lines = fields_lines(app, panel)

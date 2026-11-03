@@ -6924,8 +6924,12 @@ class S19TuiApp(App):
         Summary:
             Hand the suffix-distinguished patches-folder listing to the
             spec dropdown and the loaded A2L's measurable parameters to the
-            picker. A not-yet-mounted panel (headless unit path) is
-            tolerated as a no-op, matching ``_prefill_patch_change_files``.
+            picker. The picker signature is the safe Inc-2
+            ``_a2l_enriched_key``: re-entering the screen with the same A2L
+            and image is a no-op that preserves the filter, the page and the
+            picks (R-B102-SEL-004). A not-yet-mounted panel (headless unit
+            path) is tolerated as a no-op, matching
+            ``_prefill_patch_change_files``.
         """
         try:
             panel = self.query_one("#check_editor_panel", CheckEditorPanel)
@@ -6936,7 +6940,7 @@ class S19TuiApp(App):
         measurable = [
             tag for tag in tags if isinstance(tag.get("address"), int)
         ]
-        panel.set_a2l_parameters(measurable)
+        panel.set_a2l_parameters(measurable, self._a2l_enriched_key)
 
     def _check_items_to_document(
         self, items: Sequence[dict]

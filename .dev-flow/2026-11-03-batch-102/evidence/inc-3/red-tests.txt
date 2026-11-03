@@ -1,0 +1,617 @@
+RED evidence — batch-102 Inc 3 — shared A2L picker / Check Editor performance (TC-B102-SEL-01..07)
+================================================================================================
+
+Command : python -m pytest tests/test_b102_parameter_picker.py tests/test_b97_check_editor.py -q
+Date    : 2026-11-03 11:08 CSTM (E4 tester run, pre-integration / base tree, HEAD c3f9025)
+Platform: Windows — Python 3.12.7, pytest 8.3.4, textual 8.2.8 (encoding UTF-8)
+Result  : 10 failed, 36 passed in 193.65s — the 10 failures are the expected RED set.
+
+Expected RED (10) — reasons
+---------------------------
+Batch-102 test cases (per 02-test-cases.md notas de ejecución):
+1. test_tc_b102_sel_01_population_mounts_at_most_one_page[10000-200]
+   R-B102-SEL-001 montaje completo: base mounts all 10 000 rows ("expected 200
+   rows for 10000 parameters, got 10000"). The [0-0] and [199-199] arms pass.
+2. test_tc_b102_sel_02_filter_is_debounced_and_reports_truncation
+   R-B102-SEL-002: no shared picker, no 150 ms debounce, no #check_param_status
+   count line ("sdb.A2LParameterPicker: the shared picker ships").
+3. test_tc_b102_sel_03_repeated_includes_touch_only_marks_and_preview
+   R-B102-SEL-003: the shared picker does not ship yet (guard clause).
+4. test_tc_b102_sel_04_reentry_with_same_signature_preserves_state
+   R-B102-SEL-004: base repopulates on every screen entry and clears the picks;
+   the filtered ledger never mounts a 200-row first page ("did not settle: the
+   filter mounts the first page (200 of 250 rows)" — base mounts all 250).
+5. test_tc_b102_sel_05_pagination_boundaries
+   R-B102-SEL-005: the pagination ids do not ship yet (guard clause).
+6. test_tc_b102_sel_05_pagination_controls_fit_at_80x24
+   E3 ruling 6 (verifica 80x24): the status/pagination ids do not ship yet.
+
+Ruling-sanctioned RED on the base tree (E3 ruling 6: "E4 actualiza los
+censos/constantes afectados (CE_IDS_9C7BEAF, TC-B97-45/61)" — the censuses now
+document the target state and flip green with the component):
+7.-8. test_tc_b97_08_census_rows_and_one_docked_row[size0/size1]
+   CE_IDS_9C7BEAF is 35 ids now (31 of 9c7beaf + check_param_status,
+   check_param_page_prev_button, check_param_page_label,
+   check_param_page_next_button); the four picker ids are missing on base.
+9.-10. test_tc_b97_61_every_control_displayed_in_its_home[size0/size1]
+   HOMES extended with the two page controls (controls) and the status/page
+   label (read-outs): NoMatches for e.g. #check_param_page_label on base.
+
+Expected GREEN on base (36) — all hold
+--------------------------------------
+- TC-B102-SEL-01 arms [0-0] and [199-199], TC-B102-SEL-06 (both empty states)
+  and TC-B102-SEL-07 (hostile name literal): pins per the notas, green today.
+- AT-B97-05, AT-B97-18, AT-B97-21 migrated to real-delay pump-until waits
+  (E3 ruling 7, espera real ante el debounce 150 ms): on the synchronous base
+  tree the predicate holds at round one, so they stay green and unchanged in
+  behaviour. (AT-B97-18's wait counts the seven demo names that carry
+  "UWORD.IDENTICAL".)
+- The rest of tests/test_b97_check_editor.py, including TC-B97-45 with the new
+  PAGE_GROUP slot and the disabled-page-controls clause (that clause is
+  conditional — the ids do not exist on base — so TC-B97-45 stays green until
+  the component lands and then pins the one-page disabled state).
+
+Mutant controls honoured (full coverage per 02-test-cases.md): TC-01 full-mount
+loop; TC-02 rebuild-per-keystroke; TC-03 _toggle_highlighted rebuilding the
+ledger; TC-04 unconditional pick clearing; TC-05 unclamped paging / missing
+disables; TC-06 blank-table empty state / inverted messages; TC-07
+markup-built cell.
+
+No s19_app/ source was modified; changes live in tests/ only
+(tests/test_b102_parameter_picker.py new; tests/test_b97_check_editor.py and
+tests/b97_fixtures.py updated). No commits made.
+
+================================================================================================
+Full pytest output follows
+================================================================================================
+
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+..FFFFFF..FF...................FF.............                           [100%]
+================================== FAILURES ===================================
+______ test_tc_b102_sel_01_population_mounts_at_most_one_page[10000-200] ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32172/test_tc_b102_sel_01_population2')
+count = 10000, expected = 200
+
+    @pytest.mark.parametrize("count,expected", [(0, 0), (199, 199), (10000, 200)])
+    def test_tc_b102_sel_01_population_mounts_at_most_one_page(tmp_path: Path, count: int, expected: int) -> None:
+        """TC-B102-SEL-01 (R-B102-SEL-001, full): parameter sets of 0, 199 and
+        10 000 rows mount ``0``, ``199`` and ``200`` ledger rows — never more than
+        one 200-row page per population (E3 ruling: máximo 200 filas).
+    
+        RED on base: the ledger re-adds every filtered row, so the 10 000-row set
+        mounts 10 000 rows. Mutant: restore the full ``_rebuild_ledger`` loop.
+        """
+    
+        async def body(app, pilot, panel):
+            panel.set_a2l_parameters(synthetic_rows(count))
+            await settle(pilot, 2)
+            return table_rows(panel)
+    
+        mounted = run(tmp_path, SIZE, body, a2l=None)
+>       assert mounted == expected, (
+            f"the picker mounts one page: expected {expected} rows for {count} parameters, got {mounted}"
+        )
+E       AssertionError: the picker mounts one page: expected 200 rows for 10000 parameters, got 10000
+E       assert 10000 == 200
+
+tests\test_b102_parameter_picker.py:202: AssertionError
+_______ test_tc_b102_sel_02_filter_is_debounced_and_reports_truncation ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32172/test_tc_b102_sel_02_filter_is_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000220C5A44F20>
+
+    def test_tc_b102_sel_02_filter_is_debounced_and_reports_truncation(tmp_path: Path, monkeypatch) -> None:
+        """TC-B102-SEL-02 (R-B102-SEL-002, full): with 10 000 parameters, one typed
+        burst causes exactly one ledger rebuild (after the 150 ms debounce) and the
+        count line is exactly ``200 of 10000 shown — refine filter.``; a narrow
+        match (<= 200) drops the truncation marker.
+    
+        RED on base: no ``#check_param_status``, no debounce — the synchronous
+        rebuild never paints the count line. Mutant: rebuild per ``Input.Changed``.
+        """
+>       assert picker_class_or_none() is not None, "sdb.A2LParameterPicker: the shared picker ships (R-B102-SEL-002)"
+E       AssertionError: sdb.A2LParameterPicker: the shared picker ships (R-B102-SEL-002)
+E       assert None is not None
+E        +  where None = picker_class_or_none()
+
+tests\test_b102_parameter_picker.py:222: AssertionError
+_____ test_tc_b102_sel_03_repeated_includes_touch_only_marks_and_preview ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32172/test_tc_b102_sel_03_repeated_i0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000220C44BCB00>
+
+    def test_tc_b102_sel_03_repeated_includes_touch_only_marks_and_preview(tmp_path: Path, monkeypatch) -> None:
+        """TC-B102-SEL-03 (R-B102-SEL-003, full): three consecutive toggles on two
+        highlighted rows raise then lower the picked count (0→1→2→1, one duplicate
+        toggle) while the ledger rebuild count stays at zero after mount and the
+        picked-count preview follows each toggle.
+    
+        RED on base: the shared picker does not ship. Mutant: make
+        ``_toggle_highlighted`` call ``_rebuild_ledger``.
+        """
+>       assert picker_class_or_none() is not None, "sdb.A2LParameterPicker: the shared picker ships (R-B102-SEL-003)"
+E       AssertionError: sdb.A2LParameterPicker: the shared picker ships (R-B102-SEL-003)
+E       assert None is not None
+E        +  where None = picker_class_or_none()
+
+tests\test_b102_parameter_picker.py:272: AssertionError
+_______ test_tc_b102_sel_04_reentry_with_same_signature_preserves_state _______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32172/test_tc_b102_sel_04_reentry_wi0')
+
+    def test_tc_b102_sel_04_reentry_with_same_signature_preserves_state(tmp_path: Path) -> None:
+        """TC-B102-SEL-04 (R-B102-SEL-004, full; E3 ruling 9: firma no nula): with
+        the app's own A2L loaded (a real ``_a2l_enriched_key``), the operator
+        filters to two pages, includes two parameters, moves to page 2 and leaves
+        for the workspace and back twice: filter text, page, picked names and the
+        mounted rows are unchanged and the ledger is not repopulated.
+    
+        RED on base: every re-entry calls ``set_a2l_parameters``, which clears the
+        picks and remounts the full ledger (250 rows, unfiltered). Mutant: clear
+        picks in ``set_a2l_parameters`` unconditionally.
+        """
+    
+        async def body(app, pilot, panel):
+            filt = panel.query_one("#check_param_filter", Input)
+            filt.value = "P"
+            await settled_delay(
+                pilot,
+                lambda: table_rows(panel) == PAGE_SIZE,
+                "the filter mounts the first page (200 of 250 rows)",
+            )
+            table = panel.query_one("#check_param_table", DataTable)
+            for row in (0, 1):
+                table.move_cursor(row=row)
+                await settle(pilot, 1)
+                panel.query_one("#check_param_include_button", Button).press()
+                await settle(pilot, 2)
+            need(panel, "#check_param_page_next_button", Button).press()
+            await settled_delay(pilot, lambda: table_rows(panel) == 50, "page 2 (50 rows) mounts")
+            before = (
+                filt.value,
+                page_tuple(panel),
+                table_rows(panel),
+                list(panel._picked_params),
+                list(panel._visible_params),
+            )
+            for _round in range(2):
+                app.action_show_screen("workspace")
+                await settle(pilot, 4)
+                app.action_show_screen("check_editor")
+                await settle(pilot, 4)
+            after = (
+                filt.value,
+                page_tuple(panel),
+                table_rows(panel),
+                list(panel._picked_params),
+                list(panel._visible_params),
+            )
+            return before, after
+    
+        wide = write_wide_a2l(tmp_path)
+>       before, after = run(tmp_path, SIZE, body, a2l=wide)
+
+tests\test_b102_parameter_picker.py:357: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b102_parameter_picker.py:73: in run
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_b102_parameter_picker.py:71: in _drive
+    return await body(app, pilot, panel)
+tests\test_b102_parameter_picker.py:322: in body
+    await settled_delay(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'nocolor', 'focus'})>
+predicate = <function test_tc_b102_sel_04_reentry_with_same_signature_preserves_state.<locals>.body.<locals>.<lambda> at 0x00000220C4E57F60>
+description = 'the filter mounts the first page (200 of 250 rows)'
+attempts = 120, delay = 0.02
+
+    async def settled_delay(pilot, predicate, description: str, attempts: int = 120, delay: float = 0.02) -> None:
+        """Bounded REAL-delay pump-until (E3 ruling 7: espera real ante el debounce).
+    
+        ``pilot.pause()`` alone can elapse less wall time than the 150 ms debounce,
+        so each round carries a real delay; on the synchronous base tree the
+        predicate already holds at round one.
+        """
+        for _ in range(attempts):
+            await pilot.pause(delay)
+            if predicate():
+                return
+>       raise AssertionError(f"did not settle: {description}")
+E       AssertionError: did not settle: the filter mounts the first page (200 of 250 rows)
+
+tests\test_b102_parameter_picker.py:97: AssertionError
+__________________ test_tc_b102_sel_05_pagination_boundaries __________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32172/test_tc_b102_sel_05_pagination0')
+
+    def test_tc_b102_sel_05_pagination_boundaries(tmp_path: Path) -> None:
+        """TC-B102-SEL-05 (R-B102-SEL-005, full): 250 filtered parameters on a
+        200-row page size — next, previous, next, then next again at the last page
+        land on pages 1, 2, 1, 2; previous is disabled on page 1 and next on page
+        2, and the out-of-range activation clamps.
+    
+        RED on base: no pagination ids ship. Mutant: remove the clamping or the
+        disable logic.
+        """
+>       assert picker_class_or_none() is not None, "sdb.A2LParameterPicker: the shared picker ships (R-B102-SEL-005)"
+E       AssertionError: sdb.A2LParameterPicker: the shared picker ships (R-B102-SEL-005)
+E       assert None is not None
+E        +  where None = picker_class_or_none()
+
+tests\test_b102_parameter_picker.py:406: AssertionError
+____________ test_tc_b102_sel_05_pagination_controls_fit_at_80x24 _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32172/test_tc_b102_sel_05_pagination1')
+
+    def test_tc_b102_sel_05_pagination_controls_fit_at_80x24(tmp_path: Path) -> None:
+        """E3 ruling 6 (80x24): the new status line and the pagination row are
+        mounted, displayed and inside the panel at the minimum terminal, and the
+        ledger still mounts a single page.
+    
+        RED on base: the new ids do not ship.
+        """
+>       assert picker_class_or_none() is not None, "sdb.A2LParameterPicker: the shared picker ships (R-B102-SEL-005)"
+E       AssertionError: sdb.A2LParameterPicker: the shared picker ships (R-B102-SEL-005)
+E       assert None is not None
+E        +  where None = picker_class_or_none()
+
+tests\test_b102_parameter_picker.py:431: AssertionError
+____________ test_tc_b97_08_census_rows_and_one_docked_row[size0] _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32172/test_tc_b97_08_census_rows_and0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", [(118, 54), (118, 53)])
+    def test_tc_b97_08_census_rows_and_one_docked_row(tmp_path: Path, size) -> None:
+        """TC-B97-08 (LLR-145.1): the 35 shipped ids stay (31 of 9c7beaf plus the
+        four batch-102 Inc 3 picker ids, E3 ruling 6), the ledger holds the 75
+        A2L rows, and Validate, Write, the APPLY ghost and the field count share
+        ONE row inside the panel; no apply action exists. The 118x53 arm is the
+        body height 118x54 keeps once the two-row key bar lands (PC-24).
+    
+        RED on main: Validate at y=35, the count at y=38 (two rows). Mutation: the
+        count moved back to its own row.
+        """
+    
+        async def body(app, pilot, panel):
+            return (
+                {panel.id} | {w.id for w in panel.query("*") if w.id},
+                panel.query_one("#check_param_table", DataTable).row_count,
+                {i: app.query_one(f"#{i}").region for i in DOCKED},
+                panel.region,
+                [b.id for b in panel.query(Button) if "apply" in (b.id or "")],
+            )
+    
+        ids, rows, docked, panel_region, applies = run(tmp_path, size, body)
+        assert len(CE_IDS_9C7BEAF) == 35
+>       assert CE_IDS_9C7BEAF - ids == set(), sorted(CE_IDS_9C7BEAF - ids)
+E       AssertionError: ['check_param_page_label', 'check_param_page_next_button', 'check_param_page_prev_button', 'check_param_status']
+E       assert frozenset({'c...aram_status'}) == set()
+E         
+E         Extra items in the left set:
+E         'check_param_status'
+E         'check_param_page_next_button'
+E         'check_param_page_prev_button'
+E         'check_param_page_label'
+E         Use -v to get more diff
+
+tests\test_b97_check_editor.py:197: AssertionError
+____________ test_tc_b97_08_census_rows_and_one_docked_row[size1] _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32172/test_tc_b97_08_census_rows_and1')
+size = (118, 53)
+
+    @pytest.mark.parametrize("size", [(118, 54), (118, 53)])
+    def test_tc_b97_08_census_rows_and_one_docked_row(tmp_path: Path, size) -> None:
+        """TC-B97-08 (LLR-145.1): the 35 shipped ids stay (31 of 9c7beaf plus the
+        four batch-102 Inc 3 picker ids, E3 ruling 6), the ledger holds the 75
+        A2L rows, and Validate, Write, the APPLY ghost and the field count share
+        ONE row inside the panel; no apply action exists. The 118x53 arm is the
+        body height 118x54 keeps once the two-row key bar lands (PC-24).
+    
+        RED on main: Validate at y=35, the count at y=38 (two rows). Mutation: the
+        count moved back to its own row.
+        """
+    
+        async def body(app, pilot, panel):
+            return (
+                {panel.id} | {w.id for w in panel.query("*") if w.id},
+                panel.query_one("#check_param_table", DataTable).row_count,
+                {i: app.query_one(f"#{i}").region for i in DOCKED},
+                panel.region,
+                [b.id for b in panel.query(Button) if "apply" in (b.id or "")],
+            )
+    
+        ids, rows, docked, panel_region, applies = run(tmp_path, size, body)
+        assert len(CE_IDS_9C7BEAF) == 35
+>       assert CE_IDS_9C7BEAF - ids == set(), sorted(CE_IDS_9C7BEAF - ids)
+E       AssertionError: ['check_param_page_label', 'check_param_page_next_button', 'check_param_page_prev_button', 'check_param_status']
+E       assert frozenset({'c...aram_status'}) == set()
+E         
+E         Extra items in the left set:
+E         'check_param_status'
+E         'check_param_page_next_button'
+E         'check_param_page_prev_button'
+E         'check_param_page_label'
+E         Use -v to get more diff
+
+tests\test_b97_check_editor.py:197: AssertionError
+__________ test_tc_b97_61_every_control_displayed_in_its_home[size0] __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32172/test_tc_b97_61_every_control_d0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", SIZES)
+    def test_tc_b97_61_every_control_displayed_in_its_home(tmp_path: Path, size) -> None:
+        """TC-B97-61 (LLR-145.10): per tab state each control and read-out of the
+        table is displayed inside its home when its condition holds, every
+        displayed, enabled control is in the focus chain (17 controls counting the
+        two disabled page controls, 8 read-outs), every control-typed shipped id
+        but the toggle is in the table (15), and ``#check_preview_toggle_button``
+        is mounted and not displayed.
+    
+        RED on main: the toggle is displayed. Mutation: a control left under a
+        hidden pane; a shipped control dropped from the table.
+        """
+        from textual.widgets import TextArea
+    
+        async def body(app, pilot, panel):
+            toggle = panel.query_one("#check_preview_toggle_button")
+            toggle_displayed = is_displayed(toggle)
+            typed = {
+                i for i in CE_IDS_9C7BEAF
+                if isinstance(app.query_one(f"#{i}"), (Button, Input, Select, TextArea, DataTable))
+            }
+            seen_controls, seen_readouts, problems = set(), set(), []
+            for chip_id, _pane in TABS:
+                if panel.query(f"#{chip_id}"):
+                    await show_tab(panel, pilot, chip_id)
+                chain = {w.id for w in app.screen.focus_chain}
+                for home_id, (controls, readouts, when) in HOMES.items():
+                    if when is not None and when != chip_id:
+                        continue
+                    homes = panel.query(f"#{home_id}")
+                    if not homes:
+                        problems.append((chip_id, home_id, "home missing"))
+                        continue
+                    home = homes.first()
+                    for wid in controls + readouts:
+                        w = panel.query_one(f"#{wid}")
+                        # A read-out inside a scroll-view home is read by its
+                        # clipped region (§1.3): the part outside the viewport is
+                        # reachable by scrolling, not outside the home.
+                        region = w.region
+                        if home.styles.overflow_x in ("auto", "scroll") and w is not home:
+                            region = region.intersection(home.content_region)
+                        if not (is_displayed(w) and region.width and home.region.contains_region(region)):
+                            problems.append((chip_id, home_id, wid, w.region, home.region))
+                        if wid in controls:
+                            seen_controls.add(wid)
+                            # batch-102 Inc 3: a disabled control is out of the
+                            # focus chain by design (the one-page demo ledger
+                            # disables both pagination controls).
+                            if not w.disabled and wid not in chain:
+                                problems.append((chip_id, wid, "not in focus chain"))
+                        else:
+                            seen_readouts.add(wid)
+            return toggle_displayed, typed, seen_controls, seen_readouts, problems
+    
+>       toggle_displayed, typed, controls, readouts, problems = run(tmp_path, size, body)
+
+tests\test_b97_check_editor.py:1027: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b97_check_editor.py:65: in run
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_b97_check_editor.py:63: in _drive
+    return await body(app, pilot, panel)
+tests\test_b97_check_editor.py:991: in body
+    if isinstance(app.query_one(f"#{i}"), (Button, Input, Select, TextArea, DataTable))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'nocolor', 'focus'})
+selector = '#check_param_page_prev_button', expect_type = None
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#check_param_page_prev_button' on Screen(id='_default')
+
+..\..\anaconda3\Lib\site-packages\textual\dom.py:1505: NoMatches
+__________ test_tc_b97_61_every_control_displayed_in_its_home[size1] __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32172/test_tc_b97_61_every_control_d1')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", SIZES)
+    def test_tc_b97_61_every_control_displayed_in_its_home(tmp_path: Path, size) -> None:
+        """TC-B97-61 (LLR-145.10): per tab state each control and read-out of the
+        table is displayed inside its home when its condition holds, every
+        displayed, enabled control is in the focus chain (17 controls counting the
+        two disabled page controls, 8 read-outs), every control-typed shipped id
+        but the toggle is in the table (15), and ``#check_preview_toggle_button``
+        is mounted and not displayed.
+    
+        RED on main: the toggle is displayed. Mutation: a control left under a
+        hidden pane; a shipped control dropped from the table.
+        """
+        from textual.widgets import TextArea
+    
+        async def body(app, pilot, panel):
+            toggle = panel.query_one("#check_preview_toggle_button")
+            toggle_displayed = is_displayed(toggle)
+            typed = {
+                i for i in CE_IDS_9C7BEAF
+                if isinstance(app.query_one(f"#{i}"), (Button, Input, Select, TextArea, DataTable))
+            }
+            seen_controls, seen_readouts, problems = set(), set(), []
+            for chip_id, _pane in TABS:
+                if panel.query(f"#{chip_id}"):
+                    await show_tab(panel, pilot, chip_id)
+                chain = {w.id for w in app.screen.focus_chain}
+                for home_id, (controls, readouts, when) in HOMES.items():
+                    if when is not None and when != chip_id:
+                        continue
+                    homes = panel.query(f"#{home_id}")
+                    if not homes:
+                        problems.append((chip_id, home_id, "home missing"))
+                        continue
+                    home = homes.first()
+                    for wid in controls + readouts:
+                        w = panel.query_one(f"#{wid}")
+                        # A read-out inside a scroll-view home is read by its
+                        # clipped region (§1.3): the part outside the viewport is
+                        # reachable by scrolling, not outside the home.
+                        region = w.region
+                        if home.styles.overflow_x in ("auto", "scroll") and w is not home:
+                            region = region.intersection(home.content_region)
+                        if not (is_displayed(w) and region.width and home.region.contains_region(region)):
+                            problems.append((chip_id, home_id, wid, w.region, home.region))
+                        if wid in controls:
+                            seen_controls.add(wid)
+                            # batch-102 Inc 3: a disabled control is out of the
+                            # focus chain by design (the one-page demo ledger
+                            # disables both pagination controls).
+                            if not w.disabled and wid not in chain:
+                                problems.append((chip_id, wid, "not in focus chain"))
+                        else:
+                            seen_readouts.add(wid)
+            return toggle_displayed, typed, seen_controls, seen_readouts, problems
+    
+>       toggle_displayed, typed, controls, readouts, problems = run(tmp_path, size, body)
+
+tests\test_b97_check_editor.py:1027: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b97_check_editor.py:65: in run
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_b97_check_editor.py:63: in _drive
+    return await body(app, pilot, panel)
+tests\test_b97_check_editor.py:991: in body
+    if isinstance(app.query_one(f"#{i}"), (Button, Input, Select, TextArea, DataTable))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'nocolor', 'focus'})
+selector = '#check_param_page_prev_button', expect_type = None
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#check_param_page_prev_button' on Screen(id='_default')
+
+..\..\anaconda3\Lib\site-packages\textual\dom.py:1505: NoMatches
+=========================== short test summary info ===========================
+FAILED tests/test_b102_parameter_picker.py::test_tc_b102_sel_01_population_mounts_at_most_one_page[10000-200]
+FAILED tests/test_b102_parameter_picker.py::test_tc_b102_sel_02_filter_is_debounced_and_reports_truncation
+FAILED tests/test_b102_parameter_picker.py::test_tc_b102_sel_03_repeated_includes_touch_only_marks_and_preview
+FAILED tests/test_b102_parameter_picker.py::test_tc_b102_sel_04_reentry_with_same_signature_preserves_state
+FAILED tests/test_b102_parameter_picker.py::test_tc_b102_sel_05_pagination_boundaries
+FAILED tests/test_b102_parameter_picker.py::test_tc_b102_sel_05_pagination_controls_fit_at_80x24
+FAILED tests/test_b97_check_editor.py::test_tc_b97_08_census_rows_and_one_docked_row[size0]
+FAILED tests/test_b97_check_editor.py::test_tc_b97_08_census_rows_and_one_docked_row[size1]
+FAILED tests/test_b97_check_editor.py::test_tc_b97_61_every_control_displayed_in_its_home[size0]
+FAILED tests/test_b97_check_editor.py::test_tc_b97_61_every_control_displayed_in_its_home[size1]
+10 failed, 36 passed in 193.65s (0:03:13)

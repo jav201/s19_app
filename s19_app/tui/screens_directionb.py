@@ -74,7 +74,6 @@ from textual.containers import (
     Vertical,
     VerticalScroll,
 )
-from textual.coordinate import Coordinate
 from textual.message import Message
 from textual.widget import Widget
 from textual.widgets import (
@@ -90,6 +89,13 @@ from textual.widgets import (
     TextArea,
 )
 
+from .a2l_parameter_picker import (
+    A2LParameterPicker,
+    IncludeTable,
+    _clip_fmt_unit,
+    clip_param,
+    clip_tail,
+)
 from .changes.io import DUMMY_CHANGESET_TEXT, is_check_spec_name
 from .color_policy import css_class_for_severity
 from .entropy_style import ENTROPY_BAND_LABELS, band_style
@@ -6823,63 +6829,6 @@ def patch_layout(
     return PatchLayout(8, 10, value, status, 7, strip, max(8, ribbon_w))
 
 
-def _tail_cells(text: str, cap: int) -> str:
-    """The longest tail of ``text`` that fits in ``cap`` terminal cells."""
-    used = 0
-    for index in range(len(text) - 1, -1, -1):
-        used += cell_len(text[index])
-        if used > cap:
-            return text[index + 1:]
-    return text
-
-
-def clip_param(name: str, width: int) -> str:
-    """Clip an A2L parameter name to ``width`` cells, keeping what tells it apart.
-
-    LLR-145.3: a name that fits is painted whole; a longer one keeps its first
-    dot-separated segment, one ``…`` and the name's tail filling the column
-    (A2L names share long prefixes and differ at the end, P-38). A name with
-    no dot keeps a third of the width as its head. Widths are terminal cells
-    (``cell_len``), so a double-width name never paints past the column; a
-    wide character that would straddle the edge is dropped, leaving the clip
-    one cell short.
-
-    Example:
-        >>> clip_param("ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE", 24)
-        'ASAM…RB_NO_DEFAULT_VALUE'
-        >>> clip_param("UNKNOWN_PARAMETER_NAME_TAIL", 12)
-        'UNKN…ME_TAIL'
-    """
-    if cell_len(name) <= width:
-        return name
-    first = name.split(".")[0]
-    if cell_len(first) + 2 > width:
-        first = set_cell_size(first, max(1, width // 3)).rstrip()
-    return first + "…" + _tail_cells(name, width - cell_len(first) - 1)
-
-
-def clip_tail(text: str, width: int) -> str:
-    """Keep the tail of ``text`` behind one ``…`` when it exceeds ``width`` cells."""
-    if cell_len(text) <= width:
-        return text
-    return "…" + _tail_cells(text, width - 1)
-
-
-def _clip_fmt_unit(fmt_unit: str, width: int) -> str:
-    """Clip a ``u<bits> <unit>`` cell: the unit goes first, the width stays.
-
-    When even the ``u<bits>`` token fills the column, the token is painted
-    alone (no room for a ``…``); the full-name line shows the whole text.
-    """
-    text = fmt_unit.rstrip()
-    if cell_len(text) <= width:
-        return text
-    token = text.split(" ")[0]
-    if cell_len(token) >= width:
-        return set_cell_size(token, width)
-    return _clip_to_cells(text, width)
-
-
 def _count(n: int, noun: str) -> str:
     """``1 field`` / ``2 fields`` — a count with its noun in number (ux-reviewer L3)."""
     return f"{n} {noun}" if n == 1 else f"{n} {noun}s"
@@ -6932,25 +6881,6 @@ class TabChip(Button):
     """A one-row tab chip: ``enter`` (Button's own) and ``space`` press it (D16)."""
 
     BINDINGS = [Binding("space", "press", "Press", show=False)]
-
-
-class IncludeTable(DataTable):
-    """The Check Editor's parameter ledger: ``space`` or ``enter`` toggles the
-    highlighted row's inclusion (LLR-145.8, D16; ``enter`` replaces DataTable's
-    row-select, which the ledger never used). The description ``Include`` is
-    the key bar's label (D27); ``show=False`` keeps the shipped Footer
-    unchanged until Inc-8 replaces it."""
-
-    BINDINGS = [
-        Binding("space", "toggle_include", "Include", show=False),
-        Binding("enter", "toggle_include", "Include", show=False),
-    ]
-
-    class IncludeToggled(Message):
-        """``space`` asked to toggle the highlighted row's inclusion."""
-
-    def action_toggle_include(self) -> None:
-        self.post_message(self.IncludeToggled())
 
 
 class CheckEditorPanel(ScrollableContainer):
@@ -7051,16 +6981,36 @@ class CheckEditorPanel(ScrollableContainer):
 
     def __init__(self) -> None:
         super().__init__(id="check_editor_panel")
-        #: The picked A2L parameter rows: {name: (address, size, fmt_unit)}.
-        self._param_rows: dict = {}
-        #: The picker rows currently mounted (filter-aware), in table order.
-        self._visible_params: list = []
-        #: The picked parameter names in inclusion order (the ✓ set).
-        self._picked_params: list = []
+        #: The shared A2L parameter picker (batch-102 Inc 3): it owns the
+        #: ledger, the filter debounce, the paging and the picks. The panel
+        #: stays the host: it injects its width derivation as the picker's
+        #: ``layout_provider`` (a one-way call — the provider reads cached
+        #: scalars, never picker entry points, so there is no cycle).
+        self._picker = A2LParameterPicker(layout_provider=self._widths)
         #: The declared memory rows: list of (address, label, size).
         self._memory_rows: list = []
         #: The last derived widths; ``None`` until the panel is measured.
         self._layout: Optional[CheckLayout] = None
+
+    # ------------------------------------------------------------------
+    # Picker state (compatibility properties — existing callers and tests
+    # read the panel's historic attribute names)
+    # ------------------------------------------------------------------
+
+    @property
+    def _param_rows(self) -> dict:
+        """The normalized parameter source: {name: (address, size, fmt_unit)}."""
+        return self._picker.param_rows
+
+    @property
+    def _visible_params(self) -> list:
+        """The picker rows currently mounted (the current page), in table order."""
+        return self._picker.visible_params
+
+    @property
+    def _picked_params(self) -> list:
+        """The picked parameter names in inclusion order (the ✓ set)."""
+        return self._picker.picked_params
 
     # ------------------------------------------------------------------
     # Population seams (app.py is the only caller — the US-026 split)
@@ -7082,26 +7032,22 @@ class CheckEditorPanel(ScrollableContainer):
             options.append((label, name))
         self.query_one("#check_spec_file_select", Select).set_options(options)
 
-    def set_a2l_parameters(self, rows: Sequence[dict]) -> None:
+    def set_a2l_parameters(
+        self, rows: Sequence[dict], signature: object = None
+    ) -> None:
         """Populate the A2L parameter ledger (LLR-001.1, LLR-145.1).
 
-        Replaces the ledger's rows with the loaded A2L's parameters carrying an
-        integer address, clears the picks, and re-derives the widths (the
-        longest ``Fmt · Unit`` text is an input of :func:`check_layout`).
-        Every cell is a literal ``Text`` (C-17): A2L names are file-derived.
+        Delegates rows and the signature to the embedded
+        :class:`A2LParameterPicker` (the batch-102 Inc 3 seam): the picker
+        mounts at most one page, preserves filter/page/picks while the
+        signature is unchanged (R-B102-SEL-004) and no-ops on the
+        unchanged-signature re-entry, in which case this shim returns without
+        touching the layout or the previews. On a real (re)population it
+        re-derives the widths (the cached longest ``Fmt · Unit`` text is an
+        input of :func:`check_layout`).
         """
-        self._param_rows = {}
-        self._picked_params = []
-        for row in rows:
-            name = str(row.get("name") or "?")
-            address = row.get("address")
-            address = int(address) if isinstance(address, int) else None
-            size = int(row.get("byte_size") or 1)
-            unit = str(row.get("compu_method_unit") or "")
-            fmt_unit = f"u{size * 8}" + (f" {unit}" if unit else "")
-            self._param_rows[name] = (address, size, fmt_unit)
-        self._visible_params = list(self._param_rows)
-        self._rebuild_ledger()
+        if not self._picker.set_parameters(rows, signature):
+            return
         self._layout = None
         self.call_after_refresh(self._apply_layout)
         self._refresh_preview()
@@ -7112,7 +7058,7 @@ class CheckEditorPanel(ScrollableContainer):
         Every declared address becomes a memory row (the v2 wire grammar
         carries no names). ``app.py`` read the document; this only mirrors it.
         """
-        self._picked_params = []
+        self._picker.clear_picks()
         self._memory_rows = []
         for item in items:
             address = item.get("address")
@@ -7150,27 +7096,12 @@ class CheckEditorPanel(ScrollableContainer):
         return self._layout or check_layout(68, 38, self._fmt_longest())
 
     def _fmt_longest(self) -> int:
-        return max((cell_len(v[2].rstrip()) for v in self._param_rows.values()), default=0)
-
-    def _ledger_cells(self, name: str, layout: CheckLayout) -> tuple:
-        address, _size, fmt_unit = self._param_rows[name]
-        picked = name in self._picked_params
-        plain = safe_text(name).plain
-        return (
-            Text("✓", style=GREEN) if picked else Text(" "),
-            safe_text(clip_param(plain, layout.param), VALUE),
-            safe_text(f"0x{address:08X}" if address is not None else "-", CYAN),
-            safe_text(_clip_fmt_unit(fmt_unit, layout.fmt)),
-        )
+        """The cached longest ``Fmt · Unit`` cell (recomputed per population)."""
+        return self._picker.fmt_longest
 
     def _rebuild_ledger(self) -> None:
         """Re-add the visible ledger rows (rows only — never the columns)."""
-        table = self.query_one("#check_param_table", DataTable)
-        layout = self._widths()
-        table.clear()
-        for name in self._visible_params:
-            table.add_row(*self._ledger_cells(name, layout), key=name)
-        self._refresh_full_name()
+        self._picker.rebuild_ledger()
 
     def _rebuild_memory_table(self) -> None:
         table = self.query_one("#check_mem_table", DataTable)
@@ -7327,33 +7258,10 @@ class CheckEditorPanel(ScrollableContainer):
 
     def _refresh_full_name(self) -> None:
         """Paint the highlighted row's address, ``Fmt · Unit`` and name under
-        the ledger (LLR-145.3; code-reviewer F1, ux-reviewer L2).
-
-        The address and the full ``Fmt · Unit`` come first and are never
-        clipped; the name takes the cells left of ``layout.full_name`` and,
-        when wider, is clipped by the ledger's rule (first segment, one ``…``,
-        the tail) — so the line ends with the part that tells twins apart. The
-        text depends on the derived width, so ``_apply_layout`` repaints it
-        (D21 (4), PC-19).
+        the ledger — delegated to the picker, which owns the ledger and its
+        empty states (LLR-145.3; code-reviewer F1, ux-reviewer L2).
         """
-        line = self.query_one("#check_full_name_line", Static)
-        table = self.query_one("#check_param_table", DataTable)
-        if not self._visible_params:
-            empty = self._EMPTY_LEDGER if not self._param_rows else "No parameter matches the filter."
-            line.update(Text(empty, style=DGRAY))
-            return
-        row = table.cursor_row
-        if not 0 <= row < len(self._visible_params):
-            row = 0
-        name = self._visible_params[row]
-        address, _size, fmt_unit = self._param_rows[name]
-        head = f"0x{address:08X}" if address is not None else "-"
-        fmt_unit = fmt_unit.rstrip()
-        text = Text(head, style=CYAN)
-        text.append(f"  {fmt_unit}  ", style=DGRAY)
-        room = max(8, self._widths().full_name - cell_len(text.plain))
-        text.append(safe_text(clip_param(safe_text(name).plain, room), VALUE))
-        line.update(text)
+        self._picker.refresh_full_name()
 
     # ------------------------------------------------------------------
     # Width derivation (D21: mount, resize, show)
@@ -7392,7 +7300,7 @@ class CheckEditorPanel(ScrollableContainer):
             # the header; there is no cell for ``update_cell`` to go through.
             table.clear()
         for index, name in enumerate(self._visible_params):
-            cells = self._ledger_cells(name, layout)
+            cells = self._picker.row_cells(name, layout)
             table.update_cell(name, keys[1], cells[1], update_width=(index == 0))
             table.update_cell(name, keys[3], cells[3])
         mem = self.query_one("#check_mem_table", DataTable)
@@ -7424,33 +7332,7 @@ class CheckEditorPanel(ScrollableContainer):
         with Horizontal(id="check_columns"):
             with Vertical(id="check_left_column") as left:
                 left.border_title = "A2L PARAMETERS"
-                with Horizontal(classes="ce-row"):
-                    yield Label("Filter", classes="ce-label")
-                    yield OsClipboardInput(
-                        placeholder="filter parameters",
-                        id="check_param_filter",
-                        compact=True,
-                    )
-                yield IncludeTable(
-                    id="check_param_table",
-                    zebra_stripes=True,
-                    cursor_type="row",
-                    classes="nowrap-ledger",
-                )
-                yield Static("", id="check_full_name_line", classes="nowrap-heading")
-                with Horizontal(
-                    id="check_param_controls",
-                    classes="patch-docked-row patch-chip-entry",
-                ):
-                    yield Button(
-                        "Include parameter",
-                        id="check_param_include_button",
-                        classes="patch-chip",
-                    )
-                    yield Static(
-                        "space also toggles ✓ on the highlighted row",
-                        classes="ce-hint",
-                    )
+                yield self._picker
             with Vertical(id="check_right_column") as right:
                 right.border_title = "REPORT FIELDS"
                 with Horizontal(id="check_card_tabs"):
@@ -7579,19 +7461,13 @@ class CheckEditorPanel(ScrollableContainer):
         )
 
     def on_mount(self) -> None:
-        """Add the two tables' columns once, at the 118-column widths."""
+        """Add the memory table's columns; the picker mounts its own ledger."""
         layout = self._widths()
-        table = self.query_one("#check_param_table", DataTable)
-        table.add_column("✓", width=1, key="mark")
-        table.add_column("Parameter", width=layout.param, key="param")
-        table.add_column("Address", width=10, key="address")
-        table.add_column(layout.fmt_label, width=layout.fmt, key="fmt")
         mem = self.query_one("#check_mem_table", DataTable)
         mem.add_column("Address", width=10)
         mem.add_column("Label", width=layout.mem_label)
         mem.add_column("Fmt", width=3)
         self.query_one("#check_file_name_input", Input).value = "spec.chk.json"
-        self._refresh_full_name()
         self._refresh_preview()
         self.call_after_refresh(self._apply_layout)
 
@@ -7607,42 +7483,27 @@ class CheckEditorPanel(ScrollableContainer):
             if selected:
                 self.query_one("#check_card_switcher", ContentSwitcher).current = pane
 
-    def _toggle_highlighted(self) -> None:
-        """Include or exclude the highlighted ledger row (button and ``space``)."""
-        if not self._visible_params:
-            return
-        table = self.query_one("#check_param_table", DataTable)
-        cursor = table.cursor_row
-        if not 0 <= cursor < len(self._visible_params):
-            return
-        name = self._visible_params[cursor]
-        if name in self._picked_params:
-            self._picked_params.remove(name)
-        else:
-            self._picked_params.append(name)
-        table.update_cell_at(
-            Coordinate(cursor, 0), self._ledger_cells(name, self._widths())[0]
-        )
+    def _on_a2l_parameter_picker_selection_changed(
+        self, event: A2LParameterPicker.SelectionChanged
+    ) -> None:
+        """One ledger row was included or excluded (R-B102-SEL-003): refresh
+        the Fields/JSON/Addendum previews and the left-column count. The
+        document controls keep collecting ``items`` from the picker at
+        write/validate time."""
+        event.stop()
         self._refresh_preview()
 
-    def on_include_table_include_toggled(self, event: IncludeTable.IncludeToggled) -> None:
-        event.stop()
-        self._toggle_highlighted()
-
-    def on_data_table_row_highlighted(self, event: DataTable.RowHighlighted) -> None:
-        if event.data_table.id == "check_param_table":
-            self._refresh_full_name()
-
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        """Translate the collector controls into messages (LLR-001.1/.2)."""
+        """Translate the collector controls into messages (LLR-001.1/.2).
+
+        The ledger's own controls (the include button, the page chips, the
+        filter) are the embedded picker's; its ``SelectionChanged`` listener
+        above refreshes the previews.
+        """
         button_id = event.button.id or ""
         if any(button_id == tab_id for tab_id, _l, _p in self._CARD_TABS):
             event.stop()
             self._show_tab(button_id)
-            return
-        if button_id == "check_param_include_button":
-            event.stop()
-            self._toggle_highlighted()
             return
         if button_id == "check_mem_add_button":
             event.stop()
@@ -7716,16 +7577,6 @@ class CheckEditorPanel(ScrollableContainer):
         self._memory_rows.append((address, label, size))
         self._rebuild_memory_table()
         self._refresh_preview()
-
-    def on_input_changed(self, event: Input.Changed) -> None:
-        """Filter the parameter ledger as the operator types."""
-        if event.input.id != "check_param_filter":
-            return
-        needle = event.value.strip().lower()
-        self._visible_params = [
-            name for name in self._param_rows if not needle or needle in name.lower()
-        ]
-        self._rebuild_ledger()
 
     def on_select_changed(self, event: Select.Changed) -> None:
         """Forward a spec-file dropdown pick to ``app.py`` (LLR-010.1)."""
