@@ -14,3 +14,4 @@
 2026-11-03T15:05:00-06:00 E4 inc-4 integrated — green-core 49 passed; bulk add committed next
 2026-11-03T15:30:00-06:00 E3 inc-5 — PASS-WITH-NOTES; rulings in design/E3-rulings-inc5.md; E4 starts
 2026-11-03T16:15:00-06:00 E4 inc-5 integrated — 17 patch-picker tests + 39 patch layout/chips/card guards + 22 picker/bulk regression + 43 check regression all green
+2026-11-03T16:45:00-06:00 E3 inc-6 — PASS-WITH-NOTES; rulings in design/E3-rulings-inc6.md; E4 starts
