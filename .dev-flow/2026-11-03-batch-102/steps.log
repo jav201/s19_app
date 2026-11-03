@@ -12,3 +12,4 @@
 2026-11-03T13:20:00-06:00 E1-E3 inc-4 complete — bulk-add requirements/tests/prototype/graph lint clean (6 nodes); PASS-WITH-NOTES; rulings in design/E3-rulings-inc4.md
 2026-11-03T14:10:00-06:00 E4 inc-3 integrated — green-core 46 passed + test_tui_check_editor 7 passed; committed dc55e56. Inc 4 E4 starts.
 2026-11-03T15:05:00-06:00 E4 inc-4 integrated — green-core 49 passed; bulk add committed next
+2026-11-03T15:30:00-06:00 E3 inc-5 — PASS-WITH-NOTES; rulings in design/E3-rulings-inc5.md; E4 starts

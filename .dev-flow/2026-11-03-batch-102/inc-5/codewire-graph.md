@@ -8,7 +8,7 @@ A2LParameterPicker.__init__
 req: R-B102-PE-002, R-B102-PE-006
 in: A2LParameterPicker self; str id_prefix = "check_param"; str mode = "pick"; bool show_include_button = True; bool show_bulk_button = True; Callable layout_provider
 out: None
-func: changed constructor/config. Builds all child ids from `id_prefix`; in `highlight` mode omits include/bulk controls and exposes the highlighted row rather than a picked set. Check Editor keeps the default public ids and pick mode.
+func: changed constructor/config. Builds every child id and internal event route from `id_prefix`; accepts a proportional `layout_provider`; in `highlight` mode omits include/bulk controls, disables table include bindings/messages and exposes the highlighted row rather than a picked set. Check Editor keeps the default public ids and pick mode.
 module: s19_app/tui/a2l_parameter_picker.py
 examples: (TC-B102-PE-02) id_prefix `patch_param`, mode `highlight` → child ids include `#patch_param_filter`, `#patch_param_table`, `#patch_param_status`; zero ids start with `check_param`
 examples: (TC-B102-PE-06) hostile name rendered by either mode → Parameter cell keeps sentinel with zero markup spans
@@ -17,7 +17,7 @@ PatchEditorPanel.compose
 req: R-B102-PE-001, R-B102-PE-006
 in: PatchEditorPanel self
 out: ComposeResult
-func: changed. Adds the `A2L` tab chip and pane to the inspector `ContentSwitcher`; the pane hosts one `A2LParameterPicker` in highlight mode with patch-prefixed ids.
+func: changed. Adds the `A2L` tab chip and pane to the inspector `ContentSwitcher`; the pane hosts one `A2LParameterPicker` in highlight mode with patch-prefixed ids and a patch-width `layout_provider` derived from the measured inspector.
 module: s19_app/tui/screens_directionb.py
 examples: (TC-B102-PE-01) panel composed → tabs are `Inspector`, `JSON`, `Checks`, `A2L`; selecting A2L shows the picker
 
