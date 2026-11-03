@@ -1629,6 +1629,34 @@ ModalScreen {
     height: 1fr;
 }
 
+/* --- Bulk-add popup (batch-102 Inc 4, US-102-04 / R-B102-BULK-001..007) ---
+ * Reuses the shared `.modal-dialog` box model. The multiline area is a FIXED
+ * height (not 1fr) because this dialog is `height: auto` like the small
+ * pickers — a fractional child would collapse the auto pass. The summary
+ * line sits dim under the area (tui-design: the text area is the figure,
+ * summary and actions secondary); it may grow to two rows when the 64 KiB
+ * truncation notice rides along (E3 ruling 8), so it is `height: auto` with
+ * a one-row floor. Measured at 80x24: dialog ≈ 16 rows, well inside the
+ * screen; the dialog width stays the shared 70 %. */
+#bulk_param_text {
+    border: round $rule;
+    background: $bg-base;
+    height: 8;
+    margin-bottom: 1;
+}
+
+#bulk_param_instruction {
+    color: #969aad;                   /* insight_style.DGRAY */
+    padding: 0 1;
+}
+
+#bulk_param_summary {
+    height: auto;
+    min-height: 1;
+    padding: 0 1;
+    color: #969aad;                   /* insight_style.DGRAY */
+}
+
 /* --- Legend modal (batch-18, LLR-023.1) ---------------------------------
  * Reuses the shared `.modal-dialog` token styling; caps the dialog height
  * and scrolls the body so the full A2L/MAC/Issues legend fits the 80- and

@@ -29,9 +29,9 @@
    - Umbral: 2/2 con y sin no encontrados.
    - Mutante negativo: se omite el resumen o se altera el orden de los conteos.
 
-5. **R-B102-BULK-005** — Unwanted. If no parsed name matches an available A2L parameter, then the system shall paint `No listed parameters found.` and shall not change the included parameters.
-   - Umbral: 1/1.
-   - Mutante negativo: se limpian picks o se cierra sin feedback.
+5. **R-B102-BULK-005** — Unwanted. If the pasted buffer parses to zero parameter names, then the system shall paint `No listed parameters found.` and shall not change the included parameters. When names were parsed but none match, the summary required by R-B102-BULK-004 shall name the first missing parameter instead.
+   - Umbral: 2/2 (lista vacía y nombres ausentes).
+   - Mutante negativo: se limpian picks, se cierra sin feedback o se suprime el resumen de no encontrados.
 
 6. **R-B102-BULK-006** — Ubiquitous. The bulk-add modal shall treat pasted names as literal text and shall paint file-derived names with zero markup spans.
    - Umbral: 1/1 payload hostil.

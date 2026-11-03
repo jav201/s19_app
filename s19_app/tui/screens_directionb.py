@@ -96,6 +96,7 @@ from .a2l_parameter_picker import (
     clip_param,
     clip_tail,
 )
+from .screens import BulkParameterAddScreen
 from .changes.io import DUMMY_CHANGESET_TEXT, is_check_spec_name
 from .color_policy import css_class_for_severity
 from .entropy_style import ENTROPY_BAND_LABELS, band_style
@@ -6914,6 +6915,13 @@ class CheckEditorPanel(ScrollableContainer):
         :meth:`_apply_layout` repaints the width-dependent cells through the
         public ``update_cell`` path (D21, PC-8) on mount, resize and show.
 
+        Bulk add (batch-102 Inc 4): the picker's ``Add list`` control posts
+        ``BulkAddRequested`` and this panel pushes the
+        :class:`BulkParameterAddScreen` modal for its picker
+        (R-B102-BULK-001); the modal applies through the picker's
+        ``include_names`` seam and the dismiss tail only refreshes the
+        previews — never the ledger (R-B102-BULK-007).
+
         The panel stays **presentational** (C-7): controls post
         :class:`ActionRequested` messages that ``app.py`` routes.
 
@@ -7491,6 +7499,36 @@ class CheckEditorPanel(ScrollableContainer):
         document controls keep collecting ``items`` from the picker at
         write/validate time."""
         event.stop()
+        self._refresh_preview()
+
+    def _on_a2l_parameter_picker_bulk_add_requested(
+        self, event: A2LParameterPicker.BulkAddRequested
+    ) -> None:
+        """The picker's bulk-add control was activated (R-B102-BULK-001):
+        push the bulk modal for this panel's picker. The picker stays
+        presentational (C-7, E3 ruling 5) — it only announces; the host
+        owns the screen stack."""
+        event.stop()
+        self._open_parameter_bulk_add()
+
+    def _open_parameter_bulk_add(self) -> None:
+        """Push :class:`BulkParameterAddScreen` bound to this panel's picker."""
+        self.app.push_screen(
+            BulkParameterAddScreen(self._picker), self._on_bulk_add_closed
+        )
+
+    def _on_bulk_add_closed(self, summary: Optional[dict]) -> None:
+        """Bulk modal dismissed (R-B102-BULK-007; E3 rulings 6/9).
+
+        ``None`` — escape, cancel, or a close after a change-less session —
+        repaints nothing beyond the dismiss. A change-flagged close
+        repaints the Fields/JSON/Addendum previews and the picked count.
+        The ledger is never rebuilt here and ``load_spec`` is never
+        called: the picker's ``SelectionChanged`` already carried the
+        include to the previews at apply time.
+        """
+        if summary is None:
+            return
         self._refresh_preview()
 
     def on_button_pressed(self, event: Button.Pressed) -> None:

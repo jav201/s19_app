@@ -16,7 +16,7 @@ A2LParameterPicker.include_names
 req: R-B102-BULK-003, R-B102-BULK-005
 in: A2LParameterPicker self; Sequence[str] names
 out: dict summary
-func: new bulk include entry. For each parsed name in order, includes exact source matches not already picked; never clears existing picks; returns counts `included`, `already_included`, `not_found` and `first_missing`.
+func: new bulk include entry. For each parsed name in order, includes exact source matches not already picked; never clears existing picks; returns `parsed_unique` plus counts `included`, `already_included`, `not_found` and `first_missing`.
 module: s19_app/tui/a2l_parameter_picker.py
 modify: [Data: A2LParameterPicker._picked_params] (append); [UI: affected mark cells] (replace)
 examples: (TC-B102-BULK-03) existing `Alpha`, names ["Beta","Beta","Alpha","Gamma"] → summary included `1`, already_included `1`, not_found `1`; picks are ["Alpha","Beta"]
@@ -34,7 +34,7 @@ BulkParameterAddScreen._apply_list
 req: R-B102-BULK-002, R-B102-BULK-004, R-B102-BULK-005, R-B102-BULK-006
 in: BulkParameterAddScreen self
 out: None
-func: new modal action. Parses the buffer, calls `picker.include_names`, paints `Included <n> · already included <n> · not found <n>` plus ` — first missing: <name>` when relevant, or exactly `No listed parameters found.` when zero included and zero already included.
+func: new modal action. Parses the buffer, calls `picker.include_names`, paints `Included <n> · already included <n> · not found <n>` plus ` — first missing: <name>` when relevant, or exactly `No listed parameters found.` only when the buffer parsed to zero unique names.
 module: s19_app/tui/screens.py
 modify: [UI: #bulk_param_summary] (replace)
 examples: (TC-B102-BULK-04) buffer `Alpha\nMissingOne\nMissingTwo`, source contains `Alpha` → summary `Included 1 · already included 0 · not found 2 — first missing: MissingOne`

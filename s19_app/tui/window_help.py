@@ -438,6 +438,11 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "Include parameter — adds the highlighted ledger row to the "
             "REPORT FIELDS, or removes it when it is already included; the "
             "line under the ledger shows that row's full name and address.",
+            "Add list — opens the bulk-add popup: paste many A2L names at "
+            "once, separated by new lines, commas, semicolons or spaces; "
+            "Include matches adds every listed name found in the A2L, and "
+            "the summary line counts the included, the already included and "
+            "the not found; esc closes the popup.",
             "Prev — turns the A2L PARAMETERS ledger to the previous page; "
             "disabled on the first page.",
             "Next — turns the ledger to the next page; disabled on the last "

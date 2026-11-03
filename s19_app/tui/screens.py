@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING, Callable, List, Literal, Mapping, Optional, Sequence, Tuple
 
+from rich.cells import cell_len
 from rich.markup import escape as escape_markup
 from rich.table import Table
 from rich.text import Text
@@ -32,6 +33,11 @@ from textual.widgets import (
 from markdown_it import MarkdownIt
 
 from .capped_text_area import CappedTextArea
+from .a2l_parameter_picker import (
+    A2LParameterPicker,
+    _clip_to_cells,
+    parse_parameter_list,
+)
 from .changes.verify import STATUS_VERIFIED
 from .color_policy import css_class_for_severity
 from ..render.hexview import MAX_HEX_ROWS, render_hex_view_text
@@ -39,7 +45,7 @@ from ..utils import safe_text
 from .insight_style import DGRAY, GREEN, RED, YELLOW
 from .open_folder_chip import OpenFolderChip, titled_header
 from .window_help import WindowHelpChip, open_window_help
-from .os_clipboard_input import OsClipboardInput
+from .os_clipboard_input import OsClipboardInput, _CLIPBOARD_CAP_CHARS
 from .workspace import sanitize_project_name
 from .legend import (
     BAND_GAP_FIELDS,
@@ -834,6 +840,199 @@ class EntryJsonScreen(ModalScreen[Optional[str]]):
             return
         if event.button.id == "entry_json_confirm":
             self.dismiss(self.query_one("#entry_json_text", TextArea).text)
+
+
+class BulkParameterAddScreen(ModalScreen[Optional[dict]]):
+    """Bulk-add modal for A2L parameter names (US-102-04, R-B102-BULK-001..007).
+
+    Summary:
+        The popup the Check Editor's ``Add list`` control opens (the picker
+        emits ``BulkAddRequested`` and stays presentational — E3 ruling 5).
+        A multiline :class:`CappedTextArea` (the SAME capped, OS-clipboard
+        paste surface the other five paste sites use — no new ingress, S-01)
+        takes the pasted list; ``Include matches`` parses it with
+        :func:`parse_parameter_list` and includes exact source matches
+        through :meth:`A2LParameterPicker.include_names`. The modal STAYS
+        OPEN after an include so the operator can correct a mixed list
+        without losing the summary (batch-102 Inc-4 decision); only
+        ``Close`` or ``esc`` dismisses.
+
+        The summary is the modal's single feedback region
+        (F-B102-BULK-2): ``Included <n> · already included <n> · not found
+        <n>``, with `` — first missing: <name>`` when names were missed, or
+        exactly ``No listed parameters found.`` when nothing matched.
+        Every file-derived surface — the pasted buffer, the missing name —
+        reaches the screen as a literal ``Text`` through ``safe_text``
+        (R-B102-BULK-006): the summary never parses markup and the missing
+        name is scrubbed and clipped to the dialog's available width
+        (E3 ruling 2). When the buffer sits at the 64 KiB paste cap it must
+        have been truncated on ingress, so the summary carries a second
+        line: ``Input truncated at 65536 chars.`` (E3 ruling 8).
+
+        Dismiss contract (E3 ruling 6): ``esc`` and ``Close`` WITHOUT an
+        include in this session dismiss ``None`` — no re-apply, no host
+        refresh; ``Close`` AFTER a successful include dismisses with the
+        last summary dict, so the host repaints its preview/count. The
+        modal never logs the pasted content — only counts reach the log
+        (E3 ruling 10), and closing never reloads the spec or rebuilds
+        the ledger (E3 ruling 9 — the host's dismiss tail only refreshes
+        the preview).
+
+    Args:
+        picker (A2LParameterPicker): The host's embedded picker; the modal
+            applies the list through its ``include_names`` seam.
+
+    Returns:
+        Optional[dict]: The last include summary after a session that
+            included at least one name, else ``None``
+            (``ModalScreen[Optional[dict]]``).
+
+    Data Flow:
+        - ``compose`` builds a ``.modal-dialog`` with the title, the exact
+          contract instruction, ``#bulk_param_text`` (``CappedTextArea``),
+          ``#bulk_param_summary`` and the Include / Close button row.
+        - ``on_button_pressed``: Include → ``_apply_list`` (parse →
+          ``include_names`` → paint the summary); Close → dismiss.
+        - ``action_cancel`` (``esc``) → dismiss with ``None``.
+
+    Dependencies:
+        Uses:
+            - ``CappedTextArea`` / ``Button`` / the shared
+              ``.modal-dialog`` classes; ``parse_parameter_list`` /
+              ``A2LParameterPicker.include_names``; ``safe_text`` /
+              ``_clip_to_cells`` for the missing-name detail.
+        Used by:
+            - ``CheckEditorPanel._open_parameter_bulk_add``
+              (``screens_directionb.py``; Patch Editor at Inc 5).
+
+    Example:
+        >>> screen = BulkParameterAddScreen(picker)  # doctest: +SKIP
+    """
+
+    #: The contract instruction (R-B102-BULK-001): painted verbatim, as a
+    #: literal ``Text`` — never through a markup path.
+    _INSTRUCTION = "Separate names with new lines, commas, semicolons or spaces."
+
+    #: The 64 KiB paste-cap notice (E3 ruling 8): painted when the buffer
+    #: length sits AT the cap — a longer buffer is impossible through a
+    #: single capped paste, so ``len(text) >= cap`` means ingress truncated.
+    _TRUNCATED_NOTICE = f"Input truncated at {_CLIPBOARD_CAP_CHARS} chars."
+
+    #: Route initial focus to the multiline area so a paste lands there
+    #: rather than on a button; ``enter`` never confirms accidentally
+    #: (tui-design posture: only the Include action applies).
+    AUTO_FOCUS = "#bulk_param_text"
+
+    #: ``Escape`` cancels the modal, mirroring the Close button (E3 ruling
+    #: 6: cancel dismisses ``None``, without re-applying or refreshing).
+    BINDINGS = [Binding("escape", "cancel", "Cancel", show=False)]
+
+    def __init__(self, picker: A2LParameterPicker) -> None:
+        super().__init__()
+        self._picker = picker
+        #: Whether an include landed new picks in THIS session; drives the
+        #: dismiss value (E3 ruling 6).
+        self._changed = False
+        #: The last apply's summary; dismissed when ``_changed``.
+        self._last_summary: Optional[dict] = None
+
+    def compose(self) -> ComposeResult:
+        yield Container(
+            Label("Add A2L parameters", classes="modal-title"),
+            Label(Text(self._INSTRUCTION), id="bulk_param_instruction"),
+            CappedTextArea("", id="bulk_param_text"),
+            Static("", id="bulk_param_summary", markup=False),
+            Container(
+                Button(
+                    "Include matches",
+                    id="bulk_param_include_button",
+                    classes="modal-confirm",
+                ),
+                Button("Close", id="bulk_param_close_button"),
+                id="bulk_param_buttons",
+                classes="modal-buttons",
+            ),
+            id="bulk_param_dialog",
+            classes="modal-dialog",
+        )
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "bulk_param_include_button":
+            self._apply_list()
+            return
+        if event.button.id == "bulk_param_close_button":
+            # E3 ruling 6: a change-flagged close carries the summary; a
+            # no-change close dismisses ``None`` so the host repaints
+            # nothing.
+            self.dismiss(self._last_summary if self._changed else None)
+
+    def action_cancel(self) -> None:
+        """Dismiss with ``None`` — ``Escape`` mirrors the Close button."""
+        self.dismiss(None)
+
+    # ------------------------------------------------------------------
+    # Apply + summary
+    # ------------------------------------------------------------------
+
+    def _apply_list(self) -> None:
+        """Parse the buffer, include the matches, paint the summary.
+
+        R-B102-BULK-002 (split on every separator via
+        :func:`parse_parameter_list`), R-B102-BULK-004 (the fixed-order
+        summary), R-B102-BULK-005 (the exact no-match line), E3 ruling 8
+        (the 64 KiB truncation notice). Neither the buffer nor any name is
+        logged — counts only (E3 ruling 10).
+        """
+        text = self.query_one("#bulk_param_text", TextArea).text
+        names = parse_parameter_list(text)
+        summary = self._picker.include_names(names)
+        if summary["included"]:
+            self._changed = True
+            self._last_summary = summary
+        self._paint_summary(summary, truncated=len(text) >= _CLIPBOARD_CAP_CHARS)
+
+    def _paint_summary(self, summary: Mapping, *, truncated: bool) -> None:
+        """Paint the modal's single feedback region (F-B102-BULK-2).
+
+        The counts line keeps the contract's fixed order; the missing-name
+        detail is safe_text-scrubbed and clipped to the dialog width (E3
+        ruling 2); the truncation notice, when the buffer sat at the paste
+        cap, rides a second dim line so the contract line stays intact.
+        """
+        text = self._summary_text(summary)
+        if truncated:
+            text.append("\n")
+            text.append(self._TRUNCATED_NOTICE, style=DGRAY)
+        self.query_one("#bulk_param_summary", Static).update(text)
+
+    def _summary_text(self, summary: Mapping) -> Text:
+        """Build the counts line as literal text — never markup."""
+        if summary.get("parsed_unique", 0) == 0:
+            return Text("No listed parameters found.", style=DGRAY)
+        line = Text(
+            f"Included {summary['included']} · already included "
+            f"{summary['already_included']} · not found {summary['not_found']}",
+            style=DGRAY,
+        )
+        if summary["not_found"]:
+            line.append(" — first missing: ")
+            name = safe_text(str(summary["first_missing"] or "")).plain
+            budget = max(8, self._line_width_budget() - cell_len(line.plain))
+            line.append(safe_text(_clip_to_cells(name, budget)))
+        return line
+
+    def _line_width_budget(self) -> int:
+        """The summary line's cell budget: the dialog's content width.
+
+        Before the first layout pass (or when the dialog cannot be found)
+        the 118-column interior is assumed, so a pre-mount paint errs long
+        rather than clipping an honest name.
+        """
+        try:
+            width = self.query_one("#bulk_param_dialog", Container).content_region.width
+        except Exception:  # pragma: no cover - defensive seam
+            width = 0
+        return width if width > 0 else 76
 
 
 #: Static help copy for the variant-selector info modal (US-067 / LLR-067.3).

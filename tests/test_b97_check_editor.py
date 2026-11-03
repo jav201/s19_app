@@ -173,8 +173,9 @@ async def _settled_delay(pilot, predicate, description: str, attempts: int = 120
 
 @pytest.mark.parametrize("size", [(118, 54), (118, 53)])
 def test_tc_b97_08_census_rows_and_one_docked_row(tmp_path: Path, size) -> None:
-    """TC-B97-08 (LLR-145.1): the 35 shipped ids stay (31 of 9c7beaf plus the
-    four batch-102 Inc 3 picker ids, E3 ruling 6), the ledger holds the 75
+    """TC-B97-08 (LLR-145.1): the 36 shipped ids stay (31 of 9c7beaf plus the
+    four batch-102 Inc 3 picker ids, E3 ruling 6, and the batch-102 Inc 4
+    ``#check_param_bulk_button``, E3 ruling 5), the ledger holds the 75
     A2L rows, and Validate, Write, the APPLY ghost and the field count share
     ONE row inside the panel; no apply action exists. The 118x53 arm is the
     body height 118x54 keeps once the two-row key bar lands (PC-24).
@@ -193,7 +194,7 @@ def test_tc_b97_08_census_rows_and_one_docked_row(tmp_path: Path, size) -> None:
         )
 
     ids, rows, docked, panel_region, applies = run(tmp_path, size, body)
-    assert len(CE_IDS_9C7BEAF) == 35
+    assert len(CE_IDS_9C7BEAF) == 36
     assert CE_IDS_9C7BEAF - ids == set(), sorted(CE_IDS_9C7BEAF - ids)
     assert rows == 75
     assert len({r.y for r in docked.values()}) == 1, {i: r.y for i, r in docked.items()}
@@ -712,6 +713,11 @@ GROUPS_BY_TAB = {
 #: focus chain (R-B102-SEL-005: previous disabled on the first page, next on
 #: the last) — the order check counts them, the membership check excepts them.
 PAGE_GROUP = ("check_param_page_prev_button", "check_param_page_next_button")
+#: The batch-102 Inc 4 bulk-add control (E3 ruling 5): the picker composes
+#: ``#check_param_bulk_button`` in the ledger control row, after Include, and
+#: it ships ENABLED (unlike the one-page-disabled page chips), so it takes the
+#: chain's slot after Include with no membership exception.
+BULK_GROUP = ("check_param_bulk_button",)
 
 
 def _groups(tab: str) -> list:
@@ -720,6 +726,7 @@ def _groups(tab: str) -> list:
         ("check_param_filter",),
         ("check_param_table",),
         ("check_param_include_button",),
+        BULK_GROUP,
         PAGE_GROUP,
         tuple(c for c, _p in TABS),
         GROUPS_BY_TAB[tab],
@@ -757,7 +764,8 @@ def test_tc_b97_45_keyboard_order_enter_space_and_chip_states(tmp_path: Path) ->
     unfocused, focused and selected styles are pairwise distinct. The
     batch-102 Inc 3 pagination controls ship in the chain's slot after
     Include; with the one-page demo ledger both are disabled and out of the
-    chain (R-B102-SEL-005).
+    chain (R-B102-SEL-005). The batch-102 Inc 4 bulk-add button (E3 ruling 5)
+    takes the enabled slot right after Include (``BULK_GROUP``).
 
     RED on main (P-33, P-43): no header chip and no tab chip in the chain;
     ``DataTable`` binds no ``space``. Mutation: ``can_focus = False`` on a
@@ -952,6 +960,7 @@ def test_tc_b97_46_one_filled_element(tmp_path: Path) -> None:
 HOMES = {
     "check_left_column": (
         ("check_param_filter", "check_param_table", "check_param_include_button",
+         "check_param_bulk_button",
          "check_param_page_prev_button", "check_param_page_next_button"),
         ("check_param_status", "check_param_page_label"),
         None,
@@ -973,10 +982,11 @@ HOMES = {
 def test_tc_b97_61_every_control_displayed_in_its_home(tmp_path: Path, size) -> None:
     """TC-B97-61 (LLR-145.10): per tab state each control and read-out of the
     table is displayed inside its home when its condition holds, every
-    displayed, enabled control is in the focus chain (17 controls counting the
+    displayed, enabled control is in the focus chain (18 controls counting the
     two disabled page controls, 8 read-outs), every control-typed shipped id
-    but the toggle is in the table (15), and ``#check_preview_toggle_button``
-    is mounted and not displayed.
+    but the toggle is in the table (16), and ``#check_preview_toggle_button``
+    is mounted and not displayed. The batch-102 Inc 4 bulk-add button (E3
+    ruling 5) homes in the ledger column, after Include.
 
     RED on main: the toggle is displayed. Mutation: a control left under a
     hidden pane; a shipped control dropped from the table.
@@ -1027,10 +1037,10 @@ def test_tc_b97_61_every_control_displayed_in_its_home(tmp_path: Path, size) -> 
     toggle_displayed, typed, controls, readouts, problems = run(tmp_path, size, body)
     assert toggle_displayed is False, "the addendum toggle is mounted, not displayed"
     assert problems == [], problems[:5]
-    assert len(controls) == 17 and len(readouts) == 8, (len(controls), len(readouts))
+    assert len(controls) == 18 and len(readouts) == 8, (len(controls), len(readouts))
     column = {c for home in HOMES.values() for c in home[0]}
     shipped = typed - {"check_preview_toggle_button"}
-    assert len(shipped) == 15 and shipped <= column, sorted(shipped - column)
+    assert len(shipped) == 16 and shipped <= column, sorted(shipped - column)
 
 
 # --------------------------------------------------------------------------- #

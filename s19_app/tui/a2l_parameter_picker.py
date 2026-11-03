@@ -7,6 +7,13 @@ status line, the include control and the Prev / Next page chips. State is keyed
 by the caller-provided A2L signature so re-entering a screen does not repopulate
 the ledger or lose the operator's picks (R-B102-SEL-004).
 
+Batch-102 Inc 4 adds the bulk-add slice (R-B102-BULK-001..007) on top of the
+same picker: :func:`parse_parameter_list` splits a pasted name list, the
+``Add list`` control (``#check_param_bulk_button``) emits
+:class:`A2LParameterPicker.BulkAddRequested` for the host to push the modal,
+and :meth:`A2LParameterPicker.include_names` includes exact source matches in
+one pass, emitting the same ``SelectionChanged`` contract (E3 ruling 4/5).
+
 Every file-derived string reaches the screen as a literal ``Text`` built by
 :func:`s19_app.utils.safe_text` — no markup path exists here (R-B102-SEL-007).
 
@@ -52,6 +59,40 @@ FILTER_DEBOUNCE_S = 0.15
 #: the shipped surface TC-B97-58 and AT-B97-04 read.
 _EMPTY_LEDGER = "No A2L parameters — load an A2L (^L) to list them."
 _EMPTY_FILTER = "No parameter matches the filter."
+
+
+def parse_parameter_list(text: str) -> list:
+    """Split a bulk-pasted name list into trimmed tokens (R-B102-BULK-002).
+
+    Summary:
+        The bulk modal's pure parser. New lines, carriage returns, commas
+        and semicolons are normalized to spaces, then the text splits on
+        whitespace — so every contract separator (and any combination of
+        them) delimits names. Input order is preserved, repeated tokens are
+        kept (the duplicate control lives in
+        :meth:`A2LParameterPicker.include_names`) and empty tokens never
+        reach the list.
+
+    Args:
+        text (str): The operator's pasted buffer.
+
+    Returns:
+        list: The trimmed, non-empty tokens in input order.
+
+    Example:
+        >>> parse_parameter_list("Alpha\\nBeta, Gamma; Delta   Alpha")
+        ['Alpha', 'Beta', 'Gamma', 'Delta', 'Alpha']
+        >>> parse_parameter_list(" ,;\\n ")
+        []
+    """
+    normalized = (
+        str(text)
+        .replace("\r", " ")
+        .replace("\n", " ")
+        .replace(",", " ")
+        .replace(";", " ")
+    )
+    return [token for token in normalized.split() if token]
 
 
 def _clip_to_cells(text: str, cap: int) -> str:
@@ -218,11 +259,15 @@ class A2LParameterPicker(Vertical):
     matching key — so a bare ``set_parameters(rows)`` always repopulates.
 
     Events:
-        ``SelectionChanged``: the picked-name tuple changed (one row toggled);
-            the host repaints its collected-fields previews on it.
+        ``SelectionChanged``: the picked-name tuple changed (one row toggled
+            or a bulk include landed); the host repaints its
+            collected-fields previews on it. It stays the single "picks
+            changed" contract (E3 ruling 4).
         ``ViewChanged``: the rendered page changed (populate, filter applied,
             page turned); carries ``shown`` / ``total`` / ``page`` /
             ``page_count`` for observers.
+        ``BulkAddRequested``: the operator activated the bulk-add control;
+            the host pushes the bulk modal for this picker (R-B102-BULK-001).
     """
 
     class SelectionChanged(Message, namespace="a2l_parameter_picker"):
@@ -235,6 +280,16 @@ class A2LParameterPicker(Vertical):
         def __init__(self, names: tuple = ()) -> None:
             super().__init__()
             self.names = names
+
+    class BulkAddRequested(Message, namespace="a2l_parameter_picker"):
+        """The bulk-add control was activated (R-B102-BULK-001).
+
+        The picker stays presentational (C-7 / E3 ruling 5): it composes
+        ``#check_param_bulk_button`` but never pushes the modal itself —
+        the host (Check Editor today, Patch Editor at Inc 5) listens and
+        pushes :class:`s19_app.tui.screens.BulkParameterAddScreen` for this
+        picker.
+        """
 
     class ViewChanged(Message, namespace="a2l_parameter_picker"):
         """The ledger view changed: one page was (re)rendered.
@@ -438,6 +493,11 @@ class A2LParameterPicker(Vertical):
                 id="check_param_include_button",
                 classes="patch-chip",
             )
+            yield Button(
+                "Add list",
+                id="check_param_bulk_button",
+                classes="patch-chip",
+            )
             yield Static(
                 "space also toggles ✓ on the highlighted row",
                 classes="ce-hint",
@@ -505,6 +565,10 @@ class A2LParameterPicker(Vertical):
         if button_id == "check_param_include_button":
             event.stop()
             self._toggle_highlighted()
+            return
+        if button_id == "check_param_bulk_button":
+            event.stop()
+            self.post_message(self.BulkAddRequested())
             return
 
     def on_include_table_include_toggled(
@@ -691,3 +755,105 @@ class A2LParameterPicker(Vertical):
             Coordinate(cursor, 0), self._row_cells(name, self._layout())[0]
         )
         self.post_message(self.SelectionChanged(names=tuple(self._picked_params)))
+
+    # ------------------------------------------------------------------
+    # Bulk include (batch-102 Inc 4, R-B102-BULK-003/005)
+    # ------------------------------------------------------------------
+
+    def include_names(self, names: Sequence[str]) -> dict:
+        """Include every listed name that exactly matches a source parameter
+        (R-B102-BULK-003, R-B102-BULK-005; E3 rulings 3/4/7).
+
+        Summary:
+            The bulk path behind the Inc-4 modal. Counts classify UNIQUE
+            names: a repeated token (``Gamma\\nGamma``) counts once, so a
+            missing duplicate never inflates ``not_found`` (E3 ruling 3).
+            An exact, case-sensitive source match not already picked is
+            appended to the picks — existing picks are never cleared or
+            reordered; a source match already picked counts
+            ``already_included``; anything else counts ``not_found``, with
+            ``first_missing`` naming the first missed name in list order.
+            Every membership test runs on dict/set, never ``list.index`` /
+            ``in`` over the growing pick list, so a thousands-of-tokens
+            paste stays linear (E3 ruling 7).
+
+            When at least one name is included, only the affected VISIBLE
+            mark cells repaint and ``SelectionChanged`` posts — the message
+            stays the single "picks changed" contract (E3 ruling 4) and the
+            ledger is never rebuilt here. When nothing is included the pick
+            state, the table and the message stream are all untouched.
+
+        Args:
+            names (Sequence[str]): The parsed list (see
+                :func:`parse_parameter_list`); order matters, repeats allowed.
+
+        Returns:
+            dict: ``included`` / ``already_included`` / ``not_found`` counts
+                plus ``first_missing`` (``None`` when nothing was missed).
+
+        Example:
+            >>> picker = A2LParameterPicker()
+            >>> picker.set_parameters(
+            ...     [{"name": "Alpha", "address": 1}, {"name": "Beta", "address": 2}]
+            ... )
+            True
+            >>> picker.include_names(["Alpha"])["included"]
+            1
+            >>> picker.include_names(["Beta", "Beta", "Alpha", "Gamma"])
+            {'included': 1, 'already_included': 1, 'not_found': 1, 'first_missing': 'Gamma'}
+            >>> picker.picked_params
+            ['Alpha', 'Beta']
+        """
+        source = self._param_rows
+        picked_now = set(self._picked_params)
+        included: list = []
+        already_included = 0
+        not_found = 0
+        first_missing: Optional[str] = None
+        seen: set = set()
+        for raw in names:
+            name = raw if isinstance(raw, str) else str(raw)
+            if not name or name in seen:
+                continue
+            seen.add(name)
+            if name in source:
+                if name in picked_now:
+                    already_included += 1
+                else:
+                    picked_now.add(name)
+                    included.append(name)
+            else:
+                not_found += 1
+                if first_missing is None:
+                    first_missing = name
+        if included:
+            self._picked_params.extend(included)
+            self._repaint_included_marks(included)
+            self.post_message(self.SelectionChanged(names=tuple(self._picked_params)))
+        return {
+            "parsed_unique": len(seen),
+            "included": len(included),
+            "already_included": already_included,
+            "not_found": not_found,
+            "first_missing": first_missing,
+        }
+
+    def _repaint_included_marks(self, included: Sequence[str]) -> None:
+        """Repaint the ✓ mark cell of every newly included VISIBLE row.
+
+        The bulk include never rebuilds the ledger (R-B102-BULK-007
+        doctrine): rows not on the current page keep their state and repaint
+        when a later rebuild mounts them.
+        """
+        if not self.is_mounted:
+            return
+        fresh = set(included)
+        if not any(name in fresh for name in self._visible_params):
+            return
+        table = self.query_one("#check_param_table", DataTable)
+        layout = self._layout()
+        for index, name in enumerate(self._visible_params):
+            if name in fresh:
+                table.update_cell_at(
+                    Coordinate(index, 0), self._row_cells(name, layout)[0]
+                )

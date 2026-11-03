@@ -122,7 +122,9 @@ PE_IDS_9C7BEAF: frozenset[str] = frozenset(
 #: The 31 ids of commit 9c7beaf plus the four batch-102 Inc 3 picker ids
 #: (E3 ruling 6): ``#check_param_status`` (the count/truncation line, ruling 3)
 #: and the pagination row ``#check_param_page_prev_button`` /
-#: ``#check_param_page_label`` / ``#check_param_page_next_button``.
+#: ``#check_param_page_label`` / ``#check_param_page_next_button``; plus the
+#: batch-102 Inc 4 bulk-add control (E3 ruling 5: the picker composes
+#: ``#check_param_bulk_button`` and emits ``BulkAddRequested``).
 CE_IDS_9C7BEAF: frozenset[str] = frozenset(
     """
     check_actions_row check_actions_row2 check_addendum_preview check_apply_ghost
@@ -130,8 +132,8 @@ CE_IDS_9C7BEAF: frozenset[str] = frozenset(
     check_file_name_input check_left_column check_mem_add_button
     check_mem_address_input check_mem_controls check_mem_inputs
     check_mem_label_input check_mem_remove_button check_mem_size_input
-    check_mem_table check_param_controls check_param_filter
-    check_param_include_button check_param_page_label
+    check_mem_table check_param_bulk_button check_param_controls
+    check_param_filter check_param_include_button check_param_page_label
     check_param_page_next_button check_param_page_prev_button
     check_param_status check_param_table check_preview
     check_preview_toggle_button check_results check_right_column
@@ -143,7 +145,7 @@ CE_IDS_9C7BEAF: frozenset[str] = frozenset(
 # The literals' own guards (A.2): a drifted copy fails at import.
 assert len(ES_48_9C7BEAF) == 48, len(ES_48_9C7BEAF)
 assert len(PE_IDS_9C7BEAF) == 66, len(PE_IDS_9C7BEAF)
-assert len(CE_IDS_9C7BEAF) == 35, len(CE_IDS_9C7BEAF)
+assert len(CE_IDS_9C7BEAF) == 36, len(CE_IDS_9C7BEAF)
 assert "\x00" not in HOSTILE_C1 and "\x00" in HOSTILE_NUL
 assert "/" not in HOSTILE_NAME
 

@@ -1,0 +1,101 @@
+RED evidence — batch-102 Inc 4 — bulk add de labels/parámetros en Check Editor (TC-B102-BULK-01..07)
+====================================================================================================
+
+Command : python -m pytest tests/test_b102_bulk_add.py tests/test_b97_check_editor.py
+          "tests/test_b97_chips_help.py::test_tc_b97_32_check_editor_help_names_every_label" -q
+Date    : 2026-11-03 13:04 CSTM (E4 tester run, pre-integration / base tree, HEAD dc55e56)
+Platform: Windows — Python 3.12.7, pytest 8.3.4, textual 8.2.8 (encoding UTF-8)
+Result  : 17 failed, 32 passed in 195.87s — the 17 failures are the expected RED set.
+
+Expected RED (17) — reasons
+---------------------------
+Batch-102 test cases (per 02-test-cases.md notas de ejecución), new file
+tests/test_b102_bulk_add.py (12):
+1.-2. test_tc_b102_bulk_01_modal_opens_with_instruction_focus[empty/picked]
+   R-B102-BULK-001: screens.BulkParameterAddScreen does not ship on base (guard
+   clause: "the bulk modal ships"). 2/2 aperturas parametrized (selección vacía
+   y con un pick); both arms fail at the same guard.
+3. test_tc_b102_bulk_02_separators_split_and_empty_tokens_drop
+   R-B102-BULK-002: parse_parameter_list does not ship (guard clause); the
+   e2e arm (modal paste → four ordered picks) is never reached.
+4. test_tc_b102_bulk_03_inclusion_semantics_and_duplicate_controls
+   R-B102-BULK-003 + ruling 10: the modal does not ship — need() on
+   #check_param_bulk_button ("expected exactly 1 widget, found 0").
+5. test_tc_b102_bulk_03_unique_name_counts
+   Ruling 3: same absence (counts classify unique names: Gamma\nGamma ⇒
+   not found 1).
+6. test_tc_b102_bulk_04_summary_with_first_missing
+   R-B102-BULK-004: same absence (exact summary
+   "Included 1 · already included 0 · not found 2 — first missing: MissingOne").
+7. test_tc_b102_bulk_04_summary_contained_at_80x24
+   Ruling 2 (contención a 80x24): same absence.
+8. test_tc_b102_bulk_05_no_match_arm
+   R-B102-BULK-005: same absence (exact "No listed parameters found."; picks
+   unchanged).
+9. test_tc_b102_bulk_06_hostile_pasted_names_render_literally
+   R-B102-BULK-006 + ruling 2: same absence — the case exercises the modal
+   per the notas (hostile source name included verbatim; "[red]" literal in
+   the summary; zero markup spans / control bytes).
+10. test_tc_b102_bulk_07_close_and_apply_do_not_rebuild_the_ledger
+    R-B102-BULK-007 + rulings 4/6/9: same absence (10 000-param picker; spies
+    on _rebuild_ledger, SelectionChanged dispatch and load_spec; escape /
+    Close-after-include / no-change close oracles).
+11. test_tc_b102_bulk_07_include_names_uses_hash_membership
+    Ruling 7: A2LParameterPicker.include_names does not ship — AST pin over
+    the shipped source (no list.index, no `in self._picked_params`; a dict/set
+    backs membership).
+12. test_tc_b102_bulk_cap_input_marks_64kib_truncation
+    Ruling 8: same modal absence (a >64 KiB paste must land capped at 65536
+    chars and the summary must flag the truncation naming the cap).
+
+Ruling-sanctioned RED on the base tree (E3 rulings-inc4 addendum 1: "E4
+actualiza CE_IDS_9C7BEAF (35→36 y su assert), TC-B97-45/61" — the censuses
+document the target state and flip green with the component):
+13.-14. test_tc_b97_08_census_rows_and_one_docked_row[size0/size1]
+    CE_IDS_9C7BEAF is 36 ids now (35 of the Inc-3 census plus
+    check_param_bulk_button, E3 ruling 5: the picker composes it and emits
+    BulkAddRequested); the id is missing on base
+    ("CE_IDS_9C7BEAF - ids == set()" lists ['check_param_bulk_button']).
+15. test_tc_b97_45_keyboard_order_enter_space_and_chip_states
+    BULK_GROUP = ("check_param_bulk_button",) takes the enabled chain slot
+    after Include in _groups; on base the group has 0 focus-chain members
+    ("assert n >= 1").
+16.-17. test_tc_b97_61_every_control_displayed_in_its_home[size0/size1]
+    HOMES check_left_column extended with check_param_bulk_button; the typed
+    census walks the 36 CE_IDS via app.query_one → NoMatches for
+    #check_param_bulk_button on base. Counts move 17→18 controls and
+    15→16 shipped ids (asserts updated in the test).
+
+Expected GREEN on base (32) — all hold
+--------------------------------------
+- The rest of tests/test_b97_check_editor.py, including the batch-102 Inc 3
+  picker clauses (pagination disabled state, debounce waits, signature
+  preservation) and the acceptance tests.
+- test_tc_b97_32_check_editor_help_names_every_label (TC-B97-32 check arm):
+  help coverage derives its expectations dynamically from the rendered
+  controls, so it stays green on base and pins the ruling-1 help addendum on
+  GREEN — the implementer's window_help "check_editor" section must name the
+  new bulk control or this test fails. (window_help.py itself is s19_app
+  source: the E4 tester does not touch it; TC-B97-32 enforces the update.)
+
+Mutant controls honoured (full coverage per 02-test-cases.md + rulings)
+----------------------------------------------------------------------
+TC-01: one-line filter input reused / instruction line missing or altered.
+TC-02: newline-only parse / buffer treated as one string.
+TC-03: picks replaced / duplicates appended; token-instead-of-unique counts
+(ruling 3); pasted names in a status line (ruling 10).
+TC-04: first-missing detail dropped / count order permuted; summary painted
+as markup or overflowing the modal at 80x24 (ruling 2).
+TC-05: picks cleared / modal closed without feedback.
+TC-06: summary routed through markup; hostile name not included.
+TC-07: ledger rebuilt on modal close; refresh via load_spec (ruling 9);
+SelectionChanged not dispatched by include_names (ruling 4); no-change close
+repainting the preview (ruling 6); list membership in the bulk loop
+(ruling 7); silent / missing 64 KiB cap indication (ruling 8).
+
+Files changed (tests/ only — no s19_app/ source modified, nothing committed)
+----------------------------------------------------------------------------
+- tests/test_b102_bulk_add.py        (new — TC-B102-BULK-01..07 + ruling addenda)
+- tests/b97_fixtures.py              (CE_IDS_9C7BEAF 35→36 + guard, comment)
+- tests/test_b97_check_editor.py     (TC-B97-08 assert/docstring, TC-B97-45
+                                      BULK_GROUP slot, TC-B97-61 HOMES + counts)
