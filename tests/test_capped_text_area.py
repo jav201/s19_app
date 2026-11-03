@@ -105,8 +105,8 @@ def test_ac_1_2_small_paste_is_unchanged() -> None:
     assert asyncio.run(_run()) == payload
 
 
-def test_ac_1_3_ctrl_v_action_paste_is_capped() -> None:
-    """AC-1.3: the second ingress — ``action_paste`` reading ``app.clipboard``
+def test_ac_1_3_ctrl_v_action_paste_is_capped(monkeypatch) -> None:
+    """AC-1.3: the second ingress — ``action_paste`` reading the OS clipboard
     — is also capped to the limit."""
 
     async def _run() -> int:
@@ -115,16 +115,19 @@ def test_ac_1_3_ctrl_v_action_paste_is_capped() -> None:
             ta = app.query_one("#ta", CappedTextArea)
             ta.focus()
             await pilot.pause()
-            app.copy_to_clipboard("z" * (CAP + 5000))
-            ta.action_paste()
+            monkeypatch.setattr(
+                "s19_app.tui.os_clipboard_input.read_os_clipboard",
+                lambda: "z" * (CAP + 5000),
+            )
+            await ta.action_paste()
             await pilot.pause()
             return len(ta.text)
 
     assert asyncio.run(_run()) == CAP
 
 
-def test_ac_1_3_ctrl_v_small_clipboard_unchanged() -> None:
-    """AC-1.3 boundary: a small clipboard is pasted verbatim via ctrl+v."""
+def test_ac_1_3_ctrl_v_small_clipboard_unchanged(monkeypatch) -> None:
+    """AC-1.3 boundary: a small OS clipboard is pasted verbatim via ctrl+v."""
 
     async def _run() -> str:
         app = _CappedHarness()
@@ -132,8 +135,11 @@ def test_ac_1_3_ctrl_v_small_clipboard_unchanged() -> None:
             ta = app.query_one("#ta", CappedTextArea)
             ta.focus()
             await pilot.pause()
-            app.copy_to_clipboard("clip text")
-            ta.action_paste()
+            monkeypatch.setattr(
+                "s19_app.tui.os_clipboard_input.read_os_clipboard",
+                lambda: "clip text",
+            )
+            await ta.action_paste()
             await pilot.pause()
             return ta.text
 

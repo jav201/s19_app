@@ -947,6 +947,13 @@ class PreparedLoad:
         bases_set (Optional[frozenset[int]]): ``frozenset(row_bases)`` for fast hex render.
         a2l_enriched_tags / a2l_enriched_key / a2l_summary_lines: Precomputed A2L enrichment
             state ready to install into ``_a2l_enriched_*`` caches.
+        a2l_view_generation / a2l_image_generation (Optional[int]): The
+            generation snapshot the worker predicted when precomputing the
+            A2L enrichment (batch-102 Inc 2, R-B102-A2L-006). The apply
+            step installs the precomputed cache only when both match the
+            post-bump live generations; a mismatch discards the
+            precompute and the UI thread recomputes. ``None`` on the
+            non-precomputed fallback bundle.
 
     Data Flow:
         - Built inside ``S19TuiApp._prepare_load_payload`` on the worker thread.
@@ -973,6 +980,11 @@ class PreparedLoad:
     a2l_enriched_tags: list = field(default_factory=list)
     a2l_enriched_key: Optional[tuple] = None
     a2l_summary_lines: list = field(default_factory=list)
+    # batch-102 Inc 2 (R-B102-A2L-006): generation snapshot the A2L
+    # precompute was built against, verified by ``_apply_prepared_load``
+    # after its own generation bumps before the cache is installed.
+    a2l_view_generation: Optional[int] = None
+    a2l_image_generation: Optional[int] = None
     # DataTable-oriented precompute (populated by the load worker):
     # - ``mac_widths``: 8-tuple of column widths matching the historical inline computation
     #   in ``update_mac_view`` so the main thread never rescans full row vectors.
@@ -2727,6 +2739,16 @@ class S19TuiApp(App):
     current_project: Optional[str] = None
     current_a2l_path: Optional[Path] = None
     current_a2l_data: Optional[dict] = None
+    #: Monotonic A2L attach generation (batch-102 Inc 2, R-B102-A2L-001/
+    #: .004): bumped by the single-writer seam ``_replace_current_a2l`` on
+    #: EVERY replacement or clear of the A2L payload, so the enriched-tag
+    #: cache key ``(a2l_view_generation, image_generation, mem_size)`` can
+    #: never collide across two payloads that reuse one object address.
+    #: Declared at class level rather than assigned in ``__init__`` (the
+    #: default is immutable and per-instance bumps write through ``+=``)
+    #: so the TC-B100-09 source census of ``self.<name> =`` assignments
+    #: stays unchanged; the counter is K1-like — monotonic, never reset.
+    _a2l_view_generation: int = 0
     last_search_text: Optional[str] = None
     last_search_address: Optional[int] = None
     log_lines: deque[str]
@@ -2791,7 +2813,10 @@ class S19TuiApp(App):
         self._a2l_cache_key: Optional[tuple[str, int, int]] = None
         self._a2l_cache_data: Optional[dict[str, Any]] = None
         self._a2l_enriched_tags: list[dict[str, Any]] = []
-        self._a2l_enriched_key: Optional[tuple[int, int]] = None
+        #: Enrichment cache key, shape ``(a2l_view_generation,
+        #: image_generation, mem_size)`` (batch-102 Inc 2) — never
+        #: ``id()``-based; see ``_compute_a2l_enriched_tags``.
+        self._a2l_enriched_key: Optional[tuple[int, int, int]] = None
         self._a2l_filtered_tags: list[dict[str, Any]] = []
         self._a2l_window_start: int = 0
         self._a2l_summary_lines: list[str] = []
@@ -13029,8 +13054,11 @@ class S19TuiApp(App):
             complete by construction — and the monotonic image generation
             the app owns is re-pushed into it (LLR-165.3). The monotonic
             counters ``_image_generation`` / ``_diff_compare_generation``
-            (K1) and the view preferences, the log deque, the active
-            rail screen and the path-keyed A2L parse cache (K2) are KEPT.
+            (K1) — and the batch-102 Inc 2 A2L attach generation, which
+            the S2/S3 clear bumps through ``_replace_current_a2l`` rather
+            than resetting — and the view preferences, the log deque,
+            the active rail screen and the path-keyed A2L parse cache
+            (K2) are KEPT.
 
         Args:
             None
@@ -13074,9 +13102,12 @@ class S19TuiApp(App):
         # S2/S3: the A2L path and parsed payload — the two parse
         # fallbacks a loose-S19 reload would otherwise re-attach (P-2's
         # ``LEAK a2l_tags``; ``current_a2l_data``'s clearing writer is
-        # LLR-165.4's unload arm, :meth:`_apply_unload`).
-        self.current_a2l_path = None
-        self.current_a2l_data = None
+        # LLR-165.4's unload arm, :meth:`_apply_unload`). Routed through
+        # ``_replace_current_a2l``, the single-writer seam (batch-102
+        # Inc 2): its generation bump is harmless — the counter is
+        # monotonic and K1-like, never reset — and its cache clear
+        # overlaps S12/S13 below.
+        self._replace_current_a2l(None, None)
         # S5: variant ids — the caller adopts the manifest's set after
         # the reset.
         self._variant_set = None
@@ -13283,11 +13314,14 @@ class S19TuiApp(App):
                     else ("a2l-cache", _norm(value[0]), value[2])
                 )
             elif name == "_a2l_enriched_key":
-                # Identity-keyed cache (shape: ``(id(current_a2l_data),
-                # mem_size)`` — ``_compute_a2l_enriched_tags``): keep the
-                # comparable half.
+                # Generation-keyed cache (shape: ``(a2l_view_generation,
+                # image_generation, mem_size)`` — batch-102 Inc 2,
+                # ``_compute_a2l_enriched_tags``): the two generation
+                # components are monotonic counters (K1-like) that a
+                # load-over may move, like ``_image_generation``; keep
+                # the comparable half, the memory map size (QA R2-07).
                 snapshot[name] = (
-                    None if value is None else ("a2l-enriched", value[1])
+                    None if value is None else ("a2l-enriched", value[2])
                 )
             else:
                 snapshot[name] = _norm(value)
@@ -13671,9 +13705,9 @@ class S19TuiApp(App):
                 self._store_a2l_cache(prepared.a2l_cache)
             install = prepared.install
             if install.variant is None and install.mac is None:
-                self.current_a2l_path = install.a2l
-                self.current_a2l_data = (
-                    prepared.a2l_cache[1] if prepared.a2l_cache is not None else None
+                self._replace_current_a2l(
+                    install.a2l,
+                    prepared.a2l_cache[1] if prepared.a2l_cache is not None else None,
                 )
                 self.update_a2l_view()
                 self._refresh_loaded_panel()
@@ -15321,8 +15355,7 @@ class S19TuiApp(App):
                 self.logger.warning("Recent sources not updated: %r", str(req.source))
             self.refresh_files()
             self._store_a2l_cache(result.entry)
-            self.current_a2l_path = copied
-            self.current_a2l_data = result.entry[1]
+            self._replace_current_a2l(copied, result.entry[1])
             self._log_a2l_parse_summary(copied, self.current_a2l_data, result.parse_seconds)
             if self.current_file:
                 self.current_file.a2l_path = copied
@@ -16841,14 +16874,17 @@ class S19TuiApp(App):
         # composer that picks between two mirrors keeps the second source alive
         # and only hides the symptom.
         if kind in ("all", "a2l"):
-            self.current_a2l_path = None
-            # LLR-165.4 (P-25): the PARSED payload is the other half of
-            # the artifact being unloaded — it is the fallback the next
+            # LLR-165.4 (P-25): the A2L artifact is the path AND the
+            # parsed payload — the payload is the fallback the next
             # S19/HEX/MAC parse re-attaches (`else self.current_a2l_data`
             # at the parse branches), so clearing the path alone left the
             # tags alive after an unload. Cleared beside the path, for
-            # the kinds that drop the artifact.
-            self.current_a2l_data = None
+            # the kinds that drop the artifact — through
+            # ``_replace_current_a2l`` (batch-102 Inc 2), the
+            # single-writer seam whose generation bump makes the stale
+            # enrichment key unreachable and whose cache clear empties
+            # the tag rows the render below repaints.
+            self._replace_current_a2l(None, None)
         # Mirror the load-path install: the MAC cache is keyed on the previous
         # records, and the empty-state panels key on `current_file is None`.
         self._invalidate_mac_view_cache()
@@ -17516,11 +17552,18 @@ class S19TuiApp(App):
 
         Data Flow:
             - Mutate ``current_file``, reset MAC/hex/issues paging anchors, and sync A2L.
+            - Route any loaded A2L through ``_replace_current_a2l`` (the
+              single-writer seam) so the attach generation bumps with the
+              payload install (batch-102 Inc 2).
             - Bump ``_image_generation`` and push it into ``_change_service`` so a
               completed check run cannot keep describing the previous image
               (LLR-077.2).
             - When ``precomputed`` is True, copy MAC cache + validation results into the
               app's cache members so ``update_mac_view`` treats them as a cache hit.
+            - Install the worker-precomputed A2L enrichment only when its
+              generation snapshot equals the post-bump live generations;
+              a mismatch discards it and the UI thread recomputes
+              (R-B102-A2L-006).
             - Attach ``bases_set`` to the ``LoadedFile`` for fast hex rendering.
             - Set the coexistence status line immediately so the user sees the new file.
             - Schedule sections, hex, A2L, and project-label refreshes via ``call_later``
@@ -17643,8 +17686,11 @@ class S19TuiApp(App):
         self._alt_goto_focus_address = None
         self._mac_goto_focus_address = None
         if loaded.a2l_data:
-            self.current_a2l_path = loaded.a2l_path
-            self.current_a2l_data = loaded.a2l_data
+            # batch-102 Inc 2 (R-B102-A2L-001/.004): the install routes
+            # through the single-writer seam so the attach generation
+            # bumps and the stale enrichment key can never satisfy
+            # ``_compute_a2l_enriched_tags``.
+            self._replace_current_a2l(loaded.a2l_path, loaded.a2l_data)
         # Attach worker-precomputed bases_set so hex renders skip rebuilding sets of
         # millions of addresses on every refresh.
         try:
@@ -17667,10 +17713,35 @@ class S19TuiApp(App):
             self._mac_view_cache_cell_rows = list(prepared.mac_cell_rows)
             self._mac_view_cache_cell_styles = list(prepared.mac_cell_styles)
             if prepared.a2l_enriched_key is not None:
-                self._a2l_enriched_tags = prepared.a2l_enriched_tags
-                self._a2l_enriched_key = prepared.a2l_enriched_key
-                self._a2l_summary_lines = prepared.a2l_summary_lines
-                self._a2l_summary_start = 0
+                # batch-102 Inc 2 (R-B102-A2L-006, F-B102-A2L-3): the
+                # worker precomputed this enrichment on a generation
+                # snapshot taken before the apply-time bumps above
+                # (image generation at the install point, A2L generation
+                # at the seam). Install it only when BOTH snapshot
+                # generations still match the live counters; otherwise
+                # discard it — the caches stay cleared and
+                # ``_compute_a2l_enriched_tags`` recomputes on the UI
+                # thread in ``_step_a2l`` — so a precompute can never
+                # overwrite a fresher attach/image generation.
+                if (
+                    prepared.a2l_view_generation == self._a2l_view_generation
+                    and prepared.a2l_image_generation == self._image_generation
+                ):
+                    self._a2l_enriched_tags = prepared.a2l_enriched_tags
+                    self._a2l_enriched_key = prepared.a2l_enriched_key
+                    self._a2l_summary_lines = prepared.a2l_summary_lines
+                    self._a2l_summary_start = 0
+                else:
+                    self.logger.info(
+                        "Load phase boundary: apply_a2l_precompute_discarded "
+                        "path=%s snapshot_a2l_gen=%s snapshot_image_gen=%s "
+                        "apply_a2l_gen=%s apply_image_gen=%s",
+                        path.name,
+                        prepared.a2l_view_generation,
+                        prepared.a2l_image_generation,
+                        self._a2l_view_generation,
+                        self._image_generation,
+                    )
         # Surface the new file name right away so the user sees immediate feedback
         # even before the deferred sections/hex/a2l refreshes complete.
         status_message = self._format_coexistence_status(loaded, path)
@@ -17791,7 +17862,12 @@ class S19TuiApp(App):
             return f"Loaded {path.name} (MAC only)"
         return f"Loaded {path.name}"
 
-    def _prepare_load_payload(self, loaded: LoadedFile) -> PreparedLoad:
+    def _prepare_load_payload(
+        self,
+        loaded: LoadedFile,
+        a2l_view_generation: Optional[int] = None,
+        image_generation: Optional[int] = None,
+    ) -> PreparedLoad:
         """
         Summary:
             Build every derived artifact the UI needs from a freshly parsed ``LoadedFile``,
@@ -17799,20 +17875,35 @@ class S19TuiApp(App):
 
         Args:
             loaded (LoadedFile): Parsed payload from ``_parse_loaded_file``.
+            a2l_view_generation (Optional[int]): Predicted A2L attach generation
+                for the upcoming apply — ``_start_load_worker`` passes the live
+                counter + 1 when ``loaded.a2l_data`` exists, else the live
+                counter (the apply seam only bumps when it installs a
+                payload). This function must NOT read the mutable app
+                counter itself off-thread; the default resolves the
+                prediction on the calling thread for the synchronous
+                shipped chain (batch-102 Inc 2, R-B102-A2L-006).
+            image_generation (Optional[int]): Predicted image generation —
+                the live counter + 1, ``_apply_prepared_load`` always bumps.
+                Same threading contract as ``a2l_view_generation``.
 
         Returns:
             PreparedLoad: Bundle with MAC cache, validation report, highlights,
-            out-of-range list, ``bases_set``, and A2L enrichment state.
+            out-of-range list, ``bases_set``, and A2L enrichment state plus the
+            generation snapshot the A2L precompute was built against.
 
         Data Flow:
-            - Pre-compute enriched A2L tags (or skip when no A2L present).
+            - Pre-compute enriched A2L tags (or skip when no A2L present),
+              keyed ``(a2l_view_generation, image_generation, len(mem_map))``
+              — never ``id()``-based (F-B102-A2L-1).
             - Run ``_compute_mac_view_payload`` to produce the MAC table + validation output.
             - Derive MAC highlights and sorted out-of-range lists using the cached
               ``range_index``.
             - Freeze the ``row_bases`` into a ``frozenset`` so hex renders avoid rebuilding
               million-entry sets on every refresh.
             - Pack everything into a ``PreparedLoad`` with a matching ``mac_cache_key`` so
-              ``update_mac_view`` treats the payload as a cache hit.
+              ``update_mac_view`` treats the payload as a cache hit, and with the
+              generation snapshots so the apply step can discard a stale precompute.
 
         Dependencies:
             Uses:
@@ -17829,6 +17920,18 @@ class S19TuiApp(App):
         )
         self._flush_logger()
         range_index = self._get_range_index(loaded if loaded.file_type in {"s19", "hex"} else None)
+        # batch-102 Inc 2 (R-B102-A2L-006): resolve the generation
+        # snapshot the precompute is built against. The worker passes
+        # explicit predictions; the default mirrors that prediction on
+        # the calling thread so the synchronous shipped chain
+        # (parse -> prepare -> apply) keys the cache exactly as the
+        # worker path does.
+        if image_generation is None:
+            image_generation = self._image_generation + 1
+        if a2l_view_generation is None:
+            a2l_view_generation = self._a2l_view_generation + (
+                1 if loaded.a2l_data else 0
+            )
         a2l_data = loaded.a2l_data
         a2l_enriched_tags: list[dict[str, Any]] = []
         a2l_enriched_key: Optional[tuple] = None
@@ -17840,7 +17943,11 @@ class S19TuiApp(App):
                 mem_map,
                 max_tag_lines=500,
             )
-            a2l_enriched_key = (id(a2l_data), len(mem_map))
+            a2l_enriched_key = (
+                a2l_view_generation,
+                image_generation,
+                len(mem_map),
+            )
         self.logger.info(
             "Load phase boundary: prepare_a2l_done has_a2l=%s enriched_tags=%d",
             bool(a2l_data),
@@ -17911,6 +18018,8 @@ class S19TuiApp(App):
             a2l_enriched_tags=a2l_enriched_tags,
             a2l_enriched_key=a2l_enriched_key,
             a2l_summary_lines=a2l_summary_lines,
+            a2l_view_generation=a2l_view_generation,
+            a2l_image_generation=image_generation,
             mac_widths=mac_widths,
             mac_cell_rows=mac_cell_rows,
             mac_cell_styles=mac_cell_styles,
@@ -17942,7 +18051,10 @@ class S19TuiApp(App):
         Data Flow:
             - Log a ``worker_parse_start`` phase marker and run ``_parse_loaded_file``.
             - Log ``worker_parse_done`` then call ``_prepare_load_payload`` to build the
-              MAC cache, validation report, highlights, out-of-range list, and bases set.
+              MAC cache, validation report, highlights, out-of-range list, and bases set,
+              passing the predicted post-apply generation snapshots (image +1; A2L +1
+              only when the parse carried a payload) so the A2L precompute can be
+              verified — and discarded if stale — at apply time (R-B102-A2L-006).
             - Dispatch ``_apply_prepared_load`` via ``call_from_thread`` so the UI install
               is the only main-thread work performed for this load.
             - On parse or prepare exceptions, fall back to installing the minimal
@@ -17985,7 +18097,23 @@ class S19TuiApp(App):
             self._flush_logger()
             prepare_started = time.perf_counter()
             try:
-                prepared = self._prepare_load_payload(loaded)
+                # batch-102 Inc 2 (R-B102-A2L-006): predict the
+                # generations the apply step will have bumped by the
+                # time it installs this payload — the image generation
+                # always +1, the A2L generation +1 only when the parse
+                # carried a payload (the apply seam bumps only when it
+                # installs one). A wrong prediction is safe: the
+                # apply-time snapshot verification discards the
+                # precompute and the UI thread recomputes.
+                prepared = self._prepare_load_payload(
+                    loaded,
+                    a2l_view_generation=(
+                        self._a2l_view_generation + 1
+                        if loaded.a2l_data
+                        else self._a2l_view_generation
+                    ),
+                    image_generation=self._image_generation + 1,
+                )
             except Exception as exc:
                 # Fall back to the slow-path install so users still see the file.
                 self.logger.exception(
@@ -18997,6 +19125,73 @@ class S19TuiApp(App):
             except Exception:
                 mac_table.add_row(*row)
 
+    def _invalidate_a2l_view_cache(self) -> None:
+        """
+        Summary:
+            Clear the A2L enrichment/filter caches and the tag row-key map
+            (batch-102 Inc 2): the derived view state that must never
+            outlive the payload it was computed from.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Reset ``_a2l_enriched_tags`` / ``_a2l_enriched_key`` and
+              ``_a2l_filtered_tags`` to empty, and empty
+              ``_a2l_row_key_to_tag`` so no stale row maps to a tag of the
+              previous payload (R-B102-A2L-005).
+
+        Dependencies:
+            Used by:
+                - ``_replace_current_a2l`` (the single-writer seam)
+        """
+        self._a2l_enriched_tags = []
+        self._a2l_enriched_key = None
+        self._a2l_filtered_tags = []
+        self._a2l_row_key_to_tag = {}
+
+    def _replace_current_a2l(
+        self, a2l_path: Optional[Path], a2l_data: Optional[dict]
+    ) -> None:
+        """
+        Summary:
+            Single-writer seam for every ``current_a2l_path`` /
+            ``current_a2l_data`` replacement or clear (batch-102 Inc 2,
+            R-B102-A2L-001/.004/.005): direct attach, project install,
+            file-load install and clear/unload all funnel through here.
+
+        Args:
+            a2l_path (Optional[Path]): The A2L artifact now in effect, or
+                ``None`` when none is.
+            a2l_data (Optional[dict]): The parsed A2L payload, or ``None``
+                on clear/unload. May be a distinct dict at a reused object
+                address — that is exactly why the generation bump exists.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Replace both members, bump ``_a2l_view_generation``, and
+              clear the enrichment/filter caches plus the row-key map via
+              ``_invalidate_a2l_view_cache``.
+            - Leave rendering to the caller: every call site runs the
+              existing ``update_a2l_view()`` (directly or through the
+              load chain) when the UI must repaint.
+
+        Dependencies:
+            Used by:
+                - ``_install_attached_a2l`` / ``_install_prepared_project``
+                - ``_apply_prepared_load`` / ``_apply_unload`` /
+                  ``_reset_project_session``
+        """
+        self.current_a2l_path = a2l_path
+        self.current_a2l_data = a2l_data
+        self._a2l_view_generation += 1
+        self._invalidate_a2l_view_cache()
+
     def _compute_a2l_enriched_tags(self) -> list[dict[str, Any]]:
         """
         Summary:
@@ -19009,7 +19204,13 @@ class S19TuiApp(App):
             list[dict[str, Any]]: Enriched A2L tags with schema/memory validation fields.
 
         Data Flow:
-            - Derive cache key from current A2L payload identity and memory map size.
+            - Derive the cache key from the A2L attach generation, the
+              image generation and the memory map size — never from
+              ``id()``: CPython can reuse a freed dict's address for the
+              next payload, and an equal-size memory map would leave an
+              identity key unchanged (F-B102-A2L-1). Including
+              ``_image_generation`` makes an equal-size/different-content
+              image reload recompute automatically (R-B102-A2L-002).
             - Reuse previous enriched list when key is unchanged.
             - Use ``enrich_tags_and_render`` to compute merged tags and summary lines on cache miss.
 
@@ -19026,7 +19227,7 @@ class S19TuiApp(App):
             return []
         mem_map = self.current_file.mem_map if self.current_file else None
         mem_size = len(mem_map) if mem_map is not None else -1
-        key = (id(self.current_a2l_data), mem_size)
+        key = (self._a2l_view_generation, self._image_generation, mem_size)
         if self._a2l_enriched_key == key:
             return self._a2l_enriched_tags
         enriched, summary_lines = enrich_tags_and_render(
@@ -19087,6 +19288,12 @@ class S19TuiApp(App):
         Data Flow:
             - Apply active filter mode/text to cached enriched tags.
             - Optionally reset buffered start index on filter model changes.
+            - When a non-empty filter matches nothing, pass the
+              filter-specific empty message ``No A2L tags match
+              '<filter>'.`` so the operator reads a successful load
+              whose filter excluded every row as exactly that, not as a
+              missing load (F-B102-A2L-2); ``update_a2l_tags_view``
+              remains the one writer of the summary text.
             - Render only current buffered window to list view.
 
         Dependencies:
@@ -19102,6 +19309,13 @@ class S19TuiApp(App):
             self._a2l_window_start = 0
         else:
             self._a2l_window_start = self._a2l_clamp_page_start(len(self._a2l_filtered_tags))
+        filter_text = self.a2l_tags_filter_text
+        if not self._a2l_filtered_tags and filter_text:
+            self.update_a2l_tags_view(
+                self._a2l_filtered_tags,
+                empty_message=f"No A2L tags match '{filter_text}'.",
+            )
+            return
         self.update_a2l_tags_view(self._a2l_filtered_tags)
 
     def update_a2l_view(self) -> None:
@@ -19166,7 +19380,9 @@ class S19TuiApp(App):
         self._refresh_a2l_filtered_tags(preserve_anchor=False)
         self._update_a2l_summary_buffer()
 
-    def update_a2l_tags_view(self, tags: list[dict]) -> None:
+    def update_a2l_tags_view(
+        self, tags: list[dict], empty_message: Optional[str] = None
+    ) -> None:
         """
         Summary:
             Render one page of A2L tag rows into the A2L DataTable with row_keys
@@ -19174,6 +19390,12 @@ class S19TuiApp(App):
 
         Args:
             tags (list[dict]): Filtered enriched tags to display (may be empty).
+            empty_message (Optional[str]): Summary text painted when ``tags`` is
+                empty, replacing the generic ``No A2L tags.`` — the
+                filter-specific ``No A2L tags match '<filter>'.`` is the one
+                current caller (batch-102 Inc 2, R-B102-A2L-003). Wrapped in
+                ``safe_text`` here so hostile filter text (``[red]``, escapes)
+                renders literally, never as markup.
 
         Returns:
             None
@@ -19195,6 +19417,7 @@ class S19TuiApp(App):
                 - ``_a2l_issue_severity_map``
                 - ``_a2l_tag_row_severity`` / ``_severity_style``
                 - ``_a2l_tag_in_memory_display`` / ``_a2l_tag_unit_display``
+                - ``safe_text``
             Used by:
                 - ``_refresh_a2l_filtered_tags``
                 - ``update_a2l_view``
@@ -19207,7 +19430,10 @@ class S19TuiApp(App):
         a2l_table.clear(columns=False)
         if not tags:
             self._a2l_window_start = 0
-            summary_label.update("No A2L tags.")
+            if empty_message is not None:
+                summary_label.update(safe_text(empty_message))
+            else:
+                summary_label.update("No A2L tags.")
             self.logger.info(
                 "Load phase boundary: populate_a2l_table_done rows=0 elapsed=%.3f",
                 time.perf_counter() - populate_started,

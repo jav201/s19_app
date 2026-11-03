@@ -5,3 +5,5 @@
 2026-11-03T10:30:00-06:00 E3 round 1 — architect NO PASS on inc-2 blocker; security PASS-WITH-NOTES
 2026-11-03T10:55:00-06:00 E3 corrected — write cascade Win32/Tk/PowerShell, async copy/cut, real timeout tests, generation+image cache key, PreparedLoad snapshots, single empty-message writer
 2026-11-03T11:05:00-06:00 E3 round 2 — PASS-WITH-NOTES both; minor findings routed to E4 addenda in design/E3-rulings-inc1-inc2.md
+2026-11-03T11:10:00-06:00 E4 start — separate tester and implementer worktrees for inc-1 and inc-2 from cb51fc8
+2026-11-03T11:35:00-06:00 E4 integrated inc-1/inc-2 — RED transcripts copied; targeted GREEN 145 passed (evidence/green-targeted.txt); operator added Flow Builder scope as Inc 6/7

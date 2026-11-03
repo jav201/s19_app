@@ -29,8 +29,10 @@ Rama de trabajo: `batch-102-hotfixes` desde `2f2f932` (batch-101 sigue abierto e
 | 3 | Selector A2L compartido y Check Editor usable | rendimiento/arquitectura | US-102-03 | Extraer un selector/ledger A2L paginado con filtro debounce e integrarlo en Check Editor; mantener picks y comportamiento observable. Archivos: módulo nuevo bajo `s19_app/tui/`, `screens_directionb.py`, `app.py` en integración. | 8-10 nodos | — |
 | 4 | Bulk add de labels/parámetros | feature | US-102-04 | Aceptar lista multilínea/separada por comas o espacios, incluir válidos y reportar no resueltos sin duplicar. Archivos: selector compartido y Check Editor. | 4-6 nodos | Inc 3 |
 | 5 | Paridad Patch Editor | feature/coherencia | US-102-05 | Integrar el mismo selector usable en Patch Editor, con misma gramática visual, foco y estados. Archivos: selector compartido, `PatchEditorPanel`, `app.py` en prefill/acción. | 7-9 nodos | Inc 3 |
+| 6 | Flow Builder: editar bloques individualmente | defecto/feature | US-102-06 | Permitir editar cada bloque existente sin borrar todo el flow; operaciones por bloque coherentes con el modelo actual. Archivos: pantallas/servicios Flow Builder, tests. | 6-9 nodos | — |
+| 7 | Flow Builder: insumos de archivos claros y seleccionables | defecto/feature | US-102-07 | Mostrar qué archivo consume cada bloque y permitir elegirlo mediante dropdown de proyecto/temporales y ruta externa validada, con estados vacíos claros. Archivos: pantallas/servicios Flow Builder, workspace/tests. | 7-10 nodos | Inc 6 |
 
-Orden recomendado: 1 y 2 pueden avanzar en paralelo porque no comparten archivos fuente; 3 es la base de 4 y 5. La política de trabajo es una sola escritura concurrente por archivo fuente.
+Orden recomendado: 1 y 2 pueden avanzar en paralelo porque no comparten archivos fuente; 3 es la base de 4 y 5; 6 es base de 7. La política de trabajo es una sola escritura concurrente por archivo fuente.
 
 ## Decisiones de diseño TUI (`tui-design`)
 

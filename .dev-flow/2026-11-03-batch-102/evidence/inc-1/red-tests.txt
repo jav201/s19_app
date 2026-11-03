@@ -1,0 +1,702 @@
+$ python -m pytest tests/test_b102_clipboard.py -v
+# RED run: Inc-1 product code not yet implemented; failures must be behavioural (assertions / missing-symbol imports), never syntax or collection errors.
+
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+============================= test session starts =============================
+platform win32 -- Python 3.12.7, pytest-8.3.4, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b102-inc1-tests
+configfile: pyproject.toml
+plugins: anyio-4.2.0, asyncio-0.25.0, cov-7.1.0, textual-snapshot-1.1.0, timeout-2.3.1, syrupy-4.8.0
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
+collecting ... collected 20 items
+
+tests/test_b102_clipboard.py::test_tc_b102_01_paste_inserts_os_clipboard_text_on_representative_surfaces[a2l_tags_filter_input] PASSED [  5%]
+tests/test_b102_clipboard.py::test_tc_b102_01_paste_inserts_os_clipboard_text_on_representative_surfaces[load_path] PASSED [ 10%]
+tests/test_b102_clipboard.py::test_tc_b102_01_paste_inserts_os_clipboard_text_on_representative_surfaces[patch_paste_text] FAILED [ 15%]
+tests/test_b102_clipboard.py::test_tc_b102_01_over_cap_paste_is_capped_at_65536[input] PASSED [ 20%]
+tests/test_b102_clipboard.py::test_tc_b102_01_over_cap_paste_is_capped_at_65536[textarea] FAILED [ 25%]
+tests/test_b102_clipboard.py::test_tc_b102_02_copy_writes_selection_to_os_and_internal_without_mutation[input] FAILED [ 30%]
+tests/test_b102_clipboard.py::test_tc_b102_02_copy_writes_selection_to_os_and_internal_without_mutation[textarea] FAILED [ 35%]
+tests/test_b102_clipboard.py::test_tc_b102_02_copy_caps_os_payload_and_internal_mirror[input] FAILED [ 40%]
+tests/test_b102_clipboard.py::test_tc_b102_02_copy_caps_os_payload_and_internal_mirror[textarea] FAILED [ 45%]
+tests/test_b102_clipboard.py::test_tc_b102_02_write_os_clipboard_cascade_order FAILED [ 50%]
+tests/test_b102_clipboard.py::test_tc_b102_03_cut_writes_os_and_removes_selection[input] FAILED [ 55%]
+tests/test_b102_clipboard.py::test_tc_b102_03_cut_writes_os_and_removes_selection[textarea] FAILED [ 60%]
+tests/test_b102_clipboard.py::test_tc_b102_03_input_empty_selection_cut_skips_and_preserves_internal_clipboard FAILED [ 65%]
+tests/test_b102_clipboard.py::test_tc_b102_04_powershell_read_rescue_uses_enlarged_timeout FAILED [ 70%]
+tests/test_b102_clipboard.py::test_tc_b102_05_powershell_write_rescue_uses_enlarged_timeout_via_static_stdin_command FAILED [ 75%]
+tests/test_b102_clipboard.py::test_tc_b102_06_total_write_failure_falls_back_to_internal_with_exact_warning[input] FAILED [ 80%]
+tests/test_b102_clipboard.py::test_tc_b102_06_total_write_failure_falls_back_to_internal_with_exact_warning[textarea] FAILED [ 85%]
+tests/test_b102_clipboard.py::test_tc_b102_07_total_paste_failure_selects_field_and_paints_exact_warning[input] PASSED [ 90%]
+tests/test_b102_clipboard.py::test_tc_b102_07_total_paste_failure_selects_field_and_paints_exact_warning[textarea] FAILED [ 95%]
+tests/test_b102_clipboard.py::test_tc_b102_08_empty_selection_cut_cuts_cursor_line_to_os_and_internal FAILED [100%]
+
+================================== FAILURES ===================================
+_ test_tc_b102_01_paste_inserts_os_clipboard_text_on_representative_surfaces[patch_paste_text] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32159/test_tc_b102_01_paste_inserts_2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000167ECE3B8F0>
+widget_id = 'patch_paste_text'
+
+    @pytest.mark.parametrize(
+        "widget_id",
+        sorted(_PASTE_SURFACES),
+        ids=sorted(_PASTE_SURFACES),
+    )
+    def test_tc_b102_01_paste_inserts_os_clipboard_text_on_representative_surfaces(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, widget_id: str
+    ) -> None:
+        """TC-B102-01 (R-B102-CLIP-001): Ctrl+V lands OS text on all 3 surfaces.
+    
+        Drives the REAL key path (focus + ctrl+v) per surface with the OS read
+        faked to ``C:\\tmp\\firmware.s19`` and the internal clipboard seeded
+        with a decoy: if the action read ``App.clipboard`` first (the mutant
+        control), the decoy would win and this fails. The Load and A2L-filter
+        surfaces already paste from the OS (batch-67 contract this increment
+        extends); the Patch paste buffer is the new coverage and is RED on the
+        pre-increment tree (stock sync ``action_paste`` reads the decoy).
+        """
+        os_text = "C:\\tmp\\firmware.s19"
+        _patch_os_read(monkeypatch, os_text)
+        rail_key = _PASTE_SURFACES[widget_id]
+    
+        async def _drive() -> str:
+            app = S19TuiApp(base_dir=tmp_path)
+            app._clipboard = "INTERNAL_DECOY_MUST_NOT_WIN"
+            async with app.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                if rail_key is None:
+                    app.push_screen(bare_path_dialog())
+                    for _ in range(6):
+                        await pilot.pause()
+                else:
+                    app.action_show_screen(rail_key)
+                    for _ in range(3):
+                        await pilot.pause()
+                widget = (
+                    app.screen if rail_key is None else app
+                ).query_one(
+                    f"#{widget_id}",
+                    TextArea if widget_id == "patch_paste_text" else Input,
+                )
+                widget.focus()
+                await pilot.pause()
+                await pilot.press("ctrl+v")
+                await pilot.pause()
+                await pilot.pause()
+                return _content(widget)
+    
+        result = asyncio.run(_drive())
+>       assert os_text in result, (
+            f"Ctrl+V on #{widget_id} must insert the OS clipboard text "
+            f"{os_text!r}; got {result!r}"
+        )
+E       AssertionError: Ctrl+V on #patch_paste_text must insert the OS clipboard text 'C:\\tmp\\firmware.s19'; got 'INTERNAL_DECOY_MUST_NOT_WIN{\n  "format": "s19app-changeset",\n  "version": "2.0",\n  "kind": "change",\n  "encoding": "utf-8",\n  "value_mode": "text",\n  "entries": [\n    {"type": "bytes", "address": "0x00000000", "bytes": "DE AD BE EF"},\n    {"type": "string", "address": "0x00000010", "value": "ABC"}\n  ]\n}'
+E       assert 'C:\\tmp\\firmware.s19' in 'INTERNAL_DECOY_MUST_NOT_WIN{\n  "format": "s19app-changeset",\n  "version": "2.0",\n  "kind": "change",\n  "encoding": "utf-8",\n  "value_mode": "text",\n  "entries": [\n    {"type": "bytes", "address": "0x00000000", "bytes": "DE AD BE EF"},\n    {"type": "string", "address": "0x00000010", "value": "ABC"}\n  ]\n}'
+
+tests\test_b102_clipboard.py:300: AssertionError
+_________ test_tc_b102_01_over_cap_paste_is_capped_at_65536[textarea] _________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000167ED89A210>
+kind = 'textarea'
+
+    @pytest.mark.parametrize("kind", ["input", "textarea"], ids=["input", "textarea"])
+    def test_tc_b102_01_over_cap_paste_is_capped_at_65536(
+        monkeypatch: pytest.MonkeyPatch, kind: str
+    ) -> None:
+        """TC-B102-01 (R-B102-CLIP-001): payloads past 65,536 chars truncate.
+    
+        Injection at ``_STRATEGIES`` keeps the real bounded
+        ``read_os_clipboard`` funnel in the loop, so the cap cannot be
+        bypassed by a fake at the funnel. RED on the pre-increment tree for
+        the TextArea arm (its paste override does not exist yet).
+        """
+        blob = "A" * (_READ_CAP + 5000)
+        _inject_read_strategies(monkeypatch, blob)
+    
+        async def _drive() -> str:
+            app = _ClipboardHarness()
+            async with app.run_test() as pilot:
+                widget = _widget(app, kind)
+                widget.focus()
+                await pilot.pause()
+                await _invoke(widget, "action_paste")
+                await pilot.pause()
+                return _content(widget)
+    
+        result = asyncio.run(_drive())
+>       assert result == blob[:_READ_CAP], (
+            f"Paste must cap the OS payload at {_READ_CAP} chars; "
+            f"got {len(result)} chars"
+        )
+E       AssertionError: Paste must cap the OS payload at 65536 chars; got 0 chars
+E       assert '' == 'AAAAAAAAAAAA...AAAAAAAAAAAAA'
+E         
+E         - AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA...
+E         
+E         ...Full output truncated (1 line hidden), use '-vv' to show
+
+tests\test_b102_clipboard.py:335: AssertionError
+_ test_tc_b102_02_copy_writes_selection_to_os_and_internal_without_mutation[input] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000167EE056690>
+kind = 'input'
+
+    @pytest.mark.parametrize("kind", ["input", "textarea"], ids=["input", "textarea"])
+    def test_tc_b102_02_copy_writes_selection_to_os_and_internal_without_mutation(
+        monkeypatch: pytest.MonkeyPatch, kind: str
+    ) -> None:
+        """TC-B102-02 (R-B102-CLIP-002): copy payload is exact, widget untouched.
+    
+        The OS write strategies are replaced by a recording fake so the test
+        never touches the developer's real clipboard; the internal mirror must
+        hold the same text and ``value``/``selection`` must be unchanged.
+        RED on the pre-increment tree: the inherited sync action never
+        reaches the (not yet existing) OS write, so no payload is recorded.
+        """
+        recorded = _recording_writer(monkeypatch, result=True)
+    
+        async def _drive() -> tuple:
+            app = _ClipboardHarness()
+            async with app.run_test() as pilot:
+                widget = _widget(app, kind)
+                _set_content(widget, kind, _COPY_VALUE)
+                _select_range(widget, kind, 7, 18)
+                before_selection = widget.selection
+                await pilot.pause()
+                await _invoke(widget, "action_copy")
+                await pilot.pause()
+                return _content(widget), widget.selection, before_selection, app.clipboard
+    
+        content, selection, before_selection, internal = asyncio.run(_drive())
+>       assert recorded == [_COPY_SELECTION], (
+            f"The OS clipboard write must carry exactly {_COPY_SELECTION!r}; "
+            f"recorded payloads: {recorded!r}"
+        )
+E       AssertionError: The OS clipboard write must carry exactly 'firmware.a2l'; recorded payloads: []
+E       assert [] == ['firmware.a2l']
+E         
+E         Right contains one more item: 'firmware.a2l'
+E         
+E         Full diff:
+E         + []
+E         - [
+E         -     'firmware.a2l',
+E         - ]
+
+tests\test_b102_clipboard.py:378: AssertionError
+_ test_tc_b102_02_copy_writes_selection_to_os_and_internal_without_mutation[textarea] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000167ED3C20F0>
+kind = 'textarea'
+
+    @pytest.mark.parametrize("kind", ["input", "textarea"], ids=["input", "textarea"])
+    def test_tc_b102_02_copy_writes_selection_to_os_and_internal_without_mutation(
+        monkeypatch: pytest.MonkeyPatch, kind: str
+    ) -> None:
+        """TC-B102-02 (R-B102-CLIP-002): copy payload is exact, widget untouched.
+    
+        The OS write strategies are replaced by a recording fake so the test
+        never touches the developer's real clipboard; the internal mirror must
+        hold the same text and ``value``/``selection`` must be unchanged.
+        RED on the pre-increment tree: the inherited sync action never
+        reaches the (not yet existing) OS write, so no payload is recorded.
+        """
+        recorded = _recording_writer(monkeypatch, result=True)
+    
+        async def _drive() -> tuple:
+            app = _ClipboardHarness()
+            async with app.run_test() as pilot:
+                widget = _widget(app, kind)
+                _set_content(widget, kind, _COPY_VALUE)
+                _select_range(widget, kind, 7, 18)
+                before_selection = widget.selection
+                await pilot.pause()
+                await _invoke(widget, "action_copy")
+                await pilot.pause()
+                return _content(widget), widget.selection, before_selection, app.clipboard
+    
+        content, selection, before_selection, internal = asyncio.run(_drive())
+>       assert recorded == [_COPY_SELECTION], (
+            f"The OS clipboard write must carry exactly {_COPY_SELECTION!r}; "
+            f"recorded payloads: {recorded!r}"
+        )
+E       AssertionError: The OS clipboard write must carry exactly 'firmware.a2l'; recorded payloads: []
+E       assert [] == ['firmware.a2l']
+E         
+E         Right contains one more item: 'firmware.a2l'
+E         
+E         Full diff:
+E         + []
+E         - [
+E         -     'firmware.a2l',
+E         - ]
+
+tests\test_b102_clipboard.py:378: AssertionError
+_______ test_tc_b102_02_copy_caps_os_payload_and_internal_mirror[input] _______
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000167EE310CB0>
+kind = 'input'
+
+    @pytest.mark.parametrize("kind", ["input", "textarea"], ids=["input", "textarea"])
+    def test_tc_b102_02_copy_caps_os_payload_and_internal_mirror(
+        monkeypatch: pytest.MonkeyPatch, kind: str
+    ) -> None:
+        """TC-B102-02 + E3 addendum 3: the 65,536 cap binds OS payload AND mirror.
+    
+        A selection of ``_WRITE_CAP + 500`` chars must reach the OS writer (and
+        the internal clipboard) truncated to exactly ``_WRITE_CAP`` — the cap
+        is one contract for both destinations, not two.
+        """
+        recorded = _recording_writer(monkeypatch, result=True)
+        big = "B" * (_WRITE_CAP + 500)
+    
+        async def _drive() -> str:
+            app = _ClipboardHarness()
+            async with app.run_test() as pilot:
+                widget = _widget(app, kind)
+                _set_content(widget, kind, big)
+                _select_range(widget, kind, 0, len(big))
+                await pilot.pause()
+                await _invoke(widget, "action_copy")
+                await pilot.pause()
+                return app.clipboard
+    
+        internal = asyncio.run(_drive())
+>       assert recorded, "the OS write cascade must have been attempted"
+E       AssertionError: the OS write cascade must have been attempted
+E       assert []
+
+tests\test_b102_clipboard.py:419: AssertionError
+_____ test_tc_b102_02_copy_caps_os_payload_and_internal_mirror[textarea] ______
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000167ED63A5D0>
+kind = 'textarea'
+
+    @pytest.mark.parametrize("kind", ["input", "textarea"], ids=["input", "textarea"])
+    def test_tc_b102_02_copy_caps_os_payload_and_internal_mirror(
+        monkeypatch: pytest.MonkeyPatch, kind: str
+    ) -> None:
+        """TC-B102-02 + E3 addendum 3: the 65,536 cap binds OS payload AND mirror.
+    
+        A selection of ``_WRITE_CAP + 500`` chars must reach the OS writer (and
+        the internal clipboard) truncated to exactly ``_WRITE_CAP`` — the cap
+        is one contract for both destinations, not two.
+        """
+        recorded = _recording_writer(monkeypatch, result=True)
+        big = "B" * (_WRITE_CAP + 500)
+    
+        async def _drive() -> str:
+            app = _ClipboardHarness()
+            async with app.run_test() as pilot:
+                widget = _widget(app, kind)
+                _set_content(widget, kind, big)
+                _select_range(widget, kind, 0, len(big))
+                await pilot.pause()
+                await _invoke(widget, "action_copy")
+                await pilot.pause()
+                return app.clipboard
+    
+        internal = asyncio.run(_drive())
+>       assert recorded, "the OS write cascade must have been attempted"
+E       AssertionError: the OS write cascade must have been attempted
+E       assert []
+
+tests\test_b102_clipboard.py:419: AssertionError
+______________ test_tc_b102_02_write_os_clipboard_cascade_order _______________
+
+    def test_tc_b102_02_write_os_clipboard_cascade_order() -> None:
+        """TC-B102-02 (codewire ``write_os_clipboard``): Win32 \u2192 Tk \u2192 PS order.
+    
+        First success short-circuits the cascade; a raising strategy counts as
+        a failed layer and the cascade continues; every layer failing yields
+        ``False``. Imported lazily — the symbol is added by this increment.
+        """
+>       from s19_app.tui.os_clipboard_input import write_os_clipboard
+E       ImportError: cannot import name 'write_os_clipboard' from 's19_app.tui.os_clipboard_input' (C:\Users\jjgh8\Github\s19_app-b102-inc1-tests\s19_app\tui\os_clipboard_input.py)
+
+tests\test_b102_clipboard.py:438: ImportError
+_________ test_tc_b102_03_cut_writes_os_and_removes_selection[input] __________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000167EDA90410>
+kind = 'input'
+
+    @pytest.mark.parametrize("kind", ["input", "textarea"], ids=["input", "textarea"])
+    def test_tc_b102_03_cut_writes_os_and_removes_selection(
+        monkeypatch: pytest.MonkeyPatch, kind: str
+    ) -> None:
+        """TC-B102-03 (R-B102-CLIP-003): payload ``DE AD``, text left `` BE EF``."""
+        recorded = _recording_writer(monkeypatch, result=True)
+    
+        async def _drive() -> tuple:
+            app = _ClipboardHarness()
+            async with app.run_test() as pilot:
+                widget = _widget(app, kind)
+                _set_content(widget, kind, "DE AD BE EF")
+                _select_range(widget, kind, 0, 5)
+                await pilot.pause()
+                await _invoke(widget, "action_cut")
+                await pilot.pause()
+                return _content(widget), app.clipboard
+    
+        content, internal = asyncio.run(_drive())
+>       assert recorded == ["DE AD"], (
+            f"The OS clipboard write must carry exactly 'DE AD'; "
+            f"recorded payloads: {recorded!r}"
+        )
+E       AssertionError: The OS clipboard write must carry exactly 'DE AD'; recorded payloads: []
+E       assert [] == ['DE AD']
+E         
+E         Right contains one more item: 'DE AD'
+E         
+E         Full diff:
+E         + []
+E         - [
+E         -     'DE AD',
+E         - ]
+
+tests\test_b102_clipboard.py:518: AssertionError
+________ test_tc_b102_03_cut_writes_os_and_removes_selection[textarea] ________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000167ED5F7890>
+kind = 'textarea'
+
+    @pytest.mark.parametrize("kind", ["input", "textarea"], ids=["input", "textarea"])
+    def test_tc_b102_03_cut_writes_os_and_removes_selection(
+        monkeypatch: pytest.MonkeyPatch, kind: str
+    ) -> None:
+        """TC-B102-03 (R-B102-CLIP-003): payload ``DE AD``, text left `` BE EF``."""
+        recorded = _recording_writer(monkeypatch, result=True)
+    
+        async def _drive() -> tuple:
+            app = _ClipboardHarness()
+            async with app.run_test() as pilot:
+                widget = _widget(app, kind)
+                _set_content(widget, kind, "DE AD BE EF")
+                _select_range(widget, kind, 0, 5)
+                await pilot.pause()
+                await _invoke(widget, "action_cut")
+                await pilot.pause()
+                return _content(widget), app.clipboard
+    
+        content, internal = asyncio.run(_drive())
+>       assert recorded == ["DE AD"], (
+            f"The OS clipboard write must carry exactly 'DE AD'; "
+            f"recorded payloads: {recorded!r}"
+        )
+E       AssertionError: The OS clipboard write must carry exactly 'DE AD'; recorded payloads: []
+E       assert [] == ['DE AD']
+E         
+E         Right contains one more item: 'DE AD'
+E         
+E         Full diff:
+E         + []
+E         - [
+E         -     'DE AD',
+E         - ]
+
+tests\test_b102_clipboard.py:518: AssertionError
+_ test_tc_b102_03_input_empty_selection_cut_skips_and_preserves_internal_clipboard _
+
+    def test_tc_b102_03_input_empty_selection_cut_skips_and_preserves_internal_clipboard() -> (
+        None
+    ):
+        """E3 addendum 2 (R-B102-CLIP-003): empty Input cut is a no-op SkipAction.
+    
+        ``OsClipboardInput.action_cut`` with an empty selection must raise
+        Textual's ``SkipAction`` and must NOT clear the internal clipboard by
+        copying ``""`` into it. RED on the pre-increment tree: the inherited
+        ``Input.action_cut`` copies the empty selection into ``App.clipboard``
+        and never raises.
+        """
+        app_clipboard_before = "KEEP_ME"
+    
+        async def _drive() -> tuple:
+            app = _ClipboardHarness()
+            async with app.run_test() as pilot:
+                widget = app.query_one("#ci", OsClipboardInput)
+                widget.value = "keep me"
+                widget.selection = (0, 0)
+                app._clipboard = app_clipboard_before
+                await pilot.pause()
+                with pytest.raises(SkipAction):
+                    await _invoke(widget, "action_cut")
+                await pilot.pause()
+                return widget.value, app.clipboard
+    
+>       value, internal = asyncio.run(_drive())
+
+tests\test_b102_clipboard.py:556: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _drive() -> tuple:
+        app = _ClipboardHarness()
+        async with app.run_test() as pilot:
+            widget = app.query_one("#ci", OsClipboardInput)
+            widget.value = "keep me"
+            widget.selection = (0, 0)
+            app._clipboard = app_clipboard_before
+            await pilot.pause()
+>           with pytest.raises(SkipAction):
+E           Failed: DID NOT RAISE <class 'textual.actions.SkipAction'>
+
+tests\test_b102_clipboard.py:551: Failed
+________ test_tc_b102_04_powershell_read_rescue_uses_enlarged_timeout _________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000167ED2E8860>
+
+    def test_tc_b102_04_powershell_read_rescue_uses_enlarged_timeout(
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """TC-B102-04 (R-B102-CLIP-005): read rescue gets >= 2.0 s.
+    
+        ``subprocess.run`` is faked to record its ``timeout`` and return
+        ``OK_FROM_PS``; the tk/Win32 layers are irrelevant at this seam. The
+        recorded timeout is the real budget the layer hands the subprocess —
+        a 0.5 s residue (the mutant control) fails the assertion.
+        """
+        from s19_app.tui import os_clipboard_input as mod
+    
+        captured: dict = {}
+    
+        def _fake_run(argv, **kwargs):
+            captured["argv"] = list(argv)
+            captured["kwargs"] = dict(kwargs)
+            return _FakeCompleted(returncode=0, stdout="OK_FROM_PS\r\n", stderr="")
+    
+        monkeypatch.setattr(mod.subprocess, "run", _fake_run)
+        monkeypatch.setattr(mod.sys, "platform", "win32")
+    
+        text = mod._read_via_powershell()
+    
+        assert text == "OK_FROM_PS", f"got {text!r}"
+        timeout = captured["kwargs"].get("timeout")
+>       assert timeout is not None and timeout >= 2.0, (
+            f"The PowerShell read rescue must allow a cold process start of "
+            f"at least 2.0 s; recorded timeout={timeout!r}"
+        )
+E       AssertionError: The PowerShell read rescue must allow a cold process start of at least 2.0 s; recorded timeout=0.5
+E       assert (0.5 is not None and 0.5 >= 2.0)
+
+tests\test_b102_clipboard.py:595: AssertionError
+_ test_tc_b102_05_powershell_write_rescue_uses_enlarged_timeout_via_static_stdin_command _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000167ED3C3A70>
+
+    def test_tc_b102_05_powershell_write_rescue_uses_enlarged_timeout_via_static_stdin_command(
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """TC-B102-05 (R-B102-CLIP-005): write rescue — 2.0 s, stdin payload.
+    
+        The copied text must reach PowerShell through the ``input`` (stdin)
+        kwarg as UTF-8, never interpolated into ``-Command``; the command
+        stays the static ``Set-Clipboard`` form; ``shell=False`` and a hidden
+        window are requested (E3 addendum 5). Imported lazily — the layer is
+        added by this increment, so RED is the ``ImportError``.
+        """
+        from s19_app.tui import os_clipboard_input as mod
+>       from s19_app.tui.os_clipboard_input import _write_via_powershell
+E       ImportError: cannot import name '_write_via_powershell' from 's19_app.tui.os_clipboard_input' (C:\Users\jjgh8\Github\s19_app-b102-inc1-tests\s19_app\tui\os_clipboard_input.py)
+
+tests\test_b102_clipboard.py:629: ImportError
+_ test_tc_b102_06_total_write_failure_falls_back_to_internal_with_exact_warning[input] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000167ED3C2900>
+kind = 'input'
+
+    @pytest.mark.parametrize("kind", ["input", "textarea"], ids=["input", "textarea"])
+    def test_tc_b102_06_total_write_failure_falls_back_to_internal_with_exact_warning(
+        monkeypatch: pytest.MonkeyPatch, kind: str
+    ) -> None:
+        """TC-B102-06 (R-B102-CLIP-004): every OS write strategy fails.
+    
+        The internal clipboard still receives the selection, the local cut
+        still happens, and the LATEST painted warning is exactly
+        ``Clipboard write failed — copied inside the app only.`` at warning
+        severity. The OS write seam is a fake that always fails; RED on the
+        pre-increment tree: the inherited sync actions never reach the seam.
+        """
+        recorded = _recording_writer(monkeypatch, result=False)
+        notifications: list = []
+    
+        async def _drive() -> tuple:
+            app = _ClipboardHarness()
+            async with app.run_test() as pilot:
+                _capture_notify(app, notifications)
+                widget = _widget(app, kind)
+                _set_content(widget, kind, "DE AD BE EF")
+                _select_range(widget, kind, 0, 5)
+                await pilot.pause()
+                await _invoke(widget, "action_copy")
+                await pilot.pause()
+                internal_after_copy = app.clipboard
+                await _invoke(widget, "action_cut")
+                await pilot.pause()
+                return internal_after_copy, _content(widget), app.clipboard
+    
+        internal_after_copy, content_after_cut, internal_after_cut = asyncio.run(_drive())
+>       assert recorded, "the OS write cascade must have been attempted"
+E       AssertionError: the OS write cascade must have been attempted
+E       assert []
+
+tests\test_b102_clipboard.py:705: AssertionError
+_ test_tc_b102_06_total_write_failure_falls_back_to_internal_with_exact_warning[textarea] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000167F0E85D90>
+kind = 'textarea'
+
+    @pytest.mark.parametrize("kind", ["input", "textarea"], ids=["input", "textarea"])
+    def test_tc_b102_06_total_write_failure_falls_back_to_internal_with_exact_warning(
+        monkeypatch: pytest.MonkeyPatch, kind: str
+    ) -> None:
+        """TC-B102-06 (R-B102-CLIP-004): every OS write strategy fails.
+    
+        The internal clipboard still receives the selection, the local cut
+        still happens, and the LATEST painted warning is exactly
+        ``Clipboard write failed — copied inside the app only.`` at warning
+        severity. The OS write seam is a fake that always fails; RED on the
+        pre-increment tree: the inherited sync actions never reach the seam.
+        """
+        recorded = _recording_writer(monkeypatch, result=False)
+        notifications: list = []
+    
+        async def _drive() -> tuple:
+            app = _ClipboardHarness()
+            async with app.run_test() as pilot:
+                _capture_notify(app, notifications)
+                widget = _widget(app, kind)
+                _set_content(widget, kind, "DE AD BE EF")
+                _select_range(widget, kind, 0, 5)
+                await pilot.pause()
+                await _invoke(widget, "action_copy")
+                await pilot.pause()
+                internal_after_copy = app.clipboard
+                await _invoke(widget, "action_cut")
+                await pilot.pause()
+                return internal_after_copy, _content(widget), app.clipboard
+    
+        internal_after_copy, content_after_cut, internal_after_cut = asyncio.run(_drive())
+>       assert recorded, "the OS write cascade must have been attempted"
+E       AssertionError: the OS write cascade must have been attempted
+E       assert []
+
+tests\test_b102_clipboard.py:705: AssertionError
+_ test_tc_b102_07_total_paste_failure_selects_field_and_paints_exact_warning[textarea] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000167EE205FA0>
+kind = 'textarea'
+
+    @pytest.mark.parametrize("kind", ["input", "textarea"], ids=["input", "textarea"])
+    def test_tc_b102_07_total_paste_failure_selects_field_and_paints_exact_warning(
+        monkeypatch: pytest.MonkeyPatch, kind: str
+    ) -> None:
+        """TC-B102-07 (R-B102-CLIP-006): OS read None + internal empty.
+    
+        The field text must stay put, become fully selected (so the stale
+        value cannot ride an unnoticed compare) and the latest painted
+        warning must be exactly
+        ``Clipboard read failed — try Ctrl+Shift+V or type the path manually.``
+        The Input arm pins the existing batch-67 contract; the TextArea arm
+        is RED on the pre-increment tree (its override does not exist).
+        """
+        _patch_os_read(monkeypatch, None)
+        notifications: list = []
+        original = "OLD_TEXT_STAYS_PUT"
+    
+        async def _drive() -> tuple:
+            app = _ClipboardHarness()
+            app._clipboard = ""
+            async with app.run_test() as pilot:
+                _capture_notify(app, notifications)
+                widget = _widget(app, kind)
+                _set_content(widget, kind, original)
+                await pilot.pause()
+                await _invoke(widget, "action_paste")
+                await pilot.pause()
+                return _content(widget), widget.selected_text
+    
+        content, selected_text = asyncio.run(_drive())
+        assert content == original, (
+            f"a failed paste must not corrupt the field; got {content!r}"
+        )
+>       assert selected_text == original, (
+            f"on total failure the CURRENT field text must be fully selected; "
+            f"selected_text={selected_text!r}"
+        )
+E       AssertionError: on total failure the CURRENT field text must be fully selected; selected_text=''
+E       assert '' == 'OLD_TEXT_STAYS_PUT'
+E         
+E         - OLD_TEXT_STAYS_PUT
+
+tests\test_b102_clipboard.py:763: AssertionError
+___ test_tc_b102_08_empty_selection_cut_cuts_cursor_line_to_os_and_internal ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000167F0E10680>
+
+    def test_tc_b102_08_empty_selection_cut_cuts_cursor_line_to_os_and_internal(
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """TC-B102-08 (R-B102-CLIP-003): no-selection cut deletes the cursor line.
+    
+        The replaced line text (what ``_delete_cursor_line`` returns) must go
+        to the OS clipboard and the internal mirror — never an empty string,
+        never a no-op (the mutant control). RED on the pre-increment tree:
+        the inherited sync cut never reaches the write seam, so nothing is
+        recorded.
+        """
+        recorded = _recording_writer(monkeypatch, result=True)
+    
+        async def _drive() -> tuple:
+            app = _ClipboardHarness()
+            async with app.run_test() as pilot:
+                ta = app.query_one("#ta", CappedTextArea)
+                ta.text = "first\nline_to_cut\nthird"
+                ta.selection = ((0, 0), (0, 0))
+                ta.cursor_location = (1, 2)
+                await pilot.pause()
+                await _invoke(ta, "action_cut")
+                await pilot.pause()
+                return ta.text, app.clipboard
+    
+        text, internal = asyncio.run(_drive())
+        assert "line_to_cut" not in text, (
+            f"the cursor line must be removed from the document; got {text!r}"
+        )
+        assert text == "first\nthird", f"got {text!r}"
+>       assert recorded, (
+            "a line cut must attempt the OS write — an empty-selection cut "
+            "must not become a no-op"
+        )
+E       AssertionError: a line cut must attempt the OS write — an empty-selection cut must not become a no-op
+E       assert []
+
+tests\test_b102_clipboard.py:812: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b102_clipboard.py::test_tc_b102_01_paste_inserts_os_clipboard_text_on_representative_surfaces[patch_paste_text]
+FAILED tests/test_b102_clipboard.py::test_tc_b102_01_over_cap_paste_is_capped_at_65536[textarea]
+FAILED tests/test_b102_clipboard.py::test_tc_b102_02_copy_writes_selection_to_os_and_internal_without_mutation[input]
+FAILED tests/test_b102_clipboard.py::test_tc_b102_02_copy_writes_selection_to_os_and_internal_without_mutation[textarea]
+FAILED tests/test_b102_clipboard.py::test_tc_b102_02_copy_caps_os_payload_and_internal_mirror[input]
+FAILED tests/test_b102_clipboard.py::test_tc_b102_02_copy_caps_os_payload_and_internal_mirror[textarea]
+FAILED tests/test_b102_clipboard.py::test_tc_b102_02_write_os_clipboard_cascade_order
+FAILED tests/test_b102_clipboard.py::test_tc_b102_03_cut_writes_os_and_removes_selection[input]
+FAILED tests/test_b102_clipboard.py::test_tc_b102_03_cut_writes_os_and_removes_selection[textarea]
+FAILED tests/test_b102_clipboard.py::test_tc_b102_03_input_empty_selection_cut_skips_and_preserves_internal_clipboard
+FAILED tests/test_b102_clipboard.py::test_tc_b102_04_powershell_read_rescue_uses_enlarged_timeout
+FAILED tests/test_b102_clipboard.py::test_tc_b102_05_powershell_write_rescue_uses_enlarged_timeout_via_static_stdin_command
+FAILED tests/test_b102_clipboard.py::test_tc_b102_06_total_write_failure_falls_back_to_internal_with_exact_warning[input]
+FAILED tests/test_b102_clipboard.py::test_tc_b102_06_total_write_failure_falls_back_to_internal_with_exact_warning[textarea]
+FAILED tests/test_b102_clipboard.py::test_tc_b102_07_total_paste_failure_selects_field_and_paints_exact_warning[textarea]
+FAILED tests/test_b102_clipboard.py::test_tc_b102_08_empty_selection_cut_cuts_cursor_line_to_os_and_internal
+======================== 16 failed, 4 passed in 8.15s =========================
