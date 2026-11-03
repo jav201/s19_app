@@ -82,6 +82,7 @@ from .screens import (
     ConfirmDiscardScreen,
     ConfirmQuestionScreen,
     EntryJsonScreen,
+    FlowBlockEditScreen,
     LegendScreen,
     LOAD_RESULT_SELECT_VARIANT,
     LoadChoice,
@@ -4028,6 +4029,80 @@ class S19TuiApp(App):
                 panel.set_blocks(loaded, name=stem)
 
         self.push_screen(LoadFlowScreen(flows, project_dir), _do_load)
+
+    def on_flow_builder_panel_edit_requested(
+        self, event: "FlowBuilderPanel.EditRequested"
+    ) -> None:
+        """Open the block-edit modal for the picked block (batch-102 Inc 6).
+
+        Summary:
+            The Edit half of the panel's message coordination (E3 ruling 3):
+            the panel resolved the pick and the containment base (as Paste
+            does) and posted the target; the app snapshots the chain's wire
+            projection, pushes :class:`FlowBlockEditScreen` and, on a saved
+            candidate, applies it through the panel's PUBLIC
+            ``replace_block`` — the panel is never touched through a
+            private seam. A cancel dismisses with ``None`` and changes
+            nothing (R-B102-FB-003 keeps the original on a refused save —
+            the modal itself never dismisses with a finding).
+
+        Args:
+            event (FlowBuilderPanel.EditRequested): Carries the target
+                index, the block and the resolved base (possibly ``None`` —
+                the modal's Save then refuses in-modal, E3 ruling 4).
+        """
+        from .services import flow_persistence_service as fps
+
+        panel = self.query_one("#flow_panel", FlowBuilderPanel)
+        #: The CURRENT wire envelope the candidate validates against — the
+        #: same ``flow_to_dict`` projection persistence uses.
+        wire_blocks = fps.flow_to_dict(panel.current_flow)["blocks"]
+        index = event.index
+
+        def _apply(replacement: Optional["FlowBlock"]) -> None:
+            if replacement is None:
+                return  # cancelled (or refused — the modal stays, so None is a cancel)
+            panel.replace_block(index, replacement)
+
+        self.push_screen(
+            FlowBlockEditScreen(index, event.block, wire_blocks, event.base_dir),
+            _apply,
+        )
+
+    def on_flow_builder_panel_remove_requested(
+        self, event: "FlowBuilderPanel.RemoveRequested"
+    ) -> None:
+        """Confirm, then remove exactly the picked block (batch-102 Inc 6).
+
+        Summary:
+            The Remove half of the message coordination (E3 ruling 3): the
+            app pushes the safe confirm — initial focus and the accent on
+            Cancel, ``escape`` cancels (E3 ruling 8) — and on a yes applies
+            the removal through the panel's PUBLIC ``remove_block``, which
+            re-checks the range immediately before mutating. The index is
+            captured here, when the screen opens; the funnel and the
+            clipboard survive (R-B102-FB-004).
+
+        Args:
+            event (FlowBuilderPanel.RemoveRequested): Carries the target
+                index and the block (its kind names the confirm).
+        """
+        panel = self.query_one("#flow_panel", FlowBuilderPanel)
+        index = event.index
+        title = safe_text(
+            f"Remove block #{index + 1} ({event.block.kind})?"
+        ).plain
+        body = safe_text("This cannot be undone.").plain
+
+        def _apply(confirmed: Optional[bool]) -> None:
+            if confirmed:
+                panel.remove_block(index)
+
+        question = ConfirmQuestionScreen(title, body, "Remove (y)", "Cancel (n)")
+        # The safe default carries the emphasis (OBS-12b-2): focus already starts
+        # on Cancel via AUTO_FOCUS; the primary style follows it as well.
+        question.PRIMARY_BUTTON = "confirm_no"
+        self.push_screen(question, _apply)
 
     # -- Flow Execution (fx_a, batch-94 Inc-003; US-007, HLR-017…021) ---------
 

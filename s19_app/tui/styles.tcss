@@ -3888,3 +3888,30 @@ ModalScreen {
 .result-problem {
     height: auto;
 }
+
+/* --- Flow block edit popup (batch-102 Inc 6, US-102-06) ----------------
+ * Reuses the shared `.modal-dialog` box model. One label + input per row
+ * (the add-row vocabulary): the label column is fixed so every input
+ * aligns, each input takes the remaining width, and the refusal line sits
+ * above the buttons. Colors resolve through the shared modal tokens.
+ * APPENDED at the end of the sheet on purpose: the flow-execution CSS
+ * guard requires every earlier byte to stay a prefix of this file. */
+#block_edit_dialog .flow-edit-line {
+    height: 1;
+    padding: 0 1;
+}
+
+#block_edit_dialog .flow-edit-line .flow-field-label {
+    width: 14;
+    padding: 0 1 0 0;
+    color: #969aad;                   /* insight_style.DGRAY */
+}
+
+#block_edit_dialog .flow-edit-line Input {
+    width: 1fr;
+}
+
+#block_edit_refusal {
+    height: auto;
+    padding: 0 1;
+}

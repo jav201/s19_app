@@ -256,10 +256,16 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "beside it; an empty required field, or one holding a NUL "
             "character, is named on the line above Run and nothing is added.",
             "copy block # — the number of the block Copy takes; empty takes "
-            "the last block.",
+            "the last block. Edit and Remove use the same number, which "
+            "must be between 1 and the chain's length.",
             "Copy — copies that block to the clipboard.",
             "Paste — appends the clipboard's block to the chain, checked "
             "against this project.",
+            "Edit — opens the picked block in an edit dialog carrying its "
+            "current values; Save replaces only that block, checked "
+            "against this project, or names the refusal in the dialog.",
+            "Remove — asks, then deletes only the picked block; variables "
+            "and the clipboard are kept, and #n bindings are not rewritten.",
             "Variables — shows or hides the variables editor; the count is "
             "the number of variables declared.",
             "variable — a placeholder name of capitals, digits and _ (for "

@@ -71,6 +71,32 @@ from .operations.crc_config import (
 )
 from .operations.model import CrcRegionResult, OperationInput, OperationResult
 from .services import operation_service
+from .services.flow_model import (
+    BLOCK_A2B,
+    BLOCK_CHECK,
+    BLOCK_CRC,
+    BLOCK_EXTERNAL_STEP,
+    BLOCK_PATCH,
+    BLOCK_REPORT,
+    BLOCK_SOURCE,
+    BLOCK_WRITE_OUT,
+    CHECK_GATING_ADVISORY,
+    CHECK_GATING_BLOCK_OWN,
+    EXTERNAL_MODE_MANUAL,
+    EXTERNAL_MODE_TERMINAL,
+    A2BBlock,
+    A2B_INPUT_FLOW,
+    CheckBlock,
+    CrcBlock,
+    ExternalStepBlock,
+    Flow,
+    FlowBlock,
+    PatchBlock,
+    ReportBlock,
+    SourceBlock,
+    WriteOutBlock,
+    parse_a2b_binding,
+)
 from .services.entropy_service import ENTROPY_WINDOW_BYTES
 from .services.report_addendum import DeclaredRegion
 from .services.report_service import (
@@ -1625,6 +1651,366 @@ class LoadFlowScreen(ModalScreen[Optional[str]]):
                 ListItem(Label(stem, markup=False), name=stem)
             )
         status.update(f"imported flows/{imported.name}")
+
+
+#: kind → path-bearing wire fields (the NUL pre-check set, the add form's
+#: S4-1 idiom): a candidate holding a NUL refuses before the loader runs.
+_EDIT_PATH_FIELDS: Mapping[str, Tuple[str, ...]] = {
+    BLOCK_SOURCE: ("image_ref",),
+    BLOCK_PATCH: ("change_doc_ref",),
+    BLOCK_CHECK: ("check_doc_ref",),
+    BLOCK_CRC: ("config_ref",),
+    BLOCK_WRITE_OUT: ("output_name",),
+    BLOCK_A2B: ("image_a", "image_b"),
+    BLOCK_EXTERNAL_STEP: ("log_ref", "output_path"),
+}
+
+
+class FlowBlockEditScreen(ModalScreen[Optional[FlowBlock]]):
+    """Modal to edit ONE existing flow block in place (batch-102 Inc 6).
+
+    Summary:
+        Opened by the app when the Flow Builder posts ``EditRequested``
+        (R-B102-FB-001). The dialog fixes the block kind — the title names
+        ``EDIT BLOCK #<n> — <kind>`` — and shows exactly the add-row's
+        field vocabulary for that kind, prefilled with the block's current
+        values (TC-B102-FB-01's 8/8 kinds). Save builds the candidate by
+        MERGING the modal fields over the ORIGINAL wire dict (E3 ruling 2:
+        ``file_type`` / ``a2l_ref`` / ``fmt`` and any future unexposed
+        field survive — the candidate is never rebuilt from scratch),
+        substitutes it at the picked index in the CURRENT wire envelope and
+        re-validates the whole envelope through the hardened
+        ``dict_to_flow`` loader — the same fail-closed gate Paste uses
+        (finding F-B102-FB-2: a failed edit must never corrupt the chain).
+        On findings the ORIGINAL block stays, the refusal is painted in the
+        modal (R-B102-FB-003) listing every finding, and the modal stays
+        open; on success it dismisses with the replacement block and the
+        app applies it through the panel's public ``replace_block``.
+
+        A2B bindings round-trip canonically (E3 ruling 6): shown as ``#n``
+        (1-based, the operator grammar) and saved through
+        :func:`parse_a2b_binding` as the wire form ``{"source", "ref"}``
+        (0-based) — never the display form.
+
+        Without a containment base (E3 ruling 4) Save refuses IN the modal
+        — a hostile ref is never stored to fail later. Every file-derived
+        string (title, prefilled fields, refusal) renders literal:
+        ``safe_text`` + ``markup=False`` (R-B102-FB-006), and nothing
+        content-bearing is logged (E3 ruling 10).
+
+    Args:
+        index (int): The block's 0-based position in the chain (title is 1-based).
+        block (FlowBlock): The block being edited (frozen — never mutated).
+        wire_blocks (List[dict]): The chain's current ``flow_to_dict``
+            projection (the envelope the candidate is validated against).
+        project_dir (Optional[Path]): The resolved containment base; ``None``
+            when no project is active (Save then refuses in-modal).
+
+    Data Flow:
+        - Compose → per-kind prefilled fields (markup-safe).
+        - Save → candidate wire (merge over the original) → substituted
+          envelope → ``dict_to_flow`` → dismiss(replacement) | paint refusal.
+    """
+
+    BINDINGS = [Binding("escape", "cancel", "Cancel", show=False)]
+
+    def __init__(
+        self,
+        index: int,
+        block: FlowBlock,
+        wire_blocks: List[dict],
+        project_dir: Optional[Path],
+    ) -> None:
+        super().__init__()
+        self._index = index
+        self._block = block
+        #: A snapshot — the caller's chain can change while the modal is up;
+        #: Save re-checks the index before substituting.
+        self._wire_blocks = [dict(w) for w in wire_blocks]
+        self._project_dir = project_dir
+        if isinstance(block, A2BBlock):
+            self._first_field = "#flow_edit_ref_a"
+        elif isinstance(block, ExternalStepBlock):
+            self._first_field = "#flow_edit_ext_mode"
+        elif isinstance(block, ReportBlock):
+            self._first_field = "#flow_edit_save"
+        else:
+            self._first_field = "#flow_edit_ref"
+
+    # -- composition ---------------------------------------------------------
+
+    def compose(self) -> ComposeResult:
+        with Container(id="block_edit_dialog", classes="modal-dialog"):
+            yield Static(
+                safe_text(
+                    f"EDIT BLOCK #{self._index + 1} — {self._block.kind.upper()}"
+                ),
+                classes="modal-title",
+                markup=False,
+            )
+            block = self._block
+            if isinstance(block, SourceBlock):
+                yield from self._ref_row(
+                    "image file", block.image_ref, "flow_edit_ref", "e.g. prg.s19"
+                )
+            elif isinstance(block, PatchBlock):
+                yield from self._ref_row(
+                    "change doc", block.change_doc_ref, "flow_edit_ref",
+                    "e.g. calib_hotfix.json",
+                )
+            elif isinstance(block, CheckBlock):
+                yield from self._ref_row(
+                    "check doc", block.check_doc_ref, "flow_edit_ref",
+                    "e.g. baseline.chk.json",
+                )
+                with Horizontal(classes="flow-edit-line"):
+                    yield Label("gating", classes="flow-field-label", markup=False)
+                    yield Select(
+                        (
+                            (CHECK_GATING_ADVISORY, CHECK_GATING_ADVISORY),
+                            (CHECK_GATING_BLOCK_OWN, CHECK_GATING_BLOCK_OWN),
+                        ),
+                        value=block.gating,
+                        allow_blank=False,
+                        id="flow_edit_gating",
+                        compact=True,
+                    )
+            elif isinstance(block, CrcBlock):
+                yield from self._ref_row(
+                    "CRC template", block.config_ref, "flow_edit_ref", "e.g. crc.json"
+                )
+            elif isinstance(block, WriteOutBlock):
+                yield from self._ref_row(
+                    "output file", block.output_name, "flow_edit_ref",
+                    "e.g. fw_app_patched.s19",
+                )
+            elif isinstance(block, A2BBlock):
+                # Bindings display as the operator grammar (#n 1-based); the
+                # wire form is rebuilt from parse_a2b_binding on Save.
+                yield from self._ref_row(
+                    "image A", _binding_field_text(block.image_a),
+                    "flow_edit_ref_a", "file or #n",
+                )
+                yield from self._ref_row(
+                    "image B", _binding_field_text(block.image_b),
+                    "flow_edit_ref_b", "file or #n",
+                )
+            elif isinstance(block, ExternalStepBlock):
+                with Horizontal(classes="flow-edit-line"):
+                    yield Label("mode", classes="flow-field-label", markup=False)
+                    yield Select(
+                        (
+                            ("Terminal", EXTERNAL_MODE_TERMINAL),
+                            ("Manual", EXTERNAL_MODE_MANUAL),
+                        ),
+                        value=block.mode,
+                        allow_blank=False,
+                        id="flow_edit_ext_mode",
+                        compact=True,
+                    )
+                noun = "command" if block.mode == EXTERNAL_MODE_TERMINAL else "instruction"
+                yield from self._ref_row(
+                    noun, block.instruction, "flow_edit_ext_instruction",
+                    "the exact command run outside the app",
+                )
+                yield from self._ref_row(
+                    "log", block.log_ref, "flow_edit_ext_log", "log file (required)"
+                )
+                yield from self._ref_row(
+                    "output file", block.output_path, "flow_edit_ext_output",
+                    "the file the step leaves, absolute path preferred",
+                )
+            else:
+                # ReportBlock (and any future ref-less kind): field-less by
+                # design — Save round-trips the original wire unchanged.
+                yield Label(
+                    "This block carries no editable fields.",
+                    classes="modal-hint",
+                    markup=False,
+                )
+            yield Static("", id="block_edit_refusal", markup=False, classes="sev-warning")
+            with Horizontal(id="flow_edit_buttons", classes="modal-buttons"):
+                yield Button("Save", id="flow_edit_save", classes="modal-confirm")
+                yield Button("Cancel", id="flow_edit_cancel")
+
+    def _ref_row(
+        self, label: str, value: str, input_id: str, placeholder: str
+    ) -> ComposeResult:
+        """One label + prefilled input row (the add-row vocabulary).
+
+        The prefill rides through ``safe_text`` (R-B102-FB-006): the block's
+        stored value is literal text — control bytes are scrubbed before it
+        enters the field, markup characters stay inert.
+        """
+        with Horizontal(classes="flow-edit-line"):
+            yield Label(label, classes="flow-field-label", markup=False)
+            yield OsClipboardInput(
+                value=safe_text(value).plain,
+                placeholder=placeholder,
+                id=input_id,
+                compact=True,
+            )
+
+    def _kind_title(self) -> str:
+        """The title's kind word — the add-row look-up table, else the raw kind."""
+        titles = {
+            BLOCK_SOURCE: "LOAD",
+            BLOCK_PATCH: "PATCH",
+            BLOCK_CHECK: "CHECK",
+            BLOCK_CRC: "CRC",
+            BLOCK_WRITE_OUT: "WRITE-OUT",
+            BLOCK_A2B: "A2B-DIFF",
+            BLOCK_EXTERNAL_STEP: "EXT-STEP",
+            BLOCK_REPORT: "REPORT",
+        }
+        return titles.get(self._block.kind, self._block.kind.upper())
+
+    def on_mount(self) -> None:
+        self.query_one("#block_edit_refusal", Static).display = False
+        self.query_one(self._first_field).focus()
+
+    # -- save / cancel -------------------------------------------------------
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "flow_edit_save":
+            self._save()
+        elif event.button.id == "flow_edit_cancel":
+            self.dismiss(None)
+
+    def action_cancel(self) -> None:
+        self.dismiss(None)
+
+    def _save(self) -> None:
+        """Validate the merged candidate against the chain; dismiss or refuse.
+
+        R-B102-FB-002 / R-B102-FB-003 / E3 rulings 2/4/6/7: without a base
+        the refusal is painted here (nothing hostile is kept); the candidate
+        merges over the original wire (unexposed fields survive); the
+        substituted envelope re-runs the hardened loader — any finding keeps
+        the original block and paints EVERY finding in the modal.
+        """
+        if self._project_dir is None:
+            self._paint_refusal(
+                "Edit refused: load a project first (the edit is checked "
+                "against the session directory)."
+            )
+            return
+        candidate, refusal = self._candidate_wire()
+        if refusal is not None:
+            self._paint_refusal(refusal)
+            return
+        if not 0 <= self._index < len(self._wire_blocks):
+            self._paint_refusal(
+                f"Edit refused: the chain no longer holds block "
+                f"#{self._index + 1}."
+            )
+            return
+        envelope_blocks = [
+            *self._wire_blocks[: self._index],
+            candidate,
+            *self._wire_blocks[self._index + 1 :],
+        ]
+        from .services import flow_persistence_service as fps
+
+        envelope = {
+            "schema_version": 1,
+            "name": "block-edit",
+            "blocks": envelope_blocks,
+        }
+        parsed, findings = fps.dict_to_flow(envelope, self._project_dir)
+        if parsed is None or findings:
+            messages = [
+                safe_text(finding.message).plain for finding in findings
+            ] or ["invalid block"]
+            self._paint_refusal("Edit refused: " + "; ".join(messages))
+            return
+        self.dismiss(parsed.blocks[self._index])
+
+    def _field_text(self, input_id: str) -> str:
+        """One modal input's value, stripped — the Add form's grammar."""
+        return self.query_one(input_id, Input).value.strip()
+
+    def _candidate_wire(self) -> Tuple[Optional[dict], Optional[str]]:
+        """The candidate wire dict: the ORIGINAL merged with the modal fields.
+
+        E3 ruling 2 — never rebuilt from scratch: the canonical
+        ``flow_to_dict`` projection of the edited block is copied and only
+        the exposed fields are overwritten, so ``file_type`` / ``a2l_ref`` /
+        ``fmt`` and any future unexposed field round-trip untouched. A2B
+        bindings save the canonical wire form via ``parse_a2b_binding``;
+        a NUL in a path-bearing field refuses with the loader's code (the
+        add form's S4-1 idiom) before the loader ever runs.
+        """
+        from .services import flow_persistence_service as fps
+
+        original = fps.flow_to_dict(
+            Flow(name="block-edit", blocks=[self._block])
+        )["blocks"][0]
+        candidate = dict(original)
+        block = self._block
+        text = self._field_text
+        if isinstance(block, SourceBlock):
+            candidate["image_ref"] = text("#flow_edit_ref")
+        elif isinstance(block, PatchBlock):
+            candidate["change_doc_ref"] = text("#flow_edit_ref")
+        elif isinstance(block, CheckBlock):
+            candidate["check_doc_ref"] = text("#flow_edit_ref")
+            candidate["gating"] = str(
+                self.query_one("#flow_edit_gating", Select).value
+            )
+        elif isinstance(block, CrcBlock):
+            candidate["config_ref"] = text("#flow_edit_ref")
+        elif isinstance(block, WriteOutBlock):
+            candidate["output_name"] = text("#flow_edit_ref")
+        elif isinstance(block, A2BBlock):
+            for field, input_id in (
+                ("image_a", "#flow_edit_ref_a"),
+                ("image_b", "#flow_edit_ref_b"),
+            ):
+                binding = parse_a2b_binding(text(input_id))
+                if binding is None:
+                    return None, (
+                        f"Edit refused: {field} must be a file name or #<n> "
+                        "(a flow output)."
+                    )
+                candidate[field] = {"source": binding.source, "ref": binding.ref}
+        elif isinstance(block, ExternalStepBlock):
+            candidate["mode"] = str(
+                self.query_one("#flow_edit_ext_mode", Select).value
+            )
+            candidate["instruction"] = text("#flow_edit_ext_instruction")
+            candidate["log_ref"] = text("#flow_edit_ext_log")
+            candidate["output_path"] = text("#flow_edit_ext_output")
+        for field in _EDIT_PATH_FIELDS.get(block.kind, ()):
+            value = candidate.get(field)
+            if isinstance(value, dict):
+                value = value.get("ref", "")
+            if isinstance(value, str) and "\x00" in value:
+                return None, (
+                    f"Edit refused: [{fps.FLOW_UNSAFE_REF}] "
+                    f"{self._kind_title()} {field} holds a NUL character "
+                    "- not a path"
+                )
+        return candidate, None
+
+    def _paint_refusal(self, message: str) -> None:
+        """Paint the in-modal refusal (markup-safe; empty hides the region)."""
+        refusal = self.query_one("#block_edit_refusal", Static)
+        if message:
+            refusal.update(safe_text(message))
+            refusal.display = True
+        else:
+            refusal.update("")
+            refusal.display = False
+
+
+def _binding_field_text(binding) -> str:
+    """The operator display form of one A2B binding: ``#n`` 1-based for a
+    flow output, the file ref verbatim otherwise (never the ``.out`` stub
+    form — the modal field must re-parse through ``parse_a2b_binding``)."""
+    if binding.source == A2B_INPUT_FLOW:
+        return f"#{int(binding.ref) + 1}"
+    return binding.ref
 
 
 class ConfirmDiscardScreen(ModalScreen[bool]):

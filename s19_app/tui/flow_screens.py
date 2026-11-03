@@ -40,6 +40,17 @@ never a live instance, and paste re-validates the wire dict through the
 hardened loader against the current flow's own blocks. That is the second
 declared ``flow_screens → services`` edge; both are pure
 serialize/validate, no execution semantics.
+
+batch-102 Inc 6 (US-102-06): the copy/paste strip grows ``Edit`` / ``Remove``
+chips acting on the SAME ``#flow_pick`` ledger number (empty is INVALID for
+both — "empty = last" stays Copy-only). The panel never pushes a modal
+itself: it posts ``EditRequested`` / ``RemoveRequested`` (the Save/Load
+message family, carrying the target index + block instead of the flow) and
+the app coordinates the modal; the app's callbacks re-enter through the
+panel's PUBLIC :meth:`FlowBuilderPanel.replace_block` /
+:meth:`FlowBuilderPanel.remove_block`, which mutate exactly one index,
+preserve the funnel + clipboard, refresh and mark dirty honestly (dirty
+only when a replace actually changes the block).
 """
 
 from __future__ import annotations
@@ -1066,7 +1077,9 @@ class FlowBuilderPanel(ScrollableContainer):
         summary, session path tail), the chain as ONE row of cards joined by
         cables in a frame exactly as tall as the cards, a kind-chip palette
         with an add form showing only the chosen kind's inputs, the copy /
-        paste strip with ``Variables (n)``, the foot row with Run as the one
+        paste strip — one pick number feeding Copy (empty = last), Paste,
+        and the batch-102 Inc-6 Edit / Remove pair — with
+        ``Variables (n)``, the foot row with Run as the one
         filled action, and the result area under Run as the growing region.
         The batch-94 grid canvas and numbered list (``#flow_canvas``,
         ``#flow_blocks``) stay mounted and painted, not displayed. The A2B
@@ -1165,6 +1178,50 @@ class FlowBuilderPanel(ScrollableContainer):
         Carries nothing: the app lists ``flows/*.json`` and, on a chosen stem,
         loads through the hardened ``load_flow_json`` (LLR-003.3/.7).
         """
+
+    class EditRequested(Message):
+        """The operator pressed Edit on a picked block (batch-102 Inc 6).
+
+        Alignment with Save/Load: the panel never pushes a modal itself —
+        Save/Load post a request and the app owns the screen. The EXCEPTION
+        to their payload shape is deliberate: those carry the WHOLE flow,
+        this carries only the edit TARGET — the resolved index and the block
+        object itself (frozen; the modal merges the wire, never mutates it).
+
+        Args:
+            index (int): The block's 0-based position in ``self._blocks``.
+            block (FlowBlock): The picked block (for the modal's title + fields).
+            base_dir (Optional[Path]): The edit-validation containment base,
+                resolved exactly like Paste (session dir, else the app's
+                ``active_project_dir``); ``None`` when no project is active
+                — the modal still opens and its Save refuses in-modal.
+        """
+
+        def __init__(
+            self, index: int, block: FlowBlock, base_dir: Optional[Path]
+        ) -> None:
+            super().__init__()
+            self.index = index
+            self.block = block
+            self.base_dir = base_dir
+
+    class RemoveRequested(Message):
+        """The operator pressed Remove on a picked block (batch-102 Inc 6).
+
+        The Remove twin of :class:`EditRequested`: carries the target index
+        + block (the confirm names the kind); the app owns the confirm
+        screen and re-enters through the public
+        :meth:`FlowBuilderPanel.remove_block`.
+
+        Args:
+            index (int): The block's 0-based position in ``self._blocks``.
+            block (FlowBlock): The picked block (its kind rides the confirm).
+        """
+
+        def __init__(self, index: int, block: FlowBlock) -> None:
+            super().__init__()
+            self.index = index
+            self.block = block
 
     def __init__(self) -> None:
         super().__init__(id="flow_panel")
@@ -1279,9 +1336,11 @@ class FlowBuilderPanel(ScrollableContainer):
             yield FlowChip("+ Add", id="flow_add")
         with Horizontal(id="flow_clip_row"):
             yield Label("copy block #", classes="flow-field-label")
-            yield OsClipboardInput(placeholder="last", id="flow_pick", compact=True)
+            yield OsClipboardInput(placeholder="#", id="flow_pick", compact=True)
             yield FlowChip("Copy", id="flow_copy")
             yield FlowChip("Paste", id="flow_paste")
+            yield FlowChip("Edit", id="flow_edit")
+            yield FlowChip("Remove", id="flow_remove")
             yield Static("", id="flow_clip_status", markup=False)
             yield FlowChip("Variables (0)", id="flow_funnel_toggle")
         with Horizontal(id="flow_funnel_editor"):
@@ -1858,16 +1917,7 @@ class FlowBuilderPanel(ScrollableContainer):
                 "Paste: the clipboard is empty - nothing to paste."
             )
             return
-        base: Optional[Path] = None
-        if self._session_dir:
-            base = Path(self._session_dir)
-        else:
-            # The shipped app publishes the active project through
-            # ``active_project_dir`` (the crc_designer_view idiom) — the
-            # paste validation base comes from there when the session strip
-            # was never set.
-            active = getattr(self.app, "active_project_dir", None)
-            base = active() if callable(active) else None
+        base = self._resolve_base()
         if base is None:
             self._show_wiring_notice(
                 "Paste refused: load a project first (the paste is checked "
@@ -1890,6 +1940,107 @@ class FlowBuilderPanel(ScrollableContainer):
         self._show_wiring_notice("")
         self._refresh_blocks()
         self._refresh_clip_status(f"pasted: {block.kind}")
+        self._mark_dirty()
+
+    # -- block edit/remove (batch-102 Inc 6, US-102-06) ----------------------
+
+    def _resolve_base(self) -> Optional[Path]:
+        """The edit/paste validation base: the session dir, else the active
+        project (the ``active_project_dir`` idiom), else ``None``.
+
+        The session strip wins when set (LLR-146.11); the shipped app
+        publishes the active project through ``active_project_dir`` (the
+        crc_designer_view idiom) when the strip was never set.
+        """
+        if self._session_dir:
+            return Path(self._session_dir)
+        active = getattr(self.app, "active_project_dir", None)
+        return active() if callable(active) else None
+
+    def _selected_block(self) -> Optional[Tuple[int, FlowBlock]]:
+        """Resolve the ``#flow_pick`` ledger number for Edit / Remove.
+
+        Unlike Copy, an EMPTY pick is INVALID for both actions (E3 ruling 1:
+        "empty = last" stays Copy-only). The index is parsed defensively —
+        ``try``/``except ValueError`` plus the range check, never
+        ``isdigit()`` as a pre-filter (E3 ruling 5: a superscript or a
+        >4300-digit integer must refuse, not crash). An empty, non-numeric
+        or out-of-range pick paints
+        ``Edit/Remove needs a block # between 1 and <N>.`` and resolves to
+        ``None`` (no modal, no mutation).
+        """
+        raw = self.query_one("#flow_pick", Input).value.strip()
+        total = len(self._blocks)
+        try:
+            number = int(raw)
+        except ValueError:
+            number = -1
+        if not 1 <= number <= total:
+            self._show_wiring_notice(
+                f"Edit/Remove needs a block # between 1 and {total}."
+            )
+            return None
+        index = number - 1
+        return index, self._blocks[index]
+
+    def _edit_block(self) -> None:
+        """Post :class:`EditRequested` for the picked block (R-B102-FB-001).
+
+        The panel never pushes the modal itself (E3 ruling 3): the app
+        coordinates :class:`FlowBlockEditScreen` and re-enters through the
+        public :meth:`replace_block`.
+        """
+        selected = self._selected_block()
+        if selected is None:
+            return
+        index, block = selected
+        self.post_message(
+            self.EditRequested(index, block, self._resolve_base())
+        )
+
+    def _remove_block(self) -> None:
+        """Post :class:`RemoveRequested` for the picked block (R-B102-FB-004)."""
+        selected = self._selected_block()
+        if selected is None:
+            return
+        index, block = selected
+        self.post_message(self.RemoveRequested(index, block))
+
+    def replace_block(self, index: int, replacement: FlowBlock) -> None:
+        """Apply a VALIDATED edit: swap exactly one block (R-B102-FB-002).
+
+        Called by the app's edit-modal save callback. Minimal mutation: only
+        ``self._blocks[index]`` is touched — the funnel and the clipboard
+        survive untouched. The dirty flag is HONEST (E3 ruling 9): set only
+        when the replacement actually differs from the original; an
+        unchanged save is a no-op. A stale/out-of-range index (the chain
+        changed since the modal opened) refuses silently — the flow is
+        never corrupted.
+        """
+        if not 0 <= index < len(self._blocks):
+            return
+        if self._blocks[index] == replacement:
+            return
+        self._blocks[index] = replacement
+        self._show_wiring_notice("")
+        self._refresh_blocks()
+        self._mark_dirty()
+
+    def remove_block(self, index: int) -> None:
+        """Apply a confirmed remove: delete exactly one block (R-B102-FB-004).
+
+        Called by the app's remove-confirm callback. Minimal mutation: only
+        the picked index is deleted — variables and the clipboard survive.
+        Bindings that pointed at later blocks are NOT rewritten (the
+        builder's standing contract: no silent renumbering). The range
+        re-checks immediately before mutating (E3 ruling 8): a stale index
+        from a chain that changed under the confirm refuses silently.
+        """
+        if not 0 <= index < len(self._blocks):
+            return
+        del self._blocks[index]
+        self._show_wiring_notice("")
+        self._refresh_blocks()
         self._mark_dirty()
 
     # -- wiring -------------------------------------------------------------
@@ -2057,6 +2208,10 @@ class FlowBuilderPanel(ScrollableContainer):
             self._copy_block()
         elif event.button.id == "flow_paste":
             self._paste_block()
+        elif event.button.id == "flow_edit":
+            self._edit_block()
+        elif event.button.id == "flow_remove":
+            self._remove_block()
 
     def on_mount(self) -> None:
         # batch-97 Inc-5 (LLR-146.1, 146.11): the help sentence, the grid
