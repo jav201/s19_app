@@ -1,0 +1,178 @@
+RED evidence — batch-102 Inc 7 — Flow Builder: orígenes y selección de archivos por bloque (TC-B102-FILE-01..07 + addendas E4)
+=======================================================================================================================
+
+Command : python -m pytest tests/test_b102_flow_file_chooser.py tests/test_b97_flow_builder.py
+          "tests/test_b97_chips_help.py::test_tc_b97_32_flow_help_names_every_label"
+          "tests/test_b97_width.py::test_tc_b97_38_builder_height_goes_to_the_result" -q --tb=line
+Date    : 2026-11-03 17:17 CSTM (E4 tester run, pre-integration / base tree, HEAD ab18136)
+Platform: Windows — Python 3.12.7, pytest 8.3.4, textual 8.2.8 (encoding UTF-8)
+Result  : 41 failed, 74 passed in 312.56s — 39 failures are the expected Inc-7
+          RED set (37 in the new module + 2 census/help RED in the existing
+          files); the other 2 failures are PRE-EXISTING on base, unrelated to
+          Inc 7 — see the note at the bottom.
+
+Expected RED (39) — reasons
+---------------------------
+
+New file tests/test_b102_flow_file_chooser.py (37):
+
+1.-4. test_tc_b102_file_01_card_origin_annotation[project/temp/external/
+   missing]
+   R-B102-FILE-001: no annotation row ships on base — the pipeline paints
+   only the raw ref, so the prototype grammar (``↳ <source>: <ref>`` /
+   ``missing: <ref>``) is absent. 4/4 arms; at GREEN each card paints its
+   source label with the ref verbatim.
+
+5.  test_tc_b102_file_01_missing_paints_in_the_alert_colour
+   Design note of R-B102-FILE-001: no ``↳ project`` token paints at all, so
+   the style-difference oracle (missing = alert colour, the other origins
+   dim) cannot be satisfied. At GREEN the two tokens paint with different
+   (fg, bg, bold) tuples.
+
+6.-15. test_tc_b102_file_01_classifier_states_and_precedence[10 arms:
+   dir/none × project/temp/loaded/missing/external + precedence pairs]
+   R-B102-FILE-001 + rulings 5/6: ``flow_screens.resolve_flow_ref_source``
+   does not exist ("no flow_screens.resolve_flow_ref_source"). At GREEN: the
+   5-state vocabulary, the precedence external > project > temp > loaded,
+   the ``None``-root arms and the read-only project listing all hold.
+
+16. test_tc_b102_file_01_classifier_textual_absolute_dotdot_nul
+   Ruling 5: same absence. At GREEN: absolute (the file EXISTS on disk),
+   drive-relative (``C:...``), ``..``-bearing (both separators), NUL-bearing
+   and empty refs classify ``missing`` — the classifier never joins paths.
+
+17.-21. test_tc_b102_file_01_annotation_matrix_by_kind[source/patch/check/
+   crc/a2b_file_binding]
+   Ruling 6: the annotated arms expect exactly one ``missing: ghost.json``
+   annotation and base paints none ("expected exactly 1 missing annotation,
+   got 0"). At GREEN: SOURCE/PATCH/CHECK/CRC cards and the A2B FILE binding
+   annotate; the other arms (GREEN on base, below) stay annotation-free.
+
+22. test_tc_b102_file_02_browse_posts_request_and_chooser_lists_all_sources
+   R-B102-FILE-002 + ruling 2: ``#flow_browse`` does not ship (PC-11 need():
+   "expected exactly 1 widget, found 0"). At GREEN: pressing it posts
+   exactly one ``BrowseRequested('#flow_ref')`` (the panel never pushes the
+   modal) and the app tops ``FileRefChooserScreen`` with the ``Project`` /
+   ``Temp / workarea`` / ``Loaded artifacts`` headers, the three source
+   candidates, ``#flow_external_path_input`` and Import/Cancel; the chip
+   label reads ``Browse``.
+
+23. test_tc_b102_file_02_browse_beside_every_ref_field
+   R-B102-FILE-002 (every ref field): ``#flow_ref_a_browse`` /
+   ``#flow_ref_b_browse`` beside the A2B bindings do not ship. At GREEN: both
+   exist and a temp pick through ``#flow_ref_a_browse`` imports
+   ``external/trial.s19`` into the project (ruling 1 executability).
+
+24. test_tc_b102_file_02_project_links_omitted_from_chooser
+   Ruling 4 addendum: ``#flow_browse`` does not ship. At GREEN: a live
+   symlink and a dangling one planted in the project dir never appear in the
+   chooser, while a regular project ``.s19`` file does (the link-safe
+   listing, not an extension filter).
+
+25.-28. test_tc_b102_file_03_project_pick_fills_field_only /
+   temp_pick_imports_executable_ref / loaded_pick_inside_project_writes_
+   relative_ref / edit_modal_browse_routes_back_to_the_host
+   R-B102-FILE-003 + rulings 1/2: ``#flow_browse`` (and in the edit arm
+   ``#flow_edit_browse``) do not ship. At GREEN: a pick dismisses the chooser
+   and writes ONLY the host field (project pick → relative ref, no import;
+   temp pick → ``external/<name>`` imported; loaded pick of an in-project
+   artifact → relative ref directly); the chain stays untouched until
+   Add/Save; the edit-modal pick returns to ``FlowBlockEditScreen`` and Save
+   applies it to exactly the picked block.
+
+29. test_tc_b102_file_04_external_import_via_chooser
+   R-B102-FILE-004: ``#flow_browse`` does not ship. At GREEN: the import
+   copies to ``<project>/external/calib.json``, writes the relative ref,
+   keeps the original, reports ``imported as external/calib.json`` and a
+   same-named file with different content lands on ``calib-1.json`` (never
+   overwritten).
+
+30.-32. test_tc_b102_file_04_import_external_ref_service /
+   import_external_ref_refusals / import_external_ref_link_sources
+   R-B102-FILE-004/005/006 + ruling 4: ``workspace.import_external_ref``
+   does not exist ("no workspace.import_external_ref"). At GREEN: success
+   returns (dest, "external/<name>") with the bytes copied; an identical-
+   bytes repeat still suffixes (reuse disabled); no project raises the exact
+   ``Load or create a project before importing an external file.`` (checked
+   before the file's existence); an unreadable file raises the exact
+   ``External file not readable: <name>`` (name, never the path); live and
+   dangling symlink sources are refused without copying.
+
+33.-34. test_tc_b102_file_05_no_project_refusal[external_path/
+   temp_candidate]
+   R-B102-FILE-005 + ruling 1: ``#flow_browse`` does not ship. At GREEN:
+   both arms refuse with the exact line, copy nothing under the base dir
+   (rglob snapshot equality) and leave the field unchanged.
+
+35. test_tc_b102_file_06_unreadable_external_refusal
+   R-B102-FILE-006 + ruling 8: ``#flow_browse`` does not ship. At GREEN: the
+   exact ``External file not readable: dead.json`` paints, the full path
+   appears on no painted surface, nothing is copied, the field stays empty.
+
+36. test_tc_b102_file_07_hostile_names_render_literally
+   R-B102-FILE-007: ``#flow_browse`` does not ship. At GREEN: the hostile
+   candidate name (markup tokens, no control bytes) paints as literal text
+   in the chooser and on the card annotation — zero markup spans, zero
+   control bytes.
+
+37. test_tc_b102_file_07_logs_carry_no_paths
+   Ruling 8 logs arm: ``#flow_browse`` does not ship. At GREEN: across the
+   root logger and the app logger, Browse + annotate + a hostile-named
+   import leave no record carrying the full external path or the file name.
+
+Existing files (2):
+
+38. test_tc_b97_51_keyboard_order_keys_and_chip_states
+   KEY_GROUPS' add-form fields group now carries ``#flow_browse`` /
+   ``#flow_ref_a_browse`` / ``#flow_ref_b_browse``; the test's own layout
+   pre-poll query_one()s them — on base ``#flow_browse`` is missing
+   (NoMatches). The group-order/membership asserts hold as soon as the chips
+   ship (the Inc-6 idiom; at the census state (EXT-STEP) the chips are
+   hidden, so nothing else in the census changes).
+
+39. test_tc_b97_32_flow_help_names_every_label
+   The flow help body names no ``Browse`` line: the E4 update adds the
+   Browse chip's label to the required set explicitly (the harvest only sees
+   controls that ship), so this census documents the target state and flips
+   green when both the chip and the ``Browse — effect`` help step ship
+   (the Inc-4 census idiom).
+
+Expected GREEN on base (4 + the rest of the suite) — all hold
+-------------------------------------------------------------
+
+- tests/test_b102_flow_file_chooser.py::test_tc_b102_file_01_annotation_
+  matrix_by_kind[write_out / external_step / report / a2b_flow_bindings]
+  — the four negative matrix arms pin ruling 6's read-only side: those
+  cards must never carry a file annotation, which holds verbatim on base.
+  They guard through the increment (WRITE_OUT never painted ``missing``).
+- tests/test_b97_flow_builder.py (rest), tests/test_b97_width.py::
+  test_tc_b97_38_builder_height_goes_to_the_result (4 arms) — no layout or
+  height regression from the census edits; all pass.
+
+PRE-EXISTING base failures observed (NOT Inc-7 RED — the same two colour
+oracles already documented as pre-existing in evidence/inc-6/red-tests.txt,
+verified failing identically there before any Inc-7 test change):
+- test_tc_b97_18_crc_card_painted_in_the_crc_colour — colour-paint oracle.
+- test_tc_b97_49_ribbon_paints_saved_then_unsaved — colour-paint oracle.
+Left untouched per "do not fix unrelated bugs".
+
+Files changed (tests/ only — no s19_app/ source modified, nothing committed)
+-----------------------------------------------------------------------------
+
+- tests/test_b102_flow_file_chooser.py   (new — TC-B102-FILE-01..07 + the
+                                           E3-rulings-inc7 addendas: temp/
+                                           loaded import with executable ref,
+                                           different-content collision,
+                                           symlink/dangling sources, textual
+                                           absolute/.. classifier, links
+                                           omitted from the chooser, kind
+                                           matrix with WRITE_OUT unannotated,
+                                           log capture without paths; 41
+                                           tests)
+- tests/test_b97_flow_builder.py         (KEY_GROUPS add-form fields group
+                                           extended with #flow_browse /
+                                           #flow_ref_a_browse /
+                                           #flow_ref_b_browse — E3 ruling 2)
+- tests/test_b97_chips_help.py           (TC-B97-32 required-label set
+                                           extended with the Browse chip's
+                                           label — E4 help census)

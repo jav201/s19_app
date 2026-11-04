@@ -1210,10 +1210,19 @@ KIND_CHIPS = tuple(f"flow_palette_{k}" for k in KINDS)
 #: ``#flow_paste`` (the focus chain sorts by region, so the group order holds
 #: once the chips ship; on the pre-Inc-6 tree the group keeps its old members
 #: and the census stays green).
+#: batch-102 Inc 7 (E3 ruling 2) extends the add-form fields group with the
+#: three Browse chips — ``#flow_browse`` beside ``#flow_ref`` and
+#: ``#flow_ref_a_browse`` / ``#flow_ref_b_browse`` beside the A2B bindings.
+#: At the census state (EXT-STEP chosen) they are hidden, so on the pre-Inc-7
+#: tree the group keeps its old members and the census stays green; the group
+#: membership pins where the chips ride once they ship (the Inc-6 idiom).
 KEY_GROUPS = (
     ("open_folder_flows", "window_help_flow"),
     KIND_CHIPS,
-    ("flow_ext_mode", "flow_ext_instruction", "flow_ext_log", "flow_ext_output"),
+    (
+        "flow_ext_mode", "flow_ext_instruction", "flow_ext_log", "flow_ext_output",
+        "flow_browse", "flow_ref_a_browse", "flow_ref_b_browse",
+    ),
     ("flow_add",),
     ("flow_pick", "flow_copy", "flow_paste", "flow_edit", "flow_remove"),
     ("flow_funnel_toggle",),

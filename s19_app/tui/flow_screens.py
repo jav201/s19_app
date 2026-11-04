@@ -51,14 +51,32 @@ panel's PUBLIC :meth:`FlowBuilderPanel.replace_block` /
 :meth:`FlowBuilderPanel.remove_block`, which mutate exactly one index,
 preserve the funnel + clipboard, refresh and mark dirty honestly (dirty
 only when a replace actually changes the block).
+
+batch-102 Inc 7 (US-102-07): every file-bearing READ ref (SOURCE/PATCH/
+CHECK/CRC + A2B file bindings, never WRITE_OUT/EXT-STEP/#n bindings, E3
+ruling 6) carries a small origin annotation on its card — dim ``↳ source: <ref>``
+or the bold ``missing: <ref>`` — classified by the PURE
+TEXTUAL :func:`resolve_flow_ref_source` (listing-based, never joins the ref, E3 ruling 5)
+against a :class:`FlowRefContext` the app supplies through a provider
+callable (E3 ruling 7: without a context the cards keep their shipped
+shape).  The add form's and the edit modal's Browse chips post the
+module-level :class:`BrowseRequested` — the app builds the candidates,
+pushes ``s19_app.tui.screens.FileRefChooserScreen`` and writes the chosen
+ref back through the host's public ``apply_browsed_ref`` (E3 ruling 2);
+external/temp/loaded picks land in ``<project>/external/`` through the
+hardened :func:`s19_app.tui.workspace.import_external_ref` (atomic claim,
+``-<N>`` suffixes, never an overwrite).
 """
 
 from __future__ import annotations
 
+import os
+import stat
+import sys
 import time
 from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Dict, List, Mapping, NamedTuple, Optional, Sequence, Tuple
+from pathlib import Path, PurePosixPath, PureWindowsPath
+from typing import Callable, Dict, List, Mapping, NamedTuple, Optional, Sequence, Tuple
 
 from rich.text import Text
 from textual import events
@@ -143,6 +161,170 @@ from .services.flow_model import (
 from ..utils import safe_text
 from ..validation import ValidationIssue
 from .changes.model import DISPOSITION_APPLIED
+from .workspace import PROJECT_EXTERNAL_SUBDIR
+
+
+#: The five resolution sources a file-bearing card annotation paints
+#: (R-B102-FILE-001): ``project`` / ``temp`` / ``loaded`` / ``external``
+#: / ``missing``.
+FLOW_REF_SOURCES = ("project", "temp", "loaded", "external", "missing")
+
+
+class BrowseRequested(Message):
+    """The operator pressed Browse beside a flow ref field (batch-102 Inc 7).
+
+    Summary:
+        Posted by :class:`FlowBuilderPanel` (its add form) and by
+        :class:`FlowBlockEditScreen` (the edit modal) — E3 ruling 2: the
+        APP coordinates :class:`~s19_app.tui.screens.FileRefChooserScreen`,
+        never the host.  Carries only the target input selector; the app
+        writes the chosen ref back through the host's public
+        ``apply_browsed_ref``.
+
+    Args:
+        input_id (str): The host input's CSS selector (``#flow_ref``,
+            ``#flow_ref_a``, ``#flow_edit_ref``, …).
+    """
+
+    def __init__(self, input_id: str) -> None:
+        super().__init__()
+        self.input_id = input_id
+
+
+def _norm_ref_text(text: str) -> str:
+    """Normalize a ref for TEXTUAL comparison (E3 ruling 5): backslashes
+    become separators and the case folds on Windows — pure string work,
+    never a filesystem touch, never a path join."""
+    if sys.platform == "win32":
+        return text.replace("\\", "/").casefold()
+    return text
+
+
+def _project_child_names(project_root: Optional[Path]) -> Tuple[str, ...]:
+    """The project dir's direct-child regular file names for classification.
+
+    Only the project listing is read; the ref itself is never joined to the
+    root. Links and non-files are omitted, matching the chooser's candidate
+    construction.
+    """
+    if project_root is None:
+        return ()
+    try:
+        entries = sorted(Path(project_root).iterdir())
+    except OSError:
+        return ()
+    names: List[str] = []
+    for entry in entries:
+        try:
+            entry_stat = os.lstat(entry)
+        except OSError:
+            continue
+        if not stat.S_ISREG(entry_stat.st_mode):
+            continue
+        if entry.is_symlink() or getattr(entry, "is_junction", lambda: False)():
+            continue
+        names.append(entry.name)
+    return tuple(names)
+
+
+def resolve_flow_ref_source(
+    ref: str,
+    project_root: Optional[Path],
+    temp_files: Sequence[str],
+    loaded_names: Sequence[str],
+    project_names: Optional[Sequence[str]] = None,
+) -> str:
+    """Classify one flow ref's resolution source (R-B102-FILE-001/007).
+
+    Summary:
+        The classifier (E3 ruling 5): normalized string comparison against
+        the candidate/project listings — the ref itself is never joined to
+        a root. When ``project_names`` is omitted, the project listing is
+        read from ``project_root`` (regular non-link children only). An
+        absolute ref (either separator convention), a drive-relative
+        ``C:file``, any ``..`` component, a NUL or any otherwise unknown
+        shape classifies ``missing``; an ``external/`` first component
+        classifies ``external`` (precedence external > project > temp >
+        loaded, E3 ruling 6); membership in the project / temp / loaded
+        lists classifies accordingly; anything still unknown is
+        ``missing``.
+
+    Args:
+        ref (str): The block's stored ref (untrusted text).
+        project_root (Optional[Path]): The active project dir; read only to
+            list direct-child names when ``project_names`` is omitted.
+        temp_files (Sequence[str]): The workarea temp file names.
+        loaded_names (Sequence[str]): The loaded artifact file names.
+        project_names (Optional[Sequence[str]]): The active project's
+            direct-child file names. When omitted, the classifier reads
+            that listing from ``project_root`` (regular non-link files
+            only). Either way the ref itself is never joined to the root;
+            classification is by normalized name membership.
+
+    Returns:
+        str: One of :data:`FLOW_REF_SOURCES`.
+    """
+    if not isinstance(ref, str) or not ref:
+        return "missing"
+    if "\x00" in ref:
+        return "missing"
+    if PureWindowsPath(ref).is_absolute() or PurePosixPath(ref).is_absolute():
+        return "missing"
+    if PureWindowsPath(ref).drive:
+        return "missing"  # drive-relative ("C:file") is not project-resolvable
+    norm = _norm_ref_text(ref)
+    if not norm or norm.startswith("/"):
+        return "missing"
+    parts = [part for part in norm.split("/") if part not in ("", ".")]
+    if not parts or ".." in parts:
+        return "missing"
+    if parts[0] == PROJECT_EXTERNAL_SUBDIR:
+        return "external"
+    project_list = (
+        project_names
+        if project_names is not None
+        else _project_child_names(project_root)
+    )
+    project_set = {_norm_ref_text(n) for n in project_list}
+    temp_set = {_norm_ref_text(t) for t in temp_files}
+    loaded_set = {_norm_ref_text(n) for n in loaded_names}
+    if norm in project_set:
+        return "project"
+    if norm in temp_set:
+        return "temp"
+    if norm in loaded_set:
+        return "loaded"
+    return "missing"
+
+
+@dataclass(frozen=True)
+class FlowRefContext:
+    """The card-annotation resolution context (E3 ruling 7).
+
+    Built by the app (the only side that may list directories) and handed
+    to the panel through a provider callable, so every repaint classifies
+    against the CURRENT project/temp/loaded listing.
+    """
+
+    project_root: Optional[Path]
+    project_names: Tuple[str, ...]
+    temp_names: Tuple[str, ...]
+    loaded_names: Tuple[str, ...]
+
+    def resolver(self) -> Callable[[str], str]:
+        """The ``ref -> source`` closure the card renderer calls per ref."""
+
+        def _resolve(ref: str) -> str:
+            return resolve_flow_ref_source(
+                ref,
+                self.project_root,
+                self.temp_names,
+                self.loaded_names,
+                self.project_names,
+            )
+
+        return _resolve
+
 
 
 def _make_flow_block(
@@ -594,6 +776,15 @@ _ADD_PATH_INPUTS: Mapping[str, Tuple[Tuple[str, str], ...]] = {
     BLOCK_EXTERNAL_STEP: (("#flow_ext_log", "log"), ("#flow_ext_output", "output file")),
 }
 
+#: Browse chip id → host input selector (batch-102 Inc 7): the add form's
+#: Browse chips sit beside exactly the file-ref inputs (never the EXT-STEP
+#: log/output — those are produced outside the app, not read by a block).
+_BROWSE_INPUTS: Mapping[str, str] = {
+    "flow_browse": "#flow_ref",
+    "flow_ref_a_browse": "#flow_ref_a",
+    "flow_ref_b_browse": "#flow_ref_b",
+}
+
 
 def nul_add_refusal(kind: str, values: Mapping[str, str]) -> Optional[str]:
     """The add form's NUL refusal line, or ``None`` (LLR-146.14, S4-1).
@@ -767,8 +958,87 @@ def _card_rows(blocks: Sequence[FlowBlock], index: int) -> Tuple[List[Tuple[str,
     return [], ("out", "report marker"), ""
 
 
-def _card_lines(blocks: Sequence[FlowBlock], index: int, card_w: int, rows_in: int) -> List[Text]:
-    """One card as ``7 + 2·rows_in`` lines, each exactly ``card_w`` cells."""
+def _annotated_file_refs(block: FlowBlock) -> List[Tuple[str, str]]:
+    """The block's READ file refs as (slot label, ref) pairs (E3 ruling 6).
+
+    Only SOURCE/PATCH/CHECK/CRC refs and A2B FILE bindings carry the
+    reading annotation — never WRITE_OUT outputs, EXT-STEP logs/outputs
+    or A2B ``#n`` flow bindings (those are not file reads).
+    """
+    if isinstance(block, SourceBlock):
+        return [("file", block.image_ref)]
+    if isinstance(block, PatchBlock):
+        return [("doc", block.change_doc_ref)]
+    if isinstance(block, CheckBlock):
+        return [("doc", block.check_doc_ref)]
+    if isinstance(block, CrcBlock):
+        return [("tpl", block.config_ref)]
+    if isinstance(block, A2BBlock):
+        out: List[Tuple[str, str]] = []
+        for label, binding in (("A", block.image_a), ("B", block.image_b)):
+            if binding is not None and binding.source == A2B_INPUT_FILE:
+                out.append((label, binding.ref))
+        return out
+    return []
+
+
+#: The ``missing`` annotation's style (tui-design): BOLD weight sets it
+#: apart from the dim source annotations — the pipeline palette is a
+#: closed set (the batch-97 paint census whitelists its hues), so the
+#: alert semantics ride the ``missing:`` word and the bold weight, never
+#: a foreign hue.
+_S_MISSING = "bold " + DGRAY
+
+
+def _card_annotation(
+    block: FlowBlock, resolver: Callable[[str], str], width: int
+) -> Optional[Text]:
+    """One card's origin annotation row, or ``None`` without a file-bearing
+    READ ref (E3 ruling 6 — a WRITE_OUT-only card shows no ``missing``
+    noise).
+
+    Resolved origins paint dim as ``↳ <source>: <ref>``; ``missing``
+    paints bold and names the ref (``missing: <ref>``) so a bare ref can
+    never read as resolved. Every file-derived string rides
+    ``safe_text`` — literal text, zero markup spans (R-B102-FILE-007).
+    """
+    pairs = _annotated_file_refs(block)
+    if not pairs:
+        return None
+    multi = len(pairs) > 1
+    line = Text()
+    for index, (label, ref) in enumerate(pairs):
+        if index:
+            line.append("  ", style=_S_DIM)
+        if multi:
+            line.append(f"{label} ", style=_S_DIM)
+        source = resolver(ref)
+        if source == "missing":
+            name = clip_head(safe_text(ref).plain, max(6, width - 12))
+            line.append("missing: ", style=_S_MISSING)
+            line.append(name, style=_S_MISSING)
+        else:
+            rendered = clip_head(
+                f"↳ {source}: {safe_text(ref).plain}", max(6, width)
+            )
+            line.append(rendered, style=_S_DIM)
+    return line
+
+
+def _card_lines(
+    blocks: Sequence[FlowBlock],
+    index: int,
+    card_w: int,
+    rows_in: int,
+    annotation: Optional[Text] = None,
+    annotation_row: bool = False,
+) -> List[Text]:
+    """One card as ``7 + 2·rows_in (+ 1)`` lines, each exactly ``card_w``
+    cells.  The optional annotation row (batch-102 Inc 7, only when the
+    renderer supplies a context resolver, E3 ruling 7) sits between the
+    input rows and the note row; ``annotation_row`` is the CHAIN-level
+    flag (every card shares the height — a card without an annotated ref
+    paints a blank row there)."""
     block = blocks[index]
     glyph, label, colour, does = _KIND_LOOK.get(block.kind, ("·", block.kind.upper(), DGRAY, ""))
     ins, (out_label, out_value), note = _card_rows(blocks, index)
@@ -779,6 +1049,12 @@ def _card_lines(blocks: Sequence[FlowBlock], index: int, card_w: int, rows_in: i
         line = Text("│ ", style=_S_RULE)
         line.append(text, style=style)
         line.append(" " * (inner - len(text)) + " │", style=_S_RULE)
+        return line
+
+    def row_text(text: Text) -> Text:
+        line = Text("│ ", style=_S_RULE)
+        line.append_text(text)
+        line.append(" " * max(0, inner - len(text.plain)) + " │", style=_S_RULE)
         return line
 
     number = str(index + 1)
@@ -795,6 +1071,8 @@ def _card_lines(blocks: Sequence[FlowBlock], index: int, card_w: int, rows_in: i
             lines.append(row(keep(value, inner)))
         else:
             lines.extend([row(), row()])
+    if annotation_row:
+        lines.append(row_text(annotation) if annotation is not None else row())
     lines.append(row(clip_head(note, inner), _S_DIM))
     lines.append(row(clip_head(out_label, inner), _S_DIM))
     lines.append(row(clip_tail(out_value, inner), _S_OUT))
@@ -802,7 +1080,12 @@ def _card_lines(blocks: Sequence[FlowBlock], index: int, card_w: int, rows_in: i
     return lines
 
 
-def pipeline_text(blocks: Sequence[FlowBlock], card_w: int, spare: int = 0) -> Text:
+def pipeline_text(
+    blocks: Sequence[FlowBlock],
+    card_w: int,
+    spare: int = 0,
+    resolver: Optional[Callable[[str], str]] = None,
+) -> Text:
     """The chain as one row of equal-height cards joined by cables (fb_A).
 
     Args:
@@ -810,17 +1093,24 @@ def pipeline_text(blocks: Sequence[FlowBlock], card_w: int, spare: int = 0) -> T
         card_w (int): Every card's width (``pipeline_layout``).
         spare (int): How many cables, the first ones, take one more cell
             (``pipeline_layout``), so the chain fills the rail.
+        resolver (Optional[Callable[[str], str]]): The contextual ref
+            classifier (E3 ruling 7).  With a resolver, every card with a
+            file-bearing READ ref gains one origin-annotation row (dim
+            ``↳ <source>: <ref>`` / the bold ``missing: <ref>``);
+            without one — or when no card holds an annotated ref — the
+            chain keeps its shipped shape byte for byte.
 
     Returns:
-        Text: Every card ``card_w`` cells and ``7 + 2·m`` rows, ``m`` the most
-        inputs any card shows (2, or 3 with an EXT-STEP); the cable ``───▶``
-        (``────▶`` when widened) on the output row between consecutive cards;
-        with no blocks, the one empty-state line.
+        Text: Every card ``card_w`` cells and ``7 + 2·m (+ 1)`` rows, ``m``
+        the most inputs any card shows (2, or 3 with an EXT-STEP); the cable
+        ``───▶`` (``────▶`` when widened) on the output row between
+        consecutive cards; with no blocks, the one empty-state line.
 
     Data Flow:
         - ``blocks`` → ``_card_rows`` / ``_card_lines`` per card → rows joined
           left to right with the cables. Pure projection of ``blocks``; every
-          file-derived string goes through ``safe_text`` in ``_card_rows``.
+          file-derived string goes through ``safe_text`` in ``_card_rows`` /
+          ``_card_annotation``.
 
     Dependencies:
         Uses:
@@ -838,7 +1128,22 @@ def pipeline_text(blocks: Sequence[FlowBlock], card_w: int, spare: int = 0) -> T
         text.append(".", style=_S_DIM)
         return text
     rows_in = max(len(_card_rows(blocks, i)[0]) for i in range(len(blocks)))
-    cards = [_card_lines(blocks, i, card_w, rows_in) for i in range(len(blocks))]
+    annotations: Optional[List[Optional[Text]]] = None
+    if resolver is not None:
+        annotations = [
+            _card_annotation(blocks[i], resolver, card_w - 4)
+            for i in range(len(blocks))
+        ]
+        if not any(annotation is not None for annotation in annotations):
+            annotations = None
+    cards = [
+        _card_lines(
+            blocks, i, card_w, rows_in,
+            annotations[i] if annotations is not None else None,
+            annotation_row=annotations is not None,
+        )
+        for i in range(len(blocks))
+    ]
     height = len(cards[0])
     out_row = height - 2
     lines: List[Text] = []
@@ -1248,6 +1553,36 @@ class FlowBuilderPanel(ScrollableContainer):
         self._spare: int = 0
         #: The last run's written paths, re-clipped by the layout pass.
         self._wrote_paths: List[str] = []
+        #: The card-annotation context source (batch-102 Inc 7, E3 ruling 7):
+        #: an app-installed callable returning the CURRENT
+        #: :class:`FlowRefContext` (or ``None``) — the panel never lists
+        #: directories itself.
+        self._ref_provider: Optional[
+            Callable[[], Optional[FlowRefContext]]
+        ] = None
+
+    def set_ref_context_provider(
+        self, provider: Callable[[], Optional[FlowRefContext]]
+    ) -> None:
+        """Install the app's contextual resolver source (E3 ruling 7)."""
+        self._ref_provider = provider
+
+    def refresh_flow_ref_annotations(self) -> None:
+        """Repaint the pipeline: the app calls this when the resolution
+        context changes (project load/save, artifact load/unload) without
+        a block mutation."""
+        if not self.is_mounted:
+            return
+        self._refresh_blocks()
+
+    def _ref_resolver(self) -> Optional[Callable[[str], str]]:
+        """The current contextual classifier, or ``None`` without a
+        provider/context — cards then keep their shipped shape (E3
+        ruling 7)."""
+        if self._ref_provider is None:
+            return None
+        context = self._ref_provider()
+        return context.resolver() if context is not None else None
 
     def set_session_dir(self, path: str) -> None:
         """Publish the session artifact dir; it rides the ribbon (LLR-146.11)."""
@@ -1295,6 +1630,7 @@ class FlowBuilderPanel(ScrollableContainer):
                 with Horizontal(classes="flow-add-line"):
                     yield Label("", classes="flow-field-label flow-ref-label")
                     yield OsClipboardInput(placeholder="", id="flow_ref", compact=True)
+                    yield FlowChip("Browse", id="flow_browse", classes="flow-browse")
                     yield Label("gating", classes="flow-field-label flow-gating-label")
                     yield Select(
                         self._GATING_OPTIONS,
@@ -1305,8 +1641,10 @@ class FlowBuilderPanel(ScrollableContainer):
                     )
                     yield Label("image A", classes="flow-field-label flow-a2b-label")
                     yield OsClipboardInput(placeholder="file or #n", id="flow_ref_a", compact=True)
+                    yield FlowChip("Browse", id="flow_ref_a_browse", classes="flow-browse")
                     yield Label("image B", classes="flow-field-label flow-a2b-label")
                     yield OsClipboardInput(placeholder="file or #n", id="flow_ref_b", compact=True)
+                    yield FlowChip("Browse", id="flow_ref_b_browse", classes="flow-browse")
                     yield Label("mode", classes="flow-field-label flow-ext-label")
                     yield Select(
                         self._EXT_MODE_OPTIONS,
@@ -1772,7 +2110,9 @@ class FlowBuilderPanel(ScrollableContainer):
         self.query_one("#flow_canvas", Static).update(self._canvas_text())
         if self._layout_key is not None:
             self._card_w, self._spare = pipeline_layout(self._layout_key[0], len(self._blocks))
-        self.query_one("#flow_pipeline", Static).update(pipeline_text(self._blocks, self._card_w, self._spare))
+        self.query_one("#flow_pipeline", Static).update(
+            pipeline_text(self._blocks, self._card_w, self._spare, self._ref_resolver())
+        )
         count = len(self._blocks)
         self.query_one("#flow_pipeline_scroll").border_title = f"chain · {count} block{'' if count == 1 else 's'}"
         self.query_one("#flow_legend", Static).update(
@@ -2134,6 +2474,30 @@ class FlowBuilderPanel(ScrollableContainer):
         self._refresh_blocks()
         self._mark_dirty()
 
+    def _browse_ref(self, input_id: str) -> None:
+        """Post :class:`BrowseRequested` for a ref field's Browse chip
+        (R-B102-FILE-002).
+
+        The panel never pushes the chooser itself (E3 ruling 2): the app
+        builds the candidates, pushes ``FileRefChooserScreen`` and writes
+        the chosen ref back through the public :meth:`apply_browsed_ref`.
+        """
+        self.post_message(BrowseRequested(input_id))
+
+    def apply_browsed_ref(self, input_id: str, ref: str) -> None:
+        """Write a browsed ref into one add-form field (R-B102-FILE-003).
+
+        Fills ONLY the field: picking a candidate never adds or edits a
+        block (Add still owns that) and marks nothing dirty.  A stale or
+        foreign selector is a silent no-op; the value rides ``safe_text``
+        so a hostile name lands literal (R-B102-FILE-007).
+        """
+        try:
+            widget = self.query_one(input_id, Input)
+        except NoMatches:
+            return
+        widget.value = safe_text(ref).plain
+
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id is not None and event.button.id.startswith(
             "flow_palette_"
@@ -2143,6 +2507,9 @@ class FlowBuilderPanel(ScrollableContainer):
             self._sync_kind_dependent_visibility(kind)
             # A notice about the previous kind no longer applies (ux L-a).
             self._show_wiring_notice("")
+            return
+        if event.button.id in _BROWSE_INPUTS:
+            self._browse_ref(_BROWSE_INPUTS[event.button.id])
             return
         if event.button.id == "flow_add":
             kind = str(self.query_one("#flow_kind", Select).value)
@@ -2259,9 +2626,12 @@ class FlowBuilderPanel(ScrollableContainer):
         self.query_one(".flow-gating-label", Label).display = kind == BLOCK_CHECK
         self.query_one("#flow_ref", Input).display = single
         self.query_one(".flow-ref-label", Label).display = single
+        self.query_one("#flow_browse", Button).display = single
         for widget in (
             self.query_one("#flow_ref_a", Input),
             self.query_one("#flow_ref_b", Input),
+            self.query_one("#flow_ref_a_browse", Button),
+            self.query_one("#flow_ref_b_browse", Button),
             *self.query(".flow-a2b-label"),
         ):
             widget.display = kind == BLOCK_A2B

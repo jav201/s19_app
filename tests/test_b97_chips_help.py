@@ -1335,10 +1335,13 @@ def test_tc_b97_32_flow_help_names_every_label(tmp_path: Path) -> None:
     kinds, both EXT-STEP modes, the funnel editor open), every key it binds
     (``space``, ``enter``, ``?``) and every glyph of ``FLOW_KIND_GLYPHS``,
     ``FLOW_CABLE_GLYPHS`` and the result's status glyphs; the control subset
-    counts >= 21 (13 + the 8 add inputs of LLR-146.3).
+    counts >= 21 (13 + the 8 add inputs of LLR-146.3). batch-102 Inc 7 adds
+    the Browse chip's ``Browse`` label to the required set (E4): the flow
+    help body must name it with a ``Browse — effect`` line.
 
     RED on HEAD (P-21): 2 of 13 labels named. Mutation: a body line without
-    `` — effect``; coverage read from one kind only.
+    `` — effect``; coverage read from one kind only. RED on the pre-Inc-7
+    tree: the help names no Browse line.
     """
     from textual.widgets import Button, Input as _Input, Select as _Select
 
@@ -1386,6 +1389,12 @@ def test_tc_b97_32_flow_help_names_every_label(tmp_path: Path) -> None:
     controls, keys = asyncio.run(_drive())
     keys &= {"space", "enter", "?"}
     keys.add("enter")
+    # batch-102 Inc 7 (E4): the Browse chip beside the ref field must be named
+    # by the flow help body — the harvest only sees controls that ship, so the
+    # expected label is added explicitly: RED on the pre-Inc-7 tree (no
+    # ``Browse — effect`` line), green once both the chip and the help line
+    # ship (the Inc-4 census idiom).
+    controls.add("Browse")
     glyphs = set(getattr(fs, "FLOW_KIND_GLYPHS", {}) or {"(no FLOW_KIND_GLYPHS)"})
     glyphs |= set(getattr(fs, "FLOW_CABLE_GLYPHS", {}))
     glyphs |= set(fs._BLOCK_STATUS_GLYPH.values())
@@ -1398,8 +1407,9 @@ def test_tc_b97_32_flow_help_names_every_label(tmp_path: Path) -> None:
 
 #: Characters the Builder paints as card frame and text structure, outside the
 #: three vocabularies (design D7: frame ``╭ ╮ ╰ ╯ │``, ``←`` input from block
-#: #n, ``…``, ``·``, plus ASCII punctuation of file names and ``#n``).
-_FLOW_STRUCTURE = set("╭╮╰╯│←…·—→") | set(_string.punctuation)
+#: #n, ``…``, ``·``, batch-102 Inc 7's origin annotation ``↳``, plus ASCII
+#: punctuation of file names and ``#n``).
+_FLOW_STRUCTURE = set("╭╮╰╯│←…·—→↳") | set(_string.punctuation)
 
 
 def _vocabulary_glyphs(text: str) -> set:

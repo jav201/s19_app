@@ -247,6 +247,25 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "of block n.",
             "image B — the second A2B input, the same way; at least one input "
             "comes from this chain.",
+            "· source — under a card's file input, where that file comes "
+            "from: project, temp (the workarea temp folder), loaded (an "
+            "artifact loaded now) or external (imported into the project's "
+            "`external\\` folder); a bold `missing: <name>` names a ref "
+            "nothing provides (R-B102-FILE-001).",
+            "Browse — beside a file ref field (and in the block edit "
+            "dialog), opens a chooser listing the project's files, the "
+            "workarea temp files and the loaded artifacts; a pick only "
+            "fills the field — the block changes with Add or Save "
+            "(R-B102-FILE-002/003).  A temp or loaded file outside the "
+            "project is copied into the project's `external\\` folder "
+            "first, so the chain can run it (E3 ruling 1); an existing "
+            "name gets a `-1`, `-2`, … suffix, never an overwrite.",
+            "External path — in the chooser, type an absolute path and "
+            "press Import to bring an outside file into the project's "
+            "`external\\` folder; without a project the import refuses "
+            "with `Load or create a project before importing an external "
+            "file.`, and an unreadable file with `External file not "
+            "readable: <name>` (R-B102-FILE-004..006).",
             "mode — Terminal: a command run outside the app; Manual: an "
             "instruction for a human.",
             "command — the exact command run outside the app (Terminal mode).",

@@ -82,6 +82,9 @@ from .screens import (
     ConfirmDiscardScreen,
     ConfirmQuestionScreen,
     EntryJsonScreen,
+    FileRefCandidate,
+    FileRefChoice,
+    FileRefChooserScreen,
     FlowBlockEditScreen,
     LegendScreen,
     LOAD_RESULT_SELECT_VARIANT,
@@ -97,7 +100,13 @@ from .screens import (
     SaveProjectScreen,
     SelectVariantScreen,
 )
-from .flow_screens import FlowBuilderPanel, FlowExecutionPanel, fx_run_error_line
+from .flow_screens import (
+    BrowseRequested,
+    FlowBuilderPanel,
+    FlowExecutionPanel,
+    FlowRefContext,
+    fx_run_error_line,
+)
 from .screens_directionb import (
     AbDiffPanel,
     CheckEditorPanel,
@@ -3760,10 +3769,27 @@ class S19TuiApp(App):
                 OpenFolderChip("flows"),
                 help_button=WindowHelpChip("flow"),
             ),
-            FlowBuilderPanel(),
+            self._compose_flow_builder_panel(),
             id="screen_flow",
             classes="db-screen hidden",
         )
+
+    def _compose_flow_builder_panel(self) -> "FlowBuilderPanel":
+        """The Flow Builder panel plus its Inc-7 context wiring.
+
+        Summary:
+            Installs the card-annotation context provider (E3 ruling 7):
+            the panel pulls the CURRENT project/temp/loaded listing from
+            the app at every repaint — the panel never lists directories
+            itself (the pure textual classifier, E3 ruling 5, runs on the
+            names the app hands it).
+
+        Returns:
+            FlowBuilderPanel: The composed panel.
+        """
+        panel = FlowBuilderPanel()
+        panel.set_ref_context_provider(self._flow_ref_context)
+        return panel
 
     def _compose_screen_flow_execution(self) -> Container:
         """Build the Flow Execution rail screen (``#screen_flow_execution``).
@@ -4103,6 +4129,161 @@ class S19TuiApp(App):
         # on Cancel via AUTO_FOCUS; the primary style follows it as well.
         question.PRIMARY_BUTTON = "confirm_no"
         self.push_screen(question, _apply)
+
+    # -- flow file refs (batch-102 Inc 7, US-102-07; R-B102-FILE-001..007) -----
+
+    def _flow_project_file_names(self, project_dir: Optional[Path]) -> Tuple[str, ...]:
+        """The active project's direct-child FILE names (Inc 7 candidates
+        and the card-annotation project list).
+
+        Regular, non-link direct children only — a symlink or junction in
+        the project dir NEVER appears in the chooser (E3-ruling addendum),
+        and neither do subfolders.  An unlistable/missing dir is ``()``.
+        """
+        if project_dir is None:
+            return ()
+        try:
+            entries = sorted(Path(project_dir).iterdir())
+        except OSError:
+            return ()
+        names: List[str] = []
+        for entry in entries:
+            try:
+                entry_stat = os.lstat(entry)
+            except OSError:
+                continue
+            if not stat.S_ISREG(entry_stat.st_mode) or _is_reparse_point(entry):
+                continue
+            names.append(entry.name)
+        return tuple(names)
+
+    def _loaded_artifact_paths(self) -> Tuple[Path, ...]:
+        """The DISTINCT on-disk paths of the currently loaded artifacts
+        (primary image, MAC, A2L) — the chooser's Loaded section and the
+        annotation's ``loaded`` list."""
+        loaded = self.current_file
+        if loaded is None:
+            return ()
+        paths: List[Path] = []
+        for raw in (loaded.path, loaded.mac_path, loaded.a2l_path):
+            if raw is None:
+                continue
+            path = Path(raw)
+            if path not in paths:
+                paths.append(path)
+        return tuple(paths)
+
+    def _flow_ref_context(self) -> Optional[FlowRefContext]:
+        """The CURRENT card-annotation context (E3 ruling 7): the panel's
+        provider calls this at every repaint, so the annotations always
+        classify against the live project/temp/loaded listing.  The app
+        side MAY list directories; the classifier it feeds never does
+        (E3 ruling 5)."""
+        project_dir = self._active_project_dir()
+        try:
+            temp_names = tuple(p.name for p in list_workarea_files(self.workarea))
+        except OSError:
+            temp_names = ()
+        return FlowRefContext(
+            project_root=project_dir,
+            project_names=self._flow_project_file_names(project_dir),
+            temp_names=temp_names,
+            loaded_names=tuple(p.name for p in self._loaded_artifact_paths()),
+        )
+
+    def _flow_ref_candidates(
+        self, project_dir: Optional[Path]
+    ) -> List[FileRefCandidate]:
+        """The chooser's candidates (R-B102-FILE-002): project files, then
+        workarea temp files, then the loaded artifacts — each temp/loaded
+        entry carrying its source path so a pick outside the project
+        imports through the hardened safe path first (E3 ruling 1)."""
+        candidates: List[FileRefCandidate] = []
+        for name in self._flow_project_file_names(project_dir):
+            candidates.append(
+                FileRefCandidate(label=name, ref=name, origin="project")
+            )
+        for path in list_workarea_files(self.workarea):
+            candidates.append(
+                FileRefCandidate(
+                    label=path.name, ref=path.name, origin="temp", source=path
+                )
+            )
+        project_resolved: Optional[Path] = None
+        if project_dir is not None:
+            try:
+                project_resolved = Path(project_dir).resolve()
+            except (OSError, ValueError, RuntimeError):
+                project_resolved = None
+        for path in self._loaded_artifact_paths():
+            label = f"current ({path.name})"
+            if project_resolved is not None:
+                try:
+                    relative = path.resolve().relative_to(project_resolved)
+                except (OSError, ValueError, RuntimeError):
+                    relative = None
+                if relative is not None and relative.as_posix() not in ("", "."):
+                    # Already inside the project: the direct relative ref
+                    # is written, no copy (E3 ruling 1).
+                    candidates.append(
+                        FileRefCandidate(
+                            label=label,
+                            ref=relative.as_posix(),
+                            origin="loaded",
+                        )
+                    )
+                    continue
+            if project_dir is not None and (Path(project_dir) / path.name).is_file():
+                # The shipped load synced this artifact into the project; the
+                # project-relative name is the runnable ref, not a new import.
+                candidates.append(
+                    FileRefCandidate(label=label, ref=path.name, origin="loaded")
+                )
+                continue
+            candidates.append(
+                FileRefCandidate(
+                    label=label, ref=path.name, origin="loaded", source=path
+                )
+            )
+        return candidates
+
+    def on_browse_requested(self, event: BrowseRequested) -> None:
+        """Open the file-ref chooser for a flow host's Browse chip
+        (batch-102 Inc 7, R-B102-FILE-002; E3 ruling 2 — the app
+        coordinates the modal, never the host)."""
+        self._open_file_ref_chooser(event.input_id)
+
+    def _open_file_ref_chooser(self, input_id: str) -> None:
+        """Push :class:`FileRefChooserScreen` over the requesting host and
+        route the pick back to it."""
+        project_dir = self._active_project_dir()
+        candidates = self._flow_ref_candidates(project_dir)
+
+        def _apply(choice: Optional[FileRefChoice]) -> None:
+            if choice is None:
+                return  # cancelled — the host field keeps its text
+            self._apply_flow_ref_choice(input_id, choice)
+
+        self.push_screen(
+            FileRefChooserScreen(candidates, project_dir), _apply
+        )
+
+    def _apply_flow_ref_choice(self, input_id: str, choice: FileRefChoice) -> None:
+        """Write the browsed ref into the host that owns the field
+        (R-B102-FILE-003; E3 ruling 2): the ``FlowBlockEditScreen`` when it
+        sits under the chooser, else the Flow Builder's add form.  Only
+        the field changes — no block is added or edited."""
+        screen = self.screen
+        if isinstance(screen, FlowBlockEditScreen):
+            screen.apply_browsed_ref(input_id, choice.ref)
+        else:
+            try:
+                panel = self.query_one("#flow_panel", FlowBuilderPanel)
+            except Exception:  # noqa: BLE001 - panel not mounted: nothing to fill
+                return
+            panel.apply_browsed_ref(input_id, choice.ref)
+        if choice.origin == "external":
+            self.set_status(safe_text(f"imported as {choice.ref}").plain)
 
     # -- Flow Execution (fx_a, batch-94 Inc-003; US-007, HLR-017…021) ---------
 
@@ -13139,6 +13320,12 @@ class S19TuiApp(App):
             except Exception:  # noqa: BLE001 - panels not mounted yet
                 continue
             panel.set_session_dir(value)
+        #: batch-102 Inc 7: the project change also changes the card
+        #: annotation context (E3 ruling 7) — repaint without a block edit.
+        try:
+            self.query_one("#flow_panel", FlowBuilderPanel).refresh_flow_ref_annotations()
+        except Exception:  # noqa: BLE001 - panel not mounted yet
+            pass
 
     def _reset_project_session(self) -> None:
         """
@@ -17069,6 +17256,13 @@ class S19TuiApp(App):
             self.current_file,
             self._compose_project_label() if project is None else project,
         )
+        #: batch-102 Inc 7: a load/unload changes the ``loaded`` half of the
+        #: flow card-annotation context (E3 ruling 7) — repaint the Builder
+        #: without a block edit.  Guarded like the panel lookup above.
+        try:
+            self.query_one("#flow_panel", FlowBuilderPanel).refresh_flow_ref_annotations()
+        except Exception:  # noqa: BLE001 - panel not mounted yet
+            pass
 
     def on_loaded_artifacts_panel_unload_requested(
         self, message: "LoadedArtifactsPanel.UnloadRequested"

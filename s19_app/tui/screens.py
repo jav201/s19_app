@@ -13,6 +13,7 @@ from textual import events, work
 from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Horizontal, ScrollableContainer, VerticalScroll
+from textual.content import Content
 from textual.message import Message
 from textual.screen import ModalScreen
 from textual.widget import Widget
@@ -46,7 +47,11 @@ from .insight_style import DGRAY, GREEN, RED, YELLOW
 from .open_folder_chip import OpenFolderChip, titled_header
 from .window_help import WindowHelpChip, open_window_help
 from .os_clipboard_input import OsClipboardInput, _CLIPBOARD_CAP_CHARS
-from .workspace import sanitize_project_name
+from .workspace import (
+    ExternalImportRefusal,
+    import_external_ref,
+    sanitize_project_name,
+)
 from .legend import (
     BAND_GAP_FIELDS,
     COLOUR_SEVERITY,
@@ -98,6 +103,7 @@ from .services.flow_model import (
     parse_a2b_binding,
 )
 from .services.entropy_service import ENTROPY_WINDOW_BYTES
+from .flow_screens import BrowseRequested
 from .services.report_addendum import DeclaredRegion
 from .services.report_service import (
     REPORT_CONTEXT_BYTES_DEFAULT,
@@ -1653,6 +1659,203 @@ class LoadFlowScreen(ModalScreen[Optional[str]]):
         status.update(f"imported flows/{imported.name}")
 
 
+# ---------------------------------------------------------------------------
+# batch-102 Inc 7 (US-102-07) — the flow file-ref chooser (R-B102-FILE-002..007)
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class FileRefCandidate:
+    """One Browse candidate (E3 ruling 1).
+
+    Args:
+        label (str): The display line (scrubbed by the chooser at render).
+        ref (str): The wire value written into the host field on a direct
+            pick (project files, or a loaded artifact already inside the
+            project — its project-relative posix path).
+        origin (str): ``project`` / ``temp`` / ``loaded``.
+        source (Optional[Path]): The absolute file a temp/loaded pick must
+            import through :func:`s19_app.tui.workspace.import_external_ref`
+            before the field receives ``external/<name>``; ``None`` for a
+            direct pick.
+    """
+
+    label: str
+    ref: str
+    origin: str
+    source: Optional[Path] = None
+
+
+@dataclass(frozen=True)
+class FileRefChoice:
+    """The chooser's dismiss value: the wire ref + the origin it came from."""
+
+    ref: str
+    origin: str  # "project" | "temp" | "loaded" | "external"
+
+
+class FileRefChooserScreen(ModalScreen[Optional[FileRefChoice]]):
+    """Modal to pick the file behind one flow ref field (batch-102 Inc 7).
+
+    Summary:
+        Opened by the app when a flow host posts ``BrowseRequested``
+        (E3 ruling 2 — the app coordinates the modal, never the host).
+        Lists the three candidate sections — ``Project``, ``Temp /
+        workarea`` and ``Loaded artifacts`` — plus an external-path input
+        with an Import action (R-B102-FILE-002).  Picking a candidate
+        dismisses with its wire value and NEVER adds or edits a block
+        (R-B102-FILE-003); a temp or loaded pick whose file is not already
+        inside the active project is first imported into
+        ``<project>/external/`` through the hardened
+        :func:`import_external_ref`, so every produced value is runnable
+        by ``run_flow`` (E3 ruling 1).  Every refusal is painted in the
+        modal with its exact pinned line, names at most the file NAME
+        (never a path — E3 ruling 8), and leaves the host field untouched
+        (R-B102-FILE-005/006).  Every file-derived string renders through
+        ``safe_text``/``Content`` — literal text, zero markup spans
+        (R-B102-FILE-007).
+
+    Args:
+        candidates (Sequence[FileRefCandidate]): The app-built candidate
+            list (project/temp/loaded).
+        project_root (Optional[Path]): The active project dir — the only
+            import destination; ``None`` refuses every import with the
+            pinned no-project line.
+    """
+
+    BINDINGS = [Binding("escape", "cancel", "Cancel", show=False)]
+
+    #: The section headers, in stack order (R-B102-FILE-002: 3/3 visible).
+    _SECTION_TITLES: Tuple[Tuple[str, str], ...] = (
+        ("project", "Project"),
+        ("temp", "Temp / workarea"),
+        ("loaded", "Loaded artifacts"),
+    )
+
+    def __init__(
+        self,
+        candidates: Sequence[FileRefCandidate],
+        project_root: Optional[Path],
+    ) -> None:
+        super().__init__()
+        self._candidates = list(candidates)
+        self._project_root = project_root
+        self._pick_map: Mapping[str, FileRefCandidate] = {}
+
+    def compose(self) -> ComposeResult:
+        with Container(id="file_ref_dialog", classes="modal-dialog"):
+            yield Static(
+                "CHOOSE INPUT FILE", classes="modal-title", markup=False
+            )
+            pick_index = 0
+            for origin, title in self._SECTION_TITLES:
+                yield Static(
+                    title, classes="file-ref-section", markup=False
+                )
+                items = [c for c in self._candidates if c.origin == origin]
+                if not items:
+                    yield Static(
+                        "(none)", classes="file-ref-none", markup=False
+                    )
+                    continue
+                for candidate in items:
+                    button_id = f"file_ref_pick_{pick_index}"
+                    pick_index += 1
+                    self._pick_map[button_id] = candidate
+                    yield Button(
+                        Content(safe_text(candidate.label).plain),
+                        id=button_id,
+                        classes="file-ref-item",
+                    )
+            with Horizontal(classes="file-ref-external"):
+                yield Label(
+                    "External path", classes="flow-field-label", markup=False
+                )
+                yield OsClipboardInput(
+                    placeholder="absolute path to a file outside the project",
+                    id="flow_external_path_input",
+                    classes="file-ref-path",
+                    compact=True,
+                )
+                yield Button("Import", id="flow_external_import")
+            yield Static(
+                "", id="file_ref_status", classes="sev-warning", markup=False
+            )
+            with Horizontal(classes="modal-buttons"):
+                yield Button("Cancel", id="file_ref_cancel")
+
+    def on_mount(self) -> None:
+        self.query_one("#file_ref_status", Static).display = False
+        self.query_one("#flow_external_path_input", Input).focus()
+
+    # -- picking ----------------------------------------------------------------
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        button_id = event.button.id
+        if button_id == "file_ref_cancel":
+            self.dismiss(None)
+            return
+        if button_id == "flow_external_import":
+            raw = self.query_one("#flow_external_path_input", Input).value.strip()
+            if not raw:
+                self._paint_status(
+                    "External path is empty — type a path or pick a candidate."
+                )
+                return
+            choice = self._import_source(Path(raw))
+            if choice is not None:
+                self.dismiss(choice)
+            return
+        if button_id is not None and button_id.startswith("file_ref_pick_"):
+            candidate = self._pick_map.get(button_id)
+            if candidate is not None:
+                self._pick_candidate(candidate)
+
+    def _pick_candidate(self, candidate: FileRefCandidate) -> None:
+        """Dismiss with the candidate's wire value (R-B102-FILE-003).
+
+        A project candidate (or a loaded one already inside the project)
+        dismisses directly; a temp/loaded pick imports first (E3 ruling 1)
+        so the field receives an ``external/<name>`` value the flow can
+        actually run.  Nothing here mutates a block or the host field.
+        """
+        if candidate.source is None:
+            self.dismiss(
+                FileRefChoice(ref=candidate.ref, origin=candidate.origin)
+            )
+            return
+        choice = self._import_source(candidate.source)
+        if choice is not None:
+            self.dismiss(choice)
+
+    def _import_source(self, source: Path) -> Optional[FileRefChoice]:
+        """The hardened import; ``None`` (refusal painted) on any refusal.
+
+        The refusal messages are operator-facing and path-free (E3 ruling
+        8); nothing is copied on a refusal (R-B102-FILE-005/006).
+        """
+        try:
+            imported = import_external_ref(source, self._project_root)
+        except ExternalImportRefusal as refusal:
+            self._paint_status(str(refusal))
+            return None
+        if imported is None:  # defensive: the refusal class covers this
+            self._paint_status(
+                "Load or create a project before importing an external file."
+            )
+            return None
+        _landed, ref = imported
+        return FileRefChoice(ref=ref, origin="external")
+
+    def _paint_status(self, message: str) -> None:
+        status = self.query_one("#file_ref_status", Static)
+        status.update(safe_text(message))  # SINK: file-derived refusal text
+        status.display = True
+
+    def action_cancel(self) -> None:
+        self.dismiss(None)
+
+
 #: kind → path-bearing wire fields (the NUL pre-check set, the add form's
 #: S4-1 idiom): a candidate holding a NUL refuses before the loader runs.
 _EDIT_PATH_FIELDS: Mapping[str, Tuple[str, ...]] = {
@@ -1691,6 +1894,12 @@ class FlowBlockEditScreen(ModalScreen[Optional[FlowBlock]]):
         (1-based, the operator grammar) and saved through
         :func:`parse_a2b_binding` as the wire form ``{"source", "ref"}``
         (0-based) — never the display form.
+
+        batch-102 Inc 7: the READ file-ref rows carry a Browse chip that
+        posts the module-level ``BrowseRequested`` (E3 ruling 2 — the app
+        coordinates :class:`FileRefChooserScreen` and writes the pick back
+        through the public :meth:`apply_browsed_ref`; the block changes
+        only on a validated Save).
 
         Without a containment base (E3 ruling 4) Save refuses IN the modal
         — a hostile ref is never stored to fail later. Every file-derived
@@ -1751,17 +1960,18 @@ class FlowBlockEditScreen(ModalScreen[Optional[FlowBlock]]):
             block = self._block
             if isinstance(block, SourceBlock):
                 yield from self._ref_row(
-                    "image file", block.image_ref, "flow_edit_ref", "e.g. prg.s19"
+                    "image file", block.image_ref, "flow_edit_ref",
+                    "e.g. prg.s19", browse=True,
                 )
             elif isinstance(block, PatchBlock):
                 yield from self._ref_row(
                     "change doc", block.change_doc_ref, "flow_edit_ref",
-                    "e.g. calib_hotfix.json",
+                    "e.g. calib_hotfix.json", browse=True,
                 )
             elif isinstance(block, CheckBlock):
                 yield from self._ref_row(
                     "check doc", block.check_doc_ref, "flow_edit_ref",
-                    "e.g. baseline.chk.json",
+                    "e.g. baseline.chk.json", browse=True,
                 )
                 with Horizontal(classes="flow-edit-line"):
                     yield Label("gating", classes="flow-field-label", markup=False)
@@ -1777,23 +1987,24 @@ class FlowBlockEditScreen(ModalScreen[Optional[FlowBlock]]):
                     )
             elif isinstance(block, CrcBlock):
                 yield from self._ref_row(
-                    "CRC template", block.config_ref, "flow_edit_ref", "e.g. crc.json"
+                    "CRC template", block.config_ref, "flow_edit_ref",
+                    "e.g. crc.json", browse=True,
                 )
             elif isinstance(block, WriteOutBlock):
                 yield from self._ref_row(
                     "output file", block.output_name, "flow_edit_ref",
-                    "e.g. fw_app_patched.s19",
+                    "e.g. fw_app_patched.s19", browse=True,
                 )
             elif isinstance(block, A2BBlock):
                 # Bindings display as the operator grammar (#n 1-based); the
                 # wire form is rebuilt from parse_a2b_binding on Save.
                 yield from self._ref_row(
                     "image A", _binding_field_text(block.image_a),
-                    "flow_edit_ref_a", "file or #n",
+                    "flow_edit_ref_a", "file or #n", browse=True,
                 )
                 yield from self._ref_row(
                     "image B", _binding_field_text(block.image_b),
-                    "flow_edit_ref_b", "file or #n",
+                    "flow_edit_ref_b", "file or #n", browse=True,
                 )
             elif isinstance(block, ExternalStepBlock):
                 with Horizontal(classes="flow-edit-line"):
@@ -1834,13 +2045,17 @@ class FlowBlockEditScreen(ModalScreen[Optional[FlowBlock]]):
                 yield Button("Cancel", id="flow_edit_cancel")
 
     def _ref_row(
-        self, label: str, value: str, input_id: str, placeholder: str
+        self, label: str, value: str, input_id: str, placeholder: str,
+        *, browse: bool = False,
     ) -> ComposeResult:
         """One label + prefilled input row (the add-row vocabulary).
 
         The prefill rides through ``safe_text`` (R-B102-FB-006): the block's
         stored value is literal text — control bytes are scrubbed before it
-        enters the field, markup characters stay inert.
+        enters the field, markup characters stay inert.  ``browse=True``
+        (the READ file-ref rows only, E3 ruling 6) adds the Browse chip that
+        posts :class:`BrowseRequested` for the app to coordinate
+        (batch-102 Inc 7, E3 ruling 2).
         """
         with Horizontal(classes="flow-edit-line"):
             yield Label(label, classes="flow-field-label", markup=False)
@@ -1850,6 +2065,35 @@ class FlowBlockEditScreen(ModalScreen[Optional[FlowBlock]]):
                 id=input_id,
                 compact=True,
             )
+            if browse:
+                browse_id = (
+                    "flow_edit_browse"
+                    if input_id == "flow_edit_ref"
+                    else f"{input_id}_browse"
+                )
+                yield Button(
+                    "Browse", id=browse_id, classes="flow-browse"
+                )
+
+    def _browse_ref(self, input_id: str) -> None:
+        """Post :class:`BrowseRequested` for one of the modal's ref fields.
+
+        The modal never pushes the chooser itself (E3 ruling 2): the app
+        pushes ``FileRefChooserScreen`` and writes the choice back through
+        the public :meth:`apply_browsed_ref`.
+        """
+        self.post_message(BrowseRequested(f"#{input_id}"))
+
+    def apply_browsed_ref(self, input_id: str, ref: str) -> None:
+        """Write a browsed ref into one of the modal's fields
+        (R-B102-FILE-003): the field updates, the block changes only on a
+        validated Save.  A stale or foreign selector is a silent no-op.
+        """
+        try:
+            widget = self.query_one(input_id, Input)
+        except Exception:  # noqa: BLE001 - a stale host selector refuses silently
+            return
+        widget.value = safe_text(ref).plain
 
     def _kind_title(self) -> str:
         """The title's kind word — the add-row look-up table, else the raw kind."""
@@ -1872,9 +2116,20 @@ class FlowBlockEditScreen(ModalScreen[Optional[FlowBlock]]):
     # -- save / cancel -------------------------------------------------------
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "flow_edit_save":
+        button_id = event.button.id
+        if button_id == "flow_edit_browse":
+            self._browse_ref("flow_edit_ref")
+            return
+        if (
+            button_id is not None
+            and button_id.startswith("flow_edit_")
+            and button_id.endswith("_browse")
+        ):
+            self._browse_ref(button_id[: -len("_browse")])
+            return
+        if button_id == "flow_edit_save":
             self._save()
-        elif event.button.id == "flow_edit_cancel":
+        elif button_id == "flow_edit_cancel":
             self.dismiss(None)
 
     def action_cancel(self) -> None:
