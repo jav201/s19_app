@@ -1,0 +1,517 @@
+RED transcript â€” Batch 102 / Inc 2 â€” A2L load/reload refresh (TC-B102-A2L-01..07)
+Tester: E4 | Worktree: C:/Users/jjgh8/Github/s19_app-b102-inc2-tests | Base commit: cb51fc8 (pre-fix tree, no source changes)
+Date: 2026-11-03 16:08 UTC
+New tests: tests/test_b102_a2l_refresh.py (only file added; s19_app/ untouched)
+Command: python -m pytest tests/test_b102_a2l_refresh.py -v
+Expected RED per .dev-flow/2026-11-03-batch-102/inc-2/02-test-cases.md: TC-02 (clave (id, mem_size) sin _image_generation),
+TC-04 (mensaje generico 'No A2L tags.' en vez del mensaje con filtro), TC-05 (id() forzado colisiona la clave de identidad),
+TC-07 (apply instala el precalculo del worker sin verificar generaciones). TC-01/03/06 fijan comportamiento base (mutant controls).
+==========================================================================================================
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+============================= test session starts =============================
+platform win32 -- Python 3.12.7, pytest-8.3.4, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b102-inc2-tests
+configfile: pyproject.toml
+plugins: anyio-4.2.0, asyncio-0.25.0, cov-7.1.0, textual-snapshot-1.1.0, timeout-2.3.1, syrupy-4.8.0
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
+collecting ... collected 8 items
+
+tests/test_b102_a2l_refresh.py::test_tc_b102_a2l_01_direct_attach_refreshes_viewer PASSED [ 12%]
+tests/test_b102_a2l_refresh.py::test_tc_b102_a2l_02_same_size_reload_refreshes_rows FAILED [ 25%]
+tests/test_b102_a2l_refresh.py::test_tc_b102_a2l_03_active_filter_applied_to_new_attach PASSED [ 37%]
+tests/test_b102_a2l_refresh.py::test_tc_b102_a2l_04_no_match_filter_names_filter[Missing] FAILED [ 50%]
+tests/test_b102_a2l_refresh.py::test_tc_b102_a2l_04_no_match_filter_names_filter[[red]] FAILED [ 62%]
+tests/test_b102_a2l_refresh.py::test_tc_b102_a2l_05_forced_id_collision_recomputes FAILED [ 75%]
+tests/test_b102_a2l_refresh.py::test_tc_b102_a2l_06_clear_unload_renders_empty_state PASSED [ 87%]
+tests/test_b102_a2l_refresh.py::test_tc_b102_a2l_07_stale_prepared_load_discarded FAILED [100%]
+
+================================== FAILURES ===================================
+_____________ test_tc_b102_a2l_02_same_size_reload_refreshes_rows _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32162/test_tc_b102_a2l_02_same_size_0')
+
+    def test_tc_b102_a2l_02_same_size_reload_refreshes_rows(tmp_path: Path) -> None:
+        a_a2l = _write_a2l(tmp_path, "fixture_a.a2l", FIXTURE_A_A2L)
+        img1 = _write_s19(tmp_path, "img1.s19", 0x1000)
+        # Image 2: same address count (16), different mapped addresses AND content.
+        img2 = _write_hex(tmp_path, "img2.hex", 0x2000, fill=0xFF)
+    
+        async def scenario(app: S19TuiApp, pilot, log) -> None:
+            app.load_a2l_from_path(a_a2l)
+            await _drain(app, pilot)
+    
+            # Image 1 (S19) covers both tag addresses -> rows paint in-image "yes".
+            await projects.load_image(pilot, app, img1)
+            await _settle(pilot)
+            assert _row_names(app) == ["Alpha", "Beta"]
+            assert _in_memory_cells(app) == ["yes", "yes"]
+    
+            # Reload through the file-load path: same-size HEX over the same A2L.
+            await projects.load_image(pilot, app, img2)
+            await _settle(pilot)
+            # The final painted rows must reflect image-2 membership: neither tag
+            # address (0x1000/0x1002) is mapped by the image at 0x2000.
+            assert _row_names(app) == ["Alpha", "Beta"]
+            assert _in_memory_cells(app) == ["no", "no"], (
+                "painted A2L rows still describe the previous image's membership — "
+                "the enrichment cache was not invalidated by the equal-size reload"
+            )
+    
+>       projects.run_app(tmp_path / "app", scenario, size=SIZE)
+
+tests\test_b102_a2l_refresh.py:290: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\support\b100_projects.py:595: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:593: in _drive
+    return await scenario(app, pilot, log)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'nocolor', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'nocolor', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x0000029D83CA4980>
+
+    async def scenario(app: S19TuiApp, pilot, log) -> None:
+        app.load_a2l_from_path(a_a2l)
+        await _drain(app, pilot)
+    
+        # Image 1 (S19) covers both tag addresses -> rows paint in-image "yes".
+        await projects.load_image(pilot, app, img1)
+        await _settle(pilot)
+        assert _row_names(app) == ["Alpha", "Beta"]
+        assert _in_memory_cells(app) == ["yes", "yes"]
+    
+        # Reload through the file-load path: same-size HEX over the same A2L.
+        await projects.load_image(pilot, app, img2)
+        await _settle(pilot)
+        # The final painted rows must reflect image-2 membership: neither tag
+        # address (0x1000/0x1002) is mapped by the image at 0x2000.
+        assert _row_names(app) == ["Alpha", "Beta"]
+>       assert _in_memory_cells(app) == ["no", "no"], (
+            "painted A2L rows still describe the previous image's membership — "
+            "the enrichment cache was not invalidated by the equal-size reload"
+        )
+E       AssertionError: painted A2L rows still describe the previous image's membership — the enrichment cache was not invalidated by the equal-size reload
+E       assert ['yes', 'yes'] == ['no', 'no']
+E         
+E         At index 0 diff: 'yes' != 'no'
+E         
+E         Full diff:
+E           [
+E         -     'no',
+E         -     'no',...
+E         
+E         ...Full output truncated (3 lines hidden), use '-vv' to show
+
+tests\test_b102_a2l_refresh.py:285: AssertionError
+__________ test_tc_b102_a2l_04_no_match_filter_names_filter[Missing] __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32162/test_tc_b102_a2l_04_no_match_f0')
+filt = 'Missing'
+
+    @pytest.mark.parametrize("filt", ["Missing", HOSTILE_FILTER])
+    def test_tc_b102_a2l_04_no_match_filter_names_filter(tmp_path: Path, filt: str) -> None:
+        b_a2l = _write_a2l(tmp_path, "fixture_b.a2l", FIXTURE_B_A2L)
+    
+        async def scenario(app: S19TuiApp, pilot, log) -> None:
+            _set_filter(app, filt)
+            await _settle(pilot)
+            _attach(app, b_a2l)
+            await _settle(pilot)
+            assert _row_count(app) == 0
+            label = app.query_one("#a2l_tags_summary", Label)
+            rendered = label.render()
+            expected = f"No A2L tags match '{filt}'."
+            assert str(rendered) == expected, (
+                f"expected the exact filter-named empty message {expected!r}; "
+                f"got {str(rendered)!r} (a generic message or an interpreted-markup "
+                f"render both fail this contract)"
+            )
+            if filt == HOSTILE_FILTER:
+                # Literal-painting proof: the hostile token survives verbatim in
+                # the plain text; if markup were interpreted, ``[red]`` would be
+                # consumed as a style tag and vanish from the painted string.
+                assert filt in getattr(rendered, "plain", str(rendered))
+    
+>       projects.run_app(tmp_path / "app", scenario, size=SIZE)
+
+tests\test_b102_a2l_refresh.py:347: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\support\b100_projects.py:595: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:593: in _drive
+    return await scenario(app, pilot, log)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'nocolor', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'nocolor', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x0000029D82E26E70>
+
+    async def scenario(app: S19TuiApp, pilot, log) -> None:
+        _set_filter(app, filt)
+        await _settle(pilot)
+        _attach(app, b_a2l)
+        await _settle(pilot)
+        assert _row_count(app) == 0
+        label = app.query_one("#a2l_tags_summary", Label)
+        rendered = label.render()
+        expected = f"No A2L tags match '{filt}'."
+>       assert str(rendered) == expected, (
+            f"expected the exact filter-named empty message {expected!r}; "
+            f"got {str(rendered)!r} (a generic message or an interpreted-markup "
+            f"render both fail this contract)"
+        )
+E       AssertionError: expected the exact filter-named empty message "No A2L tags match 'Missing'."; got 'No A2L tags.' (a generic message or an interpreted-markup render both fail this contract)
+E       assert 'No A2L tags.' == "No A2L tags match 'Missing'."
+E         
+E         - No A2L tags match 'Missing'.
+E         + No A2L tags.
+
+tests\test_b102_a2l_refresh.py:336: AssertionError
+___________ test_tc_b102_a2l_04_no_match_filter_names_filter[[red]] ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32162/test_tc_b102_a2l_04_no_match_f1')
+filt = '[red]'
+
+    @pytest.mark.parametrize("filt", ["Missing", HOSTILE_FILTER])
+    def test_tc_b102_a2l_04_no_match_filter_names_filter(tmp_path: Path, filt: str) -> None:
+        b_a2l = _write_a2l(tmp_path, "fixture_b.a2l", FIXTURE_B_A2L)
+    
+        async def scenario(app: S19TuiApp, pilot, log) -> None:
+            _set_filter(app, filt)
+            await _settle(pilot)
+            _attach(app, b_a2l)
+            await _settle(pilot)
+            assert _row_count(app) == 0
+            label = app.query_one("#a2l_tags_summary", Label)
+            rendered = label.render()
+            expected = f"No A2L tags match '{filt}'."
+            assert str(rendered) == expected, (
+                f"expected the exact filter-named empty message {expected!r}; "
+                f"got {str(rendered)!r} (a generic message or an interpreted-markup "
+                f"render both fail this contract)"
+            )
+            if filt == HOSTILE_FILTER:
+                # Literal-painting proof: the hostile token survives verbatim in
+                # the plain text; if markup were interpreted, ``[red]`` would be
+                # consumed as a style tag and vanish from the painted string.
+                assert filt in getattr(rendered, "plain", str(rendered))
+    
+>       projects.run_app(tmp_path / "app", scenario, size=SIZE)
+
+tests\test_b102_a2l_refresh.py:347: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\support\b100_projects.py:595: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:593: in _drive
+    return await scenario(app, pilot, log)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'nocolor', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'nocolor', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x0000029D82E27920>
+
+    async def scenario(app: S19TuiApp, pilot, log) -> None:
+        _set_filter(app, filt)
+        await _settle(pilot)
+        _attach(app, b_a2l)
+        await _settle(pilot)
+        assert _row_count(app) == 0
+        label = app.query_one("#a2l_tags_summary", Label)
+        rendered = label.render()
+        expected = f"No A2L tags match '{filt}'."
+>       assert str(rendered) == expected, (
+            f"expected the exact filter-named empty message {expected!r}; "
+            f"got {str(rendered)!r} (a generic message or an interpreted-markup "
+            f"render both fail this contract)"
+        )
+E       AssertionError: expected the exact filter-named empty message "No A2L tags match '[red]'."; got 'No A2L tags.' (a generic message or an interpreted-markup render both fail this contract)
+E       assert 'No A2L tags.' == "No A2L tags match '[red]'."
+E         
+E         - No A2L tags match '[red]'.
+E         + No A2L tags.
+
+tests\test_b102_a2l_refresh.py:336: AssertionError
+_____________ test_tc_b102_a2l_05_forced_id_collision_recomputes ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32162/test_tc_b102_a2l_05_forced_id_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000029D82D14A10>
+
+    def test_tc_b102_a2l_05_forced_id_collision_recomputes(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        a_a2l = _write_a2l(tmp_path, "fixture_a.a2l", FIXTURE_A_A2L)
+        b_a2l = _write_a2l(tmp_path, "fixture_b.a2l", FIXTURE_B_A2L)
+        colliding_id = 0xC0111DE
+        real_id = builtins.id
+    
+        async def scenario(app: S19TuiApp, pilot, log) -> None:
+            entry_a = parse_a2l_cached(a_a2l, None)
+            entry_b = parse_a2l_cached(b_a2l, None)
+            payload_a, payload_b = entry_a[1], entry_b[1]
+    
+            def _forced_id(obj: object) -> int:
+                if obj is payload_a or obj is payload_b:
+                    return colliding_id
+                return real_id(obj)
+    
+            monkeypatch.setattr(builtins, "id", _forced_id)
+            try:
+                # Attach A at the forced identity: base stores the enrichment key
+                # ``(colliding_id, mem_size)``.
+                app._install_attached_a2l(
+                    A2LAttachResult(
+                        A2LAttachRequest(
+                            source=a_a2l, copy=False,
+                            temp_dir=app.workarea / WORKAREA_TEMP,
+                            workarea=app.workarea, record_recent=False,
+                            a2l_cache=None, gen=0,
+                        ),
+                        a_a2l, entry_a, 0.0,
+                    )
+                )
+                await _settle(pilot)
+                assert _row_names(app) == ["Alpha", "Beta"]
+    
+                # Attach B: a DIFFERENT payload at the SAME forced object address
+                # and the same memory-map size. Fresh tags must be computed.
+                app._install_attached_a2l(
+                    A2LAttachResult(
+                        A2LAttachRequest(
+                            source=b_a2l, copy=False,
+                            temp_dir=app.workarea / WORKAREA_TEMP,
+                            workarea=app.workarea, record_recent=False,
+                            a2l_cache=None, gen=0,
+                        ),
+                        b_a2l, entry_b, 0.0,
+                    )
+                )
+                await _settle(pilot)
+            finally:
+                monkeypatch.undo()
+            assert _row_names(app) == ["Alpha", "Gamma"], (
+                "stale enrichment rendered: the identity-colliding attach returned "
+                "the previous payload's tag list (Beta must be gone, Gamma present)"
+            )
+            assert " / 2 " in _summary_text(app)
+    
+>       projects.run_app(tmp_path / "app", scenario, size=SIZE)
+
+tests\test_b102_a2l_refresh.py:419: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\support\b100_projects.py:595: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:593: in _drive
+    return await scenario(app, pilot, log)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'nocolor', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'nocolor', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x0000029D8375ADB0>
+
+    async def scenario(app: S19TuiApp, pilot, log) -> None:
+        entry_a = parse_a2l_cached(a_a2l, None)
+        entry_b = parse_a2l_cached(b_a2l, None)
+        payload_a, payload_b = entry_a[1], entry_b[1]
+    
+        def _forced_id(obj: object) -> int:
+            if obj is payload_a or obj is payload_b:
+                return colliding_id
+            return real_id(obj)
+    
+        monkeypatch.setattr(builtins, "id", _forced_id)
+        try:
+            # Attach A at the forced identity: base stores the enrichment key
+            # ``(colliding_id, mem_size)``.
+            app._install_attached_a2l(
+                A2LAttachResult(
+                    A2LAttachRequest(
+                        source=a_a2l, copy=False,
+                        temp_dir=app.workarea / WORKAREA_TEMP,
+                        workarea=app.workarea, record_recent=False,
+                        a2l_cache=None, gen=0,
+                    ),
+                    a_a2l, entry_a, 0.0,
+                )
+            )
+            await _settle(pilot)
+            assert _row_names(app) == ["Alpha", "Beta"]
+    
+            # Attach B: a DIFFERENT payload at the SAME forced object address
+            # and the same memory-map size. Fresh tags must be computed.
+            app._install_attached_a2l(
+                A2LAttachResult(
+                    A2LAttachRequest(
+                        source=b_a2l, copy=False,
+                        temp_dir=app.workarea / WORKAREA_TEMP,
+                        workarea=app.workarea, record_recent=False,
+                        a2l_cache=None, gen=0,
+                    ),
+                    b_a2l, entry_b, 0.0,
+                )
+            )
+            await _settle(pilot)
+        finally:
+            monkeypatch.undo()
+>       assert _row_names(app) == ["Alpha", "Gamma"], (
+            "stale enrichment rendered: the identity-colliding attach returned "
+            "the previous payload's tag list (Beta must be gone, Gamma present)"
+        )
+E       AssertionError: stale enrichment rendered: the identity-colliding attach returned the previous payload's tag list (Beta must be gone, Gamma present)
+E       assert ['Alpha', 'Beta'] == ['Alpha', 'Gamma']
+E         
+E         At index 1 diff: 'Beta' != 'Gamma'
+E         
+E         Full diff:
+E           [
+E               'Alpha',
+E         -     'Gamma',
+E         +     'Beta',
+E           ]
+
+tests\test_b102_a2l_refresh.py:413: AssertionError
+______________ test_tc_b102_a2l_07_stale_prepared_load_discarded ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32162/test_tc_b102_a2l_07_stale_prep0')
+
+    def test_tc_b102_a2l_07_stale_prepared_load_discarded(tmp_path: Path) -> None:
+        a_a2l = _write_a2l(tmp_path, "fixture_a.a2l", FIXTURE_A_A2L)
+        img1 = _write_s19(tmp_path, "img1.s19", 0x1000)
+        img2 = _write_hex(tmp_path, "img2.hex", 0x2000, fill=0xFF)
+    
+        async def scenario(app: S19TuiApp, pilot, log) -> None:
+            app.load_a2l_from_path(a_a2l)
+            await _drain(app, pilot)
+    
+            # Arm 1/2 — valid snapshot: the shipped worker path precomputes
+            # against image 1 and the apply installs it (rows in-image "yes").
+            app.load_from_path(img1)
+            await _drain(app, pilot)
+            assert _row_names(app) == ["Alpha", "Beta"]
+            assert _in_memory_cells(app) == ["yes", "yes"]
+    
+            # Arm 2/2 — stale snapshot: capture image-1 enrichment (generation N)
+            # and hand-apply a PreparedLoad for image 2 (generation N+1) carrying
+            # that stale cache with the pre-fix key shape.
+            stale_tags = list(app._a2l_enriched_tags)
+            assert stale_tags and all(t.get("in_memory") for t in stale_tags), (
+                "arm-1 setup: the worker precompute must have produced in-image "
+                "enrichment for image 1, otherwise the stale arm is vacuous"
+            )
+            loaded2 = app._parse_loaded_file(img2)
+            assert loaded2 is not None
+            assert loaded2.a2l_data is not None
+            stale_prepared = PreparedLoad(
+                loaded=loaded2,
+                precomputed=True,
+                a2l_enriched_tags=stale_tags,
+                a2l_enriched_key=(id(loaded2.a2l_data), len(loaded2.mem_map)),
+                a2l_summary_lines=["stale snapshot"],
+            )
+            app._apply_prepared_load(stale_prepared, img2, 0.0)
+            await _settle(pilot)
+            assert app._a2l_enriched_tags is not stale_tags, (
+                "the stale worker precompute was installed verbatim — apply-time "
+                "generation verification is missing"
+            )
+            assert _row_names(app) == ["Alpha", "Beta"]
+            assert _in_memory_cells(app) == ["no", "no"], (
+                "painted A2L rows came from the stale worker snapshot instead of "
+                "a UI-thread recompute against the applied image"
+            )
+    
+>       projects.run_app(tmp_path / "app", scenario, size=SIZE)
+
+tests\test_b102_a2l_refresh.py:514: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\support\b100_projects.py:595: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:593: in _drive
+    return await scenario(app, pilot, log)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'nocolor', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'nocolor', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x0000029D82F5ADB0>
+
+    async def scenario(app: S19TuiApp, pilot, log) -> None:
+        app.load_a2l_from_path(a_a2l)
+        await _drain(app, pilot)
+    
+        # Arm 1/2 — valid snapshot: the shipped worker path precomputes
+        # against image 1 and the apply installs it (rows in-image "yes").
+        app.load_from_path(img1)
+        await _drain(app, pilot)
+        assert _row_names(app) == ["Alpha", "Beta"]
+        assert _in_memory_cells(app) == ["yes", "yes"]
+    
+        # Arm 2/2 — stale snapshot: capture image-1 enrichment (generation N)
+        # and hand-apply a PreparedLoad for image 2 (generation N+1) carrying
+        # that stale cache with the pre-fix key shape.
+        stale_tags = list(app._a2l_enriched_tags)
+        assert stale_tags and all(t.get("in_memory") for t in stale_tags), (
+            "arm-1 setup: the worker precompute must have produced in-image "
+            "enrichment for image 1, otherwise the stale arm is vacuous"
+        )
+        loaded2 = app._parse_loaded_file(img2)
+        assert loaded2 is not None
+        assert loaded2.a2l_data is not None
+        stale_prepared = PreparedLoad(
+            loaded=loaded2,
+            precomputed=True,
+            a2l_enriched_tags=stale_tags,
+            a2l_enriched_key=(id(loaded2.a2l_data), len(loaded2.mem_map)),
+            a2l_summary_lines=["stale snapshot"],
+        )
+        app._apply_prepared_load(stale_prepared, img2, 0.0)
+        await _settle(pilot)
+>       assert app._a2l_enriched_tags is not stale_tags, (
+            "the stale worker precompute was installed verbatim — apply-time "
+            "generation verification is missing"
+        )
+E       AssertionError: the stale worker precompute was installed verbatim — apply-time generation verification is missing
+E       assert [{'access': None, 'address': 4096, 'axis_meta': [], 'bit_org': None, ...}, {'access': None, 'address': 4098, 'axis_meta': [], 'bit_org': None, ...}] is not [{'access': None, 'address': 4096, 'axis_meta': [], 'bit_org': None, ...}, {'access': None, 'address': 4098, 'axis_meta': [], 'bit_org': None, ...}]
+E        +  where [{'access': None, 'address': 4096, 'axis_meta': [], 'bit_org': None, ...}, {'access': None, 'address': 4098, 'axis_meta': [], 'bit_org': None, ...}] = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'nocolor', 'focus'})._a2l_enriched_tags
+
+tests\test_b102_a2l_refresh.py:504: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b102_a2l_refresh.py::test_tc_b102_a2l_02_same_size_reload_refreshes_rows
+FAILED tests/test_b102_a2l_refresh.py::test_tc_b102_a2l_04_no_match_filter_names_filter[Missing]
+FAILED tests/test_b102_a2l_refresh.py::test_tc_b102_a2l_04_no_match_filter_names_filter[[red]]
+FAILED tests/test_b102_a2l_refresh.py::test_tc_b102_a2l_05_forced_id_collision_recomputes
+FAILED tests/test_b102_a2l_refresh.py::test_tc_b102_a2l_07_stale_prepared_load_discarded
+======================== 5 failed, 3 passed in 29.54s =========================

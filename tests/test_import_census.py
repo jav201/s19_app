@@ -55,8 +55,11 @@ SERVICES_DIR = PRODUCT_ROOT / "tui" / "services"
 #: refusal messages in ``segment_split_view.py``) imports the NAME at its
 #: module top; measured in. batch-100 (Inc 6, LLR-178.3, the Load-result
 #: panel rendering every name read from disk in ``screens.py``) imports the
-#: NAME at its module top; measured in.
+#: NAME at its module top; measured in. batch-102 (the shared A2L parameter
+#: picker rendering names read from the A2L in ``a2l_parameter_picker.py``)
+#: imports the NAME at its module top; measured in.
 MEASURED_SAFE_TEXT_CONSUMERS = {
+    "s19_app.tui.a2l_parameter_picker",
     "s19_app.tui.app",
     "s19_app.tui.checks_view",
     "s19_app.tui.flow_screens",
@@ -70,9 +73,12 @@ MEASURED_SAFE_TEXT_CONSUMERS = {
 #: repointed to s19_app.utils by Inc-B. batch-94 (Inc-001, the ce_a Check
 #: Editor) adds ``test_tui_check_editor`` — the new collector's own battery
 #: drives hostile labels through the same escaper (the C-17 fold); measured
-#: in, per the census's own contract.
+#: in, per the census's own contract. batch-102 (the Flow file chooser drives
+#: hostile names at its external-import boundary through the same escaper)
+#: adds ``test_b102_flow_file_chooser``; measured in.
 MEASURED_SAFE_TEXT_TEST_IMPORTERS = {
     "test_a2l_multiline_headers",
+    "test_b102_flow_file_chooser",
     "test_tui_check_editor",
     "test_tui_directionb",
     "test_tui_hostile_map",

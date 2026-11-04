@@ -2102,9 +2102,17 @@ _FINAL_NAME_ALLOWLIST = {
     # outside every work area, so outside LLR-155.3's invariant — through a
     # unique staging file and os.replace, and unlinks only its own staging
     # file when the write fails.
+    # batch-102 Inc 7 (the flow file-ref chooser's external import):
+    # import_external_ref stages the picked file inside the workarea's own
+    # private stage dir (shutil.copy2), claims the first free "-<N>" name
+    # with O_CREAT|O_EXCL (never an overwrite), then os.replace's the staged
+    # bytes onto the claim; every unlink removes only this import's own
+    # staging/claim files on a failure path. The placement stays confined
+    # under <project>/external/ and atomic, per the E3/E5 reviewed design.
     "s19_app/tui/workspace.py": frozenset(
         {
             "_private_stage_dir",
+            "import_external_ref",
             "place_group_into_workarea",
             "place_into_workarea",
             "record_recent_source",

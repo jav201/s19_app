@@ -2049,6 +2049,38 @@ def test_tc_b97_flow_execution_css_section_is_scoped() -> None:
     # rule): the `#status_text.-busy` tint is inserted in the status bar.
     busy = inserted("/* Inc 12a (S-g, ruling Q9)", "#workspace_status_bar #status_text.-busy", "d7b427d busy block")
     old = supersede(old, "/* Right-aligned so the context reads", busy + "/* Right-aligned so the context reads", "d7b427d busy anchor")
+    # 7a3e536 (batch-102 Inc 4, US-102-04 — the bulk A2L include modal): the
+    # `#bulk_param_*` rules are inserted at the end of the Calm Dark modal
+    # block, between the changeset JSON editor and the Legend modal section.
+    # The E5 tc033 correction re-themed the two dim colours inside this
+    # inserted block to $fg-base; those bytes are not b514b07 bytes.
+    bulk = inserted("/* --- Bulk-add popup (batch-102 Inc 4", "#bulk_param_summary", "7a3e536 bulk block")
+    old = supersede(old, "/* --- Legend modal (batch-18, LLR-023.1)", bulk + "/* --- Legend modal (batch-18, LLR-023.1)", "7a3e536 bulk anchor")
+    # dc55e56 (batch-102 Inc 3, the shared A2L picker in the Check Editor):
+    # the picker's status line joins the check editor's nowrap/ellipsis
+    # selector list.
+    old = supersede(
+        old,
+        "#check_apply_hint,\n#check_editor_panel .ce-hint {",
+        "#check_apply_hint,\n#check_param_status,\n#check_editor_panel .ce-hint {",
+        "dc55e56 #check_param_status nowrap",
+    )
+    # dc55e56 (batch-102 Inc 3, cont.): the picker's count line and the
+    # pagination page read-out are inserted between #check_full_name_line
+    # and the controls row.
+    picker = inserted("/* The picker's separate count line", "#check_param_page_label", "dc55e56 picker blocks")
+    old = supersede(old, "#check_param_controls,\n#check_mem_controls,", picker + "#check_param_controls,\n#check_mem_controls,", "dc55e56 picker anchor")
+    # db1a8f7 (batch-102 Inc 5, US-102-05 — the Patch Editor A2L picker):
+    # #patch_win_a2l joins the tab-window height rule, and the patch-scoped
+    # picker rules block is inserted before the JSON/paste panes rule.
+    old = supersede(
+        old,
+        "#patch_editor_panel #patch_win_checks {\n    height: 100%;",
+        "#patch_editor_panel #patch_win_checks,\n#patch_editor_panel #patch_win_a2l {\n    height: 100%;",
+        "db1a8f7 #patch_win_a2l heights",
+    )
+    pe_picker = inserted("/* --- Patch A2L tab (batch-102 Inc 5", "#patch_editor_panel #patch_param_controls,\n#patch_editor_panel #patch_param_use_row", "db1a8f7 patch picker block")
+    old = supersede(old, "#patch_editor_panel #patch_json_view,", pe_picker + "#patch_editor_panel #patch_json_view,", "db1a8f7 patch picker anchor")
     assert sheet.startswith(old.rstrip()), "every rule shipped at b514b07 is byte-equal; Inc-6 only appends"
     for head in (".flow-name-strip {", ".modal-hint", ".patch-docked-row, .patch-docked-group", ".sev-ok", ".sev-warning", ".sev-error", ".sev-neutral"):
         assert block(sheet, head) == block(old, head), head

@@ -1,0 +1,120 @@
+RED evidence — batch-102 Inc 5 — paridad Patch Editor con selector A2L (TC-B102-PE-01..06 + addendas E4)
+========================================================================================================
+
+Command : python -m pytest tests/test_b102_patch_picker.py
+          "tests/test_b97_chips_help.py::test_tc_b97_32_patch_help_names_every_label"
+          "tests/test_b97_chips_help.py::test_tc_b97_33_patch_glyphs_closed_and_in_the_legend"
+          "tests/test_b97_chips_help.py::test_at_b97_14_help_chip_opens_a_body_covering_the_screen[patch]"
+          "tests/test_b97_width.py::test_tc_b97_35_patch_no_horizontal_overflow"
+          "tests/test_tui_patch_layout.py::test_at064a_reachable_under_scroll_at_80"
+          "tests/test_tui_patch_layout.py::test_at064b_reachable_under_scroll_at_120" -q
+Date    : 2026-11-03 13:58 CSTM (E4 tester run, pre-integration / base tree, HEAD 5c7cfe2)
+Platform: Windows — Python 3.12.7, pytest 8.3.4, textual 8.2.8 (encoding UTF-8)
+Result  : 17 failed, 11 passed in 134.63s — the 17 failures are the expected RED set.
+
+Expected RED (17) — reasons
+---------------------------
+All 17 fail on the SAME named assertion (PC-11, need()):
+
+    AssertionError: #patch_tab_a2l: expected exactly 1 widget, found 0
+
+i.e. the Patch Editor inspector ships no A2L tab on base — per 02-test-cases.md
+notas de ejecución ("RED: TC-01..06 deben fallar en base por ausencia de
+pestaña/selector Patch") every test drives the shipped chain through the
+#patch_tab_a2l chip first, so the absence fails them before any later oracle.
+
+New file tests/test_b102_patch_picker.py (17):
+
+1.-3. test_tc_b102_pe_01_population_mounts_at_most_one_page[0-0/199-199/10000-200]
+   R-B102-PE-001: the Patch panel hosts no picker; the mount ceiling (one
+   200-row page for 10 000 parameters), the same-signature no-op and the
+   exact count line "200 of 10000 shown — refine filter." are unreachable.
+4. test_tc_b102_pe_01_activation_populates_check_population_and_reentry_preserves
+   R-B102-PE-001/.005 + mutant control "población distinta a Check": the
+   same-population census vs the mounted Check picker and the two re-entries
+   with zero ledger rebuilds are unreachable (no tab → no picker).
+5. test_tc_b102_pe_02_id_isolation_and_highlight_mode
+   R-B102-PE-002 + E3 rulings 2/3: the id census (zero duplicates, no
+   check_param_* leak into the Patch picker, patch_param_* only inside the
+   Patch panel), the absent include/bulk controls and the space/enter
+   no-mutation oracles are unreachable.
+6. test_tc_b102_pe_03_use_parameter_populates_inputs_without_document_mutation
+   R-B102-PE-003: Address as 0x%08X and Bytes as the current image bytes for
+   sizes 1/2/4 (DE AD BE EF / 7F / 12 34), document entries and dirty state
+   unchanged, are unreachable.
+7. test_tc_b102_pe_04_missing_image_bytes_arm
+   R-B102-PE-004 + ruling 7: Address populated, Bytes empty, the exact line
+   "Parameter address loaded; image bytes unavailable." on the marked surface
+   is unreachable.
+8. test_tc_b102_pe_05_reentry_preserves_filter_page_highlight
+   R-B102-PE-005: filter "P" + page (2,2) + highlighted P00200 over two
+   workspace round-trips with zero rebuilds is unreachable.
+9.-11. test_tc_b102_pe_06_shared_grammar_surfaces / _empty_states_mirror_check /
+    _hostile_parameter_name_reads_literally
+   R-B102-PE-006: the shared grammar surfaces (filter/ledger/full-name/status/
+   page controls/Use parameter), the two empty-state lines and the hostile
+   name literal (b102hostile sentinel, zero markup spans, zero control bytes)
+   are unreachable.
+
+E3-mandated addendas (rulings 4/5/6/9 + 80x24 containment):
+
+12. test_tc_b102_pe_add_unload_clears_image_bytes
+    E3 ruling 4 (load→unload→Use parameter): after the app's own
+    _apply_unload("all") pushes mem_map=None to the Patch panel, Bytes stays
+    empty and the exact unavailable line paints — unreachable.
+13. test_tc_b102_pe_add_partial_map_is_unavailable_not_zero_filled
+    E3 ruling 6: an image covering only [0x1000,0x1002) of the 4-byte
+    parameter loads Address, leaves Bytes EMPTY (never "DE AD 00 00") and
+    paints the exact unavailable line — unreachable.
+14. test_tc_b102_pe_add_oversize_parameter_skips_prefill
+    E3 ruling 5: byte_size = MAX_A2L_DECODE_BYTES + 1 with full image
+    coverage loads Address, does NOT prefill Bytes and paints a status of its
+    own (neither the unavailable nor the no-highlight line) — unreachable.
+15. test_tc_b102_pe_add_none_address_row_is_not_usable
+    E3 ruling 9: a highlighted row with address=None paints exactly
+    "No parameter highlighted." and never formats 0x%08X — unreachable.
+16.-17. test_tc_b102_pe_add_patch_a2l_surfaces_contained[size0/size1]
+    E3 ruling 1 (layout proporcional; verificar 80x24 y 118x54): the nine
+    Patch A2L surfaces displayed and horizontally contained in the panel at
+    80x24 and 118x54 — unreachable.
+
+Contract pinned by the new tests (for the implementer): chip #patch_tab_a2l /
+pane #patch_pane_a2l; picker in highlight mode with id_prefix "patch_param"
+(#patch_param_filter, #patch_param_table, #patch_param_status,
+#patch_full_name_line, page prev/label/next; NO include/bulk controls);
+#patch_param_use_button (Use parameter); the single marked use-status surface
+#patch_param_use_status painting exactly "Parameter address loaded; image
+bytes unavailable." and "No parameter highlighted.". Population reuses the
+Check seam shape (set_parameters with the app's _a2l_enriched_key signature).
+
+Expected GREEN on base (11) — all hold
+--------------------------------------
+Ruling-sanctioned census/help deltas (E3 ruling 8: "Añadir la pestaña A2L a
+censos de tabs/anchos relevantes y al help de Patch") stay GREEN on base by
+guard, and flip to exercise the tab once it ships:
+- test_tc_b97_32_patch_help_names_every_label,
+  test_tc_b97_33_patch_glyphs_closed_and_in_the_legend,
+  test_at_b97_14_help_chip_opens_a_body_covering_the_screen[patch]:
+  PATCH_TABS gains "patch_tab_a2l" (tests/test_b97_chips_help.py); the two
+  previously unguarded press loops take the file's own
+  `if panel.query(f"#{tab}")` guard, so on base the harvest/vocabulary drive
+  is unchanged. Post-integration the A2L tab is visited and its controls'
+  labels must be covered by the patch help body (implementer's ruling-8 duty).
+- test_tc_b97_35_patch_no_horizontal_overflow[size x6]
+  (tests/test_b97_width.py): the chip loop gains "patch_tab_a2l" behind the
+  existing query guard — the no-overflow census will cover the A2L tab.
+- test_at064a/064b_reachable_under_scroll_at_80/120
+  (tests/test_tui_patch_layout.py): _TAB_FOR_HOME gains
+  "patch_pane_a2l" -> "patch_tab_a2l"; the entry never fires on base (no
+  button lives in that pane yet).
+
+Not touched (historical deep oracles pin the original three tabs):
+tests/test_b97_patch_editor.py TABS/TC-B97-02/41/42/61 — the fourth tab's
+chip/pane/switcher behaviour is owned by tests/test_b102_patch_picker.py.
+
+Environment note: a prior combined run of the census batch once tripped the
+session guard at tests/conftest.py:74 (real %LOCALAPPDATA% recent-sources
+store changed mid-session); it did NOT reproduce on re-run with the same
+selection, nor with the pristine files, and the identical selection passes
+11/11 afterwards — recorded as an environmental flake, unrelated to this
+increment.

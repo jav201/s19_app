@@ -1,0 +1,157 @@
+RED evidence — batch-102 Inc 6 — Flow Builder: editar y borrar bloques individualmente (TC-B102-FB-01..06 + addendas E4)
+=======================================================================================================================
+
+Command : python -m pytest tests/test_b102_flow_block_edit.py tests/test_b97_flow_builder.py
+          "tests/test_b97_chips_help.py::test_tc_b97_32_flow_help_names_every_label"
+          "tests/test_b97_width.py::test_tc_b97_38_builder_height_goes_to_the_result" -q
+Date    : 2026-11-03 15:44 CSTM (E4 tester run, pre-integration / base tree, HEAD 0b62629)
+Platform: Windows — Python 3.12.7, pytest 8.3.4, textual 8.2.8 (encoding UTF-8)
+Result  : 37 failed, 71 passed in 326.71s — 35 failures are the expected Inc-6
+          RED set (33 in the new module + 2 census RED in
+          tests/test_b97_flow_builder.py); the other 2 failures in that file
+          are PRE-EXISTING on base, unrelated to Inc 6 — see the note at the
+          bottom.
+
+Expected RED (35) — reasons
+---------------------------
+
+New file tests/test_b102_flow_block_edit.py (33):
+1.-8. test_tc_b102_fb_01_edit_opens_initialized_modal[source/patch/check/
+   write_out/crc/a2b/external_step/report]
+   R-B102-FB-001: ``#flow_edit`` does not ship on base (PC-11 need(): "expected
+   exactly 1 widget, found 0"). 8/8 kinds parametrized; at GREEN the modal
+   title must name the block # and kind and the kind-specific fields must
+   carry the current values verbatim (ext-step: instruction/log/output +
+   terminal mode; A2B: the 1-based ``#n`` display grammar).
+9.-11. test_tc_b102_fb_02_save_replaces_only_the_selected_block[source/a2b/
+   external_step]
+   R-B102-FB-002: same absence. 3/3 routes; at GREEN only the picked index
+   changes (others dataclass-equal), the pipeline repaints the new ref and
+   dirty sets; funnel + clipboard survive.
+12.-13. test_tc_b102_fb_03_invalid_edit_refused_and_original_remains[
+   a2b_downstream/external_step_no_log]
+   R-B102-FB-003: same absence. 2/2 arms; at GREEN the refusal paints IN the
+   modal naming the binding / the missing log, the chain and the dirty state
+   stay untouched, funnel + clipboard survive.
+14.-15. test_tc_b102_fb_04_remove_first_middle_last +
+   test_tc_b102_fb_04_escape_cancels_and_focus_starts_on_cancel
+   R-B102-FB-004 + ruling 8: ``#flow_remove`` does not ship. At GREEN: confirm
+   asks the exact ``Remove block #<n> (<kind>)? This cannot be undone.``,
+   first/middle/last each remove exactly one index, funnel + clipboard
+   survive, dirty sets; escape cancels with Cancel holding the initial focus
+   and no dirty mark.
+16.-21. test_tc_b102_fb_05_invalid_pick_paints_exact_notice[empty/alpha/
+   out_of_range × edit/remove]
+   R-B102-FB-005 + ruling 1: same absence. 3/3 invalid inputs for BOTH
+   actions; at GREEN the exact notice ``Edit/Remove needs a block # between 1
+   and 2.`` paints, no modal opens, nothing is removed, no dirty mark
+   (empty is INVALID for Edit/Remove — Copy keeps empty=last, pinned green by
+   test_tc_b102_fb_r1 below).
+22.-25. test_tc_b102_fb_05_defensive_index_parsing[superscript_two/
+   int_over_4300_digits × edit/remove]
+   Ruling 5: same absence. ``'²'`` passes str.isdigit() yet int() raises;
+   a 4,301-digit integer trips CPython's int digit limit — both must refuse
+   with the exact notice, never crash (the incumbent isdigit()-then-int()
+   guard dies on the first arm).
+26. test_tc_b102_fb_06_hostile_fields_render_literally
+   R-B102-FB-006 + rulings 7/10: same absence. At GREEN the hostile sentinel
+   paints literally in the field and the painted modal (``[red]`` /
+   ``[link=e]`` / ``[@click=app.quit]`` as text), zero markup spans, zero
+   control bytes, the sentinel survives a refusal literally and is never
+   logged.
+27. test_tc_b102_fb_r2_merge_preserves_unexposed_fields
+   Ruling 2: same absence. At GREEN an edited SOURCE keeps ``file_type`` and
+   ``a2l_ref`` and an edited WRITE-OUT keeps ``fmt`` (merge of the wire dict,
+   never a rebuild).
+28. test_tc_b102_fb_r4_save_without_containment_base_refuses
+   Ruling 4: same absence. At GREEN, with no project loaded, Save refuses
+   inside the modal (a refusal region paints), the modal stays open, the
+   chain stays clean — the ref is never persisted to fail later.
+29. test_tc_b102_fb_r5_resolver_parses_without_isdigit_guard
+   Ruling 5: ``FlowBuilderPanel._selected_block`` does not ship (named guard
+   assertion). At GREEN the AST pin forbids an isdigit() guard and requires
+   a ValueError handler.
+30. test_tc_b102_fb_r6_a2b_binding_round_trip
+   Ruling 6 (+ ruling 9): same chip absence. At GREEN the modal shows ``#1``
+   (1-based display grammar, never the wire ``0`` nor ``#1.out``), an
+   unchanged save round-trips to the 0-based wire form and leaves the flow
+   clean.
+31. test_tc_b102_fb_r9_dirty_only_when_the_candidate_changes
+   Ruling 9: same absence. At GREEN an unchanged SOURCE save leaves the chain
+   dataclass-equal and the flow NOT dirty.
+32. test_tc_b102_fb_r11_extended_clip_row_stays_contained[80x24/118x54]
+   Ruling 11: same absence. At GREEN the extended strip (pick/Copy/Paste/
+   Edit/Remove + status) stays on ONE row, 1 cell tall, inside the panel at
+   BOTH sizes.
+
+Ruling-sanctioned RED on the base tree (E3 rulings-inc6 addendum 11 + the
+Inc-4 census idiom — the censuses document the target state and flip green
+with the component), in tests/test_b97_flow_builder.py (2):
+33. test_tc_b97_47_copy_paste_strip_on_one_row_inside
+    The strip census now walks ``#flow_pick``/``#flow_copy``/``#flow_paste``/
+    ``#flow_edit``/``#flow_remove``/``#flow_clip_status`` — on base
+    ``#flow_edit`` is missing ("No nodes match '#flow_edit'").
+34. test_tc_b97_51_keyboard_order_keys_and_chip_states
+    KEY_GROUPS' copy/paste strip group now carries ``#flow_edit`` /
+    ``#flow_remove``; the test's own layout pre-poll query_one()s them — on
+    base ``#flow_edit`` is missing. The group-order/membership asserts hold
+    as soon as the chips ship (the chain sorts by region).
+
+Expected GREEN on base (71) — all hold
+--------------------------------------
+- tests/test_b102_flow_block_edit.py::test_tc_b102_fb_r1_empty_pick_still_
+  copies_the_last_block — the ruling-1 regression pin: the shared-resolver
+  refactor must keep Copy's empty=last arm while Edit/Reject reject empty;
+  it exercises only shipped controls, so it is green on base by design.
+- The other 65 tests of tests/test_b97_flow_builder.py (the census clauses
+  of TC-B97-13..-51, AT-B97-06/07/08/19, the NUL/CSS guards): green — the
+  KEY_GROUPS extension does not disturb the pre-Inc-6 chain (its members all
+  still exist and sort in group order).
+- test_tc_b97_32_flow_help_names_every_label (TC-B97-32 flow arm): green —
+  the harvest derives its expectations from the rendered controls, so it
+  stays green on base and pins the ruling-11 help addendum on GREEN (the
+  ``window_help`` "flow" section must name the two new chips or this test
+  fails; window_help.py is s19_app source the E4 tester does not touch).
+- test_tc_b97_38_builder_height_goes_to_the_result[4 params]: green —
+  ``#flow_clip_row`` keeps its separator row with the two chips inside it
+  (BUILDER_SEPARATED unchanged).
+
+Mutant controls honoured (full coverage per 02-test-cases.md + rulings)
+----------------------------------------------------------------------
+TC-01: modal opens empty/default or with the wrong kind; fields re-typed.
+TC-02: the whole flow replaced; dirty skipped; funnel/clipboard cleared.
+TC-03: the invalid candidate replaces the original; refusal painted outside
+the modal; dirty set by a failed edit.
+TC-04: variables/clipboard cleared; the whole chain removed; a cancelled
+remove still marks dirty; confirm opens with Remove focused / escape
+confirms (ruling 8).
+TC-05: an invalid input opens the modal, removes a block or marks dirty;
+empty treated as "last" for Edit/Remove (ruling 1); an isdigit() guard
+killing the '²' / 4,301-digit arms (ruling 5, AST-pinned).
+TC-06: markup rendering (tokens vanish into styled spans); control bytes
+painted; block content logged (ruling 10).
+Addenda: a rebuilt (non-merged) block dropping file_type/a2l_ref/fmt
+(ruling 2); a no-base Save persisting the ref for a later failure
+(ruling 4); the display binding form persisted instead of the wire form
+(ruling 6); dirty set by an unchanged candidate (ruling 9); the extended
+strip wrapping/clipping at 80x24 or 118x54 (ruling 11).
+
+PRE-EXISTING base failures observed (NOT Inc-6 RED — verified by re-running
+both tests on the pristine tree via git stash of tests/test_b97_flow_builder.py;
+identical failures there):
+- test_tc_b97_18_crc_card_painted_in_the_crc_colour — colour-paint oracle
+  (CRC card paints #6b6b6b/#9b9b9b greys, not the CRC family hue).
+- test_tc_b97_49_ribbon_paints_saved_then_unsaved — colour-paint oracle
+  ("· unsaved" paints #f5f5f5, not YELLOW).
+Both fail identically with and without this increment's test changes; left
+untouched per "do not fix unrelated bugs".
+
+Files changed (tests/ only — no s19_app/ source modified, nothing committed)
+-----------------------------------------------------------------------------
+- tests/test_b102_flow_block_edit.py   (new — TC-B102-FB-01..06 + rulings
+                                        1/2/4/5/6/9/11 addenda; 34 tests)
+- tests/test_b97_flow_builder.py       (TC-B97-47 strip census ids extended
+                                        with #flow_edit/#flow_remove via the
+                                        assertion-based need(); KEY_GROUPS
+                                        copy/paste group extended — E3
+                                        ruling 11)
