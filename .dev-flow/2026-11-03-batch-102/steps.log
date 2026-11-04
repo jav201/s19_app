@@ -29,3 +29,4 @@
 2026-11-04T01:00:00-06:00 base check at 2f2f932 via worktree — 25 of 27 persistent failures reproduce at base (pre-existing/environment); the 2 exceptions were batch-102 regressions
 2026-11-04T01:30:00-06:00 E5 close-out fixes applied and verified green: clipboard test rename (AT-65536), TC-607 bound 246, TC-653 measured sets, TC-033 Calm Dark tokens, AT-B83-08 Name forms, TC-B100-64 freeze move (ruling pending), TC-B99-13 allow-list, 4 CSS-scoping supersessions, patch help lines, TC-B97-38 origin-row supersession (ruling pending)
 2026-11-04T01:45:00-06:00 04-validation.md + REVIEW-PACKET.md rewritten with the real full-suite numbers and the failure classification; rulings recorded in design/E5-review-rulings.md; no push or merge without operator approval
+2026-11-04T02:00:00-06:00 operator ordered push+merge — HANDOFF.md written; both E5 rulings ratified by operator instruction; batch-102-hotfixes merged to main (--no-ff) and pushed
