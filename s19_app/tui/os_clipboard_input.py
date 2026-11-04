@@ -131,6 +131,7 @@ _POWERSHELL_WRITE_COMMAND = (
     "powershell",
     "-NoProfile",
     "-Command",
+    "[Console]::InputEncoding=[System.Text.Encoding]::UTF8;"
     "$input | Set-Clipboard",
 )
 

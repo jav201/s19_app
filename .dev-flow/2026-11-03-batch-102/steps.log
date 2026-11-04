@@ -18,3 +18,4 @@
 2026-11-03T17:35:00-06:00 E4 inc-6 integrated — 34 new tests green; b97_flow_builder 67 passed with the 2 pre-existing colour failures documented
 2026-11-03T18:05:00-06:00 E3 inc-7 — NO-GO initial corrected by rulings; design/E3-rulings-inc7.md written; E4 starts
 2026-11-03T19:10:00-06:00 E4 inc-7 integrated — 43 file-chooser tests + 35 modal/help tests green; b97_flow_builder 67 passed with the 2 pre-existing colour failures only
+2026-11-03T19:45:00-06:00 E5 reviews complete — code/security/test audit PASS-WITH-NOTES; corrections applied and rulings recorded in design/E5-review-rulings.md; full suite tests/ running in a new window

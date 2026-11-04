@@ -549,7 +549,11 @@ class A2LParameterPicker(Vertical):
         for row in rows:
             name = str(row.get("name") or "?")
             address = row.get("address")
-            address = int(address) if isinstance(address, int) else None
+            address = (
+                int(address)
+                if isinstance(address, int) and not isinstance(address, bool)
+                else None
+            )
             size = int(row.get("byte_size") or 1)
             unit = str(row.get("compu_method_unit") or "")
             fmt_unit = f"u{size * 8}" + (f" {unit}" if unit else "")
@@ -659,6 +663,9 @@ class A2LParameterPicker(Vertical):
         table.add_column(
             "Fmt · Unit" if layout.fmt >= 10 else "Fmt", width=layout.fmt, key="fmt"
         )
+        # A population that ran pre-mount must become visible on the first
+        # paint instead of waiting for the next filter/page action.
+        self._rebuild_ledger()
         self._refresh_full_name()
         self._refresh_status()
         self._update_page_controls()

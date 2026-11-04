@@ -18205,7 +18205,7 @@ class S19TuiApp(App):
 
         Data Flow:
             - Pre-compute enriched A2L tags (or skip when no A2L present),
-              keyed ``(a2l_view_generation, image_generation, len(mem_map))``
+              keyed ``(a2l_view_generation, image_generation, mem_size)``
               — never ``id()``-based (F-B102-A2L-1).
             - Run ``_compute_mac_view_payload`` to produce the MAC table + validation output.
             - Derive MAC highlights and sorted out-of-range lists using the cached
@@ -18257,7 +18257,7 @@ class S19TuiApp(App):
             a2l_enriched_key = (
                 a2l_view_generation,
                 image_generation,
-                len(mem_map),
+                len(mem_map) if mem_map is not None else -1,
             )
         self.logger.info(
             "Load phase boundary: prepare_a2l_done has_a2l=%s enriched_tags=%d",

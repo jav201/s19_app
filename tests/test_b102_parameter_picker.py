@@ -232,7 +232,7 @@ def test_tc_b102_sel_02_filter_is_debounced_and_reports_truncation(tmp_path: Pat
         await pilot.press("p")
         await settled_delay(
             pilot,
-            lambda: "refine filter" in status_line(panel),
+            lambda: rebuilds["n"] >= 1 and "refine filter" in status_line(panel),
             "the debounced rebuild paints the truncated count line in #check_param_status",
         )
         after_burst = (rebuilds["n"], status_line(panel), table_rows(panel))
