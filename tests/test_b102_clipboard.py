@@ -203,10 +203,9 @@ async def _invoke(widget, action: str) -> None:
 
 
 def _widget(app: App, kind: str):
-    return app.query_one(
-        "#ci" if kind == "input" else "#ta",
-        OsClipboardInput if kind == "input" else CappedTextArea,
-    )
+    selector = "#ci" if kind == "input" else "#ta"
+    widget_type = OsClipboardInput if kind == "input" else CappedTextArea
+    return app.query_one(selector, widget_type)
 
 
 def _content(widget) -> str:
@@ -308,7 +307,7 @@ def test_tc_b102_01_paste_inserts_os_clipboard_text_on_representative_surfaces(
 
 
 @pytest.mark.parametrize("kind", ["input", "textarea"], ids=["input", "textarea"])
-def test_tc_b102_01_over_cap_paste_is_capped_at_65536(
+def test_tc_b102_01_over_cap_paste_is_capped_at_write_cap(
     monkeypatch: pytest.MonkeyPatch, kind: str
 ) -> None:
     """TC-B102-01 (R-B102-CLIP-001): payloads past 65,536 chars truncate.

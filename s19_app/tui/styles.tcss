@@ -1646,7 +1646,7 @@ ModalScreen {
 }
 
 #bulk_param_instruction {
-    color: #969aad;                   /* insight_style.DGRAY */
+    color: $fg-base;
     padding: 0 1;
 }
 
@@ -1654,7 +1654,7 @@ ModalScreen {
     height: auto;
     min-height: 1;
     padding: 0 1;
-    color: #969aad;                   /* insight_style.DGRAY */
+    color: $fg-base;
 }
 
 /* --- Legend modal (batch-18, LLR-023.1) ---------------------------------

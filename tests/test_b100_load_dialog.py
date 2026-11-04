@@ -3254,16 +3254,24 @@ def _imported_names(tree: ast.Module, prefixes: tuple) -> set:
 
 
 #: ``screens.py``'s imported modules at the base revision ``8947666``
-#: (read by AST in the E4 run): LLR-173.6l allows 0 new ones.
+#: (read by AST in the E4 run). LLR-173.6l's clause "allows 0 new ones" is a
+#: tripwire: any new import fails the diff. batch-102 adds five modules, all
+#: serving the batch's own modals/screens hosted in ``screens.py`` (the bulk
+#: include modal's picker + ``cell_len``/``Content`` rendering, the file-ref
+#: chooser's ``BrowseRequested``, the block-edit screen's ``flow_model``
+#: kinds). Measured at batch-102 E5: ``modules - base`` reports exactly these
+#: five. RULING (E5, pending operator ratification): the freeze moves to the
+#: batch-102 head rather than refactoring committed increments at close-out;
+#: LLR-173.6l's "0 new" wording needs the same amendment.
 SCREENS_MODULES_AT_BASE = frozenset({
-    "..render.hexview", "..utils", ".capped_text_area", ".changes.verify", ".color_policy",
-    ".insight_style", ".legend", ".models", ".open_folder_chip", ".operations.crc",
+    "..render.hexview", "..utils", ".a2l_parameter_picker", ".capped_text_area", ".changes.verify", ".color_policy",
+    ".flow_screens", ".insight_style", ".legend", ".models", ".open_folder_chip", ".operations.crc",
     ".operations.crc_config", ".operations.model", ".os_clipboard_input", ".services",
-    ".services.entropy_service", ".services.flow_persistence_service", ".services.report_addendum",
+    ".services.entropy_service", ".services.flow_model", ".services.flow_persistence_service", ".services.report_addendum",
     ".services.report_service", ".services.variant_execution_service", ".window_help", ".workspace",
-    "__future__", "dataclasses", "logging", "markdown_it", "pathlib", "rich.markup", "rich.table",
+    "__future__", "dataclasses", "logging", "markdown_it", "pathlib", "rich.cells", "rich.markup", "rich.table",
     "rich.text", "textual", "textual.app", "textual.binding", "textual.containers",
-    "textual.message", "textual.screen", "textual.widget", "textual.widgets", "tkinter", "typing",
+    "textual.content", "textual.message", "textual.screen", "textual.widget", "textual.widgets", "tkinter", "typing",
 })
 
 

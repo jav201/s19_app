@@ -2111,7 +2111,8 @@ class FlowBlockEditScreen(ModalScreen[Optional[FlowBlock]]):
 
     def on_mount(self) -> None:
         self.query_one("#block_edit_refusal", Static).display = False
-        self.query_one(self._first_field).focus()
+        first_field = self._first_field
+        self.query_one(first_field).focus()
 
     # -- save / cancel -------------------------------------------------------
 

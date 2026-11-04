@@ -82,6 +82,12 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "A2L — lists the loaded A2L's measurable parameters (filter, "
             "one 200-row page at a time); the highlighted row's full name "
             "and address sit under the ledger.",
+            "Filter — narrows the A2L PARAMETERS ledger to the names that "
+            "contain the typed text.",
+            "Prev — turns the A2L PARAMETERS ledger to the previous page; "
+            "disabled on the first page.",
+            "Next — turns the ledger to the next page; disabled on the last "
+            "page, so a long A2L is walked page by page.",
             "Use parameter — on the A2L tab, copies the highlighted "
             "parameter's address and the loaded image's current bytes into "
             "the entry form; the document changes only through Add or Edit.",
