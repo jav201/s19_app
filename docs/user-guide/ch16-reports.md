@@ -18,8 +18,8 @@ new project report.
 - Title *Reports (project 'demo')*, `?` help and **📂 Open reports/**.
 - The list (here *No reports in this project yet*), the report view.
 - **Declared regions** — `name,start,end` lines that the generated report uses to
-  annotate coverage. The in-app help says it pre-fills from the loaded A2L; with the
-  demo A2L it stays empty (finding F-30).
+  annotate coverage. It holds the regions saved with the project; the demo project
+  has none, so it is empty.
 - **Filter** — a dropdown of `filters\*.json` files, or a typed filter path (blank =
   full report).
 - **Context bytes** — how many bytes around each change the report shows (64).
@@ -32,8 +32,8 @@ new project report.
 **Generate new report** closes the viewer, runs the active variant's assigned
 documents first if nothing was run yet (*Report: no prior execution - running active
 scope…*), and writes `reports\<time>-report.md`. It writes Markdown only: no `.html`
-copy is produced, although the window's help says "the `*.md` + `*.html` pair"
-(finding F-41). The reports that do have an HTML copy are shown in Chapter 21.
+copy is produced, as the window's help says. The reports that do have an HTML copy
+are shown in Chapter 21.
 
 ### 16.3 Read a report
 

@@ -26,45 +26,40 @@ Coverage map (test -> TC):
   LLR-001.1/.2 — format/version/kind/encoding/value_mode/entries, the
   bytes/string entry kinds with address/bytes/value, the optional
   symbol); the fenced minimal example parses error-free through the
-  shipped reader into the documented bytes entry; and the nine batch-95
-  sections are still present and verbatim against ``help_sections.md``,
-  with the data home grown to EXACTLY those nine plus this one.
+  shipped reader into the documented bytes entry; and the data home holds
+  EXACTLY the twelve code-authored sections (batch-101 Inc 14, D-3: the
+  nine-section ``help_sections.md`` census is retired and no test reads
+  the draft).
 """
 from __future__ import annotations
 
 import re
-from pathlib import Path
 
 from s19_app.tui.changes.io import parse_change_document
 from s19_app.tui.window_help import WINDOW_HELP_SECTIONS, section_body_text
 
-#: The authored-copy source of the nine batch-95 sections (TC-707's
-#: fidelity census) — read-only here; this file only re-asserts that the
-#: nine stayed intact.
-_HELP_SECTIONS_MD = (
-    Path(__file__).resolve().parent.parent
-    / "prototypes"
-    / "cambios_10_12_2026"
-    / "help_sections.md"
-)
+#: The sections still ported from the untracked ``help_sections.md`` draft
+#: (TC-707's ``_EXPECTED_KEYS``). Named supersession (batch-101 Inc 14,
+#: orchestrator ruling D-3): the last four (``checks``, ``a2l``, ``workspace``,
+#: ``split_join_export``) are rewritten code-authored (F-37 / D7-26), the draft
+#: is in no clone, and no test reads it any more. The set is empty.
+_MD_AUTHORED_KEYS: frozenset = frozenset()
 
-#: The nine batch-95 md-authored section keys (TC-707's ``_EXPECTED_KEYS``)
-#: — the frozen census this new section must not disturb.
-_MD_AUTHORED_KEYS = frozenset(
+#: The twelve keys of the data home, all code-authored (R-WHELP.7).
+_ALL_KEYS = frozenset(
     {
-        # batch-97 Inc-4 (named supersession, D25): ``patch`` is rewritten
-        # code-authored (LLR-148.6) and leaves the md census. At the Inc-4
-        # gate (operator, 2026-10-21) ``crc_designer`` and ``reports`` follow:
-        # code names their folder, the untracked draft keeps its wording.
-        # batch-97 Inc-5 (named supersession, D25): ``flow`` is rewritten
-        # code-authored too and leaves the md census.
-        # batch-97 Inc-8 (named supersession, operator decision at the Inc-8
-        # gate 2026-10-23): ``map`` is rewritten code-authored (its md steps
-        # named keys that do not act on the Map) and leaves the md census.
+        "patch",
         "checks",
+        "crc_designer",
+        "reports",
+        "map",
+        "flow",
         "a2l",
         "workspace",
         "split_join_export",
+        "flow_execution",
+        "check_editor",
+        "changes_file_notation",
     }
 )
 
@@ -147,40 +142,19 @@ def test_tc1802_minimal_example_parses_with_the_shipped_reader() -> None:
 
 
 def test_tc1802_nine_md_sections_intact_tenth_section_added() -> None:
-    """TC-1802 (the no-disturbance census): the data home holds EXACTLY
-    the nine batch-95 md-authored sections plus this one tenth key — and
-    every one of the nine is still a verbatim port of
-    ``help_sections.md`` (title + every step string), so the batch-96
-    addition disturbed nothing the batch-95 contract froze."""
-    # Named supersession (batch-97 Inc-3): the code-authored ``check_editor``
-    # section (LLR-148.6) joins the data home; it is not an md port either.
-    assert frozenset(WINDOW_HELP_SECTIONS) == _MD_AUTHORED_KEYS | {
-        SECTION_KEY,
-        "check_editor",
-        "patch",
-        "crc_designer",
-        "reports",
-        "flow",
-        # batch-97 Inc-6 (named supersession, D25 / LLR-148.6): the
-        # code-authored ``flow_execution`` section joins the data home.
-        "flow_execution",
-        # batch-97 Inc-8: the code-authored ``map`` section.
-        "map",
-    }, (
-        "the data home must hold exactly the nine md-authored sections "
-        "plus the batch-96 changes_file_notation and batch-97 check_editor "
-        "sections"
+    """TC-1802 (the no-disturbance census; node name kept, it no longer reads
+    the md): the data home holds EXACTLY the twelve code-authored sections
+    (R-WHELP.12/4 guard), this tenth key among them.
+
+    Named supersession (batch-101 Inc 14, D-3): the four sections that were
+    still checked against ``help_sections.md`` are rewritten code-authored and
+    no test reads the draft. Negative control: a data home missing one key, or
+    holding one more, differs from the twelve.
+    """
+    assert _MD_AUTHORED_KEYS == frozenset()
+    assert SECTION_KEY in _ALL_KEYS
+    assert frozenset(WINDOW_HELP_SECTIONS) == _ALL_KEYS, (
+        "the data home must hold exactly the twelve code-authored sections"
     )
-    md_text = _HELP_SECTIONS_MD.read_text(encoding="utf-8")
-    normalized_md = re.sub(r"\s+", " ", md_text)
-    for key in _MD_AUTHORED_KEYS:
-        section = WINDOW_HELP_SECTIONS[key]
-        title = str(section["title"])
-        assert title in normalized_md, (
-            f"{key}: the batch-95 title {title!r} must stay in the md"
-        )
-        for step in section["steps"]:
-            assert step in normalized_md, (
-                f"{key}: batch-95 step drifted from help_sections.md: "
-                f"{step!r}"
-            )
+    assert frozenset(WINDOW_HELP_SECTIONS) - {"a2l"} != _ALL_KEYS
+    assert frozenset(WINDOW_HELP_SECTIONS) | {"extra"} != _ALL_KEYS

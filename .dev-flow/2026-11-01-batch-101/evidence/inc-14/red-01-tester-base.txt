@@ -1,0 +1,600 @@
+RED capture against the base revision, run on the LAN Linux host (interpreter: conda env s19ci, Python 3.11).
+Command: cd <home>/work/s19_t14 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 1800 python -m pytest -q -p no:cacheprovider -rA --tb=line --no-header <the new file + 7 existing nodes>
+Base worktree: detached at origin/main (code identical to b7b77c4; docs-only commits above it), plus ONLY the new/changed test files.
+---
+base revision: 4648972c4aa45e878130bab138147e84975c6c79 (origin/main)
+s19_app.__file__ = <home>/work/s19_t14/s19_app/__init__.py
+F.FFFFFFFFFFFFF........F.FFFFFFFFFFFF.F.FFFFFFFFFFFFFFFFFFFFFFFFF.FF..F. [100%]
+=================================== FAILURES ===================================
+E   AssertionError: {'a2l', 'changes_file_notation', 'map', 'patch', 'reports', 'workspace'}
+    assert {'a2l', 'chan...reports', ...} <= {'a2l', 'chan..., 'workspace'}
+      
+      Extra items in the left set:
+      'split_join_export'
+      'crc_designer'
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:226: AssertionError: {'a2l', 'changes_file_notation', 'map', 'patch', 'reports', 'workspace'}
+E   AssertionError: assert [('checks', '...loaded'), ...] == []
+      
+      Left contains 18 more items, first extra item: ('checks', 'the table lists every entry')
+      Use -v to get more diff
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:420: AssertionError: assert [('checks', '...loaded'), ...] == []
+E   AssertionError: assert [('crc_design...0-9]*-'), ...] == []
+      
+      Left contains 10 more items, first extra item: ('crc_designer', 5, 'change 1')
+      Use -v to get more diff
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:451: AssertionError: assert [('crc_design...0-9]*-'), ...] == []
+E   AssertionError: folders not named: ['temp\\', '.s19tool\\workarea\\', 'patches\\', 'splits\\', 'filters\\']
+    assert ['temp\\', '...., 'filters\\'] == []
+      
+      Left contains 5 more items, first extra item: 'temp\\'
+      Use -v to get more diff
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:524: AssertionError: folders not named: ['temp\\', '.s19tool\\workarea\\', 'patches\\', 'splits\\', 'filters\\']
+E   AssertionError: assert [('checks', 2...\\*\\*'), ...] == []
+      
+      Left contains 10 more items, first extra item: ('checks', 2, '\\*\\*')
+      Use -v to get more diff
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:555: AssertionError: assert [('checks', 2...\\*\\*'), ...] == []
+E   AssertionError: assert '**Generate n...der directly.' == 'Generate new... that folder.'
+      
+      - Generate new report writes one Markdown file, `<time>-report.md`, into the project's `reports\` folder; Open reports/ opens that folder.
+      + **Generate new report** writes the `*.md` + `*.html` pair into the project's `reports\` folder; **Open reports/** (change 2) opens that folder directly.
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:570: AssertionError: assert '**Generate n...der directly.' == 'Generate new... that folder.'
+E   AssertionError: assert '**Declared r...rated report.' == 'Declared reg...rated report.'
+      
+      - Declared regions starts with the regions saved with the open project (empty when it has none) and keeps the lines of your last Generate; Save project stores them with the project. Add `name,start,end` lines to annotate region coverage in the generated report.
+      + **Declared regions** pre-fills from the loaded A2L; add `name,start,end` lines to annotate region coverage in the generated report.
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:570: AssertionError: assert '**Declared r...rated report.' == 'Declared reg...rated report.'
+E   AssertionError: assert '`j` dumps th...rnal tooling.' == '`/` puts the...that address.'
+      
+      - `/` puts the cursor in Search ASCII text, the search box of the hex pane: Find Next finds that text in the loaded image's bytes. `g` puts it in Goto 0xADDR: Goto shows that address.
+      + `j` dumps the parsed A2L to JSON for external tooling.
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:570: AssertionError: assert '`j` dumps th...rnal tooling.' == '`/` puts the...that address.'
+E   AssertionError: assert 'Pick the sou...rowse to one.' == 'The window e...c` closes it.'
+      
+      - The window exports parts of the loaded image (`^L`). Open it from the palette (`^K`, Split / Join / Export); `esc` closes it.
+      + Pick the source image: the loaded file, a project file, or browse to one.
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:570: AssertionError: assert 'Pick the sou...rowse to one.' == 'The window e...c` closes it.'
+E   AssertionError: assert 'Export: spli...oined.‹ext›`.' == '`e` exports:...e first file.'
+      
+      - `e` exports: split writes `‹stem›_‹segment›.‹ext›` per range, join writes one `‹stem›_joined.‹ext›`, where ‹stem› is the loaded image's file name without its extension. The NAMING line shows the name of the first file.
+      + Export: split writes `‹stem›_‹segment›.‹ext›` per range; join writes one `‹stem›_joined.‹ext›`.
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:570: AssertionError: assert 'Export: spli...oined.‹ext›`.' == '`e` exports:...e first file.'
+E   AssertionError: assert 'The header t...es by reason.' == 'The top line...th its count.'
+      
+      - The top line tallies Pass / Fail / Uncheck. The list groups the entries by outcome: failed, then uncheckable, then passed, each under a header with its count.
+      + The header tallies **Pass / Fail / Uncheck**; the table lists every entry with its status. Grouped view clusters failures by reason.
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:570: AssertionError: assert 'The header t...es by reason.' == 'The top line...th its count.'
+E   AssertionError: assert 'Coverage com...ct behaviour.' == 'Coverage com...g is written.'
+      
+      - Coverage computes CRCs over the ranges you type in Ranges (`start-end`, end excluded), in the loaded image: Intra gap and Join gaps choose how gaps are handled, Pad byte is the fill byte, and On conflict chooses what happens when a padded gap holds image bytes. It is a preview; nothing is written.
+      + Coverage computes CRCs over the image's real ranges: choose how intra-gaps are handled (skip / concat), the pad byte, and the on-conflict behaviour.
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:570: AssertionError: assert 'Coverage com...ct behaviour.' == 'Coverage com...g is written.'
+E   AssertionError: assert 'CRC template...block stamps.' == 'CRC template...d is refused.'
+      
+      - CRC template — the CRC config file a CRC block reads (the same format as the Operations CRC config); a template the CRC Designer saves is not a CRC config and is refused.
+      + CRC template — the CRC configuration a CRC block stamps.
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:604: AssertionError: assert 'CRC template...block stamps.' == 'CRC template...d is refused.'
+E   AssertionError: assert 'a template the CRC Designer saves is not a CRC config and is refused' in 'CRC template — the CRC configuration a CRC block stamps.'
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:609: AssertionError: assert 'a template the CRC Designer saves is not a CRC config and is refused' in 'CRC template — the CRC configuration a CRC block stamps.'
+E   AssertionError: assert '↑↓ / j k sel...x · Esc close' == '↑↓ move · cl...x · Esc close'
+      
+      - ↑↓ move · click / ↵ inspect · double-click open hex · Esc close
+      ?    ^^^         ----
+      + ↑↓ / j k select · click inspect · double-click / ↵ open hex · Esc close
+      ?    ^^^^^^^ ++++                                ++++
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:878: AssertionError: assert '↑↓ / j k sel...x · Esc close' == '↑↓ move · cl...x · Esc close'
+E   AssertionError: assert 'glyph · star...· ↵ opens hex' == 'glyph · star...d · ↵ inspect'
+      
+      Skipping 50 identical leading characters in diff, use -v to show
+      -  band · ↵ inspect
+      +  band · ↵ opens hex
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:978: AssertionError: assert 'glyph · star...· ↵ opens hex' == 'glyph · star...d · ↵ inspect'
+E   AssertionError: []
+    assert [] == ['glyph · sta... · Esc close']
+      
+      Right contains 2 more items, first extra item: 'glyph · start · size · size vs largest · A2L sym · band · ↵ inspect'
+      Use -v to get more diff
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-156/test_r_legend_011_2_changed_li0 workarea=/tmp/pytest-of-<user>/pytest-156/test_r_legend_011_2_changed_li0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+INFO     s19tui:app.py:17808 Loading file: path=<home>/work/s19_t14/examples/case_07_stress_smoke/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14124 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18640 Load summary: file_type=s19 path=<home>/work/s19_t14/examples/case_07_stress_smoke/firmware.s19 addresses=1024 range_count=4 range_bytes=1024 errors=0
+INFO     s19tui:app.py:14141 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18101 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:18768 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18117 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18129 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19788 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17661 MAC validation computed: records=0 issues=0 elapsed_seconds=0.002
+INFO     s19tui:app.py:17716 MAC row cache built: records=0 elapsed_seconds=0.002
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.019
+INFO     s19tui:app.py:19302 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.023
+INFO     s19tui:app.py:18142 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:18995 Memory Map updated. ranges=4
+INFO     s19tui:app.py:18159 Loaded file successfully: path=<home>/work/s19_t14/examples/case_07_stress_smoke/firmware.s19 file_type=s19 elapsed_seconds=0.778 has_mac=False precomputed=False
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:1028: AssertionError: []
+E   AssertionError: README has no section for: ['Check Editor', 'A2B Diff', 'Flow Execution', 'Split / Join / Export']
+    assert ['Check Edito...oin / Export'] == []
+      
+      Left contains 4 more items, first extra item: 'Check Editor'
+      Use -v to get more diff
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:1089: AssertionError: README has no section for: ['Check Editor', 'A2B Diff', 'Flow Execution', 'Split / Join / Export']
+E   AssertionError: [('1', 'Workspace — sections · hex · context'), ('2', 'A2L Explorer — symbol table + hex pane'), ('3', 'MAC View — rec... 'Issues Report — validation findings'), ('6', 'Patch Editor — change-set authoring, checks, patched-image emit'), ...]
+    assert ['1', '2', '3...'5', '6', ...] == ['1', '2', '3...'5', '6', ...]
+      
+      At index 6 diff: '7' != '='
+      Right contains 2 more items, first extra item: '9'
+      Use -v to get more diff
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:1102: AssertionError: [('1', 'Workspace — sections · hex · context'), ('2', 'A2L Explorer — symbol table + hex pane'), ('3', 'MAC View — rec... 'Issues Report — validation findings'), ('6', 'Patch Editor — change-set authoring, checks, patched-image emit'), ...]
+E   AssertionError: keys with no README table row and action: [('q', 'Ctrl+Q'), ('1', '2', '3', '4', '5', '6', '=', '7', '8', ']', '9', '0'), ('d',), ('PgDn', 'PgUp'), ('c',), ('Ctrl+P',)]
+    assert [('q', 'Ctrl+..., ('Ctrl+P',)] == []
+      
+      Left contains 6 more items, first extra item: ('q', 'Ctrl+Q')
+      Use -v to get more diff
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:1152: AssertionError: keys with no README table row and action: [('q', 'Ctrl+Q'), ('1', '2', '3', '4', '5', '6', '=', '7', '8', ']', '9', '0'), ('d',), ('PgDn', 'PgUp'), ('c',), ('Ctrl+P',)]
+E   AssertionError: stale README claims still present: ['ten single-context screens', '`1`–`0`', 'the footer stays uncrowded', '`flow.json`', 'Markdown or self-contained HTML', 'and executes the selected one', '`project.toml` at the repo root', 'or over every variant of a project', '(`SOURCE`', '**Save patched**', 'Flows and change-set runs can execute variant-scoped']
+    assert ['ten single-...ted one', ...] == []
+      
+      Left contains 11 more items, first extra item: 'ten single-context screens'
+      Use -v to get more diff
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:1181: AssertionError: stale README claims still present: ['ten single-context screens', '`1`–`0`', 'the footer stays uncrowded', '`flow.json`', 'Markdown or self-contained HTML', 'and executes the selected one', '`project.toml` at the repo root', 'or over every variant of a project', '(`SOURCE`', '**Save patched**', 'Flows and change-set runs can execute variant-scoped']
+E   AssertionError: the README does not link CHANGELOG.md
+    assert 'CHANGELOG.md' in ['docs/images/cross-artefact-pipeline.png', 'docs/images/workspace.png', 'docs/images/a2l-explorer.png', 'docs/images/mac-view.png', 'docs/images/memory-map.png', 'docs/images/issues-report.png', ...]
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:1197: AssertionError: the README does not link CHANGELOG.md
+E   AssertionError: `x` lists the registered operations (the deterministic registry in `s19_app/tui/operations/registry.py`: `crc`, `extract`, `split_by_segment`) and executes the selected one against the loaded image, in-app.
+    assert 'not implemented' in '`x` lists the registered operations (the deterministic registry in `s19_app/tui/operations/registry.py`: `crc`, `extract`, `split_by_segment`) and executes the selected one against the loaded image, in-app.'
+     +  where '`x` lists the registered operations (the deterministic registry in `s19_app/tui/operations/registry.py`: `crc`, `extract`, `split_by_segment`) and executes the selected one against the loaded image, in-app.' = <built-in method lower of str object at 0x7f18c00b0130>()
+     +    where <built-in method lower of str object at 0x7f18c00b0130> = '`x` lists the registered operations (the deterministic registry in `s19_app/tui/operations/registry.py`: `crc`, `extract`, `split_by_segment`) and executes the selected one against the loaded image, in-app.'.lower
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:1212: AssertionError: `x` lists the registered operations (the deterministic registry in `s19_app/tui/operations/registry.py`: `crc`, `extract`, `split_by_segment`) and executes the selected one against the loaded image, in-app.
+E   AssertionError: SECURITY.md does not exist in the repository
+    assert False
+     +  where False = is_file()
+     +    where is_file = PosixPath('<home>/work/s19_t14/SECURITY.md').is_file
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:85: AssertionError: SECURITY.md does not exist in the repository
+E   AssertionError: SECURITY.md does not exist in the repository
+    assert False
+     +  where False = is_file()
+     +    where is_file = PosixPath('<home>/work/s19_t14/SECURITY.md').is_file
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:85: AssertionError: SECURITY.md does not exist in the repository
+E   AssertionError: the README does not link SECURITY.md
+    assert 'SECURITY.md' in ['docs/images/cross-artefact-pipeline.png', 'docs/images/workspace.png', 'docs/images/a2l-explorer.png', 'docs/images/mac-view.png', 'docs/images/memory-map.png', 'docs/images/issues-report.png', ...]
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:1262: AssertionError: the README does not link SECURITY.md
+E   AssertionError: CHANGELOG.md does not exist in the repository
+    assert False
+     +  where False = is_file()
+     +    where is_file = PosixPath('<home>/work/s19_t14/CHANGELOG.md').is_file
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:85: AssertionError: CHANGELOG.md does not exist in the repository
+E   AssertionError: CHANGELOG.md does not exist in the repository
+    assert False
+     +  where False = is_file()
+     +    where is_file = PosixPath('<home>/work/s19_t14/CHANGELOG.md').is_file
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:85: AssertionError: CHANGELOG.md does not exist in the repository
+E   AssertionError: CHANGELOG.md does not exist in the repository
+    assert False
+     +  where False = is_file()
+     +    where is_file = PosixPath('<home>/work/s19_t14/CHANGELOG.md').is_file
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:85: AssertionError: CHANGELOG.md does not exist in the repository
+E   AssertionError: CHANGELOG.md does not exist in the repository
+    assert False
+     +  where False = is_file()
+     +    where is_file = PosixPath('<home>/work/s19_t14/CHANGELOG.md').is_file
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:85: AssertionError: CHANGELOG.md does not exist in the repository
+E   AssertionError: CHANGELOG.md does not exist in the repository
+    assert False
+     +  where False = is_file()
+     +    where is_file = PosixPath('<home>/work/s19_t14/CHANGELOG.md').is_file
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:85: AssertionError: CHANGELOG.md does not exist in the repository
+E   AssertionError: CHANGELOG.md does not exist in the repository
+    assert False
+     +  where False = is_file()
+     +    where is_file = PosixPath('<home>/work/s19_t14/CHANGELOG.md').is_file
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:85: AssertionError: CHANGELOG.md does not exist in the repository
+E   AssertionError: CHANGELOG.md does not exist in the repository
+    assert False
+     +  where False = is_file()
+     +    where is_file = PosixPath('<home>/work/s19_t14/CHANGELOG.md').is_file
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:85: AssertionError: CHANGELOG.md does not exist in the repository
+E   AssertionError: CHANGELOG.md does not exist in the repository
+    assert False
+     +  where False = is_file()
+     +    where is_file = PosixPath('<home>/work/s19_t14/CHANGELOG.md').is_file
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:85: AssertionError: CHANGELOG.md does not exist in the repository
+E   AssertionError: CHANGELOG.md does not exist in the repository
+    assert False
+     +  where False = is_file()
+     +    where is_file = PosixPath('<home>/work/s19_t14/CHANGELOG.md').is_file
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:85: AssertionError: CHANGELOG.md does not exist in the repository
+E   AssertionError: CHANGELOG.md does not exist in the repository
+    assert False
+     +  where False = is_file()
+     +    where is_file = PosixPath('<home>/work/s19_t14/CHANGELOG.md').is_file
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:85: AssertionError: CHANGELOG.md does not exist in the repository
+E   AssertionError: CHANGELOG.md does not exist in the repository
+    assert False
+     +  where False = is_file()
+     +    where is_file = PosixPath('<home>/work/s19_t14/CHANGELOG.md').is_file
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:85: AssertionError: CHANGELOG.md does not exist in the repository
+E   AssertionError: CHANGELOG.md does not exist in the repository
+    assert False
+     +  where False = is_file()
+     +    where is_file = PosixPath('<home>/work/s19_t14/CHANGELOG.md').is_file
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:85: AssertionError: CHANGELOG.md does not exist in the repository
+E   AssertionError: CHANGELOG.md does not exist in the repository
+    assert False
+     +  where False = is_file()
+     +    where is_file = PosixPath('<home>/work/s19_t14/CHANGELOG.md').is_file
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:85: AssertionError: CHANGELOG.md does not exist in the repository
+E   AssertionError: CHANGELOG.md does not exist in the repository
+    assert False
+     +  where False = is_file()
+     +    where is_file = PosixPath('<home>/work/s19_t14/CHANGELOG.md').is_file
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:85: AssertionError: CHANGELOG.md does not exist in the repository
+E   AssertionError: ch06-memory-map.md: stale text still present: ['The "Map keys" line says `j k` select']
+    assert ['The "Map ke...`j k` select'] == []
+      
+      Left contains one more item: 'The "Map keys" line says `j k` select'
+      Use -v to get more diff
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:1489: AssertionError: ch06-memory-map.md: stale text still present: ['The "Map keys" line says `j k` select']
+E   AssertionError: ch16-reports.md: stale text still present: ['The in-app help says it pre-fills from the loaded A2L']
+    assert ['The in-app ...e loaded A2L'] == []
+      
+      Left contains one more item: 'The in-app help says it pre-fills from the loaded A2L'
+      Use -v to get more diff
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:1489: AssertionError: ch16-reports.md: stale text still present: ['The in-app help says it pre-fills from the loaded A2L']
+E   AssertionError: ch16-reports.md: stale text still present: ["although the window's help says"]
+    assert ["although th...'s help says"] == []
+      
+      Left contains one more item: "although the window's help says"
+      Use -v to get more diff
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:1489: AssertionError: ch16-reports.md: stale text still present: ["although the window's help says"]
+E   AssertionError: ch17-flow-builder.md: stale text still present: ["crc error — CRC config is structurally invalid: 'reverse'"]
+    assert ["crc error —...d: 'reverse'"] == []
+      
+      Left contains one more item: "crc error — CRC config is structurally invalid: 'reverse'"
+      Use -v to get more diff
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:1489: AssertionError: ch17-flow-builder.md: stale text still present: ["crc error — CRC config is structurally invalid: 'reverse'"]
+E   AssertionError: ch17-flow-builder.md: stale text still present: ['but the later block still reads the first copy']
+    assert ['but the lat...e first copy'] == []
+      
+      Left contains one more item: 'but the later block still reads the first copy'
+      Use -v to get more diff
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:1489: AssertionError: ch17-flow-builder.md: stale text still present: ['but the later block still reads the first copy']
+E   AssertionError: ch18-flow-execution.md: stale text still present: ['To use a new output, delete or rename the old copy']
+    assert ['To use a ne...the old copy'] == []
+      
+      Left contains one more item: 'To use a new output, delete or rename the old copy'
+      Use -v to get more diff
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:1489: AssertionError: ch18-flow-execution.md: stale text still present: ['To use a new output, delete or rename the old copy']
+E   AssertionError: ch19-help-palettes-settings.md: stale text still present: ['Some steps do not match the app yet']
+    assert ['Some steps ... the app yet'] == []
+      
+      Left contains one more item: 'Some steps do not match the app yet'
+      Use -v to get more diff
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:1489: AssertionError: ch19-help-palettes-settings.md: stale text still present: ['Some steps do not match the app yet']
+E   AssertionError: ch21-html-reports.md: stale text still present: ['The page is titled "Diff report" although']
+    assert ['The page is...rt" although'] == []
+      
+      Left contains one more item: 'The page is titled "Diff report" although'
+      Use -v to get more diff
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:1489: AssertionError: ch21-html-reports.md: stale text still present: ['The page is titled "Diff report" although']
+E   AssertionError: ch21-html-reports.md: stale text still present: ['column stays `-` in this report']
+    assert ['column stay... this report'] == []
+      
+      Left contains one more item: 'column stays `-` in this report'
+      Use -v to get more diff
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:1489: AssertionError: ch21-html-reports.md: stale text still present: ['column stays `-` in this report']
+E   AssertionError: ch21-html-reports.md: stale text still present: ['(findings F-41 and F-44)', 'Markdown only (finding F-41)']
+    assert ['(findings F...inding F-41)'] == []
+      
+      Left contains 2 more items, first extra item: '(findings F-41 and F-44)'
+      Use -v to get more diff
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:1489: AssertionError: ch21-html-reports.md: stale text still present: ['(findings F-41 and F-44)', 'Markdown only (finding F-41)']
+E   AssertionError: ch21-html-reports.md: 1.0.0 text missing: ['`CAL\\_A`', 'paths stay as written', 'a plain-text search']
+    assert ['`CAL\\_A`',...-text search'] == []
+      
+      Left contains 3 more items, first extra item: '`CAL\\_A`'
+      Use -v to get more diff
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:1490: AssertionError: ch21-html-reports.md: 1.0.0 text missing: ['`CAL\\_A`', 'paths stay as written', 'a plain-text search']
+E   AssertionError: rows without the fixed mark: ['F-16', 'F-28', 'F-30', 'F-37', 'F-38', 'F-41', 'F-42', 'F-49']
+    assert ['F-16', 'F-2..., 'F-41', ...] == []
+      
+      Left contains 8 more items, first extra item: 'F-16'
+      Use -v to get more diff
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:1511: AssertionError: rows without the fixed mark: ['F-16', 'F-28', 'F-30', 'F-37', 'F-38', 'F-41', 'F-42', 'F-49']
+E   AssertionError: marked set is not the pinned set: []
+    assert [] == ['F-16', 'F-2..., 'F-41', ...]
+      
+      Right contains 8 more items, first extra item: 'F-16'
+      Use -v to get more diff
+<home>/work/s19_t14/tests/test_b101_help_legend_docs.py:1517: AssertionError: marked set is not the pinned set: []
+E   AssertionError: assert [('a2l', 'ste...'steps'), ...] == []
+      
+      Left contains 12 more items, first extra item: ('a2l', 'steps')
+      Use -v to get more diff
+<home>/work/s19_t14/tests/test_window_usage_help.py:273: AssertionError: assert [('a2l', 'ste...'steps'), ...] == []
+E   AssertionError: assert [('checks', '...export', 'c')] == []
+      
+      Left contains 3 more items, first extra item: ('checks', 'c')
+      Use -v to get more diff
+<home>/work/s19_t14/tests/test_window_usage_help.py:321: AssertionError: assert [('checks', '...export', 'c')] == []
+E   AssertionError: the README key tables must list Ctrl+P, = and ] as single-key cells
+    assert {'=', 'Ctrl+P', ']'} <= {'/', '0', '1...'3', '4', ...}
+      
+      Extra items in the left set:
+      '='
+      ']'
+      'Ctrl+P'
+<home>/work/s19_t14/tests/test_docs_canon.py:87: AssertionError: the README key tables must list Ctrl+P, = and ] as single-key cells
+==================================== PASSES ====================================
+_______________ test_r_whelp_18_2_generate_writes_markdown_only ________________
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_18_2_generate_wri0 workarea=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_18_2_generate_wri0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.027
+WARNING  s19tui:app.py:13882 Project proj: no digests saved project.json (None)
+INFO     s19tui:app.py:14124 Load phase boundary: parse_branch_entry path=a.s19 suffix=.s19
+INFO     s19tui:app.py:18640 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_18_2_generate_wri0/.s19tool/workarea/proj/a.s19 addresses=4 range_count=1 range_bytes=4 errors=0
+INFO     s19tui:app.py:14141 Load phase boundary: parse_branch_done path=a.s19 branch=s19
+INFO     s19tui:app.py:18101 Load phase boundary: apply_install_state path=a.s19 precomputed=False
+INFO     s19tui:app.py:14077 Project loaded. name=proj file=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_18_2_generate_wri0/.s19tool/workarea/proj/a.s19 mac=None
+INFO     s19tui:app.py:18768 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18117 Load phase boundary: apply_sections_done path=a.s19
+INFO     s19tui:app.py:18129 Load phase boundary: apply_hex_done path=a.s19
+INFO     s19tui:app.py:19788 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17661 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17716 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.022
+INFO     s19tui:app.py:19302 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.024
+INFO     s19tui:app.py:18142 Load phase boundary: apply_a2l_done path=a.s19
+INFO     s19tui:app.py:18995 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18159 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_18_2_generate_wri0/.s19tool/workarea/proj/a.s19 file_type=s19 elapsed_seconds=0.859 has_mac=False precomputed=False
+INFO     s19tui:app.py:6164 View reports action. project=proj count=0
+INFO     s19tui:screens.py:3490 ReportViewerScreen requesting generation. context_bytes=64
+INFO     s19tui:app.py:6676 report kind=project source=proj output=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_18_2_generate_wri0/.s19tool/workarea/proj/reports/20261105T215700Z-report.md outcome=ok
+___________ test_r_whelp_19_2_declared_regions_come_from_the_project ___________
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_19_2_declared_reg0/p workarea=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_19_2_declared_reg0/p/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+WARNING  s19tui:app.py:13882 Project proj: no digests saved project.json (None)
+INFO     s19tui:app.py:14124 Load phase boundary: parse_branch_entry path=a.s19 suffix=.s19
+INFO     s19tui:app.py:18640 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_19_2_declared_reg0/p/.s19tool/workarea/proj/a.s19 addresses=4 range_count=1 range_bytes=4 errors=0
+INFO     s19tui:app.py:14141 Load phase boundary: parse_branch_done path=a.s19 branch=s19
+INFO     s19tui:app.py:18101 Load phase boundary: apply_install_state path=a.s19 precomputed=False
+INFO     s19tui:app.py:14077 Project loaded. name=proj file=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_19_2_declared_reg0/p/.s19tool/workarea/proj/a.s19 mac=None
+INFO     s19tui:app.py:18768 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18117 Load phase boundary: apply_sections_done path=a.s19
+INFO     s19tui:app.py:18129 Load phase boundary: apply_hex_done path=a.s19
+INFO     s19tui:app.py:19788 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17661 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17716 MAC row cache built: records=0 elapsed_seconds=0.002
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.021
+INFO     s19tui:app.py:19302 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.028
+INFO     s19tui:app.py:18142 Load phase boundary: apply_a2l_done path=a.s19
+INFO     s19tui:app.py:18995 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18159 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_19_2_declared_reg0/p/.s19tool/workarea/proj/a.s19 file_type=s19 elapsed_seconds=0.479 has_mac=False precomputed=False
+INFO     s19tui:app.py:6164 View reports action. project=proj count=0
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_19_2_declared_reg0/p0 workarea=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_19_2_declared_reg0/p0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.030
+WARNING  s19tui:app.py:13882 Project proj: no digests saved project.json (None)
+INFO     s19tui:app.py:14124 Load phase boundary: parse_branch_entry path=a.s19 suffix=.s19
+INFO     s19tui:app.py:18640 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_19_2_declared_reg0/p0/.s19tool/workarea/proj/a.s19 addresses=4 range_count=1 range_bytes=4 errors=0
+INFO     s19tui:app.py:14141 Load phase boundary: parse_branch_done path=a.s19 branch=s19
+INFO     s19tui:app.py:18101 Load phase boundary: apply_install_state path=a.s19 precomputed=False
+INFO     s19tui:app.py:14077 Project loaded. name=proj file=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_19_2_declared_reg0/p0/.s19tool/workarea/proj/a.s19 mac=None
+INFO     s19tui:app.py:18768 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18117 Load phase boundary: apply_sections_done path=a.s19
+INFO     s19tui:app.py:18129 Load phase boundary: apply_hex_done path=a.s19
+INFO     s19tui:app.py:19788 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17661 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17716 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+INFO     s19tui:app.py:19302 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.017
+INFO     s19tui:app.py:18142 Load phase boundary: apply_a2l_done path=a.s19
+INFO     s19tui:app.py:18995 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18159 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_19_2_declared_reg0/p0/.s19tool/workarea/proj/a.s19 file_type=s19 elapsed_seconds=0.497 has_mac=False precomputed=False
+INFO     s19tui:app.py:15648 A2L copy complete: path=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_19_2_declared_reg0/p0/.s19tool/workarea/temp/firmware.a2l size_bytes=2446 copy_seconds=0.008
+INFO     s19tui:app.py:931 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_19_2_declared_reg0/p0/.s19tool/workarea/temp/firmware.a2l size_bytes=2446
+WARNING  s19tui:app.py:15686 Recent sources not updated: '<home>/work/s19_t14/examples/case_07_stress_smoke/firmware.a2l'
+INFO     s19tui:app.py:8305 Workarea refreshed. files=1
+INFO     s19tui:app.py:18587 A2L parse summary: path=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_19_2_declared_reg0/p0/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.008 sections=1 tags=12 errors=0
+INFO     s19tui:app.py:17661 MAC validation computed: records=0 issues=25 elapsed_seconds=0.005
+INFO     s19tui:app.py:17716 MAC row cache built: records=0 elapsed_seconds=0.008
+INFO     s19tui:app.py:16598 Load phase boundary: populate_issues_table_done rows=25 total=25 elapsed=0.036
+INFO     s19tui:app.py:19302 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.049
+INFO     s19tui:app.py:19829 Load phase boundary: populate_a2l_table_done rows=12 total=12 elapsed=0.003
+INFO     s19tui:app.py:15705 A2L view refresh complete: path=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_19_2_declared_reg0/p0/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.054
+INFO     s19tui:app.py:15713 A2L loaded: /tmp/pytest-of-<user>/pytest-156/test_r_whelp_19_2_declared_reg0/p0/.s19tool/workarea/temp/firmware.a2l
+INFO     s19tui:app.py:15129 Synced A2L file into project: /tmp/pytest-of-<user>/pytest-156/test_r_whelp_19_2_declared_reg0/p0/.s19tool/workarea/proj
+INFO     s19tui:app.py:6164 View reports action. project=proj count=0
+__________ test_r_whelp_19_3_declared_regions_keep_the_last_generate ___________
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_19_3_declared_reg0 workarea=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_19_3_declared_reg0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.020
+WARNING  s19tui:app.py:13882 Project proj: no digests saved project.json (None)
+INFO     s19tui:app.py:14124 Load phase boundary: parse_branch_entry path=a.s19 suffix=.s19
+INFO     s19tui:app.py:18640 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_19_3_declared_reg0/.s19tool/workarea/proj/a.s19 addresses=4 range_count=1 range_bytes=4 errors=0
+INFO     s19tui:app.py:14141 Load phase boundary: parse_branch_done path=a.s19 branch=s19
+INFO     s19tui:app.py:18101 Load phase boundary: apply_install_state path=a.s19 precomputed=False
+INFO     s19tui:app.py:14077 Project loaded. name=proj file=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_19_3_declared_reg0/.s19tool/workarea/proj/a.s19 mac=None
+INFO     s19tui:app.py:18768 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18117 Load phase boundary: apply_sections_done path=a.s19
+INFO     s19tui:app.py:18129 Load phase boundary: apply_hex_done path=a.s19
+INFO     s19tui:app.py:19788 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17661 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17716 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.021
+INFO     s19tui:app.py:19302 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.025
+INFO     s19tui:app.py:18142 Load phase boundary: apply_a2l_done path=a.s19
+INFO     s19tui:app.py:18995 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18159 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_19_3_declared_reg0/.s19tool/workarea/proj/a.s19 file_type=s19 elapsed_seconds=0.489 has_mac=False precomputed=False
+INFO     s19tui:app.py:6164 View reports action. project=proj count=0
+INFO     s19tui:screens.py:3490 ReportViewerScreen requesting generation. context_bytes=64
+INFO     s19tui:app.py:6676 report kind=project source=proj output=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_19_3_declared_reg0/.s19tool/workarea/proj/reports/20261105T215752Z-report.md outcome=ok
+INFO     s19tui:app.py:6164 View reports action. project=proj count=1
+_________________ test_r_whelp_20_2_slash_focuses_ascii_search _________________
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_20_2_slash_focuse0 workarea=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_20_2_slash_focuse0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.022
+INFO     s19tui:app.py:17808 Loading file: path=<home>/work/s19_t14/examples/case_07_stress_smoke/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14124 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18640 Load summary: file_type=s19 path=<home>/work/s19_t14/examples/case_07_stress_smoke/firmware.s19 addresses=1024 range_count=4 range_bytes=1024 errors=0
+INFO     s19tui:app.py:14141 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18101 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:18768 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18117 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18129 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19788 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.003
+INFO     s19tui:app.py:17661 MAC validation computed: records=0 issues=0 elapsed_seconds=0.002
+INFO     s19tui:app.py:17716 MAC row cache built: records=0 elapsed_seconds=0.002
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.022
+INFO     s19tui:app.py:19302 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.026
+INFO     s19tui:app.py:18142 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:18995 Memory Map updated. ranges=4
+INFO     s19tui:app.py:18159 Loaded file successfully: path=<home>/work/s19_t14/examples/case_07_stress_smoke/firmware.s19 file_type=s19 elapsed_seconds=1.505 has_mac=False precomputed=False
+INFO     s19tui:app.py:15648 A2L copy complete: path=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_20_2_slash_focuse0/.s19tool/workarea/temp/firmware.a2l size_bytes=2446 copy_seconds=0.002
+INFO     s19tui:app.py:931 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_20_2_slash_focuse0/.s19tool/workarea/temp/firmware.a2l size_bytes=2446
+WARNING  s19tui:app.py:15686 Recent sources not updated: '<home>/work/s19_t14/examples/case_07_stress_smoke/firmware.a2l'
+INFO     s19tui:app.py:8305 Workarea refreshed. files=1
+INFO     s19tui:app.py:18587 A2L parse summary: path=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_20_2_slash_focuse0/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.040 sections=1 tags=12 errors=0
+INFO     s19tui:app.py:17661 MAC validation computed: records=0 issues=17 elapsed_seconds=0.006
+INFO     s19tui:app.py:17716 MAC row cache built: records=0 elapsed_seconds=0.006
+INFO     s19tui:app.py:16598 Load phase boundary: populate_issues_table_done rows=17 total=17 elapsed=0.065
+INFO     s19tui:app.py:19302 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.079
+INFO     s19tui:app.py:19829 Load phase boundary: populate_a2l_table_done rows=12 total=12 elapsed=0.007
+INFO     s19tui:app.py:15705 A2L view refresh complete: path=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_20_2_slash_focuse0/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.089
+INFO     s19tui:app.py:15713 A2L loaded: /tmp/pytest-of-<user>/pytest-156/test_r_whelp_20_2_slash_focuse0/.s19tool/workarea/temp/firmware.a2l
+_____________ test_r_whelp_21_2_ranges_come_from_the_loaded_image ______________
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_21_2_ranges_come_0 workarea=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_21_2_ranges_come_0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.017
+INFO     s19tui:app.py:17808 Loading file: path=<home>/work/s19_t14/examples/case_07_stress_smoke/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14124 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18640 Load summary: file_type=s19 path=<home>/work/s19_t14/examples/case_07_stress_smoke/firmware.s19 addresses=1024 range_count=4 range_bytes=1024 errors=0
+INFO     s19tui:app.py:14141 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18101 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:18768 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18117 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18129 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19788 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17661 MAC validation computed: records=0 issues=0 elapsed_seconds=0.002
+INFO     s19tui:app.py:17716 MAC row cache built: records=0 elapsed_seconds=0.002
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.024
+INFO     s19tui:app.py:19302 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.032
+INFO     s19tui:app.py:18142 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:18995 Memory Map updated. ranges=4
+INFO     s19tui:app.py:18159 Loaded file successfully: path=<home>/work/s19_t14/examples/case_07_stress_smoke/firmware.s19 file_type=s19 elapsed_seconds=1.451 has_mac=False precomputed=False
+_________________ test_r_whelp_22_2_naming_line_split_and_join _________________
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_22_2_naming_line_0 workarea=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_22_2_naming_line_0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.016
+INFO     s19tui:app.py:17808 Loading file: path=<home>/work/s19_t14/examples/case_07_stress_smoke/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14124 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18640 Load summary: file_type=s19 path=<home>/work/s19_t14/examples/case_07_stress_smoke/firmware.s19 addresses=1024 range_count=4 range_bytes=1024 errors=0
+INFO     s19tui:app.py:14141 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18101 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:18768 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18117 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18129 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19788 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17661 MAC validation computed: records=0 issues=0 elapsed_seconds=0.005
+INFO     s19tui:app.py:17716 MAC row cache built: records=0 elapsed_seconds=0.005
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.034
+INFO     s19tui:app.py:19302 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.047
+INFO     s19tui:app.py:18142 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:18995 Memory Map updated. ranges=4
+INFO     s19tui:app.py:18159 Loaded file successfully: path=<home>/work/s19_t14/examples/case_07_stress_smoke/firmware.s19 file_type=s19 elapsed_seconds=1.324 has_mac=False precomputed=False
+________________ test_r_whelp_24_2_coverage_reads_typed_ranges _________________
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_24_2_coverage_rea0 workarea=/tmp/pytest-of-<user>/pytest-156/test_r_whelp_24_2_coverage_rea0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+___________ test_r_tui_062_10_1_2_named_actions_are_the_handled_ones ___________
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-156/test_r_tui_062_10_1_2_named_ac0 workarea=/tmp/pytest-of-<user>/pytest-156/test_r_tui_062_10_1_2_named_ac0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+INFO     s19tui:app.py:18995 Memory Map updated. ranges=4
+INFO     s19tui:app.py:19107 Hex view focused at 0x08000400
+=========================== short test summary info ============================
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_12_2_named_controls_exist
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_18_2_generate_writes_markdown_only
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_19_2_declared_regions_come_from_the_project
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_19_3_declared_regions_keep_the_last_generate
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_20_2_slash_focuses_ascii_search
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_21_2_ranges_come_from_the_loaded_image
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_22_2_naming_line_split_and_join
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_23_2_checks_group_order
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_24_2_coverage_reads_typed_ranges
+PASSED tests/test_b101_help_legend_docs.py::test_r_tui_062_10_1_2_named_actions_are_the_handled_ones
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_1_2_stated_value_is_the_engines
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_2_2_remedy_restores_old_value
+PASSED tests/test_window_usage_help.py::test_tc707_section_census_nine_sections_min_three_steps
+PASSED tests/test_window_usage_help.py::test_tc707_boundary_no_orphan_seats_no_blank_modal
+PASSED tests/test_changes_file_notation_help.py::test_tc1802_nine_md_sections_intact_tenth_section_added
+PASSED tests/test_b101_flow_ext_copy.py::test_r_flow_crc_4_designer_template_is_named_in_the_flow
+FAILED tests/test_b101_help_legend_docs.py::test_r_whelp_12_1_quoted_keys_act_on_the_window
+FAILED tests/test_b101_help_legend_docs.py::test_r_whelp_12_3_no_stale_claim
+FAILED tests/test_b101_help_legend_docs.py::test_r_whelp_13_1_no_reference_to_unopenable_things
+FAILED tests/test_b101_help_legend_docs.py::test_r_whelp_13_2_named_folders_are_the_apps
+FAILED tests/test_b101_help_legend_docs.py::test_r_whelp_14_1_no_markdown_marks
+FAILED tests/test_b101_help_legend_docs.py::test_r_whelp_18_1_reports_step_names_one_markdown_file
+FAILED tests/test_b101_help_legend_docs.py::test_r_whelp_19_1_reports_step_names_saved_regions
+FAILED tests/test_b101_help_legend_docs.py::test_r_whelp_20_1_a2l_step_names_the_ascii_search
+FAILED tests/test_b101_help_legend_docs.py::test_r_whelp_21_1_split_step_names_the_loaded_image
+FAILED tests/test_b101_help_legend_docs.py::test_r_whelp_22_1_split_step_names_the_file_names
+FAILED tests/test_b101_help_legend_docs.py::test_r_whelp_23_1_checks_step_names_outcome_groups
+FAILED tests/test_b101_help_legend_docs.py::test_r_whelp_24_1_crc_step_names_typed_ranges
+FAILED tests/test_b101_help_legend_docs.py::test_r_whelp_25_1_crc_template_line_names_a_crc_config
+FAILED tests/test_b101_help_legend_docs.py::test_r_whelp_26_1_flow_help_says_designer_template_refused
+FAILED tests/test_b101_help_legend_docs.py::test_r_tui_062_10_1_1_map_key_line_text
+FAILED tests/test_b101_help_legend_docs.py::test_r_legend_011_1_region_row_field_line
+FAILED tests/test_b101_help_legend_docs.py::test_r_legend_011_2_changed_lines_fit_the_floor
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_readme_2_1_one_section_per_window
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_readme_2_2_rail_table
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_readme_3_1_every_ctx_key_listed
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_readme_4_1_no_stale_claim
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_readme_4_2_linked_documents_exist
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_readme_4_3_operations_names_placeholders
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_security_1_1_policy_names_private_path
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_security_2_1_supported_versions
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_security_1_3_readme_links_the_policy
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_1_1_crc_change_stated
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_2_1_remedy_stated
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_3_1_before_after_report_stated
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_4_1_external_copy_stated
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_5_1_markdown_escaping_stated
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_6_1_whole_hex_windows_stated
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_7_1_deleted_project_folder_stated
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_8_1_climbing_path_refusal_stated
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_9_1_relative_output_under_project_stated
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_10_1_reports_name_the_copy_stated
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_11_1_crc_config_reasons_stated
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_12_1_failed_write_leaves_nothing_stated
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_13_1_visible_replacements_stated
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_14_1_part_file_safe_to_delete_stated
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-1]
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-2]
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-3]
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-4]
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-5]
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-6]
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-7]
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-8]
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-9]
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-10]
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-11]
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_guide_2_1_fixed_rows_marked
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_guide_2_2_no_other_row_marked
+FAILED tests/test_window_usage_help.py::test_tc707_copy_matches_help_sections_md_verbatim
+FAILED tests/test_window_usage_help.py::test_tc707_numbering_generated_sequential
+FAILED tests/test_docs_canon.py::test_at285_every_readme_named_key_exists_in_the_seat
+56 failed, 16 passed in 190.25s (0:03:10)
+exit code: 1

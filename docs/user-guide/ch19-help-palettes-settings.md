@@ -14,9 +14,9 @@ Press `?` while a widget of the window has focus, or click the `?` at the right 
 window's title bar. The dialog lists numbered steps for that window and then its keys.
 ↑ ↓ PgUp PgDn Home End scroll; `esc` or **Close** closes. Windows with a help section:
 Workspace, A2L Explorer, Memory Map, Patch Editor, Check Editor, Checks, CRC Designer,
-Flow Builder, Flow Execution, Reports, Split / Join / Export. Some steps do not match
-the app yet (finding F-37) — e.g. this Workspace text refers to a
-"folders.html board" that the app does not have.
+Flow Builder, Flow Execution, Reports, Split / Join / Export. (capture taken before
+1.0.0: its step 5 names a "folders.html board"; 1.0.0 names the work area's common
+folders, finding F-37)
 
 ### 19.2 The help panel
 

@@ -82,38 +82,13 @@ from s19_app.tui.window_help import (
     section_body_text,
 )
 
-#: The authored-copy source (LLR-140.2) — read-only for the fidelity census.
-_HELP_SECTIONS_MD = (
-    Path(__file__).resolve().parent.parent
-    / "prototypes"
-    / "cambios_10_12_2026"
-    / "help_sections.md"
-)
-
-#: The exact nine section keys (LLR-140.2): the seven rail SCREEN_CONTAINER_IDS
-#: keys + ``reports`` + the inc-004 ``split_join_export``.
-_EXPECTED_KEYS = frozenset(
-    {
-        # batch-97 Inc-4 (named supersession, D25 / LLR-148.6): ``patch`` is
-        # rewritten as a code-authored ``label — effect`` body and leaves the
-        # md-fidelity census, like ``check_editor`` (_CODE_AUTHORED_SHIPPED).
-        # Inc-4 gate (operator, asked at the Inc-4 gate 2026-10-21): the
-        # tests no longer depend on the untracked draft for ``crc_designer``
-        # and ``reports`` either — their step 6 names its folder in code
-        # (F3/F4) while the draft keeps the operator's wording; both are
-        # code-authored now.
-        # batch-97 Inc-5 (named supersession, D25 / LLR-148.6): ``flow`` is
-        # rewritten as a code-authored ``label — effect`` body and leaves the
-        # md-fidelity census too.
-        # batch-97 Inc-8 (named supersession, operator decision at the Inc-8
-        # gate 2026-10-23): ``map`` is rewritten code-authored (its md steps
-        # named keys that do not act on the Map) and leaves the md census.
-        "checks",
-        "a2l",
-        "workspace",
-        "split_join_export",
-    }
-)
+#: The sections still ported from the operator's untracked
+#: ``help_sections.md`` draft. Named supersession (batch-101 Inc 14,
+#: orchestrator ruling D-3): the last four (``checks``, ``a2l``, ``workspace``,
+#: ``split_join_export``) are rewritten code-authored (F-37 / D7-26) and no
+#: test reads the draft any more -- it is in no clone, so the md-reading arms
+#: failed with ``FileNotFoundError`` before any assertion. The set is empty.
+_EXPECTED_KEYS: frozenset = frozenset()
 
 #: (window key, chip id, rail screen key or "reports") for the eight shipped
 #: surfaces.
@@ -136,8 +111,21 @@ _SEATS: Tuple[Tuple[str, str, str], ...] = (
 #: Inc-5 adds ``flow``; Inc-6 adds ``flow_execution``.
 # batch-97 Inc-6 (named supersession, D25 / I-4): ``flow_execution`` joins the
 # code-authored shipped seats (LLR-148.6).
+# batch-101 Inc 14 (named supersession, orchestrator ruling D-3): ``checks``,
+# ``a2l`` and ``workspace`` join the code-authored shipped seats.
 _CODE_AUTHORED_SHIPPED = frozenset(
-    {"check_editor", "patch", "crc_designer", "reports", "flow", "flow_execution", "map"}
+    {
+        "check_editor",
+        "patch",
+        "crc_designer",
+        "reports",
+        "flow",
+        "flow_execution",
+        "map",
+        "checks",
+        "a2l",
+        "workspace",
+    }
 )
 
 
@@ -172,94 +160,183 @@ async def _open_via_chip(app: S19TuiApp, pilot, screen_key: str, chip_id: str):
 # --------------------------------------------------------------------------- #
 
 
-def test_tc707_section_census_nine_sections_min_three_steps() -> None:
-    """TC-707 (LLR-140.2 census): the nine md-authored sections stay present
-    under the windows' keys, each >= 3 non-empty numbered steps and a title —
-    9/9 keys, 9/9 with >= 3 steps.
+#: The twelve section keys of the data home (R-WHELP.7).
+_ALL_SECTION_KEYS = frozenset(
+    {
+        "patch",
+        "checks",
+        "crc_designer",
+        "reports",
+        "map",
+        "flow",
+        "a2l",
+        "workspace",
+        "split_join_export",
+        "flow_execution",
+        "check_editor",
+        "changes_file_notation",
+    }
+)
 
-    Scope note (batch-96 / TC-1802): the census is deliberately scoped to
-    ``_EXPECTED_KEYS`` — the nine sections ported from ``help_sections.md``
-    — because that md-fidelity contract froze at batch-95. The data home
-    has since grown a tenth, CODE-authored section
-    (``changes_file_notation``) that is not an md port; its presence and
-    the exact ten-key census are asserted by tests/
-    test_changes_file_notation_help.py (TC-1802), not here.
-    """
-    assert _EXPECTED_KEYS <= frozenset(WINDOW_HELP_SECTIONS), (
-        "the data home must still hold the nine md-authored sections, keyed "
-        "by the windows' keys"
-    )
-    for key in _EXPECTED_KEYS:
-        section = WINDOW_HELP_SECTIONS[key]
-        assert isinstance(section["title"], str) and section["title"], key
+#: The pinned step count of every section (R-WHELP.7 (c)). A later increment
+#: that changes a count updates its pin by named supersession.
+_PINNED_STEP_COUNTS = {
+    "patch": 43,
+    "checks": 6,
+    "crc_designer": 6,
+    "reports": 6,
+    "map": 4,
+    "flow": 59,
+    "a2l": 5,
+    "workspace": 5,
+    "split_join_export": 8,
+    "flow_execution": 35,
+    "check_editor": 25,
+    "changes_file_notation": 4,
+}
+
+
+def _census_defects(sections: dict) -> list:
+    """Sections with no title, fewer than 3 steps, or an empty step."""
+    defects = []
+    for key, section in sections.items():
+        if not (isinstance(section["title"], str) and section["title"]):
+            defects.append((key, "title"))
         steps = section["steps"]
-        assert isinstance(steps, tuple) and len(steps) >= 3, (
-            f"{key}: each section ships >= 3 numbered steps"
-        )
-        for step in steps:
-            assert isinstance(step, str) and step.strip(), (
-                f"{key}: no empty step may ship (a blank modal is the "
-                f"boundary the contract forbids)"
-            )
+        if not (isinstance(steps, tuple) and len(steps) >= 3):
+            defects.append((key, "fewer than 3 steps"))
+            continue
+        for number, step in enumerate(steps, start=1):
+            if not (isinstance(step, str) and step.strip()):
+                defects.append((key, f"empty step {number}"))
+    return defects
+
+
+def test_tc707_section_census_nine_sections_min_three_steps() -> None:
+    """TC-707 (R-WHELP.7/1 census; node name kept): EVERY section of the data
+    home (12) has a title and >= 3 non-empty steps.
+
+    Named supersession (batch-101 Inc 14, D-3): the census used to cover the
+    four sections still ported from the untracked ``help_sections.md``; that
+    contract is retired, so it now covers all twelve and reads no file.
+    Negative control: a section cut to two steps, one with a blank step and one
+    with no title are each reported.
+    """
+    assert frozenset(WINDOW_HELP_SECTIONS) == _ALL_SECTION_KEYS
+    assert _census_defects(WINDOW_HELP_SECTIONS) == []
+    broken = {
+        **WINDOW_HELP_SECTIONS,
+        "checks": {
+            **WINDOW_HELP_SECTIONS["checks"],
+            "steps": WINDOW_HELP_SECTIONS["checks"]["steps"][:2],
+        },
+        "a2l": {**WINDOW_HELP_SECTIONS["a2l"], "steps": ("one", " ", "three")},
+        "workspace": {**WINDOW_HELP_SECTIONS["workspace"], "title": ""},
+    }
+    assert {key for key, _why in _census_defects(broken)} == {
+        "checks",
+        "a2l",
+        "workspace",
+    }
+
+
+def _copy_defects(sections: dict, copy_sections: dict, flow_steps: dict) -> list:
+    """Where the shipped sections differ from the approved copy."""
+    defects = []
+    for key, (title, steps) in copy_sections.items():
+        if sections[key]["title"] != title:
+            defects.append((key, "title"))
+        if tuple(sections[key]["steps"]) != steps:
+            defects.append((key, "steps"))
+    for number, text in flow_steps.items():
+        if sections["flow"]["steps"][number - 1] != text:
+            defects.append(("flow", number))
+    return defects
 
 
 def test_tc707_copy_matches_help_sections_md_verbatim() -> None:
-    """TC-707 (LLR-140.2, the operator-editable home): every shipped step
-    string of the nine md-authored sections is a verbatim port of
-    ``help_sections.md`` — the md is the source draft, so a drifted copy
-    edit reddens here against the source. The batch-96
-    ``changes_file_notation`` section is code-authored (not an md port);
-    it is iterated here only if it ever lands in the md, and is covered by
-    TC-1802 otherwise."""
-    md_text = _HELP_SECTIONS_MD.read_text(encoding="utf-8")
-    normalized_md = re.sub(r"\s+", " ", md_text)
-    for key in _EXPECTED_KEYS:
-        section = WINDOW_HELP_SECTIONS[key]
-        title = str(section["title"])
-        assert title in normalized_md, (
-            f"{key}: the section title {title!r} must appear in the md"
-        )
-        for step in section["steps"]:
-            assert step in normalized_md, (
-                f"{key}: step not found verbatim in help_sections.md: "
-                f"{step!r}"
-            )
+    """TC-707 (R-WHELP.12/4; node name kept, it no longer reads the md): the
+    six rewritten sections (A2L Explorer, Workspace, Checks, CRC Designer,
+    Reports, Split / Join / Export: titles and 36 steps) and the six changed
+    Flow Builder steps (1, 5, 12, 17, 18, 19) equal the approved copy, pinned
+    in ``tests/support/help_copy_i14.py``; the help sections hold exactly the
+    12 keys.
+
+    Named supersession (batch-101 Inc 14, D-3). Negative control: the base
+    text of one Flow Builder step and of one rewritten step are each reported.
+    """
+    from tests.support.help_copy_i14 import FLOW_STEPS, REWRITTEN_SECTIONS
+
+    assert frozenset(WINDOW_HELP_SECTIONS) == _ALL_SECTION_KEYS
+    assert sum(len(steps) for _title, steps in REWRITTEN_SECTIONS.values()) == 36
+    assert len(FLOW_STEPS) == 6
+    assert _copy_defects(WINDOW_HELP_SECTIONS, REWRITTEN_SECTIONS, FLOW_STEPS) == []
+    flow = list(WINDOW_HELP_SECTIONS["flow"]["steps"])
+    flow[0] += " (LLR-003.7)"
+    a2l = list(WINDOW_HELP_SECTIONS["a2l"]["steps"])
+    a2l[0] = "Open the section tree."
+    broken = {
+        **WINDOW_HELP_SECTIONS,
+        "flow": {**WINDOW_HELP_SECTIONS["flow"], "steps": tuple(flow)},
+        "a2l": {**WINDOW_HELP_SECTIONS["a2l"], "steps": tuple(a2l)},
+    }
+    assert set(_copy_defects(broken, REWRITTEN_SECTIONS, FLOW_STEPS)) == {
+        ("flow", 1),
+        ("a2l", "steps"),
+    }
+
+
+_STORED_NUMBER = re.compile(r"^\s*\d+[.)]\s")
+
+
+def _numbering_defects(sections: dict, bodies: dict = None) -> list:
+    """(a) the body is the steps numbered ``f"{n}. {step}"``, joined by blank
+    lines; (b) no stored step starts with its own number; (c) the step count is
+    the pinned one."""
+    defects = []
+    for key, section in sections.items():
+        steps = section["steps"]
+        body = bodies[key] if bodies is not None else section_body_text(key)
+        expected = [f"{n}. {step}" for n, step in enumerate(steps, start=1)]
+        if body != "\n\n".join(expected):
+            defects.append((key, "a"))
+        if any(_STORED_NUMBER.match(step) for step in steps):
+            defects.append((key, "b"))
+        if len(steps) != _PINNED_STEP_COUNTS[key]:
+            defects.append((key, "c"))
+    return defects
 
 
 def test_tc707_numbering_generated_sequential() -> None:
-    """TC-707 (LLR-140.2, the numbered-steps voice): the rendered body's
-    paragraphs are numbered 1..N with no gap — the numbering is generated
-    at render so the operator's delete/reorder edits can never strand a
-    gap, and it matches the md's own sequential numbering per section."""
-    md_text = _HELP_SECTIONS_MD.read_text(encoding="utf-8")
-    # Split the md into per-section bodies at the "## " headings.
-    chunks = re.split(r"(?m)^## ", md_text)[1:]
-    md_numbered_counts = {}
-    for chunk in chunks:
-        heading = chunk.splitlines()[0]
-        count = len(re.findall(r"(?m)^\d+\.", chunk))
-        for key, section in WINDOW_HELP_SECTIONS.items():
-            if key in _EXPECTED_KEYS and heading.startswith(str(section["title"])):
-                md_numbered_counts[key] = count
-    assert frozenset(md_numbered_counts) == _EXPECTED_KEYS, (
-        f"every authored section must be found in the md by its title; "
-        f"matched: {sorted(md_numbered_counts)}"
-    )
-    # Scoped to the nine md-authored sections: the batch-96
-    # ``changes_file_notation`` section is not an md port (its rendered
-    # numbering is covered by TC-1802).
-    for key in _EXPECTED_KEYS:
-        body = section_body_text(key)
-        paragraphs = body.split("\n\n")
-        for number, paragraph in enumerate(paragraphs, start=1):
-            assert paragraph.startswith(f"{number}. "), (
-                f"{key}: paragraph {number} must render with its generated "
-                f"number prefix; got {paragraph[:20]!r}"
-            )
-        assert len(paragraphs) == md_numbered_counts[key], (
-            f"{key}: the shipped step count must match the md's numbered "
-            f"items ({md_numbered_counts[key]}); got {len(paragraphs)}"
-        )
+    """TC-707 (R-WHELP.7/1, E3 A-3; node name kept, it no longer reads the
+    md): in all 12 sections (a) paragraph n of the rendered body equals
+    ``f"{n}. {steps[n-1]}"`` -- the numbering is generated at render so an
+    edit can never leave a gap; (b) no stored step starts with its own number;
+    (c) the step count equals the pinned count.
+
+    Negative controls: a stored step ``1. Checks run ...`` reddens (b); one
+    step dropped from any section reddens (c); a gap in a rendered body
+    reddens (a).
+    """
+    assert _numbering_defects(WINDOW_HELP_SECTIONS) == []
+    checks = WINDOW_HELP_SECTIONS["checks"]
+    stored = {
+        **WINDOW_HELP_SECTIONS,
+        "checks": {
+            **checks,
+            "steps": ("1. Checks run in the Patch Editor.",) + tuple(checks["steps"][1:]),
+        },
+    }
+    assert ("checks", "b") in _numbering_defects(stored)
+    reports = WINDOW_HELP_SECTIONS["reports"]
+    dropped = {
+        **WINDOW_HELP_SECTIONS,
+        "reports": {**reports, "steps": reports["steps"][:-1]},
+    }
+    assert ("reports", "c") in _numbering_defects(dropped)
+    gapped = {key: section_body_text(key) for key in WINDOW_HELP_SECTIONS}
+    gapped["workspace"] = gapped["workspace"].replace("2. ", "3. ", 1)
+    assert ("workspace", "a") in _numbering_defects(WINDOW_HELP_SECTIONS, gapped)
 
 
 def test_tc707_boundary_no_orphan_seats_no_blank_modal() -> None:
@@ -270,6 +347,9 @@ def test_tc707_boundary_no_orphan_seats_no_blank_modal() -> None:
     ``split_join_export``."""
     # Named supersession (batch-97 Inc-3, I-4): the shipped seats grow by the
     # code-authored ``check_editor`` key; the md-authored nine are unchanged.
+    # Named supersession (batch-101 Inc 14, D-3): ``_EXPECTED_KEYS`` is empty
+    # and ``checks``, ``a2l``, ``workspace`` join ``_CODE_AUTHORED_SHIPPED``;
+    # the seat formula is unchanged and still holds.
     assert frozenset(SHIPPED_WINDOW_KEYS) == (
         _EXPECTED_KEYS - {"split_join_export"}
     ) | _CODE_AUTHORED_SHIPPED, (

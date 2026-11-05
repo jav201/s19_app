@@ -52,8 +52,9 @@ A double click on a region row opens the Workspace with the hex view at that reg
 ![Map legend](img/ch06-05-map-legend-entropy.png)
 
 `k` explains the bands and their entropy ranges, the parts of the map, a region row,
-and the keys. The "Map keys" line says `j k` select and `↵` opens hex; in the code
-only ↑ ↓ move and Enter inspects (finding F-16).
+and the keys. The "Map keys" line says what each key does: `↑↓ move · click / ↵
+inspect · double-click open hex · Esc close`. (capture taken before 1.0.0: it shows
+the earlier line `↑↓ / j k select · … double-click / ↵ open hex`, finding F-16)
 
 ### 6.6 Wide terminal
 

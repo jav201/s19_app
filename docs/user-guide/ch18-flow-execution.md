@@ -176,10 +176,11 @@ mode → PATCH `step_patch.changes.json` → WRITE-OUT `terminal_out.s19`).
 
 **If the output changes on the next run.** In the same session the command was run
 again with `BENCH=V2`, then Run and Confirm. The new output was copied as
-`step_patch.changes_1.json`, but the PATCH block still read `step_patch.changes.json`,
-and `terminal_out.s19` still holds `BENCH=OK` (checked in the file). To use a new
-output, delete or rename the old copy in the project folder before you confirm, or
-change the PATCH ref (finding F-49).
+`step_patch.changes_1.json`. In 1.0.0 the PATCH block reads that copy — its summary
+ends ` · read step_patch.changes_1.json in place of step_patch.changes.json` — and
+`terminal_out.s19` holds `BENCH=V2`. (This run was recorded before 1.0.0, when the
+PATCH block still read `step_patch.changes.json` and the image kept `BENCH=OK`;
+finding F-49.)
 
 ## Features of this window
 
