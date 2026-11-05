@@ -4,7 +4,7 @@ Stage E2 of the design-first flow (`dev-flow-v3-beta`). Graph only: no stub, mar
 
 How to read it:
 - One file holds the baseline and the prototype. Every node's `func:` starts with **unchanged**, **changed** (then "was: … / now: …", the baseline first), **new** or **deleted**. Context nodes (unchanged) are here because a changed node calls them, or because a requirement is observed through them.
-- Example sources are the test-case ids of `02-test-cases.md`; `B` = read from the base tree at E1; `P` = the E1 probe (`parse_change_document` timing, Windows host, `b7b77c4`: 1 000 × 20 000 → 3.12 s). Every example states the Inc 4 target unless it says "holds on base".
+- Example sources are the test-case ids of `02-test-cases.md`; `B` = read from the base tree at E1; `P` = the E1 probe (`parse_change_document` timing, Windows host, `b7b77c4`: 1 000 × 20 000 → 3.12 s; historical, it sets no threshold: timings run on the LAN Linux host, E3 A-3). Every example states the Inc 4 target unless it says "holds on base".
 - `CTX` = the case-08 A2L payload (`parse_a2l_file(firmware.a2l)`, a dict with `tags`); `<tag 2>`, `<tag 3>`, `<check tag>` = the generated names (01 Definitions). The slice assumes D-1 "delete" and D-2 "add `io.py`"; nodes that depend on a decision say so.
 
 Groups for E4 (file ownership) and the interfaces they share — pinned here, changed only by an orchestrator ruling:
@@ -21,7 +21,7 @@ The slice is 13 units, 9 of them functions with behaviour; one implementer can t
 |---|---|---|
 | I-1 the no-context text | `SYMBOL_NO_A2L_CONTEXT_TEXT: str = "no A2L context is declared for this change-set"` in `s19_app/tui/changes/io.py`; R-CHG-SYM.2's message embeds it unchanged | G1 → G1 (`_resolve_symbol_tag`), G3 (`_apply_entry_json_edit`) |
 | I-2 the per-entry edit seam | `ChangeService.edit_entry_json(self, index: int, text: str, a2l_context: Optional[dict] = None) -> ChangeActionResult` | G2 → G3 |
-| I-3 Check Editor spec read (Inc 5) | `on_check_editor_panel_spec_file_selected` reads with `a2l_context=self.current_a2l_data`; a resolved entry's `ChangeEntry.symbol` is the tag's spelling. Inc 5 edits the item-building lines after the read, not the read | Inc 4 → Inc 5 |
+| I-3 Check Editor spec read (Inc 5) | `on_check_editor_panel_spec_file_selected` reads with `a2l_context=self.current_a2l_data`; a resolved entry's `ChangeEntry.symbol` is the tag's spelling. Inc 5 edits the item-building lines after the read, not the read. Name source (E3 A-9): Inc 5 uses `entry.symbol` when it is set, looks up by address only for address-only entries, and adds no third name index | Inc 4 → Inc 5 |
 | I-4 variant run files (Inc 9) | `_execute_one_variant(variant, files, project_dir, mac_records, a2l_data, capture_mem_map=False)` unchanged; `files` arrive resolved by the plan (`plan_variant_executions` / `_resolve_manifest_entry`, Inc 9's); this increment adds only `a2l_context=a2l_data` to the read | Inc 9 → Inc 4 (no change to the signature) |
 | I-5 the session's A2L | `S19TuiApp.current_a2l_data: Optional[dict]`, written only by `_replace_current_a2l` (`app.py:19507`); read on the screen thread | existing → G3 |
 
@@ -36,7 +36,7 @@ out: dict[str, dict]? index
 func: new (D-2). `None` when `a2l_context` is not a dict. Else the loop moved from `_resolve_symbol_tag` (`io.py:1102-1108`) unchanged: for each item of `a2l_context.get("tags") or []` that is a dict, `name = str(tag.get("name") or "").strip()`; a non-empty name → `index.setdefault(name.lower(), tag)` (first match wins). Pure.
 module: s19_app/tui/changes/io.py
 examples: (B) `None` → `None`; `{}` → `{}`; `{"tags": [{"name": " Speed ", "address": 16, "length": 2}, {"name": "SPEED", "address": 32, "length": 2}, "x", {"name": ""}]}` → `{"speed": <the first tag, address 16>}` (1 key)
-examples: (R-CHG-SYM.13/1) the planted 20 000-tag context → 20 000 keys, built once per read
+examples: (R-CHG-SYM.13/1) the planted 220 040-tag context → 220 040 keys, built at most once per read (E3 A-2, A-3)
 
 _resolve_symbol_tag
 req: R-CHG-SYM.2, R-CHG-SYM.3, R-CHG-SYM.4, R-CHG-SYM.7, R-CHG-SYM.13
@@ -62,9 +62,10 @@ _parse_entries
 req: R-CHG-SYM.13, R-CHG-SYM.9, R-CHG-SYM.10
 in: list raw_entries; str encoding; str value_mode; list[ValidationIssue] issues; dict? a2l_context = None
 out: list[ChangeEntry] entries
-func: changed (D-2). was: forwards `a2l_context` to every `_parse_entry`. now: `symbol_index = _symbol_name_index(a2l_context)` once, before the loop; passes `symbol_index=symbol_index` to every `_parse_entry`. Signature unchanged (its caller `parse_change_document` is unchanged). The entry-count ceiling is unchanged.
+func: changed (D-2, E3 A-2). was: forwards `a2l_context` to every `_parse_entry`. now: lazy index — no index until the first raw entry that is a dict whose `symbol` is a `str`; at that entry `symbol_index = _symbol_name_index(a2l_context)` (once per read) and `symbol_index=symbol_index` goes to that and every later `_parse_entry`; earlier entries carry no string symbol, so they never consult it. A document with no such entry builds no index (the base's cost for address-only documents). Signature unchanged (its caller `parse_change_document` is unchanged). The entry-count ceiling is unchanged.
 module: s19_app/tui/changes/io.py
-examples: (R-CHG-SYM.13/1) 1 000 symbol entries, the 20 000-tag context → 1 000 entries, 0 issues, `_symbol_name_index` called `1` time; wall time < `0.5` s — base: 3.12 s (P)
+examples: (R-CHG-SYM.13/1) 1 000 symbol entries, the 220 040-tag context → 1 000 entries, 0 issues, `_symbol_name_index` called `1` time; wall time < `1.0` s on the LAN Linux host — base: per-entry rebuild (10.46–11.03 s at 20 000 tags on the Linux host, E3 probe)
+examples: (R-CHG-SYM.13/2) 1 address-only entry, the 220 040-tag context → 1 entry, 0 issues, `_symbol_name_index` called `0` times; `demo_patch`, CTX → called `1` time
 examples: (R-CHG-SYM.10/1) `demo_patch` entries, `a2l_context=None` → 5 entries, 2 R-CHG-SYM.2 issues (holds on base)
 
 parse_change_document
@@ -115,7 +116,7 @@ run_checks_for_project
 req: (none — canon S9 review "Removed (D9-7)")
 in: Path check_path; Path image_path; Path? mac_path = None; Path? a2l_path = None
 out: CheckRunResult
-func: deleted (D-1). was: reads the check document with no `a2l_context` (T-03), then parses `a2l_path` for linkage only. now: gone, with its module-docstring paragraph and the imports only it used. Test node `tests/test_checks_engine.py::test_headless_project_run` and its import go with it. Fallback if D-1 is ruled "keep": `changed`, `a2l_data = parse_a2l_file(a2l_path) if a2l_path is not None else None` moved above the read and passed as `a2l_context=a2l_data` (row `R-CHK-HEADLESS.1`).
+func: deleted (D-1). was: reads the check document with no `a2l_context` (T-03), then parses `a2l_path` for linkage only. now: gone, with its module-docstring paragraph and the imports only it used. Test node `tests/test_checks_engine.py::test_headless_project_run` and its import go with it; TC-023's registry `nodes` drop it at integration and E4 runs `tests/test_id_registry.py` (E3 A-1). Fallback if D-1 is ruled "keep": `changed`, `a2l_data = parse_a2l_file(a2l_path) if a2l_path is not None else None` moved above the read and passed as `a2l_context=a2l_data` (row `R-CHK-HEADLESS.1`).
 module: s19_app/tui/services/change_service.py
 examples: (B) `grep -rn "run_checks_for_project(" s19_app` after the change → 0 hits
 
@@ -145,6 +146,8 @@ out: tuple(list[VariantExecutionResult], list[ValidationIssue])
 func: unchanged (context). The A2L is `validate_project_files(project_dir)`'s one A2L file, or `None` (`:2743-2755`) — the project's A2L file; no session state reaches it.
 module: s19_app/tui/services/variant_execution_service.py
 examples: (R-CHG-SYM.11/1) project with `firmware.a2l` → `a2l_path` = that file; without → `None`
+examples: (R-CHG-SYM.11/3, E3 A-4) the report run (`app.py:6566`) calls it as Execute scope does: batch `[demo_patch]`, project with `firmware.a2l` → `firmware-patched.s19` written, both symbol entries applied — base: every entry `blocked`, no file
+examples: (R-CHG-SYM.11/2 arm b, R-CHG-SYM.12/2, E3 S4-2) the session A2L unloaded (project with `firmware.a2l`) → still applied; the session A2L attached (project without an A2L file) → `a2l_path` `None`, no patched file
 
 ### G3 — app (`app.py`)
 
@@ -188,6 +191,7 @@ examples: (R-CHG-SYM.9/4) CTX loaded; draft row 2 = `<tag 2>`; seed unchanged �
 examples: (R-TUI-058.9/1) the A2L unloaded after the paste; row 2; seed unchanged → lines in order: `Patch Editor: entry edit rejected - see findings.`; `[CHG-SYMBOL-UNRESOLVED] error: entry 0: the symbol '<tag 2>' cannot be resolved — no A2L context is declared for this change-set — the entry was skipped`; `Patch Editor: the entry names an A2L symbol and no A2L is loaded - load the A2L, then edit the entry again.` — base: the first two lines only
 examples: (R-TUI-058.9/2) no A2L; confirmed entry `{"type": "bytes", "address": "0x100", "bytes": "01", "symbol": 7}` → `entry edit rejected - see findings.` + `[CHG-SYMBOL-UNRESOLVED] error: entry 0 declares a 'symbol' that is not a tag name string — the entry was skipped`; `0` plain lines
 examples: (R-TUI-058.9/3) CTX loaded; `"symbol": "NO_SUCH_TAG"` → the R-CHG-SYM.3 line; `0` plain lines
+examples: (R-TUI-058.9/3 arm b, E3 A-5) CTX loaded; `"symbol": "no A2L context is declared for this change-set"` → the R-CHG-SYM.3 line, whose message contains the I-1 text; `0` plain lines (the `current_a2l_data is None` guard decides)
 
 S19TuiApp.on_check_editor_panel_spec_file_selected
 req: R-CHG-SYM.9, R-CHG-SYM.10
@@ -235,4 +239,5 @@ desc: unchanged. The status lines (`set_status`); cases read the lines painted s
 
 > - **Threads.** All six G3 nodes run on the screen thread; `_execute_one_variant` runs in the Execute-scope worker and never reads `current_a2l_data` (R-CHG-SYM.12: the session cannot leak into a variant run).
 > - **Untrusted input (trigger C6, C8).** Documents and A2L files are untrusted. The new code paints no new file-derived text: the R-TUI-058.9 line is a fixed string; finding lines keep their existing `repr` quoting and plain-text rendering. `_symbol_name_index` keeps the base's type checks (non-dict tags skipped, names coerced with `str`), so a hostile A2L cannot raise where the base did not. Cost: one index of at most the A2L's tag count per read, held only for the read.
+> - **Escaping (E3 S4-6, binds E4).** Any new paint of `ChangeEntry.symbol` goes through the existing escapers (`safe_text`, `md_safe`, `_md_text`, `_esc(_strip_ctl(...))`).
 > - **Not changed:** the reader's refusal texts (R-CHG-SYM.1 … .6), `recorded_document_state`, the flow reads, `_resolve_manifest_entry`, `plan_variant_executions`.

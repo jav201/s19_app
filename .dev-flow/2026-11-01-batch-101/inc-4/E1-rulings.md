@@ -16,7 +16,7 @@ Batch 2026-11-01-batch-101, increment 4, base `b7b77c4`. Rows: `01-requirements.
 | 4 | `app.py:5523` `_apply_entry_json_edit` → `ChangeService.edit_entry_json` (`change_service.py:1516`) | per-entry Edit JSON confirm | none (no parameter) | T-12 | session read (4) + R-TUI-058.9 |
 | 5 | `app.py:7437` `on_check_editor_panel_spec_file_selected` | Check Editor Spec pick | none | F-01 | session read (5) |
 | 6 | `app.py:7763` `on_ab_diff_panel_check_file_selected` | A2B Diff check-spec pick | none | F-01 (third site, plan §a) | session read (6) |
-| 7 | `variant_execution_service.py:2557` `_execute_one_variant` | Execute scope variant run | none (the project A2L is parsed into `a2l_data` 3 lines up and used only for linkage) | T-04 | R-CHG-SYM.11 |
+| 7 | `variant_execution_service.py:2557` `_execute_one_variant` | Execute scope variant run (`app.py:6036`) and the project report run (`app.py:6566`, E3 A-4) | none (the project A2L is parsed into `a2l_data` 3 lines up and used only for linkage) | T-04 | R-CHG-SYM.11 |
 | 8 | `change_service.py:3224` `run_checks_for_project` | headless check run (no product caller) | none (parses `a2l_path` only for linkage) | T-03 | D-1: delete (D9-7) |
 | 9 | `app.py:2520` `recorded_document_state` (project reopen) | Load project | the project's A2L | — | unchanged |
 | 10 | `flow_execution_service.py:178`, `:182`, `:522`, `:803` | flow PATCH / CHECK blocks | the flow's declared A2L | — | unchanged |
@@ -31,6 +31,7 @@ Sites 2 and 3 share F-01's root and sit in `app.py`; leaving them would leave th
 4. Whole-document Edit JSON of a draft with symbol entries: `Edit JSON refused: …` → the draft is replaced.
 5. Per-entry Edit JSON of a symbol entry: rejected → replaced (A2L loaded); with no A2L loaded, one new line at the end (R-TUI-058.9).
 6. Execute scope: a document with symbol entries is no longer blocked; a patched variant file is written where none was.
+7. The project report run (`app.py:6566`, the report worker when no execution precedes it; same `execute_project_variants` call and save-back, `variant_execution_service.py:2578-2585`): a report of a project whose batch holds `demo_patch` writes `<variant>-patched.s19` into the project folder (base: blocked, no file), and its change and check sections move from blocked / `doc-fault` to applied / pass / fail (E3 A-4; case R-CHG-SYM.11/3).
 
 All are status lines or the documented outcome of an existing action; the user guide's ch08 §8.2, ch10 and ch17 notes on F-01 become stale (Inc 14 owns help and docs text; listed for it in §4).
 
@@ -72,7 +73,9 @@ Decisions taken here (no ruling needed):
 ## 4. Forwarded
 
 - To the requirements session: R-CHG-SYM.9, .10 amended; R-CHG-SYM.11, .12, .13, R-TUI-058.9 new; CTX-CHGDOC terms *session read*, *loaded A2L*; observation on R-VAR-002.27 (§2). CODE-CHANGES: D8-22 done by this increment; D9-7 done if D-1 is ruled "delete".
-- To Inc 14 (help and docs text): `docs/user-guide/ch08-patch-editor.md` §8.2 ("A change-set with symbol entries is refused"), `ch10-check-editor.md` (the F-01 sentence), `ch17-flow-builder.md` (the F-01 note), DOSSIER F-01 row ("Project Execute scope does resolve them" is false on `b7b77c4`: variant execution passed no A2L, T-04).
+- To the requirements/test-case session (E3 A-1, A-8): drop `tests/test_checks_engine.py::test_headless_project_run` from TC-023's `nodes` in `AT-TC-REGISTRY.jsonl` (TC-023 stays `LIVE`, 10 nodes); close BACKLOG T-03 as superseded by D9-7; mark CODE-CHANGES D9-7 done at integration; R-CHG-SYM.13 resized (§5).
+- To the backlog (E3 S4-1, routed with Inc 9): `validate_project_files` refuses a link or reparse point among the project files.
+- To Inc 14 (help and docs text; also E3 S4-8, the variant run re-reads against the project's A2L): `docs/user-guide/ch08-patch-editor.md` §8.2 ("A change-set with symbol entries is refused"), `ch10-check-editor.md` (the F-01 sentence), `ch17-flow-builder.md` (the F-01 note), DOSSIER F-01 row ("Project Execute scope does resolve them" is false on `b7b77c4`: variant execution passed no A2L, T-04).
 
 ## Orchestrator rulings (2026-11-05)
 
@@ -81,3 +84,21 @@ Decisions taken here (no ruling needed):
 - **D-3: accepted** — the R-TUI-058.9 line is an extra last line; the finding line with its code stays (R-TUI-058.3).
 - **D-4: accepted** — T-02 stays out (needs a 5th file, `check.py`); a backlog row records it open after Inc 4.
 - **Process note:** the E1 timing probe of `parse_change_document` ran on the Windows PC; from now on probes and timings run on the LAN Linux host (operator rule). The 3.12 s / 0.31 s figures are re-measured there at E4/E5 before they set any threshold.
+
+## 5. E3 rulings folded in (2026-11-05)
+
+Source: `E3-rulings.md` (architect and security both PASS-WITH-NOTES, no round 2). Each item binds E4 as an addendum to §1 … §4.
+
+- **A-1 (HIGH).** D-1 stands. Integration drops `tests/test_checks_engine.py::test_headless_project_run` from TC-023's `nodes` in `AT-TC-REGISTRY.jsonl` (TC-023 stays `LIVE` with its other 10 nodes); forwarded to the requirements/test-case session, not edited by Inc 4. E4's targeted run adds `tests/test_id_registry.py`. Slice §3 names it.
+- **A-2 (MAJOR).** The tag-name index is built lazily: on the first entry whose `symbol` is a string, at most once per read; a document with no such entry builds none. Graph node `_parse_entries` and R-CHG-SYM.13's control updated; case R-CHG-SYM.13/2 (call counter 0).
+- **A-3 (MAJOR) + S4-3, S4-9.** R-CHG-SYM.13 is sized on case_06's 220 040 tags and 1 000 symbol entries. Primary oracle: the index built once per read (call counter). Wall clock is the ceiling, measured on the LAN Linux host at E4, bound = measured × ≥ 2 (projection 1.0 s), through `report_margin` and the `serial_timing` lane. No Windows timing requirement. D-2's "once per read" now reads "at most once per read".
+- **A-4 (MAJOR).** The project report run (`app.py:6566`) is a second surface of R-CHG-SYM.11: census row 7 and §1 item 7; case R-CHG-SYM.11/3.
+- **A-5.** R-TUI-058.9/3 arm b: A2L loaded, a symbol that is the I-1 text → 0 R-TUI-058.9 lines (mutant M-13).
+- **A-6.** R-CHG-SYM.9's "Base" column corrected: `load`, `load_text` and the `io` readers already take the A2L parameter; only `edit_entry_json` lacks it.
+- **A-7.** E4 times the whole-document Edit JSON confirm (two reads) on the LAN host; no design change unless it exceeds R-CHG-SYM.13's bound (`02-test-cases.md`, E4 run notes).
+- **A-8.** D-1 leftovers: the `test_no_textual_in_static_import_graph` docstring is updated (text only; slice §3). BACKLOG T-03 closes as "superseded by D9-7 (function deleted); the `declarado` ruling still governs T-04 (R-CHG-SYM.11)"; CODE-CHANGES D9-7 is marked done at integration. Both forwarded (§4).
+- **A-9.** Interface I-3 for Inc 5: Inc 5 uses `entry.symbol` when set, looks up by address only for address-only entries, and adds no third name index (graph interface list).
+- **S4-1 (LOW).** Definition note on *the project's A2L file* (a regular file; a link in the project folder is not refused today). Backlog row routed with Inc 9 (S8-1 / S8-2): `validate_project_files` refuses an A2L / MAC / variant that is a link or reparse point (`lstat`, as `_walk_manifest_entry` does), with a test planting a link. No code change in Inc 4.
+- **S4-2 (LOW).** R-CHG-SYM.11/2 arm b: the session A2L unloaded before Execute scope → the run still applies (the project's A2L file). Converse taken as case R-CHG-SYM.12/2 (a project without an A2L file, an A2L attached in the session → no patched file). Mutant M-14.
+- **S4-4 … S4-8 (INFO), recorded.** S4-4: one status line per finding on the screen thread, same as base (backlog suggestion: fold lines past N into a count line). S4-5: the R-TUI-058.9 line is a fixed string; a symbol spelled to contain the I-1 text cannot spoof it beyond R-CHG-SYM.2's reason. **S4-6 binds E4:** any new paint of `ChangeEntry.symbol` goes through the existing escapers (`safe_text`, `md_safe`, `_md_text`, `_esc(_strip_ctl(...))`). S4-7: deleting `run_checks_for_project` shrinks the surface; E4 greps each removed import. S4-8: forwarded to Inc 14 (docs may say the variant run re-reads against the project's A2L).
+- **E4 runs:** all tests and timings on the LAN Linux host (operator rule).
