@@ -104,6 +104,7 @@ The UI rows are known failed checks for the next iteration.
 | 12 | Unreachable code; Reports viewer `esc` | F-33 (D7-10), F-34 (D6-12), F-35 (D9-8, D16-6), F-51 | `screens.py`, `app.py`, `screens_directionb.py`, `flow_screens.py` | 5, 6, 9, 10 |
 | 13 | CRC Designer and Split/Join responsive at 10 MB | F-23, F-24 | `crc_designer_view.py`, `segment_split_view.py` | 1, 2 |
 | 14 | Help, legend and README describe the shipped app | F-16, F-30, F-37 (D7-26), F-38 (D0-9..11), F-41 | `window_help.py`, `legend.py` (+ `README.md`, help census md) | 1 |
+| 16 | Documentation hygiene (operator request 2026-11-05): stale, dead and duplicate docs | `p0/doc-inventory.md` groups D1 (CLAUDE.md, PROJECT_RULES.md, docs/engineering-rules.md, requirements.txt), D2 (docs/README.md, docs/overview.md, docs/diagrams/architecture.md), D3 (docs/architecture.md), D4 (archive four finished handoff/notes docs), D5 (REQ-crc.md + examples manifests), D6 (remove the retired `.fast-dev-flow/` and its 18 citations), D7 (comment-only fixes citing removed `prototypes/` files) | docs only; D7 touches comments in `legend.py`, `project_gather_service.py` | 14 (README/guide first); D7 after 14 |
 
 **Order:**
 
