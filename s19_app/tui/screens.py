@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING, Callable, List, Literal, Mapping, Optional, Sequence, Tuple
 
+from rich.cells import cell_len
 from rich.markup import escape as escape_markup
 from rich.table import Table
 from rich.text import Text
@@ -12,6 +13,7 @@ from textual import events, work
 from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Horizontal, ScrollableContainer, VerticalScroll
+from textual.content import Content
 from textual.message import Message
 from textual.screen import ModalScreen
 from textual.widget import Widget
@@ -32,6 +34,11 @@ from textual.widgets import (
 from markdown_it import MarkdownIt
 
 from .capped_text_area import CappedTextArea
+from .a2l_parameter_picker import (
+    A2LParameterPicker,
+    _clip_to_cells,
+    parse_parameter_list,
+)
 from .changes.verify import STATUS_VERIFIED
 from .color_policy import css_class_for_severity
 from ..render.hexview import MAX_HEX_ROWS, render_hex_view_text
@@ -39,8 +46,12 @@ from ..utils import safe_text
 from .insight_style import DGRAY, GREEN, RED, YELLOW
 from .open_folder_chip import OpenFolderChip, titled_header
 from .window_help import WindowHelpChip, open_window_help
-from .os_clipboard_input import OsClipboardInput
-from .workspace import sanitize_project_name
+from .os_clipboard_input import OsClipboardInput, _CLIPBOARD_CAP_CHARS
+from .workspace import (
+    ExternalImportRefusal,
+    import_external_ref,
+    sanitize_project_name,
+)
 from .legend import (
     BAND_GAP_FIELDS,
     COLOUR_SEVERITY,
@@ -65,7 +76,34 @@ from .operations.crc_config import (
 )
 from .operations.model import CrcRegionResult, OperationInput, OperationResult
 from .services import operation_service
+from .services.flow_model import (
+    BLOCK_A2B,
+    BLOCK_CHECK,
+    BLOCK_CRC,
+    BLOCK_EXTERNAL_STEP,
+    BLOCK_PATCH,
+    BLOCK_REPORT,
+    BLOCK_SOURCE,
+    BLOCK_WRITE_OUT,
+    CHECK_GATING_ADVISORY,
+    CHECK_GATING_BLOCK_OWN,
+    EXTERNAL_MODE_MANUAL,
+    EXTERNAL_MODE_TERMINAL,
+    A2BBlock,
+    A2B_INPUT_FLOW,
+    CheckBlock,
+    CrcBlock,
+    ExternalStepBlock,
+    Flow,
+    FlowBlock,
+    PatchBlock,
+    ReportBlock,
+    SourceBlock,
+    WriteOutBlock,
+    parse_a2b_binding,
+)
 from .services.entropy_service import ENTROPY_WINDOW_BYTES
+from .flow_screens import BrowseRequested
 from .services.report_addendum import DeclaredRegion
 from .services.report_service import (
     REPORT_CONTEXT_BYTES_DEFAULT,
@@ -836,6 +874,199 @@ class EntryJsonScreen(ModalScreen[Optional[str]]):
             self.dismiss(self.query_one("#entry_json_text", TextArea).text)
 
 
+class BulkParameterAddScreen(ModalScreen[Optional[dict]]):
+    """Bulk-add modal for A2L parameter names (US-102-04, R-B102-BULK-001..007).
+
+    Summary:
+        The popup the Check Editor's ``Add list`` control opens (the picker
+        emits ``BulkAddRequested`` and stays presentational — E3 ruling 5).
+        A multiline :class:`CappedTextArea` (the SAME capped, OS-clipboard
+        paste surface the other five paste sites use — no new ingress, S-01)
+        takes the pasted list; ``Include matches`` parses it with
+        :func:`parse_parameter_list` and includes exact source matches
+        through :meth:`A2LParameterPicker.include_names`. The modal STAYS
+        OPEN after an include so the operator can correct a mixed list
+        without losing the summary (batch-102 Inc-4 decision); only
+        ``Close`` or ``esc`` dismisses.
+
+        The summary is the modal's single feedback region
+        (F-B102-BULK-2): ``Included <n> · already included <n> · not found
+        <n>``, with `` — first missing: <name>`` when names were missed, or
+        exactly ``No listed parameters found.`` when nothing matched.
+        Every file-derived surface — the pasted buffer, the missing name —
+        reaches the screen as a literal ``Text`` through ``safe_text``
+        (R-B102-BULK-006): the summary never parses markup and the missing
+        name is scrubbed and clipped to the dialog's available width
+        (E3 ruling 2). When the buffer sits at the 64 KiB paste cap it must
+        have been truncated on ingress, so the summary carries a second
+        line: ``Input truncated at 65536 chars.`` (E3 ruling 8).
+
+        Dismiss contract (E3 ruling 6): ``esc`` and ``Close`` WITHOUT an
+        include in this session dismiss ``None`` — no re-apply, no host
+        refresh; ``Close`` AFTER a successful include dismisses with the
+        last summary dict, so the host repaints its preview/count. The
+        modal never logs the pasted content — only counts reach the log
+        (E3 ruling 10), and closing never reloads the spec or rebuilds
+        the ledger (E3 ruling 9 — the host's dismiss tail only refreshes
+        the preview).
+
+    Args:
+        picker (A2LParameterPicker): The host's embedded picker; the modal
+            applies the list through its ``include_names`` seam.
+
+    Returns:
+        Optional[dict]: The last include summary after a session that
+            included at least one name, else ``None``
+            (``ModalScreen[Optional[dict]]``).
+
+    Data Flow:
+        - ``compose`` builds a ``.modal-dialog`` with the title, the exact
+          contract instruction, ``#bulk_param_text`` (``CappedTextArea``),
+          ``#bulk_param_summary`` and the Include / Close button row.
+        - ``on_button_pressed``: Include → ``_apply_list`` (parse →
+          ``include_names`` → paint the summary); Close → dismiss.
+        - ``action_cancel`` (``esc``) → dismiss with ``None``.
+
+    Dependencies:
+        Uses:
+            - ``CappedTextArea`` / ``Button`` / the shared
+              ``.modal-dialog`` classes; ``parse_parameter_list`` /
+              ``A2LParameterPicker.include_names``; ``safe_text`` /
+              ``_clip_to_cells`` for the missing-name detail.
+        Used by:
+            - ``CheckEditorPanel._open_parameter_bulk_add``
+              (``screens_directionb.py``; Patch Editor at Inc 5).
+
+    Example:
+        >>> screen = BulkParameterAddScreen(picker)  # doctest: +SKIP
+    """
+
+    #: The contract instruction (R-B102-BULK-001): painted verbatim, as a
+    #: literal ``Text`` — never through a markup path.
+    _INSTRUCTION = "Separate names with new lines, commas, semicolons or spaces."
+
+    #: The 64 KiB paste-cap notice (E3 ruling 8): painted when the buffer
+    #: length sits AT the cap — a longer buffer is impossible through a
+    #: single capped paste, so ``len(text) >= cap`` means ingress truncated.
+    _TRUNCATED_NOTICE = f"Input truncated at {_CLIPBOARD_CAP_CHARS} chars."
+
+    #: Route initial focus to the multiline area so a paste lands there
+    #: rather than on a button; ``enter`` never confirms accidentally
+    #: (tui-design posture: only the Include action applies).
+    AUTO_FOCUS = "#bulk_param_text"
+
+    #: ``Escape`` cancels the modal, mirroring the Close button (E3 ruling
+    #: 6: cancel dismisses ``None``, without re-applying or refreshing).
+    BINDINGS = [Binding("escape", "cancel", "Cancel", show=False)]
+
+    def __init__(self, picker: A2LParameterPicker) -> None:
+        super().__init__()
+        self._picker = picker
+        #: Whether an include landed new picks in THIS session; drives the
+        #: dismiss value (E3 ruling 6).
+        self._changed = False
+        #: The last apply's summary; dismissed when ``_changed``.
+        self._last_summary: Optional[dict] = None
+
+    def compose(self) -> ComposeResult:
+        yield Container(
+            Label("Add A2L parameters", classes="modal-title"),
+            Label(Text(self._INSTRUCTION), id="bulk_param_instruction"),
+            CappedTextArea("", id="bulk_param_text"),
+            Static("", id="bulk_param_summary", markup=False),
+            Container(
+                Button(
+                    "Include matches",
+                    id="bulk_param_include_button",
+                    classes="modal-confirm",
+                ),
+                Button("Close", id="bulk_param_close_button"),
+                id="bulk_param_buttons",
+                classes="modal-buttons",
+            ),
+            id="bulk_param_dialog",
+            classes="modal-dialog",
+        )
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "bulk_param_include_button":
+            self._apply_list()
+            return
+        if event.button.id == "bulk_param_close_button":
+            # E3 ruling 6: a change-flagged close carries the summary; a
+            # no-change close dismisses ``None`` so the host repaints
+            # nothing.
+            self.dismiss(self._last_summary if self._changed else None)
+
+    def action_cancel(self) -> None:
+        """Dismiss with ``None`` — ``Escape`` mirrors the Close button."""
+        self.dismiss(None)
+
+    # ------------------------------------------------------------------
+    # Apply + summary
+    # ------------------------------------------------------------------
+
+    def _apply_list(self) -> None:
+        """Parse the buffer, include the matches, paint the summary.
+
+        R-B102-BULK-002 (split on every separator via
+        :func:`parse_parameter_list`), R-B102-BULK-004 (the fixed-order
+        summary), R-B102-BULK-005 (the exact no-match line), E3 ruling 8
+        (the 64 KiB truncation notice). Neither the buffer nor any name is
+        logged — counts only (E3 ruling 10).
+        """
+        text = self.query_one("#bulk_param_text", TextArea).text
+        names = parse_parameter_list(text)
+        summary = self._picker.include_names(names)
+        if summary["included"]:
+            self._changed = True
+            self._last_summary = summary
+        self._paint_summary(summary, truncated=len(text) >= _CLIPBOARD_CAP_CHARS)
+
+    def _paint_summary(self, summary: Mapping, *, truncated: bool) -> None:
+        """Paint the modal's single feedback region (F-B102-BULK-2).
+
+        The counts line keeps the contract's fixed order; the missing-name
+        detail is safe_text-scrubbed and clipped to the dialog width (E3
+        ruling 2); the truncation notice, when the buffer sat at the paste
+        cap, rides a second dim line so the contract line stays intact.
+        """
+        text = self._summary_text(summary)
+        if truncated:
+            text.append("\n")
+            text.append(self._TRUNCATED_NOTICE, style=DGRAY)
+        self.query_one("#bulk_param_summary", Static).update(text)
+
+    def _summary_text(self, summary: Mapping) -> Text:
+        """Build the counts line as literal text — never markup."""
+        if summary.get("parsed_unique", 0) == 0:
+            return Text("No listed parameters found.", style=DGRAY)
+        line = Text(
+            f"Included {summary['included']} · already included "
+            f"{summary['already_included']} · not found {summary['not_found']}",
+            style=DGRAY,
+        )
+        if summary["not_found"]:
+            line.append(" — first missing: ")
+            name = safe_text(str(summary["first_missing"] or "")).plain
+            budget = max(8, self._line_width_budget() - cell_len(line.plain))
+            line.append(safe_text(_clip_to_cells(name, budget)))
+        return line
+
+    def _line_width_budget(self) -> int:
+        """The summary line's cell budget: the dialog's content width.
+
+        Before the first layout pass (or when the dialog cannot be found)
+        the 118-column interior is assumed, so a pre-mount paint errs long
+        rather than clipping an honest name.
+        """
+        try:
+            width = self.query_one("#bulk_param_dialog", Container).content_region.width
+        except Exception:  # pragma: no cover - defensive seam
+            width = 0
+        return width if width > 0 else 76
+
+
 #: Static help copy for the variant-selector info modal (US-067 / LLR-067.3).
 #: One paragraph per idea, joined with blank lines. Authored free of Rich /
 #: console-markup metacharacters (``[`` / ``]`` / ``link=``) and rendered
@@ -1426,6 +1657,616 @@ class LoadFlowScreen(ModalScreen[Optional[str]]):
                 ListItem(Label(stem, markup=False), name=stem)
             )
         status.update(f"imported flows/{imported.name}")
+
+
+# ---------------------------------------------------------------------------
+# batch-102 Inc 7 (US-102-07) — the flow file-ref chooser (R-B102-FILE-002..007)
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class FileRefCandidate:
+    """One Browse candidate (E3 ruling 1).
+
+    Args:
+        label (str): The display line (scrubbed by the chooser at render).
+        ref (str): The wire value written into the host field on a direct
+            pick (project files, or a loaded artifact already inside the
+            project — its project-relative posix path).
+        origin (str): ``project`` / ``temp`` / ``loaded``.
+        source (Optional[Path]): The absolute file a temp/loaded pick must
+            import through :func:`s19_app.tui.workspace.import_external_ref`
+            before the field receives ``external/<name>``; ``None`` for a
+            direct pick.
+    """
+
+    label: str
+    ref: str
+    origin: str
+    source: Optional[Path] = None
+
+
+@dataclass(frozen=True)
+class FileRefChoice:
+    """The chooser's dismiss value: the wire ref + the origin it came from."""
+
+    ref: str
+    origin: str  # "project" | "temp" | "loaded" | "external"
+
+
+class FileRefChooserScreen(ModalScreen[Optional[FileRefChoice]]):
+    """Modal to pick the file behind one flow ref field (batch-102 Inc 7).
+
+    Summary:
+        Opened by the app when a flow host posts ``BrowseRequested``
+        (E3 ruling 2 — the app coordinates the modal, never the host).
+        Lists the three candidate sections — ``Project``, ``Temp /
+        workarea`` and ``Loaded artifacts`` — plus an external-path input
+        with an Import action (R-B102-FILE-002).  Picking a candidate
+        dismisses with its wire value and NEVER adds or edits a block
+        (R-B102-FILE-003); a temp or loaded pick whose file is not already
+        inside the active project is first imported into
+        ``<project>/external/`` through the hardened
+        :func:`import_external_ref`, so every produced value is runnable
+        by ``run_flow`` (E3 ruling 1).  Every refusal is painted in the
+        modal with its exact pinned line, names at most the file NAME
+        (never a path — E3 ruling 8), and leaves the host field untouched
+        (R-B102-FILE-005/006).  Every file-derived string renders through
+        ``safe_text``/``Content`` — literal text, zero markup spans
+        (R-B102-FILE-007).
+
+    Args:
+        candidates (Sequence[FileRefCandidate]): The app-built candidate
+            list (project/temp/loaded).
+        project_root (Optional[Path]): The active project dir — the only
+            import destination; ``None`` refuses every import with the
+            pinned no-project line.
+    """
+
+    BINDINGS = [Binding("escape", "cancel", "Cancel", show=False)]
+
+    #: The section headers, in stack order (R-B102-FILE-002: 3/3 visible).
+    _SECTION_TITLES: Tuple[Tuple[str, str], ...] = (
+        ("project", "Project"),
+        ("temp", "Temp / workarea"),
+        ("loaded", "Loaded artifacts"),
+    )
+
+    def __init__(
+        self,
+        candidates: Sequence[FileRefCandidate],
+        project_root: Optional[Path],
+    ) -> None:
+        super().__init__()
+        self._candidates = list(candidates)
+        self._project_root = project_root
+        self._pick_map: Mapping[str, FileRefCandidate] = {}
+
+    def compose(self) -> ComposeResult:
+        with Container(id="file_ref_dialog", classes="modal-dialog"):
+            yield Static(
+                "CHOOSE INPUT FILE", classes="modal-title", markup=False
+            )
+            pick_index = 0
+            for origin, title in self._SECTION_TITLES:
+                yield Static(
+                    title, classes="file-ref-section", markup=False
+                )
+                items = [c for c in self._candidates if c.origin == origin]
+                if not items:
+                    yield Static(
+                        "(none)", classes="file-ref-none", markup=False
+                    )
+                    continue
+                for candidate in items:
+                    button_id = f"file_ref_pick_{pick_index}"
+                    pick_index += 1
+                    self._pick_map[button_id] = candidate
+                    yield Button(
+                        Content(safe_text(candidate.label).plain),
+                        id=button_id,
+                        classes="file-ref-item",
+                    )
+            with Horizontal(classes="file-ref-external"):
+                yield Label(
+                    "External path", classes="flow-field-label", markup=False
+                )
+                yield OsClipboardInput(
+                    placeholder="absolute path to a file outside the project",
+                    id="flow_external_path_input",
+                    classes="file-ref-path",
+                    compact=True,
+                )
+                yield Button("Import", id="flow_external_import")
+            yield Static(
+                "", id="file_ref_status", classes="sev-warning", markup=False
+            )
+            with Horizontal(classes="modal-buttons"):
+                yield Button("Cancel", id="file_ref_cancel")
+
+    def on_mount(self) -> None:
+        self.query_one("#file_ref_status", Static).display = False
+        self.query_one("#flow_external_path_input", Input).focus()
+
+    # -- picking ----------------------------------------------------------------
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        button_id = event.button.id
+        if button_id == "file_ref_cancel":
+            self.dismiss(None)
+            return
+        if button_id == "flow_external_import":
+            raw = self.query_one("#flow_external_path_input", Input).value.strip()
+            if not raw:
+                self._paint_status(
+                    "External path is empty — type a path or pick a candidate."
+                )
+                return
+            choice = self._import_source(Path(raw))
+            if choice is not None:
+                self.dismiss(choice)
+            return
+        if button_id is not None and button_id.startswith("file_ref_pick_"):
+            candidate = self._pick_map.get(button_id)
+            if candidate is not None:
+                self._pick_candidate(candidate)
+
+    def _pick_candidate(self, candidate: FileRefCandidate) -> None:
+        """Dismiss with the candidate's wire value (R-B102-FILE-003).
+
+        A project candidate (or a loaded one already inside the project)
+        dismisses directly; a temp/loaded pick imports first (E3 ruling 1)
+        so the field receives an ``external/<name>`` value the flow can
+        actually run.  Nothing here mutates a block or the host field.
+        """
+        if candidate.source is None:
+            self.dismiss(
+                FileRefChoice(ref=candidate.ref, origin=candidate.origin)
+            )
+            return
+        choice = self._import_source(candidate.source)
+        if choice is not None:
+            self.dismiss(choice)
+
+    def _import_source(self, source: Path) -> Optional[FileRefChoice]:
+        """The hardened import; ``None`` (refusal painted) on any refusal.
+
+        The refusal messages are operator-facing and path-free (E3 ruling
+        8); nothing is copied on a refusal (R-B102-FILE-005/006).
+        """
+        try:
+            imported = import_external_ref(source, self._project_root)
+        except ExternalImportRefusal as refusal:
+            self._paint_status(str(refusal))
+            return None
+        if imported is None:  # defensive: the refusal class covers this
+            self._paint_status(
+                "Load or create a project before importing an external file."
+            )
+            return None
+        _landed, ref = imported
+        return FileRefChoice(ref=ref, origin="external")
+
+    def _paint_status(self, message: str) -> None:
+        status = self.query_one("#file_ref_status", Static)
+        status.update(safe_text(message))  # SINK: file-derived refusal text
+        status.display = True
+
+    def action_cancel(self) -> None:
+        self.dismiss(None)
+
+
+#: kind → path-bearing wire fields (the NUL pre-check set, the add form's
+#: S4-1 idiom): a candidate holding a NUL refuses before the loader runs.
+_EDIT_PATH_FIELDS: Mapping[str, Tuple[str, ...]] = {
+    BLOCK_SOURCE: ("image_ref",),
+    BLOCK_PATCH: ("change_doc_ref",),
+    BLOCK_CHECK: ("check_doc_ref",),
+    BLOCK_CRC: ("config_ref",),
+    BLOCK_WRITE_OUT: ("output_name",),
+    BLOCK_A2B: ("image_a", "image_b"),
+    BLOCK_EXTERNAL_STEP: ("log_ref", "output_path"),
+}
+
+
+class FlowBlockEditScreen(ModalScreen[Optional[FlowBlock]]):
+    """Modal to edit ONE existing flow block in place (batch-102 Inc 6).
+
+    Summary:
+        Opened by the app when the Flow Builder posts ``EditRequested``
+        (R-B102-FB-001). The dialog fixes the block kind — the title names
+        ``EDIT BLOCK #<n> — <kind>`` — and shows exactly the add-row's
+        field vocabulary for that kind, prefilled with the block's current
+        values (TC-B102-FB-01's 8/8 kinds). Save builds the candidate by
+        MERGING the modal fields over the ORIGINAL wire dict (E3 ruling 2:
+        ``file_type`` / ``a2l_ref`` / ``fmt`` and any future unexposed
+        field survive — the candidate is never rebuilt from scratch),
+        substitutes it at the picked index in the CURRENT wire envelope and
+        re-validates the whole envelope through the hardened
+        ``dict_to_flow`` loader — the same fail-closed gate Paste uses
+        (finding F-B102-FB-2: a failed edit must never corrupt the chain).
+        On findings the ORIGINAL block stays, the refusal is painted in the
+        modal (R-B102-FB-003) listing every finding, and the modal stays
+        open; on success it dismisses with the replacement block and the
+        app applies it through the panel's public ``replace_block``.
+
+        A2B bindings round-trip canonically (E3 ruling 6): shown as ``#n``
+        (1-based, the operator grammar) and saved through
+        :func:`parse_a2b_binding` as the wire form ``{"source", "ref"}``
+        (0-based) — never the display form.
+
+        batch-102 Inc 7: the READ file-ref rows carry a Browse chip that
+        posts the module-level ``BrowseRequested`` (E3 ruling 2 — the app
+        coordinates :class:`FileRefChooserScreen` and writes the pick back
+        through the public :meth:`apply_browsed_ref`; the block changes
+        only on a validated Save).
+
+        Without a containment base (E3 ruling 4) Save refuses IN the modal
+        — a hostile ref is never stored to fail later. Every file-derived
+        string (title, prefilled fields, refusal) renders literal:
+        ``safe_text`` + ``markup=False`` (R-B102-FB-006), and nothing
+        content-bearing is logged (E3 ruling 10).
+
+    Args:
+        index (int): The block's 0-based position in the chain (title is 1-based).
+        block (FlowBlock): The block being edited (frozen — never mutated).
+        wire_blocks (List[dict]): The chain's current ``flow_to_dict``
+            projection (the envelope the candidate is validated against).
+        project_dir (Optional[Path]): The resolved containment base; ``None``
+            when no project is active (Save then refuses in-modal).
+
+    Data Flow:
+        - Compose → per-kind prefilled fields (markup-safe).
+        - Save → candidate wire (merge over the original) → substituted
+          envelope → ``dict_to_flow`` → dismiss(replacement) | paint refusal.
+    """
+
+    BINDINGS = [Binding("escape", "cancel", "Cancel", show=False)]
+
+    def __init__(
+        self,
+        index: int,
+        block: FlowBlock,
+        wire_blocks: List[dict],
+        project_dir: Optional[Path],
+    ) -> None:
+        super().__init__()
+        self._index = index
+        self._block = block
+        #: A snapshot — the caller's chain can change while the modal is up;
+        #: Save re-checks the index before substituting.
+        self._wire_blocks = [dict(w) for w in wire_blocks]
+        self._project_dir = project_dir
+        if isinstance(block, A2BBlock):
+            self._first_field = "#flow_edit_ref_a"
+        elif isinstance(block, ExternalStepBlock):
+            self._first_field = "#flow_edit_ext_mode"
+        elif isinstance(block, ReportBlock):
+            self._first_field = "#flow_edit_save"
+        else:
+            self._first_field = "#flow_edit_ref"
+
+    # -- composition ---------------------------------------------------------
+
+    def compose(self) -> ComposeResult:
+        with Container(id="block_edit_dialog", classes="modal-dialog"):
+            yield Static(
+                safe_text(
+                    f"EDIT BLOCK #{self._index + 1} — {self._block.kind.upper()}"
+                ),
+                classes="modal-title",
+                markup=False,
+            )
+            block = self._block
+            if isinstance(block, SourceBlock):
+                yield from self._ref_row(
+                    "image file", block.image_ref, "flow_edit_ref",
+                    "e.g. prg.s19", browse=True,
+                )
+            elif isinstance(block, PatchBlock):
+                yield from self._ref_row(
+                    "change doc", block.change_doc_ref, "flow_edit_ref",
+                    "e.g. calib_hotfix.json", browse=True,
+                )
+            elif isinstance(block, CheckBlock):
+                yield from self._ref_row(
+                    "check doc", block.check_doc_ref, "flow_edit_ref",
+                    "e.g. baseline.chk.json", browse=True,
+                )
+                with Horizontal(classes="flow-edit-line"):
+                    yield Label("gating", classes="flow-field-label", markup=False)
+                    yield Select(
+                        (
+                            (CHECK_GATING_ADVISORY, CHECK_GATING_ADVISORY),
+                            (CHECK_GATING_BLOCK_OWN, CHECK_GATING_BLOCK_OWN),
+                        ),
+                        value=block.gating,
+                        allow_blank=False,
+                        id="flow_edit_gating",
+                        compact=True,
+                    )
+            elif isinstance(block, CrcBlock):
+                yield from self._ref_row(
+                    "CRC template", block.config_ref, "flow_edit_ref",
+                    "e.g. crc.json", browse=True,
+                )
+            elif isinstance(block, WriteOutBlock):
+                yield from self._ref_row(
+                    "output file", block.output_name, "flow_edit_ref",
+                    "e.g. fw_app_patched.s19", browse=True,
+                )
+            elif isinstance(block, A2BBlock):
+                # Bindings display as the operator grammar (#n 1-based); the
+                # wire form is rebuilt from parse_a2b_binding on Save.
+                yield from self._ref_row(
+                    "image A", _binding_field_text(block.image_a),
+                    "flow_edit_ref_a", "file or #n", browse=True,
+                )
+                yield from self._ref_row(
+                    "image B", _binding_field_text(block.image_b),
+                    "flow_edit_ref_b", "file or #n", browse=True,
+                )
+            elif isinstance(block, ExternalStepBlock):
+                with Horizontal(classes="flow-edit-line"):
+                    yield Label("mode", classes="flow-field-label", markup=False)
+                    yield Select(
+                        (
+                            ("Terminal", EXTERNAL_MODE_TERMINAL),
+                            ("Manual", EXTERNAL_MODE_MANUAL),
+                        ),
+                        value=block.mode,
+                        allow_blank=False,
+                        id="flow_edit_ext_mode",
+                        compact=True,
+                    )
+                noun = "command" if block.mode == EXTERNAL_MODE_TERMINAL else "instruction"
+                yield from self._ref_row(
+                    noun, block.instruction, "flow_edit_ext_instruction",
+                    "the exact command run outside the app",
+                )
+                yield from self._ref_row(
+                    "log", block.log_ref, "flow_edit_ext_log", "log file (required)"
+                )
+                yield from self._ref_row(
+                    "output file", block.output_path, "flow_edit_ext_output",
+                    "the file the step leaves, absolute path preferred",
+                )
+            else:
+                # ReportBlock (and any future ref-less kind): field-less by
+                # design — Save round-trips the original wire unchanged.
+                yield Label(
+                    "This block carries no editable fields.",
+                    classes="modal-hint",
+                    markup=False,
+                )
+            yield Static("", id="block_edit_refusal", markup=False, classes="sev-warning")
+            with Horizontal(id="flow_edit_buttons", classes="modal-buttons"):
+                yield Button("Save", id="flow_edit_save", classes="modal-confirm")
+                yield Button("Cancel", id="flow_edit_cancel")
+
+    def _ref_row(
+        self, label: str, value: str, input_id: str, placeholder: str,
+        *, browse: bool = False,
+    ) -> ComposeResult:
+        """One label + prefilled input row (the add-row vocabulary).
+
+        The prefill rides through ``safe_text`` (R-B102-FB-006): the block's
+        stored value is literal text — control bytes are scrubbed before it
+        enters the field, markup characters stay inert.  ``browse=True``
+        (the READ file-ref rows only, E3 ruling 6) adds the Browse chip that
+        posts :class:`BrowseRequested` for the app to coordinate
+        (batch-102 Inc 7, E3 ruling 2).
+        """
+        with Horizontal(classes="flow-edit-line"):
+            yield Label(label, classes="flow-field-label", markup=False)
+            yield OsClipboardInput(
+                value=safe_text(value).plain,
+                placeholder=placeholder,
+                id=input_id,
+                compact=True,
+            )
+            if browse:
+                browse_id = (
+                    "flow_edit_browse"
+                    if input_id == "flow_edit_ref"
+                    else f"{input_id}_browse"
+                )
+                yield Button(
+                    "Browse", id=browse_id, classes="flow-browse"
+                )
+
+    def _browse_ref(self, input_id: str) -> None:
+        """Post :class:`BrowseRequested` for one of the modal's ref fields.
+
+        The modal never pushes the chooser itself (E3 ruling 2): the app
+        pushes ``FileRefChooserScreen`` and writes the choice back through
+        the public :meth:`apply_browsed_ref`.
+        """
+        self.post_message(BrowseRequested(f"#{input_id}"))
+
+    def apply_browsed_ref(self, input_id: str, ref: str) -> None:
+        """Write a browsed ref into one of the modal's fields
+        (R-B102-FILE-003): the field updates, the block changes only on a
+        validated Save.  A stale or foreign selector is a silent no-op.
+        """
+        try:
+            widget = self.query_one(input_id, Input)
+        except Exception:  # noqa: BLE001 - a stale host selector refuses silently
+            return
+        widget.value = safe_text(ref).plain
+
+    def _kind_title(self) -> str:
+        """The title's kind word — the add-row look-up table, else the raw kind."""
+        titles = {
+            BLOCK_SOURCE: "LOAD",
+            BLOCK_PATCH: "PATCH",
+            BLOCK_CHECK: "CHECK",
+            BLOCK_CRC: "CRC",
+            BLOCK_WRITE_OUT: "WRITE-OUT",
+            BLOCK_A2B: "A2B-DIFF",
+            BLOCK_EXTERNAL_STEP: "EXT-STEP",
+            BLOCK_REPORT: "REPORT",
+        }
+        return titles.get(self._block.kind, self._block.kind.upper())
+
+    def on_mount(self) -> None:
+        self.query_one("#block_edit_refusal", Static).display = False
+        first_field = self._first_field
+        self.query_one(first_field).focus()
+
+    # -- save / cancel -------------------------------------------------------
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        button_id = event.button.id
+        if button_id == "flow_edit_browse":
+            self._browse_ref("flow_edit_ref")
+            return
+        if (
+            button_id is not None
+            and button_id.startswith("flow_edit_")
+            and button_id.endswith("_browse")
+        ):
+            self._browse_ref(button_id[: -len("_browse")])
+            return
+        if button_id == "flow_edit_save":
+            self._save()
+        elif button_id == "flow_edit_cancel":
+            self.dismiss(None)
+
+    def action_cancel(self) -> None:
+        self.dismiss(None)
+
+    def _save(self) -> None:
+        """Validate the merged candidate against the chain; dismiss or refuse.
+
+        R-B102-FB-002 / R-B102-FB-003 / E3 rulings 2/4/6/7: without a base
+        the refusal is painted here (nothing hostile is kept); the candidate
+        merges over the original wire (unexposed fields survive); the
+        substituted envelope re-runs the hardened loader — any finding keeps
+        the original block and paints EVERY finding in the modal.
+        """
+        if self._project_dir is None:
+            self._paint_refusal(
+                "Edit refused: load a project first (the edit is checked "
+                "against the session directory)."
+            )
+            return
+        candidate, refusal = self._candidate_wire()
+        if refusal is not None:
+            self._paint_refusal(refusal)
+            return
+        if not 0 <= self._index < len(self._wire_blocks):
+            self._paint_refusal(
+                f"Edit refused: the chain no longer holds block "
+                f"#{self._index + 1}."
+            )
+            return
+        envelope_blocks = [
+            *self._wire_blocks[: self._index],
+            candidate,
+            *self._wire_blocks[self._index + 1 :],
+        ]
+        from .services import flow_persistence_service as fps
+
+        envelope = {
+            "schema_version": 1,
+            "name": "block-edit",
+            "blocks": envelope_blocks,
+        }
+        parsed, findings = fps.dict_to_flow(envelope, self._project_dir)
+        if parsed is None or findings:
+            messages = [
+                safe_text(finding.message).plain for finding in findings
+            ] or ["invalid block"]
+            self._paint_refusal("Edit refused: " + "; ".join(messages))
+            return
+        self.dismiss(parsed.blocks[self._index])
+
+    def _field_text(self, input_id: str) -> str:
+        """One modal input's value, stripped — the Add form's grammar."""
+        return self.query_one(input_id, Input).value.strip()
+
+    def _candidate_wire(self) -> Tuple[Optional[dict], Optional[str]]:
+        """The candidate wire dict: the ORIGINAL merged with the modal fields.
+
+        E3 ruling 2 — never rebuilt from scratch: the canonical
+        ``flow_to_dict`` projection of the edited block is copied and only
+        the exposed fields are overwritten, so ``file_type`` / ``a2l_ref`` /
+        ``fmt`` and any future unexposed field round-trip untouched. A2B
+        bindings save the canonical wire form via ``parse_a2b_binding``;
+        a NUL in a path-bearing field refuses with the loader's code (the
+        add form's S4-1 idiom) before the loader ever runs.
+        """
+        from .services import flow_persistence_service as fps
+
+        original = fps.flow_to_dict(
+            Flow(name="block-edit", blocks=[self._block])
+        )["blocks"][0]
+        candidate = dict(original)
+        block = self._block
+        text = self._field_text
+        if isinstance(block, SourceBlock):
+            candidate["image_ref"] = text("#flow_edit_ref")
+        elif isinstance(block, PatchBlock):
+            candidate["change_doc_ref"] = text("#flow_edit_ref")
+        elif isinstance(block, CheckBlock):
+            candidate["check_doc_ref"] = text("#flow_edit_ref")
+            candidate["gating"] = str(
+                self.query_one("#flow_edit_gating", Select).value
+            )
+        elif isinstance(block, CrcBlock):
+            candidate["config_ref"] = text("#flow_edit_ref")
+        elif isinstance(block, WriteOutBlock):
+            candidate["output_name"] = text("#flow_edit_ref")
+        elif isinstance(block, A2BBlock):
+            for field, input_id in (
+                ("image_a", "#flow_edit_ref_a"),
+                ("image_b", "#flow_edit_ref_b"),
+            ):
+                binding = parse_a2b_binding(text(input_id))
+                if binding is None:
+                    return None, (
+                        f"Edit refused: {field} must be a file name or #<n> "
+                        "(a flow output)."
+                    )
+                candidate[field] = {"source": binding.source, "ref": binding.ref}
+        elif isinstance(block, ExternalStepBlock):
+            candidate["mode"] = str(
+                self.query_one("#flow_edit_ext_mode", Select).value
+            )
+            candidate["instruction"] = text("#flow_edit_ext_instruction")
+            candidate["log_ref"] = text("#flow_edit_ext_log")
+            candidate["output_path"] = text("#flow_edit_ext_output")
+        for field in _EDIT_PATH_FIELDS.get(block.kind, ()):
+            value = candidate.get(field)
+            if isinstance(value, dict):
+                value = value.get("ref", "")
+            if isinstance(value, str) and "\x00" in value:
+                return None, (
+                    f"Edit refused: [{fps.FLOW_UNSAFE_REF}] "
+                    f"{self._kind_title()} {field} holds a NUL character "
+                    "- not a path"
+                )
+        return candidate, None
+
+    def _paint_refusal(self, message: str) -> None:
+        """Paint the in-modal refusal (markup-safe; empty hides the region)."""
+        refusal = self.query_one("#block_edit_refusal", Static)
+        if message:
+            refusal.update(safe_text(message))
+            refusal.display = True
+        else:
+            refusal.update("")
+            refusal.display = False
+
+
+def _binding_field_text(binding) -> str:
+    """The operator display form of one A2B binding: ``#n`` 1-based for a
+    flow output, the file ref verbatim otherwise (never the ``.out`` stub
+    form — the modal field must re-parse through ``parse_a2b_binding``)."""
+    if binding.source == A2B_INPUT_FLOW:
+        return f"#{int(binding.ref) + 1}"
+    return binding.ref
 
 
 class ConfirmDiscardScreen(ModalScreen[bool]):

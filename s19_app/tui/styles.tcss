@@ -1629,6 +1629,34 @@ ModalScreen {
     height: 1fr;
 }
 
+/* --- Bulk-add popup (batch-102 Inc 4, US-102-04 / R-B102-BULK-001..007) ---
+ * Reuses the shared `.modal-dialog` box model. The multiline area is a FIXED
+ * height (not 1fr) because this dialog is `height: auto` like the small
+ * pickers — a fractional child would collapse the auto pass. The summary
+ * line sits dim under the area (tui-design: the text area is the figure,
+ * summary and actions secondary); it may grow to two rows when the 64 KiB
+ * truncation notice rides along (E3 ruling 8), so it is `height: auto` with
+ * a one-row floor. Measured at 80x24: dialog ≈ 16 rows, well inside the
+ * screen; the dialog width stays the shared 70 %. */
+#bulk_param_text {
+    border: round $rule;
+    background: $bg-base;
+    height: 8;
+    margin-bottom: 1;
+}
+
+#bulk_param_instruction {
+    color: $fg-base;
+    padding: 0 1;
+}
+
+#bulk_param_summary {
+    height: auto;
+    min-height: 1;
+    padding: 0 1;
+    color: $fg-base;
+}
+
 /* --- Legend modal (batch-18, LLR-023.1) ---------------------------------
  * Reuses the shared `.modal-dialog` token styling; caps the dialog height
  * and scrolls the body so the full A2L/MAC/Issues legend fits the 80- and
@@ -2595,6 +2623,7 @@ ModalScreen {
 #check_legend,
 #check_status,
 #check_apply_hint,
+#check_param_status,
 #check_editor_panel .ce-hint {
     text-wrap: nowrap;
     text-overflow: ellipsis;
@@ -2603,6 +2632,26 @@ ModalScreen {
 #check_full_name_line {
     height: 1;
     padding: 0 1;
+}
+
+/* The picker's separate count line (batch-102 Inc 3, R-B102-SEL-002):
+ * ``<shown> of <total> shown`` (+ `` — refine filter.`` when a filter is
+ * active and its result exceeds one page). Dim secondary information; hidden
+ * in the two empty states, where #check_full_name_line carries the message
+ * (R-B102-SEL-006). */
+#check_param_status {
+    height: 1;
+    padding: 0 1;
+    color: #969aad;                   /* insight_style.DGRAY */
+}
+
+/* The pagination chip pair's page read-out, one row beside Prev/Next. */
+#check_param_page_label {
+    width: auto;
+    height: 1;
+    padding: 0 1;
+    margin-right: 1;
+    color: #969aad;                   /* insight_style.DGRAY */
 }
 
 #check_param_controls,
@@ -2972,11 +3021,80 @@ ModalScreen {
 /* The JSON tab: LOADED DOCUMENT (read-only) over the PASTE BUFFER, then the
  * paste, history and execute rows; the two text areas share the height. */
 #patch_editor_panel #patch_win_json,
-#patch_editor_panel #patch_win_checks {
+#patch_editor_panel #patch_win_checks,
+#patch_editor_panel #patch_win_a2l {
     height: 100%;
     layout: vertical;
     /* Below the range (LLR-149.6) the tab's rows outgrow it: it scrolls. */
     overflow-y: auto;
+}
+
+/* --- Patch A2L tab (batch-102 Inc 5, US-102-05 / R-B102-PE-001..006) ---
+ * The shared picker mounts inside the inspector with patch_param_* ids; the
+ * grammar mirrors the Check Editor's picker (filter, ledger, full-name and
+ * count lines, page chips), scoped to the patch panel. */
+#patch_editor_panel #patch_win_a2l .ce-row {
+    layout: horizontal;
+    height: 1;
+    padding: 0;
+}
+
+#patch_editor_panel #patch_win_a2l .ce-label {
+    width: auto;
+    height: 1;
+    padding: 0 1 0 0;
+    color: #969aad;                   /* insight_style.DGRAY */
+}
+
+#patch_editor_panel #patch_param_filter {
+    width: 1fr;
+}
+
+#patch_editor_panel #patch_param_table {
+    height: 1fr;
+    scrollbar-gutter: stable;
+    scrollbar-size-vertical: 1;
+}
+
+#patch_editor_panel #patch_param_full_name_line,
+#patch_editor_panel #patch_param_status,
+#patch_editor_panel #patch_param_use_status {
+    height: 1;
+    padding: 0 1;
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
+}
+
+#patch_editor_panel #patch_param_status,
+#patch_editor_panel #patch_param_use_status {
+    color: #969aad;                   /* insight_style.DGRAY */
+}
+
+#patch_editor_panel #patch_param_use_status {
+    width: 1fr;
+    min-width: 1;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+#patch_editor_panel #patch_param_use_row {
+    width: 1fr;
+    overflow: hidden;
+}
+
+#patch_editor_panel #patch_param_page_label {
+    width: auto;
+    height: 1;
+    padding: 0 1;
+    margin-right: 1;
+    color: #969aad;                   /* insight_style.DGRAY */
+}
+
+#patch_editor_panel #patch_param_controls,
+#patch_editor_panel #patch_param_use_row {
+    layout: horizontal;
+    height: 1;
+    padding: 0;
 }
 
 #patch_editor_panel #patch_json_view,
@@ -3769,4 +3887,123 @@ ModalScreen {
 
 .result-problem {
     height: auto;
+}
+
+/* --- Flow block edit popup (batch-102 Inc 6, US-102-06) ----------------
+ * Reuses the shared `.modal-dialog` box model. One label + input per row
+ * (the add-row vocabulary): the label column is fixed so every input
+ * aligns, each input takes the remaining width, and the refusal line sits
+ * above the buttons. Colors resolve through the shared modal tokens.
+ * APPENDED at the end of the sheet on purpose: the flow-execution CSS
+ * guard requires every earlier byte to stay a prefix of this file. */
+#block_edit_dialog .flow-edit-line {
+    height: 1;
+    padding: 0 1;
+}
+
+#block_edit_dialog .flow-edit-line .flow-field-label {
+    width: 14;
+    padding: 0 1 0 0;
+    color: #969aad;                   /* insight_style.DGRAY */
+}
+
+#block_edit_dialog .flow-edit-line Input {
+    width: 1fr;
+}
+
+#block_edit_refusal {
+    height: auto;
+    padding: 0 1;
+}
+
+/* --- Flow file-ref chooser + Browse chips (batch-102 Inc 7, US-102-07) ----
+ * Reuses the shared `.modal-dialog` box model.  The chooser stacks three
+ * dim section headers (Project / Temp / workarea / Loaded artifacts) over
+ * flat one-row candidate items, then the external-path row and the pinned
+ * refusal line; the box is capped so the 80x24 screen keeps the buttons
+ * reachable.  The Browse chips collapse Button's 3-row shape to one row
+ * inside the add row and the block-edit lines (the panel side inherits
+ * the one-row `#flow_panel Button` rule above).  APPENDED at the end of
+ * the sheet on purpose: the flow-execution CSS guard requires every
+ * earlier byte to stay a prefix of this file. */
+#file_ref_dialog {
+    width: 60%;
+    max-width: 96;
+    height: auto;
+    max-height: 90%;
+}
+
+#file_ref_dialog .file-ref-section {
+    height: 2;
+    padding: 1 1 0 1;
+    text-style: bold;
+    color: #969aad;                   /* insight_style.DGRAY */
+}
+
+#file_ref_dialog .file-ref-item {
+    width: 1fr;
+    min-width: 1;
+    height: 1;
+    border: none;
+    padding: 0 1;
+    margin: 0 0 0 2;
+    text-align: left;
+    background: $bg-base;
+    color: $fg-base;
+}
+
+#file_ref_dialog .file-ref-item:hover,
+#file_ref_dialog .file-ref-item:focus {
+    background: $rule;
+    color: $fg-base;
+    text-style: none;
+}
+
+#file_ref_dialog .file-ref-none {
+    height: 1;
+    padding: 0 1 0 3;
+    color: #969aad;                   /* insight_style.DGRAY */
+}
+
+#file_ref_dialog .file-ref-external {
+    height: 2;
+    padding: 1 1 0 1;
+}
+
+#file_ref_dialog .file-ref-external .flow-field-label {
+    width: 14;
+    padding: 0 1 0 0;
+    color: #969aad;                   /* insight_style.DGRAY */
+}
+
+#file_ref_dialog .file-ref-path {
+    width: 1fr;
+    margin-right: 1;
+}
+
+#file_ref_dialog #file_ref_status {
+    height: auto;
+    padding: 0 1;
+}
+
+#file_ref_dialog .modal-buttons {
+    height: auto;
+    padding: 1 1 0 1;
+}
+
+#block_edit_dialog .flow-browse,
+#file_ref_dialog .flow-browse {
+    width: 10;
+    min-width: 4;
+    height: 1;
+    min-height: 1;
+    border: none;
+    padding: 0;
+    margin-right: 1;
+    background: $bg-panel;
+    color: $accent-calm;
+}
+
+#block_edit_dialog .flow-browse:focus {
+    text-style: bold reverse;
 }

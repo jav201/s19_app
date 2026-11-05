@@ -71,14 +71,26 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
         "steps": (
             "Edit a change-set: the PATCH SCRIPT ledger on the left lists its "
             "entries; the inspector on the right shows the highlighted entry "
-            "and holds the Inspector, JSON and Checks tabs. Load an S19/HEX "
-            "image first (`^L`) to see the bytes an entry replaces.",
+            "and holds the Inspector, JSON, Checks and A2L tabs. Load an "
+            "S19/HEX image first (`^L`) to see the bytes an entry replaces.",
             "Inspector — shows the highlighted entry's BEFORE → AFTER bytes, "
             "the entry form and the DOCUMENT tally.",
             "JSON — shows the loaded document as read-only JSON under its "
             "stamp, and the editable paste buffer.",
             "Checks — shows the declaration faults and the check results, "
             "with Run checks.",
+            "A2L — lists the loaded A2L's measurable parameters (filter, "
+            "one 200-row page at a time); the highlighted row's full name "
+            "and address sit under the ledger.",
+            "Filter — narrows the A2L PARAMETERS ledger to the names that "
+            "contain the typed text.",
+            "Prev — turns the A2L PARAMETERS ledger to the previous page; "
+            "disabled on the first page.",
+            "Next — turns the ledger to the next page; disabled on the last "
+            "page, so a long A2L is walked page by page.",
+            "Use parameter — on the A2L tab, copies the highlighted "
+            "parameter's address and the loaded image's current bytes into "
+            "the entry form; the document changes only through Add or Edit.",
             "Address — the entry's start address, `0x…` hex.",
             "String — a text value, written in the document's encoding.",
             "Bytes — every token is a hex byte (1–2 digits, `0x` optional); "
@@ -241,6 +253,25 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "of block n.",
             "image B — the second A2B input, the same way; at least one input "
             "comes from this chain.",
+            "· source — under a card's file input, where that file comes "
+            "from: project, temp (the workarea temp folder), loaded (an "
+            "artifact loaded now) or external (imported into the project's "
+            "`external\\` folder); a bold `missing: <name>` names a ref "
+            "nothing provides (R-B102-FILE-001).",
+            "Browse — beside a file ref field (and in the block edit "
+            "dialog), opens a chooser listing the project's files, the "
+            "workarea temp files and the loaded artifacts; a pick only "
+            "fills the field — the block changes with Add or Save "
+            "(R-B102-FILE-002/003).  A temp or loaded file outside the "
+            "project is copied into the project's `external\\` folder "
+            "first, so the chain can run it (E3 ruling 1); an existing "
+            "name gets a `-1`, `-2`, … suffix, never an overwrite.",
+            "External path — in the chooser, type an absolute path and "
+            "press Import to bring an outside file into the project's "
+            "`external\\` folder; without a project the import refuses "
+            "with `Load or create a project before importing an external "
+            "file.`, and an unreadable file with `External file not "
+            "readable: <name>` (R-B102-FILE-004..006).",
             "mode — Terminal: a command run outside the app; Manual: an "
             "instruction for a human.",
             "command — the exact command run outside the app (Terminal mode).",
@@ -250,10 +281,16 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "beside it; an empty required field, or one holding a NUL "
             "character, is named on the line above Run and nothing is added.",
             "copy block # — the number of the block Copy takes; empty takes "
-            "the last block.",
+            "the last block. Edit and Remove use the same number, which "
+            "must be between 1 and the chain's length.",
             "Copy — copies that block to the clipboard.",
             "Paste — appends the clipboard's block to the chain, checked "
             "against this project.",
+            "Edit — opens the picked block in an edit dialog carrying its "
+            "current values; Save replaces only that block, checked "
+            "against this project, or names the refusal in the dialog.",
+            "Remove — asks, then deletes only the picked block; variables "
+            "and the clipboard are kept, and #n bindings are not rewritten.",
             "Variables — shows or hides the variables editor; the count is "
             "the number of variables declared.",
             "variable — a placeholder name of capitals, digits and _ (for "
@@ -438,6 +475,15 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "Include parameter — adds the highlighted ledger row to the "
             "REPORT FIELDS, or removes it when it is already included; the "
             "line under the ledger shows that row's full name and address.",
+            "Add list — opens the bulk-add popup: paste many A2L names at "
+            "once, separated by new lines, commas, semicolons or spaces; "
+            "Include matches adds every listed name found in the A2L, and "
+            "the summary line counts the included, the already included and "
+            "the not found; esc closes the popup.",
+            "Prev — turns the A2L PARAMETERS ledger to the previous page; "
+            "disabled on the first page.",
+            "Next — turns the ledger to the next page; disabled on the last "
+            "page, so a long A2L is walked page by page.",
             "enter — on the ledger, includes or excludes the highlighted "
             "row, like space; on a chip or button, presses it.",
             "Fields — shows the included fields, one line each, then the "

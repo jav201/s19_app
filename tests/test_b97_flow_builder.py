@@ -916,19 +916,29 @@ def test_tc_b97_20_hostile_refs_render_literally(tmp_path: Path) -> None:
 
 
 def test_tc_b97_47_copy_paste_strip_on_one_row_inside(tmp_path: Path) -> None:
-    """TC-B97-47 (LLR-146.9): ``#flow_pick``, ``#flow_copy``, ``#flow_paste``
-    and ``#flow_clip_status`` share one painted row, each 1 row tall and inside
-    the panel region; copying block 2 and pasting it through the chips adds one
-    card.
+    """TC-B97-47 (LLR-146.9): ``#flow_pick``, ``#flow_copy``, ``#flow_paste``,
+    ``#flow_edit``, ``#flow_remove`` and ``#flow_clip_status`` share one
+    painted row, each 1 row tall and inside the panel region; copying block 2
+    and pasting it through the chips adds one card.
+
+    batch-102 Inc 6 (E3 ruling 11) extends the strip census with the two new
+    chips — the row must still contain them at 118x54 (and 80x24, pinned in
+    ``tests/test_b102_flow_block_edit.py``).
 
     RED on main (P-10): ``#flow_clip_status`` overflows the panel. Mutation:
     the status given a fixed width wider than what is left on the row.
+    RED on the pre-Inc-6 tree: ``#flow_edit`` / ``#flow_remove`` do not ship —
+    the census documents the target state and flips green with the component
+    (the Inc-4 census idiom).
     """
 
     async def body(app, pilot, panel, project_dir):
         await load_flow(app, pilot, "patch_chain")
-        ids = ("flow_pick", "flow_copy", "flow_paste", "flow_clip_status")
-        regions = [panel.query_one(f"#{i}").region for i in ids]
+        ids = (
+            "flow_pick", "flow_copy", "flow_paste",
+            "flow_edit", "flow_remove", "flow_clip_status",
+        )
+        regions = [need(panel, f"#{i}").region for i in ids]
         box = panel.region
         inside = [i for i, r in zip(ids, regions) if r.x >= box.x and r.right <= box.right]
         assert inside == list(ids), f"outside the panel: {set(ids) - set(inside)}"
@@ -1195,12 +1205,26 @@ def test_tc_b97_50_run_requests_the_single_image_scope(tmp_path: Path) -> None:
 
 KIND_CHIPS = tuple(f"flow_palette_{k}" for k in KINDS)
 #: LLR-146.13's groups, in order, with the EXT-STEP form and the funnel editor open.
+#: batch-102 Inc 6 (E3 ruling 11) extends the copy/paste strip group with the
+#: ``#flow_edit`` / ``#flow_remove`` chips the extended row composes after
+#: ``#flow_paste`` (the focus chain sorts by region, so the group order holds
+#: once the chips ship; on the pre-Inc-6 tree the group keeps its old members
+#: and the census stays green).
+#: batch-102 Inc 7 (E3 ruling 2) extends the add-form fields group with the
+#: three Browse chips — ``#flow_browse`` beside ``#flow_ref`` and
+#: ``#flow_ref_a_browse`` / ``#flow_ref_b_browse`` beside the A2B bindings.
+#: At the census state (EXT-STEP chosen) they are hidden, so on the pre-Inc-7
+#: tree the group keeps its old members and the census stays green; the group
+#: membership pins where the chips ride once they ship (the Inc-6 idiom).
 KEY_GROUPS = (
     ("open_folder_flows", "window_help_flow"),
     KIND_CHIPS,
-    ("flow_ext_mode", "flow_ext_instruction", "flow_ext_log", "flow_ext_output"),
+    (
+        "flow_ext_mode", "flow_ext_instruction", "flow_ext_log", "flow_ext_output",
+        "flow_browse", "flow_ref_a_browse", "flow_ref_b_browse",
+    ),
     ("flow_add",),
-    ("flow_pick", "flow_copy", "flow_paste"),
+    ("flow_pick", "flow_copy", "flow_paste", "flow_edit", "flow_remove"),
     ("flow_funnel_toggle",),
     ("flow_funnel_name", "flow_funnel_value", "flow_funnel_add"),
     ("flow_run", "flow_clear", "flow_save", "flow_load"),

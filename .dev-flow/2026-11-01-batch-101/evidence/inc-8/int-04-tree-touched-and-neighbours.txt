@@ -1,0 +1,316 @@
+# INT-04 (E4 integration) - GREEN on the merged tree after the integration fixes: 51 files run one by one (the touched modules' tests, every test importing crc / crc_config / flow_execution_service / flow_model / flow_report_service, test_crc_kernel, the guards test_id_registry, test_batch91_registry_hygiene, test_requirements_canon, and the two new files). Result: 1218 passed, 1 skipped, 0 failed.
+# Env: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<TMP>/la, timeout 1800, interpreter <HOME>/anaconda3/envs/s19env/python.exe, -p no:cacheprovider, --basetemp <TMP>/bt*; s19_app.__file__ printed first.
+#
+
+===== per-file summary =====
+test_b100_load_dialog rc=0 772s | 158 passed, 1 skipped in 769.84s (0:12:49)
+test_b102_flow_block_edit rc=0 124s | 34 passed in 121.78s (0:02:01)
+test_b102_flow_file_chooser rc=0 129s | 41 passed in 126.24s (0:02:06)
+test_b97_chips_help rc=0 378s | 79 passed in 375.44s (0:06:15)
+test_b97_flow_builder rc=0 221s | 69 passed in 218.59s (0:03:38)
+test_b97_flow_execution rc=0 432s | 75 passed in 429.71s (0:07:09)
+test_b99_crc_region rc=0 42s | 8 passed in 40.87s
+test_b99_patch_truth rc=0 26s | 20 passed in 23.36s
+test_b99_staging rc=0 88s | 31 passed in 85.48s (0:01:25)
+test_b99_truncation rc=0 25s | 24 passed in 23.73s
+test_changes_symbol_entries rc=0 2s | 46 passed in 0.94s
+test_crc_config rc=0 1s | 35 passed in 0.53s
+test_crc_designer_model rc=0 1s | 26 passed in 0.47s
+test_crc_designer_view rc=0 122s | 40 passed in 119.38s (0:01:59)
+test_crc_engine rc=0 1s | 20 passed in 0.52s
+test_crc_job_upconvert rc=0 2s | 13 passed in 0.48s
+test_crc_operation rc=0 1s | 30 passed in 0.67s
+test_crc_template_loader rc=0 1s | 6 passed in 0.48s
+test_crc_word_codec rc=0 2s | 13 passed in 0.47s
+test_flow_a2b_b94 rc=0 1s | 13 passed in 0.60s
+test_flow_builder_render rc=0 25s | 11 passed in 23.27s
+test_flow_chainset_b94 rc=0 2s | 8 passed in 0.86s
+test_flow_crc_block rc=0 1s | 12 passed in 0.64s
+test_flow_crc_ribbon rc=0 12s | 5 passed in 10.41s
+test_flow_crc_ui rc=0 4s | 2 passed in 2.71s
+test_flow_execution rc=0 1s | 4 passed in 0.49s
+test_flow_execution_service rc=0 1s | 15 passed in 0.73s
+test_flow_external_step_b96 rc=0 11s | 8 passed in 9.97s
+test_flow_funnel_b96 rc=0 9s | 7 passed in 7.23s
+test_flow_model rc=0 1s | 4 passed in 0.41s
+test_flow_multi_image rc=0 1s | 11 passed in 0.52s
+test_flow_multi_image_ui rc=0 6s | 8 passed in 5.08s
+test_flow_persistence rc=0 2s | 40 passed in 0.74s
+test_flow_report_ac6_golden rc=0 1s | 3 passed in 0.43s
+test_flow_report_fusion rc=0 1s | 13 passed in 0.45s
+test_flow_report_service rc=0 1s | 41 passed in 0.89s
+test_flow_report_ui rc=0 7s | 3 passed in 5.03s
+test_flow_report_wire rc=0 1s | 11 passed in 0.79s
+test_patch_dual_entry rc=0 1s | 4 passed in 0.47s
+test_report_document_bytes rc=0 2s | 7 passed in 0.77s
+test_report_filter rc=0 2s | 57 passed in 0.72s
+test_tui_crc_surface rc=0 109s | 14 passed in 107.46s (0:01:47)
+test_tui_flow_builder_b94 rc=0 25s | 5 passed in 23.43s
+test_tui_flow_execution_b94 rc=0 69s | 11 passed in 67.00s (0:01:06)
+test_tui_flow_persistence_ui rc=0 23s | 7 passed in 21.25s
+test_crc_kernel rc=0 2s | 19 passed in 0.58s
+test_id_registry rc=0 5s | 12 passed in 4.71s
+test_batch91_registry_hygiene rc=0 1s | 2 passed in 0.44s
+test_requirements_canon rc=0 2s | 11 passed in 0.65s
+test_b101_crc_model_and_reasons rc=0 19s | 38 passed in 17.72s
+test_b101_flow_ext_copy rc=0 9s | 44 passed in 7.86s
+ALL-DONE tree
+
+===== tests/test_b100_load_dialog.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+.....................................................................s.. [ 45%]
+........................................................................ [ 90%]
+...............                                                          [100%]
+158 passed, 1 skipped in 769.84s (0:12:49)
+
+===== tests/test_b102_flow_block_edit.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+..................................                                       [100%]
+34 passed in 121.78s (0:02:01)
+
+===== tests/test_b102_flow_file_chooser.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+.........................................                                [100%]
+41 passed in 126.24s (0:02:06)
+
+===== tests/test_b97_chips_help.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+........................................................................ [ 91%]
+.......                                                                  [100%]
+79 passed in 375.44s (0:06:15)
+
+===== tests/test_b97_flow_builder.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+.....................................................................    [100%]
+69 passed in 218.59s (0:03:38)
+
+===== tests/test_b97_flow_execution.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+........................................................................ [ 96%]
+...                                                                      [100%]
+75 passed in 429.71s (0:07:09)
+
+===== tests/test_b99_crc_region.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+........                                                                 [100%]
+8 passed in 40.87s
+
+===== tests/test_b99_patch_truth.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+....................                                                     [100%]
+20 passed in 23.36s
+
+===== tests/test_b99_staging.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+...............................                                          [100%]
+31 passed in 85.48s (0:01:25)
+
+===== tests/test_b99_truncation.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+........................                                                 [100%]
+24 passed in 23.73s
+
+===== tests/test_changes_symbol_entries.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+..............................................                           [100%]
+46 passed in 0.94s
+
+===== tests/test_crc_config.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+...................................                                      [100%]
+35 passed in 0.53s
+
+===== tests/test_crc_designer_model.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+..........................                                               [100%]
+26 passed in 0.47s
+
+===== tests/test_crc_designer_view.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+........................................                                 [100%]
+40 passed in 119.38s (0:01:59)
+
+===== tests/test_crc_engine.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+....................                                                     [100%]
+20 passed in 0.52s
+
+===== tests/test_crc_job_upconvert.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+.............                                                            [100%]
+13 passed in 0.48s
+
+===== tests/test_crc_operation.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+..............................                                           [100%]
+30 passed in 0.67s
+
+===== tests/test_crc_template_loader.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+......                                                                   [100%]
+6 passed in 0.48s
+
+===== tests/test_crc_word_codec.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+.............                                                            [100%]
+13 passed in 0.47s
+
+===== tests/test_flow_a2b_b94.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+.............                                                            [100%]
+13 passed in 0.60s
+
+===== tests/test_flow_builder_render.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+...........                                                              [100%]
+11 passed in 23.27s
+
+===== tests/test_flow_chainset_b94.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+........                                                                 [100%]
+8 passed in 0.86s
+
+===== tests/test_flow_crc_block.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+............                                                             [100%]
+12 passed in 0.64s
+
+===== tests/test_flow_crc_ribbon.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+.....                                                                    [100%]
+5 passed in 10.41s
+
+===== tests/test_flow_crc_ui.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+..                                                                       [100%]
+2 passed in 2.71s
+
+===== tests/test_flow_execution.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+....                                                                     [100%]
+4 passed in 0.49s
+
+===== tests/test_flow_execution_service.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+...............                                                          [100%]
+15 passed in 0.73s
+
+===== tests/test_flow_external_step_b96.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+........                                                                 [100%]
+8 passed in 9.97s
+
+===== tests/test_flow_funnel_b96.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+.......                                                                  [100%]
+7 passed in 7.23s
+
+===== tests/test_flow_model.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+....                                                                     [100%]
+4 passed in 0.41s
+
+===== tests/test_flow_multi_image.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+...........                                                              [100%]
+11 passed in 0.52s
+
+===== tests/test_flow_multi_image_ui.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+........                                                                 [100%]
+8 passed in 5.08s
+
+===== tests/test_flow_persistence.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+........................................                                 [100%]
+40 passed in 0.74s
+
+===== tests/test_flow_report_ac6_golden.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+...                                                                      [100%]
+3 passed in 0.43s
+
+===== tests/test_flow_report_fusion.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+.............                                                            [100%]
+13 passed in 0.45s
+
+===== tests/test_flow_report_service.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+.........................................                                [100%]
+41 passed in 0.89s
+
+===== tests/test_flow_report_ui.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+...                                                                      [100%]
+3 passed in 5.03s
+
+===== tests/test_flow_report_wire.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+...........                                                              [100%]
+11 passed in 0.79s
+
+===== tests/test_patch_dual_entry.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+....                                                                     [100%]
+4 passed in 0.47s
+
+===== tests/test_report_document_bytes.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+.......                                                                  [100%]
+7 passed in 0.77s
+
+===== tests/test_report_filter.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+.........................................................                [100%]
+57 passed in 0.72s
+
+===== tests/test_tui_crc_surface.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+..............                                                           [100%]
+14 passed in 107.46s (0:01:47)
+
+===== tests/test_tui_flow_builder_b94.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+.....                                                                    [100%]
+5 passed in 23.43s
+
+===== tests/test_tui_flow_execution_b94.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+...........                                                              [100%]
+11 passed in 67.00s (0:01:06)
+
+===== tests/test_tui_flow_persistence_ui.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+.......                                                                  [100%]
+7 passed in 21.25s
+
+===== tests/test_crc_kernel.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+...................                                                      [100%]
+19 passed in 0.58s
+
+===== tests/test_id_registry.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+............                                                             [100%]
+12 passed in 4.71s
+
+===== tests/test_batch91_registry_hygiene.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+..                                                                       [100%]
+2 passed in 0.44s
+
+===== tests/test_requirements_canon.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+...........                                                              [100%]
+11 passed in 0.65s
+
+===== tests/test_b101_crc_model_and_reasons.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+......................................                                   [100%]
+38 passed in 17.72s
+
+===== tests/test_b101_flow_ext_copy.py =====
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+............................................                             [100%]
+44 passed in 7.86s

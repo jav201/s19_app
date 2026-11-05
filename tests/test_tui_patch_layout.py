@@ -107,14 +107,18 @@ _BUTTON_HOMES = (
     "patch_pane_inspector",
     "patch_win_json",
     "patch_win_checks",
+    "patch_win_a2l",
     "patch_doc_file_row",
     "patch_doc_controls",
 )
 # batch-97: the tab chip that shows each tab-resident home.
+# batch-102 Inc 5 (E3 ruling 8): the A2L tab's pane joins the map — on the
+# pre-integration tree no button lives there, so the entry never fires.
 _TAB_FOR_HOME = {
     "patch_pane_inspector": "patch_tab_inspector",
     "patch_win_json": "patch_tab_json",
     "patch_win_checks": "patch_tab_checks",
+    "patch_pane_a2l": "patch_tab_a2l",
 }
 
 # Pilot-measured usable floor (M-Q1 / C-23). Measured window minimums:

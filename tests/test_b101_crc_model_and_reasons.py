@@ -31,8 +31,9 @@ from s19_app.tui.operations.model import OperationInput
 from s19_app.tui.screens import OperationsScreen
 from s19_app.tui.services.flow_execution_service import run_flow
 from s19_app.tui.services.flow_model import (
+    BLOCK_STATUS_NOTICES,
     BLOCK_STATUS_OK,
-    FLOW_STATUS_OK,
+    FLOW_STATUS_ISSUES,
     CrcBlock,
     Flow,
     FlowContext,
@@ -179,7 +180,12 @@ def test_r_crc_engine_001_1_6_operations_write_stores_model_value(tmp_path: Path
 
 def test_r_crc_engine_001_1_7_flow_crc_block_injects_model_value(tmp_path: Path) -> None:
     """Flow LOAD k.s19 → CRC templates/k.json (Config K) → WRITE-OUT: the CRC
-    block is ok and out.s19 holds 31 74 8B 0F at 0x1010..0x1013."""
+    block injects 1 region and out.s19 holds 31 74 8B 0F at 0x1010..0x1013.
+
+    E4 integration seam SR-1: the flow has no PATCH, so R-FLOW-CRC.7 (canon,
+    unchanged) ends the CRC block `notices` with its one CRC-before-PATCH
+    finding and the run `completed-with-issues`; the case's "CRC block ok"
+    reads as "the block injects", the value is the D13-20 oracle."""
     project = _make_project(
         tmp_path, {"k.s19": _kat_image_s19(), "templates/k.json": json.dumps(_CONFIG_K)}
     )
@@ -192,11 +198,16 @@ def test_r_crc_engine_001_1_7_flow_crc_block_injects_model_value(tmp_path: Path)
         ],
     )
     result = run_flow(flow, FlowContext(project_dir=project))
-    assert result.status == FLOW_STATUS_OK
+    assert result.status == FLOW_STATUS_ISSUES
     assert [br.status for br in result.block_results] == [
         BLOCK_STATUS_OK,
+        BLOCK_STATUS_NOTICES,
         BLOCK_STATUS_OK,
-        BLOCK_STATUS_OK,
+    ]
+    crc_block = result.block_results[1]
+    assert crc_block.summary == "injected 1 CRC region"
+    assert [f.message for f in crc_block.findings] == [
+        "CRC before PATCH: the image is finalized before any patch is applied"
     ]
     mem = _reload_mem(project / "out.s19")
     assert [mem[0x1010 + i] for i in range(4)] == [0x31, 0x74, 0x8B, 0x0F]

@@ -174,6 +174,20 @@ def _reload_mem(path: Path) -> dict[int, int]:
     return build_loaded_s19(path, S19File(str(path)), None, None).mem_map
 
 
+def _written_image(result, project: Path) -> Path:
+    """The file the run's WRITE-OUT block wrote, read from its own summary.
+
+    E4 integration seam ruling SR-2: a second run whose image differs is
+    placed under the lowest free numbered name (R-TUI-006.2, unchanged by
+    Inc 8), so "out.s19" in a case means the image this run's WRITE-OUT
+    wrote, not a fixed file name.
+    """
+    writes = [b for b in result.block_results if b.kind == "write_out"]
+    assert len(writes) == 1 and writes[0].status == BLOCK_STATUS_OK, writes
+    assert writes[0].summary.startswith("wrote "), writes[0].summary
+    return project / writes[0].summary[len("wrote "):]
+
+
 def _cause(block) -> str:
     """The user-facing cause is the LAST diagnostic line (UX-C2)."""
     assert block.diagnostics, block
@@ -299,10 +313,10 @@ def test_r_flow_ext_9_1_later_patch_reads_this_runs_copy(tmp_path: Path) -> None
         "applied 1 entry"
         + _READ_SUFFIX.format(copy="step.changes_1.json", ref="step.changes.json")
     ), patch.summary
-    assert [(entry.block_index, entry.change_doc_ref) for entry in result.in_place_reads] == [
-        (2, "step.changes_1.json")
+    assert result.in_place_reads == [
+        (2, "PatchBlock.change_doc_ref", "step.changes.json", project / "step.changes_1.json")
     ]
-    mem = _reload_mem(project / "out.s19")
+    mem = _reload_mem(_written_image(result, project))
     assert [mem[0x1000 + i] for i in range(2)] == [0x42, 0x42]
 
 
@@ -393,12 +407,14 @@ def test_r_flow_ext_9_5_later_crc_block(tmp_path: Path) -> None:
     _write_bench(bench, _crc_config_text(0x1010), "step.crc.json")
     flow = _crc_flow(bench)
     first = _run(flow, project, _confirm(bench, output="step.crc.json"))
-    assert first.status == "ok"
+    # R-FLOW-CRC.7: a CRC block with no PATCH before it ends `notices` (seam SR-1)
+    assert first.block_results[2].status == BLOCK_STATUS_NOTICES
+    assert first.block_results[2].summary == "injected 1 CRC region"
     _write_bench(bench, _crc_config_text(0x1020), "step.crc.json")
 
     second = _run(flow, project, _confirm(bench, output="step.crc.json"))
 
-    mem = _reload_mem(project / "out.s19")
+    mem = _reload_mem(_written_image(second, project))
     assert all(0x1020 + i in mem for i in range(4)), hex(0x1020)
     assert 0x1010 not in mem, "no CRC bytes at the run-1 output address"
 
@@ -424,7 +440,7 @@ def test_r_flow_ext_9_6_later_load_block(tmp_path: Path) -> None:
 
     second = _run(flow, project, _confirm(bench, index=0, output="fw.s19"))
 
-    mem = _reload_mem(project / "out.s19")
+    mem = _reload_mem(_written_image(second, project))
     assert [mem[0x1000 + i] for i in range(2)] == [0x09, 0x08]
 
 
@@ -491,7 +507,7 @@ def test_r_flow_ext_9_8_other_refs_unchanged(tmp_path: Path) -> None:
     assert second_patch.summary == "applied 1 entry", second_patch.summary
     records = [c for c in result.change_records if c.block_index == 3]
     assert records and records[0].change_doc_ref == "patches/other.changes.json"
-    mem = _reload_mem(project / "out.s19")
+    mem = _reload_mem(_written_image(result, project))
     assert [mem[0x1000 + i] for i in range(2)] == [0x45, 0x45]
 
 
@@ -517,9 +533,9 @@ def test_r_flow_ext_9_9_earlier_block_reads_the_file_as_it_is(tmp_path: Path) ->
     assert first_patch.summary == "applied 1 entry", first_patch.summary
     early = [c for c in result.change_records if c.block_index == 1]
     late = [c for c in result.change_records if c.block_index == 3]
-    assert early and early[0].after_bytes[0:2] == [0x41, 0x41], early
-    assert late and late[0].after_bytes[0:2] == [0x42, 0x42], late
-    mem = _reload_mem(project / "out.s19")
+    assert early and early[0].after_bytes[0:2] == (0x41, 0x41), early
+    assert late and late[0].after_bytes[0:2] == (0x42, 0x42), late
+    mem = _reload_mem(_written_image(result, project))
     assert [mem[0x1000 + i] for i in range(2)] == [0x42, 0x42]
 
 
@@ -537,7 +553,7 @@ def test_r_flow_ext_9_10_case_insensitive_on_windows(tmp_path: Path) -> None:
     assert patch.summary.endswith(
         _READ_SUFFIX.format(copy="step.changes_1.json", ref="STEP.CHANGES.JSON")
     ), patch.summary
-    mem = _reload_mem(project / "out.s19")
+    mem = _reload_mem(_written_image(result, project))
     assert [mem[0x1000 + i] for i in range(2)] == [0x42, 0x42]
 
 
@@ -560,6 +576,28 @@ def test_r_flow_ext_9_11_flow_execution_confirm_reads_new_output(
         write_flow,
     )
     from tests.b97_probes import settle
+
+    async def _confirm_key(pilot, panel) -> None:
+        """Press `c` the way a human does: after the attention dwell
+        (CONFIRM_DWELL_S, LLR-147.13) - an immediate key is ignored by design."""
+        for _ in range(300):
+            await pilot.pause()
+            if panel._attention is not None and panel._attention_since is not None:
+                break
+        assert panel._attention is not None, "no lane waits for a confirm"
+        await pilot.pause(0.6)
+        await pilot.press("c")
+
+    def _rerun_image(panel, project_dir: Path):
+        """The image the lane's last (confirm re-)run wrote: the confirm
+        re-run is painted into the lane (``apply_confirmed_run`` ->
+        ``_take_outcome``), whose ``last_outputs`` are the outcome's written
+        paths - the step's copy and the WRITE-OUT image."""
+        images = [
+            Path(path) for path in panel._lanes[0].last_outputs
+            if str(path).endswith(".s19")
+        ]
+        return images[-1] if images else None
 
     base_text = emit_s19_from_mem_map(
         {0x00C001B0 + i: byte for i, byte in enumerate(b"BENCH=OK")},
@@ -589,7 +627,7 @@ def test_r_flow_ext_9_11_flow_execution_confirm_reads_new_output(
             await import_lanes(app, pilot, "terminal")
             _write_bench(bench, _doc("BENCH=OK", address=0x00C001B0))
             await run_lanes(app, pilot, panel, key=True)
-            await pilot.press("c")  # confirm run 1 (BENCH=OK)
+            await _confirm_key(pilot, panel)  # confirm run 1 (BENCH=OK)
             for _ in range(300):
                 await pilot.pause()
                 if (project_dir / "terminal_out.s19").exists():
@@ -600,7 +638,7 @@ def test_r_flow_ext_9_11_flow_execution_confirm_reads_new_output(
             # the bench output now holds the NEW evidence
             _write_bench(bench, _doc("BENCH=V2", address=0x00C001B0))
             await run_lanes(app, pilot, panel, key=True)
-            await pilot.press("c")
+            await _confirm_key(pilot, panel)
             for _ in range(300):
                 await pilot.pause()
                 if (project_dir / "step.changes_1.json").exists():
@@ -608,11 +646,15 @@ def test_r_flow_ext_9_11_flow_execution_confirm_reads_new_output(
             assert (project_dir / "step.changes_1.json").exists(), (
                 "run 2 never copied the new output"
             )
+            image = None
+            for _ in range(300):
+                await pilot.pause()
+                image = _rerun_image(panel, project_dir)
+                if image is not None and image.name != "terminal_out.s19":
+                    break
+            assert image is not None, "the confirmed re-run wrote no image"
             await settle(pilot, 6)
-            return bytes(
-                _reload_mem(project_dir / "terminal_out.s19")[0x00C001B0 + i]
-                for i in range(8)
-            )
+            return bytes(_reload_mem(image)[0x00C001B0 + i] for i in range(8))
 
     assert asyncio.run(_drive()) == b"BENCH=V2"
 
@@ -638,6 +680,9 @@ def test_r_flow_ext_9_12_later_a2l_ref(tmp_path: Path) -> None:
     record = [c for c in first.change_records if c.block_index == 2]
     assert record and record[0].address_start == 0x1000
     _write_bench(bench, _a2l_text(0x1002), "cal.a2l")
+    # seam SR-3: a symbol entry must declare the address its A2L gives (a
+    # drift is refused, CHG-SYMBOL-VALUE); the document follows the new A2L
+    (project / "step.changes.json").write_text(_symbol_doc(0x1002), encoding="utf-8")
 
     second = _run(flow, project, _confirm(bench, output="cal.a2l"))
 
@@ -763,7 +808,13 @@ def test_r_flow_ext_9_15_refused_ref_stays_refused_after_rebind(
             _flow_x(bench_b),
             FlowContext(project_dir=project_b, external_confirmations=_confirm(bench_b)),
         )
-        make_junction(project_b / "jl", project_b)
+        # seam SR-4: the guard refuses a link whose target lies outside the
+        # project; a junction back into the project is not refused on base
+        # or on the tree (pre-existing guard behaviour, left to E5)
+        outside_b = tmp_path / "outside_b"
+        outside_b.mkdir(exist_ok=True)
+        (outside_b / "step.changes.json").write_text(_doc("XX"), encoding="utf-8")
+        make_junction(project_b / "jl", outside_b)
         _write_bench(bench_b, _doc("BB"))
         result_b = _run(
             _flow_x(bench_b, patch_ref="jl/step.changes.json"),
@@ -816,7 +867,7 @@ def test_r_flow_ext_10_1_flow_report_names_the_copy(tmp_path: Path) -> None:
     assert "## Change attribution" in text
     section = text.split("## Change attribution")[1].split("## Not applied")[0]
     assert md_safe("step.changes_1.json", limit=120) in section, section
-    assert "step\\.changes_1.json" in section or "step.changes_1.json" in section
+    assert "| step\\.changes\\_1\\.json |" in section, section
 
 
 def test_r_flow_ext_10_2_chain_set_report_names_the_copy(tmp_path: Path) -> None:
@@ -860,7 +911,7 @@ def test_r_flow_ext_10_2_chain_set_report_names_the_copy(tmp_path: Path) -> None
         if ln.startswith("- Chain ") and "0x00009000" in ln
     ]
     assert len(lines) == 1, not_applied
-    assert lines[0].endswith("(step.changes_1.json)"), lines[0]
+    assert lines[0].endswith("(step\\.changes\\_1\\.json)"), lines[0]
 
 
 def test_r_flow_ext_10_3_unbound_ref_kept_as_typed(tmp_path: Path) -> None:
@@ -907,7 +958,7 @@ def _a2l_patch_flow(bench: Path, *, load_declares: bool, write_out: str = "out.s
     )
 
 
-def _symbol_doc() -> str:
+def _symbol_doc(address: int = 0x1000) -> str:
     return json.dumps(
         {
             "format": "s19app-changeset",
@@ -918,7 +969,7 @@ def _symbol_doc() -> str:
             "entries": [
                 {
                     "type": "bytes",
-                    "address": "0x00001000",
+                    "address": f"0x{address:08X}",
                     "bytes": "AA",
                     "symbol": "Speed",
                 }
@@ -944,6 +995,7 @@ def test_r_flow_ext_10_4_flow_report_names_the_copy_a2l_own(tmp_path: Path) -> N
     assert first.status == "ok"
     before = _report_snapshot(project)
     _write_bench(bench, _a2l_text(0x1002), "cal.a2l")
+    (project / "doc.json").write_text(_symbol_doc(0x1002), encoding="utf-8")  # SR-3
 
     second = _run(flow, project, _confirm(bench, index=0, output="cal.a2l"))
 
@@ -971,6 +1023,7 @@ def test_r_flow_ext_10_5_flow_report_names_the_copy_a2l_inherited(tmp_path: Path
     assert first.status == "ok"
     before = _report_snapshot(project)
     _write_bench(bench, _a2l_text(0x1002), "cal.a2l")
+    (project / "doc.json").write_text(_symbol_doc(0x1002), encoding="utf-8")  # SR-3
 
     second = _run(flow, project, _confirm(bench, index=0, output="cal.a2l"))
 
@@ -1010,7 +1063,7 @@ def test_r_flow_ext_12_2_summary_names_the_copy_check(tmp_path: Path) -> None:
     result = _run(flow, project, _confirm(bench, output="step.chk.json"))
     assert result.block_results[2].summary == (
         "passed=0 failed=1 uncheckable=0"
-        + _READ_SUFFIX.format(copy="step_1.chk.json", ref="step.chk.json")
+        + _READ_SUFFIX.format(copy="step.chk_1.json", ref="step.chk.json")
     ), result.block_results[2].summary
 
 
@@ -1024,7 +1077,7 @@ def test_r_flow_ext_12_3_summary_names_the_copy_crc(tmp_path: Path) -> None:
     result = _run(flow, project, _confirm(bench, output="step.crc.json"))
     assert result.block_results[2].summary == (
         "injected 1 CRC region"
-        + _READ_SUFFIX.format(copy="step_1.crc.json", ref="step.crc.json")
+        + _READ_SUFFIX.format(copy="step.crc_1.json", ref="step.crc.json")
     ), result.block_results[2].summary
 
 
@@ -1096,7 +1149,7 @@ def test_r_flow_ext_12_6_summary_names_the_copy_error(tmp_path: Path) -> None:
     assert crc.status == BLOCK_STATUS_ERROR
     assert crc.summary == (
         "config malformed"
-        + _READ_SUFFIX.format(copy="step_1.crc.json", ref="step.crc.json")
+        + _READ_SUFFIX.format(copy="step.crc_1.json", ref="step.crc.json")
     ), crc.summary
     assert _cause(crc) == (
         "crc config invalid: CRC config is structurally invalid: "
@@ -1120,15 +1173,13 @@ def test_r_flow_ext_12_7_two_refs_read_order(tmp_path: Path) -> None:
             WriteOutBlock("out.s19"),
         ],
     )
-    # run 1: the document travels as the second step's output too — but the
-    # PATCH document must exist under the project for the first run; write it
-    # before run 1 and let the step's output replace it from run 2 on.
-    (project / "step.changes.json").write_text(_doc("AA"), encoding="utf-8")
+    # run 1: the document is the second step's output (EXT blocks 0 and 2)
+    (bench / "step.changes.json").write_text(_doc("AA"), encoding="utf-8")
     first = _run(
         flow,
         project,
-        {1: ExternalStepConfirmation(1, str(bench / "step.log"), str(bench / "cal.a2l")),
-         3: ExternalStepConfirmation(3, str(bench / "step.log"), str(bench / "step.changes.json"))},
+        {0: ExternalStepConfirmation(0, str(bench / "step.log"), str(bench / "cal.a2l")),
+         2: ExternalStepConfirmation(2, str(bench / "step.log"), str(bench / "step.changes.json"))},
     )
     assert first.status == "ok", [b.summary for b in first.block_results]
     _write_bench(bench, _a2l_text(0x1002), "cal.a2l")
@@ -1138,8 +1189,8 @@ def test_r_flow_ext_12_7_two_refs_read_order(tmp_path: Path) -> None:
     second = _run(
         flow,
         project,
-        {1: ExternalStepConfirmation(1, str(bench / "step.log"), str(bench / "cal.a2l")),
-         3: ExternalStepConfirmation(3, str(bench / "step.log"), str(bench / "step.changes.json"))},
+        {0: ExternalStepConfirmation(0, str(bench / "step.log"), str(bench / "cal.a2l")),
+         2: ExternalStepConfirmation(2, str(bench / "step.log"), str(bench / "step.changes.json"))},
     )
 
     patch = second.block_results[3]
@@ -1195,7 +1246,10 @@ def test_r_flow_ext_12_10_suffix_before_the_refusal_token(tmp_path: Path, monkey
     _write_bench(bench, _doc("BB"))
     from tests.b97_fixtures import make_junction
 
-    make_junction(project / "jl", project)
+    outside = tmp_path / "outside"  # seam SR-4
+    outside.mkdir(exist_ok=True)
+    (outside / "cal.a2l").write_text(_a2l_text(0x1000), encoding="utf-8")
+    make_junction(project / "jl", outside)
     flow2 = Flow(
         name="flow_x",
         blocks=[
@@ -1251,8 +1305,11 @@ def test_r_flow_ext_13_chain_set_provenance_names_the_copy(tmp_path: Path) -> No
     text = record.report_path.read_text(encoding="utf-8")
     provenance = text.split("## Input provenance")[1].split("## Written files")[0]
     expected_line = (
-        f"- Chain lane1 input 1: fw.s19 [bound] path=`{project / 'fw_1.s19'}`"
-        + _READ_SUFFIX.format(copy="fw_1.s19", ref="fw.s19")
+        f"- Chain lane1 input 1: {md_safe('fw.s19', limit=120)} [bound] "
+        f"path=`{project / 'fw_1.s19'}`"
+        + _READ_SUFFIX.format(
+            copy=md_safe("fw_1.s19", limit=120), ref=md_safe("fw.s19", limit=120)
+        )
     )
     assert expected_line in provenance, provenance
 
@@ -1277,7 +1334,10 @@ def test_r_flow_ext_13_2_unbound_input_keeps_the_base_line(tmp_path: Path) -> No
     assert outcome.in_place_inputs == {}
     text = record.report_path.read_text(encoding="utf-8")
     provenance = text.split("## Input provenance")[1].split("## Written files")[0]
-    expected_line = f"- Chain lane1 input 1: base.s19 [bound] path=`{project / 'base.s19'}`"
+    expected_line = (
+        f"- Chain lane1 input 1: {md_safe('base.s19', limit=120)} [bound] "
+        f"path=`{project / 'base.s19'}`"
+    )
     assert expected_line in provenance, provenance
     assert "in place of" not in provenance
 
@@ -1383,6 +1443,7 @@ def test_r_flow_ext_11_earlier_copy_unchanged_names(tmp_path: Path) -> None:
     assert {path.name for path in project.iterdir()} == {
         "base.s19",
         "out.s19",
+        "out_1.s19",  # run 2's WRITE-OUT image (R-TUI-006.2), seam SR-2
         "step.changes.json",
         "step.changes_1.json",
     }
