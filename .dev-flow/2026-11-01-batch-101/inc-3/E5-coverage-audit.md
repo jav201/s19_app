@@ -77,3 +77,59 @@ Owed black-box ATs, through keys and dialogs (Layer B). Every product case drive
 - [x] Every cited node id collects (section 6).
 - [x] No names, home paths, hosts, credentials or PII written.
 - [ ] R-TST-112 negative control on the final tree: **open**, owed to E5-mutants.
+
+## Re-audit (2026-11-05)
+
+Mode: **validation**. Tree: worktree head `77a0ac4`. Scope: the cases the corrective pass changed or added (all 30 rows: 26 rewritten per platform, 4 new), against sections 2-6 above, `E5-rulings.md` C-1 to C-11, `E5-corrective-notes.md`, `git diff 6355565..HEAD -- 02-test-cases.md tests/` and the 10 `e5c-*` transcripts. **I ran no test.** The only command I ran is `pytest --collect-only` (below). Every pass, fail and mutant kill is the E5 corrective agent's (Opus), read from its transcripts; the E4 runs are the integrator's.
+
+### Verdict
+
+**30/30 covered, 0 `gap`, 27 full, 3 partial: I agree with the record's totals. Every earlier issue is closed. 5 of 30 re-checked rows (17 %) still need a change, 4 of them wording only.**
+
+### Earlier issues: closed
+
+| Earlier issue | Now | Evidence |
+|---|---|---|
+| GATHER.12/2 partial → full | full | case row; arm 2 unchanged, OR-2 seam |
+| GATHER.12/1 partial reason | the audit's reason, verbatim | case row |
+| GATHER.12/3 non-discriminating on Windows | **closed.** The `raw` spy records `normcase(str(path))` with `..` kept (`tests/test_project_gather.py`, `_spy_project_file_checks`), and arm 3 asserts it. M-9 survives the head form on Windows and is RED in the C-2 form on Windows (`...\r\missing\..\x.json`) and on Linux | `e5c-c2-m9-lan-and-windows.txt`; Windows test-file sha `2a93574a…` = head working-tree file |
+| 001.13/1 exact line | **closed.** `outcomes[0] == "Project saved + manifest verified"` for `save-project`. Windows 5/5 (0.694, 0.561, 0.525, 0.582, 0.515 s), and the C-10 runs print the exact line | `e5c-c10-save-project-windows.txt`, `e5c-final-serial-lan.txt` (0.472 s) |
+| R-TST-112 not shown failing by the equality | **closed.** M-7 with `CI=1` (bound 2 s): RED by the equality, 0.826 vs 0.482 s | `e5c-c6-m6-m7ci-final-file-lan.txt` |
+| R-TST-111 RED on the final file not traceable | **closed.** M-6: RED on all 3 parameters by the equality | same file |
+| ROLLBACK.2 "unless it existed before" | **closed.** New case /2 and node; M-12 RED on both platforms (`(False, False, None)`), GREEN unmutated on Windows | `e5c-c7-c8-rollback-mutants.txt` |
+| Owed key-driven ATs | **closed.** All three go through keys (`ctrl+s` `tab` `tab` `space` `alt+s`; `ctrl+l` + typed path + `enter` + `y`; `ctrl+l` + typed `.a2l` + `enter`). Each asserts the painted lines: refusal ×1, exact last line, forbidden lines absent, app alive, no run, no folder. The save node also asserts the dialog state (offered, focus, selection) | test diff; M-3, M-4, M-10, M-11 RED |
+
+### C-1 caveat: R-TST-111/112 adequately proven? Yes, for the clauses they state
+
+- The equality clause is proven by M-6 and M-7 (`CI=1`), RED by the equality assert, not the bound.
+- M-C1 is contrived (a call counter), but the subject of these rows is the test code, so a test-level mutant is the right kind. It shows what C-1 asked for: the observer no longer moves with the arm's helper (GREEN in the head form, RED in the C-1 form).
+- The named predicate mutants are **equivalent**, not survivors. The first layout publish already carries a laid-out summary, so they cannot move either stamp. Recording them and not counting them is correct.
+- **Residual (inspection, unchanged):** the observer's reading is a textual copy of the arm's predicate (`#result_summary` with height > 0). A wrong *definition* of "painted" that both share is still backed only by E1-profile §2.2.
+- **Traceability note:** the C-1 and C-6 runs hashed the test file as `79a6d8e4…`. I checked that this is the head file **minus the C-9 `GAP` print and its comment**, not the head file itself. The difference is print-only, so the result stands, but "final file" in the notes and rows is imprecise.
+
+### Platform evidence per case
+
+- **002.12/7, 002.13/3:** win32 `not_run` under the operator's run rule, stated in the Result. I do not count this as a coverage gap: the Inc 3 change is platform-shared sync code, and the dialog-typing route runs on Windows in the older by-keys nodes. It is still an open Windows result against the header's default platform, so it should stay visible in `04-validation.md`.
+- **R-TST-111/1-3, R-TST-112/1:** the win32 Results cite E4 runs on the head form (the observer shared the arm's predicate, before C-1), but unlike 002.14 the rows do not say so. Change below.
+- **002.14/1-3:** the win32 Results run on the head form, which M-C3 shows cannot discriminate. The rows say so. 002.12/2-4 run the same scene with the refusal assert in the same `int-02` run, so the win32 claim holds jointly. The rows should cite that.
+- **Linux, new nodes:** the counted lane-1 run (`e5c-final-lane1-lan.txt`, run B) is `-q`. The new nodes' passes are inferred from `318 passed, 0 failed` plus the 3 enumerated skip reasons, none of which is an Inc 3 non-junction node. Per-node GREEN for the by-keys load nodes is in `e5c-c3-c8-sync-mutants-lan.txt` (the passing arm under the other mutant). Traceability is by count, as before.
+- **M-10 on ROLLBACK.2/2:** RED by the outcome-line wait timing out, not by an asserted line. A kill by timeout is valid here; I note it only so it is not read as an assertion kill.
+
+### Remaining issues: rows I would still change
+
+| Case | Column | Change |
+|---|---|---|
+| R-TST-111/1-3, R-TST-112/1 (4 rows) | Result | win32: add "head `6355565` form (observer shared `_summary_laid_out`, before C-1)". linux: "final file" → "head file without the C-9 `GAP` print (sha `79a6d8e4…`)" |
+| R-PROJ-002.14/4 | Tests | The `a2l` arm asserts only `lines[-1] == "A2L loaded: firmware.a2l"` and no folder, so an attach that never reaches the A2L sync also passes. This is the CR-5 gap that C-3 closed for s19/hex/mac only. Fix: add `lines.count(A2L_SYNC_REFUSAL) == 1`, or cite 002.13/2 (same helper, refusal asserted) as the discriminating companion. It stays full against its Expected as written |
+
+Optional, not counted: on 002.14/1-3 win32, cite 002.12/2-4 in `int-02` as the companion.
+
+### Node ids
+
+`pytest --collect-only -q -p no:cacheprovider` on `77a0ac4` (s19env, Python 3.11, `PYTHONPATH=.`, isolated `LOCALAPPDATA`): **27/27 cited node ids collected** (20 cited verbatim + 7 "same test `[param]`" ids), 0 errors.
+
+No case is `gap`, so no `gap` sits beside a passing full test.
+
+### Final totals
+
+30 cases. 30 covered, 0 `gap`. 27 full, 3 partial (R-PROJ-001.13/1, R-PROJ-GATHER.12/1, R-TST-110/1's call-site half). 5/30 rows (17 %) to change: 4 wording, 1 test assert (002.14/4). Open on win32 by rule: 002.12/7 and 002.13/3.

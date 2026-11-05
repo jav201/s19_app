@@ -4044,6 +4044,9 @@ def test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder(
             tmp_path, monkeypatch
         )
         assert lines and lines[-1] == "A2L loaded: firmware.a2l", lines
+        # The attach reached the A2L sync and was refused there: an attach
+        # stopped before the sync would also leave no folder.
+        assert lines.count(A2L_SYNC_REFUSAL) == 1, lines
     else:
         _exited, lines, _runs, exists = _file_load_into_vanished_project(
             tmp_path, kind, "deleted"

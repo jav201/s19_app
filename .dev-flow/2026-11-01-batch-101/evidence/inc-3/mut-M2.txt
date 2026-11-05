@@ -39,7 +39,7 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fedf15fddd0>
 >       assert len(calls) == 1000, f"expected 1000 project-folder checks, got {len(calls)}"
 E       AssertionError: expected 1000 project-folder checks, got 2000
 E       assert 2000 == 1000
-E        +  where 2000 = len(['/tmp/pytest-of-<USER>/pytest-24/test_r_proj_gather_12_each_dis0/.s19tool/workarea/P/n0000.json', '/tmp/pytest-of-ja.../P/n0004.json', '/tmp/pytest-of-<USER>/pytest-24/test_r_proj_gather_12_each_dis0/.s19tool/workarea/P/n0005.json', ...])
+E        +  where 2000 = len(['/tmp/pytest-of-<USER>/pytest-24/test_r_proj_gather_12_each_dis0/.s19tool/workarea/P/n0000.json', '/tmp/pytest-of-<USER>.../P/n0004.json', '/tmp/pytest-of-<USER>/pytest-24/test_r_proj_gather_12_each_dis0/.s19tool/workarea/P/n0005.json', ...])
 
 tests/test_project_gather.py:768: AssertionError
 =========================== short test summary info ============================
