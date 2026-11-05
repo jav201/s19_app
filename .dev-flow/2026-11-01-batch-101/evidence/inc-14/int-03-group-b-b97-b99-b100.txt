@@ -1,0 +1,85 @@
+$ git -C <HOME>/work/s19_i14 rev-parse HEAD (base) + applied diff of b101-inc14
+7add3d63cb9541957ed327a9ca7ca6bee1b4d843
+s19_app: <HOME>/work/s19_i14/s19_app/__init__.py
+3.11.18
+$ pytest -q -p no:cacheprovider -rfE -n 8 tests/test_b97_check_editor.py tests/test_b97_chips_help.py tests/test_b97_flow_builder.py tests/test_b97_flow_execution.py tests/test_b97_key_bar.py tests/test_b97_patch_editor.py tests/test_b97_width.py tests/test_b99_bytes_field.py tests/test_b100_focus.py tests/test_b100_load_dialog.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 10%]
+........................................................................ [ 21%]
+...................F.................................................... [ 31%]
+........................................................................ [ 42%]
+........................................................................ [ 52%]
+........................................................................ [ 63%]
+........................................................................ [ 74%]
+..............s......................................................... [ 84%]
+........................s.....s...s.s....s....s.s....................... [ 95%]
+....................s.s.........                                         [100%]
+=================================== FAILURES ===================================
+________ test_tc_b97_55_input_queued_during_a_run_starts_no_second_run _________
+[gw5] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/s19_i14_bt/popen-gw5/test_tc_b97_55_input_queued_du0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f2259627810>
+
+    def test_tc_b97_55_input_queued_during_a_run_starts_no_second_run(tmp_path: Path, monkeypatch) -> None:
+        """TC-B97-55 (LLR-147.10, in-flight arm): during the synchronous run one
+        more ``#fx_run`` press and one queued ``enter`` start no second run — 1
+        ``run_chain_set`` call, 1 new chain-set report; ``#fx_run`` is disabled
+        inside the run, enabled after, and keeps the focus.
+    
+        Why: a press queued during a run must not start a run the operator did
+        not ask for (P-44). RED on main: 2 calls (no disable). Mutation: the
+        disable dropped.
+        """
+        holder = {}
+    
+        def during():
+            run = holder["panel"].query_one("#fx_run")
+            holder["inside"] = run.disabled
+            run.press()
+            holder["app"].simulate_key("enter")
+    
+        spy = RunSpy(monkeypatch, during=during)
+    
+        async def body(app, pilot, panel, project_dir):
+            holder.update(app=app, panel=panel)
+            before = reports_of(project_dir)
+            await run_lanes(app, pilot, panel, key=True)
+            await settle(pilot, 10)
+            run = panel.query_one("#fx_run")
+            new = [p for p in reports_of(project_dir) if p not in before]
+            return len(spy.calls), len(new), holder.get("inside"), run.disabled, app.focused.id if app.focused else None
+    
+        calls, new, inside, after, focused = run_fx(tmp_path, (118, 54), body, stems=("patch_chain",))
+>       assert calls == 1, f"{calls} run_chain_set calls for one Run"
+E       AssertionError: 4 run_chain_set calls for one Run
+E       assert 4 == 1
+
+tests/test_b97_flow_execution.py:1164: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/s19_i14_bt/popen-gw5/test_tc_b97_55_input_queued_du0 workarea=/tmp/s19_i14_bt/popen-gw5/test_tc_b97_55_input_queued_du0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+WARNING  s19tui:app.py:13882 Project proj1: no project.json project.json (None)
+INFO     s19tui:app.py:14124 Load phase boundary: parse_branch_entry path=prg.s19 suffix=.s19
+INFO     s19tui:app.py:18640 Load summary: file_type=s19 path=/tmp/s19_i14_bt/popen-gw5/test_tc_b97_55_input_queued_du0/.s19tool/workarea/proj1/prg.s19 addresses=3968 range_count=11 range_bytes=3968 errors=0
+INFO     s19tui:app.py:14141 Load phase boundary: parse_branch_done path=prg.s19 branch=s19
+INFO     s19tui:app.py:18101 Load phase boundary: apply_install_state path=prg.s19 precomputed=False
+INFO     s19tui:app.py:14077 Project loaded. name=proj1 file=/tmp/s19_i14_bt/popen-gw5/test_tc_b97_55_input_queued_du0/.s19tool/workarea/proj1/prg.s19 mac=None
+INFO     s19tui:app.py:18768 Sections updated. count=11 rendered_ranges=11 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18117 Load phase boundary: apply_sections_done path=prg.s19
+INFO     s19tui:app.py:18129 Load phase boundary: apply_hex_done path=prg.s19
+INFO     s19tui:app.py:19788 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.002
+INFO     s19tui:app.py:17661 MAC validation computed: records=0 issues=0 elapsed_seconds=0.022
+INFO     s19tui:app.py:17716 MAC row cache built: records=0 elapsed_seconds=0.023
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.047
+INFO     s19tui:app.py:19302 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.073
+INFO     s19tui:app.py:18142 Load phase boundary: apply_a2l_done path=prg.s19
+INFO     s19tui:app.py:18995 Memory Map updated. ranges=11
+INFO     s19tui:app.py:18159 Loaded file successfully: path=/tmp/s19_i14_bt/popen-gw5/test_tc_b97_55_input_queued_du0/.s19tool/workarea/proj1/prg.s19 file_type=s19 elapsed_seconds=3.097 has_mac=False precomputed=False
+=========================== short test summary info ============================
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_55_input_queued_during_a_run_starts_no_second_run
+1 failed, 669 passed, 10 skipped in 2310.15s (0:38:30)
+exit=1

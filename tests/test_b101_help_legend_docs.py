@@ -1222,10 +1222,11 @@ def test_r_doc_readme_4_3_operations_names_placeholders(tmp_path: Path) -> None:
 
 
 def test_r_doc_security_1_1_policy_names_private_path() -> None:
-    text = _flat(_doc("SECURITY.md"))
+    # The graph's text sets the UI names in bold (**Security** tab); match the rendered words.
+    text = _flat(_doc("SECURITY.md")).replace("**", "")
     assert "Security tab" in text
     assert "Report a vulnerability" in text
-    assert re.search(r"(?i)\b(do not|don't|never)\b[^.]{0,80}public (github )?issue", text), text
+    assert "not in a public issue" in text, text
 
 
 def _status_cell(cells: List[str]) -> str:
@@ -1438,7 +1439,8 @@ def test_r_doc_relnote_14_1_part_file_safe_to_delete_stated() -> None:
 # user guide and findings table
 # --------------------------------------------------------------------------- #
 
-_BEFORE = "(capture taken before 1.0.0)"
+#: Graph interface I-5: the note opens a parenthesis and goes on with what the capture shows.
+_BEFORE = "(capture taken before 1.0.0"
 
 #: (file, absent phrases, present phrases) per passage, in the order of the cases.
 _GUIDE_PASSAGES = (

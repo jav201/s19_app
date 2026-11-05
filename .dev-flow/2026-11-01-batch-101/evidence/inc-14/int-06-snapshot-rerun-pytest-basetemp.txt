@@ -1,0 +1,13 @@
+$ git -C <HOME>/work/s19_i14 rev-parse HEAD (base) + applied diff of b101-inc14
+7add3d63cb9541957ed327a9ca7ca6bee1b4d843
+s19_app: <HOME>/work/s19_i14/s19_app/__init__.py
+3.11.18
+$ pytest -q -p no:cacheprovider -rfE -n 8 -rs tests/test_tui_snapshot.py
+bringing up nodes...
+bringing up nodes...
+
+sssssssssssssssssssssssssssss....                                        [100%]
+=========================== short test summary info ============================
+SKIPPED [29] tests/test_tui_snapshot.py:1184: pytest-textual-snapshot not installed (dev-only optional extra)
+4 passed, 29 skipped in 15.45s
+exit=0

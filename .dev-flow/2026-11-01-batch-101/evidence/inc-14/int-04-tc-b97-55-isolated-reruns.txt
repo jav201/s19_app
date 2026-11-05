@@ -1,0 +1,36 @@
+=== rerun 1
+$ git -C <HOME>/work/s19_i14 rev-parse HEAD (base) + applied diff of b101-inc14
+7add3d63cb9541957ed327a9ca7ca6bee1b4d843
+s19_app: <HOME>/work/s19_i14/s19_app/__init__.py
+3.11.18
+$ pytest -q -p no:cacheprovider -rfE -n 8 tests/test_b97_flow_execution.py::test_tc_b97_55_input_queued_during_a_run_starts_no_second_run tests/test_b97_flow_execution.py::test_tc_b97_55_a_run_that_raises_paints_one_english_line
+bringing up nodes...
+bringing up nodes...
+
+..                                                                       [100%]
+2 passed in 20.41s
+exit=0
+=== rerun 2
+$ git -C <HOME>/work/s19_i14 rev-parse HEAD (base) + applied diff of b101-inc14
+7add3d63cb9541957ed327a9ca7ca6bee1b4d843
+s19_app: <HOME>/work/s19_i14/s19_app/__init__.py
+3.11.18
+$ pytest -q -p no:cacheprovider -rfE -n 8 tests/test_b97_flow_execution.py::test_tc_b97_55_input_queued_during_a_run_starts_no_second_run tests/test_b97_flow_execution.py::test_tc_b97_55_a_run_that_raises_paints_one_english_line
+bringing up nodes...
+bringing up nodes...
+
+..                                                                       [100%]
+2 passed in 19.40s
+exit=0
+=== rerun 3
+$ git -C <HOME>/work/s19_i14 rev-parse HEAD (base) + applied diff of b101-inc14
+7add3d63cb9541957ed327a9ca7ca6bee1b4d843
+s19_app: <HOME>/work/s19_i14/s19_app/__init__.py
+3.11.18
+$ pytest -q -p no:cacheprovider -rfE -n 8 tests/test_b97_flow_execution.py::test_tc_b97_55_input_queued_during_a_run_starts_no_second_run tests/test_b97_flow_execution.py::test_tc_b97_55_a_run_that_raises_paints_one_english_line
+bringing up nodes...
+bringing up nodes...
+
+..                                                                       [100%]
+2 passed in 20.45s
+exit=0
