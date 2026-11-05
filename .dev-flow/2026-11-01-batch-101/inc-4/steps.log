@@ -1,0 +1,4 @@
+E1 start 2026-11-05T20:23Z model=opus base=b7b77c4
+E1 end 2026-11-05T20:39Z model=opus rows=6 (amended R-CHG-SYM.9, .10; new R-CHG-SYM.11, .12, .13, R-TUI-058.9) TC=19; probe: parse 1000 symbol entries x 20000 tags = 3.12 s on base (Windows, not a test run)
+E2 start 2026-11-05T20:39Z model=opus
+E2 end 2026-11-05T20:39Z model=opus codewire_lint nodes=20 entities=3 edges=0 findings=0 not read=0; trace_check --base main (b7b77c4): 3 US, 6 active requirements, 7 gap(s) (6 TEST until E4, 1 EVID until E5); decisions D-1..D-4 open for the orchestrator
