@@ -1,0 +1,79 @@
+# label: M01
+# cmd: timeout 900 env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<TMP>/la python -m pytest tests/test_b101_flow_ext_copy.py tests/test_b101_crc_model_and_reasons.py --basetemp <TMP>/bt -q -p no:cacheprovider
+s19_app.__file__ = <HOME>\AppData\Local\Temp\s19m8\wt\s19_app\__init__.py
+        for init in _ENGINE_GRID_INITS:
+            for reverse in (True, False):
+                for final_xor in (0x00000000, 0xFFFFFFFF):
+                    operation = crc32_stream(
+                        KAT, polynomial=_POLY, init=init, reverse=reverse, final_xor=final_xor
+                    )
+                    designer = crc_stream(
+                        KAT,
+                        width=32,
+                        poly=_POLY,
+                        init=init,
+                        refin=reverse,
+                        refout=reverse,
+                        xorout=final_xor,
+                    )
+>                   assert operation == designer, (
+                        f"init {init:#010x} reverse {reverse} xorout {final_xor:#010x}: "
+                        f"{operation:#010x} != {designer:#010x}"
+                    )
+E                   AssertionError: init 0x12345678 reverse True xorout 0x00000000: 0xe7fd94d5 != 0xf0748bce
+E                   assert 3892155605 == 4034169806
+
+tests\test_b101_crc_model_and_reasons.py:242: AssertionError
+_________ test_r_crc_engine_002_2_2_operation_equals_designer_random __________
+
+    def test_r_crc_engine_002_2_2_operation_equals_designer_random() -> None:
+        """50/50 random sets (seed 7): random 0..1023 bytes, random odd poly,
+        init, final_xor, reverse — the two engines agree."""
+        rng = random.Random(7)
+        for _ in range(50):
+            data = bytes(rng.randrange(256) for _ in range(rng.randrange(1024)))
+            poly = rng.getrandbits(32) | 1
+            init = rng.getrandbits(32)
+            final_xor = rng.getrandbits(32)
+            reverse = rng.choice((True, False))
+            operation = crc32_stream(
+                data, polynomial=poly, init=init, reverse=reverse, final_xor=final_xor
+            )
+            designer = crc_stream(
+                data,
+                width=32,
+                poly=poly,
+                init=init,
+                refin=reverse,
+                refout=reverse,
+                xorout=final_xor,
+            )
+>           assert operation == designer
+E           assert 3393983058 == 119058638
+
+tests\test_b101_crc_model_and_reasons.py:270: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_engine_001_1_1_reverse_takes_init_as_given
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_engine_001_1_2_bit_reversed_inits_stay_distinct
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_engine_001_1_5_operations_check_gives_model_value
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_engine_001_1_6_operations_write_stores_model_value
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_engine_001_1_7_flow_crc_block_injects_model_value
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_engine_002_2_1_operation_equals_designer_grid
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_engine_002_2_2_operation_equals_designer_random
+7 failed, 75 passed in 25.24s
+# exit: 1
+
+# ---- mutation diff ----
+diff --git a/s19_app/tui/operations/crc.py b/s19_app/tui/operations/crc.py
+index 8234c37..a0edd4c 100644
+--- a/s19_app/tui/operations/crc.py
++++ b/s19_app/tui/operations/crc.py
+@@ -209,7 +209,7 @@ def crc32_stream(
+         # internally; its default seed (0) IS the zlib/PKZIP convention.
+         return zlib.crc32(data) & _MASK32
+ 
+-    reg = init & _MASK32
++    reg = (_reflect(init & _MASK32, 32) if reverse else init & _MASK32)
+     for byte in data:
+         if reverse:
+             byte = _reflect(byte, 8)

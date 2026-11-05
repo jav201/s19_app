@@ -1,0 +1,81 @@
+# label: M04
+# cmd: timeout 900 env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<TMP>/la python -m pytest tests/test_b101_flow_ext_copy.py tests/test_b101_crc_model_and_reasons.py --basetemp <TMP>/bt -q -p no:cacheprovider
+s19_app.__file__ = <HOME>\AppData\Local\Temp\s19m8\wt\s19_app\__init__.py
+>       assert errors == [
+            f"CRC config is structurally invalid: field '{field}' is not a number: {value}"
+        ], errors
+E       AssertionError: ["CRC config is structurally invalid: invalid literal for int() with base 16: 'x'"]
+E       assert ["CRC config ...base 16: 'x'"] == ['CRC config ... number: "x"']
+E         
+E         At index 0 diff: "CRC config is structurally invalid: invalid literal for int() with base 16: 'x'" != 'CRC config is structurally invalid: field \'start\' is not a number: "x"'
+E         Use -v to get more diff
+
+tests\test_b101_crc_model_and_reasons.py:396: AssertionError
+_________________ test_r_crc_config_001_11_7_value_is_clipped _________________
+
+    def test_r_crc_config_001_11_7_value_is_clipped() -> None:
+        """[S-1] A huge value is clipped: 64 characters of the JSON text + …."""
+        prefix = "CRC config is structurally invalid: field '{}' is not a number: "
+        # (a) a 1 000 000-character non-hex string [N-1: `z`, not a hex digit]
+        huge_string = json.loads(json.dumps(_CONFIG_V))
+        huge_string["init"] = "z" * 1_000_000
+        parsed, errors = parse_crc_config(json.dumps(huge_string))
+        assert parsed is None
+        expected_a = prefix.format("init") + '"' + "z" * 63 + "…"
+>       assert errors == [expected_a], errors
+E       AssertionError: ["CRC config is structurally invalid: invalid literal for int() with base 16: 'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz...zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"]
+E       assert ['CRC config ...zzzzzzzzzzzz'] == ['CRC config ...zzzzzzzzzzz…']
+E         
+E         At index 0 diff: "CRC config is structurally invalid: invalid literal for int() with base 16: 'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" != 'CRC config is structurally invalid: field \'init\' is not a number: "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz…'
+E         Use -v to get more diff
+
+tests\test_b101_crc_model_and_reasons.py:410: AssertionError
+_____________ test_r_crc_config_001_11_8_markup_value_shown_plain _____________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m8/bt/test_r_crc_config_001_11_8_mar0')
+
+    def test_r_crc_config_001_11_8_markup_value_shown_plain(tmp_path: Path) -> None:
+        """[S-7] Through keys: a markup-looking value is shown as plain text —
+        the result area carries NO_CONFIG_TEXT then the exact reason, no markup
+        error and no hex view."""
+        config = json.loads(json.dumps(_CONFIG_V))
+        config["init"] = "[/]"
+        status, hex_text = _drive_crc(tmp_path, json.dumps(config))
+        expected = (
+            f"{OperationsScreen.NO_CONFIG_TEXT}\n"
+            'CRC config is structurally invalid: field \'init\' is not a number: "[/]"'
+        )
+>       assert expected in status, status
+E       AssertionError: CRC config error - no check was run:
+E         CRC config is structurally invalid: invalid literal for int() with base 16: '[/]'
+E       assert 'CRC config error - no check was run:\nCRC config is structurally invalid: field \'init\' is not a number: "[/]"' in "CRC config error - no check was run:\nCRC config is structurally invalid: invalid literal for int() with base 16: '[/]'"
+
+tests\test_b101_crc_model_and_reasons.py:559: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_non_number_is_named[init-zz]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_non_number_is_named[init-true]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_non_number_is_named[polynomial-1.5]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_non_number_is_named[final_xor-null]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_non_number_is_named[region-end]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_non_number_is_named[span-start]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_7_value_is_clipped
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_8_markup_value_shown_plain
+8 failed, 74 passed in 25.92s
+# exit: 1
+
+# ---- mutation diff ----
+diff --git a/s19_app/tui/operations/crc_config.py b/s19_app/tui/operations/crc_config.py
+index 4e7793f..a193e11 100644
+--- a/s19_app/tui/operations/crc_config.py
++++ b/s19_app/tui/operations/crc_config.py
+@@ -287,9 +287,7 @@ def _number_field(container: dict, key: str) -> int:
+     try:
+         return _parse_int(raw)
+     except ValueError:
+-        text = json.dumps(raw)
+-        clip = text if len(text) <= VALUE_CLIP else text[:VALUE_CLIP] + "…"
+-        raise ValueError(f"field '{key}' is not a number: {clip}") from None
++        raise
+ 
+ 
+ def read_crc_config(

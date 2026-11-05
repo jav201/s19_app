@@ -19,7 +19,7 @@ import random
 from pathlib import Path
 
 import pytest
-from textual.widgets import Button, Input, ListView, Static, TextArea
+from textual.widgets import Input, ListView, Static, TextArea
 
 from s19_app.core import S19File
 from s19_app.tui.app import S19TuiApp
@@ -139,6 +139,7 @@ def test_r_crc_engine_001_1_2_bit_reversed_inits_stay_distinct() -> None:
         ("MPEG-2", False, 0x00000000, 0x0376E6E7),  # case /3
         ("JAMCRC", True, 0x00000000, 0x340BC6D9),  # case /4
     ],
+    ids=["MPEG-2", "JAMCRC"],
 )
 def test_r_crc_engine_001_1_catalogue_32_bit_checks(
     name: str, reverse: bool, final_xor: int, expected: int
@@ -285,6 +286,7 @@ def test_r_crc_engine_002_2_2_operation_equals_designer_random() -> None:
         ("ISO-HDLC", 32, 0x04C11DB7, 0xFFFFFFFF, True, True, 0xFFFFFFFF, 0xCBF43926),
         ("MPEG-2", 32, 0x04C11DB7, 0xFFFFFFFF, False, False, 0x00000000, 0x0376E6E7),
     ],
+    ids=["ARC", "MODBUS", "RIELLO", "TMS37157", "ISO-HDLC", "MPEG-2"],
 )
 def test_r_crc_designer_001_1_catalogue_checks(
     name: str, width: int, poly: int, init: int, refin: bool, refout: bool,
@@ -318,6 +320,11 @@ def _missing_field_cases() -> list[tuple[str, dict, str]]:
     span_no_end = [
         {"regions": [_without(_CONFIG_VG_GROUP["regions"][0], "end")], "output_address": "0x30"}
     ]
+    region_no_end = [_without(_CONFIG_V["regions"][0], "end")]
+    region_no_output = [_without(_CONFIG_V["regions"][0], "output_address")]
+    span_no_start = [
+        {"regions": [_without(_CONFIG_VG_GROUP["regions"][0], "start")], "output_address": "0x30"}
+    ]
     vg = lambda regions, groups: {**_CONFIG_V, "groups": groups}  # noqa: E731
     return [
         ("reverse", _without(_CONFIG_V, "reverse"), "reverse"),
@@ -332,6 +339,14 @@ def _missing_field_cases() -> list[tuple[str, dict, str]]:
         ),
         ("group-regions", vg(None, group_no_regions), "regions"),
         ("span-end", vg(None, span_no_end), "end"),
+        # E5 C-6: the remaining required fields of the definition
+        ("region-end", {**_CONFIG_V, "regions": region_no_end}, "end"),
+        (
+            "region-output_address",
+            {**_CONFIG_V, "regions": region_no_output},
+            "output_address",
+        ),
+        ("span-start", vg(None, span_no_start), "start"),
     ]
 
 
@@ -365,6 +380,12 @@ def _non_number_cases() -> list[tuple[str, dict, str, str]]:
         clone["regions"][0][key] = value
         return clone
 
+    def group_with(key: str, value) -> dict:
+        clone = json.loads(json.dumps(_CONFIG_V))
+        clone["groups"] = [json.loads(json.dumps(_CONFIG_VG_GROUP))]
+        clone["groups"][0][key] = value
+        return clone
+
     def span_with(key: str, value) -> dict:
         clone = json.loads(json.dumps(_CONFIG_V))
         clone["groups"] = [json.loads(json.dumps(_CONFIG_VG_GROUP))]
@@ -378,6 +399,11 @@ def _non_number_cases() -> list[tuple[str, dict, str, str]]:
         ("final_xor-null", with_field(_CONFIG_V, "final_xor", None), "final_xor", "null"),
         ("region-end", region_with("end", "0xQ"), "end", '"0xQ"'),
         ("span-start", span_with("start", "x"), "start", '"x"'),
+        # E5 C-6: the remaining number fields of the definition
+        ("region-start", region_with("start", "0xG"), "start", '"0xG"'),
+        ("region-output_address", region_with("output_address", [1]), "output_address", "[1]"),
+        ("group-output_address", group_with("output_address", {"a": 1}), "output_address", '{"a": 1}'),
+        ("span-end", span_with("end", False), "end", "false"),
     ]
 
 
@@ -421,6 +447,43 @@ def test_r_crc_config_001_11_7_value_is_clipped() -> None:
         assert len(reason) <= len(field_part) + len("is not a number: ") + 65
 
 
+_NESTING_REASON = "CRC config is not valid JSON: nesting too deep"
+#: The R-CRC-CONFIG-001.11 reason for an `init` that is a list nested deeper
+#: than 64 levels: its JSON text starts with 64 `[`, so <value> is exactly
+#: 64 `[` then the ellipsis.
+_DEEP_INIT_REASON = (
+    "CRC config is structurally invalid: field 'init' is not a number: "
+    + "[" * 64
+    + "…"
+)
+
+
+def _deep_init_text(depth: int) -> str:
+    """Config V with `init` = a list nested `depth` levels deep."""
+    text = json.dumps(_CONFIG_V)
+    plain = '"init": "0xFFFFFFFF"'
+    assert text.count(plain) == 1
+    return text.replace(plain, '"init": ' + "[" * depth + "]" * depth)
+
+
+def test_r_crc_config_001_11_9_deep_value_gives_the_reason_not_a_raise() -> None:
+    """E5 F1: a number field holding a list that the JSON reader still
+    accepts, nested just under its limit, gives the R-CRC-CONFIG-001.11
+    reason — the echo of the value never recurses past the reader.
+
+    The reader's limit depends on the stack depth of the caller, so every
+    depth of a band around it is tried: each one gives exactly one of the two
+    reasons, and the band holds both (the number-field path is reached at
+    its deepest)."""
+    seen = set()
+    for depth in range(800, 1001):
+        parsed, errors = parse_crc_config(_deep_init_text(depth))
+        assert parsed is None, depth
+        assert errors in ([_DEEP_INIT_REASON], [_NESTING_REASON]), (depth, errors)
+        seen.add(errors[0])
+    assert seen == {_DEEP_INIT_REASON, _NESTING_REASON}, seen
+
+
 # ---------------------------------------------------------------------------
 # R-CRC-CONFIG-001.16 — a CRC Designer template is named as such
 # ---------------------------------------------------------------------------
@@ -454,6 +517,7 @@ _TEMPLATE_REASON = (
         ),
         ("algorithm-not-object", json.dumps({"algorithm": 5})),
     ],
+    ids=["saved", "width16", "algorithm-not-object"],
 )
 def test_r_crc_config_001_16_designer_template_is_named(case: str, text: str | None) -> None:
     """A Designer-template-shaped object gives exactly the template reason."""
@@ -504,43 +568,79 @@ async def _load_file(app: S19TuiApp, pilot, path: Path) -> None:
     await _flush(pilot)
 
 
-async def _open_crc_screen(app: S19TuiApp, pilot) -> OperationsScreen:
-    """Open OperationsScreen and select the crc row (index 0, registry order)."""
-    app.action_operations_view()
-    await pilot.pause()
-    screen = app.screen
-    assert isinstance(screen, OperationsScreen)
-    screen.query_one("#operations_list", ListView).index = 0
+async def _focus_by_tab(app: S19TuiApp, pilot, widget_id: str, limit: int = 20) -> None:
+    """Move the focus to ``#widget_id`` with the tab key only."""
+    for _ in range(limit):
+        if app.focused is not None and app.focused.id == widget_id:
+            return
+        await pilot.press("tab")
+        await pilot.pause()
+    assert app.focused is not None and app.focused.id == widget_id, (app.focused, widget_id)
+
+
+async def _open_crc_screen_by_keys(app: S19TuiApp, pilot) -> OperationsScreen:
+    """Press `x` (the app's Operations binding); the dialog opens with the
+    focus on the list, its first row (crc, registry order) highlighted."""
+    await pilot.press("x")
     await _flush(pilot)
+    screen = app.screen
+    assert isinstance(screen, OperationsScreen), screen
+    assert screen.query_one("#operations_list", ListView).index == 0
+    assert screen.options[0][0] == "crc", screen.options
     return screen
 
 
-def _drive_crc(tmp_path: Path, config_text: str) -> tuple[str, str]:
-    """Load image K as the primary, open the Operations crc row, set the
-    config editor to ``config_text``, Execute; return (status, hex)."""
+async def _load_config_by_keys(app: S19TuiApp, pilot, screen: OperationsScreen, path: str) -> str:
+    """Type ``path`` into the empty config path field, then Load config by
+    `enter`; return the editor text."""
+    await _focus_by_tab(app, pilot, "operation_config_path")
+    assert screen.query_one("#operation_config_path", Input).value == ""
+    await pilot.press(*path)
+    await _focus_by_tab(app, pilot, "operation_config_load")
+    await pilot.press("enter")
+    await _flush(pilot)
+    return screen.query_one("#operation_config", TextArea).text
 
-    async def _drive() -> tuple[str, str]:
+
+async def _execute_by_keys(app: S19TuiApp, pilot, screen: OperationsScreen) -> str:
+    """Execute by `enter` on the Execute button; return the result status."""
+    await _focus_by_tab(app, pilot, "operations_execute")
+    await pilot.press("enter")
+    await _flush(pilot)
+    await app.workers.wait_for_complete()
+    await _flush(pilot)
+    return str(screen.query_one("#operation_result_status", Static).content)
+
+
+def _drive_crc(tmp_path: Path, config_text: str) -> tuple[str, str, str]:
+    """Load image K as the primary, then by keys only: `x` opens the
+    Operations dialog on the crc row, the config file's path is typed and
+    loaded into the editor (Load config, `enter`), Execute (`enter`); then a
+    later key (`tab`) — return (status, hex, the widget focused after it).
+
+    E5 C-7: the editor is filled through the Load config route because a
+    typed or pasted text cannot carry these inputs (the paste cap is 64 KiB;
+    100 000 brackets typed one by one would take minutes)."""
+    (tmp_path / "config.json").write_text(config_text, encoding="utf-8")
+
+    async def _drive() -> tuple[str, str, str]:
         s19_path = tmp_path / "k.s19"
         s19_path.write_text(_kat_image_s19(), encoding="utf-8")
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test() as pilot:
             await pilot.pause()
             await _load_file(app, pilot, s19_path)
-            screen = await _open_crc_screen(app, pilot)
-            screen.query_one("#operation_config", TextArea).text = config_text
-            screen.query_one("#operations_execute", Button).press()
-            await _flush(pilot)
-            await app.workers.wait_for_complete()
-            await _flush(pilot)
-            status = str(
-                screen.query_one("#operation_result_status", Static).content
-            )
+            screen = await _open_crc_screen_by_keys(app, pilot)
+            loaded = await _load_config_by_keys(app, pilot, screen, "config.json")
+            assert loaded == config_text
+            status = await _execute_by_keys(app, pilot, screen)
             hex_content = screen.query_one("#operation_result_hex", Static).content
             hex_text = getattr(hex_content, "plain", str(hex_content))
             # the app keeps running: a later key still acts
             await pilot.press("tab")
             await _flush(pilot)
-            return status, hex_text
+            focused = app.focused.id if app.focused is not None else ""
+            return status, hex_text, focused
 
     return asyncio.run(_drive())
 
@@ -551,12 +651,13 @@ def test_r_crc_config_001_11_8_markup_value_shown_plain(tmp_path: Path) -> None:
     error and no hex view."""
     config = json.loads(json.dumps(_CONFIG_V))
     config["init"] = "[/]"
-    status, hex_text = _drive_crc(tmp_path, json.dumps(config))
+    status, hex_text, _ = _drive_crc(tmp_path, json.dumps(config))
     expected = (
         f"{OperationsScreen.NO_CONFIG_TEXT}\n"
         'CRC config is structurally invalid: field \'init\' is not a number: "[/]"'
     )
     assert expected in status, status
+    assert status == expected, status
     assert "markup" not in status.lower()
     assert hex_text == "", repr(hex_text)
 
@@ -577,20 +678,11 @@ def test_r_crc_config_001_16_5_operations_dialog_names_template(tmp_path: Path) 
         async with app.run_test() as pilot:
             await pilot.pause()
             await _load_file(app, pilot, s19_path)
-            screen = await _open_crc_screen(app, pilot)
-            screen.query_one("#operation_config_path", Input).value = (
-                "templates/demo-crc32.crc.json"
+            screen = await _open_crc_screen_by_keys(app, pilot)
+            loaded = await _load_config_by_keys(
+                app, pilot, screen, "templates/demo-crc32.crc.json"
             )
-            screen.query_one("#operation_config_load", Button).press()
-            await _flush(pilot)
-            loaded = screen.query_one("#operation_config", TextArea).text
-            screen.query_one("#operations_execute", Button).press()
-            await _flush(pilot)
-            await app.workers.wait_for_complete()
-            await _flush(pilot)
-            status = str(
-                screen.query_one("#operation_result_status", Static).content
-            )
+            status = await _execute_by_keys(app, pilot, screen)
             hex_content = screen.query_one("#operation_result_hex", Static).content
             hex_text = getattr(hex_content, "plain", str(hex_content))
             return loaded, status, hex_text
@@ -599,6 +691,7 @@ def test_r_crc_config_001_16_5_operations_dialog_names_template(tmp_path: Path) 
     assert "polynomial" not in loaded and '"algorithm"' in loaded
     expected = f"{OperationsScreen.NO_CONFIG_TEXT}\n{_TEMPLATE_REASON}"
     assert expected in status, status
+    assert status == expected, status
     assert hex_text == "", repr(hex_text)
 
 
@@ -607,10 +700,70 @@ def test_r_crc_config_001_17_2_operations_execute_survives_deep_nesting(
 ) -> None:
     """[S-6] Through keys: the editor text nests too deep; Execute shows the
     reason and the app keeps running."""
-    status, hex_text = _drive_crc(tmp_path, "[" * 100000)
+    status, hex_text, focused_after = _drive_crc(tmp_path, "[" * 100000)
     expected = (
         f"{OperationsScreen.NO_CONFIG_TEXT}\n"
         "CRC config is not valid JSON: nesting too deep"
     )
     assert expected in status, status
+    assert status == expected, status
     assert hex_text == "", repr(hex_text)
+    # E5 C-7: the later key acted - `tab` moved the focus from Execute past
+    # the disabled Write CRC to Close
+    assert focused_after == "operations_close", focused_after
+
+
+def test_r_crc_config_001_11_10_operations_execute_survives_deep_value(
+    tmp_path: Path,
+) -> None:
+    """E5 F1, through keys: a config whose `init` nests just under the JSON
+    reader's limit is loaded and executed in the Operations dialog. The app
+    stays up and shows the malformed-config reason for every depth tried.
+
+    The reader's limit inside the dialog depends on the handler's stack, so
+    the test searches it by bisection between a depth the reader accepts and
+    one it refuses: the search ends on the first depth the number-field path
+    does not answer, which on the defect is the first depth whose echo
+    raises (the app exits there)."""
+    config_path = tmp_path / "deep.json"
+    field_status = f"{OperationsScreen.NO_CONFIG_TEXT}\n{_DEEP_INIT_REASON}"
+    nesting_status = f"{OperationsScreen.NO_CONFIG_TEXT}\n{_NESTING_REASON}"
+
+    async def _drive() -> dict[int, str]:
+        s19_path = tmp_path / "k.s19"
+        s19_path.write_text(_kat_image_s19(), encoding="utf-8")
+        app = S19TuiApp(base_dir=tmp_path)
+        statuses: dict[int, str] = {}
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await _load_file(app, pilot, s19_path)
+            screen = await _open_crc_screen_by_keys(app, pilot)
+            await _focus_by_tab(app, pilot, "operation_config_path")
+            await pilot.press(*config_path.name)
+
+            async def probe(depth: int) -> str:
+                text = _deep_init_text(depth)
+                config_path.write_text(text, encoding="utf-8")
+                await _focus_by_tab(app, pilot, "operation_config_load")
+                await pilot.press("enter")
+                await _flush(pilot)
+                assert screen.query_one("#operation_config", TextArea).text == text
+                statuses[depth] = await _execute_by_keys(app, pilot, screen)
+                return statuses[depth]
+
+            low, high = 500, 1000
+            assert await probe(low) == field_status
+            assert await probe(high) == nesting_status
+            while high - low > 1:
+                middle = (low + high) // 2
+                if await probe(middle) == field_status:
+                    low = middle
+                else:
+                    high = middle
+            assert app.is_running
+        return statuses
+
+    statuses = asyncio.run(_drive())
+    assert set(statuses.values()) == {field_status, nesting_status}, statuses
+    deepest = max(depth for depth, status in statuses.items() if status == field_status)
+    assert statuses[deepest + 1] == nesting_status, statuses

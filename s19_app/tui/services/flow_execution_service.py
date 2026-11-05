@@ -1175,6 +1175,15 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                             "file outside the project",
                         )
                         continue
+                # R-FLOW-EXT.14: the log (climb, then existence) before the
+                # output (climb, then existence).
+                if not log_path.is_file():
+                    aborted = _record_error(
+                        result, index, kind, "external step refused", [],
+                        f"log '{confirmation.log_ref}' does not exist - the "
+                        "log is mandatory evidence, never optional",
+                    )
+                    continue
                 source_path = Path(confirmation.source_path)
                 if not source_path.is_absolute():
                     # batch-101 inc-8 (R-FLOW-EXT.2, D15-17): a relative
@@ -1189,13 +1198,6 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                             "a file outside the project",
                         )
                         continue
-                if not log_path.is_file():
-                    aborted = _record_error(
-                        result, index, kind, "external step refused", [],
-                        f"log '{confirmation.log_ref}' does not exist - the "
-                        "log is mandatory evidence, never optional",
-                    )
-                    continue
                 if not source_path.is_file():
                     aborted = _record_error(
                         result, index, kind, "external step refused", [],

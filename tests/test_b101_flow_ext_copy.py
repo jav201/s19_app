@@ -24,6 +24,7 @@ from s19_app.tui.app import S19TuiApp
 from s19_app.tui.changes.io import emit_s19_from_mem_map
 from s19_app.tui.operations import crc_config as crc_config_module
 from s19_app.tui.operations.crc_designer_model import emit_template, seed_template
+from s19_app.tui.operations.crc_kernel import crc_stream
 from s19_app.tui.services import flow_execution_service as fes
 from s19_app.tui.services.flow_execution_service import (
     CHAIN_RUN_SEQUENTIAL,
@@ -318,6 +319,8 @@ def test_r_flow_ext_9_1_later_patch_reads_this_runs_copy(tmp_path: Path) -> None
     ]
     mem = _reload_mem(_written_image(result, project))
     assert [mem[0x1000 + i] for i in range(2)] == [0x42, 0x42]
+    # E5 C-5: the whole data record, all 4 bytes
+    assert [mem[0x1000 + i] for i in range(4)] == [0x42, 0x42, 0x03, 0x04]
 
 
 def test_r_flow_ext_9_2_first_run_reads_the_plain_copy(tmp_path: Path) -> None:
@@ -335,6 +338,8 @@ def test_r_flow_ext_9_2_first_run_reads_the_plain_copy(tmp_path: Path) -> None:
     )
     mem = _reload_mem(project / "out.s19")
     assert [mem[0x1000 + i] for i in range(2)] == [0x41, 0x41]
+    # E5 C-5: the whole data record, all 4 bytes
+    assert [mem[0x1000 + i] for i in range(4)] == [0x41, 0x41, 0x03, 0x04]
 
 
 def test_r_flow_ext_9_3_reused_copy_is_read(tmp_path: Path) -> None:
@@ -355,6 +360,13 @@ def test_r_flow_ext_9_3_reused_copy_is_read(tmp_path: Path) -> None:
     ), third.block_results[1].summary
     mem = _reload_mem(project / "out.s19")
     assert [mem[0x1000 + i] for i in range(2)] == [0x41, 0x41]
+    # E5 C-4: the image run 3's own WRITE-OUT names (out.s19 alone is run
+    # 1's image and would hold AA whatever run 3 read)
+    assert third.block_results[2].summary == "applied 1 entry", third.block_results[2].summary
+    image = _written_image(third, project)
+    assert image.name == "out.s19", image
+    mem = _reload_mem(image)
+    assert [mem[0x1000 + i] for i in range(4)] == [0x41, 0x41, 0x03, 0x04]
 
 
 def _check_flow(bench: Path, check_output: str = "step.chk.json") -> Flow:
@@ -417,6 +429,13 @@ def test_r_flow_ext_9_5_later_crc_block(tmp_path: Path) -> None:
     mem = _reload_mem(_written_image(second, project))
     assert all(0x1020 + i in mem for i in range(4)), hex(0x1020)
     assert 0x1010 not in mem, "no CRC bytes at the run-1 output address"
+    # E5 C-5: the CRC value itself, from the Designer engine (an oracle that
+    # is not the operation engine): CRC-32 over 01 02 03 04, little-endian
+    expected = crc_stream(
+        bytes([0x01, 0x02, 0x03, 0x04]), width=32, poly=0x04C11DB7,
+        init=0xFFFFFFFF, refin=True, refout=True, xorout=0xFFFFFFFF,
+    )
+    assert [mem[0x1020 + i] for i in range(4)] == list(expected.to_bytes(4, "little"))
 
 
 def test_r_flow_ext_9_6_later_load_block(tmp_path: Path) -> None:
@@ -537,6 +556,8 @@ def test_r_flow_ext_9_9_earlier_block_reads_the_file_as_it_is(tmp_path: Path) ->
     assert late and late[0].after_bytes[0:2] == (0x42, 0x42), late
     mem = _reload_mem(_written_image(result, project))
     assert [mem[0x1000 + i] for i in range(2)] == [0x42, 0x42]
+    # E5 C-5: the whole data record, all 4 bytes
+    assert [mem[0x1000 + i] for i in range(4)] == [0x42, 0x42, 0x03, 0x04]
 
 
 @pytest.mark.skipif(not sys.platform.startswith("win"), reason="case rule: Windows")
@@ -555,6 +576,8 @@ def test_r_flow_ext_9_10_case_insensitive_on_windows(tmp_path: Path) -> None:
     ), patch.summary
     mem = _reload_mem(_written_image(result, project))
     assert [mem[0x1000 + i] for i in range(2)] == [0x42, 0x42]
+    # E5 C-5: the whole data record, all 4 bytes
+    assert [mem[0x1000 + i] for i in range(4)] == [0x42, 0x42, 0x03, 0x04]
 
 
 # ---------------------------------------------------------------------------
@@ -588,16 +611,11 @@ def test_r_flow_ext_9_11_flow_execution_confirm_reads_new_output(
         await pilot.pause(0.6)
         await pilot.press("c")
 
-    def _rerun_image(panel, project_dir: Path):
-        """The image the lane's last (confirm re-)run wrote: the confirm
-        re-run is painted into the lane (``apply_confirmed_run`` ->
-        ``_take_outcome``), whose ``last_outputs`` are the outcome's written
-        paths - the step's copy and the WRITE-OUT image."""
-        images = [
-            Path(path) for path in panel._lanes[0].last_outputs
-            if str(path).endswith(".s19")
-        ]
-        return images[-1] if images else None
+    def _painted_head(panel) -> str:
+        """The lane head as painted (``lane_paint_plain``, the C-32 painted
+        seam): ``<mark> <chain> · <status> · <elapsed> · N blocks · wrote
+        <names>``."""
+        return panel.lane_paint_plain(0).splitlines()[0]
 
     base_text = emit_s19_from_mem_map(
         {0x00C001B0 + i: byte for i, byte in enumerate(b"BENCH=OK")},
@@ -646,12 +664,20 @@ def test_r_flow_ext_9_11_flow_execution_confirm_reads_new_output(
             assert (project_dir / "step.changes_1.json").exists(), (
                 "run 2 never copied the new output"
             )
-            image = None
+            # E5 C-7: the lane is done as painted (run 2 waited for `c`, so
+            # the first painted `done` is the confirm re-run), and the image
+            # read is the one the painted head names as written
+            head = ""
             for _ in range(300):
                 await pilot.pause()
-                image = _rerun_image(panel, project_dir)
-                if image is not None and image.name != "terminal_out.s19":
+                head = _painted_head(panel)
+                if " · done · " in head:
                     break
+            assert head.startswith("▓ terminal · done · "), head
+            written = head.split(" · wrote ", 1)[1].split(", ")
+            images = [name for name in written if name.endswith(".s19")]
+            assert len(images) == 1, head
+            image = project_dir / images[0]
             assert image is not None, "the confirmed re-run wrote no image"
             await settle(pilot, 6)
             return bytes(_reload_mem(image)[0x00C001B0 + i] for i in range(8))
@@ -712,6 +738,8 @@ def test_r_flow_ext_9_13_first_run_over_a_foreign_file_reads_the_copy(tmp_path: 
     ), patch.summary
     mem = _reload_mem(project / "out.s19")
     assert [mem[0x1000 + i] for i in range(2)] == [0x41, 0x41]
+    # E5 C-5: the whole data record, all 4 bytes
+    assert [mem[0x1000 + i] for i in range(4)] == [0x41, 0x41, 0x03, 0x04]
     # the foreign file under the output file name keeps its bytes
     assert (project / "step.changes.json").read_bytes() == _doc("CC").encode("utf-8")
 
@@ -761,6 +789,8 @@ def test_r_flow_ext_9_14_other_chain_is_not_rebound(tmp_path: Path) -> None:
     assert patch_b.summary == "applied 1 entry", patch_b.summary
     mem = _reload_mem(project / "b.s19")
     assert [mem[0x1000 + i] for i in range(2)] == [0x41, 0x41]
+    # E5 C-5: the whole data record, all 4 bytes
+    assert [mem[0x1000 + i] for i in range(4)] == [0x41, 0x41, 0x03, 0x04]
 
 
 @pytest.mark.skipif(not sys.platform.startswith("win"), reason="the junction half is Windows")
@@ -1271,6 +1301,13 @@ def test_r_flow_ext_12_10_suffix_before_the_refusal_token(tmp_path: Path, monkey
     ), patch.summary
     escape_lines = [d for d in patch.diagnostics if d.startswith("[MANIFEST-PATH-ESCAPE]")]
     assert len(escape_lines) == 1, patch.diagnostics
+    # E5 C-3: the exact placement — the suffix sits between the head and the
+    # trailing token (a suffix put anywhere else before the token fails here)
+    assert patch.summary == (
+        "a2l reference"
+        + _READ_SUFFIX.format(copy="step.changes_1.json", ref="step.changes.json")
+        + " unresolved"
+    ), patch.summary
 
 
 # ---------------------------------------------------------------------------
@@ -1392,6 +1429,52 @@ def test_r_flow_ext_14_climbing_path_refused_output(tmp_path: Path) -> None:
     assert _cause(ext) == (
         "output 'bench/../../x.json' climbs above the project folder - "
         "give an absolute path for a file outside the project"
+    )
+    assert not list(project.glob("*.json"))
+
+
+def test_r_flow_ext_14_4_both_climb_the_log_is_named(tmp_path: Path) -> None:
+    """The log and the output both climb above the project: the log is
+    checked first, so its climb is the cause; nothing is copied."""
+    project = _project(tmp_path, {"base.s19": _S19_SRC})
+    (project.parent.parent / "x.json").write_text(_doc("AA"), encoding="utf-8")
+    (project.parent / "step.log").write_text("tool ran OK\n", encoding="utf-8")
+    bench = _bench(tmp_path)
+    flow = _flow_x(bench, log="../step.log", output="../../x.json")
+
+    result = _run(
+        flow, project, {1: ExternalStepConfirmation(1, "../step.log", "../../x.json")}
+    )
+
+    ext = result.block_results[1]
+    assert ext.status == BLOCK_STATUS_ERROR
+    assert ext.summary == "external step refused", ext.summary
+    assert _cause(ext) == (
+        "log '../step.log' climbs above the project folder - "
+        "give an absolute path for a file outside the project"
+    )
+    assert not list(project.glob("*.json"))
+
+
+def test_r_flow_ext_14_5_missing_log_named_before_climbing_output(tmp_path: Path) -> None:
+    """E5 F2: the log is checked (climb, then existence) before the output
+    (climb, then existence). A relative log that stays inside but does not
+    exist, with an output that climbs: the cause is the log's existence."""
+    project = _project(tmp_path, {"base.s19": _S19_SRC})
+    (project.parent.parent / "x.json").write_text(_doc("AA"), encoding="utf-8")
+    bench = _bench(tmp_path)
+    flow = _flow_x(bench, log="missing.log", output="../../x.json")
+
+    result = _run(
+        flow, project, {1: ExternalStepConfirmation(1, "missing.log", "../../x.json")}
+    )
+
+    ext = result.block_results[1]
+    assert ext.status == BLOCK_STATUS_ERROR
+    assert ext.summary == "external step refused", ext.summary
+    assert _cause(ext) == (
+        "log 'missing.log' does not exist - the log is mandatory evidence, "
+        "never optional"
     )
     assert not list(project.glob("*.json"))
 
@@ -1563,5 +1646,89 @@ def test_r_flow_crc_9_over_limit_config_not_read(
     assert _cause(crc) == (
         "crc config invalid: CRC config file is 32 bytes, over the "
         "16-byte read cap — the file was not read"
+    )
+    assert write_out.status == BLOCK_STATUS_SKIPPED
+
+
+# ---------------------------------------------------------------------------
+# E5 C-6 — R-FLOW-CRC clauses the audit found without a case
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("arm", ["absolute", "escaping"], ids=["absolute", "escaping"])
+def test_r_flow_crc_3_2_refused_ref_exact_text(tmp_path: Path, arm: str) -> None:
+    """R-FLOW-CRC.3, the refused branch: a valid config outside the project,
+    named by an absolute ref or by a ref that climbs out, is refused with the
+    exact summary and cause; nothing is written."""
+    project = _project(tmp_path, {"prg.s19": _S19_SRC})
+    outside = project.parent / "outside_crc.json"
+    outside.write_text(_crc_config_text(0x2000), encoding="utf-8")
+    ref = str(outside) if arm == "absolute" else "../outside_crc.json"
+    flow = Flow(
+        name="refused",
+        blocks=[SourceBlock("prg.s19"), CrcBlock(ref), WriteOutBlock("out.s19")],
+    )
+
+    result = run_flow(flow, FlowContext(project_dir=project))
+
+    crc, write_out = result.block_results[1], result.block_results[2]
+    assert crc.status == BLOCK_STATUS_ERROR
+    assert crc.summary == "config unresolved", crc.summary
+    assert _cause(crc) == "crc config not found or not inside the project"
+    assert write_out.status == BLOCK_STATUS_SKIPPED
+    assert not result.written_paths
+
+
+def test_r_flow_crc_4_4_first_three_errors_joined(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """R-FLOW-CRC.4, `<first three errors, separated by "; ">`: the parser
+    the block calls is made to return four errors (the shipped parser stops
+    at one); the cause carries the first three joined by `; `."""
+    project = _project(
+        tmp_path, {"prg.s19": _S19_SRC, "crc.json": _crc_config_text(0x2000)}
+    )
+    monkeypatch.setattr(
+        fes, "parse_crc_config", lambda text: (None, ["e1", "e2", "e3", "e4"])
+    )
+    flow = Flow(
+        name="four",
+        blocks=[SourceBlock("prg.s19"), CrcBlock("crc.json"), WriteOutBlock("out.s19")],
+    )
+
+    result = run_flow(flow, FlowContext(project_dir=project))
+
+    crc = result.block_results[1]
+    assert crc.status == BLOCK_STATUS_ERROR
+    assert crc.summary == "config malformed", crc.summary
+    assert _cause(crc) == "crc config invalid: e1; e2; e3"
+
+
+def test_r_flow_crc_9_2_shipped_cap_named_in_the_cause(tmp_path: Path) -> None:
+    """R-FLOW-CRC.9 at the shipped cap (268435456 bytes): a file one byte
+    over it is refused before any read, and the cause names the shipped cap.
+    The file is extended with `truncate`, so no byte is written or read."""
+    project = _project(tmp_path, {"prg.s19": _S19_SRC})
+    config = project / "crc.json"
+    cap = crc_config_module.READ_SIZE_CAP_BYTES
+    assert cap == 268435456
+    try:
+        with config.open("wb") as handle:
+            handle.truncate(cap + 1)
+        flow = Flow(
+            name="over",
+            blocks=[SourceBlock("prg.s19"), CrcBlock("crc.json"), WriteOutBlock("out.s19")],
+        )
+
+        result = run_flow(flow, FlowContext(project_dir=project))
+    finally:
+        config.unlink()
+
+    crc, write_out = result.block_results[1], result.block_results[2]
+    assert crc.status == BLOCK_STATUS_ERROR
+    assert crc.summary == "config malformed", crc.summary
+    assert _cause(crc) == (
+        "crc config invalid: CRC config file is 268435457 bytes, over the "
+        "268435456-byte read cap — the file was not read"
     )
     assert write_out.status == BLOCK_STATUS_SKIPPED

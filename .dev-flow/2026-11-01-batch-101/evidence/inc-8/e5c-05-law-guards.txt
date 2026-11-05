@@ -1,0 +1,35 @@
+$ pytest -q -rA --tb=short --show-capture=no tests/test_id_registry.py tests/test_engine_unchanged.py tests/test_requirements_canon.py tests/test_tui_directionb.py -k test_id_registry or test_engine_unchanged or test_requirements_canon or test_tc031
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+...........................                                              [100%]
+=================================== PASSES ====================================
+=========================== short test summary info ===========================
+PASSED tests/test_id_registry.py::test_tc600_g1_every_named_node_id_is_registered
+PASSED tests/test_id_registry.py::test_tc601_g2_live_entries_name_existing_nodes
+PASSED tests/test_id_registry.py::test_tc602_g3_every_citation_is_registered
+PASSED tests/test_id_registry.py::test_tc604_g5_grammar_holds_or_is_registered_legacy
+PASSED tests/test_id_registry.py::test_tc605_g6_normalized_keys_are_unique
+PASSED tests/test_id_registry.py::test_tc606_g7_no_stem_exceeds_the_high_water_mark
+PASSED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+PASSED tests/test_id_registry.py::test_tc608_tokenizer_and_normalizer_edge_cases
+PASSED tests/test_id_registry.py::test_tc609_registry_file_is_well_formed
+PASSED tests/test_id_registry.py::test_tc610_reservations_are_recorded_and_respected
+PASSED tests/test_id_registry.py::test_at280_registry_and_repository_agree_in_both_directions
+PASSED tests/test_id_registry.py::test_at281_every_guard_rule_can_fail
+PASSED tests/test_engine_unchanged.py::test_tc027_engine_modules_unchanged_vs_main
+PASSED tests/test_requirements_canon.py::test_canon_is_one_file_with_rows
+PASSED tests/test_requirements_canon.py::test_canon_rows_have_id_form_sentence
+PASSED tests/test_requirements_canon.py::test_canon_rows_open_with_their_form
+PASSED tests/test_requirements_canon.py::test_canon_rows_hold_the_obligation_word_once
+PASSED tests/test_requirements_canon.py::test_canon_row_ids_are_unique
+PASSED tests/test_requirements_canon.py::test_canon_modules_are_s0_to_s17_in_order
+PASSED tests/test_requirements_canon.py::test_canon_history_is_the_committed_blob
+PASSED tests/test_requirements_canon.py::test_canon_s0_table_cites_existing_rows
+PASSED tests/test_requirements_canon.py::test_review_files_hold_the_decisions
+PASSED tests/test_requirements_canon.py::test_review_files_name_only_existing_tests
+PASSED tests/test_requirements_canon.py::test_canon_rows_are_one_sentence
+PASSED tests/test_tui_directionb.py::test_tc031_engine_modules_have_no_diff_vs_main
+PASSED tests/test_tui_directionb.py::test_tc031_engine_modules_have_no_name_only_diff_vs_main
+PASSED tests/test_tui_directionb.py::test_tc031_engine_imports_still_resolve
+27 passed, 181 deselected in 6.61s
+exit=0

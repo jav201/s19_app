@@ -287,9 +287,41 @@ def _number_field(container: dict, key: str) -> int:
     try:
         return _parse_int(raw)
     except ValueError:
-        text = json.dumps(raw)
-        clip = text if len(text) <= VALUE_CLIP else text[:VALUE_CLIP] + "…"
-        raise ValueError(f"field '{key}' is not a number: {clip}") from None
+        raise ValueError(
+            f"field '{key}' is not a number: {_clipped_json(raw)}"
+        ) from None
+
+
+def _clipped_json(raw: Any) -> str:
+    """
+    Summary:
+        The JSON text of ``raw``, clipped to :data:`VALUE_CLIP` characters
+        plus an ellipsis when longer (the ``<value>`` of R-CRC-CONFIG-001.11).
+
+    Args:
+        raw (Any): A value parsed by ``json.loads``.
+
+    Returns:
+        str: The whole JSON text, or its first :data:`VALUE_CLIP` characters
+        followed by ``…``.
+
+    Data Flow:
+        - Encode lazily (``JSONEncoder.iterencode`` yields chunks as it
+          descends) and stop once the text is longer than the clip. A value
+          nested just under the reader's limit would raise ``RecursionError``
+          if encoded whole (E5 F1); stopping early bounds the depth reached
+          to the clip, since each nesting level adds at least one character.
+
+    Dependencies:
+        Used by:
+            - _number_field
+    """
+    text = ""
+    for chunk in json.JSONEncoder().iterencode(raw):
+        text += chunk
+        if len(text) > VALUE_CLIP:
+            return text[:VALUE_CLIP] + "…"
+    return text
 
 
 def read_crc_config(

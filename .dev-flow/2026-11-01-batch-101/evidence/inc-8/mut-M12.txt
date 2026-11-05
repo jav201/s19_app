@@ -1,0 +1,79 @@
+# label: M12
+# cmd: timeout 900 env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<TMP>/la python -m pytest tests/test_b101_flow_ext_copy.py tests/test_b101_crc_model_and_reasons.py --basetemp <TMP>/bt -q -p no:cacheprovider
+s19_app.__file__ = <HOME>\AppData\Local\Temp\s19m8\wt\s19_app\__init__.py
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000018F13B3D890>
+
+    def test_r_flow_ext_2_2_relative_output_read_under_project(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """[D15-17] A relative output found only under the project is read under
+        the project (base reads it against the working directory → refuses)."""
+        project = _project(tmp_path, {"base.s19": _S19_SRC})
+        (project / "bench").mkdir()
+        (project / "bench" / "rel.changes.json").write_text(_doc("AA"), encoding="utf-8")
+        bench = _bench(tmp_path)
+        (bench / "step.log").write_text("tool ran OK\n", encoding="utf-8")
+        flow = _flow_x(bench, output="bench/rel.changes.json")
+        monkeypatch.chdir(tmp_path)
+    
+        result = _run(
+            flow,
+            project,
+            {1: ExternalStepConfirmation(1, str(bench / "step.log"), "bench/rel.changes.json")},
+        )
+    
+        ext = result.block_results[1]
+>       assert ext.status == BLOCK_STATUS_OK
+E       AssertionError: assert 'error' == 'ok'
+E         
+E         - ok
+E         + error
+
+<HOME>\AppData\Local\Temp\s19m8\wt\tests\test_b101_flow_ext_copy.py:274: AssertionError
+______________ test_r_flow_ext_14_climbing_path_inside_accepted _______________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m8/bt/test_r_flow_ext_14_climbing_pa2')
+
+    def test_r_flow_ext_14_climbing_path_inside_accepted(tmp_path: Path) -> None:
+        """A relative path that stays inside the project is accepted."""
+        project = _project(tmp_path, {"base.s19": _S19_SRC})
+        (project / "bench").mkdir()
+        (project / "rel.changes.json").write_text(_doc("AA"), encoding="utf-8")
+        bench = _bench(tmp_path)
+        (bench / "step.log").write_text("tool ran OK\n", encoding="utf-8")
+        flow = _flow_x(bench, output="bench/../rel.changes.json")
+    
+        result = _run(
+            flow,
+            project,
+            {1: ExternalStepConfirmation(1, str(bench / "step.log"), "bench/../rel.changes.json")},
+        )
+    
+        ext = result.block_results[1]
+>       assert ext.status == BLOCK_STATUS_OK
+E       AssertionError: assert 'error' == 'ok'
+E         
+E         - ok
+E         + error
+
+tests\test_b101_flow_ext_copy.py:1415: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_2_2_relative_output_read_under_project
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_14_climbing_path_inside_accepted
+2 failed, 80 passed in 25.46s
+# exit: 1
+
+# ---- mutation diff ----
+diff --git a/s19_app/tui/services/flow_execution_service.py b/s19_app/tui/services/flow_execution_service.py
+index c6fe4b1..8ee3b1f 100644
+--- a/s19_app/tui/services/flow_execution_service.py
++++ b/s19_app/tui/services/flow_execution_service.py
+@@ -1180,7 +1180,7 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
+                     # batch-101 inc-8 (R-FLOW-EXT.2, D15-17): a relative
+                     # output is read under the open project folder, like the
+                     # log — never against the working directory.
+-                    source_path = Path(ctx.project_dir) / source_path
++                    source_path = Path.cwd() / source_path
+                     if _climbs_above_project(source_path, Path(ctx.project_dir)):
+                         aborted = _record_error(
+                             result, index, kind, "external step refused", [],

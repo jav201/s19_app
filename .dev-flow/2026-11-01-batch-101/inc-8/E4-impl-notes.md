@@ -77,7 +77,9 @@ Probed at E4: template refusal text; `field 'reverse' is missing`;
      source_a2l_ref`; the SOURCE branch keeps `source_a2l_ref = a2l_path.name
      when a2l_in_place else block.a2l_ref` (I-4, A-1);
   4. external-step branch: order log climb → log exists → output climb →
-     output exists → copy (E4 addendum); a relative log or output that climbs
+     output exists → copy (E4 addendum) [E5 correction, C-2: the code as
+     delivered ran the output climb before the log-exists check; reordered
+     at E5, pinned by R-FLOW-EXT.14/5]; a relative log or output that climbs
      above the project folder stops the block with summary
      `external step refused` and the R-FLOW-EXT.14 cause (`<log or output>
      '<path as given>' climbs above the project folder - give an absolute path
