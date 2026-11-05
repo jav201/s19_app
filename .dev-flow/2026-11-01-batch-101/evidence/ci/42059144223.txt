@@ -1,0 +1,19 @@
+GitHub CI run 42059144223 (push, main, head 9f9f6af - first push run after Inc 2's merge) - tui-ci job, excerpts (grep of the job log; timestamps stripped)
+Successfully installed execnet-2.1.2 pytest-xdist-3.8.0
+created: 4/4 workers
+plugins: xdist-3.8.0, platformdirs-4.14.5
+--- lane summaries and failures ---
+FAILED tests/test_changes_file_notation_help.py::test_tc1802_nine_md_sections_intact_tenth_section_added
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+FAILED tests/test_window_usage_help.py::test_tc707_copy_matches_help_sections_md_verbatim
+FAILED tests/test_window_usage_help.py::test_tc707_numbering_generated_sequential
+===== 5 failed, 5210 passed, 205 skipped, 4 xfailed in 6869.83s (1:54:29) ======
+58 passed, 2 skipped, 5424 deselected in 318.92s (0:05:18)
+--- step times (GitHub API) ---
+job tui-ci: started 2026-11-05T15:51:05Z completed 2026-11-05T17:51:20Z
+step Run lean test suite (pull requests): skipped 2026-11-05T15:51:25Z -> 2026-11-05T15:51:25Z
+step Run timing arms (pull requests): skipped 2026-11-05T15:51:25Z -> 2026-11-05T15:51:25Z
+step Run full test suite (pushes): failure 2026-11-05T15:51:25Z -> 2026-11-05T17:45:56Z
+step Run timing arms (pushes): success 2026-11-05T17:45:56Z -> 2026-11-05T17:51:16Z
+snapshot job: failure - the same 2 tc016s patch-comfortable snapshots as main run 41826394456

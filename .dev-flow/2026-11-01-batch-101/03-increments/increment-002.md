@@ -35,6 +35,7 @@ Committed: `git diff --stat main...HEAD` (88 files, +18 466 / −127). Uncommitt
 | `.dev-flow/2026-11-01-batch-101/inc-2/codewire/graph-inc2.md` | doc |  | Code-wire graph I-1 … I-9, G1, per-node contracts |
 | `.dev-flow/2026-11-01-batch-101/evidence/ci/41372953464.txt` | generated | US-TST-4 | Batch CI record: 5 FAILED lines = the 5 known failures, 0 new; snapshot success, 29/29 cells |
 | `.dev-flow/2026-11-01-batch-101/evidence/ci/42037470050.txt` | generated | US-TST-2 | Inc 2's own PR CI run (head 379cd20): 6/6 history arms PASSED, 4/4 xdist workers, lane 1 116 min 29 s, lane 2 5 min 48 s; 7 FAILED = 5 known + 1 known-on-main + 1 load flake (tc_b97_64 burst, backlog) |
+| `.dev-flow/2026-11-01-batch-101/evidence/ci/42059144223.txt` | generated | US-TST-2 | First push CI run after the merge (main 9f9f6af): lanes 114 min 31 s + 5 min 20 s = 119 min 51 s ≤ 150 (R-TST-091); 5 FAILED = the 5 known |
 | `.dev-flow/2026-11-01-batch-101/evidence/inc-2/impl-1-full.txt` | generated | US-TST-1 | E4 implementer run: full suite slice (cut by the swarm cap; superseded by integration) |
 | `.dev-flow/2026-11-01-batch-101/evidence/inc-2/impl-2-serial-timing.txt` | generated | US-TST-1 | E4 implementer run: serial-timing slice, 6 failed, 53 passed, 995 deselected |
 | `.dev-flow/2026-11-01-batch-101/evidence/inc-2/impl-3-not-serial-collect.txt` | generated | US-TST-1 | E4 implementer collection check: arms not in the parallel lane |
@@ -234,10 +235,11 @@ Digests: SHA-256 of the bytes at the cited path, taken 2026-11-02. The transcrip
 | e5c-redaction-final.txt | evidence/inc-2/e5c-redaction-final.txt | 2ad94aa89344ed18f600c1803e74f273a888afc2ae48ae86ebe0c70603ce9488 |
 | 41372953464.txt | evidence/ci/41372953464.txt | 3a5e1382094c1171ef2d05f72978b019177326579bb256bab9e53b2570a280cb |
 | 42037470050.txt | evidence/ci/42037470050.txt | e656090512599e98def1f8313ed4cdf83043fe9dbc0169fbd96c4395c6db7697 |
+| 42059144223.txt | evidence/ci/42059144223.txt | ab7b40b51c1d2db3d3f55bda91e37588a9afe2d4339c4d0778b6d33daeee836e |
 
 | Field | Value |
 |---|---|
-| **Evidence files** | 18 transcripts, each cited with the digest of its stored bytes, all under the home `artifact_homes.evidence` names (`repo:.dev-flow/2026-11-01-batch-101/evidence/`) |
+| **Evidence files** | 19 transcripts, each cited with the digest of its stored bytes, all under the home `artifact_homes.evidence` names (`repo:.dev-flow/2026-11-01-batch-101/evidence/`) |
 
 ### Load-bearing emptiness (C-55)
 
@@ -280,7 +282,7 @@ Digests: SHA-256 of the bytes at the cited path, taken 2026-11-02. The transcrip
 
 - **R-TST-008/009** — the two LAN gate runs; owed until Inc 3 settles the painted-interval step (ruling R-3). Backlog: the painted-interval ~1 s step (R1-P1, profile first).
 - **R-TST-031/032** — 1 of 3 parallel-lane runs on record; 3/3 owed to the gate.
-- **R-TST-014/018-2/090** — verified on PR run 42037470050 (`evidence/ci/42037470050.txt`); **R-TST-012/017** owe a real red/stop CI run; **R-TST-091** (lane 1 on workers, ≈290 min serial) owed at the batch end.
+- **R-TST-014/018-2/090** — verified on PR run 42037470050 (`evidence/ci/42037470050.txt`); **R-TST-012/017** owe a real red/stop CI run; **R-TST-091** verified on push run 42059144223 (119 min 51 s ≤ 150).
 - **R-TST-005/7** (ruling R-1: the case input no longer matches the F7 form 6) and **R-TST-049/1** (ruling R-2: the planted test compares function names, not the guard text) — backlog rows.
 - Backlog rows appended to `.dev-flow/BACKLOG-CODE.md`: E5S-4 (CI supply-chain hashing), E5S-7 (at288 self-capture), the tc016b/tc016s environment fragility, the file-local pause-count waits (`tc_b97_23`, `tc_b100_65`), the census N-1 operator rule, and (2026-11-05) the `tc_b97_64` burst arm that fails under xdist load (routed to Inc 3).
 - The uncommitted E5 records (this packet, `04-validation.md`, the four E5 records, the mutant transcripts, the three E5 transcripts, the `02-test-cases.md` re-audit edit) are to be committed by the orchestrator — nothing here is committed by this record.
