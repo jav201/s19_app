@@ -1,0 +1,14 @@
+E1 start 2026-11-02T15:18:32Z model=opus
+E1 end 2026-11-02T15:34:11Z model=opus
+E2 start 2026-11-02T15:34:11Z model=opus
+E2 end 2026-11-02T15:36:25Z model=opus
+E3 start 2026-11-02T15:37:23Z model=opus (architect + security)
+E3 r1 corrective start/end 2026-11-02T15:55:28Z model=opus (records only: A-1..A-8, S-1..S-8 ruled; 18 rows, 82 cases, 4 source files)
+E3 end 2026-11-02T16:03:00Z model=opus (2 rounds, PASS-WITH-NOTES)
+E4 start 2026-11-02T16:03:34Z model=kimi-k2.8 (implementer + independent tester)
+E4 integration start 2026-11-05T13:36:00Z model=opus (merge origin/main f11b3f4; 22 failures, 0 source fixes)
+E4 integration end 2026-11-05T14:51:35Z model=opus (GREEN 1218/1 skip on 51 files; RED on base 64/18)
+E5 start 2026-11-05T14:53Z mutants model=kimi-k2.8
+E5 mutants kimi-k2.8 refused: 429 weekly quota; rerouted model=sonnet 2026-11-05T14:53Z
+E5 corrective start 2026-11-05T15:11:47Z model=opus
+E5 corrective end 2026-11-05T16:32:35Z model=opus (C-1..C-9 done; 99 cases 96 covered 3 partial; final: G1+G2 97 passed, 47 importer files 1189 passed + 1 flaky (rerun 75/75), law guards 27 passed)
