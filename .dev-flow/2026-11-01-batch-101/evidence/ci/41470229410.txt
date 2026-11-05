@@ -1,0 +1,13 @@
+GitHub CI run 41470229410 (pull_request, PR #212, head 0f30f32) - tui-ci job, excerpts
+  Downloading pytest_xdist-3.8.0-py3-none-any.whl.metadata (3.0 kB)
+53 passed, 2 skipped, 5286 deselected in 263.07s (0:04:23)
+===== 7 failed, 5046 passed, 207 skipped, 4 xfailed in 4934.66s (1:22:14) ======
+Downloading pytest_xdist-3.8.0-py3-none-any.whl (46 kB)
+SKIPPED [1] tests/test_engine_unchanged.py:166: git is unavailable or the 'main' ref is missing in this environment — TC-027's engine-unchanged arm cannot run: Command '['git', 'diff', '--name-only', 'main', '--', 's19_app/core.py', 's19_app/hexfile.py', 's19_app/range_index.py', 's19_app/validation', 's19_app/tui/a2l.py', 's19_app/tui/mac.py']' returned non-zero exit status 128.
+SKIPPED [1] tests/test_tui_issues_triage_b94.py:395: git is unavailable or the 'main' ref is missing in this environment — TC-B94-18's engine-freeze arm cannot run: Command '['git', 'diff', '--name-only', 'main', '--', 's19_app/validation/rules.py', 's19_app/tui/a2l.py']' returned non-zero exit status 128.
+SKIPPED [1] tests/test_tui_patch_history_strip.py:711: git is unavailable or the 'main' ref is missing in this environment — TC-081.4's binding-diff arm cannot run: Command '['git', 'diff', 'main', '--', 's19_app/tui/app.py']' returned non-zero exit status 128.
+Successfully installed execnet-2.1.2 pytest-xdist-3.8.0
+[gw0] [ 89%] SKIPPED tests/test_tui_patch_history_strip.py::test_tc081_4_no_binding_diff 
+created: 4/4 workers
+plugins: xdist-3.8.0, platformdirs-4.14.3
+job tui-ci: started 2026-11-02T15:18:10Z completed 2026-11-02T16:45:18Z (87 min); snapshot job: success (29 passed, 4 deselected)

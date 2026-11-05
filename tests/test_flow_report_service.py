@@ -383,7 +383,11 @@ def test_tc016b_exception_diagnostics_do_not_leak_absolute_paths() -> None:
     report = compose_flow_report(state, _AT)
     assert "(diagnostic)" in report          # the vector is actually rendered
     assert "Users" not in report
-    assert os.environ.get("USERNAME", "") not in report
+    # the account name, however this platform spells it; an unset or empty name
+    # cannot be searched for (an empty string is in every report)
+    for account in {os.environ.get("USERNAME"), os.environ.get("USER"), os.path.basename(os.path.expanduser("~"))}:
+        if account:
+            assert account not in report
     assert "C:" not in report
     # The useful part survives — this is redaction, not deletion.
     assert "FileExistsError" in report and "reports" in report

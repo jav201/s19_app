@@ -1278,7 +1278,10 @@ def test_r_tst_040_report_margin_returns_the_bound(fresh_pending) -> None:
     assert returned is bound
     drained = []
     assert timing_support.qc_tm_drain(drained) == 1
-    assert drained == [("qc_tm", "x|0.500|1.000|50.0")]
+    # the bound carries the platform scaling (CI doubles it); the record states
+    # the bound actually compared and the margin it leaves
+    margin = (bound - 0.5) / bound * 100
+    assert drained == [("qc_tm", f"x|0.500|{bound:.3f}|{margin:.1f}")]
 
 
 def test_r_tst_040_2_report_margin_refuses_unsafe_labels(fresh_pending) -> None:
