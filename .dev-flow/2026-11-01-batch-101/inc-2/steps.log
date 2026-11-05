@@ -1,0 +1,13 @@
+E1 start 2026-11-02T05:35:28Z model=opus
+E1 end 2026-11-02T05:54:58Z model=opus
+E2 start 2026-11-02T05:54:58Z model=opus
+E2 end 2026-11-02T05:58:45Z model=opus
+E3 start 2026-11-02T06:00:00Z model=opus (architect + security)
+E3c start 2026-11-02T06:22:29Z model=opus
+E3c end 2026-11-02T06:31:14Z model=opus (E3 corrective, round 1)
+E3 end 2026-11-02T06:42:58Z model=opus (round 2 rulings applied; PASS-WITH-NOTES)
+E4 start 2026-11-02T06:48:15Z model=kimi-k2.8 (implementers swarm A/B + independent tester)
+E4 end 2026-11-02T08:50:16Z (impl swarm rc=124 at its 7200 s cap after finishing the code; tester done)
+E5 start 2026-11-02T13:41:16Z mutants=kimi-k2.8 reviews=opus coverage-audit=opus
+E5 end 2026-11-02T15:06:07Z model=kimi-k2.8 (records)
+E5 CI evidence 2026-11-05T15:44Z run 42037470050 recorded model=opus (orchestrator)
