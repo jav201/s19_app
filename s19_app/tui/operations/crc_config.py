@@ -90,6 +90,18 @@ CRC_SPAN_COUNT_CEILING: int = 4096
 #: AT-044a compat) — the bound applies to groups only.
 _ADDRESS_SPACE_END: int = 0x1_0000_0000
 
+#: Rule text of R-CRC-CONFIG-001.16: a file saved by the CRC Designer is
+#: an algorithm template (CTX-DESIGNER), not a CRC config — it holds no
+#: regions or groups, so nothing can be computed or written from it.
+DESIGNER_TEMPLATE_RULE: str = (
+    "a CRC Designer template is not a CRC config - it has no regions or groups"
+)
+
+#: Clip bound of ``<value>`` in the R-CRC-CONFIG-001.11 reason: the field's
+#: value as JSON text is shown whole up to this many characters, then an
+#: ellipsis (U+2026) — a bound on what an untrusted config can echo back.
+VALUE_CLIP: int = 64
+
 
 @dataclass(frozen=True)
 class CrcRegion:
@@ -225,6 +237,59 @@ def _parse_int(value: Any) -> int:
     if isinstance(value, str):
         return int(value, 16)
     raise ValueError(f"expected an int or hex string, got {type(value).__name__}")
+
+
+def _required_field(container: dict, key: str) -> Any:
+    """
+    Summary:
+        Read one required key of a parsed config container, naming the field
+        when it is absent (R-CRC-CONFIG-001.10).
+
+    Args:
+        container (dict): The parsed JSON object holding the field.
+        key (str): The field's key as the config writes it (``start``),
+            without its region or group.
+
+    Returns:
+        Any: ``container[key]``.
+
+    Raises:
+        ValueError: ``field '<key>' is missing`` when the key is absent.
+    """
+    try:
+        return container[key]
+    except KeyError:
+        raise ValueError(f"field '{key}' is missing") from None
+
+
+def _number_field(container: dict, key: str) -> int:
+    """
+    Summary:
+        Read one required number field of a parsed config container:
+        :func:`_required_field`, then :func:`_parse_int`; a parse failure
+        names the field and echoes its value as JSON text clipped to
+        :data:`VALUE_CLIP` characters plus an ellipsis (R-CRC-CONFIG-001.10,
+        R-CRC-CONFIG-001.11 [S-1]).
+
+    Args:
+        container (dict): The parsed JSON object holding the field.
+        key (str): The field's key as the config writes it.
+
+    Returns:
+        int: The parsed integer.
+
+    Raises:
+        ValueError: ``field '<key>' is missing`` when the key is absent;
+            ``field '<key>' is not a number: <clip>`` when the value is not
+            a number of CTX-CRCCONFIG.
+    """
+    raw = _required_field(container, key)
+    try:
+        return _parse_int(raw)
+    except ValueError:
+        text = json.dumps(raw)
+        clip = text if len(text) <= VALUE_CLIP else text[:VALUE_CLIP] + "…"
+        raise ValueError(f"field '{key}' is not a number: {clip}") from None
 
 
 def read_crc_config(
@@ -407,8 +472,8 @@ def parse_crc_config(text: str) -> tuple[Optional[CrcConfig], list[str]]:
             (collect-don't-abort), matching :func:`read_crc_config`.
 
     Data Flow:
-        - Parse ``text`` with stdlib ``json`` catching parse/decode errors →
-          one error.
+        - Parse ``text`` with stdlib ``json`` catching parse/decode errors
+          and a nesting ``RecursionError`` → one error.
         - Reject a non-object top level → one error.
         - Build the typed :class:`CrcConfig`; any missing/invalid field →
           one error.
@@ -431,6 +496,8 @@ def parse_crc_config(text: str) -> tuple[Optional[CrcConfig], list[str]]:
     """
     try:
         data = json.loads(text)
+    except RecursionError:
+        return None, ["CRC config is not valid JSON: nesting too deep"]
     except (json.JSONDecodeError, UnicodeDecodeError) as exc:
         return None, [f"CRC config is not valid JSON: {exc}"]
 
@@ -462,16 +529,17 @@ def _build_config(data: dict[str, Any]) -> CrcConfig:
         CrcConfig: The fully-populated config.
 
     Raises:
-        KeyError: A required field is missing.
+        ValueError: A required field is missing, an int field is not a
+            base-16-parseable string/int, the object is a CRC Designer
+            template (R-CRC-CONFIG-001.16), neither ``regions`` nor
+            ``groups`` is present and non-empty, a group rule violation
+            (see :func:`_build_group`), or the total declared span count
+            exceeds the ceiling — the ceiling applies to the COMBINED
+            count, so a pathological >4096-region legacy-only config is
+            now also rejected (recorded as part of the batch-32 §6.5
+            amendment #1).
         TypeError: A field has the wrong JSON type (e.g. ``reverse`` not a
             bool, ``regions``/``groups`` not a list, an entry not an object).
-        ValueError: An int field is not a base-16-parseable string/int;
-            neither ``regions`` nor ``groups`` is present and non-empty; a
-            group rule violation (see :func:`_build_group`); or the total
-            declared span count exceeds the ceiling — the ceiling applies to
-            the COMBINED count, so a pathological >4096-region legacy-only
-            config is now also rejected (recorded as part of the batch-32
-            §6.5 amendment #1).
 
     Data Flow:
         - Called by :func:`parse_crc_config` inside its fault-collecting
@@ -479,12 +547,20 @@ def _build_config(data: dict[str, Any]) -> CrcConfig:
 
     Dependencies:
         Uses:
-            - _parse_int
+            - _required_field
+            - _number_field
             - _build_group
         Used by:
             - parse_crc_config
     """
-    reverse = data["reverse"]
+    # R-CRC-CONFIG-001.16: a CRC Designer template (CTX-DESIGNER shape —
+    # an `algorithm` object and no flat `polynomial`) is not a CRC config;
+    # refuse it with its own reason before any field check, so the operator
+    # is not sent chasing a bare missing key.
+    if "algorithm" in data and "polynomial" not in data:
+        raise ValueError(DESIGNER_TEMPLATE_RULE)
+
+    reverse = _required_field(data, "reverse")
     if not isinstance(reverse, bool):
         raise TypeError("field 'reverse' must be a boolean")
 
@@ -507,9 +583,9 @@ def _build_config(data: dict[str, Any]) -> CrcConfig:
             raise TypeError(f"region {index} must be a JSON object")
         regions.append(
             CrcRegion(
-                start=_parse_int(raw_region["start"]),
-                end=_parse_int(raw_region["end"]),
-                output_address=_parse_int(raw_region["output_address"]),
+                start=_number_field(raw_region, "start"),
+                end=_number_field(raw_region, "end"),
+                output_address=_number_field(raw_region, "output_address"),
             )
         )
 
@@ -526,10 +602,10 @@ def _build_config(data: dict[str, Any]) -> CrcConfig:
 
     return CrcConfig(
         regions=regions,
-        polynomial=_parse_int(data["polynomial"]),
-        init=_parse_int(data["init"]),
+        polynomial=_number_field(data, "polynomial"),
+        init=_number_field(data, "init"),
         reverse=reverse,
-        final_xor=_parse_int(data["final_xor"]),
+        final_xor=_number_field(data, "final_xor"),
         groups=groups,
     )
 
@@ -555,13 +631,14 @@ def _build_group(index: int, raw_group: Any) -> CrcGroup:
         CrcGroup: The fully-validated group.
 
     Raises:
-        KeyError: A required field (``regions``, ``output_address``, a span's
-            ``start``/``end``) is missing.
+        ValueError: A required field (``regions``, ``output_address``, a
+            span's ``start``/``end``) is missing, a number field holds a
+            non-number (R-CRC-CONFIG-001.10/.11), or a rule violation —
+            empty span list, inverted span (N5), stray ``output_address``
+            in a span (N6), ``output_bytes`` outside the allowed set, or an
+            out-of-address-space value. Callers catch all three exception
+            types and convert to one collected error string.
         TypeError: A field has the wrong JSON type.
-        ValueError: A rule violation — empty span list, inverted span (N5),
-            stray ``output_address`` in a span (N6), ``output_bytes`` outside
-            the allowed set, or an out-of-address-space value. Callers catch
-            all three and convert to one collected error string.
 
     Data Flow:
         - Called per ``groups`` entry by :func:`_build_config` inside the
@@ -569,14 +646,16 @@ def _build_group(index: int, raw_group: Any) -> CrcGroup:
 
     Dependencies:
         Uses:
-            - _parse_int
+            - _required_field
+            - _number_field
+            - _parse_int (``output_bytes`` keeps its own rule text)
         Used by:
             - _build_config
     """
     if not isinstance(raw_group, dict):
         raise TypeError(f"group {index + 1} must be a JSON object")
 
-    raw_spans = raw_group["regions"]
+    raw_spans = _required_field(raw_group, "regions")
     if not isinstance(raw_spans, list):
         raise TypeError(f"group {index + 1}: field 'regions' must be a list")
     if not raw_spans:
@@ -596,8 +675,8 @@ def _build_group(index: int, raw_group: Any) -> CrcGroup:
                 "allowed inside a group span (a group has exactly one "
                 "output_address)"
             )
-        start = _parse_int(raw_span["start"])
-        end = _parse_int(raw_span["end"])
+        start = _number_field(raw_span, "start")
+        end = _number_field(raw_span, "end")
         if start < 0:
             raise ValueError(
                 f"group {index + 1} span {span_index + 1}: 'start' must be non-negative"
@@ -633,7 +712,7 @@ def _build_group(index: int, raw_group: Any) -> CrcGroup:
             f"{list(ALLOWED_OUTPUT_BYTES)}, got {output_bytes_raw!r}"
         )
 
-    output_address = _parse_int(raw_group["output_address"])
+    output_address = _number_field(raw_group, "output_address")
     if output_address < 0:
         raise ValueError(f"group {index + 1}: 'output_address' must be non-negative")
     if output_address + output_bytes > _ADDRESS_SPACE_END:

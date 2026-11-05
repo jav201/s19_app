@@ -1,0 +1,75 @@
+Inc 8 (batch-101) — E4 implementation smoke transcript (redacted)
+==================================================================
+Date: 2026-11-02. Worktree: <HOME>/Github/s19_app-b101-inc8 (branch b101-inc8).
+Interpreter: <HOME>/anaconda3/envs/s19env/python.exe
+Env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=.
+     LOCALAPPDATA=<TEMP>/s19e4n8/la  (the real %LOCALAPPDATA%\s19_app was never created)
+Runner: pytest -p no:cacheprovider -q --basetemp <TEMP>/s19e4n8/bt
+
+1) Worktree proof + import smoke
+--------------------------------
+>>> import s19_app; print(s19_app.__file__)
+<HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+>>> import s19_app.tui.app
+IMPORT_APP_OK
+
+2) Existing tests of the touched modules — batch 1
+---------------------------------------------------
+Command: pytest tests/test_crc_engine.py tests/test_crc_config.py
+         tests/test_crc_operation.py tests/test_crc_template_loader.py
+         tests/test_crc_job_upconvert.py tests/test_flow_crc_block.py
+         tests/test_flow_execution_service.py tests/test_flow_model.py
+         tests/test_flow_external_step_b96.py tests/test_flow_chainset_b94.py
+         tests/test_flow_execution.py tests/test_flow_funnel_b96.py
+         tests/test_flow_a2b_b94.py tests/test_b99_crc_region.py
+Result:
+183 passed in 58.26s
+(Full result line: "183 passed"; no failures, no errors, no skips reported.)
+
+3) Existing tests of the touched modules — batch 2 (indirect coverage)
+----------------------------------------------------------------------
+Command: pytest tests/test_flow_report_service.py tests/test_flow_report_wire.py
+         tests/test_flow_report_fusion.py tests/test_b97_flow_execution.py
+         tests/test_flow_multi_image.py tests/test_flow_crc_ui.py
+         tests/test_flow_crc_ribbon.py tests/test_tui_crc_surface.py
+         tests/test_b99_patch_truth.py tests/test_b99_staging.py
+         tests/test_b99_truncation.py tests/test_changes_symbol_entries.py
+         tests/test_flow_report_ui.py
+Result:
+296 passed in 628.88s (0:10:28)
+(Full result line: "296 passed"; no failures, no errors, no skips reported.)
+
+Smoke totals: 479 passed, 0 failed across the 27 existing test files run
+(batch 1: 183, batch 2: 296). No existing test whose expectations the design
+changes failed — nothing to list.
+
+4) E4 functional probe (scratch script under <TEMP>/s19e4n8, not the repo)
+--------------------------------------------------------------------------
+Flow X = LOAD base.s19 -> EXT(log step.log, output step.changes.json)
+         -> PATCH step.changes.json -> WRITE-OUT out.s19; two runs.
+R1 0 ok | loaded base.s19 (1 ranges)
+R1 1 ok | log 'step.log' received · output copied to step.changes.json (session)
+R1 2 ok | applied 1 entry
+R1 3 ok | wrote out.s19
+R2 0 ok | loaded base.s19 (1 ranges)
+R2 1 ok | log 'step.log' received · output copied to step.changes_1.json (session)
+R2 2 ok | applied 1 entry · read step.changes_1.json in place of step.changes.json
+R2 3 ok | wrote out_1.s19
+R2 record doc: step.changes_1.json after: (66, 66)      <- change_doc_ref + BB bytes
+R2 out: S1071000424203045D                              <- the R-FLOW-EXT.9/1 oracle record
+CLIMB error | external step refused | output 'bench/../../x.json' climbs above the project folder - give an absolute path for a file outside the project
+INSIDE ok | log 'step.log' received · output copied to rel.changes.json (session)
+CAP error | config malformed | crc config invalid: CRC config file is 32 bytes, over the 16-byte read cap — the file was not read
+PROBE_ALL_OK
+
+5) G1 parse probes (python -c)
+------------------------------
+crc32_stream(KAT, poly 0x04C11DB7, init 0x12345678, reverse true, xorout 0xFFFFFFFF) -> 0xf8b7431  (graph: 0x0F8B7431)
+crc32_stream(KAT, defaults) -> 0xcbf43926  (zlib path, unchanged)
+parse: valid config -> config object, no errors
+parse: {"algorithm": {"width": 32}} -> ["CRC config is structurally invalid: a CRC Designer template is not a CRC config - it has no regions or groups"]
+parse: config without "reverse" -> ["CRC config is structurally invalid: field 'reverse' is missing"]
+parse: "polynomial": "zz" -> ["CRC config is structurally invalid: field 'polynomial' is not a number: \"zz\""]
+parse: "[" * 100000 -> ["CRC config is not valid JSON: nesting too deep"]
+_build_group(0, {"regions": [{"start": "x", "end": "0x24"}], "output_address": "0x30"}) -> field 'start' is not a number: "x"
+_build_group(0, {"output_address": "0x30"}) -> field 'regions' is missing

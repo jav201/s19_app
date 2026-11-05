@@ -33,6 +33,7 @@ No Textual import (service-layer contract C-7).
 
 from __future__ import annotations
 
+import os
 import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field, replace
@@ -124,7 +125,7 @@ from ..operations.crc import (
     inject_crcs,
     normalized_targets,
 )
-from ..operations.crc_config import parse_crc_config
+from ..operations.crc_config import parse_crc_config, read_crc_config_text
 from ..operations.model import OperationInput
 from ..workspace import copy_into_workarea
 
@@ -236,6 +237,14 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
           ``generate_diff_report`` under ``reports/``. A sink: the threaded
           image passes through unchanged; a failed report records an error
           without aborting (the REPORT-block idiom).
+        - batch-101 inc-8: every block ref resolves through
+          ``_resolve_block_ref`` — a confirmed external step's copy is read
+          in place of a later ref that names the output file name (never
+          stale evidence), named in the block summary's read suffix, the
+          change records and the chain-set provenance; a relative log/output
+          path is read under the project folder and refused when it climbs
+          above it; the CRC block reads its config through the size-capped
+          seam.
 
     Dependencies:
         Uses:
@@ -247,6 +256,12 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
             - s19_app.tui.flow_screens.FlowBuilderPanel (rail-8 Run)
     """
     result = FlowRunResult(status=FLOW_STATUS_OK)
+    # batch-101 inc-8 (R-FLOW-EXT.9): this run's external-output copies, by
+    # the name a later ref would resolve to — "<copy folder>/<output file
+    # name>" under os.path.normcase. A later block whose ref names that file
+    # reads THIS run's copy (never a stale file under the output file name).
+    # One per run_flow call; never shared between lanes or runs.
+    rebinds: Dict[str, Path] = {}
     mem_map: Optional[dict] = None
     ranges: Optional[Sequence[Tuple[int, int]]] = None
     s0_header: Optional[bytes] = None
@@ -312,10 +327,14 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                     )
                     continue
                 image_ref, file_type = binding
-                path = _resolve_manifest_entry(
+                path, image_in_place = _resolve_block_ref(
                     ctx.project_dir, image_ref,
-                    "SourceBlock.image_ref", issues,
+                    "SourceBlock.image_ref", issues, rebinds,
                 )
+                if image_in_place:
+                    result.in_place_reads.append(
+                        (index, "SourceBlock.image_ref", image_ref, path)
+                    )
                 if path is None or not path.exists():
                     aborted = _record_error(
                         result, index, kind, "source unresolved", issues,
@@ -342,10 +361,14 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                 # project_dir IS the workarea containment root, LLR-142.2).
                 if block.a2l_ref:
                     a2l_issues: List[ValidationIssue] = []
-                    a2l_path = _resolve_manifest_entry(
+                    a2l_path, a2l_in_place = _resolve_block_ref(
                         ctx.project_dir, block.a2l_ref,
-                        "SourceBlock.a2l_ref", a2l_issues,
+                        "SourceBlock.a2l_ref", a2l_issues, rebinds,
                     )
+                    if a2l_in_place:
+                        result.in_place_reads.append(
+                            (index, "SourceBlock.a2l_ref", block.a2l_ref, a2l_path)
+                        )
                     if a2l_path is None or not a2l_path.exists():
                         aborted = _record_error(
                             result, index, kind, "a2l reference unresolved",
@@ -363,7 +386,12 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                             f"read: {type(exc).__name__}",
                         )
                         continue
-                    source_a2l_ref = block.a2l_ref
+                    # batch-101 inc-8 (R-FLOW-EXT.10): an A2L read in place of
+                    # the ref is named by the copy's file name downstream —
+                    # the PATCH arms that inherit this declaration record it.
+                    source_a2l_ref = (
+                        a2l_path.name if a2l_in_place else block.a2l_ref
+                    )
                 run_a2l_data = (
                     declared_a2l if declared_a2l is not None else ctx.a2l_data
                 )
@@ -424,10 +452,15 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                     )
                     continue
                 issues = []
-                path = _resolve_manifest_entry(
+                path, doc_in_place = _resolve_block_ref(
                     ctx.project_dir, block.change_doc_ref,
-                    "PatchBlock.change_doc_ref", issues,
+                    "PatchBlock.change_doc_ref", issues, rebinds,
                 )
+                if doc_in_place:
+                    result.in_place_reads.append(
+                        (index, "PatchBlock.change_doc_ref",
+                         block.change_doc_ref, path)
+                    )
                 if path is None or not path.exists():
                     aborted = _record_error(
                         result, index, kind, "change doc unresolved", issues,
@@ -443,12 +476,18 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                 # ``None`` and symbol entries are refused named (no implicit
                 # A2L, even when the project holds a loaded A2L).
                 patch_a2l_context = declared_a2l
+                override_in_place = False
                 if block.a2l_ref:
                     override_issues: List[ValidationIssue] = []
-                    override_path = _resolve_manifest_entry(
+                    override_path, override_in_place = _resolve_block_ref(
                         ctx.project_dir, block.a2l_ref,
-                        "PatchBlock.a2l_ref", override_issues,
+                        "PatchBlock.a2l_ref", override_issues, rebinds,
                     )
+                    if override_in_place:
+                        result.in_place_reads.append(
+                            (index, "PatchBlock.a2l_ref",
+                             block.a2l_ref, override_path)
+                        )
                     if override_path is None or not override_path.exists():
                         aborted = _record_error(
                             result, index, kind, "a2l reference unresolved",
@@ -494,12 +533,21 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                 # the flow did (previously reduced to "applied N entries" and
                 # discarded). The effective reference is the patch's override,
                 # else the SOURCE declaration, else None — never implicit.
-                effective_a2l_ref = block.a2l_ref or source_a2l_ref
+                effective_a2l_ref = (
+                    block.a2l_ref or source_a2l_ref
+                ) if not override_in_place else override_path.name
+                # batch-101 inc-8 (R-FLOW-EXT.10, I-4): a document or A2L ref
+                # read in place of the typed ref is named by the copy's file
+                # name in every record and report — the block summary's read
+                # suffix names it in the lane.
+                change_doc_name = (
+                    path.name if doc_in_place else block.change_doc_ref
+                )
                 for entry in summary.entries:
                     result.change_records.append(
                         FlowChangeRecord(
                             block_index=index,
-                            change_doc_ref=block.change_doc_ref,
+                            change_doc_ref=change_doc_name,
                             a2l_ref=effective_a2l_ref,
                             entry_type=entry.entry_type,
                             symbol=entry.symbol,
@@ -516,7 +564,7 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                     result.refusals.append(
                         FlowRefusal(
                             block_index=index,
-                            change_doc_ref=block.change_doc_ref,
+                            change_doc_ref=change_doc_name,
                             a2l_ref=effective_a2l_ref,
                             code=issue.code,
                             symbol=issue.symbol,
@@ -731,10 +779,15 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                     )
                     continue
                 issues = []
-                path = _resolve_manifest_entry(
+                path, check_in_place = _resolve_block_ref(
                     ctx.project_dir, block.check_doc_ref,
-                    "CheckBlock.check_doc_ref", issues,
+                    "CheckBlock.check_doc_ref", issues, rebinds,
                 )
+                if check_in_place:
+                    result.in_place_reads.append(
+                        (index, "CheckBlock.check_doc_ref",
+                         block.check_doc_ref, path)
+                    )
                 if path is None or not path.exists():
                     _record_check_own_op(
                         result, index, kind, block.gating, issues,
@@ -795,10 +848,15 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                     )
                     continue
                 issues = []
-                path = _resolve_manifest_entry(
+                path, config_in_place = _resolve_block_ref(
                     ctx.project_dir, block.config_ref,
-                    "CrcBlock.config_ref", issues,
+                    "CrcBlock.config_ref", issues, rebinds,
                 )
+                if config_in_place:
+                    result.in_place_reads.append(
+                        (index, "CrcBlock.config_ref",
+                         block.config_ref, path)
+                    )
                 if path is None or not path.exists():
                     # LLR-092.1: containment reject (absolute/escape/reparse) or
                     # a missing target — fail closed BEFORE opening any file.
@@ -807,9 +865,20 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                         "crc config not found or not inside the project",
                     )
                     continue
-                config, config_errors = parse_crc_config(
-                    path.read_text(encoding="utf-8")
+                # batch-101 inc-8 (R-FLOW-CRC.9 [S-5]): read through the shared
+                # size-capped seam (256 MiB read cap), not a bare read_text —
+                # an over-limit file is refused with the cap named, never read.
+                config_text, config_read_errors = read_crc_config_text(
+                    str(path), ctx.project_dir
                 )
+                if config_read_errors:
+                    aborted = _record_error(
+                        result, index, kind, "config malformed", [],
+                        "crc config invalid: "
+                        + "; ".join(config_read_errors[:3]),
+                    )
+                    continue
+                config, config_errors = parse_crc_config(config_text)
                 if config is None or config_errors:
                     # LLR-092.2: malformed config → error, image un-injected.
                     aborted = _record_error(
@@ -939,10 +1008,15 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                 ):
                     if binding.source == A2B_INPUT_FILE:
                         issues = []
-                        path = _resolve_manifest_entry(
+                        path, side_in_place = _resolve_block_ref(
                             ctx.project_dir, binding.ref,
-                            f"A2BBlock.image_{side.lower()}", issues,
+                            f"A2BBlock.image_{side.lower()}", issues, rebinds,
                         )
+                        if side_in_place:
+                            result.in_place_reads.append(
+                                (index, f"A2BBlock.image_{side.lower()}",
+                                 binding.ref, path)
+                            )
                         if path is None or not path.exists():
                             aborted = _record_error(
                                 result, index, kind, "input unresolved",
@@ -1089,7 +1163,32 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                 log_path = Path(confirmation.log_ref)
                 if not log_path.is_absolute():
                     log_path = Path(ctx.project_dir) / log_path
+                    # batch-101 inc-8 (R-FLOW-EXT.14 [S-3]): a relative log
+                    # that climbs above the project folder is refused, by
+                    # text (normalised join, no link followed) — an absolute
+                    # path stays the explicit way to name an outside file.
+                    if _climbs_above_project(log_path, Path(ctx.project_dir)):
+                        aborted = _record_error(
+                            result, index, kind, "external step refused", [],
+                            f"log '{confirmation.log_ref}' climbs above the "
+                            "project folder - give an absolute path for a "
+                            "file outside the project",
+                        )
+                        continue
                 source_path = Path(confirmation.source_path)
+                if not source_path.is_absolute():
+                    # batch-101 inc-8 (R-FLOW-EXT.2, D15-17): a relative
+                    # output is read under the open project folder, like the
+                    # log — never against the working directory.
+                    source_path = Path(ctx.project_dir) / source_path
+                    if _climbs_above_project(source_path, Path(ctx.project_dir)):
+                        aborted = _record_error(
+                            result, index, kind, "external step refused", [],
+                            f"output '{confirmation.source_path}' climbs above "
+                            "the project folder - give an absolute path for "
+                            "a file outside the project",
+                        )
+                        continue
                 if not log_path.is_file():
                     aborted = _record_error(
                         result, index, kind, "external step refused", [],
@@ -1115,6 +1214,14 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                     )
                     continue
                 result.written_paths.append(copied)
+                # batch-101 inc-8 (R-FLOW-EXT.9): a later block of THIS run
+                # whose ref names "<copy folder>/<output file name>" reads the
+                # copy, not whatever file sits under that name (F-49: never
+                # stale evidence). A later external step with the same output
+                # file name replaces the entry.
+                rebinds[os.path.normcase(
+                    str(copied.parent / Path(source_path).resolve().name)
+                )] = copied
                 result.block_results.append(
                     BlockResult(
                         index, kind, BLOCK_STATUS_OK,
@@ -1206,6 +1313,11 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                             [f"{type(exc).__name__}: {exc}"])
             )
             aborted = True
+        finally:
+            # batch-101 inc-8 (R-FLOW-EXT.12): whatever path ended the block
+            # (normal end, `continue`, the `except` above), its summary names
+            # every copy read in place of one of its refs, in read order.
+            _apply_block_read_suffixes(result, index)
 
     # LLR-087.2: three-way roll-up. FAILED keys on `aborted` ALONE (an image
     # broken by a LOAD/PATCH/WRITE-OUT STOP); ISSUES when output was produced
@@ -1237,6 +1349,88 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
     if not result.pre_crc_ranges:
         result.pre_crc_ranges = list(result.image_ranges)
     return result
+
+
+#: batch-101 inc-8 (E3 round 2, N-2): refusal/status tokens a consumer
+#: matches by SUFFIX on a block summary. The read suffix is inserted BEFORE
+#: such a token so it stays last (``flow_screens._failure_detail`` matches
+#: ``endswith("unresolved")``).
+_SUFFIX_GUARDED_TOKENS: Tuple[str, ...] = ("unresolved",)
+
+
+def _apply_block_read_suffixes(result: FlowRunResult, index: int) -> None:
+    """End one block's summary with the read suffix of its in-place reads.
+
+    batch-101 inc-8 (R-FLOW-EXT.12, I-7): for each entry of
+    ``result.in_place_reads`` of this block index, in read order, the
+    summary gains `` · read <copy file name> in place of <ref>`` (ref as
+    typed). No-op when the block read nothing in place. When the summary
+    ends with a suffix-matched refusal/status token (N-2), the suffix is
+    inserted BEFORE that token so the token stays last.
+    """
+    reads = [read for read in result.in_place_reads if read[0] == index]
+    if not reads or not result.block_results:
+        return
+    block_result = result.block_results[-1]
+    if block_result.index != index:
+        return
+    suffix = "".join(
+        f" · read {copy.name} in place of {ref}"
+        for _, _, ref, copy in reads
+    )
+    summary = block_result.summary
+    for token in _SUFFIX_GUARDED_TOKENS:
+        if summary.endswith(token):
+            head = summary[: -len(token)].rstrip()
+            block_result.summary = f"{head}{suffix} {token}"
+            return
+    block_result.summary = summary + suffix
+
+
+def _resolve_block_ref(
+    project_dir: Path,
+    ref: str,
+    label: str,
+    issues: List[ValidationIssue],
+    rebinds: Dict[str, Path],
+) -> Tuple[Optional[Path], bool]:
+    """Resolve one block ref through the run's external-output rebind map.
+
+    batch-101 inc-8 (R-FLOW-EXT.9/10/12, D-2): the typed ref passes the
+    manifest containment guard FIRST (an absolute, escaping or linked ref is
+    refused before any rebind — a refused ref stays refused). When the run's
+    rebind map holds a copy for the resolved name and the copy is ANOTHER
+    file than the ref names, the copy passes the same per-read link check
+    (it lies in the project folder) and is returned with ``True`` — the
+    caller reads this run's copy in place of the ref and records the read in
+    ``FlowRunResult.in_place_reads``.
+    """
+    path = _resolve_manifest_entry(project_dir, ref, label, issues)
+    if path is None:
+        return None, False
+    copy = rebinds.get(os.path.normcase(str(path)))
+    if copy is not None and os.path.normcase(str(copy)) != os.path.normcase(
+        str(path)
+    ):
+        checked = _resolve_manifest_entry(project_dir, copy.name, label, issues)
+        if checked is None:
+            return None, False
+        return checked, True
+    return path, False
+
+
+def _climbs_above_project(path: Path, project_dir: Path) -> bool:
+    """Tell whether ``path`` climbs above ``project_dir``, by text.
+
+    batch-101 inc-8 (R-FLOW-EXT.14 [S-3]): ``.`` and ``..`` are removed by
+    text (``os.path.normpath``, no link followed); the result must stay
+    strictly under the normalised project folder.
+    """
+    root = os.path.normpath(str(project_dir))
+    candidate = os.path.normpath(str(path))
+    if candidate == root:
+        return False
+    return not candidate.startswith(root + os.sep)
 
 
 def _bound_source_ref(
@@ -1617,6 +1811,10 @@ class ChainRunOutcome:
             ``FlowRunResult.refusals`` (LLR-156.2).
         image_ranges (List[Tuple[int, int]]): The chain's final image
             footprint, copied from ``FlowRunResult.image_ranges`` (LLR-156.2).
+        in_place_inputs (Dict[int, str]): batch-101 inc-8 (R-FLOW-EXT.13):
+            1-based input index → the copy's file name, for a LOAD input the
+            run read in place of its ref. Empty when no input was read in
+            place; ``inputs`` keeps its ``(ref, path)`` 2-tuples.
     """
 
     chain: str
@@ -1631,6 +1829,7 @@ class ChainRunOutcome:
     change_records: List[FlowChangeRecord] = field(default_factory=list)
     refusals: List[FlowRefusal] = field(default_factory=list)
     image_ranges: List[Tuple[int, int]] = field(default_factory=list)
+    in_place_inputs: Dict[int, str] = field(default_factory=dict)
 
 
 @dataclass(slots=True)
@@ -1845,6 +2044,22 @@ def run_chain_set(
                 diagnostics=[f"{type(exc).__name__}: {exc}"],
             )
         finished = tick()
+        # batch-101 inc-8 (R-FLOW-EXT.13 [S-2]): _chain_inputs resolves the
+        # provenance BEFORE the run; a LOAD input the run read in place of
+        # its ref (an external step's copy rebound by name) is corrected
+        # here — the copy's path, and the copy's file name for the report's
+        # read suffix. Unbound inputs keep the pre-run line form.
+        in_place_inputs: Dict[int, str] = {}
+        source_block_indices = [
+            i for i, block in enumerate(blocks)
+            if isinstance(block, SourceBlock)
+        ]
+        for j, block_index in enumerate(source_block_indices, start=1):
+            for read in result.in_place_reads:
+                read_block, label, ref, copy = read
+                if read_block == block_index and label == "SourceBlock.image_ref":
+                    inputs[j - 1] = (ref, str(copy))
+                    in_place_inputs[j] = copy.name
         return ChainRunOutcome(
             chain=spec.name,
             template=spec.template,
@@ -1861,6 +2076,7 @@ def run_chain_set(
             change_records=list(result.change_records),
             refusals=list(result.refusals),
             image_ranges=list(result.image_ranges),
+            in_place_inputs=in_place_inputs,
         )
 
     if mode == CHAIN_RUN_PARALLEL:
@@ -1946,11 +2162,21 @@ def compose_chain_set_report(
     lines.extend(["", "## Input provenance", ""])
     for outcome in record.outcomes:
         for index, (ref, resolved) in enumerate(outcome.inputs, start=1):
-            lines.append(
+            line = (
                 f"- Chain {md_safe(outcome.chain, limit=64)} input {index}: "
                 f"{md_safe(ref, limit=120)} [bound] "
                 f"path=`{md_code(resolved)}`"
             )
+            # batch-101 inc-8 (R-FLOW-EXT.13): a rebound input names the copy
+            # and ends with the read suffix; an unbound input keeps the
+            # TC-B94-30 line form.
+            copy_name = outcome.in_place_inputs.get(index)
+            if copy_name is not None:
+                line += (
+                    f" · read {md_safe(copy_name, limit=120)} in place of "
+                    f"{md_safe(ref, limit=120)}"
+                )
+            lines.append(line)
     if not any(outcome.inputs for outcome in record.outcomes):
         lines.append("- (no inputs consumed)")
     # batch-99 Inc-8 (LLR-156.3): what the run did NOT apply, per lane — the

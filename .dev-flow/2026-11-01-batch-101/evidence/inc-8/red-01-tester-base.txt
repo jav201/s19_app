@@ -1,0 +1,2364 @@
+# RED-01 (E4 tester) — the two new Inc-8 test files run on BASE e266395 (merge-base HEAD main), detached worktree, s19_app.__file__ printed first.
+# Env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. ; interpreter <PY>/python.exe (s19env); --basetemp <TMP>/bt.
+# Result: 64 failed, 18 passed. The 18 passes are the design's holds-on-base positive controls
+# (engine catalogue with bit-symmetric inits, Designer catalogue, 001.16/4, EXT.2/1, 9/2, 9/3, 9/14,
+# 9/15, 10/3, 11/1, 11/2, FLOW-CRC.3, FLOW-CRC.4/3). Every other failure is behavioural (named in
+# E4-tester-notes.md); 12/8 and 13/2 also fail on base for the design's new API fields
+# (in_place_reads / in_place_inputs absent on base).
+#
+== RED on BASE: batch-101 inc-8 E4 tester ==
+== base commit: e2663953ef06da6f05468da282c71019af04c1ee (merge-base HEAD main) ==
+S19_APP_FILE: <TMP>\base\s19_app\__init__.py
+FF..FFFFF......FFFFFFFFFFFFFFFFFF.FFFF.FF..FFFFFFFFFF.FFF.FFFFFFFFFFFFFF [ 87%]
+FFF...FF.F                                                               [100%]
+================================== FAILURES ===================================
+____________ test_r_crc_engine_001_1_1_reverse_takes_init_as_given ____________
+
+    def test_r_crc_engine_001_1_1_reverse_takes_init_as_given() -> None:
+        """KAT, poly 0x04C11DB7, init 0x12345678, reverse true, xorout 0xFFFFFFFF
+        → 0x0F8B7431 (base seeds the register with the reflected init →
+        0x18026B2A)."""
+>       assert (
+            crc32_stream(
+                KAT, polynomial=_POLY, init=0x12345678, reverse=True, final_xor=0xFFFFFFFF
+            )
+            == 0x0F8B7431
+        )
+E       AssertionError: assert 402811690 == 260797489
+E        +  where 402811690 = crc32_stream(b'123456789', polynomial=79764919, init=305419896, reverse=True, final_xor=4294967295)
+
+tests\test_b101_crc_model_and_reasons.py:115: AssertionError
+_________ test_r_crc_engine_001_1_2_bit_reversed_inits_stay_distinct __________
+
+    def test_r_crc_engine_001_1_2_bit_reversed_inits_stay_distinct() -> None:
+        """Two inits that are each other's bit reversal give different CRCs with
+        reverse true (base swaps the two values)."""
+        first = crc32_stream(
+            KAT, polynomial=_POLY, init=0x00000001, reverse=True, final_xor=0x00000000
+        )
+        second = crc32_stream(
+            KAT, polynomial=_POLY, init=0x80000000, reverse=True, final_xor=0x00000000
+        )
+>       assert (first, second) == (0x334D3950, 0x3A8639CB)
+E       assert (981875147, 860698960) == (860698960, 981875147)
+E         
+E         At index 0 diff: 981875147 != 860698960
+E         Use -v to get more diff
+
+tests\test_b101_crc_model_and_reasons.py:132: AssertionError
+________ test_r_crc_engine_001_1_5_operations_check_gives_model_value _________
+
+    def test_r_crc_engine_001_1_5_operations_check_gives_model_value() -> None:
+        """Config K over image K through ``check_regions`` (the call the Operations
+        check makes) → the one region's computed CRC is 0x0F8B7431."""
+        config, errors = parse_crc_config(json.dumps(_CONFIG_K))
+        assert config is not None and errors == [], errors
+        regions = check_regions(_op_input(), config)
+        assert len(regions) == 1
+>       assert regions[0].computed_crc == 0x0F8B7431
+E       assert 402811690 == 260797489
+E        +  where 402811690 = CrcCoverageResult(output_address=4112, computed_crc=402811690, stored_value=None, matched=None, written=False, output_bytes=4, absent_bytes=0).computed_crc
+
+tests\test_b101_crc_model_and_reasons.py:166: AssertionError
+________ test_r_crc_engine_001_1_6_operations_write_stores_model_value ________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_crc_engine_001_1_6_oper0')
+
+    def test_r_crc_engine_001_1_6_operations_write_stores_model_value(tmp_path: Path) -> None:
+        """The Operations write route ``write_crc_image`` writes the model value:
+        the written file holds 31 74 8B 0F at 0x1010..0x1013."""
+        config, errors = parse_crc_config(json.dumps(_CONFIG_K))
+        assert config is not None and errors == [], errors
+        written = write_crc_image(_op_input(), config, workarea_base=tmp_path)
+        assert written.findings == [] and written.written_path is not None
+        mem = _reload_mem(written.written_path)
+>       assert [mem[0x1010 + i] for i in range(4)] == [0x31, 0x74, 0x8B, 0x0F]
+E       assert [42, 107, 2, 24] == [49, 116, 139, 15]
+E         
+E         At index 0 diff: 42 != 49
+E         Use -v to get more diff
+
+tests\test_b101_crc_model_and_reasons.py:177: AssertionError
+________ test_r_crc_engine_001_1_7_flow_crc_block_injects_model_value _________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_crc_engine_001_1_7_flow0')
+
+    def test_r_crc_engine_001_1_7_flow_crc_block_injects_model_value(tmp_path: Path) -> None:
+        """Flow LOAD k.s19 → CRC templates/k.json (Config K) → WRITE-OUT: the CRC
+        block is ok and out.s19 holds 31 74 8B 0F at 0x1010..0x1013."""
+        project = _make_project(
+            tmp_path, {"k.s19": _kat_image_s19(), "templates/k.json": json.dumps(_CONFIG_K)}
+        )
+        flow = Flow(
+            name="crc",
+            blocks=[
+                SourceBlock("k.s19"),
+                CrcBlock("templates/k.json"),
+                WriteOutBlock("out.s19"),
+            ],
+        )
+        result = run_flow(flow, FlowContext(project_dir=project))
+>       assert result.status == FLOW_STATUS_OK
+E       AssertionError: assert 'completed-with-issues' == 'ok'
+E         
+E         - ok
+E         + completed-with-issues
+
+tests\test_b101_crc_model_and_reasons.py:195: AssertionError
+__________ test_r_crc_engine_002_2_1_operation_equals_designer_grid ___________
+
+    def test_r_crc_engine_002_2_1_operation_equals_designer_grid() -> None:
+        """24/24 parameter sets: ``crc32_stream`` == the Designer engine at width
+        32 with refin=refout=reverse (base: the 4 non-bit-symmetric inits with
+        reverse true differ — 8/24)."""
+        for init in _ENGINE_GRID_INITS:
+            for reverse in (True, False):
+                for final_xor in (0x00000000, 0xFFFFFFFF):
+                    operation = crc32_stream(
+                        KAT, polynomial=_POLY, init=init, reverse=reverse, final_xor=final_xor
+                    )
+                    designer = crc_stream(
+                        KAT,
+                        width=32,
+                        poly=_POLY,
+                        init=init,
+                        refin=reverse,
+                        refout=reverse,
+                        xorout=final_xor,
+                    )
+>                   assert operation == designer, (
+                        f"init {init:#010x} reverse {reverse} xorout {final_xor:#010x}: "
+                        f"{operation:#010x} != {designer:#010x}"
+                    )
+E                   AssertionError: init 0x12345678 reverse True xorout 0x00000000: 0xe7fd94d5 != 0xf0748bce
+E                   assert 3892155605 == 4034169806
+
+tests\test_b101_crc_model_and_reasons.py:231: AssertionError
+_________ test_r_crc_engine_002_2_2_operation_equals_designer_random __________
+
+    def test_r_crc_engine_002_2_2_operation_equals_designer_random() -> None:
+        """50/50 random sets (seed 7): random 0..1023 bytes, random odd poly,
+        init, final_xor, reverse — the two engines agree."""
+        rng = random.Random(7)
+        for _ in range(50):
+            data = bytes(rng.randrange(256) for _ in range(rng.randrange(1024)))
+            poly = rng.getrandbits(32) | 1
+            init = rng.getrandbits(32)
+            final_xor = rng.getrandbits(32)
+            reverse = rng.choice((True, False))
+            operation = crc32_stream(
+                data, polynomial=poly, init=init, reverse=reverse, final_xor=final_xor
+            )
+            designer = crc_stream(
+                data,
+                width=32,
+                poly=poly,
+                init=init,
+                refin=reverse,
+                refout=reverse,
+                xorout=final_xor,
+            )
+>           assert operation == designer
+E           assert 3393983058 == 119058638
+
+tests\test_b101_crc_model_and_reasons.py:259: AssertionError
+__________ test_r_crc_config_001_10_missing_field_is_named[reverse] ___________
+
+case = 'reverse'
+config = {'final_xor': '0xFFFFFFFF', 'init': '0xFFFFFFFF', 'polynomial': '0x04C11DB7', 'regions': [{'end': '0x4', 'output_address': '0x10', 'start': '0x0'}]}
+field = 'reverse'
+
+    @pytest.mark.parametrize(
+        "case,config,field", _missing_field_cases(),
+        ids=[case for case, _, _ in _missing_field_cases()],
+    )
+    def test_r_crc_config_001_10_missing_field_is_named(case: str, config: dict, field: str) -> None:
+        """Each missing required field gives exactly
+        ``CRC config is structurally invalid: field '<name>' is missing``."""
+        parsed, errors = parse_crc_config(json.dumps(config))
+        assert parsed is None
+>       assert errors == [
+            f"CRC config is structurally invalid: field '{field}' is missing"
+        ], errors
+E       AssertionError: ["CRC config is structurally invalid: 'reverse'"]
+E       assert ["CRC config ...d: 'reverse'"] == ["CRC config ...' is missing"]
+E         
+E         At index 0 diff: "CRC config is structurally invalid: 'reverse'" != "CRC config is structurally invalid: field 'reverse' is missing"
+E         Use -v to get more diff
+
+tests\test_b101_crc_model_and_reasons.py:336: AssertionError
+_________ test_r_crc_config_001_10_missing_field_is_named[polynomial] _________
+
+case = 'polynomial'
+config = {'final_xor': '0xFFFFFFFF', 'init': '0xFFFFFFFF', 'regions': [{'end': '0x4', 'output_address': '0x10', 'start': '0x0'}], 'reverse': True}
+field = 'polynomial'
+
+    @pytest.mark.parametrize(
+        "case,config,field", _missing_field_cases(),
+        ids=[case for case, _, _ in _missing_field_cases()],
+    )
+    def test_r_crc_config_001_10_missing_field_is_named(case: str, config: dict, field: str) -> None:
+        """Each missing required field gives exactly
+        ``CRC config is structurally invalid: field '<name>' is missing``."""
+        parsed, errors = parse_crc_config(json.dumps(config))
+        assert parsed is None
+>       assert errors == [
+            f"CRC config is structurally invalid: field '{field}' is missing"
+        ], errors
+E       AssertionError: ["CRC config is structurally invalid: 'polynomial'"]
+E       assert ["CRC config ...'polynomial'"] == ["CRC config ...' is missing"]
+E         
+E         At index 0 diff: "CRC config is structurally invalid: 'polynomial'" != "CRC config is structurally invalid: field 'polynomial' is missing"
+E         Use -v to get more diff
+
+tests\test_b101_crc_model_and_reasons.py:336: AssertionError
+____________ test_r_crc_config_001_10_missing_field_is_named[init] ____________
+
+case = 'init'
+config = {'final_xor': '0xFFFFFFFF', 'polynomial': '0x04C11DB7', 'regions': [{'end': '0x4', 'output_address': '0x10', 'start': '0x0'}], 'reverse': True}
+field = 'init'
+
+    @pytest.mark.parametrize(
+        "case,config,field", _missing_field_cases(),
+        ids=[case for case, _, _ in _missing_field_cases()],
+    )
+    def test_r_crc_config_001_10_missing_field_is_named(case: str, config: dict, field: str) -> None:
+        """Each missing required field gives exactly
+        ``CRC config is structurally invalid: field '<name>' is missing``."""
+        parsed, errors = parse_crc_config(json.dumps(config))
+        assert parsed is None
+>       assert errors == [
+            f"CRC config is structurally invalid: field '{field}' is missing"
+        ], errors
+E       AssertionError: ["CRC config is structurally invalid: 'init'"]
+E       assert ["CRC config ...alid: 'init'"] == ["CRC config ...' is missing"]
+E         
+E         At index 0 diff: "CRC config is structurally invalid: 'init'" != "CRC config is structurally invalid: field 'init' is missing"
+E         Use -v to get more diff
+
+tests\test_b101_crc_model_and_reasons.py:336: AssertionError
+_________ test_r_crc_config_001_10_missing_field_is_named[final_xor] __________
+
+case = 'final_xor'
+config = {'init': '0xFFFFFFFF', 'polynomial': '0x04C11DB7', 'regions': [{'end': '0x4', 'output_address': '0x10', 'start': '0x0'}], 'reverse': True}
+field = 'final_xor'
+
+    @pytest.mark.parametrize(
+        "case,config,field", _missing_field_cases(),
+        ids=[case for case, _, _ in _missing_field_cases()],
+    )
+    def test_r_crc_config_001_10_missing_field_is_named(case: str, config: dict, field: str) -> None:
+        """Each missing required field gives exactly
+        ``CRC config is structurally invalid: field '<name>' is missing``."""
+        parsed, errors = parse_crc_config(json.dumps(config))
+        assert parsed is None
+>       assert errors == [
+            f"CRC config is structurally invalid: field '{field}' is missing"
+        ], errors
+E       AssertionError: ["CRC config is structurally invalid: 'final_xor'"]
+E       assert ["CRC config ... 'final_xor'"] == ["CRC config ...' is missing"]
+E         
+E         At index 0 diff: "CRC config is structurally invalid: 'final_xor'" != "CRC config is structurally invalid: field 'final_xor' is missing"
+E         Use -v to get more diff
+
+tests\test_b101_crc_model_and_reasons.py:336: AssertionError
+________ test_r_crc_config_001_10_missing_field_is_named[region-start] ________
+
+case = 'region-start'
+config = {'final_xor': '0xFFFFFFFF', 'init': '0xFFFFFFFF', 'polynomial': '0x04C11DB7', 'regions': [{'end': '0x4', 'output_address': '0x10'}], ...}
+field = 'start'
+
+    @pytest.mark.parametrize(
+        "case,config,field", _missing_field_cases(),
+        ids=[case for case, _, _ in _missing_field_cases()],
+    )
+    def test_r_crc_config_001_10_missing_field_is_named(case: str, config: dict, field: str) -> None:
+        """Each missing required field gives exactly
+        ``CRC config is structurally invalid: field '<name>' is missing``."""
+        parsed, errors = parse_crc_config(json.dumps(config))
+        assert parsed is None
+>       assert errors == [
+            f"CRC config is structurally invalid: field '{field}' is missing"
+        ], errors
+E       AssertionError: ["CRC config is structurally invalid: 'start'"]
+E       assert ["CRC config ...lid: 'start'"] == ["CRC config ...' is missing"]
+E         
+E         At index 0 diff: "CRC config is structurally invalid: 'start'" != "CRC config is structurally invalid: field 'start' is missing"
+E         Use -v to get more diff
+
+tests\test_b101_crc_model_and_reasons.py:336: AssertionError
+____ test_r_crc_config_001_10_missing_field_is_named[group-output_address] ____
+
+case = 'group-output_address'
+config = {'final_xor': '0xFFFFFFFF', 'groups': [{'regions': [{'end': '0x24', 'start': '0x20'}]}], 'init': '0xFFFFFFFF', 'polynomial': '0x04C11DB7', ...}
+field = 'output_address'
+
+    @pytest.mark.parametrize(
+        "case,config,field", _missing_field_cases(),
+        ids=[case for case, _, _ in _missing_field_cases()],
+    )
+    def test_r_crc_config_001_10_missing_field_is_named(case: str, config: dict, field: str) -> None:
+        """Each missing required field gives exactly
+        ``CRC config is structurally invalid: field '<name>' is missing``."""
+        parsed, errors = parse_crc_config(json.dumps(config))
+        assert parsed is None
+>       assert errors == [
+            f"CRC config is structurally invalid: field '{field}' is missing"
+        ], errors
+E       AssertionError: ["CRC config is structurally invalid: 'output_address'"]
+E       assert ["CRC config ...put_address'"] == ["CRC config ...' is missing"]
+E         
+E         At index 0 diff: "CRC config is structurally invalid: 'output_address'" != "CRC config is structurally invalid: field 'output_address' is missing"
+E         Use -v to get more diff
+
+tests\test_b101_crc_model_and_reasons.py:336: AssertionError
+_______ test_r_crc_config_001_10_missing_field_is_named[group-regions] ________
+
+case = 'group-regions'
+config = {'final_xor': '0xFFFFFFFF', 'groups': [{'output_address': '0x30'}], 'init': '0xFFFFFFFF', 'polynomial': '0x04C11DB7', ...}
+field = 'regions'
+
+    @pytest.mark.parametrize(
+        "case,config,field", _missing_field_cases(),
+        ids=[case for case, _, _ in _missing_field_cases()],
+    )
+    def test_r_crc_config_001_10_missing_field_is_named(case: str, config: dict, field: str) -> None:
+        """Each missing required field gives exactly
+        ``CRC config is structurally invalid: field '<name>' is missing``."""
+        parsed, errors = parse_crc_config(json.dumps(config))
+        assert parsed is None
+>       assert errors == [
+            f"CRC config is structurally invalid: field '{field}' is missing"
+        ], errors
+E       AssertionError: ["CRC config is structurally invalid: 'regions'"]
+E       assert ["CRC config ...d: 'regions'"] == ["CRC config ...' is missing"]
+E         
+E         At index 0 diff: "CRC config is structurally invalid: 'regions'" != "CRC config is structurally invalid: field 'regions' is missing"
+E         Use -v to get more diff
+
+tests\test_b101_crc_model_and_reasons.py:336: AssertionError
+__________ test_r_crc_config_001_10_missing_field_is_named[span-end] __________
+
+case = 'span-end'
+config = {'final_xor': '0xFFFFFFFF', 'groups': [{'output_address': '0x30', 'regions': [{'start': '0x20'}]}], 'init': '0xFFFFFFFF', 'polynomial': '0x04C11DB7', ...}
+field = 'end'
+
+    @pytest.mark.parametrize(
+        "case,config,field", _missing_field_cases(),
+        ids=[case for case, _, _ in _missing_field_cases()],
+    )
+    def test_r_crc_config_001_10_missing_field_is_named(case: str, config: dict, field: str) -> None:
+        """Each missing required field gives exactly
+        ``CRC config is structurally invalid: field '<name>' is missing``."""
+        parsed, errors = parse_crc_config(json.dumps(config))
+        assert parsed is None
+>       assert errors == [
+            f"CRC config is structurally invalid: field '{field}' is missing"
+        ], errors
+E       AssertionError: ["CRC config is structurally invalid: 'end'"]
+E       assert ["CRC config ...valid: 'end'"] == ["CRC config ...' is missing"]
+E         
+E         At index 0 diff: "CRC config is structurally invalid: 'end'" != "CRC config is structurally invalid: field 'end' is missing"
+E         Use -v to get more diff
+
+tests\test_b101_crc_model_and_reasons.py:336: AssertionError
+____________ test_r_crc_config_001_11_non_number_is_named[init-zz] ____________
+
+case = 'init-zz'
+config = {'final_xor': '0xFFFFFFFF', 'init': 'zz', 'polynomial': '0x04C11DB7', 'regions': [{'end': '0x4', 'output_address': '0x10', 'start': '0x0'}], ...}
+field = 'init', value = '"zz"'
+
+    @pytest.mark.parametrize(
+        "case,config,field,value", _non_number_cases(),
+        ids=[case for case, _, _, _ in _non_number_cases()],
+    )
+    def test_r_crc_config_001_11_non_number_is_named(
+        case: str, config: dict, field: str, value: str
+    ) -> None:
+        """Each non-number value gives exactly
+        ``CRC config is structurally invalid: field '<name>' is not a number: <value>``
+        with the value as JSON text."""
+        parsed, errors = parse_crc_config(json.dumps(config))
+        assert parsed is None
+>       assert errors == [
+            f"CRC config is structurally invalid: field '{field}' is not a number: {value}"
+        ], errors
+E       AssertionError: ["CRC config is structurally invalid: invalid literal for int() with base 16: 'zz'"]
+E       assert ["CRC config ...ase 16: 'zz'"] == ['CRC config ...number: "zz"']
+E         
+E         At index 0 diff: "CRC config is structurally invalid: invalid literal for int() with base 16: 'zz'" != 'CRC config is structurally invalid: field \'init\' is not a number: "zz"'
+E         Use -v to get more diff
+
+tests\test_b101_crc_model_and_reasons.py:385: AssertionError
+___________ test_r_crc_config_001_11_non_number_is_named[init-true] ___________
+
+case = 'init-true'
+config = {'final_xor': '0xFFFFFFFF', 'init': True, 'polynomial': '0x04C11DB7', 'regions': [{'end': '0x4', 'output_address': '0x10', 'start': '0x0'}], ...}
+field = 'init', value = 'true'
+
+    @pytest.mark.parametrize(
+        "case,config,field,value", _non_number_cases(),
+        ids=[case for case, _, _, _ in _non_number_cases()],
+    )
+    def test_r_crc_config_001_11_non_number_is_named(
+        case: str, config: dict, field: str, value: str
+    ) -> None:
+        """Each non-number value gives exactly
+        ``CRC config is structurally invalid: field '<name>' is not a number: <value>``
+        with the value as JSON text."""
+        parsed, errors = parse_crc_config(json.dumps(config))
+        assert parsed is None
+>       assert errors == [
+            f"CRC config is structurally invalid: field '{field}' is not a number: {value}"
+        ], errors
+E       AssertionError: ['CRC config is structurally invalid: expected an integer, got a boolean']
+E       assert ['CRC config ...ot a boolean'] == ['CRC config ...number: true']
+E         
+E         At index 0 diff: 'CRC config is structurally invalid: expected an integer, got a boolean' != "CRC config is structurally invalid: field 'init' is not a number: true"
+E         Use -v to get more diff
+
+tests\test_b101_crc_model_and_reasons.py:385: AssertionError
+________ test_r_crc_config_001_11_non_number_is_named[polynomial-1.5] _________
+
+case = 'polynomial-1.5'
+config = {'final_xor': '0xFFFFFFFF', 'init': '0xFFFFFFFF', 'polynomial': 1.5, 'regions': [{'end': '0x4', 'output_address': '0x10', 'start': '0x0'}], ...}
+field = 'polynomial', value = '1.5'
+
+    @pytest.mark.parametrize(
+        "case,config,field,value", _non_number_cases(),
+        ids=[case for case, _, _, _ in _non_number_cases()],
+    )
+    def test_r_crc_config_001_11_non_number_is_named(
+        case: str, config: dict, field: str, value: str
+    ) -> None:
+        """Each non-number value gives exactly
+        ``CRC config is structurally invalid: field '<name>' is not a number: <value>``
+        with the value as JSON text."""
+        parsed, errors = parse_crc_config(json.dumps(config))
+        assert parsed is None
+>       assert errors == [
+            f"CRC config is structurally invalid: field '{field}' is not a number: {value}"
+        ], errors
+E       AssertionError: ['CRC config is structurally invalid: expected an int or hex string, got float']
+E       assert ['CRC config ...g, got float'] == ['CRC config ... number: 1.5']
+E         
+E         At index 0 diff: 'CRC config is structurally invalid: expected an int or hex string, got float' != "CRC config is structurally invalid: field 'polynomial' is not a number: 1.5"
+E         Use -v to get more diff
+
+tests\test_b101_crc_model_and_reasons.py:385: AssertionError
+________ test_r_crc_config_001_11_non_number_is_named[final_xor-null] _________
+
+case = 'final_xor-null'
+config = {'final_xor': None, 'init': '0xFFFFFFFF', 'polynomial': '0x04C11DB7', 'regions': [{'end': '0x4', 'output_address': '0x10', 'start': '0x0'}], ...}
+field = 'final_xor', value = 'null'
+
+    @pytest.mark.parametrize(
+        "case,config,field,value", _non_number_cases(),
+        ids=[case for case, _, _, _ in _non_number_cases()],
+    )
+    def test_r_crc_config_001_11_non_number_is_named(
+        case: str, config: dict, field: str, value: str
+    ) -> None:
+        """Each non-number value gives exactly
+        ``CRC config is structurally invalid: field '<name>' is not a number: <value>``
+        with the value as JSON text."""
+        parsed, errors = parse_crc_config(json.dumps(config))
+        assert parsed is None
+>       assert errors == [
+            f"CRC config is structurally invalid: field '{field}' is not a number: {value}"
+        ], errors
+E       AssertionError: ['CRC config is structurally invalid: expected an int or hex string, got NoneType']
+E       assert ['CRC config ...got NoneType'] == ['CRC config ...number: null']
+E         
+E         At index 0 diff: 'CRC config is structurally invalid: expected an int or hex string, got NoneType' != "CRC config is structurally invalid: field 'final_xor' is not a number: null"
+E         Use -v to get more diff
+
+tests\test_b101_crc_model_and_reasons.py:385: AssertionError
+__________ test_r_crc_config_001_11_non_number_is_named[region-end] ___________
+
+case = 'region-end'
+config = {'final_xor': '0xFFFFFFFF', 'init': '0xFFFFFFFF', 'polynomial': '0x04C11DB7', 'regions': [{'end': '0xQ', 'output_address': '0x10', 'start': '0x0'}], ...}
+field = 'end', value = '"0xQ"'
+
+    @pytest.mark.parametrize(
+        "case,config,field,value", _non_number_cases(),
+        ids=[case for case, _, _, _ in _non_number_cases()],
+    )
+    def test_r_crc_config_001_11_non_number_is_named(
+        case: str, config: dict, field: str, value: str
+    ) -> None:
+        """Each non-number value gives exactly
+        ``CRC config is structurally invalid: field '<name>' is not a number: <value>``
+        with the value as JSON text."""
+        parsed, errors = parse_crc_config(json.dumps(config))
+        assert parsed is None
+>       assert errors == [
+            f"CRC config is structurally invalid: field '{field}' is not a number: {value}"
+        ], errors
+E       AssertionError: ["CRC config is structurally invalid: invalid literal for int() with base 16: '0xQ'"]
+E       assert ["CRC config ...se 16: '0xQ'"] == ['CRC config ...umber: "0xQ"']
+E         
+E         At index 0 diff: "CRC config is structurally invalid: invalid literal for int() with base 16: '0xQ'" != 'CRC config is structurally invalid: field \'end\' is not a number: "0xQ"'
+E         Use -v to get more diff
+
+tests\test_b101_crc_model_and_reasons.py:385: AssertionError
+__________ test_r_crc_config_001_11_non_number_is_named[span-start] ___________
+
+case = 'span-start'
+config = {'final_xor': '0xFFFFFFFF', 'groups': [{'output_address': '0x30', 'regions': [{'end': '0x24', 'start': 'x'}]}], 'init': '0xFFFFFFFF', 'polynomial': '0x04C11DB7', ...}
+field = 'start', value = '"x"'
+
+    @pytest.mark.parametrize(
+        "case,config,field,value", _non_number_cases(),
+        ids=[case for case, _, _, _ in _non_number_cases()],
+    )
+    def test_r_crc_config_001_11_non_number_is_named(
+        case: str, config: dict, field: str, value: str
+    ) -> None:
+        """Each non-number value gives exactly
+        ``CRC config is structurally invalid: field '<name>' is not a number: <value>``
+        with the value as JSON text."""
+        parsed, errors = parse_crc_config(json.dumps(config))
+        assert parsed is None
+>       assert errors == [
+            f"CRC config is structurally invalid: field '{field}' is not a number: {value}"
+        ], errors
+E       AssertionError: ["CRC config is structurally invalid: invalid literal for int() with base 16: 'x'"]
+E       assert ["CRC config ...base 16: 'x'"] == ['CRC config ... number: "x"']
+E         
+E         At index 0 diff: "CRC config is structurally invalid: invalid literal for int() with base 16: 'x'" != 'CRC config is structurally invalid: field \'start\' is not a number: "x"'
+E         Use -v to get more diff
+
+tests\test_b101_crc_model_and_reasons.py:385: AssertionError
+_________________ test_r_crc_config_001_11_7_value_is_clipped _________________
+
+    def test_r_crc_config_001_11_7_value_is_clipped() -> None:
+        """[S-1] A huge value is clipped: 64 characters of the JSON text + …."""
+        prefix = "CRC config is structurally invalid: field '{}' is not a number: "
+        # (a) a 1 000 000-character non-hex string [N-1: `z`, not a hex digit]
+        huge_string = json.loads(json.dumps(_CONFIG_V))
+        huge_string["init"] = "z" * 1_000_000
+        parsed, errors = parse_crc_config(json.dumps(huge_string))
+        assert parsed is None
+        expected_a = prefix.format("init") + '"' + "z" * 63 + "…"
+>       assert errors == [expected_a], errors
+E       AssertionError: ["CRC config is structurally invalid: invalid literal for int() with base 16: 'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz...zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"]
+E       assert ['CRC config ...zzzzzzzzzzzz'] == ['CRC config ...zzzzzzzzzzz…']
+E         
+E         At index 0 diff: "CRC config is structurally invalid: invalid literal for int() with base 16: 'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" != 'CRC config is structurally invalid: field \'init\' is not a number: "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz…'
+E         Use -v to get more diff
+
+tests\test_b101_crc_model_and_reasons.py:399: AssertionError
+_______ test_r_crc_config_001_16_designer_template_is_named[saved-None] _______
+
+case = 'saved'
+text = '{\n  "schema_version": 1,\n  "name": "CRC-32/ISO-HDLC",\n  "aliases": [\n    "zlib",\n    "PKZIP",\n    "CRC-32"\n  ]...xFFFFFFFF",\n    "refin": true,\n    "refout": true,\n    "xorout": "0xFFFFFFFF",\n    "check": "0xCBF43926"\n  }\n}\n'
+
+    @pytest.mark.parametrize(
+        "case,text",
+        [
+            ("saved", None),  # the Designer's own Save output, built below
+            (
+                "width16",
+                json.dumps(
+                    {
+                        "name": "T16",
+                        "algorithm": {
+                            "width": 16,
+                            "poly": "0x1021",
+                            "init": "0xFFFF",
+                            "refin": False,
+                            "refout": False,
+                            "xorout": "0x0000",
+                            "check": None,
+                        },
+                    }
+                ),
+            ),
+            ("algorithm-not-object", json.dumps({"algorithm": 5})),
+        ],
+    )
+    def test_r_crc_config_001_16_designer_template_is_named(case: str, text: str | None) -> None:
+        """A Designer-template-shaped object gives exactly the template reason."""
+        if text is None:
+            text = emit_template(seed_template())
+            assert '"algorithm"' in text and "polynomial" not in text
+        parsed, errors = parse_crc_config(text)
+        assert parsed is None
+>       assert errors == [_TEMPLATE_REASON], errors
+E       AssertionError: ["CRC config is structurally invalid: 'reverse'"]
+E       assert ["CRC config ...d: 'reverse'"] == ['CRC config ...ns or groups']
+E         
+E         At index 0 diff: "CRC config is structurally invalid: 'reverse'" != 'CRC config is structurally invalid: a CRC Designer template is not a CRC config - it has no regions or groups'
+E         Use -v to get more diff
+
+tests\test_b101_crc_model_and_reasons.py:454: AssertionError
+_ test_r_crc_config_001_16_designer_template_is_named[width16-{"name": "T16", "algorithm": {"width": 16, "poly": "0x1021", "init": "0xFFFF", "refin": false, "refout": false, "xorout": "0x0000", "check": null}}] _
+
+case = 'width16'
+text = '{"name": "T16", "algorithm": {"width": 16, "poly": "0x1021", "init": "0xFFFF", "refin": false, "refout": false, "xorout": "0x0000", "check": null}}'
+
+    @pytest.mark.parametrize(
+        "case,text",
+        [
+            ("saved", None),  # the Designer's own Save output, built below
+            (
+                "width16",
+                json.dumps(
+                    {
+                        "name": "T16",
+                        "algorithm": {
+                            "width": 16,
+                            "poly": "0x1021",
+                            "init": "0xFFFF",
+                            "refin": False,
+                            "refout": False,
+                            "xorout": "0x0000",
+                            "check": None,
+                        },
+                    }
+                ),
+            ),
+            ("algorithm-not-object", json.dumps({"algorithm": 5})),
+        ],
+    )
+    def test_r_crc_config_001_16_designer_template_is_named(case: str, text: str | None) -> None:
+        """A Designer-template-shaped object gives exactly the template reason."""
+        if text is None:
+            text = emit_template(seed_template())
+            assert '"algorithm"' in text and "polynomial" not in text
+        parsed, errors = parse_crc_config(text)
+        assert parsed is None
+>       assert errors == [_TEMPLATE_REASON], errors
+E       AssertionError: ["CRC config is structurally invalid: 'reverse'"]
+E       assert ["CRC config ...d: 'reverse'"] == ['CRC config ...ns or groups']
+E         
+E         At index 0 diff: "CRC config is structurally invalid: 'reverse'" != 'CRC config is structurally invalid: a CRC Designer template is not a CRC config - it has no regions or groups'
+E         Use -v to get more diff
+
+tests\test_b101_crc_model_and_reasons.py:454: AssertionError
+_ test_r_crc_config_001_16_designer_template_is_named[algorithm-not-object-{"algorithm": 5}] _
+
+case = 'algorithm-not-object', text = '{"algorithm": 5}'
+
+    @pytest.mark.parametrize(
+        "case,text",
+        [
+            ("saved", None),  # the Designer's own Save output, built below
+            (
+                "width16",
+                json.dumps(
+                    {
+                        "name": "T16",
+                        "algorithm": {
+                            "width": 16,
+                            "poly": "0x1021",
+                            "init": "0xFFFF",
+                            "refin": False,
+                            "refout": False,
+                            "xorout": "0x0000",
+                            "check": None,
+                        },
+                    }
+                ),
+            ),
+            ("algorithm-not-object", json.dumps({"algorithm": 5})),
+        ],
+    )
+    def test_r_crc_config_001_16_designer_template_is_named(case: str, text: str | None) -> None:
+        """A Designer-template-shaped object gives exactly the template reason."""
+        if text is None:
+            text = emit_template(seed_template())
+            assert '"algorithm"' in text and "polynomial" not in text
+        parsed, errors = parse_crc_config(text)
+        assert parsed is None
+>       assert errors == [_TEMPLATE_REASON], errors
+E       AssertionError: ["CRC config is structurally invalid: 'reverse'"]
+E       assert ["CRC config ...d: 'reverse'"] == ['CRC config ...ns or groups']
+E         
+E         At index 0 diff: "CRC config is structurally invalid: 'reverse'" != 'CRC config is structurally invalid: a CRC Designer template is not a CRC config - it has no regions or groups'
+E         Use -v to get more diff
+
+tests\test_b101_crc_model_and_reasons.py:454: AssertionError
+_____________ test_r_crc_config_001_17_1_deep_nesting_is_a_reason _____________
+
+    def test_r_crc_config_001_17_1_deep_nesting_is_a_reason() -> None:
+        """``parse_crc_config('[' * 100000)`` returns (None, [the one reason])."""
+>       parsed, errors = parse_crc_config("[" * 100000)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b101_crc_model_and_reasons.py:473: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+s19_app\tui\operations\crc_config.py:433: in parse_crc_config
+    data = json.loads(text)
+           ^^^^^^^^^^^^^^^^
+C:\Users\<user>\anaconda3\envs\s19env\Lib\json\__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\<user>\anaconda3\envs\s19env\Lib\json\decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <json.decoder.JSONDecoder object at 0x0000019A8F46F690>
+s = '[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[...[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[['
+idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+>           obj, end = self.scan_once(s, idx)
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E           RecursionError: maximum recursion depth exceeded while decoding a JSON array from a unicode string
+
+C:\Users\<user>\anaconda3\envs\s19env\Lib\json\decoder.py:353: RecursionError
+_____________ test_r_crc_config_001_11_8_markup_value_shown_plain _____________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_crc_config_001_11_8_mar0')
+
+    def test_r_crc_config_001_11_8_markup_value_shown_plain(tmp_path: Path) -> None:
+        """[S-7] Through keys: a markup-looking value is shown as plain text —
+        the result area carries NO_CONFIG_TEXT then the exact reason, no markup
+        error and no hex view."""
+        config = json.loads(json.dumps(_CONFIG_V))
+        config["init"] = "[/]"
+        status, hex_text = _drive_crc(tmp_path, json.dumps(config))
+        expected = (
+            f"{OperationsScreen.NO_CONFIG_TEXT}\n"
+            'CRC config is structurally invalid: field \'init\' is not a number: "[/]"'
+        )
+>       assert expected in status, status
+E       AssertionError: CRC config error - no check was run:
+E         CRC config is structurally invalid: invalid literal for int() with base 16: '[/]'
+E       assert 'CRC config error - no check was run:\nCRC config is structurally invalid: field \'init\' is not a number: "[/]"' in "CRC config error - no check was run:\nCRC config is structurally invalid: invalid literal for int() with base 16: '[/]'"
+
+tests\test_b101_crc_model_and_reasons.py:548: AssertionError
+_________ test_r_crc_config_001_16_5_operations_dialog_names_template _________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_crc_config_001_16_5_ope0')
+
+    def test_r_crc_config_001_16_5_operations_dialog_names_template(tmp_path: Path) -> None:
+        """Through keys: Load config with the Designer's saved file path, Execute
+        — the result area names the template."""
+        template_dir = tmp_path / "templates"
+        template_dir.mkdir()
+        (template_dir / "demo-crc32.crc.json").write_text(
+            emit_template(seed_template()), encoding="utf-8"
+        )
+    
+        async def _drive() -> tuple[str, str, str]:
+            s19_path = tmp_path / "k.s19"
+            s19_path.write_text(_kat_image_s19(), encoding="utf-8")
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await _load_file(app, pilot, s19_path)
+                screen = await _open_crc_screen(app, pilot)
+                screen.query_one("#operation_config_path", Input).value = (
+                    "templates/demo-crc32.crc.json"
+                )
+                screen.query_one("#operation_config_load", Button).press()
+                await _flush(pilot)
+                loaded = screen.query_one("#operation_config", TextArea).text
+                screen.query_one("#operations_execute", Button).press()
+                await _flush(pilot)
+                await app.workers.wait_for_complete()
+                await _flush(pilot)
+                status = str(
+                    screen.query_one("#operation_result_status", Static).content
+                )
+                hex_content = screen.query_one("#operation_result_hex", Static).content
+                hex_text = getattr(hex_content, "plain", str(hex_content))
+                return loaded, status, hex_text
+    
+        loaded, status, hex_text = asyncio.run(_drive())
+        assert "polynomial" not in loaded and '"algorithm"' in loaded
+        expected = f"{OperationsScreen.NO_CONFIG_TEXT}\n{_TEMPLATE_REASON}"
+>       assert expected in status, status
+E       AssertionError: CRC config error - no check was run:
+E         CRC config is structurally invalid: 'reverse'
+E       assert 'CRC config error - no check was run:\nCRC config is structurally invalid: a CRC Designer template is not a CRC config - it has no regions or groups' in "CRC config error - no check was run:\nCRC config is structurally invalid: 'reverse'"
+
+tests\test_b101_crc_model_and_reasons.py:590: AssertionError
+_____ test_r_crc_config_001_17_2_operations_execute_survives_deep_nesting _____
+
+    async def _drive() -> tuple[str, str]:
+        s19_path = tmp_path / "k.s19"
+        s19_path.write_text(_kat_image_s19(), encoding="utf-8")
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await _load_file(app, pilot, s19_path)
+            screen = await _open_crc_screen(app, pilot)
+            screen.query_one("#operation_config", TextArea).text = config_text
+            screen.query_one("#operations_execute", Button).press()
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            status = str(
+>               screen.query_one("#operation_result_status", Static).content
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            )
+
+tests\test_b101_crc_model_and_reasons.py:525: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = OperationsScreen(), selector = '#operation_result_status'
+expect_type = <class 'textual.widgets._static.Static'>
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#operation_result_status' on OperationsScreen()
+
+C:\Users\<user>\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: NoMatches
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_crc_config_001_17_2_ope0')
+
+    def test_r_crc_config_001_17_2_operations_execute_survives_deep_nesting(
+        tmp_path: Path,
+    ) -> None:
+        """[S-6] Through keys: the editor text nests too deep; Execute shows the
+        reason and the app keeps running."""
+>       status, hex_text = _drive_crc(tmp_path, "[" * 100000)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b101_crc_model_and_reasons.py:599: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b101_crc_model_and_reasons.py:534: in _drive_crc
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+C:\Users\<user>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+C:\Users\<user>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\<user>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b101_crc_model_and_reasons.py:515: in _drive
+    async with app.run_test() as pilot:
+C:\Users\<user>\anaconda3\envs\s19env\Lib\contextlib.py:231: in __aexit__
+    await self.gen.athrow(typ, value, traceback)
+C:\Users\<user>\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: in run_test
+    raise self._exception
+C:\Users\<user>\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:663: in _process_messages_loop
+    await self._dispatch_message(message)
+C:\Users\<user>\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:739: in _dispatch_message
+    await self._on_message(message)
+C:\Users\<user>\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:829: in _on_message
+    await invoke(method, message)
+C:\Users\<user>\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\<user>\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:56: in _invoke
+    result = callback(*params[:parameter_count])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\screens.py:3002: in on_button_pressed
+    self._execute_selected()
+s19_app\tui\screens.py:3113: in _execute_selected
+    config, issues = parse_crc_config(
+s19_app\tui\operations\crc_config.py:433: in parse_crc_config
+    data = json.loads(text)
+           ^^^^^^^^^^^^^^^^
+C:\Users\<user>\anaconda3\envs\s19env\Lib\json\__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\<user>\anaconda3\envs\s19env\Lib\json\decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <json.decoder.JSONDecoder object at 0x0000019A8F46F690>
+s = '[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[...[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[['
+idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+>           obj, end = self.scan_once(s, idx)
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E           RecursionError: maximum recursion depth exceeded while decoding a JSON array from a unicode string
+
+C:\Users\<user>\anaconda3\envs\s19env\Lib\json\decoder.py:353: RecursionError
+---------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────
+│ <TMP>\base\s19_app\tui\screens.py:3002   
+│ in on_button_pressed                                                         
+│                                                                              
+│   2999 │   │   │   self.dismiss(None)                                        
+│   3000 │   │   │   return                                                    
+│   3001 │   │   if event.button.id == "operations_execute":                   
+│ ❱ 3002 │   │   │   self._execute_selected()                                  
+│   3003 │   │   │   return                                                    
+│   3004 │   │   if event.button.id == "operation_config_load":                
+│   3005 │   │   │   self._load_config_from_path()                             
+│                                                                              
+│ ╭────────── locals ──────────╮                                               
+│ │ event = Pressed()          │                                               
+│ │  self = OperationsScreen() │                                               
+│ ╰────────────────────────────╯                                               
+│                                                                              
+│ <TMP>\base\s19_app\tui\screens.py:3113   
+│ in _execute_selected                                                         
+│                                                                              
+│   3110 │   │   │   return                                                    
+│   3111 │   │   op_input = OperationInput.from_loaded(self.loaded)            
+│   3112 │   │   if operation_id == self.CRC_OPERATION_ID:                     
+│ ❱ 3113 │   │   │   config, issues = parse_crc_config(                        
+│   3114 │   │   │   │   self.query_one("#operation_config", TextArea).text    
+│   3115 │   │   │   )                                                         
+│   3116 │   │   │   if issues:                                                
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │     op_input = OperationInput(                                           │ 
+│ │                │   mem_map={                                             │ 
+│ │                │   │   4096: 49,                                         │ 
+│ │                │   │   4097: 50,                                         │ 
+│ │                │   │   4098: 51,                                         │ 
+│ │                │   │   4099: 52,                                         │ 
+│ │                │   │   4100: 53,                                         │ 
+│ │                │   │   4101: 54,                                         │ 
+│ │                │   │   4102: 55,                                         │ 
+│ │                │   │   4103: 56,                                         │ 
+│ │                │   │   4104: 57                                          │ 
+│ │                │   },                                                    │ 
+│ │                │   ranges=[(4096, 4105)],                                │ 
+│ │                │                                                         │ 
+│ │                input_path=WindowsPath('C:/Users/<user>/AppData/Local/Tem… │ 
+│ │                │   variant_id=None,                                      │ 
+│ │                │   file_type='s19'                                       │ 
+│ │                )                                                         │ 
+│ │    operation = <s19_app.tui.operations.crc.CrcOperation object at        │ 
+│ │                0x0000019A92684DD0>                                       │ 
+│ │ operation_id = 'crc'                                                     │ 
+│ │         self = OperationsScreen()                                        │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ <TMP>\base\s19_app\tui\operations\crc_co 
+│ nfig.py:433 in parse_crc_config                                              
+│                                                                              
+│   430 │   │   79764919                                                       
+│   431 │   """                                                                
+│   432 │   try:                                                               
+│ ❱ 433 │   │   data = json.loads(text)                                        
+│   434 │   except (json.JSONDecodeError, UnicodeDecodeError) as exc:          
+│   435 │   │   return None, [f"CRC config is not valid JSON: {exc}"]          
+│   436                                                                        
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ text = '[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[… │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\<user>\anaconda3\envs\s19env\Lib\json\__init__.py:346 in loads       
+│                                                                              
+│   343 │   if (cls is None and object_hook is None and                        
+│   344 │   │   │   parse_int is None and parse_float is None and              
+│   345 │   │   │   parse_constant is None and object_pairs_hook is None and n 
+│ ❱ 346 │   │   return _default_decoder.decode(s)                              
+│   347 │   if cls is None:                                                    
+│   348 │   │   cls = JSONDecoder                                              
+│   349 │   if object_hook is not None:                                        
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │               cls = None                                                 │ 
+│ │                kw = {}                                                   │ 
+│ │       object_hook = None                                                 │ 
+│ │ object_pairs_hook = None                                                 │ 
+│ │    parse_constant = None                                                 │ 
+│ │       parse_float = None                                                 │ 
+│ │         parse_int = None                                                 │ 
+│ │                 s = '[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[… │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\<user>\anaconda3\envs\s19env\Lib\json\decoder.py:337 in decode       
+│                                                                              
+│   334 │   │   containing a JSON document).                                   
+│   335 │   │                                                                  
+│   336 │   │   """                                                            
+│ ❱ 337 │   │   obj, end = self.raw_decode(s, idx=_w(s, 0).end())              
+│   338 │   │   end = _w(s, end).end()                                         
+│   339 │   │   if end != len(s):                                              
+│   340 │   │   │   raise JSONDecodeError("Extra data", s, end)                
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │   _w = <built-in method match of re.Pattern object at                    │ 
+│ │        0x0000019A8F3FB920>                                               │ 
+│ │    s = '[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[… │ 
+│ │ self = <json.decoder.JSONDecoder object at 0x0000019A8F46F690>           │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\<user>\anaconda3\envs\s19env\Lib\json\decoder.py:353 in raw_decode   
+│                                                                              
+│   350 │   │                                                                  
+│   351 │   │   """                                                            
+│   352 │   │   try:                                                           
+│ ❱ 353 │   │   │   obj, end = self.scan_once(s, idx)                          
+│   354 │   │   except StopIteration as err:                                   
+│   355 │   │   │   raise JSONDecodeError("Expecting value", s, err.value) fro 
+│   356 │   │   return obj, end                                                
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │  idx = 0                                                                 │ 
+│ │    s = '[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[… │ 
+│ │ self = <json.decoder.JSONDecoder object at 0x0000019A8F46F690>           │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+╰──────────────────────────────────────────────────────────────────────────────
+RecursionError: maximum recursion depth exceeded while decoding a JSON array 
+from a unicode string
+___________ test_r_flow_ext_2_2_relative_output_read_under_project ____________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_2_2_relative_o0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000019A94FF6FD0>
+
+    def test_r_flow_ext_2_2_relative_output_read_under_project(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """[D15-17] A relative output found only under the project is read under
+        the project (base reads it against the working directory → refuses)."""
+        project = _project(tmp_path, {"base.s19": _S19_SRC})
+        (project / "bench").mkdir()
+        (project / "bench" / "rel.changes.json").write_text(_doc("AA"), encoding="utf-8")
+        bench = _bench(tmp_path)
+        (bench / "step.log").write_text("tool ran OK\n", encoding="utf-8")
+        flow = _flow_x(bench, output="bench/rel.changes.json")
+        monkeypatch.chdir(tmp_path)
+    
+        result = _run(
+            flow,
+            project,
+            {1: ExternalStepConfirmation(1, str(bench / "step.log"), "bench/rel.changes.json")},
+        )
+    
+        ext = result.block_results[1]
+>       assert ext.status == BLOCK_STATUS_OK
+E       AssertionError: assert 'error' == 'ok'
+E         
+E         - ok
+E         + error
+
+<TMP>\base\tests\test_b101_flow_ext_copy.py:260: AssertionError
+____________ test_r_flow_ext_9_1_later_patch_reads_this_runs_copy _____________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_9_1_later_patc0')
+
+    def test_r_flow_ext_9_1_later_patch_reads_this_runs_copy(tmp_path: Path) -> None:
+        """[F-49] Run 2's differing output is copied as _1 and the later PATCH
+        reads the copy (base keeps the first copy's bytes)."""
+        project, bench, flow = _two_runs_flow_x(tmp_path)
+        _write_bench(bench, _doc("BB"))
+    
+        result = _run(flow, project, _confirm(bench))
+    
+        ext, patch = result.block_results[1], result.block_results[2]
+        assert ext.status == BLOCK_STATUS_OK
+        assert ext.summary == (
+            "log 'step.log' received · output copied to step.changes_1.json (session)"
+        ), ext.summary
+        assert patch.status == BLOCK_STATUS_OK
+>       assert patch.summary == (
+            "applied 1 entry"
+            + _READ_SUFFIX.format(copy="step.changes_1.json", ref="step.changes.json")
+        ), patch.summary
+E       AssertionError: applied 1 entry
+E       assert 'applied 1 entry' == 'applied 1 en....changes.json'
+E         
+E         - applied 1 entry · read step.changes_1.json in place of step.changes.json
+E         + applied 1 entry
+
+tests\test_b101_flow_ext_copy.py:298: AssertionError
+____________________ test_r_flow_ext_9_4_later_check_block ____________________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_9_4_later_chec0')
+
+    def test_r_flow_ext_9_4_later_check_block(tmp_path: Path) -> None:
+        """Run 2's CHECK reads the copy: the new expectation fails 1 entry (base
+        checks the first document: 0 failed)."""
+        project = _project(tmp_path, {"base.s19": _S19_SRC})
+        bench = _bench(tmp_path)
+        _write_bench(bench, _bytes_doc([(0x1000, "01 02")], kind="check"), "step.chk.json")
+        flow = _check_flow(bench)
+        first = _run(flow, project, _confirm(bench, output="step.chk.json"))
+        assert "failed=0" in first.block_results[2].summary
+        _write_bench(bench, _bytes_doc([(0x1000, "FF FF")], kind="check"), "step.chk.json")
+    
+        second = _run(flow, project, _confirm(bench, output="step.chk.json"))
+    
+        check = second.block_results[2]
+>       assert check.status == BLOCK_STATUS_NOTICES
+E       AssertionError: assert 'ok' == 'notices'
+E         
+E         - notices
+E         + ok
+
+tests\test_b101_flow_ext_copy.py:372: AssertionError
+_____________________ test_r_flow_ext_9_5_later_crc_block _____________________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_9_5_later_crc_0')
+
+    def test_r_flow_ext_9_5_later_crc_block(tmp_path: Path) -> None:
+        """Run 2's CRC block reads the copy: 4 CRC bytes at the NEW output address
+        and none at the old one."""
+        project = _project(tmp_path, {"base.s19": _S19_SRC})
+        bench = _bench(tmp_path)
+        _write_bench(bench, _crc_config_text(0x1010), "step.crc.json")
+        flow = _crc_flow(bench)
+        first = _run(flow, project, _confirm(bench, output="step.crc.json"))
+>       assert first.status == "ok"
+E       AssertionError: assert 'completed-with-issues' == 'ok'
+E         
+E         - ok
+E         + completed-with-issues
+
+tests\test_b101_flow_ext_copy.py:396: AssertionError
+____________________ test_r_flow_ext_9_6_later_load_block _____________________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_9_6_later_load0')
+
+    def test_r_flow_ext_9_6_later_load_block(tmp_path: Path) -> None:
+        """Run 2's LOAD reads the copy: out.s19 holds image B's bytes."""
+        image_a = emit_s19_from_mem_map({0x1000: 0x01, 0x1001: 0x02}, [(0x1000, 0x1002)])
+        image_b = emit_s19_from_mem_map({0x1000: 0x09, 0x1001: 0x08}, [(0x1000, 0x1002)])
+        project = _project(tmp_path, {})
+        bench = _bench(tmp_path)
+        _write_bench(bench, image_a, "fw.s19")
+        flow = Flow(
+            name="load_flow",
+            blocks=[
+                _ext_block(bench, str(bench / "step.log"), str(bench / "fw.s19")),
+                SourceBlock("fw.s19"),
+                WriteOutBlock("out.s19"),
+            ],
+        )
+        first = _run(flow, project, _confirm(bench, index=0, output="fw.s19"))
+        assert first.status == "ok"
+        _write_bench(bench, image_b, "fw.s19")
+    
+        second = _run(flow, project, _confirm(bench, index=0, output="fw.s19"))
+    
+        mem = _reload_mem(project / "out.s19")
+>       assert [mem[0x1000 + i] for i in range(2)] == [0x09, 0x08]
+E       assert [1, 2] == [9, 8]
+E         
+E         At index 0 diff: 1 != 9
+E         Use -v to get more diff
+
+tests\test_b101_flow_ext_copy.py:428: AssertionError
+__________________ test_r_flow_ext_9_7_later_a2b_file_input ___________________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_9_7_later_a2b_0')
+
+    def test_r_flow_ext_9_7_later_a2b_file_input(tmp_path: Path) -> None:
+        """Run 2's A2B file input reads the copy: the report lists the difference
+        at 0x00001000 (run 1: none)."""
+        same = emit_s19_from_mem_map({0x1000: 0x01, 0x1001: 0x02}, [(0x1000, 0x1002)])
+        different = emit_s19_from_mem_map({0x1000: 0x09, 0x1001: 0x02}, [(0x1000, 0x1002)])
+        project = _project(tmp_path, {"base.s19": same})
+        bench = _bench(tmp_path)
+        _write_bench(bench, same, "ext.s19")
+        flow = Flow(
+            name="a2b_flow",
+            blocks=[
+                SourceBlock("base.s19"),
+                _ext_block(bench, str(bench / "step.log"), str(bench / "ext.s19")),
+                A2BBlock(
+                    image_a=A2BInputBinding(source=A2B_INPUT_FLOW, ref="0"),
+                    image_b=A2BInputBinding(source=A2B_INPUT_FILE, ref="ext.s19"),
+                ),
+            ],
+        )
+        first = _run(flow, project, _confirm(bench, output="ext.s19"))
+        reports_dir = project / "reports"
+        first_reports = set(reports_dir.glob("*")) if reports_dir.exists() else set()
+        assert first.status == "ok"
+        _write_bench(bench, different, "ext.s19")
+    
+        second = _run(flow, project, _confirm(bench, output="ext.s19"))
+    
+        new_reports = [
+            path for path in reports_dir.glob("*") if path not in first_reports
+        ]
+        assert len(new_reports) == 1, new_reports
+        text = new_reports[0].read_text(encoding="utf-8")
+>       assert "0x00001000" in text, text
+E       AssertionError: # Diff report
+E         
+E         - Generated (UTC): 2026-11-02T16:36:11.469495+00:00
+E         - Tool version: 1.0.0rc1
+E         - Image A: source.out [flow] path=`block 1 (source).out` parse-errors=0
+E         - Image B: ext [external] path=`<TMP>\bt\test_r_flow_ext_9_7_later_a2b_0\.s19tool\workarea\proj\ext.s19` parse-errors=0
+E         - Image A artifacts: none
+E         - Image B artifacts: none
+E         
+E         ## Statistics
+E         
+E         | Classification | Runs | Bytes |
+E         |---|---|---|
+E         | changed | 0 | 0 |
+E         | only in A | 0 | 0 |
+E         | only in B | 0 | 0 |
+E         
+E         ## Runs
+E         
+E         No differing runs - the images are identical.
+E         
+E         ## Hex windows
+E         
+E         No differing runs to dump.
+E         
+E       assert '0x00001000' in '# Diff report\n\n- Generated (UTC): 2026-11-02T16:36:11.469495+00:00\n- Tool version: 1.0.0rc1\n- Image A: source.out... 0 | 0 |\n\n## Runs\n\nNo differing runs - the images are identical.\n\n## Hex windows\n\nNo differing runs to dump.\n'
+
+tests\test_b101_flow_ext_copy.py:463: AssertionError
+__________________ test_r_flow_ext_9_8_other_refs_unchanged ___________________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_9_8_other_refs0')
+
+    def test_r_flow_ext_9_8_other_refs_unchanged(tmp_path: Path) -> None:
+        """A ref that names another file is not read in place: the second PATCH
+        applies `patches/other.changes.json` (holds on base; the rebind is by the
+        output file name only)."""
+        project, bench, flow = _two_runs_flow_x(tmp_path)
+        (project / "patches").mkdir()
+        (project / "patches" / "other.changes.json").write_text(
+            _doc("EE"), encoding="utf-8"
+        )
+        flow = Flow(
+            name="flow_x",
+            blocks=[
+                *flow.blocks[:3],
+                PatchBlock("patches/other.changes.json"),
+                flow.blocks[-1],
+            ],
+        )
+        _write_bench(bench, _doc("BB"))
+    
+        result = _run(flow, project, _confirm(bench))
+    
+        first_patch, second_patch = result.block_results[2], result.block_results[3]
+>       assert first_patch.summary.endswith(
+            _READ_SUFFIX.format(copy="step.changes_1.json", ref="step.changes.json")
+        ), first_patch.summary
+E       AssertionError: applied 1 entry
+E       assert False
+E        +  where False = <built-in method endswith of str object at 0x0000019A94F26B30>(' · read step.changes_1.json in place of step.changes.json')
+E        +    where <built-in method endswith of str object at 0x0000019A94F26B30> = 'applied 1 entry'.endswith
+E        +      where 'applied 1 entry' = BlockResult(index=2, kind='patch', status='ok', summary='applied 1 entry', diagnostics=[], findings=[]).summary
+E        +    and   ' · read step.changes_1.json in place of step.changes.json' = <built-in method format of str object at 0x0000019A94CC3E50>(copy='step.changes_1.json', ref='step.changes.json')
+E        +      where <built-in method format of str object at 0x0000019A94CC3E50> = ' · read {copy} in place of {ref}'.format
+
+tests\test_b101_flow_ext_copy.py:488: AssertionError
+__________ test_r_flow_ext_9_9_earlier_block_reads_the_file_as_it_is __________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_9_9_earlier_bl0')
+
+    def test_r_flow_ext_9_9_earlier_block_reads_the_file_as_it_is(tmp_path: Path) -> None:
+        """A block BEFORE the step reads the file as it is: run 2's first PATCH
+        sees the run-1 copy (AA), the second sees this run's (BB)."""
+        project, bench, _ = _two_runs_flow_x(tmp_path)
+        flow = Flow(
+            name="reordered",
+            blocks=[
+                SourceBlock("base.s19"),
+                PatchBlock("step.changes.json"),
+                _ext_block(bench, str(bench / "step.log"), str(bench / "step.changes.json")),
+                PatchBlock("step.changes.json"),
+                WriteOutBlock("out.s19"),
+            ],
+        )
+        _write_bench(bench, _doc("BB"))
+    
+        result = _run(flow, project, _confirm(bench, index=2))
+    
+        first_patch, second_patch = result.block_results[1], result.block_results[3]
+        assert first_patch.summary == "applied 1 entry", first_patch.summary
+        early = [c for c in result.change_records if c.block_index == 1]
+        late = [c for c in result.change_records if c.block_index == 3]
+>       assert early and early[0].after_bytes[0:2] == [0x41, 0x41], early
+E       AssertionError: [FlowChangeRecord(block_index=1, change_doc_ref='step.changes.json', a2l_ref=None, entry_type='string', symbol=None, address_start=4096, address_end=4098, disposition='applied', before_bytes=(1, 2), after_bytes=(65, 65))]
+E       assert ([FlowChangeRecord(block_index=1, change_doc_ref='step.changes.json', a2l_ref=None, entry_type='string', symbol=None, address_start=4096, address_end=4098, disposition='applied', before_bytes=(1, 2), after_bytes=(65, 65))] and (65, 65) == [65, 65]
+E         
+E         Use -v to get more diff)
+
+tests\test_b101_flow_ext_copy.py:520: AssertionError
+______________ test_r_flow_ext_9_10_case_insensitive_on_windows _______________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_9_10_case_inse0')
+
+    @pytest.mark.skipif(not sys.platform.startswith("win"), reason="case rule: Windows")
+    def test_r_flow_ext_9_10_case_insensitive_on_windows(tmp_path: Path) -> None:
+        """A ref spelling the output file name case-differently is read in place
+        on Windows (the name comparison is case-insensitive)."""
+        project, bench, _ = _two_runs_flow_x(tmp_path)
+        flow = _flow_x(bench, patch_ref="STEP.CHANGES.JSON")
+        _write_bench(bench, _doc("BB"))
+    
+        result = _run(flow, project, _confirm(bench))
+    
+        patch = result.block_results[2]
+>       assert patch.summary.endswith(
+            _READ_SUFFIX.format(copy="step.changes_1.json", ref="STEP.CHANGES.JSON")
+        ), patch.summary
+E       AssertionError: applied 1 entry
+E       assert False
+E        +  where False = <built-in method endswith of str object at 0x0000019A95D86430>(' · read step.changes_1.json in place of STEP.CHANGES.JSON')
+E        +    where <built-in method endswith of str object at 0x0000019A95D86430> = 'applied 1 entry'.endswith
+E        +      where 'applied 1 entry' = BlockResult(index=2, kind='patch', status='ok', summary='applied 1 entry', diagnostics=[], findings=[]).summary
+E        +    and   ' · read step.changes_1.json in place of STEP.CHANGES.JSON' = <built-in method format of str object at 0x0000019A94CC3E50>(copy='step.changes_1.json', ref='STEP.CHANGES.JSON')
+E        +      where <built-in method format of str object at 0x0000019A94CC3E50> = ' · read {copy} in place of {ref}'.format
+
+tests\test_b101_flow_ext_copy.py:537: AssertionError
+________ test_r_flow_ext_9_11_flow_execution_confirm_reads_new_output _________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_9_11_flow_exec0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000019A922EBF90>
+
+    def test_r_flow_ext_9_11_flow_execution_confirm_reads_new_output(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The lane is confirmed against BENCH=OK; the bench output is rewritten
+        with BENCH=V2; Run then `c` re-runs the lane and terminal_out.s19 holds
+        BENCH=V2 at 0x00C001B0 (base: the PATCH re-applies the first copy)."""
+        from tests.b97_fixtures import (
+            load_project,
+            open_flow_execution,
+            run_lanes,
+            import_lanes,
+            write_flow,
+        )
+        from tests.b97_probes import settle
+    
+        base_text = emit_s19_from_mem_map(
+            {0x00C001B0 + i: byte for i, byte in enumerate(b"BENCH=OK")},
+            [(0x00C001B0, 0x00C001B8)],
+        )
+        bench = _bench(tmp_path)
+    
+        async def _drive() -> bytes:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(118, 54)) as pilot:
+                await settle(pilot)
+                project_dir = app.workarea / "demo"
+                project_dir.mkdir(parents=True, exist_ok=True)
+                (project_dir / "base.s19").write_text(base_text, encoding="utf-8")
+                write_flow(
+                    project_dir,
+                    "terminal",
+                    [
+                        SourceBlock("base.s19"),
+                        _ext_block(bench, str(bench / "step.log"), str(bench / "step.changes.json")),
+                        PatchBlock("step.changes.json"),
+                        WriteOutBlock("terminal_out.s19"),
+                    ],
+                )
+                await load_project(app, "demo")
+                panel = await open_flow_execution(app, pilot)
+                await import_lanes(app, pilot, "terminal")
+                _write_bench(bench, _doc("BENCH=OK", address=0x00C001B0))
+                await run_lanes(app, pilot, panel, key=True)
+                await pilot.press("c")  # confirm run 1 (BENCH=OK)
+                for _ in range(300):
+                    await pilot.pause()
+                    if (project_dir / "terminal_out.s19").exists():
+                        break
+                assert (project_dir / "terminal_out.s19").exists(), "run 1 never finished"
+                first = _reload_mem(project_dir / "terminal_out.s19")
+                assert [first[0x00C001B0 + i] for i in range(8)] == list(b"BENCH=OK")
+                # the bench output now holds the NEW evidence
+                _write_bench(bench, _doc("BENCH=V2", address=0x00C001B0))
+                await run_lanes(app, pilot, panel, key=True)
+                await pilot.press("c")
+                for _ in range(300):
+                    await pilot.pause()
+                    if (project_dir / "step.changes_1.json").exists():
+                        break
+                assert (project_dir / "step.changes_1.json").exists(), (
+                    "run 2 never copied the new output"
+                )
+                await settle(pilot, 6)
+                return bytes(
+                    _reload_mem(project_dir / "terminal_out.s19")[0x00C001B0 + i]
+                    for i in range(8)
+                )
+    
+>       assert asyncio.run(_drive()) == b"BENCH=V2"
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b101_flow_ext_copy.py:617: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\<user>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+C:\Users\<user>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\<user>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _drive() -> bytes:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(118, 54)) as pilot:
+            await settle(pilot)
+            project_dir = app.workarea / "demo"
+            project_dir.mkdir(parents=True, exist_ok=True)
+            (project_dir / "base.s19").write_text(base_text, encoding="utf-8")
+            write_flow(
+                project_dir,
+                "terminal",
+                [
+                    SourceBlock("base.s19"),
+                    _ext_block(bench, str(bench / "step.log"), str(bench / "step.changes.json")),
+                    PatchBlock("step.changes.json"),
+                    WriteOutBlock("terminal_out.s19"),
+                ],
+            )
+            await load_project(app, "demo")
+            panel = await open_flow_execution(app, pilot)
+            await import_lanes(app, pilot, "terminal")
+            _write_bench(bench, _doc("BENCH=OK", address=0x00C001B0))
+            await run_lanes(app, pilot, panel, key=True)
+            await pilot.press("c")  # confirm run 1 (BENCH=OK)
+            for _ in range(300):
+                await pilot.pause()
+                if (project_dir / "terminal_out.s19").exists():
+                    break
+>           assert (project_dir / "terminal_out.s19").exists(), "run 1 never finished"
+E           AssertionError: run 1 never finished
+E           assert False
+E            +  where False = exists()
+E            +    where exists = (WindowsPath('<TMP>/bt/test_r_flow_ext_9_11_flow_exec0/.s19tool/workarea/demo') / 'terminal_out.s19').exists
+
+tests\test_b101_flow_ext_copy.py:597: AssertionError
+_____________________ test_r_flow_ext_9_12_later_a2l_ref ______________________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_9_12_later_a2l0')
+
+    def test_r_flow_ext_9_12_later_a2l_ref(tmp_path: Path) -> None:
+        """Run 2's PATCH resolves its symbol entry against the copied A2L: the
+        change record address is the v2 address 0x1002."""
+        project = _project(tmp_path, {"base.s19": _S19_SRC})
+        bench = _bench(tmp_path)
+        _write_bench(bench, _a2l_text(0x1000), "cal.a2l")
+        (project / "step.changes.json").write_text(_symbol_doc(), encoding="utf-8")
+        flow = Flow(
+            name="a2l_flow",
+            blocks=[
+                SourceBlock("base.s19"),
+                _ext_block(bench, str(bench / "step.log"), str(bench / "cal.a2l")),
+                PatchBlock("step.changes.json", a2l_ref="cal.a2l"),
+                WriteOutBlock("out.s19"),
+            ],
+        )
+        first = _run(flow, project, _confirm(bench, output="cal.a2l"))
+        assert first.status == "ok"
+        record = [c for c in first.change_records if c.block_index == 2]
+        assert record and record[0].address_start == 0x1000
+        _write_bench(bench, _a2l_text(0x1002), "cal.a2l")
+    
+        second = _run(flow, project, _confirm(bench, output="cal.a2l"))
+    
+        record = [c for c in second.change_records if c.block_index == 2]
+>       assert record and record[0].address_start == 0x1002, record
+E       AssertionError: [FlowChangeRecord(block_index=2, change_doc_ref='step.changes.json', a2l_ref='cal.a2l', entry_type='bytes', symbol='Speed', address_start=4096, address_end=4097, disposition='applied', before_bytes=(1,), after_bytes=(170,))]
+E       assert ([FlowChangeRecord(block_index=2, change_doc_ref='step.changes.json', a2l_ref='cal.a2l', entry_type='bytes', symbol='Speed', address_start=4096, address_end=4097, disposition='applied', before_bytes=(1,), after_bytes=(170,))] and 4096 == 4098)
+E        +  where 4096 = FlowChangeRecord(block_index=2, change_doc_ref='step.changes.json', a2l_ref='cal.a2l', entry_type='bytes', symbol='Speed', address_start=4096, address_end=4097, disposition='applied', before_bytes=(1,), after_bytes=(170,)).address_start
+
+tests\test_b101_flow_ext_copy.py:645: AssertionError
+______ test_r_flow_ext_9_13_first_run_over_a_foreign_file_reads_the_copy ______
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_9_13_first_run0')
+
+    def test_r_flow_ext_9_13_first_run_over_a_foreign_file_reads_the_copy(tmp_path: Path):
+        """[A-2] A first run into a folder that already holds a DIFFERENT file
+        under the output file name: the copy lands _1 and the PATCH reads the
+        copy (base applies the foreign file's bytes)."""
+        project = _project(tmp_path, {"base.s19": _S19_SRC})
+        (project / "step.changes.json").write_text(_doc("CC"), encoding="utf-8")
+        bench = _bench(tmp_path)
+        _write_bench(bench, _doc("AA"))
+        flow = _flow_x(bench)
+    
+        result = _run(flow, project, _confirm(bench))
+    
+        ext, patch = result.block_results[1], result.block_results[2]
+        assert ext.summary.endswith("output copied to step.changes_1.json (session)"), (
+            ext.summary
+        )
+>       assert patch.summary == (
+            "applied 1 entry"
+            + _READ_SUFFIX.format(copy="step.changes_1.json", ref="step.changes.json")
+        ), patch.summary
+E       AssertionError: applied 1 entry
+E       assert 'applied 1 entry' == 'applied 1 en....changes.json'
+E         
+E         - applied 1 entry · read step.changes_1.json in place of step.changes.json
+E         + applied 1 entry
+
+tests\test_b101_flow_ext_copy.py:664: AssertionError
+_________ test_r_flow_ext_9_15_refused_ref_stays_refused_after_rebind _________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_9_15_refused_r0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000019A96E5FB90>
+
+    @pytest.mark.skipif(not sys.platform.startswith("win"), reason="the junction half is Windows")
+    def test_r_flow_ext_9_15_refused_ref_stays_refused_after_rebind(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """[S-4] After a rebind, (a) an absolute ref and (b) a junction ref that
+        name the output file name are still refused by the manifest guard (holds
+        on base — the guard ran first there too; the case pins the order)."""
+        from tests.b97_fixtures import make_junction
+    
+        cwd = Path.cwd()
+        try:
+            monkeypatch.chdir(tmp_path)
+            # (a) the absolute ref
+            project = _project(tmp_path, {"base.s19": _S19_SRC}, name="proj_a")
+            bench_a = tmp_path / "bench_a"
+            bench_a.mkdir(exist_ok=True)
+            _write_bench(bench_a, _doc("AA"))
+            run_flow(
+                _flow_x(bench_a),
+                FlowContext(project_dir=project, external_confirmations=_confirm(bench_a)),
+            )
+            _write_bench(bench_a, _doc("BB"))
+            result_a = _run(
+                _flow_x(bench_a, patch_ref=str(project / "step.changes.json")),
+                project,
+                _confirm(bench_a),
+            )
+            patch_a = result_a.block_results[2]
+            assert patch_a.status == BLOCK_STATUS_ERROR
+            assert patch_a.summary == "change doc unresolved", patch_a.summary
+            assert _cause(patch_a) == "change document not found or not inside the project"
+            escape_a = [d for d in patch_a.diagnostics if d.startswith("[MANIFEST-PATH-ESCAPE]")]
+            assert len(escape_a) == 1, patch_a.diagnostics
+            assert result_a.block_results[3].status == BLOCK_STATUS_SKIPPED
+            assert str(project / "out.s19") not in [str(p) for p in result_a.written_paths]
+    
+            # (b) the junction ref
+            project_b = _project(tmp_path, {"base.s19": _S19_SRC}, name="proj_b")
+            bench_b = tmp_path / "bench_b"
+            bench_b.mkdir(exist_ok=True)
+            _write_bench(bench_b, _doc("AA"))
+            run_flow(
+                _flow_x(bench_b),
+                FlowContext(project_dir=project_b, external_confirmations=_confirm(bench_b)),
+            )
+            make_junction(project_b / "jl", project_b)
+            _write_bench(bench_b, _doc("BB"))
+            result_b = _run(
+                _flow_x(bench_b, patch_ref="jl/step.changes.json"),
+                project_b,
+                _confirm(bench_b),
+            )
+            patch_b = result_b.block_results[2]
+>           assert patch_b.status == BLOCK_STATUS_ERROR
+E           AssertionError: assert 'ok' == 'error'
+E             
+E             - error
+E             + ok
+
+tests\test_b101_flow_ext_copy.py:774: AssertionError
+_______________ test_r_flow_ext_10_1_flow_report_names_the_copy _______________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_10_1_flow_repo0')
+
+    def test_r_flow_ext_10_1_flow_report_names_the_copy(tmp_path: Path) -> None:
+        """The flow report's Change attribution row names the copy."""
+        project, bench, _ = _two_runs_flow_x(tmp_path)
+        flow = Flow(
+            name="flow_x",
+            blocks=[*(_flow_x(bench).blocks[:-1]), ReportBlock()],
+        )
+        _write_bench(bench, _doc("BB"))
+    
+        before = _report_snapshot(project)
+        result = _run(flow, project, _confirm(bench))
+    
+        record = [c for c in result.change_records if c.block_index == 2]
+>       assert record and record[0].change_doc_ref == "step.changes_1.json"
+E       AssertionError: assert ([FlowChangeRecord(block_index=2, change_doc_ref='step.changes.json', a2l_ref=None, entry_type='string', symbol=None, address_start=4096, address_end=4098, disposition='applied', before_bytes=(1, 2), after_bytes=(65, 65))] and 'step.changes.json' == 'step.changes_1.json'
+E         
+E         - step.changes_1.json
+E         ?             --
+E         + step.changes.json)
+
+tests\test_b101_flow_ext_copy.py:814: AssertionError
+____________ test_r_flow_ext_10_2_chain_set_report_names_the_copy _____________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_10_2_chain_set0')
+
+    def test_r_flow_ext_10_2_chain_set_report_names_the_copy(tmp_path: Path) -> None:
+        """The chain-set report's Not applied line carries the copy name."""
+        project, bench, _ = _two_runs_flow_x(tmp_path)
+        _write_bench(
+            bench,
+            json.dumps(
+                {
+                    "format": "s19app-changeset",
+                    "version": "2.0",
+                    "kind": "change",
+                    "encoding": "utf-8",
+                    "value_mode": "text",
+                    "entries": [
+                        {"type": "string", "address": "0x00001000", "value": "BB"},
+                        {"type": "string", "address": "0x00009000", "value": "ZZ"},
+                    ],
+                }
+            ),
+        )
+        chain = ChainSpec(
+            name="lane1",
+            template="lane1",
+            flow=_flow_x(bench),
+        )
+    
+        record = run_chain_set(
+            [chain],
+            FlowContext(project_dir=project, external_confirmations=_confirm(bench)),
+            mode=CHAIN_RUN_SEQUENTIAL,
+        )
+    
+        outcome = record.outcomes[0]
+        assert outcome.status in ("ok", "completed-with-issues")
+        text = record.report_path.read_text(encoding="utf-8")
+        not_applied = text.split("## Not applied")[1].split("## Refusals")[0]
+        lines = [
+            ln
+            for ln in not_applied.splitlines()
+            if ln.startswith("- Chain ") and "0x00009000" in ln
+        ]
+>       assert len(lines) == 1, not_applied
+E       AssertionError: 
+E         
+E         - Chain lane1: none
+E         
+E         
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_b101_flow_ext_copy.py:862: AssertionError
+___________ test_r_flow_ext_10_4_flow_report_names_the_copy_a2l_own ___________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_10_4_flow_repo0')
+
+    def test_r_flow_ext_10_4_flow_report_names_the_copy_a2l_own(tmp_path: Path) -> None:
+        """[A-1] The flow report's A2L reference cell names the PATCH's own A2L
+        copy (base: the typed ref)."""
+        project = _project(tmp_path, {"base.s19": _S19_SRC, "doc.json": _symbol_doc()})
+        bench = _bench(tmp_path)
+        _write_bench(bench, _a2l_text(0x1000), "cal.a2l")
+        flow = Flow(
+            name="a2l_report",
+            blocks=[
+                *(_a2l_patch_flow(bench, load_declares=False).blocks),
+                ReportBlock(),
+            ],
+        )
+        first = _run(flow, project, _confirm(bench, index=0, output="cal.a2l"))
+        assert first.status == "ok"
+        before = _report_snapshot(project)
+        _write_bench(bench, _a2l_text(0x1002), "cal.a2l")
+    
+        second = _run(flow, project, _confirm(bench, index=0, output="cal.a2l"))
+    
+        record = [c for c in second.change_records if c.block_index == 2]
+>       assert record and record[0].a2l_ref == "cal_1.a2l", record
+E       AssertionError: [FlowChangeRecord(block_index=2, change_doc_ref='doc.json', a2l_ref='cal.a2l', entry_type='bytes', symbol='Speed', address_start=4096, address_end=4097, disposition='applied', before_bytes=(1,), after_bytes=(170,))]
+E       assert ([FlowChangeRecord(block_index=2, change_doc_ref='doc.json', a2l_ref='cal.a2l', entry_type='bytes', symbol='Speed', address_start=4096, address_end=4097, disposition='applied', before_bytes=(1,), after_bytes=(170,))] and 'cal.a2l' == 'cal_1.a2l'
+E         
+E         - cal_1.a2l
+E         ?    --
+E         + cal.a2l)
+
+tests\test_b101_flow_ext_copy.py:951: AssertionError
+________ test_r_flow_ext_10_5_flow_report_names_the_copy_a2l_inherited ________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_10_5_flow_repo0')
+
+    def test_r_flow_ext_10_5_flow_report_names_the_copy_a2l_inherited(tmp_path: Path) -> None:
+        """[A-1] The PATCH inherits the LOAD's A2L: the record and the report
+        name the inherited copy; the LOAD summary carries the read suffix."""
+        project = _project(tmp_path, {"base.s19": _S19_SRC, "doc.json": _symbol_doc()})
+        bench = _bench(tmp_path)
+        _write_bench(bench, _a2l_text(0x1000), "cal.a2l")
+        flow = Flow(
+            name="a2l_report",
+            blocks=[
+                *(_a2l_patch_flow(bench, load_declares=True).blocks),
+                ReportBlock(),
+            ],
+        )
+        first = _run(flow, project, _confirm(bench, index=0, output="cal.a2l"))
+        assert first.status == "ok"
+        before = _report_snapshot(project)
+        _write_bench(bench, _a2l_text(0x1002), "cal.a2l")
+    
+        second = _run(flow, project, _confirm(bench, index=0, output="cal.a2l"))
+    
+        load_block = second.block_results[1]
+>       assert load_block.summary.endswith(
+            _READ_SUFFIX.format(copy="cal_1.a2l", ref="cal.a2l")
+        ), load_block.summary
+E       AssertionError: loaded base.s19 (1 ranges)
+E       assert False
+E        +  where False = <built-in method endswith of str object at 0x0000019A96BF8440>(' · read cal_1.a2l in place of cal.a2l')
+E        +    where <built-in method endswith of str object at 0x0000019A96BF8440> = 'loaded base.s19 (1 ranges)'.endswith
+E        +      where 'loaded base.s19 (1 ranges)' = BlockResult(index=1, kind='source', status='ok', summary='loaded base.s19 (1 ranges)', diagnostics=[], findings=[]).summary
+E        +    and   ' · read cal_1.a2l in place of cal.a2l' = <built-in method format of str object at 0x0000019A94CC3E50>(copy='cal_1.a2l', ref='cal.a2l')
+E        +      where <built-in method format of str object at 0x0000019A94CC3E50> = ' · read {copy} in place of {ref}'.format
+
+tests\test_b101_flow_ext_copy.py:978: AssertionError
+______________ test_r_flow_ext_12_1_summary_names_the_copy_patch ______________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_12_1_summary_n0')
+
+    def test_r_flow_ext_12_1_summary_names_the_copy_patch(tmp_path: Path) -> None:
+        project, bench, flow = _two_runs_flow_x(tmp_path)
+        _write_bench(bench, _doc("BB"))
+        result = _run(flow, project, _confirm(bench))
+>       assert result.block_results[2].summary == (
+            "applied 1 entry"
+            + _READ_SUFFIX.format(copy="step.changes_1.json", ref="step.changes.json")
+        )
+E       AssertionError: assert 'applied 1 entry' == 'applied 1 en....changes.json'
+E         
+E         - applied 1 entry · read step.changes_1.json in place of step.changes.json
+E         + applied 1 entry
+
+tests\test_b101_flow_ext_copy.py:997: AssertionError
+______________ test_r_flow_ext_12_2_summary_names_the_copy_check ______________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_12_2_summary_n0')
+
+    def test_r_flow_ext_12_2_summary_names_the_copy_check(tmp_path: Path) -> None:
+        project = _project(tmp_path, {"base.s19": _S19_SRC})
+        bench = _bench(tmp_path)
+        _write_bench(bench, _bytes_doc([(0x1000, "01 02")], kind="check"), "step.chk.json")
+        flow = _check_flow(bench)
+        _run(flow, project, _confirm(bench, output="step.chk.json"))
+        _write_bench(bench, _bytes_doc([(0x1000, "FF FF")], kind="check"), "step.chk.json")
+        result = _run(flow, project, _confirm(bench, output="step.chk.json"))
+>       assert result.block_results[2].summary == (
+            "passed=0 failed=1 uncheckable=0"
+            + _READ_SUFFIX.format(copy="step_1.chk.json", ref="step.chk.json")
+        ), result.block_results[2].summary
+E       AssertionError: passed=1 failed=0 uncheckable=0
+E       assert 'passed=1 fai...uncheckable=0' == 'passed=0 fai...step.chk.json'
+E         
+E         - passed=0 failed=1 uncheckable=0 · read step_1.chk.json in place of step.chk.json
+E         + passed=1 failed=0 uncheckable=0
+
+tests\test_b101_flow_ext_copy.py:1011: AssertionError
+_______________ test_r_flow_ext_12_3_summary_names_the_copy_crc _______________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_12_3_summary_n0')
+
+    def test_r_flow_ext_12_3_summary_names_the_copy_crc(tmp_path: Path) -> None:
+        project = _project(tmp_path, {"base.s19": _S19_SRC})
+        bench = _bench(tmp_path)
+        _write_bench(bench, _crc_config_text(0x1010), "step.crc.json")
+        flow = _crc_flow(bench)
+        _run(flow, project, _confirm(bench, output="step.crc.json"))
+        _write_bench(bench, _crc_config_text(0x1020), "step.crc.json")
+        result = _run(flow, project, _confirm(bench, output="step.crc.json"))
+>       assert result.block_results[2].summary == (
+            "injected 1 CRC region"
+            + _READ_SUFFIX.format(copy="step_1.crc.json", ref="step.crc.json")
+        ), result.block_results[2].summary
+E       AssertionError: injected 1 CRC region
+E       assert 'injected 1 CRC region' == 'injected 1 C...step.crc.json'
+E         
+E         - injected 1 CRC region · read step_1.crc.json in place of step.crc.json
+E         + injected 1 CRC region
+
+tests\test_b101_flow_ext_copy.py:1025: AssertionError
+______________ test_r_flow_ext_12_4_summary_names_the_copy_load _______________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_12_4_summary_n0')
+
+    def test_r_flow_ext_12_4_summary_names_the_copy_load(tmp_path: Path) -> None:
+        image_a = emit_s19_from_mem_map({0x1000: 0x01}, [(0x1000, 0x1001)])
+        image_b = emit_s19_from_mem_map({0x1000: 0x09}, [(0x1000, 0x1001)])
+        project = _project(tmp_path, {})
+        bench = _bench(tmp_path)
+        _write_bench(bench, image_a, "fw.s19")
+        flow = Flow(
+            name="load_flow",
+            blocks=[
+                _ext_block(bench, str(bench / "step.log"), str(bench / "fw.s19")),
+                SourceBlock("fw.s19"),
+                WriteOutBlock("out.s19"),
+            ],
+        )
+        _run(flow, project, _confirm(bench, index=0, output="fw.s19"))
+        _write_bench(bench, image_b, "fw.s19")
+        result = _run(flow, project, _confirm(bench, index=0, output="fw.s19"))
+>       assert result.block_results[1].summary == (
+            "loaded fw_1.s19 (1 ranges)"
+            + _READ_SUFFIX.format(copy="fw_1.s19", ref="fw.s19")
+        ), result.block_results[1].summary
+E       AssertionError: loaded fw.s19 (1 ranges)
+E       assert 'loaded fw.s19 (1 ranges)' == 'loaded fw_1....ace of fw.s19'
+E         
+E         - loaded fw_1.s19 (1 ranges) · read fw_1.s19 in place of fw.s19
+E         + loaded fw.s19 (1 ranges)
+
+tests\test_b101_flow_ext_copy.py:1048: AssertionError
+_______________ test_r_flow_ext_12_5_summary_names_the_copy_a2b _______________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_12_5_summary_n0')
+
+    def test_r_flow_ext_12_5_summary_names_the_copy_a2b(tmp_path: Path) -> None:
+        same = emit_s19_from_mem_map({0x1000: 0x01}, [(0x1000, 0x1001)])
+        different = emit_s19_from_mem_map({0x1000: 0x09}, [(0x1000, 0x1001)])
+        project = _project(tmp_path, {"base.s19": same})
+        bench = _bench(tmp_path)
+        _write_bench(bench, same, "ext.s19")
+        flow = Flow(
+            name="a2b_flow",
+            blocks=[
+                SourceBlock("base.s19"),
+                _ext_block(bench, str(bench / "step.log"), str(bench / "ext.s19")),
+                A2BBlock(
+                    image_a=A2BInputBinding(source=A2B_INPUT_FLOW, ref="0"),
+                    image_b=A2BInputBinding(source=A2B_INPUT_FILE, ref="ext.s19"),
+                ),
+            ],
+        )
+        _run(flow, project, _confirm(bench, output="ext.s19"))
+        _write_bench(bench, different, "ext.s19")
+        result = _run(flow, project, _confirm(bench, output="ext.s19"))
+        summary = result.block_results[2].summary
+        assert summary.startswith("wrote reports/"), summary
+>       assert summary.endswith(
+            _READ_SUFFIX.format(copy="ext_1.s19", ref="ext.s19")
+        ), summary
+E       AssertionError: wrote reports/20261102T163635Z-01-flow-a2b.md
+E       assert False
+E        +  where False = <built-in method endswith of str object at 0x0000019A95F9E670>(' · read ext_1.s19 in place of ext.s19')
+E        +    where <built-in method endswith of str object at 0x0000019A95F9E670> = 'wrote reports/20261102T163635Z-01-flow-a2b.md'.endswith
+E        +    and   ' · read ext_1.s19 in place of ext.s19' = <built-in method format of str object at 0x0000019A94CC3E50>(copy='ext_1.s19', ref='ext.s19')
+E        +      where <built-in method format of str object at 0x0000019A94CC3E50> = ' · read {copy} in place of {ref}'.format
+
+tests\test_b101_flow_ext_copy.py:1076: AssertionError
+______________ test_r_flow_ext_12_6_summary_names_the_copy_error ______________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_12_6_summary_n0')
+
+    def test_r_flow_ext_12_6_summary_names_the_copy_error(tmp_path: Path) -> None:
+        """An error summary carries the suffix too (the config in the copied
+        output is malformed: no `reverse`)."""
+        project = _project(tmp_path, {"base.s19": _S19_SRC})
+        bench = _bench(tmp_path)
+        _write_bench(bench, _crc_config_text(0x1010), "step.crc.json")
+        flow = _crc_flow(bench)
+        _run(flow, project, _confirm(bench, output="step.crc.json"))
+        bad = json.loads(_crc_config_text(0x1020))
+        del bad["reverse"]
+        _write_bench(bench, json.dumps(bad), "step.crc.json")
+    
+        result = _run(flow, project, _confirm(bench, output="step.crc.json"))
+    
+        crc = result.block_results[2]
+>       assert crc.status == BLOCK_STATUS_ERROR
+E       AssertionError: assert 'notices' == 'error'
+E         
+E         - error
+E         + notices
+
+tests\test_b101_flow_ext_copy.py:1096: AssertionError
+__________________ test_r_flow_ext_12_7_two_refs_read_order ___________________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_12_7_two_refs_0')
+
+    def test_r_flow_ext_12_7_two_refs_read_order(tmp_path: Path) -> None:
+        """Two in-place reads in one block: the document first, then the A2L —
+        the suffixes appear in read order."""
+        project = _project(tmp_path, {"base.s19": _S19_SRC, "doc.json": _symbol_doc()})
+        bench = _bench(tmp_path)
+        _write_bench(bench, _a2l_text(0x1000), "cal.a2l")
+        flow = Flow(
+            name="two_refs",
+            blocks=[
+                _ext_block(bench, str(bench / "step.log"), str(bench / "cal.a2l")),
+                SourceBlock("base.s19"),
+                _ext_block(bench, str(bench / "step.log"), str(bench / "step.changes.json")),
+                PatchBlock("step.changes.json", a2l_ref="cal.a2l"),
+                WriteOutBlock("out.s19"),
+            ],
+        )
+        # run 1: the document travels as the second step's output too — but the
+        # PATCH document must exist under the project for the first run; write it
+        # before run 1 and let the step's output replace it from run 2 on.
+        (project / "step.changes.json").write_text(_doc("AA"), encoding="utf-8")
+        first = _run(
+            flow,
+            project,
+            {1: ExternalStepConfirmation(1, str(bench / "step.log"), str(bench / "cal.a2l")),
+             3: ExternalStepConfirmation(3, str(bench / "step.log"), str(bench / "step.changes.json"))},
+        )
+>       assert first.status == "ok", [b.summary for b in first.block_results]
+E       AssertionError: ["paused - waiting for a human: command 'python tool.py --release' | LOG 'C:\\Users\\<user>\\AppData\\Local\\Temp\\s19e...ep)', 'skipped (waiting on external step)', 'skipped (waiting on external step)', 'skipped (waiting on external step)']
+E       assert 'paused' == 'ok'
+E         
+E         - ok
+E         + paused
+
+tests\test_b101_flow_ext_copy.py:1133: AssertionError
+____________ test_r_flow_ext_12_8_no_suffix_without_in_place_read _____________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_12_8_no_suffix0')
+
+    def test_r_flow_ext_12_8_no_suffix_without_in_place_read(tmp_path: Path) -> None:
+        """A run with no in-place read has no suffix (holds on base; the
+        `in_place_reads` attribute itself is the Inc-8 API)."""
+        project = _project(tmp_path, {"base.s19": _S19_SRC})
+        bench = _bench(tmp_path)
+        _write_bench(bench, _doc("AA"))
+        flow = _flow_x(bench)
+    
+        result = _run(flow, project, _confirm(bench))
+    
+        assert result.block_results[2].summary == "applied 1 entry"
+>       assert result.in_place_reads == []
+               ^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'FlowRunResult' object has no attribute 'in_place_reads'
+
+tests\test_b101_flow_ext_copy.py:1164: AttributeError
+_____________ test_r_flow_ext_12_9_suffix_survives_the_raise_exit _____________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_12_9_suffix_su0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000019A957D9650>
+
+    def test_r_flow_ext_12_9_suffix_survives_the_raise_exit(tmp_path: Path, monkeypatch) -> None:
+        """[N-4] The suffix is applied whatever path ends the block: when the
+        document apply raises AFTER an in-place read, the error summary still
+        carries the suffix."""
+        project, bench, flow = _two_runs_flow_x(tmp_path)
+        _write_bench(bench, _doc("BB"))
+    
+        def _boom(*args, **kwargs):
+            raise RuntimeError("boom")
+    
+        monkeypatch.setattr(fes, "apply_change_document", _boom)
+        result = _run(flow, project, _confirm(bench))
+        patch = result.block_results[2]
+        assert patch.status == BLOCK_STATUS_ERROR
+>       assert patch.summary == (
+            "error"
+            + _READ_SUFFIX.format(copy="step.changes_1.json", ref="step.changes.json")
+        ), patch.summary
+E       AssertionError: error
+E       assert 'error' == 'error · read....changes.json'
+E         
+E         - error · read step.changes_1.json in place of step.changes.json
+E         + error
+
+tests\test_b101_flow_ext_copy.py:1181: AssertionError
+____________ test_r_flow_ext_12_10_suffix_before_the_refusal_token ____________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_12_10_suffix_b0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000019A96E9A910>
+
+    @pytest.mark.skipif(not sys.platform.startswith("win"), reason="junctions are the Windows case")
+    def test_r_flow_ext_12_10_suffix_before_the_refusal_token(tmp_path: Path, monkeypatch) -> None:
+        """[N-2 option (c)] An in-place read followed by a junction-refused A2L
+        keeps the refusal token LAST in the summary (the lane's ✗ detail keeps
+        coding on it) while still naming the copy."""
+        project, bench, _ = _two_runs_flow_x(tmp_path)
+        (project / "cal.a2l").write_text(_a2l_text(0x1000), encoding="utf-8")
+        flow = _flow_x(bench, patch_a2l_ref="cal.a2l")
+        _write_bench(bench, _doc("BB"))
+        from tests.b97_fixtures import make_junction
+    
+        make_junction(project / "jl", project)
+        flow2 = Flow(
+            name="flow_x",
+            blocks=[
+                SourceBlock("base.s19"),
+                _ext_block(bench, str(bench / "step.log"), str(bench / "step.changes.json")),
+                PatchBlock("step.changes.json", a2l_ref="jl/cal.a2l"),
+                WriteOutBlock("out.s19"),
+            ],
+        )
+    
+        result = _run(flow2, project, _confirm(bench))
+    
+        patch = result.block_results[2]
+>       assert patch.status == BLOCK_STATUS_ERROR
+E       AssertionError: assert 'ok' == 'error'
+E         
+E         - error
+E         + ok
+
+tests\test_b101_flow_ext_copy.py:1212: AssertionError
+___________ test_r_flow_ext_13_chain_set_provenance_names_the_copy ____________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_13_chain_set_p0')
+
+    def test_r_flow_ext_13_chain_set_provenance_names_the_copy(tmp_path: Path) -> None:
+        image_a = emit_s19_from_mem_map({0x1000: 0x01}, [(0x1000, 0x1001)])
+        image_b = emit_s19_from_mem_map({0x1000: 0x09}, [(0x1000, 0x1001)])
+        project = _project(tmp_path, {})
+        bench = _bench(tmp_path)
+        _write_bench(bench, image_a, "fw.s19")
+        flow = Flow(
+            name="load_flow",
+            blocks=[
+                _ext_block(bench, str(bench / "step.log"), str(bench / "fw.s19")),
+                SourceBlock("fw.s19"),
+                WriteOutBlock("out.s19"),
+            ],
+        )
+        chain = ChainSpec(name="lane1", template="lane1", flow=flow)
+        ctx = FlowContext(project_dir=project, external_confirmations=_confirm(bench, index=0, output="fw.s19"))
+        first = run_chain_set([chain], ctx, mode=CHAIN_RUN_SEQUENTIAL)
+        assert first.outcomes[0].status == "ok"
+        _write_bench(bench, image_b, "fw.s19")
+    
+        record = run_chain_set([chain], ctx, mode=CHAIN_RUN_SEQUENTIAL)
+    
+        outcome = record.outcomes[0]
+>       assert outcome.inputs == [("fw.s19", str(project / "fw_1.s19"))]
+E       AssertionError: assert [('fw.s19', '...roj\\fw.s19')] == [('fw.s19', '...j\\fw_1.s19')]
+E         
+E         At index 0 diff: ('fw.s19', 'C:\\Users\\<user>\\AppData\\Local\\Temp\\s19e4t8\\bt\\test_r_flow_ext_13_chain_set_p0\\.s19tool\\workarea\\proj\\fw.s19') != ('fw.s19', 'C:\\Users\\<user>\\AppData\\Local\\Temp\\s19e4t8\\bt\\test_r_flow_ext_13_chain_set_p0\\.s19tool\\workarea\\proj\\fw_1.s19')
+E         Use -v to get more diff
+
+tests\test_b101_flow_ext_copy.py:1250: AssertionError
+___________ test_r_flow_ext_13_2_unbound_input_keeps_the_base_line ____________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_13_2_unbound_i0')
+
+    def test_r_flow_ext_13_2_unbound_input_keeps_the_base_line(tmp_path: Path) -> None:
+        """An unbound input keeps the base provenance line (holds on base; pinned
+        so the suffix never leaks onto a plain input)."""
+        project = _project(tmp_path, {"base.s19": _S19_SRC})
+        chain = ChainSpec(
+            name="lane1",
+            template="lane1",
+            flow=Flow(
+                name="lane1",
+                blocks=[SourceBlock("base.s19"), WriteOutBlock("out.s19")],
+            ),
+        )
+        record = run_chain_set(
+            [chain], FlowContext(project_dir=project), mode=CHAIN_RUN_SEQUENTIAL
+        )
+        outcome = record.outcomes[0]
+        assert outcome.inputs == [("base.s19", str(project / "base.s19"))]
+>       assert outcome.in_place_inputs == {}
+               ^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'ChainRunOutcome' object has no attribute 'in_place_inputs'
+
+tests\test_b101_flow_ext_copy.py:1277: AttributeError
+________________ test_r_flow_ext_14_climbing_path_refused_log _________________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_14_climbing_pa0')
+
+    def test_r_flow_ext_14_climbing_path_refused_log(tmp_path: Path) -> None:
+        """[S-3] A relative log that climbs above the project folder is refused
+        before anything is copied."""
+        project = _project(tmp_path, {"base.s19": _S19_SRC})
+        climbed = project.parent / "step.log"
+        climbed.write_text("tool ran OK\n", encoding="utf-8")
+        bench = _bench(tmp_path)
+        (bench / "step.changes.json").write_text(_doc("AA"), encoding="utf-8")
+        flow = _flow_x(bench, log="../step.log")
+    
+        result = _run(flow, project, _confirm(bench, log="../step.log"))
+    
+        ext = result.block_results[1]
+>       assert ext.status == BLOCK_STATUS_ERROR
+E       AssertionError: assert 'ok' == 'error'
+E         
+E         - error
+E         + ok
+
+tests\test_b101_flow_ext_copy.py:1303: AssertionError
+_______________ test_r_flow_ext_14_climbing_path_refused_output _______________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_14_climbing_pa1')
+
+    def test_r_flow_ext_14_climbing_path_refused_output(tmp_path: Path) -> None:
+        """[S-3] A relative output that climbs above the project folder is
+        refused; nothing is copied into the project."""
+        project = _project(tmp_path, {"base.s19": _S19_SRC})
+        (project / "bench").mkdir()
+        climbed = project.parent.parent / "x.json"
+        climbed.write_text(_doc("AA"), encoding="utf-8")
+        bench = _bench(tmp_path)
+        (bench / "step.log").write_text("tool ran OK\n", encoding="utf-8")
+        flow = _flow_x(bench, output="bench/../../x.json")
+    
+        result = _run(
+            flow,
+            project,
+            {1: ExternalStepConfirmation(1, str(bench / "step.log"), "bench/../../x.json")},
+        )
+    
+        ext = result.block_results[1]
+        assert ext.status == BLOCK_STATUS_ERROR
+        assert ext.summary == "external step refused", ext.summary
+>       assert _cause(ext) == (
+            "output 'bench/../../x.json' climbs above the project folder - "
+            "give an absolute path for a file outside the project"
+        )
+E       assert "output 'benc...re confirming" == "output 'benc...e the project"
+E         
+E         - output 'bench/../../x.json' climbs above the project folder - give an absolute path for a file outside the project
+E         + output 'bench/../../x.json' does not exist - run the external step before confirming
+
+tests\test_b101_flow_ext_copy.py:1332: AssertionError
+______________ test_r_flow_ext_14_climbing_path_inside_accepted _______________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_ext_14_climbing_pa2')
+
+    def test_r_flow_ext_14_climbing_path_inside_accepted(tmp_path: Path) -> None:
+        """A relative path that stays inside the project is accepted."""
+        project = _project(tmp_path, {"base.s19": _S19_SRC})
+        (project / "bench").mkdir()
+        (project / "rel.changes.json").write_text(_doc("AA"), encoding="utf-8")
+        bench = _bench(tmp_path)
+        (bench / "step.log").write_text("tool ran OK\n", encoding="utf-8")
+        flow = _flow_x(bench, output="bench/../rel.changes.json")
+    
+        result = _run(
+            flow,
+            project,
+            {1: ExternalStepConfirmation(1, str(bench / "step.log"), "bench/../rel.changes.json")},
+        )
+    
+        ext = result.block_results[1]
+>       assert ext.status == BLOCK_STATUS_OK
+E       AssertionError: assert 'error' == 'ok'
+E         
+E         - ok
+E         + error
+
+tests\test_b101_flow_ext_copy.py:1355: AssertionError
+__________ test_r_flow_crc_4_designer_template_is_named_in_the_flow ___________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_crc_4_designer_tem0')
+
+    def test_r_flow_crc_4_designer_template_is_named_in_the_flow(tmp_path: Path) -> None:
+        """[F-28] A file the CRC Designer saved: summary `config malformed`, the
+        cause names the template; WRITE-OUT skipped, nothing written."""
+        project = _project(
+            tmp_path,
+            {
+                "firmware.s19": _S19_SRC,
+                "templates/demo-crc32.crc.json": emit_template(seed_template()),
+            },
+        )
+        flow = Flow(
+            name="tpl",
+            blocks=[
+                SourceBlock("firmware.s19"),
+                CrcBlock("templates/demo-crc32.crc.json"),
+                WriteOutBlock("out.s19"),
+            ],
+        )
+    
+        result = run_flow(flow, FlowContext(project_dir=project))
+    
+        crc, write_out = result.block_results[1], result.block_results[2]
+        assert crc.status == BLOCK_STATUS_ERROR
+        assert crc.summary == "config malformed", crc.summary
+>       assert _cause(crc) == f"crc config invalid: CRC config is structurally invalid: {_TEMPLATE_REASON}"
+E       assert "crc config i...id: 'reverse'" == 'crc config i...ons or groups'
+E         
+E         Skipping 46 identical leading characters in diff, use -v to show
+E         -  invalid: a CRC Designer template is not a CRC config - it has no regions or groups
+E         +  invalid: 'reverse'
+
+tests\test_b101_flow_ext_copy.py:1440: AssertionError
+____________ test_r_flow_crc_4_missing_field_is_named_in_the_flow _____________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_crc_4_missing_fiel0')
+
+    def test_r_flow_crc_4_missing_field_is_named_in_the_flow(tmp_path: Path) -> None:
+        """A config without `reverse`: the cause names the field."""
+        config = json.loads(_crc_config_text(0x2000))
+        del config["reverse"]
+        project = _project(tmp_path, {"prg.s19": _S19_SRC, "crc.json": json.dumps(config)})
+        flow = Flow(
+            name="missing",
+            blocks=[SourceBlock("prg.s19"), CrcBlock("crc.json"), WriteOutBlock("out.s19")],
+        )
+    
+        result = run_flow(flow, FlowContext(project_dir=project))
+    
+        crc = result.block_results[1]
+        assert crc.status == BLOCK_STATUS_ERROR
+        assert crc.summary == "config malformed", crc.summary
+>       assert _cause(crc) == (
+            "crc config invalid: CRC config is structurally invalid: "
+            "field 'reverse' is missing"
+        )
+E       assert "crc config i...id: 'reverse'" == "crc config i...e' is missing"
+E         
+E         Skipping 46 identical leading characters in diff, use -v to show
+E         -  invalid: field 'reverse' is missing
+E         +  invalid: 'reverse'
+
+tests\test_b101_flow_ext_copy.py:1462: AssertionError
+________________ test_r_flow_crc_9_over_limit_config_not_read _________________
+
+tmp_path = WindowsPath('<TMP>/bt/test_r_flow_crc_9_over_limit_c0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000019A95D40490>
+
+    def test_r_flow_crc_9_over_limit_config_not_read(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """[S-5] With the read cap lowered to 16 bytes, a 32-byte config is not
+        read: the cause carries the size and the cap."""
+        monkeypatch.setattr(crc_config_module, "READ_SIZE_CAP_BYTES", 16)
+        project = _project(tmp_path, {"prg.s19": _S19_SRC, "crc.json": "x" * 32})
+        flow = Flow(
+            name="over",
+            blocks=[SourceBlock("prg.s19"), CrcBlock("crc.json"), WriteOutBlock("out.s19")],
+        )
+    
+        result = run_flow(flow, FlowContext(project_dir=project))
+    
+        crc, write_out = result.block_results[1], result.block_results[2]
+        assert crc.status == BLOCK_STATUS_ERROR
+        assert crc.summary == "config malformed", crc.summary
+>       assert _cause(crc) == (
+            "crc config invalid: CRC config file is 32 bytes, over the "
+            "16-byte read cap — the file was not read"
+        )
+E       AssertionError: assert 'crc config i...mn 1 (char 0)' == 'crc config i... was not read'
+E         
+E         - crc config invalid: CRC config file is 32 bytes, over the 16-byte read cap — the file was not read
+E         + crc config invalid: CRC config is not valid JSON: Expecting value: line 1 column 1 (char 0)
+
+tests\test_b101_flow_ext_copy.py:1502: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_engine_001_1_1_reverse_takes_init_as_given
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_engine_001_1_2_bit_reversed_inits_stay_distinct
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_engine_001_1_5_operations_check_gives_model_value
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_engine_001_1_6_operations_write_stores_model_value
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_engine_001_1_7_flow_crc_block_injects_model_value
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_engine_002_2_1_operation_equals_designer_grid
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_engine_002_2_2_operation_equals_designer_random
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_10_missing_field_is_named[reverse]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_10_missing_field_is_named[polynomial]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_10_missing_field_is_named[init]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_10_missing_field_is_named[final_xor]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_10_missing_field_is_named[region-start]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_10_missing_field_is_named[group-output_address]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_10_missing_field_is_named[group-regions]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_10_missing_field_is_named[span-end]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_non_number_is_named[init-zz]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_non_number_is_named[init-true]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_non_number_is_named[polynomial-1.5]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_non_number_is_named[final_xor-null]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_non_number_is_named[region-end]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_non_number_is_named[span-start]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_7_value_is_clipped
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_16_designer_template_is_named[saved-None]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_16_designer_template_is_named[width16-{"name": "T16", "algorithm": {"width": 16, "poly": "0x1021", "init": "0xFFFF", "refin": false, "refout": false, "xorout": "0x0000", "check": null}}]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_16_designer_template_is_named[algorithm-not-object-{"algorithm": 5}]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_17_1_deep_nesting_is_a_reason
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_8_markup_value_shown_plain
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_16_5_operations_dialog_names_template
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_17_2_operations_execute_survives_deep_nesting
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_2_2_relative_output_read_under_project
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_1_later_patch_reads_this_runs_copy
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_4_later_check_block
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_5_later_crc_block
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_6_later_load_block
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_7_later_a2b_file_input
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_8_other_refs_unchanged
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_9_earlier_block_reads_the_file_as_it_is
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_10_case_insensitive_on_windows
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_11_flow_execution_confirm_reads_new_output
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_12_later_a2l_ref
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_13_first_run_over_a_foreign_file_reads_the_copy
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_15_refused_ref_stays_refused_after_rebind
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_10_1_flow_report_names_the_copy
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_10_2_chain_set_report_names_the_copy
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_10_4_flow_report_names_the_copy_a2l_own
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_10_5_flow_report_names_the_copy_a2l_inherited
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_12_1_summary_names_the_copy_patch
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_12_2_summary_names_the_copy_check
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_12_3_summary_names_the_copy_crc
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_12_4_summary_names_the_copy_load
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_12_5_summary_names_the_copy_a2b
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_12_6_summary_names_the_copy_error
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_12_7_two_refs_read_order
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_12_8_no_suffix_without_in_place_read
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_12_9_suffix_survives_the_raise_exit
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_12_10_suffix_before_the_refusal_token
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_13_chain_set_provenance_names_the_copy
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_13_2_unbound_input_keeps_the_base_line
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_14_climbing_path_refused_log
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_14_climbing_path_refused_output
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_14_climbing_path_inside_accepted
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_crc_4_designer_template_is_named_in_the_flow
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_crc_4_missing_field_is_named_in_the_flow
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_crc_9_over_limit_config_not_read
+64 failed, 18 passed in 40.33s
