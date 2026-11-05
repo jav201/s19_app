@@ -35,6 +35,12 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      - name: Make the local main ref available to the history arms
+        # The history arms diff against a local `main`; a pull-request checkout
+        # has only origin/main, so create the local ref when it is missing.
+        run: |
+          git rev-parse --verify --quiet refs/heads/main || git branch main origin/main
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
