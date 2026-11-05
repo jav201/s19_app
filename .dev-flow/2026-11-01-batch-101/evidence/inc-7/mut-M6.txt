@@ -1,0 +1,35 @@
+s19_app.__file__ = <COPY>\s19_app\__init__.py
+MUTANT M6: composer drops a2l_data from compare_images
+FILE: s19_app/tui/services/before_after_service.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+__ test_r_before_after_report_001_35_1_artifact_lines_use_loaded_a2l_and_mac __
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_before_after_report_0010')
+
+    def test_r_before_after_report_001_35_1_artifact_lines_use_loaded_a2l_and_mac(
+        tmp_path: Path,
+    ) -> None:
+        """With the loaded A2L and MAC handed to the composer, both images'
+        artifact lines read ``summary=both; a2l=used (1/2); mac=used (1/1)`` in
+        both files (2/2 lines each)."""
+        result, md_text, html_text = _compose_texts(
+            tmp_path,
+            a2l_data=_TWO_TAG_A2L,
+            a2l_records=[{"name": "CAL_A", "address": 0x100}],
+            mac_records=[{"name": "CAL_M", "address": 0x102}],
+        )
+        assert result.written, result.diagnostics
+        tail = "summary=both; a2l=used (1/2); mac=used (1/1)"
+        for who in ("A", "B"):
+>           assert f"- Image {who} artifacts: {tail}" in md_text.splitlines()
+E           AssertionError: assert '- Image A artifacts: summary=both; a2l=used (1/2); mac=used (1/1)' in ['# Before/after report', '', '- Generated (UTC): 2026-07-02T12:00:00+00:00', '- Tool version: 1.0.0rc1', '- Image A: ...\\<USER>\\AppData\\Local\\Temp\\s19m7\\bt\\test_r_before_after_report_0010\\proj\\img-patched.s19` parse-errors=0', ...]
+E            +  where ['# Before/after report', '', '- Generated (UTC): 2026-07-02T12:00:00+00:00', '- Tool version: 1.0.0rc1', '- Image A: ...\\<USER>\\AppData\\Local\\Temp\\s19m7\\bt\\test_r_before_after_report_0010\\proj\\img-patched.s19` parse-errors=0', ...] = <built-in method splitlines of str object at 0x0000026E1E8530D0>()
+E            +    where <built-in method splitlines of str object at 0x0000026E1E8530D0> = '# Before/after report\n\n- Generated (UTC): 2026-07-02T12:00:00+00:00\n- Tool version: 1.0.0rc1\n- Image A: img\\.s19...            |................|\n0x00000100  AA BB 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|\n```\n'.splitlines
+
+tests\test_before_after_report.py:1462: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_before_after_report.py::test_r_before_after_report_001_35_1_artifact_lines_use_loaded_a2l_and_mac
+1 failed in 0.83s
+
+EXIT 1

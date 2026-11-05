@@ -48,7 +48,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict, List, Optional
+from typing import TYPE_CHECKING, Dict, List, Optional, Sequence
 
 from ...core import S19File
 from ...hexfile import IntelHexFile
@@ -180,6 +180,29 @@ def _load_map(path: Path) -> Dict[int, int]:
         return {}
 
 
+def _remove_orphan_markdown(path: Path) -> None:
+    """
+    Summary:
+        Remove the Markdown file of a pair whose HTML file failed or was
+        refused (R-CMP-005.17). A missing file is fine; an ``OSError`` from the
+        removal is suppressed (this module does no logging).
+
+    Args:
+        path (Path): The written Markdown report path.
+
+    Returns:
+        None
+
+    Dependencies:
+        Used by:
+            - compose_before_after_report
+    """
+    try:
+        path.unlink(missing_ok=True)
+    except OSError:
+        pass
+
+
 def compose_before_after_report(
     summary: Optional["ChangeSummary"],
     loaded_path: Optional[Path],
@@ -188,6 +211,9 @@ def compose_before_after_report(
     workarea: Path,
     now_fn: Optional[NowFn] = None,
     report_filter: Optional["ReportFilterMatcher"] = None,
+    a2l_data: Optional[dict] = None,
+    a2l_records: Optional[Sequence[dict]] = None,
+    mac_records: Optional[Sequence[dict]] = None,
 ) -> BeforeAfterReportResult:
     """
     Summary:
@@ -225,6 +251,16 @@ def compose_before_after_report(
             — byte-for-byte today's (F-01 / LLR-054.4, TC-311 pin). The
             LLR-038.2 precondition order is untouched — the filter is
             additive, never a reordering (LLR-053.5).
+        a2l_data (Optional[dict]): The session's loaded A2L payload, or
+            ``None`` when no A2L is loaded; forwarded to the compare so the
+            artifact lines read ``a2l=used`` (R-BEFORE-AFTER-REPORT-001.35).
+        a2l_records (Optional[Sequence[dict]]): The A2L enriched tags used to
+            name symbols in the Runs table; forwarded to both generators only
+            when not ``None`` (R-BEFORE-AFTER-REPORT-001.24).
+        mac_records (Optional[Sequence[dict]]): The loaded MAC records, or
+            ``None`` when no MAC file is loaded (an empty list would read
+            ``mac=unused``, R-CMP-003.2); forwarded to the compare and, when
+            not ``None``, to both generators.
 
     Returns:
         BeforeAfterReportResult: ``written=True`` with both paths, or a
@@ -315,7 +351,7 @@ def compose_before_after_report(
         return _refused(
             "No active project - the before/after report needs a project "
             "reports/ destination; use the manual A<->B Diff report "
-            "(screen 7) with an explicit destination instead."
+            "(key 7) with an explicit destination instead."
         )
     reports_dir = Path(project_dir) / REPORTS_DIR_NAME
     # S-F4 — refuse a symlinked destination before the generators mkdir/write.
@@ -336,6 +372,8 @@ def compose_before_after_report(
             raw_path=str(saved_path),
             label=saved_path.name,
         ),
+        a2l_data=a2l_data,
+        mac_records=mac_records,
     )
     if comparison.refused:
         return _refused(*comparison.diagnostics)
@@ -360,11 +398,20 @@ def compose_before_after_report(
         # conditionally so the no-filter kwargs shape stays byte-for-byte
         # today's (F-01, TC-311 pin).
         kwargs["report_filter"] = report_filter
+    if a2l_records is not None:
+        kwargs["a2l_records"] = a2l_records
+    if mac_records is not None:
+        kwargs["mac_records"] = mac_records
     md = generate_diff_report(comparison, **kwargs)
     if not md.written:
         return _refused(*md.diagnostics)
-    html = generate_diff_report_html(comparison, **kwargs)
+    try:
+        html = generate_diff_report_html(comparison, **kwargs)
+    except BaseException:
+        _remove_orphan_markdown(md.path)
+        raise
     if not html.written:
+        _remove_orphan_markdown(md.path)
         return _refused(*html.diagnostics)
     return BeforeAfterReportResult(
         md_path=md.path, html_path=html.path, written=True, diagnostics=[]

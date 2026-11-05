@@ -1,0 +1,134 @@
+s19_app.__file__ = <COPY>\s19_app\__init__.py
+MUTANT M11: _image_line path through _md_text
+FILE: s19_app/tui/services/diff_report_service.py
+FF                                                                       [100%]
+================================== FAILURES ===================================
+_______________ test_r_cmp_004_9_2_4_path_keeps_its_characters ________________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_cmp_004_9_2_4_path_keep0')
+
+    def test_r_cmp_004_9_2_4_path_keeps_its_characters(tmp_path: Path) -> None:
+        """A path is path text, not report-safe text: the header line holds the
+        path exactly as ``str(path)``, underscores and dots unescaped."""
+        name = "my_img.s19" if os.name == "nt" else "my_img*.s19"
+        path = tmp_path / name
+        comparison = _comparison(
+            image_a=ImageRef(label="x", path=str(path), source_kind="external")
+        )
+        text, _ = _whole_pair(
+            tmp_path, comparison, _mem(0x100, 1, 4), _mem(0x100, 2, 4)
+        )
+>       assert f"path=`{path}`" in text
+E       AssertionError: assert 'path=`<HOME>\\AppData\\Local\\Temp\\s19m7\\bt\\test_r_cmp_004_9_2_4_path_keep0\\my_img.s19`' in '# Diff report\n\n- Generated (UTC): 2026-06-11T12:00:00+00:00\n- Tool version: 1.0.0rc1\n- Image A: x [external] path...            |................|\n0x00000100  02 02 02 02                                      |................|\n```\n'
+
+tests\test_diff_report_service.py:2266: AssertionError
+______ test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden _______
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_at_054b_no_filter_bkey_re0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002A214490C10>
+
+    def test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """AT-054b / LLR-054.4 (HLR-054): with NO filter selected, the shipped
+        ``b``-key flow writes an MD+HTML pair byte-identical to the goldens
+        captured at the batch base revision ``79699a5`` under the declared
+        environment pin.
+    
+        Intent: the batch-35 guard golden — every later increment must keep the
+        unfiltered before/after output byte-for-byte untouched; any generator
+        byte drift flips this equality RED.
+    
+        Environment pin (test-side monkeypatch on SERVICE module attributes,
+        never a shipped-path change):
+        - ``s19_app.tui.services.diff_report_service._default_now`` -> fixed
+          2026-07-10T12:00:00Z — the default-clock seam BOTH generators resolve
+          when the handler passes no ``now_fn`` (``app.py`` passes none;
+          ``before_after_service`` forwards ``now_fn=None`` untouched).
+        - ``s19_app.tui.changes.apply.datetime`` -> :class:`_FixedApplyDatetime`
+          — the apply-stamp clock (inline default at ``apply.py:313-314``, no
+          ``_default_now`` symbol exists there) whose stamp is printed as the
+          ``Applied (UTC)`` report line.
+        Comparison runs on :func:`canonical_report_bytes` (CRLF undo +
+        per-run tmp-root tokenization); all other bytes are compared exact.
+        Goldens: ``tests/goldens/batch35/at054b-before-after-report.{md,html}``.
+        Double-proof (batch-24 control): a one-byte golden perturbation makes
+        this AT RED — captured in increment-000.md.
+        """
+        written = _drive_bkey_report_pair(tmp_path, monkeypatch)
+    
+        md_name = "20260710T120000Z-before-after-report.md"
+        html_name = "20260710T120000Z-before-after-report.html"
+        assert sorted(written) == [html_name, md_name], (
+            f"AT-054b: expected exactly the pinned-clock MD+HTML pair, "
+            f"got {sorted(written)}"
+        )
+    
+        for label, name, golden_path in (
+            ("md", md_name, _AT054B_MD_GOLDEN),
+            ("html", html_name, _AT054B_HTML_GOLDEN),
+        ):
+            assert golden_path.is_file(), (
+                f"AT-054b: golden fixture missing: {golden_path} (captured in "
+                f"batch-35 increment-000 at base revision 79699a5)"
+            )
+>           observed = canonical_report_bytes(written[name], tmp_path)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_before_after_report.py:906: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\conftest.py:1102: in canonical_report_bytes
+    _assert_no_host_path_residue(data, run_root)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = b'# Before/after report\n\n- Generated (UTC): 2026-07-10T12:00:00+00:00\n- Tool version: 1.0.0rc1\n- Image A: img\\.s1...            |................|\n0x00000100  AA BB 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|\n```\n'
+run_root = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_at_054b_no_filter_bkey_re0')
+
+    def _assert_no_host_path_residue(data: bytes, run_root: Path) -> None:
+        """Fail if an operator path survived canonicalization (batch-62 A-16).
+    
+        Summary:
+            R-1 is the batch's highest-risk item: escaping a path before it reaches
+            the file makes the raw-byte substitution above MISS, and an absolute
+            operator path is then baked into a golden and committed. The mitigation
+            used to be a single assertion in a single AT.
+    
+            Putting the check HERE makes every byte-identity consumer inherit it —
+            detection over prevention. It costs four lines and it cannot be
+            forgotten by the next batch that adds a path field.
+    
+            Only applied when ``run_root`` is given: a stored golden is compared
+            with ``run_root=None`` and is the very artifact this protects, so
+            asserting on it would be circular.
+    
+        Args:
+            data (bytes): The already-tokenized report bytes.
+            run_root (Path): The per-run root that was substituted.
+    
+        Raises:
+            AssertionError: If a drive letter or home-directory shape survived.
+    
+        Dependencies:
+            Used by:
+                - canonical_report_bytes
+        """
+        for pattern in _HOST_PATH_RESIDUE:
+            match = pattern.search(data)
+            if match:
+                line = next(
+                    (ln for ln in data.split(b"\n") if match.group(0) in ln), b""
+                )
+>               raise AssertionError(
+                    "A-16: a host path survived canonicalization — an operator "
+                    f"path is about to be compared or committed. Matched "
+                    f"{match.group(0)!r} in: {line[:160]!r} (run_root={run_root})"
+                )
+E               AssertionError: A-16: a host path survived canonicalization — an operator path is about to be compared or committed. Matched b'C:\\' in: b'- Image A: img\\.s19 [external] path=`<HOME>\\\\AppData\\\\Local\\\\Temp\\\\s19m7\\\\bt\\\\test\\_at\\_054b\\_no\\_filter\\_bkey\\_re0\\\\img\\.s19` parse-errors=0' (run_root=<HOME>\AppData\Local\Temp\s19m7\bt\test_at_054b_no_filter_bkey_re0)
+
+tests\conftest.py:1160: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_9_2_4_path_keeps_its_characters
+FAILED tests/test_before_after_report.py::test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden
+2 failed in 3.29s
+
+EXIT 1

@@ -346,7 +346,7 @@ def test_tc_b94_23_binding_text_grammar(tmp_path: Path) -> None:
 #: The Phase-3 C-42 paste of the FLOW-output arm — what run_flow's A2B block
 #: actually emits for a flow binding (provisional per V-5, pinned here).
 _TC_B94_24_FLOW_ARM_PASTE = (
-    "- Image A: patch.out [flow] path=`block 2 (patch).out` parse-errors=0"
+    "- Image A: patch\\.out [flow] path=`block 2 (patch).out` parse-errors=0"
 )
 #: The external arm's fixed parts — character-for-character against the
 #: executed base form in evidence/p1_probe_diff_report_emitted.txt

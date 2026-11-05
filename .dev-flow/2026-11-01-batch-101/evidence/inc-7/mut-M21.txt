@@ -1,0 +1,64 @@
+s19_app.__file__ = <COPY>\s19_app\__init__.py
+MUTANT M21: HTML linkage symbol keeps the raw value (one file keeps the control char)
+FILE: s19_app/tui/services/diff_report_service.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+______ test_tc_038_3_ctl_symbol_renders_identically_in_md_and_html_pair _______
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_tc_038_3_ctl_symbol_rende0')
+
+    def test_tc_038_3_ctl_symbol_renders_identically_in_md_and_html_pair(
+        tmp_path: Path,
+    ) -> None:
+        """A ctl-bearing linkage symbol is stripped in BOTH written formats.
+    
+        Intent: the increment-3 reviewer recommendation — ``_strip_ctl`` factored
+        out of ``_md_cell`` and applied inside the two before/after HTML helpers:
+        the md and html files render the same symbol, and the raw control
+        character reaches neither file. batch-101 Inc 7 (R-BEFORE-AFTER-REPORT-
+        001.21, changed): the control character is no longer removed, it is
+        replaced by a visible U+FFFD in BOTH files.
+        """
+        bas = _bas()
+        project_dir = tmp_path / "proj"
+        project_dir.mkdir()
+        original = _make_s19_image(tmp_path)
+        patched = _make_s19_image(project_dir, name="p.s19", patched=True)
+        summary = _summary(
+            saved_path=patched,
+            source_image_path=original,
+            entries=[_summary_entry(symbol="CTL\x01SYM")],
+        )
+    
+        result = bas.compose_before_after_report(
+            summary,
+            original,
+            project_dir=project_dir,
+            workarea=tmp_path / "wa",
+        )
+    
+        assert result.written, result.diagnostics
+        md_text = result.md_path.read_text(encoding="utf-8")
+        html_text = result.html_path.read_text(encoding="utf-8")
+>       assert "\x01" not in md_text and "\x01" not in html_text
+E       AssertionError: assert ('\x01' not in '# Before/af.......|\n```\n'
+E         
+E         '\x01' is contained here:
+E           .....|
+E           ``` and '\x01' not in '<!DOCTYPE h...dy>\n</html>'
+E         
+E         '\x01' is contained here:
+E           td><td>CTLSYM</td><td>00 00 |..|</td><td>AA BB |..|</td></tr>
+E         ?           +
+E           </table>
+E           <h2>Statistics</h2>
+E           <table>...
+E         
+E         ...Full output truncated (27 lines hidden), use '-vv' to show)
+
+tests\test_before_after_report.py:600: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_before_after_report.py::test_tc_038_3_ctl_symbol_renders_identically_in_md_and_html_pair
+1 failed in 0.79s
+
+EXIT 1

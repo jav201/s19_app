@@ -1,0 +1,57 @@
+s19_app.__file__ = <COPY>\s19_app\__init__.py
+MUTANT M23: _md_path returns the raw path (a backtick closes the code span)
+FILE: s19_app/tui/services/diff_report_service.py
+FF                                                                       [100%]
+================================== FAILURES ===================================
+____________________ test_r_cmp_004_9_2_1_image_path_text _____________________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_cmp_004_9_2_1_image_pat0')
+
+    def test_r_cmp_004_9_2_1_image_path_text(tmp_path: Path) -> None:
+        """A backtick in an image path becomes U+FFFD and the code span closes
+        once: the line holds exactly 2 backticks."""
+        comparison = _comparison(
+            image_a=ImageRef(label="A.s19", path="a`b.s19", source_kind="external")
+        )
+        text, _ = _whole_pair(
+            tmp_path, comparison, _mem(0x100, 1, 4), _mem(0x100, 2, 4)
+        )
+        line = next(ln for ln in text.splitlines() if ln.startswith("- Image A:"))
+>       assert f"path=`a{_FFFD}b.s19`" in line
+E       AssertionError: assert 'path=`a�b.s19`' in '- Image A: A\\.s19 [external] path=`a`b.s19` parse-errors=0'
+
+tests\test_diff_report_service.py:2227: AssertionError
+__________________ test_r_cmp_004_9_2_2_provenance_path_text __________________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_cmp_004_9_2_2_provenanc0')
+
+    def test_r_cmp_004_9_2_2_provenance_path_text(tmp_path: Path) -> None:
+        """Backticks in the original, saved and change-document paths: U+FFFD in
+        place, 2 backticks on each of the 3 lines."""
+        provenance = BeforeAfterProvenance(
+            original_path=Path("o`1.s19"),
+            saved_path=Path("s`1.s19"),
+            applied_at_utc="2026-07-02T09:00:00+00:00",
+            change_doc_path=Path("c`1.json"),
+        )
+        text, _ = _whole_pair(
+            tmp_path, _comparison(), _mem(0x100, 1, 4), _mem(0x100, 2, 4),
+            provenance=provenance,
+        )
+        lines = text.splitlines()
+        expected = [
+            f"- Original image (before): `o{_FFFD}1.s19`",
+            f"- Saved patched image (after): `s{_FFFD}1.s19`",
+            f"- Change document: `c{_FFFD}1.json`",
+        ]
+        for line in expected:
+>           assert line in lines
+E           AssertionError: assert '- Original image (before): `o�1.s19`' in ['# Before/after report', '', '- Generated (UTC): 2026-06-11T12:00:00+00:00', '- Tool version: 1.0.0rc1', '- Image A: ...19 [external] path=`/tmp/a.s19` parse-errors=0', '- Image B: B\\.s19 [external] path=`/tmp/b.s19` parse-errors=0', ...]
+
+tests\test_diff_report_service.py:2251: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_9_2_1_image_path_text
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_9_2_2_provenance_path_text
+2 failed in 1.03s
+
+EXIT 1

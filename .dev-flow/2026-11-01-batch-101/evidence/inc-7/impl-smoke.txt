@@ -1,0 +1,24 @@
+s19_app.__file__ = <WORKTREE>/s19_app/__init__.py (this worktree, verified)
+import s19_app.tui.app: ok
+--- pytest (9 existing files), tail ---
+FAILED tests/test_diff_report_service.py::test_report_sections_present_in_order
+FAILED tests/test_diff_report_service.py::test_symbol_annotation_only_intersecting_run
+FAILED tests/test_diff_report_service.py::test_default_kwargs_output_byte_identical_pre_change_golden
+FAILED tests/test_diff_report_service.py::test_provenance_and_linkage_render_in_both_formats
+FAILED tests/test_diff_report_service.py::test_pipe_bearing_symbol_md_escaped_html_intact
+FAILED tests/test_diff_report_service.py::test_tc312_filter_restricts_linkage_and_run_sections_both_formats
+FAILED tests/test_diff_report_service.py::test_tc312_a9_merged_window_spans_excluded_run
+FAILED tests/test_diff_report_service.py::test_tc312_audit_header_first_block_fixed_format
+FAILED tests/test_diff_report_service.py::test_tc318_hostile_filter_name_sanitized_md_html
+FAILED tests/test_diff_report_service.py::test_tc313_no_filter_output_byte_identical_todays
+FAILED tests/test_before_after_report.py::test_tc_038_3_ctl_symbol_renders_identically_in_md_and_html_pair
+FAILED tests/test_before_after_report.py::test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden
+FAILED tests/test_before_after_report.py::test_tc311_composer_forwards_matcher_filtered_output_both_formats
+FAILED tests/test_tui_report_filter_surface.py::test_at_056a_dropdown_selection_filters_both_triggers
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+FAILED tests/test_tui_report_filter_surface.py::test_at_053b_hostile_valid_filter_proceeds_sanitized_everywhere
+FAILED tests/test_tui_report_filter_surface.py::test_at_054a_bkey_filtered_pair_keeps_match_omits_unmatched
+FAILED tests/test_changes_symbol_entries.py::test_tc717_flow_produced_image_diff_references_all_flow_changes
+FAILED tests/test_flow_a2b_b94.py::test_tc_b94_24_a2b_report_states_each_inputs_provenance
+19 failed, 397 passed, 1 skipped in 578.91s (0:09:38)
+--- test_at_056e also fails on unmodified HEAD (checked in a temp worktree, removed): pre-existing ---

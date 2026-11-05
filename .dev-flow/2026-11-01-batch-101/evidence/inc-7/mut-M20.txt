@@ -1,0 +1,35 @@
+s19_app.__file__ = <COPY>\s19_app\__init__.py
+MUTANT M20: symbol membership by extent overlap (A2L tag length expands to every covered address)
+FILE: s19_app/tui/services/diff_report_service.py
+F.                                                                       [100%]
+================================== FAILURES ===================================
+_______________ test_r_cmp_004_5_1_symbol_by_address_not_extent _______________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_cmp_004_5_1_symbol_by_a0')
+
+    def test_r_cmp_004_5_1_symbol_by_address_not_extent(tmp_path: Path) -> None:
+        """A tag whose extent covers the run but whose address lies outside it
+        leaves the Symbols cell ``-``; the tag whose address is in the run names
+        it."""
+        comparison = _comparison(
+            runs=[DiffRun(0x100, 0x102, KIND_CHANGED)], stats=_stats(1, 2)
+        )
+        wide = [{"name": "WIDE", "address": 0xF0, "length": 0x40, "byte_size": 0x40}]
+        here = [{"name": "HERE", "address": 0x100, "length": 1, "byte_size": 1}]
+        first, _ = _whole_pair(
+            tmp_path, comparison, _mem(0x100, 1, 2), _mem(0x100, 2, 2),
+            a2l_records=wide,
+        )
+        second, _ = _whole_pair(
+            tmp_path, comparison, _mem(0x100, 1, 2), _mem(0x100, 2, 2),
+            a2l_records=here,
+        )
+>       assert "| 0x00000100 | 0x00000102 | 2 | changed | - |" in first
+E       AssertionError: assert '| 0x00000100 | 0x00000102 | 2 | changed | - |' in '# Diff report\n\n- Generated (UTC): 2026-06-11T12:00:00+00:00\n- Tool version: 1.0.0rc1\n- Image A: A\\.s19 [external...            |................|\n0x00000100  02 02                                            |................|\n```\n'
+
+tests\test_diff_report_service.py:1923: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_5_1_symbol_by_address_not_extent
+1 failed, 1 passed in 0.90s
+
+EXIT 1

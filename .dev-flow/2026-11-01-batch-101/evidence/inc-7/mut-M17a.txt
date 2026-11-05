@@ -1,0 +1,39 @@
+s19_app.__file__ = <COPY>\s19_app\__init__.py
+MUTANT M17a: composer keeps the Markdown file after an HTML failure or refusal
+FILE: s19_app/tui/services/before_after_service.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______ test_r_cmp_005_17_2_before_after_html_failure_removes_markdown ________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_cmp_005_17_2_before_aft0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000017334142650>
+
+    def test_r_cmp_005_17_2_before_after_html_failure_removes_markdown(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The HTML generator raising, then refusing, after the Markdown file was
+        written: the raise propagates / the refusal is returned, and in both
+        arms no ``-before-after-report.md`` is left."""
+        from s19_app.tui.services.diff_report_service import DiffReportResult
+    
+        bas = _bas()
+        reports = tmp_path / "proj" / "reports"
+    
+        def _raising(*_a, **_k):
+            raise RuntimeError("x")
+    
+        monkeypatch.setattr(bas, "generate_diff_report_html", _raising)
+        with pytest.raises(RuntimeError, match="x"):
+            _compose_texts(tmp_path)
+>       assert sorted(p.name for p in reports.iterdir()) == []
+E       AssertionError: assert ['20260702T12...er-report.md'] == []
+E         
+E         Left contains one more item: '20260702T120000Z-before-after-report.md'
+E         Use -v to get more diff
+
+tests\test_before_after_report.py:1679: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_before_after_report.py::test_r_cmp_005_17_2_before_after_html_failure_removes_markdown
+1 failed in 0.77s
+
+EXIT 1

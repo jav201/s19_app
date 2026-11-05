@@ -2129,9 +2129,13 @@ _FINAL_NAME_ALLOWLIST = {
     # privately, then ``os.replace`` onto the manifest this save wrote);
     # ``_keep_previous_manifest`` claims a NEW name with ``O_CREAT|O_EXCL``
     # (never an overwrite) and unlinks only its own partial claim.
+    # batch-101 Inc 7 (R-CMP-005.17): ``_drop_orphan_md`` (inside the A<->B
+    # report worker) unlinks only the Markdown file this report just wrote,
+    # when its HTML twin failed or was refused.
     "s19_app/tui/app.py": frozenset(
         {
             "_abort_save",
+            "_drop_orphan_md",
             "_keep_previous_manifest",
             "_restore_manifest",
             "action_dump_a2l_json",
@@ -2158,8 +2162,19 @@ _FINAL_NAME_ALLOWLIST = {
     "s19_app/tui/services/report_service.py": frozenset(
         {"generate_project_report"}
     ),
+    # batch-101 Inc 7 (R-CMP-005.16, R-CMP-005.17; E3 findings S-3, N-1): a
+    # diff report file is written whole or not at all. ``_write_report``
+    # writes ``<name>.<random>.part`` (exclusive create of an unpredictable
+    # name, never an overwrite; E5 C-1), moves it
+    # onto the report's own fresh name with os.replace, and unlinks only the
+    # ``.part`` it created. ``_remove_orphan_markdown`` unlinks only the
+    # Markdown file this before/after report wrote when its HTML twin failed
+    # or was refused.
     "s19_app/tui/services/diff_report_service.py": frozenset(
-        {"generate_diff_report", "generate_diff_report_html"}
+        {"generate_diff_report", "generate_diff_report_html", "_write_report"}
+    ),
+    "s19_app/tui/services/before_after_service.py": frozenset(
+        {"_remove_orphan_markdown"}
     ),
     "s19_app/segment_ops.py": frozenset({"write_bin_with_sidecar"}),
 }

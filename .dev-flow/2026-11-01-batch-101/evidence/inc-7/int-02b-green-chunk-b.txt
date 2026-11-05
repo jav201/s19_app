@@ -1,0 +1,501 @@
+$ git rev-parse --short HEAD: 9508239
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc7\s19_app\__init__.py
+$ python -m pytest -q -rA -m not serial_timing tests/test_render_hexview.py tests/test_report_addendum_bound.py tests/test_report_document_bound.py tests/test_report_field_census.py tests/test_report_markup_safety.py tests/test_report_off_ui_thread.py tests/test_report_producer_bound.py tests/test_report_service.py tests/test_report_symbol_escape.py tests/test_requirements_canon.py tests/test_suite_hygiene.py tests/test_tui_check_chain_b94.py tests/test_tui_check_editor.py
+........................................................................ [ 16%]
+........................................................................ [ 32%]
+........................................................................ [ 49%]
+........................................................................ [ 65%]
+........................................................................ [ 82%]
+........................................................................ [ 98%]
+.......                                                                  [100%]
+(PASSES section with captured output removed; per-node outcomes are in the short test summary below)
+=========================== short test summary info ===========================
+ERROR test_teardown_row.py::test_arm - RuntimeError: teardown boom
+========================= 1 passed, 1 error in 0.11s ==========================
+______________________ test_r_tst_044_low_margin_prefix _______________________
+---------------------------- Captured stdout call -----------------------------
+running: <HOME>\anaconda3\envs\s19env\python.exe -mpytest --basetemp=<HOME>\AppData\Local\Temp\s19i7\btB\test_r_tst_044_low_margin_prefix0\runpytest-0 -p no:cacheprovider
+     in: <HOME>\AppData\Local\Temp\s19i7\btB\test_r_tst_044_low_margin_prefix0
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: <HOME>\AppData\Local\Temp\s19i7\btB\test_r_tst_044_low_margin_prefix0
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collected 2 items
+
+test_low_prefix.py ..                                                    [100%]
+============================ QC-TM timing margins =============================
+LOW 15.0%  0.850 s / 1.000 s  b  test_low_prefix.py::test_b
+20.0%  0.800 s / 1.000 s  d  test_low_prefix.py::test_d
+QC-TM: 2 bounds, 1 under 20 % margin
+
+============================== 2 passed in 0.02s ==============================
+_________________ test_r_tst_046_over_bound_arm_still_reports _________________
+---------------------------- Captured stdout call -----------------------------
+running: <HOME>\anaconda3\envs\s19env\python.exe -mpytest --basetemp=<HOME>\AppData\Local\Temp\s19i7\btB\test_r_tst_046_over_bound_arm_still_reports0\runpytest-0 -p no:cacheprovider
+     in: <HOME>\AppData\Local\Temp\s19i7\btB\test_r_tst_046_over_bound_arm_still_reports0
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: <HOME>\AppData\Local\Temp\s19i7\btB\test_r_tst_046_over_bound_arm_still_reports0
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collected 1 item
+
+test_over_bound.py F                                                     [100%]
+
+================================== FAILURES ===================================
+__________________________________ test_over __________________________________
+
+    def test_over():
+        from tests.support.timing import report_margin
+>       assert 1.2 < report_margin("o", 1.2, 1.0)
+E       AssertionError: assert 1.2 < 1.0
+E        +  where 1.0 = <function report_margin at 0x000002582FAD4D60>('o', 1.2, 1.0)
+
+test_over_bound.py:3: AssertionError
+============================ QC-TM timing margins =============================
+LOW -20.0%  1.200 s / 1.000 s  o  test_over_bound.py::test_over
+QC-TM: 1 bounds, 1 under 20 % margin
+=========================== short test summary info ===========================
+FAILED test_over_bound.py::test_over - AssertionError: assert 1.2 < 1.0
+============================== 1 failed in 0.10s ==============================
+=========================== short test summary info ===========================
+PASSED tests/test_render_hexview.py::test_tc651_import_census_all_consumers_read_render_hexview
+PASSED tests/test_render_hexview.py::test_tc652_wrapper_absence_and_renderer_surface
+PASSED tests/test_report_addendum_bound.py::test_at194_addendum_marginal_resident_cost_flat_in_candidate_count
+PASSED tests/test_report_addendum_bound.py::test_at196_below_bound_report_is_byte_identical_to_the_inc1_golden
+PASSED tests/test_report_addendum_bound.py::test_tc491_golden_capture_harness_is_deterministic
+PASSED tests/test_report_addendum_bound.py::test_at197_notice_names_cut_class_dropped_count_and_exact_variant_set
+PASSED tests/test_report_addendum_bound.py::test_at198_notice_presence_keys_on_the_class_total[le_K]
+PASSED tests/test_report_addendum_bound.py::test_at198_notice_presence_keys_on_the_class_total[interior]
+PASSED tests/test_report_addendum_bound.py::test_at198_notice_presence_keys_on_the_class_total[K_plus_1]
+PASSED tests/test_report_addendum_bound.py::test_at199_document_derived_text_cannot_forge_a_notice
+PASSED tests/test_report_addendum_bound.py::test_at201_a_class_that_lost_nothing_is_never_named
+PASSED tests/test_report_addendum_bound.py::test_at202_a_variant_that_lost_nothing_is_never_named
+PASSED tests/test_report_addendum_bound.py::test_at203_notice_sits_under_the_flooded_regions_subsection
+PASSED tests/test_report_addendum_bound.py::test_tc480_addendum_end_to_end_shape_at_the_boundary
+PASSED tests/test_report_addendum_bound.py::test_tc481_below_the_bound_renders_every_hit_and_no_notice
+PASSED tests/test_report_addendum_bound.py::test_tc482_exactly_at_the_bound_renders_k_hits_and_no_notice
+PASSED tests/test_report_addendum_bound.py::test_tc483_above_the_bound_is_capped_and_line_count_is_bounded
+PASSED tests/test_report_addendum_bound.py::test_tc484_empty_and_negative_domain_renders_none_without_notice
+PASSED tests/test_report_addendum_bound.py::test_tc485_addendum_is_guarded_by_a_non_empty_declared_region_set
+PASSED tests/test_report_addendum_bound.py::test_tc486_membership_is_sound_over_nested_overlapping_regions
+PASSED tests/test_report_addendum_bound.py::test_tc487_duplicate_and_equal_start_nested_regions_each_emit
+PASSED tests/test_report_addendum_bound.py::test_tc488_candidate_consumption_is_r_independent_overlapping
+PASSED tests/test_report_addendum_bound.py::test_tc489_candidate_consumption_is_r_independent_disjoint
+PASSED tests/test_report_addendum_bound.py::test_tc490_notice_caps_the_variant_list_with_a_plus_n_more_remainder
+PASSED tests/test_report_addendum_bound.py::test_tc492_cap_labels_and_notice_format_are_module_constants
+PASSED tests/test_report_addendum_bound.py::test_tc493_addendum_producer_peak_is_flat_in_the_candidate_count
+PASSED tests/test_report_addendum_bound.py::test_tc494_emission_order_is_result_summary_interleaved
+PASSED tests/test_report_addendum_bound.py::test_tc495_notice_renders_a_variant_id_exactly_as_a_hit_line_does
+PASSED tests/test_report_addendum_bound.py::test_tc498_region_ops_equal_r_times_n_under_huge_tiny_geometry
+PASSED tests/test_report_addendum_bound.py::test_tc499_report_wide_truncation_is_not_an_addendum_notice
+PASSED tests/test_report_document_bound.py::test_tc552_each_ceiling_fixture_actually_overflows_its_own_ceiling[AT-250]
+PASSED tests/test_report_document_bound.py::test_tc552_each_ceiling_fixture_actually_overflows_its_own_ceiling[AT-251[1]]
+PASSED tests/test_report_document_bound.py::test_tc552_each_ceiling_fixture_actually_overflows_its_own_ceiling[AT-251[10]]
+PASSED tests/test_report_document_bound.py::test_tc552_each_ceiling_fixture_actually_overflows_its_own_ceiling[AT-251[100]]
+PASSED tests/test_report_document_bound.py::test_tc552_each_ceiling_fixture_actually_overflows_its_own_ceiling[AT-252[1]]
+PASSED tests/test_report_document_bound.py::test_tc552_each_ceiling_fixture_actually_overflows_its_own_ceiling[AT-252[3]]
+PASSED tests/test_report_document_bound.py::test_tc552_each_ceiling_fixture_actually_overflows_its_own_ceiling[AT-252[10]]
+PASSED tests/test_report_document_bound.py::test_at250_document_never_exceeds_the_stated_ceiling
+PASSED tests/test_report_document_bound.py::test_at251_ceiling_holds_across_the_variant_count[1]
+PASSED tests/test_report_document_bound.py::test_at251_ceiling_holds_across_the_variant_count[10]
+PASSED tests/test_report_document_bound.py::test_at251_ceiling_holds_across_the_variant_count[100]
+PASSED tests/test_report_document_bound.py::test_at252_ceiling_holds_across_the_check_file_count[1]
+PASSED tests/test_report_document_bound.py::test_at252_ceiling_holds_across_the_check_file_count[3]
+PASSED tests/test_report_document_bound.py::test_at252_ceiling_holds_across_the_check_file_count[10]
+PASSED tests/test_report_document_bound.py::test_at253_every_drop_is_disclosed_with_its_byte_total
+PASSED tests/test_report_document_bound.py::test_tc560_disclosed_bytes_equal_the_refused_line_bytes
+PASSED tests/test_report_document_bound.py::test_at254_no_variant_vanishes_when_the_budget_is_spent_early
+PASSED tests/test_report_document_bound.py::test_at264_every_variant_heading_survives_a_fully_exhausted_budget
+PASSED tests/test_report_document_bound.py::test_at255_pin_exhausted_report_is_still_usable
+PASSED tests/test_report_document_bound.py::test_at256_pin_under_cap_report_is_byte_identical_to_the_inc0_golden
+PASSED tests/test_report_document_bound.py::test_tc553_no_producer_writes_to_the_document_outside_the_gate
+PASSED tests/test_report_document_bound.py::test_tc573_the_hexdump_seam_refuses_when_the_gate_is_exhausted
+PASSED tests/test_report_document_bound.py::test_tc554_the_census_walk_actually_finds_a_planted_write
+PASSED tests/test_report_document_bound.py::test_tc555_allowance_is_bounded_on_both_sides_by_test_owned_derivations[0]
+PASSED tests/test_report_document_bound.py::test_tc555_allowance_is_bounded_on_both_sides_by_test_owned_derivations[1]
+PASSED tests/test_report_document_bound.py::test_tc555_allowance_is_bounded_on_both_sides_by_test_owned_derivations[10]
+PASSED tests/test_report_document_bound.py::test_tc555_allowance_is_bounded_on_both_sides_by_test_owned_derivations[100]
+PASSED tests/test_report_document_bound.py::test_tc555_allowance_is_bounded_on_both_sides_by_test_owned_derivations[400]
+PASSED tests/test_report_document_bound.py::test_tc612_allowance_is_driven_by_the_closed_label_set
+PASSED tests/test_report_document_bound.py::test_tc611_cell_allowance_must_not_be_derived_from_input_chars[escaped-ascii]
+PASSED tests/test_report_document_bound.py::test_tc611_cell_allowance_must_not_be_derived_from_input_chars[non-bmp]
+PASSED tests/test_report_document_bound.py::test_tc556_reservation_floor_covers_a_real_minimal_variant_record
+PASSED tests/test_report_document_bound.py::test_tc557_a_refused_batch_does_not_grow_the_document
+PASSED tests/test_report_document_bound.py::test_tc558_refusal_does_not_latch
+PASSED tests/test_report_document_bound.py::test_tc574_reservation_and_budget_must_BOTH_admit
+PASSED tests/test_report_document_bound.py::test_tc559_appendix_retention_is_round_robin_not_first_come
+PASSED tests/test_report_document_bound.py::test_tc575_appendix_cap_is_inert_below_the_cap
+PASSED tests/test_report_document_bound.py::test_tc561_disclosure_line_count_is_bounded_by_the_closed_label_set
+PASSED tests/test_report_field_census.py::test_at157_no_planted_field_produces_markup_in_the_app_viewer
+PASSED tests/test_report_field_census.py::test_at158_exported_file_is_inert_under_a_default_reader
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[project_name]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[variant_id]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[path_name]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[file_type]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[status]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[linkage]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[linkage_symbol]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[issue_code]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[issue_message]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[issue_symbol]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[related_artifact]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[region_name]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[change_source_path]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[saved_path]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[check_source_path]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[check_result]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[notice_variant]
+PASSED tests/test_report_field_census.py::test_census_covers_every_escaped_expression_in_the_source
+PASSED tests/test_report_field_census.py::test_every_planted_marker_reaches_the_document
+PASSED tests/test_report_field_census.py::test_every_table_row_keeps_its_header_content
+PASSED tests/test_report_field_census.py::test_a_pipe_injected_into_a_cell_is_caught_by_content_comparison
+PASSED tests/test_report_field_census.py::test_mode_b_in_a_table_cell_is_still_forbidden_at_every_call_site
+PASSED tests/test_report_field_census.py::test_mode_b_cell_guard_flags_a_planted_cell
+PASSED tests/test_report_field_census.py::test_tc397_declaration_errors_are_capped_with_a_visible_marker
+PASSED tests/test_report_field_census.py::test_tc396_report_cell_cap_is_pinned_at_a_composer_site
+PASSED tests/test_report_field_census.py::test_tc389_truncation_appendix_note_is_escaped
+PASSED tests/test_report_field_census.py::test_tc385_a_hostile_heading_cannot_change_its_own_level
+PASSED tests/test_report_field_census.py::test_lone_surrogate_is_dropped_like_any_other_unrepresentable_char
+PASSED tests/test_report_field_census.py::test_a16_canonicaliser_residue_guard_can_actually_fire
+PASSED tests/test_report_field_census.py::test_at161_an_all_backtick_image_cannot_close_the_hexdump_fence
+PASSED tests/test_report_field_census.py::test_f17_format_bytes_is_inert_by_construction
+PASSED tests/test_report_field_census.py::test_no_escaped_field_is_emitted_at_the_head_of_its_line
+PASSED tests/test_report_field_census.py::test_head_of_line_guard_detects_a_planted_violation
+PASSED tests/test_report_markup_safety.py::test_the_oracle_transcribes_the_implementations_drop_set
+PASSED tests/test_report_markup_safety.py::test_g1_every_active_rule_has_a_payload
+PASSED tests/test_report_markup_safety.py::test_g2_linkify_schemas_are_all_represented
+PASSED tests/test_report_markup_safety.py::test_g3_payload_floor
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[strong]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[em]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[strike]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[link-inline]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[link-ref]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[autolink]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[image]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[image-ref]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[linkify-scheme]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[linkify-proto-rel]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[linkify-fuzzy-www]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[linkify-fuzzy-bare]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[linkify-fuzzy-mail]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[linkify-idn]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[linkify-mailto]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[linkify-ftp]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[backticks]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[code-span-breakout]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[html-inline]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[html-tag]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[entity-vert]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[entity-amp]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[entity-lt]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[escape-backslash]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[newline-hard]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[heading]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[lheading]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[hr]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[bullet]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[bullet-plus]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[ordered-paren]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[blockquote]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[fence]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[indented-code]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[html-block]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[reference]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[table-pipe]
+PASSED tests/test_report_markup_safety.py::test_g5_negative_controls_are_inert_before_escaping[neg-fuzzy-ip]
+PASSED tests/test_report_markup_safety.py::test_g5_negative_controls_are_inert_before_escaping[neg-fake-tld]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[strong]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[em]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[strike]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[link-inline]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[link-ref]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[autolink]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[image]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[image-ref]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[linkify-scheme]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[linkify-proto-rel]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[linkify-fuzzy-www]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[linkify-fuzzy-bare]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[linkify-fuzzy-mail]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[linkify-idn]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[linkify-mailto]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[linkify-ftp]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[backticks]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[code-span-breakout]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[html-inline]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[html-tag]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[entity-vert]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[entity-amp]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[entity-lt]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[escape-backslash]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[newline-hard]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[heading]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[lheading]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[hr]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[bullet]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[bullet-plus]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[ordered-paren]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[blockquote]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[fence]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[indented-code]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[html-block]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[reference]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[table-pipe]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[neg-fuzzy-ip]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[neg-fake-tld]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[strong]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[em]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[strike]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[link-inline]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[link-ref]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[autolink]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[image]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[image-ref]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[linkify-scheme]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[linkify-proto-rel]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[linkify-fuzzy-www]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[linkify-fuzzy-bare]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[linkify-fuzzy-mail]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[linkify-idn]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[linkify-mailto]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[linkify-ftp]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[backticks]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[code-span-breakout]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[html-inline]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[html-tag]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[entity-vert]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[entity-amp]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[entity-lt]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[escape-backslash]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[newline-hard]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[heading]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[lheading]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[hr]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[bullet]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[bullet-plus]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[ordered-paren]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[blockquote]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[fence]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[indented-code]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[html-block]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[reference]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[table-pipe]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[neg-fuzzy-ip]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[neg-fake-tld]
+PASSED tests/test_report_markup_safety.py::test_backslash_is_escaped_first_and_ampersand_second
+PASSED tests/test_report_markup_safety.py::test_ampersand_escaping_kills_entity_spoofing
+PASSED tests/test_report_markup_safety.py::test_backtick_is_escaped_not_deleted
+PASSED tests/test_report_markup_safety.py::test_image_construct_is_dead_only_via_bracket_escaping
+PASSED tests/test_report_markup_safety.py::test_collapse_defuses_block_starters_pushed_onto_a_new_line[- item]
+PASSED tests/test_report_markup_safety.py::test_collapse_defuses_block_starters_pushed_onto_a_new_line[+ item]
+PASSED tests/test_report_markup_safety.py::test_collapse_defuses_block_starters_pushed_onto_a_new_line[= h]
+PASSED tests/test_report_markup_safety.py::test_collapse_defuses_block_starters_pushed_onto_a_new_line[1) item]
+PASSED tests/test_report_markup_safety.py::test_collapse_defuses_block_starters_pushed_onto_a_new_line[1. item]
+PASSED tests/test_report_markup_safety.py::test_collapse_defuses_block_starters_pushed_onto_a_new_line[> quote]
+PASSED tests/test_report_markup_safety.py::test_collapse_defuses_block_starters_pushed_onto_a_new_line[# head]
+PASSED tests/test_report_markup_safety.py::test_collapse_defuses_block_starters_pushed_onto_a_new_line[---]
+PASSED tests/test_report_markup_safety.py::test_collapse_defuses_block_starters_pushed_onto_a_new_line[    indented]
+PASSED tests/test_report_markup_safety.py::test_leading_block_starter_is_defused_behind_a_list_marker[- item]
+PASSED tests/test_report_markup_safety.py::test_leading_block_starter_is_defused_behind_a_list_marker[+ item]
+PASSED tests/test_report_markup_safety.py::test_leading_block_starter_is_defused_behind_a_list_marker[= item]
+PASSED tests/test_report_markup_safety.py::test_leading_block_starter_is_defused_behind_a_list_marker[1) item]
+PASSED tests/test_report_markup_safety.py::test_leading_block_starter_is_defused_behind_a_list_marker[---]
+PASSED tests/test_report_markup_safety.py::test_interior_hyphen_is_never_escaped
+PASSED tests/test_report_markup_safety.py::test_u2028_is_dropped_although_it_is_not_a_control_character
+PASSED tests/test_report_markup_safety.py::test_deceptive_characters_are_replaced_visibly_not_silently[\u202e]
+PASSED tests/test_report_markup_safety.py::test_deceptive_characters_are_replaced_visibly_not_silently[\u200b]
+PASSED tests/test_report_markup_safety.py::test_deceptive_characters_are_replaced_visibly_not_silently[\ufeff]
+PASSED tests/test_report_markup_safety.py::test_deceptive_characters_are_replaced_visibly_not_silently[\u2066]
+PASSED tests/test_report_markup_safety.py::test_deceptive_characters_are_replaced_visibly_not_silently[\x9f]
+PASSED tests/test_report_markup_safety.py::test_deceptive_characters_are_replaced_visibly_not_silently[\u2028]
+PASSED tests/test_report_markup_safety.py::test_deceptive_characters_are_replaced_visibly_not_silently[\u2029]
+PASSED tests/test_report_markup_safety.py::test_mode_a_truncation_boundary_pair
+PASSED tests/test_report_markup_safety.py::test_limit_is_required_and_keyword_only
+PASSED tests/test_report_markup_safety.py::test_mode_b_never_truncates
+PASSED tests/test_report_markup_safety.py::test_tc382_unicode_that_is_not_deceptive_survives_intact[astral-MK\U0001f600\U0001d400x]
+PASSED tests/test_report_markup_safety.py::test_tc382_unicode_that_is_not_deceptive_survives_intact[nbsp-MK\xa0x]
+PASSED tests/test_report_markup_safety.py::test_tc382_unicode_that_is_not_deceptive_survives_intact[combining-MKe\u0301x]
+PASSED tests/test_report_markup_safety.py::test_tc382_unicode_that_is_not_deceptive_survives_intact[cjk-MK\u6821\u9a8cx]
+PASSED tests/test_report_markup_safety.py::test_tc382_unicode_that_is_not_deceptive_survives_intact[rtl-text-MK\u0645\u0631\u062d\u0628\u0627x]
+PASSED tests/test_report_markup_safety.py::test_tc382_a_large_value_is_bounded_without_scanning_it_whole
+PASSED tests/test_report_markup_safety.py::test_tc381_none_renders_as_text_not_as_an_empty_cell
+PASSED tests/test_report_markup_safety.py::test_tc398_truncation_never_orphans_an_escape
+PASSED tests/test_report_markup_safety.py::test_truncation_marker_is_distinct_from_the_validation_one
+PASSED tests/test_report_markup_safety.py::test_both_modes_render_the_empty_marker[]
+PASSED tests/test_report_markup_safety.py::test_both_modes_render_the_empty_marker[   ]
+PASSED tests/test_report_markup_safety.py::test_both_modes_render_the_empty_marker[\n\t]
+PASSED tests/test_report_markup_safety.py::test_a_value_of_only_format_characters_is_not_empty
+PASSED tests/test_report_markup_safety.py::test_escaping_failure_propagates_and_is_never_swallowed
+PASSED tests/test_report_markup_safety.py::test_bytes_render_without_reopening_the_grammar
+PASSED tests/test_report_off_ui_thread.py::test_ac1_before_after_composes_off_the_ui_thread
+PASSED tests/test_report_off_ui_thread.py::test_ac2_diff_generators_run_off_the_ui_thread
+PASSED tests/test_report_off_ui_thread.py::test_ac4_diff_progress_never_sticks_mid_fill
+PASSED tests/test_report_off_ui_thread.py::test_ac3_before_after_progress_never_sticks_mid_fill
+PASSED tests/test_report_producer_bound.py::test_at240_modifications_admits_at_most_the_cap
+PASSED tests/test_report_producer_bound.py::test_at242_byte_cell_is_bounded_and_states_the_elided_count
+PASSED tests/test_report_producer_bound.py::test_at243_checklist_byte_cells_are_bounded
+PASSED tests/test_report_producer_bound.py::test_at244_notice_counts_the_kept_rows_not_the_population
+PASSED tests/test_report_producer_bound.py::test_at247_under_cap_report_is_byte_identical_to_the_shipped_output
+PASSED tests/test_report_producer_bound.py::test_at248_modifications_residency_is_independent_of_entry_count
+PASSED tests/test_report_producer_bound.py::test_at242b_byte_cell_residency_is_independent_of_run_length
+PASSED tests/test_report_producer_bound.py::test_tc545b_the_width_residency_oracle_discriminates
+PASSED tests/test_report_producer_bound.py::test_tc545_the_residency_oracle_discriminates
+PASSED tests/test_report_producer_bound.py::test_tc540_cap_arms[-1]
+PASSED tests/test_report_producer_bound.py::test_tc540_cap_arms[0]
+PASSED tests/test_report_producer_bound.py::test_tc540_cap_arms[1]
+PASSED tests/test_report_producer_bound.py::test_tc541_byte_cell_width_arms[-1]
+PASSED tests/test_report_producer_bound.py::test_tc541_byte_cell_width_arms[0]
+PASSED tests/test_report_producer_bound.py::test_tc541_byte_cell_width_arms[1]
+PASSED tests/test_report_producer_bound.py::test_tc542_count_correctness_under_a_filter
+PASSED tests/test_report_producer_bound.py::test_tc543_notice_names_the_constant_its_value_and_the_total
+PASSED tests/test_report_producer_bound.py::test_tc544_no_bare_cap_literal_in_the_producers_or_in_this_file
+PASSED tests/test_report_producer_bound.py::test_at241_checklist_cap_is_summed_across_check_files
+PASSED tests/test_report_producer_bound.py::test_at245_saturated_check_file_states_its_own_drop
+PASSED tests/test_report_producer_bound.py::test_at246_truncated_address_cannot_read_as_a_complete_one
+PASSED tests/test_report_producer_bound.py::test_at249_address_residency_is_independent_of_digit_count
+PASSED tests/test_report_producer_bound.py::test_tc548_the_address_residency_oracle_discriminates
+PASSED tests/test_report_producer_bound.py::test_tc546_cap_is_summed_over_three_check_files
+PASSED tests/test_report_producer_bound.py::test_tc547_saturated_file_omits_the_table_header[False]
+PASSED tests/test_report_producer_bound.py::test_tc547_saturated_file_omits_the_table_header[True]
+PASSED tests/test_report_producer_bound.py::test_tc547b_saturated_file_with_nothing_kept_keeps_todays_empty_table
+PASSED tests/test_report_producer_bound.py::test_tc549b_a_negative_address_keeps_its_sign_through_truncation
+PASSED tests/test_report_producer_bound.py::test_tc549_elided_count_comes_from_the_value_not_the_raw_string
+PASSED tests/test_report_producer_bound.py::test_tc550_address_chars_equals_its_own_derivation
+PASSED tests/test_report_producer_bound.py::test_tc551_the_address_cue_is_inert_in_markdown
+PASSED tests/test_report_producer_bound.py::test_at241b_checklist_residency_is_independent_of_entry_count
+PASSED tests/test_report_producer_bound.py::test_tc546b_the_checklist_residency_oracle_discriminates
+PASSED tests/test_report_service.py::test_full_report_content
+PASSED tests/test_report_service.py::test_filename_regex_and_same_second_collision
+PASSED tests/test_report_service.py::test_window_math_region_at_address_zero
+PASSED tests/test_report_service.py::test_window_math_region_at_image_top
+PASSED tests/test_report_service.py::test_window_math_adjacent_windows_merge
+PASSED tests/test_report_service.py::test_report_level_edge_windows
+PASSED tests/test_report_service.py::test_context_bytes_out_of_domain_rejected
+PASSED tests/test_report_service.py::test_region_cap_marker_exact_omitted_count
+PASSED tests/test_report_service.py::test_total_bytes_cap_marker
+PASSED tests/test_report_service.py::test_reports_dir_created_on_demand_stays_neutral
+PASSED tests/test_report_service.py::test_generation_is_headless_no_app
+PASSED tests/test_report_service.py::test_inspection_no_forbidden_symbols
+PASSED tests/test_report_service.py::test_execution_capture_feeds_report_end_to_end
+PASSED tests/test_report_service.py::test_measure_report_caps_on_large_s19
+PASSED tests/test_report_service.py::test_report_includes_legend_with_documented_rows
+PASSED tests/test_report_service.py::test_report_omits_legend_when_disabled
+PASSED tests/test_report_service.py::test_legend_lines_renders_shared_table
+PASSED tests/test_report_service.py::test_include_legend_default_true_and_validated
+PASSED tests/test_report_service.py::test_report_issue_line_shows_address_symbol_related
+PASSED tests/test_report_service.py::test_report_issue_without_address_has_no_hex
+PASSED tests/test_report_service.py::test_report_issue_address_zero_renders
+PASSED tests/test_report_service.py::test_addendum_lists_region_with_mods_and_issues
+PASSED tests/test_report_service.py::test_addendum_region_with_no_hits_shows_none
+PASSED tests/test_report_service.py::test_addendum_membership_inclusive_at_bounds
+PASSED tests/test_report_service.py::test_addendum_and_issue_render_use_same_address
+PASSED tests/test_report_service.py::test_report_contains_entropy_section_on_disk
+PASSED tests/test_report_service.py::test_report_omits_entropy_when_disabled_byte_identical
+PASSED tests/test_report_service.py::test_entropy_lines_shape_direct_call
+PASSED tests/test_report_service.py::test_entropy_lines_empty_mem_map_no_crash
+PASSED tests/test_report_service.py::test_include_entropy_default_true_and_validated
+PASSED tests/test_report_service.py::test_include_entropy_false_not_emitted
+PASSED tests/test_report_service.py::test_entropy_section_charged_against_budget
+PASSED tests/test_report_service.py::test_entropy_section_confidentiality_no_raw_bytes_or_logging
+PASSED tests/test_report_service.py::test_tc051_5_blocked_runs_render_checklists
+PASSED tests/test_report_service.py::test_tc314_filtered_sections_and_audit_header
+PASSED tests/test_report_service.py::test_tc314_zero_match_notice_report_still_written
+PASSED tests/test_report_service.py::test_tc314_unfiltered_output_identical_with_and_without_kwarg
+PASSED tests/test_report_service.py::test_tc315_report_filter_option_type_validation
+PASSED tests/test_report_service.py::test_tc318_hostile_filter_name_and_patterns_sanitized
+PASSED tests/test_report_service.py::test_at288_report_hex_sections_identical_after_move
+PASSED tests/test_report_symbol_escape.py::test_hostile_linkage_symbol_md_escaped
+PASSED tests/test_report_symbol_escape.py::test_benign_linkage_symbol_escapes_invisibly
+PASSED tests/test_report_symbol_escape.py::test_at159_hostile_symbol_cannot_shift_table_columns
+PASSED tests/test_report_symbol_escape.py::test_at160_recaptured_golden_carries_the_escaped_forms
+PASSED tests/test_report_symbol_escape.py::test_at162_paths_render_without_inserted_escapes
+PASSED tests/test_report_symbol_escape.py::test_at163_escaping_is_applied_exactly_once
+PASSED tests/test_requirements_canon.py::test_canon_is_one_file_with_rows
+PASSED tests/test_requirements_canon.py::test_canon_rows_have_id_form_sentence
+PASSED tests/test_requirements_canon.py::test_canon_rows_open_with_their_form
+PASSED tests/test_requirements_canon.py::test_canon_rows_hold_the_obligation_word_once
+PASSED tests/test_requirements_canon.py::test_canon_row_ids_are_unique
+PASSED tests/test_requirements_canon.py::test_canon_modules_are_s0_to_s17_in_order
+PASSED tests/test_requirements_canon.py::test_canon_history_is_the_committed_blob
+PASSED tests/test_requirements_canon.py::test_canon_s0_table_cites_existing_rows
+PASSED tests/test_requirements_canon.py::test_review_files_hold_the_decisions
+PASSED tests/test_requirements_canon.py::test_review_files_name_only_existing_tests
+PASSED tests/test_requirements_canon.py::test_canon_rows_are_one_sentence
+PASSED tests/test_suite_hygiene.py::test_r_tst_001_serial_timing_marker_is_registered
+PASSED tests/test_suite_hygiene.py::test_r_tst_002_every_timing_arm_carries_serial_timing
+PASSED tests/test_suite_hygiene.py::test_r_tst_002_2_parallel_lane_collection_prints_no_qc_tm_text
+PASSED tests/test_suite_hygiene.py::test_r_tst_003_an_unmarked_timing_arm_is_named
+PASSED tests/test_suite_hygiene.py::test_r_tst_004_a_marked_non_arm_is_named
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form1]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form2]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form3]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form4]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form5]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form6]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form7]
+PASSED tests/test_suite_hygiene.py::test_r_tst_006_detector_ignores_intervals_no_assert_reads
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-007]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-030]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-047]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-048]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-052]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-060]
+PASSED tests/test_suite_hygiene.py::test_r_tst_010_pull_request_runs_two_lanes
+PASSED tests/test_suite_hygiene.py::test_r_tst_010_2_injection_ratchet_reads_every_run_line_of_every_job
+PASSED tests/test_suite_hygiene.py::test_r_tst_011_push_runs_two_lanes
+PASSED tests/test_suite_hygiene.py::test_r_tst_012_serial_lane_runs_after_a_red_lane
+PASSED tests/test_suite_hygiene.py::test_r_tst_013_014_ci_checks_out_full_history
+PASSED tests/test_suite_hygiene.py::test_r_tst_013_snapshot_job_changes_only_persist_credentials
+PASSED tests/test_suite_hygiene.py::test_r_tst_015_016_017_ci_time_limits
+PASSED tests/test_suite_hygiene.py::test_r_tst_018_ci_installs_pinned_xdist
+PASSED tests/test_suite_hygiene.py::test_r_tst_020_021_shared_helpers_delegate_to_the_one_wait
+PASSED tests/test_suite_hygiene.py::test_r_tst_021_shared_wait_yields_between_checks
+PASSED tests/test_suite_hygiene.py::test_r_tst_022_settled_pauses_before_its_first_check
+PASSED tests/test_suite_hygiene.py::test_r_tst_023_shared_wait_signatures_are_kept
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W1]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W2]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W3]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W4]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W5]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W6]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W7]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W8]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W9]
+PASSED tests/test_suite_hygiene.py::test_r_tst_025_load_project_clock_stops_at_the_install_callback
+PASSED tests/test_suite_hygiene.py::test_r_tst_031_032_post_press_and_dwell_arms_keep_their_forms
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_report_margin_returns_the_bound
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_2_report_margin_refuses_unsafe_labels
+PASSED tests/test_suite_hygiene.py::test_r_tst_049_wrap_drift_detector_names_a_dropped_assertion
+PASSED tests/test_suite_hygiene.py::test_r_tst_049_wrapped_arms_change_nothing_else
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_041_every_upper_timing_bound_is_reported
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_1_base_tree_reports_its_37_bounds
+PASSED tests/test_suite_hygiene.py::test_r_tst_041_margin_guard_names_each_raw_bound
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_3_counts_and_lower_bounds_are_not_bounds
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_4_appended_and_conditional_reads_are_bounds
+PASSED tests/test_suite_hygiene.py::test_r_tst_042_margin_report_is_a_test_property
+PASSED tests/test_suite_hygiene.py::test_r_tst_043_045_qc_tm_section_rows_and_count
+PASSED tests/test_suite_hygiene.py::test_r_tst_043_2_teardown_error_report_gives_one_row
+PASSED tests/test_suite_hygiene.py::test_r_tst_044_low_margin_prefix
+PASSED tests/test_suite_hygiene.py::test_r_tst_046_over_bound_arm_still_reports
+PASSED tests/test_suite_hygiene.py::test_r_tst_050_status_log_keeps_every_painted_line
+PASSED tests/test_suite_hygiene.py::test_r_tst_051_newest_line_waits_do_not_grow
+PASSED tests/test_suite_hygiene.py::test_r_tst_051_all_line_reader_counts_only_under_minus_one
+PASSED tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses
+PASSED tests/test_suite_hygiene.py::test_r_tst_070_3_redaction_gate_names_each_leak_form
+PASSED tests/test_suite_hygiene.py::test_r_tst_080_report_goldens_hold_no_tool_version
+PASSED tests/test_suite_hygiene.py::test_r_tst_081_golden_takes_the_package_version
+PASSED tests/test_suite_hygiene.py::test_r_tst_082_wrong_version_still_differs
+PASSED tests/test_tui_check_chain_b94.py::test_at_b94_12_writer_dropdown_report_chain
+PASSED tests/test_tui_check_chain_b94.py::test_tc_b94_13_chk_write_round_trip
+PASSED tests/test_tui_check_chain_b94.py::test_tc_b94_14_run_check_document
+PASSED tests/test_tui_check_chain_b94.py::test_tc_b94_15_dropdown_population
+PASSED tests/test_tui_check_chain_b94.py::test_tc_b94_16_report_addendum
+PASSED tests/test_tui_check_editor.py::test_tc_b94_06_composition_census
+PASSED tests/test_tui_check_editor.py::test_tc_b94_07_rail_mounting_and_write_routing
+PASSED tests/test_tui_check_editor.py::test_tc_b94_07b_help_panel_lists_check_editor_binding
+PASSED tests/test_tui_check_editor.py::test_at_b94_01_rail_selects_check_editor_mounts_twin
+PASSED tests/test_tui_check_editor.py::test_at_b94_11_write_validate_chk_json_no_apply
+PASSED tests/test_tui_check_editor.py::test_at_b94_13_hostile_symbol_and_file_name
+PASSED tests/test_tui_check_editor.py::test_tc_b94_17_safe_text_hostile_payload
+439 passed, 1 deselected in 216.23s (0:03:36)
+exit=0

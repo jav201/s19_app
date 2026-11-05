@@ -1,0 +1,60 @@
+mutant M26 (LAN Linux host, detached worktree at base 9f9f6af + b101-inc7 working-tree diff; never the local worktree)
+mutant M26: file s19_app/tui/app.py occurrences 1
+5736,5738c5736
+<             loaded.mac_records
+<             if loaded is not None and loaded.mac_path is not None
+<             else None
+---
+>             None
+s19_app.__file__ = <HOME>/work/s19c7-e5/s19_app/__init__.py
+$ env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 2400 python -m pytest  -q -rA tests/test_before_after_report.py::test_r_before_after_report_001_35_3_bkey_loaded_mac_is_used tests/test_before_after_report.py::test_r_cmp_003_2_1_bkey_no_mac_is_absent -p no:cacheprovider
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+_________ test_r_before_after_report_001_35_3_bkey_loaded_mac_is_used __________
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-8/test_r_before_after_report_0010')
+
+    def test_r_before_after_report_001_35_3_bkey_loaded_mac_is_used(
+        tmp_path: Path,
+    ) -> None:
+        """Key ``b`` with an A2L and a MAC file loaded (E5 C-3 / C-4 R-1): the
+        app forwards the loaded MAC, so both artifact lines of both files read
+        ``summary=both; a2l=used (1/2); mac=used (1/2)``, the run's Symbols cell
+        names the A2L tag and the MAC record, and the painted status is the
+        written-pair line."""
+        outcome = _drive_bkey_texts(
+            tmp_path, a2l_tags=_TWO_TAG_A2L["tags"], mac_text=_TWO_RECORD_MAC
+        )
+        names = outcome["listing"]
+        assert names is not None and len(names) == 2, names
+        md_name, html_name = sorted(names, key=lambda n: not n.endswith(".md"))
+        assert _MD_NAME.match(md_name) and _HTML_NAME.match(html_name), names
+        md_text = outcome["files"][md_name]
+        html_text = outcome["files"][html_name]
+        tail = "summary=both; a2l=used (1/2); mac=used (1/2)"
+        for who in ("A", "B"):
+>           assert f"- Image {who} artifacts: {tail}" in md_text.splitlines()
+E           AssertionError: assert '- Image A artifacts: summary=both; a2l=used (1/2); mac=used (1/2)' in ['# Before/after report', '', '- Generated (UTC): 2026-11-05T18:32:05.583346+00:00', '- Tool version: 1.0.0rc1', '- Im...ytest-of-<USER>/pytest-8/test_r_before_after_report_0010/.s19tool/workarea/proj/img-patched.s19` parse-errors=0', ...]
+E            +  where ['# Before/after report', '', '- Generated (UTC): 2026-11-05T18:32:05.583346+00:00', '- Tool version: 1.0.0rc1', '- Im...ytest-of-<USER>/pytest-8/test_r_before_after_report_0010/.s19tool/workarea/proj/img-patched.s19` parse-errors=0', ...] = <built-in method splitlines of str object at 0x55b0d55d62b0>()
+E            +    where <built-in method splitlines of str object at 0x55b0d55d62b0> = '# Before/after report\n\n- Generated (UTC): 2026-11-05T18:32:05.583346+00:00\n- Tool version: 1.0.0rc1\n- Image A: im...            |................|\n0x00000100  AA BB 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|\n```\n'.splitlines
+
+tests/test_before_after_report.py:1738: AssertionError
+=============================== warnings summary ===============================
+tests/test_before_after_report.py:1741
+  <HOME>/work/s19c7-e5/tests/test_before_after_report.py:1741: DeprecationWarning: invalid escape sequence '\_'
+    "| 0x00000100 | 0x00000102 | 2 | changed | CAL\_A, CAL\_M |" in md_text
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+==================================== PASSES ====================================
+___________________ test_r_cmp_003_2_1_bkey_no_mac_is_absent ___________________
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-8/test_r_cmp_003_2_1_bkey_no_mac0 workarea=/tmp/pytest-of-<USER>/pytest-8/test_r_cmp_003_2_1_bkey_no_mac0/.s19tool/workarea
+INFO     s19tui:app.py:8303 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:6674 report kind=before-after source=img.s19 output=/tmp/pytest-of-<USER>/pytest-8/test_r_cmp_003_2_1_bkey_no_mac0/.s19tool/workarea/proj/reports/20261105T183209Z-before-after-report.md|/tmp/pytest-of-<USER>/pytest-8/test_r_cmp_003_2_1_bkey_no_mac0/.s19tool/workarea/proj/reports/20261105T183209Z-before-after-report.html outcome=ok
+=========================== short test summary info ============================
+PASSED tests/test_before_after_report.py::test_r_cmp_003_2_1_bkey_no_mac_is_absent
+FAILED tests/test_before_after_report.py::test_r_before_after_report_001_35_3_bkey_loaded_mac_is_used
+1 failed, 1 passed, 1 warning in 7.38s
+exit=1
+restored: byte-exact (cmp clean)

@@ -1,0 +1,67 @@
+s19_app.__file__ = <COPY>\s19_app\__init__.py
+MUTANT M17b: A<->B worker keeps the Markdown file after an HTML failure
+FILE: s19_app/tui/app.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_r_cmp_005_17_1_ab_html_failure_removes_markdown _____________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_cmp_005_17_1_ab_html_fa0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001873C20ED10>
+
+    def test_r_cmp_005_17_1_ab_html_failure_removes_markdown(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Manual A<->B report, project open, the HTML generator raising after the
+        real Markdown generator wrote its file: the status keeps its text
+        ``Diff report failed: RuntimeError: x`` and ``reports/`` holds no ``.md``
+        and no ``.html`` (the orphan Markdown file is removed)."""
+        import asyncio
+    
+        import s19_app.tui.app as app_mod
+        from s19_app.tui.app import S19TuiApp
+        from tests.support.timing import wait_until
+        from tests.test_tui_diff_screen import _b78_press_compare, _diff_result
+    
+        fake = _diff_result([(0x10, 0x14, "changed")])
+    
+        def _raising(*_a, **_k):
+            raise RuntimeError("x")
+    
+        monkeypatch.setattr(app_mod, "compare_images", lambda *a, **k: fake)
+        monkeypatch.setattr(app_mod, "generate_diff_report_html", _raising)
+        project_dir = tmp_path / ".s19tool" / "workarea" / "proj"
+    
+        async def _drive() -> str:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                project_dir.mkdir(parents=True, exist_ok=True)
+                app.current_project = "proj"
+                app.action_show_screen("diff")
+                await pilot.pause()
+                await _b78_press_compare(app, pilot)
+                app.query_one("#diff_report_button").press()
+                await wait_until(
+                    pilot,
+                    lambda: "Diff report failed"
+                    in str(app.query_one("#diff_status").render()),
+                    "the failure status never reached the diff panel",
+                )
+                await app.workers.wait_for_complete()
+                return str(app.query_one("#diff_status").render())
+    
+        status = asyncio.run(_drive())
+    
+        assert "Diff report failed: RuntimeError: x" in status
+>       assert _folder_names(project_dir / "reports") == []
+E       AssertionError: assert ['20261105T18...ff-report.md'] == []
+E         
+E         Left contains one more item: '20261105T180547Z-diff-report.md'
+E         Use -v to get more diff
+
+tests\test_diff_report_service.py:1873: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_diff_report_service.py::test_r_cmp_005_17_1_ab_html_failure_removes_markdown
+1 failed in 2.86s
+
+EXIT 1

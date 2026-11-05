@@ -1,0 +1,55 @@
+s19_app.__file__ = <COPY>\s19_app\__init__.py
+MUTANT M9: Runs Symbols cell written raw
+FILE: s19_app/tui/services/diff_report_service.py
+FF                                                                       [100%]
+================================== FAILURES ===================================
+_______________ test_r_cmp_004_9_1_3_runs_symbols_name_by_name ________________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_cmp_004_9_1_3_runs_symb0')
+
+    def test_r_cmp_004_9_1_3_runs_symbols_name_by_name(tmp_path: Path) -> None:
+        """The Runs Symbols cell escapes each name on its own: ``A_B`` and
+        ``x|y`` give ``A\\_B, x\\|y`` and the row keeps its 5 cells."""
+        comparison = _comparison(
+            runs=[DiffRun(0x100, 0x104, KIND_CHANGED)], stats=_stats(1, 4)
+        )
+        text, _ = _whole_pair(
+            tmp_path, comparison, _mem(0x100, 1, 4), _mem(0x100, 2, 4),
+            mac_records=[
+                {"name": "A_B", "address": 0x100},
+                {"name": "x|y", "address": 0x101},
+            ],
+        )
+        row = next(ln for ln in text.splitlines() if ln.startswith("| 0x00000100 |"))
+>       assert row == "| 0x00000100 | 0x00000104 | 4 | changed | A\\_B, x\\|y |"
+E       AssertionError: assert '| 0x00000100... | A_B, x|y |' == '| 0x00000100...\\_B, x\\|y |'
+E         
+E         Skipping 33 identical leading characters in diff, use -v to show
+E         - hanged | A\_B, x\|y |
+E         ?           -     -
+E         + hanged | A_B, x|y |
+
+tests\test_diff_report_service.py:1979: AssertionError
+_________ test_r_before_after_report_001_24_1_symbols_from_loaded_a2l _________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_before_after_report_0010')
+
+    def test_r_before_after_report_001_24_1_symbols_from_loaded_a2l(
+        tmp_path: Path,
+    ) -> None:
+        """The run row of the patched bytes names the A2L tag whose address lies
+        in the run: Markdown ``CAL\\_A`` (escaped), HTML ``CAL_A``."""
+        result, md_text, html_text = _compose_texts(
+            tmp_path, a2l_records=[{"name": "CAL_A", "address": 0x100}]
+        )
+        assert result.written, result.diagnostics
+>       assert "| 0x00000100 | 0x00000102 | 2 | changed | CAL\\_A |" in md_text
+E       AssertionError: assert '| 0x00000100 | 0x00000102 | 2 | changed | CAL\\_A |' in '# Before/after report\n\n- Generated (UTC): 2026-07-02T12:00:00+00:00\n- Tool version: 1.0.0rc1\n- Image A: img\\.s19...            |................|\n0x00000100  AA BB 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|\n```\n'
+
+tests\test_before_after_report.py:1486: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_9_1_3_runs_symbols_name_by_name
+FAILED tests/test_before_after_report.py::test_r_before_after_report_001_24_1_symbols_from_loaded_a2l
+2 failed in 1.02s
+
+EXIT 1

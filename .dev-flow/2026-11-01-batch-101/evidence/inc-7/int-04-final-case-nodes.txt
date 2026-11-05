@@ -1,0 +1,629 @@
+$ git rev-parse --short HEAD: 9508239
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc7\s19_app\__init__.py
+$ python -m pytest -q -rA -m not serial_timing tests/test_diff_report_service.py tests/test_before_after_report.py tests/test_report_field_census.py tests/test_changes_symbol_entries.py tests/test_flow_a2b_b94.py tests/test_tui_report_filter_surface.py tests/test_tui_flow_builder_b94.py tests/test_b100_busy.py tests/test_b99_staging.py tests/test_id_registry.py tests/test_engine_unchanged.py tests/test_requirements_canon.py tests/test_render_hexview.py tests/test_report_markup_safety.py
+........................................................................ [ 13%]
+........................................................................ [ 26%]
+.....................................................F.................. [ 39%]
+...................................s.................................... [ 52%]
+........................................................................ [ 65%]
+........................................................................ [ 78%]
+........................................................................ [ 91%]
+.............................................                            [100%]
+================================== FAILURES ===================================
+________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19i7/bt4/test_at_056e_a2b_diff_report_b0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000014C3427A410>
+
+    def test_at_056e_a2b_diff_report_byte_identical_despite_selection(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """AT-056e / LLR-054.5 (HLR-054 scope guard, Q-5 black-box arm).
+    
+        Intent: with a filter SELECTED on the report selector, the A2B diff
+        report driven through ITS shipped surface (Compare then Report on the
+        diff screen) is byte-identical (canonical form) to a no-filter A2B
+        run under the same environment pin — the sticky selection observably
+        does NOT leak into the always-complete diff report.
+        """
+        _pin_report_clocks(monkeypatch)
+    
+        def _session(root: Path, select_filter: bool) -> Dict[str, bytes]:
+            project_dir = _make_project(
+                root, "proj", filters={"f.json": _valid_filter_body()}
+            )
+    
+            async def _drive() -> Dict[str, bytes]:
+                app = S19TuiApp(base_dir=root)
+                async with app.run_test(size=(120, 40)) as pilot:
+                    await pilot.pause()
+                    await _load_project(app, pilot, "proj")
+                    if select_filter:
+                        await _select_filter_via_dropdown(app, pilot, "f.json")
+                    app.action_show_screen("diff")
+                    await pilot.pause()
+                    app.query_one("#diff_path_a", Input).value = str(
+                        project_dir / "a.s19"
+                    )
+                    app.query_one("#diff_path_b", Input).value = str(
+                        project_dir / "b.s19"
+                    )
+                    app.query_one("#diff_compare_button", Button).press()
+                    await _flush(pilot)
+                    app.query_one("#diff_report_button", Button).press()
+                    await _flush(pilot)
+                return _reports(project_dir)
+    
+            return asyncio.run(_drive())
+    
+        base_root = tmp_path / "base"
+        sel_root = tmp_path / "sel"
+        base_root.mkdir()
+        sel_root.mkdir()
+        baseline = _session(base_root, select_filter=False)
+        selected = _session(sel_root, select_filter=True)
+    
+        expected = {_DIFF_MD_NAME, _DIFF_HTML_NAME}
+>       assert set(baseline) == expected, f"baseline wrote {sorted(baseline)}"
+E       AssertionError: baseline wrote []
+E       assert set() == {'20260710T12...ff-report.md'}
+E         
+E         Extra items in the right set:
+E         '20260710T120000Z-diff-report.html'
+E         '20260710T120000Z-diff-report.md'
+E         Use -v to get more diff
+
+tests\test_tui_report_filter_surface.py:775: AssertionError
+(PASSES section with captured output removed; per-node outcomes are in the short test summary below)
+=========================== short test summary info ===========================
+PASSED tests/test_diff_report_service.py::test_filename_scheme_and_same_second_collision
+PASSED tests/test_diff_report_service.py::test_collision_never_overwrites_existing_file
+PASSED tests/test_diff_report_service.py::test_self_contained_listing_newest_first
+PASSED tests/test_diff_report_service.py::test_report_service_regex_unedited
+PASSED tests/test_diff_report_service.py::test_report_sections_present_in_order
+PASSED tests/test_diff_report_service.py::test_generation_is_deterministic_fixed_clock
+PASSED tests/test_diff_report_service.py::test_markdown_file_is_complete_no_truncation
+PASSED tests/test_diff_report_service.py::test_changed_run_emits_diff_fenced_block
+PASSED tests/test_diff_report_service.py::test_symbol_annotation_only_intersecting_run
+PASSED tests/test_diff_report_service.py::test_annotation_absent_without_context
+PASSED tests/test_diff_report_service.py::test_module_performs_no_logging
+PASSED tests/test_diff_report_service.py::test_no_project_valid_directory_writes_one_file
+PASSED tests/test_diff_report_service.py::test_no_project_empty_path_refused[]
+PASSED tests/test_diff_report_service.py::test_no_project_empty_path_refused[   ]
+PASSED tests/test_diff_report_service.py::test_no_project_nonexistent_dir_refused
+PASSED tests/test_diff_report_service.py::test_no_project_collision_no_overwrite
+PASSED tests/test_diff_report_service.py::test_no_sanitize_project_name_in_validator
+PASSED tests/test_diff_report_service.py::test_html_export_complete_and_safe
+PASSED tests/test_diff_report_service.py::test_html_escapes_embedded_payload
+PASSED tests/test_diff_report_service.py::test_html_filename_scheme_and_collision
+PASSED tests/test_diff_report_service.py::test_default_kwargs_output_byte_identical_pre_change_golden
+PASSED tests/test_diff_report_service.py::test_provenance_and_linkage_render_in_both_formats
+PASSED tests/test_diff_report_service.py::test_zero_entries_linkage_states_no_entries
+PASSED tests/test_diff_report_service.py::test_pipe_bearing_symbol_md_escaped_html_intact
+PASSED tests/test_diff_report_service.py::test_ac1_contiguous_runs_share_one_merged_window
+PASSED tests/test_diff_report_service.py::test_ac1_boundary_five_rows_merges_six_does_not
+PASSED tests/test_diff_report_service.py::test_ac2_compute_hexdump_windows_gap_parameter
+PASSED tests/test_diff_report_service.py::test_ac3_html_side_by_side_highlights_changed_bytes
+PASSED tests/test_diff_report_service.py::test_ac3_hostile_gutter_bytes_escaped_in_html
+PASSED tests/test_diff_report_service.py::test_ac4_markdown_diff_block_format_unchanged
+PASSED tests/test_diff_report_service.py::test_ac5_linkage_cells_carry_ascii_companion
+PASSED tests/test_diff_report_service.py::test_ac5_hostile_bytes_keep_md_table_and_html_safe
+PASSED tests/test_diff_report_service.py::test_ac5_markers_unchanged
+PASSED tests/test_diff_report_service.py::test_tc312_filter_restricts_linkage_and_run_sections_both_formats
+PASSED tests/test_diff_report_service.py::test_tc312_a9_merged_window_spans_excluded_run
+PASSED tests/test_diff_report_service.py::test_tc312_zero_match_notice_and_refusal_disjoint
+PASSED tests/test_diff_report_service.py::test_tc312_audit_header_first_block_fixed_format
+PASSED tests/test_diff_report_service.py::test_tc318_hostile_filter_name_sanitized_md_html
+PASSED tests/test_diff_report_service.py::test_tc313_no_filter_output_byte_identical_todays
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_14_1_markdown_changed_run_whole
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_14_2_html_and_markdown_agree
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_14_3_markdown_window_over_64_kib
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_14_4_html_window_over_64_kib
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_14_7_rows_match_render_hex_view_for_all_byte_values
+PASSED tests/test_diff_report_service.py::test_r_cmp_005_16_1_failed_markdown_write_leaves_no_file
+PASSED tests/test_diff_report_service.py::test_r_cmp_005_16_2_failed_html_write_leaves_no_file
+PASSED tests/test_diff_report_service.py::test_r_cmp_005_16_3_stale_part_file_is_not_touched
+PASSED tests/test_diff_report_service.py::test_r_cmp_005_17_1_ab_html_failure_removes_markdown
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_1_1_diff_report_keeps_its_title
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_1_2_title_follows_provenance_only
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_5_1_symbol_by_address_not_extent
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_9_1_1_image_label_and_variant_report_safe
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_9_1_3_runs_symbols_name_by_name
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_9_1_5_flow_attribution_report_safe
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_9_1_6_filter_file_name_report_safe
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_9_1_7_symbol_cut_to_512_characters
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_9_1_10_refusal_message_report_safe
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_9_1_11_diff_report_sinks_inert_under_a_reader
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_9_1_12_c1_and_bidi_visible_in_markdown
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_9_2_1_image_path_text
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_9_2_2_provenance_path_text
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_9_2_4_path_keeps_its_characters
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_8_1_html_has_no_markdown_escape
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_15_1_html_visible_text_matches_markdown
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_15_2_tab_becomes_one_space_in_both_files
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_15_3_strip_ctl_is_the_shared_visible_text
+PASSED tests/test_diff_report_service.py::test_r_before_after_report_001_21_2_provenance_path_visible
+PASSED tests/test_before_after_report.py::test_at_038a_saveback_trigger_report_pair_reread_from_surfaced_path
+PASSED tests/test_before_after_report.py::test_at_038b_declined_saveback_trigger_refuses_and_writes_nothing
+PASSED tests/test_before_after_report.py::test_at_038c_missing_original_trigger_refuses_and_writes_nothing
+PASSED tests/test_before_after_report.py::test_at_038d_stale_summary_cross_project_refusal_writes_nothing
+PASSED tests/test_before_after_report.py::test_tc_038_3_composer_happy_path_and_regex_ownership
+PASSED tests/test_before_after_report.py::test_tc_038_3_symlink_reports_destination_refused
+PASSED tests/test_before_after_report.py::test_tc_038_3_ctl_symbol_renders_identically_in_md_and_html_pair
+PASSED tests/test_before_after_report.py::test_tc_038_4_all_refusal_classes_write_no_files
+PASSED tests/test_before_after_report.py::test_tc_038_4_no_project_refusal_names_manual_ab_path
+PASSED tests/test_before_after_report.py::test_tc_038_5_module_imports_no_textual_and_no_logging
+PASSED tests/test_before_after_report.py::test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden
+PASSED tests/test_before_after_report.py::test_tc311_composer_forwards_matcher_filtered_output_both_formats
+PASSED tests/test_before_after_report.py::test_tc311_no_filter_generator_kwargs_shape_is_todays
+PASSED tests/test_before_after_report.py::test_at_061a_persistent_control_survives_then_writes_pair_and_clears
+PASSED tests/test_before_after_report.py::test_tc330_before_after_row_reveal_hide_state_machine
+PASSED tests/test_before_after_report.py::test_r_before_after_report_001_32_1_markdown_title
+PASSED tests/test_before_after_report.py::test_r_before_after_report_001_33_1_html_page_title
+PASSED tests/test_before_after_report.py::test_r_before_after_report_001_34_1_html_heading
+PASSED tests/test_before_after_report.py::test_r_before_after_report_001_35_1_artifact_lines_use_loaded_a2l_and_mac
+PASSED tests/test_before_after_report.py::test_r_cmp_003_2_2_composer_without_a2l_is_absent
+PASSED tests/test_before_after_report.py::test_r_before_after_report_001_24_1_symbols_from_loaded_a2l
+PASSED tests/test_before_after_report.py::test_r_before_after_report_001_24_2_a2l_and_mac_names_share_the_cell
+PASSED tests/test_before_after_report.py::test_r_before_after_report_001_35_2_bkey_artifact_lines
+PASSED tests/test_before_after_report.py::test_r_cmp_003_2_1_bkey_no_mac_is_absent
+PASSED tests/test_before_after_report.py::test_r_before_after_report_001_24_3_bkey_symbols
+PASSED tests/test_before_after_report.py::test_r_before_after_report_001_11_1_no_project_reason_exact_text
+PASSED tests/test_before_after_report.py::test_r_before_after_report_001_11_2_bkey_no_project_status
+PASSED tests/test_before_after_report.py::test_r_cmp_004_14_5_before_after_report_whole
+PASSED tests/test_before_after_report.py::test_r_cmp_005_16_4_before_after_failed_write_leaves_no_file
+PASSED tests/test_before_after_report.py::test_r_cmp_005_17_2_before_after_html_failure_removes_markdown
+PASSED tests/test_report_field_census.py::test_at157_no_planted_field_produces_markup_in_the_app_viewer
+PASSED tests/test_report_field_census.py::test_at158_exported_file_is_inert_under_a_default_reader
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[project_name]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[variant_id]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[path_name]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[file_type]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[status]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[linkage]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[linkage_symbol]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[issue_code]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[issue_message]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[issue_symbol]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[related_artifact]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[region_name]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[change_source_path]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[saved_path]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[check_source_path]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[check_result]
+PASSED tests/test_report_field_census.py::test_census_every_planted_field_renders_verbatim[notice_variant]
+PASSED tests/test_report_field_census.py::test_census_covers_every_escaped_expression_in_the_source
+PASSED tests/test_report_field_census.py::test_every_planted_marker_reaches_the_document
+PASSED tests/test_report_field_census.py::test_every_table_row_keeps_its_header_content
+PASSED tests/test_report_field_census.py::test_a_pipe_injected_into_a_cell_is_caught_by_content_comparison
+PASSED tests/test_report_field_census.py::test_mode_b_in_a_table_cell_is_still_forbidden_at_every_call_site
+PASSED tests/test_report_field_census.py::test_mode_b_cell_guard_flags_a_planted_cell
+PASSED tests/test_report_field_census.py::test_tc397_declaration_errors_are_capped_with_a_visible_marker
+PASSED tests/test_report_field_census.py::test_tc396_report_cell_cap_is_pinned_at_a_composer_site
+PASSED tests/test_report_field_census.py::test_tc389_truncation_appendix_note_is_escaped
+PASSED tests/test_report_field_census.py::test_tc385_a_hostile_heading_cannot_change_its_own_level
+PASSED tests/test_report_field_census.py::test_lone_surrogate_is_dropped_like_any_other_unrepresentable_char
+PASSED tests/test_report_field_census.py::test_a16_canonicaliser_residue_guard_can_actually_fire
+PASSED tests/test_report_field_census.py::test_at161_an_all_backtick_image_cannot_close_the_hexdump_fence
+PASSED tests/test_report_field_census.py::test_f17_format_bytes_is_inert_by_construction
+PASSED tests/test_report_field_census.py::test_no_escaped_field_is_emitted_at_the_head_of_its_line
+PASSED tests/test_report_field_census.py::test_head_of_line_guard_detects_a_planted_violation
+PASSED tests/test_changes_symbol_entries.py::test_tc712_symbol_resolution_matches_tag_map_zero_drift
+PASSED tests/test_changes_symbol_entries.py::test_tc712_physical_raw_encode_roundtrips_shipped_decode
+PASSED tests/test_changes_symbol_entries.py::test_tc712_canonical_writer_emits_symbol_and_resolved_address
+PASSED tests/test_changes_symbol_entries.py::test_tc712_shipped_v20_reader_applies_symbol_entry_byte_identically
+PASSED tests/test_changes_symbol_entries.py::test_tc712_unresolved_symbol_refused_at_load_naming_it
+PASSED tests/test_changes_symbol_entries.py::test_tc712_no_context_refuses_symbol_entry_no_implicit_a2l
+PASSED tests/test_changes_symbol_entries.py::test_tc712_tag_without_address_or_length_refused_named
+PASSED tests/test_changes_symbol_entries.py::test_tc712_symbol_on_string_entry_and_drift_refused_named
+PASSED tests/test_changes_symbol_entries.py::test_tc712_address_only_entries_read_and_write_byte_identically
+PASSED tests/test_changes_symbol_entries.py::test_tc713_picker_lists_loaded_tag_names
+PASSED tests/test_changes_symbol_entries.py::test_tc713_picking_resolves_address_length_datatype_zero_drift
+PASSED tests/test_changes_symbol_entries.py::test_tc713_resolve_is_case_insensitive_canonical_name_stamped
+PASSED tests/test_changes_symbol_entries.py::test_tc713_unknown_symbol_refuses_add_naming_it
+PASSED tests/test_changes_symbol_entries.py::test_tc713_no_a2l_refuses_named
+PASSED tests/test_changes_symbol_entries.py::test_tc713_out_of_limits_flags_and_proceeds
+PASSED tests/test_changes_symbol_entries.py::test_tc713_add_symbol_entry_appends_and_serializes_with_symbol
+PASSED tests/test_changes_symbol_entries.py::test_tc718_battery_unresolved_symbol_refusal_names_itself
+PASSED tests/test_changes_symbol_entries.py::test_tc718_battery_symbol_replaces_address_dropped_by_address_syntax
+PASSED tests/test_changes_symbol_entries.py::test_tc718_battery_refused_encode_limbs_named[Speed-abc-limb_fragments0]
+PASSED tests/test_changes_symbol_entries.py::test_tc718_battery_refused_encode_limbs_named[Trippy-10-limb_fragments1]
+PASSED tests/test_changes_symbol_entries.py::test_tc718_battery_refused_encode_limbs_named[Gain-300-limb_fragments2]
+PASSED tests/test_changes_symbol_entries.py::test_tc718_battery_refused_encode_limbs_named[Drifty-210-limb_fragments3]
+PASSED tests/test_changes_symbol_entries.py::test_tc718_battery_refused_encode_limbs_named[Arr-210-limb_fragments4]
+PASSED tests/test_changes_symbol_entries.py::test_tc718_battery_refused_encode_limbs_named[FormVal-210-limb_fragments5]
+PASSED tests/test_changes_symbol_entries.py::test_tc718_battery_refused_encode_limbs_named[Half-1-limb_fragments6]
+PASSED tests/test_changes_symbol_entries.py::test_tc718_battery_refused_encode_limbs_named[NoAddr-210-limb_fragments7]
+PASSED tests/test_changes_symbol_entries.py::test_tc718_battery_codes_mode_document_refuses
+PASSED tests/test_changes_symbol_entries.py::test_tc714_source_a2l_ref_resolves_symbols_through_guard
+PASSED tests/test_changes_symbol_entries.py::test_tc714_no_declared_ref_refuses_symbol_entries_no_implicit_a2l
+PASSED tests/test_changes_symbol_entries.py::test_tc714_patch_override_wins_for_its_change_set_only
+PASSED tests/test_changes_symbol_entries.py::test_tc714_flow_json_round_trips_a2l_ref
+PASSED tests/test_changes_symbol_entries.py::test_tc714_loader_rejects_unsafe_a2l_ref
+PASSED tests/test_changes_symbol_entries.py::test_tc714_dangling_override_refuses_run_naming_it
+PASSED tests/test_changes_symbol_entries.py::test_tc715_project_mode_resolves_project_root_a2l
+PASSED tests/test_changes_symbol_entries.py::test_tc715_no_project_mode_resolves_under_workarea_root
+PASSED tests/test_changes_symbol_entries.py::test_tc715_reference_in_neither_home_refuses_run_naming_it
+PASSED tests/test_changes_symbol_entries.py::test_tc715_reference_outside_guard_refused_like_any_ref
+PASSED tests/test_changes_symbol_entries.py::test_tc716_summary_entry_carries_symbol
+PASSED tests/test_changes_symbol_entries.py::test_tc716_project_report_modifications_attribute_symbol_and_address
+PASSED tests/test_changes_symbol_entries.py::test_tc716_diff_linkage_table_prefers_entry_symbol
+PASSED tests/test_changes_symbol_entries.py::test_tc716_flow_report_change_attribution_section
+PASSED tests/test_changes_symbol_entries.py::test_tc716_change_attribution_empty_renders_never_absent
+PASSED tests/test_changes_symbol_entries.py::test_tc717_flow_produced_image_diff_references_all_flow_changes
+PASSED tests/test_changes_symbol_entries.py::test_tc717_non_flow_b_renders_the_shipped_report_unchanged
+PASSED tests/test_changes_symbol_entries.py::test_tc717_html_flow_change_attribution_pairs_the_markdown
+PASSED tests/test_changes_symbol_entries.py::test_tc718_battery_diff_block_omitting_one_flow_change_red
+PASSED tests/test_flow_a2b_b94.py::test_tc_b94_21_roundtrip_one_of_each_kind_incl_a2b
+PASSED tests/test_flow_a2b_b94.py::test_tc_b94_21_loader_refuses_a2b_binding_arm
+PASSED tests/test_flow_a2b_b94.py::test_tc_b94_22_patch_write_out_run_records_per_block_results
+PASSED tests/test_flow_a2b_b94.py::test_tc_b94_22_upstream_crc_failure_skips_write_out
+PASSED tests/test_flow_a2b_b94.py::test_tc_b94_23_binding_validation_matrix
+PASSED tests/test_flow_a2b_b94.py::test_tc_b94_23_binding_text_grammar
+PASSED tests/test_flow_a2b_b94.py::test_tc_b94_24_a2b_report_states_each_inputs_provenance
+PASSED tests/test_flow_a2b_b94.py::test_tc_b94_24_upstream_failure_yields_no_report
+PASSED tests/test_flow_a2b_b94.py::test_tc_b94_25_md_safe_md_code_mode_truth_table
+PASSED tests/test_flow_a2b_b94.py::test_tc_b94_25_hostile_file_name_in_emitted_report
+PASSED tests/test_flow_a2b_b94.py::test_tc_b94_04_template_save_reload_and_dedup
+PASSED tests/test_flow_a2b_b94.py::test_tc_b94_04_zero_block_template_saves
+PASSED tests/test_flow_a2b_b94.py::test_tc_b94_04_name_sanitiser_is_the_write_authority
+PASSED tests/test_tui_report_filter_surface.py::test_at_056a_dropdown_selection_filters_both_triggers
+PASSED tests/test_tui_report_filter_surface.py::test_at_056a2_selector_row_and_generate_visible_at_both_regimes
+PASSED tests/test_tui_report_filter_surface.py::test_at_056a3_project_switch_resets_selection_next_report_unfiltered
+PASSED tests/test_tui_report_filter_surface.py::test_at_056b_hostile_filename_populates_and_renders_literally
+PASSED tests/test_tui_report_filter_surface.py::test_at_056c_fresh_default_blank_dropdown_full_report_golden
+PASSED tests/test_tui_report_filter_surface.py::test_at_056d_typed_path_valid_filters_missing_refuses
+PASSED tests/test_tui_report_filter_surface.py::test_at_053a_invalid_filter_refuses_both_surfaces_zero_files
+PASSED tests/test_tui_report_filter_surface.py::test_at_053b_hostile_valid_filter_proceeds_sanitized_everywhere
+PASSED tests/test_tui_report_filter_surface.py::test_at_054a_bkey_filtered_pair_keeps_match_omits_unmatched
+PASSED tests/test_tui_report_filter_surface.py::test_at_054c_bkey_zero_match_writes_pair_with_loud_notice
+PASSED tests/test_tui_report_filter_surface.py::test_tc316_scan_sorted_symlink_skipped_absent_dir_and_validate
+PASSED tests/test_tui_report_filter_surface.py::test_tc317_typed_path_resolution_and_swap_refusals
+PASSED tests/test_tui_report_filter_surface.py::test_tc_f1_filter_helper_wording_identical_across_report_modules
+PASSED tests/test_tui_flow_builder_b94.py::test_at_b94_15_fb_a_surface_and_wired_patch_run
+PASSED tests/test_tui_flow_builder_b94.py::test_at_b94_16_a2b_wiring_rule_and_report_provenance
+PASSED tests/test_tui_flow_builder_b94.py::test_at_b94_17_template_save_listing_import_and_dedup
+PASSED tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally
+PASSED tests/test_tui_flow_builder_b94.py::test_tc_b94_20_fb_a_composition_census
+PASSED tests/test_b100_busy.py::test_tc_b100_50_begin_paints_the_first_progress_line
+PASSED tests/test_b100_busy.py::test_tc_b100_50_long_label_stays_on_one_row
+PASSED tests/test_b100_busy.py::test_tc_b100_50_begin_sets_the_bar_to_zero
+PASSED tests/test_b100_busy.py::test_tc_b100_50_steps_by_index_set_the_bar
+PASSED tests/test_b100_busy.py::test_tc_b100_50_step_amount_moves_the_bar_within_the_step
+PASSED tests/test_b100_busy.py::test_tc_b100_50_out_of_range_step_data_is_clamped[step 0-call0-step 1/3 a-0]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_out_of_range_step_data_is_clamped[step m + 1-call1-step 3/3 c-66]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_out_of_range_step_data_is_clamped[total 0-call2-step 2/3 b-50]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_out_of_range_step_data_is_clamped[total -1-call3-step 2/3 b-50]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_out_of_range_step_data_is_clamped[done -5-call4-step 2/3 b-50]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_out_of_range_step_data_is_clamped[done total + 1-call5-step 2/3 b-66]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_spinner_and_elapsed_advance_while_a_worker_runs
+PASSED tests/test_b100_busy.py::test_tc_b100_50_overlapping_runs_share_one_timer
+PASSED tests/test_b100_busy.py::test_tc_b100_50_action_shorter_than_a_tick
+PASSED tests/test_b100_busy.py::test_tc_b100_50_last_end_stops_the_timer
+PASSED tests/test_b100_busy.py::test_tc_b100_50_elapsed_is_minutes_and_seconds[0-00:00]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_elapsed_is_minutes_and_seconds[59.9-00:59]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_elapsed_is_minutes_and_seconds[60-01:00]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_elapsed_is_minutes_and_seconds[3599-59:59]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_elapsed_is_minutes_and_seconds[4503-75:03]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_file_state_waits_while_a_run_is_shown
+PASSED tests/test_b100_busy.py::test_tc_b100_50_end_writes_the_outcome_to_the_status_log
+PASSED tests/test_b100_busy.py::test_tc_b100_50_last_end_paints_the_stored_file_state
+PASSED tests/test_b100_busy.py::test_tc_b100_50_last_end_clears_the_bar
+PASSED tests/test_b100_busy.py::test_tc_b100_50_unknown_or_replaced_run_leaves_the_indicator[end of an unknown key]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_unknown_or_replaced_run_leaves_the_indicator[step of an unknown key]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_unknown_or_replaced_run_leaves_the_indicator[end of a replaced run]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_a_newer_action_is_the_one_shown
+PASSED tests/test_b100_busy.py::test_tc_b100_50_the_newest_running_action_is_shown_after_an_end
+PASSED tests/test_b100_busy.py::test_tc_b100_50_a_begin_under_a_running_key_restarts_it
+PASSED tests/test_b100_busy.py::test_tc_b100_50_each_worker_action_begins_with_a_progress_line[file_load]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_each_worker_action_begins_with_a_progress_line[report]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_each_worker_action_begins_with_a_progress_line[diff_report]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_each_worker_action_begins_with_a_progress_line[before_after]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_progress_widgets_are_written_on_the_main_thread[file_load]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_progress_widgets_are_written_on_the_main_thread[report]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_progress_widgets_are_written_on_the_main_thread[diff_report]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_progress_widgets_are_written_on_the_main_thread[before_after]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_names_paint_literally_through_load_from_path[markup]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_names_paint_literally_through_load_from_path[bidi override]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_names_paint_literally_through_load_from_path[130 characters]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_control_bytes_never_reach_the_status_log
+PASSED tests/test_b100_busy.py::test_tc_b100_50_begin_busy_is_called_only_from_the_one_label_helper
+PASSED tests/test_b100_busy.py::test_tc_b100_50_the_bar_keeps_its_row_when_idle[size0-47]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_the_bar_keeps_its_row_when_idle[size1-17]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_running_line_paints_in_the_accent
+PASSED tests/test_b100_busy.py::test_tc_b100_50_status_line_has_one_owner_during_a_worker_load
+PASSED tests/test_b100_busy.py::test_tc_b100_50_image_pick_file_state_waits_for_a_running_report
+PASSED tests/test_b100_busy.py::test_tc_b100_50_kickoff_raise_ends_the_file_load_first
+PASSED tests/test_b100_busy.py::test_tc_b100_50_worker_raise_ends_the_action_first[file_load]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_worker_raise_ends_the_action_first[report]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_worker_raise_ends_the_action_first[diff_report]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_worker_raise_ends_the_action_first[before_after]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_a2l_raise_ends_the_action_first
+PASSED tests/test_b100_busy.py::test_tc_b100_50_project_raise_ends_the_action_first
+PASSED tests/test_b100_busy.py::test_tc_b100_50_save_raise_ends_the_action_first
+PASSED tests/test_b100_busy.py::test_tc_b100_51_action_table_names_the_seven_long_actions
+PASSED tests/test_b100_busy.py::test_tc_b100_51_every_baseline_bar_site_maps_to_a_seam_event
+PASSED tests/test_b100_busy.py::test_tc_b100_51_only_the_seam_sets_the_bar
+PASSED tests/test_b100_busy.py::test_tc_b100_51_workers_take_the_run_generation
+PASSED tests/test_b100_busy.py::test_tc_b100_51_file_load_ends_once_on_success
+PASSED tests/test_b100_busy.py::test_tc_b100_51_file_load_ends_once_on_a_parse_failure
+PASSED tests/test_b100_busy.py::test_tc_b100_51_file_load_ends_once_on_a_containment_refusal
+PASSED tests/test_b100_busy.py::test_tc_b100_51_a2l_load_ends_once_on_success
+PASSED tests/test_b100_busy.py::test_tc_b100_51_a2l_load_ends_once_on_a_containment_refusal
+PASSED tests/test_b100_busy.py::test_tc_b100_51_project_load_ends_once_on_success
+PASSED tests/test_b100_busy.py::test_tc_b100_51_project_load_without_an_a2l_skips_its_step
+PASSED tests/test_b100_busy.py::test_tc_b100_51_project_load_ends_once_on_a_failure_after_the_begin
+PASSED tests/test_b100_busy.py::test_tc_b100_51_save_project_reports_its_phases_as_steps
+PASSED tests/test_b100_busy.py::test_tc_b100_51_save_project_mismatch_tail_ends_with_the_mismatch
+PASSED tests/test_b100_busy.py::test_tc_b100_51_save_project_ends_once_on_a_placement_failure
+PASSED tests/test_b100_busy.py::test_tc_b100_51_report_ends_once_on_success
+PASSED tests/test_b100_busy.py::test_tc_b100_51_report_ends_once_on_a_failure[generator raises]
+PASSED tests/test_b100_busy.py::test_tc_b100_51_report_ends_once_on_a_failure[rejected input]
+PASSED tests/test_b100_busy.py::test_tc_b100_51_diff_report_ends_once_and_logs_its_outcome[written-written-written-bar0-Diff report written: {md}  |  {html}]
+PASSED tests/test_b100_busy.py::test_tc_b100_51_diff_report_ends_once_and_logs_its_outcome[markdown refused-refused-written-bar1-Report refused: synthetic]
+PASSED tests/test_b100_busy.py::test_tc_b100_51_diff_report_ends_once_and_logs_its_outcome[html raises-written-raise-bar2-Diff report failed: RuntimeError: x]
+PASSED tests/test_b100_busy.py::test_tc_b100_51_diff_report_ends_once_and_logs_its_outcome[html refused-written-refused-bar3-HTML report refused: y]
+PASSED tests/test_b100_busy.py::test_tc_b100_51_diff_report_without_a_comparison_begins_nothing
+PASSED tests/test_b100_busy.py::test_tc_b100_51_before_after_ends_once_and_logs_its_outcome[written]
+PASSED tests/test_b100_busy.py::test_tc_b100_51_before_after_ends_once_and_logs_its_outcome[refused]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_twelve_b_kickoff_raise_ends_the_run_first[project_load]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_twelve_b_kickoff_raise_ends_the_run_first[save_project]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_twelve_b_kickoff_raise_ends_the_run_first[a2l_load]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_twelve_b_handler_raise_ends_the_run_first[project_load]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_twelve_b_handler_raise_ends_the_run_first[save_project]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_twelve_b_handler_raise_ends_the_run_first[a2l_load]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_a2l_success_posts_no_failure_end
+PASSED tests/test_b100_busy.py::test_tc_b100_50_a2l_deferred_install_raise_ends_the_run
+PASSED tests/test_b100_busy.py::test_tc_b100_50_twelve_b_progress_reaches_the_widgets_from_workers_on_main[project_load]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_twelve_b_progress_reaches_the_widgets_from_workers_on_main[save_project]
+PASSED tests/test_b100_busy.py::test_tc_b100_50_twelve_b_progress_reaches_the_widgets_from_workers_on_main[a2l_load]
+PASSED tests/test_b100_busy.py::test_tc_b100_51_twelve_b_seam_sites_sit_in_the_workers_and_handlers
+PASSED tests/test_b100_busy.py::test_tc_b100_50_a_restarted_key_becomes_the_newest_run
+PASSED tests/test_b100_busy.py::test_tc_b100_50_a_falling_amount_never_lowers_the_bar
+PASSED tests/test_b100_busy.py::test_tc_b100_50_ending_a_middle_run_shows_the_newest_remaining
+PASSED tests/test_b100_busy.py::test_tc_b100_50_a_begin_after_the_last_end_starts_one_timer
+PASSED tests/test_b100_busy.py::test_tc_b100_50_a_stale_failure_logs_nothing
+PASSED tests/test_b100_busy.py::test_tc_b100_51_every_save_abort_return_ends_its_run_first
+PASSED tests/test_b100_busy.py::test_tc_b100_51_save_validation_abort_ends_with_its_own_line
+PASSED tests/test_b100_busy.py::test_tc_b100_51_file_load_reads_the_copy_size_before_the_worker
+PASSED tests/test_b100_busy.py::test_tc_b100_51_file_load_into_an_open_project_ends_after_the_sync
+PASSED tests/test_b100_busy.py::test_tc_b100_53_use_time_resolve_error_refuses_and_keeps_the_app[load_from_path-OSError]
+PASSED tests/test_b100_busy.py::test_tc_b100_53_use_time_resolve_error_refuses_and_keeps_the_app[load_from_path-ValueError]
+PASSED tests/test_b100_busy.py::test_tc_b100_53_use_time_resolve_error_refuses_and_keeps_the_app[load_from_path-RuntimeError]
+PASSED tests/test_b100_busy.py::test_tc_b100_53_use_time_resolve_error_refuses_and_keeps_the_app[load_a2l_from_path-OSError]
+PASSED tests/test_b100_busy.py::test_tc_b100_53_use_time_resolve_error_refuses_and_keeps_the_app[load_a2l_from_path-ValueError]
+PASSED tests/test_b100_busy.py::test_tc_b100_53_use_time_resolve_error_refuses_and_keeps_the_app[load_a2l_from_path-RuntimeError]
+PASSED tests/test_b100_busy.py::test_tc_b100_53_path_gone_under_the_load_question_keeps_the_app
+PASSED tests/test_b100_busy.py::test_tc_b100_51_raise_after_the_commit_keeps_the_saved_line
+PASSED tests/test_b100_busy.py::test_tc_b100_50_progress_bar_paints_no_eta
+PASSED tests/test_b100_busy.py::test_tc_b100_50_project_deferred_install_raise_ends_the_run
+PASSED tests/test_b100_busy.py::test_tc_b100_51_save_failure_paints_its_lines_then_its_outcome
+PASSED tests/test_b100_busy.py::test_tc_b100_51_raise_after_a_multi_line_tail_paints_the_saved_line_once
+PASSED tests/test_b100_busy.py::test_tc_b100_53_path_refused_between_the_two_looks_keeps_the_app
+PASSED tests/test_b99_staging.py::test_tc_b99_11_same_name_save_back_keeps_work_copy
+PASSED tests/test_b99_staging.py::test_tc_b99_11_junction_at_staging_temp_is_refused
+PASSED tests/test_b99_staging.py::test_tc_b99_11_dangling_junction_at_staging_temp_is_refused
+PASSED tests/test_b99_staging.py::test_tc_b99_12_eight_writers_one_name_zero_mismatches
+PASSED tests/test_b99_staging.py::test_tc_b99_12_forced_permission_error_refuses_cleanly
+PASSED tests/test_b99_staging.py::test_tc_b99_12_directory_squatting_requested_name_takes_next_free
+PASSED tests/test_b99_staging.py::test_tc_b99_12_forced_oserror_in_replace_raises_placement_error
+PASSED tests/test_b99_staging.py::test_tc_b99_12_dangling_symlink_at_requested_name_takes_next_free
+PASSED tests/test_b99_staging.py::test_tc_b99_12_source_vanishes_mid_copy_is_wrapped
+PASSED tests/test_b99_staging.py::test_tc_b99_12_source_bytes_and_mtime_unchanged
+PASSED tests/test_b99_staging.py::test_tc_b99_13_concurrent_placements_one_name_own_bytes_returned
+PASSED tests/test_b99_staging.py::test_tc_b99_13_zero_byte_target_is_never_reused
+PASSED tests/test_b99_staging.py::test_tc_b99_13_symlink_target_is_never_reused
+PASSED tests/test_b99_staging.py::test_tc_b99_39_delete_calls_delete_only_owned_staging
+PASSED tests/test_b99_staging.py::test_tc_b99_44_change_document_stages_in_private_home
+PASSED tests/test_b99_staging.py::test_tc_b99_44_junction_at_staging_temp_is_refused
+PASSED tests/test_b99_staging.py::test_tc_b99_14_save_project_missing_source
+PASSED tests/test_b99_staging.py::test_tc_b99_14_placement_failure_removes_created_folder
+PASSED tests/test_b99_staging.py::test_tc_b99_14_preexisting_folder_survives_placement_failure
+PASSED tests/test_b99_staging.py::test_at_b99_05_save_project_after_same_name_save_back
+PASSED tests/test_b99_staging.py::test_at_b99_04_duplicate_refused_distinct_parallel_markers
+PASSED tests/test_b99_staging.py::test_tc_b99_ux_c10_save_project_filename_renders_literally
+PASSED tests/test_b99_staging.py::test_tc_b99_ux_c10_placement_error_path_renders_literally
+PASSED tests/test_b99_staging.py::test_tc_b99_15_duplicate_write_out_names_refused
+PASSED tests/test_b99_staging.py::test_tc_b99_15_distinct_names_run
+PASSED tests/test_b99_staging.py::test_tc_b99_16_corrupted_write_out_is_error_naming_address
+PASSED tests/test_b99_staging.py::test_tc_b99_16_intact_write_out_is_ok
+PASSED tests/test_b99_staging.py::test_tc_b99_13_gather_drift_places_next_free_name
+PASSED tests/test_b99_staging.py::test_tc_b99_13_unchanged_resave_after_drift_adds_no_duplicate
+PASSED tests/test_b99_staging.py::test_tc_b99_13_no_final_name_replace_outside_placement
+PASSED tests/test_b99_staging.py::test_tc_b99_ux_c10_d7_lane_name_renders_literally
+PASSED tests/test_id_registry.py::test_tc600_g1_every_named_node_id_is_registered
+PASSED tests/test_id_registry.py::test_tc601_g2_live_entries_name_existing_nodes
+PASSED tests/test_id_registry.py::test_tc602_g3_every_citation_is_registered
+PASSED tests/test_id_registry.py::test_tc604_g5_grammar_holds_or_is_registered_legacy
+PASSED tests/test_id_registry.py::test_tc605_g6_normalized_keys_are_unique
+PASSED tests/test_id_registry.py::test_tc606_g7_no_stem_exceeds_the_high_water_mark
+PASSED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+PASSED tests/test_id_registry.py::test_tc608_tokenizer_and_normalizer_edge_cases
+PASSED tests/test_id_registry.py::test_tc609_registry_file_is_well_formed
+PASSED tests/test_id_registry.py::test_tc610_reservations_are_recorded_and_respected
+PASSED tests/test_id_registry.py::test_at280_registry_and_repository_agree_in_both_directions
+PASSED tests/test_id_registry.py::test_at281_every_guard_rule_can_fail
+PASSED tests/test_engine_unchanged.py::test_tc027_engine_modules_unchanged_vs_main
+PASSED tests/test_requirements_canon.py::test_canon_is_one_file_with_rows
+PASSED tests/test_requirements_canon.py::test_canon_rows_have_id_form_sentence
+PASSED tests/test_requirements_canon.py::test_canon_rows_open_with_their_form
+PASSED tests/test_requirements_canon.py::test_canon_rows_hold_the_obligation_word_once
+PASSED tests/test_requirements_canon.py::test_canon_row_ids_are_unique
+PASSED tests/test_requirements_canon.py::test_canon_modules_are_s0_to_s17_in_order
+PASSED tests/test_requirements_canon.py::test_canon_history_is_the_committed_blob
+PASSED tests/test_requirements_canon.py::test_canon_s0_table_cites_existing_rows
+PASSED tests/test_requirements_canon.py::test_review_files_hold_the_decisions
+PASSED tests/test_requirements_canon.py::test_review_files_name_only_existing_tests
+PASSED tests/test_requirements_canon.py::test_canon_rows_are_one_sentence
+PASSED tests/test_render_hexview.py::test_tc651_import_census_all_consumers_read_render_hexview
+PASSED tests/test_render_hexview.py::test_tc652_wrapper_absence_and_renderer_surface
+PASSED tests/test_report_markup_safety.py::test_the_oracle_transcribes_the_implementations_drop_set
+PASSED tests/test_report_markup_safety.py::test_g1_every_active_rule_has_a_payload
+PASSED tests/test_report_markup_safety.py::test_g2_linkify_schemas_are_all_represented
+PASSED tests/test_report_markup_safety.py::test_g3_payload_floor
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[strong]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[em]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[strike]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[link-inline]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[link-ref]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[autolink]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[image]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[image-ref]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[linkify-scheme]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[linkify-proto-rel]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[linkify-fuzzy-www]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[linkify-fuzzy-bare]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[linkify-fuzzy-mail]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[linkify-idn]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[linkify-mailto]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[linkify-ftp]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[backticks]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[code-span-breakout]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[html-inline]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[html-tag]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[entity-vert]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[entity-amp]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[entity-lt]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[escape-backslash]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[newline-hard]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[heading]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[lheading]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[hr]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[bullet]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[bullet-plus]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[ordered-paren]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[blockquote]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[fence]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[indented-code]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[html-block]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[reference]
+PASSED tests/test_report_markup_safety.py::test_g4_payload_is_non_vacuous_in_its_emission_context[table-pipe]
+PASSED tests/test_report_markup_safety.py::test_g5_negative_controls_are_inert_before_escaping[neg-fuzzy-ip]
+PASSED tests/test_report_markup_safety.py::test_g5_negative_controls_are_inert_before_escaping[neg-fake-tld]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[strong]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[em]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[strike]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[link-inline]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[link-ref]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[autolink]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[image]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[image-ref]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[linkify-scheme]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[linkify-proto-rel]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[linkify-fuzzy-www]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[linkify-fuzzy-bare]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[linkify-fuzzy-mail]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[linkify-idn]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[linkify-mailto]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[linkify-ftp]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[backticks]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[code-span-breakout]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[html-inline]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[html-tag]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[entity-vert]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[entity-amp]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[entity-lt]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[escape-backslash]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[newline-hard]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[heading]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[lheading]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[hr]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[bullet]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[bullet-plus]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[ordered-paren]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[blockquote]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[fence]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[indented-code]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[html-block]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[reference]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[table-pipe]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[neg-fuzzy-ip]
+PASSED tests/test_report_markup_safety.py::test_mode_a_neutralises_and_preserves[neg-fake-tld]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[strong]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[em]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[strike]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[link-inline]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[link-ref]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[autolink]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[image]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[image-ref]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[linkify-scheme]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[linkify-proto-rel]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[linkify-fuzzy-www]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[linkify-fuzzy-bare]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[linkify-fuzzy-mail]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[linkify-idn]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[linkify-mailto]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[linkify-ftp]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[backticks]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[code-span-breakout]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[html-inline]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[html-tag]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[entity-vert]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[entity-amp]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[entity-lt]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[escape-backslash]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[newline-hard]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[heading]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[lheading]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[hr]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[bullet]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[bullet-plus]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[ordered-paren]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[blockquote]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[fence]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[indented-code]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[html-block]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[reference]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[table-pipe]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[neg-fuzzy-ip]
+PASSED tests/test_report_markup_safety.py::test_mode_b_neutralises_and_preserves[neg-fake-tld]
+PASSED tests/test_report_markup_safety.py::test_backslash_is_escaped_first_and_ampersand_second
+PASSED tests/test_report_markup_safety.py::test_ampersand_escaping_kills_entity_spoofing
+PASSED tests/test_report_markup_safety.py::test_backtick_is_escaped_not_deleted
+PASSED tests/test_report_markup_safety.py::test_image_construct_is_dead_only_via_bracket_escaping
+PASSED tests/test_report_markup_safety.py::test_collapse_defuses_block_starters_pushed_onto_a_new_line[- item]
+PASSED tests/test_report_markup_safety.py::test_collapse_defuses_block_starters_pushed_onto_a_new_line[+ item]
+PASSED tests/test_report_markup_safety.py::test_collapse_defuses_block_starters_pushed_onto_a_new_line[= h]
+PASSED tests/test_report_markup_safety.py::test_collapse_defuses_block_starters_pushed_onto_a_new_line[1) item]
+PASSED tests/test_report_markup_safety.py::test_collapse_defuses_block_starters_pushed_onto_a_new_line[1. item]
+PASSED tests/test_report_markup_safety.py::test_collapse_defuses_block_starters_pushed_onto_a_new_line[> quote]
+PASSED tests/test_report_markup_safety.py::test_collapse_defuses_block_starters_pushed_onto_a_new_line[# head]
+PASSED tests/test_report_markup_safety.py::test_collapse_defuses_block_starters_pushed_onto_a_new_line[---]
+PASSED tests/test_report_markup_safety.py::test_collapse_defuses_block_starters_pushed_onto_a_new_line[    indented]
+PASSED tests/test_report_markup_safety.py::test_leading_block_starter_is_defused_behind_a_list_marker[- item]
+PASSED tests/test_report_markup_safety.py::test_leading_block_starter_is_defused_behind_a_list_marker[+ item]
+PASSED tests/test_report_markup_safety.py::test_leading_block_starter_is_defused_behind_a_list_marker[= item]
+PASSED tests/test_report_markup_safety.py::test_leading_block_starter_is_defused_behind_a_list_marker[1) item]
+PASSED tests/test_report_markup_safety.py::test_leading_block_starter_is_defused_behind_a_list_marker[---]
+PASSED tests/test_report_markup_safety.py::test_interior_hyphen_is_never_escaped
+PASSED tests/test_report_markup_safety.py::test_u2028_is_dropped_although_it_is_not_a_control_character
+PASSED tests/test_report_markup_safety.py::test_deceptive_characters_are_replaced_visibly_not_silently[\u202e]
+PASSED tests/test_report_markup_safety.py::test_deceptive_characters_are_replaced_visibly_not_silently[\u200b]
+PASSED tests/test_report_markup_safety.py::test_deceptive_characters_are_replaced_visibly_not_silently[\ufeff]
+PASSED tests/test_report_markup_safety.py::test_deceptive_characters_are_replaced_visibly_not_silently[\u2066]
+PASSED tests/test_report_markup_safety.py::test_deceptive_characters_are_replaced_visibly_not_silently[\x9f]
+PASSED tests/test_report_markup_safety.py::test_deceptive_characters_are_replaced_visibly_not_silently[\u2028]
+PASSED tests/test_report_markup_safety.py::test_deceptive_characters_are_replaced_visibly_not_silently[\u2029]
+PASSED tests/test_report_markup_safety.py::test_mode_a_truncation_boundary_pair
+PASSED tests/test_report_markup_safety.py::test_limit_is_required_and_keyword_only
+PASSED tests/test_report_markup_safety.py::test_mode_b_never_truncates
+PASSED tests/test_report_markup_safety.py::test_tc382_unicode_that_is_not_deceptive_survives_intact[astral-MK\U0001f600\U0001d400x]
+PASSED tests/test_report_markup_safety.py::test_tc382_unicode_that_is_not_deceptive_survives_intact[nbsp-MK\xa0x]
+PASSED tests/test_report_markup_safety.py::test_tc382_unicode_that_is_not_deceptive_survives_intact[combining-MKe\u0301x]
+PASSED tests/test_report_markup_safety.py::test_tc382_unicode_that_is_not_deceptive_survives_intact[cjk-MK\u6821\u9a8cx]
+PASSED tests/test_report_markup_safety.py::test_tc382_unicode_that_is_not_deceptive_survives_intact[rtl-text-MK\u0645\u0631\u062d\u0628\u0627x]
+PASSED tests/test_report_markup_safety.py::test_tc382_a_large_value_is_bounded_without_scanning_it_whole
+PASSED tests/test_report_markup_safety.py::test_tc381_none_renders_as_text_not_as_an_empty_cell
+PASSED tests/test_report_markup_safety.py::test_tc398_truncation_never_orphans_an_escape
+PASSED tests/test_report_markup_safety.py::test_truncation_marker_is_distinct_from_the_validation_one
+PASSED tests/test_report_markup_safety.py::test_both_modes_render_the_empty_marker[]
+PASSED tests/test_report_markup_safety.py::test_both_modes_render_the_empty_marker[   ]
+PASSED tests/test_report_markup_safety.py::test_both_modes_render_the_empty_marker[\n\t]
+PASSED tests/test_report_markup_safety.py::test_a_value_of_only_format_characters_is_not_empty
+PASSED tests/test_report_markup_safety.py::test_escaping_failure_propagates_and_is_never_swallowed
+PASSED tests/test_report_markup_safety.py::test_bytes_render_without_reopening_the_grammar
+SKIPPED [1] tests\test_b100_busy.py:1038: not run on Windows (the name cannot be created), never passed
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+1 failed, 547 passed, 1 skipped, 1 deselected in 597.72s (0:09:57)
+exit=1

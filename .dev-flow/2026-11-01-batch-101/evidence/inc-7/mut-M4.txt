@@ -1,0 +1,27 @@
+s19_app.__file__ = <COPY>\s19_app\__init__.py
+MUTANT M4: title 'Before/after report' for every report
+FILE: s19_app/tui/services/diff_report_service.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______________ test_r_cmp_004_1_1_diff_report_keeps_its_title ________________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_cmp_004_1_1_diff_report0')
+
+    def test_r_cmp_004_1_1_diff_report_keeps_its_title(tmp_path: Path) -> None:
+        """A diff report without provenance: Markdown line 1 ``# Diff report``,
+        ``<title>Diff report</title>`` and ``<h1>Diff report</h1>``."""
+        md_text, html_text = _whole_pair(
+            tmp_path, _comparison(), _mem(0x100, 0xAA, 4), _mem(0x100, 0xBB, 4)
+        )
+>       assert md_text.splitlines()[0] == "# Diff report"
+E       AssertionError: assert '# Before/after report' == '# Diff report'
+E         
+E         - # Diff report
+E         + # Before/after report
+
+tests\test_diff_report_service.py:1885: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_1_1_diff_report_keeps_its_title
+1 failed in 0.91s
+
+EXIT 1

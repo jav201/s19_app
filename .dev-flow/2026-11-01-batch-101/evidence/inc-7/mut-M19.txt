@@ -1,0 +1,42 @@
+s19_app.__file__ = <COPY>\s19_app\__init__.py
+MUTANT M19: _window_rows writes chr(b) for every b >= 0x20
+FILE: s19_app/tui/services/diff_report_service.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____ test_r_cmp_004_14_7_rows_match_render_hex_view_for_all_byte_values ______
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_cmp_004_14_7_rows_match0')
+
+    def test_r_cmp_004_14_7_rows_match_render_hex_view_for_all_byte_values(
+        tmp_path: Path,
+    ) -> None:
+        """The row format, byte value by byte value: image A holds 0x00..0xFF in
+        order at 0x100. The A block equals the screen's own renderer row for row
+        (the independent differential oracle) and three spelled-out rows pin the
+        ASCII column at the printable boundaries (0x20, 0x7E, 0x7F)."""
+        mem_a = {0x100 + value: value for value in range(256)}
+        mem_b = {0x100 + value: value ^ 0xFF for value in range(256)}
+        comparison = _comparison(
+            runs=[DiffRun(0x100, 0x200, KIND_CHANGED)], stats=_stats(1, 256)
+        )
+        md_text, _ = _whole_pair(tmp_path, comparison, mem_a, mem_b)
+    
+        blocks = _md_fences(md_text)
+        a_rows = blocks[1][1]
+        window = list(range(0xC0, 0x200, 16))
+        assert len(window) == 20
+>       assert a_rows == render_hex_view(
+            mem_a, row_bases=window, max_rows=512
+        ).splitlines()
+E       AssertionError: assert ['0x000000C0 .........|', ...] == ['0x000000C0 .........|', ...]
+E         
+E         At index 11 diff: '0x00000170  70 71 72 73 74 75 76 77 78 79 7A 7B 7C 7D 7E 7F  |pqrstuvwxyz{|}~\x7f|' != '0x00000170  70 71 72 73 74 75 76 77 78 79 7A 7B 7C 7D 7E 7F  |pqrstuvwxyz{|}~.|'
+E         Left contains one more item: '0x000001F0  F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 FA FB FC FD FE FF  |ðñòóôõö÷øùúûüýþÿ|'
+E         Use -v to get more diff
+
+tests\test_diff_report_service.py:1706: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_14_7_rows_match_render_hex_view_for_all_byte_values
+1 failed in 0.95s
+
+EXIT 1

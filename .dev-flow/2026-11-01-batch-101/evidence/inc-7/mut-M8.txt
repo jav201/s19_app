@@ -1,0 +1,41 @@
+s19_app.__file__ = <COPY>\s19_app\__init__.py
+MUTANT M8: composer drops a2l_records from the generator kwargs
+FILE: s19_app/tui/services/before_after_service.py
+FF                                                                       [100%]
+================================== FAILURES ===================================
+_________ test_r_before_after_report_001_24_1_symbols_from_loaded_a2l _________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_before_after_report_0010')
+
+    def test_r_before_after_report_001_24_1_symbols_from_loaded_a2l(
+        tmp_path: Path,
+    ) -> None:
+        """The run row of the patched bytes names the A2L tag whose address lies
+        in the run: Markdown ``CAL\\_A`` (escaped), HTML ``CAL_A``."""
+        result, md_text, html_text = _compose_texts(
+            tmp_path, a2l_records=[{"name": "CAL_A", "address": 0x100}]
+        )
+        assert result.written, result.diagnostics
+>       assert "| 0x00000100 | 0x00000102 | 2 | changed | CAL\\_A |" in md_text
+E       AssertionError: assert '| 0x00000100 | 0x00000102 | 2 | changed | CAL\\_A |' in '# Before/after report\n\n- Generated (UTC): 2026-07-02T12:00:00+00:00\n- Tool version: 1.0.0rc1\n- Image A: img\\.s19...            |................|\n0x00000100  AA BB 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|\n```\n'
+
+tests\test_before_after_report.py:1486: AssertionError
+______________ test_r_before_after_report_001_24_3_bkey_symbols _______________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_before_after_report_0011')
+
+    def test_r_before_after_report_001_24_3_bkey_symbols(tmp_path: Path) -> None:
+        """Key ``b`` with an A2L loaded: the Symbols cell of the run that holds
+        the tag's address names it."""
+        outcome = _drive_bkey_texts(tmp_path, a2l_tags=_TWO_TAG_A2L["tags"])
+        md_text = _bkey_md(outcome)
+>       assert "| 0x00000100 | 0x00000102 | 2 | changed | CAL\\_A |" in md_text
+E       AssertionError: assert '| 0x00000100 | 0x00000102 | 2 | changed | CAL\\_A |' in '# Before/after report\n\n- Generated (UTC): 2026-11-05T18:05:17.575068+00:00\n- Tool version: 1.0.0rc1\n- Image A: im...            |................|\n0x00000100  AA BB 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|\n```\n'
+
+tests\test_before_after_report.py:1548: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_before_after_report.py::test_r_before_after_report_001_24_1_symbols_from_loaded_a2l
+FAILED tests/test_before_after_report.py::test_r_before_after_report_001_24_3_bkey_symbols
+2 failed in 3.17s
+
+EXIT 1

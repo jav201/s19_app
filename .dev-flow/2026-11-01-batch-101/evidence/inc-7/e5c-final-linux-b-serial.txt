@@ -1,0 +1,17 @@
+$ env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 2400 python -m pytest  '-q' '-rfE' '-m' 'serial_timing' 'tests/test_diff_report_service.py' 'tests/test_before_after_report.py' 'tests/test_tui_flow_builder_b94.py' 'tests/test_b99_staging.py' 'tests/test_b100_busy.py' 'tests/test_b99_editor_image.py' 'tests/test_changes_symbol_entries.py' 'tests/test_entropy_service.py' 'tests/test_render_hexview.py' 'tests/test_report_field_census.py' 'tests/test_report_off_ui_thread.py' 'tests/test_report_service.py' 'tests/test_tui_check_chain_b94.py' 'tests/test_tui_check_editor.py' 'tests/test_tui_diff_screen.py' 'tests/test_tui_patch_json.py' 'tests/test_tui_report_filter_surface.py' 'tests/test_flow_a2b_b94.py' 'tests/test_suite_hygiene.py' 'tests/test_id_registry.py' 'tests/test_engine_unchanged.py' 'tests/test_requirements_canon.py' -p no:cacheprovider   (LAN Linux host)
+UTC 2026-11-05T18:39:43Z  base 9f9f6af + git diff of b101-inc7 working tree (src 90ea8ae + uncommitted)
+s19_app.__file__ = <HOME>/work/s19c7-e5/s19_app/__init__.py
+3.11.18
+..                                                                       [100%]
+=============================== warnings summary ===============================
+tests/test_before_after_report.py:1741
+  <HOME>/work/s19c7-e5/tests/test_before_after_report.py:1741: DeprecationWarning: invalid escape sequence '\_'
+    "| 0x00000100 | 0x00000102 | 2 | changed | CAL\_A, CAL\_M |" in md_text
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= QC-TM timing margins =============================
+49.4%  0.203 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.5%  0.502 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+2 passed, 604 deselected, 1 warning in 94.67s (0:01:34)
+exit=0

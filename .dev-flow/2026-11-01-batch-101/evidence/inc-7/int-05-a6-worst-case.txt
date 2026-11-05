@@ -1,0 +1,14 @@
+A-6 worst case: two 4 MiB images that differ at every byte (one changed run), one process per report. Script: <SCRATCH>/a6_measure.py (not committed). Host shared with other agents' pytest runs during the measurement: wall times are upper bounds.
+scenario=ab image bytes=4194304 (fully changed, one run)
+baseline working set after setup: 53.1 MiB
+runs=1 compare=7.92s maps=6.77s md=4.88s html=13.07s
+wall=32.64s peak working set=5157.2 MiB
+.md: 85459849 bytes (81.5 MiB)
+.html: 1183319853 bytes (1128.5 MiB)
+exit=0
+scenario=ba image bytes=4194304 (fully changed, one run)
+baseline working set after setup: 53.3 MiB
+wall=32.16s peak working set=5156.8 MiB
+.md: 85460393 bytes (81.5 MiB)
+.html: 1183320572 bytes (1128.5 MiB)
+exit=0

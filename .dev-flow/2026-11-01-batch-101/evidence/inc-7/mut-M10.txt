@@ -1,0 +1,120 @@
+s19_app.__file__ = <COPY>\s19_app\__init__.py
+MUTANT M10: HTML sinks left on a C0-only strip
+FILE: s19_app/tui/services/diff_report_service.py
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+___________ test_r_cmp_004_15_1_html_visible_text_matches_markdown ____________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_cmp_004_15_1_html_visib0')
+
+    def test_r_cmp_004_15_1_html_visible_text_matches_markdown(
+        tmp_path: Path,
+    ) -> None:
+        """U+0085 and U+202E planted in an image label, a Runs symbol, a linkage
+        symbol, a provenance path and a refusal message: both files show U+FFFD
+        at the same place in all 5 fields and neither holds a raw U+0085 or
+        U+202E."""
+        refusal = FlowRefusal(
+            block_index=1, change_doc_ref="c.json", a2l_ref=None, code="CHG-X",
+            symbol=None, address=None, message="MS\x85MT",
+        )
+        comparison = _comparison(
+            runs=[DiffRun(0x100, 0x104, KIND_CHANGED)], stats=_stats(1, 4),
+            image_a=ImageRef(label="LA\x85LB", path="/tmp/a.s19", source_kind="external"),
+        )
+        provenance = BeforeAfterProvenance(
+            original_path=Path("/tmp/o.s19"),
+            saved_path=Path("/tmp/s.s19"),
+            applied_at_utc="2026-07-02T09:00:00+00:00",
+            change_doc_path=Path("cd‮ef.json"),
+        )
+        md_text, html_text = _whole_pair(
+            tmp_path, comparison, _mem(0x100, 1, 4), _mem(0x100, 2, 4),
+            provenance=provenance,
+            linkage_entries=[_entry(linkage_symbol="KS\x85KT")],
+            mac_records=[{"name": "RS‮RT", "address": 0x100}],
+            flow_changes=FlowChangeAttribution(records=(), refusals=(refusal,)),
+        )
+        for planted in (
+            f"LA{_FFFD}LB", f"RS{_FFFD}RT", f"KS{_FFFD}KT",
+            f"cd{_FFFD}ef.json", f"MS{_FFFD}MT",
+        ):
+            assert planted in md_text, ("markdown", planted)
+>           assert planted in html_text, ("html", planted)
+E           AssertionError: ('html', 'LA�LB')
+E           assert 'LA�LB' in '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>Before/after report</title>\n<style>body{fo...</h2>\n<p>0x00000100–0x00000104 changed: no flow change</p>\n<p>refused: c.json [CHG-X] MS\x85MT</p>\n</body>\n</html>'
+
+tests\test_diff_report_service.py:2325: AssertionError
+_________ test_r_before_after_report_001_21_2_provenance_path_visible _________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_before_after_report_0010')
+
+    def test_r_before_after_report_001_21_2_provenance_path_visible(
+        tmp_path: Path,
+    ) -> None:
+        """A control character in the change-document path is replaced by U+FFFD
+        in both files, never removed and never raw."""
+        provenance = BeforeAfterProvenance(
+            original_path=Path("/tmp/o.s19"),
+            saved_path=Path("/tmp/s.s19"),
+            applied_at_utc="2026-07-02T09:00:00+00:00",
+            change_doc_path=Path("pa\x01th.json"),
+        )
+        md_text, html_text = _whole_pair(
+            tmp_path, _comparison(), _mem(0x100, 1, 4), _mem(0x100, 2, 4),
+            provenance=provenance,
+        )
+        assert f"pa{_FFFD}th.json" in md_text
+>       assert f"pa{_FFFD}th.json" in html_text
+E       assert 'pa�th.json' in '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>Before/after report</title>\n<style>body{fo...yle="background:#ffd54d;color:#000;font-weight:bold">.</span>            |</pre></td>\n</tr></table>\n</body>\n</html>'
+
+tests\test_diff_report_service.py:2379: AssertionError
+______ test_tc_038_3_ctl_symbol_renders_identically_in_md_and_html_pair _______
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_tc_038_3_ctl_symbol_rende0')
+
+    def test_tc_038_3_ctl_symbol_renders_identically_in_md_and_html_pair(
+        tmp_path: Path,
+    ) -> None:
+        """A ctl-bearing linkage symbol is stripped in BOTH written formats.
+    
+        Intent: the increment-3 reviewer recommendation — ``_strip_ctl`` factored
+        out of ``_md_cell`` and applied inside the two before/after HTML helpers:
+        the md and html files render the same symbol, and the raw control
+        character reaches neither file. batch-101 Inc 7 (R-BEFORE-AFTER-REPORT-
+        001.21, changed): the control character is no longer removed, it is
+        replaced by a visible U+FFFD in BOTH files.
+        """
+        bas = _bas()
+        project_dir = tmp_path / "proj"
+        project_dir.mkdir()
+        original = _make_s19_image(tmp_path)
+        patched = _make_s19_image(project_dir, name="p.s19", patched=True)
+        summary = _summary(
+            saved_path=patched,
+            source_image_path=original,
+            entries=[_summary_entry(symbol="CTL\x01SYM")],
+        )
+    
+        result = bas.compose_before_after_report(
+            summary,
+            original,
+            project_dir=project_dir,
+            workarea=tmp_path / "wa",
+        )
+    
+        assert result.written, result.diagnostics
+        md_text = result.md_path.read_text(encoding="utf-8")
+        html_text = result.html_path.read_text(encoding="utf-8")
+        assert "\x01" not in md_text and "\x01" not in html_text
+>       assert "CTL\ufffdSYM" in md_text and "CTL\ufffdSYM" in html_text
+E       assert ('CTL�SYM' in '# Before/after report\n\n- Generated (UTC): 2026-11-05T18:06:28.717236+00:00\n- Tool version: 1.0.0rc1\n- Image A: im...            |................|\n0x00000100  AA BB 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|\n```\n' and 'CTL�SYM' in '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>Before/after report</title>\n<style>body{fo...e="background:#ffd54d;color:#000;font-weight:bold">.</span>..............|</pre></td>\n</tr></table>\n</body>\n</html>')
+
+tests\test_before_after_report.py:601: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_15_1_html_visible_text_matches_markdown
+FAILED tests/test_diff_report_service.py::test_r_before_after_report_001_21_2_provenance_path_visible
+FAILED tests/test_before_after_report.py::test_tc_038_3_ctl_symbol_renders_identically_in_md_and_html_pair
+3 failed in 1.07s
+
+EXIT 1

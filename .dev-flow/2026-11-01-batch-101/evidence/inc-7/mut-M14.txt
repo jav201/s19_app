@@ -1,0 +1,75 @@
+s19_app.__file__ = <COPY>\s19_app\__init__.py
+MUTANT M14: flow_change_census_complete left on _md_cell (predicate vs emission mismatch)
+FILE: s19_app/tui/services/diff_report_service.py
+FF                                                                       [100%]
+================================== FAILURES ===================================
+______________ test_r_cmp_004_9_1_5_flow_attribution_report_safe ______________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_cmp_004_9_1_5_flow_attr0')
+
+    def test_r_cmp_004_9_1_5_flow_attribution_report_safe(tmp_path: Path) -> None:
+        """Flow change attribution: the change-document reference and the symbol
+        are report-safe text in the table row and in the refusal bullet, and the
+        census predicate holds on the complete section and fails with a row
+        dropped."""
+        record, refusal, comparison, mem_a, mem_b = _flow_fixture()
+        full = FlowChangeAttribution(records=(record,), refusals=(refusal,))
+        text, _ = _whole_pair(
+            tmp_path, comparison, mem_a, mem_b, flow_changes=full
+        )
+    
+        section = text.split("## Flow change attribution")[1].split("\n## ")[0]
+        lines = section.splitlines()
+        row = next(ln for ln in lines if ln.startswith("| patches"))
+        assert "| patches\\/c\\_1\\.json | S\\*1 | 0x00001000 |" in row
+        assert (
+            "- refused: patches\\/c\\_1\\.json symbol 'S\\*1' @ 0x00001000 "
+            "[CHG-X] m"
+        ) in lines
+        assert "patches/c_1.json" not in section and "S*1" not in section
+>       assert flow_change_census_complete(full, lines) is True
+E       AssertionError: assert False is True
+E        +  where False = flow_change_census_complete(FlowChangeAttribution(records=(FlowChangeRecord(block_index=1, change_doc_ref='patches/c_1.json', a2l_ref=None, entry_...ock_index=1, change_doc_ref='patches/c_1.json', a2l_ref=None, code='CHG-X', symbol='S*1', address=4096, message='m'),)), ['', '', '| Change document | Symbol | Address | Length | Disposition | Diff runs |', '|---|---|---|---|---|---|', '| patches\\/c\\_1\\.json | S\\*1 | 0x00001000 | 2 | applied | 0x00001000–0x00001002 |', '', ...])
+
+tests\test_diff_report_service.py:2034: AssertionError
+_______ test_tc717_flow_produced_image_diff_references_all_flow_changes _______
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_tc717_flow_produced_image0')
+
+    def test_tc717_flow_produced_image_diff_references_all_flow_changes(
+        tmp_path: Path,
+    ) -> None:
+        """TC-717 (LLR-143.2, the law): the A2B diff over the flow's output
+        references 100% of the flow's changes — each differing run attributed to
+        the entries that produced it, the no-diff entry explicit, the skipped
+        record and the named refusal listed as such (0 unreferenced, 0 dropped)."""
+        project, result, comparison = _census_flow_result(tmp_path)
+        attribution = flow_change_attribution(result)
+        assert len(attribution.records) == 3, "Speed + no-op + skipped-outside"
+        assert len(attribution.refusals) == 1
+        mem_a, mem_b = _census_maps(project, result)
+        md = generate_diff_report(
+            comparison,
+            mem_map_a=mem_a,
+            mem_map_b=mem_b,
+            project_dir=project,
+            flow_changes=attribution,
+        )
+        assert md.written
+        text = md.path.read_text(encoding="utf-8")
+        assert "## Flow change attribution" in text
+        section = text.split("## Flow change attribution")[1]
+        # the census predicate over the SHIPPED document: 100% referenced.
+>       assert flow_change_census_complete(attribution, section.splitlines())
+E       assert False
+E        +  where False = flow_change_census_complete(FlowChangeAttribution(records=(FlowChangeRecord(block_index=1, change_doc_ref='c1.json', a2l_ref='cal.a2l', entry_type... address=4099, message="entry 0: the symbol 'Ghost' resolves to no tag in the declared A2L — the entry was skipped"),)), ['', '', '| Change document | Symbol | Address | Length | Disposition | Diff runs |', '|---|---|---|---|---|---|', '| ...| 0x00001000 | 2 | applied | 0x00001000–0x00001002 |', '| c1\\.json | - | 0x00001002 | 1 | applied | (no diff) |', ...])
+E        +    where ['', '', '| Change document | Symbol | Address | Length | Disposition | Diff runs |', '|---|---|---|---|---|---|', '| ...| 0x00001000 | 2 | applied | 0x00001000–0x00001002 |', '| c1\\.json | - | 0x00001002 | 1 | applied | (no diff) |', ...] = <built-in method splitlines of str object at 0x0000015B6452D650>()
+E        +      where <built-in method splitlines of str object at 0x0000015B6452D650> = "\n\n| Change document | Symbol | Address | Length | Disposition | Diff runs |\n|---|---|---|---|---|---|\n| c1\\.json...3 [CHG-SYMBOL-UNRESOLVED] entry 0: the symbol 'Ghost' resolves to no tag in the declared A2L — the entry was skipped\n".splitlines
+
+tests\test_changes_symbol_entries.py:1354: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_9_1_5_flow_attribution_report_safe
+FAILED tests/test_changes_symbol_entries.py::test_tc717_flow_produced_image_diff_references_all_flow_changes
+2 failed in 1.07s
+
+EXIT 1

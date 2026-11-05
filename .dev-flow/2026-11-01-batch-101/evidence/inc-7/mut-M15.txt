@@ -1,0 +1,100 @@
+s19_app.__file__ = <COPY>\s19_app\__init__.py
+MUTANT M15: refusal message left on _md_cell
+FILE: s19_app/tui/services/diff_report_service.py
+FF                                                                       [100%]
+================================== FAILURES ===================================
+______________ test_r_cmp_004_9_1_10_refusal_message_report_safe ______________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_cmp_004_9_1_10_refusal_0')
+
+    def test_r_cmp_004_9_1_10_refusal_message_report_safe(tmp_path: Path) -> None:
+        """A refusal message that repeats a hostile symbol is report-safe text:
+        the bullet is the exact escaped line, a CommonMark reader finds no
+        ``html_inline``, ``link_open`` or ``image`` token in it, and a
+        600-character message is cut to 500 characters plus the marker."""
+        hostile = "<img src=https://h/p>[x](http://b)"
+        refusal = FlowRefusal(
+            block_index=1, change_doc_ref="c.json", a2l_ref=None,
+            code="CHG-SYMBOL-UNRESOLVED", symbol=hostile, address=None,
+            message=f"the symbol '{hostile}' is not declared",
+        )
+        comparison, mem_a, mem_b = _long_changed_fixture()
+        text, _ = _whole_pair(
+            tmp_path, comparison, mem_a, mem_b,
+            flow_changes=FlowChangeAttribution(records=(), refusals=(refusal,)),
+        )
+        bullet = next(ln for ln in text.splitlines() if ln.startswith("- refused:"))
+        escaped = "\\<img src=https:\\/\\/h\\/p\\>\\[x\\](http:\\/\\/b)"
+>       assert bullet == (
+            f"- refused: c\\.json symbol '{escaped}' [CHG-SYMBOL-UNRESOLVED] "
+            f"the symbol '{escaped}' is not declared"
+        )
+E       AssertionError: assert '- refused: c... not declared' == '- refused: c... not declared'
+E         
+E         Skipping 98 identical leading characters in diff, use -v to show
+E         - e symbol '\<img src=https:\/\/h\/p\>\[x\](http:\/\/b)' is not declared
+E         ?           -               - -  -  - -  -       - -
+E         + e symbol '<img src=https://h/p>[x](http://b)' is not declared
+
+tests\test_diff_report_service.py:2096: AssertionError
+________ test_r_cmp_004_9_1_11_diff_report_sinks_inert_under_a_reader _________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_cmp_004_9_1_11_diff_rep0')
+
+    def test_r_cmp_004_9_1_11_diff_report_sinks_inert_under_a_reader(
+        tmp_path: Path,
+    ) -> None:
+        """One hostile payload planted in every label, path, symbol and message
+        field of a diff report that carries linkage, provenance, flow
+        attribution and a filter: a CommonMark reader (links and HTML on) finds
+        0 ``html_inline``, ``html_block``, ``link_open`` and ``image`` tokens and
+        every table keeps one column count. The control: the same payload
+        written raw IS flagged by that reader, so the check can fail."""
+        assert {t.type for t in _walk(DEFAULT.parse("- Image A: " + _HOSTILE))} & _BAD_TOKENS
+    
+        record = FlowChangeRecord(
+            block_index=1, change_doc_ref=_HOSTILE, a2l_ref=None,
+            entry_type="bytes", symbol=_HOSTILE, address_start=0x100,
+            address_end=0x102, disposition="applied", before_bytes=(1, 1),
+            after_bytes=(2, 2),
+        )
+        refusal = FlowRefusal(
+            block_index=1, change_doc_ref=_HOSTILE, a2l_ref=None, code="CHG-X",
+            symbol=_HOSTILE, address=0x100, message=_HOSTILE,
+        )
+        comparison = _comparison(
+            runs=[DiffRun(0x100, 0x104, KIND_CHANGED)], stats=_stats(1, 4),
+            image_a=ImageRef(
+                label=_HOSTILE, path=_HOSTILE_PATH, source_kind="project-variant",
+                variant_id=_HOSTILE,
+            ),
+            image_b=ImageRef(label=_HOSTILE, path=_HOSTILE_PATH, source_kind="external"),
+        )
+        provenance = BeforeAfterProvenance(
+            original_path=Path(_HOSTILE_PATH),
+            saved_path=Path(_HOSTILE_PATH),
+            applied_at_utc="2026-07-02T09:00:00+00:00",
+            change_doc_path=Path(_HOSTILE_PATH),
+        )
+        matcher = _report_matcher(addresses=[(0x100, 0x110)], name=_HOSTILE)
+        md_text, _ = _whole_pair(
+            tmp_path, comparison, _mem(0x100, 1, 4), _mem(0x100, 2, 4),
+            provenance=provenance,
+            linkage_entries=[_entry(linkage_symbol=_HOSTILE)],
+            mac_records=[{"name": _HOSTILE, "address": 0x100}],
+            flow_changes=FlowChangeAttribution(records=(record,), refusals=(refusal,)),
+            report_filter=matcher,
+        )
+    
+        live = {t.type for t in _walk(DEFAULT.parse(md_text))}
+>       assert not live & _BAD_TOKENS, sorted(live & _BAD_TOKENS)
+E       AssertionError: ['html_inline', 'link_open']
+E       assert not ({'bullet_list_close', 'bullet_list_open', 'code_inline', 'fence', 'heading_close', 'heading_open', ...} & {'html_block', 'html_inline', 'image', 'link_open'})
+
+tests\test_diff_report_service.py:2186: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_9_1_10_refusal_message_report_safe
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_9_1_11_diff_report_sinks_inert_under_a_reader
+2 failed in 1.18s
+
+EXIT 1

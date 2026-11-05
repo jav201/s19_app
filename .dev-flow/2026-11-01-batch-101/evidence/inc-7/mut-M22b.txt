@@ -1,0 +1,8 @@
+s19_app.__file__ = <COPY>\s19_app\__init__.py
+MUTANT M22b: _md_cell stops escaping the pipe (broad: whole diff_report_service + before_after_report test files)
+FILE: s19_app/tui/services/diff_report_service.py
+........................................................................ [ 74%]
+.........................                                                [100%]
+97 passed in 33.00s
+
+EXIT 0

@@ -1,0 +1,171 @@
+$ env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 2400 python -m pytest  '-q' '-rA' '-n' '8' '-p' 'no:randomly' 'tests/test_before_after_report.py::test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden' 'tests/test_before_after_report.py::test_r_before_after_report_001_11_1_no_project_reason_exact_text' 'tests/test_before_after_report.py::test_r_before_after_report_001_11_2_bkey_no_project_status' 'tests/test_before_after_report.py::test_r_before_after_report_001_24_1_symbols_from_loaded_a2l' 'tests/test_before_after_report.py::test_r_before_after_report_001_24_2_a2l_and_mac_names_share_the_cell' 'tests/test_before_after_report.py::test_r_before_after_report_001_24_3_bkey_symbols' 'tests/test_before_after_report.py::test_r_before_after_report_001_32_1_markdown_title' 'tests/test_before_after_report.py::test_r_before_after_report_001_33_1_html_page_title' 'tests/test_before_after_report.py::test_r_before_after_report_001_34_1_html_heading' 'tests/test_before_after_report.py::test_r_before_after_report_001_35_1_artifact_lines_use_loaded_a2l_and_mac' 'tests/test_before_after_report.py::test_r_before_after_report_001_35_2_bkey_artifact_lines' 'tests/test_before_after_report.py::test_r_before_after_report_001_35_3_bkey_loaded_mac_is_used' 'tests/test_before_after_report.py::test_r_cmp_003_2_1_bkey_no_mac_is_absent' 'tests/test_before_after_report.py::test_r_cmp_003_2_2_composer_without_a2l_is_absent' 'tests/test_before_after_report.py::test_r_cmp_004_14_5_before_after_report_whole' 'tests/test_before_after_report.py::test_r_cmp_005_16_3_bkey_failed_write_status' 'tests/test_before_after_report.py::test_r_cmp_005_16_4_before_after_failed_write_leaves_no_file' 'tests/test_before_after_report.py::test_r_cmp_005_17_2_before_after_html_failure_removes_markdown' 'tests/test_before_after_report.py::test_r_cmp_005_17_3_bkey_html_failure_status[raise]' 'tests/test_before_after_report.py::test_r_cmp_005_17_3_bkey_html_failure_status[refuse]' 'tests/test_before_after_report.py::test_tc311_no_filter_generator_kwargs_shape_is_todays' 'tests/test_before_after_report.py::test_tc_038_3_ctl_symbol_renders_identically_in_md_and_html_pair' 'tests/test_changes_symbol_entries.py::test_tc717_flow_produced_image_diff_references_all_flow_changes' 'tests/test_diff_report_service.py::test_default_kwargs_output_byte_identical_pre_change_golden' 'tests/test_diff_report_service.py::test_pipe_bearing_symbol_md_escaped_html_intact' 'tests/test_diff_report_service.py::test_r_before_after_report_001_21_2_provenance_path_visible' 'tests/test_diff_report_service.py::test_r_before_after_report_001_22_2_pipe_in_vocabulary_cells_stays_escaped' 'tests/test_diff_report_service.py::test_r_cmp_004_14_1_markdown_changed_run_whole' 'tests/test_diff_report_service.py::test_r_cmp_004_14_2_html_and_markdown_agree' 'tests/test_diff_report_service.py::test_r_cmp_004_14_3_markdown_window_over_64_kib' 'tests/test_diff_report_service.py::test_r_cmp_004_14_4_html_window_over_64_kib' 'tests/test_diff_report_service.py::test_r_cmp_004_14_7_rows_match_render_hex_view_for_all_byte_values' 'tests/test_diff_report_service.py::test_r_cmp_004_15_1_html_visible_text_matches_markdown' 'tests/test_diff_report_service.py::test_r_cmp_004_15_2_tab_becomes_one_space_in_both_files' 'tests/test_diff_report_service.py::test_r_cmp_004_15_3_strip_ctl_is_the_shared_visible_text' 'tests/test_diff_report_service.py::test_r_cmp_004_1_1_diff_report_keeps_its_title' 'tests/test_diff_report_service.py::test_r_cmp_004_1_2_title_follows_provenance_only' 'tests/test_diff_report_service.py::test_r_cmp_004_5_1_symbol_by_address_not_extent' 'tests/test_diff_report_service.py::test_r_cmp_004_8_1_html_has_no_markdown_escape' 'tests/test_diff_report_service.py::test_r_cmp_004_9_1_10_refusal_message_report_safe' 'tests/test_diff_report_service.py::test_r_cmp_004_9_1_11_diff_report_sinks_inert_under_a_reader' 'tests/test_diff_report_service.py::test_r_cmp_004_9_1_12_c1_and_bidi_visible_in_markdown' 'tests/test_diff_report_service.py::test_r_cmp_004_9_1_1_image_label_and_variant_report_safe' 'tests/test_diff_report_service.py::test_r_cmp_004_9_1_3_runs_symbols_name_by_name' 'tests/test_diff_report_service.py::test_r_cmp_004_9_1_5_flow_attribution_report_safe' 'tests/test_diff_report_service.py::test_r_cmp_004_9_1_6_filter_file_name_report_safe' 'tests/test_diff_report_service.py::test_r_cmp_004_9_1_7_symbol_cut_to_512_characters' 'tests/test_diff_report_service.py::test_r_cmp_004_9_2_1_image_path_text' 'tests/test_diff_report_service.py::test_r_cmp_004_9_2_2_provenance_path_text' 'tests/test_diff_report_service.py::test_r_cmp_004_9_2_4_path_keeps_its_characters' 'tests/test_diff_report_service.py::test_r_cmp_004_9_2_5_image_b_path_text' 'tests/test_diff_report_service.py::test_r_cmp_005_16_1_failed_markdown_write_leaves_no_file' 'tests/test_diff_report_service.py::test_r_cmp_005_16_2_failed_html_write_leaves_no_file' 'tests/test_diff_report_service.py::test_r_cmp_005_16_3_report_control_failed_write_status[-diff-report.html]' 'tests/test_diff_report_service.py::test_r_cmp_005_16_3_report_control_failed_write_status[-diff-report.md]' 'tests/test_diff_report_service.py::test_r_cmp_005_16_3_stale_part_file_is_not_touched' 'tests/test_diff_report_service.py::test_r_cmp_005_16_5_planted_link_at_part_name_is_not_followed' 'tests/test_diff_report_service.py::test_r_cmp_005_17_1_ab_html_failure_removes_markdown' 'tests/test_diff_report_service.py::test_symbol_annotation_only_intersecting_run' 'tests/test_diff_report_service.py::test_tc312_audit_header_first_block_fixed_format' 'tests/test_diff_report_service.py::test_tc318_hostile_filter_name_sanitized_md_html' 'tests/test_flow_a2b_b94.py::test_tc_b94_24_a2b_report_states_each_inputs_provenance' 'tests/test_report_field_census.py::test_mode_b_cell_guard_flags_a_planted_cell' 'tests/test_report_field_census.py::test_mode_b_in_a_table_cell_is_still_forbidden_at_every_call_site' 'tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally' 'tests/test_tui_report_filter_surface.py::test_at_053b_hostile_valid_filter_proceeds_sanitized_everywhere' -p no:cacheprovider   (LAN Linux host)
+UTC 2026-11-05T18:49:24Z  base 9f9f6af + git diff of b101-inc7 working tree (src 90ea8ae + uncommitted)
+s19_app.__file__ = <HOME>/work/s19c7-e5/s19_app/__init__.py
+3.11.18
+bringing up nodes...
+bringing up nodes...
+
+..................................................................       [100%]
+==================================== PASSES ====================================
+_____________ test_r_cmp_005_17_1_ab_html_failure_removes_markdown _____________
+[gw0] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-36/popen-gw0/test_r_cmp_005_17_1_ab_html_fa0 workarea=/tmp/pytest-of-<USER>/pytest-36/popen-gw0/test_r_cmp_005_17_1_ab_html_fa0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+ERROR    s19tui:app.py:7952 Diff report failed: x
+Traceback (most recent call last):
+  File "<HOME>/work/s19c7-e5/s19_app/tui/app.py", line 7950, in _start_diff_report_worker
+    html = generate_diff_report_html(result, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<HOME>/work/s19c7-e5/tests/test_diff_report_service.py", line 1889, in _raising
+    raise RuntimeError("x")
+RuntimeError: x
+WARNING  s19tui:app.py:6678 report kind=diff source=proj output=- outcome=failed: RuntimeError
+___ test_r_cmp_005_16_3_report_control_failed_write_status[-diff-report.md] ____
+[gw3] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-36/popen-gw3/test_r_cmp_005_16_3_report_con1 workarea=/tmp/pytest-of-<USER>/pytest-36/popen-gw3/test_r_cmp_005_16_3_report_con1/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+ERROR    s19tui:app.py:7952 Diff report failed: disk full
+Traceback (most recent call last):
+  File "<HOME>/work/s19c7-e5/s19_app/tui/app.py", line 7937, in _start_diff_report_worker
+    md = generate_diff_report(result, **kwargs)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<HOME>/work/s19c7-e5/s19_app/tui/services/diff_report_service.py", line 1887, in generate_diff_report
+    _write_report(target, "\n".join(lines))
+  File "<HOME>/work/s19c7-e5/s19_app/tui/services/diff_report_service.py", line 346, in _write_report
+    handle.write(text)
+  File "<HOME>/work/s19c7-e5/tests/test_diff_report_service.py", line 1749, in write
+    raise OSError("disk full")
+OSError: disk full
+WARNING  s19tui:app.py:6678 report kind=diff source=proj output=- outcome=failed: OSError
+_____________ test_r_cmp_005_17_3_bkey_html_failure_status[refuse] _____________
+[gw4] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-36/popen-gw4/test_r_cmp_005_17_3_bkey_html_1 workarea=/tmp/pytest-of-<USER>/pytest-36/popen-gw4/test_r_cmp_005_17_3_bkey_html_1/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+WARNING  s19tui:app.py:6678 report kind=before-after source=img.s19 output=- outcome=refused
+_________ test_r_before_after_report_001_35_3_bkey_loaded_mac_is_used __________
+[gw5] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-36/popen-gw5/test_r_before_after_report_0011 workarea=/tmp/pytest-of-<USER>/pytest-36/popen-gw5/test_r_before_after_report_0011/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+INFO     s19tui:app.py:16827 Load phase boundary: mac_parse_entry path=tags.mac
+INFO     s19tui:app.py:16833 Load phase boundary: mac_parse_done path=tags.mac rows=3 diagnostics=1 elapsed=0.000s
+INFO     s19tui:app.py:16847 MAC parse summary (mirrored): path=/tmp/pytest-of-<USER>/pytest-36/popen-gw5/test_r_before_after_report_0011/tags.mac rows=3 parse_ok=2 diagnostics=1 valid_addresses=2
+INFO     s19tui:app.py:16868 Load phase boundary: mac_a2l_resolve_entry path=tags.mac a2l_path=None
+INFO     s19tui:app.py:16874 Load phase boundary: mac_a2l_resolve_done path=tags.mac has_a2l_data=False
+INFO     s19tui:app.py:16880 MAC parse summary: path=/tmp/pytest-of-<USER>/pytest-36/popen-gw5/test_r_before_after_report_0011/tags.mac total_records=3 parse_ok=2 diagnostics=1 valid_addresses=2 a2l_path=None elapsed_seconds=0.001
+INFO     s19tui:app.py:6676 report kind=before-after source=img.s19 output=/tmp/pytest-of-<USER>/pytest-36/popen-gw5/test_r_before_after_report_0011/.s19tool/workarea/proj/reports/20261105T184938Z-before-after-report.md|/tmp/pytest-of-<USER>/pytest-36/popen-gw5/test_r_before_after_report_0011/.s19tool/workarea/proj/reports/20261105T184938Z-before-after-report.html outcome=ok
+________________ test_at_b94_18_hostile_names_render_literally _________________
+[gw1] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-36/popen-gw1/test_at_b94_18_hostile_names_r0 workarea=/tmp/pytest-of-<USER>/pytest-36/popen-gw1/test_at_b94_18_hostile_names_r0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-36/popen-gw1/test_at_b94_18_hostile_names_r0 workarea=/tmp/pytest-of-<USER>/pytest-36/popen-gw1/test_at_b94_18_hostile_names_r0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+_______ test_at_053b_hostile_valid_filter_proceeds_sanitized_everywhere ________
+[gw6] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-36/popen-gw6/test_at_053b_hostile_valid_fil0 workarea=/tmp/pytest-of-<USER>/pytest-36/popen-gw6/test_at_053b_hostile_valid_fil0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+WARNING  s19tui:app.py:13882 Project proj: no digests saved project.json (None)
+INFO     s19tui:app.py:14124 Load phase boundary: parse_branch_entry path=a.s19 suffix=.s19
+INFO     s19tui:app.py:18642 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-36/popen-gw6/test_at_053b_hostile_valid_fil0/.s19tool/workarea/proj/a.s19 addresses=4 range_count=1 range_bytes=4 errors=0
+INFO     s19tui:app.py:14141 Load phase boundary: parse_branch_done path=a.s19 branch=s19
+INFO     s19tui:app.py:18103 Load phase boundary: apply_install_state path=a.s19 precomputed=False
+INFO     s19tui:app.py:14077 Project loaded. name=proj file=/tmp/pytest-of-<USER>/pytest-36/popen-gw6/test_at_053b_hostile_valid_fil0/.s19tool/workarea/proj/a.s19 mac=None
+INFO     s19tui:app.py:18770 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18119 Load phase boundary: apply_sections_done path=a.s19
+INFO     s19tui:app.py:18131 Load phase boundary: apply_hex_done path=a.s19
+INFO     s19tui:app.py:19790 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:17663 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17718 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.011
+INFO     s19tui:app.py:19304 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.012
+INFO     s19tui:app.py:18144 Load phase boundary: apply_a2l_done path=a.s19
+INFO     s19tui:app.py:18997 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18161 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-36/popen-gw6/test_at_053b_hostile_valid_fil0/.s19tool/workarea/proj/a.s19 file_type=s19 elapsed_seconds=0.282 has_mac=False precomputed=False
+INFO     s19tui:app.py:6164 View reports action. project=proj count=0
+INFO     s19tui:app.py:6242 Report filter selected: /tmp/pytest-of-<USER>/pytest-36/popen-gw6/test_at_053b_hostile_valid_fil0/.s19tool/workarea/proj/filters/[boom]`b`.json
+INFO     s19tui:screens.py:3480 ReportViewerScreen dismissed by close.
+INFO     s19tui:app.py:6676 report kind=before-after source=a.s19 output=/tmp/pytest-of-<USER>/pytest-36/popen-gw6/test_at_053b_hostile_valid_fil0/.s19tool/workarea/proj/reports/20260710T120000Z-before-after-report.md|/tmp/pytest-of-<USER>/pytest-36/popen-gw6/test_at_053b_hostile_valid_fil0/.s19tool/workarea/proj/reports/20260710T120000Z-before-after-report.html outcome=ok
+INFO     s19tui:app.py:6164 View reports action. project=proj count=1
+INFO     s19tui:screens.py:3490 ReportViewerScreen requesting generation. context_bytes=64
+INFO     s19tui:app.py:6676 report kind=project source=proj output=/tmp/pytest-of-<USER>/pytest-36/popen-gw6/test_at_053b_hostile_valid_fil0/.s19tool/workarea/proj/reports/20260710T120000Z-report.md outcome=ok
+=========================== short test summary info ============================
+PASSED tests/test_before_after_report.py::test_r_before_after_report_001_34_1_html_heading
+PASSED tests/test_before_after_report.py::test_r_before_after_report_001_24_2_a2l_and_mac_names_share_the_cell
+PASSED tests/test_before_after_report.py::test_r_before_after_report_001_32_1_markdown_title
+PASSED tests/test_before_after_report.py::test_r_before_after_report_001_33_1_html_page_title
+PASSED tests/test_before_after_report.py::test_r_before_after_report_001_35_1_artifact_lines_use_loaded_a2l_and_mac
+PASSED tests/test_before_after_report.py::test_tc311_no_filter_generator_kwargs_shape_is_todays
+PASSED tests/test_before_after_report.py::test_tc_038_3_ctl_symbol_renders_identically_in_md_and_html_pair
+PASSED tests/test_changes_symbol_entries.py::test_tc717_flow_produced_image_diff_references_all_flow_changes
+PASSED tests/test_diff_report_service.py::test_default_kwargs_output_byte_identical_pre_change_golden
+PASSED tests/test_diff_report_service.py::test_pipe_bearing_symbol_md_escaped_html_intact
+PASSED tests/test_diff_report_service.py::test_r_before_after_report_001_21_2_provenance_path_visible
+PASSED tests/test_diff_report_service.py::test_r_before_after_report_001_22_2_pipe_in_vocabulary_cells_stays_escaped
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_14_1_markdown_changed_run_whole
+PASSED tests/test_before_after_report.py::test_r_cmp_004_14_5_before_after_report_whole
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_14_2_html_and_markdown_agree
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_14_3_markdown_window_over_64_kib
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_14_7_rows_match_render_hex_view_for_all_byte_values
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_15_1_html_visible_text_matches_markdown
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_15_2_tab_becomes_one_space_in_both_files
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_15_3_strip_ctl_is_the_shared_visible_text
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_1_1_diff_report_keeps_its_title
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_1_2_title_follows_provenance_only
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_5_1_symbol_by_address_not_extent
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_8_1_html_has_no_markdown_escape
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_9_1_10_refusal_message_report_safe
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_9_1_11_diff_report_sinks_inert_under_a_reader
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_9_1_12_c1_and_bidi_visible_in_markdown
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_9_1_1_image_label_and_variant_report_safe
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_9_1_3_runs_symbols_name_by_name
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_9_1_5_flow_attribution_report_safe
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_9_1_6_filter_file_name_report_safe
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_9_1_7_symbol_cut_to_512_characters
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_9_2_1_image_path_text
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_9_2_2_provenance_path_text
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_9_2_4_path_keeps_its_characters
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_9_2_5_image_b_path_text
+PASSED tests/test_diff_report_service.py::test_r_cmp_005_16_1_failed_markdown_write_leaves_no_file
+PASSED tests/test_diff_report_service.py::test_r_cmp_005_16_2_failed_html_write_leaves_no_file
+PASSED tests/test_before_after_report.py::test_r_before_after_report_001_11_2_bkey_no_project_status
+PASSED tests/test_before_after_report.py::test_r_before_after_report_001_24_1_symbols_from_loaded_a2l
+PASSED tests/test_before_after_report.py::test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden
+PASSED tests/test_diff_report_service.py::test_r_cmp_005_16_3_stale_part_file_is_not_touched
+PASSED tests/test_before_after_report.py::test_r_before_after_report_001_11_1_no_project_reason_exact_text
+PASSED tests/test_diff_report_service.py::test_r_cmp_005_16_5_planted_link_at_part_name_is_not_followed
+PASSED tests/test_diff_report_service.py::test_symbol_annotation_only_intersecting_run
+PASSED tests/test_diff_report_service.py::test_tc318_hostile_filter_name_sanitized_md_html
+PASSED tests/test_flow_a2b_b94.py::test_tc_b94_24_a2b_report_states_each_inputs_provenance
+PASSED tests/test_report_field_census.py::test_mode_b_cell_guard_flags_a_planted_cell
+PASSED tests/test_before_after_report.py::test_r_cmp_003_2_1_bkey_no_mac_is_absent
+PASSED tests/test_before_after_report.py::test_r_cmp_003_2_2_composer_without_a2l_is_absent
+PASSED tests/test_before_after_report.py::test_r_before_after_report_001_35_2_bkey_artifact_lines
+PASSED tests/test_report_field_census.py::test_mode_b_in_a_table_cell_is_still_forbidden_at_every_call_site
+PASSED tests/test_before_after_report.py::test_r_before_after_report_001_24_3_bkey_symbols
+PASSED tests/test_before_after_report.py::test_r_cmp_005_16_4_before_after_failed_write_leaves_no_file
+PASSED tests/test_before_after_report.py::test_r_cmp_005_17_2_before_after_html_failure_removes_markdown
+PASSED tests/test_before_after_report.py::test_r_cmp_005_17_3_bkey_html_failure_status[raise]
+PASSED tests/test_diff_report_service.py::test_r_cmp_005_16_3_report_control_failed_write_status[-diff-report.html]
+PASSED tests/test_before_after_report.py::test_r_cmp_005_16_3_bkey_failed_write_status
+PASSED tests/test_diff_report_service.py::test_r_cmp_004_14_4_html_window_over_64_kib
+PASSED tests/test_diff_report_service.py::test_r_cmp_005_17_1_ab_html_failure_removes_markdown
+PASSED tests/test_diff_report_service.py::test_tc312_audit_header_first_block_fixed_format
+PASSED tests/test_diff_report_service.py::test_r_cmp_005_16_3_report_control_failed_write_status[-diff-report.md]
+PASSED tests/test_before_after_report.py::test_r_cmp_005_17_3_bkey_html_failure_status[refuse]
+PASSED tests/test_before_after_report.py::test_r_before_after_report_001_35_3_bkey_loaded_mac_is_used
+PASSED tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally
+PASSED tests/test_tui_report_filter_surface.py::test_at_053b_hostile_valid_filter_proceeds_sanitized_everywhere
+66 passed in 23.88s
+exit=0

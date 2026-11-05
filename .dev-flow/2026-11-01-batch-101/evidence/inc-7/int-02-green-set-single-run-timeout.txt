@@ -1,0 +1,16 @@
+$ git rev-parse --short HEAD: 9508239
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc7\s19_app\__init__.py
+$ python -m pytest -q -rfE -m not serial_timing tests/test_b100_busy.py tests/test_b99_editor_image.py tests/test_b99_staging.py tests/test_before_after_report.py tests/test_changes_symbol_entries.py tests/test_diff_report_service.py tests/test_engine_unchanged.py tests/test_entropy_service.py tests/test_flow_a2b_b94.py tests/test_flow_report_ac6_golden.py tests/test_id_registry.py tests/test_render_hexview.py tests/test_report_addendum_bound.py tests/test_report_document_bound.py tests/test_report_field_census.py tests/test_report_markup_safety.py tests/test_report_off_ui_thread.py tests/test_report_producer_bound.py tests/test_report_service.py tests/test_report_symbol_escape.py tests/test_requirements_canon.py tests/test_suite_hygiene.py tests/test_tui_check_chain_b94.py tests/test_tui_check_editor.py tests/test_tui_commandbar.py tests/test_tui_diff_screen.py tests/test_tui_directionb.py tests/test_tui_flow_builder_b94.py tests/test_tui_map_big.py tests/test_tui_patch_json.py tests/test_tui_report_filter_surface.py tests/test_tui_report_seam.py
+.........................................s.............................. [  5%]
+........................................................................ [ 11%]
+.........F.............................................................. [ 17%]
+........................................................................ [ 23%]
+.........................................F.........FF................... [ 29%]
+........................................................................ [ 35%]
+........................................................................ [ 40%]
+........................................................................ [ 46%]
+........................................................................ [ 52%]
+........................................................................ [ 58%]
+........................................................................ [ 64%]
+............................F.......FF.................................. [ 70%]
+....exit=124

@@ -1,0 +1,107 @@
+$ env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<TMP>/s19c7/la timeout 2400 python -m pytest -q -rA tests/test_diff_report_service.py::test_r_cmp_005_16_3_stale_part_file_is_not_touched tests/test_diff_report_service.py::test_r_cmp_005_16_5_planted_link_at_part_name_is_not_followed --basetemp <TMP>/s19c7/bt -p no:cacheprovider
+UTC 2026-11-05T18:24:27Z  head 90ea8ae
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc7\s19_app\__init__.py
+FF                                                                       [100%]
+================================== FAILURES ===================================
+_____________ test_r_cmp_005_16_3_stale_part_file_is_not_touched ______________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19c7/bt/test_r_cmp_005_16_3_stale_part0')
+
+    def test_r_cmp_005_16_3_stale_part_file_is_not_touched(tmp_path: Path) -> None:
+        """A ``.part`` file left by another writer is never overwritten or
+        removed: it keeps its bytes (E3 round 2, N-1). Since E5 C-1 the staging
+        name is ``<name>.<random>.part``, so a stale file at the old guessable
+        ``<name>.part`` no longer collides: the report is written whole under its
+        own name beside it, and no other file is left."""
+        reports = tmp_path / "reports"
+        reports.mkdir()
+        planted = reports / "20260611T120000Z-diff-report.md.part"
+        planted.write_bytes(b"ANOTHER WRITER")
+    
+>       result = generate_diff_report(
+            _comparison(), mem_map_a=_mem(0x100, 1, 4), mem_map_b=_mem(0x100, 2, 4),
+            project_dir=tmp_path, now_fn=_fixed_clock,
+        )
+
+tests\test_diff_report_service.py:1821: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+s19_app\tui\services\diff_report_service.py:1885: in generate_diff_report
+    _write_report(target, "\n".join(lines))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+target = WindowsPath('<HOME>/AppData/Local/Temp/s19c7/bt/test_r_cmp_005_16_3_stale_part0/reports/20260611T120000Z-diff-report.md')
+text = '# Diff report\n\n- Generated (UTC): 2026-06-11T12:00:00+00:00\n- Tool version: 1.0.0rc1\n- Image A: A\\.s19 [external...            |................|\n0x00000100  02 02 02 02                                      |................|\n```\n'
+
+    def _write_report(target: Path, text: str) -> None:
+        """
+        Summary:
+            Write a report file whole or not at all (R-CMP-005.16): the text goes to
+            ``<target>.part`` (exclusive create, UTF-8) and ``os.replace`` moves it
+            onto ``target``. On any exception after the exclusive open succeeded
+            the ``.part`` file is removed and the error re-raised. A ``.part`` file
+            this run did not create stays in place and ``FileExistsError``
+            propagates.
+    
+        Args:
+            target (Path): Final report path.
+            text (str): The whole report text.
+    
+        Returns:
+            None
+    
+        Raises:
+            OSError: Any write or rename failure (``FileExistsError`` when a
+                ``.part`` file already exists).
+    
+        Dependencies:
+            Used by:
+                - generate_diff_report
+                - generate_diff_report_html
+        """
+        part = target.with_name(target.name + ".part")
+>       handle = open(part, "x", encoding="utf-8")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileExistsError: [Errno 17] File exists: '<HOME>\\AppData\\Local\\Temp\\s19c7\\bt\\test_r_cmp_005_16_3_stale_part0\\reports\\20260611T120000Z-diff-report.md.part'
+
+s19_app\tui\services\diff_report_service.py:341: FileExistsError
+________ test_r_cmp_005_16_5_planted_link_at_part_name_is_not_followed ________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19c7/bt/test_r_cmp_005_16_5_planted_li0')
+
+    def test_r_cmp_005_16_5_planted_link_at_part_name_is_not_followed(
+        tmp_path: Path,
+    ) -> None:
+        """A dangling link planted at the guessable staging name ``<name>.part``
+        is never followed (E5 C-1, security finding S5-1): the file it points to
+        is not created, the link is left as it was, and the report is written
+        whole under its own name as a regular file. Base (fixed name, exclusive
+        create): on Windows ``CreateFile(CREATE_NEW)`` follows the link, writes
+        the report into its target and moves the link onto the report's name."""
+        reports = tmp_path / "reports"
+        reports.mkdir()
+        name = "20260611T120000Z-diff-report.md"
+        elsewhere = tmp_path / "elsewhere.txt"
+        link = reports / (name + ".part")
+        try:
+            os.symlink(elsewhere, link)
+        except (OSError, NotImplementedError) as exc:
+            pytest.skip(f"symbolic links cannot be created on this host: {exc}")
+    
+        result = generate_diff_report(
+            _comparison(), mem_map_a=_mem(0x100, 1, 4), mem_map_b=_mem(0x100, 2, 4),
+            project_dir=tmp_path, now_fn=_fixed_clock,
+        )
+    
+>       assert not os.path.lexists(elsewhere), "the planted link was followed"
+E       AssertionError: the planted link was followed
+E       assert not True
+E        +  where True = <function lexists at 0x00000217E97ACF40>(WindowsPath('<HOME>/AppData/Local/Temp/s19c7/bt/test_r_cmp_005_16_5_planted_li0/elsewhere.txt'))
+E        +    where <function lexists at 0x00000217E97ACF40> = <module 'ntpath' (frozen)>.lexists
+E        +      where <module 'ntpath' (frozen)> = os.path
+
+tests\test_diff_report_service.py:1856: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_diff_report_service.py::test_r_cmp_005_16_3_stale_part_file_is_not_touched
+FAILED tests/test_diff_report_service.py::test_r_cmp_005_16_5_planted_link_at_part_name_is_not_followed
+2 failed in 0.61s
+exit=1

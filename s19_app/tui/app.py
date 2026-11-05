@@ -5727,6 +5727,16 @@ class S19TuiApp(App):
         # F-10: the active-project dir is resolved BEFORE the begin, so nothing
         # that can raise sits between the begin and the dispatch.
         project_dir = self._active_project_dir()
+        # R-BEFORE-AFTER-REPORT-001.24/.35: the A2L and MAC the session holds,
+        # gathered on the UI thread (a worker reading them would race a load).
+        # "No MAC loaded" is mac_path None, never an empty list (R-CMP-003.2).
+        report_a2l_data = self.current_a2l_data
+        report_a2l_records = self._compute_a2l_enriched_tags() or None
+        report_mac_records = (
+            loaded.mac_records
+            if loaded is not None and loaded.mac_path is not None
+            else None
+        )
         gen = self._busy_begin_action("before_after")
         self._start_before_after_worker(
             loaded.path if loaded is not None else None,
@@ -5734,6 +5744,9 @@ class S19TuiApp(App):
             report_filter,
             loaded.path.name if loaded is not None else "-",
             gen=gen,
+            a2l_data=report_a2l_data,
+            a2l_records=report_a2l_records,
+            mac_records=report_mac_records,
         )
 
     @work(thread=True, exclusive=True, group="before_after_report")
@@ -5745,6 +5758,9 @@ class S19TuiApp(App):
         source_name: str,
         *,
         gen: int,
+        a2l_data: Optional[dict] = None,
+        a2l_records: Optional[Sequence[dict]] = None,
+        mac_records: Optional[Sequence[dict]] = None,
     ) -> None:
         """
         Summary:
@@ -5768,6 +5784,12 @@ class S19TuiApp(App):
                 from a worker would race a concurrent load.
             gen (int): The busy run's generation from ``_busy_begin_action``
                 (keyword-only; Inc 12a S-m), passed to every ``end_busy``.
+            a2l_data (Optional[dict]): The loaded A2L payload, or ``None``
+                (gathered on the UI thread by the caller).
+            a2l_records (Optional[Sequence[dict]]): The A2L enriched tags, or
+                ``None`` when there are none.
+            mac_records (Optional[Sequence[dict]]): The loaded MAC records, or
+                ``None`` when no MAC file is loaded.
 
         Returns:
             None: Effects only — the written report pair, a log line, the
@@ -5792,6 +5814,9 @@ class S19TuiApp(App):
                     project_dir=project_dir,
                     workarea=self.workarea,
                     report_filter=report_filter,
+                    a2l_data=a2l_data,
+                    a2l_records=a2l_records,
+                    mac_records=mac_records,
                 )
             except Exception as exc:
                 self.logger.exception("Before/after report failed: %s", exc)
@@ -7893,6 +7918,20 @@ class S19TuiApp(App):
             Used by:
                 - ``on_ab_diff_panel_report_requested``
         """
+        # R-CMP-005.17: set only after the Markdown file is written, so a
+        # Markdown refusal or exception removes nothing.
+        md_written_path: Optional[Path] = None
+
+        def _drop_orphan_md() -> None:
+            if md_written_path is None:
+                return
+            try:
+                md_written_path.unlink(missing_ok=True)
+            except OSError as exc:
+                self.logger.warning(
+                    "report kind=diff orphan not removed: %s", type(exc).__name__
+                )
+
         try:
             try:
                 md = generate_diff_report(result, **kwargs)
@@ -7906,10 +7945,12 @@ class S19TuiApp(App):
                     )
                     self.call_from_thread(panel.set_status, text, "sev-error")
                     return
+                md_written_path = md.path
                 self.call_from_thread(self.step_busy, "diff_report", gen, 2)
                 html = generate_diff_report_html(result, **kwargs)
             except Exception as exc:
                 self.logger.exception("Diff report failed: %s", exc)
+                _drop_orphan_md()
                 self._log_report_event(
                     "diff", diff_source, "-", f"failed: {type(exc).__name__}",
                     ok=False,
@@ -7919,6 +7960,7 @@ class S19TuiApp(App):
                 self.call_from_thread(panel.set_status, text, "sev-error")
                 return
             if not html.written:
+                _drop_orphan_md()
                 text = "HTML report refused: " + "; ".join(html.diagnostics)
                 self._log_report_event(
                     "diff", diff_source, "-", "refused (html)", ok=False

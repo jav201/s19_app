@@ -413,6 +413,16 @@ def test_at_b94_18_hostile_names_render_literally(tmp_path: Path) -> None:
     ]
     assert len(image_lines) == 1
     label_part = image_lines[0].split(" [external]")[0]
+    # batch-101 Inc 7 E5 C-5 (R-CMP-004.9.1/9): the flow-produced input's
+    # label is escaped once by the generator, never twice (no ``\\.``).
+    flow_lines = [
+        ln for ln in report_text.splitlines() if ln.startswith("- Image A:")
+    ]
+    assert flow_lines == [
+        "- Image A: source\\.out [flow] path=`block 1 (source).out` "
+        "parse-errors=0"
+    ]
+    assert "\\\\" not in flow_lines[0]
     assert "[red]" not in label_part and "\\[red\\]" in label_part
     normalized = report_text.replace("\r\n", "\n")
     assert _control_bytes(normalized) == []
