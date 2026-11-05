@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 88 requirement files | corpus digest: 57283a33ee7dd3f2 -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 89 requirement files | corpus digest: db4c96438f198b97 -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -1522,7 +1522,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 2360 unique id(s)
+## family US/HLR/LLR — 2364 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -2986,6 +2986,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `LLR-170.1` | batches, canon, tests |
 | `LLR-170.2` | batches, tests |
 | `LLR-170.3` | batches, tests |
+| `LLR-171` | batches |
 | `LLR-171.1` | batches, canon, tests |
 | `LLR-171.1a` | batches, tests |
 | `LLR-171.1b` | batches |
@@ -3868,11 +3869,14 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-P4` | batches, tests |
 | `US-P5` | batches, tests |
 | `US-P6` | batches, tests |
+| `US-PROJ-SAVE-1` | batches |
+| `US-PROJ-SYNC-1` | batches |
 | `US-TST-1` | batches |
 | `US-TST-2` | batches |
 | `US-TST-3` | batches |
 | `US-TST-4` | batches |
 | `US-TST-5` | batches, tests |
+| `US-TST-PAINT-1` | batches |
 | `US-U8` | batches, tests |
 | `US-V1` | batches |
 | `US-V1..V8` | batches |
@@ -3887,7 +3891,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-less` | batches |
 | `US-nnn` | batches |
 
-## family R — 527 unique id(s)
+## family R — 532 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -4142,7 +4146,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `R-PE-110` | canon |
 | `R-PE-111` | canon |
 | `R-PROJ-001` | batches, canon, tests |
-| `R-PROJ-002` | batches, canon |
+| `R-PROJ-002` | batches, canon, tests |
 | `R-PROJCHK-1` | canon |
 | `R-PROJCHK-10` | canon |
 | `R-PROJCHK-11` | canon |
@@ -4265,6 +4269,11 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `R-TST-082` | batches |
 | `R-TST-090` | batches |
 | `R-TST-091` | batches |
+| `R-TST-11` | batches |
+| `R-TST-110` | batches, tests |
+| `R-TST-111` | batches, tests |
+| `R-TST-112` | batches, tests |
+| `R-TST-113` | batches, tests |
 | `R-TUI-001` | batches, canon |
 | `R-TUI-002` | batches, canon |
 | `R-TUI-003` | batches |

@@ -1,0 +1,16 @@
+LAN Linux host, merged tree b7b77c4 (main aa17f85 + Inc 3), 20 test files (touched by Inc 3, importers of project_gather_service / the sync functions, id registry, hygiene, placement and engine guards, canon)
+ 14:23:57 up 2 days, 21:28,  2 users,  load average: 0.47, 1.94, 2.88
+<HOME>/work/s19_merge3/s19_app/__init__.py
+........................................................................ [ 79%]
+........................................................................ [ 85%]
+....................................................................s... [ 91%]
+........................................................................ [ 97%]
+...............................                                          [100%]
+1088 passed, 94 skipped, 1 xfailed in 1378.80s (0:22:58)
+---serial---
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier truncated  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[truncated]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier v1-document  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document]
+100.0%  0.000 s / 1.000 s  TC-B100-24 batch  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[batch]
+100.0%  0.000 s / 1.000 s  TC-B100-24 gathered  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[gathered]
+QC-TM: 70 bounds, 0 under 20 % margin
+51 passed, 2 skipped, 1183 deselected in 226.13s (0:03:46)

@@ -172,6 +172,11 @@
       "station": "P3",
       "date": "2026-11-05",
       "decision": "P3 increment 008 (Inc 8, external-step copy and in-place reads, CRC model and refusal reasons) approved and merged at 2a70774 under the standing authorization: mutants 20/20; code-reviewer FAIL (F1 recursion crash, F2 check order) then PASS on re-review; security-reviewer PASS-WITH-NOTES (S8-1, S8-2 routed to Inc 9); coverage 99 cases, 96 covered, 3 partial; trace_check 0 gaps. Merge verified on the LAN Linux host: 1774 passed, 1 failed (known 056e); serial 1 load flake, 2/2 on rerun (evidence/merge/lan-merge-inc7-inc8.txt). CRC release note in inc-8/release-note-crc.md."
+    },
+    {
+      "station": "P3",
+      "date": "2026-11-05",
+      "decision": "P3 increment 003 (Inc 3, gather once per name without resolve, no folder re-creation on sync, panel-paint timing verifiers R-TST-110..113) approved and merged at b7b77c4 under the standing authorization: mutants 14/14 (Windows junction arms on Windows, the rest on the LAN Linux host); code-reviewer and security-reviewer PASS-WITH-NOTES; coverage 30 cases covered (27 full, 3 partial); save-project 5/5 on Windows and 5/5 on Linux under 0.8 s; trace_check 0 gaps. Merge verified on the LAN Linux host: 1088 passed, 0 failed; serial lane 51 passed, 0 bounds under 20 % margin (evidence/merge/lan-merge-inc3.txt)."
     }
   ],
   "obsidian_synced": false,
