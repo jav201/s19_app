@@ -1,0 +1,4 @@
+E1 start 2026-11-05T20:24Z model=opus base=b7b77c4
+E2 start 2026-11-05T20:40Z model=opus (baseline graph in parallel with E1)
+E1 end 2026-11-05T20:50Z model=opus (20 active rows: 9 new/changed + 11 canon verified, 1 withdrawn by split; 34 TC; slice 17 items in 3 files; decisions D-1..D-4 owed)
+E2 end 2026-11-05T20:50Z model=opus (graph-inc13.md: 13 G1 + 2 G2 + 2 G3 changed/new nodes, 9 context nodes, interfaces I-1..I-8)
