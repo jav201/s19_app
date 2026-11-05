@@ -1,0 +1,43 @@
+# int-00: superseded first attempts (kept for the record; see E4-integration-notes.md)
+## (a) int-02 first run: before the docstring/N-3(c) edits, on the first E4 commit (later redone without .pyc as b2b3c05)
+# int-02: the 4 touched test files, parallel-lane selection (not serial_timing), run serially
+# cmd: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<TMP>/la timeout 2400 python -m pytest -p no:cacheprovider -q -rs -m not serial_timing tests/test_project_gather.py tests/test_b100_active_variant.py tests/test_b100_workers.py tests/test_b100_project_check.py --basetemp <TMP>/bt2
+# HEAD f41da06 + uncommitted E4-integration test edits (git diff --stat below)
+ tests/support/suite_census.py    | 10 +++++++---
+ tests/test_b100_project_check.py | 39 ++++++++++++++++++++-------------------
+ tests/test_b97_flow_execution.py |  1 +
+ tests/test_suite_hygiene.py      |  5 ++++-
+ 4 files changed, 32 insertions(+), 23 deletions(-)
+# start 2026-11-05T16:23:56Z
+s19_app.__file__ = C:\Users\<USER>\Github\s19_app-b101-inc3\s19_app\__init__.py
+3.11.15 | packaged by Anaconda, Inc. | (main, Jun 11 2026, 15:12:53) [MSC v.1942 64 bit (AMD64)]
+........................................................................ [ 28%]
+.............................................x.......................... [ 57%]
+........................................................................ [ 86%]
+.................................                                        [100%]
+248 passed, 23 deselected, 1 xfailed in 1594.81s (0:26:34)
+# exit 0
+# end 2026-11-05T16:50:35Z
+
+## (b) combined guards+importers run: hit the 2400 s cap (exit 124); its 3 F marks are the engine-frozen guards, red because the first E4 commit carried .pyc files
+# int-04: hygiene, id registry, law guards (engine-frozen), and every test importing project_gather_service (other than the touched file), not serial_timing
+# cmd: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<TMP>/la timeout 2400 python -m pytest -p no:cacheprovider -q -rs -m not serial_timing tests/test_suite_hygiene.py tests/test_id_registry.py tests/test_engine_unchanged.py tests/test_tui_directionb.py tests/test_b100_document.py tests/test_b100_load_question.py tests/test_b100_project_homes.py tests/test_b100_reuse.py tests/test_b100_save_dialog.py tests/test_b100_save_guards.py tests/test_b100_save_image.py tests/test_b97_chips_help.py tests/test_b99_staging.py tests/test_copy_into_workarea_content_dedup.py tests/test_open_folder_chips.py --basetemp <TMP>/bt4
+# HEAD f41da06 + uncommitted E4-integration test edits (git diff --stat below)
+ tests/support/suite_census.py    | 10 +++++++---
+ tests/test_b100_project_check.py | 39 ++++++++++++++++++++-------------------
+ tests/test_b97_flow_execution.py |  1 +
+ tests/test_suite_hygiene.py      |  5 ++++-
+ 4 files changed, 32 insertions(+), 23 deletions(-)
+# start 2026-11-05T16:23:57Z
+s19_app.__file__ = C:\Users\<USER>\Github\s19_app-b101-inc3\s19_app\__init__.py
+3.11.15 | packaged by Anaconda, Inc. | (main, Jun 11 2026, 15:12:53) [MSC v.1942 64 bit (AMD64)]
+........................................................................ [  6%]
+....F................................................................... [ 13%]
+........................................................................ [ 20%]
+.FF..................................................................... [ 27%]
+........................................................................ [ 34%]
+........................................................................ [ 41%]
+........................................................................ [ 48%]
+........................................................................ [ 55%]
+..............................................................# exit 124
+# end 2026-11-05T17:03:57Z

@@ -1,0 +1,1115 @@
+tree clean before mutant (equals staged head state)
+applied M-3
+ s19_app/tui/app.py | 1 +
+ 1 file changed, 1 insertion(+)
++            project_dir.mkdir(parents=True, exist_ok=True)
+s19_app.__file__ <HOME>/work/s19_inc3/s19_app/__init__.py 3.11.18
+CMD: cd ~/work/s19_inc3 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 1800 /data/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -rA tests/test_b100_workers.py -k 'r_proj_002_12 or r_proj_002_14 or tc_b100_54'
+...........FFF...FFF.                                                    [100%]
+=================================== FAILURES ===================================
+_ test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted[deleted-s19] _
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s0')
+case = 'deleted-s19'
+
+    @pytest.mark.parametrize("case", _VANISHED_CASES)
+    def test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted(
+        tmp_path: Path, case: str
+    ) -> None:
+        """The open project's folder is gone (deleted, or a regular file stands in
+        its place) when a data-file load syncs into the project: the load still
+        ends ``Loaded other.<ext>``, the refusal line is painted exactly once, no
+        variant is reported added or opened, the app keeps running and no run is
+        left. The three ``file-in-place`` arms hold on the base tree; the three
+        ``deleted`` arms are the new behaviour.
+    
+        Why: a deleted folder used to be re-created, read as empty and filled
+        with a fresh project.json, and the user was told ``Added variant``.
+    
+        Negative control: the base re-creates the folder before reading it, so
+        the ``deleted`` arms see ``Added variant`` / ``manifest verified`` and no
+        refusal."""
+        standing, kind = case.rsplit("-", 1)
+        exited, lines, runs, _exists = _file_load_into_vanished_project(tmp_path, kind, standing)
+        assert not exited, lines
+>       assert lines.count(SYNC_REFUSAL) == 1, lines
+E       AssertionError: ['Project saved + manifest verified', "Project 'P2' now opens other.s19", "Added variant 'other' to project 'P2'", 'Loaded other.s19']
+E       assert 0 == 1
+E        +  where 0 = <built-in method count of list object at 0x7fbaf3fdda80>("Project sync NOT done: project 'P2' could not be read — check that the folder can be opened, then load again.")
+E        +    where <built-in method count of list object at 0x7fbaf3fdda80> = ['Project saved + manifest verified', "Project 'P2' now opens other.s19", "Added variant 'other' to project 'P2'", 'Loaded other.s19'].count
+
+tests/test_b100_workers.py:3955: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s0/app workarea=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s0/app/.s19tool/workarea
+INFO     s19tui:app.py:8263 Workarea refreshed. files=0
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+WARNING  s19tui:app.py:13840 Project P2: no project.json project.json (None)
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18599 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s0/app/.s19tool/workarea/P2/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14099 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:14035 Project loaded. name=P2 file=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s0/app/.s19tool/workarea/P2/firmware.s19 mac=None
+INFO     s19tui:app.py:18727 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19747 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17620 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17675 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19261 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.011
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s0/app/.s19tool/workarea/P2/firmware.s19 file_type=s19 elapsed_seconds=0.361 has_mac=False precomputed=False
+INFO     s19tui:app.py:15423 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s0/src/other.s19
+INFO     s19tui:app.py:15444 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s0/src/other.s19
+INFO     s19tui:app.py:15457 Load phase boundary: copy_done path=other.s19 elapsed=0.001s
+WARNING  s19tui:app.py:15476 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s0/src/other.s19'
+INFO     s19tui:app.py:8263 Workarea refreshed. files=1
+INFO     s19tui:app.py:15494 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s0/app/.s19tool/workarea/temp/other.s19 size_bytes=302 copy_seconds=0.001
+INFO     s19tui:app.py:15500 Load phase boundary: worker_spawned path=other.s19
+INFO     s19tui:app.py:18383 Load phase boundary: worker_parse_start path=other.s19
+INFO     s19tui:app.py:17767 Loading file: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s0/app/.s19tool/workarea/temp/other.s19 suffix=.s19 project=P2
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=other.s19 suffix=.s19
+INFO     s19tui:app.py:18599 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s0/app/.s19tool/workarea/temp/other.s19 addresses=82 range_count=3 range_bytes=82 errors=0
+INFO     s19tui:app.py:14099 Load phase boundary: parse_branch_done path=other.s19 branch=s19
+INFO     s19tui:app.py:18402 Load phase boundary: worker_parse_done path=other.s19 elapsed=0.006s
+INFO     s19tui:app.py:18226 Load phase boundary: prepare_entry path=other.s19 file_type=s19
+INFO     s19tui:app.py:18261 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17620 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18270 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18290 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18297 Load phase boundary: prepare_bases_done row_bases=6
+INFO     s19tui:app.py:18307 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18313 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:18435 Load phase boundary: worker_compute_done path=other.s19 precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:18442 Load phase boundary: call_from_thread_apply_dispatched path=other.s19
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=other.s19 precomputed=True
+INFO     s19tui:app.py:18727 Sections updated. count=3 rendered_ranges=3 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=other.s19
+INFO     s19tui:app.py:15020 Appended variant 'other' into project: /tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s0/app/.s19tool/workarea/P2
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=other.s19
+INFO     s19tui:app.py:19747 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19261 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=other.s19
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=3
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s0/app/.s19tool/workarea/temp/other.s19 file_type=s19 elapsed_seconds=0.542 has_mac=False precomputed=True
+_ test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted[deleted-hex] _
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s1')
+case = 'deleted-hex'
+
+    @pytest.mark.parametrize("case", _VANISHED_CASES)
+    def test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted(
+        tmp_path: Path, case: str
+    ) -> None:
+        """The open project's folder is gone (deleted, or a regular file stands in
+        its place) when a data-file load syncs into the project: the load still
+        ends ``Loaded other.<ext>``, the refusal line is painted exactly once, no
+        variant is reported added or opened, the app keeps running and no run is
+        left. The three ``file-in-place`` arms hold on the base tree; the three
+        ``deleted`` arms are the new behaviour.
+    
+        Why: a deleted folder used to be re-created, read as empty and filled
+        with a fresh project.json, and the user was told ``Added variant``.
+    
+        Negative control: the base re-creates the folder before reading it, so
+        the ``deleted`` arms see ``Added variant`` / ``manifest verified`` and no
+        refusal."""
+        standing, kind = case.rsplit("-", 1)
+        exited, lines, runs, _exists = _file_load_into_vanished_project(tmp_path, kind, standing)
+        assert not exited, lines
+>       assert lines.count(SYNC_REFUSAL) == 1, lines
+E       AssertionError: ['Project saved + manifest verified', "Project 'P2' now opens other.hex", "Added variant 'other' to project 'P2'", 'Loaded other.hex']
+E       assert 0 == 1
+E        +  where 0 = <built-in method count of list object at 0x7fbaf3909b40>("Project sync NOT done: project 'P2' could not be read — check that the folder can be opened, then load again.")
+E        +    where <built-in method count of list object at 0x7fbaf3909b40> = ['Project saved + manifest verified', "Project 'P2' now opens other.hex", "Added variant 'other' to project 'P2'", 'Loaded other.hex'].count
+
+tests/test_b100_workers.py:3955: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s1/app workarea=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s1/app/.s19tool/workarea
+INFO     s19tui:app.py:8263 Workarea refreshed. files=0
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+WARNING  s19tui:app.py:13840 Project P2: no project.json project.json (None)
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18599 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s1/app/.s19tool/workarea/P2/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14099 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:14035 Project loaded. name=P2 file=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s1/app/.s19tool/workarea/P2/firmware.s19 mac=None
+INFO     s19tui:app.py:18727 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19747 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17620 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17675 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19261 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.011
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s1/app/.s19tool/workarea/P2/firmware.s19 file_type=s19 elapsed_seconds=0.373 has_mac=False precomputed=False
+INFO     s19tui:app.py:15423 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s1/src/other.hex
+INFO     s19tui:app.py:15444 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s1/src/other.hex
+INFO     s19tui:app.py:15457 Load phase boundary: copy_done path=other.hex elapsed=0.001s
+WARNING  s19tui:app.py:15476 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s1/src/other.hex'
+INFO     s19tui:app.py:8263 Workarea refreshed. files=1
+INFO     s19tui:app.py:15494 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s1/app/.s19tool/workarea/temp/other.hex size_bytes=32 copy_seconds=0.001
+INFO     s19tui:app.py:15500 Load phase boundary: worker_spawned path=other.hex
+INFO     s19tui:app.py:18383 Load phase boundary: worker_parse_start path=other.hex
+INFO     s19tui:app.py:17767 Loading file: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s1/app/.s19tool/workarea/temp/other.hex suffix=.hex project=P2
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=other.hex suffix=.hex
+INFO     s19tui:app.py:18599 Load summary: file_type=hex path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s1/app/.s19tool/workarea/temp/other.hex addresses=4 range_count=1 range_bytes=4 errors=0
+INFO     s19tui:app.py:14116 Load phase boundary: parse_branch_done path=other.hex branch=hex
+INFO     s19tui:app.py:18402 Load phase boundary: worker_parse_done path=other.hex elapsed=0.009s
+INFO     s19tui:app.py:18226 Load phase boundary: prepare_entry path=other.hex file_type=hex
+INFO     s19tui:app.py:18261 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17620 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18270 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18290 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18297 Load phase boundary: prepare_bases_done row_bases=1
+INFO     s19tui:app.py:18307 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18313 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:18435 Load phase boundary: worker_compute_done path=other.hex precomputed=True elapsed=0.000s
+INFO     s19tui:app.py:18442 Load phase boundary: call_from_thread_apply_dispatched path=other.hex
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=other.hex precomputed=True
+INFO     s19tui:app.py:18727 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=other.hex
+INFO     s19tui:app.py:15020 Appended variant 'other' into project: /tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s1/app/.s19tool/workarea/P2
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=other.hex
+INFO     s19tui:app.py:19747 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19261 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=other.hex
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s1/app/.s19tool/workarea/temp/other.hex file_type=hex elapsed_seconds=0.195 has_mac=False precomputed=True
+_ test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted[deleted-mac] _
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s2')
+case = 'deleted-mac'
+
+    @pytest.mark.parametrize("case", _VANISHED_CASES)
+    def test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted(
+        tmp_path: Path, case: str
+    ) -> None:
+        """The open project's folder is gone (deleted, or a regular file stands in
+        its place) when a data-file load syncs into the project: the load still
+        ends ``Loaded other.<ext>``, the refusal line is painted exactly once, no
+        variant is reported added or opened, the app keeps running and no run is
+        left. The three ``file-in-place`` arms hold on the base tree; the three
+        ``deleted`` arms are the new behaviour.
+    
+        Why: a deleted folder used to be re-created, read as empty and filled
+        with a fresh project.json, and the user was told ``Added variant``.
+    
+        Negative control: the base re-creates the folder before reading it, so
+        the ``deleted`` arms see ``Added variant`` / ``manifest verified`` and no
+        refusal."""
+        standing, kind = case.rsplit("-", 1)
+        exited, lines, runs, _exists = _file_load_into_vanished_project(tmp_path, kind, standing)
+        assert not exited, lines
+>       assert lines.count(SYNC_REFUSAL) == 1, lines
+E       AssertionError: ['Project saved + manifest verified', 'Loaded other.mac']
+E       assert 0 == 1
+E        +  where 0 = <built-in method count of list object at 0x7fbaf3cc4e80>("Project sync NOT done: project 'P2' could not be read — check that the folder can be opened, then load again.")
+E        +    where <built-in method count of list object at 0x7fbaf3cc4e80> = ['Project saved + manifest verified', 'Loaded other.mac'].count
+
+tests/test_b100_workers.py:3955: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s2/app workarea=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s2/app/.s19tool/workarea
+INFO     s19tui:app.py:8263 Workarea refreshed. files=0
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+WARNING  s19tui:app.py:13840 Project P2: no project.json project.json (None)
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18599 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s2/app/.s19tool/workarea/P2/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14099 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:14035 Project loaded. name=P2 file=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s2/app/.s19tool/workarea/P2/firmware.s19 mac=None
+INFO     s19tui:app.py:18727 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19747 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:17620 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17675 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19261 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.011
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s2/app/.s19tool/workarea/P2/firmware.s19 file_type=s19 elapsed_seconds=0.578 has_mac=False precomputed=False
+INFO     s19tui:app.py:15423 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s2/src/other.mac
+INFO     s19tui:app.py:15444 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s2/src/other.mac
+INFO     s19tui:app.py:15457 Load phase boundary: copy_done path=other.mac elapsed=0.001s
+WARNING  s19tui:app.py:15476 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s2/src/other.mac'
+INFO     s19tui:app.py:8263 Workarea refreshed. files=1
+INFO     s19tui:app.py:15494 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s2/app/.s19tool/workarea/temp/other.mac size_bytes=32 copy_seconds=0.001
+INFO     s19tui:app.py:15500 Load phase boundary: worker_spawned path=other.mac
+INFO     s19tui:app.py:18383 Load phase boundary: worker_parse_start path=other.mac
+INFO     s19tui:app.py:17767 Loading file: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s2/app/.s19tool/workarea/temp/other.mac suffix=.mac project=P2
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=other.mac suffix=.mac
+INFO     s19tui:app.py:16784 Load phase boundary: mac_parse_entry path=other.mac
+INFO     s19tui:app.py:16790 Load phase boundary: mac_parse_done path=other.mac rows=2 diagnostics=1 elapsed=0.000s
+INFO     s19tui:app.py:16804 MAC parse summary (mirrored): path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s2/app/.s19tool/workarea/temp/other.mac rows=2 parse_ok=1 diagnostics=1 valid_addresses=1
+INFO     s19tui:app.py:16825 Load phase boundary: mac_a2l_resolve_entry path=other.mac a2l_path=None
+INFO     s19tui:app.py:16831 Load phase boundary: mac_a2l_resolve_done path=other.mac has_a2l_data=False
+INFO     s19tui:app.py:16837 MAC parse summary: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s2/app/.s19tool/workarea/temp/other.mac total_records=2 parse_ok=1 diagnostics=1 valid_addresses=1 a2l_path=None elapsed_seconds=0.000
+INFO     s19tui:app.py:14124 Load phase boundary: mac_merge_entry path=other.mac has_primary=True
+INFO     s19tui:app.py:14131 Load phase boundary: mac_merge_done path=other.mac file_type=s19
+INFO     s19tui:app.py:18599 Load summary: file_type=s19+mac path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s2/app/.s19tool/workarea/temp/other.mac addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14153 Load phase boundary: parse_branch_done path=other.mac branch=mac
+INFO     s19tui:app.py:18402 Load phase boundary: worker_parse_done path=other.mac elapsed=0.006s
+INFO     s19tui:app.py:18226 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:18261 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+ERROR    s19_app.core:core.py:361 File not found: /tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s2/app/.s19tool/workarea/P2/firmware.s19
+WARNING  s19tui:app.py:17588 Failed to compute overlap set for /tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s2/app/.s19tool/workarea/P2/firmware.s19: [Errno 2] No such file or directory: '/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s2/app/.s19tool/workarea/P2/firmware.s19'
+INFO     s19tui:app.py:17620 MAC validation computed: records=2 issues=2 elapsed_seconds=0.000
+INFO     s19tui:app.py:18270 Load phase boundary: prepare_mac_payload_done rows=2 issues=2
+INFO     s19tui:app.py:18290 Load phase boundary: prepare_highlights_done highlights=1 out_of_range=0
+INFO     s19tui:app.py:18297 Load phase boundary: prepare_bases_done row_bases=7
+INFO     s19tui:app.py:18307 Load phase boundary: prepare_datatable_done mac_rows=2 widths=(9, 10, 5, 5, 9, 10, 26, 8)
+INFO     s19tui:app.py:18313 Load phase boundary: prepare_done records=2
+INFO     s19tui:app.py:18435 Load phase boundary: worker_compute_done path=other.mac precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:18442 Load phase boundary: call_from_thread_apply_dispatched path=other.mac
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=other.mac precomputed=True
+INFO     s19tui:app.py:18727 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=other.mac
+INFO     s19tui:app.py:14977 Sync skipped: variant 'firmware' already in project /tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s2/app/.s19tool/workarea/P2
+INFO     s19tui:app.py:15041 Synced attached MAC file into project: /tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s2/app/.s19tool/workarea/P2
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=other.mac
+INFO     s19tui:app.py:19747 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:16557 Load phase boundary: populate_issues_table_done rows=2 total=2 elapsed=0.010
+INFO     s19tui:app.py:19312 Load phase boundary: populate_mac_table_done rows=2 total=2 elapsed=0.012
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=other.mac
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s2/app/.s19tool/workarea/temp/other.mac file_type=s19 elapsed_seconds=0.262 has_mac=True precomputed=True
+_ test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[s19] _
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fbafcb340d0>
+kind = 's19'
+
+    @pytest.mark.parametrize("kind", ["s19", "hex", "mac", "a2l"])
+    def test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, kind: str
+    ) -> None:
+        """A load or an A2L attach into an open project whose folder was deleted
+        leaves nothing at the project's path: the sync refuses instead of
+        re-creating the folder (and placing a copy and a fresh project.json into
+        it). For a2l the folder goes during the attach, after the request-time
+        guard passed; the attach still ends A2L loaded: firmware.a2l.
+    
+        Why: the user deleted that folder on purpose or by accident; loading an
+        unrelated file must not bring it back."""
+        if kind == "a2l":
+            _exited, lines, _runs, exists = _a2l_attach_with_the_folder_deleted_mid_attach(
+                tmp_path, monkeypatch
+            )
+            assert lines and lines[-1] == "A2L loaded: firmware.a2l", lines
+        else:
+            _exited, _lines, _runs, exists = _file_load_into_vanished_project(
+                tmp_path, kind, "deleted"
+            )
+>       assert exists is False, "the sync re-created the deleted project folder"
+E       AssertionError: the sync re-created the deleted project folder
+E       assert True is False
+
+tests/test_b100_workers.py:4041: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a0/app workarea=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a0/app/.s19tool/workarea
+INFO     s19tui:app.py:8263 Workarea refreshed. files=0
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.007
+WARNING  s19tui:app.py:13840 Project P2: no project.json project.json (None)
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18599 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a0/app/.s19tool/workarea/P2/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14099 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:14035 Project loaded. name=P2 file=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a0/app/.s19tool/workarea/P2/firmware.s19 mac=None
+INFO     s19tui:app.py:18727 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19747 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:17620 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17675 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:19261 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a0/app/.s19tool/workarea/P2/firmware.s19 file_type=s19 elapsed_seconds=0.517 has_mac=False precomputed=False
+INFO     s19tui:app.py:15423 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a0/src/other.s19
+INFO     s19tui:app.py:15444 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a0/src/other.s19
+INFO     s19tui:app.py:15457 Load phase boundary: copy_done path=other.s19 elapsed=0.001s
+WARNING  s19tui:app.py:15476 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a0/src/other.s19'
+INFO     s19tui:app.py:8263 Workarea refreshed. files=1
+INFO     s19tui:app.py:15494 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a0/app/.s19tool/workarea/temp/other.s19 size_bytes=302 copy_seconds=0.001
+INFO     s19tui:app.py:15500 Load phase boundary: worker_spawned path=other.s19
+INFO     s19tui:app.py:18383 Load phase boundary: worker_parse_start path=other.s19
+INFO     s19tui:app.py:17767 Loading file: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a0/app/.s19tool/workarea/temp/other.s19 suffix=.s19 project=P2
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=other.s19 suffix=.s19
+INFO     s19tui:app.py:18599 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a0/app/.s19tool/workarea/temp/other.s19 addresses=82 range_count=3 range_bytes=82 errors=0
+INFO     s19tui:app.py:14099 Load phase boundary: parse_branch_done path=other.s19 branch=s19
+INFO     s19tui:app.py:18402 Load phase boundary: worker_parse_done path=other.s19 elapsed=0.006s
+INFO     s19tui:app.py:18226 Load phase boundary: prepare_entry path=other.s19 file_type=s19
+INFO     s19tui:app.py:18261 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17620 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18270 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18290 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18297 Load phase boundary: prepare_bases_done row_bases=6
+INFO     s19tui:app.py:18307 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18313 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:18435 Load phase boundary: worker_compute_done path=other.s19 precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:18442 Load phase boundary: call_from_thread_apply_dispatched path=other.s19
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=other.s19 precomputed=True
+INFO     s19tui:app.py:18727 Sections updated. count=3 rendered_ranges=3 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=other.s19
+INFO     s19tui:app.py:15020 Appended variant 'other' into project: /tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a0/app/.s19tool/workarea/P2
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=other.s19
+INFO     s19tui:app.py:19747 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19261 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=other.s19
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=3
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a0/app/.s19tool/workarea/temp/other.s19 file_type=s19 elapsed_seconds=0.492 has_mac=False precomputed=True
+_ test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[hex] _
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fbaf9c9f990>
+kind = 'hex'
+
+    @pytest.mark.parametrize("kind", ["s19", "hex", "mac", "a2l"])
+    def test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, kind: str
+    ) -> None:
+        """A load or an A2L attach into an open project whose folder was deleted
+        leaves nothing at the project's path: the sync refuses instead of
+        re-creating the folder (and placing a copy and a fresh project.json into
+        it). For a2l the folder goes during the attach, after the request-time
+        guard passed; the attach still ends A2L loaded: firmware.a2l.
+    
+        Why: the user deleted that folder on purpose or by accident; loading an
+        unrelated file must not bring it back."""
+        if kind == "a2l":
+            _exited, lines, _runs, exists = _a2l_attach_with_the_folder_deleted_mid_attach(
+                tmp_path, monkeypatch
+            )
+            assert lines and lines[-1] == "A2L loaded: firmware.a2l", lines
+        else:
+            _exited, _lines, _runs, exists = _file_load_into_vanished_project(
+                tmp_path, kind, "deleted"
+            )
+>       assert exists is False, "the sync re-created the deleted project folder"
+E       AssertionError: the sync re-created the deleted project folder
+E       assert True is False
+
+tests/test_b100_workers.py:4041: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a1/app workarea=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a1/app/.s19tool/workarea
+INFO     s19tui:app.py:8263 Workarea refreshed. files=0
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+WARNING  s19tui:app.py:13840 Project P2: no project.json project.json (None)
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18599 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a1/app/.s19tool/workarea/P2/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14099 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:14035 Project loaded. name=P2 file=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a1/app/.s19tool/workarea/P2/firmware.s19 mac=None
+INFO     s19tui:app.py:18727 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19747 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:17620 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17675 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:19261 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a1/app/.s19tool/workarea/P2/firmware.s19 file_type=s19 elapsed_seconds=0.281 has_mac=False precomputed=False
+INFO     s19tui:app.py:15423 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a1/src/other.hex
+INFO     s19tui:app.py:15444 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a1/src/other.hex
+INFO     s19tui:app.py:15457 Load phase boundary: copy_done path=other.hex elapsed=0.003s
+WARNING  s19tui:app.py:15476 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a1/src/other.hex'
+INFO     s19tui:app.py:8263 Workarea refreshed. files=1
+INFO     s19tui:app.py:15494 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a1/app/.s19tool/workarea/temp/other.hex size_bytes=32 copy_seconds=0.003
+INFO     s19tui:app.py:15500 Load phase boundary: worker_spawned path=other.hex
+INFO     s19tui:app.py:18383 Load phase boundary: worker_parse_start path=other.hex
+INFO     s19tui:app.py:17767 Loading file: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a1/app/.s19tool/workarea/temp/other.hex suffix=.hex project=P2
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=other.hex suffix=.hex
+INFO     s19tui:app.py:18599 Load summary: file_type=hex path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a1/app/.s19tool/workarea/temp/other.hex addresses=4 range_count=1 range_bytes=4 errors=0
+INFO     s19tui:app.py:14116 Load phase boundary: parse_branch_done path=other.hex branch=hex
+INFO     s19tui:app.py:18402 Load phase boundary: worker_parse_done path=other.hex elapsed=0.001s
+INFO     s19tui:app.py:18226 Load phase boundary: prepare_entry path=other.hex file_type=hex
+INFO     s19tui:app.py:18261 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17620 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18270 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18290 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18297 Load phase boundary: prepare_bases_done row_bases=1
+INFO     s19tui:app.py:18307 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18313 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:18435 Load phase boundary: worker_compute_done path=other.hex precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:18442 Load phase boundary: call_from_thread_apply_dispatched path=other.hex
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=other.hex precomputed=True
+INFO     s19tui:app.py:18727 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=other.hex
+INFO     s19tui:app.py:15020 Appended variant 'other' into project: /tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a1/app/.s19tool/workarea/P2
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=other.hex
+INFO     s19tui:app.py:19747 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:19261 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=other.hex
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a1/app/.s19tool/workarea/temp/other.hex file_type=hex elapsed_seconds=0.190 has_mac=False precomputed=True
+_ test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[mac] _
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fbaf84ca210>
+kind = 'mac'
+
+    @pytest.mark.parametrize("kind", ["s19", "hex", "mac", "a2l"])
+    def test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, kind: str
+    ) -> None:
+        """A load or an A2L attach into an open project whose folder was deleted
+        leaves nothing at the project's path: the sync refuses instead of
+        re-creating the folder (and placing a copy and a fresh project.json into
+        it). For a2l the folder goes during the attach, after the request-time
+        guard passed; the attach still ends A2L loaded: firmware.a2l.
+    
+        Why: the user deleted that folder on purpose or by accident; loading an
+        unrelated file must not bring it back."""
+        if kind == "a2l":
+            _exited, lines, _runs, exists = _a2l_attach_with_the_folder_deleted_mid_attach(
+                tmp_path, monkeypatch
+            )
+            assert lines and lines[-1] == "A2L loaded: firmware.a2l", lines
+        else:
+            _exited, _lines, _runs, exists = _file_load_into_vanished_project(
+                tmp_path, kind, "deleted"
+            )
+>       assert exists is False, "the sync re-created the deleted project folder"
+E       AssertionError: the sync re-created the deleted project folder
+E       assert True is False
+
+tests/test_b100_workers.py:4041: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a2/app workarea=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a2/app/.s19tool/workarea
+INFO     s19tui:app.py:8263 Workarea refreshed. files=0
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.007
+WARNING  s19tui:app.py:13840 Project P2: no project.json project.json (None)
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18599 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a2/app/.s19tool/workarea/P2/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14099 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:14035 Project loaded. name=P2 file=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a2/app/.s19tool/workarea/P2/firmware.s19 mac=None
+INFO     s19tui:app.py:18727 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19747 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:17620 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17675 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19261 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a2/app/.s19tool/workarea/P2/firmware.s19 file_type=s19 elapsed_seconds=0.523 has_mac=False precomputed=False
+INFO     s19tui:app.py:15423 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a2/src/other.mac
+INFO     s19tui:app.py:15444 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a2/src/other.mac
+INFO     s19tui:app.py:15457 Load phase boundary: copy_done path=other.mac elapsed=0.001s
+WARNING  s19tui:app.py:15476 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a2/src/other.mac'
+INFO     s19tui:app.py:8263 Workarea refreshed. files=1
+INFO     s19tui:app.py:15494 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a2/app/.s19tool/workarea/temp/other.mac size_bytes=32 copy_seconds=0.001
+INFO     s19tui:app.py:15500 Load phase boundary: worker_spawned path=other.mac
+INFO     s19tui:app.py:18383 Load phase boundary: worker_parse_start path=other.mac
+INFO     s19tui:app.py:17767 Loading file: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a2/app/.s19tool/workarea/temp/other.mac suffix=.mac project=P2
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=other.mac suffix=.mac
+INFO     s19tui:app.py:16784 Load phase boundary: mac_parse_entry path=other.mac
+INFO     s19tui:app.py:16790 Load phase boundary: mac_parse_done path=other.mac rows=2 diagnostics=1 elapsed=0.000s
+INFO     s19tui:app.py:16804 MAC parse summary (mirrored): path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a2/app/.s19tool/workarea/temp/other.mac rows=2 parse_ok=1 diagnostics=1 valid_addresses=1
+INFO     s19tui:app.py:16825 Load phase boundary: mac_a2l_resolve_entry path=other.mac a2l_path=None
+INFO     s19tui:app.py:16831 Load phase boundary: mac_a2l_resolve_done path=other.mac has_a2l_data=False
+INFO     s19tui:app.py:16837 MAC parse summary: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a2/app/.s19tool/workarea/temp/other.mac total_records=2 parse_ok=1 diagnostics=1 valid_addresses=1 a2l_path=None elapsed_seconds=0.000
+INFO     s19tui:app.py:14124 Load phase boundary: mac_merge_entry path=other.mac has_primary=True
+INFO     s19tui:app.py:14131 Load phase boundary: mac_merge_done path=other.mac file_type=s19
+INFO     s19tui:app.py:18599 Load summary: file_type=s19+mac path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a2/app/.s19tool/workarea/temp/other.mac addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14153 Load phase boundary: parse_branch_done path=other.mac branch=mac
+INFO     s19tui:app.py:18402 Load phase boundary: worker_parse_done path=other.mac elapsed=0.009s
+INFO     s19tui:app.py:18226 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:18261 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+ERROR    s19_app.core:core.py:361 File not found: /tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a2/app/.s19tool/workarea/P2/firmware.s19
+WARNING  s19tui:app.py:17588 Failed to compute overlap set for /tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a2/app/.s19tool/workarea/P2/firmware.s19: [Errno 2] No such file or directory: '/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a2/app/.s19tool/workarea/P2/firmware.s19'
+INFO     s19tui:app.py:17620 MAC validation computed: records=2 issues=2 elapsed_seconds=0.000
+INFO     s19tui:app.py:18270 Load phase boundary: prepare_mac_payload_done rows=2 issues=2
+INFO     s19tui:app.py:18290 Load phase boundary: prepare_highlights_done highlights=1 out_of_range=0
+INFO     s19tui:app.py:18297 Load phase boundary: prepare_bases_done row_bases=7
+INFO     s19tui:app.py:18307 Load phase boundary: prepare_datatable_done mac_rows=2 widths=(9, 10, 5, 5, 9, 10, 26, 8)
+INFO     s19tui:app.py:18313 Load phase boundary: prepare_done records=2
+INFO     s19tui:app.py:18435 Load phase boundary: worker_compute_done path=other.mac precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:18442 Load phase boundary: call_from_thread_apply_dispatched path=other.mac
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=other.mac precomputed=True
+INFO     s19tui:app.py:18727 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=other.mac
+INFO     s19tui:app.py:14977 Sync skipped: variant 'firmware' already in project /tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a2/app/.s19tool/workarea/P2
+INFO     s19tui:app.py:15041 Synced attached MAC file into project: /tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a2/app/.s19tool/workarea/P2
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=other.mac
+INFO     s19tui:app.py:19747 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:16557 Load phase boundary: populate_issues_table_done rows=2 total=2 elapsed=0.010
+INFO     s19tui:app.py:19312 Load phase boundary: populate_mac_table_done rows=2 total=2 elapsed=0.011
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=other.mac
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a2/app/.s19tool/workarea/temp/other.mac file_type=s19 elapsed_seconds=0.260 has_mac=True precomputed=True
+==================================== PASSES ====================================
+_____ test_tc_b100_54_project_worker_failure_keeps_the_session[ValueError] _____
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_project_worker1/app workarea=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_project_worker1/app/.s19tool/workarea
+INFO     s19tui:app.py:8263 Workarea refreshed. files=0
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:17767 Loading file: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_project_worker1/fw.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=fw.s19 suffix=.s19
+INFO     s19tui:app.py:18599 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_project_worker1/fw.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14099 Load phase boundary: parse_branch_done path=fw.s19 branch=s19
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=fw.s19 precomputed=False
+INFO     s19tui:app.py:18727 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=fw.s19
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=fw.s19
+INFO     s19tui:app.py:19747 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:17620 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17675 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:19261 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=fw.s19
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_project_worker1/fw.s19 file_type=s19 elapsed_seconds=0.423 has_mac=False precomputed=False
+ERROR    s19tui:app.py:13824 Project load failed on the worker: 'P2'
+Traceback (most recent call last):
+  File "<HOME>/work/s19_inc3/s19_app/tui/app.py", line 13822, in _project_load_worker
+    prepared = self._prepare_project_load(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<HOME>/work/s19_inc3/s19_app/tui/app.py", line 13837, in _prepare_project_load
+    manifest = read_project_manifest(request.project_dir)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<HOME>/work/s19_inc3/tests/test_b100_workers.py", line 2780, in _raise
+    raise exc
+ValueError: synthetic
+WARNING  s19tui:app.py:14060 Project load not installed: 'P2' (ValueError)
+_______ test_tc_b100_54_save_worker_non_os_error_rolls_back_and_reports ________
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_save_worker_no0/app workarea=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_save_worker_no0/app/.s19tool/workarea
+INFO     s19tui:app.py:8263 Workarea refreshed. files=0
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+WARNING  s19tui:app.py:13840 Project P2: no project.json project.json (None)
+INFO     s19tui:app.py:931 A2L cache miss: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_save_worker_no0/app/.s19tool/workarea/P2/firmware.a2l size_bytes=1391
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18599 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_save_worker_no0/app/.s19tool/workarea/P2/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14099 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=firmware.mac suffix=.mac
+INFO     s19tui:app.py:16784 Load phase boundary: mac_parse_entry path=firmware.mac
+INFO     s19tui:app.py:16790 Load phase boundary: mac_parse_done path=firmware.mac rows=2 diagnostics=1 elapsed=0.000s
+INFO     s19tui:app.py:16804 MAC parse summary (mirrored): path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_save_worker_no0/app/.s19tool/workarea/P2/firmware.mac rows=2 parse_ok=1 diagnostics=1 valid_addresses=1
+INFO     s19tui:app.py:16825 Load phase boundary: mac_a2l_resolve_entry path=firmware.mac a2l_path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_save_worker_no0/app/.s19tool/workarea/P2/firmware.a2l
+INFO     s19tui:app.py:16831 Load phase boundary: mac_a2l_resolve_done path=firmware.mac has_a2l_data=True
+INFO     s19tui:app.py:16837 MAC parse summary: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_save_worker_no0/app/.s19tool/workarea/P2/firmware.mac total_records=2 parse_ok=1 diagnostics=1 valid_addresses=1 a2l_path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_save_worker_no0/app/.s19tool/workarea/P2/firmware.a2l elapsed_seconds=0.000
+INFO     s19tui:app.py:14124 Load phase boundary: mac_merge_entry path=firmware.mac has_primary=True
+INFO     s19tui:app.py:14131 Load phase boundary: mac_merge_done path=firmware.mac file_type=s19
+INFO     s19tui:app.py:18599 Load summary: file_type=s19+mac path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_save_worker_no0/app/.s19tool/workarea/P2/firmware.mac addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14153 Load phase boundary: parse_branch_done path=firmware.mac branch=mac
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=firmware.mac precomputed=False
+INFO     s19tui:app.py:14035 Project loaded. name=P2 file=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_save_worker_no0/app/.s19tool/workarea/P2/firmware.s19 mac=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_save_worker_no0/app/.s19tool/workarea/P2/firmware.mac
+INFO     s19tui:app.py:18727 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18727 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=firmware.mac
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=firmware.mac
+INFO     s19tui:app.py:17620 MAC validation computed: records=2 issues=9 elapsed_seconds=0.000
+INFO     s19tui:app.py:17675 MAC row cache built: records=2 elapsed_seconds=0.000
+INFO     s19tui:app.py:16557 Load phase boundary: populate_issues_table_done rows=9 total=9 elapsed=0.013
+INFO     s19tui:app.py:19312 Load phase boundary: populate_mac_table_done rows=2 total=2 elapsed=0.015
+INFO     s19tui:app.py:19788 Load phase boundary: populate_a2l_table_done rows=3 total=3 elapsed=0.001
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:16557 Load phase boundary: populate_issues_table_done rows=9 total=9 elapsed=0.014
+INFO     s19tui:app.py:19312 Load phase boundary: populate_mac_table_done rows=2 total=2 elapsed=0.016
+INFO     s19tui:app.py:19788 Load phase boundary: populate_a2l_table_done rows=3 total=3 elapsed=0.001
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=firmware.mac
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_save_worker_no0/app/.s19tool/workarea/P2/firmware.s19 file_type=s19 elapsed_seconds=0.783 has_mac=False precomputed=False
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_save_worker_no0/app/.s19tool/workarea/P2/firmware.mac file_type=s19 elapsed_seconds=0.848 has_mac=True precomputed=False
+ERROR    s19tui:app.py:12366 Project save failed with an unexpected error.
+Traceback (most recent call last):
+  File "<HOME>/work/s19_inc3/s19_app/tui/app.py", line 12031, in _save_project_files
+    emit_verify = verify_written_image(
+                  ^^^^^^^^^^^^^^^^^^^^^
+  File "<HOME>/work/s19_inc3/tests/test_b100_workers.py", line 2825, in _boom
+    raise ValueError("forced defect")
+ValueError: forced defect
+_________ test_tc_b100_54_a2l_worker_failure_keeps_the_session[parse] __________
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_worker_fai0/app workarea=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_worker_fai0/app/.s19tool/workarea
+INFO     s19tui:app.py:8263 Workarea refreshed. files=0
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:15607 A2L copy complete: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_worker_fai0/app/.s19tool/workarea/temp/p0.a2l size_bytes=1391 copy_seconds=0.001
+INFO     s19tui:app.py:931 A2L cache miss: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_worker_fai0/app/.s19tool/workarea/temp/p0.a2l size_bytes=1391
+WARNING  s19tui:app.py:15645 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_worker_fai0/p0.a2l'
+INFO     s19tui:app.py:8263 Workarea refreshed. files=1
+INFO     s19tui:app.py:18546 A2L parse summary: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_worker_fai0/app/.s19tool/workarea/temp/p0.a2l elapsed_seconds=0.005 sections=1 tags=3 errors=0
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:19261 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19788 Load phase boundary: populate_a2l_table_done rows=3 total=3 elapsed=0.001
+INFO     s19tui:app.py:15664 A2L view refresh complete: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_worker_fai0/app/.s19tool/workarea/temp/p0.a2l elapsed_seconds=0.010
+INFO     s19tui:app.py:15672 A2L loaded: /tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_worker_fai0/app/.s19tool/workarea/temp/p0.a2l
+INFO     s19tui:app.py:15607 A2L copy complete: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_worker_fai0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=1391 copy_seconds=0.001
+INFO     s19tui:app.py:931 A2L cache miss: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_worker_fai0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=1391
+ERROR    s19tui:app.py:15625 A2L attach failed: <HOME>/work/s19_inc3/examples/case_01_basic_valid/firmware.a2l
+Traceback (most recent call last):
+  File "<HOME>/work/s19_inc3/s19_app/tui/app.py", line 15615, in _a2l_attach_worker
+    entry = parse_a2l_cached(
+            ^^^^^^^^^^^^^^^^^
+  File "<HOME>/work/s19_inc3/s19_app/tui/app.py", line 933, in parse_a2l_cached
+    parse_a2l_file(path, progress=progress)
+  File "<HOME>/work/s19_inc3/tests/test_b100_workers.py", line 2879, in _parse_fail
+    raise ValueError("synthetic parse")
+ValueError: synthetic parse
+INFO     s19tui:app.py:8263 Workarea refreshed. files=2
+__________ test_tc_b100_54_a2l_worker_failure_keeps_the_session[copy] __________
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_worker_fai1/app workarea=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_worker_fai1/app/.s19tool/workarea
+INFO     s19tui:app.py:8263 Workarea refreshed. files=0
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:15607 A2L copy complete: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_worker_fai1/app/.s19tool/workarea/temp/p0.a2l size_bytes=1391 copy_seconds=0.004
+INFO     s19tui:app.py:931 A2L cache miss: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_worker_fai1/app/.s19tool/workarea/temp/p0.a2l size_bytes=1391
+WARNING  s19tui:app.py:15645 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_worker_fai1/p0.a2l'
+INFO     s19tui:app.py:8263 Workarea refreshed. files=1
+INFO     s19tui:app.py:18546 A2L parse summary: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_worker_fai1/app/.s19tool/workarea/temp/p0.a2l elapsed_seconds=0.002 sections=1 tags=3 errors=0
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19261 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:19788 Load phase boundary: populate_a2l_table_done rows=3 total=3 elapsed=0.001
+INFO     s19tui:app.py:15664 A2L view refresh complete: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_worker_fai1/app/.s19tool/workarea/temp/p0.a2l elapsed_seconds=0.012
+INFO     s19tui:app.py:15672 A2L loaded: /tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_worker_fai1/app/.s19tool/workarea/temp/p0.a2l
+ERROR    s19tui:app.py:15625 A2L attach failed: <HOME>/work/s19_inc3/examples/case_01_basic_valid/firmware.a2l
+Traceback (most recent call last):
+  File "<HOME>/work/s19_inc3/s19_app/tui/app.py", line 15603, in _a2l_attach_worker
+    path = copy_into_workarea(
+           ^^^^^^^^^^^^^^^^^^^
+  File "<HOME>/work/s19_inc3/tests/test_b100_workers.py", line 2882, in _copy_fail
+    raise PermissionError(13, "synthetic denied")
+PermissionError: [Errno 13] synthetic denied
+INFO     s19tui:app.py:8263 Workarea refreshed. files=1
+______ test_tc_b100_54_a2l_worker_failure_keeps_the_session[containment] _______
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_worker_fai2/app workarea=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_worker_fai2/app/.s19tool/workarea
+INFO     s19tui:app.py:8263 Workarea refreshed. files=0
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:15607 A2L copy complete: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_worker_fai2/app/.s19tool/workarea/temp/p0.a2l size_bytes=1391 copy_seconds=0.001
+INFO     s19tui:app.py:931 A2L cache miss: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_worker_fai2/app/.s19tool/workarea/temp/p0.a2l size_bytes=1391
+WARNING  s19tui:app.py:15645 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_worker_fai2/p0.a2l'
+INFO     s19tui:app.py:8263 Workarea refreshed. files=1
+INFO     s19tui:app.py:18546 A2L parse summary: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_worker_fai2/app/.s19tool/workarea/temp/p0.a2l elapsed_seconds=0.005 sections=1 tags=3 errors=0
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:19261 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19788 Load phase boundary: populate_a2l_table_done rows=3 total=3 elapsed=0.001
+INFO     s19tui:app.py:15664 A2L view refresh complete: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_worker_fai2/app/.s19tool/workarea/temp/p0.a2l elapsed_seconds=0.011
+INFO     s19tui:app.py:15672 A2L loaded: /tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_worker_fai2/app/.s19tool/workarea/temp/p0.a2l
+WARNING  s19tui:app.py:15689 A2L load rejected by workarea guard: synthetic containment refusal
+_ test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished[project_folder] _
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_attach_ref0/app workarea=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_attach_ref0/app/.s19tool/workarea
+INFO     s19tui:app.py:8263 Workarea refreshed. files=0
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+WARNING  s19tui:app.py:15539 A2L load refused (project folder could not be read): PosixPath('/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_attach_ref0/app/.s19tool/workarea/gone')
+_ test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished[a2l_size] _
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_attach_ref1/app workarea=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_attach_ref1/app/.s19tool/workarea
+INFO     s19tui:app.py:8263 Workarea refreshed. files=0
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+WARNING  s19tui:app.py:15558 A2L file not found: /tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_attach_ref1/src/firmware.a2l
+____ test_tc_b100_54_file_load_sync_refuses_when_the_project_folder_is_gone ____
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_file_load_sync0/app workarea=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_file_load_sync0/app/.s19tool/workarea
+INFO     s19tui:app.py:8263 Workarea refreshed. files=0
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+WARNING  s19tui:app.py:13840 Project P2: no project.json project.json (None)
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18599 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_file_load_sync0/app/.s19tool/workarea/P2/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14099 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:14035 Project loaded. name=P2 file=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_file_load_sync0/app/.s19tool/workarea/P2/firmware.s19 mac=None
+INFO     s19tui:app.py:18727 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19747 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:17620 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17675 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19261 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_file_load_sync0/app/.s19tool/workarea/P2/firmware.s19 file_type=s19 elapsed_seconds=0.501 has_mac=False precomputed=False
+INFO     s19tui:app.py:15423 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_file_load_sync0/src/other.s19
+INFO     s19tui:app.py:15444 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_file_load_sync0/src/other.s19
+INFO     s19tui:app.py:15457 Load phase boundary: copy_done path=other.s19 elapsed=0.001s
+WARNING  s19tui:app.py:15476 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_file_load_sync0/src/other.s19'
+INFO     s19tui:app.py:8263 Workarea refreshed. files=1
+INFO     s19tui:app.py:15494 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_file_load_sync0/app/.s19tool/workarea/temp/other.s19 size_bytes=302 copy_seconds=0.001
+INFO     s19tui:app.py:15500 Load phase boundary: worker_spawned path=other.s19
+INFO     s19tui:app.py:18383 Load phase boundary: worker_parse_start path=other.s19
+INFO     s19tui:app.py:17767 Loading file: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_file_load_sync0/app/.s19tool/workarea/temp/other.s19 suffix=.s19 project=P2
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=other.s19 suffix=.s19
+INFO     s19tui:app.py:18599 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_file_load_sync0/app/.s19tool/workarea/temp/other.s19 addresses=82 range_count=3 range_bytes=82 errors=0
+INFO     s19tui:app.py:14099 Load phase boundary: parse_branch_done path=other.s19 branch=s19
+INFO     s19tui:app.py:18402 Load phase boundary: worker_parse_done path=other.s19 elapsed=0.005s
+INFO     s19tui:app.py:18226 Load phase boundary: prepare_entry path=other.s19 file_type=s19
+INFO     s19tui:app.py:18261 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17620 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18270 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18290 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18297 Load phase boundary: prepare_bases_done row_bases=6
+INFO     s19tui:app.py:18307 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18313 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:18435 Load phase boundary: worker_compute_done path=other.s19 precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:18442 Load phase boundary: call_from_thread_apply_dispatched path=other.s19
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=other.s19 precomputed=True
+INFO     s19tui:app.py:18727 Sections updated. count=3 rendered_ranges=3 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=other.s19
+WARNING  s19tui:app.py:14951 Project sync refused (project folder could not be read): PosixPath('/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_file_load_sync0/app/.s19tool/workarea/P2')
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=other.s19
+INFO     s19tui:app.py:19747 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19261 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=other.s19
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=3
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_file_load_sync0/app/.s19tool/workarea/temp/other.s19 file_type=s19 elapsed_seconds=0.452 has_mac=False precomputed=True
+__ test_tc_b100_54_a2l_sync_refuses_when_the_project_folder_turns_unreadable ___
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_sync_refus0/app workarea=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_sync_refus0/app/.s19tool/workarea
+INFO     s19tui:app.py:8263 Workarea refreshed. files=0
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+WARNING  s19tui:app.py:13840 Project P2: no project.json project.json (None)
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18599 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_sync_refus0/app/.s19tool/workarea/P2/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14099 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=firmware.mac suffix=.mac
+INFO     s19tui:app.py:16784 Load phase boundary: mac_parse_entry path=firmware.mac
+INFO     s19tui:app.py:16790 Load phase boundary: mac_parse_done path=firmware.mac rows=2 diagnostics=1 elapsed=0.000s
+INFO     s19tui:app.py:16804 MAC parse summary (mirrored): path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_sync_refus0/app/.s19tool/workarea/P2/firmware.mac rows=2 parse_ok=1 diagnostics=1 valid_addresses=1
+INFO     s19tui:app.py:16825 Load phase boundary: mac_a2l_resolve_entry path=firmware.mac a2l_path=None
+INFO     s19tui:app.py:16831 Load phase boundary: mac_a2l_resolve_done path=firmware.mac has_a2l_data=False
+INFO     s19tui:app.py:16837 MAC parse summary: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_sync_refus0/app/.s19tool/workarea/P2/firmware.mac total_records=2 parse_ok=1 diagnostics=1 valid_addresses=1 a2l_path=None elapsed_seconds=0.000
+INFO     s19tui:app.py:14124 Load phase boundary: mac_merge_entry path=firmware.mac has_primary=True
+INFO     s19tui:app.py:14131 Load phase boundary: mac_merge_done path=firmware.mac file_type=s19
+INFO     s19tui:app.py:18599 Load summary: file_type=s19+mac path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_sync_refus0/app/.s19tool/workarea/P2/firmware.mac addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14153 Load phase boundary: parse_branch_done path=firmware.mac branch=mac
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=firmware.mac precomputed=False
+INFO     s19tui:app.py:14035 Project loaded. name=P2 file=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_sync_refus0/app/.s19tool/workarea/P2/firmware.s19 mac=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_sync_refus0/app/.s19tool/workarea/P2/firmware.mac
+INFO     s19tui:app.py:18727 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18727 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=firmware.mac
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=firmware.mac
+INFO     s19tui:app.py:19747 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17620 MAC validation computed: records=2 issues=2 elapsed_seconds=0.000
+INFO     s19tui:app.py:17675 MAC row cache built: records=2 elapsed_seconds=0.000
+INFO     s19tui:app.py:16557 Load phase boundary: populate_issues_table_done rows=2 total=2 elapsed=0.010
+INFO     s19tui:app.py:19312 Load phase boundary: populate_mac_table_done rows=2 total=2 elapsed=0.012
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:19747 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:16557 Load phase boundary: populate_issues_table_done rows=2 total=2 elapsed=0.010
+INFO     s19tui:app.py:19312 Load phase boundary: populate_mac_table_done rows=2 total=2 elapsed=0.012
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=firmware.mac
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_sync_refus0/app/.s19tool/workarea/P2/firmware.s19 file_type=s19 elapsed_seconds=0.435 has_mac=False precomputed=False
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_sync_refus0/app/.s19tool/workarea/P2/firmware.mac file_type=s19 elapsed_seconds=0.499 has_mac=True precomputed=False
+INFO     s19tui:app.py:15607 A2L copy complete: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_sync_refus0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=1391 copy_seconds=0.004
+INFO     s19tui:app.py:931 A2L cache miss: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_sync_refus0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=1391
+WARNING  s19tui:app.py:15645 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_sync_refus0/src/firmware.a2l'
+INFO     s19tui:app.py:8263 Workarea refreshed. files=1
+INFO     s19tui:app.py:18546 A2L parse summary: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_sync_refus0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.001 sections=1 tags=3 errors=0
+INFO     s19tui:app.py:17620 MAC validation computed: records=2 issues=9 elapsed_seconds=0.000
+INFO     s19tui:app.py:17675 MAC row cache built: records=2 elapsed_seconds=0.000
+INFO     s19tui:app.py:16557 Load phase boundary: populate_issues_table_done rows=9 total=9 elapsed=0.014
+INFO     s19tui:app.py:19312 Load phase boundary: populate_mac_table_done rows=2 total=2 elapsed=0.016
+INFO     s19tui:app.py:19788 Load phase boundary: populate_a2l_table_done rows=3 total=3 elapsed=0.001
+INFO     s19tui:app.py:15664 A2L view refresh complete: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_sync_refus0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.018
+INFO     s19tui:app.py:15672 A2L loaded: /tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_sync_refus0/app/.s19tool/workarea/temp/firmware.a2l
+WARNING  s19tui:app.py:15073 A2L sync refused (project folder could not be read): PosixPath('/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_a2l_sync_refus0/app/.s19tool/workarea/P2')
+_____ test_tc_b100_54_failed_in_place_a2l_pick_keeps_the_files_list_cursor _____
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_failed_in_plac0/app workarea=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_failed_in_plac0/app/.s19tool/workarea
+INFO     s19tui:app.py:8263 Workarea refreshed. files=2
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.007
+INFO     s19tui:app.py:8263 Workarea refreshed. files=2
+INFO     s19tui:app.py:15936 Loading from workarea selection: /tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_failed_in_plac0/app/.s19tool/workarea/temp/firmware.a2l
+INFO     s19tui:app.py:931 A2L cache miss: path=/tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_failed_in_plac0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=1391
+ERROR    s19tui:app.py:15625 A2L attach failed: /tmp/pytest-of-<USER>/pytest-28/test_tc_b100_54_failed_in_plac0/app/.s19tool/workarea/temp/firmware.a2l
+Traceback (most recent call last):
+  File "<HOME>/work/s19_inc3/s19_app/tui/app.py", line 15615, in _a2l_attach_worker
+    entry = parse_a2l_cached(
+            ^^^^^^^^^^^^^^^^^
+  File "<HOME>/work/s19_inc3/s19_app/tui/app.py", line 933, in parse_a2l_cached
+    parse_a2l_file(path, progress=progress)
+  File "<HOME>/work/s19_inc3/tests/test_b100_workers.py", line 3845, in _parse_fail
+    raise ValueError("synthetic parse")
+ValueError: synthetic parse
+_ test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted[file-in-place-s19] _
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s3/app workarea=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s3/app/.s19tool/workarea
+INFO     s19tui:app.py:8263 Workarea refreshed. files=0
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+WARNING  s19tui:app.py:13840 Project P2: no project.json project.json (None)
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18599 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s3/app/.s19tool/workarea/P2/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14099 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:14035 Project loaded. name=P2 file=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s3/app/.s19tool/workarea/P2/firmware.s19 mac=None
+INFO     s19tui:app.py:18727 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19747 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:17620 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17675 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19261 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s3/app/.s19tool/workarea/P2/firmware.s19 file_type=s19 elapsed_seconds=0.516 has_mac=False precomputed=False
+INFO     s19tui:app.py:15423 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s3/src/other.s19
+INFO     s19tui:app.py:15444 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s3/src/other.s19
+INFO     s19tui:app.py:15457 Load phase boundary: copy_done path=other.s19 elapsed=0.001s
+WARNING  s19tui:app.py:15476 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s3/src/other.s19'
+INFO     s19tui:app.py:8263 Workarea refreshed. files=1
+INFO     s19tui:app.py:15494 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s3/app/.s19tool/workarea/temp/other.s19 size_bytes=302 copy_seconds=0.001
+INFO     s19tui:app.py:15500 Load phase boundary: worker_spawned path=other.s19
+INFO     s19tui:app.py:18383 Load phase boundary: worker_parse_start path=other.s19
+INFO     s19tui:app.py:17767 Loading file: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s3/app/.s19tool/workarea/temp/other.s19 suffix=.s19 project=P2
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=other.s19 suffix=.s19
+INFO     s19tui:app.py:18599 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s3/app/.s19tool/workarea/temp/other.s19 addresses=82 range_count=3 range_bytes=82 errors=0
+INFO     s19tui:app.py:14099 Load phase boundary: parse_branch_done path=other.s19 branch=s19
+INFO     s19tui:app.py:18402 Load phase boundary: worker_parse_done path=other.s19 elapsed=0.008s
+INFO     s19tui:app.py:18226 Load phase boundary: prepare_entry path=other.s19 file_type=s19
+INFO     s19tui:app.py:18261 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17620 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18270 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18290 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18297 Load phase boundary: prepare_bases_done row_bases=6
+INFO     s19tui:app.py:18307 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18313 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:18435 Load phase boundary: worker_compute_done path=other.s19 precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:18442 Load phase boundary: call_from_thread_apply_dispatched path=other.s19
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=other.s19 precomputed=True
+INFO     s19tui:app.py:18727 Sections updated. count=3 rendered_ranges=3 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=other.s19
+WARNING  s19tui:app.py:14951 Project sync refused (project folder could not be read): PosixPath('/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s3/app/.s19tool/workarea/P2')
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=other.s19
+INFO     s19tui:app.py:19747 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19261 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=other.s19
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=3
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s3/app/.s19tool/workarea/temp/other.s19 file_type=s19 elapsed_seconds=0.478 has_mac=False precomputed=True
+_ test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted[file-in-place-hex] _
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s4/app workarea=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s4/app/.s19tool/workarea
+INFO     s19tui:app.py:8263 Workarea refreshed. files=0
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.007
+WARNING  s19tui:app.py:13840 Project P2: no project.json project.json (None)
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18599 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s4/app/.s19tool/workarea/P2/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14099 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:14035 Project loaded. name=P2 file=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s4/app/.s19tool/workarea/P2/firmware.s19 mac=None
+INFO     s19tui:app.py:18727 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19747 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:17620 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17675 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:19261 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s4/app/.s19tool/workarea/P2/firmware.s19 file_type=s19 elapsed_seconds=0.514 has_mac=False precomputed=False
+INFO     s19tui:app.py:15423 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s4/src/other.hex
+INFO     s19tui:app.py:15444 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s4/src/other.hex
+INFO     s19tui:app.py:15457 Load phase boundary: copy_done path=other.hex elapsed=0.001s
+WARNING  s19tui:app.py:15476 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s4/src/other.hex'
+INFO     s19tui:app.py:8263 Workarea refreshed. files=1
+INFO     s19tui:app.py:15494 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s4/app/.s19tool/workarea/temp/other.hex size_bytes=32 copy_seconds=0.001
+INFO     s19tui:app.py:15500 Load phase boundary: worker_spawned path=other.hex
+INFO     s19tui:app.py:18383 Load phase boundary: worker_parse_start path=other.hex
+INFO     s19tui:app.py:17767 Loading file: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s4/app/.s19tool/workarea/temp/other.hex suffix=.hex project=P2
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=other.hex suffix=.hex
+INFO     s19tui:app.py:18599 Load summary: file_type=hex path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s4/app/.s19tool/workarea/temp/other.hex addresses=4 range_count=1 range_bytes=4 errors=0
+INFO     s19tui:app.py:14116 Load phase boundary: parse_branch_done path=other.hex branch=hex
+INFO     s19tui:app.py:18402 Load phase boundary: worker_parse_done path=other.hex elapsed=0.005s
+INFO     s19tui:app.py:18226 Load phase boundary: prepare_entry path=other.hex file_type=hex
+INFO     s19tui:app.py:18261 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17620 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18270 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18290 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18297 Load phase boundary: prepare_bases_done row_bases=1
+INFO     s19tui:app.py:18307 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18313 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:18435 Load phase boundary: worker_compute_done path=other.hex precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:18442 Load phase boundary: call_from_thread_apply_dispatched path=other.hex
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=other.hex precomputed=True
+INFO     s19tui:app.py:18727 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=other.hex
+WARNING  s19tui:app.py:14951 Project sync refused (project folder could not be read): PosixPath('/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s4/app/.s19tool/workarea/P2')
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=other.hex
+INFO     s19tui:app.py:19747 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:19261 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=other.hex
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s4/app/.s19tool/workarea/temp/other.hex file_type=hex elapsed_seconds=0.112 has_mac=False precomputed=True
+_ test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted[file-in-place-mac] _
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s5/app workarea=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s5/app/.s19tool/workarea
+INFO     s19tui:app.py:8263 Workarea refreshed. files=0
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.007
+WARNING  s19tui:app.py:13840 Project P2: no project.json project.json (None)
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18599 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s5/app/.s19tool/workarea/P2/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14099 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:14035 Project loaded. name=P2 file=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s5/app/.s19tool/workarea/P2/firmware.s19 mac=None
+INFO     s19tui:app.py:18727 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19747 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:17620 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17675 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19261 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s5/app/.s19tool/workarea/P2/firmware.s19 file_type=s19 elapsed_seconds=0.526 has_mac=False precomputed=False
+INFO     s19tui:app.py:15423 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s5/src/other.mac
+INFO     s19tui:app.py:15444 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s5/src/other.mac
+INFO     s19tui:app.py:15457 Load phase boundary: copy_done path=other.mac elapsed=0.001s
+WARNING  s19tui:app.py:15476 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s5/src/other.mac'
+INFO     s19tui:app.py:8263 Workarea refreshed. files=1
+INFO     s19tui:app.py:15494 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s5/app/.s19tool/workarea/temp/other.mac size_bytes=32 copy_seconds=0.001
+INFO     s19tui:app.py:15500 Load phase boundary: worker_spawned path=other.mac
+INFO     s19tui:app.py:18383 Load phase boundary: worker_parse_start path=other.mac
+INFO     s19tui:app.py:17767 Loading file: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s5/app/.s19tool/workarea/temp/other.mac suffix=.mac project=P2
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=other.mac suffix=.mac
+INFO     s19tui:app.py:16784 Load phase boundary: mac_parse_entry path=other.mac
+INFO     s19tui:app.py:16790 Load phase boundary: mac_parse_done path=other.mac rows=2 diagnostics=1 elapsed=0.000s
+INFO     s19tui:app.py:16804 MAC parse summary (mirrored): path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s5/app/.s19tool/workarea/temp/other.mac rows=2 parse_ok=1 diagnostics=1 valid_addresses=1
+INFO     s19tui:app.py:16825 Load phase boundary: mac_a2l_resolve_entry path=other.mac a2l_path=None
+INFO     s19tui:app.py:16831 Load phase boundary: mac_a2l_resolve_done path=other.mac has_a2l_data=False
+INFO     s19tui:app.py:16837 MAC parse summary: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s5/app/.s19tool/workarea/temp/other.mac total_records=2 parse_ok=1 diagnostics=1 valid_addresses=1 a2l_path=None elapsed_seconds=0.000
+INFO     s19tui:app.py:14124 Load phase boundary: mac_merge_entry path=other.mac has_primary=True
+INFO     s19tui:app.py:14131 Load phase boundary: mac_merge_done path=other.mac file_type=s19
+INFO     s19tui:app.py:18599 Load summary: file_type=s19+mac path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s5/app/.s19tool/workarea/temp/other.mac addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14153 Load phase boundary: parse_branch_done path=other.mac branch=mac
+INFO     s19tui:app.py:18402 Load phase boundary: worker_parse_done path=other.mac elapsed=0.006s
+INFO     s19tui:app.py:18226 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:18261 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+ERROR    s19_app.core:core.py:364 Unexpected error while loading file: [Errno 20] Not a directory: '/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s5/app/.s19tool/workarea/P2/firmware.s19'
+Traceback (most recent call last):
+  File "<HOME>/work/s19_inc3/s19_app/core.py", line 312, in _load
+    with open(self.path, 'r') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+NotADirectoryError: [Errno 20] Not a directory: '/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s5/app/.s19tool/workarea/P2/firmware.s19'
+WARNING  s19tui:app.py:17588 Failed to compute overlap set for /tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s5/app/.s19tool/workarea/P2/firmware.s19: [Errno 20] Not a directory: '/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s5/app/.s19tool/workarea/P2/firmware.s19'
+INFO     s19tui:app.py:17620 MAC validation computed: records=2 issues=2 elapsed_seconds=0.001
+INFO     s19tui:app.py:18270 Load phase boundary: prepare_mac_payload_done rows=2 issues=2
+INFO     s19tui:app.py:18290 Load phase boundary: prepare_highlights_done highlights=1 out_of_range=0
+INFO     s19tui:app.py:18297 Load phase boundary: prepare_bases_done row_bases=7
+INFO     s19tui:app.py:18307 Load phase boundary: prepare_datatable_done mac_rows=2 widths=(9, 10, 5, 5, 9, 10, 26, 8)
+INFO     s19tui:app.py:18313 Load phase boundary: prepare_done records=2
+INFO     s19tui:app.py:18435 Load phase boundary: worker_compute_done path=other.mac precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:18442 Load phase boundary: call_from_thread_apply_dispatched path=other.mac
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=other.mac precomputed=True
+INFO     s19tui:app.py:18727 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=other.mac
+WARNING  s19tui:app.py:14951 Project sync refused (project folder could not be read): PosixPath('/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s5/app/.s19tool/workarea/P2')
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=other.mac
+INFO     s19tui:app.py:19747 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:16557 Load phase boundary: populate_issues_table_done rows=2 total=2 elapsed=0.010
+INFO     s19tui:app.py:19312 Load phase boundary: populate_mac_table_done rows=2 total=2 elapsed=0.011
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=other.mac
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_12_file_load_s5/app/.s19tool/workarea/temp/other.mac file_type=s19 elapsed_seconds=0.493 has_mac=True precomputed=True
+_ test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[a2l] _
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a3/app workarea=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a3/app/.s19tool/workarea
+INFO     s19tui:app.py:8263 Workarea refreshed. files=0
+INFO     s19tui:app.py:16525 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+WARNING  s19tui:app.py:13840 Project P2: no project.json project.json (None)
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18599 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a3/app/.s19tool/workarea/P2/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14099 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=firmware.mac suffix=.mac
+INFO     s19tui:app.py:16784 Load phase boundary: mac_parse_entry path=firmware.mac
+INFO     s19tui:app.py:16790 Load phase boundary: mac_parse_done path=firmware.mac rows=2 diagnostics=1 elapsed=0.000s
+INFO     s19tui:app.py:16804 MAC parse summary (mirrored): path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a3/app/.s19tool/workarea/P2/firmware.mac rows=2 parse_ok=1 diagnostics=1 valid_addresses=1
+INFO     s19tui:app.py:16825 Load phase boundary: mac_a2l_resolve_entry path=firmware.mac a2l_path=None
+INFO     s19tui:app.py:16831 Load phase boundary: mac_a2l_resolve_done path=firmware.mac has_a2l_data=False
+INFO     s19tui:app.py:16837 MAC parse summary: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a3/app/.s19tool/workarea/P2/firmware.mac total_records=2 parse_ok=1 diagnostics=1 valid_addresses=1 a2l_path=None elapsed_seconds=0.000
+INFO     s19tui:app.py:14124 Load phase boundary: mac_merge_entry path=firmware.mac has_primary=True
+INFO     s19tui:app.py:14131 Load phase boundary: mac_merge_done path=firmware.mac file_type=s19
+INFO     s19tui:app.py:18599 Load summary: file_type=s19+mac path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a3/app/.s19tool/workarea/P2/firmware.mac addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14153 Load phase boundary: parse_branch_done path=firmware.mac branch=mac
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:18060 Load phase boundary: apply_install_state path=firmware.mac precomputed=False
+INFO     s19tui:app.py:14035 Project loaded. name=P2 file=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a3/app/.s19tool/workarea/P2/firmware.s19 mac=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a3/app/.s19tool/workarea/P2/firmware.mac
+INFO     s19tui:app.py:18727 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18727 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18076 Load phase boundary: apply_sections_done path=firmware.mac
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:18088 Load phase boundary: apply_hex_done path=firmware.mac
+INFO     s19tui:app.py:19747 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17620 MAC validation computed: records=2 issues=2 elapsed_seconds=0.000
+INFO     s19tui:app.py:17675 MAC row cache built: records=2 elapsed_seconds=0.000
+INFO     s19tui:app.py:16557 Load phase boundary: populate_issues_table_done rows=2 total=2 elapsed=0.010
+INFO     s19tui:app.py:19312 Load phase boundary: populate_mac_table_done rows=2 total=2 elapsed=0.012
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:19747 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:16557 Load phase boundary: populate_issues_table_done rows=2 total=2 elapsed=0.010
+INFO     s19tui:app.py:19312 Load phase boundary: populate_mac_table_done rows=2 total=2 elapsed=0.012
+INFO     s19tui:app.py:18101 Load phase boundary: apply_a2l_done path=firmware.mac
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a3/app/.s19tool/workarea/P2/firmware.s19 file_type=s19 elapsed_seconds=0.653 has_mac=False precomputed=False
+INFO     s19tui:app.py:18954 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18118 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a3/app/.s19tool/workarea/P2/firmware.mac file_type=s19 elapsed_seconds=0.717 has_mac=True precomputed=False
+INFO     s19tui:app.py:15607 A2L copy complete: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a3/app/.s19tool/workarea/temp/firmware.a2l size_bytes=1391 copy_seconds=0.003
+INFO     s19tui:app.py:931 A2L cache miss: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a3/app/.s19tool/workarea/temp/firmware.a2l size_bytes=1391
+WARNING  s19tui:app.py:15645 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a3/src/firmware.a2l'
+INFO     s19tui:app.py:8263 Workarea refreshed. files=1
+INFO     s19tui:app.py:18546 A2L parse summary: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a3/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.001 sections=1 tags=3 errors=0
+ERROR    s19_app.core:core.py:361 File not found: /tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a3/app/.s19tool/workarea/P2/firmware.s19
+WARNING  s19tui:app.py:17588 Failed to compute overlap set for /tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a3/app/.s19tool/workarea/P2/firmware.s19: [Errno 2] No such file or directory: '/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a3/app/.s19tool/workarea/P2/firmware.s19'
+INFO     s19tui:app.py:17620 MAC validation computed: records=2 issues=9 elapsed_seconds=0.000
+INFO     s19tui:app.py:17675 MAC row cache built: records=2 elapsed_seconds=0.000
+INFO     s19tui:app.py:16557 Load phase boundary: populate_issues_table_done rows=9 total=9 elapsed=0.013
+INFO     s19tui:app.py:19312 Load phase boundary: populate_mac_table_done rows=2 total=2 elapsed=0.015
+INFO     s19tui:app.py:19788 Load phase boundary: populate_a2l_table_done rows=3 total=3 elapsed=0.001
+INFO     s19tui:app.py:15664 A2L view refresh complete: path=/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a3/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.016
+INFO     s19tui:app.py:15672 A2L loaded: /tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a3/app/.s19tool/workarea/temp/firmware.a2l
+WARNING  s19tui:app.py:15073 A2L sync refused (project folder could not be read): PosixPath('/tmp/pytest-of-<USER>/pytest-28/test_r_proj_002_14_sync_into_a3/app/.s19tool/workarea/P2')
+=========================== short test summary info ============================
+PASSED tests/test_b100_workers.py::test_tc_b100_54_project_worker_failure_keeps_the_session[PermissionError]
+PASSED tests/test_b100_workers.py::test_tc_b100_54_project_worker_failure_keeps_the_session[ValueError]
+PASSED tests/test_b100_workers.py::test_tc_b100_54_save_worker_non_os_error_rolls_back_and_reports
+PASSED tests/test_b100_workers.py::test_tc_b100_54_a2l_worker_failure_keeps_the_session[parse]
+PASSED tests/test_b100_workers.py::test_tc_b100_54_a2l_worker_failure_keeps_the_session[copy]
+PASSED tests/test_b100_workers.py::test_tc_b100_54_a2l_worker_failure_keeps_the_session[containment]
+PASSED tests/test_b100_workers.py::test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished[project_folder]
+PASSED tests/test_b100_workers.py::test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished[a2l_size]
+PASSED tests/test_b100_workers.py::test_tc_b100_54_file_load_sync_refuses_when_the_project_folder_is_gone
+PASSED tests/test_b100_workers.py::test_tc_b100_54_a2l_sync_refuses_when_the_project_folder_turns_unreadable
+PASSED tests/test_b100_workers.py::test_tc_b100_54_failed_in_place_a2l_pick_keeps_the_files_list_cursor
+PASSED tests/test_b100_workers.py::test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted[file-in-place-s19]
+PASSED tests/test_b100_workers.py::test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted[file-in-place-hex]
+PASSED tests/test_b100_workers.py::test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted[file-in-place-mac]
+PASSED tests/test_b100_workers.py::test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[a2l]
+FAILED tests/test_b100_workers.py::test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted[deleted-s19]
+FAILED tests/test_b100_workers.py::test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted[deleted-hex]
+FAILED tests/test_b100_workers.py::test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted[deleted-mac]
+FAILED tests/test_b100_workers.py::test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[s19]
+FAILED tests/test_b100_workers.py::test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[hex]
+FAILED tests/test_b100_workers.py::test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[mac]
+6 failed, 15 passed, 60 deselected in 95.29s (0:01:35)
+EXIT=1
+REVERTED: git diff --quiet clean

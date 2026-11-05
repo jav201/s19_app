@@ -1,0 +1,12 @@
+~\Github\s19_app-b101-inc3\s19_app\__init__.py
+...............................................x........................ [ 46%]
+........................................................................ [ 92%]
+............                                                             [100%]
+============================ QC-TM timing margins =============================
+LOW 9.1%  0.909 s / 1.000 s  TC-B100-20 save-project  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project]
+23.7%  0.763 s / 1.000 s  TC-B100-20 save-back  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-back]
+44.8%  0.552 s / 1.000 s  TC-B100-20 variant-append  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[variant-append]
+45.0%  0.550 s / 1.000 s  TC-B100-20 a2l-sync  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[a2l-sync]
+46.2%  0.538 s / 1.000 s  TC-B100-20 mac-sync  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync]
+QC-TM: 5 bounds, 1 under 20 % margin
+155 passed, 1 xfailed in 1370.06s (0:22:50)

@@ -1,0 +1,17 @@
+# E5 re-audit item (a): R-PROJ-002.14/4 [a2l] asserts the A2L sync ran. LAN Linux host, Python 3.11.18, detached worktree of 9f9f6af + the Inc 3 working-tree diff (incl. the new assert). GREEN on the tree; RED under the mutant 'the A2L attach never calls _sync_loaded_a2l_to_project' (the call replaced by pass, in the remote worktree); app.py sha256 prefix identical before and after (restored byte-exact).
+HOST: LAN Linux host
+2026-11-05T20:02:06Z
+<HOME>/work/s19_inc3z/s19_app/__init__.py 3.11.18
+======== GREEN (unmutated) a2l ========
+.                                                                        [100%]
+1 passed, 3 deselected in 5.16s
+ec7839290cb95543
+======== RED mutant: the load never reaches the A2L sync ========
+        guard passed; the attach still ends A2L loaded: firmware.a2l.
+E           AssertionError: ['A2L loaded: firmware.a2l']
+E           assert 0 == 1
+E            +  where 0 = <built-in method count of list object at 0x7f25791f2840>("A2L sync NOT done: project 'P2' could not be read — check that the folder can be opened, then load again.")
+E            +    where <built-in method count of list object at 0x7f25791f2840> = ['A2L loaded: firmware.a2l'].count
+1 failed, 3 deselected in 5.24s
+ec7839290cb95543
+ M s19_app/tui/app.py

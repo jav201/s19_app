@@ -1,0 +1,160 @@
+# E5 corrective C-7 (ROLLBACK.2/2) and C-8 (Save project by keys): LAN Linux host (l*, POSIX self-symlink loop, Python 3.11.18) and Windows PC (w*, directory junction loop, s19env Python 3.11.15; also C-10's M-10/M-11 on the ROLLBACK.9/1 junction node). M-12 = home_preexisted forced False.
+# Mutants: exact text replace, run, restore byte-exact (sha256 printed). Filtered transcript: header, result lines, assertion lines.
+
+======== lm10 ========
+HOST: LAN Linux host
+2026-11-05T19:20:49Z
+ 13:20:49 up 2 days, 20:25,  3 users,  load average: 8.10, 6.51, 4.24
+<HOME>/work/s19_inc3c/s19_app/__init__.py 3.11.18
+_ test_r_proj_rollback_2_a_failed_save_keeps_a_patches_folder_that_existed_before _
+    def test_r_proj_rollback_2_a_failed_save_keeps_a_patches_folder_that_existed_before(
+predicate = <function test_r_proj_rollback_2_a_failed_save_keeps_a_patches_folder_that_existed_before.<locals>.scenario.<locals>.<lambda> at 0x7f117f03b9c0>
+E               AssertionError: timed out waiting for the Save project outcome line
+E               AssertionError: timed out waiting for the Save project outcome line
+WARNING  s19tui:app.py:13304 Manifest verify mismatch: drift: batch; manifest batch entry traverses a symbolic link or reparse point - entry skipped: 'x.json'
+SKIPPED [1] tests/support/b100_links.py:30: directory junctions are a Windows-only test arm (PDR C-QA-6)
+FAILED tests/test_b100_active_variant.py::test_r_proj_rollback_2_a_failed_save_keeps_a_patches_folder_that_existed_before
+FAILED tests/test_b100_active_variant.py::test_r_proj_rollback_9_by_keys_save_project_with_a_link_loop_swapped_in_at_a_composition_name
+2 failed, 1 skipped, 71 deselected in 139.59s (0:02:19)
+MUTANT M-10: manifest_writer._reject_unsafe_entry returns None (accepts a link entry)
+  file s19_app/tui/services/manifest_writer.py sha256 before: ec112853ababec278fe0d2009c08266a7247a394dd64c918d13d7ac9c4952beb
+extra env: {}
+pytest exit code: 1 -> RED (mutant killed)
+  file s19_app/tui/services/manifest_writer.py sha256 after restore: ec112853ababec278fe0d2009c08266a7247a394dd64c918d13d7ac9c4952beb REVERTED byte-exact
+
+======== lm11 ========
+HOST: LAN Linux host
+2026-11-05T19:23:17Z
+ 13:23:17 up 2 days, 20:28,  3 users,  load average: 8.47, 7.29, 4.86
+<HOME>/work/s19_inc3c/s19_app/__init__.py 3.11.18
+_ test_r_proj_rollback_2_a_failed_save_keeps_a_patches_folder_that_existed_before _
+    def test_r_proj_rollback_2_a_failed_save_keeps_a_patches_folder_that_existed_before(
+E       AssertionError: (gathered copy left, patches/ kept, its content) = (True, True, ['x.json'])
+E       assert (True, True, ['x.json']) == (False, True, [])
+E         
+E         At index 0 diff: True != False
+E         Use -v to get more diff
+>       assert left == (False, False), f"the failed save left a gathered copy: {left}"
+E       AssertionError: the failed save left a gathered copy: (True, True)
+E       assert (True, True) == (False, False)
+E         
+E         At index 0 diff: True != False
+E         Use -v to get more diff
+SKIPPED [1] tests/support/b100_links.py:30: directory junctions are a Windows-only test arm (PDR C-QA-6)
+FAILED tests/test_b100_active_variant.py::test_r_proj_rollback_2_a_failed_save_keeps_a_patches_folder_that_existed_before
+FAILED tests/test_b100_active_variant.py::test_r_proj_rollback_9_by_keys_save_project_with_a_link_loop_swapped_in_at_a_composition_name
+2 failed, 1 skipped, 71 deselected in 21.96s
+MUTANT M-11: the gather's written list not handed to the rollback (placed_files.extend(gather_outcome.written) removed)
+  file s19_app/tui/app.py sha256 before: ec7839290cb95543d30f3b426fd63603bb45501b7456c24f805a3d53f7b2abcf
+extra env: {}
+pytest exit code: 1 -> RED (mutant killed)
+  file s19_app/tui/app.py sha256 after restore: ec7839290cb95543d30f3b426fd63603bb45501b7456c24f805a3d53f7b2abcf REVERTED byte-exact
+
+======== lm12 ========
+HOST: LAN Linux host
+2026-11-05T19:23:46Z
+ 13:23:46 up 2 days, 20:28,  3 users,  load average: 8.97, 7.50, 5.01
+<HOME>/work/s19_inc3c/s19_app/__init__.py 3.11.18
+_ test_r_proj_rollback_2_a_failed_save_keeps_a_patches_folder_that_existed_before _
+    def test_r_proj_rollback_2_a_failed_save_keeps_a_patches_folder_that_existed_before(
+E       AssertionError: (gathered copy left, patches/ kept, its content) = (False, False, None)
+E       assert (False, False, None) == (False, True, [])
+E         
+E         At index 1 diff: False != True
+E         Use -v to get more diff
+PASSED tests/test_b100_active_variant.py::test_r_proj_rollback_9_by_keys_save_project_with_a_link_loop_swapped_in_at_a_composition_name
+SKIPPED [1] tests/support/b100_links.py:30: directory junctions are a Windows-only test arm (PDR C-QA-6)
+FAILED tests/test_b100_active_variant.py::test_r_proj_rollback_2_a_failed_save_keeps_a_patches_folder_that_existed_before
+1 failed, 1 passed, 1 skipped, 71 deselected in 21.52s
+MUTANT M-12: the gather records every home as created (home_preexisted forced False), so the rollback removes a pre-existing empty patches/
+  file s19_app/tui/services/project_gather_service.py sha256 before: f01407c405e48da75a303955e4e169bad370b0cbe4008e3b1eab207a193d7f70
+extra env: {}
+pytest exit code: 1 -> RED (mutant killed)
+  file s19_app/tui/services/project_gather_service.py sha256 after restore: f01407c405e48da75a303955e4e169bad370b0cbe4008e3b1eab207a193d7f70 REVERTED byte-exact
+
+======== w_junction_green ========
+HOST: Windows PC
+2026-11-05T19:24:01Z
+<HOME>\AppData\Local\Temp\s19c3\mwt\s19_app\__init__.py 3.11.15
+PASSED tests/test_project_gather.py::test_r_proj_gather_12_each_distinct_composition_name_is_checked_once
+PASSED tests/test_project_gather.py::test_r_proj_gather_13_a_link_loop_at_a_composition_name_is_not_raised
+PASSED tests/test_project_gather.py::test_r_proj_gather_13_a_posix_self_symlink_at_a_composition_name_is_not_raised
+PASSED tests/test_b100_active_variant.py::test_r_proj_rollback_9_2_a_link_loop_at_a_composition_name_ends_in_the_rollback_refusal
+PASSED tests/test_b100_active_variant.py::test_r_proj_rollback_2_a_failed_save_keeps_a_patches_folder_that_existed_before
+PASSED tests/test_b100_active_variant.py::test_r_proj_rollback_9_by_keys_save_project_with_a_link_loop_swapped_in_at_a_composition_name
+6 passed, 86 deselected in 11.90s
+
+======== wm10 ========
+HOST: Windows PC
+2026-11-05T19:24:15Z
+<HOME>\AppData\Local\Temp\s19c3\mwt\s19_app\__init__.py 3.11.15
+        refuses a link entry, and a failed save must leave no copy behind.
+E               AssertionError: timed out waiting for the Save project outcome line
+_ test_r_proj_rollback_2_a_failed_save_keeps_a_patches_folder_that_existed_before _
+    def test_r_proj_rollback_2_a_failed_save_keeps_a_patches_folder_that_existed_before(
+predicate = <function test_r_proj_rollback_2_a_failed_save_keeps_a_patches_folder_that_existed_before.<locals>.scenario.<locals>.<lambda> at 0x0000022FB2318220>
+E               AssertionError: timed out waiting for the Save project outcome line
+E               AssertionError: timed out waiting for the Save project outcome line
+FAILED tests/test_b100_active_variant.py::test_r_proj_rollback_9_2_a_link_loop_at_a_composition_name_ends_in_the_rollback_refusal
+FAILED tests/test_b100_active_variant.py::test_r_proj_rollback_2_a_failed_save_keeps_a_patches_folder_that_existed_before
+FAILED tests/test_b100_active_variant.py::test_r_proj_rollback_9_by_keys_save_project_with_a_link_loop_swapped_in_at_a_composition_name
+3 failed, 71 deselected in 190.23s (0:03:10)
+MUTANT M-10: manifest_writer._reject_unsafe_entry returns None (accepts a link entry)
+  file s19_app/tui/services/manifest_writer.py sha256 before: 254693df5dcdf38a5045f40e321862c130fad80865b98217fba4436642de58b4
+extra env: {}
+pytest exit code: 1 -> RED (mutant killed)
+  file s19_app/tui/services/manifest_writer.py sha256 after restore: 254693df5dcdf38a5045f40e321862c130fad80865b98217fba4436642de58b4 REVERTED byte-exact
+
+======== wm11 ========
+HOST: Windows PC
+2026-11-05T19:27:27Z
+<HOME>\AppData\Local\Temp\s19c3\mwt\s19_app\__init__.py 3.11.15
+        refuses a link entry, and a failed save must leave no copy behind.
+>       assert left == (False, False), f"the failed save left a gathered copy: {left}"
+E       AssertionError: the failed save left a gathered copy: (True, True)
+E       assert (True, True) == (False, False)
+E         
+E         At index 0 diff: True != False
+E         Use -v to get more diff
+_ test_r_proj_rollback_2_a_failed_save_keeps_a_patches_folder_that_existed_before _
+    def test_r_proj_rollback_2_a_failed_save_keeps_a_patches_folder_that_existed_before(
+E       AssertionError: (gathered copy left, patches/ kept, its content) = (True, True, ['x.json'])
+E       assert (True, True, ['x.json']) == (False, True, [])
+E         
+E         At index 0 diff: True != False
+E         Use -v to get more diff
+>       assert left == (False, False), f"the failed save left a gathered copy: {left}"
+E       AssertionError: the failed save left a gathered copy: (True, True)
+E       assert (True, True) == (False, False)
+E         
+E         At index 0 diff: True != False
+E         Use -v to get more diff
+FAILED tests/test_b100_active_variant.py::test_r_proj_rollback_9_2_a_link_loop_at_a_composition_name_ends_in_the_rollback_refusal
+FAILED tests/test_b100_active_variant.py::test_r_proj_rollback_2_a_failed_save_keeps_a_patches_folder_that_existed_before
+FAILED tests/test_b100_active_variant.py::test_r_proj_rollback_9_by_keys_save_project_with_a_link_loop_swapped_in_at_a_composition_name
+3 failed, 71 deselected in 11.05s
+MUTANT M-11: the gather's written list not handed to the rollback (placed_files.extend(gather_outcome.written) removed)
+  file s19_app/tui/app.py sha256 before: f9ff7383a36b2197e7833582ce04b9099ade717ad6f1c31345f9bb4e5f769d2a
+extra env: {}
+pytest exit code: 1 -> RED (mutant killed)
+  file s19_app/tui/app.py sha256 after restore: f9ff7383a36b2197e7833582ce04b9099ade717ad6f1c31345f9bb4e5f769d2a REVERTED byte-exact
+
+======== wm12 ========
+HOST: Windows PC
+2026-11-05T19:18:50Z
+<HOME>\AppData\Local\Temp\s19c3\mwt\s19_app\__init__.py 3.11.15
+_ test_r_proj_rollback_2_a_failed_save_keeps_a_patches_folder_that_existed_before _
+    def test_r_proj_rollback_2_a_failed_save_keeps_a_patches_folder_that_existed_before(
+E       AssertionError: (gathered copy left, patches/ kept, its content) = (False, False, None)
+E       assert (False, False, None) == (False, True, [])
+E         
+E         At index 1 diff: False != True
+E         Use -v to get more diff
+PASSED tests/test_b100_active_variant.py::test_r_proj_rollback_9_2_a_link_loop_at_a_composition_name_ends_in_the_rollback_refusal
+FAILED tests/test_b100_active_variant.py::test_r_proj_rollback_2_a_failed_save_keeps_a_patches_folder_that_existed_before
+1 failed, 1 passed, 71 deselected in 6.38s
+MUTANT M-12: the gather records every home as created (home_preexisted forced False), so the rollback removes a pre-existing empty patches/
+  file s19_app/tui/services/project_gather_service.py sha256 before: 6700ab54fdd7102a61e21774d7b4ad31fa99dfa4fecf69f880bbf10109d4ea2e
+extra env: {}
+pytest exit code: 1 -> RED (mutant killed)
+  file s19_app/tui/services/project_gather_service.py sha256 after restore: 6700ab54fdd7102a61e21774d7b4ad31fa99dfa4fecf69f880bbf10109d4ea2e REVERTED byte-exact

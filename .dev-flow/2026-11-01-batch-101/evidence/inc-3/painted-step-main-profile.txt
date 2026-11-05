@@ -1,0 +1,72 @@
+# painted step: main-thread cProfile from the click's return to the test's predicate (one run), tree e266395
+Mon Nov  2 09:38:54 2026    paint.prof
+
+         4573812 function calls (4538581 primitive calls) in 1.909 seconds
+
+   Ordered by: cumulative time
+   List reduced from 1916 to 60 due to restriction <60>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+       80    0.004    0.000    1.907    0.024 asyncio\base_events.py:1859(_run_once)
+     4894    0.003    0.000    1.718    0.000 asyncio\events.py:82(_run)
+     4894    0.004    0.000    1.715    0.000 {method 'run' of '_contextvars.Context' objects}
+11981/8700    0.009    0.000    1.248    0.000 site-packages\textual\_callback.py:62(invoke)
+11981/8700    0.012    0.000    1.240    0.000 site-packages\textual\_callback.py:45(_invoke)
+     4083    0.002    0.000    1.183    0.000 site-packages\textual\message_pump.py:562(_process_messages)
+     4066    0.027    0.000    1.130    0.000 site-packages\textual\message_pump.py:634(_process_messages_loop)
+     5458    0.015    0.000    0.984    0.000 site-packages\textual\message_pump.py:707(_dispatch_message)
+     5025    0.012    0.000    0.947    0.000 site-packages\textual\message_pump.py:810(_on_message)
+     4440    0.002    0.000    0.933    0.000 site-packages\textual\message_pump.py:802(on_event)
+       12    0.002    0.000    0.835    0.070 site-packages\textual\screen.py:1316(_refresh_layout)
+        3    0.000    0.000    0.649    0.216 .dev-flow\2026-11-01-batch-101\evidence\inc-3\painted-step-script.py:48(_layout)
+       19    0.000    0.000    0.401    0.021 site-packages\textual\_compositor.py:525(_arrange_root)
+  1813/19    0.011    0.000    0.401    0.021 site-packages\textual\_compositor.py:548(add_widget)
+       17    0.000    0.000    0.399    0.023 site-packages\textual\screen.py:1188(_compositor_refresh)
+        9    0.000    0.000    0.397    0.044 site-packages\textual\_compositor.py:1096(render_update)
+     12/9    0.008    0.001    0.397    0.044 site-packages\textual\_compositor.py:1200(_render_chops)
+       12    0.001    0.000    0.387    0.032 site-packages\textual\_compositor.py:365(reflow)
+        4    0.000    0.000    0.384    0.096 .dev-flow\2026-11-01-batch-101\evidence\inc-3\painted-step-script.py:67(_comp)
+  515/178    0.001    0.000    0.379    0.002 site-packages\textual\_compositor.py:1031(_get_renders)
+  503/169    0.000    0.000    0.379    0.002 site-packages\textual\widget.py:4271(render_lines)
+  503/169    0.003    0.000    0.378    0.002 site-packages\textual\_styles_cache.py:99(render_widget)
+16751/6590    0.007    0.000    0.364    0.000 site-packages\rich\console.py:1294(render)
+  503/169    0.004    0.000    0.363    0.002 site-packages\textual\_styles_cache.py:163(render)
+  995/407    0.006    0.000    0.353    0.001 site-packages\textual\_styles_cache.py:267(render_line)
+    84/66    0.002    0.000    0.350    0.005 site-packages\textual\_arrange.py:39(arrange)
+  379/362    0.001    0.000    0.348    0.001 site-packages\textual\widget.py:1335(arrange)
+    82/64    0.001    0.000    0.333    0.005 site-packages\textual\_resolve.py:218(resolve_box_models)
+       12    0.000    0.000    0.323    0.027 site-packages\textual\screen.py:1236(_on_timer_update)
+    51/37    0.004    0.000    0.322    0.009 site-packages\textual\layouts\vertical.py:20(arrange)
+        1    0.000    0.000    0.306    0.306 site-packages\textual\screen.py:1510(_on_resize)
+        2    0.000    0.000    0.306    0.153 site-packages\textual\screen.py:1460(_screen_resized)
+2075/1891    0.004    0.000    0.304    0.000 site-packages\rich\segment.py:306(split_and_crop_lines)
+        7    0.000    0.000    0.276    0.039 site-packages\textual\_compositor.py:1165(render_partial_update)
+       21    0.000    0.000    0.259    0.012 tests\test_b100_project_check.py:85(_wait_for)
+  560/534    0.061    0.000    0.258    0.000 site-packages\textual\css\stylesheet.py:470(apply)
+    82/64    0.002    0.000    0.252    0.004 site-packages\textual\_resolve.py:250(<listcomp>)
+ 1151/491    0.011    0.000    0.251    0.001 site-packages\textual\widget.py:1736(_get_box_model)
+        1    0.000    0.000    0.247    0.247 site-packages\textual\screen.py:1465(_on_screen_resume)
+  951/392    0.001    0.000    0.242    0.001 site-packages\textual\widget.py:4250(render_line)
+   213/53    0.001    0.000    0.242    0.005 site-packages\textual\widget.py:4242(_render_content)
+   213/53    0.002    0.000    0.238    0.004 site-packages\textual\visual.py:190(to_strips)
+       20    0.000    0.000    0.236    0.012 .dev-flow\2026-11-01-batch-101\evidence\inc-3\painted-step-script.py:78(drive)
+    37/36    0.000    0.000    0.231    0.006 site-packages\textual\visual.py:324(render_strips)
+    37/36    0.000    0.000    0.229    0.006 site-packages\textual\visual.py:348(<listcomp>)
+  598/158    0.001    0.000    0.223    0.001 site-packages\textual\widget.py:1912(get_content_height)
+3263/3261    0.002    0.000    0.218    0.000 site-packages\textual\widget.py:199(<genexpr>)
+3336/3334    0.002    0.000    0.216    0.000 site-packages\textual\widget.py:193(<genexpr>)
+       24    0.000    0.000    0.196    0.008 site-packages\textual\pilot.py:535(pause)
+     2921    0.007    0.000    0.190    0.000 site-packages\textual\renderables\background_screen.py:34(process_segments)
+       80    0.000    0.000    0.184    0.002 asyncio\windows_events.py:442(select)
+       80    0.000    0.000    0.184    0.002 asyncio\windows_events.py:812(_poll)
+       99    0.184    0.002    0.184    0.002 {built-in method _overlapped.GetQueuedCompletionStatus}
+       21    0.000    0.000    0.180    0.009 site-packages\textual\timer.py:143(_run_timer)
+       21    0.000    0.000    0.180    0.009 site-packages\textual\timer.py:150(_run)
+       14    0.000    0.000    0.179    0.013 site-packages\textual\timer.py:180(_tick)
+1938/1932    0.003    0.000    0.172    0.000 site-packages\rich\protocol.py:18(rich_cast)
+        3    0.000    0.000    0.168    0.056 site-packages\textual\_compositor.py:1245(__rich__)
+        3    0.000    0.000    0.168    0.056 site-packages\textual\_compositor.py:1185(render_strips)
+    22/16    0.000    0.000    0.167    0.010 site-packages\textual\layout.py:250(get_content_height)
+
+
+

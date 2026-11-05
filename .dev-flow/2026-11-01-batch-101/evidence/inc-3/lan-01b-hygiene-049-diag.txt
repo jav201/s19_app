@@ -1,0 +1,5 @@
+DIAG: run test_r_tst_049 with _merge_base_with_main patched to origin/main merge-base (9f9f6af); main ref here is e273181a
+s19_app/tests module file: <HOME>/work/s19_inc3/tests/test_suite_hygiene.py
+base = 9f9f6af6417ac1a3d7fd7679a93995b38088e6f1
+test_r_tst_049 PASSED against base 9f9f6af
+EXIT=0

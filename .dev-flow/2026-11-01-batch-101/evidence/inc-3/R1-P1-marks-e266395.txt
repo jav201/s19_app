@@ -1,0 +1,9 @@
+# R1-P1 marks, Windows, tree e266395, 2026-11-02T15:22:00Z
+s19_app from <HOME>\Github\s19_app-b101-inc3\s19_app\__init__.py
+marks    {'handler_return': 0.196, 'worker_start': 0.213, 'worker_end': 1.171, 'commit_start': 1.171, 'status': 1.171, 'commit_end': 1.181} ['Project saved + manifest verified']
+marks    {'handler_return': 0.202, 'worker_start': 0.219, 'worker_end': 1.252, 'commit_start': 1.252, 'status': 1.252, 'commit_end': 1.263} ['Project saved + manifest verified']
+marks    {'handler_return': 0.197, 'worker_start': 0.217, 'worker_end': 1.306, 'commit_start': 1.307, 'status': 1.307, 'commit_end': 1.321} ['Project saved + manifest verified']
+marks    {'handler_return': 0.204, 'worker_start': 0.222, 'worker_end': 1.379, 'commit_start': 1.379, 'status': 1.379, 'commit_end': 1.389} ['Project saved + manifest verified']
+marks    {'handler_return': 0.2, 'worker_start': 0.218, 'worker_end': 1.314, 'commit_start': 1.314, 'status': 1.314, 'commit_end': 1.326} ['Project saved + manifest verified']
+marks    {'handler_return': 0.156, 'worker_start': 0.175, 'worker_end': 1.008, 'commit_start': 1.008, 'status': 1.008, 'commit_end': 1.02} ['Project saved + manifest verified']
+exit=0

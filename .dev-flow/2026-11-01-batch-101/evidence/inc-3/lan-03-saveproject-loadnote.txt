@@ -1,0 +1,5 @@
+host-load before run 1: 2.19 4.68 3.95 2/704 20665 2 
+host-load before run 2: 2.16 4.60 3.92 2/704 20699 2 
+host-load before run 3: 2.06 4.49 3.90 2/704 20737 2 
+host-load before run 4: 2.12 4.43 3.88 2/704 20780 2 
+host-load before run 5: 2.11 4.35 3.86 2/704 20815 2 

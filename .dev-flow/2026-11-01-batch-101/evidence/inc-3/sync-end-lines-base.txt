@@ -1,0 +1,27 @@
+# sync end lines with the project folder gone (F8), Windows, tree 99696fa (product code = e266395), 2026-11-02T16:16:20Z
+File not found: <HOME>\AppData\Local\Temp\s19i3\runs\tmpq9mm32af\app\.s19tool\workarea\P2\firmware.s19
+File not found: <HOME>\AppData\Local\Temp\s19i3\runs\tmpqewuyaod\app\.s19tool\workarea\P2\firmware.s19
+s19_app from <HOME>\Github\s19_app-b101-inc3\s19_app\__init__.py
+[s19/deleted] exited=False lexists=True isdir=True
+    Project saved + manifest verified
+    Project 'P2' now opens other.s19
+    Added variant 'other' to project 'P2'
+    Loaded other.s19
+[s19/file] exited=False lexists=True isdir=False
+    Project sync NOT done: project 'P2' could not be read — check that the folder can be opened, then load again.
+    Loaded other.s19
+[hex/deleted] exited=False lexists=True isdir=True
+    Project saved + manifest verified
+    Project 'P2' now opens other.hex
+    Added variant 'other' to project 'P2'
+    Loaded other.hex
+[hex/file] exited=False lexists=True isdir=False
+    Project sync NOT done: project 'P2' could not be read — check that the folder can be opened, then load again.
+    Loaded other.hex
+[mac/deleted] exited=False lexists=True isdir=True
+    Project saved + manifest verified
+    Loaded other.mac
+[mac/file] exited=False lexists=True isdir=False
+    Project sync NOT done: project 'P2' could not be read — check that the folder can be opened, then load again.
+    Loaded other.mac
+exit=0

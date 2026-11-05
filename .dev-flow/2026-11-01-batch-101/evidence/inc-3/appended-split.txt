@@ -1,0 +1,44 @@
+# sec6_5 appended split (distinct-folders scene), Windows, tree e266395, 2026-11-02T15:55:38Z
+s19_app from <HOME>\Github\s19_app-b101-inc3\s19_app\__init__.py
+{'start': 0.0, 'sync_start': 0.164, 'status': 0.886, 'sync_end': 0.889}
+{'start': 0.0, 'sync_start': 0.278, 'status': 1.02, 'sync_end': 1.023}
+{'start': 0.0, 'sync_start': 0.117, 'status': 0.828, 'sync_end': 0.83}
+{'start': 0.0, 'sync_start': 0.309, 'status': 0.962, 'sync_end': 0.965}
+{'start': 0.0, 'sync_start': 0.118, 'status': 0.863, 'sync_end': 0.865}
+## cProfile of the sync, accumulated over the 5 runs
+Mon Nov  2 09:56:16 2026    append2.prof
+
+         4183569 function calls (4181549 primitive calls) in 3.578 seconds
+
+   Ordered by: cumulative time
+   List reduced from 613 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        5    0.007    0.001    3.586    0.717 s19_app\tui\app.py:14572(_sync_loaded_file_to_project)
+        5    0.007    0.001    2.151    0.430 s19_app\tui\app.py:14406(_rewrite_project_manifest)
+        5    0.009    0.002    2.141    0.428 s19_app\tui\services\variant_execution_service.py:1438(read_project_manifest)
+    30000    0.040    0.000    1.201    0.000 s19_app\tui\services\variant_execution_service.py:758(_walk_manifest_entry)
+    20000    0.014    0.000    1.200    0.000 s19_app\tui\services\variant_execution_service.py:823(_resolve_manifest_entry)
+       10    0.017    0.002    1.147    0.115 s19_app\tui\workspace.py:1874(validate_project_files)
+    30000    0.091    0.000    1.122    0.000 s19_app\tui\services\variant_execution_service.py:619(check)
+    30025    0.026    0.000    1.058    0.000 pathlib.py:1261(is_file)
+    30175    0.012    0.000    1.035    0.000 pathlib.py:1008(stat)
+    30225    0.931    0.000    1.025    0.000 {built-in method nt.stat}
+    25000    0.029    0.000    0.853    0.000 s19_app\tui\services\variant_execution_service.py:575(_lstat_state)
+    25070    0.724    0.000    0.824    0.000 {built-in method nt.lstat}
+        5    0.026    0.005    0.809    0.162 s19_app\tui\services\variant_execution_service.py:1299(_parse_manifest_derived_from)
+    10000    0.012    0.000    0.755    0.000 s19_app\tui\services\variant_execution_service.py:1148(_recorded_file)
+        5    0.000    0.000    0.657    0.131 s19_app\tui\app.py:14517(_activate_project_file)
+    30000    0.093    0.000    0.629    0.000 s19_app\tui\services\variant_execution_service.py:651(_entry_text)
+   110165    0.130    0.000    0.474    0.000 pathlib.py:484(_parse_args)
+        5    0.015    0.003    0.438    0.088 s19_app\tui\services\variant_execution_service.py:1233(_parse_manifest_files)
+    85085    0.055    0.000    0.436    0.000 pathlib.py:504(_from_parts)
+    60000    0.022    0.000    0.350    0.000 pathlib.py:469(__new__)
+   110165    0.187    0.000    0.312    0.000 pathlib.py:56(parse_parts)
+    30000    0.049    0.000    0.289    0.000 s19_app\tui\services\variant_execution_service.py:499(_manifest_key_refusal)
+    55420    0.027    0.000    0.195    0.000 pathlib.py:546(__fspath__)
+    55455    0.115    0.000    0.168    0.000 pathlib.py:536(__str__)
+    25075    0.009    0.000    0.162    0.000 pathlib.py:765(__truediv__)
+
+
+

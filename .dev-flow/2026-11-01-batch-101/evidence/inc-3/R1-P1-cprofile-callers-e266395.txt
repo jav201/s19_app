@@ -1,0 +1,73 @@
+# R1-P1 cProfile call structure of the worker step (from the profile run's dump), tree e266395
+   Ordered by: cumulative time
+   List reduced from 351 to 1 due to restriction <'_save_project_files'>
+Function                                                                               called...
+                                                                                           ncalls  tottime  cumtime
+s19_app\tui\app.py:11542(_save_project_files)  ->       1    0.000    0.000  s19_app\tui\app.py:2251(__init__)
+                                                                                                1    0.000    0.000  s19_app\tui\app.py:2263(extend)
+                                                                                                1    0.000    0.000  s19_app\tui\app.py:2268(_plan_row_mismatch)
+                                                                                                1    0.000    0.001  s19_app\tui\app.py:11563(tick)
+                                                                                                1    0.000    0.000  s19_app\tui\app.py:11611(<listcomp>)
+                                                                                                1    0.000    0.000  s19_app\tui\app.py:11612(<listcomp>)
+                                                                                                1    0.000    0.000  s19_app\tui\app.py:11813(<genexpr>)
+                                                                                                1    0.000    0.000  s19_app\tui\app.py:11836(<listcomp>)
+                                                                                                1    0.002    0.742  s19_app\tui\app.py:12305(_write_manifest_for_save)
+                                                                                                1    0.000    0.000  s19_app\tui\app.py:20494(_progress_forwarder)
+                                                                                                1    0.000    0.000  s19_app\tui\services\project_gather_service.py:180(document_home_for_kind)
+                                                                                                1    0.005    0.784  s19_app\tui\services\project_gather_service.py:525(gather_project_artifacts)
+                                                                                                1    0.000    0.000  s19_app\tui\services\variant_execution_service.py:2061(manifest_keep_reason)
+                                                                                                1    0.000    0.005  s19_app\tui\workspace.py:1032(place_into_workarea)
+                                                                                                2    0.000    0.001  s19_app\tui\workspace.py:1874(validate_project_files)
+                                                                                                1    0.000    0.000  s19_app\tui\workspace.py:1929(build_variant_set)
+                                                                                                3    0.000    0.000  _weakrefset.py:39(_remove)
+                                                                                                1    0.000    0.000  logging\__init__.py:1479(info)
+                                                                                                1    0.000    0.000  pathlib.py:622(name)
+                                                                                                1    0.000    0.000  pathlib.py:630(suffix)
+                                                                                                4    0.000    0.000  pathlib.py:765(__truediv__)
+                                                                                                1    0.000    0.000  pathlib.py:1046(read_bytes)
+                                                                                                1    0.000    0.019  pathlib.py:1111(mkdir)
+                                                                                                1    0.000    0.000  pathlib.py:1261(is_file)
+                                                                                                3    0.000    0.002  site-packages\textual\app.py:1788(call_from_thread)
+                                                                                                1    0.000    0.000  {built-in method builtins.any}
+                                                                                                1    0.000    0.000  {built-in method builtins.len}
+                                                                                                2    0.000    0.000  {built-in method builtins.next}
+                                                                                                1    0.000    0.000  {method 'extend' of 'list' objects}
+                                                                                                1    0.000    0.000  {method 'get' of 'dict' objects}
+                                                                                                1    0.000    0.000  {method 'lower' of 'str' objects}
+                                                                                                2    0.000    0.000  {method 'values' of 'dict' objects}
+   Ordered by: cumulative time
+   List reduced from 351 to 1 due to restriction <'_write_manifest_for_save'>
+Function                                                                                    called...
+                                                                                                ncalls  tottime  cumtime
+s19_app\tui\app.py:12305(_write_manifest_for_save)  ->       1    0.000    0.000  s19_app\tui\app.py:11965(_manifest_written)
+                                                                                                     1    0.000    0.259  s19_app\tui\services\manifest_writer.py:526(write_project_manifest)
+                                                                                                     1    0.001    0.480  s19_app\tui\services\manifest_writer.py:785(verify_written_manifest)
+                                                                                                     1    0.000    0.001  s19_app\tui\services\manifest_writer.py:987(project_file_records)
+   Ordered by: cumulative time
+   List reduced from 351 to 1 due to restriction <'gather_project_artifacts'>
+Function                                                                                                              was called by...
+                                                                                                                          ncalls  tottime  cumtime
+s19_app\tui\services\project_gather_service.py:525(gather_project_artifacts)  <-       1    0.005    0.784  s19_app\tui\app.py:11542(_save_project_files)
+   Ordered by: cumulative time
+   List reduced from 351 to 1 due to restriction <'read_project_manifest'>
+Function                                                                                                               was called by...
+                                                                                                                           ncalls  tottime  cumtime
+s19_app\tui\services\variant_execution_service.py:1438(read_project_manifest)  <-       1    0.001    0.300  s19_app\tui\services\manifest_writer.py:785(verify_written_manifest)
+   Ordered by: cumulative time
+   List reduced from 351 to 1 due to restriction <'_resolve_manifest_entry'>
+Function                                                                                                                was called by...
+                                                                                                                            ncalls  tottime  cumtime
+s19_app\tui\services\variant_execution_service.py:823(_resolve_manifest_entry)  <-    2001    0.001    0.249  s19_app\tui\services\manifest_writer.py:208(_reject_unsafe_entry)
+                                                                                                                              2000    0.001    0.293  s19_app\tui\services\variant_execution_service.py:1438(read_project_manifest)
+   Ordered by: cumulative time
+   List reduced from 351 to 1 due to restriction <'pathlib.py.*\\(resolve\\)'>
+Function                                                          was called by...
+                                                                      ncalls  tottime  cumtime
+pathlib.py:981(resolve)  <-       2    0.000    0.004  s19_app\tui\services\manifest_writer.py:747(_resolve_intended_entries)
+                                                                           1    0.000    0.006  s19_app\tui\services\manifest_writer.py:785(verify_written_manifest)
+                                                                           1    0.000    0.000  s19_app\tui\services\manifest_writer.py:889(<dictcomp>)
+                                                                        2001    0.006    0.649  s19_app\tui\services\project_gather_service.py:525(gather_project_artifacts)
+                                                                           1    0.000    0.000  s19_app\tui\services\variant_execution_service.py:1438(read_project_manifest)
+                                                                           6    0.000    0.001  s19_app\tui\workspace.py:620(contained_in_workarea)
+                                                                           6    0.000    0.001  s19_app\tui\workspace.py:663(_guarded_destination)
+                                                                           1    0.000    0.000  s19_app\tui\workspace.py:1032(place_into_workarea)

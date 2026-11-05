@@ -1,0 +1,81 @@
+# E5 corrective C-9 (CR-3): stamp-pair gap (arm value minus observer difference) of the R-TST-111/112 verifier, LAN Linux host, Python 3.11.18, serial (-m serial_timing, one node run per invocation, -s).
+# Runs 1-3: another agent's 8-worker pytest lane was running on the host (load 3.6-6.6); run 3 stopped at the arm's own 'sec6_5 appended' 1 s bound (1.0009 s), not at the equality, and is not counted.
+# Runs 4-6: idle host (load < 1): the 3 counted runs. Largest gap in any run: +79.7 us (run 2, loaded); idle max +52.4 us. N-3's trigger is 0.5 ms: not reached, the 1 ms tolerance stays.
+
+======== run 1 ========
+HOST: LAN Linux host
+HEAD: 9f9f6af6 + Inc 3 working-tree diff
+2026-11-05T19:13:24Z
+ 13:13:24 up 2 days, 20:18,  3 users,  load average: 3.56, 1.76, 1.97
+<HOME>/work/s19_inc3c/s19_app/__init__.py 3.11.18
+GAP TC-B100-61 all-bad painted: +51.4 us
+GAP TC-B100-61 cap painted: +69.4 us
+GAP sec6_5 painted: +62.9 us
+GAP sec6_5 appended: -0.3 us
+LOW 16.9%  0.831 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+3 passed in 31.53s
+
+======== run 2 ========
+HOST: LAN Linux host
+HEAD: 9f9f6af6 + Inc 3 working-tree diff
+2026-11-05T19:13:59Z
+ 13:13:59 up 2 days, 20:19,  3 users,  load average: 5.75, 2.50, 2.21
+<HOME>/work/s19_inc3c/s19_app/__init__.py 3.11.18
+GAP TC-B100-61 all-bad painted: +71.3 us
+GAP TC-B100-61 cap painted: +75.6 us
+GAP sec6_5 painted: +79.7 us
+GAP sec6_5 appended: -2.3 us
+LOW 18.3%  0.817 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+3 passed in 30.78s
+
+======== run 3 ========
+HOST: LAN Linux host
+HEAD: 9f9f6af6 + Inc 3 working-tree diff
+2026-11-05T19:14:33Z
+ 13:14:33 up 2 days, 20:19,  3 users,  load average: 6.59, 3.02, 2.39
+<HOME>/work/s19_inc3c/s19_app/__init__.py 3.11.18
+GAP TC-B100-61 all-bad painted: +51.1 us
+GAP TC-B100-61 cap painted: +63.4 us
+E       AssertionError: {'read': 0.24413328801165335, 'load': 0.6953320330067072, 'painted': 0.8352525460068136, 'appended': 1.0008934749930631}
+E       assert 1.0008934749930631 < 1.0
+E        +  where 1.0 = report_margin('sec6_5 appended', 1.0008934749930631, 1.0)
+E        +    where 1.0 = timing_bound(1.0)
+LOW -0.1%  1.001 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+LOW 16.5%  0.835 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+1 failed, 2 passed in 33.18s
+
+======== run 4 ========
+HOST: LAN Linux host
+HEAD: 9f9f6af6 + Inc 3 working-tree diff
+2026-11-05T19:45:58Z
+ 13:45:58 up 2 days, 20:50,  2 users,  load average: 0.98, 3.57, 6.18
+<HOME>/work/s19_inc3c/s19_app/__init__.py 3.11.18
+GAP TC-B100-61 all-bad painted: +35.0 us
+GAP TC-B100-61 cap painted: +32.6 us
+GAP sec6_5 painted: +42.0 us
+GAP sec6_5 appended: -3.9 us
+3 passed in 15.42s
+
+======== run 5 ========
+HOST: LAN Linux host
+HEAD: 9f9f6af6 + Inc 3 working-tree diff
+2026-11-05T19:46:15Z
+ 13:46:15 up 2 days, 20:51,  2 users,  load average: 0.99, 3.40, 6.07
+<HOME>/work/s19_inc3c/s19_app/__init__.py 3.11.18
+GAP TC-B100-61 all-bad painted: +30.9 us
+GAP TC-B100-61 cap painted: +31.6 us
+GAP sec6_5 painted: +35.2 us
+GAP sec6_5 appended: -3.0 us
+3 passed in 15.51s
+
+======== run 6 ========
+HOST: LAN Linux host
+HEAD: 9f9f6af6 + Inc 3 working-tree diff
+2026-11-05T19:46:33Z
+ 13:46:33 up 2 days, 20:51,  2 users,  load average: 0.91, 3.27, 5.98
+<HOME>/work/s19_inc3c/s19_app/__init__.py 3.11.18
+GAP TC-B100-61 all-bad painted: +31.4 us
+GAP TC-B100-61 cap painted: +31.7 us
+GAP sec6_5 painted: +52.4 us
+GAP sec6_5 appended: -2.8 us
+3 passed in 15.72s

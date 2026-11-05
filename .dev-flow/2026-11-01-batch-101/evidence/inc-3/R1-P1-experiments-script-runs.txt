@@ -1,0 +1,36 @@
+[none] s19_app from <HOME>\Github\s19_app-b101-inc3\s19_app\__init__.py
+[none] marks    {'handler_return': 0.198, 'worker_start': 0.213, 'worker_end': 1.251, 'commit_start': 1.251, 'status': 1.251, 'commit_end': 1.264} ['Project saved + manifest verified']
+[none] marks    {'handler_return': 0.198, 'worker_start': 0.219, 'worker_end': 1.251, 'commit_start': 1.251, 'status': 1.252, 'commit_end': 1.264} ['Project saved + manifest verified']
+[none] marks    {'handler_return': 0.188, 'worker_start': 0.213, 'worker_end': 1.25, 'commit_start': 1.25, 'status': 1.25, 'commit_end': 1.263} ['Project saved + manifest verified']
+[none] marks    {'handler_return': 0.203, 'worker_start': 0.231, 'worker_end': 1.239, 'commit_start': 1.24, 'status': 1.24, 'commit_end': 1.25} ['Project saved + manifest verified']
+[none] marks    {'handler_return': 0.18, 'worker_start': 0.203, 'worker_end': 1.288, 'commit_start': 1.289, 'status': 1.289, 'commit_end': 1.301} ['Project saved + manifest verified']
+[gather] s19_app from <HOME>\Github\s19_app-b101-inc3\s19_app\__init__.py
+[gather] marks    {'handler_return': 0.175, 'worker_start': 0.186, 'worker_end': 0.748, 'commit_start': 0.749, 'status': 0.749, 'commit_end': 0.759} ['Project saved + manifest verified']
+[gather] marks    {'handler_return': 0.167, 'worker_start': 0.191, 'worker_end': 0.778, 'commit_start': 0.778, 'status': 0.779, 'commit_end': 0.795} ['Project saved + manifest verified']
+[gather] marks    {'handler_return': 0.169, 'worker_start': 0.187, 'worker_end': 0.916, 'commit_start': 0.916, 'status': 0.916, 'commit_end': 0.932} ['Project saved + manifest verified']
+[gather] marks    {'handler_return': 0.197, 'worker_start': 0.215, 'worker_end': 0.862, 'commit_start': 0.862, 'status': 0.862, 'commit_end': 0.872} ['Project saved + manifest verified']
+[gather] marks    {'handler_return': 0.206, 'worker_start': 0.228, 'worker_end': 0.797, 'commit_start': 0.797, 'status': 0.797, 'commit_end': 0.809} ['Project saved + manifest verified']
+[memo] s19_app from <HOME>\Github\s19_app-b101-inc3\s19_app\__init__.py
+[memo] marks    {'handler_return': 0.129, 'worker_start': 0.154, 'worker_end': 0.926, 'commit_start': 0.926, 'status': 0.926, 'commit_end': 0.941} ['Project saved + manifest verified']
+[memo] marks    {'handler_return': 0.149, 'worker_start': 0.172, 'worker_end': 1.122, 'commit_start': 1.122, 'status': 1.123, 'commit_end': 1.137} ['Project saved + manifest verified']
+[memo] marks    {'handler_return': 0.123, 'worker_start': 0.148, 'worker_end': 1.253, 'commit_start': 1.254, 'status': 1.254, 'commit_end': 1.266} ['Project saved + manifest verified']
+[memo] marks    {'handler_return': 0.136, 'worker_start': 0.155, 'worker_end': 1.244, 'commit_start': 1.245, 'status': 1.245, 'commit_end': 1.256} ['Project saved + manifest verified']
+[memo] marks    {'handler_return': 0.12, 'worker_start': 0.144, 'worker_end': 1.113, 'commit_start': 1.113, 'status': 1.113, 'commit_end': 1.125} ['Project saved + manifest verified']
+[gather,memo] s19_app from <HOME>\Github\s19_app-b101-inc3\s19_app\__init__.py
+[gather,memo] marks    {'handler_return': 0.138, 'worker_start': 0.158, 'worker_end': 0.749, 'commit_start': 0.749, 'status': 0.749, 'commit_end': 0.761} ['Project saved + manifest verified']
+[gather,memo] marks    {'handler_return': 0.139, 'worker_start': 0.153, 'worker_end': 0.752, 'commit_start': 0.752, 'status': 0.752, 'commit_end': 0.763} ['Project saved + manifest verified']
+[gather,memo] marks    {'handler_return': 0.141, 'worker_start': 0.16, 'worker_end': 0.775, 'commit_start': 0.776, 'status': 0.776, 'commit_end': 0.791} ['Project saved + manifest verified']
+[gather,memo] marks    {'handler_return': 0.134, 'worker_start': 0.149, 'worker_end': 1.116, 'commit_start': 1.116, 'status': 1.116, 'commit_end': 1.128} ['Project saved + manifest verified']
+[gather,memo] marks    {'handler_return': 0.122, 'worker_start': 0.14, 'worker_end': 0.867, 'commit_start': 0.868, 'status': 0.868, 'commit_end': 0.878} ['Project saved + manifest verified']
+[none] s19_app from <HOME>\Github\s19_app-b101-inc3\s19_app\__init__.py
+[none] marks    {'handler_return': 0.19, 'worker_start': 0.216, 'worker_end': 1.127, 'commit_start': 1.127, 'status': 1.127, 'commit_end': 1.139} ['Project saved + manifest verified']
+[none] marks    {'handler_return': 0.193, 'worker_start': 0.21, 'worker_end': 1.071, 'commit_start': 1.072, 'status': 1.072, 'commit_end': 1.085} ['Project saved + manifest verified']
+[none] marks    {'handler_return': 0.18, 'worker_start': 0.197, 'worker_end': 1.272, 'commit_start': 1.273, 'status': 1.273, 'commit_end': 1.285} ['Project saved + manifest verified']
+[none] marks    {'handler_return': 0.201, 'worker_start': 0.22, 'worker_end': 1.164, 'commit_start': 1.164, 'status': 1.164, 'commit_end': 1.18} ['Project saved + manifest verified']
+[none] marks    {'handler_return': 0.201, 'worker_start': 0.22, 'worker_end': 1.362, 'commit_start': 1.363, 'status': 1.363, 'commit_end': 1.378} ['Project saved + manifest verified']
+[gather,memo] s19_app from <HOME>\Github\s19_app-b101-inc3\s19_app\__init__.py
+[gather,memo] marks    {'handler_return': 0.131, 'worker_start': 0.16, 'worker_end': 0.661, 'commit_start': 0.661, 'status': 0.661, 'commit_end': 0.671} ['Project saved + manifest verified']
+[gather,memo] marks    {'handler_return': 0.129, 'worker_start': 0.144, 'worker_end': 0.732, 'commit_start': 0.732, 'status': 0.732, 'commit_end': 0.744} ['Project saved + manifest verified']
+[gather,memo] marks    {'handler_return': 0.119, 'worker_start': 0.133, 'worker_end': 0.708, 'commit_start': 0.708, 'status': 0.708, 'commit_end': 0.721} ['Project saved + manifest verified']
+[gather,memo] marks    {'handler_return': 0.112, 'worker_start': 0.134, 'worker_end': 0.706, 'commit_start': 0.706, 'status': 0.706, 'commit_end': 0.721} ['Project saved + manifest verified']
+[gather,memo] marks    {'handler_return': 0.143, 'worker_start': 0.158, 'worker_end': 0.967, 'commit_start': 0.967, 'status': 0.967, 'commit_end': 0.978} ['Project saved + manifest verified']

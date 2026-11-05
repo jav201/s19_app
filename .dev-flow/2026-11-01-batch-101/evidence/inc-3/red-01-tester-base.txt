@@ -1,0 +1,1082 @@
+BASE REVISION: 9f9f6af6417ac1a3d7fd7679a93995b38088e6f1 (git merge-base HEAD main of the Inc 3 branch; detached worktree, only the 4 test files copied in)
+ENV: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<isolated> ; interpreter: s19env python 3.11; pytest --basetemp <isolated> -p no:cacheprovider -q
+### RUN 1: tests/test_project_gather.py -k r_proj_gather_1
+<home>\AppData\Local\Temp\s19e4t3\base\s19_app\__init__.py
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+____ test_r_proj_gather_12_each_distinct_composition_name_is_checked_once _____
+
+tmp_path = WindowsPath('<home>/AppData/Local/Temp/s19e4t3/bt/test_r_proj_gather_12_each_dis0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000233E530D7D0>
+
+    def test_r_proj_gather_12_each_distinct_composition_name_is_checked_once(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A name that appears twice is looked up in the project folder once.
+    
+        Why it matters: Save project of a 1 000-name composition spends its time
+        in this loop; a repeated name must cost one check, not two, and the
+        outcome must be the one the names given once would give.
+    
+        Arms: (1) 1 000 real names given twice -> 1 000 checks, same outcome as
+        given once; (2) a missing name given twice -> 1 check and 1 finding;
+        (3) a ``missing/../x.json`` name is checked once on the folded path
+        ``<project>/x.json`` and counts as already home."""
+        project_dir, kwargs = _composition_scene(tmp_path)
+        names = [f"n{index:04d}.json" for index in range(1000)]
+        for name in names:
+            (project_dir / name).write_text(_change_doc_text(), encoding="utf-8")
+    
+        # Arm 1 — 1 000 names twice.
+        calls = _spy_project_file_checks(monkeypatch, project_dir)
+        doubled = gather_project_artifacts(
+            project_dir, composition_names=names + names, **kwargs
+        )
+>       assert len(calls) == 1000, f"expected 1000 project-folder checks, got {len(calls)}"
+E       AssertionError: expected 1000 project-folder checks, got 2000
+E       assert 2000 == 1000
+E        +  where 2000 = len(['c:\\users\\<user>\\appdata\\local\\temp\\s19e4t3\\bt\\test_r_proj_gather_12_each_dis0\\.s19tool\\workarea\\p\\n0000.j...rs\\<user>\\appdata\\local\\temp\\s19e4t3\\bt\\test_r_proj_gather_12_each_dis0\\.s19tool\\workarea\\p\\n0005.json', ...])
+
+tests\test_project_gather.py:768: AssertionError
+____ test_r_proj_gather_13_a_link_loop_at_a_composition_name_is_not_raised ____
+
+self = WindowsPath('<home>/AppData/Local/Temp/s19e4t3/bt/test_r_proj_gather_13_a_link_l0/.s19tool/workarea/P/x.json')
+strict = False
+
+    def resolve(self, strict=False):
+        """
+        Make the path absolute, resolving all symlinks on the way and also
+        normalizing it.
+        """
+    
+        def check_eloop(e):
+            winerror = getattr(e, 'winerror', 0)
+            if e.errno == ELOOP or winerror == _WINERROR_CANT_RESOLVE_FILENAME:
+                raise RuntimeError("Symlink loop from %r" % e.filename)
+    
+        try:
+            s = os.path.realpath(self, strict=strict)
+        except OSError as e:
+            check_eloop(e)
+            raise
+        p = self._from_parts((s,))
+    
+        # In non-strict mode, realpath() doesn't raise on symlink loops.
+        # Ensure we get an exception by calling stat()
+        if not strict:
+            try:
+>               p.stat()
+
+<home>\anaconda3\envs\s19env\Lib\pathlib.py:1003: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('<home>/AppData/Local/Temp/s19e4t3/bt/test_r_proj_gather_13_a_link_l0/.s19tool/workarea/P/x.json')
+
+    def stat(self, *, follow_symlinks=True):
+        """
+        Return the result of the stat() system call on this path, like
+        os.stat() does.
+        """
+>       return os.stat(self, follow_symlinks=follow_symlinks)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       OSError: [WinError 1921] The name of the file cannot be resolved by the system: 'C:\\Users\\<user>\\AppData\\Local\\Temp\\s19e4t3\\bt\\test_r_proj_gather_13_a_link_l0\\.s19tool\\workarea\\P\\x.json'
+
+<home>\anaconda3\envs\s19env\Lib\pathlib.py:1013: OSError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = WindowsPath('<home>/AppData/Local/Temp/s19e4t3/bt/test_r_proj_gather_13_a_link_l0')
+
+    def test_r_proj_gather_13_a_link_loop_at_a_composition_name_is_not_raised(
+        tmp_path: Path,
+    ) -> None:
+        """Windows: a junction that points to itself stands at the composition
+        name ``x.json`` in the project folder, and the common library holds an
+        ``x.json`` change document. The gather returns (no exception) and looks
+        the name up in the library by its last part.
+    
+        Why it matters: at base the gather raised ``RuntimeError`` on the loop
+        and the whole Save project ended on the unexpected-error line; the
+        gather is collect-don't-abort."""
+        b100_links.require_junctions()
+        project_dir, kwargs = _composition_scene(tmp_path)
+        _library_document(kwargs)
+        link = projects.create_junction_loop(project_dir / "x.json")
+        try:
+>           outcome = gather_project_artifacts(
+                project_dir, composition_names=["x.json"], **kwargs
+            )
+
+tests\test_project_gather.py:819: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+s19_app\tui\services\project_gather_service.py:656: in gather_project_artifacts
+    in_project = (resolved_project / name).resolve()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<home>\anaconda3\envs\s19env\Lib\pathlib.py:1005: in resolve
+    check_eloop(e)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+e = OSError(22, 'The name of the file cannot be resolved by the system')
+
+    def check_eloop(e):
+        winerror = getattr(e, 'winerror', 0)
+        if e.errno == ELOOP or winerror == _WINERROR_CANT_RESOLVE_FILENAME:
+>           raise RuntimeError("Symlink loop from %r" % e.filename)
+E           RuntimeError: Symlink loop from 'C:\\Users\\<user>\\AppData\\Local\\Temp\\s19e4t3\\bt\\test_r_proj_gather_13_a_link_l0\\.s19tool\\workarea\\P\\x.json'
+
+<home>\anaconda3\envs\s19env\Lib\pathlib.py:990: RuntimeError
+_ test_r_proj_gather_13_a_posix_self_symlink_at_a_composition_name_is_not_raised _
+
+self = WindowsPath('<home>/AppData/Local/Temp/s19e4t3/bt/test_r_proj_gather_13_a_posix_0/.s19tool/workarea/P/x.json')
+strict = False
+
+    def resolve(self, strict=False):
+        """
+        Make the path absolute, resolving all symlinks on the way and also
+        normalizing it.
+        """
+    
+        def check_eloop(e):
+            winerror = getattr(e, 'winerror', 0)
+            if e.errno == ELOOP or winerror == _WINERROR_CANT_RESOLVE_FILENAME:
+                raise RuntimeError("Symlink loop from %r" % e.filename)
+    
+        try:
+            s = os.path.realpath(self, strict=strict)
+        except OSError as e:
+            check_eloop(e)
+            raise
+        p = self._from_parts((s,))
+    
+        # In non-strict mode, realpath() doesn't raise on symlink loops.
+        # Ensure we get an exception by calling stat()
+        if not strict:
+            try:
+>               p.stat()
+
+<home>\anaconda3\envs\s19env\Lib\pathlib.py:1003: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('<home>/AppData/Local/Temp/s19e4t3/bt/test_r_proj_gather_13_a_posix_0/.s19tool/workarea/P/x.json')
+
+    def stat(self, *, follow_symlinks=True):
+        """
+        Return the result of the stat() system call on this path, like
+        os.stat() does.
+        """
+>       return os.stat(self, follow_symlinks=follow_symlinks)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       OSError: [WinError 1921] The name of the file cannot be resolved by the system: 'C:\\Users\\<user>\\AppData\\Local\\Temp\\s19e4t3\\bt\\test_r_proj_gather_13_a_posix_0\\.s19tool\\workarea\\P\\x.json'
+
+<home>\anaconda3\envs\s19env\Lib\pathlib.py:1013: OSError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = WindowsPath('<home>/AppData/Local/Temp/s19e4t3/bt/test_r_proj_gather_13_a_posix_0')
+
+    def test_r_proj_gather_13_a_posix_self_symlink_at_a_composition_name_is_not_raised(
+        tmp_path: Path,
+    ) -> None:
+        """A symbolic link that points to itself (``x.json -> x.json``) stands at
+        the composition name in the project folder; the library holds ``x.json``.
+        The gather returns and looks the name up in the library.
+    
+        Skipped where the run may not create symbolic links (Windows without the
+        privilege)."""
+        project_dir, kwargs = _composition_scene(tmp_path)
+        _library_document(kwargs)
+        link = project_dir / "x.json"
+        try:
+            os.symlink("x.json", link)
+        except (OSError, NotImplementedError) as exc:
+            pytest.skip(f"symbolic links are not available to this run: {exc}")
+        try:
+>           outcome = gather_project_artifacts(
+                project_dir, composition_names=["x.json"], **kwargs
+            )
+
+tests\test_project_gather.py:844: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+s19_app\tui\services\project_gather_service.py:656: in gather_project_artifacts
+    in_project = (resolved_project / name).resolve()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<home>\anaconda3\envs\s19env\Lib\pathlib.py:1005: in resolve
+    check_eloop(e)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+e = OSError(22, 'The name of the file cannot be resolved by the system')
+
+    def check_eloop(e):
+        winerror = getattr(e, 'winerror', 0)
+        if e.errno == ELOOP or winerror == _WINERROR_CANT_RESOLVE_FILENAME:
+>           raise RuntimeError("Symlink loop from %r" % e.filename)
+E           RuntimeError: Symlink loop from 'C:\\Users\\<user>\\AppData\\Local\\Temp\\s19e4t3\\bt\\test_r_proj_gather_13_a_posix_0\\.s19tool\\workarea\\P\\x.json'
+
+<home>\anaconda3\envs\s19env\Lib\pathlib.py:990: RuntimeError
+=========================== short test summary info ===========================
+FAILED tests/test_project_gather.py::test_r_proj_gather_12_each_distinct_composition_name_is_checked_once
+FAILED tests/test_project_gather.py::test_r_proj_gather_13_a_link_loop_at_a_composition_name_is_not_raised
+FAILED tests/test_project_gather.py::test_r_proj_gather_13_a_posix_self_symlink_at_a_composition_name_is_not_raised
+3 failed, 15 deselected in 1.50s
+
+### RUN 2: tests/test_b100_workers.py tests/test_b100_active_variant.py -k 'r_proj_002 or r_proj_rollback or tc_b100_54_file_load or tc_b100_54_a2l_sync'
+<home>\AppData\Local\Temp\s19e4t3\base\s19_app\__init__.py
+..FFF...FFFFFF                                                           [100%]
+================================== FAILURES ===================================
+_ test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted[deleted-s19] _
+
+tmp_path = WindowsPath('<home>/AppData/Local/Temp/s19e4t3/bt/test_r_proj_002_12_file_load_s0')
+case = 'deleted-s19'
+
+    @pytest.mark.parametrize("case", _VANISHED_CASES)
+    def test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted(
+        tmp_path: Path, case: str
+    ) -> None:
+        """The open project's folder is gone (deleted, or a regular file stands in
+        its place) when a data-file load syncs into the project: the load still
+        ends ``Loaded other.<ext>``, the refusal line is painted exactly once, no
+        variant is reported added or opened, the app keeps running and no run is
+        left. The three ``file-in-place`` arms hold on the base tree; the three
+        ``deleted`` arms are the new behaviour.
+    
+        Why: a deleted folder used to be re-created, read as empty and filled
+        with a fresh project.json, and the user was told ``Added variant``.
+    
+        Negative control: the base re-creates the folder before reading it, so
+        the ``deleted`` arms see ``Added variant`` / ``manifest verified`` and no
+        refusal."""
+        standing, kind = case.rsplit("-", 1)
+        exited, lines, runs, _exists = _file_load_into_vanished_project(tmp_path, kind, standing)
+        assert not exited, lines
+>       assert lines.count(SYNC_REFUSAL) == 1, lines
+E       AssertionError: ['Project saved + manifest verified', "Project 'P2' now opens other.s19", "Added variant 'other' to project 'P2'", 'Loaded other.s19']
+E       assert 0 == 1
+E        +  where 0 = <built-in method count of list object at 0x0000015AD6F99900>("Project sync NOT done: project 'P2' could not be read — check that the folder can be opened, then load again.")
+E        +    where <built-in method count of list object at 0x0000015AD6F99900> = ['Project saved + manifest verified', "Project 'P2' now opens other.s19", "Added variant 'other' to project 'P2'", 'Loaded other.s19'].count
+
+tests\test_b100_workers.py:3955: AssertionError
+_ test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted[deleted-hex] _
+
+tmp_path = WindowsPath('<home>/AppData/Local/Temp/s19e4t3/bt/test_r_proj_002_12_file_load_s1')
+case = 'deleted-hex'
+
+    @pytest.mark.parametrize("case", _VANISHED_CASES)
+    def test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted(
+        tmp_path: Path, case: str
+    ) -> None:
+        """The open project's folder is gone (deleted, or a regular file stands in
+        its place) when a data-file load syncs into the project: the load still
+        ends ``Loaded other.<ext>``, the refusal line is painted exactly once, no
+        variant is reported added or opened, the app keeps running and no run is
+        left. The three ``file-in-place`` arms hold on the base tree; the three
+        ``deleted`` arms are the new behaviour.
+    
+        Why: a deleted folder used to be re-created, read as empty and filled
+        with a fresh project.json, and the user was told ``Added variant``.
+    
+        Negative control: the base re-creates the folder before reading it, so
+        the ``deleted`` arms see ``Added variant`` / ``manifest verified`` and no
+        refusal."""
+        standing, kind = case.rsplit("-", 1)
+        exited, lines, runs, _exists = _file_load_into_vanished_project(tmp_path, kind, standing)
+        assert not exited, lines
+>       assert lines.count(SYNC_REFUSAL) == 1, lines
+E       AssertionError: ['Project saved + manifest verified', "Project 'P2' now opens other.hex", "Added variant 'other' to project 'P2'", 'Loaded other.hex']
+E       assert 0 == 1
+E        +  where 0 = <built-in method count of list object at 0x0000015AD99BA300>("Project sync NOT done: project 'P2' could not be read — check that the folder can be opened, then load again.")
+E        +    where <built-in method count of list object at 0x0000015AD99BA300> = ['Project saved + manifest verified', "Project 'P2' now opens other.hex", "Added variant 'other' to project 'P2'", 'Loaded other.hex'].count
+
+tests\test_b100_workers.py:3955: AssertionError
+_ test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted[deleted-mac] _
+
+tmp_path = WindowsPath('<home>/AppData/Local/Temp/s19e4t3/bt/test_r_proj_002_12_file_load_s2')
+case = 'deleted-mac'
+
+    @pytest.mark.parametrize("case", _VANISHED_CASES)
+    def test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted(
+        tmp_path: Path, case: str
+    ) -> None:
+        """The open project's folder is gone (deleted, or a regular file stands in
+        its place) when a data-file load syncs into the project: the load still
+        ends ``Loaded other.<ext>``, the refusal line is painted exactly once, no
+        variant is reported added or opened, the app keeps running and no run is
+        left. The three ``file-in-place`` arms hold on the base tree; the three
+        ``deleted`` arms are the new behaviour.
+    
+        Why: a deleted folder used to be re-created, read as empty and filled
+        with a fresh project.json, and the user was told ``Added variant``.
+    
+        Negative control: the base re-creates the folder before reading it, so
+        the ``deleted`` arms see ``Added variant`` / ``manifest verified`` and no
+        refusal."""
+        standing, kind = case.rsplit("-", 1)
+        exited, lines, runs, _exists = _file_load_into_vanished_project(tmp_path, kind, standing)
+        assert not exited, lines
+>       assert lines.count(SYNC_REFUSAL) == 1, lines
+E       AssertionError: ['Project saved + manifest verified', 'Loaded other.mac']
+E       assert 0 == 1
+E        +  where 0 = <built-in method count of list object at 0x0000015ADC1A5680>("Project sync NOT done: project 'P2' could not be read — check that the folder can be opened, then load again.")
+E        +    where <built-in method count of list object at 0x0000015ADC1A5680> = ['Project saved + manifest verified', 'Loaded other.mac'].count
+
+tests\test_b100_workers.py:3955: AssertionError
+------------------------------ Captured log call ------------------------------
+ERROR    s19_app.core:core.py:361 File not found: <home>\AppData\Local\Temp\s19e4t3\bt\test_r_proj_002_12_file_load_s2\app\.s19tool\workarea\P2\firmware.s19
+_ test_r_proj_002_13_a2l_sync_refuses_when_the_project_folder_was_deleted_mid_attach _
+
+tmp_path = WindowsPath('<home>/AppData/Local/Temp/s19e4t3/bt/test_r_proj_002_13_a2l_sync_re0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000015ADAA9BBD0>
+
+    def test_r_proj_002_13_a2l_sync_refuses_when_the_project_folder_was_deleted_mid_attach(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The open project's folder is deleted while the A2L attach worker runs
+        (after the request-time guard passed): the attach still ends ``A2L
+        loaded: firmware.a2l``, the A2L sync refusal is painted exactly once, no
+        ``A2L NOT loaded`` line is painted, the app keeps running and no run is
+        left.
+    
+        Why: the install syncs the A2L into the project; with the folder gone it
+        used to re-create the folder and copy the A2L into it."""
+        exited, lines, runs, _exists = _a2l_attach_with_the_folder_deleted_mid_attach(tmp_path, monkeypatch)
+        assert not exited, lines
+>       assert lines.count(A2L_SYNC_REFUSAL) == 1, lines
+E       AssertionError: ['Project saved + manifest verified', 'A2L loaded: firmware.a2l']
+E       assert 0 == 1
+E        +  where 0 = <built-in method count of list object at 0x0000015AD90EEC40>("A2L sync NOT done: project 'P2' could not be read — check that the folder can be opened, then load again.")
+E        +    where <built-in method count of list object at 0x0000015AD90EEC40> = ['Project saved + manifest verified', 'A2L loaded: firmware.a2l'].count
+
+tests\test_b100_workers.py:4014: AssertionError
+------------------------------ Captured log call ------------------------------
+ERROR    s19_app.core:core.py:361 File not found: <home>\AppData\Local\Temp\s19e4t3\bt\test_r_proj_002_13_a2l_sync_re0\app\.s19tool\workarea\P2\firmware.s19
+_ test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[s19] _
+
+tmp_path = WindowsPath('<home>/AppData/Local/Temp/s19e4t3/bt/test_r_proj_002_14_sync_into_a0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000015ADA64B010>
+kind = 's19'
+
+    @pytest.mark.parametrize("kind", ["s19", "hex", "mac", "a2l"])
+    def test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, kind: str
+    ) -> None:
+        """A load or an A2L attach into an open project whose folder was deleted
+        leaves nothing at the project's path: the sync refuses instead of
+        re-creating the folder (and placing a copy and a fresh project.json into
+        it). For a2l the folder goes during the attach, after the request-time
+        guard passed; the attach still ends A2L loaded: firmware.a2l.
+    
+        Why: the user deleted that folder on purpose or by accident; loading an
+        unrelated file must not bring it back."""
+        if kind == "a2l":
+            _exited, lines, _runs, exists = _a2l_attach_with_the_folder_deleted_mid_attach(
+                tmp_path, monkeypatch
+            )
+            assert lines and lines[-1] == "A2L loaded: firmware.a2l", lines
+        else:
+            _exited, _lines, _runs, exists = _file_load_into_vanished_project(
+                tmp_path, kind, "deleted"
+            )
+>       assert exists is False, "the sync re-created the deleted project folder"
+E       AssertionError: the sync re-created the deleted project folder
+E       assert True is False
+
+tests\test_b100_workers.py:4041: AssertionError
+_ test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[hex] _
+
+tmp_path = WindowsPath('<home>/AppData/Local/Temp/s19e4t3/bt/test_r_proj_002_14_sync_into_a1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000015AD8504450>
+kind = 'hex'
+
+    @pytest.mark.parametrize("kind", ["s19", "hex", "mac", "a2l"])
+    def test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, kind: str
+    ) -> None:
+        """A load or an A2L attach into an open project whose folder was deleted
+        leaves nothing at the project's path: the sync refuses instead of
+        re-creating the folder (and placing a copy and a fresh project.json into
+        it). For a2l the folder goes during the attach, after the request-time
+        guard passed; the attach still ends A2L loaded: firmware.a2l.
+    
+        Why: the user deleted that folder on purpose or by accident; loading an
+        unrelated file must not bring it back."""
+        if kind == "a2l":
+            _exited, lines, _runs, exists = _a2l_attach_with_the_folder_deleted_mid_attach(
+                tmp_path, monkeypatch
+            )
+            assert lines and lines[-1] == "A2L loaded: firmware.a2l", lines
+        else:
+            _exited, _lines, _runs, exists = _file_load_into_vanished_project(
+                tmp_path, kind, "deleted"
+            )
+>       assert exists is False, "the sync re-created the deleted project folder"
+E       AssertionError: the sync re-created the deleted project folder
+E       assert True is False
+
+tests\test_b100_workers.py:4041: AssertionError
+_ test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[mac] _
+
+tmp_path = WindowsPath('<home>/AppData/Local/Temp/s19e4t3/bt/test_r_proj_002_14_sync_into_a2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000015AD89B05D0>
+kind = 'mac'
+
+    @pytest.mark.parametrize("kind", ["s19", "hex", "mac", "a2l"])
+    def test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, kind: str
+    ) -> None:
+        """A load or an A2L attach into an open project whose folder was deleted
+        leaves nothing at the project's path: the sync refuses instead of
+        re-creating the folder (and placing a copy and a fresh project.json into
+        it). For a2l the folder goes during the attach, after the request-time
+        guard passed; the attach still ends A2L loaded: firmware.a2l.
+    
+        Why: the user deleted that folder on purpose or by accident; loading an
+        unrelated file must not bring it back."""
+        if kind == "a2l":
+            _exited, lines, _runs, exists = _a2l_attach_with_the_folder_deleted_mid_attach(
+                tmp_path, monkeypatch
+            )
+            assert lines and lines[-1] == "A2L loaded: firmware.a2l", lines
+        else:
+            _exited, _lines, _runs, exists = _file_load_into_vanished_project(
+                tmp_path, kind, "deleted"
+            )
+>       assert exists is False, "the sync re-created the deleted project folder"
+E       AssertionError: the sync re-created the deleted project folder
+E       assert True is False
+
+tests\test_b100_workers.py:4041: AssertionError
+------------------------------ Captured log call ------------------------------
+ERROR    s19_app.core:core.py:361 File not found: <home>\AppData\Local\Temp\s19e4t3\bt\test_r_proj_002_14_sync_into_a2\app\.s19tool\workarea\P2\firmware.s19
+_ test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[a2l] _
+
+tmp_path = WindowsPath('<home>/AppData/Local/Temp/s19e4t3/bt/test_r_proj_002_14_sync_into_a3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000015AD68AF250>
+kind = 'a2l'
+
+    @pytest.mark.parametrize("kind", ["s19", "hex", "mac", "a2l"])
+    def test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, kind: str
+    ) -> None:
+        """A load or an A2L attach into an open project whose folder was deleted
+        leaves nothing at the project's path: the sync refuses instead of
+        re-creating the folder (and placing a copy and a fresh project.json into
+        it). For a2l the folder goes during the attach, after the request-time
+        guard passed; the attach still ends A2L loaded: firmware.a2l.
+    
+        Why: the user deleted that folder on purpose or by accident; loading an
+        unrelated file must not bring it back."""
+        if kind == "a2l":
+            _exited, lines, _runs, exists = _a2l_attach_with_the_folder_deleted_mid_attach(
+                tmp_path, monkeypatch
+            )
+            assert lines and lines[-1] == "A2L loaded: firmware.a2l", lines
+        else:
+            _exited, _lines, _runs, exists = _file_load_into_vanished_project(
+                tmp_path, kind, "deleted"
+            )
+>       assert exists is False, "the sync re-created the deleted project folder"
+E       AssertionError: the sync re-created the deleted project folder
+E       assert True is False
+
+tests\test_b100_workers.py:4041: AssertionError
+------------------------------ Captured log call ------------------------------
+ERROR    s19_app.core:core.py:361 File not found: <home>\AppData\Local\Temp\s19e4t3\bt\test_r_proj_002_14_sync_into_a3\app\.s19tool\workarea\P2\firmware.s19
+_ test_r_proj_rollback_9_2_a_link_loop_at_a_composition_name_ends_in_the_rollback_refusal _
+
+tmp_path = WindowsPath('<home>/AppData/Local/Temp/s19e4t3/bt/test_r_proj_rollback_9_2_a_lin0')
+
+    def test_r_proj_rollback_9_2_a_link_loop_at_a_composition_name_ends_in_the_rollback_refusal(
+        tmp_path: Path,
+    ) -> None:
+        """Windows. Project ``P`` is open; a directory junction that points to
+        itself stands at ``P/x.json``, and the common patches library holds an
+        ``x.json`` change document. Save project with the composition
+        ``batch=("x.json",)`` ends with the project.json refusal, exactly once
+        -- not with the unexpected-error line -- and the gathered copy is rolled
+        back: neither ``P/patches/x.json`` nor ``P/patches`` exists afterwards.
+    
+        Why it matters: the gather must not raise on the loop (it used to, and
+        the user was told only that an unexpected error stopped the save); the
+        save-level end is the existing refusal because the manifest writer
+        refuses a link entry, and a failed save must leave no copy behind.
+    
+        Negative control (the base tree): the gather raises on the loop and the
+        save ends on the unexpected-error line, with the refusal line absent.
+        Containment: if the writer is ever changed to accept the link entry,
+        this node fails -- it must not be re-pinned to pass (that would weaken
+        the refusal)."""
+        b100_links.require_junctions()
+        from s19_app.tui.screens import SaveProjectPayload
+    
+        base = tmp_path / "app"
+        projects.copy_sources(_workarea(base) / "P", projects.CASE01_DIR, "firmware.s19")
+        refusal = "Project NOT saved: could not save — project.json was not written. check the folder."
+        unexpected = "an unexpected error stopped the save"
+        verified = "Project saved + manifest verified"
+        outcomes = ("Project NOT saved", verified)
+    
+        async def scenario(app, pilot, log):
+            await projects.load_project(pilot, app, "P")
+            project_dir = app.workarea / "P"
+            patches_library = app.workarea / "patches"
+            patches_library.mkdir(parents=True, exist_ok=True)
+            (patches_library / "x.json").write_bytes(projects.change_document_bytes())
+            link = projects.create_junction_loop(project_dir / "x.json")
+            try:
+                mark = len(log.messages)
+                app._handle_save_dialog(
+                    SaveProjectPayload(
+                        parent_folder=str(app.workarea),
+                        project_name="P",
+                        batch=("x.json",),
+                        assignments={},
+                    )
+                )
+                await projects.wait_for(
+                    pilot,
+                    lambda: any(o in line for line in log.since(mark) for o in outcomes),
+                    "the Save project outcome line",
+                )
+                await settle_workers(pilot)
+                for _ in range(4):
+                    await pilot.pause()
+                lines = log.since(mark)
+                left = (
+                    os.path.lexists(project_dir / "patches" / "x.json"),
+                    os.path.lexists(project_dir / "patches"),
+                )
+                return lines, left, list(app._busy.runs), app.return_code is None and app.is_running
+            finally:
+                if os.path.lexists(link):
+                    os.rmdir(link)  # never a recursive delete through the junction
+    
+        lines, left, runs, alive = projects.run_app(base, scenario)
+>       assert lines.count(refusal) == 1, lines
+E       AssertionError: ['Project NOT saved: could not save — an unexpected error stopped the save. check the folder.']
+E       assert 0 == 1
+E        +  where 0 = <built-in method count of list object at 0x0000015AD936F4C0>('Project NOT saved: could not save — project.json was not written. check the folder.')
+E        +    where <built-in method count of list object at 0x0000015AD936F4C0> = ['Project NOT saved: could not save — an unexpected error stopped the save. check the folder.'].count
+
+tests\test_b100_active_variant.py:1540: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_workers.py::test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted[deleted-s19]
+FAILED tests/test_b100_workers.py::test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted[deleted-hex]
+FAILED tests/test_b100_workers.py::test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_deleted[deleted-mac]
+FAILED tests/test_b100_workers.py::test_r_proj_002_13_a2l_sync_refuses_when_the_project_folder_was_deleted_mid_attach
+FAILED tests/test_b100_workers.py::test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[s19]
+FAILED tests/test_b100_workers.py::test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[hex]
+FAILED tests/test_b100_workers.py::test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[mac]
+FAILED tests/test_b100_workers.py::test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[a2l]
+FAILED tests/test_b100_active_variant.py::test_r_proj_rollback_9_2_a_link_loop_at_a_composition_name_ends_in_the_rollback_refusal
+9 failed, 5 passed, 139 deselected in 56.79s
+
+### RUN 3: tests/test_b100_project_check.py -k 'r_tst or the 6 touched nodes' (test-only rows: product identical on base, expected to pass unmutated)
+<home>\AppData\Local\Temp\s19e4t3\base\s19_app\__init__.py
+...........                                                              [100%]
+============================ QC-TM timing margins =============================
+22.2%  0.778 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+30.6%  0.694 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+31.6%  0.684 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+34.9%  0.651 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+49.5%  0.505 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+49.5%  0.505 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+52.8%  0.472 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+56.0%  0.440 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+62.5%  0.375 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure
+62.8%  0.372 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+63.9%  0.361 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+68.8%  0.312 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+70.6%  0.294 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+70.8%  0.292 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+72.6%  0.274 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+75.7%  0.243 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+75.8%  0.242 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+76.5%  0.235 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+76.6%  0.234 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+77.5%  0.225 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+78.1%  0.219 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+81.2%  0.188 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+81.3%  0.187 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+82.9%  0.171 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+83.9%  0.161 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure
+85.7%  0.143 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure
+90.6%  0.094 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+94.4%  0.056 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure
+QC-TM: 28 bounds, 0 under 20 % margin
+11 passed, 90 deselected in 45.09s
+
+### MUTANT M5 applied to the test file in the base worktree: tests/test_b100_project_check.py -k r_tst
+<home>\AppData\Local\Temp\s19e4t3\base\s19_app\__init__.py
+F....                                                                    [100%]
+================================== FAILURES ===================================
+___________ test_r_tst_110_panel_clock_starts_at_the_install_stamp ____________
+
+    def test_r_tst_110_panel_clock_starts_at_the_install_stamp() -> None:
+        """The panel paint clock starts at the install stamp, whichever came
+        later: the click or the install. A missing stamp fails the test. The
+        three call sites (the all-bad arm, the cap arm and the shared scene's
+        helper) compute their start through that rule.
+    
+        Why: starting at the click charged the wait for the load to the panel's
+        paint and made a 0.2 s paint read as 0.8-1.1 s."""
+>       assert _paint_clock_start(SimpleNamespace(_load_returned_at=10.0), 12.0) == 10.0
+E       assert 12.0 == 10.0
+E        +  where 12.0 = _paint_clock_start(namespace(_load_returned_at=10.0), 12.0)
+E        +    where namespace(_load_returned_at=10.0) = SimpleNamespace(_load_returned_at=10.0)
+
+tests\test_b100_project_check.py:1577: AssertionError
+============================ QC-TM timing margins =============================
+29.7%  0.703 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+31.1%  0.689 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+64.8%  0.352 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+66.7%  0.333 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+72.5%  0.275 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+72.8%  0.272 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+73.6%  0.264 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+77.7%  0.223 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+QC-TM: 8 bounds, 0 under 20 % margin
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_check.py::test_r_tst_110_panel_clock_starts_at_the_install_stamp
+1 failed, 4 passed, 96 deselected in 16.62s
+
+### MUTANT M6 applied to the test file in the base worktree: tests/test_b100_project_check.py -k r_tst
+<home>\AppData\Local\Temp\s19e4t3\base\s19_app\__init__.py
+..FFF                                                                    [100%]
+================================== FAILURES ===================================
+_______ test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad] _______
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000029EFAD8AA50>
+tmp_path = WindowsPath('<home>/AppData/Local/Temp/s19e4t3/bt/test_r_tst_111_112_arm_values_0')
+scene = 'all-bad'
+
+    @pytest.mark.serial_timing
+    @pytest.mark.parametrize("scene", ["all-bad", "cap", "scene"])
+    def test_r_tst_111_112_arm_values_equal_the_product_stamps(
+        monkeypatch: pytest.MonkeyPatch, tmp_path: Path, scene: str
+    ) -> None:
+        """Each timing arm's recorded panel / append value equals the difference
+        of the product's own stamps, read by an observer that shares nothing
+        with the arm. The arm runs once; its ``report_margin`` calls are
+        recorded (and still forwarded, so the margin rows are kept).
+    
+        ``all-bad`` / ``cap``: the arm's ``painted`` equals observer paint stamp
+        minus observer install stamp. ``scene``: ``sec6_5 painted`` equals the
+        same difference and ``sec6_5 appended`` equals the observer's outcome
+        stamp minus the observer's ``load_from_path`` entry. Equality is within
+        ``_STAMP_TOLERANCE_S`` (``math.isclose``), not an ordering assert.
+    
+        Why: a clock that stops when a poll notices the paint reads 0.5-0.7 s
+        too long; only a comparison against an independent reading can fail on
+        that, and it fails the same way for any later arm that goes back to a
+        poll."""
+        module = sys.modules[__name__]
+        real_report_margin = report_margin
+        recorded: list = []
+    
+        def _record(label, measured, bound):
+            recorded.append((label, measured))
+            return real_report_margin(label, measured, bound)
+    
+        monkeypatch.setattr(module, "report_margin", _record)
+        observer = _StampObserver.install(monkeypatch)
+        if scene == "all-bad":
+            test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second(tmp_path)
+            panel_label, append_label = "TC-B100-61 all-bad painted", None
+        elif scene == "cap":
+            test_tc_b100_61_files_at_the_cap_all_missing_are_bounded(tmp_path)
+            panel_label, append_label = "TC-B100-61 cap painted", None
+        else:
+            _assert_sec6_5_bounded(_distinct_folders_scene(tmp_path))
+            panel_label, append_label = "sec6_5 painted", "sec6_5 appended"
+    
+        values = dict(recorded)
+        assert panel_label in values, [label for label, _ in recorded]
+        assert observer.installed is not None and observer.paint is not None, (
+            "the observer saw no panel paint"
+        )
+        stamped_panel = observer.paint - observer.installed
+>       assert math.isclose(values[panel_label], stamped_panel, abs_tol=_STAMP_TOLERANCE_S), (
+            f"{panel_label}: the arm recorded {values[panel_label]:.4f} s, "
+            f"the product stamps give {stamped_panel:.4f} s"
+        )
+E       AssertionError: TC-B100-61 all-bad painted: the arm recorded 0.8453 s, the product stamps give 0.2734 s
+E       assert False
+E        +  where False = <built-in function isclose>(0.8452765999827534, 0.2733754999935627, abs_tol=0.005)
+E        +    where <built-in function isclose> = math.isclose
+
+tests\test_b100_project_check.py:1713: AssertionError
+_________ test_r_tst_111_112_arm_values_equal_the_product_stamps[cap] _________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000029EFC5AD350>
+tmp_path = WindowsPath('<home>/AppData/Local/Temp/s19e4t3/bt/test_r_tst_111_112_arm_values_1')
+scene = 'cap'
+
+    @pytest.mark.serial_timing
+    @pytest.mark.parametrize("scene", ["all-bad", "cap", "scene"])
+    def test_r_tst_111_112_arm_values_equal_the_product_stamps(
+        monkeypatch: pytest.MonkeyPatch, tmp_path: Path, scene: str
+    ) -> None:
+        """Each timing arm's recorded panel / append value equals the difference
+        of the product's own stamps, read by an observer that shares nothing
+        with the arm. The arm runs once; its ``report_margin`` calls are
+        recorded (and still forwarded, so the margin rows are kept).
+    
+        ``all-bad`` / ``cap``: the arm's ``painted`` equals observer paint stamp
+        minus observer install stamp. ``scene``: ``sec6_5 painted`` equals the
+        same difference and ``sec6_5 appended`` equals the observer's outcome
+        stamp minus the observer's ``load_from_path`` entry. Equality is within
+        ``_STAMP_TOLERANCE_S`` (``math.isclose``), not an ordering assert.
+    
+        Why: a clock that stops when a poll notices the paint reads 0.5-0.7 s
+        too long; only a comparison against an independent reading can fail on
+        that, and it fails the same way for any later arm that goes back to a
+        poll."""
+        module = sys.modules[__name__]
+        real_report_margin = report_margin
+        recorded: list = []
+    
+        def _record(label, measured, bound):
+            recorded.append((label, measured))
+            return real_report_margin(label, measured, bound)
+    
+        monkeypatch.setattr(module, "report_margin", _record)
+        observer = _StampObserver.install(monkeypatch)
+        if scene == "all-bad":
+            test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second(tmp_path)
+            panel_label, append_label = "TC-B100-61 all-bad painted", None
+        elif scene == "cap":
+            test_tc_b100_61_files_at_the_cap_all_missing_are_bounded(tmp_path)
+            panel_label, append_label = "TC-B100-61 cap painted", None
+        else:
+            _assert_sec6_5_bounded(_distinct_folders_scene(tmp_path))
+            panel_label, append_label = "sec6_5 painted", "sec6_5 appended"
+    
+        values = dict(recorded)
+        assert panel_label in values, [label for label, _ in recorded]
+        assert observer.installed is not None and observer.paint is not None, (
+            "the observer saw no panel paint"
+        )
+        stamped_panel = observer.paint - observer.installed
+>       assert math.isclose(values[panel_label], stamped_panel, abs_tol=_STAMP_TOLERANCE_S), (
+            f"{panel_label}: the arm recorded {values[panel_label]:.4f} s, "
+            f"the product stamps give {stamped_panel:.4f} s"
+        )
+E       AssertionError: TC-B100-61 cap painted: the arm recorded 0.7563 s, the product stamps give 0.3119 s
+E       assert False
+E        +  where False = <built-in function isclose>(0.7563046999275684, 0.31187059998046607, abs_tol=0.005)
+E        +    where <built-in function isclose> = math.isclose
+
+tests\test_b100_project_check.py:1713: AssertionError
+---------------------------- Captured stdout call -----------------------------
+load [0.23738619999494404] s; panel painted 0.76 s; rows 103
+________ test_r_tst_111_112_arm_values_equal_the_product_stamps[scene] ________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000029EFD1E5650>
+tmp_path = WindowsPath('<home>/AppData/Local/Temp/s19e4t3/bt/test_r_tst_111_112_arm_values_2')
+scene = 'scene'
+
+    @pytest.mark.serial_timing
+    @pytest.mark.parametrize("scene", ["all-bad", "cap", "scene"])
+    def test_r_tst_111_112_arm_values_equal_the_product_stamps(
+        monkeypatch: pytest.MonkeyPatch, tmp_path: Path, scene: str
+    ) -> None:
+        """Each timing arm's recorded panel / append value equals the difference
+        of the product's own stamps, read by an observer that shares nothing
+        with the arm. The arm runs once; its ``report_margin`` calls are
+        recorded (and still forwarded, so the margin rows are kept).
+    
+        ``all-bad`` / ``cap``: the arm's ``painted`` equals observer paint stamp
+        minus observer install stamp. ``scene``: ``sec6_5 painted`` equals the
+        same difference and ``sec6_5 appended`` equals the observer's outcome
+        stamp minus the observer's ``load_from_path`` entry. Equality is within
+        ``_STAMP_TOLERANCE_S`` (``math.isclose``), not an ordering assert.
+    
+        Why: a clock that stops when a poll notices the paint reads 0.5-0.7 s
+        too long; only a comparison against an independent reading can fail on
+        that, and it fails the same way for any later arm that goes back to a
+        poll."""
+        module = sys.modules[__name__]
+        real_report_margin = report_margin
+        recorded: list = []
+    
+        def _record(label, measured, bound):
+            recorded.append((label, measured))
+            return real_report_margin(label, measured, bound)
+    
+        monkeypatch.setattr(module, "report_margin", _record)
+        observer = _StampObserver.install(monkeypatch)
+        if scene == "all-bad":
+            test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second(tmp_path)
+            panel_label, append_label = "TC-B100-61 all-bad painted", None
+        elif scene == "cap":
+            test_tc_b100_61_files_at_the_cap_all_missing_are_bounded(tmp_path)
+            panel_label, append_label = "TC-B100-61 cap painted", None
+        else:
+            _assert_sec6_5_bounded(_distinct_folders_scene(tmp_path))
+            panel_label, append_label = "sec6_5 painted", "sec6_5 appended"
+    
+        values = dict(recorded)
+        assert panel_label in values, [label for label, _ in recorded]
+        assert observer.installed is not None and observer.paint is not None, (
+            "the observer saw no panel paint"
+        )
+        stamped_panel = observer.paint - observer.installed
+>       assert math.isclose(values[panel_label], stamped_panel, abs_tol=_STAMP_TOLERANCE_S), (
+            f"{panel_label}: the arm recorded {values[panel_label]:.4f} s, "
+            f"the product stamps give {stamped_panel:.4f} s"
+        )
+E       AssertionError: sec6_5 painted: the arm recorded 0.9335 s, the product stamps give 0.1993 s
+E       assert False
+E        +  where False = <built-in function isclose>(0.933464500005357, 0.19927470001857728, abs_tol=0.005)
+E        +    where <built-in function isclose> = math.isclose
+
+tests\test_b100_project_check.py:1713: AssertionError
+---------------------------- Captured stdout call -----------------------------
+SEC6-5 timings (s): {'read': 0.227, 'load': 0.808, 'painted': 0.933, 'appended': 0.701}
+============================ QC-TM timing margins =============================
+LOW 6.7%  0.933 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+LOW 15.5%  0.845 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+LOW 19.2%  0.808 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+24.4%  0.756 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+29.9%  0.701 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+72.2%  0.278 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+76.3%  0.237 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+77.3%  0.227 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+QC-TM: 8 bounds, 3 under 20 % margin
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+FAILED tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+FAILED tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+3 failed, 2 passed, 96 deselected in 16.12s
+
+### MUTANT M7 applied to the test file in the base worktree: tests/test_b100_project_check.py -k r_tst
+<home>\AppData\Local\Temp\s19e4t3\base\s19_app\__init__.py
+....F                                                                    [100%]
+================================== FAILURES ===================================
+________ test_r_tst_111_112_arm_values_equal_the_product_stamps[scene] ________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000197E1B2EA90>
+tmp_path = WindowsPath('<home>/AppData/Local/Temp/s19e4t3/bt/test_r_tst_111_112_arm_values_2')
+scene = 'scene'
+
+    @pytest.mark.serial_timing
+    @pytest.mark.parametrize("scene", ["all-bad", "cap", "scene"])
+    def test_r_tst_111_112_arm_values_equal_the_product_stamps(
+        monkeypatch: pytest.MonkeyPatch, tmp_path: Path, scene: str
+    ) -> None:
+        """Each timing arm's recorded panel / append value equals the difference
+        of the product's own stamps, read by an observer that shares nothing
+        with the arm. The arm runs once; its ``report_margin`` calls are
+        recorded (and still forwarded, so the margin rows are kept).
+    
+        ``all-bad`` / ``cap``: the arm's ``painted`` equals observer paint stamp
+        minus observer install stamp. ``scene``: ``sec6_5 painted`` equals the
+        same difference and ``sec6_5 appended`` equals the observer's outcome
+        stamp minus the observer's ``load_from_path`` entry. Equality is within
+        ``_STAMP_TOLERANCE_S`` (``math.isclose``), not an ordering assert.
+    
+        Why: a clock that stops when a poll notices the paint reads 0.5-0.7 s
+        too long; only a comparison against an independent reading can fail on
+        that, and it fails the same way for any later arm that goes back to a
+        poll."""
+        module = sys.modules[__name__]
+        real_report_margin = report_margin
+        recorded: list = []
+    
+        def _record(label, measured, bound):
+            recorded.append((label, measured))
+            return real_report_margin(label, measured, bound)
+    
+        monkeypatch.setattr(module, "report_margin", _record)
+        observer = _StampObserver.install(monkeypatch)
+        if scene == "all-bad":
+            test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second(tmp_path)
+            panel_label, append_label = "TC-B100-61 all-bad painted", None
+        elif scene == "cap":
+            test_tc_b100_61_files_at_the_cap_all_missing_are_bounded(tmp_path)
+            panel_label, append_label = "TC-B100-61 cap painted", None
+        else:
+>           _assert_sec6_5_bounded(_distinct_folders_scene(tmp_path))
+
+tests\test_b100_project_check.py:1704: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+scene = {'appended': 1.167762600001879, 'load': 0.6851364000467584, 'manifest': ProjectManifest(schema_version=1, active_varia...e41e4649b934ca495991b7852b855', differ=1)}, unknown_keys=(), active_document=None), 'painted': 0.3501230999827385, ...}
+
+    def _assert_sec6_5_bounded(scene: dict) -> None:
+        timings = {key: scene[key] for key in ("read", "load", "painted", "appended")}
+        print("SEC6-5 timings (s):", {key: round(value, 3) for key, value in timings.items()})
+        assert scene["read"] < report_margin("sec6_5 read", scene["read"], timing_bound(1.0)), timings
+        assert scene["load"] is not None and scene["load"] < report_margin(
+            "sec6_5 load", scene["load"], timing_bound(1.0)
+        ), timings
+        assert scene["painted"] < report_margin(
+            "sec6_5 painted", scene["painted"], timing_bound(1.0)
+        ), timings
+>       assert scene["appended"] < report_margin(
+            "sec6_5 appended", scene["appended"], timing_bound(1.0)
+        ), timings
+E       AssertionError: {'appended': 1.167762600001879, 'load': 0.6851364000467584, 'painted': 0.3501230999827385, 'read': 0.40862620004918426}
+E       assert 1.167762600001879 < 1.0
+E        +  where 1.0 = report_margin('sec6_5 appended', 1.167762600001879, 1.0)
+E        +    where 1.0 = timing_bound(1.0)
+
+tests\test_b100_project_check.py:1143: AssertionError
+---------------------------- Captured stdout call -----------------------------
+SEC6-5 timings (s): {'read': 0.409, 'load': 0.685, 'painted': 0.35, 'appended': 1.168}
+============================ QC-TM timing margins =============================
+LOW -16.8%  1.168 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+31.5%  0.685 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+59.1%  0.409 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+65.0%  0.350 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+71.0%  0.290 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+71.2%  0.288 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+71.7%  0.283 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+72.6%  0.274 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+QC-TM: 8 bounds, 1 under 20 % margin
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+1 failed, 4 passed, 96 deselected in 15.48s
+
+### MUTANT M8 applied to the test file in the base worktree: tests/test_b100_project_check.py -k r_tst
+<home>\AppData\Local\Temp\s19e4t3\base\s19_app\__init__.py
+.F...                                                                    [100%]
+================================== FAILURES ===================================
+__________ test_r_tst_113_panel_and_append_bounds_stay_at_one_second __________
+
+    def test_r_tst_113_panel_and_append_bounds_stay_at_one_second() -> None:
+        """The four panel / append bounds are still 1 s through ``timing_bound``:
+        the clock fix must not be replaced by a raised bound. A planted copy
+        with one bound at 1.5 s is flagged by the same check, naming the label.
+    
+        Why: a bound raised until the slow reading passes would hide the very
+        slowness the bound exists to catch."""
+        source = Path(__file__).read_text(encoding="utf-8")
+>       assert _off_one_second(source) == [], _off_one_second(source)
+E       AssertionError: ['sec6_5 appended (line 1143): timing_bound(1.5)']
+E       assert ['sec6_5 appe...g_bound(1.5)'] == []
+E         
+E         Left contains one more item: 'sec6_5 appended (line 1143): timing_bound(1.5)'
+E         Use -v to get more diff
+
+tests\test_b100_project_check.py:1637: AssertionError
+============================ QC-TM timing margins =============================
+LOW 12.3%  0.877 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+52.2%  0.717 s / 1.500 s  sec6_5 appended  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+56.1%  0.439 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+59.4%  0.406 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+67.2%  0.328 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+71.1%  0.289 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+71.3%  0.287 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+81.9%  0.181 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+QC-TM: 8 bounds, 1 under 20 % margin
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_check.py::test_r_tst_113_panel_and_append_bounds_stay_at_one_second
+1 failed, 4 passed, 96 deselected in 16.02s
+
+### END
+
+### MUTANT M7 again with CI=1 (loosened bounds), so the arm's own bound cannot trip first: the verifier's equality must
+<home>\AppData\Local\Temp\s19e4t3\base\s19_app\__init__.py
+..F                                                                      [100%]
+================================== FAILURES ===================================
+________ test_r_tst_111_112_arm_values_equal_the_product_stamps[scene] ________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000193ED7F6950>
+tmp_path = WindowsPath('<home>/AppData/Local/Temp/s19e4t3/bt/test_r_tst_111_112_arm_values_2')
+scene = 'scene'
+
+    @pytest.mark.serial_timing
+    @pytest.mark.parametrize("scene", ["all-bad", "cap", "scene"])
+    def test_r_tst_111_112_arm_values_equal_the_product_stamps(
+        monkeypatch: pytest.MonkeyPatch, tmp_path: Path, scene: str
+    ) -> None:
+        """Each timing arm's recorded panel / append value equals the difference
+        of the product's own stamps, read by an observer that shares nothing
+        with the arm. The arm runs once; its ``report_margin`` calls are
+        recorded (and still forwarded, so the margin rows are kept).
+    
+        ``all-bad`` / ``cap``: the arm's ``painted`` equals observer paint stamp
+        minus observer install stamp. ``scene``: ``sec6_5 painted`` equals the
+        same difference and ``sec6_5 appended`` equals the observer's outcome
+        stamp minus the observer's ``load_from_path`` entry. Equality is within
+        ``_STAMP_TOLERANCE_S`` (``math.isclose``), not an ordering assert.
+    
+        Why: a clock that stops when a poll notices the paint reads 0.5-0.7 s
+        too long; only a comparison against an independent reading can fail on
+        that, and it fails the same way for any later arm that goes back to a
+        poll."""
+        module = sys.modules[__name__]
+        real_report_margin = report_margin
+        recorded: list = []
+    
+        def _record(label, measured, bound):
+            recorded.append((label, measured))
+            return real_report_margin(label, measured, bound)
+    
+        monkeypatch.setattr(module, "report_margin", _record)
+        observer = _StampObserver.install(monkeypatch)
+        if scene == "all-bad":
+            test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second(tmp_path)
+            panel_label, append_label = "TC-B100-61 all-bad painted", None
+        elif scene == "cap":
+            test_tc_b100_61_files_at_the_cap_all_missing_are_bounded(tmp_path)
+            panel_label, append_label = "TC-B100-61 cap painted", None
+        else:
+            _assert_sec6_5_bounded(_distinct_folders_scene(tmp_path))
+            panel_label, append_label = "sec6_5 painted", "sec6_5 appended"
+    
+        values = dict(recorded)
+        assert panel_label in values, [label for label, _ in recorded]
+        assert observer.installed is not None and observer.paint is not None, (
+            "the observer saw no panel paint"
+        )
+        stamped_panel = observer.paint - observer.installed
+        assert math.isclose(values[panel_label], stamped_panel, abs_tol=_STAMP_TOLERANCE_S), (
+            f"{panel_label}: the arm recorded {values[panel_label]:.4f} s, "
+            f"the product stamps give {stamped_panel:.4f} s"
+        )
+        if append_label is not None:
+            assert observer.append_start is not None and observer.outcome is not None, (
+                "the observer saw no append outcome line"
+            )
+            stamped_append = observer.outcome - observer.append_start
+>           assert math.isclose(values[append_label], stamped_append, abs_tol=_STAMP_TOLERANCE_S), (
+                f"{append_label}: the arm recorded {values[append_label]:.4f} s, "
+                f"the product stamps give {stamped_append:.4f} s"
+            )
+E           AssertionError: sec6_5 appended: the arm recorded 1.1192 s, the product stamps give 0.7142 s
+E           assert False
+E            +  where False = <built-in function isclose>(1.119195400038734, 0.7142016999423504, abs_tol=0.005)
+E            +    where <built-in function isclose> = math.isclose
+
+tests\test_b100_project_check.py:1722: AssertionError
+---------------------------- Captured stdout call -----------------------------
+SEC6-5 timings (s): {'read': 0.23, 'load': 0.957, 'painted': 0.205, 'appended': 1.119}
+============================ QC-TM timing margins =============================
+44.0%  1.119 s / 2.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+52.1%  0.957 s / 2.000 s  sec6_5 load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+81.4%  0.371 s / 2.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+84.2%  0.317 s / 2.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+85.0%  0.301 s / 2.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+86.7%  0.267 s / 2.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+88.5%  0.230 s / 2.000 s  sec6_5 read  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+89.8%  0.205 s / 2.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+QC-TM: 8 bounds, 0 under 20 % margin
+=========================== short test summary info ===========================
+FAILED tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene] - AssertionError: sec6_5 appended: the arm recorded 1.1192 s, the product stamps give 0.7142 s
+assert False
+ +  where False = <built-in function isclose>(1.119195400038734, 0.7142016999423504, abs_tol=0.005)
+ +    where <built-in function isclose> = math.isclose
+1 failed, 2 passed, 98 deselected in 16.96s
+### END2
+
+### GREEN control (own emulation of the approved design, not the implementer's tree)
+A second detached worktree of the same base revision, plus the same 4 test files, plus a hand-written patch of
+the approved design (gather: seen-name set and os.path.normpath(...).is_file() with no resolve(); app.py: the two
+`project_dir.mkdir(parents=True, exist_ok=True)` lines removed in the two syncs). Results, each from one complete run:
+  tests/test_project_gather.py -k r_proj_gather_1                                  3 passed
+  tests/test_b100_workers.py tests/test_b100_active_variant.py (the same -k as RUN 2) 14 passed
+  tests/test_b100_project_check.py -k r_tst                                         5 passed
+  tests/test_b100_project_check.py (the 6 touched nodes)                            6 passed
+  tests/test_suite_hygiene.py tests/test_id_registry.py                             77 passed
+The same files run on the base tree give the RED above (RUN 1: 3 failed; RUN 2: 9 failed, 5 passed; RUN 3: 11 passed).

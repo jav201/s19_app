@@ -1,0 +1,96 @@
+# E5 corrective C-6: on the final test file, LAN Linux host, Python 3.11.18. M-7 with CI=1 (timing_bound doubled; the equality assert decides): RED by the 'sec6_5 appended' equality. M-6 (R-TST-111 RED on the final file): RED on all 3 parameters by the equality.
+# Mutants: exact text replace, run, restore byte-exact (sha256 printed). Filtered transcript: header, result lines, assertion lines.
+
+======== m7ci ========
+HOST: LAN Linux host
+2026-11-05T19:12:20Z
+ 13:12:20 up 2 days, 20:17,  2 users,  load average: 0.90, 1.17, 1.82
+<HOME>/work/s19_inc3c/s19_app/__init__.py 3.11.18
+        ``all-bad`` / ``cap``: the arm's ``painted`` equals observer paint stamp
+        minus observer install stamp. ``scene``: ``sec6_5 painted`` equals the
+        same difference and ``sec6_5 appended`` equals the observer's outcome
+            panel_label, append_label = "TC-B100-61 all-bad painted", None
+            panel_label, append_label = "TC-B100-61 cap painted", None
+            panel_label, append_label = "sec6_5 painted", "sec6_5 appended"
+E           AssertionError: sec6_5 appended: the arm recorded 0.8260 s, the product stamps give 0.4822 s
+E           assert False
+E            +  where False = <built-in function isclose>(0.8259512690128759, 0.48218329800874926, abs_tol=0.001)
+E            +    where <built-in function isclose> = math.isclose
+SEC6-5 timings (s): {'read': 0.13, 'load': 0.322, 'painted': 0.388, 'appended': 0.826}
+WARNING  s19tui:app.py:14791 Manifest not rewritten (holds entries that were skipped): /tmp/pytest-of-<USER>/pytest-63/test_r_tst_111_112_arm_values_2/app/.s19tool/workarea/P (placed /tmp/pytest-of-<USER>/pytest-63/test_r_tst_111_112_arm_values_2/app/.s19tool/workarea/P/extra.s19)
+load [0.19062897900585085] s; panel painted 0.40 s; rows 103
+============================= QC-TM timing margins =============================
+58.7%  0.826 s / 2.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+79.9%  0.401 s / 2.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+80.6%  0.388 s / 2.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+83.7%  0.326 s / 2.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+83.9%  0.322 s / 2.000 s  sec6_5 load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+90.5%  0.191 s / 2.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+90.6%  0.187 s / 2.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+QC-TM: 8 bounds, 0 under 20 % margin
+PASSED tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+PASSED tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+FAILED tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene] - AssertionError: sec6_5 appended: the arm recorded 0.8260 s, the product stamps give 0.4822 s
+1 failed, 2 passed in 15.53s
+MUTANT M-7 with CI=1 (final file): append clock stopped when the wait notices (appended = time.perf_counter() - started); CI=1 doubles timing_bound so the equality assert decides
+  file tests/test_b100_project_check.py sha256 before: 79a6d8e4ef488efd843c984a5de72f9fb46533b241ee38f8e7219ddd3116e9a8
+extra env: {'CI': '1'}
+pytest exit code: 1 -> RED (mutant killed)
+  file tests/test_b100_project_check.py sha256 after restore: 79a6d8e4ef488efd843c984a5de72f9fb46533b241ee38f8e7219ddd3116e9a8 REVERTED byte-exact
+
+======== m6 ========
+HOST: LAN Linux host
+2026-11-05T19:12:40Z
+ 13:12:40 up 2 days, 20:17,  2 users,  load average: 1.13, 1.21, 1.82
+<HOME>/work/s19_inc3c/s19_app/__init__.py 3.11.18
+        ``all-bad`` / ``cap``: the arm's ``painted`` equals observer paint stamp
+        minus observer install stamp. ``scene``: ``sec6_5 painted`` equals the
+        same difference and ``sec6_5 appended`` equals the observer's outcome
+            panel_label, append_label = "TC-B100-61 all-bad painted", None
+            panel_label, append_label = "TC-B100-61 cap painted", None
+            panel_label, append_label = "sec6_5 painted", "sec6_5 appended"
+E       AssertionError: TC-B100-61 all-bad painted: the arm recorded 0.9424 s, the product stamps give 0.3387 s
+E       assert False
+E        +  where False = <built-in function isclose>(0.9423529760097153, 0.3386773689999245, abs_tol=0.001)
+E        +    where <built-in function isclose> = math.isclose
+        ``all-bad`` / ``cap``: the arm's ``painted`` equals observer paint stamp
+        minus observer install stamp. ``scene``: ``sec6_5 painted`` equals the
+        same difference and ``sec6_5 appended`` equals the observer's outcome
+            panel_label, append_label = "TC-B100-61 all-bad painted", None
+            panel_label, append_label = "TC-B100-61 cap painted", None
+            panel_label, append_label = "sec6_5 painted", "sec6_5 appended"
+E       AssertionError: TC-B100-61 cap painted: the arm recorded 0.7956 s, the product stamps give 0.3990 s
+E       assert False
+E        +  where False = <built-in function isclose>(0.7955706639913842, 0.39904014801140875, abs_tol=0.001)
+E        +    where <built-in function isclose> = math.isclose
+load [0.17028857200057246] s; panel painted 0.80 s; rows 103
+        ``all-bad`` / ``cap``: the arm's ``painted`` equals observer paint stamp
+        minus observer install stamp. ``scene``: ``sec6_5 painted`` equals the
+        same difference and ``sec6_5 appended`` equals the observer's outcome
+            panel_label, append_label = "TC-B100-61 all-bad painted", None
+            panel_label, append_label = "TC-B100-61 cap painted", None
+            panel_label, append_label = "sec6_5 painted", "sec6_5 appended"
+E       AssertionError: sec6_5 painted: the arm recorded 0.7851 s, the product stamps give 0.2645 s
+E       assert False
+E        +  where False = <built-in function isclose>(0.78514958100277, 0.2645248710177839, abs_tol=0.001)
+E        +    where <built-in function isclose> = math.isclose
+SEC6-5 timings (s): {'read': 0.124, 'load': 0.44, 'painted': 0.785, 'appended': 0.341}
+WARNING  s19tui:app.py:14791 Manifest not rewritten (holds entries that were skipped): /tmp/pytest-of-<USER>/pytest-64/test_r_tst_111_112_arm_values_2/app/.s19tool/workarea/P (placed /tmp/pytest-of-<USER>/pytest-64/test_r_tst_111_112_arm_values_2/app/.s19tool/workarea/P/extra.s19)
+============================= QC-TM timing margins =============================
+LOW 5.8%  0.942 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+20.4%  0.796 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+21.5%  0.785 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+56.0%  0.440 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+65.9%  0.341 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+82.1%  0.179 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+83.0%  0.170 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+QC-TM: 8 bounds, 1 under 20 % margin
+FAILED tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+FAILED tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+FAILED tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+3 failed in 15.53s
+MUTANT M-6 (final file): panel clock stopped when the wait notices, all 3 sites (painted = time.perf_counter() - start)
+  file tests/test_b100_project_check.py sha256 before: 79a6d8e4ef488efd843c984a5de72f9fb46533b241ee38f8e7219ddd3116e9a8
+extra env: {}
+pytest exit code: 1 -> RED (mutant killed)
+  file tests/test_b100_project_check.py sha256 after restore: 79a6d8e4ef488efd843c984a5de72f9fb46533b241ee38f8e7219ddd3116e9a8 REVERTED byte-exact

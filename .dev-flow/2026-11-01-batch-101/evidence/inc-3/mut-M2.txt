@@ -1,0 +1,49 @@
+tree clean before mutant (equals staged head state)
+applied M-2
+ s19_app/tui/services/project_gather_service.py | 2 --
+ 1 file changed, 2 deletions(-)
+-        if name in checked_names:
+-            continue
+s19_app.__file__ <HOME>/work/s19_inc3/s19_app/__init__.py 3.11.18
+CMD: cd ~/work/s19_inc3 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 1800 /data/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -rA tests/test_project_gather.py -k r_proj_gather_12
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_r_proj_gather_12_each_distinct_composition_name_is_checked_once _____
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-24/test_r_proj_gather_12_each_dis0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fedf15fddd0>
+
+    def test_r_proj_gather_12_each_distinct_composition_name_is_checked_once(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A name that appears twice is looked up in the project folder once.
+    
+        Why it matters: Save project of a 1 000-name composition spends its time
+        in this loop; a repeated name must cost one check, not two, and the
+        outcome must be the one the names given once would give.
+    
+        Arms: (1) 1 000 real names given twice -> 1 000 checks, same outcome as
+        given once; (2) a missing name given twice -> 1 check and 1 finding;
+        (3) a ``missing/../x.json`` name is checked once on the folded path
+        ``<project>/x.json`` and counts as already home."""
+        project_dir, kwargs = _composition_scene(tmp_path)
+        names = [f"n{index:04d}.json" for index in range(1000)]
+        for name in names:
+            (project_dir / name).write_text(_change_doc_text(), encoding="utf-8")
+    
+        # Arm 1 — 1 000 names twice.
+        calls = _spy_project_file_checks(monkeypatch, project_dir)
+        doubled = gather_project_artifacts(
+            project_dir, composition_names=names + names, **kwargs
+        )
+>       assert len(calls) == 1000, f"expected 1000 project-folder checks, got {len(calls)}"
+E       AssertionError: expected 1000 project-folder checks, got 2000
+E       assert 2000 == 1000
+E        +  where 2000 = len(['/tmp/pytest-of-<USER>/pytest-24/test_r_proj_gather_12_each_dis0/.s19tool/workarea/P/n0000.json', '/tmp/pytest-of-<USER>.../P/n0004.json', '/tmp/pytest-of-<USER>/pytest-24/test_r_proj_gather_12_each_dis0/.s19tool/workarea/P/n0005.json', ...])
+
+tests/test_project_gather.py:768: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_project_gather.py::test_r_proj_gather_12_each_distinct_composition_name_is_checked_once
+1 failed, 17 deselected in 0.72s
+EXIT=1
+REVERTED: git diff --quiet clean

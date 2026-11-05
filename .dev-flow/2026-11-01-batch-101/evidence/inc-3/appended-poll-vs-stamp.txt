@@ -1,0 +1,9 @@
+# sec6_5 appended: poll clock vs stamp, Windows, tree e266395, 2026-11-02T15:52:07Z
+s19_app from <HOME>\Github\s19_app-b101-inc3\s19_app\__init__.py
+distinct_folders: appended(poll)=0.978 stamped(load_from_path->outcome line)=0.591 painted(poll)=0.861
+distinct_folders: appended(poll)=0.961 stamped(load_from_path->outcome line)=0.822 painted(poll)=0.935
+distinct_folders: appended(poll)=1.062 stamped(load_from_path->outcome line)=0.853 painted(poll)=0.958
+distinct_folders: appended(poll)=1.141 stamped(load_from_path->outcome line)=0.958 painted(poll)=0.794
+distinct_folders: appended(poll)=1.005 stamped(load_from_path->outcome line)=0.911 painted(poll)=0.978
+distinct_folders: appended(poll)=0.870 stamped(load_from_path->outcome line)=0.615 painted(poll)=0.898
+exit=0

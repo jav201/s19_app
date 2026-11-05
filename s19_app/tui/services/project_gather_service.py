@@ -594,6 +594,13 @@ def gather_project_artifacts(
           home; COMMON hit by bare name → gather; neither → one
           ``GATHER-SOURCE-MISSING`` finding) + the active document + the
           active template.
+        - Each distinct name text is checked once: a repeat would get the
+          same answer, and at the T2 composition the checks are the save's
+          cost (R-PROJ-GATHER.12). The project-dir check is on the
+          lexically folded join (``os.path.normpath``), never ``resolve()``:
+          ``resolve()`` raises on a link loop at a name, which must instead
+          fall to the common library (R-PROJ-GATHER.13), and it walks every
+          component of every name.
         - The active document is classified first, on the UNRESOLVED paths
           (:func:`classify_active_document`): ``in_home`` → not copied,
           named in ``outcome.active_document``; ``outside`` → copied (the
@@ -652,8 +659,12 @@ def gather_project_artifacts(
         return resolved_source
 
     # Predicate limb 1 — the save's own composition.
+    checked_names: set[str] = set()
     for name in composition_names:
-        in_project = (resolved_project / name).resolve()
+        if name in checked_names:
+            continue
+        checked_names.add(name)
+        in_project = Path(os.path.normpath(resolved_project / name))
         if in_project.is_file():
             continue  # already home — the manifest batch/assignments carry it
         common_candidate = common_patches_dir / Path(name).name

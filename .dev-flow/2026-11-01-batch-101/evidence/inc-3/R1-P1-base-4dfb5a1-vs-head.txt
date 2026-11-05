@@ -1,0 +1,11 @@
+# same-day interleaved: base 4dfb5a1 (git archive into a temp folder, its own node) vs head e266395 (worktree), TC-B100-20 save-project, Windows, 2026-11-02T15:33:58Z
+base save-project: trigger -> outcome 1.027 s; ['Project saved + manifest verified'] 1 failed in 4.55s 
+head save-project: trigger -> outcome 1.267 s; ['Project saved + manifest verified'] 1 failed in 4.97s 
+base save-project: trigger -> outcome 0.976 s; ['Project saved + manifest verified'] 1 passed in 4.37s 
+head save-project: trigger -> outcome 1.322 s; ['Project saved + manifest verified'] 1 failed in 5.11s 
+base save-project: trigger -> outcome 0.981 s; ['Project saved + manifest verified'] 1 passed in 4.39s 
+head save-project: trigger -> outcome 1.331 s; ['Project saved + manifest verified'] 1 failed in 5.04s 
+base save-project: trigger -> outcome 0.985 s; ['Project saved + manifest verified'] 1 passed in 4.45s 
+head save-project: trigger -> outcome 1.167 s; ['Project saved + manifest verified'] 1 failed in 4.94s 
+base save-project: trigger -> outcome 0.953 s; ['Project saved + manifest verified'] 1 passed in 4.39s 
+head save-project: trigger -> outcome 1.192 s; ['Project saved + manifest verified'] 1 failed in 4.86s 

@@ -1,0 +1,25 @@
+s19_app from <HOME>\Github\s19_app-b101-inc3\s19_app\__init__.py
+painted=0.912 stamped(install_end->signal_painted)=0.313 {'load_start': 0.036, 'install_start': 0.274, 'install_end': 0.317, 'compose_start': 0.346, 'compose_end': 0.355, 'layout_first': 0.532, 'signal_painted': 0.63, 'layout_first_end': 0.63, 'seen': 1.229}
+   frames written for the panel (start, end): [(0.396, 0.396), (0.574, 0.63), (0.709, 0.829), (0.949, 0.999), (0.999, 1.001), (1.025, 1.174)]
+   layouts (start, end, summary height): [(0.532, 0.63, 6), (0.632, 0.829, 6), (0.941, 0.999, 6)]
+painted=0.912 stamped(install_end->signal_painted)=0.331 {'load_start': -0.005, 'install_start': 0.3, 'install_end': 0.35, 'compose_start': 0.385, 'compose_end': 0.395, 'layout_first': 0.464, 'signal_painted': 0.681, 'layout_first_end': 0.681, 'seen': 1.262}
+   frames written for the panel (start, end): [(0.499, 0.681), (0.735, 0.754), (0.869, 1.06), (1.06, 1.062), (1.095, 1.136), (1.161, 1.185)]
+   layouts (start, end, summary height): [(0.464, 0.681, 6), (0.682, 0.754, 6), (0.86, 1.06, 6)]
+painted=0.823 stamped(install_end->signal_painted)=0.324 {'load_start': -0.048, 'install_start': 0.23, 'install_end': 0.274, 'compose_start': 0.281, 'compose_end': 0.288, 'layout_first': 0.364, 'signal_painted': 0.599, 'layout_first_end': 0.599, 'seen': 1.097}
+   frames written for the panel (start, end): [(0.4, 0.599), (0.67, 0.699), (0.81, 0.855), (0.856, 0.857), (0.878, 1.094)]
+   layouts (start, end, summary height): [(0.364, 0.599, 6), (0.6, 0.699, 6), (0.803, 0.855, 6)]
+painted=0.750 stamped(install_end->signal_painted)=0.174 {'load_start': 0.01, 'install_start': 0.443, 'install_end': 0.483, 'compose_start': 0.52, 'compose_end': 0.529, 'layout_first': 0.583, 'signal_painted': 0.657, 'layout_first_end': 0.657, 'seen': 1.233}
+   frames written for the panel (start, end): [(0.628, 0.657), (0.728, 0.745), (0.878, 1.129), (1.129, 1.13), (1.161, 1.197), (1.21, 1.233)]
+   layouts (start, end, summary height): [(0.583, 0.657, 6), (0.659, 0.746, 6), (0.871, 1.129, 6)]
+painted=0.771 stamped(install_end->signal_painted)=0.181 {'load_start': -0.11, 'install_start': 0.17, 'install_end': 0.211, 'compose_start': 0.218, 'compose_end': 0.228, 'layout_first': 0.298, 'signal_painted': 0.392, 'layout_first_end': 0.392, 'seen': 0.982}
+   frames written for the panel (start, end): [(0.341, 0.392), (0.457, 0.693), (0.805, 0.847), (0.848, 0.849), (0.883, 0.919), (0.95, 0.981)]
+   layouts (start, end, summary height): [(0.298, 0.392, 6), (0.393, 0.693, 6), (0.795, 0.847, 6)]
+painted=1.043 stamped(install_end->signal_painted)=0.424 {'load_start': 0.012, 'install_start': 0.296, 'install_end': 0.348, 'compose_start': 0.387, 'compose_end': 0.396, 'layout_first': 0.469, 'signal_painted': 0.772, 'layout_first_end': 0.772, 'seen': 1.391}
+   frames written for the panel (start, end): [(0.505, 0.772), (0.847, 0.875), (0.997, 1.053), (1.054, 1.055), (1.086, 1.124), (1.149, 1.39)]
+   layouts (start, end, summary height): [(0.469, 0.772, 6), (0.774, 0.875, 6), (0.987, 1.053, 6)]
+painted=0.972 stamped(install_end->signal_painted)=0.386 {'load_start': -0.014, 'install_start': 0.376, 'install_end': 0.425, 'compose_start': 0.431, 'compose_end': 0.438, 'layout_first': 0.51, 'signal_painted': 0.811, 'layout_first_end': 0.811, 'seen': 1.396}
+   frames written for the panel (start, end): [(0.553, 0.811), (0.875, 0.898), (1.023, 1.075), (1.076, 1.077), (1.106, 1.134), (1.373, 1.396)]
+   layouts (start, end, summary height): [(0.51, 0.811, 6), (0.813, 0.898, 6), (1.017, 1.075, 6)]
+painted=1.070 stamped(install_end->signal_painted)=0.414 {'load_start': 0.011, 'install_start': 0.334, 'install_end': 0.379, 'compose_start': 0.412, 'compose_end': 0.421, 'layout_first': 0.483, 'signal_painted': 0.793, 'layout_first_end': 0.793, 'seen': 1.449}
+   frames written for the panel (start, end): [(0.528, 0.793), (0.852, 0.88), (1.02, 1.084), (1.084, 1.086), (1.117, 1.391), (1.422, 1.448)]
+   layouts (start, end, summary height): [(0.483, 0.793, 6), (0.795, 0.88, 6), (1.012, 1.084, 6)]

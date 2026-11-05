@@ -1,0 +1,90 @@
+# int-05 run 1/3: R-TST-111/112 verifier alone on the final tree
+# cmd: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<TMP>/la timeout 2400 python -m pytest -p no:cacheprovider -q -rfEs -m serial_timing tests/test_b100_project_check.py -k r_tst_111_112 --basetemp <TMP>/bt5
+# HEAD b2b3c05 + uncommitted E4-integration test edits (git diff --stat below)
+ .../2026-11-01-batch-101/inc-3/01-requirements.md  |  2 +
+ .dev-flow/2026-11-01-batch-101/inc-3/E1-rulings.md |  2 +-
+ .dev-flow/2026-11-01-batch-101/inc-3/E1-slice.md   |  2 +-
+ .../inc-3/codewire/graph-inc3.md                   |  5 +-
+ tests/support/suite_census.py                      | 10 ++--
+ tests/test_b100_active_variant.py                  | 12 +++--
+ tests/test_b100_project_check.py                   | 58 ++++++++++++----------
+ tests/test_b97_flow_execution.py                   |  1 +
+ tests/test_suite_hygiene.py                        |  5 +-
+ 9 files changed, 57 insertions(+), 40 deletions(-)
+# start 2026-11-05T18:14:08Z
+s19_app.__file__ = C:\Users\<USER>\Github\s19_app-b101-inc3\s19_app\__init__.py
+3.11.15 | packaged by Anaconda, Inc. | (main, Jun 11 2026, 15:12:53) [MSC v.1942 64 bit (AMD64)]
+...                                                                      [100%]
+============================ QC-TM timing margins =============================
+LOW 13.9%  0.861 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+37.3%  0.627 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+67.1%  0.329 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+67.4%  0.326 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+71.3%  0.287 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+72.4%  0.276 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+76.8%  0.232 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+80.7%  0.193 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+QC-TM: 8 bounds, 1 under 20 % margin
+3 passed, 98 deselected in 15.78s
+# exit 0
+# end 2026-11-05T18:14:26Z
+# int-05 run 2/3: R-TST-111/112 verifier alone on the final tree
+# cmd: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<TMP>/la timeout 2400 python -m pytest -p no:cacheprovider -q -rfEs -m serial_timing tests/test_b100_project_check.py -k r_tst_111_112 --basetemp <TMP>/bt5
+# HEAD b2b3c05 + uncommitted E4-integration test edits (git diff --stat below)
+ .../2026-11-01-batch-101/inc-3/01-requirements.md  |  2 +
+ .dev-flow/2026-11-01-batch-101/inc-3/E1-rulings.md |  2 +-
+ .dev-flow/2026-11-01-batch-101/inc-3/E1-slice.md   |  2 +-
+ .../inc-3/codewire/graph-inc3.md                   |  5 +-
+ tests/support/suite_census.py                      | 10 ++--
+ tests/test_b100_active_variant.py                  | 12 +++--
+ tests/test_b100_project_check.py                   | 58 ++++++++++++----------
+ tests/test_b97_flow_execution.py                   |  1 +
+ tests/test_suite_hygiene.py                        |  5 +-
+ 9 files changed, 57 insertions(+), 40 deletions(-)
+# start 2026-11-05T18:14:26Z
+s19_app.__file__ = C:\Users\<USER>\Github\s19_app-b101-inc3\s19_app\__init__.py
+3.11.15 | packaged by Anaconda, Inc. | (main, Jun 11 2026, 15:12:53) [MSC v.1942 64 bit (AMD64)]
+...                                                                      [100%]
+============================ QC-TM timing margins =============================
+27.1%  0.729 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+29.0%  0.710 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+66.6%  0.334 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+66.9%  0.331 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+68.0%  0.320 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+72.5%  0.275 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+72.7%  0.273 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+76.9%  0.231 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+QC-TM: 8 bounds, 0 under 20 % margin
+3 passed, 98 deselected in 15.75s
+# exit 0
+# end 2026-11-05T18:14:44Z
+# int-05 run 3/3: R-TST-111/112 verifier alone on the final tree
+# cmd: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<TMP>/la timeout 2400 python -m pytest -p no:cacheprovider -q -rfEs -m serial_timing tests/test_b100_project_check.py -k r_tst_111_112 --basetemp <TMP>/bt5
+# HEAD b2b3c05 + uncommitted E4-integration test edits (git diff --stat below)
+ .../2026-11-01-batch-101/inc-3/01-requirements.md  |  2 +
+ .dev-flow/2026-11-01-batch-101/inc-3/E1-rulings.md |  2 +-
+ .dev-flow/2026-11-01-batch-101/inc-3/E1-slice.md   |  2 +-
+ .../inc-3/codewire/graph-inc3.md                   |  5 +-
+ tests/support/suite_census.py                      | 10 ++--
+ tests/test_b100_active_variant.py                  | 12 +++--
+ tests/test_b100_project_check.py                   | 58 ++++++++++++----------
+ tests/test_b97_flow_execution.py                   |  1 +
+ tests/test_suite_hygiene.py                        |  5 +-
+ 9 files changed, 57 insertions(+), 40 deletions(-)
+# start 2026-11-05T18:14:44Z
+s19_app.__file__ = C:\Users\<USER>\Github\s19_app-b101-inc3\s19_app\__init__.py
+3.11.15 | packaged by Anaconda, Inc. | (main, Jun 11 2026, 15:12:53) [MSC v.1942 64 bit (AMD64)]
+...                                                                      [100%]
+============================ QC-TM timing margins =============================
+LOW 14.1%  0.859 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+43.5%  0.565 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+51.5%  0.485 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+69.8%  0.302 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+70.5%  0.295 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+76.0%  0.240 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+76.9%  0.231 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+80.1%  0.199 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+QC-TM: 8 bounds, 1 under 20 % margin
+3 passed, 98 deselected in 16.26s
+# exit 0
+# end 2026-11-05T18:15:02Z
