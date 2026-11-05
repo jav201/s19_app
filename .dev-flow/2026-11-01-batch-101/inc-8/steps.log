@@ -12,3 +12,4 @@ E5 start 2026-11-05T14:53Z mutants model=kimi-k2.8
 E5 mutants kimi-k2.8 refused: 429 weekly quota; rerouted model=sonnet 2026-11-05T14:53Z
 E5 corrective start 2026-11-05T15:11:47Z model=opus
 E5 corrective end 2026-11-05T16:32:35Z model=opus (C-1..C-9 done; 99 cases 96 covered 3 partial; final: G1+G2 97 passed, 47 importer files 1189 passed + 1 flaky (rerun 75/75), law guards 27 passed)
+E5 end 2026-11-05T16:48:55Z model=sonnet (records)

@@ -95,7 +95,7 @@ _number_field
 req: R-CRC-CONFIG-001.10, R-CRC-CONFIG-001.11
 in: dict container; str key
 out: int value
-func: new. `raw = _required_field(container, key)`; returns `_parse_int(raw)` (unchanged: bool refused, int as is, str as hexadecimal); a `ValueError` from `_parse_int` becomes `ValueError(f"field '{key}' is not a number: {clip}")`, `text = json.dumps(raw)`, `clip = text if len(text) <= VALUE_CLIP else text[:VALUE_CLIP] + "…"`, `VALUE_CLIP = 64` [S-1].
+func: new. `raw = _required_field(container, key)`; returns `_parse_int(raw)` (unchanged: bool refused, int as is, str as hexadecimal); a `ValueError` from `_parse_int` becomes `ValueError(f"field '{key}' is not a number: {clip}")`, `clip = _clipped_json(raw)`, `VALUE_CLIP = 64` [S-1]. [E5 F1, corrected 2026-11-05 per `E5-code-review.md` §Re-review: the first design encoded the whole value with `json.dumps(raw)` before clipping, and a value nested just under the reader's limit then raised `RecursionError` while encoding. `_clipped_json` encodes lazily (`JSONEncoder().iterencode`) and stops once the text is longer than `VALUE_CLIP`, so it never descends more than about 65 levels and cannot raise for a value `json.loads` returns; the text is the first 64 characters of the JSON text, followed by `…` when longer.]
 module: s19_app/tui/operations/crc_config.py
 examples: (R-CRC-CONFIG-001.11/1) {"init": "zz"}, key "init" → raises ValueError "field 'init' is not a number: \"zz\"" (base text: "invalid literal for int() with base 16: 'zz'", B)
 examples: (R-CRC-CONFIG-001.11/2) {"init": true}, key "init" → raises ValueError "field 'init' is not a number: true" (base: "expected an integer, got a boolean", B)

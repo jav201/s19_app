@@ -72,3 +72,49 @@ The probes ran from the session scratchpad and touched no file of the worktree. 
 ## Evidence states
 
 F1: `executed`, probed and reproduced. F2: `executed`, probed. F3–F7: `executed`, by reading. Fixes for F1 and F2: `not-run`. They are owed, and they are verified by re-reading the corrected diff.
+
+## Re-review (2026-11-05)
+
+Scope: F1 and F2 only (`E5-rulings.md` C-1, C-2), on `git diff e455a07..HEAD -- s19_app` (head includes `a27b9ee`) and the tests for cases R-CRC-CONFIG-001.11/9, 001.11/10, R-FLOW-EXT.14/4, 14/5. Read against `E5-corrective-notes.md` §2 (C-1, C-2).
+
+### Verdict
+
+**PASS — F1 and F2 discharged.** No new finding from the fixes. Two notes, neither blocking.
+
+| Id | Verdict | Evidence state |
+|---|---|---|
+| F1 | PASS | `executed` (diff re-read, probes, RED on the old code, GREEN on head) |
+| F2 | PASS | `executed` (diff re-read, RED on the old order, GREEN on head) |
+
+### F1 — `_number_field` / `_clipped_json`
+
+- **It cannot raise for any value `json.loads` returns.** `_clipped_json` encodes with `JSONEncoder().iterencode` and returns once the text is longer than 64 characters. The pure-Python encoder yields `[`, `{` or the key before it goes down a level, so it never goes deeper than about 65 levels, whatever the value's depth. `json.loads` output has no cycles, and `allow_nan` is on, so neither `ValueError` path of the encoder can be reached. The `except ValueError` in `_number_field` is unchanged, and `parse_crc_config` still collects the reason.
+- **Probes** (scratch, py3.11 `s19env`, no file of the worktree touched):
+  - Six number fields of Config V (`polynomial`, `init`, `final_xor`, region `start`, `end`, `output_address`). Values: a nested list, a nested object and a list with a leading scalar. Depths 60–69 and 850–1000. Caller stack depths 0, 200, 600, 850, 900 and 920. **0 exceptions escaped.** Each run gave either the 001.11 reason or the 001.17 reason.
+  - **Headroom.** With a deep `init`, the first raise comes at caller stack depth 997. A valid Config V also raises from depth 997. The echo therefore adds no stack exposure beyond what the parser already has.
+  - **Deep values.** Lists, objects and leading-scalar lists at depths 63, 64, 65, 66, 100, 5 000 and 100 000 all return text of at most 65 characters. Where `json.dumps` can still compare (depth up to 300), the text equals `json.dumps(v)[:64] + "…"`.
+  - **Huge flat values.** A list of 5 000 000 items and a dict of 1 000 000 keys take about 0 s. A 20 000 000-character string takes 0.03 s, because it arrives as one chunk. Each result is 65 characters.
+- **Echo is exact.** 25 values were compared with the old formula and none differed. They included strings, `true`/`false`/`null`, floats, `Infinity`, `NaN`, `-0.0`, a 4 000-digit int, control characters, `"é"`, a lone surrogate, CJK text, a long key, nested objects, `[[[]]]` and `[0, [[[[1]]]]]`. `JSONEncoder()` has the same defaults as `json.dumps` (separators, `ensure_ascii`, `sort_keys`), so the `<value>` is the first 64 characters of the JSON text.
+- **The message text is unchanged:** `field '<key>' is not a number: <value>`.
+- **The dialog path is fixed.** On head, 001.11/10 (keys only: `x`, the typed path, Load config, Execute) bisects to the reader's limit inside the handler and the app stays up. On the old `crc_config.py`, 001.11/9 and 001.11/10 fail with `RecursionError … while encoding a JSON object`. 001.11/10 dies with `NoMatches #operation_result_status`, which means the app exited.
+- **The corrective used a different means from the ruling, and the change is accepted.** The ruling's "catch and echo a fixed form" was my own F1 suggestion. That fixed form is the exact `<value>` only for a list whose first item nests. For an object (`{"a": {"a": …`) or a list with a leading scalar (`[0, [0, …`) it is not, so it would break S-1. The lazy encoder gives the exact prefix for every shape. It also removes the raise instead of catching it after the fact. It is simpler and more correct than the suggestion. The deviation is recorded with its reason (corrective notes §2, C-1).
+
+### F2 — external-step check order
+
+- `flow_execution_service.py` (external branch of `run_flow`) now checks in this order: log climb → log exists → output join and climb → output exists → copy. That matches R-FLOW-EXT.14 and the E3 addendum. The moved block is unchanged apart from its position.
+- **The order is pinned.** 14/5 uses `missing.log`, relative, inside the project and absent, with output `../../x.json`. It asserts the log's existence cause exactly. On the old order it fails (`"output '../../x.json' climbs above …" != "log 'missing.log' does not exist …"`). 14/4 (both paths climb) passes on either order, as the corrective notes say. It is kept as the audit's owed case and does not pin the order.
+
+### Notes (not blocking)
+
+- **N-R1 (LOW, records).** `codewire/graph-inc8.md`, node `_number_field`, still prescribes a whole `json.dumps`. It now disagrees with the code. This is already listed in corrective notes §6 for the graph session.
+- **N-R2 (NIT, test).** 001.11/9 relies on the reader's limit falling inside depths 800–1000 at the test's stack depth. It does on win32/py3.11, where the limit is about 993. A runner that adds about 200 frames would make the `seen` assertion fail loudly, not pass vacuously, so no action is needed.
+
+### What I ran
+
+Environment: `env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=.`, `LOCALAPPDATA` redirected under a temp folder, `--basetemp` under a temp folder, `-p no:cacheprovider`. `s19_app.__file__` was checked first in each tree.
+
+| Run | Result |
+|---|---|
+| Head: `tests/test_b101_crc_model_and_reasons.py tests/test_b101_flow_ext_copy.py tests/test_crc_config.py` | 132 passed |
+| Scratch export of head with `crc_config.py` and `flow_execution_service.py` from `e455a07`: 001.11/9, 001.11/10, 14/4, 14/5 | 3 failed (001.11/9 and 001.11/10 `RecursionError`, 14/5 on the cause), 14/4 passed |
+| F1 probes (equivalence, huge values, deep values, field × shape × depth × caller-depth sweep, headroom) | as above, 0 escapes |

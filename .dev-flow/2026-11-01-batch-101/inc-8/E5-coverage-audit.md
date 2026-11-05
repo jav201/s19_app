@@ -136,3 +136,50 @@ No requirement row lacks a case. These clauses do:
 - ✗ Layer B: the shipped TUI surface is reached by keys only for Run/confirm in 9/11; seven ATs owed (§5).
 - ✓ Bidirectional reachability: `check_regions`, `write_crc_image`, `action_operations_view` (bound to `x`), `emit_template` (the Designer's Save, `crc_designer_view.py:1259`) all have product callers.
 - ✓ No real PII, no secrets, no host or home paths in this file.
+
+## Re-audit (2026-11-05)
+
+Scope: only the cases the corrective pass changed or added (`E5-rulings.md` C-1 … C-9, `E5-corrective-notes.md`, `git diff e455a07..HEAD -- 02-test-cases.md tests/`), head `a27b9ee`. Re-checked: **45 cases** (28 changed in a field other than Coverage/Result, 17 new). Mode: validation. Evidence: **inspection** of the test bodies and the product call sites, plus one **executed** `--collect-only` by this auditor over the six cited test files (144 ids). Pass/fail is consumed from the orchestrator's corrective run `e5c-03` (97 passed, win32, Python 3.11.15; executor: the orchestrator) — this auditor ran no test. No Linux run exists.
+
+### Earlier top issues
+
+| # | Issue | Now |
+|---|---|---|
+| 1 | Coverage column contradicts Result | **closed** — 96 `covered`, 3 `partial`, 0 `gap`, 0 `conflict`; every `covered` row cites a `(full` test and every `partial` row cites none (checked row by row) |
+| 2 | 21 cases with pre-ruling values | **closed** — SR-1 … SR-6, N-1 values now match the pinned values in every re-checked row |
+| 3 | 9/3 vacuous byte clause | **closed** — the test reads the file named by run 3's own WRITE-OUT summary (`_written_image(third)`), asserts it is `out.s19` and holds `41 41 03 04`. Discriminating: the product's WRITE-OUT verifies the placed file against the run's own memory map before it writes `wrote <name>` (`flow_execution_service.py`, `verify_written_image`), so a run 3 that read the BB copy would either name another file (`out_1.s19`/`out_2.s19`, fails the name) or hold BB (fails the bytes); run 1's image can no longer satisfy the assertion |
+| 4 | 9/15(b) does not reach the rebind | **accepted as partial** (C-8) — reason recorded in the case; S-4 is carried by arm (a); still skipped off Windows (routed, BACKLOG-CODE) |
+| 5 | "through keys" ATs were method-driven | **closed for 001.11/8, 001.16/5, 001.17/2, 001.11/10** — `x`, typed path, Load config and Execute by `enter`, focus moved by `tab` only; 001.17/2 asserts the later key's effect (focus lands on `operations_close`). 9/11 now asserts the painted lane head `▓ terminal · done · …` and takes the image from the painted `wrote` list, not from private state. Fixture-driven preconditions are declared in the cases |
+| — | Uncovered clauses | **closed** — FLOW-CRC.3/2, /3; FLOW-CRC.4/4; FLOW-CRC.9/2; EXT.14/4, /5; 001.10/9 … /11; 001.11/11 … /14; Linux halves and the junction-into-project case ruled not-testable here with reasons (S8-2, Inc 9) |
+| — | 4 bytes and the CRC value | **closed** — 9/1, /2, /3, /9, /10, /13, /14 pin all four data bytes; 9/5 pins `CD FB 3C B6` at 0x1020 from the Designer engine (`crc_stream`), an oracle independent of the operation engine; this auditor confirmed CRC-32(`01 02 03 04`) = 0xB63CFBCD with a third implementation (`zlib.crc32`) |
+
+### Marks of the re-checked cases
+
+- **FLOW-CRC.4/4 `partial` — agreed.** The four errors come from a monkeypatched `parse_crc_config`; the shipped parser returns at most one, so the product never produces the asserted three-way join from its own input. The join code is the product's, but the asserted cause exists only under the injection (TCP-MAP-5). Pending: reword R-FLOW-CRC.4 or keep the join as defence (requirements session).
+- **12/9 `full` — kept**, unlike 4/4: the injected raise stands for an I/O failure the shipped callee can produce, and the asserted summary is product-written.
+- **12/10 `partial` — agreed**; the exact summary is now pinned, the lane ✗ line is still unobserved, Windows only.
+- **9/1, /2, /3, /5, /9, /10, /11, /13, /14 and 001.17/2: `partial` → `full` — agreed.**
+- Every other changed or new case: `full` agreed.
+
+### Collection
+
+All **101** node ids cited in the Tests column of the 99 rows collect (`--collect-only`, s19env, `PYTHONPATH=.`, `LOCALAPPDATA` redirected): 0 missing. `ids=` now makes `[MPEG-2]`, `[JAMCRC]`, `[ARC]` … `[MPEG-2]`, `[saved]` … collect as cited.
+
+### Remaining issues
+
+1. **9/11 wording** — the Expected result names `terminal_out_1.s19`; the test reads whatever `.s19` the painted head lists and asserts its bytes, not its name. Either assert the name or mark it as illustrative. (case wording; mark unaffected)
+2. **001.11/9 and 001.11/10 are stack-depth sensitive** — the bands 800 … 1000 and 500 … 1000 assume the JSON reader's limit falls inside them; a deeper caller stack (xdist, plugins, another Python) can move it and fail the test without a product defect. Not vacuous; a flakiness risk to watch on the Linux run.
+3. **FLOW-CRC.9/2** extends a file to 256 MiB; on a file system without sparse extension this reserves real disk. Acceptable; note for CI.
+4. **Not ruled, still open from §2/§5:** 9/7 hardening ("run 1: none"); black-box ATs A-2 (Designer save by key, then consume) and A-3 … A-7. A-1 is now met by 001.11/8 and 001.17/2.
+5. **Row thresholds** R-CRC-CONFIG-001.10 / .11 still read "8/8" with 11 and 14 cases (requirements session).
+
+### Final totals
+
+| Item | Value |
+|---|---|
+| Cases | 99 (82 + 17) |
+| Coverage | **96 covered · 3 partial** (9/15, 12/10, FLOW-CRC.4/4) · 0 gap · 0 conflict — agreed |
+| Cited node ids not collecting | 0 of 101 |
+| `gap` with a passing full test | 0 |
+| Re-checked cases I would still change | **1 of 45 = 2.2%** (9/11 wording); marks to change: **0 of 45** |
+| Result column | `verified (win32, e5c)` on 99 rows — executor the orchestrator; `not-run` on Linux for all rows (no Linux run) |
