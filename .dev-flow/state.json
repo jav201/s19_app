@@ -157,6 +157,11 @@
       "station": "P3",
       "date": "2026-11-02",
       "decision": "P3 increment 001 (Inc 1, strict-EARS canon swap) approved and merged at 6a4eadb under the standing authorization: guard RED 11/11 on e273181, GREEN 11/11; 20/20 mutants; code-reviewer and security-reviewer PASS-WITH-NOTES; orchestrator re-run 67 passed, 2 failed = the version goldens, re-pinned after the merge. Ruling R-3 retires G4 (reverses review decision D0-8), raised to the operator."
+    },
+    {
+      "station": "P3",
+      "date": "2026-11-05",
+      "decision": "P3 increment 002 (Inc 2, test hygiene: serial_timing lane, margins, shared waits, CI xdist lanes, version-agnostic goldens, redaction gate) approved and merged at 8e5127a (PR #212) under the standing authorization: hygiene RED 54/54 on base 84d4507, GREEN 65/65; mutants 45/46 then the survivor killed; code-reviewer PASS-WITH-NOTES after re-review, security-reviewer PASS-WITH-NOTES; PR CI run 42037470050: lane 1 116 min 29 s on 4 workers, lane 2 5 min 48 s, 6/6 history arms PASSED; 7 failed = 6 known + tc_b97_64 burst load flake (backlog, Inc 3). R-TST-008/009, 031/032 3/3 and 091 owed."
     }
   ],
   "obsidian_synced": false,

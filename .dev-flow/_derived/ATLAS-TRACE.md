@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 78 requirement files | corpus digest: 676f5cbc6f16bc3c -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 86 requirement files | corpus digest: fa63396b82f9f21a -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -1522,7 +1522,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 2341 unique id(s)
+## family US/HLR/LLR — 2353 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -2068,7 +2068,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `LLR-021.2` | batches, canon |
 | `LLR-022.1` | batches, tests |
 | `LLR-022.2` | batches |
-| `LLR-023.1` | batches |
+| `LLR-023.1` | batches, tests |
 | `LLR-023.2` | batches |
 | `LLR-023.3` | batches |
 | `LLR-024.1` | batches, tests |
@@ -3673,6 +3673,13 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-088` | batches, tests |
 | `US-101.1` | batches |
 | `US-102` | batches |
+| `US-102-01` | batches |
+| `US-102-02` | batches |
+| `US-102-03` | batches |
+| `US-102-04` | batches, tests |
+| `US-102-05` | batches, tests |
+| `US-102-06` | batches |
+| `US-102-07` | batches |
 | `US-102..104` | batches |
 | `US-103` | batches |
 | `US-104` | batches |
@@ -3854,6 +3861,11 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-P4` | batches, tests |
 | `US-P5` | batches, tests |
 | `US-P6` | batches, tests |
+| `US-TST-1` | batches |
+| `US-TST-2` | batches |
+| `US-TST-3` | batches |
+| `US-TST-4` | batches |
+| `US-TST-5` | batches, tests |
 | `US-U8` | batches, tests |
 | `US-V1` | batches |
 | `US-V1..V8` | batches |
@@ -3868,7 +3880,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-less` | batches |
 | `US-nnn` | batches |
 
-## family R — 478 unique id(s)
+## family R — 527 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -4197,6 +4209,55 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `R-SAVEDLG-7` | canon |
 | `R-SAVEDLG-8` | canon |
 | `R-SAVEDLG-9` | canon |
+| `R-TST-001` | batches, tests |
+| `R-TST-002` | batches, tests |
+| `R-TST-003` | batches, tests |
+| `R-TST-004` | batches, tests |
+| `R-TST-005` | batches, tests |
+| `R-TST-006` | batches, tests |
+| `R-TST-007` | batches, tests |
+| `R-TST-008` | batches, tests |
+| `R-TST-009` | batches |
+| `R-TST-010` | batches, tests |
+| `R-TST-011` | batches |
+| `R-TST-012` | batches |
+| `R-TST-013` | batches, tests |
+| `R-TST-014` | batches |
+| `R-TST-015` | batches |
+| `R-TST-016` | batches, tests |
+| `R-TST-017` | batches, tests |
+| `R-TST-018` | batches |
+| `R-TST-020` | batches, tests |
+| `R-TST-021` | batches |
+| `R-TST-022` | batches |
+| `R-TST-023` | batches |
+| `R-TST-024` | batches, tests |
+| `R-TST-025` | batches, tests |
+| `R-TST-030` | batches, tests |
+| `R-TST-031` | batches, tests |
+| `R-TST-032` | batches |
+| `R-TST-040` | batches, tests |
+| `R-TST-041` | batches, tests |
+| `R-TST-042` | batches, tests |
+| `R-TST-043` | batches |
+| `R-TST-044` | batches |
+| `R-TST-045` | batches |
+| `R-TST-046` | batches |
+| `R-TST-047` | batches, tests |
+| `R-TST-048` | batches, tests |
+| `R-TST-049` | batches, tests |
+| `R-TST-050` | batches, tests |
+| `R-TST-051` | batches, tests |
+| `R-TST-052` | batches, tests |
+| `R-TST-060` | batches, tests |
+| `R-TST-070` | batches |
+| `R-TST-071` | batches |
+| `R-TST-072` | batches |
+| `R-TST-080` | batches, tests |
+| `R-TST-081` | batches |
+| `R-TST-082` | batches |
+| `R-TST-090` | batches |
+| `R-TST-091` | batches |
 | `R-TUI-001` | batches, canon |
 | `R-TUI-002` | batches, canon |
 | `R-TUI-003` | batches |
@@ -4351,7 +4412,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `R-VAR-003` | batches |
 | `R-VER-001` | canon |
 
-## family AT/TC — 2004 unique id(s)
+## family AT/TC — 2013 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -4886,6 +4947,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `AT-40` | batches, tests |
 | `AT-43` | batches |
 | `AT-65` | batches |
+| `AT-65536` | batches |
 | `AT-65b` | batches, tests |
 | `AT-80` | batches, tests |
 | `AT-88` | batches, tests |
@@ -5123,7 +5185,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `TC-009` | batches, tests |
 | `TC-009a` | batches, tests |
 | `TC-009b` | batches, tests |
-| `TC-01` | batches |
+| `TC-01` | batches, tests |
 | `TC-010` | batches, tests |
 | `TC-011` | batches, tests |
 | `TC-011a` | batches, tests |
@@ -5150,7 +5212,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `TC-019f` | batches |
 | `TC-019g` | batches |
 | `TC-019h` | batches |
-| `TC-02` | batches |
+| `TC-02` | batches, tests |
 | `TC-020` | batches, tests |
 | `TC-021` | batches, tests |
 | `TC-021.1` | batches |
@@ -5278,7 +5340,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `TC-052` | batches, tests |
 | `TC-052.1` | batches |
 | `TC-053` | batches |
-| `TC-06` | batches |
+| `TC-06` | batches, tests |
 | `TC-060` | batches |
 | `TC-060.1` | batches |
 | `TC-060.2` | tests |
@@ -6079,6 +6141,14 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `TC-B100-71` | batches, tests |
 | `TC-B100-72` | batches, tests |
 | `TC-B100-73` | batches, tests |
+| `TC-B102-01` | batches, tests |
+| `TC-B102-02` | batches, tests |
+| `TC-B102-03` | batches, tests |
+| `TC-B102-04` | batches, tests |
+| `TC-B102-05` | batches, tests |
+| `TC-B102-06` | batches, tests |
+| `TC-B102-07` | batches, tests |
+| `TC-B102-08` | batches, tests |
 | `TC-B77-01` | batches, tests |
 | `TC-B77-02` | batches, tests |
 | `TC-B77-03` | batches, tests |
