@@ -36,7 +36,7 @@ Base `b7b77c4`. Requirements `01-requirements.md`; slice `E1-slice.md`; cases `0
 
 ## 2. Canon changes, for the requirements session
 
-**New rows (19):** R-WHELP.18, .19, .20, .21, .22, .23, .24, .25, .26 (S7.4); R-DOC-SECURITY.1, .2; R-DOC-RELNOTE.1, .2, .3, .4, .5, .6; R-DOC-GUIDE.1, .2 (S0). Each id was checked absent from `REQUIREMENTS.md`, `s19w/review/S*-ears-strict.md` and every `.dev-flow/2026-11-01-batch-101/*` folder at `b7b77c4`. S0 has no section for the security policy, the release notes or the user guide: proposed new subsections S0.4 (security policy), S0.5 (release notes), S0.6 (user guide), with the context terms of `01-requirements.md` §Documents.
+**New rows (27):** R-WHELP.18, .19, .20, .21, .22, .23, .24, .25, .26 (S7.4); R-DOC-SECURITY.1, .2; R-DOC-RELNOTE.1, .2, .3, .4, .5, .6, and .7 … .14 (E3 round 1, A-14 / S-2 / S-3; each id checked absent from `REQUIREMENTS.md` and every `inc-*/01-requirements.md` on every `b101-*` branch); R-DOC-GUIDE.1, .2 (S0). Each id was checked absent from `REQUIREMENTS.md`, `s19w/review/S*-ears-strict.md` and every `.dev-flow/2026-11-01-batch-101/*` folder at `b7b77c4`. S0 has no section for the security policy, the release notes or the user guide: proposed new subsections S0.4 (security policy), S0.5 (release notes), S0.6 (user guide), with the context terms of `01-requirements.md` §Documents.
 
 **Split (E2, E7):** R-TUI-062.10 ("… in the Memory Map's key line, inspector subtitle and row glyphs …") has three objects in one `shall` (not singular, 29148). It becomes:
 
@@ -86,7 +86,7 @@ Base `b7b77c4`. Requirements `01-requirements.md`; slice `E1-slice.md`; cases `0
 | D-6 | F-16 scope: legend text only | **Recommend** (operator ruling 3): the legend names what the keys do today (Enter inspects). R-TUI-062.3 (Enter opens hex) stays an open requirement (D4-21, backlog); CTX-LEGEND's field line is written as `↵ <what Enter does on a region row>` so the canon does not state "inspect" and R-TUI-062.3 "open hex" at once. When D4-21 lands, the two legend constants change with it |
 | D-7 | Requirement and ruling ids in help steps | Treated under R-WHELP.13 with the CTX-HELP term "reference" (no new row); five ids in the Flow Builder steps are removed |
 | D-8 | Guide scope | Inc 14 takes BL-I8-3, the ch21 carry of Inc 7 and its own findings' passages and DOSSIER rows. The other increments' guide passages (F-01 … F-51 fixed elsewhere) go to the batch-end doc pass, which applies R-DOC-GUIDE.1/.2 to them |
-| D-9 | The README key guard `tests/test_docs_canon.py::test_at285_every_readme_named_key_exists_in_the_seat` | Its `_GLYPH` map has no `=` / `]`, and `_shipped_keys` reads `S19TuiApp.BINDINGS` only, so the README rows `=`, `]` and `Ctrl+P` (bound by Textual's `App`: `App.BINDINGS` holds `ctrl+q`; `App.COMMAND_PALETTE_BINDING` = `ctrl+p`, Textual 8.2.8) would turn it RED. **Recommend:** extend `_GLYPH` with `=` → `equals_sign`, `]` → `right_square_bracket`, and `_shipped_keys` with the inherited `App.BINDINGS` and `App.COMMAND_PALETTE_BINDING`. This makes the guard check more keys, not fewer; it is not a weakening. Node name unchanged |
+| D-9 | The README key guard `tests/test_docs_canon.py::test_at285_every_readme_named_key_exists_in_the_seat` | Its `_GLYPH` map has no `=` / `]`, and `_shipped_keys` reads `S19TuiApp.BINDINGS` only, so the README rows `=`, `]` and `Ctrl+P` (bound by Textual's `App`: `App.BINDINGS` holds `ctrl+q`; `App.COMMAND_PALETTE_BINDING` = `ctrl+p`, Textual 8.2.8) would turn it RED. **Recommend:** extend `_GLYPH` with `=` → `equals_sign`, `]` → `right_square_bracket`, and `_shipped_keys` with the inherited `App.BINDINGS` and `App.COMMAND_PALETTE_BINDING`. This makes the guard check more keys, not fewer; it is not a weakening. Node name unchanged. **Amended at E3 [A-5]:** the inherited keys come from `S19TuiApp._merged_bindings` (not `App.BINDINGS`, which misses an override or `inherit_bindings = False`), and `ctrl+p` counts only while `S19TuiApp.ENABLE_COMMAND_PALETTE` is true (Textual binds it only then, `app.py:874-881`); negative control: the flag monkeypatched to `False` → the README `Ctrl+P` row is RED — the drift D-11 predicts |
 | D-10 | D3-19 legend rows (A2L red, MAC pale yellow, Issues info) | **Recommend out of Inc 14.** The PLAN scopes Inc 14 to the map-keys line of D3-19; the rows also print in the project report (R-LEGEND-SOURCE-001), so changing them re-pins report goldens (a B3 ripple). Backlog BL-I14-3 |
 | D-11 | `Ctrl+P` in the README | CTX-KEYS lists it and the app binds it today; S0 D0-10 says not to list it because S6 D6-13 will remove Textual's palette. D6-13 is not in batch-101, so 1.0.0 ships it. **Recommend: list it** (R-DOC-README.3 and .4 both hold only then); remove the row with D6-13 |
 
@@ -96,6 +96,7 @@ Base `b7b77c4`. Requirements `01-requirements.md`; slice `E1-slice.md`; cases `0
 - **BL-I14-2** — the `changes_file_notation` section's JSON fence shows its Markdown marks as typed if the section is ever shown (R-WHELP.14). Decide with D7-11.
 - **BL-I14-3** — D3-19: the A2L, MAC and Issues legend rows describe intentions (R-LEGEND-011); rewrite from CTX-LEGEND with the report goldens re-pinned.
 - **BL-I14-4** — README claims not verified in this pass: the test count (`2760 collected tests`, measured 2026-10-11) and "Every one of these has an equivalent in the TUI" (CLI section). Neither names a window, key, command or file (R-DOC-README.4 does not reach them).
+- **BL-I14-6** [E3 A-2] — Check Editor home split: **Write .chk.json** writes into the common `.s19tool/workarea/patches/` with or without a project (`app.py:7338`, no `dest_dir`; `tui/changes/io.py:1504`), while the Open checks/ chip opens `<project>/checks/` (`folder_open_service.py:330`) and the Check Editor help says check specs are kept there. A product defect, not Inc 14's to fix (operator ruling 3); an Inc 5 / Inc 6 interface (graph I-9). Inc 14's README says what the code does.
 - **BL-I14-5** — re-take the guide captures ch06-05, ch17-05, ch19-01, ch21-02 (D-5), and the other increments' guide passages (D-8): the batch-end doc pass.
 
 ## 6. Interfaces with other increments
@@ -104,7 +105,9 @@ Base `b7b77c4`. Requirements `01-requirements.md`; slice `E1-slice.md`; cases `0
 |---|---|---|
 | Inc 7, Inc 8 (merged) | their user-visible changes | read only: the release notes and guide text quote their rows' exact texts (R-BEFORE-AFTER-REPORT-001.32, R-CRC-CONFIG-001.16, R-FLOW-CRC.4, read suffix of R-FLOW-EXT.12) |
 | Inc 2 (merged) | the known-failure list | the three md nodes leave it (§3) |
-| Inc 13 (CRC Designer recompute) | README CRC Designer section | the README says "recomputes after each edit", true with or without Inc 13's debounce |
+| Inc 13 (CRC Designer recompute) | README CRC Designer section | **Corrected at E3 [A-12]:** "after each edit" does not survive Inc 13's own wording ("150 ms after the last keystroke"); the README keeps the base sentence "recomputes on every keystroke" (`crc_designer_view.py:615-625`) and Inc 13 rewrites it when it merges (graph I-14) |
+| Inc 9 (F-45) | README Flow Execution section | [A-11] "Each run writes a chain-set report" (not "one"), true at base; Inc 9 updates it (graph I-10) |
+| Inc 4, 5, 6, 10, 11, 12; every later merge | help, README, CHANGELOG, DOSSIER text | the full list is the graph's interface table I-8 … I-16 (E3 architect §3) |
 | Inc 12 (Reports viewer `esc`, F-51) | Reports help section (this increment's copy) | if Inc 12 makes `esc` close the viewer, it may add a step; it does not own `window_help.py` (PLAN), so it asks the orchestrator |
 | Inc 6 (F-06, Patch Editor dropdown) | Patch Editor help `File — picks a change file in patches/` | untouched here; Inc 6 owns the text if its fix changes what the dropdown lists |
 | Inc 11 (F-03 Issues filter) | legend Issues rows | untouched here (D-10) |
@@ -120,3 +123,26 @@ Base `b7b77c4`. Requirements `01-requirements.md`; slice `E1-slice.md`; cases `0
 - **D-9: yes** — the AT-285 README key guard counts `=`, `]`, `Ctrl+Q`, `Ctrl+P` as bound keys (stricter, not looser).
 - Inc 4's stale guide text (ch08 §8.2, ch10 F-01 sentence, ch17 F-01 note, DOSSIER F-01 row and its false "Project Execute scope does resolve them" claim) and S4-8 go to the batch-end doc pass (D-8), since Inc 4 is not merged yet.
 - Runs: tests on the LAN Linux host only (operator rule).
+
+## E3 round 1 — rulings folded (`E3-rulings.md`, 2026-11-05)
+
+Architect FAIL (A-1 … A-6 MAJOR, A-7 … A-19 MINOR), security PASS-WITH-NOTES (S-1 MEDIUM, S-2 … S-5 LOW, S-6 … S-8 INFO). Round 2 re-checks A-1 … A-6 and S-1.
+
+| Ruling | Folded into |
+|---|---|
+| A-1 | R-DOC-RELNOTE.5 statement ("of a name"), threshold and negative control; case R-DOC-RELNOTE.5/1, R-DOC-GUIDE.1/11; graph CHANGELOG (c) and guide /11 |
+| A-2 | graph README block (5); R-DOC-README.4 threshold and case /1 (present phrase); backlog BL-I14-6 (§5); graph I-9 |
+| A-3 | R-WHELP.7 threshold and negative controls; case R-WHELP.7/1; graph node `test_tc707_numbering_generated_sequential`, `section_body_text` examples, I-15; slice §4 |
+| A-4 | Definitions "Key that acts on a window" (K(w)); R-WHELP.12 threshold (a) and negative control; case fixture K(w) and R-WHELP.12/1; graph entity example |
+| A-5 | D-9 (amended above); R-DOC-README.3 threshold and negative control; case R-DOC-README.3/2; graph node `test_at285_…`; slice §4 |
+| A-6 + S-1 | D-1 (amended at the end of this section); R-DOC-SECURITY.1 threshold; case R-DOC-SECURITY.1/2 (blocking merge precondition); graph `[I/O: SECURITY.md]`; slice §1 |
+| A-7, A-8, A-9 | Help copy I14 Reports step 4, Workspace step 5, CRC Designer step 3; R-WHELP.19 statement and threshold; new case R-WHELP.19/3; case R-WHELP.13/2; graph `ReportViewerScreen.compose` |
+| A-10, A-18 | graph README blocks (3), (13) |
+| A-11, A-12 | graph README blocks (8), (9); graph I-10, I-14; §6 |
+| A-13, A-14 + S-2, S-3 | R-DOC-RELNOTE.6; new rows R-DOC-RELNOTE.7 … .14 and cases /1; US-REL-1; graph CHANGELOG; slice §1 |
+| A-15 | R-DOC-GUIDE.2 threshold and negative control; case R-DOC-GUIDE.2/2 |
+| A-16, A-17 | slice §4; graph test nodes `test_tc707_boundary_…`, `test_tc1802_…` |
+| A-19 + S-4, S-5 | graph `[I/O: SECURITY.md]` Scope; graph README block (8) |
+| S-6 | R-DOC-SECURITY.2 threshold; graph `[I/O: SECURITY.md]` |
+
+- **D-1 amended [A-6, S-1]:** private vulnerability reporting enabled is a merge precondition for `SECURITY.md`, checked at E5 with the dated `gh api` transcript. If it is still off at merge, `SECURITY.md` is held out of the merge (the rest of Inc 14 merges) and re-checked at the batch end. No public-issue fallback text. Enabling it is the operator's action; the orchestrator has asked.
