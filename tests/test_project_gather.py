@@ -65,9 +65,11 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 from pathlib import Path
 from typing import Optional
 
+import pytest
 from textual.widgets import Button, Input, Static
 
 import s19_app.tui.app as app_module
@@ -77,6 +79,7 @@ from s19_app.tui.changes.model import ChangeDocument
 from s19_app.tui.operations.crc_kernel import SEED_ALGORITHM
 from s19_app.tui.services.project_gather_service import (
     GATHER_CONTAINMENT,
+    GATHER_SOURCE_MISSING,
     PROJECT_CHECKS_DIR,
     PROJECT_PATCHES_DIR,
     PROJECT_TEMPLATES_DIR,
@@ -94,6 +97,8 @@ from s19_app.tui.workspace import (
     ensure_template_lib,
     sanitize_project_name,
 )
+from tests.support import b100_links
+from tests.support import b100_projects as projects
 from tests.support.b100_workers import settle_workers
 
 #: Minimal valid S19 image (checksum verified against s19_app.core.S19File) —
@@ -679,3 +684,166 @@ def test_scoped_home_containment_escape_refuses(tmp_path: Path) -> None:
     assert not (outside_project / PROJECT_PATCHES_DIR / "escape.json").exists(), (
         "no byte may land outside the work area"
     )
+
+
+# --------------------------------------------------------------------------- #
+# Inc 3 (batch-101) — the composition limb: one check per distinct name, and a
+# link loop at a name is looked up in the common library, never raised
+# --------------------------------------------------------------------------- #
+
+
+def _composition_scene(tmp_path: Path) -> tuple:
+    """A project folder ``P`` inside a fresh work area, and the common
+    patches library beside it; returns ``(project_dir, kwargs)`` where
+    ``kwargs`` are the gather's three path arguments. Paths are resolved up
+    front so a spy can compare them as text."""
+    workarea = tmp_path / WORKAREA_DIRNAME / WORKAREA_SUBDIR
+    workarea.mkdir(parents=True)
+    workarea = workarea.resolve()
+    project_dir = workarea / "P"
+    project_dir.mkdir()
+    patches = workarea / WORKAREA_PATCHES
+    patches.mkdir()
+    kwargs = dict(
+        common_patches_dir=patches,
+        common_templates_dir=workarea.parent / "templates",
+        workarea_root=workarea,
+    )
+    return project_dir, kwargs
+
+
+def _spy_project_file_checks(monkeypatch: pytest.MonkeyPatch, project_dir: Path) -> list:
+    """Record, as normalised text, every file check made on a path inside
+    ``project_dir`` through the two seams a composition check can use
+    (``Path.is_file`` and ``os.path.isfile``); the real check still runs.
+    Checks of paths outside the project (the common library) are not
+    recorded."""
+    prefix = os.path.normcase(os.path.normpath(str(project_dir))) + os.sep
+    calls: list = []
+
+    def _note(path) -> None:
+        text = os.path.normcase(os.path.normpath(str(path)))
+        if text.startswith(prefix):
+            calls.append(text)
+
+    real_is_file = Path.is_file
+    real_isfile = os.path.isfile
+
+    def _is_file(self, *args, **kwargs):
+        _note(self)
+        return real_is_file(self, *args, **kwargs)
+
+    def _isfile(path):
+        _note(path)
+        return real_isfile(path)
+
+    monkeypatch.setattr(Path, "is_file", _is_file)
+    monkeypatch.setattr(os.path, "isfile", _isfile)
+    return calls
+
+
+def test_r_proj_gather_12_each_distinct_composition_name_is_checked_once(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A name that appears twice is looked up in the project folder once.
+
+    Why it matters: Save project of a 1 000-name composition spends its time
+    in this loop; a repeated name must cost one check, not two, and the
+    outcome must be the one the names given once would give.
+
+    Arms: (1) 1 000 real names given twice -> 1 000 checks, same outcome as
+    given once; (2) a missing name given twice -> 1 check and 1 finding;
+    (3) a ``missing/../x.json`` name is checked once on the folded path
+    ``<project>/x.json`` and counts as already home."""
+    project_dir, kwargs = _composition_scene(tmp_path)
+    names = [f"n{index:04d}.json" for index in range(1000)]
+    for name in names:
+        (project_dir / name).write_text(_change_doc_text(), encoding="utf-8")
+
+    # Arm 1 — 1 000 names twice.
+    calls = _spy_project_file_checks(monkeypatch, project_dir)
+    doubled = gather_project_artifacts(
+        project_dir, composition_names=names + names, **kwargs
+    )
+    assert len(calls) == 1000, f"expected 1000 project-folder checks, got {len(calls)}"
+    calls.clear()
+    once = gather_project_artifacts(project_dir, composition_names=names, **kwargs)
+    assert len(calls) == 1000, len(calls)
+    assert doubled.gathered == once.gathered == {}
+    assert doubled.issues == once.issues == []
+
+    # Arm 2 — a missing name twice.
+    empty_dir = project_dir.parent / "Q"
+    empty_dir.mkdir()
+    calls = _spy_project_file_checks(monkeypatch, empty_dir)
+    gone = gather_project_artifacts(
+        empty_dir, composition_names=["gone.json", "gone.json"], **kwargs
+    )
+    assert len(calls) == 1, calls
+    assert [issue.code for issue in gone.issues] == [GATHER_SOURCE_MISSING], gone.issues
+    assert "'gone.json'" in gone.issues[0].message, gone.issues[0].message
+
+    # Arm 3 — `..` over a missing folder is folded lexically.
+    fold_dir = project_dir.parent / "R"
+    fold_dir.mkdir()
+    (fold_dir / "x.json").write_text(_change_doc_text(), encoding="utf-8")
+    calls = _spy_project_file_checks(monkeypatch, fold_dir)
+    folded = gather_project_artifacts(
+        fold_dir, composition_names=["missing/../x.json"], **kwargs
+    )
+    expected_check = os.path.normcase(os.path.normpath(str(fold_dir / "x.json")))
+    assert calls == [expected_check], calls
+    assert folded.gathered == {} and folded.issues == [], (folded.gathered, folded.issues)
+
+
+def _library_document(kwargs: dict, name: str = "x.json") -> None:
+    (kwargs["common_patches_dir"] / name).write_text(_change_doc_text("change"), encoding="utf-8")
+
+
+def test_r_proj_gather_13_a_link_loop_at_a_composition_name_is_not_raised(
+    tmp_path: Path,
+) -> None:
+    """Windows: a junction that points to itself stands at the composition
+    name ``x.json`` in the project folder, and the common library holds an
+    ``x.json`` change document. The gather returns (no exception) and looks
+    the name up in the library by its last part.
+
+    Why it matters: at base the gather raised ``RuntimeError`` on the loop
+    and the whole Save project ended on the unexpected-error line; the
+    gather is collect-don't-abort."""
+    b100_links.require_junctions()
+    project_dir, kwargs = _composition_scene(tmp_path)
+    _library_document(kwargs)
+    link = projects.create_junction_loop(project_dir / "x.json")
+    try:
+        outcome = gather_project_artifacts(
+            project_dir, composition_names=["x.json"], **kwargs
+        )
+    finally:
+        os.rmdir(link)  # never a recursive delete through the junction
+    assert outcome.gathered == {"patches": ["patches/x.json"]}, outcome.gathered
+
+
+def test_r_proj_gather_13_a_posix_self_symlink_at_a_composition_name_is_not_raised(
+    tmp_path: Path,
+) -> None:
+    """A symbolic link that points to itself (``x.json -> x.json``) stands at
+    the composition name in the project folder; the library holds ``x.json``.
+    The gather returns and looks the name up in the library.
+
+    Skipped where the run may not create symbolic links (Windows without the
+    privilege)."""
+    project_dir, kwargs = _composition_scene(tmp_path)
+    _library_document(kwargs)
+    link = project_dir / "x.json"
+    try:
+        os.symlink("x.json", link)
+    except (OSError, NotImplementedError) as exc:
+        pytest.skip(f"symbolic links are not available to this run: {exc}")
+    try:
+        outcome = gather_project_artifacts(
+            project_dir, composition_names=["x.json"], **kwargs
+        )
+    finally:
+        link.unlink()
+    assert outcome.gathered == {"patches": ["patches/x.json"]}, outcome.gathered

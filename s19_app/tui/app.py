@@ -14937,7 +14937,6 @@ class S19TuiApp(App):
         if not project_dir:
             return
         try:  # SE5-12b-2: the open project's folder can vanish outside the app
-            project_dir.mkdir(parents=True, exist_ok=True)
             data_files, a2l_files, error = validate_project_files(project_dir)
         except OSError:
             reason, step = _TYPED_REFUSAL_TOKENS["unreadable"]
@@ -15060,7 +15059,6 @@ class S19TuiApp(App):
         if not project_dir:
             return
         try:  # SE5-12b-2: the open project's folder can vanish outside the app
-            project_dir.mkdir(parents=True, exist_ok=True)
             data_files, a2l_files, error = validate_project_files(project_dir)
         except OSError:
             reason, step = _TYPED_REFUSAL_TOKENS["unreadable"]

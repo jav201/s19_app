@@ -652,8 +652,12 @@ def gather_project_artifacts(
         return resolved_source
 
     # Predicate limb 1 — the save's own composition.
+    checked_names: set[str] = set()
     for name in composition_names:
-        in_project = (resolved_project / name).resolve()
+        if name in checked_names:
+            continue
+        checked_names.add(name)
+        in_project = Path(os.path.normpath(resolved_project / name))
         if in_project.is_file():
             continue  # already home — the manifest batch/assignments carry it
         common_candidate = common_patches_dir / Path(name).name

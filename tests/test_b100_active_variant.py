@@ -65,6 +65,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 import time
 from pathlib import Path
 
@@ -80,9 +81,11 @@ from s19_app.tui.services.variant_execution_service import read_project_manifest
 from s19_app.tui.workspace import WORKAREA_DIRNAME
 from s19_app.tui.workspace import WORKAREA_SUBDIR
 
+from tests.support import b100_links
 from tests.support import b100_projects as projects
 from tests.support import b100_save_dialog as sd
 from tests.support.b100_load_dialog import highlight_row
+from tests.support.b100_workers import settle_workers
 from tests.support.b100_load_dialog import is_load_dialog
 from tests.support.b100_load_dialog import load_choice_cls
 from tests.support.independent_reader import read_s19
@@ -1461,3 +1464,81 @@ def test_at_b100_20_inc8a_every_writer_carries_the_active_document(
     assert f"{projects.DOCUMENT_ADDRESS:08X}" in ledger.upper(), ledger
     assert "1 entry" in border and "1 entry" == border.split("─")[-2].strip(), border
     assert dirty_marker not in border, border
+
+
+# ---------------------------------------------------------------------------
+# Inc 3 (batch-101) — Save project with a link loop at a composition name
+# ---------------------------------------------------------------------------
+
+
+def test_r_proj_rollback_9_2_a_link_loop_at_a_composition_name_ends_in_the_rollback_refusal(
+    tmp_path: Path,
+) -> None:
+    """Windows. Project ``P`` is open; a directory junction that points to
+    itself stands at ``P/x.json``, and the common patches library holds an
+    ``x.json`` change document. Save project with the composition
+    ``batch=("x.json",)`` ends with the project.json refusal, exactly once
+    -- not with the unexpected-error line -- and the gathered copy is rolled
+    back: neither ``P/patches/x.json`` nor ``P/patches`` exists afterwards.
+
+    Why it matters: the gather must not raise on the loop (it used to, and
+    the user was told only that an unexpected error stopped the save); the
+    save-level end is the existing refusal because the manifest writer
+    refuses a link entry, and a failed save must leave no copy behind.
+
+    Negative control (the base tree): the gather raises on the loop and the
+    save ends on the unexpected-error line, with the refusal line absent.
+    Containment: if the writer is ever changed to accept the link entry,
+    this node fails -- it must not be re-pinned to pass (that would weaken
+    the refusal)."""
+    b100_links.require_junctions()
+    from s19_app.tui.screens import SaveProjectPayload
+
+    base = tmp_path / "app"
+    projects.copy_sources(_workarea(base) / "P", projects.CASE01_DIR, "firmware.s19")
+    refusal = "Project NOT saved: could not save — project.json was not written. check the folder."
+    unexpected = "an unexpected error stopped the save"
+    verified = "Project saved + manifest verified"
+    outcomes = ("Project NOT saved", verified)
+
+    async def scenario(app, pilot, log):
+        await projects.load_project(pilot, app, "P")
+        project_dir = app.workarea / "P"
+        patches_library = app.workarea / "patches"
+        patches_library.mkdir(parents=True, exist_ok=True)
+        (patches_library / "x.json").write_bytes(projects.change_document_bytes())
+        link = projects.create_junction_loop(project_dir / "x.json")
+        try:
+            mark = len(log.messages)
+            app._handle_save_dialog(
+                SaveProjectPayload(
+                    parent_folder=str(app.workarea),
+                    project_name="P",
+                    batch=("x.json",),
+                    assignments={},
+                )
+            )
+            await projects.wait_for(
+                pilot,
+                lambda: any(o in line for line in log.since(mark) for o in outcomes),
+                "the Save project outcome line",
+            )
+            await settle_workers(pilot)
+            for _ in range(4):
+                await pilot.pause()
+            lines = log.since(mark)
+            left = (
+                os.path.lexists(project_dir / "patches" / "x.json"),
+                os.path.lexists(project_dir / "patches"),
+            )
+            return lines, left, list(app._busy.runs), app.return_code is None and app.is_running
+        finally:
+            if os.path.lexists(link):
+                os.rmdir(link)  # never a recursive delete through the junction
+
+    lines, left, runs, alive = projects.run_app(base, scenario)
+    assert lines.count(refusal) == 1, lines
+    assert not [line for line in lines if unexpected in line], lines
+    assert not [line for line in lines if verified in line], lines
+    assert alive and runs == [], (alive, runs)
+    assert left == (False, False), f"the failed save left a gathered copy: {left}"

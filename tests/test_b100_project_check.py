@@ -35,14 +35,18 @@ behavioural nodes of this module still run (and fail) at the base.
 from __future__ import annotations
 
 import asyncio
+import ast
 import hashlib
 import json
+import math
 import os
 import re
 import shutil
+import sys
 import threading
 import time
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 from textual.widgets import Label
@@ -72,6 +76,7 @@ from tests.support import b100_projects as projects
 from tests.support.b100_load_dialog import highlight_row, is_load_dialog
 from tests.support.timing import report_margin
 from tests.support.timing import timing_bound
+from tests.support.timing import wait_until
 from tests.support.b100_workers import settle_workers
 
 SIZES = [(118, 54), (220, 60)]
@@ -772,15 +777,139 @@ def test_tc_b100_61_seven_kinds_seven_next_steps_no_codes() -> None:
 
 
 def _paint_clock_start(app: S19TuiApp, pressed: float) -> float:
-    """Inc 9b re-pin: the panel paint clock starts when the timed load returns.
+    """The panel paint clock starts at the install stamp: the moment the
+    project install callback returned (``app._load_returned_at``, set by the
+    arm's wrapper of ``_install_prepared_project``).
 
-    Before 9b the project pick's dismiss callback ran the load inside the
-    ``#project_ok`` click, so ``pressed`` (taken after the click) already
-    followed the load. The one Load dialog router defers the load with
-    ``call_after_refresh`` (LLR-173.1e), so the load now runs after the
-    click; starting the clock at the later of the two keeps this bound on
-    the panel paint alone. The load itself keeps its own 1 s bound."""
-    return max(pressed, getattr(app, "_load_returned_at", pressed))
+    Inc 9b started the clock at the later of the click and the install,
+    because the router defers the load until after the click. Batch-101
+    Inc 3 (R-TST-110): the click is not a start at all -- a worker may end
+    the load long after it, and ``max`` then charged the wait for the load
+    to the panel. ``pressed`` stays a parameter for the call sites and is
+    not read. A missing stamp is a failed test, never a silent fall-back to
+    the click."""
+    stamp = getattr(app, "_load_returned_at", None)
+    assert stamp is not None, "the project install callback did not run"
+    return stamp
+
+
+def _summary_laid_out(screen) -> bool:
+    """True when ``screen`` holds a ``#result_summary`` with a height. Uses
+    ``query`` and a length check, never ``query_one``: the layout signal can
+    publish before the summary is mounted."""
+    found = screen.query("#result_summary")
+    return len(found) > 0 and found.first().size.height > 0
+
+
+def _watch_panel_paint(app: S19TuiApp) -> list:
+    """The panel paint stamp: wrap the instance's ``push_screen`` so that,
+    when the screen pushed is the Load-result panel, the app subscribes to
+    that screen's ``screen_layout_refresh_signal`` (``immediate=True``; the
+    app is a running node, the not-yet-mounted screen is not). The first
+    publish at which the summary is laid out appends
+    ``(time.perf_counter(), problem rows in that layout)`` and nothing more.
+
+    Returns the list, empty until the panel paints. ``Signal.publish``
+    swallows a callback's exception, so a callback that failed leaves the
+    list empty: every caller asserts it is non-empty. The stamp is once per
+    layout pass; outside a ``batch_update`` the publish follows the pass's
+    screen refresh (diagnosed on textual 8.2.8; re-check on a bump). Public
+    Textual API only."""
+    from s19_app.tui.screens import LoadResultScreen
+
+    stamps: list = []
+    real_push = app.push_screen
+
+    def _push(screen, *args, **kwargs):
+        # The push is made first: the verifier's observer wraps it at class
+        # level and subscribes inside it, so its callback runs before this
+        # one's (this one counts the rows after its stamp, which takes ~1 ms).
+        # Mounting and the first layout happen after this call returns.
+        result = real_push(screen, *args, **kwargs)
+        if isinstance(screen, LoadResultScreen):
+
+            def _on_layout(_value=None) -> None:
+                if stamps or not _summary_laid_out(screen):
+                    return
+                stamps.append(
+                    (
+                        time.perf_counter(),
+                        len(screen.query("#result_body .result-problem")),
+                    )
+                )
+
+            screen.screen_layout_refresh_signal.subscribe(app, _on_layout, immediate=True)
+        return result
+
+    app.push_screen = _push
+    return stamps
+
+
+class _StampObserver:
+    """The verifier's own reading of the product, apart from the arms: four
+    class-level wrappers on ``S19TuiApp`` installed before an arm builds its
+    app (so the arm's instance wrappers call through them). It shares no
+    list or attribute with the arm and never reads ``_watch_panel_paint``'s
+    list, ``_load_returned_at`` or ``_statuses``.
+
+    Fields: ``installed`` (the first ``_install_prepared_project`` return),
+    ``paint`` (the first layout publish of a pushed Load-result panel with a
+    summary height, by its own subscription), ``append_start`` (the last
+    entry of ``load_from_path``) and ``outcome`` (the first ``set_status``
+    line holding ``manifest verified`` or ``was not rewritten`` after
+    ``append_start``)."""
+
+    def __init__(self) -> None:
+        self.installed = None
+        self.paint = None
+        self.append_start = None
+        self.outcome = None
+
+    @classmethod
+    def install(cls, monkeypatch: pytest.MonkeyPatch) -> "_StampObserver":
+        from s19_app.tui.screens import LoadResultScreen
+
+        observer = cls()
+        real_install = S19TuiApp._install_prepared_project
+        real_push = S19TuiApp.push_screen
+        real_load = S19TuiApp.load_from_path
+        real_status = S19TuiApp.set_status
+
+        def _install(app, prepared):
+            result = real_install(app, prepared)
+            if observer.installed is None:
+                observer.installed = time.perf_counter()
+            return result
+
+        def _push(app, screen, *args, **kwargs):
+            if isinstance(screen, LoadResultScreen):
+
+                def _on_layout(_value=None) -> None:
+                    if observer.paint is None and _summary_laid_out(screen):
+                        observer.paint = time.perf_counter()
+
+                screen.screen_layout_refresh_signal.subscribe(app, _on_layout, immediate=True)
+            return real_push(app, screen, *args, **kwargs)
+
+        def _load(app, *args, **kwargs):
+            observer.append_start = time.perf_counter()
+            observer.outcome = None
+            return real_load(app, *args, **kwargs)
+
+        def _status(app, message, *args, **kwargs):
+            if (
+                observer.append_start is not None
+                and observer.outcome is None
+                and ("manifest verified" in str(message) or "was not rewritten" in str(message))
+            ):
+                observer.outcome = time.perf_counter()
+            return real_status(app, message, *args, **kwargs)
+
+        monkeypatch.setattr(S19TuiApp, "_install_prepared_project", _install)
+        monkeypatch.setattr(S19TuiApp, "push_screen", _push)
+        monkeypatch.setattr(S19TuiApp, "load_from_path", _load)
+        monkeypatch.setattr(S19TuiApp, "set_status", _status)
+        return observer
 
 
 async def _open_panel_through_the_dialog(pilot, app: S19TuiApp, name: str = "P") -> None:
@@ -830,19 +959,24 @@ def test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second(
 
         app._handle_load_project = _timed
         app._install_prepared_project = _installed
+        stamps = _watch_panel_paint(app)
         async with app.run_test(size=(118, 54)) as pilot:
             await pilot.pause()
             await _open_panel_through_the_dialog(pilot, app)
             pressed = time.perf_counter()
-            await _wait_for(
+            await wait_until(
                 pilot,
                 lambda: len(app.screen.query("#result_summary")) > 0
                 and app.screen.query_one("#result_summary").size.height > 0,
-                "the painted Load-result panel",
-                attempts=4000,
+                "timed out waiting for the painted Load-result panel",
+                timeout=60.0,
             )
-            painted = time.perf_counter() - _paint_clock_start(app, pressed)
+            assert stamps, "the Load-result panel was never laid out with a summary"
+            painted = stamps[0][0] - _paint_clock_start(app, pressed)
             rows = len(app.screen.query("#result_body .result-problem"))
+            assert stamps[0][1] == rows, (
+                f"the stamped layout held {stamps[0][1]} problem rows; the panel ends with {rows}"
+            )
             return timing, painted, rows
 
     timing, painted, rows = asyncio.run(_drive())
@@ -884,7 +1018,9 @@ def test_tc_b100_61_skipped_entries_beyond_the_bound_are_counted(tmp_path: Path)
     )
 
 
-async def _timed_load_panel_and_append(pilot, app: S19TuiApp, source: Path) -> tuple:
+async def _timed_load_panel_and_append(
+    pilot, app: S19TuiApp, source: Path, stamps: list
+) -> tuple:
     """Open P through the Load dialog (the timed load), wait for the
     painted panel, close it, then load ``source`` so the variant append
     re-reads ``project.json`` (an in-project writer); returns the load
@@ -892,29 +1028,31 @@ async def _timed_load_panel_and_append(pilot, app: S19TuiApp, source: Path) -> t
     time to its manifest outcome line."""
     await _open_panel_through_the_dialog(pilot, app)
     pressed = time.perf_counter()
-    await _wait_for(
+    await wait_until(
         pilot,
         lambda: len(app.screen.query("#result_summary")) > 0
         and app.screen.query_one("#result_summary").size.height > 0,
-        "the painted Load-result panel",
-        attempts=4000,
+        "timed out waiting for the painted Load-result panel",
+        timeout=60.0,
     )
-    painted = time.perf_counter() - _paint_clock_start(app, pressed)
+    assert stamps, "the Load-result panel was never laid out with a summary"
+    painted = stamps[0][0] - _paint_clock_start(app, pressed)
     rows = len(app.screen.query("#result_body .result-problem"))
+    assert stamps[0][1] == rows, (
+        f"the stamped layout held {stamps[0][1]} problem rows; the panel ends with {rows}"
+    )
     await pilot.press("escape")
     await _wait_for(pilot, lambda: len(app.screen.query("#result_ok")) == 0, "the panel closed")
     started = time.perf_counter()
+    app._append_started_at = started
     app.load_from_path(source)
-    await _wait_for(
+    await wait_until(
         pilot,
-        lambda: any(
-            "was not rewritten" in line or "manifest verified" in line
-            for line in app._statuses
-        ),
-        "the append's manifest outcome",
-        attempts=4000,
+        lambda: bool(app._append_outcome_at),
+        "timed out waiting for the append's manifest outcome",
+        timeout=60.0,
     )
-    appended = time.perf_counter() - started
+    appended = app._append_outcome_at[0] - started
     return painted, rows, appended
 
 
@@ -936,10 +1074,18 @@ def _sec6_5_filesystem_scene(tmp_path: Path, payload: dict, setup=None) -> dict:
     async def _drive() -> tuple:
         app = S19TuiApp(base_dir=base)
         app._statuses = []
+        app._append_started_at = None
+        app._append_outcome_at = []
         real_set_status = app.set_status
 
         def _capture(message, *args, **kwargs):
             app._statuses.append(str(message))
+            if (
+                app._append_started_at is not None
+                and not app._append_outcome_at
+                and ("was not rewritten" in str(message) or "manifest verified" in str(message))
+            ):
+                app._append_outcome_at.append(time.perf_counter())
             return real_set_status(message, *args, **kwargs)
 
         app.set_status = _capture
@@ -963,10 +1109,11 @@ def _sec6_5_filesystem_scene(tmp_path: Path, payload: dict, setup=None) -> dict:
 
         app._handle_load_project = _timed
         app._install_prepared_project = _installed
+        stamps = _watch_panel_paint(app)
         async with app.run_test(size=(118, 54)) as pilot:
             await pilot.pause()
             painted, rows, appended = await _timed_load_panel_and_append(
-                pilot, app, source / "extra.s19"
+                pilot, app, source / "extra.s19", stamps
             )
             problems = app._last_load_announcement.problems
         return timing, painted, rows, appended, problems
@@ -1358,19 +1505,24 @@ def test_tc_b100_61_files_at_the_cap_all_missing_are_bounded(tmp_path: Path) -> 
 
         app._handle_load_project = _timed
         app._install_prepared_project = _installed
+        stamps = _watch_panel_paint(app)
         async with app.run_test(size=(118, 54)) as pilot:
             await pilot.pause()
             await _open_panel_through_the_dialog(pilot, app)
             pressed = time.perf_counter()
-            await _wait_for(
+            await wait_until(
                 pilot,
                 lambda: len(app.screen.query("#result_summary")) > 0
                 and app.screen.query_one("#result_summary").size.height > 0,
-                "the painted Load-result panel",
-                attempts=4000,
+                "timed out waiting for the painted Load-result panel",
+                timeout=60.0,
             )
-            painted = time.perf_counter() - _paint_clock_start(app, pressed)
+            assert stamps, "the Load-result panel was never laid out with a summary"
+            painted = stamps[0][0] - _paint_clock_start(app, pressed)
             rows = len(app.screen.query("#result_body .result-problem"))
+            assert stamps[0][1] == rows, (
+                f"the stamped layout held {stamps[0][1]} problem rows; the panel ends with {rows}"
+            )
             title = str(app.screen.query_one(".modal-title", Label).render())
             summary = [line for line in app.log_lines if line.endswith("details: p")]
             return timing, painted, rows, app._last_load_announcement, title, summary
@@ -1390,6 +1542,187 @@ def test_tc_b100_61_files_at_the_cap_all_missing_are_bounded(tmp_path: Path) -> 
     assert announcement.problem_count == 999
     assert "999 problems" in title, title
     assert summary and "999 problems" in summary[-1], summary
+
+
+# ---------------------------------------------------------------------------
+# Batch-101 Inc 3 -- the panel and append clocks (R-TST-110 ... R-TST-113)
+# ---------------------------------------------------------------------------
+
+_PANEL_SITES = (
+    "test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second",
+    "test_tc_b100_61_files_at_the_cap_all_missing_are_bounded",
+    "_timed_load_panel_and_append",
+)
+
+
+def _function_calls(source: str, function: str) -> set:
+    """The names of the plain functions called inside ``function``."""
+    tree = ast.parse(source)
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name == function:
+            return {
+                call.func.id
+                for call in ast.walk(node)
+                if isinstance(call, ast.Call) and isinstance(call.func, ast.Name)
+            }
+    raise AssertionError(f"no function {function} in the source")
+
+
+def test_r_tst_110_panel_clock_starts_at_the_install_stamp() -> None:
+    """The panel paint clock starts at the install stamp, whichever came
+    later: the click or the install. A missing stamp fails the test. The
+    three call sites (the all-bad arm, the cap arm and the shared scene's
+    helper) compute their start through that rule.
+
+    Why: starting at the click charged the wait for the load to the panel's
+    paint and made a 0.2 s paint read as 0.8-1.1 s."""
+    assert _paint_clock_start(SimpleNamespace(_load_returned_at=10.0), 12.0) == 10.0
+    assert _paint_clock_start(SimpleNamespace(_load_returned_at=12.0), 10.0) == 12.0
+    with pytest.raises(AssertionError, match="install callback did not run"):
+        _paint_clock_start(SimpleNamespace(), 12.0)
+    source = Path(__file__).read_text(encoding="utf-8")
+    for site in _PANEL_SITES:
+        assert "_paint_clock_start" in _function_calls(source, site), site
+
+
+_ONE_SECOND_LABELS = (
+    "TC-B100-61 all-bad painted",
+    "TC-B100-61 cap painted",
+    "sec6_5 painted",
+    "sec6_5 appended",
+)
+
+
+def _bound_sites(source: str) -> dict:
+    """label -> (line, source text of the third argument) for every
+    ``report_margin(<label>, ...)`` call whose label is one of
+    :data:`_ONE_SECOND_LABELS`."""
+    found: dict = {}
+    for node in ast.walk(ast.parse(source)):
+        if (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "report_margin"
+            and len(node.args) == 3
+            and isinstance(node.args[0], ast.Constant)
+            and node.args[0].value in _ONE_SECOND_LABELS
+        ):
+            found.setdefault(node.args[0].value, []).append(
+                (node.lineno, ast.unparse(node.args[2]))
+            )
+    return found
+
+
+def _off_one_second(source: str) -> list:
+    """The labels (with their line) whose bound is not ``timing_bound(1.0)``,
+    or that are not wrapped exactly once."""
+    found = _bound_sites(source)
+    bad = [f"{label}: {len(found.get(label, []))} site(s)" for label in _ONE_SECOND_LABELS
+           if len(found.get(label, [])) != 1]
+    for label, sites in found.items():
+        for line, bound in sites:
+            if bound != "timing_bound(1.0)":
+                bad.append(f"{label} (line {line}): {bound}")
+    return bad
+
+
+def test_r_tst_113_panel_and_append_bounds_stay_at_one_second() -> None:
+    """The four panel / append bounds are still 1 s through ``timing_bound``:
+    the clock fix must not be replaced by a raised bound. A planted copy
+    with one bound at 1.5 s is flagged by the same check, naming the label.
+
+    Why: a bound raised until the slow reading passes would hide the very
+    slowness the bound exists to catch."""
+    source = Path(__file__).read_text(encoding="utf-8")
+    assert _off_one_second(source) == [], _off_one_second(source)
+    planted = source.replace(
+        'report_margin(\n        "sec6_5 appended", scene["appended"], timing_bound(1.0)\n    )',
+        'report_margin(\n        "sec6_5 appended", scene["appended"], timing_bound(1.5)\n    )',
+    )
+    assert planted != source, "the planted copy did not change: the bound site moved"
+    flagged = _off_one_second(planted)
+    assert len(flagged) == 1 and flagged[0].startswith("sec6_5 appended"), flagged
+
+
+#: The verifier's equality tolerance. The ruling (A-1) asked for 1 ms; the two
+#: readings differ by 0.4-0.6 ms on the E4 host (the observer's callback runs
+#: first), so 1 ms had under 2x headroom, and one GIL switch interval (5 ms)
+#: would fail it with no clock error. The mutants it must catch are 50 ms to
+#: 0.5 s off.
+_STAMP_TOLERANCE_S = 0.005
+
+
+def _distinct_folders_scene(tmp_path: Path) -> dict:
+    """The shared SEC6-5 scene on the distinct-folders payload (the same
+    folders as the folder-ceiling arm)."""
+
+    def _folders(project_dir: Path) -> None:
+        for name in hostile.distinct_folder_names():
+            (project_dir / name).mkdir()
+            (project_dir / name / "x.json").write_text("{}", encoding="utf-8")
+
+    return _sec6_5_filesystem_scene(tmp_path, hostile.distinct_folders_at_cap(), setup=_folders)
+
+
+@pytest.mark.serial_timing
+@pytest.mark.parametrize("scene", ["all-bad", "cap", "scene"])
+def test_r_tst_111_112_arm_values_equal_the_product_stamps(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, scene: str
+) -> None:
+    """Each timing arm's recorded panel / append value equals the difference
+    of the product's own stamps, read by an observer that shares nothing
+    with the arm. The arm runs once; its ``report_margin`` calls are
+    recorded (and still forwarded, so the margin rows are kept).
+
+    ``all-bad`` / ``cap``: the arm's ``painted`` equals observer paint stamp
+    minus observer install stamp. ``scene``: ``sec6_5 painted`` equals the
+    same difference and ``sec6_5 appended`` equals the observer's outcome
+    stamp minus the observer's ``load_from_path`` entry. Equality is within
+    ``_STAMP_TOLERANCE_S`` (``math.isclose``), not an ordering assert.
+
+    Why: a clock that stops when a poll notices the paint reads 0.5-0.7 s
+    too long; only a comparison against an independent reading can fail on
+    that, and it fails the same way for any later arm that goes back to a
+    poll."""
+    module = sys.modules[__name__]
+    real_report_margin = report_margin
+    recorded: list = []
+
+    def _record(label, measured, bound):
+        recorded.append((label, measured))
+        return real_report_margin(label, measured, bound)
+
+    monkeypatch.setattr(module, "report_margin", _record)
+    observer = _StampObserver.install(monkeypatch)
+    if scene == "all-bad":
+        test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second(tmp_path)
+        panel_label, append_label = "TC-B100-61 all-bad painted", None
+    elif scene == "cap":
+        test_tc_b100_61_files_at_the_cap_all_missing_are_bounded(tmp_path)
+        panel_label, append_label = "TC-B100-61 cap painted", None
+    else:
+        _assert_sec6_5_bounded(_distinct_folders_scene(tmp_path))
+        panel_label, append_label = "sec6_5 painted", "sec6_5 appended"
+
+    values = dict(recorded)
+    assert panel_label in values, [label for label, _ in recorded]
+    assert observer.installed is not None and observer.paint is not None, (
+        "the observer saw no panel paint"
+    )
+    stamped_panel = observer.paint - observer.installed
+    assert math.isclose(values[panel_label], stamped_panel, abs_tol=_STAMP_TOLERANCE_S), (
+        f"{panel_label}: the arm recorded {values[panel_label]:.4f} s, "
+        f"the product stamps give {stamped_panel:.4f} s"
+    )
+    if append_label is not None:
+        assert observer.append_start is not None and observer.outcome is not None, (
+            "the observer saw no append outcome line"
+        )
+        stamped_append = observer.outcome - observer.append_start
+        assert math.isclose(values[append_label], stamped_append, abs_tol=_STAMP_TOLERANCE_S), (
+            f"{append_label}: the arm recorded {values[append_label]:.4f} s, "
+            f"the product stamps give {stamped_append:.4f} s"
+        )
 
 
 # ---------------------------------------------------------------------------
