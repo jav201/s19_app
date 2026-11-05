@@ -1631,9 +1631,9 @@ def test_repopulate_blank_reset_posts_no_spurious_load(tmp_path: Path) -> None:
         load_paths: list[str] = []
         real_load = app._change_service.load
 
-        def _spy_load(path: str, base_dir: Path) -> object:
+        def _spy_load(path: str, base_dir: Path, **kwargs: object) -> object:
             load_paths.append(str(path))
-            return real_load(path, base_dir)
+            return real_load(path, base_dir, **kwargs)
 
         app._change_service.load = _spy_load  # type: ignore[method-assign]
 
@@ -3440,9 +3440,9 @@ def test_tc329_popup_seed_and_load_text_apply_seam(tmp_path: Path) -> None:
             calls: list[str] = []
             real_load_text = app._change_service.load_text
 
-            def _spy(text: str):
+            def _spy(text: str, **kwargs: object):
                 calls.append(text)
-                return real_load_text(text)
+                return real_load_text(text, **kwargs)
 
             app._change_service.load_text = _spy  # type: ignore[assignment]
 

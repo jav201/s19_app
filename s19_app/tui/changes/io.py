@@ -108,6 +108,7 @@ __all__ = [
     "CHG_V1_FORMAT",
     "CHG_SYMBOL_UNRESOLVED",
     "CHG_SYMBOL_VALUE",
+    "SYMBOL_NO_A2L_CONTEXT_TEXT",
     "CHG_COLLISION",
     "parse_change_document",
     "read_change_document",
@@ -244,6 +245,12 @@ CHG_SYMBOL_UNRESOLVED = "CHG-SYMBOL-UNRESOLVED"
 #: physical value must encode to bytes), or whose declared address / byte
 #: length drifts from what the symbol resolves to — refused at load, named.
 CHG_SYMBOL_VALUE = "CHG-SYMBOL-VALUE"
+
+#: The R-CHG-SYM.2 no-context tail (batch-101 Inc 4, D-2 / I-1) — the one
+#: string shared by the reader (:func:`_resolve_symbol_tag`) and the app's
+#: R-TUI-058.9 condition, so both sides key on the same text. R-CHG-SYM.2's
+#: full reason is ``the symbol <symbol> cannot be resolved — <this text>``.
+SYMBOL_NO_A2L_CONTEXT_TEXT = "no A2L context is declared for this change-set"
 
 # ---------------------------------------------------------------------------
 # Read-path resource bounds (LLR-001.7) — pinned, documented limits. Values
@@ -863,10 +870,15 @@ def _parse_entries(
           ``MF-ENTRY-LIMIT`` issue for the whole overflow; only the
           in-ceiling prefix is parsed.
         - Each in-ceiling element goes through :func:`_parse_entry`.
+        - Lazy tag-name index (R-CHG-SYM.13): built once, on the first
+          in-ceiling element whose ``symbol`` is a string, via
+          :func:`_symbol_name_index`; a document with no such element
+          builds none.
 
     Dependencies:
         Uses:
             - _parse_entry
+            - _symbol_name_index
             - _issue
         Used by:
             - read_change_document
@@ -885,10 +897,17 @@ def _parse_entries(
         in_ceiling = raw_entries[:MF_ENTRY_COUNT_CEILING]
 
     entries: list[ChangeEntry] = []
+    symbol_index: Optional[dict[str, dict]] = None
     for index, element in enumerate(in_ceiling):
+        if (
+            symbol_index is None
+            and isinstance(element, dict)
+            and isinstance(element.get("symbol"), str)
+        ):
+            symbol_index = _symbol_name_index(a2l_context)
         entry = _parse_entry(
             index, element, encoding, value_mode, issues,
-            a2l_context=a2l_context,
+            symbol_index=symbol_index,
         )
         if entry is not None:
             entries.append(entry)
@@ -901,7 +920,7 @@ def _parse_entry(
     encoding: str,
     value_mode: str,
     issues: list[ValidationIssue],
-    a2l_context: Optional[dict] = None,
+    symbol_index: Optional[dict[str, dict]] = None,
 ) -> Optional[ChangeEntry]:
     """
     Summary:
@@ -918,10 +937,10 @@ def _parse_entry(
         encoding (str): The validated document text codec.
         value_mode (str): The validated string-value mode.
         issues (list[ValidationIssue]): The shared issue list.
-        a2l_context (Optional[dict]): The declared A2L context resolving
-            ``symbol`` entries — the parsed payload's ``tags`` list. ``None``
-            refuses every symbol entry (``CHG-SYMBOL-UNRESOLVED``, the
-            no-implicit-A2L law).
+        symbol_index (Optional[dict[str, dict]]): The case-insensitive
+            tag-name index built once per read by
+            :func:`_symbol_name_index`; ``None`` refuses every symbol entry
+            (``CHG-SYMBOL-UNRESOLVED``, the no-implicit-A2L law).
 
     Returns:
         Optional[ChangeEntry]: The parsed entry, or ``None`` when a rule
@@ -1001,7 +1020,7 @@ def _parse_entry(
                 )
             )
             return None
-        resolved_tag, reason = _resolve_symbol_tag(symbol, a2l_context)
+        resolved_tag, reason = _resolve_symbol_tag(symbol, symbol_index)
         if resolved_tag is None:
             issues.append(
                 _issue(
@@ -1059,13 +1078,54 @@ def _parse_entry(
     return entry
 
 
+def _symbol_name_index(
+    a2l_context: Optional[dict],
+) -> Optional[dict[str, dict]]:
+    """
+    Summary:
+        Build the case-insensitive tag-name index for one read (batch-101
+        Inc 4, D-2 / R-CHG-SYM.13): the loop moved here unchanged from
+        :func:`_resolve_symbol_tag` so it runs at most once per read
+        instead of once per symbol entry.
+
+    Args:
+        a2l_context (Optional[dict]): The declared A2L context whose
+            ``tags`` list is the resolution source, or ``None``.
+
+    Returns:
+        Optional[dict[str, dict]]: ``{lowercased_name: tag}`` — dict tags
+        only, stripped non-empty names, first match wins. ``None`` when
+        ``a2l_context`` is not a dict (no declared A2L).
+
+    Data Flow:
+        - Not a dict → ``None``.
+        - For each item of ``a2l_context.get("tags") or []`` that is a
+          dict: ``name = str(tag.get("name") or "").strip()``; a non-empty
+          name → ``index.setdefault(name.lower(), tag)`` (first match wins).
+
+    Dependencies:
+        Used by:
+            - _parse_entries
+    """
+    if not isinstance(a2l_context, dict):
+        return None
+    index: dict[str, dict] = {}
+    for tag in a2l_context.get("tags") or []:
+        if not isinstance(tag, dict):
+            continue
+        tag_name = str(tag.get("name") or "").strip()
+        if tag_name:
+            index.setdefault(tag_name.lower(), tag)
+    return index
+
+
 def _resolve_symbol_tag(
-    symbol: str, a2l_context: Optional[dict]
+    symbol: str, symbol_index: Optional[dict[str, dict]]
 ) -> tuple[Optional[dict], str]:
     """
     Summary:
-        Resolve one change-5 ``symbol`` through the declared A2L context's
-        tag map (batch-95 LLR-141.1) — the read-time half of the
+        Resolve one change-5 ``symbol`` through the prebuilt tag-name index
+        (batch-101 Inc 4, R-CHG-SYM.13) — the read-time half of the
         symbol-reference form; the physical→raw value encode is the
         authoring-time half and lives in ``a2l.py``.
 
@@ -1073,8 +1133,9 @@ def _resolve_symbol_tag(
         symbol (str): The declared tag name (already known to be a non-empty
             string; matched case-insensitively, the shipped name-index idiom
             of ``app.py::_build_a2l_name_index``).
-        a2l_context (Optional[dict]): The parsed A2L payload whose ``tags``
-            list is the resolution source, or ``None`` (no declared context).
+        symbol_index (Optional[dict[str, dict]]): The case-insensitive
+            tag-name index built once per read by
+            :func:`_symbol_name_index`, or ``None`` (no declared context).
 
     Returns:
         tuple[Optional[dict], str]: ``(tag, "")`` on success — the tag row
@@ -1083,10 +1144,9 @@ def _resolve_symbol_tag(
             in the ``CHG-SYMBOL-UNRESOLVED`` finding).
 
     Data Flow:
-        - No context → "no A2L context is declared for this change-set".
-        - Case-insensitive name index over ``a2l_context["tags"]`` (first
-          match wins — ASAP2 tag names are unique per file); a miss →
-          "the symbol ... resolves to no tag".
+        - No index → :data:`SYMBOL_NO_A2L_CONTEXT_TEXT` ("no A2L context
+          is declared for this change-set").
+        - Index miss → "the symbol ... resolves to no tag".
         - A tag without address or length → "the symbol ... resolves to a
           tag without an address or length".
 
@@ -1094,19 +1154,12 @@ def _resolve_symbol_tag(
         Used by:
             - _parse_entry
     """
-    if not isinstance(a2l_context, dict):
+    if symbol_index is None:
         return None, (
-            f"the symbol {symbol!r} cannot be resolved — no A2L context is "
-            f"declared for this change-set"
+            f"the symbol {symbol!r} cannot be resolved — "
+            f"{SYMBOL_NO_A2L_CONTEXT_TEXT}"
         )
-    index: dict[str, dict] = {}
-    for tag in a2l_context.get("tags") or []:
-        if not isinstance(tag, dict):
-            continue
-        tag_name = str(tag.get("name") or "").strip()
-        if tag_name:
-            index.setdefault(tag_name.lower(), tag)
-    resolved = index.get(symbol.strip().lower())
+    resolved = symbol_index.get(symbol.strip().lower())
     if resolved is None:
         return None, (
             f"the symbol {symbol!r} resolves to no tag in the declared A2L"

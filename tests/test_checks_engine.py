@@ -408,7 +408,7 @@ def _imported_names(path: Path, module_name: str) -> set[str]:
 
 
 def test_no_textual_in_static_import_graph() -> None:
-    """The engine + headless entry point reach no Textual import.
+    """The check engine and the change service reach no Textual import.
 
     Intent: LLR-004.4 / F-Q-07 — the no-Textual guarantee verified by
     static import-graph inspection: every ``s19_app``-internal source file

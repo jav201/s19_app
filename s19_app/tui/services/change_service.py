@@ -13,22 +13,15 @@ apply (``apply_change_document``) with the LLR-002.7 save-back flow
 (``changes.check.run_check_document``) since increment E4, still injectable
 for tests.
 
-It also hosts the LLR-004.4 **headless project entry point**,
-:func:`run_checks_for_project` — service-level per the LLR's wording: paths
-in, one :class:`CheckRunResult` out, reusing the load-service parse path
-(``build_loaded_s19`` / ``build_loaded_hex``) plus the MAC / A2L parsers for
-the informative linkage sources. No TUI interaction anywhere on that path.
-
 The retired parameter-by-name methods and the selective-``.cdfx`` export of
 ``CdfxService`` deliberately do not exist here (HLR-003 statement 2); the
 ``cdfx_service.py`` file itself was deleted at increment E3b.
 
-This module imports stdlib + the parse layer (``core`` / ``hexfile`` /
-``mac`` / ``a2l_parse``) + the ``changes`` package + sibling services +
-``validation.model`` + ``color_policy`` only — **no Textual import**
-(service-layer contract; the screen and ``app.py`` stay presentational,
-constraint C-7; verified by the subprocess-isolated probe in
-``tests/test_checks_engine.py``, F-Q-07).
+This module imports stdlib + the parse layer (``a2l``) + the ``changes``
+package + ``validation.model`` + ``color_policy`` + ``workspace`` only —
+**no Textual import** (service-layer contract; the screen and ``app.py``
+stay presentational, constraint C-7; verified by the subprocess-isolated
+probe in ``tests/test_checks_engine.py``, F-Q-07).
 """
 
 from __future__ import annotations
@@ -41,11 +34,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Sequence, Tuple
 
-from ...core import S19File
-from ...hexfile import IntelHexFile
 from ...validation.model import ValidationIssue, ValidationSeverity
 from ..a2l import encode_physical_to_raw_bytes
-from ..a2l_parse import parse_a2l_file
 from ..changes import (
     CHG_COLLISION,
     CHG_SYMBOL_UNRESOLVED,
@@ -69,12 +59,9 @@ from ..changes import (
 )
 from ..changes.check import run_check_document
 from ..changes.io import parse_change_document
-from ..changes.model import CHECK_AGGREGATE_KEYS, CheckRunResult
+from ..changes.model import CHECK_AGGREGATE_KEYS
 from ..color_policy import css_class_for_severity
-from ..mac import parse_mac_file
 from ..workspace import PlacementResult
-from .a2l_service import enrich_tags_and_render
-from .load_service import build_loaded_hex, build_loaded_s19
 
 #: The two v2 entry kinds (LLR-001.2 wire field ``type``).
 ENTRY_KIND_STRING = "string"
@@ -1449,7 +1436,9 @@ class ChangeService:
         payload = json.loads(serialize_change_document(probe))
         return json.dumps(payload["entries"][0], indent=2)
 
-    def edit_entry_json(self, index: int, text: str) -> ChangeActionResult:
+    def edit_entry_json(
+        self, index: int, text: str, a2l_context: Optional[dict] = None
+    ) -> ChangeActionResult:
         """
         Summary:
             Replace ONLY the entry at ``index`` with an entry parsed from the
@@ -1471,6 +1460,9 @@ class ChangeService:
             index (int): The zero-based index of the entry to replace.
             text (str): The edited single-entry JSON from the popup — one wire
                 entry object (``{"type", "address", "value"|"bytes"}``).
+            a2l_context (Optional[dict]): The declared A2L context for
+                change-5 symbol resolution; ``None`` refuses a symbol entry
+                (the no-implicit-A2L law).
 
         Returns:
             ChangeActionResult: ``ok`` is ``True`` and ``message`` reports the
@@ -1513,7 +1505,7 @@ class ChangeService:
             }
         )
         envelope_text = f'{header[:-1]}, "entries": [{text}]}}'
-        probe = parse_change_document(envelope_text)
+        probe = parse_change_document(envelope_text, a2l_context=a2l_context)
         if probe.has_errors or len(probe.entries) != 1:
             return ChangeActionResult(
                 message="Patch Editor: entry edit rejected - see findings.",
@@ -3155,95 +3147,4 @@ class ChangeService:
         ]
 
 
-# ---------------------------------------------------------------------------
-# Headless project entry point (LLR-004.4)
-# ---------------------------------------------------------------------------
 
-
-def run_checks_for_project(
-    check_path: Path,
-    image_path: Path,
-    mac_path: Optional[Path] = None,
-    a2l_path: Optional[Path] = None,
-) -> CheckRunResult:
-    """
-    Summary:
-        Execute one check file against one project image entirely headless —
-        the LLR-004.4 service-level entry point: path inputs, ONE
-        :class:`CheckRunResult` out, carrying its own declaration-fault
-        ``issues`` (B-2). No Textual app is constructed anywhere on this
-        path (verified by the subprocess-isolated import probe in
-        ``tests/test_checks_engine.py`` — F-Q-07).
-
-    Args:
-        check_path (Path): The v2 ``kind="check"`` JSON document to run.
-            Read through ``read_change_document`` (the one shared reader,
-            LLR-004.1) with the file's own directory as the resolution base.
-        image_path (Path): The S19 or Intel HEX image to check against —
-            ``.hex`` / ``.ihex`` suffixes parse as Intel HEX, anything else
-            as S19, matching the loader split of the TUI load path.
-        mac_path (Optional[Path]): Optional ``.mac`` file parsed via
-            ``parse_mac_file`` for the informative linkage classification.
-        a2l_path (Optional[Path]): Optional A2L file parsed via
-            ``parse_a2l_file`` and enriched against the image
-            (``enrich_tags_and_render``) for the linkage classification.
-
-    Returns:
-        CheckRunResult: The §6.2 C-6 results object (LLR-004.3) —
-        ``variant_id`` is the image filename stem, ``source_path`` the
-        resolved check file, ``issues`` the check document's collected
-        declaration faults. A faulted or wrong-kind document yields the
-        all-``uncheckable`` not-runnable outcome with its issues carried.
-
-    Data Flow:
-        - ``read_change_document(check_path)`` → the check document
-          (collect-don't-abort; faults ride the result).
-        - Parse the image and build the ``LoadedFile`` snapshot through the
-          load-service parse path (``build_loaded_s19`` /
-          ``build_loaded_hex``) — the same enrichment the TUI worker uses,
-          minus any UI thread.
-        - Parse the optional MAC / A2L linkage sources.
-        - Delegate to :func:`~s19_app.tui.changes.check.run_check_document`.
-
-    Dependencies:
-        Uses:
-            - read_change_document
-            - S19File / IntelHexFile
-            - build_loaded_s19 / build_loaded_hex
-            - parse_mac_file / parse_a2l_file / enrich_tags_and_render
-            - run_check_document
-        Used by:
-            - tests/test_checks_engine.py::test_headless_project_run
-            - The E6 variant-execution layer (later increment).
-
-    Example:
-        >>> result = run_checks_for_project(
-        ...     Path("checks.json"), Path("prg.s19"),
-        ... )  # doctest: +SKIP
-    """
-    document = read_change_document(str(check_path), check_path.parent)
-    a2l_data = parse_a2l_file(a2l_path) if a2l_path is not None else None
-    if image_path.suffix.lower() in {".hex", ".ihex"}:
-        loaded = build_loaded_hex(
-            image_path, IntelHexFile(str(image_path)), a2l_path, a2l_data
-        )
-    else:
-        loaded = build_loaded_s19(
-            image_path, S19File(str(image_path)), a2l_path, a2l_data
-        )
-    mac_records = (
-        parse_mac_file(mac_path)["records"] if mac_path is not None else None
-    )
-    a2l_tags = (
-        enrich_tags_and_render(a2l_data, loaded.mem_map)[0]
-        if a2l_data
-        else None
-    )
-    return run_check_document(
-        document,
-        loaded.mem_map,
-        loaded.ranges,
-        mac_records,
-        a2l_tags,
-        variant_id=image_path.stem,
-    )
