@@ -1,0 +1,5 @@
+2026-11-05T11:10:56-06:00 E0 start — worktree s19_app-b103 branch batch-103 from 9f9f6af; inputs veredicto-b103.json + PLAN-DRAFT; readings confirmed by operator; model orchestrator Opus 5.5
+2026-11-05T11:10:56-06:00 E0 ruling — clipboard partial resolved by copy→paste matrix; Linux runs on CachyOS (private Xvfb), Win32 layer in new windows-latest CI job (operator choice); nothing runs on main PC
+2026-11-05T11:10:56-06:00 E0 draft — PLAN.md: 9 increments (draft Inc 2 split in two by cap estimate); awaiting G1
+2026-11-05T11:27:55-06:00 G1 approved — Q1 apruebo (9 increments), Q2 WT captures on the main PC (isolated LOCALAPPDATA, no clipboard, close windows), Q3 accept app.py overlap with b101-inc3/inc7; verdict design/G1-e0-verdict.json
+2026-11-05T11:28:49-06:00 E0 done — test host = cachyos-rtx (javiergr@192.168.1.67): no Xvfb, no conda env, no clone yet
