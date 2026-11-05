@@ -64,3 +64,61 @@ Six MAJOR findings, all fixable by targeted edits to the records (text and test 
 - [x] Diagram — `n/a — no flow changes; the interface table in §3 replaces one`.
 - [x] What would change the recommendation — if the operator enables private vulnerability reporting before E5, A-6 closes by evidence alone; if D6-13 enters batch-101, the README `Ctrl+P` row goes now (D-11) and A-5 becomes its guard.
 - [x] Two-layer requirements — every US reaches rows and cases; acceptance cases exist for the behaviour claims (R-WHELP.18/2 … .24/2, R-TUI-062.10.1/2); trace gaps are A-3 (vacuous node) and A-7 (missing state).
+
+## Round 2 (2026-11-05)
+
+Scope: the round-1 blocking items A-1 … A-6 (architect, MAJOR) and S-1 (security, MEDIUM), re-read at head `821d445`. That commit touches records only (`git diff b7b77c4 821d445` changes nothing outside `.dev-flow/`), so the product tree is the base. Read: `E3-rulings.md`, `git show 821d445 -- inc-14/`, the four records, and the code each new product sentence describes. No test, probe or `s19_app` import was run. One plain-Python `ast.parse` of `s19_app/tui/window_help.py` (no import) counted the help steps.
+
+### Verdict: PASS-WITH-NOTES
+
+All seven blocking items are closed, and closed the same way in `01-requirements.md`, `02-test-cases.md`, `E1-slice.md` and `codewire/graph-inc14.md`. This round adds three MINOR findings and two INFO notes. None of them blocks E4, but N-1 and N-2 should be folded in before G2 / G3 start.
+
+| Item | Verdict | Evidence |
+|---|---|---|
+| A-1 | closed | CHANGELOG (c), guide /11 and R-DOC-RELNOTE.5 now limit the backslash to names. This matches the code. `_md_text` → `md_safe` escapes the image label, variant id, symbol, change-document ref and filter name (`diff_report_service.py:597`, `:694`, `:991-993`, `:1125`, `:1272-1309`); it escapes `.` unconditionally, so `img\.s19` holds. Paths go through `_md_path` → `md_code` ("nothing escaped or cut", `:295-312`), and a backtick becomes U+FFFD, so "a backtick in a path shows as `�`" holds. Case /1 and guide /11 check that `names and paths carry a backslash` is absent. |
+| A-2 | closed | README (5) now says that Write .chk.json writes into the common `.s19tool/workarea/patches/` with or without a project. `app.py:7337-7339` calls `write_change_document(document, self.base_dir, file_name)` with no `dest_dir`, so the default is the common home (`tui/changes/io.py:1504-1545`). "Save project copies the specs the project uses into its `checks/` folder" also holds: the gather copies check-kind documents that the save composition names or the Patch Editor has loaded into `checks/` (`project_gather_service.py:180-203`, `:536-545`, `:661-690`). R-DOC-README.4/1 gains the present-phrase check, and BL-I14-6 records the product split. Note: the unchanged Check Editor help line "Open checks/ — … where check specs are kept" (`window_help.py:507-508`) belongs to BL-I14-6 and should stay there. |
+| A-3 | closed | The node is re-bodied to three checks: (a) paragraph n == `f"{n}. {steps[n-1]}"`; (b) no stored step matches `^\s*\d+[.)]\s`; (c) each section keeps its pinned step count. These mutants turn it RED: a stored step `1. Checks run …` fails (b); one step dropped from any section fails (c); `enumerate(steps, start=0)` or any other change to the generated prefix fails (a). The AST count at base matches the pins for `patch` 43, `map` 4, `flow` 59, `flow_execution` 35, `check_editor` 25, `changes_file_notation` 4, `workspace` 5, `crc_designer` 6 and `reports` 6. At base, `checks` (5), `a2l` (4) and `split_join_export` (7) differ from their pins, so the node is RED on base as the graph states. No step matches (b) and no step holds a blank line, so the `\n\n` split is exact. |
+| A-4 | closed (residual N-1) | K(w) now leaves out what `check_action` refuses on w: `confirm_attention` off `flow_execution`, `page_next/prev_context` off `a2l`/`mac`, and `hex_page_prev/next` off `workspace` (`app.py:9608-9615`, the same in the Definitions and the fixture). It also leaves out the self-guarded `d` and `^Z`/`^Y`, and adds the window's widget keys. The negative control holds: `,` → `hex_page_prev` (`app.py:2725`), `check_action` returns False on `checks`, and the Checks window binds no `,` (`checks_view.py` has no `BINDINGS`), so the test goes RED. |
+| A-5 | closed | Textual 8.2.8 is installed and pinned in `pyproject.toml`. `_merged_bindings` is built per class from its own and inherited `BINDINGS` and honours `inherit_bindings` (`dom.py:176`, `:584-591`, `:671-695`). `App.BINDINGS` holds `ctrl+q` (`app.py:454-462`). `ctrl+p` is added in `__init__` only `if self.ENABLE_COMMAND_PALETTE` (`app.py:427`, `:874-885`). Grep shows `S19TuiApp` sets neither flag nor `inherit_bindings`, so `ctrl+p` counts at base. The helper reads the class flag when it runs, so monkeypatching `S19TuiApp.ENABLE_COMMAND_PALETTE = False` with the README `Ctrl+P` row kept makes the test RED. |
+| A-6 + S-1 | closed (note N-2) | The R-DOC-SECURITY.1 threshold, case /2, slice §1, graph `[I/O: SECURITY.md]` and the amended D-1 all state the same rule. A dated E5 `gh api` transcript reading `"enabled":true` must exist before `SECURITY.md` merges. If the setting is off at merge, `SECURITY.md` is held out and re-checked at the batch end, and no public-issue fallback text is written. The text names no fallback channel. |
+
+### New product sentences checked against the base
+
+These sentences match the code:
+- Help:
+  - Workspace step 5: `.s19tool\templates\`, `workspace.py:37`, `:151-169`.
+  - CRC step 3, "end excluded": `_parse_ranges` reads half-open ranges, `crc_designer_view.py:866-897`.
+  - Reports step 4: the regions are seeded at load (`app.py:14028-14036`), replaced on Generate (`:6350-6354`) and stored by Save project (`:11863`).
+- README:
+  - (3) `^p palette`: `window_help.py:985-993`.
+  - (8) the external-step sentence: `flow_execution_service.py` starts no process. Grep finds `subprocess` only in `services/folder_open_service.py` and `os_clipboard_input.py`.
+  - (9) "recomputes on every keystroke": `crc_designer_view.py:615-625`.
+- SECURITY.md: the scope.
+- CHANGELOG:
+  - (d): `_write_report` plus `_remove_orphan_markdown` / `_drop_orphan_md` (`diff_report_service.py:315-350`, `before_after_service.py:183-203`, `app.py:7921-7934`).
+  - (e): `_strip_ctl`, `:240-262`.
+  - (f): `f"{target.name}.{token_hex(8)}.part"`, `:342-350`.
+  - `### Flows`: `flow_execution_service.py:1160-1202`, `:389-394`, `:539-546`.
+  - `### CRC config`: `operations/crc_config.py:94-97`, `:259-262`, `:288-292`, `:539-542`. The earlier texts are as in the Base column of Inc 8 R-CRC-CONFIG-001.10 / .11.
+  - `### Projects`: the status text is at `app.py:14980-14992` (Inc 3 R-PROJ-002.12 / .14).
+
+The graph's CHANGELOG text contains every substring that cases R-DOC-RELNOTE.5 … .14 look for, and `### Reports` does not contain `random`.
+
+### New findings
+
+| Id | Sev | Row / node | Finding (evidence) | Proposed fix |
+|---|---|---|---|---|
+| N-1 | MINOR | Definitions K(w); fixture K(w); R-WHELP.12 (a) | The self-guarded exclusions list only `d` and `^Z`/`^Y`. `/` and `g` act only on Workspace, A2L Explorer and MAC View: `_focus_local_input` goes through `_FIND_GOTO_INPUTS` (`app.py:9351-9364`), and on any other window it writes a log line. `pgdn`/`pgup` page only Issues, A2L and MAC: `action_page_down_context` (`app.py:10474+`) forwards to `+`/`-`, which `check_action` gates. A Checks step that quotes `/` or `pgdn` therefore still passes. No Inc 14 copy is affected, because `/` and `g` appear only in `a2l`. My round-1 fix text missed these too. | In the Definitions and the fixture, also exclude `focus_find` / `focus_goto` (`/`, `g`; they count only on the windows whose `_FIND_GOTO_INPUTS` entry is not `None`) and `page_down_context` / `page_up_context` (`pgdn`, `pgup`; they count only on `issues`, `a2l`, `mac`). Better: derive the find/go-to exclusion from `_FIND_GOTO_INPUTS` so it cannot drift. |
+| N-2 | MINOR | R-DOC-SECURITY.1 hold-out; README block (15); R-DOC-README.4/2; cases R-DOC-SECURITY.1/1, .2/1 | The hold-out names only `SECURITY.md`, but other parts of Inc 14 depend on that file. README block (15) links to it, R-DOC-README.4/2 lists it as a link target that must exist, and two G tests read it. If only `SECURITY.md` is held out, the merged README links to a missing file (the R-DOC-README.4 defect class) and three nodes go RED. | Name the whole hold-out unit in the records: `SECURITY.md`, its README Documentation row, its entry in R-DOC-README.4/2's list, and the tests of R-DOC-SECURITY.1/1 and .2/1. They are held out and merged back together. |
+| N-3 | MINOR | R-DOC-RELNOTE.7 threshold; graph CHANGELOG `### Projects` note | The cited evidence (`app.py:8740`, `:8886`, `:8944`) points to the Load dialog's "could not be read" rows (`list_projects`, the manifest stat), not to the sync. The status line is at `app.py:14980-14992`, in the `OSError` branch of `validate_project_files`. The sentence itself is true. | Cite `app.py:14980-14992` and Inc 3 R-PROJ-002.12 / .14 instead. |
+| N-4 | INFO | case R-WHELP.12/1 | The case says "the 11 sections with tokens" but lists 8: `patch`, `reports`, `map`, `a2l`, `workspace`, `crc_designer`, `split_join_export`, `changes_file_notation`. The AST count also finds 8. The error dates from E1. | Write 8. |
+| N-5 | INFO | CHANGELOG (f) | "An interrupted report write" covers more than its row, which is about diff and before/after reports only; the project report has no `.part` staging. The sentence is not false, because it says "can leave". | Optional: "An interrupted diff or before/after report write …". |
+
+### Evidence checklist (round 2)
+
+- [x] Each blocking item re-read in all four records — `executed` (table above).
+- [x] A-3 mutants named and pins measured — `executed` (AST parse, no import).
+- [x] A-4 / A-5 negative controls traced to code — `executed` (`app.py:9608-9615`, `:2725`; Textual 8.2.8 `dom.py`, `app.py`).
+- [x] New product sentences checked against base — `executed` (list above).
+- [ ] R-DOC-SECURITY.1/2 channel open — `not-run` (the operator's setting; E5 merge precondition).
+- [x] Tests — `n/a — no run on this PC (operator rule); design records only`.

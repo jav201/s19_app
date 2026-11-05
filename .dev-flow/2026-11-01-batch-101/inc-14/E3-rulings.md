@@ -21,3 +21,11 @@ Inputs: E3-architect.md (FAIL: A-1…A-6 MAJOR, A-7…A-19 MINOR), E3-security.m
 
 Interfaces (architect §3) are recorded in the graph's interface list; the batch-end doc pass reconciles them.
 Runs: tests on the LAN Linux host only (operator rule).
+
+## Round 2 (2026-11-05)
+
+Round 2 (architect + security items, one reviewer): PASS-WITH-NOTES; A-1…A-6 and S-1 closed. E4 addenda (binding, no further round):
+- **N-1:** K(w) excludes `/`, `g`, `pgdn`, `pgup` on windows where they do not act (`app.py:9351`, `:10474`); the census test models that.
+- **N-2:** the SECURITY.md hold-out names everything it takes with it: the file, its two tests, and the README link to it plus the README link-check arm (all held out together, re-checked at the batch end).
+- **N-3:** R-DOC-RELNOTE.7 cites `app.py:14980-14992`.
+- INFO notes (R-WHELP.12/1 count, CHANGELOG (f) wording) are fixed in the records at E4 integration.
