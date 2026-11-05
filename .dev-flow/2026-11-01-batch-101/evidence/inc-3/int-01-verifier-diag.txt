@@ -1,0 +1,29 @@
+# int-01: R-TST-111/112 verifier, 3 node runs, abs_tol 0.001 s, with a temporary (uncommitted) print of arm-minus-observer differences in microseconds (OR-1)
+# cmd: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<TMP>/la python -m pytest -p no:cacheprovider -q -s -m serial_timing tests/test_b100_project_check.py -k r_tst_111_112 --basetemp <TMP>/bt
+2026-11-05T16:21:32Z
+C:\Users\<USER>\Github\s19_app-b101-inc3\s19_app\__init__.py
+## run 1
+DIAG all-bad panel diff_us 43.9
+DIAG cap panel diff_us 37.7
+DIAG scene panel diff_us 35.2
+DIAG scene append diff_us -3.3
+============================ QC-TM timing margins =============================
+QC-TM: 8 bounds, 0 under 20 % margin
+3 passed, 98 deselected in 16.19s
+## run 2
+DIAG all-bad panel diff_us 40.2
+DIAG cap panel diff_us 37.0
+DIAG scene panel diff_us 48.0
+DIAG scene append diff_us -4.1
+============================ QC-TM timing margins =============================
+LOW 10.7%  0.893 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+QC-TM: 8 bounds, 1 under 20 % margin
+3 passed, 98 deselected in 15.73s
+## run 3
+DIAG all-bad panel diff_us 36.9
+DIAG cap panel diff_us 39.6
+DIAG scene panel diff_us 32.9
+DIAG scene append diff_us -2.7
+============================ QC-TM timing margins =============================
+QC-TM: 8 bounds, 0 under 20 % margin
+3 passed, 98 deselected in 15.63s

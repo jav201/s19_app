@@ -1,0 +1,24 @@
+# int-04b: tests importing project_gather_service (part 1), not serial_timing
+# cmd: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<TMP>/la timeout 2400 python -m pytest -p no:cacheprovider -q -rfEs -m not serial_timing tests/test_b100_document.py tests/test_b100_load_question.py tests/test_b100_project_homes.py tests/test_b100_reuse.py --basetemp <TMP>/bt4b
+# HEAD b2b3c05 + uncommitted E4-integration test edits (git diff --stat below)
+ .../2026-11-01-batch-101/inc-3/01-requirements.md  |  2 +
+ .dev-flow/2026-11-01-batch-101/inc-3/E1-rulings.md |  2 +-
+ .dev-flow/2026-11-01-batch-101/inc-3/E1-slice.md   |  2 +-
+ .../inc-3/codewire/graph-inc3.md                   |  5 +-
+ tests/support/suite_census.py                      | 10 ++--
+ tests/test_b100_active_variant.py                  | 12 +++--
+ tests/test_b100_project_check.py                   | 58 ++++++++++++----------
+ tests/test_b97_flow_execution.py                   |  1 +
+ tests/test_suite_hygiene.py                        |  5 +-
+ 9 files changed, 57 insertions(+), 40 deletions(-)
+# start 2026-11-05T17:04:57Z
+s19_app.__file__ = C:\Users\<USER>\Github\s19_app-b101-inc3\s19_app\__init__.py
+3.11.15 | packaged by Anaconda, Inc. | (main, Jun 11 2026, 15:12:53) [MSC v.1942 64 bit (AMD64)]
+........................................................................ [ 21%]
+........................................................................ [ 43%]
+........................................................................ [ 65%]
+........................................................................ [ 87%]
+........................................                                 [100%]
+328 passed, 23 deselected in 1480.41s (0:24:40)
+# exit 0
+# end 2026-11-05T17:29:41Z

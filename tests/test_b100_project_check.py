@@ -795,10 +795,13 @@ def _paint_clock_start(app: S19TuiApp, pressed: float) -> float:
 
 def _summary_laid_out(screen) -> bool:
     """True when ``screen`` holds a ``#result_summary`` with a height. Uses
-    ``query`` and a length check, never ``query_one``: the layout signal can
-    publish before the summary is mounted."""
-    found = screen.query("#result_summary")
-    return len(found) > 0 and found.first().size.height > 0
+    ``query_one_optional``, never ``query_one``: the layout signal can
+    publish before the summary is mounted. It is an id lookup that stops at
+    the first match, not a walk of the whole panel: with 1 000 problem rows a
+    full ``query`` costs about 0.5 ms, and the observer's call of it sat
+    between the observer's paint stamp and the arm's."""
+    summary = screen.query_one_optional("#result_summary")
+    return summary is not None and summary.size.height > 0
 
 
 def _watch_panel_paint(app: S19TuiApp) -> list:
@@ -829,14 +832,10 @@ def _watch_panel_paint(app: S19TuiApp) -> list:
         if isinstance(screen, LoadResultScreen):
 
             def _on_layout(_value=None) -> None:
+                now = time.perf_counter()
                 if stamps or not _summary_laid_out(screen):
                     return
-                stamps.append(
-                    (
-                        time.perf_counter(),
-                        len(screen.query("#result_body .result-problem")),
-                    )
-                )
+                stamps.append((now, len(screen.query("#result_body .result-problem"))))
 
             screen.screen_layout_refresh_signal.subscribe(app, _on_layout, immediate=True)
         return result
@@ -852,9 +851,10 @@ class _StampObserver:
     list or attribute with the arm and never reads ``_watch_panel_paint``'s
     list, ``_load_returned_at`` or ``_statuses``.
 
-    Fields: ``installed`` (the first ``_install_prepared_project`` return),
-    ``paint`` (the first layout publish of a pushed Load-result panel with a
-    summary height, by its own subscription), ``append_start`` (the last
+    Fields: ``installed`` (the last ``_install_prepared_project`` return
+    before the paint), ``paint`` (the first layout publish of a pushed
+    Load-result panel with a summary height, by its own subscription),
+    ``append_start`` (the last
     entry of ``load_from_path``) and ``outcome`` (the first ``set_status``
     line holding ``manifest verified`` or ``was not rewritten`` after
     ``append_start``)."""
@@ -877,16 +877,18 @@ class _StampObserver:
 
         def _install(app, prepared):
             result = real_install(app, prepared)
-            if observer.installed is None:
-                observer.installed = time.perf_counter()
+            now = time.perf_counter()
+            if observer.paint is None:
+                observer.installed = now
             return result
 
         def _push(app, screen, *args, **kwargs):
             if isinstance(screen, LoadResultScreen):
 
                 def _on_layout(_value=None) -> None:
+                    now = time.perf_counter()
                     if observer.paint is None and _summary_laid_out(screen):
-                        observer.paint = time.perf_counter()
+                        observer.paint = now
 
                 screen.screen_layout_refresh_signal.subscribe(app, _on_layout, immediate=True)
             return real_push(app, screen, *args, **kwargs)
@@ -897,12 +899,13 @@ class _StampObserver:
             return real_load(app, *args, **kwargs)
 
         def _status(app, message, *args, **kwargs):
+            now = time.perf_counter()
             if (
                 observer.append_start is not None
                 and observer.outcome is None
                 and ("manifest verified" in str(message) or "was not rewritten" in str(message))
             ):
-                observer.outcome = time.perf_counter()
+                observer.outcome = now
             return real_status(app, message, *args, **kwargs)
 
         monkeypatch.setattr(S19TuiApp, "_install_prepared_project", _install)
@@ -1079,13 +1082,14 @@ def _sec6_5_filesystem_scene(tmp_path: Path, payload: dict, setup=None) -> dict:
         real_set_status = app.set_status
 
         def _capture(message, *args, **kwargs):
+            now = time.perf_counter()
             app._statuses.append(str(message))
             if (
                 app._append_started_at is not None
                 and not app._append_outcome_at
                 and ("was not rewritten" in str(message) or "manifest verified" in str(message))
             ):
-                app._append_outcome_at.append(time.perf_counter())
+                app._append_outcome_at.append(now)
             return real_set_status(message, *args, **kwargs)
 
         app.set_status = _capture
@@ -1644,12 +1648,11 @@ def test_r_tst_113_panel_and_append_bounds_stay_at_one_second() -> None:
     assert len(flagged) == 1 and flagged[0].startswith("sec6_5 appended"), flagged
 
 
-#: The verifier's equality tolerance. The ruling (A-1) asked for 1 ms; the two
-#: readings differ by 0.4-0.6 ms on the E4 host (the observer's callback runs
-#: first), so 1 ms had under 2x headroom, and one GIL switch interval (5 ms)
-#: would fail it with no clock error. The mutants it must catch are 50 ms to
-#: 0.5 s off.
-_STAMP_TOLERANCE_S = 0.005
+#: The verifier's equality tolerance (E3 addendum A-1). Each paired stamp is
+#: taken first in its callback (N-3) and the laid-out check is an id lookup,
+#: so the two readings differ by the work between two adjacent callbacks.
+#: The mutants it must catch are 50 ms to 0.5 s off.
+_STAMP_TOLERANCE_S = 0.001
 
 
 def _distinct_folders_scene(tmp_path: Path) -> dict:
@@ -1669,9 +1672,10 @@ def _distinct_folders_scene(tmp_path: Path) -> dict:
 def test_r_tst_111_112_arm_values_equal_the_product_stamps(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path, scene: str
 ) -> None:
-    """Each timing arm's recorded panel / append value equals the difference
-    of the product's own stamps, read by an observer that shares nothing
-    with the arm. The arm runs once; its ``report_margin`` calls are
+    """R-TST-111 and R-TST-112: each timing arm's recorded panel / append
+    value equals the difference of the product's own stamps, read by an
+    observer that shares nothing with the arm. The arm runs once; its
+    ``report_margin`` calls are
     recorded (and still forwarded, so the margin rows are kept).
 
     ``all-bad`` / ``cap``: the arm's ``painted`` equals observer paint stamp

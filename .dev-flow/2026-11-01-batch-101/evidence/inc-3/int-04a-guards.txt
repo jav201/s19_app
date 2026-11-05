@@ -1,0 +1,23 @@
+# int-04a: hygiene, id registry, law guards (engine-frozen: test_engine_unchanged, test_tui_directionb incl. tc031), not serial_timing
+# cmd: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<TMP>/la timeout 2400 python -m pytest -p no:cacheprovider -q -rfEs -m not serial_timing tests/test_suite_hygiene.py tests/test_id_registry.py tests/test_engine_unchanged.py tests/test_tui_directionb.py --basetemp <TMP>/bt4a
+# HEAD b2b3c05 + uncommitted E4-integration test edits (git diff --stat below)
+ .../2026-11-01-batch-101/inc-3/01-requirements.md  |  2 +
+ .dev-flow/2026-11-01-batch-101/inc-3/E1-rulings.md |  2 +-
+ .dev-flow/2026-11-01-batch-101/inc-3/E1-slice.md   |  2 +-
+ .../inc-3/codewire/graph-inc3.md                   |  5 +-
+ tests/support/suite_census.py                      | 10 ++--
+ tests/test_b100_active_variant.py                  | 12 +++--
+ tests/test_b100_project_check.py                   | 58 ++++++++++++----------
+ tests/test_b97_flow_execution.py                   |  1 +
+ tests/test_suite_hygiene.py                        |  5 +-
+ 9 files changed, 57 insertions(+), 40 deletions(-)
+# start 2026-11-05T17:04:57Z
+s19_app.__file__ = C:\Users\<USER>\Github\s19_app-b101-inc3\s19_app\__init__.py
+3.11.15 | packaged by Anaconda, Inc. | (main, Jun 11 2026, 15:12:53) [MSC v.1942 64 bit (AMD64)]
+........................................................................ [ 27%]
+........................................................................ [ 55%]
+........................................................................ [ 82%]
+.............................................                            [100%]
+261 passed, 1 deselected in 643.38s (0:10:43)
+# exit 0
+# end 2026-11-05T17:15:57Z

@@ -1513,6 +1513,7 @@ def test_tc_b97_64_c_after_the_dwell_confirms_the_attention_lane(tmp_path: Path,
     assert "c — Confirm" not in section_body_text("flow_execution")
 
 
+@pytest.mark.serial_timing
 def test_tc_b97_64_burst_on_two_waiting_lanes_confirms_one(tmp_path: Path, monkeypatch) -> None:
     """TC-B97-64 (LLR-147.13 boundary, P-60): ``two_wait`` — after the dwell,
     ``press("c", "c")`` confirms one lane (the attention lane) and the other

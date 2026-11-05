@@ -671,7 +671,10 @@ def test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second(
     loop saw the outcome line some time after the app painted it. The clock
     now stops when ``set_status`` receives the outcome line (the bound's end
     point: the line is painted by the main-thread commit), not when the
-    settle loop notices it."""
+    settle loop notices it.
+
+    Batch-101 Inc 3: the ``save-project`` parameter verifies R-PROJ-001.13;
+    its 0.8 s target is read from the QC-TM row, not asserted."""
     from s19_app.tui.app import SaveProjectPayload
 
     base = tmp_path / "app"
@@ -1474,9 +1477,10 @@ def test_at_b100_20_inc8a_every_writer_carries_the_active_document(
 def test_r_proj_rollback_9_2_a_link_loop_at_a_composition_name_ends_in_the_rollback_refusal(
     tmp_path: Path,
 ) -> None:
-    """Windows. Project ``P`` is open; a directory junction that points to
-    itself stands at ``P/x.json``, and the common patches library holds an
-    ``x.json`` change document. Save project with the composition
+    """R-PROJ-ROLLBACK.9 and R-PROJ-ROLLBACK.2, Windows. Project ``P`` is
+    open; a directory junction that points to itself stands at
+    ``P/x.json``, and the common patches library holds an ``x.json``
+    change document. Save project with the composition
     ``batch=("x.json",)`` ends with the project.json refusal, exactly once
     -- not with the unexpected-error line -- and the gathered copy is rolled
     back: neither ``P/patches/x.json`` nor ``P/patches`` exists afterwards.

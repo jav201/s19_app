@@ -20,12 +20,16 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
-#: A sampled timing arm: it counts glyphs and elapsed texts sampled during
-#: the parse, so it has no bound to wrap; the guard adds it to the static
-#: arm set (interface I-4 of the increment's Code-Wire graph).
+#: Timing arms the census cannot see, so they have no bound to wrap; the
+#: guard adds them to the static arm set (interface I-4 of the increment's
+#: Code-Wire graph). A sampled arm counts glyphs and elapsed texts sampled
+#: during the parse. A press-burst arm presses keys against a dwell, so a
+#: slow worker turns it red; it is listed by hand until the census learns
+#: the press-burst form (backlog; batch-101 Inc 3, PR CI run 42037470050).
 SAMPLED_TIMING_ARMS: frozenset = frozenset(
     {
         "tests/test_b100_busy.py::test_at_b100_17_worker_load_of_an_8_mib_s19_by_keys",
+        "tests/test_b97_flow_execution.py::test_tc_b97_64_burst_on_two_waiting_lanes_confirms_one",
     }
 )
 

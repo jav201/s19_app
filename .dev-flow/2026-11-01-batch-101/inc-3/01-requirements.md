@@ -36,6 +36,8 @@ As the author or reviewer of a later increment, I want the Load-result panel arm
 
 ### R1-P1 — Save project at the T2 composition (US-PROJ-SAVE-1)
 
+Source implementing R-PROJ-001.13, R-PROJ-GATHER.12 and R-PROJ-GATHER.13: `s19_app/tui/services/project_gather_service.py` (`gather_project_artifacts`, composition limb; map in `E1-slice.md` §1). [E4 integration: named here so the trace check's SLICE rule finds it.]
+
 | Id | Form | Requirement | Threshold | Negative control | US | Base |
 |---|---|---|---|---|---|---|
 | R-PROJ-001.13 | E | When the operator confirms Save project into the open project at the T2 composition, the system shall show the status `Project saved + manifest verified` within 1 second of the confirm. | < 1.0 s (`timing_bound(1.0)`), 5/5 runs alone; increment target ≤ 0.8 s alone (QC-TM margin ≥ 20 %), 5/5 on Windows and 5/5 on the LAN Linux host (E1 measured 0.65–0.74 s on Windows with the design applied as a runtime wrapper) | the composition check's `resolve()` restored → ≥ 1.0 s on the E1 host (base: 1.11–1.33 s) → RED | US-PROJ-SAVE-1 | No: 1.11–1.33 s, 10/10 over the bound (`E1-profile.md` §1.3) |

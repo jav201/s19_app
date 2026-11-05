@@ -145,7 +145,10 @@ _BASE_STATIC_ARMS = frozenset(
 )
 
 _SAMPLED_PIN = frozenset(
-    ["tests/test_b100_busy.py::test_at_b100_17_worker_load_of_an_8_mib_s19_by_keys"]
+    [
+        "tests/test_b100_busy.py::test_at_b100_17_worker_load_of_an_8_mib_s19_by_keys",
+        "tests/test_b97_flow_execution.py::test_tc_b97_64_burst_on_two_waiting_lanes_confirms_one",
+    ]
 )
 
 # The 7 report goldens that record the tool version (Definitions).
