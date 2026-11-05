@@ -23,3 +23,11 @@ Runs: every test, probe and snapshot regeneration on the LAN Linux host (operato
 ## Round 1 addendum (orchestrator, 2026-11-05)
 
 - `0400` is read as decimal 400 under the ASCII Number pattern (leading zeros allowed for decimal); case R-A2L-036.2/5 expecting base 400 is accepted. The A-1 ruling listed it among the "no base" inputs by mistake; the reading that matters is that the pair can no longer slide onto the size and offset words.
+
+## Round 2 (2026-11-05)
+
+Round 2 (architect + security items, one reviewer): PASS-WITH-NOTES; A-1…A-4, S-1, S-2 closed. E4 addenda (binding, no further round):
+- **N-1:** R-A2L-036.2 trigger and R-A2L-036.4 include the base + size ≤ 2^32 bound of .13 (no contradiction for S12); E4 implements the bound once in the reader and the tests follow .13.
+- **N-2:** the anchor is "the first unquoted word that starts with an ASCII digit or sign"; a non-ASCII digit word (`٣`) is not a Number and is skipped as a non-number word — accepted residual: `٣ 0x10 0x20` yields base 0x10. Recorded in D-5.
+- **N-3:** an address typo that does not start with a digit or sign shifts the anchor to the next number — accepted residual, recorded in D-5.
+- **N-4:** stale wording of R-A2L-036.5/.6 corrected at E4 integration (text only).
