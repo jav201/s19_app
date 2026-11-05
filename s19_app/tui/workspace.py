@@ -15,7 +15,7 @@ from collections import Counter
 from dataclasses import dataclass
 from logging.handlers import RotatingFileHandler
 from pathlib import Path, PureWindowsPath
-from typing import Iterator, Optional, Sequence
+from typing import Iterator, Optional, Sequence, Tuple
 
 from .models import ProjectVariantSet, VariantDescriptor
 
@@ -35,6 +35,13 @@ LOG_FILENAME = "s19tui.log"
 # ``<sanitized-basename>.crc.json`` here, so a template name can never redirect the
 # write outside this bounded directory.
 WORKAREA_TEMPLATES = "templates"
+#: The ONE destination for flow external imports (batch-102 Inc 7, E3
+#: ruling 3): every file Browse imports for a flow block lands in
+#: ``<active-project>/external/`` — never the project root, never the
+#: workarea root, never outside the project.  The flow runtime resolves
+#: refs against the project dir, so the ``external/<name>`` ref the field
+#: receives stays inside the project by construction.
+PROJECT_EXTERNAL_SUBDIR = "external"
 #: Reserved work-area home names (HLR-162 / LLR-162.2): the closed set of
 #: folder homes the tool manages — ``temp``, ``patches``, ``crc`` and
 #: ``splits`` are created directly under the work area (the last two also
@@ -83,6 +90,16 @@ class WorkareaPlacementError(WorkareaContainmentError):
     that already handles a containment refusal reports a placement failure
     with no edit. The message leads with the outcome, names the file and the
     folder, gives the cause and the next step, and says nothing was written.
+    """
+
+
+class ExternalImportRefusal(ValueError):
+    """A flow external import was refused BEFORE any filesystem mutation.
+
+    batch-102 Inc 7 (R-B102-FILE-005/006): the ``message`` is
+    operator-facing and carries at most the file NAME — never a full
+    path (E3 ruling 8, zero path logs/paints) — and is rendered verbatim
+    by the chooser through ``safe_text`` + ``markup=False``.
     """
 
 
@@ -1480,6 +1497,254 @@ def copy_into_workarea(
     return place_into_workarea(
         source, destination, max_size_bytes, workarea_root
     ).path
+
+
+def _imported_name_candidates(name: str) -> Iterator[str]:
+    """The Inc-7 import landing-name walk: the requested name, then the
+    lowest free ``-<N>`` (``calib-1.json``, ``calib-2.json``, …).
+
+    batch-102 Inc 7 (R-B102-FILE-004, E3 rulings 1/4): the workarea
+    placement walk uses ``_<N>``; the flow import uses ``-<N>`` because the
+    increment's operator contract (``02-test-cases.md``,
+    ``external/calib-1.json``) names the hyphen form.  Every yielded name
+    is only a candidate — the caller decides whether the name is taken.
+    """
+    target = Path(name)
+    yield target.name
+    counter = 1
+    while True:
+        yield f"{target.stem}-{counter}{target.suffix}"
+        counter += 1
+
+
+def import_external_ref(
+    external_path: Path,
+    project_root: Optional[Path],
+    max_size_bytes: int = DEFAULT_COPY_SIZE_CAP_BYTES,
+) -> Tuple[Path, str]:
+    """
+    Summary:
+        Import one external file for a flow block into the active
+        project's ``external/`` folder (batch-102 Inc 7, US-102-07,
+        R-B102-FILE-004..006) and return the landed path plus the
+        workarea-relative ref (``external/<name>``) the flow field
+        receives.  A byte-identical name is NEVER reused: any taken name
+        (identical content or not) advances the claim to the next free
+        ``-<N>`` suffix — reuse-by-content is disabled for this flow
+        (E3 ruling 4), so a repeated import always lands a fresh file and
+        never overwrites (R-B102-FILE-004).
+
+    Args:
+        external_path (Path): The external/temp/loaded source file
+            (untrusted).  Must exist, be a regular readable file, and
+            pass every guard below.
+        project_root (Optional[Path]): The active project directory (the
+            app passes it UNRESOLVED, exactly like ``_active_project_dir``
+            returns it, so the destination guard reads the workarea root
+            off its textual path).  ``None`` refuses BEFORE any
+            filesystem touch (R-B102-FILE-005).
+        max_size_bytes (int): Source size cap (the shared 256 MB default).
+
+    Returns:
+        Tuple[Path, str]: ``(landed_path, ref)`` — ``landed_path`` is the
+            file inside ``<project>/external/`` (a ``-<N>`` suffix on any
+            name taken) and ``ref`` is the project-relative wire value
+            (``external/<name>``) written into the flow field.
+
+    Raises:
+        ExternalImportRefusal: ALWAYS before any mutation, with an
+            operator-facing, path-free message: the pinned refusals
+            ``Load or create a project before importing an external
+            file.`` (no project) and ``External file not readable:
+            <name>`` (missing/unreadable/non-regular source), plus
+            name-only refusals for link sources, the size cap, and any
+            guard/placement failure.  Raised even where the replicated
+            pipeline below would raise :class:`WorkareaContainmentError`
+            — that class's messages embed full paths and must never
+            reach a paint sink (E3 ruling 8).
+
+    Data Flow:
+        - An EXACT replica of :func:`place_into_workarea`'s guards
+          (E3 ruling 4), minus its byte-identity reuse and with the
+          ``-<N>`` name walk: reparse-point rejection on the source (a
+          link or junction is refused before ``resolve()`` would follow
+          it — dangling links included), textual-destiny destination
+          guard (:func:`_guarded_destination`), size cap BEFORE any
+          staging, private staging (:func:`_private_stage_dir`), the
+          atomic ``O_CREAT|O_EXCL`` claim with a pre-claim ``os.lstat``
+          (any existing entry — file, directory, link, dangling link,
+          junction — counts as taken), the post-claim re-``lstat``
+          regular-file/reparse verification, and the ``os.replace`` fill
+          with the 5-retry/1 s ``PermissionError`` window.  The source is
+          only ever read, never moved or deleted; the own staging
+          directory is removed in a ``finally``.
+        - No logger call in this path names a path, ref or file-derived
+          string (E3 ruling 8).
+
+    Dependencies:
+        Uses:
+            - _is_reparse_point / _guarded_destination / _private_stage_dir
+              (the one workarea guard set, replicated per E3 ruling 4)
+        Used by:
+            - s19_app.tui.screens.FileRefChooserScreen (Browse imports)
+    """
+    if project_root is None:
+        raise ExternalImportRefusal(
+            "Load or create a project before importing an external file."
+        )
+    source = Path(external_path)
+    name = source.name or "file"
+    if _is_reparse_point(source):
+        raise ExternalImportRefusal(f"External import refused: {name} is a link.")
+    try:
+        resolved_source = source.resolve()
+    except (OSError, ValueError, RuntimeError):
+        raise ExternalImportRefusal(
+            f"External file not readable: {name}"
+        ) from None
+    if _is_reparse_point(resolved_source):
+        raise ExternalImportRefusal(f"External import refused: {name} is a link.")
+    try:
+        source_stat = resolved_source.stat()
+    except OSError:
+        raise ExternalImportRefusal(
+            f"External file not readable: {name}"
+        ) from None
+    if not stat.S_ISREG(source_stat.st_mode):
+        raise ExternalImportRefusal(f"External file not readable: {name}")
+    try:
+        with open(resolved_source, "rb"):
+            pass  # readability probe: an unreadable file refuses before staging
+    except OSError:
+        raise ExternalImportRefusal(
+            f"External file not readable: {name}"
+        ) from None
+    if source_stat.st_size > max_size_bytes:
+        raise ExternalImportRefusal(f"External import refused: {name} is too large.")
+
+    # The destination guard reads the work-area root off the UNRESOLVED
+    # textual path (LLR-171.4) — the caller passes project_root exactly as
+    # the app stores it.
+    destination = Path(project_root) / PROJECT_EXTERNAL_SUBDIR
+    try:
+        resolved_destination, resolved_root = _guarded_destination(destination, None)
+    except WorkareaContainmentError:
+        raise ExternalImportRefusal(
+            f"External import refused: {name} has no safe project folder."
+        ) from None
+    try:
+        resolved_destination.mkdir(parents=True, exist_ok=True)
+    except OSError:
+        raise ExternalImportRefusal(
+            f"External import refused: {name} has no safe project folder."
+        ) from None
+
+    try:
+        stage_dir = _private_stage_dir(resolved_root)
+    except WorkareaContainmentError:
+        raise ExternalImportRefusal(
+            f"External import refused: {name} has no safe project folder."
+        ) from None
+    staging_owned = True
+    try:
+        staged_file = stage_dir / resolved_source.name
+        try:
+            shutil.copy2(resolved_source, staged_file)
+        except OSError:
+            raise ExternalImportRefusal(
+                f"External file not readable: {name}"
+            ) from None
+
+        # Exclusive, atomic placement: claim the first free ``-<N>`` name.
+        # No content comparison anywhere — reuse is disabled for this flow.
+        claim_path: Optional[Path] = None
+        claim_owned = False
+        for candidate_name in _imported_name_candidates(resolved_source.name):
+            candidate = resolved_destination / candidate_name
+            try:
+                os.lstat(candidate)
+            except OSError:
+                pass  # the name is free
+            else:
+                continue  # any existing entry (file/dir/link/dangling) is taken
+            claim_path = candidate
+            try:
+                claim_fd = os.open(
+                    str(claim_path), os.O_CREAT | os.O_EXCL | os.O_WRONLY
+                )
+                claim_owned = True
+            except FileExistsError:
+                claim_path = None  # lost a lstat-vs-open race: taken after all
+                continue
+            except OSError:
+                try:
+                    os.lstat(claim_path)
+                except OSError:
+                    raise ExternalImportRefusal(
+                        f"External import refused: {name} could not be placed."
+                    ) from None
+                claim_path = None
+                continue
+            os.close(claim_fd)
+            try:
+                claim_stat = os.lstat(claim_path)
+            except OSError:
+                if claim_owned:
+                    try:
+                        os.unlink(claim_path)
+                    except OSError:
+                        pass
+                raise ExternalImportRefusal(
+                    f"External import refused: {name} could not be placed."
+                ) from None
+            if not stat.S_ISREG(claim_stat.st_mode) or _is_reparse_point(claim_path):
+                if claim_owned:
+                    try:
+                        os.unlink(claim_path)
+                    except OSError:
+                        pass
+                raise ExternalImportRefusal(
+                    f"External import refused: {name} could not be placed."
+                )
+            break
+
+        if claim_path is None:  # pragma: no cover - the name walk is unbounded
+            raise ExternalImportRefusal(
+                f"External import refused: {name} could not be placed."
+            )
+
+        deadline = time.monotonic() + 1.0
+        attempts = 0
+        while True:
+            try:
+                os.replace(staged_file, claim_path)
+                break
+            except PermissionError:
+                attempts += 1
+                if attempts >= 5 or time.monotonic() >= deadline:
+                    if claim_owned:
+                        try:
+                            os.unlink(claim_path)
+                        except OSError:
+                            pass
+                    raise ExternalImportRefusal(
+                        f"External import refused: {name} could not be written."
+                    ) from None
+                time.sleep(min(0.05, max(0.0, deadline - time.monotonic())))
+            except OSError:
+                if claim_owned:
+                    try:
+                        os.unlink(claim_path)
+                    except OSError:
+                        pass
+                raise ExternalImportRefusal(
+                    f"External import refused: {name} could not be written."
+                ) from None
+        ref = f"{PROJECT_EXTERNAL_SUBDIR}/{claim_path.name}"
+        return claim_path, ref
+    finally:
+        if staging_owned:
+            shutil.rmtree(stage_dir, ignore_errors=True)
 
 
 def place_group_into_workarea(

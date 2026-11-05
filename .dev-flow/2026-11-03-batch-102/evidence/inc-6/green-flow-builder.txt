@@ -1,0 +1,83 @@
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+..........................F.........F................................    [100%]
+================================== FAILURES ===================================
+______________ test_tc_b97_18_crc_card_painted_in_the_crc_colour ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32276/test_tc_b97_18_crc_card_painte0')
+
+    def test_tc_b97_18_crc_card_painted_in_the_crc_colour(tmp_path: Path) -> None:
+        """TC-B97-18 (LLR-146.6, paint arm, PC-7): with a ``source \u2192 patch \u2192 crc \u2192
+        write_out`` chain at 118x54, the CRC card's kind line, read as painted
+        cells (``span_colours`` strip runs), carries a foreground within 4° of
+        ``CRC_FAMILY``, and no painted cell of the pipeline lies within 4° of
+        ``WAITING_HUMAN`` — hue distance, never hex equality.
+    
+        RED: no pipeline on main. Mutations: the CRC card painted with
+        ``WAITING_HUMAN``; painted with fb_A's ``#d9a35b`` (17.96° from CRC).
+        """
+    
+        async def body(app, pilot, panel, project_dir):
+            await load_flow(app, pilot, "crc_chain")
+            await settle(pilot, 2)
+            return span_colours(app, need(panel, "#flow_pipeline"))
+    
+        runs = run_builder(tmp_path, (118, 54), body)
+        strips = [r for r in runs if r.source == "strip"]
+        crc = [r for r in strips if "CRC" in r.text]
+        assert crc, [r.text for r in strips][:20]
+>       assert any(hue_matches(r.fg, insight_style.CRC_FAMILY) for r in crc), [(r.text, r.fg) for r in crc]
+E       AssertionError: [('\u2295 CRC', '#6b6b6b'), ('stamps a CRC', '#9b9b9b')]
+E       assert False
+E        +  where False = any(<generator object test_tc_b97_18_crc_card_painted_in_the_crc_colour.<locals>.<genexpr> at 0x0000026945B1A340>)
+
+tests\test_b97_flow_builder.py:769: AssertionError
+_______________ test_tc_b97_49_ribbon_paints_saved_then_unsaved _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-32276/test_tc_b97_49_ribbon_paints_s0')
+
+    def test_tc_b97_49_ribbon_paints_saved_then_unsaved(tmp_path: Path) -> None:
+        """TC-B97-49 (LLR-146.11, painted arm): a loaded flow paints ``· saved``
+        with no saturated hue (grey); one Add later the ribbon paints ``·
+        unsaved`` within 4° of ``YELLOW`` (PC-7: the painted strip, matched by
+        hue, never hex equality) and no ``\u2713`` / ``\u25cf`` on either reading.
+    
+        RED on the pre-fold tree: the glyphs. Mutation: the dirty word grey.
+        """
+        from s19_app.tui.insight_style import YELLOW
+    
+        def word_runs(app, panel, word):
+            return [r for r in span_colours(app, need(panel, "#flow_name_strip"))
+                    if r.source == "strip" and word in r.text]
+    
+        async def body(app, pilot, panel, project_dir):
+            await load_flow(app, pilot, "patch_chain")
+            await poll(pilot, lambda: "saved" in " ".join(painted_rows(app, need(panel, "#flow_name_strip"))))
+            saved_row = " ".join(painted_rows(app, need(panel, "#flow_name_strip")))
+            saved = word_runs(app, panel, "saved")
+            await choose_kind(app, pilot, panel, BLOCK_WRITE_OUT)
+            panel.query_one("#flow_ref", Input).value = "more.s19"
+            await press(pilot, panel, "flow_add", lambda: "unsaved" in " ".join(painted_rows(app, need(panel, "#flow_name_strip"))))
+            dirty_row = " ".join(painted_rows(app, need(panel, "#flow_name_strip")))
+            unsaved = word_runs(app, panel, "unsaved")
+            return saved_row, saved, dirty_row, unsaved
+    
+        saved_row, saved, dirty_row, unsaved = run_builder(tmp_path, (118, 54), body)
+        assert "· saved" in saved_row and "unsaved" not in saved_row, saved_row
+        assert "· unsaved" in dirty_row, dirty_row
+        for row in (saved_row, dirty_row):
+            assert "\u2713" not in row and "\u25cf" not in row, row
+        assert saved and all(not hue_matches(r.fg, YELLOW) for r in saved), saved
+        assert saved and all(r.fg and _saturation(r.fg) < 0.30 for r in saved), saved
+>       assert unsaved and all(hue_matches(r.fg, YELLOW) for r in unsaved), unsaved
+E       AssertionError: [ColourRun(source='strip', text='· unsaved', fg='#f5f5f5', bg='#0e0e0e', bold=False, x=25, y=4)]
+E       assert ([ColourRun(source='strip', text='· unsaved', fg='#f5f5f5', bg='#0e0e0e', bold=False, x=25, y=4)] and False)
+E        +  where False = all(<generator object test_tc_b97_49_ribbon_paints_saved_then_unsaved.<locals>.<genexpr> at 0x00000269490CF060>)
+
+tests\test_b97_flow_builder.py:1084: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_18_crc_card_painted_in_the_crc_colour
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_49_ribbon_paints_saved_then_unsaved
+2 failed, 67 passed in 206.17s (0:03:26)

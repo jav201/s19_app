@@ -1,0 +1,32 @@
+2026-11-03T09:28:08-06:00 E0 start — branch batch-102-hotfixes from 2f2f932; scope = five hot-fixes commissioned by operator; model orchestrator Kimi K2.8
+2026-11-03T09:28:08-06:00 E0 split approved under operator standing authorization — five increments; Inc 1/2 parallel-safe; Inc 3 base for 4/5
+2026-11-03T09:45:00-06:00 E1 done draft — inc-1 clipboard requirements/test cases; inc-2 A2L refresh requirements/test cases
+2026-11-03T10:12:00-06:00 E2 complete — Code-Wire graphs lint clean for inc-1 (10 nodes) and inc-2 (8 nodes)
+2026-11-03T10:30:00-06:00 E3 round 1 — architect NO PASS on inc-2 blocker; security PASS-WITH-NOTES
+2026-11-03T10:55:00-06:00 E3 corrected — write cascade Win32/Tk/PowerShell, async copy/cut, real timeout tests, generation+image cache key, PreparedLoad snapshots, single empty-message writer
+2026-11-03T11:05:00-06:00 E3 round 2 — PASS-WITH-NOTES both; minor findings routed to E4 addenda in design/E3-rulings-inc1-inc2.md
+2026-11-03T11:10:00-06:00 E4 start — separate tester and implementer worktrees for inc-1 and inc-2 from cb51fc8
+2026-11-03T11:35:00-06:00 E4 integrated inc-1/inc-2 — RED transcripts copied; targeted GREEN 145 passed (evidence/green-targeted.txt); operator added Flow Builder scope as Inc 6/7
+2026-11-03T12:20:00-06:00 E1-E2 inc-3 complete — picker requirements, tests, prototype, Code-Wire graph lint clean (8 nodes)
+2026-11-03T12:40:00-06:00 E3 inc-3 — PASS-WITH-NOTES architect/security; mandatory rulings written to design/E3-rulings-inc3.md
+2026-11-03T13:20:00-06:00 E1-E3 inc-4 complete — bulk-add requirements/tests/prototype/graph lint clean (6 nodes); PASS-WITH-NOTES; rulings in design/E3-rulings-inc4.md
+2026-11-03T14:10:00-06:00 E4 inc-3 integrated — green-core 46 passed + test_tui_check_editor 7 passed; committed dc55e56. Inc 4 E4 starts.
+2026-11-03T15:05:00-06:00 E4 inc-4 integrated — green-core 49 passed; bulk add committed next
+2026-11-03T15:30:00-06:00 E3 inc-5 — PASS-WITH-NOTES; rulings in design/E3-rulings-inc5.md; E4 starts
+2026-11-03T16:15:00-06:00 E4 inc-5 integrated — 17 patch-picker tests + 39 patch layout/chips/card guards + 22 picker/bulk regression + 43 check regression all green
+2026-11-03T16:45:00-06:00 E3 inc-6 — PASS-WITH-NOTES; rulings in design/E3-rulings-inc6.md; E4 starts
+2026-11-03T17:35:00-06:00 E4 inc-6 integrated — 34 new tests green; b97_flow_builder 67 passed with the 2 pre-existing colour failures documented
+2026-11-03T18:05:00-06:00 E3 inc-7 — NO-GO initial corrected by rulings; design/E3-rulings-inc7.md written; E4 starts
+2026-11-03T19:10:00-06:00 E4 inc-7 integrated — 43 file-chooser tests + 35 modal/help tests green; b97_flow_builder 67 passed with the 2 pre-existing colour failures only
+2026-11-03T19:45:00-06:00 E5 reviews complete — code/security/test audit PASS-WITH-NOTES; corrections applied and rulings recorded in design/E5-review-rulings.md; full suite tests/ running in a new window
+2026-11-03T20:10:00-06:00 E5 validation record and review packet written; full tests/ suite remains pending on LAN/CI; no push or merge without operator approval
+2026-11-03T22:20:00-06:00 cachyos-rtx full-suite attempt — first SSH foreground hit 1h local timeout at ~90%; remote process stopped. Relaunched with nohup, 12 workers, persistent remote-parallel.log; serial_timing pending
+2026-11-03T22:55:00-06:00 cachyos-rtx parallel suite relaunched detached via setsid (PID 3288), 12 workers, exitcode file enabled; prior nohup attempt died with SSH session around 78%
+2026-11-03T23:30:00-06:00 cachyos-rtx rebooted at 23:23 while parallel suite was at ~90%; Steam closed gracefully, suite relaunched detached via setsid with 8 workers (PID 3502), serial_timing pending
+2026-11-03T23:40:00-06:00 lab PCs unavailable/off per operator; local Windows PC selected. pytest-xdist installed locally; full suite started here with 8 workers: pytest tests -q -n 8 -m "not serial_timing"
+2026-11-04T00:05:00-06:00 local parallel suite complete — pytest tests -q -n 8: 72 failed / 5331 passed / 12 skipped / 4 xfailed in 2156s; serial_timing marker does not exist (no serial phase owed); 23 snapshot mismatches reported
+2026-11-04T00:40:00-06:00 serial rerun of the 72 failures — 61 failed / 11 passed (parallel/timing flakes); post-fix rerun — 56 failed / 16 passed
+2026-11-04T01:00:00-06:00 base check at 2f2f932 via worktree — 25 of 27 persistent failures reproduce at base (pre-existing/environment); the 2 exceptions were batch-102 regressions
+2026-11-04T01:30:00-06:00 E5 close-out fixes applied and verified green: clipboard test rename (AT-65536), TC-607 bound 246, TC-653 measured sets, TC-033 Calm Dark tokens, AT-B83-08 Name forms, TC-B100-64 freeze move (ruling pending), TC-B99-13 allow-list, 4 CSS-scoping supersessions, patch help lines, TC-B97-38 origin-row supersession (ruling pending)
+2026-11-04T01:45:00-06:00 04-validation.md + REVIEW-PACKET.md rewritten with the real full-suite numbers and the failure classification; rulings recorded in design/E5-review-rulings.md; no push or merge without operator approval
+2026-11-04T02:00:00-06:00 operator ordered push+merge — HANDOFF.md written; both E5 rulings ratified by operator instruction; batch-102-hotfixes merged to main (--no-ff) and pushed
