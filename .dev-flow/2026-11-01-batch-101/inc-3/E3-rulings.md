@@ -45,3 +45,11 @@ Only line numbers moved; the map is `E1-slice.md` §0. Nothing was merged here.
 ## Status after the pass
 
 `trace_check.py --base e266395`: `3 US, 12 active requirements (0 withdrawn), 11 gap(s)` — 10 TEST (tests at E4), 1 EVID (`04-validation.md` at E5). With `--base main` it also lists 8 SLICE gaps: the local `main` is now `f11b3f4`, so batch-102's files show as changed until the rebase. `codewire_lint`: `nodes=15 entities=4 edges=0 findings=0 not read=0`.
+
+## Round 2 (2026-11-05)
+
+Re-review (E3-r2.md): PASS-WITH-NOTES — F1 = S-1 and F2 closed; the F5 fold lets no name reach outside the project. E4 addenda:
+- N-1: correct E1-D8's stated reason (the writer accepts `lnk/../x.json`; the design stands).
+- N-2: add the NUL-character name to I-1's list of inputs whose outcome changes (base raises ValueError; now a missing-file finding and the writer refuses the entry).
+- N-3: in each arm, take every paired stamp first, before any logging or query; the install stamp is the last stamp before the paint.
+- Cosmetic: remove the blank line splitting the interface table (graph-inc3.md:27).
