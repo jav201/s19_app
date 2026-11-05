@@ -1,0 +1,377 @@
+# RED capture - Inc 7 tester nodes against BASE (merge-base of HEAD and main = 9f9f6af6417ac1a3d7fd7679a93995b38088e6f1)
+# Detached worktree of the base, only the new/changed test files + 2 goldens copied in; cwd = that worktree.
+# env: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<SCRATCH>/la
+# cmd: timeout 1800 python -m pytest --basetemp <SCRATCH>/bt -p no:cacheprovider -q --no-header -rfE --tb=short <new nodes> <re-pinned nodes>
+# Paths redacted (<SCRATCH>, <CONDA>, <HOME>).
+
+base revision: 9f9f6af6417ac1a3d7fd7679a93995b38088e6f1
+s19_app.__file__ = C:\Users\<user>\AppData\Local\Temp\s19e4t7\base\s19_app\__init__.py
+FFFF.FFFF...FFFFFFFFFF..FFFFFFFF.FFFFFFFFFF..FFFFFFFFFFFF.FFFFFF         [100%]
+================================== FAILURES ===================================
+_______________ test_r_cmp_004_14_1_markdown_changed_run_whole ________________
+tests\test_diff_report_service.py:1632: in test_r_cmp_004_14_1_markdown_changed_run_whole
+    assert _rows_with_prefix(diff_lines, "-") == expected_a
+E   AssertionError: assert ['0x00000FC0 .........|', ...] == ['0x00000FC0 .........|', ...]
+E     
+E     Right contains 132 more items, first extra item: '0x00002FC0  AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA  |................|'
+E     Use -v to get more diff
+_________________ test_r_cmp_004_14_2_html_and_markdown_agree _________________
+tests\test_diff_report_service.py:1653: in test_r_cmp_004_14_2_html_and_markdown_agree
+    assert [row[:10] for row in pane] == [row[:10] for row in md_rows]
+E   AssertionError: assert ['0x00000FC0'...0001010', ...] == ['... window'...0001000', ...]
+E     
+E     At index 0 diff: '0x00000FC0' != '... window'
+E     Left contains 131 more items, first extra item: '0x00002FD0'
+E     Use -v to get more diff
+_______________ test_r_cmp_004_14_3_markdown_window_over_64_kib _______________
+tests\test_diff_report_service.py:1667: in test_r_cmp_004_14_3_markdown_window_over_64_kib
+    assert len(rows) == 4356
+E   AssertionError: assert 513 == 4356
+E    +  where 513 = len(['... window limited to 512 rows ...', '0x0000FFC0                                                   |...................           |................|', '0x00010000  3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C  |<<<<<<<<<<<<<<<<|', ...])
+_________________ test_r_cmp_004_14_4_html_window_over_64_kib _________________
+tests\test_diff_report_service.py:1683: in test_r_cmp_004_14_4_html_window_over_64_kib
+    assert len(panes[0]) == 4356
+E   AssertionError: assert 513 == 4356
+E    +  where 513 = len(['... window limited to 512 rows ...', '0x0000FFC0                                                   |...................           |................|', '0x00010000  3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C  |<<<<<<<<<<<<<<<<|', ...])
+__________ test_r_cmp_005_16_1_failed_markdown_write_leaves_no_file ___________
+tests\test_diff_report_service.py:1789: in test_r_cmp_005_16_1_failed_markdown_write_leaves_no_file
+    assert _folder_names(tmp_path / "reports") == []
+E   AssertionError: assert ['20260611T12...ff-report.md'] == []
+E     
+E     Left contains one more item: '20260611T120000Z-diff-report.md'
+E     Use -v to get more diff
+____________ test_r_cmp_005_16_2_failed_html_write_leaves_no_file _____________
+tests\test_diff_report_service.py:1806: in test_r_cmp_005_16_2_failed_html_write_leaves_no_file
+    assert _folder_names(tmp_path / "reports") == []
+E   AssertionError: assert ['20260611T12...-report.html'] == []
+E     
+E     Left contains one more item: '20260611T120000Z-diff-report.html'
+E     Use -v to get more diff
+_____________ test_r_cmp_005_16_3_stale_part_file_is_not_touched ______________
+tests\test_diff_report_service.py:1818: in test_r_cmp_005_16_3_stale_part_file_is_not_touched
+    with pytest.raises(FileExistsError):
+E   Failed: DID NOT RAISE <class 'FileExistsError'>
+____________ test_r_cmp_005_17_1_ab_html_failure_removes_markdown _____________
+tests\test_diff_report_service.py:1873: in test_r_cmp_005_17_1_ab_html_failure_removes_markdown
+    assert _folder_names(project_dir / "reports") == []
+E   AssertionError: assert ['20261105T16...ff-report.md'] == []
+E     
+E     Left contains one more item: '20261105T160859Z-diff-report.md'
+E     Use -v to get more diff
+__________ test_r_cmp_004_9_1_1_image_label_and_variant_report_safe ___________
+tests\test_diff_report_service.py:1954: in test_r_cmp_004_9_1_1_image_label_and_variant_report_safe
+    assert (
+E   AssertionError: assert '- Image A: A\\*b\\_\\[x\\]\\.s19 [external] path=`/tmp/a.s19` parse-errors=0' in '# Diff report\n\n- Generated (UTC): 2026-06-11T12:00:00+00:00\n- Tool version: 1.0.0rc1\n- Image A: A*b_[x].s19 [exte...            |................|\n0x00000100  02 02 02 02                                      |................|\n```\n'
+_______________ test_r_cmp_004_9_1_3_runs_symbols_name_by_name ________________
+tests\test_diff_report_service.py:1979: in test_r_cmp_004_9_1_3_runs_symbols_name_by_name
+    assert row == "| 0x00000100 | 0x00000104 | 4 | changed | A\\_B, x\\|y |"
+E   AssertionError: assert '| 0x00000100... | A_B, x|y |' == '| 0x00000100...\\_B, x\\|y |'
+E     
+E     Skipping 33 identical leading characters in diff, use -v to show
+E     - hanged | A\_B, x\|y |
+E     ?           -     -
+E     + hanged | A_B, x|y |
+______________ test_r_cmp_004_9_1_5_flow_attribution_report_safe ______________
+tests\test_diff_report_service.py:2028: in test_r_cmp_004_9_1_5_flow_attribution_report_safe
+    assert "| patches\\/c\\_1\\.json | S\\*1 | 0x00001000 |" in row
+E   AssertionError: assert '| patches\\/c\\_1\\.json | S\\*1 | 0x00001000 |' in '| patches/c_1.json | S*1 | 0x00001000 | 2 | applied | 0x00001000–0x00001002 |'
+______________ test_r_cmp_004_9_1_6_filter_file_name_report_safe ______________
+tests\test_diff_report_service.py:2058: in test_r_cmp_004_9_1_6_filter_file_name_report_safe
+    assert "- Filter file: a\\|b\\`c\\<b\\>d\\.json" in md_text.splitlines()
+E   AssertionError: assert '- Filter file: a\\|b\\`c\\<b\\>d\\.json' in ['# Diff report', '', '## Report filter applied', '', '- Filter file: a|b`c<b>d.json', '- Linkage entries: shown 1 of 2 (hidden 1)', ...]
+E    +  where ['# Diff report', '', '## Report filter applied', '', '- Filter file: a|b`c<b>d.json', '- Linkage entries: shown 1 of 2 (hidden 1)', ...] = <built-in method splitlines of str object at 0x0000026282EB2AD0>()
+E    +    where <built-in method splitlines of str object at 0x0000026282EB2AD0> = '# Diff report\n\n## Report filter applied\n\n- Filter file: a|b`c<b>d.json\n- Linkage entries: shown 1 of 2 (hidden 1...            |................|\n0x00000140                                                   |................|\n```\n'.splitlines
+___________________ test_r_cmp_004_9_1_7_symbol_cut_at_512 ____________________
+tests\test_diff_report_service.py:2072: in test_r_cmp_004_9_1_7_symbol_cut_at_512
+    assert row == (
+E   AssertionError: assert '| 0x00000100...AAAAAAAAAAA |' == '| 0x00000100...(truncated) |'
+E     
+E     Skipping 544 identical leading characters in diff, use -v to show
+E     - AAAAAAAAAA… (truncated) |
+E     + AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA |
+______________ test_r_cmp_004_9_1_10_refusal_message_report_safe ______________
+tests\test_diff_report_service.py:2096: in test_r_cmp_004_9_1_10_refusal_message_report_safe
+    assert bullet == (
+E   AssertionError: assert '- refused: c... not declared' == '- refused: c... not declared'
+E     
+E     - - refused: c\.json symbol '\<img src=https:\/\/h\/p\>\[x\](http:\/\/b)' [CHG-SYMBOL-UNRESOLVED] the symbol '\<img src=https:\/\/h\/p\>\[x\](http:\/\/b)' is not declared
+E     ?             -              -               - -  -  - -  -       - -                                         -               - -  -  - -  -       - -
+E     + - refused: c.json symbol '<img src=https://h/p>[x](http://b)' [CHG-SYMBOL-UNRESOLVED] the symbol '<img src=https://h/p>[x](http://b)' is not declared
+________ test_r_cmp_004_9_1_11_diff_report_sinks_inert_under_a_reader _________
+tests\test_diff_report_service.py:2186: in test_r_cmp_004_9_1_11_diff_report_sinks_inert_under_a_reader
+    assert not live & _BAD_TOKENS, sorted(live & _BAD_TOKENS)
+E   AssertionError: ['html_inline', 'link_open']
+E   assert not ({'bullet_list_close', 'bullet_list_open', 'code_inline', 'fence', 'heading_close', 'heading_open', ...} & {'html_block', 'html_inline', 'image', 'link_open'})
+____________ test_r_cmp_004_9_1_12_c1_and_bidi_visible_in_markdown ____________
+tests\test_diff_report_service.py:2209: in test_r_cmp_004_9_1_12_c1_and_bidi_visible_in_markdown
+    assert f"- Image A: a{_FFFD}b [external] path=`/tmp/a.s19`" in text
+E   AssertionError: assert '- Image A: a�b [external] path=`/tmp/a.s19`' in '# Diff report\n\n- Generated (UTC): 2026-06-11T12:00:00+00:00\n- Tool version: 1.0.0rc1\n- Image A: a\x85b [external]...            |................|\n0x00000100  02 02 02 02                                      |................|\n```\n'
+____________________ test_r_cmp_004_9_2_1_image_path_text _____________________
+tests\test_diff_report_service.py:2227: in test_r_cmp_004_9_2_1_image_path_text
+    assert f"path=`a{_FFFD}b.s19`" in line
+E   AssertionError: assert 'path=`a�b.s19`' in '- Image A: A.s19 [external] path=`a`b.s19` parse-errors=0'
+__________________ test_r_cmp_004_9_2_2_provenance_path_text __________________
+tests\test_diff_report_service.py:2251: in test_r_cmp_004_9_2_2_provenance_path_text
+    assert line in lines
+E   AssertionError: assert '- Original image (before): `o�1.s19`' in ['# Diff report', '', '- Generated (UTC): 2026-06-11T12:00:00+00:00', '- Tool version: 1.0.0rc1', '- Image A: A.s19 [external] path=`/tmp/a.s19` parse-errors=0', '- Image B: B.s19 [external] path=`/tmp/b.s19` parse-errors=0', ...]
+___________ test_r_cmp_004_15_1_html_visible_text_matches_markdown ____________
+tests\test_diff_report_service.py:2324: in test_r_cmp_004_15_1_html_visible_text_matches_markdown
+    assert planted in md_text, ("markdown", planted)
+E   AssertionError: ('markdown', 'LA�LB')
+E   assert 'LA�LB' in '# Diff report\n\n- Generated (UTC): 2026-06-11T12:00:00+00:00\n- Tool version: 1.0.0rc1\n- Image A: LA\x85LB [externa...n\n## Flow change attribution\n\n- 0x00000100–0x00000104 changed: no flow change\n- refused: c.json [CHG-X] MS\x85MT\n'
+___________ test_r_cmp_004_15_2_tab_becomes_one_space_in_both_files ___________
+tests\test_diff_report_service.py:2340: in test_r_cmp_004_15_2_tab_becomes_one_space_in_both_files
+    assert "- Image A: a b\\.s19 [external]" in md_text
+E   AssertionError: assert '- Image A: a b\\.s19 [external]' in '# Diff report\n\n- Generated (UTC): 2026-06-11T12:00:00+00:00\n- Tool version: 1.0.0rc1\n- Image A: a\tb.s19 [externa...            |................|\n0x00000100  02 02 02 02                                      |................|\n```\n'
+__________ test_r_cmp_004_15_3_strip_ctl_is_the_shared_visible_text ___________
+tests\test_diff_report_service.py:2356: in test_r_cmp_004_15_3_strip_ctl_is_the_shared_visible_text
+    for value in samples:
+E   AssertionError: 'a\x85b'
+E   assert 'a\x85b' == 'a�b'
+E     
+E     - a�b
+E     + a
+E     
+E     + b
+_________ test_r_before_after_report_001_21_2_provenance_path_visible _________
+tests\test_diff_report_service.py:2378: in test_r_before_after_report_001_21_2_provenance_path_visible
+    assert f"pa{_FFFD}th.json" in md_text
+E   AssertionError: assert 'pa�th.json' in '# Diff report\n\n- Generated (UTC): 2026-06-11T12:00:00+00:00\n- Tool version: 1.0.0rc1\n- Image A: A.s19 [external] ...            |................|\n0x00000100  02 02 02 02                                      |................|\n```\n'
+_____________ test_r_before_after_report_001_32_1_markdown_title ______________
+tests\test_before_after_report.py:1422: in test_r_before_after_report_001_32_1_markdown_title
+    assert md_text.splitlines()[0] == "# Before/after report"
+E   AssertionError: assert '# Diff report' == '# Before/after report'
+E     
+E     - # Before/after report
+E     + # Diff report
+_____________ test_r_before_after_report_001_33_1_html_page_title _____________
+tests\test_before_after_report.py:1431: in test_r_before_after_report_001_33_1_html_page_title
+    assert html_text.count("<title>Before/after report</title>") == 1
+E   assert 0 == 1
+E    +  where 0 = <built-in method count of str object at 0x00000262FEF3F070>('<title>Before/after report</title>')
+E    +    where <built-in method count of str object at 0x00000262FEF3F070> = '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>Diff report</title>\n<style>body{font-famil...e="background:#ffd54d;color:#000;font-weight:bold">.</span>..............|</pre></td>\n</tr></table>\n</body>\n</html>'.count
+______________ test_r_before_after_report_001_34_1_html_heading _______________
+tests\test_before_after_report.py:1440: in test_r_before_after_report_001_34_1_html_heading
+    assert h1_lines[0] == "<h1>Before/after report</h1>"
+E   AssertionError: assert '<h1>Diff report</h1>' == '<h1>Before/after report</h1>'
+E     
+E     - <h1>Before/after report</h1>
+E     ?     ^^ ----- ---
+E     + <h1>Diff report</h1>
+E     ?     ^^
+__ test_r_before_after_report_001_35_1_artifact_lines_use_loaded_a2l_and_mac __
+tests\test_before_after_report.py:1453: in test_r_before_after_report_001_35_1_artifact_lines_use_loaded_a2l_and_mac
+    result, md_text, html_text = _compose_texts(
+tests\test_before_after_report.py:1338: in _compose_texts
+    result = bas.compose_before_after_report(
+E   TypeError: compose_before_after_report() got an unexpected keyword argument 'a2l_data'
+_________ test_r_before_after_report_001_24_1_symbols_from_loaded_a2l _________
+tests\test_before_after_report.py:1482: in test_r_before_after_report_001_24_1_symbols_from_loaded_a2l
+    result, md_text, html_text = _compose_texts(
+tests\test_before_after_report.py:1338: in _compose_texts
+    result = bas.compose_before_after_report(
+E   TypeError: compose_before_after_report() got an unexpected keyword argument 'a2l_records'
+____ test_r_before_after_report_001_24_2_a2l_and_mac_names_share_the_cell _____
+tests\test_before_after_report.py:1499: in test_r_before_after_report_001_24_2_a2l_and_mac_names_share_the_cell
+    result, md_text, html_text = _compose_texts(
+tests\test_before_after_report.py:1338: in _compose_texts
+    result = bas.compose_before_after_report(
+E   TypeError: compose_before_after_report() got an unexpected keyword argument 'a2l_records'
+___________ test_r_before_after_report_001_35_2_bkey_artifact_lines ___________
+tests\test_before_after_report.py:1525: in test_r_before_after_report_001_35_2_bkey_artifact_lines
+    assert match and int(match.group(1)) >= 1, line
+E   AssertionError: - Image A artifacts: summary=none; a2l=absent; mac=absent
+E   assert (None)
+__________________ test_r_cmp_003_2_1_bkey_no_mac_is_absent ___________________
+tests\test_before_after_report.py:1540: in test_r_cmp_003_2_1_bkey_no_mac_is_absent
+    assert "a2l=used" in line, line
+E   AssertionError: - Image A artifacts: summary=none; a2l=absent; mac=absent
+E   assert 'a2l=used' in '- Image A artifacts: summary=none; a2l=absent; mac=absent'
+______________ test_r_before_after_report_001_24_3_bkey_symbols _______________
+tests\test_before_after_report.py:1548: in test_r_before_after_report_001_24_3_bkey_symbols
+    assert "| 0x00000100 | 0x00000102 | 2 | changed | CAL\\_A |" in md_text
+E   AssertionError: assert '| 0x00000100 | 0x00000102 | 2 | changed | CAL\\_A |' in '# Diff report\n\n- Generated (UTC): 2026-11-05T16:09:07.587595+00:00\n- Tool version: 1.0.0rc1\n- Image A: img.s19 [e...            |................|\n0x00000100  AA BB 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|\n```\n'
+______ test_r_before_after_report_001_11_1_no_project_reason_exact_text _______
+tests\test_before_after_report.py:1573: in test_r_before_after_report_001_11_1_no_project_reason_exact_text
+    assert result.diagnostics == [_NO_PROJECT_REASON]
+E   AssertionError: assert ['No active p...ion instead.'] == ['No active p...ion instead.']
+E     
+E     At index 0 diff: 'No active project - the before/after report needs a project reports/ destination; use the manual A<->B Diff report (screen 7) with an explicit destination instead.' != 'No active project - the before/after report needs a project reports/ destination; use the manual A<->B Diff report (key 7) with an explicit destination instead.'
+E     Use -v to get more diff
+_________ test_r_before_after_report_001_11_2_bkey_no_project_status __________
+tests\test_before_after_report.py:1584: in test_r_before_after_report_001_11_2_bkey_no_project_status
+    assert "Before/after report refused: " + _NO_PROJECT_REASON in (
+E   AssertionError: ['Before/after report refused: No active project - the before/after report needs a project reports/ destination; use the manual A<->B Diff report (screen 7) with an explicit destination instead.']
+E   assert ('Before/after report refused: ' + 'No active project - the before/after report needs a project reports/ destination; use the manual A<->B Diff report (key 7) with an explicit destination instead.') in ['Before/after report refused: No active project - the before/after report needs a project reports/ destination; use the manual A<->B Diff report (screen 7) with an explicit destination instead.']
+________________ test_r_cmp_004_14_5_before_after_report_whole ________________
+tests\test_before_after_report.py:1634: in test_r_cmp_004_14_5_before_after_report_whole
+    assert _rows_with_prefix(blocks[0][1], "-") == expected_a
+E   AssertionError: assert ['0x000000C0 .........|', ...] == ['0x000000C0 .........|', ...]
+E     
+E     Right contains 52 more items, first extra item: '0x000020C0  11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11  |................|'
+E     Use -v to get more diff
+________ test_r_cmp_005_16_4_before_after_failed_write_leaves_no_file _________
+tests\test_before_after_report.py:1659: in test_r_cmp_005_16_4_before_after_failed_write_leaves_no_file
+    assert sorted(p.name for p in reports.iterdir()) == []
+E   AssertionError: assert ['20260702T12...er-report.md'] == []
+E     
+E     Left contains 2 more items, first extra item: '20260702T120000Z-before-after-report.html'
+E     Use -v to get more diff
+_______ test_r_cmp_005_17_2_before_after_html_failure_removes_markdown ________
+tests\test_before_after_report.py:1679: in test_r_cmp_005_17_2_before_after_html_failure_removes_markdown
+    assert sorted(p.name for p in reports.iterdir()) == []
+E   AssertionError: assert ['20260702T12...er-report.md'] == []
+E     
+E     Left contains one more item: '20260702T120000Z-before-after-report.md'
+E     Use -v to get more diff
+______ test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden _______
+tests\test_before_after_report.py:908: in test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden
+    assert observed == golden, (
+E   AssertionError: AT-054b: unfiltered md report bytes drifted from golden at054b-before-after-report.md (LLR-054.4 byte-identity, canonical form)
+E   assert b'# Diff repo........|\n```\n' == b'# Before/af........|\n```\n'
+E     
+E     At index 2 diff: b'D' != b'B'
+E     Use -v to get more diff
+______ test_tc311_composer_forwards_matcher_filtered_output_both_formats ______
+tests\test_before_after_report.py:1006: in test_tc311_composer_forwards_matcher_filtered_output_both_formats
+    assert ("cal-filter\\.json" if escaped else "cal-filter.json") in text
+E   AssertionError: assert 'cal-filter\\.json' in '# Diff report\n\n## Report filter applied\n\n- Filter file: cal-filter.json\n- Linkage entries: shown 1 of 2 (hidden ...            |................|\n0x00000100  AA BB 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|\n```\n'
+______ test_tc_038_3_ctl_symbol_renders_identically_in_md_and_html_pair _______
+tests\test_before_after_report.py:601: in test_tc_038_3_ctl_symbol_renders_identically_in_md_and_html_pair
+    assert "CTL\ufffdSYM" in md_text and "CTL\ufffdSYM" in html_text
+E   AssertionError: assert ('CTL�SYM' in '# Diff report\n\n- Generated (UTC): 2026-11-05T16:09:13.003746+00:00\n- Tool version: 1.0.0rc1\n- Image A: img.s19 [e...            |................|\n0x00000100  AA BB 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|\n```\n')
+_________ test_at_054a_bkey_filtered_pair_keeps_match_omits_unmatched _________
+tests\test_tui_report_filter_surface.py:1087: in test_at_054a_bkey_filtered_pair_keeps_match_omits_unmatched
+    assert spelling in text, (
+E   AssertionError: AT-054a: the md header must name the real filter file
+E   assert 'first-byte\\.json' in '# Diff report\r\n\r\n## Report filter applied\r\n\r\n- Filter file: first-byte.json\r\n- Linkage entries: shown 1 of ...      |................|\r\n0x00001000  AA 02 BB 04                                      |................|\r\n```\r\n'
+____________________ test_report_sections_present_in_order ____________________
+tests\test_diff_report_service.py:297: in test_report_sections_present_in_order
+    assert "- Image A: A\\.s19 [external]" in text
+E   AssertionError: assert '- Image A: A\\.s19 [external]' in '# Diff report\n\n- Generated (UTC): 2026-06-11T12:00:00+00:00\n- Tool version: 1.0.0rc1\n- Image A: A.s19 [external] ...            |................|\n0x00000200  05 05                                            |................|\n```\n'
+________________ test_symbol_annotation_only_intersecting_run _________________
+tests\test_diff_report_service.py:431: in test_symbol_annotation_only_intersecting_run
+    assert "| 0x00000100 | 0x00000104 | 4 | changed | INSIDE\\_SYM |" in text
+E   AssertionError: assert '| 0x00000100 | 0x00000104 | 4 | changed | INSIDE\\_SYM |' in '# Diff report\n\n- Generated (UTC): 2026-06-11T12:00:00+00:00\n- Tool version: 1.0.0rc1\n- Image A: A.s19 [external] ...            |................|\n0x00000300  02 02 02 02                                      |................|\n```\n'
+_________ test_default_kwargs_output_byte_identical_pre_change_golden _________
+tests\test_diff_report_service.py:762: in test_default_kwargs_output_byte_identical_pre_change_golden
+    assert md.path.read_bytes() == expected_md.replace(
+E   AssertionError: assert b'# Diff repo....|\r\n```\r\n' == b'# Diff repo....|\r\n```\r\n'
+E     
+E     At index 101 diff: b'.' != b'\\'
+E     Use -v to get more diff
+______________ test_tc313_no_filter_output_byte_identical_todays ______________
+tests\test_diff_report_service.py:1472: in test_tc313_no_filter_output_byte_identical_todays
+    assert omitted.path.read_bytes() == expected_md
+E   AssertionError: assert b'# Diff repo....|\r\n```\r\n' == b'# Diff repo....|\r\n```\r\n'
+E     
+E     At index 101 diff: b'.' != b'\\'
+E     Use -v to get more diff
+_____________ test_provenance_and_linkage_render_in_both_formats ______________
+tests\test_diff_report_service.py:841: in test_provenance_and_linkage_render_in_both_formats
+    assert cal_sym in text
+E   AssertionError: assert 'CAL\\_SYM' in '# Diff report\n\n- Generated (UTC): 2026-06-11T12:00:00+00:00\n- Tool version: 1.0.0rc1\n- Image A: A.s19 [external] ...            |................|\n0x00000100  BB BB BB BB                                      |................|\n```\n'
+_______________ test_pipe_bearing_symbol_md_escaped_html_intact _______________
+tests\test_diff_report_service.py:922: in test_pipe_bearing_symbol_md_escaped_html_intact
+    assert "EVIL\\|SYM\\<b\\>\ufffdEND" in md_text
+E   AssertionError: assert 'EVIL\\|SYM\\<b\\>�END' in '# Diff report\n\n- Generated (UTC): 2026-06-11T12:00:00+00:00\n- Tool version: 1.0.0rc1\n- Image A: A.s19 [external] ...            |................|\n0x00000100  BB BB BB BB                                      |................|\n```\n'
+______ test_tc312_filter_restricts_linkage_and_run_sections_both_formats ______
+tests\test_diff_report_service.py:1273: in test_tc312_filter_restricts_linkage_and_run_sections_both_formats
+    assert "CAL\\_KEEP" in md_text
+E   AssertionError: assert 'CAL\\_KEEP' in '# Diff report\n\n## Report filter applied\n\n- Filter file: cal-filter.json\n- Linkage entries: shown 1 of 2 (hidden ...            |................|\n0x00000140                                                   |................|\n```\n'
+_______________ test_tc312_a9_merged_window_spans_excluded_run ________________
+tests\test_diff_report_service.py:1334: in test_tc312_a9_merged_window_spans_excluded_run
+    assert "EDGE\\_A" in md_text and "EDGE\\_B" in md_text
+E   AssertionError: assert ('EDGE\\_A' in '# Diff report\n\n## Report filter applied\n\n- Filter file: cal-filter.json\n- Linkage entries: shown 2 of 3 (hidden ...B BB BB BB  |................|\n0x00001040  BB BB BB BB BB BB BB BB BB BB BB BB BB BB BB BB  |................|\n```\n')
+______________ test_tc312_audit_header_first_block_fixed_format _______________
+tests\test_diff_report_service.py:1398: in test_tc312_audit_header_first_block_fixed_format
+    assert md_lines[4] == "- Filter file: cal-filter\\.json"
+E   AssertionError: assert '- Filter fil...l-filter.json' == '- Filter fil...filter\\.json'
+E     
+E     - - Filter file: cal-filter\.json
+E     ?                          -
+E     + - Filter file: cal-filter.json
+______________ test_tc318_hostile_filter_name_sanitized_md_html _______________
+tests\test_diff_report_service.py:1432: in test_tc318_hostile_filter_name_sanitized_md_html
+    assert "- Filter file: a\\|b\\`c\\<b\\>\ufffd d\\.json" in md_text
+E   AssertionError: assert '- Filter file: a\\|b\\`c\\<b\\>� d\\.json' in '# Diff report\n\n## Report filter applied\n\n- Filter file: a|b`c<b>d.json\n- Linkage entries: shown 1 of 2 (hidden 1...            |................|\n0x00000140                                                   |................|\n```\n'
+_______ test_at_053b_hostile_valid_filter_proceeds_sanitized_everywhere _______
+tests\test_tui_report_filter_surface.py:967: in test_at_053b_hostile_valid_filter_proceeds_sanitized_everywhere
+    assert "Filter file: \\[boom\\]\\`b\\`\\.json" in md_text, (
+E   AssertionError: the ba-md audit header must carry the ESCAPED hostile filename (R-CMP-004.9.1)
+E   assert 'Filter file: \\[boom\\]\\`b\\`\\.json' in '# Diff report\r\n\r\n## Report filter applied\r\n\r\n- Filter file: [boom]`b`.json\r\n- Linkage entries: shown 1 of 2...      |................|\r\n0x00001000  AA 02 BB 04                                      |................|\r\n```\r\n'
+_______ test_tc717_flow_produced_image_diff_references_all_flow_changes _______
+tests\test_changes_symbol_entries.py:1368: in test_tc717_flow_produced_image_diff_references_all_flow_changes
+    assert "c2\\.json" in refusal_line  # report-safe text (R-CMP-004.9.1)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   assert 'c2\\.json' in "- refused: c2.json @ 0x00001003 [CHG-SYMBOL-UNRESOLVED] entry 0: the symbol 'Ghost' resolves to no tag in the declared A2L — the entry was skipped"
+___________ test_tc_b94_24_a2b_report_states_each_inputs_provenance ___________
+tests\test_flow_a2b_b94.py:397: in test_tc_b94_24_a2b_report_states_each_inputs_provenance
+    assert line_a == _TC_B94_24_FLOW_ARM_PASTE, line_a
+E   AssertionError: - Image A: patch.out [flow] path=`block 2 (patch).out` parse-errors=0
+E   assert '- Image A: p...arse-errors=0' == '- Image A: p...arse-errors=0'
+E     
+E     - - Image A: patch\.out [flow] path=`block 2 (patch).out` parse-errors=0
+E     ?                 -
+E     + - Image A: patch.out [flow] path=`block 2 (patch).out` parse-errors=0
+____________ test_at_056a_dropdown_selection_filters_both_triggers ____________
+tests\test_tui_report_filter_surface.py:383: in test_at_056a_dropdown_selection_filters_both_triggers
+    assert expected_name in filtered_text, (
+E   AssertionError: AT-056a: 20260710T120000Z-before-after-report.md audit header must carry the REAL filename
+E   assert 'only-first\\.json' in '# Diff report\r\n\r\n## Report filter applied\r\n\r\n- Filter file: only-first.json\r\n- Linkage entries: shown 1 of ...      |................|\r\n0x00001000  AA BB 03 04                                      |................|\r\n```\r\n'
+=========================== short test summary info ===========================
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_14_1_markdown_changed_run_whole
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_14_2_html_and_markdown_agree
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_14_3_markdown_window_over_64_kib
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_14_4_html_window_over_64_kib
+FAILED tests/test_diff_report_service.py::test_r_cmp_005_16_1_failed_markdown_write_leaves_no_file
+FAILED tests/test_diff_report_service.py::test_r_cmp_005_16_2_failed_html_write_leaves_no_file
+FAILED tests/test_diff_report_service.py::test_r_cmp_005_16_3_stale_part_file_is_not_touched
+FAILED tests/test_diff_report_service.py::test_r_cmp_005_17_1_ab_html_failure_removes_markdown
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_9_1_1_image_label_and_variant_report_safe
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_9_1_3_runs_symbols_name_by_name
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_9_1_5_flow_attribution_report_safe
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_9_1_6_filter_file_name_report_safe
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_9_1_7_symbol_cut_at_512
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_9_1_10_refusal_message_report_safe
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_9_1_11_diff_report_sinks_inert_under_a_reader
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_9_1_12_c1_and_bidi_visible_in_markdown
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_9_2_1_image_path_text
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_9_2_2_provenance_path_text
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_15_1_html_visible_text_matches_markdown
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_15_2_tab_becomes_one_space_in_both_files
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_15_3_strip_ctl_is_the_shared_visible_text
+FAILED tests/test_diff_report_service.py::test_r_before_after_report_001_21_2_provenance_path_visible
+FAILED tests/test_before_after_report.py::test_r_before_after_report_001_32_1_markdown_title
+FAILED tests/test_before_after_report.py::test_r_before_after_report_001_33_1_html_page_title
+FAILED tests/test_before_after_report.py::test_r_before_after_report_001_34_1_html_heading
+FAILED tests/test_before_after_report.py::test_r_before_after_report_001_35_1_artifact_lines_use_loaded_a2l_and_mac
+FAILED tests/test_before_after_report.py::test_r_before_after_report_001_24_1_symbols_from_loaded_a2l
+FAILED tests/test_before_after_report.py::test_r_before_after_report_001_24_2_a2l_and_mac_names_share_the_cell
+FAILED tests/test_before_after_report.py::test_r_before_after_report_001_35_2_bkey_artifact_lines
+FAILED tests/test_before_after_report.py::test_r_cmp_003_2_1_bkey_no_mac_is_absent
+FAILED tests/test_before_after_report.py::test_r_before_after_report_001_24_3_bkey_symbols
+FAILED tests/test_before_after_report.py::test_r_before_after_report_001_11_1_no_project_reason_exact_text
+FAILED tests/test_before_after_report.py::test_r_before_after_report_001_11_2_bkey_no_project_status
+FAILED tests/test_before_after_report.py::test_r_cmp_004_14_5_before_after_report_whole
+FAILED tests/test_before_after_report.py::test_r_cmp_005_16_4_before_after_failed_write_leaves_no_file
+FAILED tests/test_before_after_report.py::test_r_cmp_005_17_2_before_after_html_failure_removes_markdown
+FAILED tests/test_before_after_report.py::test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden
+FAILED tests/test_before_after_report.py::test_tc311_composer_forwards_matcher_filtered_output_both_formats
+FAILED tests/test_before_after_report.py::test_tc_038_3_ctl_symbol_renders_identically_in_md_and_html_pair
+FAILED tests/test_tui_report_filter_surface.py::test_at_054a_bkey_filtered_pair_keeps_match_omits_unmatched
+FAILED tests/test_diff_report_service.py::test_report_sections_present_in_order
+FAILED tests/test_diff_report_service.py::test_symbol_annotation_only_intersecting_run
+FAILED tests/test_diff_report_service.py::test_default_kwargs_output_byte_identical_pre_change_golden
+FAILED tests/test_diff_report_service.py::test_tc313_no_filter_output_byte_identical_todays
+FAILED tests/test_diff_report_service.py::test_provenance_and_linkage_render_in_both_formats
+FAILED tests/test_diff_report_service.py::test_pipe_bearing_symbol_md_escaped_html_intact
+FAILED tests/test_diff_report_service.py::test_tc312_filter_restricts_linkage_and_run_sections_both_formats
+FAILED tests/test_diff_report_service.py::test_tc312_a9_merged_window_spans_excluded_run
+FAILED tests/test_diff_report_service.py::test_tc312_audit_header_first_block_fixed_format
+FAILED tests/test_diff_report_service.py::test_tc318_hostile_filter_name_sanitized_md_html
+FAILED tests/test_tui_report_filter_surface.py::test_at_053b_hostile_valid_filter_proceeds_sanitized_everywhere
+FAILED tests/test_changes_symbol_entries.py::test_tc717_flow_produced_image_diff_references_all_flow_changes
+FAILED tests/test_flow_a2b_b94.py::test_tc_b94_24_a2b_report_states_each_inputs_provenance
+FAILED tests/test_tui_report_filter_surface.py::test_at_056a_dropdown_selection_filters_both_triggers
+54 failed, 10 passed in 53.24s

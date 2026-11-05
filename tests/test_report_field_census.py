@@ -620,11 +620,24 @@ def test_mode_b_in_a_table_cell_is_still_forbidden_at_every_call_site() -> None:
     cell. The rule is that no `md_code(...)` value may be emitted into a line
     template that contains a `|` column separator.
     """
-    source = (
-        Path(__file__).resolve().parents[1]
-        / "s19_app" / "tui" / "services" / "report_service.py"
-    ).read_text(encoding="utf-8")
+    services = Path(__file__).resolve().parents[1] / "s19_app" / "tui" / "services"
+    offenders = []
+    # batch-101 Inc 7 (R-CMP-004.9.1): the diff report writes paths through
+    # `_md_path` (Mode B); the same rule holds for it.
+    for name in ("report_service.py", "diff_report_service.py"):
+        source = (services / name).read_text(encoding="utf-8")
+        offenders += [
+            f"{name} {where}" for where in _mode_b_cell_offenders(source)
+        ]
+    assert not offenders, (
+        "md_code (Mode B) is emitted into a table-row template, where a raw "
+        f"pipe in its value still splits the cell: {offenders}"
+    )
 
+
+def _mode_b_cell_offenders(source: str) -> list:
+    """Line numbers of f-strings that hold a ``|`` column separator AND call a
+    Mode-B writer (`md_code` or the diff report's `_md_path`)."""
     offenders = []
     for node in ast.walk(ast.parse(source)):
         if not isinstance(node, ast.JoinedStr):
@@ -641,12 +654,19 @@ def test_mode_b_in_a_table_cell_is_still_forbidden_at_every_call_site() -> None:
             for inner in ast.walk(part.value):
                 if (isinstance(inner, ast.Call)
                         and isinstance(inner.func, ast.Name)
-                        and inner.func.id == "md_code"):
+                        and inner.func.id in {"md_code", "_md_path"}):
                     offenders.append(f"line {node.lineno}")
-    assert not offenders, (
-        "md_code (Mode B) is emitted into a table-row template, where a raw "
-        f"pipe in its value still splits the cell: {offenders}"
-    )
+    return offenders
+
+
+def test_mode_b_cell_guard_flags_a_planted_cell() -> None:
+    """The counterfactual of the guard above: a table-row template that calls
+    `_md_path` or `md_code` IS flagged, a path line outside a table is not, so
+    the extended guard can fail."""
+    planted = 'row = f"| {_md_path(p)} | {x} |"\nother = f"| {md_code(p)} |"\n'
+    assert len(_mode_b_cell_offenders(planted)) == 2
+    clean = 'line = f"- Original image: `{_md_path(p)}`"\n'
+    assert _mode_b_cell_offenders(clean) == []
 
 
 # --------------------------------------------------------------------------- #

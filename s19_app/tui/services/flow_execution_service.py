@@ -971,19 +971,17 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                             )
                             side_failed = True
                             break
-                        # HLR-016: the report identity is file-derived — the
-                        # bare label rides the escaper (Mode A) and the path
-                        # rides the code-span form (Mode B, the truth table).
-                        # Both are IDENTITY on clean values, so the external
-                        # arm keeps the producer's established emitted form
-                        # (C-42 paste, TC-B94-24); flow-arm values are
+                        # HLR-016: the report identity is file-derived. It
+                        # goes RAW to the generator, which is the one escaper
+                        # (Inc 7, R-CMP-004.9.1/.9.2): escaping here too would
+                        # write the label twice escaped. Flow-arm values are
                         # model-derived vocabulary and need no scrub.
                         sides.append(
                             (
                                 loaded_side.mem_map or {},
-                                md_safe(path.stem, limit=120),
+                                path.stem,
                                 SOURCE_EXTERNAL,
-                                md_code(str(path)),
+                                str(path),
                                 len(getattr(loaded_side, "errors", None) or []),
                             )
                         )

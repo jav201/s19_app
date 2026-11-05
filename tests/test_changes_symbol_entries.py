@@ -1365,7 +1365,7 @@ def test_tc717_flow_produced_image_diff_references_all_flow_changes(
     refusal_line = next(
         ln for ln in section.splitlines() if ln.startswith("- refused:")
     )
-    assert "c2.json" in refusal_line
+    assert "c2\\.json" in refusal_line  # report-safe text (R-CMP-004.9.1)
     assert "CHG-SYMBOL-UNRESOLVED" in refusal_line
     assert "'Ghost'" in refusal_line, "the named refusal names the symbol"
     assert ": no flow change" not in section, (

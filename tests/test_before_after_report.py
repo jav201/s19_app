@@ -571,8 +571,10 @@ def test_tc_038_3_ctl_symbol_renders_identically_in_md_and_html_pair(
 
     Intent: the increment-3 reviewer recommendation — ``_strip_ctl`` factored
     out of ``_md_cell`` and applied inside the two before/after HTML helpers:
-    the md and html files render the same ctl-stripped symbol, and the raw
-    control character reaches neither file.
+    the md and html files render the same symbol, and the raw control
+    character reaches neither file. batch-101 Inc 7 (R-BEFORE-AFTER-REPORT-
+    001.21, changed): the control character is no longer removed, it is
+    replaced by a visible U+FFFD in BOTH files.
     """
     bas = _bas()
     project_dir = tmp_path / "proj"
@@ -596,7 +598,8 @@ def test_tc_038_3_ctl_symbol_renders_identically_in_md_and_html_pair(
     md_text = result.md_path.read_text(encoding="utf-8")
     html_text = result.html_path.read_text(encoding="utf-8")
     assert "\x01" not in md_text and "\x01" not in html_text
-    assert "CTLSYM" in md_text and "CTLSYM" in html_text
+    assert "CTL\ufffdSYM" in md_text and "CTL\ufffdSYM" in html_text
+    assert "CTLSYM" not in md_text and "CTLSYM" not in html_text
 
 
 # ===========================================================================
@@ -994,11 +997,15 @@ def test_tc311_composer_forwards_matcher_filtered_output_both_formats(
     assert result.written, result.diagnostics
     md_text = result.md_path.read_text(encoding="utf-8")
     html_text = result.html_path.read_text(encoding="utf-8")
-    for text in (md_text, html_text):
+    # batch-101 Inc 7 (R-CMP-004.9.1): the Markdown file writes the filter
+    # name and the symbols as report-safe text; the HTML file keeps the raw
+    # spelling (R-CMP-004.8). Every negative checks BOTH spellings (F-E3-2).
+    for text, spelling in ((md_text, "md"), (html_text, "html")):
+        escaped = spelling == "md"
         assert "Report filter applied" in text
-        assert "cal-filter.json" in text
-        assert "CAL_KEEP" in text
-        assert "OTHER_DROP" not in text
+        assert ("cal-filter\\.json" if escaped else "cal-filter.json") in text
+        assert ("CAL\\_KEEP" if escaped else "CAL_KEEP") in text
+        assert "OTHER_DROP" not in text and "OTHER\\_DROP" not in text
 
 
 def test_tc311_no_filter_generator_kwargs_shape_is_todays(
@@ -1292,3 +1299,390 @@ def test_tc330_before_after_row_reveal_hide_state_machine(
     assert outcomes["routed_calls"] == 1, (
         "TC-330: pressing the button must invoke action_before_after_report once"
     )
+
+
+# ===========================================================================
+# batch-101 Inc 7 - the before/after report names itself and its inputs
+# (F-42), carries whole hex windows (F6-1), writes atomically (S-3).
+# Written from the approved requirements and test cases only (independent
+# tester). Expected values are literals spelled out from the requirement text.
+# ===========================================================================
+
+#: The canon text of R-BEFORE-AFTER-REPORT-001.11 (the no-project refusal).
+_NO_PROJECT_REASON = (
+    "No active project - the before/after report needs a project reports/ "
+    "destination; use the manual A<->B Diff report (key 7) with an explicit "
+    "destination instead."
+)
+
+#: A 2-tag A2L payload: CAL_A at 0x100 (inside the 16-byte test image) and
+#: CAL_B at 0x9000 (outside it).
+_TWO_TAG_A2L = {
+    "sections": [],
+    "errors": [],
+    "tags": [
+        {"name": "CAL_A", "address": 0x100, "length": 1},
+        {"name": "CAL_B", "address": 0x9000, "length": 1},
+    ],
+}
+
+
+def _compose_texts(tmp_path: Path, **kwargs) -> tuple:
+    """Run the composer over the standard fixture; return ``(result,
+    md_text, html_text)`` (texts are ``""`` when nothing was written)."""
+    bas = _bas()
+    project_dir = tmp_path / "proj"
+    project_dir.mkdir(exist_ok=True)
+    original = _make_s19_image(tmp_path)
+    patched = _make_s19_image(project_dir, name="img-patched.s19", patched=True)
+    result = bas.compose_before_after_report(
+        _summary(saved_path=patched, source_image_path=original),
+        original,
+        project_dir=project_dir,
+        workarea=tmp_path / "wa",
+        now_fn=_fixed_clock,
+        **kwargs,
+    )
+    if not result.written:
+        return result, "", ""
+    return (
+        result,
+        result.md_path.read_text(encoding="utf-8"),
+        result.html_path.read_text(encoding="utf-8"),
+    )
+
+
+def _drive_bkey_texts(
+    tmp_path: Path, *, a2l_tags=None, project: bool = True
+) -> dict:
+    """Drive the shipped chain (load, apply, confirm save-back, key ``b``)
+    and return the written ``{file name: text}`` pairs, the captured status
+    lines and every before/after file found anywhere under ``tmp_path``.
+    ``a2l_tags`` loads an A2L payload with those tags; ``project=False``
+    leaves no project open."""
+    from textual.widgets import Button
+
+    image_path = _make_s19_image(tmp_path)
+
+    async def _drive() -> dict:
+        app = S19TuiApp(base_dir=tmp_path)
+        project_dir = tmp_path / ".s19tool" / "workarea" / "proj"
+        reports_dir = project_dir / "reports"
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            if project:
+                project_dir.mkdir(parents=True, exist_ok=True)
+                app.current_project = "proj"
+            _load_image(app, image_path)
+            if a2l_tags is not None:
+                app.current_a2l_data = {
+                    "sections": [], "errors": [], "tags": list(a2l_tags),
+                }
+            app.action_show_screen("patch")
+            await pilot.pause()
+            await _drive_apply(app, pilot)
+            app.query_one("#patch_saveback_confirm_button", Button).press()
+            await pilot.pause()
+            statuses = _statuses(app)
+            app.set_focus(None)
+            await pilot.press("b")
+            await app.workers.wait_for_complete()
+            await pilot.pause()
+            files = {}
+            if reports_dir.is_dir():
+                files = {
+                    p.name: p.read_text(encoding="utf-8")
+                    for p in reports_dir.iterdir()
+                    if p.is_file()
+                }
+            return {
+                "files": files,
+                "statuses": list(statuses),
+                "found": sorted(
+                    p.name for p in tmp_path.rglob("*-before-after-report.*")
+                ),
+            }
+
+    return asyncio.run(_drive())
+
+
+def _bkey_md(outcome: dict) -> str:
+    names = [n for n in outcome["files"] if n.endswith(".md")]
+    assert len(names) == 1, (sorted(outcome["files"]), outcome["statuses"])
+    return outcome["files"][names[0]]
+
+
+# ----- F-42: the title ------------------------------------------------------
+
+
+def test_r_before_after_report_001_32_1_markdown_title(tmp_path: Path) -> None:
+    """The composer's Markdown file starts with ``# Before/after report``."""
+    result, md_text, _ = _compose_texts(tmp_path)
+    assert result.written, result.diagnostics
+    assert md_text.splitlines()[0] == "# Before/after report"
+    assert "# Diff report" not in md_text
+
+
+def test_r_before_after_report_001_33_1_html_page_title(tmp_path: Path) -> None:
+    """The HTML head holds exactly one ``<title>Before/after report</title>``
+    and no ``<title>Diff report</title>``."""
+    result, _, html_text = _compose_texts(tmp_path)
+    assert result.written, result.diagnostics
+    assert html_text.count("<title>Before/after report</title>") == 1
+    assert html_text.count("<title>Diff report</title>") == 0
+
+
+def test_r_before_after_report_001_34_1_html_heading(tmp_path: Path) -> None:
+    """The first ``<h1>`` of the HTML file is ``Before/after report``."""
+    result, _, html_text = _compose_texts(tmp_path)
+    assert result.written, result.diagnostics
+    h1_lines = [ln for ln in html_text.splitlines() if ln.startswith("<h1>")]
+    assert h1_lines[0] == "<h1>Before/after report</h1>"
+    assert "<h1>Diff report</h1>" not in html_text
+
+
+# ----- F-42: the artifact lines and the Symbols column ----------------------
+
+
+def test_r_before_after_report_001_35_1_artifact_lines_use_loaded_a2l_and_mac(
+    tmp_path: Path,
+) -> None:
+    """With the loaded A2L and MAC handed to the composer, both images'
+    artifact lines read ``summary=both; a2l=used (1/2); mac=used (1/1)`` in
+    both files (2/2 lines each)."""
+    result, md_text, html_text = _compose_texts(
+        tmp_path,
+        a2l_data=_TWO_TAG_A2L,
+        a2l_records=[{"name": "CAL_A", "address": 0x100}],
+        mac_records=[{"name": "CAL_M", "address": 0x102}],
+    )
+    assert result.written, result.diagnostics
+    tail = "summary=both; a2l=used (1/2); mac=used (1/1)"
+    for who in ("A", "B"):
+        assert f"- Image {who} artifacts: {tail}" in md_text.splitlines()
+        assert f"<li>Image {who} artifacts: {tail}</li>" in html_text.splitlines()
+
+
+def test_r_cmp_003_2_2_composer_without_a2l_is_absent(tmp_path: Path) -> None:
+    """Nothing loaded: both artifact lines of both files read ``a2l=absent;
+    mac=absent`` (an absent artifact is not an unused one)."""
+    result, md_text, html_text = _compose_texts(tmp_path)
+    assert result.written, result.diagnostics
+    tail = "summary=none; a2l=absent; mac=absent"
+    for who in ("A", "B"):
+        assert f"- Image {who} artifacts: {tail}" in md_text.splitlines()
+        assert f"<li>Image {who} artifacts: {tail}</li>" in html_text.splitlines()
+
+
+def test_r_before_after_report_001_24_1_symbols_from_loaded_a2l(
+    tmp_path: Path,
+) -> None:
+    """The run row of the patched bytes names the A2L tag whose address lies
+    in the run: Markdown ``CAL\\_A`` (escaped), HTML ``CAL_A``."""
+    result, md_text, html_text = _compose_texts(
+        tmp_path, a2l_records=[{"name": "CAL_A", "address": 0x100}]
+    )
+    assert result.written, result.diagnostics
+    assert "| 0x00000100 | 0x00000102 | 2 | changed | CAL\\_A |" in md_text
+    html_row = next(
+        ln for ln in html_text.splitlines() if "<td>0x00000100</td>" in ln
+        and "changed" in ln
+    )
+    assert html_row.endswith("<td>CAL_A</td></tr>")
+
+
+def test_r_before_after_report_001_24_2_a2l_and_mac_names_share_the_cell(
+    tmp_path: Path,
+) -> None:
+    """A tag and a MAC record that both lie in the run are listed in one
+    cell, A2L first."""
+    result, md_text, html_text = _compose_texts(
+        tmp_path,
+        a2l_records=[{"name": "CAL_A", "address": 0x100}],
+        mac_records=[{"name": "CAL_M", "address": 0x101}],
+    )
+    assert result.written, result.diagnostics
+    assert (
+        "| 0x00000100 | 0x00000102 | 2 | changed | CAL\\_A, CAL\\_M |" in md_text
+    )
+    assert "<td>CAL_A, CAL_M</td>" in html_text
+
+
+def test_r_before_after_report_001_35_2_bkey_artifact_lines(
+    tmp_path: Path,
+) -> None:
+    """Key ``b`` with an A2L loaded: both Markdown artifact lines read
+    ``a2l=used (k/2)`` with k >= 1, n = 2 being the loaded A2L's tags with an
+    address (the composer is fed the session's A2L)."""
+    outcome = _drive_bkey_texts(tmp_path, a2l_tags=_TWO_TAG_A2L["tags"])
+    md_text = _bkey_md(outcome)
+    for who in ("A", "B"):
+        line = next(
+            ln for ln in md_text.splitlines()
+            if ln.startswith(f"- Image {who} artifacts:")
+        )
+        match = re.search(r"a2l=used \((\d+)/2\)", line)
+        assert match and int(match.group(1)) >= 1, line
+
+
+def test_r_cmp_003_2_1_bkey_no_mac_is_absent(tmp_path: Path) -> None:
+    """Key ``b`` with an A2L but no MAC file loaded: both artifact lines read
+    ``mac=absent`` (never ``mac=unused (0/0)``) while the A2L is used."""
+    outcome = _drive_bkey_texts(tmp_path, a2l_tags=_TWO_TAG_A2L["tags"])
+    md_text = _bkey_md(outcome)
+    lines = [
+        ln for ln in md_text.splitlines() if "artifacts: summary=" in ln
+    ]
+    assert len(lines) == 2, lines
+    for line in lines:
+        assert "mac=absent" in line, line
+        assert "mac=unused" not in line, line
+        assert "a2l=used" in line, line
+
+
+def test_r_before_after_report_001_24_3_bkey_symbols(tmp_path: Path) -> None:
+    """Key ``b`` with an A2L loaded: the Symbols cell of the run that holds
+    the tag's address names it."""
+    outcome = _drive_bkey_texts(tmp_path, a2l_tags=_TWO_TAG_A2L["tags"])
+    md_text = _bkey_md(outcome)
+    assert "| 0x00000100 | 0x00000102 | 2 | changed | CAL\\_A |" in md_text
+
+
+# ----- R-BEFORE-AFTER-REPORT-001.11: the exact no-project reason ------------
+
+
+def test_r_before_after_report_001_11_1_no_project_reason_exact_text(
+    tmp_path: Path,
+) -> None:
+    """No project open: the composer refuses with exactly the canon reason
+    and writes nothing."""
+    bas = _bas()
+    workarea = tmp_path / ".s19tool" / "workarea"
+    workarea.mkdir(parents=True)
+    original = _make_s19_image(tmp_path)
+    patched = _make_s19_image(workarea, name="img-patched.s19", patched=True)
+
+    result = bas.compose_before_after_report(
+        _summary(saved_path=patched, source_image_path=original),
+        original,
+        project_dir=None,
+        workarea=workarea,
+    )
+
+    assert result.written is False
+    assert result.diagnostics == [_NO_PROJECT_REASON]
+    assert list(tmp_path.rglob("*-before-after-report.*")) == []
+
+
+def test_r_before_after_report_001_11_2_bkey_no_project_status(
+    tmp_path: Path,
+) -> None:
+    """Key ``b`` with no project open: the status is ``Before/after report
+    refused: `` followed by the whole canon reason, and no report file
+    exists anywhere."""
+    outcome = _drive_bkey_texts(tmp_path, project=False)
+    assert "Before/after report refused: " + _NO_PROJECT_REASON in (
+        outcome["statuses"]
+    ), outcome["statuses"]
+    assert outcome["found"] == []
+
+
+# ----- R-CMP-004.14/5: the before/after report is whole too -----------------
+
+
+def test_r_cmp_004_14_5_before_after_report_whole(tmp_path: Path) -> None:
+    """A fully changed 8,960-byte run (0x100 .. 0x23FF): window 0xC0 .. 0x2400
+    holds 564 rows in the diff block (``-`` and ``+``), in the A block and in
+    the B block of the Markdown file and in both HTML panes, with no cap
+    line in either file."""
+    from tests.test_diff_report_service import (
+        _cap_lines, _html_pre_blocks, _md_fences, _oracle_rows,
+        _rows_with_prefix,
+    )
+
+    bas = _bas()
+    project_dir = tmp_path / "proj"
+    project_dir.mkdir()
+    length = 0x2300
+    before = {0x100 + i: 0x11 for i in range(length)}
+    after = {0x100 + i: 0x22 for i in range(length)}
+    original = tmp_path / "big.s19"
+    original.write_text(
+        emit_s19_from_mem_map(before, [(0x100, 0x100 + length)]), encoding="ascii"
+    )
+    patched = project_dir / "big-patched.s19"
+    patched.write_text(
+        emit_s19_from_mem_map(after, [(0x100, 0x100 + length)]), encoding="ascii"
+    )
+
+    result = bas.compose_before_after_report(
+        _summary(saved_path=patched, source_image_path=original),
+        original,
+        project_dir=project_dir,
+        workarea=tmp_path / "wa",
+        now_fn=_fixed_clock,
+    )
+
+    assert result.written, result.diagnostics
+    md_text = result.md_path.read_text(encoding="utf-8")
+    html_text = result.html_path.read_text(encoding="utf-8")
+    expected_a = _oracle_rows(before, 0xC0, 0x2400)
+    expected_b = _oracle_rows(after, 0xC0, 0x2400)
+    assert len(expected_a) == 564
+    blocks = _md_fences(md_text)
+    assert [opener for opener, _ in blocks] == ["```diff", "```text", "```text"]
+    assert _rows_with_prefix(blocks[0][1], "-") == expected_a
+    assert _rows_with_prefix(blocks[0][1], "+") == expected_b
+    assert blocks[1][1] == expected_a
+    assert blocks[2][1] == expected_b
+    panes = _html_pre_blocks(html_text)
+    assert [len(p) for p in panes] == [564, 564]
+    assert _cap_lines(md_text) == [] and _cap_lines(html_text) == []
+
+
+# ----- R-CMP-005.16 / .17: the composer leaves no partial or orphan file ----
+
+
+def test_r_cmp_005_16_4_before_after_failed_write_leaves_no_file(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The composer's HTML write failing half way: the error propagates and
+    ``reports/`` holds no ``.md``, no ``.html`` and no ``.part`` file."""
+    from tests.test_diff_report_service import _inject_half_write
+
+    hit = _inject_half_write(monkeypatch, "-before-after-report.html")
+    with pytest.raises(OSError, match="disk full"):
+        _compose_texts(tmp_path)
+
+    assert hit, "the injected failure was never reached (write path changed)"
+    reports = tmp_path / "proj" / "reports"
+    assert sorted(p.name for p in reports.iterdir()) == []
+
+
+def test_r_cmp_005_17_2_before_after_html_failure_removes_markdown(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The HTML generator raising, then refusing, after the Markdown file was
+    written: the raise propagates / the refusal is returned, and in both
+    arms no ``-before-after-report.md`` is left."""
+    from s19_app.tui.services.diff_report_service import DiffReportResult
+
+    bas = _bas()
+    reports = tmp_path / "proj" / "reports"
+
+    def _raising(*_a, **_k):
+        raise RuntimeError("x")
+
+    monkeypatch.setattr(bas, "generate_diff_report_html", _raising)
+    with pytest.raises(RuntimeError, match="x"):
+        _compose_texts(tmp_path)
+    assert sorted(p.name for p in reports.iterdir()) == []
+
+    def _refusing(*_a, **_k):
+        return DiffReportResult(path=None, written=False, diagnostics=["nope"])
+
+    monkeypatch.setattr(bas, "generate_diff_report_html", _refusing)
+    result, _, _ = _compose_texts(tmp_path)
+    assert result.written is False
+    assert "nope" in " ".join(result.diagnostics)
+    assert sorted(p.name for p in reports.iterdir()) == []

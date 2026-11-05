@@ -77,6 +77,7 @@ public example data exclusively.
 from __future__ import annotations
 
 import html
+import os
 import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -101,9 +102,10 @@ from ..changes.display import format_memory_value
 from ..changes.model import DISPOSITION_APPLIED
 from ..changes.model import ChangeDocument
 from .flow_model import FlowChangeRecord, FlowRefusal, FlowRunResult
-from ...render.hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
-from .markdown_safety import MD_ESCAPE, md_safe
+from ...render.hexview import HEX_WIDTH
+from .markdown_safety import MD_ESCAPE, _normalise, md_code, md_safe
 from .report_service import (
+    REPORT_CELL_CHARS,
     REPORT_CONTEXT_BYTES_DEFAULT,
     REPORT_TIMESTAMP_FORMAT,
     REPORTS_DIR_NAME,
@@ -237,29 +239,111 @@ class BeforeAfterProvenance:
 def _strip_ctl(value: object) -> str:
     """
     Summary:
-        Strip control characters (``ord < 0x20`` — which covers the
-        row-breaking ``\\n``/``\\r`` — plus ``0x7F``) from one parsed-artifact
-        value (S-F2, LLR-038.1). Shared by the Markdown cell pipeline and the
-        two before/after HTML helpers so a ctl-bearing symbol renders
-        identically in BOTH written formats (increment-3 review
-        recommendation); ``_esc`` escapes markup but does not strip.
+        Return the visible text of one parsed-artifact value (R-CMP-004.15,
+        R-BEFORE-AFTER-REPORT-001.21): tab, CR and LF each become one space and
+        every character of Unicode category Cc, Cf, Cs, Zl or Zp becomes
+        U+FFFD. Shared by the Markdown cell pipeline and the HTML helpers so a
+        control-bearing symbol renders identically in BOTH written formats;
+        ``_esc`` escapes markup but does not replace. The private
+        ``markdown_safety._normalise`` is imported on purpose (one definition of
+        the dropped categories, pinned by ``tests/test_report_markup_safety.py``).
 
     Args:
         value (object): The raw value (symbol, path, entry field); rendered
             via ``str()``.
 
     Returns:
-        str: The text with every control character removed.
+        str: The visible text.
 
     Dependencies:
+        Uses:
+            - markdown_safety._normalise
         Used by:
             - _md_cell
+            - _html_header
+            - _html_run_rows
             - _html_provenance
             - _html_linkage
     """
-    return "".join(
-        ch for ch in str(value) if ord(ch) >= 0x20 and ord(ch) != 0x7F
-    )
+    return _normalise(str(value))
+
+
+def _md_text(value: object, limit: int = REPORT_CELL_CHARS) -> str:
+    """
+    Summary:
+        Write one label field (or refusal message, ``limit=500``) as S12
+        report-safe text: visible-text steps, cut at ``limit``, escaped
+        (R-CMP-004.9.1). The caller passes the RAW value (I-3).
+
+    Args:
+        value (object): The raw label, symbol, document reference or message.
+        limit (int): Field limit (512 default; 500 for a refusal message).
+
+    Returns:
+        str: Markdown-inert text.
+
+    Dependencies:
+        Uses:
+            - markdown_safety.md_safe
+    """
+    return md_safe(value, limit=limit)
+
+
+def _md_path(value: object) -> str:
+    """
+    Summary:
+        Write one path field as S12 path text (R-CMP-004.9.2): visible-text
+        steps, a backtick becomes U+FFFD, nothing escaped or cut. The caller
+        writes the two surrounding backticks.
+
+    Args:
+        value (object): The raw path.
+
+    Returns:
+        str: Text safe inside a code span.
+
+    Dependencies:
+        Uses:
+            - markdown_safety.md_code
+    """
+    return md_code(value)
+
+
+def _write_report(target: Path, text: str) -> None:
+    """
+    Summary:
+        Write a report file whole or not at all (R-CMP-005.16): the text goes to
+        ``<target>.part`` (exclusive create, UTF-8) and ``os.replace`` moves it
+        onto ``target``. On any exception after the exclusive open succeeded
+        the ``.part`` file is removed and the error re-raised. A ``.part`` file
+        this run did not create stays in place and ``FileExistsError``
+        propagates.
+
+    Args:
+        target (Path): Final report path.
+        text (str): The whole report text.
+
+    Returns:
+        None
+
+    Raises:
+        OSError: Any write or rename failure (``FileExistsError`` when a
+            ``.part`` file already exists).
+
+    Dependencies:
+        Used by:
+            - generate_diff_report
+            - generate_diff_report_html
+    """
+    part = target.with_name(target.name + ".part")
+    handle = open(part, "x", encoding="utf-8")
+    try:
+        with handle:
+            handle.write(text)
+        os.replace(part, target)
+    except BaseException:
+        part.unlink(missing_ok=True)
+        raise
 
 
 def _md_cell(value: object) -> str:
@@ -506,7 +590,7 @@ def _audit_header_lines(
     lines = [
         "## Report filter applied",
         "",
-        f"- Filter file: {_strip_ctl(filter_name)}",
+        f"- Filter file: {_md_text(filter_name)}",
     ]
     if linkage_counts is not None:
         shown, total = linkage_counts
@@ -529,7 +613,8 @@ def _provenance_lines(provenance: BeforeAfterProvenance) -> List[str]:
     Summary:
         Build the Markdown before/after provenance header section
         (LLR-038.1): original path, saved (post-dedup) path, apply instant,
-        and change-document origin. Values pass :func:`_md_cell` (S-F2).
+        and change-document origin. Paths pass :func:`_md_path`, the instant
+        :func:`_md_cell` (S-F2).
 
     Args:
         provenance (BeforeAfterProvenance): The composer-built identities.
@@ -544,15 +629,15 @@ def _provenance_lines(provenance: BeforeAfterProvenance) -> List[str]:
             - generate_diff_report
     """
     doc = (
-        f"`{_md_cell(provenance.change_doc_path)}`"
+        f"`{_md_path(provenance.change_doc_path)}`"
         if provenance.change_doc_path is not None
         else "(in-memory document)"
     )
     return [
         "## Before/after provenance",
         "",
-        f"- Original image (before): `{_md_cell(provenance.original_path)}`",
-        f"- Saved patched image (after): `{_md_cell(provenance.saved_path)}`",
+        f"- Original image (before): `{_md_path(provenance.original_path)}`",
+        f"- Saved patched image (after): `{_md_path(provenance.saved_path)}`",
         f"- Applied (UTC): {_md_cell(provenance.applied_at_utc)}",
         f"- Change document: {doc}",
         "",
@@ -602,7 +687,7 @@ def _linkage_table_lines(
         # linkage — attribution names the symbol when present, the address
         # always (the Start/End columns).
         entry_symbol = entry.symbol or entry.linkage_symbol
-        symbol = _md_cell(entry_symbol) if entry_symbol is not None else "-"
+        symbol = _md_text(entry_symbol) if entry_symbol is not None else "-"
         lines.append(
             f"| {index} | {_md_cell(entry.entry_type)} "
             f"| 0x{entry.address_start:08X} | 0x{entry.address_end:08X} "
@@ -829,6 +914,39 @@ def _artifact_addresses_with_names(
     return pairs
 
 
+def _run_symbol_names(
+    run: DiffRun, symbol_addresses: Sequence[Tuple[int, str]]
+) -> List[str]:
+    """
+    Summary:
+        The names of every artifact symbol whose address lies in
+        ``[run.start, run.end)``, in ``symbol_addresses`` order (LLR-004.4,
+        R-CMP-004.5, R-BEFORE-AFTER-REPORT-001.24); empty when none.
+
+    Args:
+        run (DiffRun): The differing run.
+        symbol_addresses (Sequence[Tuple[int, str]]): ``(address, name)`` pairs.
+
+    Returns:
+        List[str]: The matching names.
+
+    Dependencies:
+        Uses:
+            - build_sorted_range_index / address_in_sorted_ranges
+        Used by:
+            - _annotate_run
+            - _run_table_lines
+    """
+    if not symbol_addresses:
+        return []
+    index = build_sorted_range_index([(run.start, run.end)])
+    return [
+        name
+        for addr, name in symbol_addresses
+        if address_in_sorted_ranges(addr, index)
+    ]
+
+
 def _annotate_run(
     run: DiffRun, symbol_addresses: Sequence[Tuple[int, str]]
 ) -> str:
@@ -861,23 +979,15 @@ def _annotate_run(
             - _run_table_lines
             - _html_run_rows
     """
-    if not symbol_addresses:
-        return "-"
-    index = build_sorted_range_index([(run.start, run.end)])
-    names = [
-        name
-        for addr, name in symbol_addresses
-        if address_in_sorted_ranges(addr, index)
-    ]
-    return ", ".join(names) if names else "-"
+    return ", ".join(_run_symbol_names(run, symbol_addresses)) or "-"
 
 
 def _image_line(label: str, image) -> str:
     """Render one image-identity header bullet (label, source, path, errors)."""
-    variant = f" variant={image.variant_id}" if image.variant_id else ""
+    variant = f" variant={_md_text(image.variant_id)}" if image.variant_id else ""
     return (
-        f"- Image {label}: {image.label or '(unnamed)'} "
-        f"[{image.source_kind}{variant}] path=`{image.path}` "
+        f"- Image {label}: {_md_text(image.label) if image.label else '(unnamed)'} "
+        f"[{image.source_kind}{variant}] path=`{_md_path(image.path)}` "
         f"parse-errors={image.parse_error_count}"
     )
 
@@ -899,7 +1009,7 @@ def _usage_line(label: str, usage) -> str:
 
 
 def _header_lines(
-    comparison: ComparisonResult, generated_at: datetime
+    comparison: ComparisonResult, generated_at: datetime, title: str
 ) -> List[str]:
     """
     Summary:
@@ -910,6 +1020,7 @@ def _header_lines(
     Args:
         comparison (ComparisonResult): The completed comparison.
         generated_at (datetime): The clock's generation instant.
+        title (str): First-line title (R-BEFORE-AFTER-REPORT-001.32).
 
     Returns:
         List[str]: Markdown lines, trailing blank included.
@@ -919,7 +1030,7 @@ def _header_lines(
             - generate_diff_report
     """
     return [
-        "# Diff report",
+        f"# {title}",
         "",
         f"- Generated (UTC): {generated_at.isoformat()}",
         f"- Tool version: {__version__}",
@@ -990,7 +1101,7 @@ def _run_table_lines(
 
     Dependencies:
         Uses:
-            - _annotate_run
+            - _run_symbol_names / _md_text
         Used by:
             - generate_diff_report
     """
@@ -1006,10 +1117,12 @@ def _run_table_lines(
         ]
     )
     for run in runs:
+        names = _run_symbol_names(run, symbol_addresses)
+        symbols = ", ".join(_md_text(name) for name in names) or "-"
         lines.append(
             f"| 0x{run.start:08X} | 0x{run.end:08X} | {run.length} "
             f"| {_kind_label(run.kind)} "
-            f"| {_annotate_run(run, symbol_addresses)} |"
+            f"| {symbols} |"
         )
     lines.append("")
     return lines
@@ -1152,7 +1265,7 @@ def _flow_change_attribution_lines(
             ]
         )
         for record in attribution.records:
-            symbol_cell = _md_cell(record.symbol) if record.symbol else "-"
+            symbol_cell = _md_text(record.symbol) if record.symbol else "-"
             produced = _record_produced_runs(record, runs)
             if produced:
                 runs_cell = ", ".join(
@@ -1163,7 +1276,7 @@ def _flow_change_attribution_lines(
             else:
                 runs_cell = "—"
             lines.append(
-                f"| {_md_cell(record.change_doc_ref)} | {symbol_cell} "
+                f"| {_md_text(record.change_doc_ref)} | {symbol_cell} "
                 f"| 0x{record.address_start:08X} "
                 f"| {record.address_end - record.address_start} "
                 f"| {_md_cell(record.disposition)} | {runs_cell} |"
@@ -1181,15 +1294,15 @@ def _flow_change_attribution_lines(
         )
     for refusal in attribution.refusals:
         symbol_part = (
-            f" symbol '{_md_cell(refusal.symbol)}'" if refusal.symbol else ""
+            f" symbol '{_md_text(refusal.symbol)}'" if refusal.symbol else ""
         )
         address_part = (
             f" @ 0x{refusal.address:08X}" if refusal.address is not None else ""
         )
         lines.append(
-            f"- refused: {_md_cell(refusal.change_doc_ref)}{symbol_part}"
+            f"- refused: {_md_text(refusal.change_doc_ref)}{symbol_part}"
             f"{address_part} [{_md_cell(refusal.code)}] "
-            f"{_md_cell(refusal.message)}"
+            f"{_md_text(refusal.message, 500)}"
         )
     if unattributed or attribution.refusals:
         lines.append("")
@@ -1240,7 +1353,7 @@ def flow_change_census_complete(
         # where the next entry starts), so the identity check pins the row's
         # own Change-document and Address CELLS.
         address_cell = f"0x{record.address_start:08X}"
-        doc_cell = _md_cell(record.change_doc_ref)
+        doc_cell = _md_text(record.change_doc_ref)
         if not any(
             doc_cell in row
             and address_cell in [cell.strip() for cell in row.split("|")]
@@ -1248,7 +1361,7 @@ def flow_change_census_complete(
         ):
             return False
     for refusal in attribution.refusals:
-        if _md_cell(refusal.change_doc_ref) not in body:
+        if _md_text(refusal.change_doc_ref) not in body:
             return False
         if f"[{_md_cell(refusal.code)}]" not in body:
             return False
@@ -1259,9 +1372,10 @@ def _window_rows(mem_map: Dict[int, int], low: int, high: int) -> List[str]:
     """
     Summary:
         Render the plain-string hex+ASCII rows for the window ``[low, high)`` of
-        ``mem_map`` via ``hexview.render_hex_view`` (LLR-004.3) — the shared
-        row source for the Markdown ```text / ```diff blocks and the HTML
-        ``<pre>`` windows.
+        ``mem_map`` (LLR-004.3, R-CMP-004.14) — the shared row source for the
+        Markdown ```text / ```diff blocks and the HTML ``<pre>`` windows.
+        EVERY row is written: no row cap and no byte cap (G-9). The row format
+        is the one ``hexview.render_hex_view`` writes (I-5).
 
     Args:
         mem_map (Dict[int, int]): The image memory map to render.
@@ -1269,19 +1383,26 @@ def _window_rows(mem_map: Dict[int, int], low: int, high: int) -> List[str]:
         high (int): Exclusive window end.
 
     Returns:
-        List[str]: One string per rendered row (header + hex lines).
+        List[str]: One string per row of the window.
 
     Dependencies:
-        Uses:
-            - render_hex_view
         Used by:
             - _hex_windows_lines
             - _diff_block_lines
             - _html_hex_windows
     """
-    row_bases = list(range(low, high, HEX_WIDTH))
-    rendered = render_hex_view(mem_map, row_bases=row_bases, max_rows=MAX_HEX_ROWS)
-    return rendered.splitlines()
+    rows: List[str] = []
+    for base in range(low, high, HEX_WIDTH):
+        cells: List[str] = []
+        ascii_cells: List[str] = []
+        for addr in range(base, base + HEX_WIDTH):
+            value = mem_map.get(addr)
+            cells.append(f"{value:02X}" if value is not None else "  ")
+            ascii_cells.append(
+                chr(value) if value is not None and 32 <= value <= 126 else "."
+            )
+        rows.append(f"0x{base:08X}  {' '.join(cells)}  |{''.join(ascii_cells)}|")
+    return rows
 
 
 #: batch-34 (B-08, operator spec): run windows in the diff/before-after
@@ -1695,7 +1816,8 @@ def generate_diff_report(
     )
 
     lines: List[str] = []
-    header = _header_lines(comparison, generated_at)
+    title = "Before/after report" if provenance is not None else "Diff report"
+    header = _header_lines(comparison, generated_at, title)
     if report_filter is None:
         lines.extend(header)
     else:
@@ -1758,7 +1880,7 @@ def generate_diff_report(
         )
 
     target = dest_dir / filename
-    target.write_text("\n".join(lines), encoding="utf-8")
+    _write_report(target, "\n".join(lines))
     return DiffReportResult(path=target, written=True, diagnostics=[])
 
 
@@ -1773,7 +1895,9 @@ def _esc(value: object) -> str:
     return html.escape(str(value), quote=True)
 
 
-def _html_header(comparison: ComparisonResult, generated_at: datetime) -> List[str]:
+def _html_header(
+    comparison: ComparisonResult, generated_at: datetime, title: str
+) -> List[str]:
     """
     Summary:
         Build the HTML header block (LLR-004.7): image identities/sources,
@@ -1783,23 +1907,27 @@ def _html_header(comparison: ComparisonResult, generated_at: datetime) -> List[s
     Args:
         comparison (ComparisonResult): The completed comparison.
         generated_at (datetime): The clock's generation instant.
+        title (str): The first heading (R-BEFORE-AFTER-REPORT-001.34).
 
     Returns:
         List[str]: HTML lines.
 
     Dependencies:
         Uses:
-            - _esc
+            - _esc / _strip_ctl
         Used by:
             - generate_diff_report_html
     """
 
     def _img(label: str, image) -> str:
-        variant = f" variant={image.variant_id}" if image.variant_id else ""
+        variant = (
+            f" variant={_strip_ctl(image.variant_id)}" if image.variant_id else ""
+        )
+        shown = _strip_ctl(image.label) if image.label else "(unnamed)"
         return (
-            f"<li>Image {label}: {_esc(image.label or '(unnamed)')} "
+            f"<li>Image {label}: {_esc(shown)} "
             f"[{_esc(image.source_kind)}{_esc(variant)}] "
-            f"path=<code>{_esc(image.path)}</code> "
+            f"path=<code>{_esc(_strip_ctl(image.path))}</code> "
             f"parse-errors={_esc(image.parse_error_count)}</li>"
         )
 
@@ -1818,7 +1946,7 @@ def _html_header(comparison: ComparisonResult, generated_at: datetime) -> List[s
         )
 
     return [
-        "<h1>Diff report</h1>",
+        f"<h1>{_esc(title)}</h1>",
         "<ul>",
         f"<li>Generated (UTC): {_esc(generated_at.isoformat())}</li>",
         f"<li>Tool version: {_esc(__version__)}</li>",
@@ -2046,7 +2174,7 @@ def _html_run_rows(
             f"<tr><td>0x{run.start:08X}</td><td>0x{run.end:08X}</td>"
             f"<td>{_esc(run.length)}</td>"
             f'<td style="color:{colour}">{_esc(_kind_label(run.kind))}</td>'
-            f"<td>{_esc(_annotate_run(run, symbol_addresses))}</td></tr>"
+            f"<td>{_esc(_strip_ctl(_annotate_run(run, symbol_addresses)))}</td></tr>"
         )
     lines.append("</table>")
     return lines
@@ -2568,17 +2696,18 @@ def generate_diff_report_html(
         "pre{border:1px solid #93a1a1;padding:6px;overflow:auto;}"
     )
 
+    title = "Before/after report" if provenance is not None else "Diff report"
     lines: List[str] = [
         "<!DOCTYPE html>",
         '<html lang="en">',
         "<head>",
         '<meta charset="utf-8">',
-        "<title>Diff report</title>",
+        f"<title>{_esc(title)}</title>",
         f"<style>{style}</style>",
         "</head>",
         "<body>",
     ]
-    header = _html_header(comparison, generated_at)
+    header = _html_header(comparison, generated_at, title)
     if report_filter is None:
         lines.extend(header)
     else:
@@ -2639,5 +2768,5 @@ def generate_diff_report_html(
     lines.extend(["</body>", "</html>"])
 
     target = dest_dir / filename
-    target.write_text("\n".join(lines), encoding="utf-8")
+    _write_report(target, "\n".join(lines))
     return DiffReportResult(path=target, written=True, diagnostics=[])

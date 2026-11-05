@@ -373,10 +373,12 @@ def test_at_056a_dropdown_selection_filters_both_triggers(
         )
         # §6.5 A-29 re-baseline (batch-62): the PROJECT report escapes the
         # filter name; the diff reports still carry it literally because D-8
-        # defers their own escapers. Branching keeps both facts asserted —
+        # defers their own escapers. (batch-101 Inc 7: the Markdown diff files
+        # now escape it too; only the HTML file keeps the literal.) Branching
+        # keeps both facts asserted —
         # relaxing the check to "either form" would stop proving either.
         expected_name = (
-            "only-first\\.json" if name == _PR_NAME else "only-first.json"
+            "only-first.json" if name == _BA_HTML_NAME else "only-first\\.json"
         )
         assert expected_name in filtered_text, (
             f"AT-056a: {name} audit header must carry the REAL filename"
@@ -958,11 +960,21 @@ def test_at_053b_hostile_valid_filter_proceeds_sanitized_everywhere(
     #     own un-audited HTML sink).
     # Asserting them separately keeps that divergence visible; a shared loop
     # would have to be weakened to the point of proving nothing about either.
-    for label, text in (("ba-md", md_text), ("ba-html", html_text)):
-        assert f"Filter file: {hostile_name}" in text, (
-            f"AT-053b: the {label} audit header must carry the literal "
-            "hostile filename (diff reports are deferred under D-8)"
-        )
+    # batch-101 Inc 7 (R-CMP-004.9.1, O-5): the diff report's Markdown file
+    # now writes the filter name as report-safe text too, so the ba-md line
+    # matches the project report's; the HTML file keeps the literal (HTML
+    # escape only, R-CMP-004.8).
+    assert "Filter file: \\[boom\\]\\`b\\`\\.json" in md_text, (
+        "the ba-md audit header must carry the ESCAPED hostile "
+        "filename (R-CMP-004.9.1)"
+    )
+    assert f"Filter file: {hostile_name}" not in md_text, (
+        "the raw hostile filename must not reach the ba-md file"
+    )
+    assert f"Filter file: {hostile_name}" in html_text, (
+        "the ba-html audit header must carry the literal hostile "
+        "filename (HTML-escaped only)"
+    )
     assert "Filter file: \\[boom\\]\\`b\\`\\.json" in pr_text, (
         "AT-053b: the project report's audit header must carry the ESCAPED "
         "name — backticks escaped rather than deleted, so the recorded "
@@ -979,7 +991,7 @@ def test_at_053b_hostile_valid_filter_proceeds_sanitized_everywhere(
     # first-block-after-title position (S-F6), in each format — the
     # header-forging pattern must mint no second heading line.
     md_lines = md_text.splitlines()
-    assert md_lines[0] == "# Diff report" and md_lines[2] == (
+    assert md_lines[0] == "# Before/after report" and md_lines[2] == (
         "## Report filter applied"
     ), f"AT-053b: ba-md header block displaced: {md_lines[:4]}"
     assert sum(
@@ -993,7 +1005,7 @@ def test_at_053b_hostile_valid_filter_proceeds_sanitized_everywhere(
         1 for ln in pr_lines if ln == "## Report filter applied"
     ) == 1, "AT-053b: the project audit heading must appear exactly once"
     html_lines = html_text.splitlines()
-    title_index = html_lines.index("<h1>Diff report</h1>")
+    title_index = html_lines.index("<h1>Before/after report</h1>")
     assert html_lines[title_index + 1] == (
         "<h2>Report filter applied</h2>"
     ), "AT-053b: the HTML audit heading must follow the title"
@@ -1070,7 +1082,9 @@ def test_at_054a_bkey_filtered_pair_keeps_match_omits_unmatched(
         assert "Report filter applied" in text, (
             f"AT-054a: the {label} must carry the audit header"
         )
-        assert "first-byte.json" in text, (
+        # Markdown writes the name as report-safe text (R-CMP-004.9.1).
+        spelling = "first-byte\\.json" if label == "md" else "first-byte.json"
+        assert spelling in text, (
             f"AT-054a: the {label} header must name the real filter file"
         )
         assert "0x00001000" in text, (
