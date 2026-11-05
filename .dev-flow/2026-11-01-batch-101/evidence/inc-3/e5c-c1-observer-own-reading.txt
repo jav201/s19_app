@@ -1,0 +1,214 @@
+# E5 corrective C-1 (CR-1): the R-TST-111/112 observer takes its own 'laid out' reading
+# Platform: LAN Linux host, Python 3.11.18. Tree: base 9f9f6af + the Inc 3 working-tree diff (incl. E5 corrective edits) in a private remote worktree.
+# Each mutant is applied by exact text replace to tests/test_b100_project_check.py, the node is run, and the file is restored byte-exact (sha256 printed).
+# 'before' = the observer calls the shared _summary_laid_out (head 6355565 form, re-created by the mutant script); 'after' = the C-1 form.
+# Result: M-C1 (the shared predicate fires a layout pass late): before GREEN (gap), after RED 3/3; unmutated after: GREEN 3/3.
+# Equivalent mutants (first layout publish already has the summary laid out, so they do not move the stamp on textual 8.2.8): A drop the height check; B return True; C also wait for the vertical scrollbar -- GREEN in both forms.
+
+======== c1D_before ========
+HOST: LAN Linux host
+2026-11-05T19:01:34Z
+ 13:01:34 up 2 days, 20:06,  3 users,  load average: 5.52, 3.40, 2.79
+<HOME>/work/s19_inc3c/s19_app/__init__.py 3.11.18
+load [0.18586055299965665] s; panel painted 0.57 s; rows 103
+SEC6-5 timings (s): {'read': 0.14, 'load': 0.448, 'painted': 0.547, 'appended': 0.484}
+WARNING  s19tui:app.py:14791 Manifest not rewritten (holds entries that were skipped): /tmp/pytest-of-<USER>/pytest-52/test_r_tst_111_112_arm_values_2/app/.s19tool/workarea/P (placed /tmp/pytest-of-<USER>/pytest-52/test_r_tst_111_112_arm_values_2/app/.s19tool/workarea/P/extra.s19)
+============================= QC-TM timing margins =============================
+37.8%  0.622 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+42.7%  0.573 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+45.3%  0.547 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+51.6%  0.484 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+55.2%  0.448 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+80.9%  0.191 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+81.4%  0.186 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+QC-TM: 8 bounds, 0 under 20 % margin
+PASSED tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+PASSED tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+PASSED tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+3 passed in 16.45s
+MUTANT M-C1 before (head 6355565 form): M-C1: _summary_laid_out answers True only from its third call on a screen (the shared predicate fires a layout pass late); the observer calls the shared helper in tests/test_b100_project_check.py
+sha256 before: 79a6d8e4ef488efd843c984a5de72f9fb46533b241ee38f8e7219ddd3116e9a8
+pytest exit code: 0 -> GREEN (mutant survived)
+sha256 after restore: 79a6d8e4ef488efd843c984a5de72f9fb46533b241ee38f8e7219ddd3116e9a8 REVERTED byte-exact
+
+======== c1D_after ========
+HOST: LAN Linux host
+2026-11-05T19:01:55Z
+ 13:01:55 up 2 days, 20:06,  2 users,  load average: 4.64, 3.34, 2.78
+<HOME>/work/s19_inc3c/s19_app/__init__.py 3.11.18
+        ``all-bad`` / ``cap``: the arm's ``painted`` equals observer paint stamp
+        minus observer install stamp. ``scene``: ``sec6_5 painted`` equals the
+        same difference and ``sec6_5 appended`` equals the observer's outcome
+            panel_label, append_label = "TC-B100-61 all-bad painted", None
+            panel_label, append_label = "TC-B100-61 cap painted", None
+            panel_label, append_label = "sec6_5 painted", "sec6_5 appended"
+E       AssertionError: TC-B100-61 all-bad painted: the arm recorded 0.6900 s, the product stamps give 0.3394 s
+E       assert False
+E        +  where False = <built-in function isclose>(0.6899794950149953, 0.33942777797346935, abs_tol=0.001)
+E        +    where <built-in function isclose> = math.isclose
+        ``all-bad`` / ``cap``: the arm's ``painted`` equals observer paint stamp
+        minus observer install stamp. ``scene``: ``sec6_5 painted`` equals the
+        same difference and ``sec6_5 appended`` equals the observer's outcome
+            panel_label, append_label = "TC-B100-61 all-bad painted", None
+            panel_label, append_label = "TC-B100-61 cap painted", None
+            panel_label, append_label = "sec6_5 painted", "sec6_5 appended"
+E       AssertionError: TC-B100-61 cap painted: the arm recorded 0.6848 s, the product stamps give 0.4024 s
+E       assert False
+E        +  where False = <built-in function isclose>(0.6847750259912573, 0.40237367298686877, abs_tol=0.001)
+E        +    where <built-in function isclose> = math.isclose
+load [0.29290222498821095] s; panel painted 0.68 s; rows 103
+        ``all-bad`` / ``cap``: the arm's ``painted`` equals observer paint stamp
+        minus observer install stamp. ``scene``: ``sec6_5 painted`` equals the
+        same difference and ``sec6_5 appended`` equals the observer's outcome
+            panel_label, append_label = "TC-B100-61 all-bad painted", None
+            panel_label, append_label = "TC-B100-61 cap painted", None
+            panel_label, append_label = "sec6_5 painted", "sec6_5 appended"
+E       AssertionError: sec6_5 painted: the arm recorded 0.6446 s, the product stamps give 0.3748 s
+E       assert False
+E        +  where False = <built-in function isclose>(0.6446470730006695, 0.37481205799849704, abs_tol=0.001)
+E        +    where <built-in function isclose> = math.isclose
+SEC6-5 timings (s): {'read': 0.127, 'load': 0.319, 'painted': 0.645, 'appended': 0.342}
+WARNING  s19tui:app.py:14791 Manifest not rewritten (holds entries that were skipped): /tmp/pytest-of-<USER>/pytest-53/test_r_tst_111_112_arm_values_2/app/.s19tool/workarea/P (placed /tmp/pytest-of-<USER>/pytest-53/test_r_tst_111_112_arm_values_2/app/.s19tool/workarea/P/extra.s19)
+============================= QC-TM timing margins =============================
+31.0%  0.690 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+31.5%  0.685 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+35.5%  0.645 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+65.8%  0.342 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+68.1%  0.319 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+70.7%  0.293 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+78.1%  0.219 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+QC-TM: 8 bounds, 0 under 20 % margin
+FAILED tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+FAILED tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+FAILED tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+3 failed in 16.05s
+MUTANT M-C1 after (C-1 form): M-C1: _summary_laid_out answers True only from its third call on a screen (the shared predicate fires a layout pass late); the observer has its own reading in tests/test_b100_project_check.py
+sha256 before: 79a6d8e4ef488efd843c984a5de72f9fb46533b241ee38f8e7219ddd3116e9a8
+pytest exit code: 1 -> RED (mutant killed)
+sha256 after restore: 79a6d8e4ef488efd843c984a5de72f9fb46533b241ee38f8e7219ddd3116e9a8 REVERTED byte-exact
+
+======== c1_green ========
+HOST: LAN Linux host
+HEAD: 9f9f6af6 + Inc 3 working-tree diff
+2026-11-05T19:02:24Z
+ 13:02:24 up 2 days, 20:07,  2 users,  load average: 3.10, 3.10, 2.72
+<HOME>/work/s19_inc3c/s19_app/__init__.py 3.11.18
+load [0.16892626698245294] s; panel painted 0.40 s; rows 103
+SEC6-5 timings (s): {'read': 0.129, 'load': 0.318, 'painted': 0.383, 'appended': 0.479}
+WARNING  s19tui:app.py:14791 Manifest not rewritten (holds entries that were skipped): /tmp/pytest-of-<USER>/pytest-54/test_r_tst_111_112_arm_values_2/app/.s19tool/workarea/P (placed /tmp/pytest-of-<USER>/pytest-54/test_r_tst_111_112_arm_values_2/app/.s19tool/workarea/P/extra.s19)
+============================= QC-TM timing margins =============================
+52.1%  0.479 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+60.4%  0.396 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+61.7%  0.383 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+66.8%  0.332 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+68.2%  0.318 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+75.6%  0.244 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+83.1%  0.169 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+QC-TM: 8 bounds, 0 under 20 % margin
+PASSED tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+PASSED tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+PASSED tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+3 passed in 15.59s
+
+======== c1A_after ========
+HOST: LAN Linux host
+2026-11-05T18:57:15Z
+ 12:57:15 up 2 days, 20:02,  2 users,  load average: 0.72, 1.01, 2.13
+<HOME>/work/s19_inc3c/s19_app/__init__.py 3.11.18
+============================= QC-TM timing margins =============================
+49.5%  0.505 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+60.1%  0.399 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+61.1%  0.389 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+65.6%  0.344 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+67.2%  0.328 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+67.8%  0.322 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+78.3%  0.217 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+QC-TM: 8 bounds, 0 under 20 % margin
+3 passed in 15.51s
+MUTANT C1-A-after: _summary_laid_out mutated (return summary is not None); the observer has its own reading (C-1) in tests/test_b100_project_check.py
+sha256 before: 79a6d8e4ef488efd843c984a5de72f9fb46533b241ee38f8e7219ddd3116e9a8
+pytest exit code: 0 -> GREEN (mutant survived)
+sha256 after restore: 79a6d8e4ef488efd843c984a5de72f9fb46533b241ee38f8e7219ddd3116e9a8 REVERTED byte-exact
+
+======== c1B_before ========
+HOST: LAN Linux host
+2026-11-05T18:57:39Z
+ 12:57:39 up 2 days, 20:02,  2 users,  load average: 0.66, 0.98, 2.09
+<HOME>/work/s19_inc3c/s19_app/__init__.py 3.11.18
+============================= QC-TM timing margins =============================
+62.6%  0.374 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+66.1%  0.339 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+66.1%  0.339 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+68.0%  0.320 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+68.5%  0.315 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+73.3%  0.267 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+82.9%  0.171 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+QC-TM: 8 bounds, 0 under 20 % margin
+3 passed in 15.56s
+MUTANT C1-B-before: _summary_laid_out mutated (return True) with the observer sharing the helper (head 6355565 form) in tests/test_b100_project_check.py
+sha256 before: 79a6d8e4ef488efd843c984a5de72f9fb46533b241ee38f8e7219ddd3116e9a8
+pytest exit code: 0 -> GREEN (mutant survived)
+sha256 after restore: 79a6d8e4ef488efd843c984a5de72f9fb46533b241ee38f8e7219ddd3116e9a8 REVERTED byte-exact
+
+======== c1B_after ========
+HOST: LAN Linux host
+2026-11-05T18:58:00Z
+ 12:58:00 up 2 days, 20:03,  2 users,  load average: 0.75, 0.98, 2.06
+<HOME>/work/s19_inc3c/s19_app/__init__.py 3.11.18
+============================= QC-TM timing margins =============================
+55.0%  0.450 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+60.4%  0.396 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+65.8%  0.342 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+66.9%  0.331 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+68.0%  0.320 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+81.2%  0.188 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+82.7%  0.173 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+QC-TM: 8 bounds, 0 under 20 % margin
+3 passed in 15.85s
+MUTANT C1-B-after: _summary_laid_out mutated (return True); the observer has its own reading (C-1) in tests/test_b100_project_check.py
+sha256 before: 79a6d8e4ef488efd843c984a5de72f9fb46533b241ee38f8e7219ddd3116e9a8
+pytest exit code: 0 -> GREEN (mutant survived)
+sha256 after restore: 79a6d8e4ef488efd843c984a5de72f9fb46533b241ee38f8e7219ddd3116e9a8 REVERTED byte-exact
+
+======== c1C_before ========
+HOST: LAN Linux host
+2026-11-05T18:59:23Z
+ 12:59:23 up 2 days, 20:04,  3 users,  load average: 3.31, 1.56, 2.16
+<HOME>/work/s19_inc3c/s19_app/__init__.py 3.11.18
+============================= QC-TM timing margins =============================
+LOW 9.2%  0.908 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+LOW 16.0%  0.840 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+41.8%  0.582 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+45.4%  0.546 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+45.7%  0.543 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+64.2%  0.358 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+76.6%  0.234 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+QC-TM: 8 bounds, 2 under 20 % margin
+3 passed in 28.83s
+MUTANT C1-before: _summary_laid_out mutated to also wait for the panel's vertical scrollbar (a later layout pass); observer shares the helper (head 6355565 form) in tests/test_b100_project_check.py
+sha256 before: 79a6d8e4ef488efd843c984a5de72f9fb46533b241ee38f8e7219ddd3116e9a8
+pytest exit code: 0 -> GREEN (mutant survived)
+sha256 after restore: 79a6d8e4ef488efd843c984a5de72f9fb46533b241ee38f8e7219ddd3116e9a8 REVERTED byte-exact
+
+======== c1C_after ========
+HOST: LAN Linux host
+2026-11-05T18:59:59Z
+ 12:59:59 up 2 days, 20:05,  3 users,  load average: 5.76, 2.37, 2.41
+<HOME>/work/s19_inc3c/s19_app/__init__.py 3.11.18
+============================= QC-TM timing margins =============================
+LOW 0.0%  1.000 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+LOW 19.5%  0.805 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+23.1%  0.769 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+35.2%  0.648 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+40.1%  0.599 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+46.3%  0.537 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+59.7%  0.403 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+QC-TM: 8 bounds, 2 under 20 % margin
+3 passed in 30.77s
+MUTANT C1-after: _summary_laid_out mutated to also wait for the panel's vertical scrollbar (a later layout pass); observer has its own reading (C-1) in tests/test_b100_project_check.py
+sha256 before: 79a6d8e4ef488efd843c984a5de72f9fb46533b241ee38f8e7219ddd3116e9a8
+pytest exit code: 0 -> GREEN (mutant survived)
+sha256 after restore: 79a6d8e4ef488efd843c984a5de72f9fb46533b241ee38f8e7219ddd3116e9a8 REVERTED byte-exact
+
+======== c1A_before ========
+(run inline; summary lines) 3 passed in 15.29s; pytest exit code: 0 -> GREEN (mutant survived); sha256 after restore REVERTED byte-exact

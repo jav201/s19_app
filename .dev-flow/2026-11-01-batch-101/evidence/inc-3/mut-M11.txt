@@ -1,0 +1,14 @@
+tree clean before mutant (equals staged head state)
+applied M-11
+ s19_app/tui/app.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+-            placed_files.extend(gather_outcome.written)
++            pass  # MUTANT M-11
+s19_app.__file__ <HOME>/work/s19_inc3/s19_app/__init__.py 3.11.18
+CMD: cd ~/work/s19_inc3 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 1800 /data/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -rA tests/test_b100_active_variant.py -k r_proj_rollback_9_2
+s                                                                        [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/support/b100_links.py:30: directory junctions are a Windows-only test arm (PDR C-QA-6)
+1 skipped, 71 deselected in 0.76s
+EXIT=0
+REVERTED: git diff --quiet clean

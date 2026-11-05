@@ -1,0 +1,8 @@
+s19_app.__file__ <HOME>/work/s19_inc3/s19_app/__init__.py 3.11.18
+CMD: cd ~/work/s19_inc3 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 1800 /data/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider tests/test_b100_active_variant.py -k tc_b100_20 and save-project
+.                                                                        [100%]
+============================= QC-TM timing margins =============================
+44.0%  0.560 s / 1.000 s  TC-B100-20 save-project  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project]
+QC-TM: 1 bounds, 0 under 20 % margin
+1 passed, 71 deselected in 5.50s
+EXIT=0

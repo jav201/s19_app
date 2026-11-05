@@ -8,3 +8,6 @@ E3 end 2026-11-05T13:54:16Z model=opus (2 rounds, PASS-WITH-NOTES)
 E4 start 2026-11-05T15:51Z implementer+tester model=sonnet (Kimi weekly quota exhausted)
 E4 integration start 2026-11-05T16:17:44Z model=opus
 E4 integration end 2026-11-05T18:22:22Z model=opus (GREEN Windows; lane 1: 248+261+328+315+125 passed; serial lane 52/53 then 53/53, the one failure the pre-existing sec6_5 load bound; verifier 3/3 at 1 ms; OR-1..OR-5, S-1..S-4 in E4-integration-notes.md)
+E5 start 2026-11-05T18:23Z mutants+LAN=sonnet reviews=opus
+E5 corrective start 2026-11-05T18:53:04Z model=opus
+E5 corrective end 2026-11-05T19:56:43Z model=opus (C-1..C-11 done; 30 cases; mutants 14 killed incl. M-12/M-C1/M-C3; LAN lane 1 318 passed, serial 23 passed, law guards 196 passed; Windows junction arms 6 passed, save-project 5/5)

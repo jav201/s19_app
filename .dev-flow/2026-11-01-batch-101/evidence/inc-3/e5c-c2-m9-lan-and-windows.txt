@@ -1,0 +1,61 @@
+# E5 corrective C-2 (CR-4): the GATHER.12 arm-3 spy records the raw path text. LAN Linux host (m9_lan*, Python 3.11.18) and Windows PC (wm9_*, s19env Python 3.11.15). Windows before = arm 3 without the raw-text spy (head form): M-9 GREEN (survives); after: M-9 RED. LAN: M-9 RED; unmutated GREEN.
+# Mutants: exact text replace, run, restore byte-exact (sha256 printed). Filtered transcript: header, result lines, assertion lines.
+
+======== m9_lan ========
+HOST: LAN Linux host
+2026-11-05T19:03:03Z
+ 13:03:03 up 2 days, 20:08,  2 users,  load average: 2.20, 2.89, 2.66
+<HOME>/work/s19_inc3c/s19_app/__init__.py 3.11.18
+        # The text the product passed is already folded: on Windows the OS would
+E       AssertionError: ['/tmp/pytest-of-<USER>/pytest-55/test_r_proj_gather_12_each_dis0/.s19tool/workarea/R/missing/../x.json']
+E       assert ['/tmp/pytest...ng/../x.json'] == ['/tmp/pytest...rea/R/x.json']
+E         
+E         At index 0 diff: '/tmp/pytest-of-<USER>/pytest-55/test_r_proj_gather_12_each_dis0/.s19tool/workarea/R/missing/../x.json' != '/tmp/pytest-of-<USER>/pytest-55/test_r_proj_gather_12_each_dis0/.s19tool/workarea/R/x.json'
+E         Use -v to get more diff
+FAILED tests/test_project_gather.py::test_r_proj_gather_12_each_distinct_composition_name_is_checked_once
+1 failed in 0.78s
+MUTANT M-9 (C-2 form): os.path.normpath fold dropped in the composition check (in_project = resolved_project / name) in s19_app/tui/services/project_gather_service.py
+sha256 before: f01407c405e48da75a303955e4e169bad370b0cbe4008e3b1eab207a193d7f70
+pytest exit code: 1 -> RED (mutant killed)
+sha256 after restore: f01407c405e48da75a303955e4e169bad370b0cbe4008e3b1eab207a193d7f70 REVERTED byte-exact
+
+======== m9_lan_green ========
+HOST: LAN Linux host
+HEAD: 9f9f6af6 + Inc 3 working-tree diff
+2026-11-05T19:03:05Z
+ 13:03:05 up 2 days, 20:08,  2 users,  load average: 2.20, 2.89, 2.66
+<HOME>/work/s19_inc3c/s19_app/__init__.py 3.11.18
+PASSED tests/test_project_gather.py::test_r_proj_gather_12_each_distinct_composition_name_is_checked_once
+1 passed in 0.76s
+
+======== wm9_before ========
+HOST: Windows PC
+2026-11-05T19:16:07Z
+<HOME>\AppData\Local\Temp\s19c3\mwt\s19_app\__init__.py 3.11.15
+PASSED tests/test_project_gather.py::test_r_proj_gather_12_each_distinct_composition_name_is_checked_once
+1 passed in 1.45s
+MUTANT M-9 Windows, head 6355565 form of arm 3: os.path.normpath fold dropped in the composition check (in_project = resolved_project / name); arm 3 without the raw-text spy (C-2 not applied)
+  file s19_app/tui/services/project_gather_service.py sha256 before: 6700ab54fdd7102a61e21774d7b4ad31fa99dfa4fecf69f880bbf10109d4ea2e
+  file tests/test_project_gather.py sha256 before: 2a93574a228c696447e769cf6db8274a8132137d05b9eeef2fb5bbc1210cebad
+extra env: {}
+pytest exit code: 0 -> GREEN (mutant survived)
+  file s19_app/tui/services/project_gather_service.py sha256 after restore: 6700ab54fdd7102a61e21774d7b4ad31fa99dfa4fecf69f880bbf10109d4ea2e REVERTED byte-exact
+  file tests/test_project_gather.py sha256 after restore: 2a93574a228c696447e769cf6db8274a8132137d05b9eeef2fb5bbc1210cebad REVERTED byte-exact
+
+======== wm9_after ========
+HOST: Windows PC
+2026-11-05T19:16:09Z
+<HOME>\AppData\Local\Temp\s19c3\mwt\s19_app\__init__.py 3.11.15
+        # The text the product passed is already folded: on Windows the OS would
+E       AssertionError: ['<HOME>\\appdata\\local\\temp\\s19c3\\bt\\test_r_proj_gather_12_each_dis0\\.s19tool\\workarea\\r\\missing\\..\\x.json']
+E       assert ['c:\\users\\...\\..\\x.json'] == ['c:\\users\\...a\\r\\x.json']
+E         
+E         At index 0 diff: '<HOME>\\appdata\\local\\temp\\s19c3\\bt\\test_r_proj_gather_12_each_dis0\\.s19tool\\workarea\\r\\missing\\..\\x.json' != '<HOME>\\appdata\\local\\temp\\s19c3\\bt\\test_r_proj_gather_12_each_dis0\\.s19tool\\workarea\\r\\x.json'
+E         Use -v to get more diff
+FAILED tests/test_project_gather.py::test_r_proj_gather_12_each_distinct_composition_name_is_checked_once
+1 failed in 1.05s
+MUTANT M-9 Windows, C-2 form: os.path.normpath fold dropped in the composition check (in_project = resolved_project / name)
+  file s19_app/tui/services/project_gather_service.py sha256 before: 6700ab54fdd7102a61e21774d7b4ad31fa99dfa4fecf69f880bbf10109d4ea2e
+extra env: {}
+pytest exit code: 1 -> RED (mutant killed)
+  file s19_app/tui/services/project_gather_service.py sha256 after restore: 6700ab54fdd7102a61e21774d7b4ad31fa99dfa4fecf69f880bbf10109d4ea2e REVERTED byte-exact

@@ -798,8 +798,9 @@ def _summary_laid_out(screen) -> bool:
     ``query_one_optional``, never ``query_one``: the layout signal can
     publish before the summary is mounted. It is an id lookup that stops at
     the first match, not a walk of the whole panel: with 1 000 problem rows a
-    full ``query`` costs about 0.5 ms, and the observer's call of it sat
-    between the observer's paint stamp and the arm's."""
+    full ``query`` costs about 0.5 ms, and such a lookup sat between the
+    observer's paint stamp and the arm's. The verifier's observer makes its
+    own lookup and does not call this helper (CR-1)."""
     summary = screen.query_one_optional("#result_summary")
     return summary is not None and summary.size.height > 0
 
@@ -886,8 +887,14 @@ class _StampObserver:
             if isinstance(screen, LoadResultScreen):
 
                 def _on_layout(_value=None) -> None:
+                    # Its own "laid out" reading, written apart from the
+                    # arm's ``_summary_laid_out`` (graph ``_StampObserver``):
+                    # a shared predicate would move both stamps together.
                     now = time.perf_counter()
-                    if observer.paint is None and _summary_laid_out(screen):
+                    if observer.paint is not None:
+                        return
+                    summary = screen.query_one_optional("#result_summary")
+                    if summary is not None and summary.size.height > 0:
                         observer.paint = now
 
                 screen.screen_layout_refresh_signal.subscribe(app, _on_layout, immediate=True)
@@ -1573,8 +1580,8 @@ def _function_calls(source: str, function: str) -> set:
 
 
 def test_r_tst_110_panel_clock_starts_at_the_install_stamp() -> None:
-    """The panel paint clock starts at the install stamp, whichever came
-    later: the click or the install. A missing stamp fails the test. The
+    """The panel paint clock starts at the install stamp, never at the
+    click, whichever came later. A missing stamp fails the test. The
     three call sites (the all-bad arm, the cap arm and the shared scene's
     helper) compute their start through that rule.
 
@@ -1714,6 +1721,8 @@ def test_r_tst_111_112_arm_values_equal_the_product_stamps(
         "the observer saw no panel paint"
     )
     stamped_panel = observer.paint - observer.installed
+    # The stamp-pair gap, for the record (CR-3: N-3's 0.5 ms trigger).
+    print(f"GAP {panel_label}: {(values[panel_label] - stamped_panel) * 1e6:+.1f} us")
     assert math.isclose(values[panel_label], stamped_panel, abs_tol=_STAMP_TOLERANCE_S), (
         f"{panel_label}: the arm recorded {values[panel_label]:.4f} s, "
         f"the product stamps give {stamped_panel:.4f} s"
@@ -1723,6 +1732,7 @@ def test_r_tst_111_112_arm_values_equal_the_product_stamps(
             "the observer saw no append outcome line"
         )
         stamped_append = observer.outcome - observer.append_start
+        print(f"GAP {append_label}: {(values[append_label] - stamped_append) * 1e6:+.1f} us")
         assert math.isclose(values[append_label], stamped_append, abs_tol=_STAMP_TOLERANCE_S), (
             f"{append_label}: the arm recorded {values[append_label]:.4f} s, "
             f"the product stamps give {stamped_append:.4f} s"

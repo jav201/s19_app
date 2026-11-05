@@ -1,0 +1,31 @@
+tree clean before mutant (equals staged head state)
+applied M-5
+ tests/test_b100_project_check.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+-    return stamp
++    return max(pressed, stamp)
+s19_app.__file__ <HOME>/work/s19_inc3/s19_app/__init__.py 3.11.18
+CMD: cd ~/work/s19_inc3 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 1800 /data/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -rA tests/test_b100_project_check.py -k r_tst_110
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_r_tst_110_panel_clock_starts_at_the_install_stamp ____________
+
+    def test_r_tst_110_panel_clock_starts_at_the_install_stamp() -> None:
+        """The panel paint clock starts at the install stamp, whichever came
+        later: the click or the install. A missing stamp fails the test. The
+        three call sites (the all-bad arm, the cap arm and the shared scene's
+        helper) compute their start through that rule.
+    
+        Why: starting at the click charged the wait for the load to the panel's
+        paint and made a 0.2 s paint read as 0.8-1.1 s."""
+>       assert _paint_clock_start(SimpleNamespace(_load_returned_at=10.0), 12.0) == 10.0
+E       assert 12.0 == 10.0
+E        +  where 12.0 = _paint_clock_start(namespace(_load_returned_at=10.0), 12.0)
+E        +    where namespace(_load_returned_at=10.0) = SimpleNamespace(_load_returned_at=10.0)
+
+tests/test_b100_project_check.py:1583: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b100_project_check.py::test_r_tst_110_panel_clock_starts_at_the_install_stamp
+1 failed, 100 deselected in 0.80s
+EXIT=1
+REVERTED: git diff --quiet clean

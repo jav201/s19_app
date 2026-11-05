@@ -3960,14 +3960,16 @@ def test_r_proj_002_12_file_load_sync_refuses_when_the_project_folder_was_delete
 
 
 def _a2l_attach_with_the_folder_deleted_mid_attach(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, by_keys: bool = False
 ) -> tuple:
     """``P2`` (no A2L) is open. The attach passes its request-time project
     guard; the project folder is then deleted from inside the attach worker,
     right after the worker's copy step returns (a wrapper of
     ``copy_into_workarea``, off the event-loop thread only, once). Returns
     ``(exited, lines since the trigger, runs left, the folder path exists
-    afterwards)``."""
+    afterwards)``. ``by_keys``: the A2L path is typed into the Load dialog
+    opened with ``ctrl+l`` and confirmed with ``enter`` (the attach route),
+    instead of a direct ``load_a2l_from_path`` call."""
     base = tmp_path / "app"
     trio(W(base) / "P2", names=("firmware.s19", "firmware.mac"))
     a2l = tmp_path / "src" / "firmware.a2l"
@@ -3990,7 +3992,15 @@ def _a2l_attach_with_the_folder_deleted_mid_attach(
         main_thread.append(threading.get_ident())
         await open_trio_project(app, pilot, "P2")
         mark = len(log.messages)
-        app.load_a2l_from_path(a2l)
+        if by_keys:
+            await ld.load_path_through_dialog(
+                pilot, app, a2l, open_key="ctrl+l", confirm="enter",
+                until=lambda: app.return_code is not None
+                or any(line.startswith("A2L ") for line in log.since(mark)),
+                what="the typed A2L load",
+            )
+        else:
+            app.load_a2l_from_path(a2l)
         exited = await ended_or_exited(app, "a2l_load")
         assert deleted, "the folder was not deleted from inside the attach worker"
         return exited, log.since(mark), list(app._busy.runs), os.path.lexists(W(base) / "P2")
@@ -4035,7 +4045,91 @@ def test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder(
         )
         assert lines and lines[-1] == "A2L loaded: firmware.a2l", lines
     else:
-        _exited, _lines, _runs, exists = _file_load_into_vanished_project(
+        _exited, lines, _runs, exists = _file_load_into_vanished_project(
             tmp_path, kind, "deleted"
         )
+        # The load reached the sync and was refused there (R-PROJ-002.12's
+        # lines): a load stopped before the sync would also leave no folder.
+        assert lines.count(SYNC_REFUSAL) == 1, lines
+        assert lines[-1] == f"Loaded other.{kind}", lines
+    assert exists is False, "the sync re-created the deleted project folder"
+
+
+def test_r_proj_002_12_by_keys_a_load_over_unsaved_work_into_a_deleted_project_folder(
+    tmp_path: Path,
+) -> None:
+    """R-PROJ-002.12 and R-PROJ-002.14 through the keys a user presses. ``P2``
+    is open with one unsaved patched byte, and its folder is deleted outside
+    the app. ``ctrl+l`` opens the Load dialog, ``other.s19``'s path is typed
+    and ``enter`` loads it; the replace question appears (unsaved work) and
+    ``y`` answers Replace. The load ends ``Loaded other.s19``, the sync
+    refusal is painted exactly once, no variant is reported added, the app
+    keeps running, no run is left and no ``P2`` path exists afterwards.
+
+    Why: the handler-level nodes skip the dialog and the replace question
+    (``_confirm_then_load`` defers the load past a refresh); this node runs
+    the route the user takes.
+
+    Negative control: the sync's ``mkdir`` restored (mutant M-3) re-creates
+    ``P2`` and reports the variant added -- this node fails."""
+    base = tmp_path / "app"
+    trio(W(base) / "P2", names=("firmware.s19",))
+    src = _data_file_source(tmp_path, "s19")
+
+    async def scenario(app, pilot, log):
+        await open_trio_project(app, pilot, "P2")
+        await patch_one_byte(app, pilot)
+        shutil.rmtree(W(base) / "P2")
+        neutral_focus(app)
+        mark = len(log.messages)
+        await pilot.press("ctrl+l")
+        await ld.wait_for_dialog(pilot, app)
+        await ld.type_into_path(pilot, app, str(src))
+        await pilot.press("enter")
+        await wait(
+            pilot, lambda: type(app.screen).__name__ == "ConfirmQuestionScreen", "the replace question", 10
+        )
+        asked = type(app.screen).__name__
+        await pilot.press("y")
+        await wait(
+            pilot,
+            lambda: app.return_code is not None or "Loaded other.s19" in log.since(mark),
+            "the durable load line",
+        )
+        exited = await ended_or_exited(app, "file_load")
+        await settle_workers(pilot)
+        return asked, exited, log.since(mark), list(app._busy.runs), os.path.lexists(W(base) / "P2")
+
+    asked, exited, lines, runs, exists = run(base, scenario)
+    assert asked == "ConfirmQuestionScreen", asked
+    assert not exited, lines
+    assert lines.count(SYNC_REFUSAL) == 1, lines
+    assert lines[-1] == "Loaded other.s19", lines
+    assert not [line for line in lines if line.startswith("Added variant")], lines
+    assert not [line for line in lines if "now opens" in line or "manifest verified" in line], lines
+    assert runs == [], runs
+    assert exists is False, "the sync re-created the deleted project folder"
+
+
+def test_r_proj_002_13_by_keys_an_a2l_typed_into_the_load_dialog_into_a_deleted_project_folder(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """R-PROJ-002.13 and R-PROJ-002.14 through the keys a user presses: the
+    A2L path is typed into the Load dialog (``ctrl+l``, ``enter``: the attach
+    route, which asks no replace question) while ``P2`` is open; the folder
+    goes during the attach (the same injected precondition as the handler
+    node). The attach ends ``A2L loaded: firmware.a2l``, the A2L sync
+    refusal is painted exactly once, no ``A2L NOT loaded`` line, no run left
+    and no ``P2`` path afterwards.
+
+    Negative control: the A2L sync's ``mkdir`` restored (mutant M-4) -- this
+    node fails."""
+    exited, lines, runs, exists = _a2l_attach_with_the_folder_deleted_mid_attach(
+        tmp_path, monkeypatch, by_keys=True
+    )
+    assert not exited, lines
+    assert lines.count(A2L_SYNC_REFUSAL) == 1, lines
+    assert not [line for line in lines if line.startswith("A2L NOT loaded")], lines
+    assert lines[-1] == "A2L loaded: firmware.a2l", lines
+    assert runs == [], runs
     assert exists is False, "the sync re-created the deleted project folder"

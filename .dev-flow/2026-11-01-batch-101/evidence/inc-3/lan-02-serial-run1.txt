@@ -1,0 +1,1584 @@
+s19_app.__file__ <HOME>/work/s19_inc3/s19_app/__init__.py 3.11.18
+CMD: cd ~/work/s19_inc3 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 1800 /data/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -m serial_timing tests/test_project_gather.py tests/test_b100_active_variant.py tests/test_b100_workers.py tests/test_b100_project_check.py tests/test_suite_hygiene.py
+FFF............F..s.....                                                 [100%]
+=================================== FAILURES ===================================
+_ test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[variant-append] _
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_30')
+writer = 'variant-append'
+
+    @pytest.mark.serial_timing
+    @pytest.mark.parametrize(
+        "writer", ["variant-append", "mac-sync", "a2l-sync", "save-back", "save-project"]
+    )
+    def test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second(
+        tmp_path: Path, writer: str
+    ) -> None:
+        """Inc 7 corrective pass 2, SEC7-R2-2 (SEC6-5's time bound for the
+        writers; security probe T2): P records 1 000 real files at the end of a
+        31-folder chain in ``batch``, ``assignments`` and ``gathered`` (no
+        finding, so every writer rewrites). Each in-project writer — variant
+        append, MAC sync, A2L sync, save-back — and Save project with that
+        composition reach their verified manifest line under 1 s from the
+        trigger.
+    
+        RED (cp1 tree): append 6.89 s, MAC sync 7.12 s, A2L sync 6.44 s,
+        save-back 6.42 s (one fresh walk per entry in the serializer).
+    
+        Fix round 2 R-1 (measurement re-pin, the Inc 12b F-23 rule): the loads
+        (Inc 12a) and Save project (Inc 12b) run on workers, so the polling
+        loop saw the outcome line some time after the app painted it. The clock
+        now stops when ``set_status`` receives the outcome line (the bound's end
+        point: the line is painted by the main-thread commit), not when the
+        settle loop notices it.
+    
+        Batch-101 Inc 3: the ``save-project`` parameter verifies R-PROJ-001.13;
+        its 0.8 s target is read from the QC-TM row, not asserted."""
+        from s19_app.tui.app import SaveProjectPayload
+    
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        names = projects.real_files_under_a_chain(project_dir)
+        manifest = projects.read_manifest(project_dir)
+        manifest.update(batch=names, assignments={"firmware": names}, gathered={"patches": names})
+        (project_dir / "project.json").write_text(
+            json.dumps(manifest, separators=(",", ":")), encoding="utf-8"
+        )
+        sources = {
+            "variant-append": (projects.CASE02_DIR, "firmware.s19"),
+            "mac-sync": (projects.CASE01_DIR, "firmware.mac"),
+            "a2l-sync": (projects.CASE01_DIR, "firmware.a2l"),
+        }
+        src = None
+        if writer in sources:
+            folder, name = sources[writer]
+            src = projects.copy_sources(tmp_path / "src", folder, name) / name
+        statuses: list = []
+        painted_at: list = []
+    
+        async def _drive() -> float:
+            app = S19TuiApp(base_dir=base)
+            real_set_status = app.set_status
+    
+            def _capture(message, *args, **kwargs):
+                statuses.append(str(message))
+                if not painted_at and any(o in str(message) for o in WRITER_OUTCOMES):
+                    painted_at.append(time.perf_counter())
+                return real_set_status(message, *args, **kwargs)
+    
+            app.set_status = _capture
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await _open_seeded_project(pilot, app)
+                statuses.clear()
+                painted_at.clear()
+                started = time.perf_counter()
+                if writer == "save-back":
+                    _apply_patch(app)
+                    app.on_patch_editor_panel_save_back_decision(
+                        PatchEditorPanel.SaveBackDecision("firmware.s19", 32)
+                    )
+                elif writer == "variant-append" or writer == "mac-sync":
+                    app.load_from_path(src)
+                elif writer == "a2l-sync":
+                    app.load_a2l_from_path(src)
+                else:
+                    app._handle_save_dialog(
+                        SaveProjectPayload(
+                            parent_folder=str(app.workarea),
+                            project_name="P",
+                            batch=tuple(names),
+                            assignments={"firmware": tuple(names)},
+                        )
+                    )
+                await _wait_yielding(
+                    pilot,
+                    lambda: any(o in s for s in statuses for o in WRITER_OUTCOMES),
+                    f"the {writer}'s manifest outcome",
+                )
+                return painted_at[0] - started
+    
+        took = asyncio.run(_drive())
+        outcomes = [s for s in statuses if any(o in s for o in WRITER_OUTCOMES)]
+        print(f"{writer}: trigger -> outcome {took:.3f} s; {outcomes[:1]}")
+        assert "manifest verified" in outcomes[0], outcomes
+>       assert took < report_margin(f"TC-B100-20 {writer}", took, timing_bound(1.0)), took
+E       AssertionError: 1.238282457983587
+E       assert 1.238282457983587 < 1.0
+E        +  where 1.0 = report_margin('TC-B100-20 variant-append', 1.238282457983587, 1.0)
+E        +    where 1.0 = timing_bound(1.0)
+
+tests/test_b100_active_variant.py:746: AssertionError
+----------------------------- Captured stdout call -----------------------------
+variant-append: trigger -> outcome 1.238 s; ['Project saved + manifest verified']
+_ test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync] _
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_31')
+writer = 'mac-sync'
+
+    @pytest.mark.serial_timing
+    @pytest.mark.parametrize(
+        "writer", ["variant-append", "mac-sync", "a2l-sync", "save-back", "save-project"]
+    )
+    def test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second(
+        tmp_path: Path, writer: str
+    ) -> None:
+        """Inc 7 corrective pass 2, SEC7-R2-2 (SEC6-5's time bound for the
+        writers; security probe T2): P records 1 000 real files at the end of a
+        31-folder chain in ``batch``, ``assignments`` and ``gathered`` (no
+        finding, so every writer rewrites). Each in-project writer — variant
+        append, MAC sync, A2L sync, save-back — and Save project with that
+        composition reach their verified manifest line under 1 s from the
+        trigger.
+    
+        RED (cp1 tree): append 6.89 s, MAC sync 7.12 s, A2L sync 6.44 s,
+        save-back 6.42 s (one fresh walk per entry in the serializer).
+    
+        Fix round 2 R-1 (measurement re-pin, the Inc 12b F-23 rule): the loads
+        (Inc 12a) and Save project (Inc 12b) run on workers, so the polling
+        loop saw the outcome line some time after the app painted it. The clock
+        now stops when ``set_status`` receives the outcome line (the bound's end
+        point: the line is painted by the main-thread commit), not when the
+        settle loop notices it.
+    
+        Batch-101 Inc 3: the ``save-project`` parameter verifies R-PROJ-001.13;
+        its 0.8 s target is read from the QC-TM row, not asserted."""
+        from s19_app.tui.app import SaveProjectPayload
+    
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        names = projects.real_files_under_a_chain(project_dir)
+        manifest = projects.read_manifest(project_dir)
+        manifest.update(batch=names, assignments={"firmware": names}, gathered={"patches": names})
+        (project_dir / "project.json").write_text(
+            json.dumps(manifest, separators=(",", ":")), encoding="utf-8"
+        )
+        sources = {
+            "variant-append": (projects.CASE02_DIR, "firmware.s19"),
+            "mac-sync": (projects.CASE01_DIR, "firmware.mac"),
+            "a2l-sync": (projects.CASE01_DIR, "firmware.a2l"),
+        }
+        src = None
+        if writer in sources:
+            folder, name = sources[writer]
+            src = projects.copy_sources(tmp_path / "src", folder, name) / name
+        statuses: list = []
+        painted_at: list = []
+    
+        async def _drive() -> float:
+            app = S19TuiApp(base_dir=base)
+            real_set_status = app.set_status
+    
+            def _capture(message, *args, **kwargs):
+                statuses.append(str(message))
+                if not painted_at and any(o in str(message) for o in WRITER_OUTCOMES):
+                    painted_at.append(time.perf_counter())
+                return real_set_status(message, *args, **kwargs)
+    
+            app.set_status = _capture
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await _open_seeded_project(pilot, app)
+                statuses.clear()
+                painted_at.clear()
+                started = time.perf_counter()
+                if writer == "save-back":
+                    _apply_patch(app)
+                    app.on_patch_editor_panel_save_back_decision(
+                        PatchEditorPanel.SaveBackDecision("firmware.s19", 32)
+                    )
+                elif writer == "variant-append" or writer == "mac-sync":
+                    app.load_from_path(src)
+                elif writer == "a2l-sync":
+                    app.load_a2l_from_path(src)
+                else:
+                    app._handle_save_dialog(
+                        SaveProjectPayload(
+                            parent_folder=str(app.workarea),
+                            project_name="P",
+                            batch=tuple(names),
+                            assignments={"firmware": tuple(names)},
+                        )
+                    )
+                await _wait_yielding(
+                    pilot,
+                    lambda: any(o in s for s in statuses for o in WRITER_OUTCOMES),
+                    f"the {writer}'s manifest outcome",
+                )
+                return painted_at[0] - started
+    
+        took = asyncio.run(_drive())
+        outcomes = [s for s in statuses if any(o in s for o in WRITER_OUTCOMES)]
+        print(f"{writer}: trigger -> outcome {took:.3f} s; {outcomes[:1]}")
+        assert "manifest verified" in outcomes[0], outcomes
+>       assert took < report_margin(f"TC-B100-20 {writer}", took, timing_bound(1.0)), took
+E       AssertionError: 1.1192418400023598
+E       assert 1.1192418400023598 < 1.0
+E        +  where 1.0 = report_margin('TC-B100-20 mac-sync', 1.1192418400023598, 1.0)
+E        +    where 1.0 = timing_bound(1.0)
+
+tests/test_b100_active_variant.py:746: AssertionError
+----------------------------- Captured stdout call -----------------------------
+mac-sync: trigger -> outcome 1.119 s; ['Project saved + manifest verified']
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_31/app workarea=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_31/app/.s19tool/workarea
+INFO     s19tui:app.py:8263 Workarea refreshed. files=0
+INFO     s19tui:app.py:16524 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+WARNING  s19tui:app.py:13840 Project P: no digests saved project.json (None)
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18598 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_31/app/.s19tool/workarea/P/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14099 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18059 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:14035 Project loaded. name=P file=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_31/app/.s19tool/workarea/P/firmware.s19 mac=None
+INFO     s19tui:app.py:18726 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18075 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18087 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19746 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.002
+INFO     s19tui:app.py:17619 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17674 MAC row cache built: records=0 elapsed_seconds=0.001
+INFO     s19tui:app.py:16524 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.018
+INFO     s19tui:app.py:19260 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.021
+INFO     s19tui:app.py:18100 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:18953 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18117 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_31/app/.s19tool/workarea/P/firmware.s19 file_type=s19 elapsed_seconds=0.626 has_mac=False precomputed=False
+INFO     s19tui:app.py:15422 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_31/src/firmware.mac
+INFO     s19tui:app.py:15443 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_31/src/firmware.mac
+INFO     s19tui:app.py:15456 Load phase boundary: copy_done path=firmware.mac elapsed=0.001s
+WARNING  s19tui:app.py:15475 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_31/src/firmware.mac'
+INFO     s19tui:app.py:8263 Workarea refreshed. files=1
+INFO     s19tui:app.py:15493 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_31/app/.s19tool/workarea/temp/firmware.mac size_bytes=32 copy_seconds=0.001
+INFO     s19tui:app.py:15499 Load phase boundary: worker_spawned path=firmware.mac
+INFO     s19tui:app.py:18382 Load phase boundary: worker_parse_start path=firmware.mac
+INFO     s19tui:app.py:17766 Loading file: path=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_31/app/.s19tool/workarea/temp/firmware.mac suffix=.mac project=P
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=firmware.mac suffix=.mac
+INFO     s19tui:app.py:16783 Load phase boundary: mac_parse_entry path=firmware.mac
+INFO     s19tui:app.py:16789 Load phase boundary: mac_parse_done path=firmware.mac rows=2 diagnostics=1 elapsed=0.000s
+INFO     s19tui:app.py:16803 MAC parse summary (mirrored): path=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_31/app/.s19tool/workarea/temp/firmware.mac rows=2 parse_ok=1 diagnostics=1 valid_addresses=1
+INFO     s19tui:app.py:16824 Load phase boundary: mac_a2l_resolve_entry path=firmware.mac a2l_path=None
+INFO     s19tui:app.py:16830 Load phase boundary: mac_a2l_resolve_done path=firmware.mac has_a2l_data=False
+INFO     s19tui:app.py:16836 MAC parse summary: path=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_31/app/.s19tool/workarea/temp/firmware.mac total_records=2 parse_ok=1 diagnostics=1 valid_addresses=1 a2l_path=None elapsed_seconds=0.001
+INFO     s19tui:app.py:14124 Load phase boundary: mac_merge_entry path=firmware.mac has_primary=True
+INFO     s19tui:app.py:14131 Load phase boundary: mac_merge_done path=firmware.mac file_type=s19
+INFO     s19tui:app.py:18598 Load summary: file_type=s19+mac path=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_31/app/.s19tool/workarea/temp/firmware.mac addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14153 Load phase boundary: parse_branch_done path=firmware.mac branch=mac
+INFO     s19tui:app.py:18401 Load phase boundary: worker_parse_done path=firmware.mac elapsed=0.002s
+INFO     s19tui:app.py:18225 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:18260 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17619 MAC validation computed: records=2 issues=2 elapsed_seconds=0.000
+INFO     s19tui:app.py:18269 Load phase boundary: prepare_mac_payload_done rows=2 issues=2
+INFO     s19tui:app.py:18289 Load phase boundary: prepare_highlights_done highlights=1 out_of_range=0
+INFO     s19tui:app.py:18296 Load phase boundary: prepare_bases_done row_bases=7
+INFO     s19tui:app.py:18306 Load phase boundary: prepare_datatable_done mac_rows=2 widths=(9, 10, 5, 5, 9, 10, 26, 8)
+INFO     s19tui:app.py:18312 Load phase boundary: prepare_done records=2
+INFO     s19tui:app.py:18434 Load phase boundary: worker_compute_done path=firmware.mac precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:18441 Load phase boundary: call_from_thread_apply_dispatched path=firmware.mac
+INFO     s19tui:app.py:18059 Load phase boundary: apply_install_state path=firmware.mac precomputed=True
+INFO     s19tui:app.py:18726 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18075 Load phase boundary: apply_sections_done path=firmware.mac
+INFO     s19tui:app.py:14976 Sync skipped: variant 'firmware' already in project /tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_31/app/.s19tool/workarea/P
+INFO     s19tui:app.py:15040 Synced attached MAC file into project: /tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_31/app/.s19tool/workarea/P
+INFO     s19tui:app.py:18087 Load phase boundary: apply_hex_done path=firmware.mac
+INFO     s19tui:app.py:19746 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:16556 Load phase boundary: populate_issues_table_done rows=2 total=2 elapsed=0.019
+INFO     s19tui:app.py:19311 Load phase boundary: populate_mac_table_done rows=2 total=2 elapsed=0.021
+INFO     s19tui:app.py:18100 Load phase boundary: apply_a2l_done path=firmware.mac
+INFO     s19tui:app.py:18953 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18117 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_31/app/.s19tool/workarea/temp/firmware.mac file_type=s19 elapsed_seconds=1.384 has_mac=True precomputed=True
+_ test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[a2l-sync] _
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_32')
+writer = 'a2l-sync'
+
+    @pytest.mark.serial_timing
+    @pytest.mark.parametrize(
+        "writer", ["variant-append", "mac-sync", "a2l-sync", "save-back", "save-project"]
+    )
+    def test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second(
+        tmp_path: Path, writer: str
+    ) -> None:
+        """Inc 7 corrective pass 2, SEC7-R2-2 (SEC6-5's time bound for the
+        writers; security probe T2): P records 1 000 real files at the end of a
+        31-folder chain in ``batch``, ``assignments`` and ``gathered`` (no
+        finding, so every writer rewrites). Each in-project writer — variant
+        append, MAC sync, A2L sync, save-back — and Save project with that
+        composition reach their verified manifest line under 1 s from the
+        trigger.
+    
+        RED (cp1 tree): append 6.89 s, MAC sync 7.12 s, A2L sync 6.44 s,
+        save-back 6.42 s (one fresh walk per entry in the serializer).
+    
+        Fix round 2 R-1 (measurement re-pin, the Inc 12b F-23 rule): the loads
+        (Inc 12a) and Save project (Inc 12b) run on workers, so the polling
+        loop saw the outcome line some time after the app painted it. The clock
+        now stops when ``set_status`` receives the outcome line (the bound's end
+        point: the line is painted by the main-thread commit), not when the
+        settle loop notices it.
+    
+        Batch-101 Inc 3: the ``save-project`` parameter verifies R-PROJ-001.13;
+        its 0.8 s target is read from the QC-TM row, not asserted."""
+        from s19_app.tui.app import SaveProjectPayload
+    
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        names = projects.real_files_under_a_chain(project_dir)
+        manifest = projects.read_manifest(project_dir)
+        manifest.update(batch=names, assignments={"firmware": names}, gathered={"patches": names})
+        (project_dir / "project.json").write_text(
+            json.dumps(manifest, separators=(",", ":")), encoding="utf-8"
+        )
+        sources = {
+            "variant-append": (projects.CASE02_DIR, "firmware.s19"),
+            "mac-sync": (projects.CASE01_DIR, "firmware.mac"),
+            "a2l-sync": (projects.CASE01_DIR, "firmware.a2l"),
+        }
+        src = None
+        if writer in sources:
+            folder, name = sources[writer]
+            src = projects.copy_sources(tmp_path / "src", folder, name) / name
+        statuses: list = []
+        painted_at: list = []
+    
+        async def _drive() -> float:
+            app = S19TuiApp(base_dir=base)
+            real_set_status = app.set_status
+    
+            def _capture(message, *args, **kwargs):
+                statuses.append(str(message))
+                if not painted_at and any(o in str(message) for o in WRITER_OUTCOMES):
+                    painted_at.append(time.perf_counter())
+                return real_set_status(message, *args, **kwargs)
+    
+            app.set_status = _capture
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await _open_seeded_project(pilot, app)
+                statuses.clear()
+                painted_at.clear()
+                started = time.perf_counter()
+                if writer == "save-back":
+                    _apply_patch(app)
+                    app.on_patch_editor_panel_save_back_decision(
+                        PatchEditorPanel.SaveBackDecision("firmware.s19", 32)
+                    )
+                elif writer == "variant-append" or writer == "mac-sync":
+                    app.load_from_path(src)
+                elif writer == "a2l-sync":
+                    app.load_a2l_from_path(src)
+                else:
+                    app._handle_save_dialog(
+                        SaveProjectPayload(
+                            parent_folder=str(app.workarea),
+                            project_name="P",
+                            batch=tuple(names),
+                            assignments={"firmware": tuple(names)},
+                        )
+                    )
+                await _wait_yielding(
+                    pilot,
+                    lambda: any(o in s for s in statuses for o in WRITER_OUTCOMES),
+                    f"the {writer}'s manifest outcome",
+                )
+                return painted_at[0] - started
+    
+        took = asyncio.run(_drive())
+        outcomes = [s for s in statuses if any(o in s for o in WRITER_OUTCOMES)]
+        print(f"{writer}: trigger -> outcome {took:.3f} s; {outcomes[:1]}")
+        assert "manifest verified" in outcomes[0], outcomes
+>       assert took < report_margin(f"TC-B100-20 {writer}", took, timing_bound(1.0)), took
+E       AssertionError: 1.042391121009132
+E       assert 1.042391121009132 < 1.0
+E        +  where 1.0 = report_margin('TC-B100-20 a2l-sync', 1.042391121009132, 1.0)
+E        +    where 1.0 = timing_bound(1.0)
+
+tests/test_b100_active_variant.py:746: AssertionError
+----------------------------- Captured stdout call -----------------------------
+a2l-sync: trigger -> outcome 1.042 s; ['Project saved + manifest verified']
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_32/app workarea=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_32/app/.s19tool/workarea
+INFO     s19tui:app.py:8263 Workarea refreshed. files=0
+INFO     s19tui:app.py:16524 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.016
+WARNING  s19tui:app.py:13840 Project P: no digests saved project.json (None)
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18598 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_32/app/.s19tool/workarea/P/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14099 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18059 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:14035 Project loaded. name=P file=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_32/app/.s19tool/workarea/P/firmware.s19 mac=None
+INFO     s19tui:app.py:18726 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18075 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18087 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19746 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17619 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17674 MAC row cache built: records=0 elapsed_seconds=0.001
+INFO     s19tui:app.py:16524 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.017
+INFO     s19tui:app.py:19260 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.021
+INFO     s19tui:app.py:18100 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:18953 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18117 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_32/app/.s19tool/workarea/P/firmware.s19 file_type=s19 elapsed_seconds=0.429 has_mac=False precomputed=False
+INFO     s19tui:app.py:15606 A2L copy complete: path=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_32/app/.s19tool/workarea/temp/firmware.a2l size_bytes=1391 copy_seconds=0.001
+INFO     s19tui:app.py:931 A2L cache miss: path=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_32/app/.s19tool/workarea/temp/firmware.a2l size_bytes=1391
+WARNING  s19tui:app.py:15644 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_32/src/firmware.a2l'
+INFO     s19tui:app.py:8263 Workarea refreshed. files=1
+INFO     s19tui:app.py:18545 A2L parse summary: path=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_32/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.002 sections=1 tags=3 errors=0
+INFO     s19tui:app.py:17619 MAC validation computed: records=0 issues=7 elapsed_seconds=0.001
+INFO     s19tui:app.py:17674 MAC row cache built: records=0 elapsed_seconds=0.001
+INFO     s19tui:app.py:16556 Load phase boundary: populate_issues_table_done rows=7 total=7 elapsed=0.023
+INFO     s19tui:app.py:19260 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.027
+INFO     s19tui:app.py:19787 Load phase boundary: populate_a2l_table_done rows=3 total=3 elapsed=0.002
+INFO     s19tui:app.py:15663 A2L view refresh complete: path=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_32/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.031
+INFO     s19tui:app.py:15671 A2L loaded: /tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_32/app/.s19tool/workarea/temp/firmware.a2l
+INFO     s19tui:app.py:15087 Synced A2L file into project: /tmp/pytest-of-<USER>/pytest-11/test_tc_b100_20_writers_on_a_32/app/.s19tool/workarea/P
+______ test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling ______
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_61_sec6_5_distinc0')
+
+    @pytest.mark.serial_timing
+    def test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling(tmp_path: Path) -> None:
+        """Inc 7 corrective pass 2 (R2-2), the folder ceiling's worst case: 3 x
+        1 000 entries each under its own real folder, 1 000 ``files`` records
+        and 1 000 ``derived_from`` records with distinct bases (the most folder
+        and file checks the caps allow). Folder checks stop at
+        ``MANIFEST_FOLDER_CHECK_CAP`` (1 000); the 2 000 entries past it are skipped
+        unchecked and counted in one row (never silently); read, Load + panel
+        and the variant append's re-read each stay under 1 s."""
+    
+        def _folders(project_dir: Path) -> None:
+            for name in hostile.distinct_folder_names():
+                (project_dir / name).mkdir()
+                (project_dir / name / "x.json").write_text("{}", encoding="utf-8")
+    
+        scene = _sec6_5_filesystem_scene(tmp_path, hostile.distinct_folders_at_cap(), setup=_folders)
+>       _assert_sec6_5_bounded(scene)
+
+tests/test_b100_project_check.py:1311: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+scene = {'read': 0.131473873014329, 'load': 0.5826390970032662, 'painted': 1.0016910529811867, 'rows': 103, ...}
+
+    def _assert_sec6_5_bounded(scene: dict) -> None:
+        timings = {key: scene[key] for key in ("read", "load", "painted", "appended")}
+        print("SEC6-5 timings (s):", {key: round(value, 3) for key, value in timings.items()})
+        assert scene["read"] < report_margin("sec6_5 read", scene["read"], timing_bound(1.0)), timings
+        assert scene["load"] is not None and scene["load"] < report_margin(
+            "sec6_5 load", scene["load"], timing_bound(1.0)
+        ), timings
+>       assert scene["painted"] < report_margin(
+            "sec6_5 painted", scene["painted"], timing_bound(1.0)
+        ), timings
+E       AssertionError: {'read': 0.131473873014329, 'load': 0.5826390970032662, 'painted': 1.0016910529811867, 'appended': 0.3833569480048027}
+E       assert 1.0016910529811867 < 1.0
+E        +  where 1.0 = report_margin('sec6_5 painted', 1.0016910529811867, 1.0)
+E        +    where 1.0 = timing_bound(1.0)
+
+tests/test_b100_project_check.py:1144: AssertionError
+----------------------------- Captured stdout call -----------------------------
+SEC6-5 timings (s): {'read': 0.131, 'load': 0.583, 'painted': 1.002, 'appended': 0.383}
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_61_sec6_5_distinc0/app workarea=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_61_sec6_5_distinc0/app/.s19tool/workarea
+INFO     s19tui:app.py:8263 Workarea refreshed. files=0
+INFO     s19tui:app.py:16524 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.028
+INFO     s19tui:app.py:8410 Load project action triggered.
+INFO     s19tui:app.py:15377 Load phase boundary: modal_dismiss_scheduled kind=project value='P'
+WARNING  s19tui:app.py:13840 Project P: manifest damaged 2000 more recorded entries (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13840 Project P: missing f0.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f1.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f2.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f3.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f4.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f5.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f6.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f7.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f8.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f9.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f10.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f11.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f12.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f13.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f14.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f15.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f16.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f17.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f18.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f19.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f20.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f21.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f22.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f23.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f24.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f25.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f26.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f27.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f28.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f29.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f30.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f31.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f32.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f33.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f34.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f35.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f36.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f37.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f38.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f39.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f40.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f41.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f42.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f43.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f44.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f45.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f46.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f47.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f48.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f49.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f50.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f51.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f52.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f53.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f54.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f55.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f56.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f57.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f58.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f59.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f60.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f61.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f62.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f63.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f64.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f65.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f66.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f67.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f68.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f69.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f70.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f71.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f72.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f73.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f74.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f75.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f76.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f77.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f78.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f79.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f80.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f81.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f82.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f83.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f84.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f85.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f86.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f87.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f88.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f89.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f90.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f91.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f92.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f93.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f94.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f95.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f96.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f97.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f98.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f99.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f100.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f101.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f102.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f103.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f104.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f105.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f106.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f107.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f108.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f109.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f110.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f111.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f112.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f113.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f114.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f115.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f116.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f117.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f118.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f119.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f120.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f121.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f122.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f123.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f124.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f125.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f126.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f127.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f128.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f129.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f130.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f131.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f132.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f133.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f134.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f135.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f136.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f137.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f138.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f139.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f140.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f141.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f142.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f143.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f144.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f145.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f146.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f147.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f148.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f149.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f150.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f151.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f152.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f153.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f154.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f155.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f156.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f157.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f158.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f159.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f160.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f161.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f162.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f163.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f164.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f165.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f166.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f167.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f168.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f169.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f170.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f171.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f172.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f173.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f174.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f175.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f176.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f177.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f178.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f179.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f180.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f181.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f182.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f183.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f184.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f185.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f186.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f187.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f188.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f189.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f190.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f191.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f192.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f193.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f194.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f195.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f196.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f197.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f198.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f199.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f200.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f201.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f202.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f203.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f204.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f205.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f206.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f207.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f208.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f209.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f210.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f211.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f212.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f213.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f214.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f215.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f216.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f217.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f218.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f219.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f220.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f221.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f222.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f223.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f224.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f225.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f226.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f227.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f228.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f229.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f230.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f231.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f232.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f233.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f234.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f235.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f236.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f237.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f238.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f239.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f240.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f241.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f242.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f243.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f244.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f245.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f246.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f247.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f248.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f249.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f250.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f251.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f252.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f253.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f254.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f255.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f256.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f257.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f258.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f259.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f260.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f261.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f262.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f263.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f264.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f265.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f266.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f267.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f268.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f269.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f270.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f271.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f272.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f273.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f274.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f275.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f276.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f277.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f278.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f279.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f280.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f281.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f282.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f283.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f284.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f285.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f286.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f287.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f288.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f289.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f290.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f291.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f292.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f293.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f294.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f295.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f296.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f297.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f298.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f299.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f300.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f301.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f302.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f303.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f304.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f305.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f306.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f307.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f308.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f309.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f310.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f311.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f312.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f313.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f314.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f315.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f316.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f317.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f318.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f319.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f320.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f321.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f322.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f323.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f324.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f325.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f326.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f327.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f328.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f329.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f330.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f331.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f332.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f333.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f334.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f335.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f336.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f337.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f338.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f339.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f340.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f341.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f342.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f343.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f344.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f345.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f346.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f347.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f348.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f349.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f350.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f351.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f352.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f353.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f354.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f355.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f356.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f357.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f358.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f359.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f360.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f361.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f362.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f363.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f364.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f365.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f366.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f367.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f368.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f369.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f370.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f371.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f372.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f373.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f374.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f375.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f376.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f377.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f378.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f379.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f380.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f381.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f382.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f383.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f384.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f385.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f386.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f387.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f388.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f389.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f390.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f391.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f392.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f393.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f394.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f395.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f396.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f397.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f398.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f399.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f400.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f401.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f402.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f403.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f404.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f405.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f406.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f407.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f408.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f409.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f410.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f411.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f412.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f413.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f414.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f415.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f416.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f417.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f418.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f419.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f420.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f421.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f422.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f423.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f424.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f425.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f426.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f427.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f428.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f429.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f430.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f431.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f432.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f433.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f434.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f435.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f436.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f437.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f438.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f439.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f440.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f441.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f442.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f443.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f444.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f445.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f446.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f447.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f448.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f449.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f450.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f451.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f452.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f453.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f454.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f455.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f456.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f457.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f458.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f459.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f460.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f461.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f462.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f463.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f464.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f465.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f466.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f467.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f468.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f469.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f470.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f471.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f472.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f473.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f474.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f475.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f476.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f477.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f478.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f479.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f480.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f481.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f482.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f483.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f484.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f485.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f486.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f487.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f488.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f489.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f490.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f491.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f492.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f493.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f494.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f495.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f496.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f497.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f498.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f499.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f500.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f501.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f502.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f503.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f504.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f505.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f506.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f507.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f508.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f509.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f510.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f511.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f512.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f513.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f514.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f515.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f516.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f517.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f518.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f519.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f520.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f521.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f522.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f523.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f524.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f525.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f526.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f527.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f528.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f529.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f530.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f531.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f532.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f533.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f534.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f535.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f536.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f537.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f538.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f539.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f540.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f541.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f542.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f543.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f544.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f545.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f546.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f547.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f548.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f549.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f550.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f551.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f552.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f553.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f554.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f555.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f556.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f557.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f558.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f559.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f560.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f561.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f562.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f563.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f564.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f565.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f566.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f567.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f568.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f569.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f570.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f571.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f572.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f573.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f574.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f575.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f576.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f577.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f578.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f579.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f580.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f581.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f582.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f583.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f584.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f585.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f586.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f587.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f588.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f589.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f590.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f591.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f592.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f593.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f594.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f595.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f596.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f597.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f598.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f599.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f600.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f601.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f602.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f603.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f604.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f605.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f606.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f607.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f608.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f609.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f610.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f611.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f612.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f613.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f614.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f615.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f616.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f617.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f618.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f619.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f620.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f621.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f622.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f623.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f624.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f625.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f626.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f627.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f628.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f629.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f630.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f631.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f632.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f633.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f634.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f635.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f636.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f637.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f638.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f639.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f640.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f641.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f642.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f643.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f644.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f645.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f646.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f647.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f648.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f649.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f650.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f651.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f652.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f653.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f654.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f655.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f656.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f657.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f658.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f659.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f660.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f661.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f662.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f663.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f664.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f665.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f666.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f667.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f668.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f669.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f670.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f671.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f672.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f673.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f674.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f675.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f676.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f677.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f678.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f679.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f680.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f681.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f682.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f683.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f684.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f685.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f686.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f687.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f688.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f689.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f690.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f691.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f692.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f693.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f694.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f695.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f696.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f697.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f698.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f699.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f700.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f701.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f702.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f703.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f704.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f705.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f706.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f707.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f708.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f709.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f710.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f711.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f712.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f713.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f714.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f715.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f716.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f717.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f718.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f719.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f720.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f721.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f722.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f723.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f724.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f725.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f726.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f727.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f728.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f729.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f730.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f731.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f732.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f733.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f734.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f735.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f736.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f737.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f738.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f739.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f740.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f741.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f742.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f743.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f744.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f745.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f746.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f747.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f748.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f749.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f750.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f751.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f752.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f753.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f754.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f755.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f756.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f757.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f758.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f759.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f760.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f761.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f762.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f763.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f764.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f765.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f766.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f767.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f768.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f769.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f770.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f771.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f772.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f773.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f774.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f775.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f776.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f777.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f778.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f779.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f780.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f781.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f782.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f783.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f784.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f785.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f786.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f787.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f788.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f789.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f790.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f791.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f792.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f793.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f794.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f795.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f796.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f797.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f798.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f799.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f800.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f801.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f802.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f803.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f804.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f805.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f806.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f807.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f808.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f809.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f810.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f811.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f812.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f813.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f814.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f815.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f816.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f817.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f818.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f819.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f820.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f821.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f822.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f823.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f824.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f825.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f826.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f827.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f828.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f829.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f830.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f831.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f832.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f833.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f834.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f835.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f836.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f837.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f838.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f839.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f840.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f841.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f842.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f843.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f844.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f845.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f846.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f847.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f848.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f849.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f850.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f851.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f852.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f853.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f854.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f855.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f856.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f857.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f858.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f859.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f860.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f861.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f862.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f863.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f864.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f865.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f866.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f867.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f868.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f869.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f870.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f871.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f872.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f873.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f874.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f875.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f876.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f877.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f878.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f879.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f880.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f881.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f882.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f883.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f884.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f885.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f886.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f887.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f888.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f889.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f890.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f891.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f892.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f893.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f894.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f895.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f896.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f897.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f898.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f899.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f900.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f901.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f902.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f903.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f904.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f905.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f906.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f907.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f908.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f909.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f910.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f911.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f912.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f913.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f914.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f915.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f916.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f917.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f918.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f919.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f920.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f921.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f922.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f923.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f924.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f925.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f926.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f927.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f928.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f929.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f930.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f931.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f932.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f933.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f934.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f935.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f936.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f937.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f938.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f939.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f940.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f941.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f942.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f943.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f944.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f945.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f946.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f947.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f948.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f949.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f950.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f951.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f952.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f953.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f954.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f955.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f956.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f957.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f958.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f959.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f960.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f961.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f962.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f963.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f964.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f965.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f966.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f967.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f968.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f969.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f970.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f971.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f972.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f973.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f974.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f975.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f976.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f977.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f978.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f979.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f980.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f981.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f982.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f983.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f984.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f985.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f986.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f987.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f988.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f989.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f990.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f991.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f992.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f993.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f994.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f995.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f996.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f997.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f998.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: missing f999.s19 (None)
+WARNING  s19tui:app.py:13840 Project P: not recorded firmware.s19 (None)
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18598 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_61_sec6_5_distinc0/app/.s19tool/workarea/P/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14099 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18059 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:14035 Project loaded. name=P file=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_61_sec6_5_distinc0/app/.s19tool/workarea/P/firmware.s19 mac=None
+INFO     s19tui:app.py:18726 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18075 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18087 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19746 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17619 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17674 MAC row cache built: records=0 elapsed_seconds=0.001
+INFO     s19tui:app.py:16524 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.018
+INFO     s19tui:app.py:19260 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.021
+INFO     s19tui:app.py:18100 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:18953 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18117 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_61_sec6_5_distinc0/app/.s19tool/workarea/P/firmware.s19 file_type=s19 elapsed_seconds=1.952 has_mac=False precomputed=False
+INFO     s19tui:app.py:15422 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_61_sec6_5_distinc0/src/extra.s19
+INFO     s19tui:app.py:15443 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_61_sec6_5_distinc0/src/extra.s19
+INFO     s19tui:app.py:15456 Load phase boundary: copy_done path=extra.s19 elapsed=0.001s
+WARNING  s19tui:app.py:15475 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_61_sec6_5_distinc0/src/extra.s19'
+INFO     s19tui:app.py:8263 Workarea refreshed. files=1
+INFO     s19tui:app.py:15493 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_61_sec6_5_distinc0/app/.s19tool/workarea/temp/extra.s19 size_bytes=349 copy_seconds=0.001
+INFO     s19tui:app.py:15499 Load phase boundary: worker_spawned path=extra.s19
+INFO     s19tui:app.py:18382 Load phase boundary: worker_parse_start path=extra.s19
+INFO     s19tui:app.py:17766 Loading file: path=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_61_sec6_5_distinc0/app/.s19tool/workarea/temp/extra.s19 suffix=.s19 project=P
+INFO     s19tui:app.py:14082 Load phase boundary: parse_branch_entry path=extra.s19 suffix=.s19
+INFO     s19tui:app.py:18598 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_61_sec6_5_distinc0/app/.s19tool/workarea/temp/extra.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14099 Load phase boundary: parse_branch_done path=extra.s19 branch=s19
+INFO     s19tui:app.py:18401 Load phase boundary: worker_parse_done path=extra.s19 elapsed=0.006s
+INFO     s19tui:app.py:18225 Load phase boundary: prepare_entry path=extra.s19 file_type=s19
+INFO     s19tui:app.py:18260 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17619 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18269 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18289 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18296 Load phase boundary: prepare_bases_done row_bases=7
+INFO     s19tui:app.py:18306 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18312 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:18434 Load phase boundary: worker_compute_done path=extra.s19 precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:18441 Load phase boundary: call_from_thread_apply_dispatched path=extra.s19
+INFO     s19tui:app.py:18059 Load phase boundary: apply_install_state path=extra.s19 precomputed=True
+INFO     s19tui:app.py:18726 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18075 Load phase boundary: apply_sections_done path=extra.s19
+WARNING  s19tui:app.py:14791 Manifest not rewritten (holds entries that were skipped): /tmp/pytest-of-<USER>/pytest-11/test_tc_b100_61_sec6_5_distinc0/app/.s19tool/workarea/P (placed /tmp/pytest-of-<USER>/pytest-11/test_tc_b100_61_sec6_5_distinc0/app/.s19tool/workarea/P/extra.s19)
+INFO     s19tui:app.py:15019 Appended variant 'extra' into project: /tmp/pytest-of-<USER>/pytest-11/test_tc_b100_61_sec6_5_distinc0/app/.s19tool/workarea/P
+INFO     s19tui:app.py:18087 Load phase boundary: apply_hex_done path=extra.s19
+INFO     s19tui:app.py:19746 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:16524 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:19260 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.012
+INFO     s19tui:app.py:18100 Load phase boundary: apply_a2l_done path=extra.s19
+INFO     s19tui:app.py:18953 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18117 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-11/test_tc_b100_61_sec6_5_distinc0/app/.s19tool/workarea/temp/extra.s19 file_type=s19 elapsed_seconds=0.806 has_mac=False precomputed=True
+============================= QC-TM timing margins =============================
+LOW -23.8%  1.238 s / 1.000 s  TC-B100-20 variant-append  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[variant-append]
+LOW -11.9%  1.119 s / 1.000 s  TC-B100-20 mac-sync  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync]
+LOW -4.2%  1.042 s / 1.000 s  TC-B100-20 a2l-sync  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[a2l-sync]
+LOW -0.2%  1.002 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+28.8%  0.712 s / 1.000 s  TC-B100-20 save-project  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project]
+41.4%  0.586 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+41.7%  0.583 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+46.4%  0.536 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+49.7%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+51.2%  0.488 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+51.3%  0.487 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+51.8%  0.482 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+52.5%  0.475 s / 1.000 s  TC-B100-20 save-back  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-back]
+55.0%  0.450 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+56.4%  0.436 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+57.4%  0.426 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+57.7%  0.423 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+62.3%  0.377 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+66.4%  0.504 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+71.5%  0.285 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+72.5%  0.275 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+72.7%  0.273 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+75.0%  0.250 s / 1.000 s  TC-B100-61 checks a  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+77.1%  0.229 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+78.2%  0.218 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+80.9%  0.191 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+81.2%  0.188 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+86.6%  0.134 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+86.9%  0.131 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+87.1%  0.129 s / 1.000 s  TC-B100-61 sec7 serialize  tests/test_b100_project_check.py::test_tc_b100_61_sec7_r2_2_one_serialize_checks_each_name_once
+89.0%  0.110 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+91.2%  0.088 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+91.6%  0.084 s / 1.000 s  TC-B100-61 checks d  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+95.2%  0.048 s / 1.000 s  TC-B100-61 checks e  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+95.9%  0.041 s / 1.000 s  TC-B100-61 R2-2 read  tests/test_b100_project_check.py::test_tc_b100_61_r2_2_legitimate_manifest_inside_every_cap_is_checked_whole
+98.6%  0.014 s / 1.000 s  TC-B100-61 checks b  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+99.5%  0.005 s / 1.000 s  TC-B100-24 assignments  tests/test_b100_project_check.py::test_tc_b100_24_assignments_75_by_1000_is_one_issue_fast
+99.8%  0.002 s / 1.000 s  TC-B100-24 files  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[files]
+99.9%  0.001 s / 1.000 s  TC-B100-24 declared_regions  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[declared_regions]
+99.9%  0.001 s / 1.000 s  TC-B100-24 derived_from  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[derived_from]
+100.0%  0.000 s / 1.000 s  TC-B100-24 batch  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[batch]
+100.0%  0.000 s / 1.000 s  TC-B100-24 gathered  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[gathered]
+QC-TM: 42 bounds, 4 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[variant-append]
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync]
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[a2l-sync]
+FAILED tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+4 failed, 19 passed, 1 skipped, 313 deselected in 93.62s (0:01:33)
+EXIT=1

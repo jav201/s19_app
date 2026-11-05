@@ -1,0 +1,33 @@
+tree clean before mutant (equals staged head state)
+applied M-8
+ tests/test_b100_project_check.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+-        "sec6_5 appended", scene["appended"], timing_bound(1.0)
++        "sec6_5 appended", scene["appended"], timing_bound(1.5)
+s19_app.__file__ <HOME>/work/s19_inc3/s19_app/__init__.py 3.11.18
+CMD: cd ~/work/s19_inc3 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 1800 /data/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -rA tests/test_b100_project_check.py -k r_tst_113
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_r_tst_113_panel_and_append_bounds_stay_at_one_second ___________
+
+    def test_r_tst_113_panel_and_append_bounds_stay_at_one_second() -> None:
+        """The four panel / append bounds are still 1 s through ``timing_bound``:
+        the clock fix must not be replaced by a raised bound. A planted copy
+        with one bound at 1.5 s is flagged by the same check, naming the label.
+    
+        Why: a bound raised until the slow reading passes would hide the very
+        slowness the bound exists to catch."""
+        source = Path(__file__).read_text(encoding="utf-8")
+>       assert _off_one_second(source) == [], _off_one_second(source)
+E       AssertionError: ['sec6_5 appended (line 1147): timing_bound(1.5)']
+E       assert ['sec6_5 appe...g_bound(1.5)'] == []
+E         
+E         Left contains one more item: 'sec6_5 appended (line 1147): timing_bound(1.5)'
+E         Use -v to get more diff
+
+tests/test_b100_project_check.py:1641: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b100_project_check.py::test_r_tst_113_panel_and_append_bounds_stay_at_one_second
+1 failed, 100 deselected in 1.91s
+EXIT=1
+REVERTED: git diff --quiet clean

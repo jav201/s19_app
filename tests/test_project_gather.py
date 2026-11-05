@@ -712,12 +712,16 @@ def _composition_scene(tmp_path: Path) -> tuple:
     return project_dir, kwargs
 
 
-def _spy_project_file_checks(monkeypatch: pytest.MonkeyPatch, project_dir: Path) -> list:
+def _spy_project_file_checks(
+    monkeypatch: pytest.MonkeyPatch, project_dir: Path, raw: list | None = None
+) -> list:
     """Record, as normalised text, every file check made on a path inside
     ``project_dir`` through the two seams a composition check can use
     (``Path.is_file`` and ``os.path.isfile``); the real check still runs.
     Checks of paths outside the project (the common library) are not
-    recorded."""
+    recorded. When ``raw`` is given, the same checks are also recorded there
+    as the text the product passed (case-folded only, ``..`` kept), so a
+    caller can see whether the product folded the name itself."""
     prefix = os.path.normcase(os.path.normpath(str(project_dir))) + os.sep
     calls: list = []
 
@@ -725,6 +729,8 @@ def _spy_project_file_checks(monkeypatch: pytest.MonkeyPatch, project_dir: Path)
         text = os.path.normcase(os.path.normpath(str(path)))
         if text.startswith(prefix):
             calls.append(text)
+            if raw is not None:
+                raw.append(os.path.normcase(str(path)))
 
     real_is_file = Path.is_file
     real_isfile = os.path.isfile
@@ -787,12 +793,16 @@ def test_r_proj_gather_12_each_distinct_composition_name_is_checked_once(
     fold_dir = project_dir.parent / "R"
     fold_dir.mkdir()
     (fold_dir / "x.json").write_text(_change_doc_text(), encoding="utf-8")
-    calls = _spy_project_file_checks(monkeypatch, fold_dir)
+    raw: list = []
+    calls = _spy_project_file_checks(monkeypatch, fold_dir, raw)
     folded = gather_project_artifacts(
         fold_dir, composition_names=["missing/../x.json"], **kwargs
     )
     expected_check = os.path.normcase(os.path.normpath(str(fold_dir / "x.json")))
     assert calls == [expected_check], calls
+    # The text the product passed is already folded: on Windows the OS would
+    # fold `..` itself, so only this sees a product that stopped folding.
+    assert raw == [os.path.normcase(str(fold_dir / "x.json"))], raw
     assert folded.gathered == {} and folded.issues == [], (folded.gathered, folded.issues)
 
 

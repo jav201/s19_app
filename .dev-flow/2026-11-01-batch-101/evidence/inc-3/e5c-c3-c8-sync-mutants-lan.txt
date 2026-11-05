@@ -1,0 +1,152 @@
+# E5 corrective C-3 (CR-5) and C-8 load/A2L by keys: LAN Linux host, Python 3.11.18. M-3 / M-4 (sync mkdir restored) against the R-PROJ-002.14 arms and the two by-keys nodes; M-C3 (the load never posts the sync) against R-PROJ-002.14 before (head form, GREEN = the gap) and after C-3 (RED).
+# Mutants: exact text replace, run, restore byte-exact (sha256 printed). Filtered transcript: header, result lines, assertion lines.
+
+======== m3 ========
+HOST: LAN Linux host
+2026-11-05T19:07:29Z
+ 13:07:29 up 2 days, 20:12,  2 users,  load average: 0.95, 1.59, 2.15
+<HOME>/work/s19_inc3c/s19_app/__init__.py 3.11.18
+        """A load or an A2L attach into an open project whose folder was deleted
+        guard passed; the attach still ends A2L loaded: firmware.a2l.
+            # The load reached the sync and was refused there (R-PROJ-002.12's
+            # lines): a load stopped before the sync would also leave no folder.
+E           AssertionError: ['Project saved + manifest verified', "Project 'P2' now opens other.s19", "Added variant 'other' to project 'P2'", 'Loaded other.s19']
+E           assert 0 == 1
+E            +  where 0 = <built-in method count of list object at 0x7f302c32d440>("Project sync NOT done: project 'P2' could not be read — check that the folder can be opened, then load again.")
+E            +    where <built-in method count of list object at 0x7f302c32d440> = ['Project saved + manifest verified', "Project 'P2' now opens other.s19", "Added variant 'other' to project 'P2'", 'Loaded other.s19'].count
+        """A load or an A2L attach into an open project whose folder was deleted
+        guard passed; the attach still ends A2L loaded: firmware.a2l.
+            # The load reached the sync and was refused there (R-PROJ-002.12's
+            # lines): a load stopped before the sync would also leave no folder.
+E           AssertionError: ['Project saved + manifest verified', "Project 'P2' now opens other.hex", "Added variant 'other' to project 'P2'", 'Loaded other.hex']
+E           assert 0 == 1
+E            +  where 0 = <built-in method count of list object at 0x7f3020f76500>("Project sync NOT done: project 'P2' could not be read — check that the folder can be opened, then load again.")
+E            +    where <built-in method count of list object at 0x7f3020f76500> = ['Project saved + manifest verified', "Project 'P2' now opens other.hex", "Added variant 'other' to project 'P2'", 'Loaded other.hex'].count
+        """A load or an A2L attach into an open project whose folder was deleted
+        guard passed; the attach still ends A2L loaded: firmware.a2l.
+            # The load reached the sync and was refused there (R-PROJ-002.12's
+            # lines): a load stopped before the sync would also leave no folder.
+E           AssertionError: ['Project saved + manifest verified', 'Loaded other.mac']
+E           assert 0 == 1
+E            +  where 0 = <built-in method count of list object at 0x7f302093ba40>("Project sync NOT done: project 'P2' could not be read — check that the folder can be opened, then load again.")
+E            +    where <built-in method count of list object at 0x7f302093ba40> = ['Project saved + manifest verified', 'Loaded other.mac'].count
+ERROR    s19_app.core:core.py:361 File not found: /tmp/pytest-of-<USER>/pytest-58/test_r_proj_002_14_sync_into_a2/app/.s19tool/workarea/P2/firmware.s19
+INFO     s19tui:app.py:14977 Sync skipped: variant 'firmware' already in project /tmp/pytest-of-<USER>/pytest-58/test_r_proj_002_14_sync_into_a2/app/.s19tool/workarea/P2
+        ``y`` answers Replace. The load ends ``Loaded other.s19``, the sync
+        refusal is painted exactly once, no variant is reported added, the app
+        (``_confirm_then_load`` defers the load past a refresh); this node runs
+                "the durable load line",
+E       AssertionError: ['Project saved + manifest verified', "Project 'P2' now opens other.s19", "Added variant 'other' to project 'P2'", 'Loaded other.s19']
+E       assert 0 == 1
+E        +  where 0 = <built-in method count of list object at 0x7f30224b3100>("Project sync NOT done: project 'P2' could not be read — check that the folder can be opened, then load again.")
+E        +    where <built-in method count of list object at 0x7f30224b3100> = ['Project saved + manifest verified', "Project 'P2' now opens other.s19", "Added variant 'other' to project 'P2'", 'Loaded other.s19'].count
+ERROR    s19_app.core:core.py:361 File not found: /tmp/pytest-of-<USER>/pytest-58/test_r_proj_002_14_sync_into_a3/app/.s19tool/workarea/P2/firmware.s19
+ERROR    s19_app.core:core.py:361 File not found: /tmp/pytest-of-<USER>/pytest-58/test_r_proj_002_13_by_keys_an_0/app/.s19tool/workarea/P2/firmware.s19
+PASSED tests/test_b100_workers.py::test_at_b100_18_worker_half_case06_project_load_by_keys
+PASSED tests/test_b100_workers.py::test_at_b100_18_refusal_half_l_during_a_save_by_keys
+PASSED tests/test_b100_workers.py::test_at_b100_17_parse_half_case06_a2l_by_keys
+PASSED tests/test_b100_workers.py::test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[a2l]
+PASSED tests/test_b100_workers.py::test_r_proj_002_13_by_keys_an_a2l_typed_into_the_load_dialog_into_a_deleted_project_folder
+FAILED tests/test_b100_workers.py::test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[s19]
+FAILED tests/test_b100_workers.py::test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[hex]
+FAILED tests/test_b100_workers.py::test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[mac]
+FAILED tests/test_b100_workers.py::test_r_proj_002_12_by_keys_a_load_over_unsaved_work_into_a_deleted_project_folder
+4 failed, 5 passed, 74 deselected in 100.50s (0:01:40)
+MUTANT M-3: mkdir(parents=True, exist_ok=True) restored in _sync_loaded_file_to_project (S19/HEX/MAC sync)
+  file s19_app/tui/app.py sha256 before: ec7839290cb95543d30f3b426fd63603bb45501b7456c24f805a3d53f7b2abcf
+pytest exit code: 1 -> RED (mutant killed)
+  file s19_app/tui/app.py sha256 after restore: ec7839290cb95543d30f3b426fd63603bb45501b7456c24f805a3d53f7b2abcf REVERTED byte-exact
+
+======== m4 ========
+HOST: LAN Linux host
+2026-11-05T19:09:14Z
+ 13:09:14 up 2 days, 20:14,  2 users,  load average: 1.14, 1.48, 2.05
+<HOME>/work/s19_inc3c/s19_app/__init__.py 3.11.18
+        """A load or an A2L attach into an open project whose folder was deleted
+        guard passed; the attach still ends A2L loaded: firmware.a2l.
+            # The load reached the sync and was refused there (R-PROJ-002.12's
+            # lines): a load stopped before the sync would also leave no folder.
+E       AssertionError: the sync re-created the deleted project folder
+E       assert True is False
+ERROR    s19_app.core:core.py:361 File not found: /tmp/pytest-of-<USER>/pytest-59/test_r_proj_002_14_sync_into_a3/app/.s19tool/workarea/P2/firmware.s19
+        refusal is painted exactly once, no ``A2L NOT loaded`` line, no run left
+E       AssertionError: ['Project saved + manifest verified', 'A2L loaded: firmware.a2l']
+E       assert 0 == 1
+E        +  where 0 = <built-in method count of list object at 0x7f210b4b6c00>("A2L sync NOT done: project 'P2' could not be read — check that the folder can be opened, then load again.")
+E        +    where <built-in method count of list object at 0x7f210b4b6c00> = ['Project saved + manifest verified', 'A2L loaded: firmware.a2l'].count
+ERROR    s19_app.core:core.py:361 File not found: /tmp/pytest-of-<USER>/pytest-59/test_r_proj_002_13_by_keys_an_0/app/.s19tool/workarea/P2/firmware.s19
+ERROR    s19_app.core:core.py:361 File not found: /tmp/pytest-of-<USER>/pytest-59/test_r_proj_002_14_sync_into_a2/app/.s19tool/workarea/P2/firmware.s19
+PASSED tests/test_b100_workers.py::test_at_b100_18_worker_half_case06_project_load_by_keys
+PASSED tests/test_b100_workers.py::test_at_b100_18_refusal_half_l_during_a_save_by_keys
+PASSED tests/test_b100_workers.py::test_at_b100_17_parse_half_case06_a2l_by_keys
+PASSED tests/test_b100_workers.py::test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[s19]
+PASSED tests/test_b100_workers.py::test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[hex]
+PASSED tests/test_b100_workers.py::test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[mac]
+PASSED tests/test_b100_workers.py::test_r_proj_002_12_by_keys_a_load_over_unsaved_work_into_a_deleted_project_folder
+FAILED tests/test_b100_workers.py::test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[a2l]
+FAILED tests/test_b100_workers.py::test_r_proj_002_13_by_keys_an_a2l_typed_into_the_load_dialog_into_a_deleted_project_folder
+2 failed, 7 passed, 74 deselected in 100.56s (0:01:40)
+MUTANT M-4: mkdir(parents=True, exist_ok=True) restored in _sync_loaded_a2l_to_project
+  file s19_app/tui/app.py sha256 before: ec7839290cb95543d30f3b426fd63603bb45501b7456c24f805a3d53f7b2abcf
+pytest exit code: 1 -> RED (mutant killed)
+  file s19_app/tui/app.py sha256 after restore: ec7839290cb95543d30f3b426fd63603bb45501b7456c24f805a3d53f7b2abcf REVERTED byte-exact
+
+======== mc3_before ========
+HOST: LAN Linux host
+2026-11-05T19:10:59Z
+ 13:10:59 up 2 days, 20:16,  2 users,  load average: 0.69, 1.23, 1.89
+<HOME>/work/s19_inc3c/s19_app/__init__.py 3.11.18
+ERROR    s19_app.core:core.py:361 File not found: /tmp/pytest-of-<USER>/pytest-60/test_r_proj_002_14_sync_into_a2/app/.s19tool/workarea/P2/firmware.s19
+ERROR    s19_app.core:core.py:361 File not found: /tmp/pytest-of-<USER>/pytest-60/test_r_proj_002_14_sync_into_a3/app/.s19tool/workarea/P2/firmware.s19
+PASSED tests/test_b100_workers.py::test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[s19]
+PASSED tests/test_b100_workers.py::test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[hex]
+PASSED tests/test_b100_workers.py::test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[mac]
+PASSED tests/test_b100_workers.py::test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[a2l]
+4 passed, 79 deselected in 18.56s
+MUTANT M-C3 (head 6355565 form of the test): the file load never posts _sync_loaded_file_to_project (a load stopped before the sync); the R-PROJ-002.14 arms without the C-3 line asserts
+  file s19_app/tui/app.py sha256 before: ec7839290cb95543d30f3b426fd63603bb45501b7456c24f805a3d53f7b2abcf
+  file tests/test_b100_workers.py sha256 before: fac839abedd5ea09680a9f572e3ca6a4d6030412e2a9f2b91cd98009713d95cb
+pytest exit code: 0 -> GREEN (mutant survived)
+  file s19_app/tui/app.py sha256 after restore: ec7839290cb95543d30f3b426fd63603bb45501b7456c24f805a3d53f7b2abcf REVERTED byte-exact
+  file tests/test_b100_workers.py sha256 after restore: fac839abedd5ea09680a9f572e3ca6a4d6030412e2a9f2b91cd98009713d95cb REVERTED byte-exact
+
+======== mc3_after ========
+HOST: LAN Linux host
+2026-11-05T19:11:22Z
+ 13:11:22 up 2 days, 20:16,  2 users,  load average: 0.76, 1.22, 1.88
+<HOME>/work/s19_inc3c/s19_app/__init__.py 3.11.18
+        """A load or an A2L attach into an open project whose folder was deleted
+        guard passed; the attach still ends A2L loaded: firmware.a2l.
+            # The load reached the sync and was refused there (R-PROJ-002.12's
+            # lines): a load stopped before the sync would also leave no folder.
+E           AssertionError: ['Loaded other.s19']
+E           assert 0 == 1
+E            +  where 0 = <built-in method count of list object at 0x7fa5d8961a00>("Project sync NOT done: project 'P2' could not be read — check that the folder can be opened, then load again.")
+E            +    where <built-in method count of list object at 0x7fa5d8961a00> = ['Loaded other.s19'].count
+        """A load or an A2L attach into an open project whose folder was deleted
+        guard passed; the attach still ends A2L loaded: firmware.a2l.
+            # The load reached the sync and was refused there (R-PROJ-002.12's
+            # lines): a load stopped before the sync would also leave no folder.
+E           AssertionError: ['Loaded other.hex']
+E           assert 0 == 1
+E            +  where 0 = <built-in method count of list object at 0x7fa5d6cd1dc0>("Project sync NOT done: project 'P2' could not be read — check that the folder can be opened, then load again.")
+E            +    where <built-in method count of list object at 0x7fa5d6cd1dc0> = ['Loaded other.hex'].count
+        """A load or an A2L attach into an open project whose folder was deleted
+        guard passed; the attach still ends A2L loaded: firmware.a2l.
+            # The load reached the sync and was refused there (R-PROJ-002.12's
+            # lines): a load stopped before the sync would also leave no folder.
+E           AssertionError: ['Loaded other.mac']
+E           assert 0 == 1
+E            +  where 0 = <built-in method count of list object at 0x7fa5d5d5dec0>("Project sync NOT done: project 'P2' could not be read — check that the folder can be opened, then load again.")
+E            +    where <built-in method count of list object at 0x7fa5d5d5dec0> = ['Loaded other.mac'].count
+ERROR    s19_app.core:core.py:361 File not found: /tmp/pytest-of-<USER>/pytest-61/test_r_proj_002_14_sync_into_a2/app/.s19tool/workarea/P2/firmware.s19
+ERROR    s19_app.core:core.py:361 File not found: /tmp/pytest-of-<USER>/pytest-61/test_r_proj_002_14_sync_into_a3/app/.s19tool/workarea/P2/firmware.s19
+PASSED tests/test_b100_workers.py::test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[a2l]
+FAILED tests/test_b100_workers.py::test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[s19]
+FAILED tests/test_b100_workers.py::test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[hex]
+FAILED tests/test_b100_workers.py::test_r_proj_002_14_sync_into_a_deleted_project_folder_creates_no_folder[mac]
+3 failed, 1 passed, 79 deselected in 18.83s
+MUTANT M-C3 (C-3 form): the file load never posts _sync_loaded_file_to_project (a load stopped before the sync)
+  file s19_app/tui/app.py sha256 before: ec7839290cb95543d30f3b426fd63603bb45501b7456c24f805a3d53f7b2abcf
+pytest exit code: 1 -> RED (mutant killed)
+  file s19_app/tui/app.py sha256 after restore: ec7839290cb95543d30f3b426fd63603bb45501b7456c24f805a3d53f7b2abcf REVERTED byte-exact

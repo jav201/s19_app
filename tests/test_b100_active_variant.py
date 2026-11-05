@@ -743,6 +743,9 @@ def test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second(
     outcomes = [s for s in statuses if any(o in s for o in WRITER_OUTCOMES)]
     print(f"{writer}: trigger -> outcome {took:.3f} s; {outcomes[:1]}")
     assert "manifest verified" in outcomes[0], outcomes
+    if writer == "save-project":
+        # R-PROJ-001.13 fixes the exact line, not a line that holds it.
+        assert outcomes[0] == "Project saved + manifest verified", outcomes
     assert took < report_margin(f"TC-B100-20 {writer}", took, timing_bound(1.0)), took
 
 
@@ -1541,6 +1544,186 @@ def test_r_proj_rollback_9_2_a_link_loop_at_a_composition_name_ends_in_the_rollb
                 os.rmdir(link)  # never a recursive delete through the junction
 
     lines, left, runs, alive = projects.run_app(base, scenario)
+    assert lines.count(refusal) == 1, lines
+    assert not [line for line in lines if unexpected in line], lines
+    assert not [line for line in lines if verified in line], lines
+    assert alive and runs == [], (alive, runs)
+    assert left == (False, False), f"the failed save left a gathered copy: {left}"
+
+
+def _link_loop_at(link: Path) -> None:
+    """A link at ``link`` that points to itself: a directory junction on
+    Windows, a symbolic link elsewhere (skipped where neither can be made)."""
+    if b100_links.junctions_available():
+        projects.create_junction_loop(link)
+        return
+    try:
+        os.symlink(link.name, link)
+    except (OSError, NotImplementedError) as exc:
+        pytest.skip(f"symbolic links are not available to this run: {exc}")
+
+
+def _remove_link(link: Path) -> None:
+    """Remove the link itself, never a recursive delete through it."""
+    if os.path.islink(link):
+        os.unlink(link)
+    elif os.path.lexists(link):
+        os.rmdir(link)
+
+
+def test_r_proj_rollback_2_a_failed_save_keeps_a_patches_folder_that_existed_before(
+    tmp_path: Path,
+) -> None:
+    """R-PROJ-ROLLBACK.2, its "unless it existed before the save" clause.
+    The scene of the R-PROJ-ROLLBACK.9 node (a link loop at ``P/x.json``,
+    ``x.json`` in the common patches library, Save project with
+    ``batch=("x.json",)``), but ``P/patches/`` already exists, empty, before
+    the save. The save ends with the project.json refusal exactly once; the
+    rollback removes the gathered ``P/patches/x.json`` and keeps the folder.
+
+    Why it matters: the rollback removes what the save created, not what the
+    user had; an empty home it did not create is still the user's.
+
+    Negative control: a gather that records every home as created
+    (``home_preexisted`` forced False) hands ``P/patches`` to the rollback,
+    which removes it while empty -- this node fails."""
+    from s19_app.tui.screens import SaveProjectPayload
+
+    base = tmp_path / "app"
+    projects.copy_sources(_workarea(base) / "P", projects.CASE01_DIR, "firmware.s19")
+    refusal = "Project NOT saved: could not save — project.json was not written. check the folder."
+    unexpected = "an unexpected error stopped the save"
+    verified = "Project saved + manifest verified"
+    outcomes = ("Project NOT saved", verified)
+
+    async def scenario(app, pilot, log):
+        await projects.load_project(pilot, app, "P")
+        project_dir = app.workarea / "P"
+        patches_library = app.workarea / "patches"
+        patches_library.mkdir(parents=True, exist_ok=True)
+        (patches_library / "x.json").write_bytes(projects.change_document_bytes())
+        (project_dir / "patches").mkdir()
+        link = project_dir / "x.json"
+        _link_loop_at(link)
+        try:
+            mark = len(log.messages)
+            app._handle_save_dialog(
+                SaveProjectPayload(
+                    parent_folder=str(app.workarea),
+                    project_name="P",
+                    batch=("x.json",),
+                    assignments={},
+                )
+            )
+            await projects.wait_for(
+                pilot,
+                lambda: any(o in line for line in log.since(mark) for o in outcomes),
+                "the Save project outcome line",
+            )
+            await settle_workers(pilot)
+            for _ in range(4):
+                await pilot.pause()
+            lines = log.since(mark)
+            patches = project_dir / "patches"
+            left = (
+                os.path.lexists(patches / "x.json"),
+                patches.is_dir() and not os.path.islink(patches),
+                sorted(os.listdir(patches)) if patches.is_dir() else None,
+            )
+            return lines, left, list(app._busy.runs), app.return_code is None and app.is_running
+        finally:
+            _remove_link(link)
+
+    lines, left, runs, alive = projects.run_app(base, scenario)
+    assert lines.count(refusal) == 1, lines
+    assert not [line for line in lines if unexpected in line], lines
+    assert not [line for line in lines if verified in line], lines
+    assert alive and runs == [], (alive, runs)
+    assert left == (False, True, []), (
+        f"(gathered copy left, patches/ kept, its content) = {left}"
+    )
+
+
+def test_r_proj_rollback_9_by_keys_save_project_with_a_link_loop_swapped_in_at_a_composition_name(
+    tmp_path: Path,
+) -> None:
+    """R-PROJ-ROLLBACK.9 and R-PROJ-ROLLBACK.2 through the keys a user
+    presses. ``P`` is open and holds a real ``x.json`` change document, so
+    the Save dialog (``ctrl+s``) offers it in the project-wide batch list;
+    ``tab`` ``tab`` reaches that list and ``space`` selects it. While the
+    dialog is open, ``P/x.json`` is replaced by a link that points to itself
+    (the dialog lists only regular files, so a loop can reach the save only
+    this way); the common library holds ``x.json``. ``alt+s`` saves. The
+    save ends with the project.json refusal exactly once, no unexpected-error
+    line, no verified line, no run left, and neither ``P/patches/x.json`` nor
+    ``P/patches`` afterwards.
+
+    Why: the handler-level node hands the composition to
+    ``_handle_save_dialog`` directly; this node runs the dialog's own
+    composition collection and confirm.
+
+    Negative controls: the writer accepting the link entry (mutant M-10) or
+    the gather's written list not handed to the rollback (M-11) -- this
+    node fails."""
+    from textual.widgets import SelectionList
+
+    base = tmp_path / "app"
+    project_src = projects.copy_sources(_workarea(base) / "P", projects.CASE01_DIR, "firmware.s19")
+    (project_src / "x.json").write_bytes(projects.change_document_bytes())
+    refusal = "Project NOT saved: could not save — project.json was not written. check the folder."
+    unexpected = "an unexpected error stopped the save"
+    verified = "Project saved + manifest verified"
+    outcomes = ("Project NOT saved", verified)
+
+    async def scenario(app, pilot, log):
+        await projects.load_project(pilot, app, "P")
+        project_dir = app.workarea / "P"
+        patches_library = app.workarea / "patches"
+        patches_library.mkdir(parents=True, exist_ok=True)
+        (patches_library / "x.json").write_bytes(projects.change_document_bytes())
+        mark = len(log.messages)
+        await sd.open_save_dialog(pilot, app)
+        screen = app.screen
+        batch_list = screen.query_one("#assign_batch", SelectionList)
+        offered = [str(batch_list.get_option_at_index(i).prompt) for i in range(batch_list.option_count)]
+        await pilot.press("tab", "tab")
+        await sd.settle(pilot, 2)
+        focused = app.focused.id if app.focused is not None else None
+        await pilot.press("space")
+        await sd.settle(pilot, 2)
+        selected = list(batch_list.selected)
+        link = project_dir / "x.json"
+        os.remove(link)
+        _link_loop_at(link)
+        try:
+            for _attempt in range(2):
+                await pilot.press("alt+s")
+                await sd.settle(pilot, 4)
+                if not sd.is_save_dialog(app.screen):
+                    break
+                await sd.settle(pilot, 4)
+            await projects.wait_for(
+                pilot,
+                lambda: any(o in line for line in log.since(mark) for o in outcomes),
+                "the Save project outcome line",
+            )
+            await settle_workers(pilot)
+            for _ in range(4):
+                await pilot.pause()
+            lines = log.since(mark)
+            left = (
+                os.path.lexists(project_dir / "patches" / "x.json"),
+                os.path.lexists(project_dir / "patches"),
+            )
+            alive = app.return_code is None and app.is_running
+            return offered, focused, selected, lines, left, list(app._busy.runs), alive
+        finally:
+            _remove_link(link)
+
+    offered, focused, selected, lines, left, runs, alive = projects.run_app(base, scenario)
+    assert offered == ["x.json"], offered
+    assert focused == "assign_batch", focused
+    assert selected == ["x.json"], selected
     assert lines.count(refusal) == 1, lines
     assert not [line for line in lines if unexpected in line], lines
     assert not [line for line in lines if verified in line], lines

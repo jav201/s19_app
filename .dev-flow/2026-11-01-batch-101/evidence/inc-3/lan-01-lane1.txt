@@ -1,0 +1,48 @@
+s19_app.__file__ <HOME>/work/s19_inc3/s19_app/__init__.py 3.11.18
+CMD: cd ~/work/s19_inc3 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 1800 /data/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -n 8 -m not serial_timing tests/test_project_gather.py tests/test_b100_active_variant.py tests/test_b100_workers.py tests/test_b100_project_check.py tests/test_suite_hygiene.py
+bringing up nodes...
+bringing up nodes...
+
+.........................ss..........s.................................. [ 23%]
+........x.........................s..................................... [ 46%]
+..............................................s.............ss..sss..... [ 69%]
+.........................................................F.............. [ 92%]
+.........................                                                [100%]
+=================================== FAILURES ===================================
+_______________ test_r_tst_049_wrapped_arms_change_nothing_else ________________
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+    def test_r_tst_049_wrapped_arms_change_nothing_else() -> None:
+        """E5 F10: every function this branch wraps as a timing arm (against the
+        merge-base with main) differs from its base only by the serial_timing
+        marker and the report_margin wraps."""
+        base = _merge_base_with_main()
+        if base is None:
+            pytest.skip("no merge-base with main in this checkout")
+        drift = []
+        for path in sorted(TESTS_ROOT.rglob("*.py")):
+            text = path.read_text(encoding="utf-8")
+            if "report_margin" not in text and "serial_timing" not in text:
+                continue
+            rel = path.relative_to(REPO_ROOT).as_posix()
+            old = _git("show", f"{base}:{rel}")
+            if old is None:
+                continue
+            for name in _wrap_drift(old.decode("utf-8"), text):
+                drift.append(
+                    f"wrapped timing arm changed beyond marker and report_margin: {rel}::{name}"
+                )
+>       assert drift == [], "\n".join(drift)
+E       AssertionError: wrapped timing arm changed beyond marker and report_margin: tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second
+E         wrapped timing arm changed beyond marker and report_margin: tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+E         wrapped timing arm changed beyond marker and report_margin: tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+E       assert ['wrapped tim..._are_bounded'] == []
+E         
+E         Left contains 3 more items, first extra item: 'wrapped timing arm changed beyond marker and report_margin: tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second'
+E         Use -v to get more diff
+
+tests/test_suite_hygiene.py:1441: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_suite_hygiene.py::test_r_tst_049_wrapped_arms_change_nothing_else
+1 failed, 301 passed, 10 skipped, 1 xfailed in 721.68s (0:12:01)
+EXIT=1
