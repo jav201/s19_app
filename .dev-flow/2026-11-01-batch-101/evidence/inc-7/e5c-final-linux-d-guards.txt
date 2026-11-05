@@ -1,0 +1,553 @@
+$ env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 2400 python -m pytest  '-q' '-rA' 'tests/test_id_registry.py' 'tests/test_suite_hygiene.py' 'tests/test_b99_staging.py' 'tests/test_engine_unchanged.py' 'tests/test_requirements_canon.py' '-m' 'not serial_timing' -p no:cacheprovider   (LAN Linux host)
+UTC 2026-11-05T18:41:38Z  base 9f9f6af + git diff of b101-inc7 working tree (src 90ea8ae + uncommitted)
+s19_app.__file__ = <HOME>/work/s19c7-e5/s19_app/__init__.py
+3.11.18
+........................................................................ [ 60%]
+...............................................                          [100%]
+=============================== warnings summary ===============================
+tests/test_id_registry.py::test_tc600_g1_every_named_node_id_is_registered
+tests/test_id_registry.py::test_tc600_g1_every_named_node_id_is_registered
+  <unknown>:1741: DeprecationWarning: invalid escape sequence '\_'
+
+tests/test_suite_hygiene.py::test_r_tst_002_every_timing_arm_carries_serial_timing
+tests/test_suite_hygiene.py::test_r_tst_002_every_timing_arm_carries_serial_timing
+  tests/test_before_after_report.py:1741: DeprecationWarning: invalid escape sequence '\_'
+    "| 0x00000100 | 0x00000102 | 2 | changed | CAL\_A, CAL\_M |" in md_text
+
+tests/test_suite_hygiene.py::test_r_tst_002_every_timing_arm_carries_serial_timing
+  <HOME>/work/s19c7-e5/tests/test_before_after_report.py:1741: DeprecationWarning: invalid escape sequence '\_'
+    "| 0x00000100 | 0x00000102 | 2 | changed | CAL\_A, CAL\_M |" in md_text
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+==================================== PASSES ====================================
+_______________ test_r_tst_042_margin_report_is_a_test_property ________________
+----------------------------- Captured stdout call -----------------------------
+running: <CONDA>/envs/s19ci/bin/python -mpytest --basetemp=/tmp/pytest-of-<USER>/pytest-16/test_r_tst_042_margin_report_is_a_test_property0/runpytest-0 -p no:cacheprovider --junitxml=junit.xml
+     in: /tmp/pytest-of-<USER>/pytest-16/test_r_tst_042_margin_report_is_a_test_property0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0
+rootdir: /tmp/pytest-of-<USER>/pytest-16/test_r_tst_042_margin_report_is_a_test_property0
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collected 1 item
+
+test_margin_property.py .                                                [100%]
+
+- generated xml file: /tmp/pytest-of-<USER>/pytest-16/test_r_tst_042_margin_report_is_a_test_property0/junit.xml -
+============================= QC-TM timing margins =============================
+LOW 15.0%  0.850 s / 1.000 s  p  test_margin_property.py::test_arm
+QC-TM: 1 bounds, 1 under 20 % margin
+============================== 1 passed in 0.01s ===============================
+_______________ test_r_tst_043_045_qc_tm_section_rows_and_count ________________
+----------------------------- Captured stdout call -----------------------------
+running: <CONDA>/envs/s19ci/bin/python -mpytest --basetemp=/tmp/pytest-of-<USER>/pytest-16/test_r_tst_043_045_qc_tm_section_rows_and_count0/runpytest-0 -p no:cacheprovider
+     in: /tmp/pytest-of-<USER>/pytest-16/test_r_tst_043_045_qc_tm_section_rows_and_count0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0
+rootdir: /tmp/pytest-of-<USER>/pytest-16/test_r_tst_043_045_qc_tm_section_rows_and_count0
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collected 3 items
+
+test_qc_tm_rows.py ...                                                   [100%]
+============================= QC-TM timing margins =============================
+LOW 15.0%  0.850 s / 1.000 s  b  test_qc_tm_rows.py::test_b
+25.0%  0.750 s / 1.000 s  c  test_qc_tm_rows.py::test_c
+40.0%  0.600 s / 1.000 s  a  test_qc_tm_rows.py::test_a
+QC-TM: 3 bounds, 1 under 20 % margin
+
+============================== 3 passed in 0.01s ===============================
+_____________ test_r_tst_043_2_teardown_error_report_gives_one_row _____________
+----------------------------- Captured stdout call -----------------------------
+running: <CONDA>/envs/s19ci/bin/python -mpytest --basetemp=/tmp/pytest-of-<USER>/pytest-16/test_r_tst_043_2_teardown_error_report_gives_one_row0/runpytest-0 -p no:cacheprovider
+     in: /tmp/pytest-of-<USER>/pytest-16/test_r_tst_043_2_teardown_error_report_gives_one_row0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0
+rootdir: /tmp/pytest-of-<USER>/pytest-16/test_r_tst_043_2_teardown_error_report_gives_one_row0
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collected 1 item
+
+test_teardown_row.py .E                                                  [100%]
+
+==================================== ERRORS ====================================
+________________________ ERROR at teardown of test_arm _________________________
+
+    @pytest.fixture
+    def _boom():
+        yield
+>       raise RuntimeError("teardown boom")
+E       RuntimeError: teardown boom
+
+test_teardown_row.py:7: RuntimeError
+============================= QC-TM timing margins =============================
+LOW 15.0%  0.850 s / 1.000 s  e  test_teardown_row.py::test_arm
+QC-TM: 1 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+ERROR test_teardown_row.py::test_arm - RuntimeError: teardown boom
+========================== 1 passed, 1 error in 0.02s ==========================
+_______________________ test_r_tst_044_low_margin_prefix _______________________
+----------------------------- Captured stdout call -----------------------------
+running: <CONDA>/envs/s19ci/bin/python -mpytest --basetemp=/tmp/pytest-of-<USER>/pytest-16/test_r_tst_044_low_margin_prefix0/runpytest-0 -p no:cacheprovider
+     in: /tmp/pytest-of-<USER>/pytest-16/test_r_tst_044_low_margin_prefix0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0
+rootdir: /tmp/pytest-of-<USER>/pytest-16/test_r_tst_044_low_margin_prefix0
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collected 2 items
+
+test_low_prefix.py ..                                                    [100%]
+============================= QC-TM timing margins =============================
+LOW 15.0%  0.850 s / 1.000 s  b  test_low_prefix.py::test_b
+20.0%  0.800 s / 1.000 s  d  test_low_prefix.py::test_d
+QC-TM: 2 bounds, 1 under 20 % margin
+
+============================== 2 passed in 0.01s ===============================
+_________________ test_r_tst_046_over_bound_arm_still_reports __________________
+----------------------------- Captured stdout call -----------------------------
+running: <CONDA>/envs/s19ci/bin/python -mpytest --basetemp=/tmp/pytest-of-<USER>/pytest-16/test_r_tst_046_over_bound_arm_still_reports0/runpytest-0 -p no:cacheprovider
+     in: /tmp/pytest-of-<USER>/pytest-16/test_r_tst_046_over_bound_arm_still_reports0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0
+rootdir: /tmp/pytest-of-<USER>/pytest-16/test_r_tst_046_over_bound_arm_still_reports0
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collected 1 item
+
+test_over_bound.py F                                                     [100%]
+
+=================================== FAILURES ===================================
+__________________________________ test_over ___________________________________
+
+    def test_over():
+        from tests.support.timing import report_margin
+>       assert 1.2 < report_margin("o", 1.2, 1.0)
+E       AssertionError: assert 1.2 < 1.0
+E        +  where 1.0 = <function report_margin at 0x7f53662fa200>('o', 1.2, 1.0)
+
+test_over_bound.py:3: AssertionError
+============================= QC-TM timing margins =============================
+LOW -20.0%  1.200 s / 1.000 s  o  test_over_bound.py::test_over
+QC-TM: 1 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+FAILED test_over_bound.py::test_over - AssertionError: assert 1.2 < 1.0
+============================== 1 failed in 0.02s ===============================
+______________ test_r_tst_050_status_log_keeps_every_painted_line ______________
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-16/test_r_tst_050_status_log_keep0/app workarea=/tmp/pytest-of-<USER>/pytest-16/test_r_tst_050_status_log_keep0/app/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+__________________ test_tc_b99_14_save_project_missing_source __________________
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_save_project_mi0 workarea=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_save_project_mi0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.007
+INFO     s19tui:app.py:8314 Load file action triggered.
+INFO     s19tui:app.py:15421 Load phase boundary: modal_dismiss_scheduled kind=path value='/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_save_project_mi0/firmware.s19'
+INFO     s19tui:app.py:15466 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_save_project_mi0/firmware.s19
+INFO     s19tui:app.py:15487 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_save_project_mi0/firmware.s19
+INFO     s19tui:app.py:15500 Load phase boundary: copy_done path=firmware.s19 elapsed=0.001s
+WARNING  s19tui:app.py:15519 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_save_project_mi0/firmware.s19'
+INFO     s19tui:app.py:8305 Workarea refreshed. files=1
+INFO     s19tui:app.py:15537 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_save_project_mi0/.s19tool/workarea/temp/firmware.s19 size_bytes=35 copy_seconds=0.001
+INFO     s19tui:app.py:15543 Load phase boundary: worker_spawned path=firmware.s19
+INFO     s19tui:app.py:18426 Load phase boundary: worker_parse_start path=firmware.s19
+INFO     s19tui:app.py:17810 Loading file: path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_save_project_mi0/.s19tool/workarea/temp/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14124 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18642 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_save_project_mi0/.s19tool/workarea/temp/firmware.s19 addresses=1 range_count=1 range_bytes=1 errors=0
+INFO     s19tui:app.py:14141 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18445 Load phase boundary: worker_parse_done path=firmware.s19 elapsed=0.007s
+INFO     s19tui:app.py:18269 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:18304 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17663 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18313 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18333 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18340 Load phase boundary: prepare_bases_done row_bases=1
+INFO     s19tui:app.py:18350 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18356 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:18478 Load phase boundary: worker_compute_done path=firmware.s19 precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:18485 Load phase boundary: call_from_thread_apply_dispatched path=firmware.s19
+INFO     s19tui:app.py:18103 Load phase boundary: apply_install_state path=firmware.s19 precomputed=True
+INFO     s19tui:app.py:18770 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18119 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18131 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19790 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:19304 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:18144 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:18997 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18161 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_save_project_mi0/.s19tool/workarea/temp/firmware.s19 file_type=s19 elapsed_seconds=0.130 has_mac=False precomputed=True
+INFO     s19tui:app.py:8387 Save project action triggered for /tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_save_project_mi0/.s19tool/workarea/temp/firmware.s19
+___________ test_tc_b99_14_placement_failure_removes_created_folder ____________
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_placement_failu0 workarea=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_placement_failu0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:8314 Load file action triggered.
+INFO     s19tui:app.py:15421 Load phase boundary: modal_dismiss_scheduled kind=path value='/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_placement_failu0/firmware.s19'
+INFO     s19tui:app.py:15466 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_placement_failu0/firmware.s19
+INFO     s19tui:app.py:15487 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_placement_failu0/firmware.s19
+INFO     s19tui:app.py:15500 Load phase boundary: copy_done path=firmware.s19 elapsed=0.001s
+WARNING  s19tui:app.py:15519 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_placement_failu0/firmware.s19'
+INFO     s19tui:app.py:8305 Workarea refreshed. files=1
+INFO     s19tui:app.py:15537 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_placement_failu0/.s19tool/workarea/temp/firmware.s19 size_bytes=35 copy_seconds=0.001
+INFO     s19tui:app.py:15543 Load phase boundary: worker_spawned path=firmware.s19
+INFO     s19tui:app.py:18426 Load phase boundary: worker_parse_start path=firmware.s19
+INFO     s19tui:app.py:17810 Loading file: path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_placement_failu0/.s19tool/workarea/temp/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14124 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18642 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_placement_failu0/.s19tool/workarea/temp/firmware.s19 addresses=1 range_count=1 range_bytes=1 errors=0
+INFO     s19tui:app.py:14141 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18445 Load phase boundary: worker_parse_done path=firmware.s19 elapsed=0.003s
+INFO     s19tui:app.py:18269 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:18304 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17663 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18313 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18333 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18340 Load phase boundary: prepare_bases_done row_bases=1
+INFO     s19tui:app.py:18350 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18356 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:18478 Load phase boundary: worker_compute_done path=firmware.s19 precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:18485 Load phase boundary: call_from_thread_apply_dispatched path=firmware.s19
+INFO     s19tui:app.py:18103 Load phase boundary: apply_install_state path=firmware.s19 precomputed=True
+INFO     s19tui:app.py:18770 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18119 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18131 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19790 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19304 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:18144 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:18997 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18161 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_placement_failu0/.s19tool/workarea/temp/firmware.s19 file_type=s19 elapsed_seconds=0.132 has_mac=False precomputed=True
+INFO     s19tui:app.py:8387 Save project action triggered for /tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_placement_failu0/.s19tool/workarea/temp/firmware.s19
+WARNING  s19tui:app.py:12365 Project save placement failed: Not saved: firmware.s19 in /tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_placement_failu0/.s19tool/workarea/proj is still locked after 5 retries, another program may hold it — close it and retry. Nothing written.
+_________ test_tc_b99_14_preexisting_folder_survives_placement_failure _________
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_preexisting_fol0 workarea=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_preexisting_fol0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:8314 Load file action triggered.
+INFO     s19tui:app.py:15421 Load phase boundary: modal_dismiss_scheduled kind=path value='/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_preexisting_fol0/firmware.s19'
+INFO     s19tui:app.py:15466 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_preexisting_fol0/firmware.s19
+INFO     s19tui:app.py:15487 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_preexisting_fol0/firmware.s19
+INFO     s19tui:app.py:15500 Load phase boundary: copy_done path=firmware.s19 elapsed=0.001s
+WARNING  s19tui:app.py:15519 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_preexisting_fol0/firmware.s19'
+INFO     s19tui:app.py:8305 Workarea refreshed. files=1
+INFO     s19tui:app.py:15537 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_preexisting_fol0/.s19tool/workarea/temp/firmware.s19 size_bytes=35 copy_seconds=0.001
+INFO     s19tui:app.py:15543 Load phase boundary: worker_spawned path=firmware.s19
+INFO     s19tui:app.py:18426 Load phase boundary: worker_parse_start path=firmware.s19
+INFO     s19tui:app.py:17810 Loading file: path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_preexisting_fol0/.s19tool/workarea/temp/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14124 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18642 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_preexisting_fol0/.s19tool/workarea/temp/firmware.s19 addresses=1 range_count=1 range_bytes=1 errors=0
+INFO     s19tui:app.py:14141 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18445 Load phase boundary: worker_parse_done path=firmware.s19 elapsed=0.003s
+INFO     s19tui:app.py:18269 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:18304 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17663 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18313 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18333 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18340 Load phase boundary: prepare_bases_done row_bases=1
+INFO     s19tui:app.py:18350 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18356 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:18478 Load phase boundary: worker_compute_done path=firmware.s19 precomputed=True elapsed=0.007s
+INFO     s19tui:app.py:18485 Load phase boundary: call_from_thread_apply_dispatched path=firmware.s19
+INFO     s19tui:app.py:18103 Load phase boundary: apply_install_state path=firmware.s19 precomputed=True
+INFO     s19tui:app.py:18770 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18119 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18131 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19790 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:19304 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.011
+INFO     s19tui:app.py:18144 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:18997 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18161 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_preexisting_fol0/.s19tool/workarea/temp/firmware.s19 file_type=s19 elapsed_seconds=0.148 has_mac=False precomputed=True
+INFO     s19tui:app.py:8387 Save project action triggered for /tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_preexisting_fol0/.s19tool/workarea/temp/firmware.s19
+WARNING  s19tui:app.py:12365 Project save placement failed: Not saved: firmware.s19 in /tmp/pytest-of-<USER>/pytest-16/test_tc_b99_14_preexisting_fol0/.s19tool/workarea/proj is still locked after 5 retries, another program may hold it — close it and retry. Nothing written.
+____________ test_at_b99_05_save_project_after_same_name_save_back _____________
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-16/test_at_b99_05_save_project_af0 workarea=/tmp/pytest-of-<USER>/pytest-16/test_at_b99_05_save_project_af0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:8314 Load file action triggered.
+INFO     s19tui:app.py:15421 Load phase boundary: modal_dismiss_scheduled kind=path value='/tmp/pytest-of-<USER>/pytest-16/test_at_b99_05_save_project_af0/firmware.s19'
+INFO     s19tui:app.py:15466 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-16/test_at_b99_05_save_project_af0/firmware.s19
+INFO     s19tui:app.py:15487 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-16/test_at_b99_05_save_project_af0/firmware.s19
+INFO     s19tui:app.py:15500 Load phase boundary: copy_done path=firmware.s19 elapsed=0.001s
+WARNING  s19tui:app.py:15519 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-16/test_at_b99_05_save_project_af0/firmware.s19'
+INFO     s19tui:app.py:8305 Workarea refreshed. files=1
+INFO     s19tui:app.py:15537 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-16/test_at_b99_05_save_project_af0/.s19tool/workarea/temp/firmware.s19 size_bytes=48 copy_seconds=0.001
+INFO     s19tui:app.py:15543 Load phase boundary: worker_spawned path=firmware.s19
+INFO     s19tui:app.py:18426 Load phase boundary: worker_parse_start path=firmware.s19
+INFO     s19tui:app.py:17810 Loading file: path=/tmp/pytest-of-<USER>/pytest-16/test_at_b99_05_save_project_af0/.s19tool/workarea/temp/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14124 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18642 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-16/test_at_b99_05_save_project_af0/.s19tool/workarea/temp/firmware.s19 addresses=2 range_count=2 range_bytes=2 errors=0
+INFO     s19tui:app.py:14141 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18445 Load phase boundary: worker_parse_done path=firmware.s19 elapsed=0.003s
+INFO     s19tui:app.py:18269 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:18304 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17663 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18313 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18333 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18340 Load phase boundary: prepare_bases_done row_bases=2
+INFO     s19tui:app.py:18350 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18356 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:18478 Load phase boundary: worker_compute_done path=firmware.s19 precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:18485 Load phase boundary: call_from_thread_apply_dispatched path=firmware.s19
+INFO     s19tui:app.py:18103 Load phase boundary: apply_install_state path=firmware.s19 precomputed=True
+INFO     s19tui:app.py:18770 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18119 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18131 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19790 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:19304 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.011
+INFO     s19tui:app.py:18144 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:18997 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18161 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-16/test_at_b99_05_save_project_af0/.s19tool/workarea/temp/firmware.s19 file_type=s19 elapsed_seconds=0.364 has_mac=False precomputed=True
+INFO     s19tui:app.py:8387 Save project action triggered for /tmp/pytest-of-<USER>/pytest-16/test_at_b99_05_save_project_af0/.s19tool/workarea/temp/firmware.s19
+INFO     s19tui:app.py:12121 Project saved image. name=proj file=/tmp/pytest-of-<USER>/pytest-16/test_at_b99_05_save_project_af0/.s19tool/workarea/proj/firmware.s19
+INFO     s19tui:app.py:12121 Project saved document. name=proj file=/tmp/pytest-of-<USER>/pytest-16/test_at_b99_05_save_project_af0/.s19tool/workarea/proj/patches/changes.json
+INFO     s19tui:app.py:8305 Workarea refreshed. files=1
+__________ test_at_b99_04_duplicate_refused_distinct_parallel_markers __________
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-16/test_at_b99_04_duplicate_refus0 workarea=/tmp/pytest-of-<USER>/pytest-16/test_at_b99_04_duplicate_refus0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:8452 Load project action triggered.
+INFO     s19tui:app.py:15421 Load phase boundary: modal_dismiss_scheduled kind=project value='proj'
+WARNING  s19tui:app.py:13882 Project proj: no project.json project.json (None)
+INFO     s19tui:app.py:14124 Load phase boundary: parse_branch_entry path=base0.s19 suffix=.s19
+INFO     s19tui:app.py:18642 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-16/test_at_b99_04_duplicate_refus0/.s19tool/workarea/proj/base0.s19 addresses=1 range_count=1 range_bytes=1 errors=0
+INFO     s19tui:app.py:14141 Load phase boundary: parse_branch_done path=base0.s19 branch=s19
+INFO     s19tui:app.py:18103 Load phase boundary: apply_install_state path=base0.s19 precomputed=False
+INFO     s19tui:app.py:14077 Project loaded. name=proj file=/tmp/pytest-of-<USER>/pytest-16/test_at_b99_04_duplicate_refus0/.s19tool/workarea/proj/base0.s19 mac=None
+INFO     s19tui:app.py:18770 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18119 Load phase boundary: apply_sections_done path=base0.s19
+INFO     s19tui:app.py:18131 Load phase boundary: apply_hex_done path=base0.s19
+INFO     s19tui:app.py:19790 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:17663 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17718 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:19304 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:18144 Load phase boundary: apply_a2l_done path=base0.s19
+INFO     s19tui:app.py:18997 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18161 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-16/test_at_b99_04_duplicate_refus0/.s19tool/workarea/proj/base0.s19 file_type=s19 elapsed_seconds=0.318 has_mac=False precomputed=False
+__________ test_tc_b99_ux_c10_save_project_filename_renders_literally __________
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_ux_c10_save_projec0 workarea=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_ux_c10_save_projec0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:15466 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_ux_c10_save_projec0/[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:15487 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_ux_c10_save_projec0/[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:15500 Load phase boundary: copy_done path=[red]x[@click=app.quit].s19 elapsed=0.001s
+WARNING  s19tui:app.py:15519 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_ux_c10_save_projec0/[red]x[@click=app.quit].s19'
+INFO     s19tui:app.py:8305 Workarea refreshed. files=1
+INFO     s19tui:app.py:15537 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_ux_c10_save_projec0/.s19tool/workarea/temp/[red]x[@click=app.quit].s19 size_bytes=35 copy_seconds=0.001
+INFO     s19tui:app.py:15543 Load phase boundary: worker_spawned path=[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:18426 Load phase boundary: worker_parse_start path=[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:17810 Loading file: path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_ux_c10_save_projec0/.s19tool/workarea/temp/[red]x[@click=app.quit].s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14124 Load phase boundary: parse_branch_entry path=[red]x[@click=app.quit].s19 suffix=.s19
+INFO     s19tui:app.py:18642 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_ux_c10_save_projec0/.s19tool/workarea/temp/[red]x[@click=app.quit].s19 addresses=1 range_count=1 range_bytes=1 errors=0
+INFO     s19tui:app.py:14141 Load phase boundary: parse_branch_done path=[red]x[@click=app.quit].s19 branch=s19
+INFO     s19tui:app.py:18445 Load phase boundary: worker_parse_done path=[red]x[@click=app.quit].s19 elapsed=0.021s
+INFO     s19tui:app.py:18269 Load phase boundary: prepare_entry path=[red]x[@click=app.quit].s19 file_type=s19
+INFO     s19tui:app.py:18304 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17663 MAC validation computed: records=0 issues=0 elapsed_seconds=0.021
+INFO     s19tui:app.py:18313 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18333 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18340 Load phase boundary: prepare_bases_done row_bases=1
+INFO     s19tui:app.py:18350 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18356 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:18478 Load phase boundary: worker_compute_done path=[red]x[@click=app.quit].s19 precomputed=True elapsed=0.032s
+INFO     s19tui:app.py:18485 Load phase boundary: call_from_thread_apply_dispatched path=[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:18103 Load phase boundary: apply_install_state path=[red]x[@click=app.quit].s19 precomputed=True
+INFO     s19tui:app.py:18770 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18119 Load phase boundary: apply_sections_done path=[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:18131 Load phase boundary: apply_hex_done path=[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:19790 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.016
+INFO     s19tui:app.py:19304 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.017
+INFO     s19tui:app.py:18144 Load phase boundary: apply_a2l_done path=[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:18997 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18161 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_ux_c10_save_projec0/.s19tool/workarea/temp/[red]x[@click=app.quit].s19 file_type=s19 elapsed_seconds=0.212 has_mac=False precomputed=True
+INFO     s19tui:app.py:8387 Save project action triggered for /tmp/pytest-of-<USER>/pytest-16/test_tc_b99_ux_c10_save_projec0/.s19tool/workarea/temp/[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:11021 Save project canceled.
+WARNING  s19tui:app.py:11068 Save project refused: Project NOT saved: source file missing: [red]x[@click=app.quit].s19 — reload it or remove it from the project.
+__________ test_tc_b99_ux_c10_placement_error_path_renders_literally ___________
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_ux_c10_placement_e0 workarea=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_ux_c10_placement_e0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:15466 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_ux_c10_placement_e0/[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:15487 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_ux_c10_placement_e0/[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:15500 Load phase boundary: copy_done path=[red]x[@click=app.quit].s19 elapsed=0.001s
+WARNING  s19tui:app.py:15519 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_ux_c10_placement_e0/[red]x[@click=app.quit].s19'
+INFO     s19tui:app.py:8305 Workarea refreshed. files=1
+INFO     s19tui:app.py:15537 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_ux_c10_placement_e0/.s19tool/workarea/temp/[red]x[@click=app.quit].s19 size_bytes=35 copy_seconds=0.001
+INFO     s19tui:app.py:15543 Load phase boundary: worker_spawned path=[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:18426 Load phase boundary: worker_parse_start path=[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:17810 Loading file: path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_ux_c10_placement_e0/.s19tool/workarea/temp/[red]x[@click=app.quit].s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14124 Load phase boundary: parse_branch_entry path=[red]x[@click=app.quit].s19 suffix=.s19
+INFO     s19tui:app.py:18642 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_ux_c10_placement_e0/.s19tool/workarea/temp/[red]x[@click=app.quit].s19 addresses=1 range_count=1 range_bytes=1 errors=0
+INFO     s19tui:app.py:14141 Load phase boundary: parse_branch_done path=[red]x[@click=app.quit].s19 branch=s19
+INFO     s19tui:app.py:18445 Load phase boundary: worker_parse_done path=[red]x[@click=app.quit].s19 elapsed=0.056s
+INFO     s19tui:app.py:18269 Load phase boundary: prepare_entry path=[red]x[@click=app.quit].s19 file_type=s19
+INFO     s19tui:app.py:18304 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17663 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18313 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18333 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18340 Load phase boundary: prepare_bases_done row_bases=1
+INFO     s19tui:app.py:18350 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18356 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:18478 Load phase boundary: worker_compute_done path=[red]x[@click=app.quit].s19 precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:18485 Load phase boundary: call_from_thread_apply_dispatched path=[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:18103 Load phase boundary: apply_install_state path=[red]x[@click=app.quit].s19 precomputed=True
+INFO     s19tui:app.py:18770 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18119 Load phase boundary: apply_sections_done path=[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:18131 Load phase boundary: apply_hex_done path=[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:19790 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.011
+INFO     s19tui:app.py:19304 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.012
+INFO     s19tui:app.py:18144 Load phase boundary: apply_a2l_done path=[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:18997 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18161 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_ux_c10_placement_e0/.s19tool/workarea/temp/[red]x[@click=app.quit].s19 file_type=s19 elapsed_seconds=0.194 has_mac=False precomputed=True
+INFO     s19tui:app.py:8387 Save project action triggered for /tmp/pytest-of-<USER>/pytest-16/test_tc_b99_ux_c10_placement_e0/.s19tool/workarea/temp/[red]x[@click=app.quit].s19
+WARNING  s19tui:app.py:12365 Project save placement failed: Not saved: [red]x[@click=app.quit].s19 in /tmp/pytest-of-<USER>/pytest-16/test_tc_b99_ux_c10_placement_e0/.s19tool/workarea/proj is still locked after 5 retries, another program may hold it — close it and retry. Nothing written.
+______________ test_tc_b99_ux_c10_d7_lane_name_renders_literally _______________
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_ux_c10_d7_lane_nam0 workarea=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_ux_c10_d7_lane_nam0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+WARNING  s19tui:app.py:13882 Project proj: no project.json project.json (None)
+INFO     s19tui:app.py:14124 Load phase boundary: parse_branch_entry path=prg.s19 suffix=.s19
+INFO     s19tui:app.py:18642 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_ux_c10_d7_lane_nam0/.s19tool/workarea/proj/prg.s19 addresses=3968 range_count=11 range_bytes=3968 errors=0
+INFO     s19tui:app.py:14141 Load phase boundary: parse_branch_done path=prg.s19 branch=s19
+INFO     s19tui:app.py:18103 Load phase boundary: apply_install_state path=prg.s19 precomputed=False
+INFO     s19tui:app.py:14077 Project loaded. name=proj file=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_ux_c10_d7_lane_nam0/.s19tool/workarea/proj/prg.s19 mac=None
+INFO     s19tui:app.py:18770 Sections updated. count=11 rendered_ranges=11 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18119 Load phase boundary: apply_sections_done path=prg.s19
+INFO     s19tui:app.py:18131 Load phase boundary: apply_hex_done path=prg.s19
+INFO     s19tui:app.py:19790 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17663 MAC validation computed: records=0 issues=0 elapsed_seconds=0.002
+INFO     s19tui:app.py:17718 MAC row cache built: records=0 elapsed_seconds=0.002
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:19304 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.014
+INFO     s19tui:app.py:18144 Load phase boundary: apply_a2l_done path=prg.s19
+INFO     s19tui:app.py:18997 Memory Map updated. ranges=11
+INFO     s19tui:app.py:18161 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-16/test_tc_b99_ux_c10_d7_lane_nam0/.s19tool/workarea/proj/prg.s19 file_type=s19 elapsed_seconds=0.584 has_mac=False precomputed=False
+=========================== short test summary info ============================
+PASSED tests/test_id_registry.py::test_tc600_g1_every_named_node_id_is_registered
+PASSED tests/test_id_registry.py::test_tc601_g2_live_entries_name_existing_nodes
+PASSED tests/test_id_registry.py::test_tc602_g3_every_citation_is_registered
+PASSED tests/test_id_registry.py::test_tc604_g5_grammar_holds_or_is_registered_legacy
+PASSED tests/test_id_registry.py::test_tc605_g6_normalized_keys_are_unique
+PASSED tests/test_id_registry.py::test_tc606_g7_no_stem_exceeds_the_high_water_mark
+PASSED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+PASSED tests/test_id_registry.py::test_tc608_tokenizer_and_normalizer_edge_cases
+PASSED tests/test_id_registry.py::test_tc609_registry_file_is_well_formed
+PASSED tests/test_id_registry.py::test_tc610_reservations_are_recorded_and_respected
+PASSED tests/test_id_registry.py::test_at280_registry_and_repository_agree_in_both_directions
+PASSED tests/test_id_registry.py::test_at281_every_guard_rule_can_fail
+PASSED tests/test_suite_hygiene.py::test_r_tst_001_serial_timing_marker_is_registered
+PASSED tests/test_suite_hygiene.py::test_r_tst_002_every_timing_arm_carries_serial_timing
+PASSED tests/test_suite_hygiene.py::test_r_tst_002_2_parallel_lane_collection_prints_no_qc_tm_text
+PASSED tests/test_suite_hygiene.py::test_r_tst_003_an_unmarked_timing_arm_is_named
+PASSED tests/test_suite_hygiene.py::test_r_tst_004_a_marked_non_arm_is_named
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form1]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form2]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form3]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form4]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form5]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form6]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form7]
+PASSED tests/test_suite_hygiene.py::test_r_tst_006_detector_ignores_intervals_no_assert_reads
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-007]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-030]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-047]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-048]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-052]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-060]
+PASSED tests/test_suite_hygiene.py::test_r_tst_010_pull_request_runs_two_lanes
+PASSED tests/test_suite_hygiene.py::test_r_tst_010_2_injection_ratchet_reads_every_run_line_of_every_job
+PASSED tests/test_suite_hygiene.py::test_r_tst_011_push_runs_two_lanes
+PASSED tests/test_suite_hygiene.py::test_r_tst_012_serial_lane_runs_after_a_red_lane
+PASSED tests/test_suite_hygiene.py::test_r_tst_013_014_ci_checks_out_full_history
+PASSED tests/test_suite_hygiene.py::test_r_tst_013_snapshot_job_changes_only_persist_credentials
+PASSED tests/test_suite_hygiene.py::test_r_tst_015_016_017_ci_time_limits
+PASSED tests/test_suite_hygiene.py::test_r_tst_018_ci_installs_pinned_xdist
+PASSED tests/test_suite_hygiene.py::test_r_tst_020_021_shared_helpers_delegate_to_the_one_wait
+PASSED tests/test_suite_hygiene.py::test_r_tst_021_shared_wait_yields_between_checks
+PASSED tests/test_suite_hygiene.py::test_r_tst_022_settled_pauses_before_its_first_check
+PASSED tests/test_suite_hygiene.py::test_r_tst_023_shared_wait_signatures_are_kept
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W1]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W2]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W3]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W4]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W5]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W6]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W7]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W8]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W9]
+PASSED tests/test_suite_hygiene.py::test_r_tst_025_load_project_clock_stops_at_the_install_callback
+PASSED tests/test_suite_hygiene.py::test_r_tst_031_032_post_press_and_dwell_arms_keep_their_forms
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_report_margin_returns_the_bound
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_2_report_margin_refuses_unsafe_labels
+PASSED tests/test_suite_hygiene.py::test_r_tst_049_wrap_drift_detector_names_a_dropped_assertion
+PASSED tests/test_suite_hygiene.py::test_r_tst_049_wrapped_arms_change_nothing_else
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_041_every_upper_timing_bound_is_reported
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_1_base_tree_reports_its_37_bounds
+PASSED tests/test_suite_hygiene.py::test_r_tst_041_margin_guard_names_each_raw_bound
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_3_counts_and_lower_bounds_are_not_bounds
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_4_appended_and_conditional_reads_are_bounds
+PASSED tests/test_suite_hygiene.py::test_r_tst_042_margin_report_is_a_test_property
+PASSED tests/test_suite_hygiene.py::test_r_tst_043_045_qc_tm_section_rows_and_count
+PASSED tests/test_suite_hygiene.py::test_r_tst_043_2_teardown_error_report_gives_one_row
+PASSED tests/test_suite_hygiene.py::test_r_tst_044_low_margin_prefix
+PASSED tests/test_suite_hygiene.py::test_r_tst_046_over_bound_arm_still_reports
+PASSED tests/test_suite_hygiene.py::test_r_tst_050_status_log_keeps_every_painted_line
+PASSED tests/test_suite_hygiene.py::test_r_tst_051_newest_line_waits_do_not_grow
+PASSED tests/test_suite_hygiene.py::test_r_tst_051_all_line_reader_counts_only_under_minus_one
+PASSED tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses
+PASSED tests/test_suite_hygiene.py::test_r_tst_070_3_redaction_gate_names_each_leak_form
+PASSED tests/test_suite_hygiene.py::test_r_tst_080_report_goldens_hold_no_tool_version
+PASSED tests/test_suite_hygiene.py::test_r_tst_081_golden_takes_the_package_version
+PASSED tests/test_suite_hygiene.py::test_r_tst_082_wrong_version_still_differs
+PASSED tests/test_b99_staging.py::test_tc_b99_11_same_name_save_back_keeps_work_copy
+PASSED tests/test_b99_staging.py::test_tc_b99_11_junction_at_staging_temp_is_refused
+PASSED tests/test_b99_staging.py::test_tc_b99_11_dangling_junction_at_staging_temp_is_refused
+PASSED tests/test_b99_staging.py::test_tc_b99_12_eight_writers_one_name_zero_mismatches
+PASSED tests/test_b99_staging.py::test_tc_b99_12_forced_permission_error_refuses_cleanly
+PASSED tests/test_b99_staging.py::test_tc_b99_12_directory_squatting_requested_name_takes_next_free
+PASSED tests/test_b99_staging.py::test_tc_b99_12_forced_oserror_in_replace_raises_placement_error
+PASSED tests/test_b99_staging.py::test_tc_b99_12_dangling_symlink_at_requested_name_takes_next_free
+PASSED tests/test_b99_staging.py::test_tc_b99_12_source_vanishes_mid_copy_is_wrapped
+PASSED tests/test_b99_staging.py::test_tc_b99_12_source_bytes_and_mtime_unchanged
+PASSED tests/test_b99_staging.py::test_tc_b99_13_concurrent_placements_one_name_own_bytes_returned
+PASSED tests/test_b99_staging.py::test_tc_b99_13_zero_byte_target_is_never_reused
+PASSED tests/test_b99_staging.py::test_tc_b99_13_symlink_target_is_never_reused
+PASSED tests/test_b99_staging.py::test_tc_b99_39_delete_calls_delete_only_owned_staging
+PASSED tests/test_b99_staging.py::test_tc_b99_44_change_document_stages_in_private_home
+PASSED tests/test_b99_staging.py::test_tc_b99_44_junction_at_staging_temp_is_refused
+PASSED tests/test_b99_staging.py::test_tc_b99_14_save_project_missing_source
+PASSED tests/test_b99_staging.py::test_tc_b99_14_placement_failure_removes_created_folder
+PASSED tests/test_b99_staging.py::test_tc_b99_14_preexisting_folder_survives_placement_failure
+PASSED tests/test_b99_staging.py::test_at_b99_05_save_project_after_same_name_save_back
+PASSED tests/test_b99_staging.py::test_at_b99_04_duplicate_refused_distinct_parallel_markers
+PASSED tests/test_b99_staging.py::test_tc_b99_ux_c10_save_project_filename_renders_literally
+PASSED tests/test_b99_staging.py::test_tc_b99_ux_c10_placement_error_path_renders_literally
+PASSED tests/test_b99_staging.py::test_tc_b99_15_duplicate_write_out_names_refused
+PASSED tests/test_b99_staging.py::test_tc_b99_15_distinct_names_run
+PASSED tests/test_b99_staging.py::test_tc_b99_16_corrupted_write_out_is_error_naming_address
+PASSED tests/test_b99_staging.py::test_tc_b99_16_intact_write_out_is_ok
+PASSED tests/test_b99_staging.py::test_tc_b99_13_gather_drift_places_next_free_name
+PASSED tests/test_b99_staging.py::test_tc_b99_13_unchanged_resave_after_drift_adds_no_duplicate
+PASSED tests/test_b99_staging.py::test_tc_b99_13_no_final_name_replace_outside_placement
+PASSED tests/test_b99_staging.py::test_tc_b99_ux_c10_d7_lane_name_renders_literally
+PASSED tests/test_engine_unchanged.py::test_tc027_engine_modules_unchanged_vs_main
+PASSED tests/test_requirements_canon.py::test_canon_is_one_file_with_rows
+PASSED tests/test_requirements_canon.py::test_canon_rows_have_id_form_sentence
+PASSED tests/test_requirements_canon.py::test_canon_rows_open_with_their_form
+PASSED tests/test_requirements_canon.py::test_canon_rows_hold_the_obligation_word_once
+PASSED tests/test_requirements_canon.py::test_canon_row_ids_are_unique
+PASSED tests/test_requirements_canon.py::test_canon_modules_are_s0_to_s17_in_order
+PASSED tests/test_requirements_canon.py::test_canon_history_is_the_committed_blob
+PASSED tests/test_requirements_canon.py::test_canon_s0_table_cites_existing_rows
+PASSED tests/test_requirements_canon.py::test_review_files_hold_the_decisions
+PASSED tests/test_requirements_canon.py::test_review_files_name_only_existing_tests
+PASSED tests/test_requirements_canon.py::test_canon_rows_are_one_sentence
+119 passed, 1 deselected, 5 warnings in 269.27s (0:04:29)
+exit=0

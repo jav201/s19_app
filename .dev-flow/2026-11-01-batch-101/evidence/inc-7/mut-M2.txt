@@ -1,0 +1,47 @@
+s19_app.__file__ = <COPY>\s19_app\__init__.py
+MUTANT M2: _window_rows via render_hex_view(max_rows=len(row_bases)): 64 KiB byte cap remains
+FILE: s19_app/tui/services/diff_report_service.py
+FF                                                                       [100%]
+================================== FAILURES ===================================
+_______________ test_r_cmp_004_14_3_markdown_window_over_64_kib _______________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_cmp_004_14_3_markdown_w0')
+
+    def test_r_cmp_004_14_3_markdown_window_over_64_kib(tmp_path: Path) -> None:
+        """A window holding 69,632 mapped bytes: the Markdown B block has all
+        4,356 rows (0x0000FFC0 .. 0x00020FF0), there is no A block, and neither
+        cap line appears (the screen's 65,536-byte cap must not reach the file)."""
+        comparison, mem_a, mem_b = _only_b_fixture()
+        md_text, _ = _whole_pair(tmp_path, comparison, mem_a, mem_b)
+    
+        blocks = _md_fences(md_text)
+        assert [opener for opener, _ in blocks] == ["```text"]
+        rows = blocks[0][1]
+>       assert len(rows) == 4356
+E       AssertionError: assert 4101 == 4356
+E        +  where 4101 = len(['... output truncated at 65536 bytes ...', '0x0000FFC0                                                   |..............           |................|', '0x00010000  3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C  |<<<<<<<<<<<<<<<<|', ...])
+
+tests\test_diff_report_service.py:1667: AssertionError
+_________________ test_r_cmp_004_14_4_html_window_over_64_kib _________________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_cmp_004_14_4_html_windo0')
+
+    def test_r_cmp_004_14_4_html_window_over_64_kib(tmp_path: Path) -> None:
+        """The HTML only-B window of the same run: the B ``<pre>`` holds 4,356
+        rows and no cap line is written."""
+        comparison, mem_a, mem_b = _only_b_fixture()
+        _, html_text = _whole_pair(tmp_path, comparison, mem_a, mem_b)
+    
+        panes = _html_pre_blocks(html_text)
+        assert len(panes) == 1
+>       assert len(panes[0]) == 4356
+E       AssertionError: assert 4101 == 4356
+E        +  where 4101 = len(['... output truncated at 65536 bytes ...', '0x0000FFC0                                                   |..............           |................|', '0x00010000  3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C  |<<<<<<<<<<<<<<<<|', ...])
+
+tests\test_diff_report_service.py:1683: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_14_3_markdown_window_over_64_kib
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_14_4_html_window_over_64_kib
+2 failed in 1.16s
+
+EXIT 1

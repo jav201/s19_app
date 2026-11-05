@@ -79,6 +79,7 @@ from __future__ import annotations
 import html
 import os
 import re
+import secrets
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -315,11 +316,13 @@ def _write_report(target: Path, text: str) -> None:
     """
     Summary:
         Write a report file whole or not at all (R-CMP-005.16): the text goes to
-        ``<target>.part`` (exclusive create, UTF-8) and ``os.replace`` moves it
-        onto ``target``. On any exception after the exclusive open succeeded
-        the ``.part`` file is removed and the error re-raised. A ``.part`` file
-        this run did not create stays in place and ``FileExistsError``
-        propagates.
+        ``<target>.<16 random hex>.part`` (exclusive create, UTF-8) and
+        ``os.replace`` moves it onto ``target``. The staging name is
+        unpredictable, so a link planted at a guessable name is never
+        followed (Windows exclusive create follows a dangling link; E5 C-1).
+        On any exception after the exclusive open succeeded the ``.part``
+        file is removed and the error re-raised. A ``.part`` file this run did
+        not create is never touched.
 
     Args:
         target (Path): Final report path.
@@ -329,15 +332,14 @@ def _write_report(target: Path, text: str) -> None:
         None
 
     Raises:
-        OSError: Any write or rename failure (``FileExistsError`` when a
-            ``.part`` file already exists).
+        OSError: Any write or rename failure.
 
     Dependencies:
         Used by:
             - generate_diff_report
             - generate_diff_report_html
     """
-    part = target.with_name(target.name + ".part")
+    part = target.with_name(f"{target.name}.{secrets.token_hex(8)}.part")
     handle = open(part, "x", encoding="utf-8")
     try:
         with handle:

@@ -1,0 +1,159 @@
+$ env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 2400 python -m pytest  '-q' '-rfE' '-n' '8' '-m' 'not serial_timing' 'tests/test_diff_report_service.py' 'tests/test_before_after_report.py' 'tests/test_tui_flow_builder_b94.py' 'tests/test_b99_staging.py' 'tests/test_b100_busy.py' 'tests/test_b99_editor_image.py' 'tests/test_changes_symbol_entries.py' 'tests/test_entropy_service.py' 'tests/test_render_hexview.py' 'tests/test_report_field_census.py' 'tests/test_report_off_ui_thread.py' 'tests/test_report_service.py' 'tests/test_tui_check_chain_b94.py' 'tests/test_tui_check_editor.py' 'tests/test_tui_diff_screen.py' 'tests/test_tui_patch_json.py' 'tests/test_tui_report_filter_surface.py' 'tests/test_flow_a2b_b94.py' 'tests/test_suite_hygiene.py' 'tests/test_id_registry.py' 'tests/test_engine_unchanged.py' 'tests/test_requirements_canon.py' -p no:cacheprovider   (LAN Linux host)
+UTC 2026-11-05T18:33:12Z  base 9f9f6af + git diff of b101-inc7 working tree (src 90ea8ae + uncommitted)
+s19_app.__file__ = <HOME>/work/s19c7-e5/s19_app/__init__.py
+3.11.18
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 11%]
+........................................................................ [ 23%]
+........................................................................ [ 35%]
+........................................................................ [ 47%]
+........................................................................ [ 59%]
+........................................................................ [ 71%]
+........................................................................ [ 83%]
+.......................................F................................ [ 95%]
+............................                                             [100%]
+=================================== FAILURES ===================================
+________ test_at_056e_a2b_diff_report_byte_identical_despite_selection _________
+[gw3] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-10/popen-gw3/test_at_056e_a2b_diff_report_b0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f9d77ca5b50>
+
+    def test_at_056e_a2b_diff_report_byte_identical_despite_selection(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """AT-056e / LLR-054.5 (HLR-054 scope guard, Q-5 black-box arm).
+    
+        Intent: with a filter SELECTED on the report selector, the A2B diff
+        report driven through ITS shipped surface (Compare then Report on the
+        diff screen) is byte-identical (canonical form) to a no-filter A2B
+        run under the same environment pin — the sticky selection observably
+        does NOT leak into the always-complete diff report.
+        """
+        _pin_report_clocks(monkeypatch)
+    
+        def _session(root: Path, select_filter: bool) -> Dict[str, bytes]:
+            project_dir = _make_project(
+                root, "proj", filters={"f.json": _valid_filter_body()}
+            )
+    
+            async def _drive() -> Dict[str, bytes]:
+                app = S19TuiApp(base_dir=root)
+                async with app.run_test(size=(120, 40)) as pilot:
+                    await pilot.pause()
+                    await _load_project(app, pilot, "proj")
+                    if select_filter:
+                        await _select_filter_via_dropdown(app, pilot, "f.json")
+                    app.action_show_screen("diff")
+                    await pilot.pause()
+                    app.query_one("#diff_path_a", Input).value = str(
+                        project_dir / "a.s19"
+                    )
+                    app.query_one("#diff_path_b", Input).value = str(
+                        project_dir / "b.s19"
+                    )
+                    app.query_one("#diff_compare_button", Button).press()
+                    await _flush(pilot)
+                    app.query_one("#diff_report_button", Button).press()
+                    await _flush(pilot)
+                return _reports(project_dir)
+    
+            return asyncio.run(_drive())
+    
+        base_root = tmp_path / "base"
+        sel_root = tmp_path / "sel"
+        base_root.mkdir()
+        sel_root.mkdir()
+        baseline = _session(base_root, select_filter=False)
+        selected = _session(sel_root, select_filter=True)
+    
+        expected = {_DIFF_MD_NAME, _DIFF_HTML_NAME}
+>       assert set(baseline) == expected, f"baseline wrote {sorted(baseline)}"
+E       AssertionError: baseline wrote []
+E       assert set() == {'20260710T12...ff-report.md'}
+E         
+E         Extra items in the right set:
+E         '20260710T120000Z-diff-report.html'
+E         '20260710T120000Z-diff-report.md'
+E         Use -v to get more diff
+
+tests/test_tui_report_filter_surface.py:775: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-10/popen-gw3/test_at_056e_a2b_diff_report_b0/base workarea=/tmp/pytest-of-<USER>/pytest-10/popen-gw3/test_at_056e_a2b_diff_report_b0/base/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+WARNING  s19tui:app.py:13882 Project proj: no digests saved project.json (None)
+INFO     s19tui:app.py:14124 Load phase boundary: parse_branch_entry path=a.s19 suffix=.s19
+INFO     s19tui:app.py:18642 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-10/popen-gw3/test_at_056e_a2b_diff_report_b0/base/.s19tool/workarea/proj/a.s19 addresses=4 range_count=1 range_bytes=4 errors=0
+INFO     s19tui:app.py:14141 Load phase boundary: parse_branch_done path=a.s19 branch=s19
+INFO     s19tui:app.py:18103 Load phase boundary: apply_install_state path=a.s19 precomputed=False
+INFO     s19tui:app.py:14077 Project loaded. name=proj file=/tmp/pytest-of-<USER>/pytest-10/popen-gw3/test_at_056e_a2b_diff_report_b0/base/.s19tool/workarea/proj/a.s19 mac=None
+INFO     s19tui:app.py:18770 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18119 Load phase boundary: apply_sections_done path=a.s19
+INFO     s19tui:app.py:18131 Load phase boundary: apply_hex_done path=a.s19
+INFO     s19tui:app.py:19790 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17663 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17718 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.016
+INFO     s19tui:app.py:19304 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.018
+INFO     s19tui:app.py:18144 Load phase boundary: apply_a2l_done path=a.s19
+INFO     s19tui:app.py:18997 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18161 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-10/popen-gw3/test_at_056e_a2b_diff_report_b0/base/.s19tool/workarea/proj/a.s19 file_type=s19 elapsed_seconds=0.367 has_mac=False precomputed=False
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-10/popen-gw3/test_at_056e_a2b_diff_report_b0/sel workarea=/tmp/pytest-of-<USER>/pytest-10/popen-gw3/test_at_056e_a2b_diff_report_b0/sel/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+WARNING  s19tui:app.py:13882 Project proj: no digests saved project.json (None)
+INFO     s19tui:app.py:14124 Load phase boundary: parse_branch_entry path=a.s19 suffix=.s19
+INFO     s19tui:app.py:18642 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-10/popen-gw3/test_at_056e_a2b_diff_report_b0/sel/.s19tool/workarea/proj/a.s19 addresses=4 range_count=1 range_bytes=4 errors=0
+INFO     s19tui:app.py:14141 Load phase boundary: parse_branch_done path=a.s19 branch=s19
+INFO     s19tui:app.py:18103 Load phase boundary: apply_install_state path=a.s19 precomputed=False
+INFO     s19tui:app.py:14077 Project loaded. name=proj file=/tmp/pytest-of-<USER>/pytest-10/popen-gw3/test_at_056e_a2b_diff_report_b0/sel/.s19tool/workarea/proj/a.s19 mac=None
+INFO     s19tui:app.py:18770 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18119 Load phase boundary: apply_sections_done path=a.s19
+INFO     s19tui:app.py:18131 Load phase boundary: apply_hex_done path=a.s19
+INFO     s19tui:app.py:19790 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17663 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17718 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+INFO     s19tui:app.py:19304 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.017
+INFO     s19tui:app.py:18144 Load phase boundary: apply_a2l_done path=a.s19
+INFO     s19tui:app.py:18997 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18161 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-10/popen-gw3/test_at_056e_a2b_diff_report_b0/sel/.s19tool/workarea/proj/a.s19 file_type=s19 elapsed_seconds=0.352 has_mac=False precomputed=False
+INFO     s19tui:app.py:6164 View reports action. project=proj count=0
+INFO     s19tui:app.py:6242 Report filter selected: /tmp/pytest-of-<USER>/pytest-10/popen-gw3/test_at_056e_a2b_diff_report_b0/sel/.s19tool/workarea/proj/filters/f.json
+INFO     s19tui:screens.py:3480 ReportViewerScreen dismissed by close.
+=============================== warnings summary ===============================
+tests/test_before_after_report.py:1741: 8 warnings
+tests/test_render_hexview.py: 1 warning
+tests/test_suite_hygiene.py: 1 warning
+  <HOME>/work/s19c7-e5/tests/test_before_after_report.py:1741: DeprecationWarning: invalid escape sequence '\_'
+    "| 0x00000100 | 0x00000102 | 2 | changed | CAL\_A, CAL\_M |" in md_text
+
+tests/test_suite_hygiene.py::test_r_tst_006_detector_ignores_intervals_no_assert_reads
+tests/test_suite_hygiene.py::test_r_tst_006_detector_ignores_intervals_no_assert_reads
+tests/test_suite_hygiene.py::test_r_tst_002_every_timing_arm_carries_serial_timing
+tests/test_suite_hygiene.py::test_r_tst_002_every_timing_arm_carries_serial_timing
+tests/test_suite_hygiene.py::test_r_tst_031_032_post_press_and_dwell_arms_keep_their_forms
+tests/test_suite_hygiene.py::test_r_tst_031_032_post_press_and_dwell_arms_keep_their_forms
+tests/test_suite_hygiene.py::test_r_tst_040_041_every_upper_timing_bound_is_reported
+tests/test_suite_hygiene.py::test_r_tst_040_041_every_upper_timing_bound_is_reported
+  tests/test_before_after_report.py:1741: DeprecationWarning: invalid escape sequence '\_'
+    "| 0x00000100 | 0x00000102 | 2 | changed | CAL\_A, CAL\_M |" in md_text
+
+tests/test_id_registry.py::test_tc600_g1_every_named_node_id_is_registered
+tests/test_id_registry.py::test_tc600_g1_every_named_node_id_is_registered
+tests/test_id_registry.py::test_tc604_g5_grammar_holds_or_is_registered_legacy
+tests/test_id_registry.py::test_tc604_g5_grammar_holds_or_is_registered_legacy
+tests/test_id_registry.py::test_tc606_g7_no_stem_exceeds_the_high_water_mark
+tests/test_id_registry.py::test_tc606_g7_no_stem_exceeds_the_high_water_mark
+tests/test_id_registry.py::test_tc602_g3_every_citation_is_registered
+tests/test_id_registry.py::test_tc602_g3_every_citation_is_registered
+  <unknown>:1741: DeprecationWarning: invalid escape sequence '\_'
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+1 failed, 603 passed, 26 warnings in 381.14s (0:06:21)
+exit=1

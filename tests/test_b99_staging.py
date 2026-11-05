@@ -2164,7 +2164,8 @@ _FINAL_NAME_ALLOWLIST = {
     ),
     # batch-101 Inc 7 (R-CMP-005.16, R-CMP-005.17; E3 findings S-3, N-1): a
     # diff report file is written whole or not at all. ``_write_report``
-    # writes ``<name>.part`` (exclusive create, never an overwrite), moves it
+    # writes ``<name>.<random>.part`` (exclusive create of an unpredictable
+    # name, never an overwrite; E5 C-1), moves it
     # onto the report's own fresh name with os.replace, and unlinks only the
     # ``.part`` it created. ``_remove_orphan_markdown`` unlinks only the
     # Markdown file this before/after report wrote when its HTML twin failed

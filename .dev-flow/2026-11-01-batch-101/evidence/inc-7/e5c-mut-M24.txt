@@ -1,0 +1,74 @@
+mutant M24 (LAN Linux host, detached worktree at base 9f9f6af + b101-inc7 working-tree diff; never the local worktree)
+mutant M24: file s19_app/tui/services/before_after_service.py occurrences 1
+376d375
+<         mac_records=mac_records,
+s19_app.__file__ = <HOME>/work/s19c7-e5/s19_app/__init__.py
+$ env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 2400 python -m pytest  -q -rA tests/test_before_after_report.py::test_r_before_after_report_001_35_1_artifact_lines_use_loaded_a2l_and_mac tests/test_before_after_report.py::test_r_before_after_report_001_35_3_bkey_loaded_mac_is_used -p no:cacheprovider
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+__ test_r_before_after_report_001_35_1_artifact_lines_use_loaded_a2l_and_mac ___
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-6/test_r_before_after_report_0010')
+
+    def test_r_before_after_report_001_35_1_artifact_lines_use_loaded_a2l_and_mac(
+        tmp_path: Path,
+    ) -> None:
+        """With the loaded A2L and MAC handed to the composer, both images'
+        artifact lines read ``summary=both; a2l=used (1/2); mac=used (1/1)`` in
+        both files (2/2 lines each)."""
+        result, md_text, html_text = _compose_texts(
+            tmp_path,
+            a2l_data=_TWO_TAG_A2L,
+            a2l_records=[{"name": "CAL_A", "address": 0x100}],
+            mac_records=[{"name": "CAL_M", "address": 0x102}],
+        )
+        assert result.written, result.diagnostics
+        tail = "summary=both; a2l=used (1/2); mac=used (1/1)"
+        for who in ("A", "B"):
+>           assert f"- Image {who} artifacts: {tail}" in md_text.splitlines()
+E           AssertionError: assert '- Image A artifacts: summary=both; a2l=used (1/2); mac=used (1/1)' in ['# Before/after report', '', '- Generated (UTC): 2026-07-02T12:00:00+00:00', '- Tool version: 1.0.0rc1', '- Image A: ...rnal] path=`/tmp/pytest-of-<USER>/pytest-6/test_r_before_after_report_0010/proj/img-patched.s19` parse-errors=0', ...]
+E            +  where ['# Before/after report', '', '- Generated (UTC): 2026-07-02T12:00:00+00:00', '- Tool version: 1.0.0rc1', '- Image A: ...rnal] path=`/tmp/pytest-of-<USER>/pytest-6/test_r_before_after_report_0010/proj/img-patched.s19` parse-errors=0', ...] = <built-in method splitlines of str object at 0x55c4589623c0>()
+E            +    where <built-in method splitlines of str object at 0x55c4589623c0> = '# Before/after report\n\n- Generated (UTC): 2026-07-02T12:00:00+00:00\n- Tool version: 1.0.0rc1\n- Image A: img\\.s19...            |................|\n0x00000100  AA BB 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|\n```\n'.splitlines
+
+tests/test_before_after_report.py:1479: AssertionError
+_________ test_r_before_after_report_001_35_3_bkey_loaded_mac_is_used __________
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-6/test_r_before_after_report_0011')
+
+    def test_r_before_after_report_001_35_3_bkey_loaded_mac_is_used(
+        tmp_path: Path,
+    ) -> None:
+        """Key ``b`` with an A2L and a MAC file loaded (E5 C-3 / C-4 R-1): the
+        app forwards the loaded MAC, so both artifact lines of both files read
+        ``summary=both; a2l=used (1/2); mac=used (1/2)``, the run's Symbols cell
+        names the A2L tag and the MAC record, and the painted status is the
+        written-pair line."""
+        outcome = _drive_bkey_texts(
+            tmp_path, a2l_tags=_TWO_TAG_A2L["tags"], mac_text=_TWO_RECORD_MAC
+        )
+        names = outcome["listing"]
+        assert names is not None and len(names) == 2, names
+        md_name, html_name = sorted(names, key=lambda n: not n.endswith(".md"))
+        assert _MD_NAME.match(md_name) and _HTML_NAME.match(html_name), names
+        md_text = outcome["files"][md_name]
+        html_text = outcome["files"][html_name]
+        tail = "summary=both; a2l=used (1/2); mac=used (1/2)"
+        for who in ("A", "B"):
+>           assert f"- Image {who} artifacts: {tail}" in md_text.splitlines()
+E           AssertionError: assert '- Image A artifacts: summary=both; a2l=used (1/2); mac=used (1/2)' in ['# Before/after report', '', '- Generated (UTC): 2026-11-05T18:31:51.262221+00:00', '- Tool version: 1.0.0rc1', '- Im...ytest-of-<USER>/pytest-6/test_r_before_after_report_0011/.s19tool/workarea/proj/img-patched.s19` parse-errors=0', ...]
+E            +  where ['# Before/after report', '', '- Generated (UTC): 2026-11-05T18:31:51.262221+00:00', '- Tool version: 1.0.0rc1', '- Im...ytest-of-<USER>/pytest-6/test_r_before_after_report_0011/.s19tool/workarea/proj/img-patched.s19` parse-errors=0', ...] = <built-in method splitlines of str object at 0x55c4586305d0>()
+E            +    where <built-in method splitlines of str object at 0x55c4586305d0> = '# Before/after report\n\n- Generated (UTC): 2026-11-05T18:31:51.262221+00:00\n- Tool version: 1.0.0rc1\n- Image A: im...            |................|\n0x00000100  AA BB 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|\n```\n'.splitlines
+
+tests/test_before_after_report.py:1738: AssertionError
+=============================== warnings summary ===============================
+tests/test_before_after_report.py:1741
+  <HOME>/work/s19c7-e5/tests/test_before_after_report.py:1741: DeprecationWarning: invalid escape sequence '\_'
+    "| 0x00000100 | 0x00000102 | 2 | changed | CAL\_A, CAL\_M |" in md_text
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_before_after_report.py::test_r_before_after_report_001_35_1_artifact_lines_use_loaded_a2l_and_mac
+FAILED tests/test_before_after_report.py::test_r_before_after_report_001_35_3_bkey_loaded_mac_is_used
+2 failed, 1 warning in 4.15s
+exit=1
+restored: byte-exact (cmp clean)

@@ -1353,12 +1353,14 @@ def _compose_texts(tmp_path: Path, **kwargs) -> tuple:
 
 
 def _drive_bkey_texts(
-    tmp_path: Path, *, a2l_tags=None, project: bool = True
+    tmp_path: Path, *, a2l_tags=None, project: bool = True, mac_text=None
 ) -> dict:
     """Drive the shipped chain (load, apply, confirm save-back, key ``b``)
     and return the written ``{file name: text}`` pairs, the captured status
-    lines and every before/after file found anywhere under ``tmp_path``.
-    ``a2l_tags`` loads an A2L payload with those tags; ``project=False``
+    lines, the four painted status-log lines and every before/after file
+    found anywhere under ``tmp_path``. ``a2l_tags`` loads an A2L payload with
+    those tags; ``mac_text`` writes a ``.mac`` file and loads it over the
+    image through the app's own MAC loader (E5 C-4); ``project=False``
     leaves no project open."""
     from textual.widgets import Button
 
@@ -1374,6 +1376,12 @@ def _drive_bkey_texts(
                 project_dir.mkdir(parents=True, exist_ok=True)
                 app.current_project = "proj"
             _load_image(app, image_path)
+            if mac_text is not None:
+                mac_path = tmp_path / "tags.mac"
+                mac_path.write_text(mac_text, encoding="utf-8")
+                app.current_file = app._merge_mac_with_existing_primary(
+                    app._load_mac_file(mac_path), app.current_file
+                )
             if a2l_tags is not None:
                 app.current_a2l_data = {
                     "sections": [], "errors": [], "tags": list(a2l_tags),
@@ -1398,6 +1406,15 @@ def _drive_bkey_texts(
             return {
                 "files": files,
                 "statuses": list(statuses),
+                "listing": (
+                    sorted(p.name for p in reports_dir.iterdir())
+                    if reports_dir.is_dir()
+                    else None
+                ),
+                "painted": [
+                    str(app.query_one(f"#log_line_{index}").render())
+                    for index in range(1, 5)
+                ],
                 "found": sorted(
                     p.name for p in tmp_path.rglob("*-before-after-report.*")
                 ),
@@ -1686,3 +1703,103 @@ def test_r_cmp_005_17_2_before_after_html_failure_removes_markdown(
     assert result.written is False
     assert "nope" in " ".join(result.diagnostics)
     assert sorted(p.name for p in reports.iterdir()) == []
+
+
+# ----- E5 corrective pass (C-3, C-4): black-box key-``b`` cases ---------------
+
+#: A MAC file with one record inside the 16-byte test image (``CAL_M`` at
+#: 0x101) and one outside it (``CAL_N`` at 0x9000).
+_TWO_RECORD_MAC = "; E5 C-4\nCAL_M=101\nCAL_N=9000\n"
+
+#: The width of the ``run_test`` terminal used by ``_drive_bkey_texts``; a
+#: status-log line is painted cut to this width.
+_BKEY_WIDTH = 120
+
+
+def test_r_before_after_report_001_35_3_bkey_loaded_mac_is_used(
+    tmp_path: Path,
+) -> None:
+    """Key ``b`` with an A2L and a MAC file loaded (E5 C-3 / C-4 R-1): the
+    app forwards the loaded MAC, so both artifact lines of both files read
+    ``summary=both; a2l=used (1/2); mac=used (1/2)``, the run's Symbols cell
+    names the A2L tag and the MAC record, and the painted status is the
+    written-pair line."""
+    outcome = _drive_bkey_texts(
+        tmp_path, a2l_tags=_TWO_TAG_A2L["tags"], mac_text=_TWO_RECORD_MAC
+    )
+    names = outcome["listing"]
+    assert names is not None and len(names) == 2, names
+    md_name, html_name = sorted(names, key=lambda n: not n.endswith(".md"))
+    assert _MD_NAME.match(md_name) and _HTML_NAME.match(html_name), names
+    md_text = outcome["files"][md_name]
+    html_text = outcome["files"][html_name]
+    tail = "summary=both; a2l=used (1/2); mac=used (1/2)"
+    for who in ("A", "B"):
+        assert f"- Image {who} artifacts: {tail}" in md_text.splitlines()
+        assert f"<li>Image {who} artifacts: {tail}</li>" in html_text.splitlines()
+    assert (
+        "| 0x00000100 | 0x00000102 | 2 | changed | CAL\\_A, CAL\\_M |" in md_text
+    )
+    assert "<td>CAL_A, CAL_M</td>" in html_text
+    reports =tmp_path / ".s19tool" / "workarea" / "proj" / "reports"
+    status = (
+        f"Before/after report written: {reports / md_name} "
+        f"| {reports / html_name}"
+    )
+    assert status in outcome["statuses"], outcome["statuses"]
+    assert status[:_BKEY_WIDTH] in outcome["painted"], outcome["painted"]
+
+
+def test_r_cmp_005_16_3_bkey_failed_write_status(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Key ``b`` with the HTML file's write failing half way (E5 C-3 / C-4,
+    R-CMP-005.16 status clause): the painted status is exactly
+    ``Before/after report failed: OSError: disk full`` and ``reports/`` holds
+    no report and no ``.part`` file (the Markdown file was written and
+    removed, so the folder exists)."""
+    from tests.test_diff_report_service import _inject_half_write
+
+    hit = _inject_half_write(monkeypatch, "-before-after-report.html")
+    outcome = _drive_bkey_texts(tmp_path)
+
+    assert hit, "the injected failure was never reached (write path changed)"
+    status = "Before/after report failed: OSError: disk full"
+    assert status in outcome["statuses"], outcome["statuses"]
+    assert status in outcome["painted"], outcome["painted"]
+    assert outcome["listing"] == []
+    assert outcome["found"] == []
+
+
+@pytest.mark.parametrize("arm", ["raise", "refuse"])
+def test_r_cmp_005_17_3_bkey_html_failure_status(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str
+) -> None:
+    """Key ``b`` with the HTML generator raising, then refusing, after the
+    Markdown file was written (E5 C-3 / C-4 R-3, R-CMP-005.17 and
+    R-BEFORE-AFTER-REPORT-001.17): the painted status is exactly
+    ``Before/after report failed: RuntimeError: x`` / ``Before/after report
+    refused: nope`` and no ``.md`` or ``.html`` is left in ``reports/``."""
+    from s19_app.tui.services.diff_report_service import DiffReportResult
+
+    bas = _bas()
+
+    def _raising(*_a, **_k):
+        raise RuntimeError("x")
+
+    def _refusing(*_a, **_k):
+        return DiffReportResult(path=None, written=False, diagnostics=["nope"])
+
+    monkeypatch.setattr(
+        bas, "generate_diff_report_html", _raising if arm == "raise" else _refusing
+    )
+    outcome = _drive_bkey_texts(tmp_path)
+
+    status = {
+        "raise": "Before/after report failed: RuntimeError: x",
+        "refuse": "Before/after report refused: nope",
+    }[arm]
+    assert status in outcome["statuses"], outcome["statuses"]
+    assert status in outcome["painted"], outcome["painted"]
+    assert outcome["listing"] == []
+    assert outcome["found"] == []

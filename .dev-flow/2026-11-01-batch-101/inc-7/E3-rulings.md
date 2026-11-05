@@ -33,7 +33,7 @@ Round 1 reviews at `137424b`: architect PASS-WITH-NOTES (`E3-architect.md`, MAJO
 ## 3. E4 addenda
 
 - **A-1 [S-2]** `diff_report_service.py` imports the private `_normalise` from `markdown_safety` instead of copying the category set. If the reviewer prefers a public name, the alternative is a public alias in `markdown_safety.py`, but that would be a 5th source file. Keep the import and say so in the docstring.
-- **A-2 [S-3]** `_write_report` opens the `.part` file with mode `"x"`. If a `.part` file is left from a crash, the exclusive create raises `FileExistsError`. That error surfaces as `Diff report failed: FileExistsError: …`, which is loud and acceptable; do not unlink a `.part` file this run did not create.
+- **A-2 [S-3]** `_write_report` opens the `.part` file with mode `"x"`. If a `.part` file is left from a crash, the exclusive create raises `FileExistsError`. That error surfaces as `Diff report failed: FileExistsError: …`, which is loud and acceptable; do not unlink a `.part` file this run did not create. **[Superseded in part by E5 C-1:** the staging name is now `<name>.<16 random hex>.part`, so a stale `.part` no longer collides and raises nothing; it is still never touched.**]**
 - **A-3 [S-3]** In `_start_diff_report_worker`, track the Markdown path in a variable set only after `md.written`. A Markdown exception then removes nothing. `test_tc_b100_51_diff_report_ends_once_and_logs_its_outcome` stubs the generators, so the removal must use `missing_ok=True`.
 - **A-4 [F-E3-2]** Every negative assertion on a file-derived name in a test that reads a Markdown report checks both spellings. This applies to the 5 listed sites and to any new test.
 - **A-5 [S-1]** The new message escaping changes no existing assertion: TC-717 checks `CHG-SYMBOL-UNRESOLVED` and `'Ghost'`, and neither changes under report-safe text. E4 confirms this by running TC-717/718.
@@ -44,6 +44,6 @@ Round 1 reviews at `137424b`: architect PASS-WITH-NOTES (`E3-architect.md`, MAJO
 ## Round 2 (2026-11-02)
 
 Re-review (E3-r2.md): PASS-WITH-NOTES — F-E3-1..3 and S-1..S-3 closed. E4 addenda added:
-- N-1: the write helper starts its cleanup only after the exclusive open of `<name>.part` succeeds, and removes it after closing; a pre-existing `.part` stays in place and `FileExistsError` propagates (new sub-case).
+- N-1: the write helper starts its cleanup only after the exclusive open of `<name>.part` succeeds, and removes it after closing; a pre-existing `.part` stays in place and `FileExistsError` propagates (new sub-case). **[E5 C-1:** with the random staging name a pre-existing `.part` stays in place and the report is written beside it; case R-CMP-005.16/4.**]**
 - L-1: fix the E1-rulings scope table (the `(key 7)` string is in scope).
 - Private `_normalise` import accepted: docstring note (A-1), a test `_strip_ctl(v) == _normalise(v)` over the S-2 inputs, and a backlog row for a public alias.

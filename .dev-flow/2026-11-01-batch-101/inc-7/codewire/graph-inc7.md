@@ -33,7 +33,7 @@ Interfaces with other increments:
 | Inc 8, Inc 9 | `flow_execution_service.run_flow` (CRC block, external outputs, re-run) | O-2: Inc 7 touches only lines `:981-988` of the A2B arm |
 | Inc 3 … 5 | other `app.py` functions | disjoint functions |
 | Inc 14 | guide ch21 text describing F-42 | docs follow after the fix |
-| I-6 report file write [S-3] | `_write_report(target: Path, text: str) -> None`: `<target>.part` created exclusively, written UTF-8, `os.replace` onto `<target>`; on any exception the `.part` file is removed and the exception re-raised | G1 → both generators |
+| I-6 report file write [S-3] | `_write_report(target: Path, text: str) -> None`: `<target>.<16 random hex>.part` created exclusively (E5 C-1), written UTF-8, `os.replace` onto `<target>`; on any exception the `.part` file is removed and the exception re-raised | G1 → both generators |
 | I-7 visible text [S-2] | `_strip_ctl(value) -> str` = `markdown_safety._normalise(str(value))`: tab/CR/LF → space; Cc, Cf, Cs, Zl, Zp → `�`. Every HTML sink of a label field, path field, refusal message, provenance or linkage value calls it before `_esc`; `md_safe`/`md_code` apply the same steps on the Markdown side | G1 internal |
 | D16-15 (open) | `run_flow` runs on the UI thread; the flow-A2B report's whole windows cost ~1.3 s per MiB there | OBS-7-5, admitted limit [F-E3-3] |
 
@@ -231,11 +231,13 @@ _write_report
 req: R-CMP-005.16
 in: Path target; str text
 out: None
-func: new [S-3] (I-6). `part = target.with_name(target.name + ".part")`; open `part` with mode `"x"`, encoding UTF-8, write `text`; `os.replace(part, target)`. On any exception: `part.unlink(missing_ok=True)`, then re-raise. The `.part` name never matches `DIFF_REPORT_FILENAME_REGEX` and is not a `.md`, so `list_diff_reports` and the Reports listing never show it. The final name was chosen free by `_diff_report_filename`; the replace does not add an overwrite the old `write_text` did not have (D14-11, exclusive create of the final name, stays on the backlog).
+func: new [S-3] (I-6). `part = target.with_name(f"{target.name}.{secrets.token_hex(8)}.part")` (E5 C-1, design-gap fix: an unpredictable staging name, so a link planted at a guessable `<name>.part` is never followed; Windows exclusive create follows a dangling link, S5-1); open `part` with mode `"x"`, encoding UTF-8, write `text`; `os.replace(part, target)`. On any exception: `part.unlink(missing_ok=True)`, then re-raise. The `.part` name never matches `DIFF_REPORT_FILENAME_REGEX` and is not a `.md`, so `list_diff_reports` and the Reports listing never show it. The final name was chosen free by `_diff_report_filename`; the replace does not add an overwrite the old `write_text` did not have (D14-11, exclusive create of the final name, stays on the backlog).
 module: s19_app/tui/services/diff_report_service.py
-modify: [File: <dest>/<name>.part] (create, then rename); [File: <dest>/<name>] (create)
+modify: [File: <dest>/<name>.<random>.part] (create, then rename); [File: <dest>/<name>] (create)
 examples: (R-CMP-005.16/1) write raises after half the text → no `<name>`, no `<name>.part`; the `OSError` reaches the caller (status `Diff report failed: OSError: disk full`)
 examples: (R-CMP-005.16/2) success → `<name>` holds the whole text, no `.part` left
+examples: (R-CMP-005.16/4) a stale `<name>.part` holding `ANOTHER WRITER` → `<name>` written whole beside it; the stale file keeps its bytes (N-1; before E5 C-1: `FileExistsError`)
+examples: (R-CMP-005.16/5) a dangling link at `<name>.part` → its target is not created, the link is unchanged, `<name>` is a regular file (E5 C-1; base and head `90ea8ae` on Windows: target created, `<name>` became the link)
 
 _md_cell, _md_table_cell, md_safe, md_code, _normalise
 req: R-BEFORE-AFTER-REPORT-001.21, R-BEFORE-AFTER-REPORT-001.22, R-CMP-004.9.1, R-CMP-004.9.2

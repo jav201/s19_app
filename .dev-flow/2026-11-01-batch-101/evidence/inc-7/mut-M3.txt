@@ -1,0 +1,60 @@
+s19_app.__file__ = <COPY>\s19_app\__init__.py
+MUTANT M3: title constant 'Diff report' (both generators)
+FILE: s19_app/tui/services/diff_report_service.py
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+_____________ test_r_before_after_report_001_32_1_markdown_title ______________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_before_after_report_0010')
+
+    def test_r_before_after_report_001_32_1_markdown_title(tmp_path: Path) -> None:
+        """The composer's Markdown file starts with ``# Before/after report``."""
+        result, md_text, _ = _compose_texts(tmp_path)
+        assert result.written, result.diagnostics
+>       assert md_text.splitlines()[0] == "# Before/after report"
+E       AssertionError: assert '# Diff report' == '# Before/after report'
+E         
+E         - # Before/after report
+E         + # Diff report
+
+tests\test_before_after_report.py:1422: AssertionError
+_____________ test_r_before_after_report_001_33_1_html_page_title _____________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_before_after_report_0011')
+
+    def test_r_before_after_report_001_33_1_html_page_title(tmp_path: Path) -> None:
+        """The HTML head holds exactly one ``<title>Before/after report</title>``
+        and no ``<title>Diff report</title>``."""
+        result, _, html_text = _compose_texts(tmp_path)
+        assert result.written, result.diagnostics
+>       assert html_text.count("<title>Before/after report</title>") == 1
+E       assert 0 == 1
+E        +  where 0 = <built-in method count of str object at 0x00000219DD788380>('<title>Before/after report</title>')
+E        +    where <built-in method count of str object at 0x00000219DD788380> = '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>Diff report</title>\n<style>body{font-famil...e="background:#ffd54d;color:#000;font-weight:bold">.</span>..............|</pre></td>\n</tr></table>\n</body>\n</html>'.count
+
+tests\test_before_after_report.py:1431: AssertionError
+______________ test_r_before_after_report_001_34_1_html_heading _______________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_before_after_report_0012')
+
+    def test_r_before_after_report_001_34_1_html_heading(tmp_path: Path) -> None:
+        """The first ``<h1>`` of the HTML file is ``Before/after report``."""
+        result, _, html_text = _compose_texts(tmp_path)
+        assert result.written, result.diagnostics
+        h1_lines = [ln for ln in html_text.splitlines() if ln.startswith("<h1>")]
+>       assert h1_lines[0] == "<h1>Before/after report</h1>"
+E       AssertionError: assert '<h1>Diff report</h1>' == '<h1>Before/after report</h1>'
+E         
+E         - <h1>Before/after report</h1>
+E         ?     ^^ ----- ---
+E         + <h1>Diff report</h1>
+E         ?     ^^
+
+tests\test_before_after_report.py:1440: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_before_after_report.py::test_r_before_after_report_001_32_1_markdown_title
+FAILED tests/test_before_after_report.py::test_r_before_after_report_001_33_1_html_page_title
+FAILED tests/test_before_after_report.py::test_r_before_after_report_001_34_1_html_heading
+3 failed in 0.90s
+
+EXIT 1

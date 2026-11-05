@@ -1,0 +1,90 @@
+s19_app.__file__ = <COPY>\s19_app\__init__.py
+MUTANT M16: _write_report writes the final name directly
+FILE: s19_app/tui/services/diff_report_service.py
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+__________ test_r_cmp_005_16_1_failed_markdown_write_leaves_no_file ___________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_cmp_005_16_1_failed_mar0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023F90CCC950>
+
+    def test_r_cmp_005_16_1_failed_markdown_write_leaves_no_file(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A disk that fails after half the text: the Markdown generator raises
+        and ``reports/`` holds no ``-diff-report.md`` and no ``.part`` file."""
+        comparison, mem_a, mem_b = _long_changed_fixture()
+        hit = _inject_half_write(monkeypatch, "-diff-report.md")
+    
+        with pytest.raises(OSError, match="disk full"):
+            generate_diff_report(
+                comparison, mem_map_a=mem_a, mem_map_b=mem_b,
+                project_dir=tmp_path, now_fn=_fixed_clock,
+            )
+    
+        assert hit, "the injected failure was never reached (write path changed)"
+>       assert _folder_names(tmp_path / "reports") == []
+E       AssertionError: assert ['20260611T12...ff-report.md'] == []
+E         
+E         Left contains one more item: '20260611T120000Z-diff-report.md'
+E         Use -v to get more diff
+
+tests\test_diff_report_service.py:1789: AssertionError
+____________ test_r_cmp_005_16_2_failed_html_write_leaves_no_file _____________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_cmp_005_16_2_failed_htm0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023F93B1FC10>
+
+    def test_r_cmp_005_16_2_failed_html_write_leaves_no_file(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The same for the HTML generator: 0 ``-diff-report.html``, 0 ``.part``."""
+        comparison, mem_a, mem_b = _long_changed_fixture()
+        hit = _inject_half_write(monkeypatch, "-diff-report.html")
+    
+        with pytest.raises(OSError, match="disk full"):
+            generate_diff_report_html(
+                comparison, mem_map_a=mem_a, mem_map_b=mem_b,
+                project_dir=tmp_path, now_fn=_fixed_clock,
+            )
+    
+        assert hit, "the injected failure was never reached (write path changed)"
+>       assert _folder_names(tmp_path / "reports") == []
+E       AssertionError: assert ['20260611T12...-report.html'] == []
+E         
+E         Left contains one more item: '20260611T120000Z-diff-report.html'
+E         Use -v to get more diff
+
+tests\test_diff_report_service.py:1806: AssertionError
+________ test_r_cmp_005_16_4_before_after_failed_write_leaves_no_file _________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_cmp_005_16_4_before_aft0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023F92394090>
+
+    def test_r_cmp_005_16_4_before_after_failed_write_leaves_no_file(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The composer's HTML write failing half way: the error propagates and
+        ``reports/`` holds no ``.md``, no ``.html`` and no ``.part`` file."""
+        from tests.test_diff_report_service import _inject_half_write
+    
+        hit = _inject_half_write(monkeypatch, "-before-after-report.html")
+        with pytest.raises(OSError, match="disk full"):
+            _compose_texts(tmp_path)
+    
+        assert hit, "the injected failure was never reached (write path changed)"
+        reports = tmp_path / "proj" / "reports"
+>       assert sorted(p.name for p in reports.iterdir()) == []
+E       AssertionError: assert ['20260702T12...-report.html'] == []
+E         
+E         Left contains one more item: '20260702T120000Z-before-after-report.html'
+E         Use -v to get more diff
+
+tests\test_before_after_report.py:1659: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_diff_report_service.py::test_r_cmp_005_16_1_failed_markdown_write_leaves_no_file
+FAILED tests/test_diff_report_service.py::test_r_cmp_005_16_2_failed_html_write_leaves_no_file
+FAILED tests/test_before_after_report.py::test_r_cmp_005_16_4_before_after_failed_write_leaves_no_file
+3 failed in 1.09s
+
+EXIT 1

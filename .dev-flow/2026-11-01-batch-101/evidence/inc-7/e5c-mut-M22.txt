@@ -1,0 +1,68 @@
+mutant M22 (LAN Linux host, detached worktree at base 9f9f6af + b101-inc7 working-tree diff; never the local worktree)
+mutant M22: file s19_app/tui/services/diff_report_service.py occurrences 1
+376c376
+<     return _strip_ctl(value).replace("|", "\\|")
+---
+>     return _strip_ctl(value)
+s19_app.__file__ = <HOME>/work/s19c7-e5/s19_app/__init__.py
+$ env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 2400 python -m pytest  -q -rA tests/test_diff_report_service.py::test_r_before_after_report_001_22_2_pipe_in_vocabulary_cells_stays_escaped tests/test_diff_report_service.py::test_pipe_bearing_symbol_md_escaped_html_intact -p no:cacheprovider
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+__ test_r_before_after_report_001_22_2_pipe_in_vocabulary_cells_stays_escaped __
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-5/test_r_before_after_report_0010')
+
+    def test_r_before_after_report_001_22_2_pipe_in_vocabulary_cells_stays_escaped(
+        tmp_path: Path,
+    ) -> None:
+        """Every field written by ``_md_cell`` keeps a planted ``|`` inside its
+        cell (E5 C-2; the M22 survivor): linkage Type, Disposition and Linkage,
+        the flow record's disposition, the refusal code and the Applied (UTC)
+        value. Each pipe is preceded by a backslash and every table row keeps its
+        column count. These fields are system vocabulary today, so this pins
+        the escaper's guarantee, not an exposure."""
+        record, refusal, comparison, mem_a, mem_b = _flow_fixture()
+        record = dataclasses.replace(record, disposition="app|lied")
+        refusal = dataclasses.replace(refusal, code="CHG|X")
+        provenance = BeforeAfterProvenance(
+            original_path=Path("/tmp/original.s19"),
+            saved_path=Path("/tmp/original-patched_1.s19"),
+            applied_at_utc="2026-07-02|09:00",
+            change_doc_path=Path("/tmp/change-doc.json"),
+        )
+        entry = _entry(
+            address_start=0x1000,
+            address_end=0x1002,
+            entry_type="by|tes",
+            disposition="app|lied",
+            linkage="mac|linked",
+        )
+        md_text, _ = _whole_pair(
+            tmp_path, comparison, mem_a, mem_b,
+            linkage_entries=[entry],
+            provenance=provenance,
+            flow_changes=FlowChangeAttribution(records=(record,), refusals=(refusal,)),
+        )
+        lines = md_text.splitlines()
+    
+        def _structural(row: str) -> int:
+            return len(re.findall(r"(?<!\\)\|", row))
+    
+        linkage_row = next(ln for ln in lines if ln.startswith("| 1 | "))
+>       assert linkage_row.startswith(
+            "| 1 | by\\|tes | 0x00001000 | 0x00001002 | app\\|lied | mac\\|linked "
+            "| CAL\\_SYM |"
+        ), linkage_row
+E       AssertionError: | 1 | by|tes | 0x00001000 | 0x00001002 | app|lied | mac|linked | CAL\_SYM | AA AA \|..\| | 01 02 \|..\| |
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x7fb4e29b3b90>('| 1 | by\\|tes | 0x00001000 | 0x00001002 | app\\|lied | mac\\|linked | CAL\\_SYM |')
+E        +    where <built-in method startswith of str object at 0x7fb4e29b3b90> = '| 1 | by|tes | 0x00001000 | 0x00001002 | app|lied | mac|linked | CAL\\_SYM | AA AA \\|..\\| | 01 02 \\|..\\| |'.startswith
+
+tests/test_diff_report_service.py:2458: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_diff_report_service.py::test_pipe_bearing_symbol_md_escaped_html_intact
+FAILED tests/test_diff_report_service.py::test_r_before_after_report_001_22_2_pipe_in_vocabulary_cells_stays_escaped
+1 failed, 1 passed in 0.98s
+exit=1
+restored: byte-exact (cmp clean)

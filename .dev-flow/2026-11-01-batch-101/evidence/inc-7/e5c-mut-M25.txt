@@ -1,0 +1,73 @@
+mutant M25 (LAN Linux host, detached worktree at base 9f9f6af + b101-inc7 working-tree diff; never the local worktree)
+mutant M25: file s19_app/tui/services/before_after_service.py occurrences 1
+403,404d402
+<     if mac_records is not None:
+<         kwargs["mac_records"] = mac_records
+s19_app.__file__ = <HOME>/work/s19c7-e5/s19_app/__init__.py
+$ env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 2400 python -m pytest  -q -rA tests/test_before_after_report.py::test_r_before_after_report_001_24_2_a2l_and_mac_names_share_the_cell tests/test_before_after_report.py::test_r_before_after_report_001_35_3_bkey_loaded_mac_is_used -p no:cacheprovider
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_____ test_r_before_after_report_001_24_2_a2l_and_mac_names_share_the_cell _____
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-7/test_r_before_after_report_0010')
+
+    def test_r_before_after_report_001_24_2_a2l_and_mac_names_share_the_cell(
+        tmp_path: Path,
+    ) -> None:
+        """A tag and a MAC record that both lie in the run are listed in one
+        cell, A2L first."""
+        result, md_text, html_text = _compose_texts(
+            tmp_path,
+            a2l_records=[{"name": "CAL_A", "address": 0x100}],
+            mac_records=[{"name": "CAL_M", "address": 0x101}],
+        )
+        assert result.written, result.diagnostics
+>       assert (
+            "| 0x00000100 | 0x00000102 | 2 | changed | CAL\\_A, CAL\\_M |" in md_text
+        )
+E       AssertionError: assert '| 0x00000100 | 0x00000102 | 2 | changed | CAL\\_A, CAL\\_M |' in '# Before/after report\n\n- Generated (UTC): 2026-07-02T12:00:00+00:00\n- Tool version: 1.0.0rc1\n- Image A: img\\.s19...            |................|\n0x00000100  AA BB 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|\n```\n'
+
+tests/test_before_after_report.py:1522: AssertionError
+_________ test_r_before_after_report_001_35_3_bkey_loaded_mac_is_used __________
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-7/test_r_before_after_report_0011')
+
+    def test_r_before_after_report_001_35_3_bkey_loaded_mac_is_used(
+        tmp_path: Path,
+    ) -> None:
+        """Key ``b`` with an A2L and a MAC file loaded (E5 C-3 / C-4 R-1): the
+        app forwards the loaded MAC, so both artifact lines of both files read
+        ``summary=both; a2l=used (1/2); mac=used (1/2)``, the run's Symbols cell
+        names the A2L tag and the MAC record, and the painted status is the
+        written-pair line."""
+        outcome = _drive_bkey_texts(
+            tmp_path, a2l_tags=_TWO_TAG_A2L["tags"], mac_text=_TWO_RECORD_MAC
+        )
+        names = outcome["listing"]
+        assert names is not None and len(names) == 2, names
+        md_name, html_name = sorted(names, key=lambda n: not n.endswith(".md"))
+        assert _MD_NAME.match(md_name) and _HTML_NAME.match(html_name), names
+        md_text = outcome["files"][md_name]
+        html_text = outcome["files"][html_name]
+        tail = "summary=both; a2l=used (1/2); mac=used (1/2)"
+        for who in ("A", "B"):
+            assert f"- Image {who} artifacts: {tail}" in md_text.splitlines()
+            assert f"<li>Image {who} artifacts: {tail}</li>" in html_text.splitlines()
+>       assert (
+            "| 0x00000100 | 0x00000102 | 2 | changed | CAL\_A, CAL\_M |" in md_text
+        )
+E       AssertionError: assert '| 0x00000100 | 0x00000102 | 2 | changed | CAL\\_A, CAL\\_M |' in '# Before/after report\n\n- Generated (UTC): 2026-11-05T18:31:58.469223+00:00\n- Tool version: 1.0.0rc1\n- Image A: im...            |................|\n0x00000100  AA BB 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|\n```\n'
+
+tests/test_before_after_report.py:1740: AssertionError
+=============================== warnings summary ===============================
+tests/test_before_after_report.py:1741
+  <HOME>/work/s19c7-e5/tests/test_before_after_report.py:1741: DeprecationWarning: invalid escape sequence '\_'
+    "| 0x00000100 | 0x00000102 | 2 | changed | CAL\_A, CAL\_M |" in md_text
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_before_after_report.py::test_r_before_after_report_001_24_2_a2l_and_mac_names_share_the_cell
+FAILED tests/test_before_after_report.py::test_r_before_after_report_001_35_3_bkey_loaded_mac_is_used
+2 failed, 1 warning in 4.16s
+exit=1
+restored: byte-exact (cmp clean)

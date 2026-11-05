@@ -1,0 +1,27 @@
+s19_app.__file__ = <COPY>\s19_app\__init__.py
+MUTANT M5: title chosen by linkage_entries is not None
+FILE: s19_app/tui/services/diff_report_service.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+______________ test_r_cmp_004_1_2_title_follows_provenance_only _______________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_cmp_004_1_2_title_follo0')
+
+    def test_r_cmp_004_1_2_title_follows_provenance_only(tmp_path: Path) -> None:
+        """Linkage entries without provenance do not switch the title."""
+        md_text, html_text = _whole_pair(
+            tmp_path, _comparison(), _mem(0x100, 0xAA, 4), _mem(0x100, 0xBB, 4),
+            linkage_entries=[_entry()], provenance=None,
+        )
+>       assert md_text.splitlines()[0] == "# Diff report"
+E       AssertionError: assert '# Before/after report' == '# Diff report'
+E         
+E         - # Diff report
+E         + # Before/after report
+
+tests\test_diff_report_service.py:1898: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_1_2_title_follows_provenance_only
+1 failed in 0.96s
+
+EXIT 1

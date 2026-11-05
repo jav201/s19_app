@@ -1,0 +1,29 @@
+s19_app.__file__ = <COPY>\s19_app\__init__.py
+MUTANT M7: app forwards loaded.mac_records unconditionally (empty list when no MAC file)
+FILE: s19_app/tui/app.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________________ test_r_cmp_003_2_1_bkey_no_mac_is_absent ___________________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_cmp_003_2_1_bkey_no_mac0')
+
+    def test_r_cmp_003_2_1_bkey_no_mac_is_absent(tmp_path: Path) -> None:
+        """Key ``b`` with an A2L but no MAC file loaded: both artifact lines read
+        ``mac=absent`` (never ``mac=unused (0/0)``) while the A2L is used."""
+        outcome = _drive_bkey_texts(tmp_path, a2l_tags=_TWO_TAG_A2L["tags"])
+        md_text = _bkey_md(outcome)
+        lines = [
+            ln for ln in md_text.splitlines() if "artifacts: summary=" in ln
+        ]
+        assert len(lines) == 2, lines
+        for line in lines:
+>           assert "mac=absent" in line, line
+E           AssertionError: - Image A artifacts: summary=one (a2l); a2l=used (1/2); mac=unused (0/0)
+E           assert 'mac=absent' in '- Image A artifacts: summary=one (a2l); a2l=used (1/2); mac=unused (0/0)'
+
+tests\test_before_after_report.py:1538: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_before_after_report.py::test_r_cmp_003_2_1_bkey_no_mac_is_absent
+1 failed in 3.12s
+
+EXIT 1

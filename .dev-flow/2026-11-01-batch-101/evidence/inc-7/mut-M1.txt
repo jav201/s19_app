@@ -1,0 +1,125 @@
+s19_app.__file__ = <COPY>\s19_app\__init__.py
+MUTANT M1: _window_rows via render_hex_view(max_rows=MAX_HEX_ROWS): 512-row cap restored
+FILE: s19_app/tui/services/diff_report_service.py
+FFFF                                                                     [100%]
+================================== FAILURES ===================================
+_______________ test_r_cmp_004_14_1_markdown_changed_run_whole ________________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_cmp_004_14_1_markdown_c0')
+
+    def test_r_cmp_004_14_1_markdown_changed_run_whole(tmp_path: Path) -> None:
+        """A 10,240-byte changed run: 644 rows in each of the 4 Markdown blocks
+        (diff ``-``, diff ``+``, A, B), first row 0x00000FC0, last 0x000037F0,
+        0 cap lines. Fails when the 512-row cap is in force."""
+        comparison, mem_a, mem_b = _long_changed_fixture()
+        md_text, _ = _whole_pair(tmp_path, comparison, mem_a, mem_b)
+    
+        blocks = _md_fences(md_text)
+        assert [opener for opener, _ in blocks] == ["```diff", "```text", "```text"]
+        diff_lines, a_lines, b_lines = (inner for _, inner in blocks)
+        expected_a = _oracle_rows(mem_a, 0xFC0, 0x3800)
+        expected_b = _oracle_rows(mem_b, 0xFC0, 0x3800)
+        assert len(expected_a) == 644
+>       assert _rows_with_prefix(diff_lines, "-") == expected_a
+E       AssertionError: assert ['0x00000FC0 .........|', ...] == ['0x00000FC0 .........|', ...]
+E         
+E         Right contains 132 more items, first extra item: '0x00002FC0  AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA  |................|'
+E         Use -v to get more diff
+
+tests\test_diff_report_service.py:1632: AssertionError
+_______________ test_r_cmp_004_14_3_markdown_window_over_64_kib _______________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_cmp_004_14_3_markdown_w0')
+
+    def test_r_cmp_004_14_3_markdown_window_over_64_kib(tmp_path: Path) -> None:
+        """A window holding 69,632 mapped bytes: the Markdown B block has all
+        4,356 rows (0x0000FFC0 .. 0x00020FF0), there is no A block, and neither
+        cap line appears (the screen's 65,536-byte cap must not reach the file)."""
+        comparison, mem_a, mem_b = _only_b_fixture()
+        md_text, _ = _whole_pair(tmp_path, comparison, mem_a, mem_b)
+    
+        blocks = _md_fences(md_text)
+        assert [opener for opener, _ in blocks] == ["```text"]
+        rows = blocks[0][1]
+>       assert len(rows) == 4356
+E       AssertionError: assert 513 == 4356
+E        +  where 513 = len(['... window limited to 512 rows ...', '0x0000FFC0                                                   |...................           |................|', '0x00010000  3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C  |<<<<<<<<<<<<<<<<|', ...])
+
+tests\test_diff_report_service.py:1667: AssertionError
+_________________ test_r_cmp_004_14_4_html_window_over_64_kib _________________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_cmp_004_14_4_html_windo0')
+
+    def test_r_cmp_004_14_4_html_window_over_64_kib(tmp_path: Path) -> None:
+        """The HTML only-B window of the same run: the B ``<pre>`` holds 4,356
+        rows and no cap line is written."""
+        comparison, mem_a, mem_b = _only_b_fixture()
+        _, html_text = _whole_pair(tmp_path, comparison, mem_a, mem_b)
+    
+        panes = _html_pre_blocks(html_text)
+        assert len(panes) == 1
+>       assert len(panes[0]) == 4356
+E       AssertionError: assert 513 == 4356
+E        +  where 513 = len(['... window limited to 512 rows ...', '0x0000FFC0                                                   |...................           |................|', '0x00010000  3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C 3C  |<<<<<<<<<<<<<<<<|', ...])
+
+tests\test_diff_report_service.py:1683: AssertionError
+________________ test_r_cmp_004_14_5_before_after_report_whole ________________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_cmp_004_14_5_before_aft0')
+
+    def test_r_cmp_004_14_5_before_after_report_whole(tmp_path: Path) -> None:
+        """A fully changed 8,960-byte run (0x100 .. 0x23FF): window 0xC0 .. 0x2400
+        holds 564 rows in the diff block (``-`` and ``+``), in the A block and in
+        the B block of the Markdown file and in both HTML panes, with no cap
+        line in either file."""
+        from tests.test_diff_report_service import (
+            _cap_lines, _html_pre_blocks, _md_fences, _oracle_rows,
+            _rows_with_prefix,
+        )
+    
+        bas = _bas()
+        project_dir = tmp_path / "proj"
+        project_dir.mkdir()
+        length = 0x2300
+        before = {0x100 + i: 0x11 for i in range(length)}
+        after = {0x100 + i: 0x22 for i in range(length)}
+        original = tmp_path / "big.s19"
+        original.write_text(
+            emit_s19_from_mem_map(before, [(0x100, 0x100 + length)]), encoding="ascii"
+        )
+        patched = project_dir / "big-patched.s19"
+        patched.write_text(
+            emit_s19_from_mem_map(after, [(0x100, 0x100 + length)]), encoding="ascii"
+        )
+    
+        result = bas.compose_before_after_report(
+            _summary(saved_path=patched, source_image_path=original),
+            original,
+            project_dir=project_dir,
+            workarea=tmp_path / "wa",
+            now_fn=_fixed_clock,
+        )
+    
+        assert result.written, result.diagnostics
+        md_text = result.md_path.read_text(encoding="utf-8")
+        html_text = result.html_path.read_text(encoding="utf-8")
+        expected_a = _oracle_rows(before, 0xC0, 0x2400)
+        expected_b = _oracle_rows(after, 0xC0, 0x2400)
+        assert len(expected_a) == 564
+        blocks = _md_fences(md_text)
+        assert [opener for opener, _ in blocks] == ["```diff", "```text", "```text"]
+>       assert _rows_with_prefix(blocks[0][1], "-") == expected_a
+E       AssertionError: assert ['0x000000C0 .........|', ...] == ['0x000000C0 .........|', ...]
+E         
+E         Right contains 52 more items, first extra item: '0x000020C0  11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11  |................|'
+E         Use -v to get more diff
+
+tests\test_before_after_report.py:1634: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_14_1_markdown_changed_run_whole
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_14_3_markdown_window_over_64_kib
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_14_4_html_window_over_64_kib
+FAILED tests/test_before_after_report.py::test_r_cmp_004_14_5_before_after_report_whole
+4 failed in 1.45s
+
+EXIT 1

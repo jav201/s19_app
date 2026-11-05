@@ -1,0 +1,7 @@
+s19_app.__file__ = <COPY>\s19_app\__init__.py
+MUTANT M22: _md_cell stops escaping the pipe
+FILE: s19_app/tui/services/diff_report_service.py
+.                                                                        [100%]
+1 passed in 0.79s
+
+EXIT 0

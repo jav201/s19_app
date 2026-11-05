@@ -48,6 +48,7 @@ never operator firmware.
 
 from __future__ import annotations
 
+import dataclasses
 import inspect
 import json
 import os
@@ -1650,7 +1651,13 @@ def test_r_cmp_004_14_2_html_and_markdown_agree(tmp_path: Path) -> None:
     md_a, md_b = blocks[1][1], blocks[2][1]
     for pane, md_rows in zip(panes, (md_a, md_b)):
         assert len(pane) == 644
-        assert [row[:10] for row in pane] == [row[:10] for row in md_rows]
+        # E5 C-6: the address and all 16 byte cells are equal, row for row
+        # (the ASCII column differs by design: an unmapped byte is a space in
+        # the HTML pane, F-E3-5).
+        assert [row[:58] for row in pane] == [row[:58] for row in md_rows]
+        assert [row.split("  |")[0] for row in pane] == [
+            row.split("  |")[0] for row in md_rows
+        ]
     assert _cap_lines(html_text) == []
 
 
@@ -1808,21 +1815,58 @@ def test_r_cmp_005_16_2_failed_html_write_leaves_no_file(
 
 def test_r_cmp_005_16_3_stale_part_file_is_not_touched(tmp_path: Path) -> None:
     """A ``.part`` file left by another writer is never overwritten or
-    removed: the exclusive create raises ``FileExistsError`` and the planted
-    file keeps its bytes (E3 round 2, N-1)."""
+    removed: it keeps its bytes (E3 round 2, N-1). Since E5 C-1 the staging
+    name is ``<name>.<random>.part``, so a stale file at the old guessable
+    ``<name>.part`` no longer collides: the report is written whole under its
+    own name beside it, and no other file is left."""
     reports = tmp_path / "reports"
     reports.mkdir()
     planted = reports / "20260611T120000Z-diff-report.md.part"
     planted.write_bytes(b"ANOTHER WRITER")
 
-    with pytest.raises(FileExistsError):
-        generate_diff_report(
-            _comparison(), mem_map_a=_mem(0x100, 1, 4), mem_map_b=_mem(0x100, 2, 4),
-            project_dir=tmp_path, now_fn=_fixed_clock,
-        )
+    result = generate_diff_report(
+        _comparison(), mem_map_a=_mem(0x100, 1, 4), mem_map_b=_mem(0x100, 2, 4),
+        project_dir=tmp_path, now_fn=_fixed_clock,
+    )
 
+    assert result.written and result.path == reports / "20260611T120000Z-diff-report.md"
+    assert result.path.read_text(encoding="utf-8").startswith("# Diff report\n")
     assert planted.read_bytes() == b"ANOTHER WRITER"
-    assert _folder_names(reports) == [planted.name]
+    assert _folder_names(reports) == [result.path.name, planted.name]
+
+
+def test_r_cmp_005_16_5_planted_link_at_part_name_is_not_followed(
+    tmp_path: Path,
+) -> None:
+    """A dangling link planted at the guessable staging name ``<name>.part``
+    is never followed (E5 C-1, security finding S5-1): the file it points to
+    is not created, the link is left as it was, and the report is written
+    whole under its own name as a regular file. Base (fixed name, exclusive
+    create): on Windows ``CreateFile(CREATE_NEW)`` follows the link, writes
+    the report into its target and moves the link onto the report's name."""
+    reports = tmp_path / "reports"
+    reports.mkdir()
+    name = "20260611T120000Z-diff-report.md"
+    elsewhere = tmp_path / "elsewhere.txt"
+    link = reports / (name + ".part")
+    try:
+        os.symlink(elsewhere, link)
+    except (OSError, NotImplementedError) as exc:
+        pytest.skip(f"symbolic links cannot be created on this host: {exc}")
+
+    result = generate_diff_report(
+        _comparison(), mem_map_a=_mem(0x100, 1, 4), mem_map_b=_mem(0x100, 2, 4),
+        project_dir=tmp_path, now_fn=_fixed_clock,
+    )
+
+    assert not os.path.lexists(elsewhere), "the planted link was followed"
+    # Windows reports the link target with its ``\\?\`` long-path prefix.
+    target = os.readlink(link).removeprefix("\\\\?\\")
+    assert link.is_symlink() and Path(target) == elsewhere
+    assert result.written and result.path == reports / name
+    assert result.path.is_file() and not result.path.is_symlink()
+    assert result.path.read_text(encoding="utf-8").startswith("# Diff report\n")
+    assert _folder_names(reports) == [name, link.name]
 
 
 def test_r_cmp_005_17_1_ab_html_failure_removes_markdown(
@@ -1870,6 +1914,91 @@ def test_r_cmp_005_17_1_ab_html_failure_removes_markdown(
     status = asyncio.run(_drive())
 
     assert "Diff report failed: RuntimeError: x" in status
+    # E5 C-7: the Markdown file was written into this folder and then
+    # removed, so the folder exists; were it absent, the emptiness check
+    # below would pass without testing anything.
+    assert (project_dir / "reports").is_dir()
+    assert _folder_names(project_dir / "reports") == []
+
+
+@pytest.mark.parametrize("failing", ["-diff-report.md", "-diff-report.html"])
+def test_r_cmp_005_16_3_report_control_failed_write_status(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, failing: str
+) -> None:
+    """Black-box through keys (E5 C-3 / C-4 R-2): key ``7`` opens the A2B
+    Diff screen, Compare and Report are pressed with ``enter``, and the
+    Markdown (then, second arm, the HTML) file's write fails half way. The
+    diff panel paints exactly ``Diff report failed: OSError: disk full``,
+    the status log holds the same line, and ``reports/`` holds no report
+    and no ``.part`` file (R-CMP-005.16 status clause, R-CMP-005.10)."""
+    import asyncio
+
+    from textual.widgets import Input
+
+    from s19_app.tui.app import S19TuiApp
+    from s19_app.tui.changes import emit_s19_from_mem_map
+    from tests.support.timing import wait_until
+
+    image_a = tmp_path / "a.s19"
+    image_b = tmp_path / "b.s19"
+    image_a.write_text(
+        emit_s19_from_mem_map(_mem(0x100, 0x00, 16), [(0x100, 0x110)]),
+        encoding="ascii",
+    )
+    image_b.write_text(
+        emit_s19_from_mem_map(
+            _mem(0x100, 0x00, 16) | {0x100: 0xAA, 0x101: 0xBB}, [(0x100, 0x110)]
+        ),
+        encoding="ascii",
+    )
+    project_dir = tmp_path / ".s19tool" / "workarea" / "proj"
+    hit = _inject_half_write(monkeypatch, failing)
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            project_dir.mkdir(parents=True, exist_ok=True)
+            app.current_project = "proj"
+            app.set_focus(None)
+            await pilot.press("7")
+            await pilot.pause()
+            app.query_one("#diff_path_a", Input).value = str(image_a)
+            app.query_one("#diff_path_b", Input).value = str(image_b)
+            generation = app._diff_compare_generation
+            app.query_one("#diff_compare_button").focus()
+            await pilot.press("enter")
+            await wait_until(
+                pilot,
+                lambda: app._diff_compare_generation > generation,
+                "the compare handler never completed",
+            )
+            await app.workers.wait_for_complete()
+            await pilot.pause()
+            assert app._diff_last_result is not None, "the compare refused"
+            app.query_one("#diff_report_button").focus()
+            await pilot.press("enter")
+            await wait_until(
+                pilot,
+                lambda: "Diff report failed"
+                in str(app.query_one("#diff_status").render()),
+                "the failure status never reached the diff panel",
+            )
+            await app.workers.wait_for_complete()
+            await pilot.pause()
+            painted = [
+                str(app.query_one(f"#log_line_{index}").render())
+                for index in range(1, 5)
+            ]
+            return str(app.query_one("#diff_status").render()), painted
+
+    status, painted = asyncio.run(_drive())
+
+    expected = "Diff report failed: OSError: disk full"
+    assert hit, "the injected failure was never reached (write path changed)"
+    assert status == expected
+    assert expected in painted, painted
+    assert (project_dir / "reports").is_dir()
     assert _folder_names(project_dir / "reports") == []
 
 
@@ -2265,6 +2394,85 @@ def test_r_cmp_004_9_2_4_path_keeps_its_characters(tmp_path: Path) -> None:
     )
     assert f"path=`{path}`" in text
     assert "my\\_img" not in text
+
+
+def test_r_cmp_004_9_2_5_image_b_path_text(tmp_path: Path) -> None:
+    """Image B's path is path text too (the threshold's 4/4 fields name both
+    image paths; E5 C-3): a backtick becomes U+FFFD and the line holds
+    exactly 2 backticks, while image A's ordinary path is unchanged."""
+    comparison = _comparison(
+        image_b=ImageRef(label="B.s19", path="c`d.s19", source_kind="external")
+    )
+    text, _ = _whole_pair(
+        tmp_path, comparison, _mem(0x100, 1, 4), _mem(0x100, 2, 4)
+    )
+    lines = text.splitlines()
+    line_b = next(ln for ln in lines if ln.startswith("- Image B:"))
+    assert line_b == (
+        f"- Image B: B\\.s19 [external] path=`c{_FFFD}d.s19` parse-errors=0"
+    )
+    assert line_b.count("`") == 2
+    assert "- Image A: A\\.s19 [external] path=`/tmp/a.s19` parse-errors=0" in lines
+
+
+# ----- R-BEFORE-AFTER-REPORT-001.22: a pipe in a system-vocabulary cell -------
+
+
+def test_r_before_after_report_001_22_2_pipe_in_vocabulary_cells_stays_escaped(
+    tmp_path: Path,
+) -> None:
+    """Every field written by ``_md_cell`` keeps a planted ``|`` inside its
+    cell (E5 C-2; the M22 survivor): linkage Type, Disposition and Linkage,
+    the flow record's disposition, the refusal code and the Applied (UTC)
+    value. Each pipe is preceded by a backslash and every table row keeps its
+    column count. These fields are system vocabulary today, so this pins
+    the escaper's guarantee, not an exposure."""
+    record, refusal, comparison, mem_a, mem_b = _flow_fixture()
+    record = dataclasses.replace(record, disposition="app|lied")
+    refusal = dataclasses.replace(refusal, code="CHG|X")
+    provenance = BeforeAfterProvenance(
+        original_path=Path("/tmp/original.s19"),
+        saved_path=Path("/tmp/original-patched_1.s19"),
+        applied_at_utc="2026-07-02|09:00",
+        change_doc_path=Path("/tmp/change-doc.json"),
+    )
+    entry = _entry(
+        address_start=0x1000,
+        address_end=0x1002,
+        entry_type="by|tes",
+        disposition="app|lied",
+        linkage="mac|linked",
+    )
+    md_text, _ = _whole_pair(
+        tmp_path, comparison, mem_a, mem_b,
+        linkage_entries=[entry],
+        provenance=provenance,
+        flow_changes=FlowChangeAttribution(records=(record,), refusals=(refusal,)),
+    )
+    lines = md_text.splitlines()
+
+    def _structural(row: str) -> int:
+        return len(re.findall(r"(?<!\\)\|", row))
+
+    linkage_row = next(ln for ln in lines if ln.startswith("| 1 | "))
+    assert linkage_row.startswith(
+        "| 1 | by\\|tes | 0x00001000 | 0x00001002 | app\\|lied | mac\\|linked "
+        "| CAL\\_SYM |"
+    ), linkage_row
+    assert _structural(linkage_row) == 10
+    flow_row = next(ln for ln in lines if ln.startswith("| patches"))
+    assert flow_row == (
+        "| patches\\/c\\_1\\.json | S\\*1 | 0x00001000 | 2 | app\\|lied "
+        "| 0x00001000–0x00001002 |"
+    ), flow_row
+    assert _structural(flow_row) == 7
+    assert (
+        "- refused: patches\\/c\\_1\\.json symbol 'S\\*1' @ 0x00001000 "
+        "[CHG\\|X] m"
+    ) in lines
+    assert "- Applied (UTC): 2026-07-02\\|09:00" in lines
+    for raw in ("by|tes", "app|lied", "mac|linked", "CHG|X", "02|09"):
+        assert raw not in md_text, raw
 
 
 # ----- R-CMP-004.8: the HTML file takes no Markdown escape -------------------

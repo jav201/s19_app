@@ -1,0 +1,29 @@
+s19_app.__file__ = <COPY>\s19_app\__init__.py
+MUTANT M13: _md_text used in _html_header (image label)
+FILE: s19_app/tui/services/diff_report_service.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______________ test_r_cmp_004_8_1_html_has_no_markdown_escape ________________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_r_cmp_004_8_1_html_has_no0')
+
+    def test_r_cmp_004_8_1_html_has_no_markdown_escape(tmp_path: Path) -> None:
+        """The HTML file of a report with an underscore label and an A2L symbol
+        holds the characters as they are: no backslash is added."""
+        comparison = _comparison(
+            runs=[DiffRun(0x100, 0x104, KIND_CHANGED)], stats=_stats(1, 4),
+            image_a=ImageRef(label="A_b.s19", path="/tmp/a.s19", source_kind="external"),
+        )
+        _, html_text = _whole_pair(
+            tmp_path, comparison, _mem(0x100, 1, 4), _mem(0x100, 2, 4),
+            a2l_records=[{"name": "CAL_A", "address": 0x100}],
+        )
+>       assert "Image A: A_b.s19" in html_text
+E       assert 'Image A: A_b.s19' in '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>Diff report</title>\n<style>body{font-famil...yle="background:#ffd54d;color:#000;font-weight:bold">.</span>            |</pre></td>\n</tr></table>\n</body>\n</html>'
+
+tests\test_diff_report_service.py:2284: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_diff_report_service.py::test_r_cmp_004_8_1_html_has_no_markdown_escape
+1 failed in 0.93s
+
+EXIT 1

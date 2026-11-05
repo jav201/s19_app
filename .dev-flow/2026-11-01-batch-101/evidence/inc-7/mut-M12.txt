@@ -1,0 +1,93 @@
+s19_app.__file__ = <COPY>\s19_app\__init__.py
+MUTANT M12: flow_execution_service keeps its pre-escape (md_safe / md_code at the producer)
+FILE: s19_app/tui/services/flow_execution_service.py
+.F                                                                       [100%]
+================================== FAILURES ===================================
+________________ test_at_b94_18_hostile_names_render_literally ________________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m7/bt/test_at_b94_18_hostile_names_r0')
+
+    def test_at_b94_18_hostile_names_render_literally(tmp_path: Path) -> None:
+        """AT-B94-18 (HLR-016, black-box, C-17): the batch-77 hostile payload in a
+        bound file name renders literally on the canvas (sentinel visible, markup
+        literal, 0 control bytes) and a Windows-legal hostile name reaches the
+        emitted report with the sentinel visible, the Mode-A label escaped and 0
+        control bytes. Two app sessions: the full payload never runs (its file
+        does not exist), the report arm uses the legal on-disk name."""
+        project = _make_project(
+            tmp_path,
+            {"prg.s19": _S19, _HOSTILE_FILE_NAME: _S19, "hotfix.json": _patch_json()},
+        )
+    
+        async def _drive_canvas() -> str:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await _show_flow(app, pilot, project)
+                _add_ref_block(app, "source", "prg.s19")
+                await pilot.pause()
+                # The full hostile payload (control bytes + markup) as the file
+                # input — refused bindings never paint, so pair it with a legal
+                # flow output to make the wiring stick. Never run.
+                app.query_one("#flow_palette_a2b", Button).press()
+                await pilot.pause()
+                app.query_one("#flow_ref_a", Input).value = "#1"
+                # batch-97 Inc-5 (S4-1, LLR-146.14, named supersession): the add
+                # form refuses a NUL in a path-bearing input, so the canvas arm
+                # binds the payload minus its NUL; the NUL arm is TC-B97-62.
+                app.query_one("#flow_ref_b", Input).value = _HOSTILE_SYMBOL.replace("\x00", "")
+                app.query_one("#flow_add", Button).press()
+                await pilot.pause()
+                canvas, _spans = _painted_static(app, "#flow_canvas")
+                return canvas
+    
+        async def _drive_report() -> str:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await _show_flow(app, pilot, project)
+                _add_ref_block(app, "source", "prg.s19")
+                await pilot.pause()
+                app.query_one("#flow_palette_a2b", Button).press()
+                await pilot.pause()
+                app.query_one("#flow_ref_a", Input).value = "#1"
+                app.query_one("#flow_ref_b", Input).value = _HOSTILE_FILE_NAME
+                app.query_one("#flow_add", Button).press()
+                await pilot.pause()
+                app.query_one("#flow_run", Button).press()
+                for _ in range(30):
+                    await pilot.pause()
+                reports = sorted((project / "reports").glob("*flow-a2b*.md"))
+                assert reports, "the runnable hostile-name arm must emit a report"
+                return reports[-1].read_bytes().decode("utf-8")
+    
+        canvas = asyncio.run(_drive_canvas())
+        report_text = asyncio.run(_drive_report())
+    
+        # Canvas: sentinel visible, brackets literal, 0 control bytes. (The canvas
+        # legitimately carries STYLE spans — box-art colours — so the markup
+        # census is the AST scan in test_tc_042_10, not a span emptiness check.)
+        assert _SENTINEL in canvas
+        assert "_evil[red]" in canvas  # literal brackets, never parsed
+        assert _control_bytes(canvas) == []
+        # Report: sentinel visible, the Mode-A label escaped, 0 control bytes
+        # (over the newline-normalized bytes — the CRLF convention is the
+        # producer's own).
+        assert _SENTINEL in report_text
+        image_lines = [
+            ln for ln in report_text.splitlines() if ln.startswith("- Image B:")
+        ]
+        assert len(image_lines) == 1
+        label_part = image_lines[0].split(" [external]")[0]
+>       assert "[red]" not in label_part and "\\[red\\]" in label_part
+E       AssertionError: assert ('[red]' not in '- Image B: ...\[red\\\\\\]'
+E         
+E         '[red]' is contained here:
+E           \\\[red\\\] and '\\[red\\]' in '- Image B: b77hostilemark\\\\\\_evil\\\\\\[red\\\\\\]')
+
+tests\test_tui_flow_builder_b94.py:416: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally
+1 failed, 1 passed in 6.86s
+
+EXIT 1
