@@ -1,0 +1,73 @@
+# Inc 13 — E3 code-free design review: architect (round 1)
+
+Base `b7b77c4`, branch `b101-inc13` at `95a9284`. Reviewer: architect (E3). Read: `01-requirements.md`, `E1-rulings.md` (incl. the orchestrator rulings D-1 … D-4), `E1-slice.md`, `02-test-cases.md`, `codewire/graph-inc13.md`; code `crc_designer_view.py:268, 505-640, 860-1175, 1268-1345`, `operations/crc_kernel.py:36-72, 147-250`, `operations/crc_designer_model.py:161-416`, `segment_split_view.py:251-460, 1008-1040, 1112-1131, _sync`, `screens.py:1158, 1311-1340`, `app.py:2748, 3855-3870, 17851`; tests `test_crc_kernel.py:100-145`, `test_b101_crc_model_and_reasons.py:200-260`, `test_suite_hygiene.py` (R-TST-002/041/049 guards), `support/suite_census.py:749-980`, `support/timing.py:20-70`; Textual 8.2.8 `message_pump.py:160-216, 862-885`, `widget.py:4655-4670`, `widgets/_input.py:543-555`, `widgets/_switch.py:170-181`; Inc 11 `E1-rulings.md` O-2 and `E3-architect.md` A-11.
+
+## Verdict: **FAIL** (records only — 0 BLOCKER, 0 HIGH, 2 MAJOR, 6 MINOR)
+
+The product design is sound and I approve it as drawn: every node's behaviour was checked against the base code, the three equivalence claims hold by an exhaustive-style fuzz on the LAN Linux host, and the time estimates are confirmed by measurement (§ Evidence). The two MAJOR findings are about the **tests' safety net**, not the product code: the guard the D-2 ruling relies on cannot see the D-2 edits, and two new test cases sample the wall clock in the parallel lane. Both are fixed by editing `02-test-cases.md` / `E1-rulings.md` text; no node of the graph changes.
+
+## Findings
+
+| Id | Severity | Row / node | Finding | Proposed fix |
+|---|---|---|---|---|
+| A-1 | MAJOR | D-2 ruling; `E1-slice.md` §3; R-TST-049 | The D-2 ruling names the wrap-drift guard R-TST-049 as the check that keeps the existing node bodies intact ("no assertion change … R-TST-049 must stay GREEN"). That guard cannot see these edits: `_wrap_drift` (`test_suite_hygiene.py:1370-1393`) inspects only functions that **gain a `serial_timing` marker or a `report_margin` wrap** against the merge-base; the 12 nodes and 3 helpers of §3 gain neither, so the guard is GREEN whatever E4 does to them. That is exactly Inc 2's F1 (HIGH: a wrap that also deleted two oracle assertions), here with no guard. | Add an E5 check, recorded as evidence: for every node and helper of `E1-slice.md` §3, the head body equals the `b7b77c4` body after removing the inserted `await wait_designer_recompute(...)` statements (AST compare, the `_WrapStrip` technique of `test_suite_hygiene.py`); a node outside §3 that changed is named. Either a test node in T1 (`test_r_crc_designer_007_d2_waits_change_nothing_else`) or an E5 script whose transcript is force-added. Correct the D-2 ruling text: R-TST-049 stays GREEN but is not the evidence. |
+| A-2 | MAJOR | R-CRC-DESIGNER-001.2.2/1, /2; 007.1/1 | Two cases decide by wall-clock samples in the **parallel lane** (the T1 file has no `serial_timing` mark): "at t0 + 0.3 s 0 recomputes" with the quiet time 0.6 s fails if `pilot.pause(0.3)` overshoots by 300 ms; "5 edits 50 ms apart" splits into two bursts (count 2) if one pause overshoots by 550 ms. Both happen on a loaded xdist runner. If E4 writes them with `perf_counter` intervals instead, the census (`suite_census.timing_arms`) classes them as timing arms and R-TST-002/041 then require the serial lane and `report_margin`. | Make the decisions independent of the clock: **(a)** "not before the quiet time" with the quiet time injected as 10 s: edit, `pilot.pause()` ×2 → count +0, `_pending_recompute is not None`, verdict still `✓ MATCH`; **(b)** "after the quiet time" with 0.05 s: edit → `wait_until(count advanced)` → count +1, `✗ MISMATCH`; **(c)** the burst: 5 edits set back to back (no pause between them; each is still < Q after the previous) with Q = 0.6 s → `wait_until(count advanced)`, then `pilot.pause(0.8)` → exactly +1. The image limb of 001.2.2/2 the same way as (a)/(b). Negative controls unchanged (M-2: count +1 in (a) → RED; M-3: (b) times out → RED; M-4: count 2 in (c) → RED). |
+| A-3 | MINOR | T6 `wait_designer_recompute`; I-2; `02-test-cases.md` Shared terms | The records give two different waits: the slice's T6 helper waits until `_pending_recompute is None`; the test cases' "Wait for the recompute" waits until the count advanced. `wait_until` checks its predicate **before** yielding (`timing.py:62-64`), and a text edit's `Input.Changed` reaches the panel only after a yield, so the T6 predicate is already true right after `inp.value = …` and returns at once (stale read). It works only when placed after the node's existing `pilot.pause()`. | Pin one helper: `wait_designer_recompute(pilot, app, before)` waits (with `pause_first=True`) until the recompute count is above `before` and `_pending_recompute is None`; the D-2 sites take the count before the edit. Or state in §3 that the call goes after the node's existing `pilot.pause()`. |
+| A-4 | MINOR | R-CRC-PREVIEW-002.2 (Base column, M-4); E1-D1 | The F-23 CRC scene's trigger (Join gaps → fill with On conflict **abort**) takes the **refused** path: the fill gap `[0x931FBF, 0xC00000)` holds the last calibration byte (the Ranges end is exclusive), so `gap_conflict` = `[0x931FBF]`. Measured on the LAN host, base computes 2 window reads + 2 gap walks there: **≈ 5.2 s, not ≈ 10 s** (≈ 10 s is the guide's text-edit path with concat active: 6 reads). The table alone already brings this arm to 1.60 s, so the arm does not depend on the shared computation (the count case 002.2/2 does pin it). | Correct the Base column and M-4's expectation to ≈ 5 s for this trigger (still RED against 3 s). Optional: run the same arm with On conflict `warn` as well (base ≈ 17 s, head ≈ 1.4 s), where both changes are needed. |
+| A-5 | MINOR | US-CRC-RESP-1; R-CRC-PREVIEW-002.2/.3 | No row times the reported pain itself, a text edit with concat active in the 1.2 MiB scene (guide ch12.4: "each edit … took about 10 s"). It is covered only indirectly (debounce count + dropdown arm). Measured head cost of that recompute: 1.12 s. | Accept and say so in E1 §5, or add one arm: Ranges edited in the F-23 CRC scene → the window's update ≤ Q + `timing_bound(3.0)`. |
+| A-6 | MINOR | R-CRC-PREVIEW-002.1; E1-D4; "What the operator can notice" | The panel lives in a hidden `WindowSection` (`app.py:3860-3869`); the new watcher recomputes on every load and project load even when the CRC Designer is not shown. With the first-shown Ranges the cost is negligible; with the 1.2 MiB coverage left in the form, every image load now adds ≈ 1.1–1.4 s of main-loop work after the load, on another view. Not admitted in the records. | Admit it in E1 §1 "What the operator can notice", or (alternative) recompute only while the section is shown and mark the panel dirty otherwise, recomputing on its next show. Reviewer preference: admit; it stays simple. |
+| A-7 | MINOR | D-1 ruling | "Inc 8 grid tests must stay GREEN" is no evidence for the kernel change: `test_r_crc_engine_002_2_1/2_2` compare `crc32_stream` with `crc_stream` (the bit-by-bit engine), never `crc_lut`. The real pin is `test_crc_kernel.py:108-138`, whose vectors include `bytes(range(256))`, so every entry of `_REFLECT8` is exercised for refin presets and M-11 turns RED by construction. | Name `test_crc_kernel.py` as the evidence in the D-1 ruling; keep the Inc 8 tests as an unaffected-module check only. |
+| A-8 | MINOR | `crc_lut` (G3) | `bytes(data).translate(_REFLECT8)` turns an `int` argument into that many zero bytes, silently; base raised `TypeError` on an int. Every caller passes `bytes` today (E1 checked). | Accept (all callers pass bytes), or write `bytes(memoryview(data)).translate(_REFLECT8)`, which raises on an int and still accepts `bytes`, `bytearray` and `memoryview`. |
+
+Considered and **not** findings:
+- Loading a template, picking a preset, replacing or clearing the image mid-burst, or closing the screen with a recompute pending cannot leave a stale result. `prevent` is a context-variable stack on the running task (`message_pump.py:164-196`); `Input._watch_value` and `Switch.watch_value` post `Changed` synchronously (`_input.py:555`, `_switch.py:181`), so their posts inside the `with` block are dropped at `post_message` (`widget.py:4663`). The Load and preset handlers run in the panel's task, and the explicit `_recompute()` after the fill reads the final widget values. A `Changed` already queued before the `with` block, or a timer event already queued when `stop()` runs, at worst costs one extra recompute over the current form; every recompute reads live state, so none is stale. The timer callback reads `app.current_file` when it fires, so a replace or clear mid-burst shows the latest image. Timers and the `watch` registration end with the panel: `_close_messages` stops the panel's timers (`message_pump.py:525-535`), and global watchers of a closing reactable are dropped (`reactive.py:402-407`). The one stale class left is the in-place apply (D-4, backlog), as recorded.
+- **Same window for every number.** `_compute_coverage` builds the target once. The active policy's CRC is the evaluation's own CRC (`evaluate_target` → `compute_target_crc(target)`, the same target as `replace(target, join=target.join)`), and the store word now comes from the same integer the preview shows. Fault texts match base: in every state the only `ValueError` source is the kernel's width check, so `Cannot preview` / `Cannot compute` carry the same text whichever call raises first. The ordering change (evaluate before concat and fill) is invisible: the width-4 dirty-abort case gives the refusal in the preview and `Cannot compute` in the window, as on base.
+- R-TST-049 and the D-2 edits do not conflict. The waits add no marker and no wrap, so the guard neither fires nor protects (A-1). The new T3 arms are new functions, which the guard skips (`base_node is None`).
+- Inc 11 / R-SEG-SRC.6: Inc 11's E3 moves the size > 0 rule into the A2L reader (its A-11). No size-0 or negative row needs Inc 13. Both new band functions still equal base on such rows (fuzz below), so there is no interface clash.
+
+## Evidence (LAN Linux host, py 3.11.18, Textual 8.2.8; detached worktree of `origin/main` @ `4648972c`, whose `crc_designer_view.py`, `segment_split_view.py`, `operations/` and `tools/synth/` equal `b7b77c4`'s — `git diff --stat` empty; worktree removed afterwards)
+
+Prototypes written from the graph nodes only (`proto_crc_lut`, `proto_sweep`, `proto_marks`), compared with the base functions in-process:
+
+```
+crc_lut equiv: 6840 cases OK (widths 8..64 x refin x refout, bytes/bytearray/memoryview)
+crc_lut width fault text identical: width 7 out of range [8, 64]
+_sweep equiv: 20000 random cases OK (empty/inverted/outside/touching/overlap, lo==hi)
+_conflict_marks equiv: 20000 random cases OK (pads incl. regex metachars, touching/overlap/unsorted/size-0)
+negative/size-0 fuzz OK: 30000 _conflict_marks cases, 120000 build_plan comparisons (4 modes)
+```
+(`crc_lut` also equals `crc_stream` for every combination with input under 8 bytes; the `build_plan` comparison covers the map blocks, each file's blocks, packed, span, fill, conflicts, guard and raised exceptions, with rows and source ranges of negative and zero size.)
+
+Demo image (E1-D7 confirmed: `generate(…, 20260001, 10.0)` → `firmware.s19` parsed by `S19File` equals `build_objects`' bytes, 4 247 392 entries, identical):
+
+```
+crc_lut base: 0.790 us/byte   proto: 0.144 us/byte (1 MiB, CRC-32/ISO-HDLC, best of 3)
+F-23 CRC scene oracles (Ranges end exclusive): concat 1257406 B 0x6CD65EAE, fill 4198399 B 0xA7B4C7F5 (= guide ch12.4), gap_conflict [0x931FBF]
+coverage compute, fill trigger, abort (refused): base-sequence+base-lut 5.18 s | new-sequence+table 1.36 s | table only 1.60 s | sharing only 4.96 s
+coverage compute, fill trigger, warn:            base-sequence+base-lut 17.08 s | new-sequence+table 1.36 s | table only 4.27 s | sharing only 4.94 s
+coverage compute, concat active (text-edit path), new+table: 1.12 s
+pieces: gap_conflict 0.24 s, gather concat 0.17 s, gather fill 0.17 s
+Split/Join scene: 21 922 conflict runs, 2 902 341 bytes (= gap_conflict, 2.77 MiB)
+  _conflict_marks base 0.57 s / proto 0.16 s (equal);  base _sweep (union band) 24.4 s;  proto _sweep 0.095 s
+  build_plan with both protos 0.33 s (43 849 blocks; packed 1 318 848 = 1.26 MiB, span 9 641 920 = 9.20 MiB);  band_text 0.067 s; rich crop render 0.01 s
+```
+
+These numbers support the estimates: CRC Designer ≈ 1.1–1.4 s of compute plus UI work against E1's 1.0–1.6 s (bound 3 s, margin cap 2.4 s; on CI the bound is doubled by `CI_TIMING_FACTOR = 2`). Split/Join ≈ 0.4–0.5 s against 0.3–0.6 s (bound 2.5 s). The base `_sweep` alone (24.4 s) confirms the triage's ≈ 25 s and E1 §1's diagnosis of the quadratic sweep. The band paint (`set_blocks` → `band_text`) runs inside `_sync` before `#sje_stats` is updated, so the R-SEG-PREV.20 clock includes it.
+
+## Requirements quality (rows)
+
+- All 20 active rows are singular "shall" statements in the declared EARS forms. No statement names a function or a file; `gather_target` appears only in a threshold, as a counting point. The .2.1 / .2.2 split is consistent with the Definitions: after a toggle's recompute, an earlier text edit is no longer a *pending change*, so .2.2 does not fire a second time, and the design (`_recompute` stops the timer) matches.
+- R-CRC-DESIGNER-001.2.1 carries no time in the statement ("at once" lives in the threshold, with the quiet time injected as 10 s). Acceptable, given how .2.2 is shaped and the rationale in E1 §2.
+- R-SEG-PREV.20's pinned texts check out against the measured plan (`1.26 MiB`, `9.20 MiB`, conflict size `fmtB(2 902 341)`).
+
+## Interfaces with other increments
+
+- **Inc 10** (`segment_split_view.py` after this one): only the module-level `_sweep` and `_conflict_marks` change, with identical outputs (fuzz above), and the signatures are pinned (I-4). No clash.
+- **`app.py` chain:** no edit. I-8 depends on `current_file` staying an assigned reactive (`app.py:2748`; assigned at `:13434`, `:17189`, `:17954`). The slice already asks the chain to report any change to that contract.
+- **Inc 8:** no shared function. Its CRC operation engine does not import `crc_kernel.crc_lut` (A-7).
+- **Inc 11:** see "not findings" above.
+- **Inc 2 conventions:** T3 arms are `serial_timing` + `timing_bound` + `report_margin` and stop at product stamps (R-TST-047). A-1 and A-2 are the gaps.
+
+## Closure condition for round 2
+
+Close A-1 and A-2 in the records: the D-2 AST check named, with its owner and evidence path; T1's cases rewritten clock-free. A-3 … A-8 may go to E4 as addenda.
