@@ -3,3 +3,6 @@
 2026-11-05T11:10:56-06:00 E0 draft — PLAN.md: 9 increments (draft Inc 2 split in two by cap estimate); awaiting G1
 2026-11-05T11:27:55-06:00 G1 approved — Q1 apruebo (9 increments), Q2 WT captures on the main PC (isolated LOCALAPPDATA, no clipboard, close windows), Q3 accept app.py overlap with b101-inc3/inc7; verdict design/G1-e0-verdict.json
 2026-11-05T11:28:49-06:00 E0 done — test host = cachyos-rtx (javiergr@192.168.1.67): no Xvfb, no conda env, no clone yet
+2026-11-05T11:32:09-06:00 runner ready — cachyos-rtx env s19ci py3.11.18 tk8.6 textual 8.2.8 at main 9f9f6af; Xvfb/xclip missing (needs operator sudo pacman)
+2026-11-05T11:32:09-06:00 E1 start — Inc 1, 2, 4 in parallel; model Opus (architect agents); outputs inc-N/01-requirements.md + design/E1-rulings-incN.md
+2026-11-05T11:40:57-06:00 PAUSED by operator — 'dejemos que el batch 101 termine'; E1 agents (Inc 1, 2, 4) stopped while still reading, no E1 files written; resume from E1 after batch-101 closes
