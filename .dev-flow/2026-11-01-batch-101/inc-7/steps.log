@@ -12,3 +12,4 @@ E4 integration end 2026-11-05T17:59:54Z model=opus (GREEN: int-04 547 passed, 1 
 E5 start 2026-11-05T18:00Z mutants=sonnet reviews=opus
 E5 corrective start 2026-11-05T18:16Z model=opus (approx.: first tool call)
 E5 corrective end 2026-11-05T18:53:25Z model=opus (C-1..C-8 done; 60 cases covered; mutants 28/28; Windows C-1 arm + LAN Linux host runs)
+E5 end 2026-11-05T19:06:06Z model=sonnet (records)

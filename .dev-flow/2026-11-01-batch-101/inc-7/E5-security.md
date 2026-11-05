@@ -79,3 +79,39 @@ All probes ran in a temporary folder outside the repository, using the `s19env` 
 - [x] No secret, home folder, account name, host or LAN address appears in this file. Probe paths are given only as "a temporary folder".
 - [x] The verdict is explicit: PASS-WITH-NOTES. No HIGH is open; no BLOCK-UNTIL is owed. This review is not merge or release authority.
 - [x] New tool or integration: n/a. Inc 7 adds no external tool, connector or network path.
+
+## Re-review (2026-11-05)
+
+Scope: ruling C-1 only (finding S5-1), at head `f24d71e`. Read: `E5-rulings.md` C-1, `E5-corrective-notes.md`, `git diff 90ea8ae..HEAD -- s19_app/tui/services/diff_report_service.py`, the changed `test_r_cmp_005_16_3` and the new `test_r_cmp_005_16_5`, and the census comment in `tests/test_b99_staging.py`. Probes ran on Windows in a temporary folder outside the repository, with `LOCALAPPDATA` redirected there and `PYTHONPATH` set to the worktree; no pytest run, no clipboard; the folder was deleted afterwards. Probe scripts are not committed.
+
+**Verdict on S5-1: closed.** The fix is applied and verified (state `approved`). No HIGH is open; no BLOCK-UNTIL is owed. One new LOW (S5-5, test gap) and one INFO (S5-6). This review clears risk only; it is not merge or release authority.
+
+### What was confirmed
+
+| Id | Check | Result | State |
+|---|---|---|---|
+| RR-1 | Source of randomness | `secrets.token_hex(8)` (`diff_report_service.py:342`): 64 bits from the OS CSPRNG. 2,000 generated names were all distinct. The name does not exist on disk before this call creates it, so it cannot be planted in advance. | `executed` |
+| RR-2 | Exclusive create at the forced random name (`token_hex` patched to a fixed value) | Regular file: `FileExistsError`, bytes kept. Live symlink: `FileExistsError`, target untouched. Junction (dangling or live): `PermissionError`, nothing created. **Dangling file symlink: followed** (the link target was created and the final name became a link), the same Windows `CREATE_NEW` behaviour as S5-1. So the refusal holds for a file, a live link and a junction, but not for a dangling symlink; for that case the protection is the unpredictable name, not the exclusive create. That is what C-1 asked for and what the docstring says. | `executed` |
+| RR-3 | Leftovers never touched | Stale `<name>.part`, a killed-run `<name>.<hex>.part` and an unrelated link stay as they were, with their bytes; the report is written whole beside them. | `executed` |
+| RR-4 | S5-1 scenario at the old guessable name | A dangling symlink, or a dangling junction, at `<name>.part`: not followed, nothing created outside `reports/`, the final name is a regular file. | `executed` |
+| RR-5 | Cleanup on failure touches only this call's file | `os.replace` raising and an encode error during the write: the call's own `.part` is removed; the stale `<name>.part`, another `<name>.<hex>.part` and an unrelated report stay. A failed exclusive open (forced collision) raises before the `try`, so the existing file is not removed. | `executed` |
+| RR-6 | LLR-155.3 placement guard | `test_tc_b99_13_no_final_name_replace_outside_placement` called directly (not through pytest): GREEN; the census of `diff_report_service.py` finds 0 hits. The primitives in `_write_report` (`open(…, "x")`, `os.replace`, `unlink`) are unchanged, so the allow-list entry covers the same code. | `executed` |
+
+### The removed assertion (`_16_3`)
+
+Accepted. `FileExistsError` was a side effect of the guessable name, not the guarantee: N-1 says a `.part` this write did not create is never touched. The rewritten test still pins that guarantee (the planted bytes are kept, and the folder holds exactly the report and the planted file), and it now also proves that a stale file no longer blocks the write. `_16_5` replaces the lost signal with the S5-1 scenario itself (RED on base, per the corrective notes).
+
+### New findings
+
+| Id | Tag | Severity | Where | Finding | Recommendation |
+|---|---|---|---|---|---|
+| S5-5 | test gap | LOW | `tests/test_diff_report_service.py` (`_16_3`, `_16_5`) | No test pins that the staging name is **unpredictable**. A mutant that uses any other fixed name (for example `<name>.tmp`) passes both tests, yet a dangling link planted at that fixed name would be followed again (RR-2). | Add one assertion: two writes of the same target use different staging names, or record the `.part` name opened (patch `open` or `secrets.token_hex`) and assert it matches `<name>.[0-9a-f]{16}.part` with the value from `secrets`. Backlog or this increment, orchestrator's call. Not blocking. |
+| S5-6 | impl | INFO | `diff_report_service.py:342`–`347` | Between the close and `os.replace` the `.part` name is visible in the folder. A local writer with delete rights in `reports/` could swap it for a link, and the final name would then become that link. This is no new capability: the same writer can replace the final file after the write. No write goes through the link. | none |
+
+### Evidence checklist (re-review)
+
+- [x] Each finding has what, where, why and a recommendation (table above).
+- [x] Each finding has a severity: LOW x1, INFO x1.
+- [x] No secret, name, home folder, host or address appears in this section.
+- [x] Verdict explicit: S5-1 closed, applied and verified by RR-1 to RR-6.
+- [x] New tool or integration: n/a.

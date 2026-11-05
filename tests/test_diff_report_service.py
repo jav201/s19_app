@@ -1869,6 +1869,59 @@ def test_r_cmp_005_16_5_planted_link_at_part_name_is_not_followed(
     assert _folder_names(reports) == [name, link.name]
 
 
+def test_r_cmp_005_16_4_stale_part_file_survives_failed_write(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The failure arm of "a stale ``.part`` file is never touched" (E5
+    re-audit RA-2): a file at the pre-C-1 name ``<name>.part`` keeps its
+    bytes when the write of the report fails half way, and the only file the
+    failed run leaves behind is that stale one."""
+    reports = tmp_path / "reports"
+    reports.mkdir()
+    planted = reports / "20260611T120000Z-diff-report.md.part"
+    planted.write_bytes(b"ANOTHER WRITER")
+    hit = _inject_half_write(monkeypatch, "-diff-report.md")
+
+    with pytest.raises(OSError, match="disk full"):
+        generate_diff_report(
+            _comparison(), mem_map_a=_mem(0x100, 1, 4), mem_map_b=_mem(0x100, 2, 4),
+            project_dir=tmp_path, now_fn=_fixed_clock,
+        )
+
+    assert hit, "the injected failure was never reached (write path changed)"
+    assert planted.read_bytes() == b"ANOTHER WRITER"
+    assert _folder_names(reports) == [planted.name]
+
+
+def test_r_cmp_005_16_6_staging_name_is_random_per_write(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The staging file is created exclusively under
+    ``<final name>.<16 lowercase hex>.part`` and the 16 digits differ between
+    two writes of the same report (E5 re-audit RA-1): a fixed or guessable
+    staging name would let a planted link be followed (S5-1)."""
+    created: list = []
+    real_open = builtins.open
+
+    def _spy(file, mode="r", *args, **kwargs):
+        if "x" in mode:
+            created.append(os.path.basename(os.fspath(file)))
+        return real_open(file, mode, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "open", _spy)
+    name = "20260611T120000Z-diff-report.md"
+    for run in range(2):
+        generate_diff_report(
+            _comparison(), mem_map_a=_mem(0x100, 1, 4), mem_map_b=_mem(0x100, 2, 4),
+            project_dir=tmp_path / str(run), now_fn=_fixed_clock,
+        )
+
+    pattern = re.compile(re.escape(name) + r"\.[0-9a-f]{16}\.part")
+    assert len(created) == 2, created
+    assert all(pattern.fullmatch(n) for n in created), created
+    assert created[0] != created[1], "the staging name repeats between writes"
+
+
 def test_r_cmp_005_17_1_ab_html_failure_removes_markdown(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

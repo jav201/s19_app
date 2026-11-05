@@ -66,3 +66,7 @@ Run by the E5 corrective agent on the **LAN Linux host** (Python 3.11, `s19ci`),
 | M27 | R-CMP-005.16 (C-1) | `_write_report` back to the fixed `<name>.part` staging name | `test_r_cmp_005_16_3_stale_part_file_is_not_touched`; `test_r_cmp_005_16_5_planted_link_at_part_name_is_not_followed` | **KILLED**, 2/2 red (`FileExistsError` on Linux, where `O_EXCL` refuses the link; on Windows the same tree followed the link: `e5c-red-c1-windows.txt`) | e5c-mut-M27.txt |
 
 **Score after the corrective pass: 28 killed / 28 = 100 %** (run 1: 23 of 24 with M22 survived; M22 re-run killed; M24–M27 new, all killed). The audit's owed proofs are closed: `.35/1` MAC half by M24 and `.24/2` by M25, each failing on an output difference.
+
+## Close addendum (2026-11-05)
+
+Two controls added by the E5 close for RA-1/RA-2, run on the LAN Linux host: **M28** fixes the staging name to `<name>.tmp.part` -> KILLED by `test_r_cmp_005_16_6_staging_name_is_random_per_write` (1 failed, 3 passed); **M29** unlinks every `*.part` on a failed write -> KILLED by `test_r_cmp_005_16_4_stale_part_file_survives_failed_write`. Transcripts: `evidence/inc-7/e5d-*.txt`. Score: 30/30 killed.

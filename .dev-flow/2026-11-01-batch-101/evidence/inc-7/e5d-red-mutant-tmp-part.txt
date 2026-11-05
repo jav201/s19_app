@@ -1,0 +1,32 @@
+# RED with mutant: staging name fixed to <name>.tmp.part (LAN Linux host)
+2026-11-05T18:58:20Z
+        ``<final name>.<16 lowercase hex>.part`` and the 16 digits differ between
+        two writes of the same report (E5 re-audit RA-1): a fixed or guessable
+        staging name would let a planted link be followed (S5-1)."""
+        created: list = []
+        real_open = builtins.open
+    
+        def _spy(file, mode="r", *args, **kwargs):
+            if "x" in mode:
+                created.append(os.path.basename(os.fspath(file)))
+            return real_open(file, mode, *args, **kwargs)
+    
+        monkeypatch.setattr(builtins, "open", _spy)
+        name = "20260611T120000Z-diff-report.md"
+        for run in range(2):
+            generate_diff_report(
+                _comparison(), mem_map_a=_mem(0x100, 1, 4), mem_map_b=_mem(0x100, 2, 4),
+                project_dir=tmp_path / str(run), now_fn=_fixed_clock,
+            )
+    
+        pattern = re.compile(re.escape(name) + r"\.[0-9a-f]{16}\.part")
+        assert len(created) == 2, created
+>       assert all(pattern.fullmatch(n) for n in created), created
+E       AssertionError: ['20260611T120000Z-diff-report.md.tmp.part', '20260611T120000Z-diff-report.md.tmp.part']
+E       assert False
+E        +  where False = all(<generator object test_r_cmp_005_16_6_staging_name_is_random_per_write.<locals>.<genexpr> at 0x7f0fccf4b3e0>)
+
+tests/test_diff_report_service.py:1921: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_diff_report_service.py::test_r_cmp_005_16_6_staging_name_is_random_per_write
+1 failed, 3 passed in 1.09s

@@ -1,0 +1,12 @@
+# RED with mutant: failure cleanup unlinks every *.part in the folder (LAN Linux host)
+2026-11-05T18:58:32Z
+349:        [p.unlink() for p in target.parent.glob("*.part")]
+>       handle = real_open(file, mode, *args, **kwargs)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-<USER>/pytest-47/test_r_cmp_005_16_4_stale_part0/reports/20260611T120000Z-diff-report.md.part'
+
+tests/test_diff_report_service.py:1765: FileNotFoundError
+=========================== short test summary info ============================
+FAILED tests/test_diff_report_service.py::test_r_cmp_005_16_4_stale_part_file_survives_failed_write
+1 failed, 1 passed in 0.93s
+8a0f4f4c02dc4b6c4bf6cb21a04b968839625eaa2b94fda39dfeaaec78aebc0b  s19_app/tui/services/diff_report_service.py

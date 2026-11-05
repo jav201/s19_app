@@ -108,3 +108,46 @@ Naming note, no action needed: node `…_16_4_…` backs case /2, `…_15_3_…`
 | R-CMP-004.15/1 | covered = | input deviation (§3) |
 | R-CMP-004.15/2 | covered = **(C-7)** | `_15_3` supporting only |
 | .21/1, .21/2, .22/1 | covered = | `CTL�SYM` both files, no `CTLSYM`; path `�`; 10 structural pipes |
+
+## Re-audit (2026-11-05)
+
+Scope: only the cases the E5 corrective pass changed or added (`E5-rulings.md` C-1 … C-8, `E5-corrective-notes.md`), at head `f24d71e`. Mode: **validation** (an audit of the mapping, not a run). Inputs: `git diff 90ea8ae..HEAD -- I/01-requirements.md I/02-test-cases.md tests/ s19_app/`, the `e5c-*` transcripts. Every pass/kill below was **executed by the E5 corrective agent** (Linux LAN host; the C-1 arm on Windows) and read from its transcripts. I ran no test: `--collect-only` only.
+
+### R.1 Earlier issues: closed
+
+| Earlier issue | Status | Evidence |
+|---|---|---|
+| §4/R-1 loaded MAC through key `b` | closed | `…_001_35_3_bkey_loaded_mac_is_used`: key `b` pressed by the pilot; MAC loaded through the app's own `_load_mac_file` + `_merge_mac_with_existing_primary` (the same two calls as the load branch, `app.py` ~14165), not seeded; exact artifact lines (both files, both images), exact Symbols row/cell. M26 (never forward) and M24/M25 kill it on output text (`e5c-mut-M24/25/26.txt`). |
+| §4/R-2 R-CMP-005.16 status text | closed | `…_16_3_report_control_failed_write_status[md/html]`: key `7`, Compare and Report by `enter`; `#diff_status` render `==` `Diff report failed: OSError: disk full`, the same line is an element of the painted `#log_line_1…4`; `hit` proves the injection was reached; `reports/` exists and is empty. Key-`b` arm `…_16_3_bkey_failed_write_status`: painted line exact; `listing == []` also proves the folder exists. |
+| §4/R-3 R-CMP-005.17 before/after status | closed | `…_17_3_bkey_html_failure_status[raise/refuse]`: painted line exact for both texts; `listing == []`, `found == []`. |
+| §4 image B path | closed | `…_9_2_5_image_b_path_text`: whole line equality, 2 backticks, image A line unchanged. |
+| §4/R-5 N-1 node with no row | closed | row R-CMP-005.16/4 cites `…_16_3_stale_part_file_is_not_touched`; `_16_3` removed from /2. |
+| R-4 AT-B94-18 assertion | closed | whole flow Image A line pinned (`source\.out [flow] …`) and no `\`; .9.1/9 is now observed wholly through the Flow Builder. |
+| R-6 .35/1 MAC half, .24/2 | closed | M24 fails .35/1 at the `mac=used (1/1)` line; M25 fails .24/2 at the `CAL\_A, CAL\_M` row. Both are output-text assertion failures, not `TypeError`. |
+| C-3 R-CMP-004.14/2 | closed | compares `row[:58]` (address + 16 byte cells) and the whole hex part before `  |`, row for row; Expected not reworded, now matches what is pinned. |
+| C-7 `…_17_1` vacuity | closed | `reports/` asserted to be a directory before the emptiness check. |
+| §2 label changes C-1, C-2, C-4 … C-8 | applied | `02-test-cases.md` rows .24/4, .14/6, .16/2, .9.1/6, .9.1/9, .15/2, .9.1/11 carry the audit labels. |
+
+**C-2 (M22) RED proof.** Acceptable. The case pins a guarantee head already keeps (`_md_cell` escapes the pipe), so no RED on head can exist; the mutant kill is the correct proof that the oracle fails on wrong output. `e5c-mut-M22.txt` fails at the exact linkage-row assertion with raw `by|tes`, while the neighbouring pre-existing test passes under the same mutant, which is why M22 survived run 1. Limit: the kill shows only the first assertion failing; the flow-row, refusal and Applied assertions are exact-text equalities and need no separate proof.
+
+**C-1 case text.** The CTX-DIFFREPORT `file write` term, graph I-6 and node `_write_report`, and the E3 N-1 note now say `<name>.<16 random hex digits>.part`, and that a `.part` this write did not create is never touched. That matches the source (`secrets.token_hex(8)`). M27 (back to the fixed name) kills /4 and /5 (`FileExistsError` on Linux).
+
+**Full / partial.** All 8 new rows and every changed row are `full` under the rule: the product writes the report text and paints the status that is asserted. The stubs only inject failure (half write, a raising or refusing HTML generator) and are not asserted. Black-box notes (no verdict change): the R-2 arm sets the two path `Input` values and button focus programmatically, then presses `7` and `enter`; the written-pair status of .35/3 is compared cut to the 120-column log line, and its whole text is asserted through the `set_status` capture.
+
+### R.2 Remaining issues
+
+| # | Severity | Case / clause | Issue | Owed |
+|---|---|---|---|---|
+| RA-1 | MEDIUM (coverage of the security fix) | CTX-DIFFREPORT `file write`: "`<name>.<16 random hex digits>.part`"; R-CMP-005.16/5 | No case pins that the staging name is **unpredictable**. /4 and /5 plant only the old `<name>.part`, and M27 reverts only to that exact name. A mutant staging under any other fixed name (for example `<name>.tmp.part`) survives all 60 cases, and so would a link planted at that name. | New case R-CMP-005.16/6: spy the mode-`"x"` open in `_write_report`; the staging name matches `^<name>\.[0-9a-f]{16}\.part$` and differs between two writes. Mutant: a fixed `<name>.tmp.part` → RED. |
+| RA-2 | LOW | R-CMP-005.16/4 | The Inputs still name `<ts>-diff-report.md.part` without saying it is the pre-C-1 guessable name, which can no longer collide. The case also exercises "never touched" only on the success path. A failure-path cleanup that unlinks every `*.part` in the folder survives (/1 and /2 plant no stale file). | Reword the Inputs ("a stale file at the pre-C-1 name `<name>.part`"). Add a failure arm: stale `.part` + half-write failure → the stale file keeps its bytes. |
+
+### R.3 Totals after re-audit
+
+| Count | Value |
+|---|---|
+| Cases re-checked | 19: 8 new (R-CMP-005.16/3, /4, /5, R-CMP-005.17/3, .35/3, .24/5, .22/2, R-CMP-004.9.2/5) + 11 changed (.35/1, .24/2, .24/4, R-CMP-004.14/2, /6, R-CMP-005.16/2, R-CMP-005.17/1, R-CMP-004.9.1/6, /9, /11, R-CMP-004.15/2) |
+| Re-checked cases I would still change | **1 / 19 = 5.3 %** (R-CMP-005.16/4, RA-2). RA-1 adds a row; it changes no existing one. |
+| Coverage | **60 covered, 0 partial, 0 gap** (the RA-1 clause has no row, so it is not counted as a gap) |
+| Cited node ids | **66 distinct; 66/66 collect** (`--collect-only`, s19env, `s19_app.__file__` = the worktree package, isolated `LOCALAPPDATA`). The 66 equal the 66 `PASSED` in `e5c-final-case-nodes.txt` (executed by the E5 corrective agent; Linux). |
+| Mutants | 28/28 killed as recorded in `E5-mutants.md`. I read M22 and M24 … M27: each fails on an output-text assertion or the intended `FileExistsError`. |
+| Requirement clauses with no case | 1 (RA-1) |
