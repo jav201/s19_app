@@ -19,3 +19,7 @@ Inputs: E3-architect.md (FAIL: A-1 HIGH, A-2…A-4 MAJOR, A-5…A-12 MINOR), E3-
 | S-11 | Optional laziness of the record-word helper: not required. |
 
 Runs: every test, probe and snapshot regeneration on the LAN Linux host (operator rule).
+
+## Round 1 addendum (orchestrator, 2026-11-05)
+
+- `0400` is read as decimal 400 under the ASCII Number pattern (leading zeros allowed for decimal); case R-A2L-036.2/5 expecting base 400 is accepted. The A-1 ruling listed it among the "no base" inputs by mistake; the reading that matters is that the pair can no longer slide onto the size and offset words.
