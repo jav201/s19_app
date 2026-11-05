@@ -7,22 +7,72 @@ from typing import Any, Optional
 from .model import ValidationIssue, ValidationSeverity
 
 RECOGNIZED_A2L_BLOCKS = {
-    "PROJECT",
-    "MODULE",
+    "A2ML",
+    "ANNOTATION",
+    "ANNOTATION_TEXT",
+    "AR_COMPONENT",
+    "AXIS_DESCR",
+    "AXIS_PTS",
+    "BIT_OPERATION",
+    "BLOB",
+    "CALIBRATION_HANDLE",
+    "CALIBRATION_METHOD",
     "CHARACTERISTIC",
-    "MEASUREMENT",
-    "GROUP",
-    "FUNCTION",
-    "MEMORY_SEGMENT",
-    "RECORD_LAYOUT",
     "COMPU_METHOD",
     "COMPU_TAB",
     "COMPU_VTAB",
+    "COMPU_VTAB_RANGE",
+    "DEF_CHARACTERISTIC",
+    "DEPENDENT_CHARACTERISTIC",
+    "FIX_AXIS_PAR_LIST",
+    "FORMULA",
+    "FRAME",
+    "FUNCTION",
+    "FUNCTION_LIST",
+    "GROUP",
+    "HEADER",
+    "IF_DATA",
+    "IN_MEASUREMENT",
+    "INSTANCE",
+    "LOC_MEASUREMENT",
+    "MAP_LIST",
+    "MEASUREMENT",
+    "MEMORY_LAYOUT",
+    "MEMORY_SEGMENT",
+    "MOD_COMMON",
+    "MOD_PAR",
+    "MODULE",
+    "OUT_MEASUREMENT",
+    "OVERWRITE",
+    "PROJECT",
+    "RECORD_LAYOUT",
+    "REF_CHARACTERISTIC",
+    "REF_GROUP",
+    "REF_MEASUREMENT",
+    "STRUCTURE_COMPONENT",
+    "SUB_FUNCTION",
+    "SUB_GROUP",
+    "TRANSFORMER",
+    "TRANSFORMER_IN_OBJECTS",
+    "TRANSFORMER_OUT_OBJECTS",
+    "TYPEDEF_AXIS",
+    "TYPEDEF_BLOB",
     "TYPEDEF_CHARACTERISTIC",
     "TYPEDEF_MEASUREMENT",
-    "AXIS_PTS",
-    "IF_DATA",
+    "TYPEDEF_STRUCTURE",
+    "UNIT",
+    "USER_RIGHTS",
+    "VAR_ADDRESS",
+    "VAR_CHARACTERISTIC",
+    "VAR_CRITERION",
+    "VAR_FORBIDDEN_COMB",
+    "VARIANT_CODING",
+    "VIRTUAL",
+    "VIRTUAL_CHARACTERISTIC",
 }
+
+INTERFACE_DATA_BLOCK = "IF_DATA"
+
 
 REFERENCE_KEYWORDS = {
     "REF_CHARACTERISTIC",
@@ -397,15 +447,16 @@ def validate_mac_records(
     return issues
 
 
-def _iter_sections(sections: list[dict]) -> list[dict]:
-    out: list[dict] = []
+def _iter_sections(sections: list[dict]) -> list[tuple[dict, bool]]:
+    out: list[tuple[dict, bool]] = []
 
-    def walk(nodes: list[dict]) -> None:
+    def walk(nodes: list[dict], inside_if_data: bool) -> None:
         for node in nodes:
-            out.append(node)
-            walk(node.get("children") or [])
+            name = str(node.get("name") or "").strip().upper()
+            out.append((node, inside_if_data))
+            walk(node.get("children") or [], inside_if_data or name == INTERFACE_DATA_BLOCK)
 
-    walk(sections)
+    walk(sections, False)
     return out
 
 
@@ -479,9 +530,9 @@ def validate_a2l_structure(a2l_data: dict, tags: Optional[list[dict]] = None) ->
                 )
             )
 
-    for section in _iter_sections(sections):
+    for section, inside_if_data in _iter_sections(sections):
         section_name = str(section.get("name") or "").strip().upper()
-        if section_name and section_name not in RECOGNIZED_A2L_BLOCKS:
+        if section_name and not inside_if_data and section_name not in RECOGNIZED_A2L_BLOCKS:
             issues.append(
                 ValidationIssue(
                     code="A2L_UNRECOGNIZED_BLOCK",
